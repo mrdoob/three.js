@@ -1698,7 +1698,7 @@ class WebGPUBackend extends Backend {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( renderObject.effectiveLayers.test( subCamera.layers ) ) {
 
 					const vp = subCamera.viewport;
 

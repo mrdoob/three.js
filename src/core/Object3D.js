@@ -1081,6 +1081,37 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
+	 * Like {@link Object3D#traverseVisible}, but the callback will only be executed
+	 * for visible 3D objects that pass the layer test. Descendants of invisible
+	 * 3D objects and objects with recursive layers that fail the test are not traversed.
+	 *
+	 * Note: Modifying the scene graph inside the callback is discouraged.
+	 *
+	 * @param {Layers} cameraLayers - The camera layers to test against.
+	 * @param {Function} callback - A callback function that allows to process the current 3D object.
+	 */
+	traverseVisibleWithLayers( cameraLayers, callback, inheritedLayers = null ) {
+
+		if ( this.visible === false ) return;
+
+		const effectiveLayers = inheritedLayers !== null ? inheritedLayers : this.layers;
+		const layerVisible = effectiveLayers.test( cameraLayers );
+
+		if ( ! layerVisible && effectiveLayers.recursive ) return;
+
+		if ( layerVisible ) callback( this );
+
+		const childInheritedLayers = this.layers.recursive ? this.layers : inheritedLayers;
+
+		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverseVisibleWithLayers( cameraLayers, callback, childInheritedLayers );
+
+		}
+
+	}
+
+	/**
 	 * Like {@link Object3D#traverse}, but the callback will only be executed for all ancestors.
 	 *
 	 * Note: Modifying the scene graph inside the callback is discouraged.

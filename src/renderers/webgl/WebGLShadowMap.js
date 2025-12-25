@@ -503,11 +503,14 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	}
 
-	function renderObject( object, camera, shadowCamera, light, type ) {
+	function renderObject( object, camera, shadowCamera, light, type, inheritedLayers = null ) {
 
 		if ( object.visible === false ) return;
 
-		const visible = object.layers.test( camera.layers );
+		const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+		const visible = effectiveLayers.test( camera.layers );
+
+		if ( visible === false && effectiveLayers.recursive === true ) return;
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
@@ -557,11 +560,13 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
+		const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 		const children = object.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera, light, type );
+			renderObject( children[ i ], camera, shadowCamera, light, type, childInheritedLayers );
 
 		}
 

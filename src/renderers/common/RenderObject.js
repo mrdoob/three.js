@@ -201,6 +201,15 @@ class RenderObject {
 		this.group = null;
 
 		/**
+		 * The effective layers for layer visibility testing.
+		 * This accounts for recursive layer inheritance from ancestors.
+		 *
+		 * @type {?Layers}
+		 * @default null
+		 */
+		this.effectiveLayers = null;
+
+		/**
 		 * An array holding the vertex buffers which can
 		 * be buffer attributes but also interleaved buffers.
 		 *
