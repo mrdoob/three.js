@@ -113,7 +113,7 @@ class VTKLoader extends Loader {
 			const patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
-			const pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
+			const pat3Floats = /(-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)\s+(-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)\s+(-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
 
 			// pattern for connectivity, an integer followed by any number of ints
 			// the first integer is the number of polygon nodes
