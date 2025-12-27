@@ -410,7 +410,7 @@ class VTKLoader extends Loader {
 				let index = start;
 				let c = buffer[ index ];
 				const s = [];
-				while ( c !== 10 ) {
+				while ( c !== 10 && index < buffer.length ) {
 
 					s.push( String.fromCharCode( c ) );
 					index ++;
