@@ -112,11 +112,11 @@ class VTKLoader extends Loader {
 			// pattern for detecting the end of a number sequence
 			const patWord = /^[^\d.\s-]+/;
 
-			// helper function to parse floats from a line
 			function parseFloats( line ) {
 
-				const parts = line.split( /\s+/ );
 				const result = [];
+				const parts = line.split( /\s+/ );
+
 				for ( let i = 0; i < parts.length; i ++ ) {
 
 					if ( parts[ i ] !== '' ) result.push( parseFloat( parts[ i ] ) );
@@ -180,6 +180,7 @@ class VTKLoader extends Loader {
 					if ( patWord.exec( line ) === null ) {
 
 						const values = parseFloats( line );
+
 						for ( let k = 0; k + 2 < values.length; k += 3 ) {
 
 							positions.push( values[ k ], values[ k + 1 ], values[ k + 2 ] );
@@ -258,6 +259,7 @@ class VTKLoader extends Loader {
 						if ( patWord.exec( line ) === null ) {
 
 							const values = parseFloats( line );
+
 							for ( let k = 0; k + 2 < values.length; k += 3 ) {
 
 								color.setRGB( values[ k ], values[ k + 1 ], values[ k + 2 ], SRGBColorSpace );
@@ -274,6 +276,7 @@ class VTKLoader extends Loader {
 						if ( patWord.exec( line ) === null ) {
 
 							const values = parseFloats( line );
+
 							for ( let k = 0; k + 2 < values.length; k += 3 ) {
 
 								normals.push( values[ k ], values[ k + 1 ], values[ k + 2 ] );
