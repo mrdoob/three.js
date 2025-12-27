@@ -260,6 +260,7 @@ class FBXTreeParser {
 
 		const images = {};
 		const blobs = {};
+
 		if ( 'Video' in fbxTree.Objects ) {
 
 			const videoNodes = fbxTree.Objects.Video;
@@ -298,6 +299,7 @@ class FBXTreeParser {
 
 			if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ];
 			else images[ id ] = images[ id ].replace(/^.*[\\/]|[?#].*$/g, ''); // Split on / or ?# as well as \
+
 		}
 
 		return images;
