@@ -48,7 +48,6 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
-
 let fbxTree;
 let connections;
 let sceneGraph;
@@ -172,7 +171,7 @@ class FBXLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new FBXTreeParser( textureLoader, this.manager ).parse(); // Parse the fbxTree
+		return new FBXTreeParser( textureLoader, this.manager ).parse();
 
 	}
 
