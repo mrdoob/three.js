@@ -92,7 +92,7 @@ camera.position.z = 5;
 		<p>Si vous copiez le code ci-dessus dans le fichier main.js que nous avons créé précédemment, vous ne pourrez rien voir. C'est parce que nous n'affichons encore rien. Pour cela, nous avons besoin de ce qu'on appelle une boucle de rendu ou d'animation.</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
-function animate() {
+function animate( time ) {
   renderer.render( scene, camera );
 }
 renderer.setAnimationLoop( animate );
@@ -107,8 +107,8 @@ renderer.setAnimationLoop( animate );
 		<p>Ajoutez le code suivant juste au-dessus de l'appel `renderer.render` dans votre fonction `animate` :</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
-cube.rotation.x += 0.01;
-cube.rotation.y += 0.01;
+cube.rotation.x = time / 2000;
+cube.rotation.y = time / 1000;
 </pre>
 
 		<p>Cela sera exécuté à chaque image (normalement 60 fois par seconde) et donnera au cube une belle animation de rotation. En gros, tout ce que vous voulez déplacer ou modifier pendant que l'application est en cours d'exécution doit passer par la boucle d'animation. Vous pouvez bien sûr appeler d'autres fonctions à partir de là, afin de ne pas vous retrouver avec une fonction `animate` de plusieurs centaines de lignes.</p>
@@ -156,10 +156,10 @@ scene.add( cube );
 
 camera.position.z = 5;
 
-function animate() {
+function animate( time ) {
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  cube.rotation.x = time / 2000;
+  cube.rotation.y = time / 1000;
 
   renderer.render( scene, camera );
 
