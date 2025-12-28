@@ -10,7 +10,7 @@ import * as AnimationUtils from './AnimationUtils.js';
 import { warn, error } from '../utils.js';
 
 /**
- * Represents s a timed sequence of keyframes, which are composed of lists of
+ * Represents a timed sequence of keyframes, which are composed of lists of
  * times and related values, and which are used to animate a specific property
  * of an object.
  */
