@@ -92,7 +92,7 @@ camera.position.z = 5;
 		<p>If you copied the code from above into the main.js file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a render or animation loop.</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
-function animate() {
+function animate( time ) {
   renderer.render( scene, camera );
 }
 renderer.setAnimationLoop( animate );
@@ -107,8 +107,8 @@ renderer.setAnimationLoop( animate );
 		<p>Add the following code right above the `renderer.render` call in your `animate` function:</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
-cube.rotation.x += 0.01;
-cube.rotation.y += 0.01;
+cube.rotation.x = time / 2000;
+cube.rotation.y = time / 1000;
 </pre>
 
 		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animation loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
@@ -156,10 +156,10 @@ scene.add( cube );
 
 camera.position.z = 5;
 
-function animate() {
+function animate( time ) {
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  cube.rotation.x = time / 2000;
+  cube.rotation.y = time / 1000;
 
   renderer.render( scene, camera );
 
