@@ -252,6 +252,7 @@ class KTX2Loader extends Loader {
 			};
 
 			if ( typeof navigator !== 'undefined' &&
+				typeof navigator.platform !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
 				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
 				this.workerConfig.astcSupported && this.workerConfig.etc2Supported &&
 				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
