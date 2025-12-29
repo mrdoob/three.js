@@ -7,7 +7,7 @@ import {
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
-import { error } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -376,14 +376,6 @@ class WebGLState {
 							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
-						case SubtractiveBlending:
-							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
-							break;
-
-						case MultiplyBlending:
-							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
-							break;
-
 						default:
 							error( 'WebGLState: Invalid blending: ', blending );
 							break;
@@ -748,6 +740,17 @@ class WebGLState {
 		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		this.setFlipSided( flipSided );
+
+		if ( material.premultipliedAlpha === false ) {
+
+			if ( material.blending === MultiplyBlending || material.blending === SubtractiveBlending ) {
+
+				warnOnce( 'WebGLState: Material premultipliedAlpha was set to true because MultiplyBlending and SubtractiveBlending require it.' );
+				material.premultipliedAlpha = true;
+
+			}
+
+		}
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? this.setBlending( NoBlending )

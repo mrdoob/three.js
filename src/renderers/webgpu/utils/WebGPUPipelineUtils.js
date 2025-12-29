@@ -15,7 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -119,6 +119,17 @@ class WebGPUPipelineUtils {
 		// blending
 
 		let blending;
+
+		if ( material.premultipliedAlpha === false ) {
+
+			if ( material.blending === MultiplyBlending || material.blending === SubtractiveBlending ) {
+
+				warnOnce( 'WebGPURenderer: Material premultipliedAlpha was set to true because MultiplyBlending and SubtractiveBlending require it.' );
+				material.premultipliedAlpha = true;
+
+			}
+
+		}
 
 		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
 
@@ -445,14 +456,6 @@ class WebGPUPipelineUtils {
 
 					case AdditiveBlending:
 						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One );
-						break;
-
-					case SubtractiveBlending:
-						error( 'WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
-						break;
-
-					case MultiplyBlending:
-						error( 'WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
 						break;
 
 				}

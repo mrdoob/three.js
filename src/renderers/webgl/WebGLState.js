@@ -1,7 +1,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { error } from '../../utils.js';
+import { error, warnOnce } from '../../utils.js';
 
 const reversedFuncs = {
 	[ NeverDepth ]: AlwaysDepth,
@@ -689,14 +689,6 @@ function WebGLState( gl, extensions ) {
 							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
-						case SubtractiveBlending:
-							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
-							break;
-
-						case MultiplyBlending:
-							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
-							break;
-
 						default:
 							error( 'WebGLState: Invalid blending: ', blending );
 							break;
@@ -771,6 +763,17 @@ function WebGLState( gl, extensions ) {
 		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		setFlipSided( flipSided );
+
+		if ( material.premultipliedAlpha === false ) {
+
+			if ( material.blending === MultiplyBlending || material.blending === SubtractiveBlending ) {
+
+				warnOnce( 'WebGLState: Material premultipliedAlpha was set to true because MultiplyBlending and SubtractiveBlending require it.' );
+				material.premultipliedAlpha = true;
+
+			}
+
+		}
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? setBlending( NoBlending )
