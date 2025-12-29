@@ -819,7 +819,8 @@ export const RGBIntegerFormat = 1032;
 export const RGBAIntegerFormat = 1033;
 
 /**
- * Reads the green and alpha components. Use by KTX2 texture encoded with --normal-mode for example
+ * Reads the green and alpha components. Use by KTX2 texture encoded with --normal-mode for example.
+ * Only supported by WebGPURenderer.
  *
  * @type {number}
  * @constant
