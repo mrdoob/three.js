@@ -132,7 +132,7 @@ class Node extends EventDispatcher {
 		this._cacheKey = null;
 
 		/**
-		 * The cache key 's version.
+		 * The cache key's version.
 		 *
 		 * @private
 		 * @type {number}
