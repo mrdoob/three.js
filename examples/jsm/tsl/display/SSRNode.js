@@ -479,9 +479,6 @@ class SSRNode extends TempNode {
 
 			// below variables are used to control the raymarching process
 
-			// total length of the ray
-			const totalLen = d1.sub( d0 ).length().toVar();
-
 			// offset in x and y direction
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
@@ -519,8 +516,8 @@ class SSRNode extends TempNode {
 
 				const viewReflectRayZ = float( 0 ).toVar();
 
-				// normalized distance between the current position xy and the starting point d0
-				const s = xy.sub( d0 ).length().div( totalLen );
+				// normalized distance along the ray (0 to 1)
+				const s = float( i ).div( float( totalStep ) );
 
 				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
 				If( this._isPerspectiveCamera, () => {
