@@ -494,6 +494,10 @@ class SSRNode extends TempNode {
 
 			const output = vec4( 0 ).toVar();
 
+			// incremental interpolation factor
+			const s = float( 0 ).toVar();
+			const sStep = float( 1 ).div( float( totalStep ) );
+
 			// the actual ray marching loop
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
@@ -515,9 +519,6 @@ class SSRNode extends TempNode {
 				const vZ = getViewZ( d ).toVar();
 
 				const viewReflectRayZ = float( 0 ).toVar();
-
-				// normalized distance along the ray (0 to 1)
-				const s = float( i ).div( float( totalStep ) );
 
 				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
 				If( this._isPerspectiveCamera, () => {
@@ -590,6 +591,9 @@ class SSRNode extends TempNode {
 					} );
 
 				} );
+
+				// advance interpolation factor
+				s.addAssign( sStep );
 
 			} );
 
