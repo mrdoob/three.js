@@ -15,6 +15,7 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 import { NoBlending } from '../../constants.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
+let _viewportTexture = null;
 
 /**
  * This node material can be used to render lines with a size larger than one
@@ -459,7 +460,9 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+			if ( _viewportTexture === null ) _viewportTexture = viewportSharedTexture(); // this node instance must be defined once and shared so copyFramebufferToTexture() happens only once
+
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( _viewportTexture.rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
 
 		}
 
