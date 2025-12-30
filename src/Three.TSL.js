@@ -619,6 +619,7 @@ export const viewportLinearDepth = TSL.viewportLinearDepth;
 export const viewportMipTexture = TSL.viewportMipTexture;
 export const viewportResolution = TSL.viewportResolution;
 export const viewportSafeUV = TSL.viewportSafeUV;
+export const viewportSharedDepthTexture = TSL.viewportSharedDepthTexture;
 export const viewportSharedTexture = TSL.viewportSharedTexture;
 export const viewportSize = TSL.viewportSize;
 export const viewportTexture = TSL.viewportTexture;

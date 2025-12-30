@@ -105,6 +105,7 @@ export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';
 export * from './display/ViewportSharedTextureNode.js';
 export * from './display/ViewportDepthTextureNode.js';
+export * from './display/ViewportSharedDepthTextureNode.js';
 export * from './display/ViewportDepthNode.js';
 export * from './display/RenderOutputNode.js';
 export * from './display/ToonOutlinePassNode.js';
