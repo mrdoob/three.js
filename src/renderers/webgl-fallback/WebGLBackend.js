@@ -958,9 +958,9 @@ class WebGLBackend extends Backend {
 
 		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
 
-		if ( context.textures !== null && context.textures.length > 1 ) {
+		if ( context.mrt !== null && context.textures !== null ) {
 
-			state.setMRTBlending( context.textures );
+			state.setMRTBlending( context.textures, context.mrt, material );
 
 		}
 

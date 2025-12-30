@@ -62,8 +62,9 @@ class RenderContexts {
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
+			renderState.mrt = mrt;
 
-			 this._renderContexts[ renderStateKey ] = renderState;
+			this._renderContexts[ renderStateKey ] = renderState;
 
 		}
 
