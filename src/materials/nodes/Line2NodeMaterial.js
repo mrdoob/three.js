@@ -9,7 +9,7 @@ import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { screenDPR, viewport } from '../../nodes/display/ScreenNode.js';
-import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
+import { viewportOpaqueMipTexture } from '../../nodes/display/ViewportTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
 import { NoBlending } from '../../constants.js';
@@ -459,7 +459,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportOpaqueMipTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
 
 		}
 
