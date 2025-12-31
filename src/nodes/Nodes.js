@@ -97,7 +97,6 @@ export { default as ScreenNode } from './display/ScreenNode.js';
 export { default as ViewportTextureNode } from './display/ViewportTextureNode.js';
 export { default as ViewportSharedTextureNode } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode } from './display/ViewportDepthTextureNode.js';
-export { default as ViewportSharedDepthTextureNode } from './display/ViewportSharedDepthTextureNode.js';
 export { default as ViewportDepthNode } from './display/ViewportDepthNode.js';
 export { default as RenderOutputNode } from './display/RenderOutputNode.js';
 export { default as PassNode } from './display/PassNode.js';
