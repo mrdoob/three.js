@@ -24,7 +24,6 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 	 *
 	 * @param {Node} [uvNode=screenUV] - The uv node.
 	 * @param {?Node} [levelNode=null] - The level node.
-	 * @param {?DepthTexture} [depthTexture=null] - A depth texture. If not provided, a depth texture is created automatically.
 	 */
 	constructor( uvNode = screenUV, levelNode = null, depthTexture = null ) {
 

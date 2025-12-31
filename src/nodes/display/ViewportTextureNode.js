@@ -80,13 +80,14 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
-		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node needs to
+		 * update for each render call, supporting multi-canvas scenarios where multiple
+		 * render calls occur per frame.
 		 *
 		 * @type {string}
-		 * @default 'frame'
+		 * @default 'render'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 		/**
 		 * The framebuffer texture for the current renderer context.
@@ -99,12 +100,12 @@ class ViewportTextureNode extends TextureNode {
 	}
 
 	/**
-	 * This methods returns a texture for the given render target reference.
+	 * This methods returns a texture for the given render target or canvas target reference.
 	 *
 	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
 	 * for different render contexts.
 	 *
-	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @param {?(RenderTarget|CanvasTarget)} [reference=null] - The render target or canvas target reference.
 	 * @return {Texture} The framebuffer texture.
 	 */
 	getTextureForReference( reference = null ) {
@@ -124,7 +125,8 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
-		if ( reference === null ) {
+		// Use default framebuffer for null reference or the default canvas target (single canvas scenario)
+		if ( reference === null || reference.isDefaultCanvasTarget === true ) {
 
 			return defaultFramebuffer;
 
@@ -144,9 +146,13 @@ class ViewportTextureNode extends TextureNode {
 
 	updateReference( frame ) {
 
-		const renderTarget = frame.renderer.getRenderTarget();
+		const renderer = frame.renderer;
+		const renderTarget = renderer.getRenderTarget();
 
-		this.value = this.getTextureForReference( renderTarget );
+		// Use canvas target as reference when no render target is set (multi-canvas support)
+		const reference = renderTarget !== null ? renderTarget : renderer.getCanvasTarget();
+
+		this.value = this.getTextureForReference( reference );
 
 		return this.value;
 
@@ -167,9 +173,12 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
+		// Use canvas target as reference when no render target is set (multi-canvas support)
+		const reference = renderTarget !== null ? renderTarget : renderer.getCanvasTarget();
+
 		//
 
-		const framebufferTexture = this.getTextureForReference( renderTarget );
+		const framebufferTexture = this.getTextureForReference( reference );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
