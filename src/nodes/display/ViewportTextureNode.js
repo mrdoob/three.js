@@ -148,9 +148,9 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderer = frame.renderer;
 		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		// Use canvas target as reference when no render target is set (multi-canvas support)
-		const reference = renderTarget !== null ? renderTarget : renderer.getCanvasTarget();
+		const reference = canvasTarget !== null ? canvasTarget : renderTarget;
 
 		this.value = this.getTextureForReference( reference );
 
@@ -162,8 +162,11 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderer = frame.renderer;
 		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		if ( renderTarget === null ) {
+		const reference = canvasTarget !== null ? canvasTarget : renderTarget;
+
+		if ( reference === null ) {
 
 			renderer.getDrawingBufferSize( _size );
 
@@ -172,9 +175,6 @@ class ViewportTextureNode extends TextureNode {
 			_size.set( renderTarget.width, renderTarget.height );
 
 		}
-
-		// Use canvas target as reference when no render target is set (multi-canvas support)
-		const reference = renderTarget !== null ? renderTarget : renderer.getCanvasTarget();
 
 		//
 
