@@ -497,13 +497,13 @@ class SSRNode extends TempNode {
 			const output = vec4( 0 ).toVar();
 
 			// incremental interpolation factor
-			const s = float( 0 ).toVar();
 			const sStep = float( 1 ).div( float( totalStep ) );
+			const s = sStep.toVar(); // start at sStep since loop starts at i=1
 
 			// the actual ray marching loop
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
-			Loop( totalStep, ( { i } ) => {
+			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
 
 				// advance on the ray by computing a new position in screen coordinates
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
