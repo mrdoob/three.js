@@ -174,7 +174,7 @@
 				controls.floorDecale = ( size / repeat ) * 4;
 
 				const bulbGeometry = new THREE.SphereGeometry( 0.05, 16, 8 );
-				const bulbLight = new THREE.PointLight( 0xffee88, 2, 500, 2 );
+				const bulbLight = new THREE.PointLight( 0xffee88, 2, 0, 2 );
 
 				const bulbMat = new THREE.MeshStandardMaterial( { emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000 } );
 				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );

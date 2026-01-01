@@ -288,29 +288,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p><a href="/docs/#api/ko/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a>는 점의 표상을 그립니다. 점의 표상이란 점으로는 확인이 어려우니,
-기본값으로 다이아몬드 형태의 와이어프레임(wireframe)을 대신 그려놓은 것이죠. 점의
-형태는 조명에 <code class="notranslate" translate="no">mesh</code> 객체를 하나 넘겨 얼마든지 바꿀 수 있습니다.</p>
-<p><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>에는 추가로 <a href="/docs/#api/ko/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a> 속성이 있습니다.
-<code class="notranslate" translate="no">distance</code>가이 0이면 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>의 밝기가 무한대임을 의미하고,  0보다 크면
-<code class="notranslate" translate="no">distance</code>에 지정된 거리만큼만 영향을 미칩니다.</p>
-<p>거리도 조정할 수 있도록 GUI에 추가하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 250, 1);
-+gui.add(light, 'distance', 0, 40).onChange(updateLight);
-
-makeXYZGUI(gui, light.position, 'position', updateLight);
--makeXYZGUI(gui, light.target.position, 'target', updateLight);
-</pre>
-<p>이제 한 번 테스트해보죠.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
-<p><code class="notranslate" translate="no">distance</code>가 0보다 클 때 조명의 밝기를 잘 관찰해보세요.</p>
 <h2 id="-spotlight-"><a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
 <p>스포트라이트는 비유하자면 원뿔 안의 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>입니다.
 차이점은 원뿔 안에서만 빛난다는 점이죠. <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의
@@ -353,8 +336,7 @@ scene.add(helper);
 <p><code class="notranslate" translate="no">penumbra</code> 속성이 0일 때는 빛의 경계가 굉장히 분명한 것이 보일 겁니다.
 <code class="notranslate" translate="no">penumbra</code> 속성을 1에 가깝게 조정하면 경계가 점점 흐릿해지죠.</p>
 <p><a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>가 <em>원뿔 모양</em>처럼 보이지 않을지도 모릅니다. 이는 바닥이 원뿔의
-거리보다 가까이 있기 때문으로, <code class="notranslate" translate="no">distance</code>를 약 5 정도로 조정하면 원뿔의 밑면을
-확인할 수 있을 겁니다.</p>
+거리보다 가까이 있기 때문입니다.</p>
 <h2 id="-rectarealight-"><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
 <p>마지막으로 살펴볼 조명은 <a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>입니다. 이름 그대로 사각 형태의
 조명으로, 형광등이나 천장의 유리를 통과하는 태양빛을 표현하기에 적합합니다.</p>

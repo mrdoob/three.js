@@ -122,6 +122,20 @@
 
 						editor.selectByUuid( selected );
 
+						// Update PointLightHelper showRange for restored selection
+
+						for ( const id in editor.helpers ) {
+
+							const helper = editor.helpers[ id ];
+
+							if ( helper.isPointLightHelper ) {
+
+								helper.showRange = ( helper.light === editor.selected );
+
+							}
+
+						}
+
 					}
 
 				} );

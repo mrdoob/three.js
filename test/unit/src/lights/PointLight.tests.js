@@ -13,7 +13,6 @@ export default QUnit.module( 'Lights', () => {
 			const parameters = {
 				color: 0xaaaaaa,
 				intensity: 0.5,
-				distance: 100,
 				decay: 2
 			};
 
@@ -21,8 +20,7 @@ export default QUnit.module( 'Lights', () => {
 				new PointLight(),
 				new PointLight( parameters.color ),
 				new PointLight( parameters.color, parameters.intensity ),
-				new PointLight( parameters.color, parameters.intensity, parameters.distance ),
-				new PointLight( parameters.color, parameters.intensity, parameters.distance, parameters.decay )
+				new PointLight( parameters.color, parameters.intensity, 0, parameters.decay )
 			];
 
 		} );

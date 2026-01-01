@@ -414,9 +414,8 @@ function MenubarAdd( editor ) {
 
 		const color = 0xffffff;
 		const intensity = 1;
-		const distance = 0;
 
-		const light = new THREE.PointLight( color, intensity, distance );
+		const light = new THREE.PointLight( color, intensity );
 		light.name = 'PointLight';
 
 		editor.execute( new AddObjectCommand( editor, light ) );
@@ -433,11 +432,10 @@ function MenubarAdd( editor ) {
 
 		const color = 0xffffff;
 		const intensity = 1;
-		const distance = 0;
 		const angle = Math.PI * 0.1;
 		const penumbra = 0;
 
-		const light = new THREE.SpotLight( color, intensity, distance, angle, penumbra );
+		const light = new THREE.SpotLight( color, intensity, 0, angle, penumbra );
 		light.name = 'SpotLight';
 		light.target.name = 'SpotLight Target';
 

@@ -306,30 +306,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p>Обратите внимание, что на каком-то уровне <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> не имеет точки.
-Он просто рисует маленький каркас ромба. Это может быть любая
-форма, которую вы хотите, просто добавьте mesh к самому источнику света.</p>
-<p><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> имеет дополнительное свойство <a href="/docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
-Если <code class="notranslate" translate="no">distance</code> = 0, то  <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> светит до бесконечности. Если значение
-<code class="notranslate" translate="no">distance</code> больше 0, то свет излучает свою полную интенсивность и
-исчезает, с увеличением <code class="notranslate" translate="no">distance</code> вдали от света.</p>
-<p>Давайте настроим графический интерфейс, чтобы мы могли регулировать расстояние.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 250, 1);
-+gui.add(light, 'distance', 0, 40).onChange(updateLight);
-
-makeXYZGUI(gui, light.position, 'position', updateLight);
--makeXYZGUI(gui, light.target.position, 'target', updateLight);
-</pre>
-<p>А теперь попробуйте.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
-<p>Обратите внимание, когда <code class="notranslate" translate="no">distance</code> &gt; 0, как свет гаснет.</p>
 <h2 id="-spotlight-"><a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
 <p>Прожекторы - это точечный источник света с прикрепленным к нему
 конусом, который светит только внутри конуса. Там на самом деле

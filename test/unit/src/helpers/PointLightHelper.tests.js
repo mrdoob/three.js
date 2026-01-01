@@ -1,6 +1,5 @@
 import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
 
-import { Mesh } from '../../../../src/objects/Mesh.js';
 import { PointLight } from '../../../../src/lights/PointLight.js';
 
 export default QUnit.module( 'Helpers', () => {
@@ -8,30 +7,17 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module( 'PointLightHelper', () => {
 
 		const parameters = {
-			sphereSize: 1,
+			size: 1,
 			color: 0xaaaaaa,
 			intensity: 0.5,
-			distance: 100,
 			decay: 2
 		};
-
-		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
-
-			const light = new PointLight( parameters.color );
-			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
-			assert.strictEqual(
-				object instanceof Mesh, true,
-				'PointLightHelper extends from Mesh'
-			);
-
-		} );
 
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const light = new PointLight( parameters.color );
-			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			const object = new PointLightHelper( light, parameters.size );
 			assert.ok( object, 'Can instantiate a PointLightHelper.' );
 
 		} );
@@ -40,7 +26,7 @@ export default QUnit.module( 'Helpers', () => {
 		QUnit.test( 'type', ( assert ) => {
 
 			const light = new PointLight( parameters.color );
-			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			const object = new PointLightHelper( light, parameters.size );
 			assert.ok(
 				object.type === 'PointLightHelper',
 				'PointLightHelper.type should be PointLightHelper'
@@ -54,7 +40,7 @@ export default QUnit.module( 'Helpers', () => {
 			assert.expect( 0 );
 
 			const light = new PointLight( parameters.color );
-			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			const object = new PointLightHelper( light, parameters.size );
 			object.dispose();
 
 		} );

@@ -245,16 +245,6 @@ function SidebarObject( editor ) {
 
 	container.add( objectGroundColorRow );
 
-	// distance
-
-	const objectDistanceRow = new UIRow();
-	const objectDistance = new UINumber().setRange( 0, Infinity ).onChange( update );
-
-	objectDistanceRow.add( new UIText( strings.getKey( 'sidebar/object/distance' ) ).setClass( 'Label' ) );
-	objectDistanceRow.add( objectDistance );
-
-	container.add( objectDistanceRow );
-
 	// angle
 
 	const objectAngleRow = new UIRow();
@@ -535,12 +525,6 @@ function SidebarObject( editor ) {
 
 			}
 
-			if ( object.distance !== undefined && Math.abs( object.distance - objectDistance.getValue() ) >= 0.01 ) {
-
-				editor.execute( new SetValueCommand( editor, object, 'distance', objectDistance.getValue() ) );
-
-			}
-
 			if ( object.angle !== undefined && Math.abs( object.angle - objectAngle.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'angle', objectAngle.getValue() ) );
@@ -650,7 +634,6 @@ function SidebarObject( editor ) {
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
-			'distance': objectDistanceRow,
 			'angle': objectAngleRow,
 			'penumbra': objectPenumbraRow,
 			'decay': objectDecayRow,
@@ -822,12 +805,6 @@ function SidebarObject( editor ) {
 		if ( object.groundColor !== undefined ) {
 
 			objectGroundColor.setHexValue( object.groundColor.getHexString() );
-
-		}
-
-		if ( object.distance !== undefined ) {
-
-			objectDistance.setValue( object.distance );
 
 		}
 

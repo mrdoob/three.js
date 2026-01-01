@@ -308,31 +308,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p>Note that at some level a <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> has no um, point.
-It just draws a small wireframe diamond. It could just as easily
-be any shape you want, just add a mesh to the light itself.</p>
-<p>A <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> has the added property of <a href="/docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
-If the <code class="notranslate" translate="no">distance</code> is 0 then the <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> shines to
-infinity. If the <code class="notranslate" translate="no">distance</code> is greater than 0 then the light shines
-its full intensity at the light and fades to no influence at <code class="notranslate" translate="no">distance</code>
-units away from the light.</p>
-<p>Let's setup the GUI so we can adjust the distance.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 250, 1);
-+gui.add(light, 'distance', 0, 40).onChange(updateLight);
-
-makeXYZGUI(gui, light.position, 'position', updateLight);
--makeXYZGUI(gui, light.target.position, 'target', updateLight);
-</pre>
-<p>And now try it out.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
-<p>Notice when <code class="notranslate" translate="no">distance</code> is &gt; 0 how the light fades out.</p>
 <h2 id="-spotlight-"><a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
 <p>Spotlights are effectively a point light with a cone
 attached where the light only shines inside the cone.
@@ -378,8 +359,7 @@ the center of the outer cone.</p>
 <p>Notice with the default <code class="notranslate" translate="no">penumbra</code> of 0 the spotlight has a very sharp edge
 whereas as you adjust the <code class="notranslate" translate="no">penumbra</code> toward 1 the edge blurs.</p>
 <p>It might be hard to see the <em>cone</em> of the spotlight. The reason is it's
-below the ground. Shorten the distance to around 5 and you'll see the open
-end of the cone.</p>
+below the ground.</p>
 <h2 id="-rectarealight-"><a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
 <p>There's one more type of light, the <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>, which represents
 exactly what it sounds like, a rectangular area of light like a long
