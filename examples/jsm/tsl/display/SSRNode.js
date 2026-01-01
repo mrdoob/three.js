@@ -486,7 +486,9 @@ class SSRNode extends TempNode {
 			// determine the larger delta
 			// The larger difference will help to determine how much to travel in the X and Y direction each iteration and
 			// how many iterations are needed to travel the entire ray
-			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
+			// scale step count by distance - distant surfaces need less precision (0.5 to 1.0 multiplier)
+			const distanceFactor = float( 1 ).sub( depth.mul( 0.5 ) ).clamp( 0.5, 1 );
+			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ).mul( distanceFactor ) ).toConst();
 
 			// step sizes in the x and y directions
 			const xSpan = xLen.div( totalStep ).toVar();
