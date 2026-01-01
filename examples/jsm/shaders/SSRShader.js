@@ -170,17 +170,17 @@ const SSRShader = {
 			#endif
 			d1=viewPositionToXY(d1viewPosition);
 
-			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
 			float yLen=d1.y-d0.y;
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=0.;i<float(MAX_STEP);i++){
+			float sStep=1./totalStep;
+			float s=sStep; // start at sStep since loop starts at i=1
+			for(float i=1.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
 				if(xy.x<0.||xy.x>resolution.x||xy.y<0.||xy.y>resolution.y) break;
-				float s=length(xy-d0)/totalLen;
 				vec2 uv=xy/resolution;
 
 				float d = getDepth(uv);
@@ -221,7 +221,7 @@ const SSRShader = {
 
 					if(hit){
 						vec3 vN=getViewNormal( uv );
-						if(dot(viewReflectDir,vN)>=0.) continue;
+						if(dot(viewReflectDir,vN)>=0.) break; // treat backfaces as opaque
 						float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
 						if(distance>maxDistance) break;
 						float op=opacity;
@@ -240,6 +240,7 @@ const SSRShader = {
 						break;
 					}
 				}
+				s+=sStep;
 			}
 		}
 	`
