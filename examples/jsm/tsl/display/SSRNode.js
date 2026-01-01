@@ -399,7 +399,7 @@ class SSRNode extends TempNode {
 			// https://en.wikipedia.org/wiki/Plane_(geometry)
 			// http://paulbourke.net/geometry/pointlineplane/
 
-			const d = mul( planeNormal.x, planePoint.x ).add( mul( planeNormal.y, planePoint.y ) ).add( mul( planeNormal.z, planePoint.z ) ).negate();
+			const d = mul( planeNormal.x, planePoint.x ).add( mul( planeNormal.y, planePoint.y ) ).add( mul( planeNormal.z, planePoint.z ) ).negate().toVar();
 			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
 			return distance;
 
@@ -557,6 +557,7 @@ class SSRNode extends TempNode {
 
 							// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
+							s.addAssign( sStep );
 							Continue();
 
 						} );

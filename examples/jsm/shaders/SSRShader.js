@@ -96,7 +96,7 @@ const SSRShader = {
 			float x0=point.x,y0=point.y,z0=point.z;
 			float x=planePoint.x,y=planePoint.y,z=planePoint.z;
 			float d=-(a*x+b*y+c*z);
-			float distance=(a*x0+b*y0+c*z0+d)/sqrt(a*a+b*b+c*c);
+			float distance=a*x0+b*y0+c*z0+d;
 			return distance;
 		}
 		float getDepth( const in vec2 uv ) {
