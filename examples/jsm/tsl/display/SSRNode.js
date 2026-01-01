@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
-import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 import { boxBlur } from './boxBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -555,10 +555,9 @@ class SSRNode extends TempNode {
 
 						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
 
-							// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
-							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
-							s.addAssign( sStep );
-							Continue();
+							// the reflected ray is hitting a backface (normal pointing away from ray),
+							// treat as opaque surface that blocks the ray
+							Break();
 
 						} );
 
