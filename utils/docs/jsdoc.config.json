@@ -14,7 +14,10 @@
             "outputSourceFiles": false
         }
     },
-    "plugins": [ "plugins/markdown" ],
+    "plugins": [ 
+        "plugins/markdown",
+        "plugins/markdown-plugin.mjs"
+    ],
     "source": {
         "include": [
             "examples/jsm",
