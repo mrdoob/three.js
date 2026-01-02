@@ -1046,7 +1046,9 @@ class Matrix4 {
 		position.y = te[ 13 ];
 		position.z = te[ 14 ];
 
-		if ( this.determinant() === 0 ) {
+		const det = this.determinant();
+
+		if ( det === 0 ) {
 
 			scale.set( 1, 1, 1 );
 			quaternion.identity();
@@ -1059,8 +1061,7 @@ class Matrix4 {
 		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
 		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
-		// if determine is negative, we need to invert one scale
-		const det = this.determinant();
+		// if determinant is negative, we need to invert one scale
 		if ( det < 0 ) sx = - sx;
 
 		// scale the rotation part
