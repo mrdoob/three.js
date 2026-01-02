@@ -1,3 +1,4 @@
+import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 import * as fs from 'fs/promises';
 
@@ -174,6 +175,15 @@ class Image {
 
 		}
 
+		// Check if PNG (starts with PNG signature)
+		if ( buffer[ 0 ] === 0x89 && buffer[ 1 ] === 0x50 && buffer[ 2 ] === 0x4E && buffer[ 3 ] === 0x47 ) {
+
+			const png = PNG.sync.read( buffer );
+			return new Image( png.width, png.height, png.data );
+
+		}
+
+		// Otherwise assume JPEG
 		const decoded = jpeg.decode( buffer, { useTArray: true } );
 		return new Image( decoded.width, decoded.height, Buffer.from( decoded.data ) );
 
