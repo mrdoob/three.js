@@ -4,7 +4,7 @@ import path from 'path';
 import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
-import { createReadStream, existsSync } from 'fs';
+import { createReadStream, existsSync, statSync } from 'fs';
 
 const exceptionList = [
 
@@ -169,8 +169,36 @@ const server = http.createServer( ( req, res ) => {
 	}
 
 	const ext = path.extname( filePath ).toLowerCase();
-	res.writeHead( 200, { 'Content-Type': mimeTypes[ ext ] || 'application/octet-stream' } );
-	createReadStream( filePath ).pipe( res );
+	const contentType = mimeTypes[ ext ] || 'application/octet-stream';
+	const stat = statSync( filePath );
+	const fileSize = stat.size;
+	const range = req.headers.range;
+
+	if ( range ) {
+
+		const parts = range.replace( /bytes=/, '' ).split( '-' );
+		const start = parseInt( parts[ 0 ], 10 );
+		const end = parts[ 1 ] ? parseInt( parts[ 1 ], 10 ) : fileSize - 1;
+
+		res.writeHead( 206, {
+			'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+			'Accept-Ranges': 'bytes',
+			'Content-Length': end - start + 1,
+			'Content-Type': contentType
+		} );
+
+		createReadStream( filePath, { start, end } ).pipe( res );
+
+	} else {
+
+		res.writeHead( 200, {
+			'Content-Length': fileSize,
+			'Content-Type': contentType
+		} );
+
+		createReadStream( filePath ).pipe( res );
+
+	}
 
 } );
 
