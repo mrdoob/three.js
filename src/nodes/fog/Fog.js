@@ -1,4 +1,4 @@
-import { positionView } from '../accessors/Position.js';
+import { positionView, positionWorld } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
 import { Fn, output, vec4 } from '../tsl/TSLBase.js';
 
@@ -59,6 +59,25 @@ export const densityFogFactor = Fn( ( [ density ], builder ) => {
 	const viewZ = getViewZNode( builder );
 
 	return density.mul( density, viewZ, viewZ ).negate().exp().oneMinus();
+
+} );
+
+/**
+ * Constructs a new height factor node. This fog factor requires a Y-up coordinate system.
+ *
+ * @tsl
+ * @function
+ * @param {Node} density - Defines the fog density.
+ * @param {Node} height - The height threshold in world space. Everything below this y-coordinate is affected by fog.
+ */
+export const exponentialHeightFogFactor = Fn( ( [ density, height ], builder ) => {
+
+	const viewZ = getViewZNode( builder );
+
+	const distance = height.sub( positionWorld.y ).max( 0 ).toConst();
+	const m = distance.mul( viewZ ).toConst();
+
+	return density.mul( density, m, m ).negate().exp().oneMinus();
 
 } );
 
