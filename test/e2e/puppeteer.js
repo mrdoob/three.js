@@ -1,9 +1,10 @@
 import puppeteer from 'puppeteer';
-import express from 'express';
+import http from 'http';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
+import { createReadStream, existsSync } from 'fs';
 
 const exceptionList = [
 
@@ -117,9 +118,47 @@ let browser;
 
 /* Launch server */
 
-const app = express();
-app.use( express.static( path.resolve() ) );
-const server = app.listen( port, main );
+const mimeTypes = {
+	'.html': 'text/html',
+	'.js': 'application/javascript',
+	'.mjs': 'application/javascript',
+	'.css': 'text/css',
+	'.json': 'application/json',
+	'.png': 'image/png',
+	'.jpg': 'image/jpeg',
+	'.gif': 'image/gif',
+	'.svg': 'image/svg+xml',
+	'.wav': 'audio/wav',
+	'.mp3': 'audio/mpeg',
+	'.mp4': 'video/mp4',
+	'.woff': 'font/woff',
+	'.woff2': 'font/woff2',
+	'.ttf': 'font/ttf',
+	'.glb': 'model/gltf-binary',
+	'.gltf': 'model/gltf+json',
+	'.hdr': 'application/octet-stream',
+	'.exr': 'application/octet-stream'
+};
+
+const server = http.createServer( ( req, res ) => {
+
+	const filePath = path.join( path.resolve(), req.url.split( '?' )[ 0 ] );
+	const ext = path.extname( filePath ).toLowerCase();
+
+	if ( ! existsSync( filePath ) ) {
+
+		res.writeHead( 404 );
+		res.end( 'File not found' );
+		return;
+
+	}
+
+	res.writeHead( 200, { 'Content-Type': mimeTypes[ ext ] || 'application/octet-stream' } );
+	createReadStream( filePath ).pipe( res );
+
+} );
+
+server.listen( port, main );
 
 process.on( 'SIGINT', async () => {
 
