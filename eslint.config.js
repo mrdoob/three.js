@@ -3,7 +3,6 @@ import globals from 'globals';
 import mdcs from 'eslint-config-mdcs';
 import compat from 'eslint-plugin-compat';
 import html from 'eslint-plugin-html';
-import importPlugin from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
@@ -35,7 +34,6 @@ export default [
 		files: [ '**/*.js', '**/*.html' ],
 		plugins: {
 			html,
-			import: importPlugin,
 			compat,
 			jsdoc
 		},
