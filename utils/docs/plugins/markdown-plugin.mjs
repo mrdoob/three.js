@@ -115,11 +115,30 @@ export const handlers = {
                 }
 
                 const longname = doclet.longname || doclet.name;
-                const members = allData.filter(item =>
-                    !item.undocumented &&
-                    item.access !== 'private' &&
-                    item.memberof === longname
-                );
+                let members;
+
+                // Handle special pages (global and TSL)
+                if (doclet.kind === 'globalobj') {
+                    const isTSLPage = doclet.isTSL === true;
+
+                    // For global/TSL pages, collect global items (those without memberof)
+                    members = allData.filter(item => {
+                        if (item.undocumented || item.access === 'private') return false;
+                        if (item.memberof !== undefined) return false; // Skip items that belong to a class/module
+                        if (item.longname && item.longname.indexOf('module:') === 0) return false; // Skip module exports
+
+                        // Filter based on @tsl tag
+                        const hasTslTag = Array.isArray(item.tags) && item.tags.some(tag => tag.title === 'tsl');
+                        return isTSLPage ? hasTslTag : !hasTslTag;
+                    });
+                } else {
+                    // Regular class/module pages
+                    members = allData.filter(item =>
+                        !item.undocumented &&
+                        item.access !== 'private' &&
+                        item.memberof === longname
+                    );
+                }
 
                 const items = [doclet, ...members];
                 const markdown = generateMarkdown(items, doclet);
@@ -151,6 +170,17 @@ export const handlers = {
  * @returns {Doclet|null} The matching doclet or null if not found
  */
 function findDocletForHtmlFile(htmlBasename) {
+    // Handle special cases first (before searching allData)
+    if (htmlBasename === 'global') {
+        // Create a synthetic doclet for the global scope
+        return { longname: 'global', name: 'global', kind: 'globalobj' };
+    } else if (htmlBasename === 'TSL') {
+        // Create a synthetic doclet for the TSL page (contains all @tsl tagged items)
+        // Note: There may be a member named TSL in the source (export { TSL }), but we want
+        // the special globalobj version for the documentation page
+        return { longname: 'TSL', name: 'TSL', kind: 'globalobj', isTSL: true };
+    }
+
     // Try standard transformation matching - find ALL matches
     let matches = allData.filter(item => {
         if (!item.longname && !item.name) return false;
@@ -176,16 +206,11 @@ function findDocletForHtmlFile(htmlBasename) {
         if (!doclet) doclet = matches[0];
     }
 
-    // Handle special cases
-    if (!doclet) {
-        if (htmlBasename === 'global') {
-            // Create a synthetic doclet for the global scope
-            doclet = { longname: 'global', name: 'global', kind: 'globalobj' };
-        } else if (htmlBasename.startsWith('module-')) {
-            // Module files have 'module:' prefix in their longname
-            const moduleName = 'module:' + htmlBasename.substring(7);
-            doclet = allData.find(item => item.longname === moduleName);
-        }
+    // Handle module files
+    if (!doclet && htmlBasename.startsWith('module-')) {
+        // Module files have 'module:' prefix in their longname
+        const moduleName = 'module:' + htmlBasename.substring(7);
+        doclet = allData.find(item => item.longname === moduleName);
     }
 
     return doclet || null;
@@ -209,6 +234,12 @@ function generateMarkdown(items, mainItem) {
     const displayName = mainItem.name.replace(/^module:/, '');
     lines.push(`# ${displayName}`);
     lines.push('');
+
+    // Special description for TSL page
+    if (mainItem.isTSL === true) {
+        lines.push('TSL (Three.js Shading Language) is a collection of functions and constants for building shader node graphs in three.js. These are global functions tagged with `@tsl` that can be used to create complex shader effects.');
+        lines.push('');
+    }
 
     // Description (classdesc for classes, description for others)
     // Note: We need to extract code examples from the description since the HTML template does this
@@ -496,8 +527,8 @@ function cleanDescription(text) {
 
     // Preserve markdown code blocks (```js...```) by temporarily replacing them
     const codeBlocks = [];
-    let tempText = text.replace(/(```[\s\S]*?```)/g, (match) => {
-        codeBlocks.push(match);
+    let tempText = text.replace(/(```[\s\S]*?```)/g, (codeBlock) => {
+        codeBlocks.push(codeBlock);
         return `__CODEBLOCK_${codeBlocks.length - 1}__`;
     });
 
