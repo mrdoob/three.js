@@ -48,10 +48,10 @@
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
-    "dev": "node utils/build/dev.js && servez -p 8080",
-    "dev-ssl": "node utils/build/dev.js && servez -p 8080 --ssl",
-    "preview": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "preview-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
+    "dev-ssl": "node utils/build/dev.js && node utils/server.js -p 8080 --ssl",
+    "preview": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"node utils/server.js -p 8080\"",
+    "preview-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"node utils/server.js -p 8080 --ssl\"",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm",
     "lint-examples": "eslint examples",
@@ -111,7 +111,7 @@
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
-    "servez": "^2.2.4"
+    "selfsigned": "^2.4.1"
   },
   "jspm": {
     "files": [
