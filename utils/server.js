@@ -149,8 +149,8 @@ ${items}
 
 async function getCertificate() {
 
-	// Cache certificate in OS temp directory
-	const cacheDir = path.join( os.tmpdir(), 'three-dev-server' );
+	// Cache certificate in user's home directory
+	const cacheDir = path.join( os.homedir(), '.three-dev-server' );
 	const certPath = path.join( cacheDir, 'cert.pem' );
 	const keyPath = path.join( cacheDir, 'key.pem' );
 
@@ -202,12 +202,12 @@ async function getCertificate() {
 		]
 	} );
 
-	// Cache the certificate
+	// Cache the certificate with restrictive permissions
 	try {
 
-		mkdirSync( cacheDir, { recursive: true } );
-		writeFileSync( certPath, pems.cert );
-		writeFileSync( keyPath, pems.private );
+		mkdirSync( cacheDir, { recursive: true, mode: 0o700 } );
+		writeFileSync( certPath, pems.cert, { mode: 0o600 } );
+		writeFileSync( keyPath, pems.private, { mode: 0o600 } );
 
 	} catch ( e ) {
 
