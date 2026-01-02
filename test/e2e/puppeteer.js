@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer';
-import pixelmatch from 'pixelmatch';
 import { Image } from './image.js';
 import * as fs from 'fs/promises';
 import { createServer } from '../../utils/server.js';
@@ -524,16 +523,13 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 			try {
 
-				numDifferentPixels = pixelmatch( expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
-					threshold: pixelThreshold,
-					alpha: 0.2
-				} );
+				numDifferentPixels = expected.compare( screenshot, diff, pixelThreshold );
 
 			} catch ( e ) {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
-				throw new Error( `Image sizes does not match in file: ${ file }` );
+				throw new Error( `Image sizes do not match in file: ${ file }` );
 
 			}
 

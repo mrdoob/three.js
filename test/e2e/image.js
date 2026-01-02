@@ -102,6 +102,52 @@ class Image {
 
 	}
 
+	compare( other, diff, threshold = 0.1 ) {
+
+		if ( this.width !== other.width || this.height !== other.height ) {
+
+			throw new Error( 'Image sizes do not match' );
+
+		}
+
+		const maxDelta = 255 * 255 * 3; // Max squared distance in RGB space
+		let numDiffPixels = 0;
+
+		for ( let i = 0; i < this.data.length; i += 4 ) {
+
+			const dr = this.data[ i ] - other.data[ i ];
+			const dg = this.data[ i + 1 ] - other.data[ i + 1 ];
+			const db = this.data[ i + 2 ] - other.data[ i + 2 ];
+
+			// Squared Euclidean distance normalized to 0-1
+			const delta = ( dr * dr + dg * dg + db * db ) / maxDelta;
+
+			if ( delta > threshold * threshold ) {
+
+				numDiffPixels ++;
+
+				// Mark difference in red
+				diff.data[ i ] = 255;
+				diff.data[ i + 1 ] = 0;
+				diff.data[ i + 2 ] = 0;
+				diff.data[ i + 3 ] = 255;
+
+			} else {
+
+				// Dim matching pixels
+				diff.data[ i ] = this.data[ i ] * 0.2;
+				diff.data[ i + 1 ] = this.data[ i + 1 ] * 0.2;
+				diff.data[ i + 2 ] = this.data[ i + 2 ] * 0.2;
+				diff.data[ i + 3 ] = 255;
+
+			}
+
+		}
+
+		return numDiffPixels;
+
+	}
+
 	async write( filepath, quality = 95 ) {
 
 		const rawImageData = {

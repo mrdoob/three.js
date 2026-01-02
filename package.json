@@ -106,7 +106,6 @@
     "jsdoc": "^4.0.5",
     "pngjs": "^7.0.0",
     "magic-string": "^0.30.0",
-    "pixelmatch": "^7.0.0",
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
