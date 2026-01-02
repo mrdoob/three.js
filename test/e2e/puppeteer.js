@@ -1,9 +1,8 @@
 import puppeteer from 'puppeteer';
-import express from 'express';
-import path from 'path';
 import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
+import server from './server.js';
 
 const exceptionList = [
 
@@ -117,9 +116,7 @@ let browser;
 
 /* Launch server */
 
-const app = express();
-app.use( express.static( path.resolve() ) );
-const server = app.listen( port, main );
+server.listen( port, main );
 
 process.on( 'SIGINT', async () => {
 
