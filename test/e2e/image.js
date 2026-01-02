@@ -26,40 +26,67 @@ class Image {
 
 	scale( factor ) {
 
+		if ( factor >= 1 ) {
+
+			console.warn( 'Image.scale() is optimized for downscaling only.' );
+
+		}
+
 		const newWidth = Math.round( this.width * factor );
 		const newHeight = Math.round( this.height * factor );
 		const newData = Buffer.alloc( newWidth * newHeight * 4 );
+
+		// Box filter for downscaling (averages all source pixels in the region)
+		const scaleX = this.width / newWidth;
+		const scaleY = this.height / newHeight;
 
 		for ( let y = 0; y < newHeight; y ++ ) {
 
 			for ( let x = 0; x < newWidth; x ++ ) {
 
-				// Map to source coordinates
-				const srcX = x / factor;
-				const srcY = y / factor;
+				// Calculate source region
+				const srcX0 = x * scaleX;
+				const srcY0 = y * scaleY;
+				const srcX1 = ( x + 1 ) * scaleX;
+				const srcY1 = ( y + 1 ) * scaleY;
 
-				// Get integer and fractional parts
-				const x0 = Math.floor( srcX );
-				const y0 = Math.floor( srcY );
-				const x1 = Math.min( x0 + 1, this.width - 1 );
-				const y1 = Math.min( y0 + 1, this.height - 1 );
-				const xFrac = srcX - x0;
-				const yFrac = srcY - y0;
-
-				// Get the four surrounding pixels
-				const idx00 = ( y0 * this.width + x0 ) * 4;
-				const idx10 = ( y0 * this.width + x1 ) * 4;
-				const idx01 = ( y1 * this.width + x0 ) * 4;
-				const idx11 = ( y1 * this.width + x1 ) * 4;
+				const x0 = Math.floor( srcX0 );
+				const y0 = Math.floor( srcY0 );
+				const x1 = Math.min( Math.ceil( srcX1 ), this.width );
+				const y1 = Math.min( Math.ceil( srcY1 ), this.height );
 
 				const dstIdx = ( y * newWidth + x ) * 4;
+				const sums = [ 0, 0, 0, 0 ];
+				let totalWeight = 0;
 
-				// Bilinear interpolation for each channel
+				// Average all pixels in the source region with proper weighting
+				for ( let sy = y0; sy < y1; sy ++ ) {
+
+					for ( let sx = x0; sx < x1; sx ++ ) {
+
+						// Calculate coverage weight for edge pixels
+						const wx0 = Math.max( 0, Math.min( 1, sx + 1 - srcX0 ) );
+						const wx1 = Math.max( 0, Math.min( 1, srcX1 - sx ) );
+						const wy0 = Math.max( 0, Math.min( 1, sy + 1 - srcY0 ) );
+						const wy1 = Math.max( 0, Math.min( 1, srcY1 - sy ) );
+						const weight = Math.min( wx0, wx1 ) * Math.min( wy0, wy1 );
+
+						const srcIdx = ( sy * this.width + sx ) * 4;
+						for ( let c = 0; c < 4; c ++ ) {
+
+							sums[ c ] += this.data[ srcIdx + c ] * weight;
+
+						}
+
+						totalWeight += weight;
+
+					}
+
+				}
+
 				for ( let c = 0; c < 4; c ++ ) {
 
-					const top = this.data[ idx00 + c ] * ( 1 - xFrac ) + this.data[ idx10 + c ] * xFrac;
-					const bottom = this.data[ idx01 + c ] * ( 1 - xFrac ) + this.data[ idx11 + c ] * xFrac;
-					newData[ dstIdx + c ] = Math.round( top * ( 1 - yFrac ) + bottom * yFrac );
+					newData[ dstIdx + c ] = Math.round( sums[ c ] / totalWeight );
 
 				}
 
