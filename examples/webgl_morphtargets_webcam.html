@@ -32,7 +32,6 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
@@ -114,13 +113,10 @@
 			camera.position.z = 5;
 
 			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x666666 );
 			scene.scale.x = - 1;
 
-			const environment = new RoomEnvironment();
-			const pmremGenerator = new THREE.PMREMGenerator( renderer );
-
-			scene.background = new THREE.Color( 0x666666 );
-			scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+			scene.add( new THREE.AmbientLight( 0xffffff, 5 ) );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 
@@ -143,6 +139,9 @@
 
 					const head = mesh.getObjectByName( 'mesh_2' );
 					head.material = new THREE.MeshNormalMaterial();
+
+					const teeth = mesh.getObjectByName( 'mesh_3' );
+					teeth.material = new THREE.MeshNormalMaterial();
 
 					face = mesh.getObjectByName( 'mesh_2' );
 					eyeL = mesh.getObjectByName( 'eyeLeft' );
