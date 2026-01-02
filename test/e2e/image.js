@@ -34,15 +34,34 @@ class Image {
 
 			for ( let x = 0; x < newWidth; x ++ ) {
 
-				const srcX = Math.floor( x / factor );
-				const srcY = Math.floor( y / factor );
-				const srcIdx = ( srcY * this.width + srcX ) * 4;
+				// Map to source coordinates
+				const srcX = x / factor;
+				const srcY = y / factor;
+
+				// Get integer and fractional parts
+				const x0 = Math.floor( srcX );
+				const y0 = Math.floor( srcY );
+				const x1 = Math.min( x0 + 1, this.width - 1 );
+				const y1 = Math.min( y0 + 1, this.height - 1 );
+				const xFrac = srcX - x0;
+				const yFrac = srcY - y0;
+
+				// Get the four surrounding pixels
+				const idx00 = ( y0 * this.width + x0 ) * 4;
+				const idx10 = ( y0 * this.width + x1 ) * 4;
+				const idx01 = ( y1 * this.width + x0 ) * 4;
+				const idx11 = ( y1 * this.width + x1 ) * 4;
+
 				const dstIdx = ( y * newWidth + x ) * 4;
 
-				newData[ dstIdx ] = this.data[ srcIdx ];
-				newData[ dstIdx + 1 ] = this.data[ srcIdx + 1 ];
-				newData[ dstIdx + 2 ] = this.data[ srcIdx + 2 ];
-				newData[ dstIdx + 3 ] = this.data[ srcIdx + 3 ];
+				// Bilinear interpolation for each channel
+				for ( let c = 0; c < 4; c ++ ) {
+
+					const top = this.data[ idx00 + c ] * ( 1 - xFrac ) + this.data[ idx10 + c ] * xFrac;
+					const bottom = this.data[ idx01 + c ] * ( 1 - xFrac ) + this.data[ idx11 + c ] * xFrac;
+					newData[ dstIdx + c ] = Math.round( top * ( 1 - yFrac ) + bottom * yFrac );
+
+				}
 
 			}
 
