@@ -120,7 +120,7 @@
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			scene.background = new THREE.Color( 0x666666 );
-			scene.environment = pmremGenerator.fromScene( environment ).texture;
+			scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 
