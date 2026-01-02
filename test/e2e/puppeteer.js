@@ -148,7 +148,7 @@ const rootDirectory = path.resolve();
 
 const server = http.createServer( ( req, res ) => {
 
-	const pathname = req.url.split( '?' )[ 0 ];
+	const pathname = decodeURIComponent( req.url.split( '?' )[ 0 ] );
 	const filePath = path.normalize( path.join( rootDirectory, pathname ) );
 
 	// Prevent path traversal attacks
