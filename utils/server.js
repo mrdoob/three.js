@@ -70,7 +70,18 @@ function createHandler( rootDirectory ) {
 			} else {
 
 				// Show directory listing
-				const files = readdirSync( filePath );
+				const files = readdirSync( filePath )
+					.filter( f => ! f.startsWith( '.' ) )
+					.sort( ( a, b ) => {
+
+						const aIsDir = statSync( path.join( filePath, a ) ).isDirectory();
+						const bIsDir = statSync( path.join( filePath, b ) ).isDirectory();
+						if ( aIsDir && ! bIsDir ) return - 1;
+						if ( ! aIsDir && bIsDir ) return 1;
+						return a.localeCompare( b );
+
+					} );
+
 				const base = pathname.endsWith( '/' ) ? pathname : pathname + '/';
 				const items = files.map( file => {
 
@@ -78,20 +89,31 @@ function createHandler( rootDirectory ) {
 					const isDir = statSync( fullPath ).isDirectory();
 					const safeFile = escapeHtml( file );
 					const safeHref = escapeHtml( base + file + ( isDir ? '/' : '' ) );
-					return `<li><a href="${safeHref}">${safeFile}${isDir ? '/' : ''}</a></li>`;
+					const icon = isDir ? '📁' : '📄';
+					return `<a href="${safeHref}"><span class="i">${icon}</span>${safeFile}</a>`;
 
 				} ).join( '\n' );
 
 				const safePath = escapeHtml( pathname );
 				const html = `<!DOCTYPE html>
 <html>
-<head><title>Index of ${safePath}</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="color-scheme" content="light dark">
+<title>Index of ${safePath}</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 20px; }
+h1 { font-weight: normal; font-size: 1.2em; margin-bottom: 10px; }
+a { display: block; padding: 6px 8px; color: inherit; text-decoration: none; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+a:hover { background: rgba(128,128,128,0.2); }
+.i { display: inline-block; width: 1.5em; }
+</style>
+</head>
 <body>
 <h1>Index of ${safePath}</h1>
-<ul>
-${pathname !== '/' ? '<li><a href="../">../</a></li>' : ''}
+${pathname !== '/' ? '<a href="../"><span class="i">📁</span>..</a>' : ''}
 ${items}
-</ul>
 </body>
 </html>`;
 
