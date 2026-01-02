@@ -4,6 +4,16 @@ import path from 'path';
 import os from 'os';
 import { createReadStream, existsSync, statSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs';
 
+function escapeHtml( str ) {
+
+	return str
+		.replace( /&/g, '&amp;' )
+		.replace( /</g, '&lt;' )
+		.replace( />/g, '&gt;' )
+		.replace( /"/g, '&quot;' );
+
+}
+
 const mimeTypes = {
 	'.html': 'text/html',
 	'.js': 'application/javascript',
@@ -66,15 +76,18 @@ function createHandler( rootDirectory ) {
 
 					const fullPath = path.join( filePath, file );
 					const isDir = statSync( fullPath ).isDirectory();
-					return `<li><a href="${base}${file}${isDir ? '/' : ''}">${file}${isDir ? '/' : ''}</a></li>`;
+					const safeFile = escapeHtml( file );
+					const safeHref = escapeHtml( base + file + ( isDir ? '/' : '' ) );
+					return `<li><a href="${safeHref}">${safeFile}${isDir ? '/' : ''}</a></li>`;
 
 				} ).join( '\n' );
 
+				const safePath = escapeHtml( pathname );
 				const html = `<!DOCTYPE html>
 <html>
-<head><title>Index of ${pathname}</title></head>
+<head><title>Index of ${safePath}</title></head>
 <body>
-<h1>Index of ${pathname}</h1>
+<h1>Index of ${safePath}</h1>
 <ul>
 ${pathname !== '/' ? '<li><a href="../">../</a></li>' : ''}
 ${items}
@@ -141,8 +154,8 @@ async function getCertificate() {
 	const certPath = path.join( cacheDir, 'cert.pem' );
 	const keyPath = path.join( cacheDir, 'key.pem' );
 
-	// Check for cached certificate (valid for 7 days)
-	if ( existsSync( certPath ) && existsSync( keyPath ) ) {
+	// Try to use cached certificate (valid for 7 days)
+	try {
 
 		const stat = statSync( certPath );
 		const age = Date.now() - stat.mtimeMs;
@@ -150,12 +163,15 @@ async function getCertificate() {
 
 		if ( age < maxAge ) {
 
-			return {
-				cert: readFileSync( certPath, 'utf8' ),
-				key: readFileSync( keyPath, 'utf8' )
-			};
+			const cert = readFileSync( certPath, 'utf8' );
+			const key = readFileSync( keyPath, 'utf8' );
+			return { cert, key };
 
 		}
+
+	} catch ( e ) {
+
+		// Cache miss or invalid, generate new certificate
 
 	}
 
@@ -187,9 +203,17 @@ async function getCertificate() {
 	} );
 
 	// Cache the certificate
-	mkdirSync( cacheDir, { recursive: true } );
-	writeFileSync( certPath, pems.cert );
-	writeFileSync( keyPath, pems.private );
+	try {
+
+		mkdirSync( cacheDir, { recursive: true } );
+		writeFileSync( certPath, pems.cert );
+		writeFileSync( keyPath, pems.private );
+
+	} catch ( e ) {
+
+		// Caching failed, but certificate is still valid for this session
+
+	}
 
 	return { cert: pems.cert, key: pems.private };
 
