@@ -2,7 +2,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 import os from 'os';
-import { createReadStream, existsSync, statSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs';
+import { createReadStream, existsSync, statSync, readFileSync, mkdirSync, readdirSync, openSync, writeSync, closeSync, fstatSync, constants } from 'fs';
 
 function escapeHtml( str ) {
 
@@ -199,17 +199,21 @@ async function getCertificate() {
 	// Try to use cached certificate (valid for 7 days)
 	try {
 
-		const stat = statSync( certPath );
+		const certFd = openSync( certPath, constants.O_RDONLY );
+		const stat = fstatSync( certFd );
 		const age = Date.now() - stat.mtimeMs;
 		const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 		if ( age < maxAge ) {
 
-			const cert = readFileSync( certPath, 'utf8' );
+			const cert = readFileSync( certFd, 'utf8' );
+			closeSync( certFd );
 			const key = readFileSync( keyPath, 'utf8' );
 			return { cert, key };
 
 		}
+
+		closeSync( certFd );
 
 	} catch ( e ) {
 
@@ -248,8 +252,14 @@ async function getCertificate() {
 	try {
 
 		mkdirSync( cacheDir, { recursive: true, mode: 0o700 } );
-		writeFileSync( certPath, pems.cert, { mode: 0o600 } );
-		writeFileSync( keyPath, pems.private, { mode: 0o600 } );
+
+		const certFd = openSync( certPath, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC, 0o600 );
+		writeSync( certFd, pems.cert );
+		closeSync( certFd );
+
+		const keyFd = openSync( keyPath, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC, 0o600 );
+		writeSync( keyFd, pems.private );
+		closeSync( keyFd );
 
 	} catch ( e ) {
 
