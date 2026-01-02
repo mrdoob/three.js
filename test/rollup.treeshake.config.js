@@ -12,7 +12,7 @@ function filesize() {
 		name: 'filesize',
 		writeBundle( options, bundle ) {
 
-			for ( const [ name, chunk ] of Object.entries( bundle ) ) {
+			for ( const [ , chunk ] of Object.entries( bundle ) ) {
 
 				if ( chunk.code ) {
 
@@ -32,8 +32,10 @@ function filesize() {
 					console.log( `\n┌${'─'.repeat( width )}┐` );
 					console.log( `│${' '.repeat( width )}│` );
 					lines.forEach( ( { label, value } ) => {
+
 						const padding = ' '.repeat( width - label.length - value.length - 3 );
 						console.log( `│   ${green}${label}${yellow}${value}${reset}${padding}│` );
+
 					} );
 					console.log( `│${' '.repeat( width )}│` );
 					console.log( `└${'─'.repeat( width )}┘` );
