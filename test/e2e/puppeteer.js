@@ -140,10 +140,21 @@ const mimeTypes = {
 	'.exr': 'application/octet-stream'
 };
 
+const rootDirectory = path.resolve();
+
 const server = http.createServer( ( req, res ) => {
 
-	const filePath = path.join( path.resolve(), req.url.split( '?' )[ 0 ] );
-	const ext = path.extname( filePath ).toLowerCase();
+	const pathname = req.url.split( '?' )[ 0 ];
+	const filePath = path.normalize( path.join( rootDirectory, pathname ) );
+
+	// Prevent path traversal attacks
+	if ( ! filePath.startsWith( rootDirectory ) ) {
+
+		res.writeHead( 403 );
+		res.end( 'Forbidden' );
+		return;
+
+	}
 
 	if ( ! existsSync( filePath ) ) {
 
@@ -153,6 +164,7 @@ const server = http.createServer( ( req, res ) => {
 
 	}
 
+	const ext = path.extname( filePath ).toLowerCase();
 	res.writeHead( 200, { 'Content-Type': mimeTypes[ ext ] || 'application/octet-stream' } );
 	createReadStream( filePath ).pipe( res );
 
