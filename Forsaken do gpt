@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Forsaken 3D - Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<div id="info">Forsaken 3D Prototype</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+<script>
+  // Cena
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x101010);
+
+  // Câmera
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+
+  // Render
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Luz
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 5);
+  scene.add(light);
+
+  const ambient = new THREE.AmbientLight(0x404040);
+  scene.add(ambient);
+
+  // Chão (arena)
+  const floorGeometry = new THREE.PlaneGeometry(50, 50);
+  const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  // Jogador
+  const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+  const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const player = new THREE.Mesh(playerGeometry, playerMaterial);
+  player.position.y = 1;
+  scene.add(player);
+
+  // Movimento
+  const speed = 0.1;
+  const keys = {};
+
+  window.addEventListener('keydown', e => keys[e.key] = true);
+  window.addEventListener('keyup', e => keys[e.key] = false);
+
+  // Câmera terceira pessoa
+  function updateCamera() {
+    const offset = new THREE.Vector3(0, 3, 6);
+    camera.position.copy(player.position).add(offset);
+    camera.lookAt(player.position);
+  }
+
+  // Loop do jogo
+  function animate() {
+    requestAnimationFrame(animate);
+
+    if (keys['w']) player.position.z -= speed;
+    if (keys['s']) player.position.z += speed;
+    if (keys['a']) player.position.x -= speed;
+    if (keys['d']) player.position.x += speed;
+
+    updateCamera();
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Responsivo
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+</script>
+
+</body>
+</html>
