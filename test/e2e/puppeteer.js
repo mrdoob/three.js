@@ -2,7 +2,9 @@ import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import { Image } from './image.js';
 import * as fs from 'fs/promises';
-import server from '../../utils/server.js';
+import { createServer } from '../../utils/server.js';
+
+const server = createServer();
 
 const exceptionList = [
 

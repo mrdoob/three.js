@@ -204,16 +204,6 @@ export function createServer( options = {} ) {
 
 }
 
-export async function createSecureServer( options = {} ) {
-
-	const rootDirectory = options.root || path.resolve();
-	const handler = createHandler( rootDirectory );
-	const credentials = await getCertificate();
-
-	return https.createServer( credentials, handler );
-
-}
-
 function tryListen( server, port, maxAttempts = 20 ) {
 
 	return new Promise( ( resolve, reject ) => {
@@ -313,6 +303,3 @@ if ( isMain ) {
 	} );
 
 }
-
-// Default export for backwards compatibility with test/e2e
-export default createServer();
