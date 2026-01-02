@@ -2663,7 +2663,7 @@ class GLTFParser {
 		let isFirefox = false;
 		let firefoxVersion = - 1;
 
-		if ( typeof navigator !== 'undefined' ) {
+		if ( typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined' ) {
 
 			const userAgent = navigator.userAgent;
 
