@@ -1061,7 +1061,7 @@ class Matrix4 {
 		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
 		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
-		// if determine is negative, we need to invert one scale
+		// if determinant is negative, we need to invert one scale
 		if ( det < 0 ) sx = - sx;
 
 		// scale the rotation part
