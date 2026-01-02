@@ -147,10 +147,30 @@ ${items}
 
 }
 
+function getCacheDir() {
+
+	const appName = 'three-dev-server';
+
+	if ( process.platform === 'darwin' ) {
+
+		return path.join( os.homedir(), 'Library', 'Application Support', appName );
+
+	} else if ( process.platform === 'win32' ) {
+
+		return path.join( process.env.LOCALAPPDATA || process.env.APPDATA, appName );
+
+	} else {
+
+		return path.join( os.homedir(), '.config', appName );
+
+	}
+
+}
+
 async function getCertificate() {
 
-	// Cache certificate in user's home directory
-	const cacheDir = path.join( os.homedir(), '.three-dev-server' );
+	// Cache certificate in platform-specific data directory
+	const cacheDir = getCacheDir();
 	const certPath = path.join( cacheDir, 'cert.pem' );
 	const keyPath = path.join( cacheDir, 'key.pem' );
 
