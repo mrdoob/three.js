@@ -206,10 +206,12 @@
 					if ( ! match ) return;
 
 					const htmlFile = match[ 1 ];
+					const mdFile = htmlFile.replace( /\.html$/, '.md' );
 					const anchor = match[ 2 ] || '';
 					const pageName = htmlFile.replace( /\.html$/, '' );
 					const fullPageName = pageName + anchor.replace( '#', '.' );
 					const pageURL = 'pages/' + htmlFile;
+					const markdownURL = 'pages/' + mdFile;
 
 					link.setAttribute( 'href', pageURL + anchor );
 					link.setAttribute( 'target', 'viewer' );
@@ -235,8 +237,9 @@
 					pageLinks[ fullPageName ] = {
 						linkElement: link,
 						pageURL: pageURL,
+						markdownURL: markdownURL,
 						anchor: anchor,
-						href: href
+						href: href,
 					};
 
 					if ( ! pageLinks[ pageName ] ) {
@@ -244,6 +247,7 @@
 						pageLinks[ pageName ] = {
 							linkElement: link,
 							pageURL: pageURL,
+							markdownURL: markdownURL,
 							anchor: '',
 							href: htmlFile
 						};
@@ -601,6 +605,17 @@
 			// Try to find the page link - first with full hash (e.g., "global.Break"), then without anchor
 			const fullPageName = hash;
 			let pageLink = pageLinks[ fullPageName ] || pageLinks[ pageName ];
+
+			if ( hash.endsWith( '.md' ) && pageLink && pageLink.markdownURL ) {
+
+				window.history.pushState( {}, '', window.location.pathname + window.location.search + '#' + hash.replace( '.md', '' ) );
+				
+				// Redirect to markdown version if available
+				window.location.href = pageLink.markdownURL;
+				
+				return;
+
+			}
 
 			// If not found and hash doesn't contain a dot, try TSL.{hash} or global.{hash}
 			if ( ! pageLink && dotIndex === - 1 && hash ) {
