@@ -229,7 +229,13 @@ class GLTFLoader extends Loader {
 
 		this.register( function ( parser ) {
 
-			return new GLTFMeshoptCompression( parser );
+			return new GLTFMeshoptCompression( parser, EXTENSIONS.EXT_MESHOPT_COMPRESSION );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFMeshoptCompression( parser, EXTENSIONS.KHR_MESHOPT_COMPRESSION );
 
 		} );
 
@@ -622,6 +628,7 @@ const EXTENSIONS = {
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
+	KHR_MESHOPT_COMPRESSION: 'KHR_meshopt_compression',
 	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing'
 };
 
@@ -1674,9 +1681,9 @@ class GLTFTextureAVIFExtension {
  */
 class GLTFMeshoptCompression {
 
-	constructor( parser ) {
+	constructor( parser, name ) {
 
-		this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
+		this.name = name;
 		this.parser = parser;
 
 	}
