@@ -1,7 +1,12 @@
+import { gzipSync } from 'zlib';
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
 function filesize() {
+
+	const green = '\x1b[1m\x1b[32m';
+	const yellow = '\x1b[33m';
+	const reset = '\x1b[0m';
 
 	return {
 		name: 'filesize',
@@ -9,7 +14,31 @@ function filesize() {
 
 			for ( const [ name, chunk ] of Object.entries( bundle ) ) {
 
-				if ( chunk.code ) console.log( `\x1b[32m${name}: ${( chunk.code.length / 1024 ).toFixed( 1 )} kB\x1b[0m` );
+				if ( chunk.code ) {
+
+					const size = ( chunk.code.length / 1024 ).toFixed( 2 ) + ' KB';
+					const gzipped = ( gzipSync( chunk.code ).length / 1024 ).toFixed( 2 ) + ' KB';
+					const destination = options.file;
+
+					const lines = [
+						{ label: 'Destination: ', value: destination },
+						{ label: 'Bundle Size:  ', value: size },
+						{ label: 'Gzipped Size: ', value: gzipped }
+					];
+
+					const maxLength = Math.max( ...lines.map( l => l.label.length + l.value.length ) );
+					const width = maxLength + 6;
+
+					console.log( `\n┌${'─'.repeat( width )}┐` );
+					console.log( `│${' '.repeat( width )}│` );
+					lines.forEach( ( { label, value } ) => {
+						const padding = ' '.repeat( width - label.length - value.length - 3 );
+						console.log( `│   ${green}${label}${yellow}${value}${reset}${padding}│` );
+					} );
+					console.log( `│${' '.repeat( width )}│` );
+					console.log( `└${'─'.repeat( width )}┘` );
+
+				}
 
 			}
 
