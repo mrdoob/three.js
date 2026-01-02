@@ -715,36 +715,57 @@ class Matrix4 {
 			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
 			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
 
-			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
-			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
-			t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
-			t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+			t11 = n23 * n34 - n24 * n33,
+			t12 = n22 * n34 - n24 * n32,
+			t13 = n22 * n33 - n23 * n32,
+			t14 = n21 * n34 - n24 * n31,
+			t15 = n21 * n33 - n23 * n31,
+			t16 = n21 * n32 - n22 * n31,
 
-		const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+			t17 = n13 * n34 - n14 * n33,
+			t18 = n12 * n34 - n14 * n32,
+			t19 = n12 * n33 - n13 * n32,
+			t20 = n11 * n34 - n14 * n31,
+			t21 = n11 * n33 - n13 * n31,
+			t22 = n11 * n32 - n12 * n31,
+
+			t23 = n13 * n24 - n14 * n23,
+			t24 = n12 * n24 - n14 * n22,
+			t25 = n12 * n23 - n13 * n22,
+			t26 = n11 * n24 - n14 * n21,
+			t27 = n11 * n23 - n13 * n21,
+			t28 = n11 * n22 - n12 * n21,
+
+			d11 = n42 * t11 - n43 * t12 + n44 * t13,
+			d12 = n42 * t17 - n43 * t18 + n44 * t19,
+			d13 = n42 * t23 - n43 * t24 + n44 * t25,
+			d14 = n32 * t23 - n33 * t24 + n34 * t25;
+
+		const det = n11 * d11 - n12 * ( n41 * t11 - n43 * t14 + n44 * t15 ) + n13 * ( n41 * t12 - n42 * t14 + n44 * t16 ) - n14 * ( n41 * t13 - n42 * t15 + n43 * t16 );
 
 		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		const detInv = 1 / det;
 
-		te[ 0 ] = t11 * detInv;
-		te[ 1 ] = ( n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44 ) * detInv;
-		te[ 2 ] = ( n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44 ) * detInv;
-		te[ 3 ] = ( n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43 ) * detInv;
+		te[ 0 ] = d11 * detInv;
+		te[ 1 ] = ( n41 * t11 - n43 * t14 + n44 * t15 ) * - detInv;
+		te[ 2 ] = ( n41 * t12 - n42 * t14 + n44 * t16 ) * detInv;
+		te[ 3 ] = ( n41 * t13 - n42 * t15 + n43 * t16 ) * - detInv;
 
-		te[ 4 ] = t12 * detInv;
-		te[ 5 ] = ( n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44 ) * detInv;
-		te[ 6 ] = ( n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44 ) * detInv;
-		te[ 7 ] = ( n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43 ) * detInv;
+		te[ 4 ] = d12 * - detInv;
+		te[ 5 ] = ( n41 * t17 - n43 * t20 + n44 * t21 ) * detInv;
+		te[ 6 ] = ( n41 * t18 - n42 * t20 + n44 * t22 ) * - detInv;
+		te[ 7 ] = ( n41 * t19 - n42 * t21 + n43 * t22 ) * detInv;
 
-		te[ 8 ] = t13 * detInv;
-		te[ 9 ] = ( n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44 ) * detInv;
-		te[ 10 ] = ( n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44 ) * detInv;
-		te[ 11 ] = ( n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43 ) * detInv;
+		te[ 8 ] = d13 * detInv;
+		te[ 9 ] = ( n41 * t23 - n43 * t26 + n44 * t27 ) * - detInv;
+		te[ 10 ] = ( n41 * t24 - n42 * t26 + n44 * t28 ) * detInv;
+		te[ 11 ] = ( n41 * t25 - n42 * t27 + n43 * t28 ) * - detInv;
 
-		te[ 12 ] = t14 * detInv;
-		te[ 13 ] = ( n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34 ) * detInv;
-		te[ 14 ] = ( n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34 ) * detInv;
-		te[ 15 ] = ( n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33 ) * detInv;
+		te[ 12 ] = d14 * - detInv;
+		te[ 13 ] = ( n31 * t23 - n33 * t26 + n34 * t27 ) * detInv;
+		te[ 14 ] = ( n31 * t24 - n32 * t26 + n34 * t28 ) * - detInv;
+		te[ 15 ] = ( n31 * t25 - n32 * t27 + n33 * t28 ) * detInv;
 
 		return this;
 
