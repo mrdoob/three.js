@@ -103,17 +103,15 @@
     "eslint-plugin-html": "^8.1.3",
     "eslint-plugin-jsdoc": "^61.4.1",
     "globals": "^16.5.0",
-    "jimp": "^1.6.0",
+    "jpeg-js": "^0.4.4",
     "jsdoc": "^4.0.5",
+    "pngjs": "^7.0.0",
     "magic-string": "^0.30.0",
     "pixelmatch": "^7.0.0",
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "servez": "^2.2.4"
-  },
-  "overrides": {
-    "jpeg-js": "^0.4.4"
   },
   "jspm": {
     "files": [
