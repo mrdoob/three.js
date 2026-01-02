@@ -1,6 +1,22 @@
 import resolve from '@rollup/plugin-node-resolve';
-import filesize from 'rollup-plugin-filesize';
 import terser from '@rollup/plugin-terser';
+
+function filesize() {
+
+	return {
+		name: 'filesize',
+		writeBundle( options, bundle ) {
+
+			for ( const [ name, chunk ] of Object.entries( bundle ) ) {
+
+				if ( chunk.code ) console.log( `\x1b[32m${name}: ${( chunk.code.length / 1024 ).toFixed( 1 )} kB\x1b[0m` );
+
+			}
+
+		}
+	};
+
+}
 
 export default [
 	{
@@ -20,9 +36,7 @@ export default [
 		plugins: [
 			resolve(),
 			terser(),
-			filesize( {
-				showMinifiedSize: false,
-			} )
+			filesize()
 		],
 		output: [
 			{
@@ -48,9 +62,7 @@ export default [
 		plugins: [
 			resolve(),
 			terser(),
-			filesize( {
-				showMinifiedSize: false,
-			} )
+			filesize()
 		],
 		output: [
 			{
@@ -76,9 +88,7 @@ export default [
 		plugins: [
 			resolve(),
 			terser(),
-			filesize( {
-				showMinifiedSize: false,
-			} )
+			filesize()
 		],
 		output: [
 			{

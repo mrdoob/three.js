@@ -111,7 +111,6 @@
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
-    "rollup-plugin-filesize": "^10.0.0",
     "servez": "^2.2.4"
   },
   "overrides": {
