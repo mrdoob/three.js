@@ -487,7 +487,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 		}
 
-		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
+		const screenshot = ( await Image.read( await page.screenshot( { type: 'jpeg', quality: 100 } ) ) ).scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
 

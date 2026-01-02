@@ -104,7 +104,6 @@
     "globals": "^16.5.0",
     "jpeg-js": "^0.4.4",
     "jsdoc": "^4.0.5",
-    "pngjs": "^7.0.0",
     "magic-string": "^0.30.0",
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
