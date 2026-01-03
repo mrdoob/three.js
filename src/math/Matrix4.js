@@ -707,7 +707,7 @@ class Matrix4 {
 	 */
 	invert() {
 
-		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+		// based on https://github.com/toji/gl-matrix
 		const te = this.elements,
 
 			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ], n41 = te[ 3 ],
@@ -715,57 +715,44 @@ class Matrix4 {
 			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
 			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
 
-			t11 = n23 * n34 - n24 * n33,
-			t12 = n22 * n34 - n24 * n32,
-			t13 = n22 * n33 - n23 * n32,
-			t14 = n21 * n34 - n24 * n31,
-			t15 = n21 * n33 - n23 * n31,
-			t16 = n21 * n32 - n22 * n31,
+			t1 = n11 * n22 - n21 * n12,
+			t2 = n11 * n32 - n31 * n12,
+			t3 = n11 * n42 - n41 * n12,
+			t4 = n21 * n32 - n31 * n22,
+			t5 = n21 * n42 - n41 * n22,
+			t6 = n31 * n42 - n41 * n32,
+			t7 = n13 * n24 - n23 * n14,
+			t8 = n13 * n34 - n33 * n14,
+			t9 = n13 * n44 - n43 * n14,
+			t10 = n23 * n34 - n33 * n24,
+			t11 = n23 * n44 - n43 * n24,
+			t12 = n33 * n44 - n43 * n34;
 
-			t17 = n13 * n34 - n14 * n33,
-			t18 = n12 * n34 - n14 * n32,
-			t19 = n12 * n33 - n13 * n32,
-			t20 = n11 * n34 - n14 * n31,
-			t21 = n11 * n33 - n13 * n31,
-			t22 = n11 * n32 - n12 * n31,
-
-			t23 = n13 * n24 - n14 * n23,
-			t24 = n12 * n24 - n14 * n22,
-			t25 = n12 * n23 - n13 * n22,
-			t26 = n11 * n24 - n14 * n21,
-			t27 = n11 * n23 - n13 * n21,
-			t28 = n11 * n22 - n12 * n21,
-
-			d11 = n42 * t11 - n43 * t12 + n44 * t13,
-			d12 = n42 * t17 - n43 * t18 + n44 * t19,
-			d13 = n42 * t23 - n43 * t24 + n44 * t25,
-			d14 = n32 * t23 - n33 * t24 + n34 * t25;
-
-		const det = n11 * d11 - n12 * ( n41 * t11 - n43 * t14 + n44 * t15 ) + n13 * ( n41 * t12 - n42 * t14 + n44 * t16 ) - n14 * ( n41 * t13 - n42 * t15 + n43 * t16 );
+		const det = t1 * t12 - t2 * t11 + t3 * t10 + t4 * t9 - t5 * t8 + t6 * t7;
 
 		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		const detInv = 1 / det;
 
-		te[ 0 ] = d11 * detInv;
-		te[ 1 ] = ( n41 * t11 - n43 * t14 + n44 * t15 ) * - detInv;
-		te[ 2 ] = ( n41 * t12 - n42 * t14 + n44 * t16 ) * detInv;
-		te[ 3 ] = ( n41 * t13 - n42 * t15 + n43 * t16 ) * - detInv;
+		te[ 0 ] = ( n22 * t12 - n32 * t11 + n42 * t10 ) * detInv;
+		te[ 1 ] = ( n31 * t11 - n21 * t12 - n41 * t10 ) * detInv;
+		te[ 2 ] = ( n24 * t6 - n34 * t5 + n44 * t4 ) * detInv;
+		te[ 3 ] = ( n33 * t5 - n23 * t6 - n43 * t4 ) * detInv;
 
-		te[ 4 ] = d12 * - detInv;
-		te[ 5 ] = ( n41 * t17 - n43 * t20 + n44 * t21 ) * detInv;
-		te[ 6 ] = ( n41 * t18 - n42 * t20 + n44 * t22 ) * - detInv;
-		te[ 7 ] = ( n41 * t19 - n42 * t21 + n43 * t22 ) * detInv;
+		te[ 4 ] = ( n32 * t9 - n12 * t12 - n42 * t8 ) * detInv;
+		te[ 5 ] = ( n11 * t12 - n31 * t9 + n41 * t8 ) * detInv;
+		te[ 6 ] = ( n34 * t3 - n14 * t6 - n44 * t2 ) * detInv;
+		te[ 7 ] = ( n13 * t6 - n33 * t3 + n43 * t2 ) * detInv;
 
-		te[ 8 ] = d13 * detInv;
-		te[ 9 ] = ( n41 * t23 - n43 * t26 + n44 * t27 ) * - detInv;
-		te[ 10 ] = ( n41 * t24 - n42 * t26 + n44 * t28 ) * detInv;
-		te[ 11 ] = ( n41 * t25 - n42 * t27 + n43 * t28 ) * - detInv;
+		te[ 8 ] = ( n12 * t11 - n22 * t9 + n42 * t7 ) * detInv;
+		te[ 9 ] = ( n21 * t9 - n11 * t11 - n41 * t7 ) * detInv;
+		te[ 10 ] = ( n14 * t5 - n24 * t3 + n44 * t1 ) * detInv;
+		te[ 11 ] = ( n23 * t3 - n13 * t5 - n43 * t1 ) * detInv;
 
-		te[ 12 ] = d14 * - detInv;
-		te[ 13 ] = ( n31 * t23 - n33 * t26 + n34 * t27 ) * detInv;
-		te[ 14 ] = ( n31 * t24 - n32 * t26 + n34 * t28 ) * - detInv;
-		te[ 15 ] = ( n31 * t25 - n32 * t27 + n33 * t28 ) * detInv;
+		te[ 12 ] = ( n22 * t8 - n12 * t10 - n32 * t7 ) * detInv;
+		te[ 13 ] = ( n11 * t10 - n21 * t8 + n31 * t7 ) * detInv;
+		te[ 14 ] = ( n24 * t2 - n14 * t4 - n34 * t1 ) * detInv;
+		te[ 15 ] = ( n13 * t4 - n23 * t2 + n33 * t1 ) * detInv;
 
 		return this;
 
