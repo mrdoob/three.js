@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temple Runner 3D - Nepali Style</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FF 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+            color: #2c3e50;
+        }
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+        #score {
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #2c3e50;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            font-size: 18px;
+            color: #2c3e50;
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .key {
+            display: inline-block;
+            background: rgba(255,255,255,0.4);
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.6);
+            font-weight: bold;
+            min-width: 40px;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #2c3e50;
+            font-size: 2.5em;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+        }
+        .hint {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏔️ Temple Runner 3D - Nepali Style 🇳🇵</h1>
+    
+    <div id="gameContainer">
+        <div id="ui">
+            <div id="score">Score: 0</div>
+        </div>
+        <div id="controls">
+            <div>
+                <span class="key">SPACE</span> Jump 
+                <span class="key">←</span> Move Left 
+                <span class="key">→</span> Move Right
+            </div>
+            <div class="hint">Avoid obstacles and run as far as you can!</div>
+        </div>
+    </div>
+
+    <script>
+        // === INITIALIZATION ===
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('gameContainer').appendChild(renderer.domElement);
+
+        // === LIGHTING ===
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 20, 5);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        scene.add(directionalLight);
+
+        // === MOUNT EVEREST & HIMALAYAN BACKGROUND ===
+        function createMountainRange() {
+            const range = new THREE.Group();
+            
+            // Main Mount Everest
+            const mainPeakGeo = new THREE.ConeGeometry(15, 25, 8);
+            const mainPeakMat = new THREE.MeshPhongMaterial({ 
+                color: 0xffffff,
+                shininess: 60,
+                transparent: true,
+                opacity: 0.95
+            });
+            const mainPeak = new THREE.Mesh(mainPeakGeo, mainPeakMat);
+            mainPeak.position.set(-20, 5, -80);
+            mainPeak.rotation.y = Math.PI / 8;
+            
+            // Everest base
+            const baseGeo = new THREE.ConeGeometry(20, 15, 8);
+            const baseMat = new THREE.MeshPhongMaterial({ 
+                color: 0x5D4037,
+                shininess: 20
+            });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.set(-20, -12, -80);
+            base.rotation.y = Math.PI / 8;
+            
+            // Distant peaks
+            for (let i = 0; i < 12; i++) {
+                const peakSize = 5 + Math.random() * 8;
+                const peakGeo = new THREE.ConeGeometry(peakSize, peakSize * 1.5, 6);
+                const peakMat = new THREE.MeshPhongMaterial({ 
+                    color: 0xCCCCCC,
+                    transparent: true,
+                    opacity: 0.7 - (i * 0.05)
+                });
+                
+                const peak = new THREE.Mesh(peakGeo, peakMat);
+                peak.position.set(
+                    (Math.random() - 0.5) * 100,
+                    -10 + Math.random() * 5,
+                    -60 - (Math.random() * 40)
+                );
+                range.add(peak);
+            }
+            
+            range.add(mainPeak, base);
+            scene.add(range);
+            return range;
+        }
+
+        // === GROUND ===
+        const groundGeometry = new THREE.PlaneGeometry(200, 30);
+        const groundMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x2E7D32,
+            side: THREE.DoubleSide
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = Math.PI / 2;
+        ground.position.y = -2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Add texture to ground
+        const gridTexture = new THREE.TextureLoader().load('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+            <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#2E7D32"/>
+                <path d="M0,50 L100,50 M50,0 L50,100" stroke="#388E3C" stroke-width="1" opacity="0.3"/>
+            </svg>
+        `));
+        gridTexture.wrapS = THREE.RepeatWrapping;
+        gridTexture.wrapT = THREE.RepeatWrapping;
+        gridTexture.repeat.set(20, 4);
+        groundMaterial.map = gridTexture;
+
+        // === PLAYER (Yeti/Sherpa) ===
+        const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+        const playerMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x1e3c72,
+            shininess: 30
+        });
+        const player = new THREE.Mesh(playerGeometry, playerMaterial);
+        player.position.set(0, 1, 0);
+        player.castShadow = true;
+        scene.add(player);
+
+        // === OBSTACLES ===
+        let obstacles = [];
+        function createObstacle() {
+            const types = [
+                { shape: 'box', size: [0.8, 1.2, 0.8], color: 0x8B4513, name: 'Stupa' },
+                { shape: 'box', size: [1.5, 0.7, 0.8], color: 0xA0522D, name: 'Prayer Stone' },
+                { shape: 'cylinder', size: [0.5, 1.5, 0.5], color: 0x654321, name: 'Pillar' },
+                { shape: 'box', size: [0.6, 0.6, 0.6], color: 0xD2691E, name: 'Rock' }
+            ];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            let geometry;
+            
+            if (type.shape === 'cylinder') {
+                geometry = new THREE.CylinderGeometry(type.size[0], type.size[0], type.size[1], 8);
+            } else {
+                geometry = new THREE.BoxGeometry(...type.size);
+            }
+            
+            const material = new THREE.MeshPhongMaterial({ color: type.color });
+            const obstacle = new THREE.Mesh(geometry, material);
+            
+            obstacle.position.set(
+                30, // Start far right
+                type.shape === 'cylinder' ? type.size[1]/2 - 1 : type.size[1]/2 - 1,
+                (Math.random() - 0.5) * 10 // Random Z position
+            );
+            
+            obstacle.castShadow = true;
+            obstacle.userData = { name: type.name, speed: 0.15 + Math.random() * 0.1 };
+            scene.add(obstacle);
+            obstacles.push(obstacle);
+            
+            return obstacle;
+        }
+
+        // === GAME STATE ===
+        let score = 0;
+        let playerVelocityY = 0;
+        const gravity = -0.025;
+        const jumpForce = 0.4;
+        let isJumping = false;
+        let gameOver = false;
+        let obstacleTimer = 0;
+        const keys = {};
+        
+        const himalayas = createMountainRange();
+
+        // === CONTROLS ===
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            if (e.code === 'Space') e.preventDefault();
+        });
+        
+        window.addEventListener('keyup', (e) => keys[e.code] = false);
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // === GAME FUNCTIONS ===
+        function updatePlayer() {
+            // Jumping
+            if (keys['Space'] && !isJumping && !gameOver) {
+                playerVelocityY = jumpForce;
+                isJumping = true;
+            }
+            
+            // Apply gravity
+            playerVelocityY += gravity;
+            player.position.y += playerVelocityY;
+            
+            // Ground collision
+            if (player.position.y <= 1) {
+                player.position.y = 1;
+                playerVelocityY = 0;
+                isJumping = false;
+            }
+            
+            // Left/Right movement
+            const moveSpeed = 0.2;
+            if (keys['ArrowLeft'] || keys['KeyA']) {
+                player.position.z += moveSpeed;
+            }
+            if (keys['ArrowRight'] || keys['KeyD']) {
+                player.position.z -= moveSpeed;
+            }
+            
+            // Boundary check
+            player.position.z = Math.max(-8, Math.min(8, player.position.z));
+        }
+
+        function updateObstacles() {
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obstacle = obstacles[i];
+                obstacle.position.x -= obstacle.userData.speed;
+                
+                // Collision detection
+                const distance = Math.sqrt(
+                    Math.pow(player.position.x - obstacle.position.x, 2) +
+                    Math.pow(player.position.z - obstacle.position.z, 2)
+                );
+                
+                const heightDiff = Math.abs(player.position.y - obstacle.position.y);
+                const collisionThreshold = 1.2;
+                
+                if (distance < collisionThreshold && heightDiff < 1.5) {
+                    endGame();
+                    return;
+                }
+                
+                // Remove off-screen obstacles and increase score
+                if (obstacle.position.x < -30) {
+                    scene.remove(obstacle);
+                    obstacles.splice(i, 1);
+                    score += 10;
+                    document.getElementById('score').textContent = `Score: ${score}`;
+                }
+            }
+        }
+
+        function endGame() {
+            if (gameOver) return;
+            
+            gameOver = true;
+            player.material.color.set(0xff0000);
+            
+            setTimeout(() => {
+                alert(`Game Over!\n\nFinal Score: ${score}\n\nPress OK to restart`);
+                location.reload();
+            }, 100);
+        }
+
+        // === GAME LOOP ===
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (!gameOver) {
+                updatePlayer();
+                updateObstacles();
+                
+                // Generate new obstacles at random intervals
+                obstacleTimer++;
+                if (obstacleTimer > 40 + Math.random() * 80) {
+                    createObstacle();
+                    obstacleTimer = 0;
+                }
+                
+                // Update score continuously
+                score++;
+                if (score % 10 === 0) {
+                    document.getElementById('score').textContent = `Score: ${score}`;
+                }
+            }
+            
+            // Camera follows player
+            camera.position.x = player.position.x - 8;
+            camera.position.y = player.position.y + 5;
+            camera.position.z = player.position.z + 6;
+            camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+            
+            // Slow rotation of distant mountains for parallax effect
+            himalayas.rotation.y += 0.0002;
+            
+            renderer.render(scene, camera);
+        }
+
+        // === START GAME ===
+        camera.position.set(-8, 5, 6);
+        createObstacle(); // Initial obstacle
+        animate();
+    </script>
+</body>
+</html>
