@@ -92,6 +92,7 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - KHR_materials_unlit
  * - KHR_materials_volume
  * - KHR_mesh_quantization
+ * - KHR_meshopt_compression
  * - KHR_lights_punctual
  * - KHR_texture_basisu
  * - KHR_texture_transform
