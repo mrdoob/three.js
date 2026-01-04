@@ -10,7 +10,7 @@ import { addMethodChaining } from '../tsl/TSLCore.js';
  * @param {?ConditionalNode} conditional - An optional conditional node. It allows to decide whether the discard should be executed or not.
  * @return {Node} The `discard` expression.
  */
-export const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).toStack();
+export const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) );
 
 /**
  * Represents a `return` shader operation in TSL.
@@ -19,6 +19,10 @@ export const Discard = ( conditional ) => ( conditional ? select( conditional, e
  * @function
  * @return {ExpressionNode} The `return` expression.
  */
-export const Return = () => expression( 'return' ).toStack();
+export const Return = () => expression( 'return' );
 
-addMethodChaining( 'discard', Discard );
+addMethodChaining( 'discard', ( conditional ) => {
+
+	Discard( conditional ).toStack();
+
+} );

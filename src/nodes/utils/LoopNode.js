@@ -337,7 +337,7 @@ export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).
  * @function
  * @returns {ExpressionNode}
  */
-export const Continue = () => expression( 'continue' ).toStack();
+export const Continue = () => expression( 'continue' );
 
 /**
  * TSL function for creating a `Break()` expression.
@@ -346,4 +346,4 @@ export const Continue = () => expression( 'continue' ).toStack();
  * @function
  * @returns {ExpressionNode}
  */
-export const Break = () => expression( 'break' ).toStack();
+export const Break = () => expression( 'break' );
