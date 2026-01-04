@@ -63,7 +63,7 @@ export const densityFogFactor = Fn( ( [ density ], builder ) => {
 } );
 
 /**
- * Constructs a new height factor node. This fog factor requires a Y-up coordinate system.
+ * Constructs a new height fog factor node. This fog factor requires a Y-up coordinate system.
  *
  * @tsl
  * @function
