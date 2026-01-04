@@ -16,7 +16,7 @@
 			</div>
 
 			<small>
-				Exponential Height Fog via TSL.
+				Exponential Height Fog with TSL.
 			</small>
 		</div>
 
@@ -63,10 +63,10 @@
 
 				// meshes
 
-				const buildGeometry = new THREE.BoxGeometry( 1, 25, 1 );
-				const buildMaterial = new THREE.MeshPhongNodeMaterial( { color: 0xcd959a } );
+				const geometry = new THREE.BoxGeometry( 1, 25, 1 );
+				const material = new THREE.MeshPhongNodeMaterial( { color: 0xcd959a } );
 
-				const mesh = new THREE.InstancedMesh( buildGeometry, buildMaterial, 100 );
+				const mesh = new THREE.InstancedMesh( geometry, material, 100 );
 				mesh.position.y = - 10;
 				scene.add( mesh );
 
@@ -109,7 +109,7 @@
 
 				// gui
 
-				const gui = renderer.inspector.createParameters( 'Settings' );
+				const gui = renderer.inspector.createParameters( 'Fog Settings' );
 
 				gui.add( density, 'value', 0.001, 0.1 ).step( 0.0001 ).name( 'Density' );
 				gui.add( height, 'value', - 5, 5 ).name( 'Height' );
