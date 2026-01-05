@@ -47,7 +47,7 @@ function createHandler( rootDirectory ) {
 	return ( req, res ) => {
 
 		const pathname = decodeURIComponent( req.url.split( '?' )[ 0 ] );
-		let filePath = path.normalize( path.join( rootDirectory, pathname ) );
+		let filePath = path.join( rootDirectory, pathname );
 
 		// Prevent path traversal attacks
 		if ( ! filePath.startsWith( rootDirectory ) ) {
