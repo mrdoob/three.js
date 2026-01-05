@@ -72,23 +72,20 @@ function createHandler( rootDirectory ) {
 				// Show directory listing
 				const files = readdirSync( filePath )
 					.filter( f => ! f.startsWith( '.' ) )
+					.map( f => ( { name: f, isDir: statSync( path.join( filePath, f ) ).isDirectory() } ) )
 					.sort( ( a, b ) => {
 
-						const aIsDir = statSync( path.join( filePath, a ) ).isDirectory();
-						const bIsDir = statSync( path.join( filePath, b ) ).isDirectory();
-						if ( aIsDir && ! bIsDir ) return - 1;
-						if ( ! aIsDir && bIsDir ) return 1;
-						return a.localeCompare( b );
+						if ( a.isDir && ! b.isDir ) return - 1;
+						if ( ! a.isDir && b.isDir ) return 1;
+						return a.name.localeCompare( b.name );
 
 					} );
 
 				const base = pathname.endsWith( '/' ) ? pathname : pathname + '/';
-				const items = files.map( file => {
+				const items = files.map( ( { name, isDir } ) => {
 
-					const fullPath = path.join( filePath, file );
-					const isDir = statSync( fullPath ).isDirectory();
-					const safeFile = escapeHtml( file );
-					const safeHref = escapeHtml( base + file + ( isDir ? '/' : '' ) );
+					const safeFile = escapeHtml( name );
+					const safeHref = escapeHtml( base + name + ( isDir ? '/' : '' ) );
 					const icon = isDir ? '📁' : '📄';
 					return `<a href="${safeHref}"><span class="i">${icon}</span>${safeFile}</a>`;
 
