@@ -18932,13 +18932,13 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
-		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node should extract
+		 * the current contents of the bound framebuffer for each render call.
 		 *
 		 * @type {string}
-		 * @default 'frame'
+		 * @default 'render'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 		/**
 		 * The framebuffer texture for the current renderer context.
@@ -41131,6 +41131,25 @@ const densityFogFactor = Fn( ( [ density ], builder ) => {
 } );
 
 /**
+ * Constructs a new height fog factor node. This fog factor requires a Y-up coordinate system.
+ *
+ * @tsl
+ * @function
+ * @param {Node} density - Defines the fog density.
+ * @param {Node} height - The height threshold in world space. Everything below this y-coordinate is affected by fog.
+ */
+const exponentialHeightFogFactor = Fn( ( [ density, height ], builder ) => {
+
+	const viewZ = getViewZNode( builder );
+
+	const distance = height.sub( positionWorld.y ).max( 0 ).toConst();
+	const m = distance.mul( viewZ ).toConst();
+
+	return density.mul( density, m, m ).negate().exp().oneMinus();
+
+} );
+
+/**
  * This class can be used to configure a fog for the scene.
  * Nodes of this type are assigned to `Scene.fogNode`.
  *
@@ -47396,6 +47415,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	equirectUV: equirectUV,
 	exp: exp,
 	exp2: exp2,
+	exponentialHeightFogFactor: exponentialHeightFogFactor,
 	expression: expression,
 	faceDirection: faceDirection,
 	faceForward: faceForward,
