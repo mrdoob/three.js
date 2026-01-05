@@ -381,6 +381,9 @@ function Strings( config ) {
 			'sidebar/history/clear': 'پاک کردن',
 			'sidebar/history/persistent': 'ماندگار',
 
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
+
 			'toolbar/translate': 'ترجمه',
 			'toolbar/rotate': 'چرخش (دوران)',
 			'toolbar/scale': 'مقیاس',
