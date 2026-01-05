@@ -109,7 +109,7 @@
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
-    "selfsigned": "^2.4.1"
+    "selfsigned": "^5.0.0"
   },
   "jspm": {
     "files": [
