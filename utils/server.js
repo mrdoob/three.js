@@ -235,7 +235,7 @@ async function getCertificate() {
 	}
 
 	const attrs = [ { name: 'commonName', value: 'localhost' } ];
-	const pems = selfsigned.generate( attrs, {
+	const pems = await selfsigned.generate( attrs, {
 		algorithm: 'sha256',
 		days: 30,
 		keySize: 2048,
