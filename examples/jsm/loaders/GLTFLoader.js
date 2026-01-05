@@ -500,40 +500,61 @@ class GLTFLoader extends Loader {
 
 		}
 
-		if ( json.extensionsUsed ) {
+		// Ensure material extensionsUsed are also in top-level extensionsUsed
+		json.extensionsUsed = json.extensionsUsed || [];
 
-			for ( let i = 0; i < json.extensionsUsed.length; ++ i ) {
+		if ( json.materials ) {
 
-				const extensionName = json.extensionsUsed[ i ];
-				const extensionsRequired = json.extensionsRequired || [];
+			let materialExtensions = {};
 
-				switch ( extensionName ) {
+			for ( let i = 0; i < json.materials.length; i++ ) {
 
-					case EXTENSIONS.KHR_MATERIALS_UNLIT:
-						extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
-						break;
+				const material = json.materials[ i ];
 
-					case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
-						extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
-						break;
+				materialExtensions = { ...materialExtensions, ...( material.extensions || {} ) };
 
-					case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
-						extensions[ extensionName ] = new GLTFTextureTransformExtension();
-						break;
+			}
 
-					case EXTENSIONS.KHR_MESH_QUANTIZATION:
-						extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
-						break;
+			const materialExtensionNames = Object.keys( materialExtensions );
 
-					default:
+			if ( materialExtensionNames.length > 0 ) {
 
-						if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
+				json.extensionsUsed = [ ...new Set( [ ...json.extensionsUsed, ...materialExtensionNames ] ) ];
 
-							console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
+			}
 
-						}
+		}
 
-				}
+		for ( let i = 0; i < json.extensionsUsed.length; ++ i ) {
+
+			const extensionName = json.extensionsUsed[ i ];
+			const extensionsRequired = json.extensionsRequired || [];
+
+			switch ( extensionName ) {
+
+				case EXTENSIONS.KHR_MATERIALS_UNLIT:
+					extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
+					break;
+
+				case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
+					extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
+					break;
+
+				case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
+					extensions[ extensionName ] = new GLTFTextureTransformExtension();
+					break;
+
+				case EXTENSIONS.KHR_MESH_QUANTIZATION:
+					extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
+					break;
+
+				default:
+
+					if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
+
+						console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
+
+					}
 
 			}
 
