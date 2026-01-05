@@ -13,7 +13,6 @@ class ParametersGroup {
 
 		this.paramList = new Item( name );
 
-		/** @type {Array<{ object:object, key:string, editor:object, subItem:Item }>} */
 		this.objects = [];
 
 	}
@@ -63,12 +62,6 @@ class ParametersGroup {
 
 	}
 
-	/**
-	 * @param {Object} object
-	 * @param {string} property
-	 * @param {Object} editor
-	 * @param {Item} subItem
-	 */
 	_addParameter( object, property, editor, subItem ) {
 
 		editor.name = ( name ) => {
