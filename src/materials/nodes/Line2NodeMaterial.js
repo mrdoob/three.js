@@ -56,7 +56,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.useColor = parameters.vertexColors;
+		this.vertexColors = parameters.vertexColors;
 
 		/**
 		 * The dash offset.
@@ -133,7 +133,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		const { renderer } = builder;
 
 		const useAlphaToCoverage = this._useAlphaToCoverage;
-		const useColor = this.useColor;
+		const vertexColors = this.vertexColors;
 		const useDash = this._useDash;
 		const useWorldUnits = this._useWorldUnits;
 
@@ -434,7 +434,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			} else {
 
-				if ( useColor ) {
+				if ( vertexColors ) {
 
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
