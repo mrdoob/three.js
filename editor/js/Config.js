@@ -22,6 +22,7 @@ function Config() {
 		'project/renderer/toneMappingExposure': 1,
 
 		'settings/history': false,
+		'settings/import/gltf/scene': false,
 
 		'settings/shortcuts/translate': 'w',
 		'settings/shortcuts/rotate': 'e',

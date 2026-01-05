@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
@@ -276,7 +277,16 @@ function Loader( editor ) {
 						scene.name = filename;
 
 						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
+
+							editor.execute( new SetSceneCommand( editor, scene ) );
+
+						} else {
+
+							editor.execute( new AddObjectCommand( editor, scene ) );
+
+						}
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -306,7 +316,16 @@ function Loader( editor ) {
 						scene.name = filename;
 
 						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
+
+							editor.execute( new SetSceneCommand( editor, scene ) );
+
+						} else {
+
+							editor.execute( new AddObjectCommand( editor, scene ) );
+
+						}
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -932,7 +951,16 @@ function Loader( editor ) {
 						const scene = result.scene;
 
 						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
+
+							editor.execute( new SetSceneCommand( editor, scene ) );
+
+						} else {
+
+							editor.execute( new AddObjectCommand( editor, scene ) );
+
+						}
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -954,7 +982,16 @@ function Loader( editor ) {
 						const scene = result.scene;
 
 						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
+
+							editor.execute( new SetSceneCommand( editor, scene ) );
+
+						} else {
+
+							editor.execute( new AddObjectCommand( editor, scene ) );
+
+						}
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();

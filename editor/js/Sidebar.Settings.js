@@ -2,6 +2,7 @@ import { UIPanel, UIRow, UISelect, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
 import { SidebarSettingsHistory } from './Sidebar.Settings.History.js';
+import { SidebarSettingsImport } from './Sidebar.Settings.Import.js';
 
 function SidebarSettings( editor ) {
 
@@ -50,6 +51,7 @@ function SidebarSettings( editor ) {
 
 	container.add( new SidebarSettingsShortcuts( editor ) );
 	container.add( new SidebarSettingsHistory( editor ) );
+	container.add( new SidebarSettingsImport( editor ) );
 
 	return container;
 

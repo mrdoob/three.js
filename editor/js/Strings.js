@@ -783,6 +783,9 @@ function Strings( config ) {
 			'sidebar/history/clear': 'Clear',
 			'sidebar/history/persistent': 'Persistent',
 
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
+
 			'toolbar/translate': 'Translate',
 			'toolbar/rotate': 'Rotate',
 			'toolbar/scale': 'Scale',
@@ -1185,6 +1188,9 @@ function Strings( config ) {
 			'sidebar/history': 'Historique',
 			'sidebar/history/clear': 'Supprimer',
 			'sidebar/history/persistent': 'Permanent',
+
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
 
 			'toolbar/translate': 'Position',
 			'toolbar/rotate': 'Rotation',
@@ -1589,6 +1595,9 @@ function Strings( config ) {
 			'sidebar/history/clear': '清空',
 			'sidebar/history/persistent': '本地存储',
 
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
+
 			'toolbar/translate': '移动',
 			'toolbar/rotate': '旋转',
 			'toolbar/scale': '缩放',
@@ -1992,6 +2001,9 @@ function Strings( config ) {
 			'sidebar/history/clear': 'クリア',
 			'sidebar/history/persistent': '永続的',
 
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
+
 			'toolbar/translate': '移動',
 			'toolbar/rotate': '回転',
 			'toolbar/scale': 'スケール',
@@ -2393,6 +2405,9 @@ function Strings( config ) {
 			'sidebar/history': '기록',
 			'sidebar/history/clear': '지우기',
 			'sidebar/history/persistent': '영구적',
+
+			'sidebar/settings/import': 'Import',
+			'sidebar/settings/import/gltf/scene': 'Import glTF as root scene',
 
 			'toolbar/translate': '이동',
 			'toolbar/rotate': '회전',
