@@ -32,10 +32,11 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Water } from 'three/addons/objects/Water.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
+			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 			let container, stats;
 			let camera, scene, renderer;
-			let controls, water, sun, mesh;
+			let controls, water, sun, mesh, bloomPass;
 
 			init();
 
@@ -45,13 +46,19 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.5;
+				renderer.toneMappingExposure = 0.1;
 				container.appendChild( renderer.domElement );
+
+				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ) );
+				bloomPass.threshold = 0;
+				bloomPass.strength = 0.1;
+				bloomPass.radius = 0;
+				renderer.setEffects( [ bloomPass ] );
 
 				//
 
@@ -105,7 +112,8 @@
 
 				const parameters = {
 					elevation: 2,
-					azimuth: 180
+					azimuth: 180,
+					exposure: 0.1
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
@@ -164,6 +172,11 @@
 				const folderSky = gui.addFolder( 'Sky' );
 				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
 				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+				folderSky.add( parameters, 'exposure', 0, 1, 0.0001 ).onChange( function ( value ) {
+
+					renderer.toneMappingExposure = value;
+
+				} );
 				folderSky.open();
 
 				const waterUniforms = water.material.uniforms;
@@ -172,6 +185,11 @@
 				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
 				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
 				folderWater.open();
+
+				const folderBloom = gui.addFolder( 'Bloom' );
+				folderBloom.add( bloomPass, 'strength', 0, 3, 0.01 );
+				folderBloom.add( bloomPass, 'radius', 0, 1, 0.01 );
+				folderBloom.open();
 
 				//
 
