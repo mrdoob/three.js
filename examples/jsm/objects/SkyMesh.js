@@ -105,7 +105,6 @@ class SkyMesh extends Mesh {
 
 		const vSunDirection = varyingProperty( 'vec3' );
 		const vSunE = varyingProperty( 'float' );
-		const vSunfade = varyingProperty( 'float' );
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
@@ -146,10 +145,9 @@ class SkyMesh extends Mesh {
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
 			vSunE.assign( sunIntensity );
 
-			// varying sun fade
+			// sun fade
 
 			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
-			vSunfade.assign( sunfade );
 
 			// varying vBetaR
 
@@ -234,9 +232,7 @@ class SkyMesh extends Mesh {
 
 			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
-			const retColor = pow( texColor, vec3( float( 1.0 ).div( float( 1.2 ).add( vSunfade.mul( 1.2 ) ) ) ) );
-
-			return vec4( retColor, 1.0 );
+			return vec4( texColor, 1.0 );
 
 		} )();
 

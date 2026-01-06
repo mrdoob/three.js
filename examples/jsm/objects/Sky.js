@@ -150,7 +150,6 @@ Sky.SkyShader = {
 	fragmentShader: /* glsl */`
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
-		varying float vSunfade;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
 		varying float vSunE;
@@ -223,9 +222,7 @@ Sky.SkyShader = {
 
 			vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
 
-			vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
-
-			gl_FragColor = vec4( retColor, 1.0 );
+			gl_FragColor = vec4( texColor, 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
