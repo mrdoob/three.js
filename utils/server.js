@@ -2,6 +2,7 @@ import http from 'http';
 import path from 'path';
 import os from 'os';
 import { createReadStream, existsSync, statSync, readdirSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 function escapeHtml( str ) {
 
@@ -211,7 +212,7 @@ function tryListen( server, port, maxAttempts = 20 ) {
 }
 
 // CLI mode
-const isMain = process.argv[ 1 ] && path.resolve( process.argv[ 1 ] ) === path.resolve( import.meta.url.replace( 'file://', '' ) );
+const isMain = process.argv[ 1 ] && path.resolve( process.argv[ 1 ] ) === path.resolve( fileURLToPath( import.meta.url ) );
 
 if ( isMain ) {
 
