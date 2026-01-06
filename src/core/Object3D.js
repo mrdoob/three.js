@@ -355,6 +355,18 @@ class Object3D extends EventDispatcher {
 		this.customDistanceMaterial = undefined;
 
 		/**
+		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
+		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * geometry and material settings.
+		 *
+		 * Only relevant in context of {@link WebGPURenderer}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.static = false;
+
+		/**
 		 * An object that can be used to store custom data about the 3D object. It
 		 * should not hold references to functions as these will not be cloned.
 		 *
@@ -1267,6 +1279,7 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
+		if ( this.static !== false ) object.static = this.static;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
@@ -1564,6 +1577,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.static = source.static;
 
 		this.animations = source.animations.slice();
 
