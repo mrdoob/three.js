@@ -49,9 +49,7 @@
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
     "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
-    "dev-ssl": "node utils/build/dev.js && node utils/server.js -p 8080 --ssl",
     "preview": "node utils/build/preview.js",
-    "preview-ssl": "node utils/build/preview.js --ssl",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm",
     "lint-examples": "eslint examples",
@@ -108,8 +106,7 @@
     "magic-string": "^0.30.0",
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
-    "rollup": "^4.6.0",
-    "selfsigned": "^5.0.0"
+    "rollup": "^4.6.0"
   },
   "jspm": {
     "files": [
