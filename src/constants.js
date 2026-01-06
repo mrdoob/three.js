@@ -156,6 +156,14 @@ export const MultiplyBlending = 4;
 export const CustomBlending = 5;
 
 /**
+ * Represents material blending.
+ *
+ * @type {number}
+ * @constant
+ */
+export const MaterialBlending = 6;
+
+/**
  * A `source + destination` blending equation.
  *
  * @type {number}

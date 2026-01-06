@@ -7,7 +7,7 @@ import {
 import {
 	BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
-	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
+	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, MaterialBlending,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
 	OneMinusDstColorFactor, DstAlphaFactor, OneMinusDstAlphaFactor, SrcAlphaSaturateFactor,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
@@ -116,13 +116,13 @@ class WebGPUPipelineUtils {
 
 		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
 
-		// blending
+		// material blending
 
-		let blending;
+		let materialBlending;
 
 		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
 
-			blending = this._getBlending( material );
+			materialBlending = this._getBlending( material );
 
 		}
 
@@ -148,27 +148,42 @@ class WebGPUPipelineUtils {
 		if ( renderObject.context.textures !== null ) {
 
 			const textures = renderObject.context.textures;
+			const mrt = renderObject.context.mrt;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
-				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
+				const texture = textures[ i ];
+				const colorFormat = utils.getTextureFormatGPU( texture );
 
-				if ( i === 0 ) {
+				// mrt blending
 
-					targets.push( {
-						format: colorFormat,
-						blend: blending,
-						writeMask: colorWriteMask
-					} );
+				let blending;
+
+				if ( mrt !== null ) {
+
+					const blendMode = mrt.getBlendMode( texture.name );
+
+					if ( blendMode.blending === MaterialBlending ) {
+
+						blending = materialBlending;
+
+					} else if ( blendMode.blending !== NoBlending ) {
+
+						blending = this._getBlending( blendMode );
+
+					}
 
 				} else {
 
-					targets.push( {
-						format: colorFormat,
-						writeMask: colorWriteMask
-					} );
+					blending = materialBlending;
 
 				}
+
+				targets.push( {
+					format: colorFormat,
+					blend: blending,
+					writeMask: colorWriteMask
+				} );
 
 			}
 
@@ -178,7 +193,7 @@ class WebGPUPipelineUtils {
 
 			targets.push( {
 				format: colorFormat,
-				blend: blending,
+				blend: materialBlending,
 				writeMask: colorWriteMask
 			} );
 
@@ -362,24 +377,24 @@ class WebGPUPipelineUtils {
 	 * for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Material} material - The material.
+	 * @param {Material|BlendMode} object - The object containing blending information.
 	 * @return {Object} The blending state.
 	 */
-	_getBlending( material ) {
+	_getBlending( object ) {
 
 		let color, alpha;
 
-		const blending = material.blending;
-		const blendSrc = material.blendSrc;
-		const blendDst = material.blendDst;
-		const blendEquation = material.blendEquation;
+		const blending = object.blending;
+		const blendSrc = object.blendSrc;
+		const blendDst = object.blendDst;
+		const blendEquation = object.blendEquation;
 
 
 		if ( blending === CustomBlending ) {
 
-			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : blendSrc;
-			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : blendDst;
-			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : blendEquation;
+			const blendSrcAlpha = object.blendSrcAlpha !== null ? object.blendSrcAlpha : blendSrc;
+			const blendDstAlpha = object.blendDstAlpha !== null ? object.blendDstAlpha : blendDst;
+			const blendEquationAlpha = object.blendEquationAlpha !== null ? object.blendEquationAlpha : blendEquation;
 
 			color = {
 				srcFactor: this._getBlendFactor( blendSrc ),
@@ -395,7 +410,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const premultipliedAlpha = material.premultipliedAlpha;
+			const premultipliedAlpha = object.premultipliedAlpha;
 
 			const setBlend = ( srcRGB, dstRGB, srcAlpha, dstAlpha ) => {
 
@@ -448,11 +463,11 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
-						error( 'WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
+						error( `WebGPURenderer: "SubtractiveBlending" requires "${ object.isMaterial ? 'material' : 'blendMode' }.premultipliedAlpha = true".` );
 						break;
 
 					case MultiplyBlending:
-						error( 'WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
+						error( `WebGPURenderer: "MultiplyBlending" requires "${ object.isMaterial ? 'material' : 'blendMode' }.premultipliedAlpha = true".` );
 						break;
 
 				}
