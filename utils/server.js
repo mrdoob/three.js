@@ -1,8 +1,7 @@
 import http from 'http';
-import https from 'https';
 import path from 'path';
 import os from 'os';
-import { createReadStream, existsSync, statSync, readFileSync, mkdirSync, readdirSync, openSync, writeSync, closeSync, fstatSync, constants } from 'fs';
+import { createReadStream, existsSync, statSync, readdirSync } from 'fs';
 
 function escapeHtml( str ) {
 
@@ -166,108 +165,6 @@ ${items}
 
 }
 
-function getCacheDir() {
-
-	const appName = 'three-dev-server';
-
-	if ( process.platform === 'darwin' ) {
-
-		return path.join( os.homedir(), 'Library', 'Application Support', appName );
-
-	} else if ( process.platform === 'win32' ) {
-
-		return path.join( process.env.LOCALAPPDATA || process.env.APPDATA, appName );
-
-	} else {
-
-		return path.join( os.homedir(), '.config', appName );
-
-	}
-
-}
-
-async function getCertificate() {
-
-	// Cache certificate in platform-specific data directory
-	const cacheDir = getCacheDir();
-	const certPath = path.join( cacheDir, 'cert.pem' );
-	const keyPath = path.join( cacheDir, 'key.pem' );
-
-	// Try to use cached certificate (valid for 7 days)
-	try {
-
-		const certFd = openSync( certPath, constants.O_RDONLY );
-		const stat = fstatSync( certFd );
-		const age = Date.now() - stat.mtimeMs;
-		const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-		if ( age < maxAge ) {
-
-			const cert = readFileSync( certFd, 'utf8' );
-			closeSync( certFd );
-			const key = readFileSync( keyPath, 'utf8' );
-			return { cert, key };
-
-		}
-
-		closeSync( certFd );
-
-	} catch ( e ) {
-
-		// Cache miss or invalid, generate new certificate
-
-	}
-
-	// Generate new self-signed certificate using selfsigned
-	let selfsigned;
-	try {
-
-		selfsigned = ( await import( 'selfsigned' ) ).default;
-
-	} catch ( e ) {
-
-		console.error( 'For HTTPS support, install selfsigned: npm install selfsigned' );
-		process.exit( 1 );
-
-	}
-
-	const attrs = [ { name: 'commonName', value: 'localhost' } ];
-	const pems = await selfsigned.generate( attrs, {
-		algorithm: 'sha256',
-		days: 30,
-		keySize: 2048,
-		extensions: [
-			{ name: 'keyUsage', keyCertSign: true, digitalSignature: true, keyEncipherment: true },
-			{ name: 'subjectAltName', altNames: [
-				{ type: 2, value: 'localhost' },
-				{ type: 7, ip: '127.0.0.1' }
-			] }
-		]
-	} );
-
-	// Cache the certificate with restrictive permissions
-	try {
-
-		mkdirSync( cacheDir, { recursive: true, mode: 0o700 } );
-
-		const certFd = openSync( certPath, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC, 0o600 );
-		writeSync( certFd, pems.cert );
-		closeSync( certFd );
-
-		const keyFd = openSync( keyPath, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC, 0o600 );
-		writeSync( keyFd, pems.private );
-		closeSync( keyFd );
-
-	} catch ( e ) {
-
-		// Caching failed, but certificate is still valid for this session
-
-	}
-
-	return { cert: pems.cert, key: pems.private };
-
-}
-
 export function createServer( options = {} ) {
 
 	const rootDirectory = options.root || path.resolve();
@@ -320,24 +217,10 @@ if ( isMain ) {
 
 	const args = process.argv.slice( 2 );
 	const requestedPort = parseInt( args.find( ( _, i, arr ) => arr[ i - 1 ] === '-p' ) || '8080', 10 );
-	const useSSL = args.includes( '--ssl' );
 	const rootDirectory = path.resolve();
 
-	const protocol = useSSL ? 'https' : 'http';
 	const handler = createHandler( rootDirectory );
-
-	let server;
-
-	if ( useSSL ) {
-
-		const credentials = await getCertificate();
-		server = https.createServer( credentials, handler );
-
-	} else {
-
-		server = http.createServer( handler );
-
-	}
+	const server = http.createServer( handler );
 
 	const port = await tryListen( server, requestedPort );
 
@@ -347,7 +230,7 @@ if ( isMain ) {
 
 	}
 
-	console.log( `\x1b[32mServer running at ${protocol}://localhost:${port}/\x1b[0m` );
+	console.log( `\x1b[32mServer running at http://localhost:${port}/\x1b[0m` );
 
 	// Show network addresses
 	const interfaces = os.networkInterfaces();
@@ -357,7 +240,7 @@ if ( isMain ) {
 
 			if ( net.family === 'IPv4' && ! net.internal ) {
 
-				console.log( `  ${protocol}://${net.address}:${port}/` );
+				console.log( `  http://${net.address}:${port}/` );
 
 			}
 

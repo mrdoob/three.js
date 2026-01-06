@@ -5,8 +5,6 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const rootDir = path.resolve( __dirname, '../..' );
 
-const useSSL = process.argv.includes( '--ssl' );
-
 // Start rollup in watch mode
 const rollup = spawn( 'npx', [
 	'rollup',
@@ -20,10 +18,7 @@ const rollup = spawn( 'npx', [
 } );
 
 // Start server
-const serverArgs = [ 'utils/server.js', '-p', '8080' ];
-if ( useSSL ) serverArgs.push( '--ssl' );
-
-const server = spawn( 'node', serverArgs, {
+const server = spawn( 'node', [ 'utils/server.js', '-p', '8080' ], {
 	cwd: rootDir,
 	stdio: [ 'ignore', 'pipe', 'pipe' ],
 	shell: false
