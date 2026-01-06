@@ -1,6 +1,7 @@
 import {
 	Color,
 	FrontSide,
+	HalfFloatType,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -84,7 +85,7 @@ class Water extends Mesh {
 
 		const mirrorCamera = new PerspectiveCamera();
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: HalfFloatType } );
 
 		const mirrorShader = {
 
