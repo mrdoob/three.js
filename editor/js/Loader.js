@@ -278,15 +278,7 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 
-						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
-
-							editor.execute( new SetSceneCommand( editor, scene ) );
-
-						} else {
-
-							editor.execute( new AddObjectCommand( editor, scene ) );
-
-						}
+						addScene( editor, scene );
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -317,15 +309,7 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 
-						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
-
-							editor.execute( new SetSceneCommand( editor, scene ) );
-
-						} else {
-
-							editor.execute( new AddObjectCommand( editor, scene ) );
-
-						}
+						addScene( editor, scene );
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -808,6 +792,20 @@ function Loader( editor ) {
 
 	};
 
+	function addScene( editor, scene ) {
+
+		if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
+
+			editor.execute( new SetSceneCommand( editor, scene ) );
+
+		} else {
+
+			editor.execute( new AddObjectCommand( editor, scene ) );
+
+		}
+
+	}
+
 	function handleJSON( data ) {
 
 		if ( data.metadata === undefined ) { // 2.0
@@ -952,15 +950,7 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 
-						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
-
-							editor.execute( new SetSceneCommand( editor, scene ) );
-
-						} else {
-
-							editor.execute( new AddObjectCommand( editor, scene ) );
-
-						}
+						addScene( editor, scene );
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
@@ -983,15 +973,7 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 
-						if ( editor.config.getKey( 'settings/import/gltf/scene' ) === true ) {
-
-							editor.execute( new SetSceneCommand( editor, scene ) );
-
-						} else {
-
-							editor.execute( new AddObjectCommand( editor, scene ) );
-
-						}
+						addScene( editor, scene );
 
 						loader.dracoLoader.dispose();
 						loader.ktx2Loader.dispose();
