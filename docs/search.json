@@ -4013,6 +4013,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "InstanceNode#getPreviousInstancedPosition",
+			"kind": "function"
+		},
+		{
 			"title": "InstanceNode#instanceColor",
 			"kind": "member"
 		},
@@ -4026,6 +4030,10 @@
 		},
 		{
 			"title": "InstanceNode#instanceMatrixNode",
+			"kind": "member"
+		},
+		{
+			"title": "InstanceNode#previousInstanceMatrixNode",
 			"kind": "member"
 		},
 		{
@@ -4114,6 +4122,10 @@
 		},
 		{
 			"title": "InstancedMesh#morphTexture",
+			"kind": "member"
+		},
+		{
+			"title": "InstancedMesh#previousInstanceMatrix",
 			"kind": "member"
 		},
 		{
@@ -7837,6 +7849,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NodeBuilder#needsPreviousData",
+			"kind": "function"
+		},
+		{
 			"title": "NodeBuilder#needsToWorkingColorSpace",
 			"kind": "function"
 		},
@@ -8254,6 +8270,10 @@
 		},
 		{
 			"title": "NodeMaterial#maskNode",
+			"kind": "member"
+		},
+		{
+			"title": "NodeMaterial#maskShadowNode",
 			"kind": "member"
 		},
 		{
@@ -11973,10 +11993,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "SkinningNode#needsPreviousBoneMatrices",
-			"kind": "function"
-		},
-		{
 			"title": "SkinningNode#positionNode",
 			"kind": "member"
 		},
@@ -15058,6 +15074,10 @@
 		},
 		{
 			"title": "WGSLNodeBuilder#uniformGroups",
+			"kind": "member"
+		},
+		{
+			"title": "WGSLNodeBuilder#uniformGroupsBindings",
 			"kind": "member"
 		},
 		{
@@ -18909,18 +18929,6 @@
 		{
 			"title": "MaterialXLoader#parse",
 			"kind": "function"
-		},
-		{
-			"title": "MeshPostProcessingMaterial",
-			"kind": "class"
-		},
-		{
-			"title": "MeshPostProcessingMaterial#aoPassMap",
-			"kind": "member"
-		},
-		{
-			"title": "MeshPostProcessingMaterial#aoPassMapScale",
-			"kind": "member"
 		},
 		{
 			"title": "MeshSurfaceSampler",
@@ -25608,6 +25616,10 @@
 		},
 		{
 			"title": "clearcoatRoughness",
+			"kind": "member"
+		},
+		{
+			"title": "clipSpace",
 			"kind": "member"
 		},
 		{

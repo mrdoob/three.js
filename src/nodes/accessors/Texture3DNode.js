@@ -1,6 +1,5 @@
 import TextureNode from './TextureNode.js';
-import { nodeProxy, vec3, Fn, If, int } from '../tsl/TSLBase.js';
-import { textureSize } from './TextureSizeNode.js';
+import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
 
 const normal = Fn( ( { texture, uv } ) => {
 
@@ -114,35 +113,6 @@ class Texture3DNode extends TextureNode {
 	 * @param {boolean} value - The update toggle.
 	 */
 	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
-
-	/**
-	 * Overwrites the default implementation to return the unmodified uv node.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Node} uvNode - The uv node to setup.
-	 * @return {Node} The unmodified uv node.
-	 */
-	setupUV( builder, uvNode ) {
-
-		const texture = this.value;
-
-		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) ) {
-
-			if ( this.sampler ) {
-
-				uvNode = uvNode.flipY();
-
-			} else {
-
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
-
-			}
-
-		}
-
-		return uvNode;
-
-	}
 
 	/**
 	 * Generates the uv code snippet.

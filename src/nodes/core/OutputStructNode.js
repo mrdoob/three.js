@@ -42,11 +42,17 @@ class OutputStructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	getNodeType( /*builder*/ ) {
 
-		const properties = builder.getNodeProperties( this );
+		return 'OutputType';
 
-		if ( properties.membersLayout === undefined ) {
+	}
+
+	generate( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.membersLayout === undefined ) {
 
 			const members = this.members;
 			const membersLayout = [];
@@ -60,16 +66,12 @@ class OutputStructNode extends Node {
 
 			}
 
-			properties.membersLayout = membersLayout;
-			properties.structType = builder.getOutputStructTypeFromNode( this, properties.membersLayout );
+			nodeData.membersLayout = membersLayout;
+			nodeData.structType = builder.getOutputStructTypeFromNode( this, nodeData.membersLayout );
 
 		}
 
-		return properties.structType.name;
-
-	}
-
-	generate( builder ) {
+		//
 
 		const propertyName = builder.getOutputStructName();
 		const members = this.members;
