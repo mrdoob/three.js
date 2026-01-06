@@ -2,10 +2,10 @@ import {
 	Color,
 	Mesh,
 	Vector3,
-	MeshLambertNodeMaterial
+	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, diffuseColor } from 'three/tsl';
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -32,7 +32,7 @@ class WaterMesh extends Mesh {
 	 */
 	constructor( geometry, options ) {
 
-		const material = new MeshLambertNodeMaterial();
+		const material = new NodeMaterial();
 
 		super( geometry, material );
 
@@ -154,8 +154,6 @@ class WaterMesh extends Mesh {
 		material.opacityNode = this.alpha;
 
 		material.receivedShadowPositionNode = positionWorld.add( distortion );
-
-		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
 
 		material.colorNode = Fn( () => {
 
