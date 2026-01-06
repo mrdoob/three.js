@@ -46,8 +46,9 @@
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
+    "build-docs": "jsdoc -c utils/docs/jsdoc.config.json && npm run build-llms",
+    "build-llms": "node utils/llms/build.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
-    "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
     "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
     "preview": "node utils/build/preview.js",
     "lint-core": "eslint src",
@@ -101,11 +102,12 @@
     "globals": "^17.0.0",
     "jpeg-js": "^0.4.4",
     "jsdoc": "^4.0.5",
-    "pngjs": "^7.0.0",
     "magic-string": "^0.30.0",
+    "pngjs": "^7.0.0",
     "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
-    "rollup": "^4.6.0"
+    "rollup": "^4.6.0",
+    "turndown": "^7.2.2"
   },
   "jspm": {
     "files": [
