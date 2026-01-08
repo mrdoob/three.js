@@ -442,13 +442,12 @@ class Renderer {
 		this._transparentSort = null;
 
 		/**
-		 * The framebuffer target.
+		 * Cache of framebuffer targets per canvas target.
 		 *
 		 * @private
-		 * @type {?RenderTarget}
-		 * @default null
+		 * @type {WeakMap<CanvasTarget, RenderTarget>}
 		 */
-		this._frameBufferTarget = null;
+		this._frameBufferTargets = new WeakMap();
 
 		const alphaClear = this.alpha === true ? 0 : 1;
 
@@ -1292,9 +1291,11 @@ class Renderer {
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
-		let frameBufferTarget = this._frameBufferTarget;
+		const canvasTarget = this._canvasTarget;
 
-		if ( frameBufferTarget === null ) {
+		let frameBufferTarget = this._frameBufferTargets.get( canvasTarget );
+
+		if ( frameBufferTarget === undefined ) {
 
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
@@ -1310,7 +1311,7 @@ class Renderer {
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
 
-			this._frameBufferTarget = frameBufferTarget;
+			this._frameBufferTargets.set( canvasTarget, frameBufferTarget );
 
 		}
 
@@ -1327,8 +1328,6 @@ class Renderer {
 			frameBufferTarget.setSize( width, height, 1 );
 
 		}
-
-		const canvasTarget = this._canvasTarget;
 
 		frameBufferTarget.viewport.copy( canvasTarget._viewport );
 		frameBufferTarget.scissor.copy( canvasTarget._scissor );
@@ -2311,7 +2310,8 @@ class Renderer {
 			this._renderContexts.dispose();
 			this._textures.dispose();
 
-			if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
+			// WeakMap will be garbage collected automatically, but we reset it for cleanliness
+			this._frameBufferTargets = new WeakMap();
 
 			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
@@ -2413,8 +2413,7 @@ class Renderer {
 		this.setOutputRenderTarget( null );
 		this.setRenderTarget( null );
 
-		this._frameBufferTarget.dispose();
-		this._frameBufferTarget = null;
+		this._frameBufferTargets = new WeakMap();
 
 	}
 

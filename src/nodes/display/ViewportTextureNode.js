@@ -9,6 +9,8 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
+const _textureCaches = /*@__PURE__*/ new WeakMap();
+
 /**
  * A special type of texture node which represents the data of the current viewport
  * as a texture. The module extracts data from the current bound framebuffer with
@@ -80,47 +82,37 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
-		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node needs to
+		 * update for each render call, supporting multi-canvas scenarios where multiple
+		 * render calls occur per frame.
 		 *
 		 * @type {string}
-		 * @default 'frame'
+		 * @default 'render'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
-
-		/**
-		 * The framebuffer texture for the current renderer context.
-		 *
-		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
-		 * @private
-		 */
-		this._cacheTextures = new WeakMap();
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
 	/**
-	 * This methods returns a texture for the given render target reference.
+	 * This methods returns a texture for the given render target or canvas target reference.
 	 *
 	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
 	 * for different render contexts.
 	 *
-	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @param {?(RenderTarget|CanvasTarget)} [reference=null] - The render target or canvas target reference.
 	 * @return {Texture} The framebuffer texture.
 	 */
 	getTextureForReference( reference = null ) {
 
 		let defaultFramebuffer;
-		let cacheTextures;
 
 		if ( this.referenceNode ) {
 
 			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
-			cacheTextures = this.referenceNode._cacheTextures;
 
 		} else {
 
 			defaultFramebuffer = this.defaultFramebuffer;
-			cacheTextures = this._cacheTextures;
 
 		}
 
@@ -130,11 +122,20 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
+		let cacheTextures = _textureCaches.get( defaultFramebuffer );
+
+		if ( cacheTextures === undefined ) {
+
+			cacheTextures = new WeakMap();
+			_textureCaches.set( defaultFramebuffer, cacheTextures );
+
+		}
+
 		if ( cacheTextures.has( reference ) === false ) {
 
 			const framebufferTexture = defaultFramebuffer.clone();
 
-			cacheTextures.set( reference, framebufferTexture );
+      cacheTextures.set( reference, framebufferTexture );
 
 		}
 
@@ -144,9 +145,14 @@ class ViewportTextureNode extends TextureNode {
 
 	updateReference( frame ) {
 
-		const renderTarget = frame.renderer.getRenderTarget();
+		const renderer = frame.renderer;
+		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		this.value = this.getTextureForReference( renderTarget );
+		// Use canvasTarget if available, otherwise renderTarget (handles both null and undefined)
+		const reference = canvasTarget ? canvasTarget : renderTarget;
+
+		this.value = this.getTextureForReference( reference );
 
 		return this.value;
 
@@ -156,20 +162,27 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderer = frame.renderer;
 		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		if ( renderTarget === null ) {
+		const reference = canvasTarget ? canvasTarget : renderTarget;
+
+		if ( reference == null ) {
 
 			renderer.getDrawingBufferSize( _size );
 
+		} else if ( reference.getDrawingBufferSize ) {
+
+			reference.getDrawingBufferSize( _size );
+
 		} else {
 
-			_size.set( renderTarget.width, renderTarget.height );
+			_size.set( reference.width, reference.height );
 
 		}
 
 		//
 
-		const framebufferTexture = this.getTextureForReference( renderTarget );
+		const framebufferTexture = this.getTextureForReference( reference );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 

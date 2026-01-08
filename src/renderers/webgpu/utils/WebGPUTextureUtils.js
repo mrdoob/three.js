@@ -458,7 +458,13 @@ class WebGPUTextureUtils {
 			depthTexture.depth === depth &&
 			depthTexture.stencil === stencil ) {
 
-			return backend.get( depthTexture ).texture;
+			const cachedTexture = backend.get( depthTexture ).texture;
+
+			if ( cachedTexture !== undefined ) {
+
+				return cachedTexture;
+
+			}
 
 		}
 
