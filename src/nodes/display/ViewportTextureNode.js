@@ -9,8 +9,6 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
-const _textureCaches = /*@__PURE__*/ new WeakMap();
-
 /**
  * A special type of texture node which represents the data of the current viewport
  * as a texture. The module extracts data from the current bound framebuffer with
@@ -82,9 +80,8 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node needs to
-		 * update for each render call, supporting multi-canvas scenarios where multiple
-		 * render calls occur per frame.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node should extract
+		 * the current contents of the bound framebuffer for each render call.
 		 *
 		 * @type {string}
 		 * @default 'render'
@@ -122,12 +119,12 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
-		let cacheTextures = _textureCaches.get( defaultFramebuffer );
+		let cacheTextures = defaultFramebuffer._viewportCache;
 
 		if ( cacheTextures === undefined ) {
 
 			cacheTextures = new WeakMap();
-			_textureCaches.set( defaultFramebuffer, cacheTextures );
+			defaultFramebuffer._viewportCache = cacheTextures;
 
 		}
 
@@ -135,7 +132,7 @@ class ViewportTextureNode extends TextureNode {
 
 			const framebufferTexture = defaultFramebuffer.clone();
 
-      cacheTextures.set( reference, framebufferTexture );
+			cacheTextures.set( reference, framebufferTexture );
 
 		}
 
@@ -166,7 +163,7 @@ class ViewportTextureNode extends TextureNode {
 
 		const reference = canvasTarget ? canvasTarget : renderTarget;
 
-		if ( reference == null ) {
+		if ( reference === null ) {
 
 			renderer.getDrawingBufferSize( _size );
 
@@ -239,3 +236,20 @@ export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode ).se
  * @returns {ViewportTextureNode}
  */
 export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } ).setParameterLength( 0, 3 );
+
+// Singleton instances for common usage
+const _singletonOpaqueViewportTextureNode = /*@__PURE__*/ viewportMipTexture();
+
+/**
+ * TSL function for creating a viewport texture node with enabled mipmap generation.
+ * The texture should only contain the opaque rendering objects.
+ *
+ * This should be used just in transparent or transmissive materials.
+ *
+ * @tsl
+ * @function
+ * @param {?Node} [uv=screenUV] - The uv node.
+ * @param {?Node} [level=null] - The level node.
+ * @returns {ViewportTextureNode}
+ */
+export const viewportOpaqueMipTexture = ( uv = screenUV, level = null ) => _singletonOpaqueViewportTextureNode.sample( uv, level ); // TODO: Use once() when sample() supports it

@@ -301,7 +301,7 @@ class AnimationClip {
 	 * @static
 	 * @deprecated since r175.
 	 * @param {Object} animation - A serialized animation clip as JSON.
-	 * @param {Array<Bones>} bones - An array of bones.
+	 * @param {Array<Bone>} bones - An array of bones.
 	 * @return {?AnimationClip} The new animation clip.
 	 */
 	static parseAnimation( animation, bones ) {

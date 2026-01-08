@@ -1131,6 +1131,7 @@ class ObjectLoader extends Loader {
 		if ( data.visible !== undefined ) object.visible = data.visible;
 		if ( data.frustumCulled !== undefined ) object.frustumCulled = data.frustumCulled;
 		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
+		if ( data.static !== undefined ) object.static = data.static;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
 
