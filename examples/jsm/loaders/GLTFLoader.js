@@ -224,6 +224,12 @@ class GLTFLoader extends Loader {
 
 		this.register( function ( parser ) {
 
+			return new GLTFMaterialsUnlitExtension( parser );
+
+		});
+
+		this.register( function ( parser ) {
+
 			return new GLTFLightsExtension( parser );
 
 		} );
