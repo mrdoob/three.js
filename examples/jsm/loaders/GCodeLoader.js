@@ -182,11 +182,11 @@ class GCodeLoader extends Loader {
 
 				const line = Object.assign( {}, state ); // clone state
 
-				line.x = args.x !== undefined ? absolute( state.x, args.x ) : state.x;
-				line.y = args.y !== undefined ? absolute( state.y, args.y ) : state.y;
-				line.z = args.z !== undefined ? absolute( state.z, args.z ) : state.z;
-				line.e = args.e !== undefined ? absoluteExtrusion( state.e, args.e ) : state.e;
-				line.f = args.f !== undefined ? absolute( state.f, args.f ) : state.f;
+				if ( args.x !== undefined ) line.x = absolute( state.x, args.x );
+				if ( args.y !== undefined ) line.y = absolute( state.y, args.y );
+				if ( args.z !== undefined ) line.z = absolute( state.z, args.z );
+				if ( args.e !== undefined ) line.e = absoluteExtrusion( state.e, args.e );
+				if ( args.f !== undefined ) line.f = absolute( state.f, args.f );
 
 				//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
 				if ( delta( state.e, line.e ) > 0 ) {
