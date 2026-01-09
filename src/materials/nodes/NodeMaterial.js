@@ -25,7 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
-import { error, warn } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * Base class for all node materials.
