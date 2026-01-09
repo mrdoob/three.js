@@ -535,9 +535,9 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const mvp = subBuild( this.setupVertex( builder ), 'VERTEX' );
+		const mvp = this.setupVertex( builder );
 
-		const vertexNode = this.vertexNode || mvp;
+		const vertexNode = subBuild( this.vertexNode || mvp, 'VERTEX' );
 
 		builder.context.clipSpace = vertexNode;
 
