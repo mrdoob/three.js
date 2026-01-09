@@ -41,7 +41,8 @@ import {
 	Vector2,
 	Vector3,
 	Vector4,
-	VectorKeyframeTrack
+	VectorKeyframeTrack,
+	MeshStandardMaterial
 } from 'three';
 
 import * as fflate from '../libs/fflate.module.js';
@@ -172,7 +173,7 @@ class FBXLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
+		return new FBXTreeParser( textureLoader, this.manager ).parse();
 
 	}
 
@@ -297,7 +298,7 @@ class FBXTreeParser {
 			const filename = images[ id ];
 
 			if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ];
-			else images[ id ] = images[ id ].split( '\\' ).pop();
+			else images[ id ] = images[ id ].split( /[/\\]/ ).pop(); // Split on / as well as \
 
 		}
 
@@ -541,6 +542,9 @@ class FBXTreeParser {
 			case 'lambert':
 				material = new MeshLambertMaterial();
 				break;
+			case 'openpbrsurface':
+				material = new MeshStandardMaterial();
+				break;
 			default:
 				console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
 				material = new MeshPhongMaterial();
@@ -561,15 +565,17 @@ class FBXTreeParser {
 
 		const parameters = {};
 
-		if ( materialNode.BumpFactor ) {
+		if ( materialNode.BumpFactor || materialNode[ 'Maya|normalCameraFactor' ] ) {
 
-			parameters.bumpScale = materialNode.BumpFactor.value;
+			// parameters.bumpScale = materialNode.BumpFactor?.value ?? materialNode['Maya|normalCameraFactor'].value;
+			parameters.bumpScale = materialNode.BumpFactor && materialNode.BumpFactor.value !== undefined ? materialNode.BumpFactor.value : materialNode[ 'Maya|normalCameraFactor' ] && materialNode[ 'Maya|normalCameraFactor' ].value !== undefined ? materialNode[ 'Maya|normalCameraFactor' ].value : undefined;
 
 		}
 
-		if ( materialNode.Diffuse ) {
+		if ( materialNode.Diffuse || materialNode[ 'Maya|baseColor' ] ) {
 
-			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
+			// parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse?.value || materialNode['Maya|baseColor'].value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( ( materialNode.Diffuse && materialNode.Diffuse.value !== undefined ) ? materialNode.Diffuse.value : materialNode[ 'Maya|baseColor' ].value ), SRGBColorSpace );
 
 		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
@@ -584,9 +590,10 @@ class FBXTreeParser {
 
 		}
 
-		if ( materialNode.Emissive ) {
+		if ( materialNode.Emissive || materialNode[ 'Maya|emissionColor' ] ) {
 
-			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive.value ), SRGBColorSpace );
+			// parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive?.value || materialNode['Maya|emissionColor'].value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( ( materialNode.Emissive && materialNode.Emissive.value !== undefined ) ? materialNode.Emissive.value : materialNode[ 'Maya|emissionColor' ].value ), SRGBColorSpace );
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
@@ -595,25 +602,40 @@ class FBXTreeParser {
 
 		}
 
-		if ( materialNode.EmissiveFactor ) {
+		if ( materialNode.EmissiveFactor || materialNode[ 'Maya|emissionLuminance' ] ) {
 
-			parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor.value );
+			// parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor?.value ?? materialNode['Maya|emissionLuminance'].value );
+			parameters.emissiveIntensity = parseFloat( ( materialNode.EmissiveFactor && materialNode.EmissiveFactor.value !== undefined ) ? materialNode.EmissiveFactor.value : materialNode[ 'Maya|emissionLuminance' ].value
+			);
 
 		}
 
 		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
 
-		parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
+		if ( materialNode.TransparencyFactor ) {
 
-		if ( parameters.opacity === 1 || parameters.opacity === 0 ) {
+			parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
 
-			parameters.opacity = ( materialNode.Opacity ? parseFloat( materialNode.Opacity.value ) : null );
+			if ( parameters.opacity === 1 || parameters.opacity === 0 ) {
 
-			if ( parameters.opacity === null ) {
+				parameters.opacity = ( materialNode.Opacity ? parseFloat( materialNode.Opacity.value ) : null );
 
-				parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+				if ( parameters.opacity === null ) {
+
+					parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+
+				}
 
 			}
+
+		} else if ( materialNode[ 'Maya|transmissionWeight' ] ) {
+
+			parameters.opacity = 1 - materialNode[ 'Maya|transmissionWeight' ].value;
+
+		} else {
+
+			// Default: Because opacity should always be set
+			parameters.opacity = 1;
 
 		}
 
@@ -646,6 +668,12 @@ class FBXTreeParser {
 
 		}
 
+		if ( materialNode[ 'Maya|baseMetalness' ] ) {
+
+			parameters.metalness = materialNode[ 'Maya|baseMetalness' ].value;
+
+		}
+
 		const scope = this;
 		connections.get( ID ).children.forEach( function ( child ) {
 
@@ -672,6 +700,17 @@ class FBXTreeParser {
 
 					break;
 
+				case 'Maya|baseColor':
+					parameters.map = scope.getTexture( textureMap, child.ID );
+					if ( parameters.map !== undefined ) {
+
+						parameters.color = ColorManagement.colorSpaceToWorking( new Color( 'white' ) ); // MATERIAL COLOR GETS SET TO BLACK BY MAYA WHEN A COLOR MAP IS APPLIED, SO SETTING IT TO WHITE TO RESOLVE THAT PROBLEM
+						parameters.map.colorSpace = SRGBColorSpace;
+
+					}
+
+					break;
+
 				case 'DisplacementColor':
 					parameters.displacementMap = scope.getTexture( textureMap, child.ID );
 					break;
@@ -686,7 +725,19 @@ class FBXTreeParser {
 
 					break;
 
+				case 'Maya|emissionColor':
+					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
+					if ( parameters.emissiveMap !== undefined ) {
+
+						parameters.emissive = ColorManagement.colorSpaceToWorking( new Color( 'white' ) ); // MATERIAL COLOR GETS SET TO BLACK BY MAYA WHEN A COLOR MAP IS APPLIED, SO SETTING IT TO WHITE TO RESOLVE THAT PROBLEM
+						parameters.emissiveMap.colorSpace = SRGBColorSpace;
+
+					}
+
+					break;
+
 				case 'NormalMap':
+				case 'Maya|normalCamera':
 				case 'Maya|TEX_normal_map':
 					parameters.normalMap = scope.getTexture( textureMap, child.ID );
 					break;
