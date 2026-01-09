@@ -40,7 +40,7 @@ export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
 export * from './utils/ViewportUtils.js';
 export * from './utils/RotateNode.js';
-export * from './utils/SpriteSheetUVNode.js';
+export * from './utils/SpriteSheetUV.js';
 export * from './utils/Timer.js';
 export * from './utils/TriplanarTextures.js';
 export * from './utils/ReflectorNode.js';
