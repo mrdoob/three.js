@@ -29165,8 +29165,7 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-
-				attributesId[ nodeAttribute.name ] = attribute.version;
+				attributesId[ nodeAttribute.name ] = attribute.id;
 
 			}
 
