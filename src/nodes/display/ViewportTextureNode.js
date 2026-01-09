@@ -88,6 +88,14 @@ class ViewportTextureNode extends TextureNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
+		/**
+		 * The framebuffer texture for the current renderer context.
+		 *
+		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
+		 * @private
+		 */
+		this._cacheTextures = new WeakMap();
+
 	}
 
 	/**
@@ -102,29 +110,23 @@ class ViewportTextureNode extends TextureNode {
 	getTextureForReference( reference = null ) {
 
 		let defaultFramebuffer;
+		let cacheTextures;
 
 		if ( this.referenceNode ) {
 
 			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
+			cacheTextures = this.referenceNode._cacheTextures;
 
 		} else {
 
 			defaultFramebuffer = this.defaultFramebuffer;
+			cacheTextures = this._cacheTextures;
 
 		}
 
 		if ( reference === null ) {
 
 			return defaultFramebuffer;
-
-		}
-
-		let cacheTextures = defaultFramebuffer._viewportCache;
-
-		if ( cacheTextures === undefined ) {
-
-			cacheTextures = new WeakMap();
-			defaultFramebuffer._viewportCache = cacheTextures;
 
 		}
 
@@ -146,8 +148,7 @@ class ViewportTextureNode extends TextureNode {
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 
-		// Use canvasTarget if available, otherwise renderTarget (handles both null and undefined)
-		const reference = canvasTarget ? canvasTarget : renderTarget;
+		const reference = renderTarget ? renderTarget : canvasTarget;
 
 		this.value = this.getTextureForReference( reference );
 
@@ -161,7 +162,7 @@ class ViewportTextureNode extends TextureNode {
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 
-		const reference = canvasTarget ? canvasTarget : renderTarget;
+		const reference = renderTarget ? renderTarget : canvasTarget;
 
 		if ( reference === null ) {
 
