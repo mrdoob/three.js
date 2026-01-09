@@ -84,7 +84,12 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		const currentMRT = renderer.getMRT();
 		renderer.setMRT( null );
 
+		const currentAutoClear = renderer.autoClear;
+		renderer.autoClear = true;
+
 		camera.update( renderer, scene );
+
+		renderer.autoClear = currentAutoClear;
 
 		renderer.setMRT( currentMRT );
 
