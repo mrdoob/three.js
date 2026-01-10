@@ -30,7 +30,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, VSMShadowMap } from '../../constants.js';
 
 import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
@@ -46,6 +46,8 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
+
+const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
 /**
  * Base class for renderers.
@@ -3183,7 +3185,15 @@ class Renderer {
 
 				const { colorNode, depthNode, positionNode } = this._getShadowNodes( material );
 
-				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+				if ( this.shadowMap.type === VSMShadowMap ) {
+
+					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
+
+				} else {
+
+					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : _shadowSide[ material.side ];
+
+				}
 
 				if ( colorNode !== null ) overrideMaterial.colorNode = colorNode;
 				if ( depthNode !== null ) overrideMaterial.depthNode = depthNode;
