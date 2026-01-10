@@ -1013,7 +1013,7 @@ class USDCParser {
 			// Uncompressed specs
 			// Each spec: pathIndex (4), fieldSetIndex (4), specType (4) = 12 bytes
 			// For version 0.0.1 there may be different padding
-			const specSize = ( this.version.major === 0 && this.version.minor === 0 && this.version.patch === 1 ) ? 16 : 12;
+			const specSize = ( this.version.minor === 0 && this.version.patch === 1 ) ? 16 : 12;
 			const numSpecs = Math.floor( section.size / specSize );
 
 			for ( let i = 0; i < numSpecs; i ++ ) {
