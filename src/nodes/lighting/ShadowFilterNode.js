@@ -9,6 +9,7 @@ import { objectPosition } from '../accessors/Object3DNode.js';
 import { positionWorld } from '../accessors/Position.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
+import { NoBlending } from '../../constants.js';
 
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 
@@ -263,6 +264,7 @@ export const getShadowMaterial = ( light ) => {
 		material.depthNode = depthNode;
 		material.isShadowPassMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
 		material.name = 'ShadowMaterial';
+		material.blending = NoBlending;
 		material.fog = false;
 
 		shadowMaterialLib.set( light, material );
