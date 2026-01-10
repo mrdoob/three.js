@@ -7,7 +7,7 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Color } from '../../math/Color.js';
-import { BasicShadowMap, LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
+import { BasicShadowMap, LessEqualCompare, WebGPUCoordinateSystem } from '../../constants.js';
 import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
@@ -205,7 +205,7 @@ class PointShadowNode extends ShadowNode {
 
 		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
 		depthTexture.name = 'PointShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		depthTexture.compareFunction = LessEqualCompare;
 
 		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
 		shadowMap.texture.name = 'PointShadowMap';
