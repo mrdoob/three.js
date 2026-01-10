@@ -5,8 +5,6 @@ import { mix, fract, step, max, clamp } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { objectPosition } from '../accessors/Object3DNode.js';
-import { positionWorld } from '../accessors/Position.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 import { NoBlending } from '../../constants.js';
@@ -212,31 +210,6 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 } );
 
-//
-
-const linearDistance = /*@__PURE__*/ Fn( ( [ position, cameraNear, cameraFar ] ) => {
-
-	let dist = positionWorld.sub( position ).length();
-	dist = dist.sub( cameraNear ).div( cameraFar.sub( cameraNear ) );
-	dist = dist.saturate(); // clamp to [ 0, 1 ]
-
-	return dist;
-
-} );
-
-const linearShadowDistance = ( light ) => {
-
-	const camera = light.shadow.camera;
-
-	const nearDistance = reference( 'near', 'float', camera ).setGroup( renderGroup );
-	const farDistance = reference( 'far', 'float', camera ).setGroup( renderGroup );
-
-	const referencePosition = objectPosition( light );
-
-	return linearDistance( referencePosition, nearDistance, farDistance );
-
-};
-
 /**
  * Retrieves or creates a shadow material for the given light source.
  *
@@ -257,11 +230,8 @@ export const getShadowMaterial = ( light ) => {
 
 	if ( material === undefined ) {
 
-		const depthNode = light.isPointLight ? linearShadowDistance( light ) : null;
-
 		material = new NodeMaterial();
 		material.colorNode = vec4( 0, 0, 0, 1 );
-		material.depthNode = depthNode;
 		material.isShadowPassMaterial = true; // Use to avoid other overrideMaterial override material.colorNode unintentionally when using material.shadowNode
 		material.name = 'ShadowMaterial';
 		material.blending = NoBlending;
