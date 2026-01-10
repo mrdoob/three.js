@@ -1575,13 +1575,15 @@ class USDCParser {
 
 	_buildHierarchy( parent, parentPath ) {
 
+		const prefix = parentPath === '/' ? '/' : parentPath + '/';
+
 		// Find all direct children of this path
 		for ( const path in this.specsByPath ) {
 
 			const spec = this.specsByPath[ path ];
 
 			// Check if this is a direct child
-			if ( ! this._isDirectChild( parentPath, path ) ) continue;
+			if ( ! this._isDirectChild( parentPath, path, prefix ) ) continue;
 
 			// Only process Prim specs
 			if ( spec.specType !== SpecType.Prim ) continue;
@@ -1627,7 +1629,7 @@ class USDCParser {
 
 	}
 
-	_isDirectChild( parentPath, childPath ) {
+	_isDirectChild( parentPath, childPath, prefix ) {
 
 		if ( parentPath === '/' ) {
 
@@ -1639,10 +1641,10 @@ class USDCParser {
 		}
 
 		// Must start with parent path
-		if ( ! childPath.startsWith( parentPath + '/' ) ) return false;
+		if ( ! childPath.startsWith( prefix ) ) return false;
 
 		// Must not have additional slashes (direct child only)
-		const remainder = childPath.slice( parentPath.length + 1 );
+		const remainder = childPath.slice( prefix.length );
 		return remainder.indexOf( '/' ) === - 1 && remainder.length > 0;
 
 	}
@@ -1704,10 +1706,11 @@ class USDCParser {
 	_getGeomSubsets( meshPath ) {
 
 		const subsets = [];
+		const prefix = meshPath + '/';
 
 		for ( const p in this.specsByPath ) {
 
-			if ( ! p.startsWith( meshPath + '/' ) ) continue;
+			if ( ! p.startsWith( prefix ) ) continue;
 
 			const spec = this.specsByPath[ p ];
 			if ( spec.fields.typeName !== 'GeomSubset' ) continue;
@@ -1931,11 +1934,12 @@ class USDCParser {
 		// In USDC, attributes are stored as child specs with paths like /Mesh.points
 		// The attribute value is in the 'default' field of the attribute spec
 		const attrs = {};
+		const prefix = primPath + '.';
 
 		for ( const path in this.specsByPath ) {
 
 			// Check if this is an attribute of the prim (path contains a dot after primPath)
-			if ( ! path.startsWith( primPath + '.' ) ) continue;
+			if ( ! path.startsWith( prefix ) ) continue;
 
 			const spec = this.specsByPath[ path ];
 
@@ -1943,7 +1947,7 @@ class USDCParser {
 			if ( spec.specType !== SpecType.Attribute ) continue;
 
 			// Get attribute name (part after the dot)
-			const attrName = path.slice( primPath.length + 1 );
+			const attrName = path.slice( prefix.length );
 
 			// Get the value from 'default' field
 			if ( spec.fields.default !== undefined ) {
@@ -2204,11 +2208,12 @@ class USDCParser {
 		if ( ! materialPath ) {
 
 			const materialPaths = [];
+			const prefix = meshPath + '/';
 
 			for ( const path in this.specsByPath ) {
 
 				// Look for material:binding specs under mesh path
-				if ( ! path.startsWith( meshPath + '/' ) ) continue;
+				if ( ! path.startsWith( prefix ) ) continue;
 				if ( ! path.endsWith( '.material:binding' ) ) continue;
 
 				const bindingSpec = this.specsByPath[ path ];
@@ -2274,10 +2279,12 @@ class USDCParser {
 		// Prefer materials that have texture files
 		for ( const materialPath of materialPaths ) {
 
+			const prefix = materialPath + '/';
+
 			// Check if this material has any texture shaders
 			for ( const path in this.specsByPath ) {
 
-				if ( ! path.startsWith( materialPath + '/' ) ) continue;
+				if ( ! path.startsWith( prefix ) ) continue;
 
 				const spec = this.specsByPath[ path ];
 				if ( spec.fields.typeName !== 'Shader' ) continue;
@@ -2304,10 +2311,12 @@ class USDCParser {
 		const materialSpec = this.specsByPath[ materialPath ];
 		if ( ! materialSpec ) return;
 
+		const prefix = materialPath + '/';
+
 		// Look for shader children (UsdPreviewSurface)
 		for ( const path in this.specsByPath ) {
 
-			if ( ! path.startsWith( materialPath + '/' ) ) continue;
+			if ( ! path.startsWith( prefix ) ) continue;
 
 			const spec = this.specsByPath[ path ];
 			const typeName = spec.fields.typeName;
@@ -2520,10 +2529,12 @@ class USDCParser {
 
 	_applyTexturesFallback( material, materialPath ) {
 
+		const prefix = materialPath + '/';
+
 		// Fallback heuristic: find texture samplers by name/file patterns
 		for ( const path in this.specsByPath ) {
 
-			if ( ! path.startsWith( materialPath + '/' ) ) continue;
+			if ( ! path.startsWith( prefix ) ) continue;
 
 			const spec = this.specsByPath[ path ];
 			const typeName = spec.fields.typeName;
