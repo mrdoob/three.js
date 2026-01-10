@@ -505,6 +505,8 @@ class ValueRep {
 	get payload() {
 
 		// 48-bit payload: lo (32 bits) + hi lower 16 bits
+		// Note: JavaScript numbers are IEEE 754 doubles with 53 bits of integer precision,
+		// so 48-bit values are represented exactly without loss of precision.
 		return this.lo + ( ( this.hi & 0xFFFF ) * 0x100000000 );
 
 	}
@@ -617,8 +619,15 @@ class USDCParser {
 			for ( let i = 0; i < numTokens; i ++ ) {
 
 				let strEnd = strStart;
-				while ( tokensData[ strEnd ] !== 0 ) strEnd ++;
-				const str = String.fromCharCode.apply( null, tokensData.slice( strStart, strEnd ) );
+				while ( strEnd < tokensData.length && tokensData[ strEnd ] !== 0 ) strEnd ++;
+
+				let str = '';
+				for ( let j = strStart; j < strEnd; j ++ ) {
+
+					str += String.fromCharCode( tokensData[ j ] );
+
+				}
+
 				this.tokens.push( str );
 				strStart = strEnd + 1;
 
@@ -637,7 +646,7 @@ class USDCParser {
 			for ( let i = 0; i < numTokens; i ++ ) {
 
 				let strEnd = strStart;
-				while ( tokensData[ strEnd ] !== 0 ) strEnd ++;
+				while ( strEnd < tokensData.length && tokensData[ strEnd ] !== 0 ) strEnd ++;
 
 				let str = '';
 				for ( let j = strStart; j < strEnd; j ++ ) {
@@ -856,7 +865,7 @@ class USDCParser {
 		const reader = this.reader;
 
 		// Prevent infinite recursion
-		if ( depth > 10000 ) return;
+		if ( depth > 1000 ) return;
 
 		// Read path item header
 		const index = reader.readUint32();
@@ -1549,7 +1558,11 @@ class USDCParser {
 		let fieldSetIndex = spec.fieldSetIndex;
 
 		// Field sets are terminated by 0xFFFFFFFF
-		while ( fieldSetIndex < this.fieldSets.length ) {
+		// Limit iterations to prevent infinite loops from malformed data
+		const maxIterations = 10000;
+		let iterations = 0;
+
+		while ( fieldSetIndex < this.fieldSets.length && iterations < maxIterations ) {
 
 			const fieldIndex = this.fieldSets[ fieldSetIndex ];
 
@@ -1566,6 +1579,7 @@ class USDCParser {
 			}
 
 			fieldSetIndex ++;
+			iterations ++;
 
 		}
 
