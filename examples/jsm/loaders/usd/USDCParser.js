@@ -530,6 +530,8 @@ class USDCParser {
 		this.reader = new BinaryReader( this.buffer );
 		this.assets = assets;
 		this.version = { major: 0, minor: 0, patch: 0 };
+		this.textureLoader = new TextureLoader();
+		this.textureCache = {};
 
 		// Parse structure
 		this._readBootstrap();
@@ -2607,12 +2609,20 @@ class USDCParser {
 		if ( cleanPath.endsWith( '@' ) ) cleanPath = cleanPath.slice( 0, - 1 );
 		if ( cleanPath.startsWith( './' ) ) cleanPath = cleanPath.slice( 2 );
 
-		// Check assets
+		// Check cache first
+		if ( this.textureCache[ cleanPath ] ) {
+
+			return this.textureCache[ cleanPath ];
+
+		}
+
+		// Load from assets
 		const assetUrl = this.assets[ cleanPath ];
 		if ( assetUrl ) {
 
-			const loader = new TextureLoader();
-			return loader.load( assetUrl );
+			const texture = this.textureLoader.load( assetUrl );
+			this.textureCache[ cleanPath ] = texture;
+			return texture;
 
 		}
 
