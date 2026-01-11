@@ -677,7 +677,9 @@ class USDCParser {
 		const reader = this.reader;
 		reader.seek( section.start );
 
-		// Strings section contains token indices
+		// Strings section has an 8-byte count prefix, but string indices stored
+		// elsewhere in the file are relative to the section start (not the data).
+		// So we read the entire section as uint32 values to maintain correct indexing.
 		const numStrings = section.size / 4;
 		this.strings = [];
 
@@ -1502,14 +1504,22 @@ class USDCParser {
 	_readHalf() {
 
 		const h = this.reader.readUint16();
-		// Convert half to float
+		// Convert half to float (IEEE 754 half-precision)
 		const sign = ( h & 0x8000 ) >> 15;
 		const exp = ( h & 0x7C00 ) >> 10;
 		const frac = h & 0x03FF;
 
 		if ( exp === 0 ) {
 
-			return sign ? - 0 : 0;
+			// Zero or denormalized number
+			if ( frac === 0 ) {
+
+				return sign ? - 0 : 0;
+
+			}
+
+			// Denormalized: value = ±2^-14 × (frac/1024)
+			return ( sign ? - 1 : 1 ) * Math.pow( 2, - 14 ) * ( frac / 1024 );
 
 		} else if ( exp === 31 ) {
 
