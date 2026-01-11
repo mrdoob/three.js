@@ -39,7 +39,7 @@
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
-		let geometries, mesh, material;
+		let geometries, mesh;
 		const ids = [];
 		const matrix = new THREE.Matrix4();
 
@@ -103,6 +103,19 @@
 
 		}
 
+		function randomizeColor( color ) {
+
+			return color.set( 0xffffff * Math.random() );
+
+		}
+
+		function randomizeAlpha() {
+
+			// make ~20% of all objects transparent
+			return Math.random() > 0.8 ? 0.5 : 1.0;
+
+		}
+
 		function initGeometries() {
 
 			geometries = [
@@ -115,19 +128,25 @@
 
 		function createMaterial() {
 
-			if ( ! material ) {
-
-				material = new THREE.MeshNormalMaterial();
-
-			}
-
-			return material;
+			return new THREE.MeshBasicMaterial( {
+				transparent: true
+			} );
 
 		}
 
 		function cleanup() {
 
 			if ( mesh ) {
+
+				mesh.traverse( node => {
+
+					if ( node instanceof THREE.Mesh ) {
+
+						node.material.dispose();
+
+					}
+
+				} );
 
 				mesh.parent.remove( mesh );
 
@@ -159,10 +178,14 @@
 
 		function initRegularMesh() {
 
+			const color = new THREE.Color();
 			mesh = new THREE.Group();
-			const material = createMaterial();
 
 			for ( let i = 0; i < api.count; i ++ ) {
+
+				const material = createMaterial();
+				material.color.copy( randomizeColor( color ) );
+				material.opacity = randomizeAlpha();
 
 				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
 				randomizeMatrix( child.matrix );
@@ -184,6 +207,8 @@
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
+			const color = new THREE.Color();
+			const colorWithAlpha = new THREE.Vector4();
 			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
 			mesh.userData.rotationSpeeds = [];
 
@@ -200,8 +225,12 @@
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
+				randomizeColor( color );
+				colorWithAlpha.set( color.r, color.g, color.b, randomizeAlpha() );
+
 				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				mesh.setColorAt( id, colorWithAlpha );
 
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
@@ -255,24 +284,6 @@
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 			gui.add( api, 'method', Method ).onChange( initMesh );
-			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
-
-				if ( v < 1 ) {
-
-					material.transparent = true;
-					material.depthWrite = false;
-
-				} else {
-
-					material.transparent = false;
-					material.depthWrite = true;
-
-				}
-
-				material.opacity = v;
-				material.needsUpdate = true;
-
-			} );
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
