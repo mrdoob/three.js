@@ -1783,6 +1783,9 @@ class USDCParser {
 		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
 		const uvIndices = fields[ 'primvars:st:indices' ];
 
+		// Get normals
+		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+
 		// Build face-to-triangle mapping
 		// For each face, compute how many triangles it produces and at what offset
 		const faceTriangleOffset = [];
@@ -1881,10 +1884,18 @@ class USDCParser {
 		const origIndices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
 		const origUvIndices = uvIndices ? this._triangulateIndices( uvIndices, faceVertexCounts ) : null;
 
+		// Triangulate normals if they are faceVarying (one per face-vertex)
+		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
+		const origNormalIndices = hasFaceVaryingNormals
+			? this._triangulateIndices( Array.from( { length: numFaceVertices }, ( _, i ) => i ), faceVertexCounts )
+			: null;
+
 		// Build reordered vertex data
 		const vertexCount = triangleCount * 3;
 		const positions = new Float32Array( vertexCount * 3 );
 		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
+		const normalData = normals ? new Float32Array( vertexCount * 3 ) : null;
 
 		for ( let i = 0; i < sortedTriangles.length; i ++ ) {
 
@@ -1920,6 +1931,28 @@ class USDCParser {
 
 				}
 
+				// Normals
+				if ( normalData && normals ) {
+
+					if ( origNormalIndices ) {
+
+						// FaceVarying normals
+						const normalIdx = origNormalIndices[ origIdx ];
+						normalData[ newIdx * 3 ] = normals[ normalIdx * 3 ];
+						normalData[ newIdx * 3 + 1 ] = normals[ normalIdx * 3 + 1 ];
+						normalData[ newIdx * 3 + 2 ] = normals[ normalIdx * 3 + 2 ];
+
+					} else if ( normals.length === points.length ) {
+
+						// Per-vertex normals
+						normalData[ newIdx * 3 ] = normals[ pointIdx * 3 ];
+						normalData[ newIdx * 3 + 1 ] = normals[ pointIdx * 3 + 1 ];
+						normalData[ newIdx * 3 + 2 ] = normals[ pointIdx * 3 + 2 ];
+
+					}
+
+				}
+
 			}
 
 		}
@@ -1932,8 +1965,15 @@ class USDCParser {
 
 		}
 
-		// Compute normals (simpler than reordering existing normals)
-		geometry.computeVertexNormals();
+		if ( normalData ) {
+
+			geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
+
+		} else {
+
+			geometry.computeVertexNormals();
+
+		}
 
 		return geometry;
 
