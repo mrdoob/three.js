@@ -1451,7 +1451,7 @@ class USDCParser {
 				// Float compression: 'i' = compressed as ints, 't' = lookup table
 				const code = reader.readInt8();
 
-				if ( code === 105 ) { // 'i'
+				if ( code === 0x69 ) { // 'i'
 
 					const compressedSize = reader.readUint64();
 					const compressed = reader.readBytes( compressedSize );
@@ -1466,7 +1466,7 @@ class USDCParser {
 					for ( let i = 0; i < size; i ++ ) floats[ i ] = ints[ i ];
 					return floats;
 
-				} else if ( code === 116 ) { // 't'
+				} else if ( code === 0x74 ) { // 't'
 
 					const lutSize = reader.readUint32();
 					const lut = new Float32Array( lutSize );
@@ -2595,80 +2595,58 @@ class USDCParser {
 
 		const prefix = materialPath + '/';
 
+		// Texture type matching patterns: [materialProperty, colorSpace, patterns]
+		const textureTypes = [
+			[ 'map', SRGBColorSpace, [ 'diffuse', 'basecolor', 'albedo', '_bc', '_diffuse', '_albedo' ]],
+			[ 'normalMap', NoColorSpace, [ 'normal', '_n.', '_normal' ]],
+			[ 'roughnessMap', NoColorSpace, [ 'roughness', '_r.', '_roughness' ]],
+			[ 'metalnessMap', NoColorSpace, [ 'metallic', 'metalness', '_m.', '_metallic' ]],
+			[ 'aoMap', NoColorSpace, [ 'occlusion', 'ao', '_ao', '_occlusion' ]],
+			[ 'emissiveMap', SRGBColorSpace, [ 'emissive', '_emissive' ]]
+		];
+
 		// Fallback heuristic: find texture samplers by name/file patterns
 		for ( const path in this.specsByPath ) {
 
 			if ( ! path.startsWith( prefix ) ) continue;
 
 			const spec = this.specsByPath[ path ];
-			const typeName = spec.fields.typeName;
-
-			if ( typeName !== 'Shader' ) continue;
+			if ( spec.fields.typeName !== 'Shader' ) continue;
 
 			const textureAttrs = this._getAttributeValues( path );
 			const infoId = textureAttrs[ 'info:id' ] || spec.fields[ 'info:id' ];
-
 			if ( infoId !== 'UsdUVTexture' ) continue;
 
 			const file = textureAttrs[ 'inputs:file' ];
 			if ( ! file ) continue;
-
-			const shaderName = this._getPathName( path );
-			const fileName = typeof file === 'string' ? file.toLowerCase() : '';
 
 			const texture = this._loadTexture( file );
 			if ( ! texture ) continue;
 
 			const wrapS = textureAttrs[ 'inputs:wrapS' ];
 			const wrapT = textureAttrs[ 'inputs:wrapT' ];
-
 			if ( wrapS ) texture.wrapS = this._getWrapMode( wrapS );
 			if ( wrapT ) texture.wrapT = this._getWrapMode( wrapT );
 
-			const nameLower = shaderName.toLowerCase();
+			const nameLower = this._getPathName( path ).toLowerCase();
+			const fileName = typeof file === 'string' ? file.toLowerCase() : '';
 
-			if ( ! material.map && ( nameLower.includes( 'diffuse' ) ||
-				nameLower.includes( 'basecolor' ) || nameLower.includes( 'albedo' ) ||
-				fileName.includes( '_bc' ) || fileName.includes( '_diffuse' ) ||
-				fileName.includes( '_albedo' ) ) ) {
+			for ( const [ prop, colorSpace, patterns ] of textureTypes ) {
 
-				material.map = texture;
-				material.map.colorSpace = SRGBColorSpace;
+				if ( material[ prop ] ) continue;
 
-			} else if ( ! material.normalMap && ( nameLower.includes( 'normal' ) ||
-				fileName.includes( '_n.' ) || fileName.includes( '_normal' ) ) ) {
+				const matches = patterns.some( p => nameLower.includes( p ) || fileName.includes( p ) );
+				if ( ! matches ) continue;
 
-				material.normalMap = texture;
-				material.normalMap.colorSpace = NoColorSpace;
+				material[ prop ] = texture;
+				texture.colorSpace = colorSpace;
 
-			} else if ( ! material.roughnessMap && ( nameLower.includes( 'roughness' ) ||
-				fileName.includes( '_r.' ) || fileName.includes( '_roughness' ) ) ) {
+				// Additional setup for specific texture types
+				if ( prop === 'roughnessMap' ) material.roughness = 1.0;
+				if ( prop === 'metalnessMap' ) material.metalness = 1.0;
+				if ( prop === 'emissiveMap' ) material.emissive.set( 0xffffff );
 
-				material.roughnessMap = texture;
-				material.roughnessMap.colorSpace = NoColorSpace;
-				material.roughness = 1.0;
-
-			} else if ( ! material.metalnessMap && ( nameLower.includes( 'metallic' ) ||
-				nameLower.includes( 'metalness' ) || fileName.includes( '_m.' ) ||
-				fileName.includes( '_metallic' ) ) ) {
-
-				material.metalnessMap = texture;
-				material.metalnessMap.colorSpace = NoColorSpace;
-				material.metalness = 1.0;
-
-			} else if ( ! material.aoMap && ( nameLower.includes( 'occlusion' ) ||
-				nameLower.includes( 'ao' ) || fileName.includes( '_ao' ) ||
-				fileName.includes( '_occlusion' ) ) ) {
-
-				material.aoMap = texture;
-				material.aoMap.colorSpace = NoColorSpace;
-
-			} else if ( ! material.emissiveMap && ( nameLower.includes( 'emissive' ) ||
-				fileName.includes( '_emissive' ) ) ) {
-
-				material.emissiveMap = texture;
-				material.emissiveMap.colorSpace = SRGBColorSpace;
-				material.emissive.set( 0xffffff );
+				break;
 
 			}
 
