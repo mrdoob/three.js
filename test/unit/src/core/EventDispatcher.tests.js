@@ -16,56 +16,78 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'addEventListener', ( assert ) => {
 
 			const eventDispatcher = new EventDispatcher();
+			const listener = () => {};
 
-			const listener = {};
-			eventDispatcher.addEventListener( 'anyType', listener );
+			assert.ok( ! eventDispatcher.hasEventListener( 'test', listener ), 'no listeners have been registered yet' );
 
-			assert.ok( eventDispatcher._listeners.anyType.length === 1, 'listener with unknown type was added' );
-			assert.ok( eventDispatcher._listeners.anyType[ 0 ] === listener, 'listener with unknown type was added' );
+			eventDispatcher.addEventListener( 'test', listener );
+			assert.ok( eventDispatcher.hasEventListener( 'test', listener ), 'listener was added' );
 
-			eventDispatcher.addEventListener( 'anyType', listener );
-
-			assert.ok( eventDispatcher._listeners.anyType.length === 1, 'can\'t add one listener twice to same type' );
-			assert.ok( eventDispatcher._listeners.anyType[ 0 ] === listener, 'listener is still there' );
+			eventDispatcher.addEventListener( 'test', listener );
+			assert.ok( eventDispatcher.hasEventListener( 'test', listener ), 'listener is still there' );
 
 		} );
 
 		QUnit.test( 'hasEventListener', ( assert ) => {
 
 			const eventDispatcher = new EventDispatcher();
+			const listener = () => {};
 
-			const listener = {};
-			eventDispatcher.addEventListener( 'anyType', listener );
+			eventDispatcher.addEventListener( 'test', listener );
 
-			assert.ok( eventDispatcher.hasEventListener( 'anyType', listener ), 'listener was found' );
-			assert.ok( ! eventDispatcher.hasEventListener( 'anotherType', listener ), 'listener was not found which is good' );
+			assert.ok( eventDispatcher.hasEventListener( 'test', listener ), 'listener was found' );
+			assert.ok( ! eventDispatcher.hasEventListener( 'other', listener ), 'no listeners exists for this type' );
 
 		} );
 
 		QUnit.test( 'removeEventListener', ( assert ) => {
 
 			const eventDispatcher = new EventDispatcher();
+			const listener = () => {};
 
-			const listener = {};
+			eventDispatcher.addEventListener( 'test', listener );
+			assert.ok( eventDispatcher.hasEventListener( 'test', listener ), 'listener exists' );
 
-			assert.ok( eventDispatcher._listeners === undefined, 'there are no listeners by default' );
+			eventDispatcher.removeEventListener( 'test', listener );
+			assert.ok( ! eventDispatcher.hasEventListener( 'test', listener ), 'listener is gone' );
 
-			eventDispatcher.addEventListener( 'anyType', listener );
-			assert.ok( Object.keys( eventDispatcher._listeners ).length === 1 &&
-				eventDispatcher._listeners.anyType.length === 1, 'if a listener was added, there is a new key' );
+			eventDispatcher.removeEventListener( 'unknown', listener );
+			assert.ok( ! eventDispatcher.hasEventListener( 'unknown', listener ), 'no listeners exists for this type' );
 
-			eventDispatcher.removeEventListener( 'anyType', listener );
-			assert.ok( eventDispatcher._listeners.anyType.length === 0, 'listener was deleted' );
-
-			eventDispatcher.removeEventListener( 'unknownType', listener );
-			assert.ok( eventDispatcher._listeners.unknownType === undefined, 'unknown types will be ignored' );
-
-			eventDispatcher.removeEventListener( 'anyType', undefined );
-			assert.ok( eventDispatcher._listeners.anyType.length === 0, 'undefined listeners are ignored' );
+			eventDispatcher.addEventListener( 'test', listener );
+			eventDispatcher.removeEventListener( 'test', undefined );
+			assert.ok( eventDispatcher.hasEventListener( 'test', listener ), 'undefined listeners are ignored' );
 
 		} );
 
 		QUnit.test( 'dispatchEvent', ( assert ) => {
+
+			const eventDispatcher = new EventDispatcher();
+
+			eventDispatcher.addEventListener( 'test', function ( event ) {
+
+				assert.equal( event.type, 'test', 'does not get called for other event types' );
+				assert.equal( event.target, eventDispatcher, 'listener gets called' );
+
+			} );
+
+			eventDispatcher.addEventListener( 'test', {
+
+				handleEvent( event ) {
+
+					assert.equal( event.type, 'test', 'does not get called for other event types' );
+					assert.equal( event.target, eventDispatcher, 'handleEvent gets called' );
+
+				}
+
+			} );
+
+			eventDispatcher.dispatchEvent( { type: 'test' } );
+			eventDispatcher.dispatchEvent( { type: 'ignore' } );
+
+		} );
+
+		QUnit.test( 'dispatchEvent call count', ( assert ) => {
 
 			const eventDispatcher = new EventDispatcher();
 
@@ -76,14 +98,39 @@ export default QUnit.module( 'Core', () => {
 
 			};
 
-			eventDispatcher.addEventListener( 'anyType', listener );
-			assert.ok( callCount === 0, 'no event, no call' );
+			eventDispatcher.addEventListener( 'test', listener );
+			assert.equal( callCount, 0, 'no event, no call' );
 
-			eventDispatcher.dispatchEvent( { type: 'anyType' } );
-			assert.ok( callCount === 1, 'one event, one call' );
+			eventDispatcher.dispatchEvent( { type: 'test' } );
+			assert.equal( callCount, 1, 'one event, one call' );
 
-			eventDispatcher.dispatchEvent( { type: 'anyType' } );
-			assert.ok( callCount === 2, 'two events, two calls' );
+			eventDispatcher.dispatchEvent( { type: 'test' } );
+			assert.equal( callCount, 2, 'two events, two calls' );
+
+		} );
+
+		QUnit.test( 'removeEventListener during dispatchEvent', ( assert ) => {
+
+			const eventDispatcher = new EventDispatcher();
+
+			const listener1 = () => eventDispatcher.removeEventListener( 'test', listener1 );
+			const listener2 = event => assert.equal( event.target, eventDispatcher, 'can remove listener during dispatch' );
+
+			eventDispatcher.addEventListener( 'test', listener1 );
+			eventDispatcher.addEventListener( 'test', listener2 );
+			eventDispatcher.dispatchEvent( { type: 'test' } );
+
+		} );
+
+		QUnit.test( 'addEventListener during dispatchEvent', ( assert ) => {
+
+			const eventDispatcher = new EventDispatcher();
+
+			const listener1 = event => assert.equal( event.target, eventDispatcher, 'can add listener during dispatch' );
+			const listener2 = () => eventDispatcher.addEventListener( 'test', listener1 );
+
+			eventDispatcher.addEventListener( 'test', listener2 );
+			eventDispatcher.dispatchEvent( { type: 'test' } );
 
 		} );
 
