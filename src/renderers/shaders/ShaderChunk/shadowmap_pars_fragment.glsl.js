@@ -280,12 +280,18 @@ export default /* glsl */`
 			// Use IGN to rotate sampling pattern per pixel
 			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * 6.28318530718;
 
+			vec2 sample0 = vogelDiskSample( 0, 5, phi );
+			vec2 sample1 = vogelDiskSample( 1, 5, phi );
+			vec2 sample2 = vogelDiskSample( 2, 5, phi );
+			vec2 sample3 = vogelDiskSample( 3, 5, phi );
+			vec2 sample4 = vogelDiskSample( 4, 5, phi );
+
 			shadow = (
-				texture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 0, 5, phi ).x + bitangent * vogelDiskSample( 0, 5, phi ).y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 1, 5, phi ).x + bitangent * vogelDiskSample( 1, 5, phi ).y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 2, 5, phi ).x + bitangent * vogelDiskSample( 2, 5, phi ).y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 3, 5, phi ).x + bitangent * vogelDiskSample( 3, 5, phi ).y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 4, 5, phi ).x + bitangent * vogelDiskSample( 4, 5, phi ).y ) * texelSize, dp ) )
+				texture( shadowMap, vec4( bd3D + ( tangent * sample0.x + bitangent * sample0.y ) * texelSize, dp ) ) +
+				texture( shadowMap, vec4( bd3D + ( tangent * sample1.x + bitangent * sample1.y ) * texelSize, dp ) ) +
+				texture( shadowMap, vec4( bd3D + ( tangent * sample2.x + bitangent * sample2.y ) * texelSize, dp ) ) +
+				texture( shadowMap, vec4( bd3D + ( tangent * sample3.x + bitangent * sample3.y ) * texelSize, dp ) ) +
+				texture( shadowMap, vec4( bd3D + ( tangent * sample4.x + bitangent * sample4.y ) * texelSize, dp ) )
 			) * 0.2;
 
 		}
@@ -304,9 +310,6 @@ export default /* glsl */`
 		// the vector from the light to the world-space position of the fragment.
 		vec3 lightToPosition = shadowCoord.xyz;
 
-		// Direction from light to fragment
-		vec3 bd3D = normalize( lightToPosition );
-
 		// For cube shadow maps, depth is stored as distance along each face's view axis, not radial distance
 		// The view-space depth is the maximum component of the direction vector (which face is sampled)
 		vec3 absVec = abs( lightToPosition );
@@ -318,6 +321,9 @@ export default /* glsl */`
 			// Standard perspective depth formula: depth = (far * (z - near)) / (z * (far - near))
 			float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
 			dp += shadowBias;
+
+			// Direction from light to fragment
+			vec3 bd3D = normalize( lightToPosition );
 
 			float depth = textureCube( shadowMap, bd3D ).r;
 

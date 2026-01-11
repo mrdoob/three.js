@@ -69,9 +69,9 @@ precision highp isampler3D;
 precision highp isamplerCube;
 precision highp isampler2DArray;
 
-precision lowp sampler2DShadow;
-precision lowp sampler2DArrayShadow;
-precision lowp samplerCubeShadow;
+precision highp sampler2DShadow;
+precision highp sampler2DArrayShadow;
+precision highp samplerCubeShadow;
 `;
 
 /**

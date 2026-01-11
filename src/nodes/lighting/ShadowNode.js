@@ -11,7 +11,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
@@ -400,7 +400,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.name = 'ShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		depthTexture.compareFunction = LessEqualCompare;
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
@@ -423,9 +423,21 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { light, shadow } = this;
 
+		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
+
 		const shadowMapType = renderer.shadowMap.type;
 
-		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
+		if ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) {
+
+			depthTexture.minFilter = LinearFilter;
+			depthTexture.magFilter = LinearFilter;
+
+		} else {
+
+			depthTexture.minFilter = NearestFilter;
+			depthTexture.magFilter = NearestFilter;
+
+		}
 
 		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
