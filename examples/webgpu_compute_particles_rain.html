@@ -64,20 +64,9 @@
 				scene = new THREE.Scene();
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-				dirLight.castShadow = true;
 				dirLight.position.set( 3, 17, 17 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.near = 1;
-				dirLight.shadow.camera.far = 50;
-				dirLight.shadow.camera.right = 25;
-				dirLight.shadow.camera.left = - 25;
-				dirLight.shadow.camera.top = 25;
-				dirLight.shadow.camera.bottom = - 25;
-				dirLight.shadow.mapSize.width = 2048;
-				dirLight.shadow.mapSize.height = 2048;
-				dirLight.shadow.bias = - 0.01;
-
 				scene.add( dirLight );
+			
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
 				//
@@ -257,7 +246,6 @@
 				collisionBox.position.y = 12;
 				collisionBox.scale.x = 3.5;
 				collisionBox.layers.enable( 1 );
-				collisionBox.castShadow = true;
 				scene.add( collisionBox );
 
 				//
@@ -268,7 +256,6 @@
 					geometry.computeVertexNormals();
 
 					monkey = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { roughness: 1, metalness: 0 } ) );
-					monkey.receiveShadow = true;
 					monkey.scale.setScalar( 5 );
 					monkey.rotation.y = Math.PI / 2;
 					monkey.position.y = 4.5;

@@ -67,6 +67,7 @@
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
+				dirLight.shadow.bias = - 0.001; // remove self-shadowing artifacts
 				dirLight.shadow.camera.top = 4;
 				dirLight.shadow.camera.bottom = - 4;
 				dirLight.shadow.camera.left = - 4;
