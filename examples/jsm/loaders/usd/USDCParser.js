@@ -1,16 +1,23 @@
 import {
+	AnimationClip,
+	Bone,
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Group,
+	Matrix4,
 	NoColorSpace,
 	Mesh,
 	MeshPhysicalMaterial,
 	MirroredRepeatWrapping,
+	QuaternionKeyframeTrack,
 	RepeatWrapping,
+	Skeleton,
+	SkinnedMesh,
 	SRGBColorSpace,
 	TextureLoader,
-	Object3D
+	Object3D,
+	VectorKeyframeTrack
 } from 'three';
 
 // Type enum values from crateDataTypes.h
@@ -1098,6 +1105,13 @@ class USDCParser {
 		const isArray = valueRep.isArray;
 		const isInlined = valueRep.isInlined;
 
+		// Handle TimeSamples specially - they have their own format
+		if ( type === TypeEnum.TimeSamples ) {
+
+			return this._readTimeSamples( valueRep );
+
+		}
+
 		if ( isInlined ) {
 
 			return this._readInlinedValue( valueRep );
@@ -1148,6 +1162,15 @@ class USDCParser {
 
 			}
 
+			case TypeEnum.Double: {
+
+				// When a double is inlined, it's stored as float32 bits in the payload
+				const buf = new ArrayBuffer( 4 );
+				new DataView( buf ).setUint32( 0, payload, true );
+				return new DataView( buf ).getFloat32( 0, true );
+
+			}
+
 			case TypeEnum.Token:
 				return this.tokens[ payload ] || '';
 			case TypeEnum.String:
@@ -1163,6 +1186,72 @@ class USDCParser {
 				return payload;
 
 		}
+
+	}
+
+	_readTimeSamples( valueRep ) {
+
+		const reader = this.reader;
+		const offset = valueRep.payload;
+		const savedOffset = reader.tell();
+		reader.seek( offset );
+
+		// TimeSamples format uses RELATIVE offsets (from OpenUSD _RecursiveRead):
+		// _RecursiveRead: read int64 relativeOffset at current position, then seek to start + relativeOffset
+		// After reading timesRep, continue reading from current position (after timesRep)
+		// Layout at TimeSamples location:
+		// - int64 timesOffset (relative from start of this int64)
+		// At (start + timesOffset): timesRep ValueRep, then int64 valuesOffset, then numValues + ValueReps
+
+		// Read times relative offset and resolve
+		const timesStart = reader.tell();
+		const timesRelOffset = reader.readInt64();
+		reader.seek( timesStart + timesRelOffset );
+
+		const timesRepLo = reader.readUint32();
+		const timesRepHi = reader.readUint32();
+		const timesRep = new ValueRep( timesRepLo, timesRepHi );
+
+		// Resolve times array
+		const times = this._readValue( timesRep );
+
+		// Continue reading from current position (after timesRep)
+		// The second _RecursiveRead reads from CURRENT position, not from the beginning
+		const afterTimesRep = timesStart + timesRelOffset + 8;
+		reader.seek( afterTimesRep );
+
+		// Read values relative offset
+		const valuesStart = reader.tell();
+		const valuesRelOffset = reader.readInt64();
+		reader.seek( valuesStart + valuesRelOffset );
+
+		// Read number of values
+		const numValues = reader.readUint64();
+
+		// Read all ValueReps
+		const valueReps = [];
+		for ( let i = 0; i < numValues; i ++ ) {
+
+			const repLo = reader.readUint32();
+			const repHi = reader.readUint32();
+			valueReps.push( new ValueRep( repLo, repHi ) );
+
+		}
+
+		// Resolve each value
+		const values = [];
+		for ( let i = 0; i < numValues; i ++ ) {
+
+			values.push( this._readValue( valueReps[ i ] ) );
+
+		}
+
+		reader.seek( savedOffset );
+
+		// Convert times to array if needed
+		const timesArray = times instanceof Float64Array ? Array.from( times ) : ( Array.isArray( times ) ? times : [ times ] );
+
+		return { times: timesArray, values };
 
 	}
 
@@ -1260,6 +1349,16 @@ class USDCParser {
 				}
 
 				return paths;
+
+			}
+
+			case TypeEnum.DoubleVector: {
+
+				// DoubleVector is a count-prefixed array of doubles
+				const count = reader.readUint64();
+				const arr = new Float64Array( count );
+				for ( let i = 0; i < count; i ++ ) arr[ i ] = reader.readFloat64();
+				return arr;
 
 			}
 
@@ -1391,6 +1490,42 @@ class USDCParser {
 
 				const arr = new Float32Array( size * 4 );
 				for ( let i = 0; i < size * 4; i ++ ) arr[ i ] = reader.readFloat32();
+				return arr;
+
+			}
+
+			case TypeEnum.Vec3h: {
+
+				// Half-precision vec3 array (used for scales in skeletal animation)
+				const arr = new Float32Array( size * 3 );
+				for ( let i = 0; i < size * 3; i ++ ) arr[ i ] = this._readHalf();
+				return arr;
+
+			}
+
+			case TypeEnum.Quatf: {
+
+				// Quaternion array (w,x,y,z order in USD)
+				const arr = new Float32Array( size * 4 );
+				for ( let i = 0; i < size * 4; i ++ ) arr[ i ] = reader.readFloat32();
+				return arr;
+
+			}
+
+			case TypeEnum.Quath: {
+
+				// Half-precision quaternion array
+				const arr = new Float32Array( size * 4 );
+				for ( let i = 0; i < size * 4; i ++ ) arr[ i ] = this._readHalf();
+				return arr;
+
+			}
+
+			case TypeEnum.Matrix4d: {
+
+				// 4x4 matrix array (16 doubles per matrix, row-major)
+				const arr = new Float64Array( size * 16 );
+				for ( let i = 0; i < size * 16; i ++ ) arr[ i ] = reader.readFloat64();
 				return arr;
 
 			}
@@ -1554,9 +1689,25 @@ class USDCParser {
 
 		}
 
+		// Extract animation metadata from root
+		const rootSpec = this.specsByPath[ '/' ];
+		const rootFields = rootSpec ? rootSpec.fields : {};
+		this.fps = rootFields.framesPerSecond || rootFields.timeCodesPerSecond || 30;
+
+		// Track skeletons and skinned meshes for binding
+		this.skeletons = {};
+		this.skinnedMeshes = [];
+
 		// Build Three.js scene
 		const group = new Group();
 		this._buildHierarchy( group, '/' );
+
+		// Bind skeletons to skinned meshes
+		this._bindSkeletons();
+
+		// Build animations
+		const animations = this._buildAnimations();
+		group.animations = animations;
 
 		return group;
 
@@ -1618,7 +1769,35 @@ class USDCParser {
 			const typeName = spec.fields.typeName || '';
 			const name = this._getPathName( path );
 
-			if ( typeName === 'Xform' || typeName === 'Scope' || typeName === '' ) {
+			if ( typeName === 'SkelRoot' ) {
+
+				// Skeletal root - treat as transform but track for skeleton binding
+				const obj = this._buildXform( path, spec );
+				obj.name = name;
+				obj.userData.isSkelRoot = true;
+				parent.add( obj );
+
+				// Recursively build children
+				this._buildHierarchy( obj, path );
+
+			} else if ( typeName === 'Skeleton' ) {
+
+				// Build skeleton and store it
+				const skeleton = this._buildSkeleton( path );
+				if ( skeleton ) {
+
+					this.skeletons[ path ] = skeleton;
+
+				}
+
+				// Recursively build children (may contain SkelAnimation)
+				this._buildHierarchy( parent, path );
+
+			} else if ( typeName === 'SkelAnimation' ) {
+
+				// Skip - animations are processed separately in _buildAnimations
+
+			} else if ( typeName === 'Xform' || typeName === 'Scope' || typeName === '' ) {
 
 				// Transform node or group
 				const obj = this._buildXform( path, spec );
@@ -1630,7 +1809,7 @@ class USDCParser {
 
 			} else if ( typeName === 'Mesh' ) {
 
-				// Mesh
+				// Mesh (may be skinned)
 				const mesh = this._buildMesh( path, spec );
 				mesh.name = name;
 				parent.add( mesh );
@@ -1699,6 +1878,12 @@ class USDCParser {
 		// Get attribute values from child attribute specs
 		const attrs = this._getAttributeValues( path );
 
+		// Check for skinning data
+		const jointIndices = attrs[ 'primvars:skel:jointIndices' ];
+		const jointWeights = attrs[ 'primvars:skel:jointWeights' ];
+		const hasSkinning = jointIndices && jointWeights &&
+			jointIndices.length > 0 && jointWeights.length > 0;
+
 		// Collect GeomSubsets for multi-material support
 		const geomSubsets = this._getGeomSubsets( path );
 
@@ -1707,18 +1892,45 @@ class USDCParser {
 		if ( geomSubsets.length > 0 ) {
 
 			// Multi-material mesh: reorder triangles by material group
-			geometry = this._buildGeometryWithSubsets( attrs, geomSubsets );
+			geometry = this._buildGeometryWithSubsets( attrs, geomSubsets, hasSkinning );
 			material = geomSubsets.map( subset => this._buildMaterialForPath( subset.materialPath ) );
 
 		} else {
 
 			// Single material mesh
-			geometry = this._buildGeometry( path, attrs );
+			geometry = this._buildGeometry( path, attrs, hasSkinning );
 			material = this._buildMaterial( path, spec.fields );
 
 		}
 
-		const mesh = new Mesh( geometry, material );
+		let mesh;
+
+		if ( hasSkinning ) {
+
+			mesh = new SkinnedMesh( geometry, material );
+
+			// Find skeleton path from skel:skeleton relationship
+			const skelBindingPath = path + '.skel:skeleton';
+			const skelBindingSpec = this.specsByPath[ skelBindingPath ];
+			let skeletonPath = null;
+
+			if ( skelBindingSpec && skelBindingSpec.fields.targetPaths && skelBindingSpec.fields.targetPaths.length > 0 ) {
+
+				skeletonPath = skelBindingSpec.fields.targetPaths[ 0 ];
+
+			}
+
+			// Get per-mesh joint mapping (local joint names for this mesh)
+			const localJoints = attrs[ 'skel:joints' ];
+
+			// Track for later skeleton binding
+			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints } );
+
+		} else {
+
+			mesh = new Mesh( geometry, material );
+
+		}
 
 		// Apply transform from mesh spec fields and attributes
 		this._applyTransform( mesh, spec.fields, attrs );
@@ -1765,7 +1977,7 @@ class USDCParser {
 
 	}
 
-	_buildGeometryWithSubsets( fields, geomSubsets ) {
+	_buildGeometryWithSubsets( fields, geomSubsets, hasSkinning = false ) {
 
 		const geometry = new BufferGeometry();
 
@@ -1785,6 +1997,11 @@ class USDCParser {
 
 		// Get normals
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+
+		// Get skinning data
+		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
+		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
+		const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
 
 		// Build face-to-triangle mapping
 		// For each face, compute how many triangles it produces and at what offset
@@ -1896,6 +2113,8 @@ class USDCParser {
 		const positions = new Float32Array( vertexCount * 3 );
 		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
 		const normalData = normals ? new Float32Array( vertexCount * 3 ) : null;
+		const skinIndexData = jointIndices ? new Uint16Array( vertexCount * 4 ) : null;
+		const skinWeightData = jointWeights ? new Float32Array( vertexCount * 4 ) : null;
 
 		for ( let i = 0; i < sortedTriangles.length; i ++ ) {
 
@@ -1953,6 +2172,27 @@ class USDCParser {
 
 				}
 
+				// Skinning data
+				if ( skinIndexData && skinWeightData && jointIndices && jointWeights ) {
+
+					for ( let j = 0; j < 4; j ++ ) {
+
+						if ( j < elementSize ) {
+
+							skinIndexData[ newIdx * 4 + j ] = jointIndices[ pointIdx * elementSize + j ] || 0;
+							skinWeightData[ newIdx * 4 + j ] = jointWeights[ pointIdx * elementSize + j ] || 0;
+
+						} else {
+
+							skinIndexData[ newIdx * 4 + j ] = 0;
+							skinWeightData[ newIdx * 4 + j ] = 0;
+
+						}
+
+					}
+
+				}
+
 			}
 
 		}
@@ -1972,6 +2212,18 @@ class USDCParser {
 		} else {
 
 			geometry.computeVertexNormals();
+
+		}
+
+		if ( skinIndexData ) {
+
+			geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndexData, 4 ) );
+
+		}
+
+		if ( skinWeightData ) {
+
+			geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeightData, 4 ) );
 
 		}
 
@@ -2017,6 +2269,13 @@ class USDCParser {
 			if ( spec.fields.default !== undefined ) {
 
 				attrs[ attrName ] = spec.fields.default;
+
+			}
+
+			// Also include elementSize for skinning attributes
+			if ( spec.fields.elementSize !== undefined ) {
+
+				attrs[ attrName + ':elementSize' ] = spec.fields.elementSize;
 
 			}
 
@@ -2074,7 +2333,7 @@ class USDCParser {
 
 	}
 
-	_buildGeometry( path, fields ) {
+	_buildGeometry( path, fields, hasSkinning = false ) {
 
 		const geometry = new BufferGeometry();
 
@@ -2159,6 +2418,63 @@ class USDCParser {
 			}
 
 			geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( uvData ), 2 ) );
+
+		}
+
+		// Add skinning attributes
+		if ( hasSkinning ) {
+
+			const jointIndices = fields[ 'primvars:skel:jointIndices' ];
+			const jointWeights = fields[ 'primvars:skel:jointWeights' ];
+			const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
+
+			if ( jointIndices && jointWeights ) {
+
+				const numVertices = positions.length / 3; // After expansion
+
+				// Expand skinning attributes by the same indices used for positions
+				let skinIndexData, skinWeightData;
+
+				if ( indices && indices.length > 0 ) {
+
+					skinIndexData = this._expandAttribute( jointIndices, indices, elementSize );
+					skinWeightData = this._expandAttribute( jointWeights, indices, elementSize );
+
+				} else {
+
+					skinIndexData = jointIndices;
+					skinWeightData = jointWeights;
+
+				}
+
+				// Three.js expects exactly 4 influences per vertex
+				const skinIndices = new Uint16Array( numVertices * 4 );
+				const skinWeights = new Float32Array( numVertices * 4 );
+
+				for ( let i = 0; i < numVertices; i ++ ) {
+
+					for ( let j = 0; j < 4; j ++ ) {
+
+						if ( j < elementSize ) {
+
+							skinIndices[ i * 4 + j ] = skinIndexData[ i * elementSize + j ] || 0;
+							skinWeights[ i * 4 + j ] = skinWeightData[ i * elementSize + j ] || 0;
+
+						} else {
+
+							skinIndices[ i * 4 + j ] = 0;
+							skinWeights[ i * 4 + j ] = 0;
+
+						}
+
+					}
+
+				}
+
+				geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndices, 4 ) );
+				geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeights, 4 ) );
+
+			}
 
 		}
 
@@ -2693,6 +3009,386 @@ class USDCParser {
 			default: return RepeatWrapping;
 
 		}
+
+	}
+
+	// ========================================================================
+	// Skeletal Animation
+	// ========================================================================
+
+	_buildSkeleton( path ) {
+
+		const attrs = this._getAttributeValues( path );
+
+		// Get joint names (paths like "root", "root/body_joint", etc.)
+		const joints = attrs[ 'joints' ];
+		if ( ! joints || joints.length === 0 ) return null;
+
+		// Get bind transforms (world-space bind pose matrices)
+		const bindTransforms = attrs[ 'bindTransforms' ];
+		const restTransforms = attrs[ 'restTransforms' ];
+
+		// Build bones
+		const bones = [];
+		const bonesByPath = {};
+		const boneInverses = [];
+
+		for ( let i = 0; i < joints.length; i ++ ) {
+
+			const jointPath = joints[ i ];
+			const jointName = jointPath.split( '/' ).pop();
+
+			const bone = new Bone();
+			bone.name = jointName;
+			bones.push( bone );
+			bonesByPath[ jointPath ] = { bone, index: i };
+
+			// Compute inverse bind matrix
+			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
+
+				const bindMatrix = new Matrix4();
+				// USD matrices are row-major. When loaded via fromArray into Three.js
+				// column-major storage, they get automatically transposed.
+				bindMatrix.fromArray( bindTransforms, i * 16 );
+				const inverseBindMatrix = bindMatrix.clone().invert();
+				boneInverses.push( inverseBindMatrix );
+
+			} else {
+
+				boneInverses.push( new Matrix4() );
+
+			}
+
+		}
+
+		// Build parent-child relationships based on joint paths
+		for ( let i = 0; i < joints.length; i ++ ) {
+
+			const jointPath = joints[ i ];
+			const parts = jointPath.split( '/' );
+
+			if ( parts.length > 1 ) {
+
+				const parentPath = parts.slice( 0, - 1 ).join( '/' );
+				const parentData = bonesByPath[ parentPath ];
+
+				if ( parentData ) {
+
+					parentData.bone.add( bones[ i ] );
+
+				}
+
+			}
+
+		}
+
+		// Apply rest transforms to bones (local transforms)
+		if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
+
+			for ( let i = 0; i < joints.length; i ++ ) {
+
+				const matrix = new Matrix4();
+				// USD matrices are row-major. When loaded via fromArray into Three.js
+				// column-major storage, they get automatically transposed.
+				matrix.fromArray( restTransforms, i * 16 );
+				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
+
+			}
+
+		}
+
+		// Find root bone(s) - bones without a parent bone
+		const rootBones = bones.filter( bone => ! bone.parent || ! bone.parent.isBone );
+
+		// Get animation source path
+		const animSourceSpec = this.specsByPath[ path + '.skel:animationSource' ];
+		let animationPath = null;
+		if ( animSourceSpec && animSourceSpec.fields.targetPaths && animSourceSpec.fields.targetPaths.length > 0 ) {
+
+			animationPath = animSourceSpec.fields.targetPaths[ 0 ];
+
+		}
+
+		return {
+			skeleton: new Skeleton( bones, boneInverses ),
+			joints: joints,
+			rootBones: rootBones,
+			animationPath: animationPath,
+			path: path
+		};
+
+	}
+
+	_bindSkeletons() {
+
+		// Find all skinned meshes and bind them to their skeletons
+		for ( const meshData of this.skinnedMeshes ) {
+
+			const { mesh, skeletonPath, localJoints } = meshData;
+
+			// Find the skeleton
+			let skeletonData = null;
+			for ( const skelPath in this.skeletons ) {
+
+				if ( skeletonPath && skeletonPath.includes( skelPath ) ) {
+
+					skeletonData = this.skeletons[ skelPath ];
+					break;
+
+				}
+
+			}
+
+			// If no direct match, try to find any skeleton (for single-skeleton files)
+			if ( ! skeletonData ) {
+
+				const skeletonPaths = Object.keys( this.skeletons );
+				if ( skeletonPaths.length > 0 ) {
+
+					skeletonData = this.skeletons[ skeletonPaths[ 0 ] ];
+
+				}
+
+			}
+
+			if ( skeletonData ) {
+
+				const { skeleton, rootBones, joints } = skeletonData;
+
+				// Remap local joint indices to global skeleton indices
+				// Each mesh can have its own skel:joints array that defines which
+				// subset of skeleton joints it uses (and in what order)
+				if ( localJoints && localJoints.length > 0 ) {
+
+					const skinIndex = mesh.geometry.attributes.skinIndex;
+					if ( skinIndex ) {
+
+						// Build mapping: local index -> global skeleton index
+						const localToGlobal = [];
+						for ( let i = 0; i < localJoints.length; i ++ ) {
+
+							const jointName = localJoints[ i ];
+							const globalIdx = joints.indexOf( jointName );
+							localToGlobal[ i ] = globalIdx >= 0 ? globalIdx : 0;
+
+						}
+
+						// Remap all joint indices
+						const arr = skinIndex.array;
+						for ( let i = 0; i < arr.length; i ++ ) {
+
+							const localIdx = arr[ i ];
+							if ( localIdx < localToGlobal.length ) {
+
+								arr[ i ] = localToGlobal[ localIdx ];
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Add root bones to the mesh first
+				for ( const rootBone of rootBones ) {
+
+					mesh.add( rootBone );
+
+				}
+
+				// Bind the skeleton to the mesh with identity bind matrix
+				// We pass a bind matrix to prevent Three.js from overwriting
+				// our carefully computed boneInverses via calculateInverses()
+				mesh.bind( skeleton, new Matrix4() );
+
+			}
+
+		}
+
+	}
+
+	_buildAnimations() {
+
+		const animations = [];
+
+		// Find all SkelAnimation prims
+		for ( const path in this.specsByPath ) {
+
+			const spec = this.specsByPath[ path ];
+			if ( spec.specType !== SpecType.Prim ) continue;
+			if ( spec.fields.typeName !== 'SkelAnimation' ) continue;
+
+			const clip = this._buildAnimationClip( path );
+			if ( clip ) {
+
+				animations.push( clip );
+
+			}
+
+		}
+
+		return animations;
+
+	}
+
+	_buildAnimationClip( path ) {
+
+		const attrs = this._getAttributeValues( path );
+		const joints = attrs[ 'joints' ];
+
+		if ( ! joints || joints.length === 0 ) return null;
+
+		const tracks = [];
+
+		// Get rotation time samples
+		const rotationsAttr = this._getTimeSampledAttribute( path, 'rotations' );
+		if ( rotationsAttr && rotationsAttr.times && rotationsAttr.values ) {
+
+			const { times, values } = rotationsAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const quatData = values[ t ];
+					if ( ! quatData || quatData.length < ( jointIdx + 1 ) * 4 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+
+					// USD GfQuatf stores imaginary (x,y,z) first, then real (w)
+					// This matches Three.js quaternion order (x,y,z,w)
+					const x = quatData[ jointIdx * 4 + 0 ];
+					const y = quatData[ jointIdx * 4 + 1 ];
+					const z = quatData[ jointIdx * 4 + 2 ];
+					const w = quatData[ jointIdx * 4 + 3 ];
+					keyframeValues.push( x, y, z, w );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new QuaternionKeyframeTrack(
+						jointName + '.quaternion',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		// Get translation time samples
+		const translationsAttr = this._getTimeSampledAttribute( path, 'translations' );
+		if ( translationsAttr && translationsAttr.times && translationsAttr.values ) {
+
+			const { times, values } = translationsAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const transData = values[ t ];
+					if ( ! transData || transData.length < ( jointIdx + 1 ) * 3 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+					keyframeValues.push(
+						transData[ jointIdx * 3 + 0 ],
+						transData[ jointIdx * 3 + 1 ],
+						transData[ jointIdx * 3 + 2 ]
+					);
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						jointName + '.position',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		// Get scale time samples
+		const scalesAttr = this._getTimeSampledAttribute( path, 'scales' );
+		if ( scalesAttr && scalesAttr.times && scalesAttr.values ) {
+
+			const { times, values } = scalesAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const scaleData = values[ t ];
+					if ( ! scaleData || scaleData.length < ( jointIdx + 1 ) * 3 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+					keyframeValues.push(
+						scaleData[ jointIdx * 3 + 0 ],
+						scaleData[ jointIdx * 3 + 1 ],
+						scaleData[ jointIdx * 3 + 2 ]
+					);
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						jointName + '.scale',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		if ( tracks.length === 0 ) return null;
+
+		const clipName = this._getPathName( path );
+		return new AnimationClip( clipName, - 1, tracks );
+
+	}
+
+	_getTimeSampledAttribute( primPath, attrName ) {
+
+		// Look for the attribute spec with time samples
+		const attrPath = primPath + '.' + attrName;
+		const attrSpec = this.specsByPath[ attrPath ];
+
+		if ( attrSpec && attrSpec.fields.timeSamples ) {
+
+			const timeSamples = attrSpec.fields.timeSamples;
+			if ( timeSamples && timeSamples.times && timeSamples.values ) {
+
+				return timeSamples;
+
+			}
+
+		}
+
+		return null;
 
 	}
 
