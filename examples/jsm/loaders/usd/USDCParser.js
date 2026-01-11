@@ -20,6 +20,8 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
+const textDecoder = new TextDecoder();
+
 // Type enum values from crateDataTypes.h
 const TypeEnum = {
 	Invalid: 0,
@@ -84,6 +86,13 @@ const TypeEnum = {
 	Spline: 59,
 	AnimationBlock: 60
 };
+
+// Field set terminator marker
+const FIELD_SET_TERMINATOR = 0xFFFFFFFF;
+
+// Float compression type codes
+const FLOAT_COMPRESSION_INT = 0x69; // 'i' - compressed as integers
+const FLOAT_COMPRESSION_LUT = 0x74; // 't' - lookup table
 
 // Spec types
 const SpecType = {
@@ -459,14 +468,9 @@ class BinaryReader {
 	readString( length ) {
 
 		const bytes = this.readBytes( length );
-		let str = '';
-		for ( let i = 0; i < length && bytes[ i ] !== 0; i ++ ) {
-
-			str += String.fromCharCode( bytes[ i ] );
-
-		}
-
-		return str;
+		let end = 0;
+		while ( end < length && bytes[ end ] !== 0 ) end ++;
+		return textDecoder.decode( bytes.subarray( 0, end ) );
 
 	}
 
@@ -542,7 +546,6 @@ class USDCParser {
 		this.textureLoader = new TextureLoader();
 		this.textureCache = {};
 
-		// Parse structure
 		this._readBootstrap();
 		this._readTOC();
 		this._readTokens();
@@ -552,7 +555,6 @@ class USDCParser {
 		this._readPaths();
 		this._readSpecs();
 
-		// Build scene
 		return this._buildScene();
 
 	}
@@ -628,14 +630,7 @@ class USDCParser {
 				let strEnd = strStart;
 				while ( strEnd < tokensData.length && tokensData[ strEnd ] !== 0 ) strEnd ++;
 
-				let str = '';
-				for ( let j = strStart; j < strEnd; j ++ ) {
-
-					str += String.fromCharCode( tokensData[ j ] );
-
-				}
-
-				this.tokens.push( str );
+				this.tokens.push( textDecoder.decode( tokensData.subarray( strStart, strEnd ) ) );
 				strStart = strEnd + 1;
 
 			}
@@ -655,14 +650,7 @@ class USDCParser {
 				let strEnd = strStart;
 				while ( strEnd < tokensData.length && tokensData[ strEnd ] !== 0 ) strEnd ++;
 
-				let str = '';
-				for ( let j = strStart; j < strEnd; j ++ ) {
-
-					str += String.fromCharCode( tokensData[ j ] );
-
-				}
-
-				this.tokens.push( str );
+				this.tokens.push( textDecoder.decode( tokensData.subarray( strStart, strEnd ) ) );
 				strStart = strEnd + 1;
 
 			}
@@ -1505,7 +1493,6 @@ class USDCParser {
 
 			case TypeEnum.Quatf: {
 
-				// Quaternion array (w,x,y,z order in USD)
 				const arr = new Float32Array( size * 4 );
 				for ( let i = 0; i < size * 4; i ++ ) arr[ i ] = reader.readFloat32();
 				return arr;
@@ -1586,7 +1573,7 @@ class USDCParser {
 				// Float compression: 'i' = compressed as ints, 't' = lookup table
 				const code = reader.readInt8();
 
-				if ( code === 0x69 ) { // 'i'
+				if ( code === FLOAT_COMPRESSION_INT ) {
 
 					const compressedSize = reader.readUint64();
 					const compressed = reader.readBytes( compressedSize );
@@ -1601,7 +1588,7 @@ class USDCParser {
 					for ( let i = 0; i < size; i ++ ) floats[ i ] = ints[ i ];
 					return floats;
 
-				} else if ( code === 0x74 ) { // 't'
+				} else if ( code === FLOAT_COMPRESSION_LUT ) {
 
 					const lutSize = reader.readUint32();
 					const lut = new Float32Array( lutSize );
@@ -1672,7 +1659,6 @@ class USDCParser {
 
 	_buildScene() {
 
-		// Build a map of path -> spec data
 		this.specsByPath = {};
 
 		for ( const spec of this.specs ) {
@@ -1680,34 +1666,23 @@ class USDCParser {
 			const path = this.paths[ spec.pathIndex ];
 			if ( ! path ) continue;
 
-			// Get fields for this spec
 			const fields = this._getFieldsForSpec( spec );
-			this.specsByPath[ path ] = {
-				specType: spec.specType,
-				fields
-			};
+			this.specsByPath[ path ] = { specType: spec.specType, fields };
 
 		}
 
-		// Extract animation metadata from root
 		const rootSpec = this.specsByPath[ '/' ];
 		const rootFields = rootSpec ? rootSpec.fields : {};
 		this.fps = rootFields.framesPerSecond || rootFields.timeCodesPerSecond || 30;
 
-		// Track skeletons and skinned meshes for binding
 		this.skeletons = {};
 		this.skinnedMeshes = [];
 
-		// Build Three.js scene
 		const group = new Group();
 		this._buildHierarchy( group, '/' );
-
-		// Bind skeletons to skinned meshes
 		this._bindSkeletons();
 
-		// Build animations
-		const animations = this._buildAnimations();
-		group.animations = animations;
+		group.animations = this._buildAnimations();
 
 		return group;
 
@@ -1718,7 +1693,7 @@ class USDCParser {
 		const fields = {};
 		let fieldSetIndex = spec.fieldSetIndex;
 
-		// Field sets are terminated by 0xFFFFFFFF
+		// Field sets are terminated by FIELD_SET_TERMINATOR
 		// Limit iterations to prevent infinite loops from malformed data
 		const maxIterations = 10000;
 		let iterations = 0;
@@ -1728,7 +1703,7 @@ class USDCParser {
 			const fieldIndex = this.fieldSets[ fieldSetIndex ];
 
 			// Terminator
-			if ( fieldIndex === 0xFFFFFFFF || fieldIndex === - 1 ) break;
+			if ( fieldIndex === FIELD_SET_TERMINATOR || fieldIndex === - 1 ) break;
 
 			const field = this.fields[ fieldIndex ];
 			if ( field ) {
@@ -1981,30 +1956,23 @@ class USDCParser {
 
 		const geometry = new BufferGeometry();
 
-		// Get points
 		const points = fields[ 'points' ];
 		if ( ! points || points.length === 0 ) return geometry;
 
-		// Get face data
 		const faceVertexIndices = fields[ 'faceVertexIndices' ];
 		const faceVertexCounts = fields[ 'faceVertexCounts' ];
 
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
-		// Get UVs
 		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
 		const uvIndices = fields[ 'primvars:st:indices' ];
-
-		// Get normals
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
 
-		// Get skinning data
 		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
 		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
 		const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
 
-		// Build face-to-triangle mapping
-		// For each face, compute how many triangles it produces and at what offset
+		// Build face-to-triangle mapping (triangles per face and cumulative offset)
 		const faceTriangleOffset = [];
 		let triangleCount = 0;
 
@@ -2016,7 +1984,6 @@ class USDCParser {
 
 		}
 
-		// Build triangle-to-subset mapping
 		const triangleToSubset = new Int32Array( triangleCount ).fill( - 1 );
 
 		for ( let si = 0; si < geomSubsets.length; si ++ ) {
@@ -2041,7 +2008,7 @@ class USDCParser {
 
 		}
 
-		// Sort triangles by subset
+		// Sort triangles by subset (unassigned first, then by subset index)
 		const sortedTriangles = [];
 
 		for ( let tri = 0; tri < triangleCount; tri ++ ) {
@@ -2050,10 +2017,7 @@ class USDCParser {
 
 		}
 
-		// Sort: unassigned (-1) first, then by subset index
 		sortedTriangles.sort( ( a, b ) => a.subset - b.subset );
-
-		// Compute groups
 		const groups = [];
 		let currentSubset = sortedTriangles.length > 0 ? sortedTriangles[ 0 ].subset : - 1;
 		let groupStart = 0;
@@ -2337,15 +2301,12 @@ class USDCParser {
 
 		const geometry = new BufferGeometry();
 
-		// Get points
 		const points = fields[ 'points' ];
 		if ( ! points || points.length === 0 ) return geometry;
 
-		// Get face vertex indices
 		const faceVertexIndices = fields[ 'faceVertexIndices' ];
 		const faceVertexCounts = fields[ 'faceVertexCounts' ];
 
-		// Convert to triangle indices if needed
 		let indices = faceVertexIndices;
 		if ( faceVertexCounts && faceVertexCounts.length > 0 ) {
 
@@ -2353,7 +2314,6 @@ class USDCParser {
 
 		}
 
-		// Build position attribute
 		let positions = points;
 		if ( indices && indices.length > 0 ) {
 
@@ -2363,14 +2323,13 @@ class USDCParser {
 
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
 
-		// Get normals
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
 		if ( normals && normals.length > 0 ) {
 
 			let normalData = normals;
 			if ( normals.length === points.length ) {
 
-				// Per-vertex normals, expand by indices
+				// Per-vertex normals
 				if ( indices && indices.length > 0 ) {
 
 					normalData = this._expandAttribute( normals, indices, 3 );
@@ -2396,7 +2355,6 @@ class USDCParser {
 
 		}
 
-		// Get UVs
 		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
 		const uvIndices = fields[ 'primvars:st:indices' ];
 
@@ -3121,12 +3079,10 @@ class USDCParser {
 
 	_bindSkeletons() {
 
-		// Find all skinned meshes and bind them to their skeletons
 		for ( const meshData of this.skinnedMeshes ) {
 
 			const { mesh, skeletonPath, localJoints } = meshData;
 
-			// Find the skeleton
 			let skeletonData = null;
 			for ( const skelPath in this.skeletons ) {
 
@@ -3139,7 +3095,7 @@ class USDCParser {
 
 			}
 
-			// If no direct match, try to find any skeleton (for single-skeleton files)
+			// Fallback to first skeleton for single-skeleton files
 			if ( ! skeletonData ) {
 
 				const skeletonPaths = Object.keys( this.skeletons );
@@ -3380,7 +3336,7 @@ class USDCParser {
 		if ( attrSpec && attrSpec.fields.timeSamples ) {
 
 			const timeSamples = attrSpec.fields.timeSamples;
-			if ( timeSamples && timeSamples.times && timeSamples.values ) {
+			if ( timeSamples.times && timeSamples.values ) {
 
 				return timeSamples;
 
