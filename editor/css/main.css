@@ -18,37 +18,37 @@ hr {
 	border-top: 1px solid #ccc;
 }
 
-button {
+.Button {
 	position: relative;
 }
 
-input {
+.Input {
 	vertical-align: middle;
 }
 
-	input[type="color"]::-webkit-color-swatch-wrapper {
+	.Input[type="color"]::-webkit-color-swatch-wrapper {
 		padding: 0;
 	}
-	input[type="color"]::-webkit-color-swatch {
+	.Input[type="color"]::-webkit-color-swatch {
 		border: none;
 	}
 
-textarea {
+.TextArea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
 }
 
-	textarea.success {
+	.TextArea.success {
 		border-color: #8b8 !important;
 	}
 
-	textarea.fail {
+	.TextArea.fail {
 		border-color: #f00 !important;
 		background-color: rgba(255,0,0,0.05);
 	}
 
-textarea, input { outline: none; } /* osx */
+.TextArea, .Input { outline: none; } /* osx */
 
 .Panel {
 	-moz-user-select: none;
@@ -264,7 +264,7 @@ textarea, input { outline: none; } /* osx */
 
 /*  */
 
-button {
+.Button {
 	color: #555;
 	background-color: #ddd;
 	border: 0px;
@@ -276,27 +276,27 @@ button {
 	outline: none;
 }
 
-	button:hover {
+	.Button:hover {
 		background-color: #fff;
 	}
 
-	button.selected {
+	.Button.selected {
 		background-color: #fff;
 	}
 
-input, textarea {
+.Input, .TextArea {
 	border: 1px solid transparent;
 	color: #444;
 }
 
-input.Number {
+.Input.Number {
 	color: #08f!important;
 	font-size: 12px;
 	border: 0px;
 	padding: 2px;
 }
 
-select {
+.Select {
 	color: #666;
 	background-color: #ddd;
 	border: 0px;
@@ -305,7 +305,7 @@ select {
 	outline: none;
 }
 
-	select:hover {
+	.Select:hover {
 		background-color: #fff;
 	}
 
@@ -533,11 +533,11 @@ select {
 	text-align: center;
 }
 
-	#toolbar button, #toolbar input {
+	#toolbar .Button, #toolbar .Input {
 		height: 32px;
 	}
 
-		#toolbar button img {
+		#toolbar .Button img {
 			width: 16px;
 			opacity: 0.5;
 		}
@@ -644,33 +644,33 @@ select {
 
 @media ( prefers-color-scheme: dark ) {
 
-	button {
+	.Button {
 		color: #aaa;
 		background-color: #222;
 	}
 
-		button:hover {
+		.Button:hover {
 			color: #ccc;
 			background-color: #444;
 		}
 
-		button.selected {
+		.Button.selected {
 			color: #fff;
 			background-color: #08f;
 		}
 
-	input, textarea {
+	.Input, .TextArea {
 		background-color: #222;
 		border: 1px solid transparent;
 		color: #888;
 	}
 
-	select {
+	.Select {
 		color: #aaa;
 		background-color: #222;
 	}
 
-		select:hover {
+		.Select:hover {
 			color: #ccc;
 			background-color: #444;
 		}

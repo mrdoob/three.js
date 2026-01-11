@@ -448,7 +448,7 @@ class UICheckbox extends UIElement {
 
 		super( document.createElement( 'input' ) );
 
-		this.dom.className = 'Checkbox';
+		this.dom.className = 'Checkbox Input';
 		this.dom.type = 'checkbox';
 
 		this.dom.addEventListener( 'pointerdown', function ( event ) {
@@ -490,7 +490,7 @@ class UIColor extends UIElement {
 
 		super( document.createElement( 'input' ) );
 
-		this.dom.className = 'Color';
+		this.dom.className = 'Color Input';
 		this.dom.style.width = '32px';
 		this.dom.style.height = '16px';
 		this.dom.style.border = '0px';
@@ -545,7 +545,7 @@ class UINumber extends UIElement {
 		super( document.createElement( 'input' ) );
 
 		this.dom.style.cursor = 'ns-resize';
-		this.dom.className = 'Number';
+		this.dom.className = 'Number Input';
 		this.dom.value = '0.00';
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
@@ -766,7 +766,7 @@ class UIInteger extends UIElement {
 		super( document.createElement( 'input' ) );
 
 		this.dom.style.cursor = 'ns-resize';
-		this.dom.className = 'Number';
+		this.dom.className = 'Number Input';
 		this.dom.value = '0';
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
