@@ -94,8 +94,7 @@ void main() {
 
 	#if DEPTH_PACKING == 3200
 
-		// Need to use swizzle because VSM uses RGFormat and PCF uses RGBAFormat
-		gl_FragColor.r = 1.0 - fragCoordZ;
+		gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );
 
 	#elif DEPTH_PACKING == 3201
 
@@ -105,12 +104,12 @@ void main() {
 	#elif DEPTH_PACKING == 3202
 
 		// TODO Deprecate
-		gl_FragColor = packDepthToRGB( fragCoordZ );
+		gl_FragColor = vec4( packDepthToRGB( fragCoordZ ), 1.0 );
 
 	#elif DEPTH_PACKING == 3203
 
 		// TODO Deprecate
-		gl_FragColor = packDepthToRG( fragCoordZ );
+		gl_FragColor = vec4( packDepthToRG( fragCoordZ ), 0.0, 1.0 );
 
 	#endif
 

@@ -25,11 +25,7 @@ import {
 	NeutralToneMapping,
 	NoToneMapping,
 	PCFShadowMap,
-	RedFormat,
-	RedIntegerFormat,
 	ReinhardToneMapping,
-	RGFormat,
-	RGIntegerFormat,
 	ShortType,
 	SRGBTransfer,
 	UnsignedIntType,
@@ -465,20 +461,8 @@ function getOutputType( texture ) {
 	const isIntType = texture.type === IntType || texture.type === ShortType;
 	const isUintType = texture.type === UnsignedIntType || texture.type === UnsignedShortType;
 
-	switch ( texture.format ) {
-
-		case RedFormat:
-		case RedIntegerFormat:
-			return isUintType ? 'uint' : isIntType ? 'int' : 'float';
-
-		case RGFormat:
-		case RGIntegerFormat:
-			return isUintType ? 'uvec2' : isIntType ? 'ivec2' : 'vec2';
-
-		default:
-			return isUintType ? 'uvec4' : isIntType ? 'ivec4' : 'vec4';
-
-	}
+	// Using vec4 for best compatibility and flexibility.
+	return isUintType ? 'uvec4' : isIntType ? 'ivec4' : 'vec4';
 
 }
 
