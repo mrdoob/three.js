@@ -191,7 +191,7 @@
 
 				// tile indexes debug, needs to be updated every time the renderer size changes
 
-				const debugBlockIndexes = lighting.getNode( scene, camera ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio ).getBlock().toColor().div( count * 2 );
+				const debugBlockIndexes = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio ).getBlock().toColor().div( count * 2 );
 
 				postProcessing.outputNode = compose.add( debugBlockIndexes.mul( tileInfluence ) );
 				postProcessing.needsUpdate = true;

@@ -328,6 +328,7 @@
 		"webgpu_cubemap_mix",
 		"webgpu_custom_fog",
 		"webgpu_custom_fog_background",
+		"webgpu_custom_fog_scattering",
 		"webgpu_depth_texture",
 		"webgpu_display_stereo",
 		"webgpu_equirectangular",

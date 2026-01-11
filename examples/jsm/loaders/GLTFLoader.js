@@ -71,7 +71,7 @@ import { clone } from '../utils/SkeletonUtils.js';
 /**
  * A loader for the glTF 2.0 format.
  *
- * [glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)
+ * [glTF](https://www.khronos.org/gltf/) (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf) or binary (.glb)
  * format. External files store textures (.jpg, .png) and additional binary data (.bin). A glTF asset may deliver
  * one or more scenes, including meshes, materials, textures, skins, skeletons, morph targets, animations, lights,
@@ -408,7 +408,7 @@ class GLTFLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given FBX data and returns the resulting group.
+	 * Parses the given glTF data and returns the resulting group.
 	 *
 	 * @param {string|ArrayBuffer} data - The raw glTF data.
 	 * @param {string} path - The URL base path.

@@ -9904,7 +9904,7 @@ function createBufferAttribute( array, type = null, stride = 0, offset = 0, usag
 
 	}
 
-	return new BufferAttributeNode( array, type, stride, offset );
+	return new BufferAttributeNode( array, type, stride, offset ).setUsage( usage );
 
 }
 
@@ -13947,6 +13947,26 @@ const highpModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 } ).once() )().toVar( 'highpModelNormalViewMatrix' );
 
 /**
+ * TSL object that represents the clip space position of the current rendered object.
+ *
+ * @tsl
+ * @type {VaryingNode<vec4>}
+ */
+const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage !== 'fragment' ) {
+
+		warnOnce( 'TSL: `clipSpace` is only available in fragment stage.' );
+
+		return vec4();
+
+	}
+
+	return builder.context.clipSpace.toVarying( 'v_clipSpace' );
+
+} ).once() )();
+
+/**
  * TSL object that represents the position attribute of the current rendered object.
  *
  * @tsl
@@ -13979,6 +13999,14 @@ const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'positionPrev
  */
 const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
+
+		// reconstruct world position from view position
+
+		return cameraWorldMatrix.mul( positionView ).xyz.toVar( 'positionWorld' );
+
+	}
+
 	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
 
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
@@ -14004,6 +14032,16 @@ const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
  * @type {VaryingNode<vec3>}
  */
 const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
+
+		// reconstruct view position from clip space
+
+		const viewPos = cameraProjectionMatrixInverse.mul( clipSpace );
+
+		return viewPos.xyz.div( viewPos.w ).toVar( 'positionView' );
+
+	}
 
 	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 
@@ -17254,7 +17292,7 @@ class InstanceNode extends Node {
 
 		if ( instanceMatrixNode === null ) {
 
-			instanceMatrixNode = this._createInstanceMatrixNode( true );
+			instanceMatrixNode = this._createInstanceMatrixNode( true, builder );
 
 			this.instanceMatrixNode = instanceMatrixNode;
 
@@ -17333,7 +17371,7 @@ class InstanceNode extends Node {
 
 			// update version if necessary
 
-			if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMatrix.version !== this.buffer.version ) {
+			if ( this.instanceMatrix.version !== this.buffer.version ) {
 
 				this.buffer.version = this.instanceMatrix.version;
 
@@ -17346,7 +17384,7 @@ class InstanceNode extends Node {
 			this.bufferColor.clearUpdateRanges();
 			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
 
-			if ( this.instanceColor.usage !== DynamicDrawUsage && this.instanceColor.version !== this.bufferColor.version ) {
+			if ( this.instanceColor.version !== this.bufferColor.version ) {
 
 				this.bufferColor.version = this.instanceColor.version;
 
@@ -17376,7 +17414,7 @@ class InstanceNode extends Node {
 
 			instancedMesh.previousInstanceMatrix = this.instanceMatrix.clone();
 
-			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false );
+			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false, builder );
 
 		}
 
@@ -17389,9 +17427,10 @@ class InstanceNode extends Node {
 	 *
 	 * @private
 	 * @param {boolean} assignBuffer - Whether the created interleaved buffer should be assigned to the `buffer` member or not.
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @return {Node} The instance matrix node.
 	 */
-	_createInstanceMatrixNode( assignBuffer ) {
+	_createInstanceMatrixNode( assignBuffer, builder ) {
 
 		let instanceMatrixNode;
 
@@ -17404,9 +17443,11 @@ class InstanceNode extends Node {
 
 		} else {
 
-			// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
+			// WebGPU has a 64kb UBO limit, WebGL 2 ensures only 16KB; fallback to attributes if a certain count is exceeded
 
-			if ( count <= 1000 ) {
+			const limit = ( builder.renderer.backend.isWebGPUBackend === true ) ? 1000 : 250;
+
+			if ( count <= limit ) {
 
 				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
@@ -20179,6 +20220,14 @@ class NodeMaterial extends Material {
 		this.maskNode = null;
 
 		/**
+		 * This node can be used to implement a shadow mask for the material.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskShadowNode = null;
+
+		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
 		 * the default and define local vertex positions with nodes instead.
@@ -20469,6 +20518,8 @@ class NodeMaterial extends Material {
 
 		const vertexNode = this.vertexNode || mvp;
 
+		builder.context.clipSpace = vertexNode;
+
 		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
@@ -20733,7 +20784,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
@@ -21277,6 +21328,7 @@ class NodeMaterial extends Material {
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
 		this.maskNode = source.maskNode;
+		this.maskShadowNode = source.maskShadowNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
@@ -33915,7 +33967,7 @@ function getTextureIndex( textures, name ) {
  * const mrtNode = mrt( {
  *   output: output,
  *   normal: normalView
- * } ) );
+ * } ) ;
  * ```
  * The MRT output is defined as a dictionary.
  *
@@ -44004,24 +44056,40 @@ class ShadowNode extends ShadowBaseNode {
 
 		let shadowColor;
 
-		if ( shadowMap.texture.isCubeTexture ) {
+		if ( renderer.shadowMap.transmitted === true ) {
 
-			// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
-			shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+			if ( shadowMap.texture.isCubeTexture ) {
 
-		} else {
+				// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+				shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
 
-			shadowColor = texture( shadowMap.texture, shadowCoord );
+			} else {
 
-			if ( depthTexture.isArrayTexture ) {
+				shadowColor = texture( shadowMap.texture, shadowCoord );
 
-				shadowColor = shadowColor.depth( this.depthLayer );
+				if ( depthTexture.isArrayTexture ) {
+
+					shadowColor = shadowColor.depth( this.depthLayer );
+
+				}
 
 			}
 
 		}
 
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		//
+
+		let shadowOutput;
+
+		if ( shadowColor ) {
+
+			shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+
+		} else {
+
+			shadowOutput = mix( 1, shadowNode, shadowIntensity ).toVar();
+
+		}
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
@@ -44030,17 +44098,23 @@ class ShadowNode extends ShadowBaseNode {
 
 		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
 
-		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+		if ( shadowColor ) {
 
-			if ( this.shadowMap.texture.isCubeTexture ) {
+			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
 
-				return cubeTexture( this.shadowMap.texture );
+				if ( this.shadowMap.texture.isCubeTexture ) {
 
-			}
+					return cubeTexture( this.shadowMap.texture );
 
-			return texture( this.shadowMap.texture );
+				}
 
-		} ).toInspector( `${ inspectName } / Depth`, () => {
+				return texture( this.shadowMap.texture );
+
+			} );
+
+		}
+
+		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
 
 			// TODO: Use linear depth
 
@@ -47088,6 +47162,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	clearcoat: clearcoat,
 	clearcoatNormalView: clearcoatNormalView,
 	clearcoatRoughness: clearcoatRoughness,
+	clipSpace: clipSpace,
 	code: code,
 	color: color,
 	colorSpaceToWorking: colorSpaceToWorking,
@@ -49800,7 +49875,16 @@ class NodeBuilder {
 					const uniforms = bindings[ shaderStage ][ groupName ];
 
 					const groupUniforms = groups[ groupName ] || ( groups[ groupName ] = [] );
-					groupUniforms.push( ...uniforms );
+
+					for ( const uniform of uniforms ) {
+
+						if ( groupUniforms.includes( uniform ) === false ) {
+
+							groupUniforms.push( uniform );
+
+						}
+
+					}
 
 				}
 
@@ -52063,9 +52147,9 @@ class NodeBuilder {
 
 			this.setBuildStage( buildStage );
 
-			if ( this.context.vertex && this.context.vertex.isNode ) {
+			if ( this.context.position && this.context.position.isNode ) {
 
-				this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
+				this.flowNodeFromShaderStage( 'vertex', this.context.position );
 
 			}
 
@@ -57657,6 +57741,7 @@ class Renderer {
 		 * Shadow map configuration
 		 * @typedef {Object} ShadowMapConfig
 		 * @property {boolean} enabled - Whether to globally enable shadows or not.
+		 * @property {boolean} transmitted - Whether to enable light transmission through non-opaque materials.
 		 * @property {number} type - The shadow map type.
 		 */
 
@@ -57667,6 +57752,7 @@ class Renderer {
 		 */
 		this.shadowMap = {
 			enabled: false,
+			transmitted: false,
 			type: PCFShadowMap
 		};
 
@@ -60034,12 +60120,13 @@ class Renderer {
 			const hasMap = material.map !== null;
 			const hasColorNode = material.colorNode && material.colorNode.isNode;
 			const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
+			const hasMaskNode = ( material.maskShadowNode && material.maskShadowNode.isNode ) || ( material.maskNode && material.maskNode.isNode );
 
 			let positionNode = null;
 			let colorNode = null;
 			let depthNode = null;
 
-			if ( hasMap || hasColorNode || hasCastShadowNode ) {
+			if ( hasMap || hasColorNode || hasCastShadowNode || hasMaskNode ) {
 
 				let shadowRGB;
 				let shadowAlpha;
@@ -60048,6 +60135,12 @@ class Renderer {
 
 					shadowRGB = material.castShadowNode.rgb;
 					shadowAlpha = material.castShadowNode.a;
+
+					if ( this.shadowMap.transmitted !== true ) {
+
+						warnOnce( 'Renderer: `shadowMap.transmitted` needs to be set to `true` when using `material.castShadowNode`.' );
+
+					}
 
 				} else {
 
@@ -60069,6 +60162,20 @@ class Renderer {
 				}
 
 				colorNode = vec4( shadowRGB, shadowAlpha );
+
+				if ( hasMaskNode ) {
+
+					const maskNode = material.maskShadowNode || material.maskNode;
+
+					colorNode = Fn( ( [ color ] ) => {
+
+						maskNode.not().discard();
+
+						return color;
+
+					} )( colorNode );
+
+				}
 
 			}
 
@@ -73479,6 +73586,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.uniformGroups = {};
 
 		/**
+		 * A dictionary that holds the assigned binding indices for each uniform group.
+		 * This ensures the same binding index is used across all shader stages.
+		 *
+		 * @type {Object<string,{index: number, id: number}>}
+		 */
+		this.uniformGroupsBindings = {};
+
+		/**
 		 * A dictionary that holds for each shader stage a Map of builtins.
 		 *
 		 * @type {Object<string,Map<string,Object>>}
@@ -74964,7 +75079,7 @@ ${ flowData.code }
 
 		if ( shaderStage === 'vertex' ) {
 
-			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
+			this.getBuiltin( 'position', 'builtinClipSpace', 'vec4<f32>', 'vertex' );
 
 		}
 
@@ -75160,7 +75275,7 @@ ${ flowData.code }
 
 				const groupName = uniform.groupNode.name;
 
-				// Check if this group has already been processed
+				// Check if this group has already been processed in this shader stage
 				if ( uniformGroups[ groupName ] === undefined ) {
 
 					// Get the shared uniform group that contains uniforms from all stages
@@ -75179,9 +75294,24 @@ ${ flowData.code }
 
 						}
 
+						// Check if this group already has an assigned binding index (from another shader stage)
+						let groupBinding = this.uniformGroupsBindings[ groupName ];
+
+						if ( groupBinding === undefined ) {
+
+							// First time processing this group - assign a new binding index
+							groupBinding = {
+								index: uniformIndexes.binding ++,
+								id: uniformIndexes.group
+							};
+
+							this.uniformGroupsBindings[ groupName ] = groupBinding;
+
+						}
+
 						uniformGroups[ groupName ] = {
-							index: uniformIndexes.binding ++,
-							id: uniformIndexes.group,
+							index: groupBinding.index,
+							id: groupBinding.id,
 							snippets: snippets
 						};
 
@@ -75262,7 +75392,7 @@ ${ flowData.code }
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += `varyings.Vertex = ${ flowSlotData.result };`;
+						flow += `varyings.builtinClipSpace = ${ flowSlotData.result };`;
 
 					} else if ( shaderStage === 'fragment' ) {
 

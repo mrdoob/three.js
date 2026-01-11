@@ -44097,6 +44097,12 @@ class Loader {
 		 */
 		this.requestHeader = {};
 
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		}
+
 	}
 
 	/**
@@ -50175,7 +50181,7 @@ class Audio extends Object3D {
 		/**
 		 * Defines the source type.
 		 *
-		 * The property is automatically by one of the `set*()` methods.
+		 * The property is automatically set by one of the `set*()` methods.
 		 *
 		 * @type {('empty'|'audioNode'|'mediaNode'|'mediaStreamNode'|'buffer')}
 		 * @readonly
@@ -53650,6 +53656,12 @@ class AnimationMixer extends EventDispatcher {
 		 * @default 1
 		 */
 		this.timeScale = 1.0;
+
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		}
 
 	}
 
