@@ -10,8 +10,8 @@ const _vector = /*@__PURE__*/ new Vector3();
 /**
  * This displays a cone shaped helper object for a {@link SpotLight}.
  *
- * When the spot light is transformed or its light properties are changed,
- * it's necessary to call the `update()` method of the respective helper.
+ * When the spot light or its target are transformed or light properties are
+ * changed, it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
  * const spotLight = new THREE.SpotLight( 0xffffff );
