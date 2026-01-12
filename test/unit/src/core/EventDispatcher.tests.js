@@ -113,11 +113,19 @@ export default QUnit.module( 'Core', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
-			const listener1 = () => eventDispatcher.removeEventListener( 'test', listener1 );
-			const listener2 = event => assert.equal( event.target, eventDispatcher, 'can remove listener during dispatch' );
+			const listener1 = event => assert.equal( event.target, eventDispatcher, 'can remove listeners during dispatch' );
+			const listener2 = () => {};
+
+			const listener3 = () => {
+
+				eventDispatcher.removeEventListener( 'test', listener3 ); // remove self
+				eventDispatcher.removeEventListener( 'test', listener2 ); // also remove next in line
+
+			};
 
 			eventDispatcher.addEventListener( 'test', listener1 );
 			eventDispatcher.addEventListener( 'test', listener2 );
+			eventDispatcher.addEventListener( 'test', listener3 );
 			eventDispatcher.dispatchEvent( { type: 'test' } );
 
 		} );
