@@ -121,9 +121,13 @@ textarea, input { outline: none; } /* osx */
 }
 
 .Listbox .ListboxItem {
-	padding: 6px;
+	padding: 4px;
 	color: #666;
 	white-space: nowrap;
+}
+
+.Listbox .ListboxItem:hover {
+	background-color: rgba(0, 0, 0, 0.02);
 }
 
 .Listbox .ListboxItem.active {
