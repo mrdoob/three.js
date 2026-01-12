@@ -201,12 +201,12 @@ class RenderImageDialog {
 
 			const loader = new THREE.ObjectLoader();
 
-			const camera = loader.parse( json.camera );
+			const camera = await loader.parseAsync( json.camera );
 			camera.aspect = imageWidth.getValue() / imageHeight.getValue();
 			camera.updateProjectionMatrix();
 			camera.updateMatrixWorld();
 
-			const scene = loader.parse( json.scene );
+			const scene = await loader.parseAsync( json.scene );
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
