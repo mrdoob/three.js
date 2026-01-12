@@ -1964,8 +1964,7 @@ class USDCParser {
 
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
-		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
-		const uvIndices = fields[ 'primvars:st:indices' ];
+		const { uvs, uvIndices } = this._findUVPrimvar( fields );
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
 
 		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
@@ -2243,9 +2242,41 @@ class USDCParser {
 
 			}
 
+			if ( attrName.startsWith( 'primvars:' ) && spec.fields.typeName !== undefined ) {
+
+				attrs[ attrName + ':typeName' ] = spec.fields.typeName;
+
+			}
+
 		}
 
 		return attrs;
+
+	}
+
+	_findUVPrimvar( fields ) {
+
+		for ( const key in fields ) {
+
+			if ( ! key.startsWith( 'primvars:' ) ) continue;
+			if ( key.endsWith( ':typeName' ) || key.endsWith( ':elementSize' ) || key.endsWith( ':indices' ) ) continue;
+			if ( key.includes( 'skel:' ) ) continue;
+
+			const typeName = fields[ key + ':typeName' ];
+			if ( typeName && typeName.includes( 'texCoord' ) ) {
+
+				return {
+					uvs: fields[ key ],
+					uvIndices: fields[ key + ':indices' ]
+				};
+
+			}
+
+		}
+
+		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
+		const uvIndices = fields[ 'primvars:st:indices' ];
+		return { uvs, uvIndices };
 
 	}
 
@@ -2364,8 +2395,7 @@ class USDCParser {
 
 		}
 
-		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
-		const uvIndices = fields[ 'primvars:st:indices' ];
+		const { uvs, uvIndices } = this._findUVPrimvar( fields );
 
 		if ( uvs && uvs.length > 0 ) {
 
