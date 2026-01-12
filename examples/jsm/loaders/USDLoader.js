@@ -106,6 +106,10 @@ class USDLoader extends Loader {
 
 				}
 
+			}
+
+			for ( const filename in zip ) {
+
 				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) || filename.endsWith( 'usdc' ) ) {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
