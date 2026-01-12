@@ -14,7 +14,7 @@ const _v3 = /*@__PURE__*/ new Vector3();
  * effect on the scene. This consists of a plane and a line representing the
  * light's position and direction.
  *
- * When the directional light or its target are transformed or light properties 
+ * When the directional light or its target are transformed or light properties
  * are changed, it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
