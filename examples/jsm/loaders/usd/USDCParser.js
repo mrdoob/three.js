@@ -2280,7 +2280,16 @@ class USDCParser {
 		if ( data[ 'xformOp:scale' ] ) {
 
 			const s = data[ 'xformOp:scale' ];
-			obj.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+			if ( Array.isArray( s ) ) {
+
+				obj.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+			} else {
+
+				obj.scale.set( s, s, s );
+
+			}
 
 		}
 
