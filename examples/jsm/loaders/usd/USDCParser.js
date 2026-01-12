@@ -241,10 +241,10 @@ function decompressLZ4( input, uncompressedSize ) {
 
 		for ( let i = 0; i < numChunks; i ++ ) {
 
-			const size = input[ headerOffset ] |
+			const size = ( input[ headerOffset ] |
 						( input[ headerOffset + 1 ] << 8 ) |
 						( input[ headerOffset + 2 ] << 16 ) |
-						( input[ headerOffset + 3 ] << 24 );
+						( input[ headerOffset + 3 ] << 24 ) ) >>> 0;
 			compressedSizes.push( size );
 			headerOffset += 4;
 
@@ -315,7 +315,7 @@ function decodeIntegers32( data, numInts ) {
 		for ( let j = 0; j < 4 && i < numInts; j ++, i ++ ) {
 
 			const code = ( codeByte >> ( j * 2 ) ) & 3;
-			let delta;
+			let delta = 0;
 
 			switch ( code ) {
 
@@ -675,7 +675,7 @@ class USDCParser {
 		// Strings section has an 8-byte count prefix, but string indices stored
 		// elsewhere in the file are relative to the section start (not the data).
 		// So we read the entire section as uint32 values to maintain correct indexing.
-		const numStrings = section.size / 4;
+		const numStrings = Math.floor( section.size / 4 );
 		this.strings = [];
 
 		for ( let i = 0; i < numStrings; i ++ ) {
@@ -699,7 +699,7 @@ class USDCParser {
 		if ( this.version.major === 0 && this.version.minor < 4 ) {
 
 			// Uncompressed fields
-			const numFields = section.size / 12; // 4 bytes token index + 8 bytes value rep
+			const numFields = Math.floor( section.size / 12 ); // 4 bytes token index + 8 bytes value rep
 
 			for ( let i = 0; i < numFields; i ++ ) {
 
@@ -765,7 +765,7 @@ class USDCParser {
 		if ( this.version.major === 0 && this.version.minor < 4 ) {
 
 			// Uncompressed field sets
-			const numFieldSets = section.size / 4;
+			const numFieldSets = Math.floor( section.size / 4 );
 
 			for ( let i = 0; i < numFieldSets; i ++ ) {
 
