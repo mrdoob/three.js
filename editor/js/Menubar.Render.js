@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { UIPanel, UIRow, UIButton, UIInteger, UISelect, UIText, UIBreak } from './libs/ui.js';
+import { UIPanel, UIRow, UIButton, UIInteger, UISelect, UIText } from './libs/ui.js';
 
 import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 import { APP } from './libs/app.js';
