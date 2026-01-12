@@ -98,9 +98,10 @@ class USDLoader extends Loader {
 
 			for ( const filename in zip ) {
 
-				if ( filename.endsWith( 'png' ) ) {
+				if ( filename.endsWith( 'png' ) || filename.endsWith( 'jpg' ) || filename.endsWith( 'jpeg' ) ) {
 
-					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
+					const type = filename.endsWith( 'png' ) ? 'image/png' : 'image/jpeg';
+					const blob = new Blob( [ zip[ filename ] ], { type } );
 					data[ filename ] = URL.createObjectURL( blob );
 
 				}
