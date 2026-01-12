@@ -199,6 +199,9 @@ class CubeCamera extends Object3D {
 
 		renderer.xr.enabled = false;
 
+		const currentAutoClear = renderer.autoClear;
+		renderer.autoClear = true;
+
 		const generateMipmaps = renderTarget.texture.generateMipmaps;
 
 		renderTarget.texture.generateMipmaps = false;
@@ -229,6 +232,7 @@ class CubeCamera extends Object3D {
 		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 
 		renderer.xr.enabled = currentXrEnabled;
+		renderer.autoClear = currentAutoClear;
 
 		renderTarget.texture.needsPMREMUpdate = true;
 
