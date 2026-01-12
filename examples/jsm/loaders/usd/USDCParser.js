@@ -2669,7 +2669,7 @@ class USDCParser {
 
 			if ( infoId === 'UsdPreviewSurface' ) {
 
-				this._applyPreviewSurface( material, path, materialPath );
+				this._applyPreviewSurface( material, path );
 
 			}
 
@@ -2677,7 +2677,7 @@ class USDCParser {
 
 	}
 
-	_applyPreviewSurface( material, shaderPath, materialPath ) {
+	_applyPreviewSurface( material, shaderPath ) {
 
 		const fields = this._getAttributeValues( shaderPath );
 
@@ -2722,7 +2722,7 @@ class USDCParser {
 		};
 
 		// Diffuse color / base color map
-		const hasDiffuseMap = applyTextureFromConnection(
+		applyTextureFromConnection(
 			'inputs:diffuseColor',
 			'map',
 			SRGBColorSpace,
@@ -2861,13 +2861,6 @@ class USDCParser {
 
 		}
 
-		// Fallback: if no diffuse map found via connections, try heuristic matching
-		if ( ! hasDiffuseMap ) {
-
-			this._applyTexturesFallback( material, materialPath );
-
-		}
-
 	}
 
 	_getTextureFromConnection( connectionPath ) {
@@ -2901,69 +2894,6 @@ class USDCParser {
 		if ( wrapT ) texture.wrapT = this._getWrapMode( wrapT );
 
 		return texture;
-
-	}
-
-	_applyTexturesFallback( material, materialPath ) {
-
-		const prefix = materialPath + '/';
-
-		// Texture type matching patterns: [materialProperty, colorSpace, patterns]
-		const textureTypes = [
-			[ 'map', SRGBColorSpace, [ 'diffuse', 'basecolor', 'albedo', '_bc', '_diffuse', '_albedo' ]],
-			[ 'normalMap', NoColorSpace, [ 'normal', '_n.', '_normal' ]],
-			[ 'roughnessMap', NoColorSpace, [ 'roughness', '_r.', '_roughness' ]],
-			[ 'metalnessMap', NoColorSpace, [ 'metallic', 'metalness', '_m.', '_metallic' ]],
-			[ 'aoMap', NoColorSpace, [ 'occlusion', 'ao', '_ao', '_occlusion' ]],
-			[ 'emissiveMap', SRGBColorSpace, [ 'emissive', '_emissive' ]]
-		];
-
-		// Fallback heuristic: find texture samplers by name/file patterns
-		for ( const path in this.specsByPath ) {
-
-			if ( ! path.startsWith( prefix ) ) continue;
-
-			const spec = this.specsByPath[ path ];
-			if ( spec.fields.typeName !== 'Shader' ) continue;
-
-			const textureAttrs = this._getAttributeValues( path );
-			const infoId = textureAttrs[ 'info:id' ] || spec.fields[ 'info:id' ];
-			if ( infoId !== 'UsdUVTexture' ) continue;
-
-			const file = textureAttrs[ 'inputs:file' ];
-			if ( ! file ) continue;
-
-			const texture = this._loadTexture( file );
-			if ( ! texture ) continue;
-
-			const wrapS = textureAttrs[ 'inputs:wrapS' ];
-			const wrapT = textureAttrs[ 'inputs:wrapT' ];
-			if ( wrapS ) texture.wrapS = this._getWrapMode( wrapS );
-			if ( wrapT ) texture.wrapT = this._getWrapMode( wrapT );
-
-			const nameLower = this._getPathName( path ).toLowerCase();
-			const fileName = typeof file === 'string' ? file.toLowerCase() : '';
-
-			for ( const [ prop, colorSpace, patterns ] of textureTypes ) {
-
-				if ( material[ prop ] ) continue;
-
-				const matches = patterns.some( p => nameLower.includes( p ) || fileName.includes( p ) );
-				if ( ! matches ) continue;
-
-				material[ prop ] = texture;
-				texture.colorSpace = colorSpace;
-
-				// Additional setup for specific texture types
-				if ( prop === 'roughnessMap' ) material.roughness = 1.0;
-				if ( prop === 'metalnessMap' ) material.metalness = 1.0;
-				if ( prop === 'emissiveMap' ) material.emissive.set( 0xffffff );
-
-				break;
-
-			}
-
-		}
 
 	}
 
