@@ -1,28 +1,26 @@
 <html lang="en">
+	<head>
+		<title>three.js webgpu - compute ping/pong texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
 
-<head>
-	<title>three.js webgpu - compute ping/pong texture</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="example.css">
-</head>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
-<body>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Ping/Pong Texture</span>
+			</div>
 
-	<div id="info">
-		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
-
-		<div class="title-wrapper">
-			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
-			<span>Compute Ping/Pong Texture</span>
+			<small>
+				Compute ping/pong texture using GPU (pure TSL).
+			</small>
 		</div>
 
-		<small>
-			Compute ping/pong texture using GPU (pure TSL).
-		</small>
-	</div>
-
-	<script type="importmap">
+		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
@@ -33,192 +31,185 @@
 			}
 		</script>
 
-	<script type="module">
+		<script type="module">
 
-		import * as THREE from 'three/webgpu';
-		import { storageTexture, textureStore, Fn, instanceIndex, uniform, float, vec2, vec4, uvec2, ivec2, int, uint, NodeAccess } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { storageTexture, textureStore, Fn, instanceIndex, uniform, float, vec2, vec4, uvec2, ivec2, int, NodeAccess } from 'three/tsl';
 
-		import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-		let camera, scene, renderer;
-		let computeInitNode, computeToPing, computeToPong;
-		let pingTexture, pongTexture;
-		let material;
-		let phase = true;
-		let lastUpdate = - 1;
+			let camera, scene, renderer;
+			let computeInitNode, computeToPing, computeToPong;
+			let pingTexture, pongTexture;
+			let material;
+			let phase = true;
+			let lastUpdate = - 1;
 
-		const width = 512, height = 512;
+			const width = 512, height = 512;
 
-		const seed = uniform(new THREE.Vector2());
+			const seed = uniform( new THREE.Vector2() );
 
-		init();
+			init();
 
-		async function init() {
+			async function init() {
 
-			if (WebGPU.isAvailable() === false) {
+				if ( WebGPU.isAvailable() === false ) {
 
-				document.body.appendChild(WebGPU.getErrorMessage());
+					document.body.appendChild( WebGPU.getErrorMessage() );
 
-				throw new Error('No WebGPU support');
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				const aspect = window.innerWidth / window.innerHeight;
+				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				scene = new THREE.Scene();
+
+				// texture
+
+				const hdr = true;
+
+				pingTexture = new THREE.StorageTexture( width, height );
+				pongTexture = new THREE.StorageTexture( width, height );
+
+				if ( hdr ) {
+
+					pingTexture.type = THREE.HalfFloatType;
+					pongTexture.type = THREE.HalfFloatType;
+
+				}
+
+				const rand2 = Fn( ( [ n ] ) => {
+
+					return n.dot( vec2( 12.9898, 4.1414 ) ).sin().mul( 43758.5453 ).fract();
+
+				} );
+
+				// Create storage texture nodes with proper access
+				const writePing = storageTexture( pingTexture ).setAccess( NodeAccess.WRITE_ONLY );
+				const readPing = storageTexture( pingTexture ).setAccess( NodeAccess.READ_ONLY );
+				const writePong = storageTexture( pongTexture ).setAccess( NodeAccess.WRITE_ONLY );
+				const readPong = storageTexture( pongTexture ).setAccess( NodeAccess.READ_ONLY );
+
+				const computeInit = Fn( () => {
+
+					const posX = instanceIndex.mod( width );
+					const posY = instanceIndex.div( width );
+					const indexUV = uvec2( posX, posY );
+					const uv = vec2( float( posX ).div( width ), float( posY ).div( height ) );
+
+					const r = rand2( uv.add( seed.mul( 100 ) ) ).sub( rand2( uv.add( seed.mul( 300 ) ) ) );
+					const g = rand2( uv.add( seed.mul( 200 ) ) ).sub( rand2( uv.add( seed.mul( 300 ) ) ) );
+					const b = rand2( uv.add( seed.mul( 200 ) ) ).sub( rand2( uv.add( seed.mul( 100 ) ) ) );
+
+					textureStore( writePing, indexUV, vec4( r, g, b, 1 ) );
+
+				} );
+
+				computeInitNode = computeInit().compute( width * height );
+
+				// compute ping-pong: blur function using .load() for textureLoad
+				const blur = Fn( ( [ readTex, uv ] ) => {
+
+					const c0 = readTex.load( uv.add( ivec2( - 1, 1 ) ) );
+					const c1 = readTex.load( uv.add( ivec2( - 1, - 1 ) ) );
+					const c2 = readTex.load( uv.add( ivec2( 0, 0 ) ) );
+					const c3 = readTex.load( uv.add( ivec2( 1, - 1 ) ) );
+					const c4 = readTex.load( uv.add( ivec2( 1, 1 ) ) );
+
+					return c0.add( c1 ).add( c2 ).add( c3 ).add( c4 ).div( 5.0 );
+
+				} );
+
+				// compute loop: read from one texture, blur, write to another
+				const computePingPong = Fn( ( [ readTex, writeTex ] ) => {
+
+					const posX = instanceIndex.mod( width );
+					const posY = instanceIndex.div( width );
+					const indexUV = ivec2( int( posX ), int( posY ) );
+
+					const color = blur( readTex, indexUV );
+
+					textureStore( writeTex, indexUV, vec4( color.rgb.mul( 1.05 ), 1 ) );
+
+				} );
+
+				computeToPong = computePingPong( readPing, writePong ).compute( width * height );
+				computeToPing = computePingPong( readPong, writePing ).compute( width * height );
+
+				//
+
+				material = new THREE.MeshBasicMaterial( { color: 0xffffff, map: pongTexture } );
+
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				scene.add( plane );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// compute init
+
+				renderer.compute( computeInitNode );
 
 			}
 
-			const aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera(- aspect, aspect, 1, - 1, 0, 2);
-			camera.position.z = 1;
+			function onWindowResize() {
 
-			scene = new THREE.Scene();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			// texture
+				const aspect = window.innerWidth / window.innerHeight;
 
-			const hdr = true;
+				const frustumHeight = camera.top - camera.bottom;
 
-			pingTexture = new THREE.StorageTexture(width, height);
-			pongTexture = new THREE.StorageTexture(width, height);
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
 
-			if (hdr) {
-
-				pingTexture.type = THREE.HalfFloatType;
-				pongTexture.type = THREE.HalfFloatType;
+				camera.updateProjectionMatrix();
 
 			}
 
+			function render() {
 
-			const rand2 = Fn(([n]) => {
+				const time = performance.now();
+				const seconds = Math.floor( time / 1000 );
 
-				return n.dot(vec2(12.9898, 4.1414)).sin().mul(43758.5453).fract();
+				// reset every second
 
-			});
+				if ( phase && seconds !== lastUpdate ) {
 
-			// Create storage texture nodes with proper access
-			const writePing = storageTexture(pingTexture).setAccess(NodeAccess.WRITE_ONLY);
-			const readPing = storageTexture(pingTexture).setAccess(NodeAccess.READ_ONLY);
-			const writePong = storageTexture(pongTexture).setAccess(NodeAccess.WRITE_ONLY);
-			const readPong = storageTexture(pongTexture).setAccess(NodeAccess.READ_ONLY);
+					seed.value.set( Math.random(), Math.random() );
 
+					renderer.compute( computeInitNode );
 
-			const computeInit = Fn(() => {
+					lastUpdate = seconds;
 
-				const posX = instanceIndex.mod(width);
-				const posY = instanceIndex.div(width);
-				const indexUV = uvec2(posX, posY);
-				const uv = vec2(float(posX).div(width), float(posY).div(height));
+				}
 
-				const r = rand2(uv.add(seed.mul(100))).sub(rand2(uv.add(seed.mul(300))));
-				const g = rand2(uv.add(seed.mul(200))).sub(rand2(uv.add(seed.mul(300))));
-				const b = rand2(uv.add(seed.mul(200))).sub(rand2(uv.add(seed.mul(100))));
+				// compute step
 
-				textureStore(writePing, indexUV, vec4(r, g, b, 1));
+				renderer.compute( phase ? computeToPong : computeToPing );
 
-			});
+				material.map = phase ? pongTexture : pingTexture;
 
-			computeInitNode = computeInit().compute(width * height);
+				phase = ! phase;
 
-			// compute ping-pong: blur function using .load() for textureLoad
-			// This triggers both bugs:
-			// 1. clone() loses READ_ONLY access
-			// 2. generateTextureLoad adds level parameter for storage textures
-			const blur = Fn(([readTex, uv]) => {
+				// render step
 
-				const c0 = readTex.load(uv.add(ivec2(- 1, 1)));
-				const c1 = readTex.load(uv.add(ivec2(- 1, - 1)));
-				const c2 = readTex.load(uv.add(ivec2(0, 0)));
-				const c3 = readTex.load(uv.add(ivec2(1, - 1)));
-				const c4 = readTex.load(uv.add(ivec2(1, 1)));
+				// update material texture node
 
-				return c0.add(c1).add(c2).add(c3).add(c4).div(5.0);
-
-			});
-
-			// compute loop: read from one texture, blur, write to another
-			// will explode
-			const computePingPong = Fn(([readTex, writeTex]) => {
-
-				const posX = instanceIndex.mod(width);
-				const posY = instanceIndex.div(width);
-				const indexUV = ivec2(int(posX), int(posY));
-
-				const color = blur(readTex, indexUV);
-
-				textureStore(writeTex, indexUV, vec4(color.rgb.mul(1.05), 1));
-
-			});
-
-			computeToPong = computePingPong(readPing, writePong).compute(width * height);
-			computeToPing = computePingPong(readPong, writePing).compute(width * height);
-
-			//
-
-			material = new THREE.MeshBasicMaterial({ color: 0xffffff, map: pongTexture });
-
-			const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-			scene.add(plane);
-
-			renderer = new THREE.WebGPURenderer({ antialias: true });
-			renderer.setPixelRatio(window.devicePixelRatio);
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			renderer.setAnimationLoop(render);
-			document.body.appendChild(renderer.domElement);
-
-			await renderer.init();
-
-			window.addEventListener('resize', onWindowResize);
-
-			// compute init
-
-			renderer.compute(computeInitNode);
-
-		}
-
-		function onWindowResize() {
-
-			renderer.setSize(window.innerWidth, window.innerHeight);
-
-			const aspect = window.innerWidth / window.innerHeight;
-
-			const frustumHeight = camera.top - camera.bottom;
-
-			camera.left = - frustumHeight * aspect / 2;
-			camera.right = frustumHeight * aspect / 2;
-
-			camera.updateProjectionMatrix();
-
-		}
-
-		function render() {
-
-			const time = performance.now();
-			const seconds = Math.floor(time / 1000);
-
-			// reset every second
-
-			if (phase && seconds !== lastUpdate) {
-
-				seed.value.set(Math.random(), Math.random());
-
-				renderer.compute(computeInitNode);
-
-				lastUpdate = seconds;
+				renderer.render( scene, camera );
 
 			}
 
-			// compute step
-
-			renderer.compute(phase ? computeToPong : computeToPing);
-
-			material.map = phase ? pongTexture : pingTexture;
-
-			phase = !phase;
-
-			// render step
-
-			// update material texture node
-
-			renderer.render(scene, camera);
-
-		}
-
-	</script>
-</body>
-
+		</script>
+	</body>
 </html>

@@ -222,6 +222,7 @@ class StorageTextureNode extends TextureNode {
 		const newNode = super.clone();
 		newNode.storeNode = this.storeNode;
 		newNode.mipLevel = this.mipLevel;
+		newNode.access = this.access;
 		return newNode;
 
 	}
@@ -255,7 +256,20 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
  */
 export const textureStore = ( value, uvNode, storeNode ) => {
 
-	const node = storageTexture( value, uvNode, storeNode );
+	let node;
+
+	if ( value.isStorageTextureNode === true ) {
+
+		// Derive new storage texture node from existing one
+		node = value.clone();
+		node.uvNode = uvNode;
+		node.storeNode = storeNode;
+
+	} else {
+
+		node = storageTexture( value, uvNode, storeNode );
+
+	}
 
 	if ( storeNode !== null ) node.toStack();
 

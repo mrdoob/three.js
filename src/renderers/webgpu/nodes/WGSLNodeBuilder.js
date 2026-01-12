@@ -544,7 +544,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		if ( levelSnippet === null ) levelSnippet = '0u';
+		const isStorageTexture = texture.isStorageTexture === true;
+
+		if ( levelSnippet === null && ! isStorageTexture ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
@@ -556,15 +558,33 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( depthSnippet ) {
 
-			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+			// Storage textures don't take a level parameter in WGSL
+			if ( isStorageTexture ) {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet } )`;
+
+			} else {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+
+			}
 
 		} else {
 
-			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+			// Storage textures don't take a level parameter in WGSL
+			if ( isStorageTexture ) {
 
-			if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
-				snippet += '.x';
+			} else {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+
+				if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+
+					snippet += '.x';
+
+				}
 
 			}
 
