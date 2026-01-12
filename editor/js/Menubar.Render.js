@@ -652,7 +652,6 @@ function createMP4( chunks, avcC, width, height, fps ) {
 	}
 
 	// mdat
-	const mdatHeader = concat( u32( 0 ), str( 'mdat' ) );
 	let mdatSize = 8;
 	for ( const chunk of chunks ) mdatSize += chunk.data.length;
 
