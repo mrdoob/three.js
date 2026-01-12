@@ -2822,6 +2822,45 @@ class USDCParser {
 
 		}
 
+		// Opacity / transparency
+		const opacitySpec = getAttrSpec( 'inputs:opacity' );
+
+		if ( opacitySpec && opacitySpec.fields.connectionPaths && opacitySpec.fields.connectionPaths.length > 0 ) {
+
+			const opacityConn = opacitySpec.fields.connectionPaths[ 0 ];
+
+			// Check if opacity is connected to alpha channel of diffuse texture
+			if ( opacityConn.endsWith( '.outputs:a' ) ) {
+
+				// Alpha is in the diffuse texture - enable transparency with blending
+				material.transparent = true;
+
+			} else {
+
+				// Separate opacity texture
+				const texture = this._getTextureFromConnection( opacityConn );
+				if ( texture ) {
+
+					texture.colorSpace = NoColorSpace;
+					material.alphaMap = texture;
+					material.transparent = true;
+
+				}
+
+			}
+
+		} else if ( fields[ 'inputs:opacity' ] !== undefined ) {
+
+			const opacity = fields[ 'inputs:opacity' ];
+			if ( typeof opacity === 'number' && opacity < 1.0 ) {
+
+				material.opacity = opacity;
+				material.transparent = true;
+
+			}
+
+		}
+
 		// Fallback: if no diffuse map found via connections, try heuristic matching
 		if ( ! hasDiffuseMap ) {
 
