@@ -123,6 +123,7 @@ export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as ProjectorLightNode } from './lighting/ProjectorLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
+export { default as BasicLightMapNode } from './lighting/BasicLightMapNode.js';
 export { default as LightsNode } from './lighting/LightsNode.js';
 export { default as LightingNode } from './lighting/LightingNode.js';
 export { default as LightingContextNode } from './lighting/LightingContextNode.js';
@@ -135,6 +136,7 @@ export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 export { default as ShadowBaseNode } from './lighting/ShadowBaseNode.js';
 export { default as ShadowNode } from './lighting/ShadowNode.js';
+export { default as PointShadowNode } from './lighting/PointShadowNode.js';
 
 // pmrem
 export { default as PMREMNode } from './pmrem/PMREMNode.js';
