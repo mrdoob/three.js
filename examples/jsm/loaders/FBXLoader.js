@@ -42,7 +42,7 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	MeshStandardMaterial
+	MeshStandardMaterial,
 } from 'three';
 
 import * as fflate from '../libs/fflate.module.js';
@@ -671,6 +671,12 @@ class FBXTreeParser {
 		if ( materialNode[ 'Maya|baseMetalness' ] ) {
 
 			parameters.metalness = materialNode[ 'Maya|baseMetalness' ].value;
+
+		}
+
+		if ( materialNode[ 'Maya|specularRoughness' ] ) {
+
+			parameters.roughness = materialNode[ 'Maya|specularRoughness' ].value;
 
 		}
 
