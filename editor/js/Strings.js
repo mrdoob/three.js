@@ -99,6 +99,11 @@ function Strings( config ) {
 			'menubar/view/lightHelpers': 'کمک کننده نور',
 			'menubar/view/skeletonHelpers': 'کمک کننده اسکلتون',
 
+			'menubar/render': 'رندر',
+			'menubar/render/image': 'عکس',
+			'menubar/render/video': 'ویدیو',
+			'menubar/render/cancel': 'لغو',
+
 			'menubar/help': 'کمک',
 			'menubar/help/source_code': 'سورس کد',
 			'menubar/help/icons': 'پک آیکون',
@@ -500,6 +505,11 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': 'Camera Helpers',
 			'menubar/view/lightHelpers': 'Light Helpers',
 			'menubar/view/skeletonHelpers': 'Skeleton Helpers',
+
+			'menubar/render': 'Render',
+			'menubar/render/image': 'Image',
+			'menubar/render/video': 'Video',
+			'menubar/render/cancel': 'Cancel',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -904,6 +914,11 @@ function Strings( config ) {
 			'menubar/view/lightHelpers': 'Aides Lumière',
 			'menubar/view/skeletonHelpers': 'Aides squelettes',
 
+			'menubar/render': 'Rendu',
+			'menubar/render/image': 'Image',
+			'menubar/render/video': 'Vidéo',
+			'menubar/render/cancel': 'Annuler',
+
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
@@ -1306,6 +1321,11 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': '相机助手',
 			'menubar/view/lightHelpers': '光助手',
 			'menubar/view/skeletonHelpers': '骷髅助手',
+
+			'menubar/render': '渲染',
+			'menubar/render/image': '图片',
+			'menubar/render/video': '视频',
+			'menubar/render/cancel': '取消',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -1710,6 +1730,11 @@ function Strings( config ) {
 			'menubar/view/lightHelpers': 'ライトヘルパー',
 			'menubar/view/skeletonHelpers': 'スケルトンヘルパー',
 
+			'menubar/render': 'レンダー',
+			'menubar/render/image': '画像',
+			'menubar/render/video': '動画',
+			'menubar/render/cancel': 'キャンセル',
+
 			'menubar/help': 'ヘルプ',
 			'menubar/help/source_code': 'ソースコード',
 			'menubar/help/icons': 'アイコンパック',
@@ -2111,6 +2136,11 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': '카메라 도우미',
 			'menubar/view/lightHelpers': '조명 도우미',
 			'menubar/view/skeletonHelpers': '골격 도우미',
+
+			'menubar/render': '렌더',
+			'menubar/render/image': '이미지',
+			'menubar/render/video': '비디오',
+			'menubar/render/cancel': '취소',
 
 			'menubar/help': '도움말',
 			'menubar/help/source_code': '소스 코드',
