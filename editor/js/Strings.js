@@ -354,7 +354,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
 			'sidebar/project/toneMapping': 'تون مپینگ',
+			'sidebar/project/geometries': 'هندسه ها',
 			'sidebar/project/materials': 'متریال ها',
+			'sidebar/project/textures': 'تکستچرها',
 			'sidebar/project/Assign': 'اختصاص',
 
 			'sidebar/project/app': 'اپ',
@@ -762,7 +764,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
 			'sidebar/project/toneMapping': 'Tonemapping',
+			'sidebar/project/geometries': 'Geometries',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/project/app': 'App',
@@ -1171,7 +1175,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
+			'sidebar/project/geometries': 'Géométries',
 			'sidebar/project/materials': 'Matériaux',
+			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Attribuer',
 
 			'sidebar/project/app': 'App',
@@ -1580,7 +1586,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/toneMapping': '色调映射',
+			'sidebar/project/geometries': '几何体',
 			'sidebar/project/materials': '材质',
+			'sidebar/project/textures': '纹理',
 			'sidebar/project/Assign': '应用',
 
 			'sidebar/project/app': 'App',
@@ -1989,7 +1997,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
 			'sidebar/project/toneMapping': 'トーンマッピング',
+			'sidebar/project/geometries': 'ジオメトリ',
 			'sidebar/project/materials': 'マテリアル',
+			'sidebar/project/textures': 'テクスチャ',
 			'sidebar/project/Assign': '割り当て',
 
 			'sidebar/project/app': 'アプリ',
@@ -2397,7 +2407,9 @@ function Strings( config ) {
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',
+			'sidebar/project/geometries': '지오메트리',
 			'sidebar/project/materials': '머티리얼',
+			'sidebar/project/textures': '텍스처',
 			'sidebar/project/Assign': '할당',
 
 			'sidebar/project/app': '앱',
