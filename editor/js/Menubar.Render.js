@@ -35,7 +35,7 @@ function MenubarRender( editor ) {
 
 	// Video
 
-	if ( 'SharedArrayBuffer' in window ) {
+	if ( 'VideoEncoder' in window ) {
 
 		option = new UIRow();
 		option.setClass( 'option' );
@@ -386,6 +386,20 @@ class RenderVideoDialog {
 		const videoDuration = new UIInteger( 10 );
 		videoDurationRow.add( videoDuration );
 
+		// Quality
+
+		const qualityRow = new UIRow();
+		qualityRow.add( new UIText( strings.getKey( 'menubar/render/quality' ) ).setClass( 'Label' ) );
+		body.appendChild( qualityRow.dom );
+
+		const videoQuality = new UISelect().setOptions( {
+			'low': 'Low',
+			'medium': 'Medium',
+			'high': 'High',
+			'ultra': 'Ultra'
+		} ).setWidth( '170px' ).setValue( 'high' );
+		qualityRow.add( videoQuality );
+
 		// Buttons
 
 		const buttonsRow = document.createElement( 'div' );
@@ -435,32 +449,6 @@ class RenderVideoDialog {
 			status.style.textShadow = '0 0 2px black';
 			output.document.body.appendChild( status );
 
-			const writeFileStatus = document.createElement( 'span' );
-			status.appendChild( writeFileStatus );
-
-			const encodingText = document.createElement( 'span' );
-			encodingText.textContent = ' encoding';
-			encodingText.hidden = true;
-			status.appendChild( encodingText );
-
-			const encodingStatus = document.createElement( 'span' );
-			encodingStatus.hidden = true;
-			status.appendChild( encodingStatus );
-
-			const videoSizeText = document.createElement( 'span' );
-			videoSizeText.textContent = ' size';
-			videoSizeText.hidden = true;
-			status.appendChild( videoSizeText );
-
-			const videoSizeStatus = document.createElement( 'span' );
-			videoSizeStatus.hidden = true;
-			status.appendChild( videoSizeStatus );
-
-			const completedStatus = document.createElement( 'span' );
-			completedStatus.textContent = ' \u2713';
-			completedStatus.hidden = true;
-			status.appendChild( completedStatus );
-
 			const video = document.createElement( 'video' );
 			video.width = width;
 			video.height = height;
@@ -469,88 +457,103 @@ class RenderVideoDialog {
 			video.hidden = true;
 			output.document.body.appendChild( video );
 
-			//
-
-			const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
-			const ffmpeg = createFFmpeg( { log: true } );
-
-			await ffmpeg.load();
-
-			ffmpeg.setProgress( ( { ratio } ) => {
-
-				encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
-
-			} );
-
 			output.addEventListener( 'unload', function () {
 
 				if ( video.src.startsWith( 'blob:' ) ) {
 
 					URL.revokeObjectURL( video.src );
 
-				} else {
-
-					ffmpeg.exit();
-
 				}
 
 			} );
+
+			//
 
 			const fps = videoFPS.getValue();
 			const duration = videoDuration.getValue();
 			const frames = duration * fps;
 
-			//
+			const encodedChunks = [];
+			let codecConfig = null;
 
-			await ( async function () {
+			const videoEncoder = new VideoEncoder( {
 
-				let currentTime = 0;
+				output: ( chunk, metadata ) => {
 
-				for ( let i = 0; i < frames; i ++ ) {
+					if ( metadata?.decoderConfig?.description ) {
 
-					player.render( currentTime );
+						codecConfig = new Uint8Array( metadata.decoderConfig.description );
 
-					const num = i.toString().padStart( 5, '0' );
+					}
 
-					if ( output.closed ) return;
+					const chunkData = new Uint8Array( chunk.byteLength );
+					chunk.copyTo( chunkData );
+					encodedChunks.push( { data: chunkData, timestamp: chunk.timestamp, type: chunk.type } );
 
-					ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
-					currentTime += 1 / fps;
+				},
+				error: ( e ) => console.error( 'VideoEncoder error:', e )
 
-					const frame = i + 1;
-					const progress = Math.floor( frame / frames * 100 );
-					writeFileStatus.textContent = `${ frame } / ${ frames } ( ${ progress }% )`;
+			} );
+
+			const qualityToBitrate = {
+				'low': 2_000_000,
+				'medium': 5_000_000,
+				'high': 10_000_000,
+				'ultra': 20_000_000
+			};
+
+			videoEncoder.configure( {
+				codec: 'avc1.640028',
+				width: videoWidth.getValue(),
+				height: videoHeight.getValue(),
+				bitrate: qualityToBitrate[ videoQuality.getValue() ],
+				framerate: fps,
+				avc: { format: 'avc' }
+			} );
+
+			let currentTime = 0;
+			let aborted = false;
+
+			for ( let i = 0; i < frames; i ++ ) {
+
+				if ( output.closed ) {
+
+					aborted = true;
+					break;
 
 				}
 
-				encodingText.hidden = false;
-				encodingStatus.hidden = false;
+				player.render( currentTime );
 
-				await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
+				const bitmap = await createImageBitmap( canvas );
+				const frame = new VideoFrame( bitmap, { timestamp: i * ( 1_000_000 / fps ) } );
 
-				const videoData = ffmpeg.FS( 'readFile', 'out.mp4' );
+				videoEncoder.encode( frame, { keyFrame: i % fps === 0 } );
+				frame.close();
+				bitmap.close();
 
-				for ( let i = 0; i < frames; i ++ ) {
+				currentTime += 1 / fps;
 
-					const num = i.toString().padStart( 5, '0' );
-					ffmpeg.FS( 'unlink', `tmp.${num}.png` );
+				const progress = Math.floor( ( i + 1 ) / frames * 100 );
+				status.textContent = `${ i + 1 } / ${ frames } ( ${ progress }% )`;
 
-				}
+			}
 
-				ffmpeg.FS( 'unlink', 'out.mp4' );
+			if ( ! aborted ) {
+
+				await videoEncoder.flush();
+				videoEncoder.close();
 
 				output.document.body.removeChild( canvas );
 
-				videoSizeText.hidden = false;
-				videoSizeStatus.textContent = `( ${ formatFileSize( videoData.buffer.byteLength ) } )`;
-				videoSizeStatus.hidden = false;
+				const mp4Data = createMP4( encodedChunks, codecConfig, videoWidth.getValue(), videoHeight.getValue(), fps );
 
-				completedStatus.hidden = false;
+				status.textContent = `${ frames } / ${ frames } ( 100% ) ${ formatFileSize( mp4Data.byteLength ) } \u2713`;
 
-				video.src = URL.createObjectURL( new Blob( [ videoData.buffer ], { type: 'video/mp4' } ) );
+				video.src = URL.createObjectURL( new Blob( [ mp4Data ], { type: 'video/mp4' } ) );
 				video.hidden = false;
 
-			} )();
+			}
 
 			player.dispose();
 
@@ -572,6 +575,254 @@ class RenderVideoDialog {
 		this.dom.remove();
 
 	}
+
+}
+
+// Simple MP4 muxer for H.264 encoded chunks
+
+function createMP4( chunks, avcC, width, height, fps ) {
+
+	const timescale = 90000;
+	const frameDuration = timescale / fps;
+
+	function u32( value ) {
+
+		return new Uint8Array( [ ( value >> 24 ) & 0xFF, ( value >> 16 ) & 0xFF, ( value >> 8 ) & 0xFF, value & 0xFF ] );
+
+	}
+
+	function u16( value ) {
+
+		return new Uint8Array( [ ( value >> 8 ) & 0xFF, value & 0xFF ] );
+
+	}
+
+	function str( s ) {
+
+		return new TextEncoder().encode( s );
+
+	}
+
+	function concat( ...arrays ) {
+
+		const totalLength = arrays.reduce( ( sum, arr ) => sum + arr.length, 0 );
+		const result = new Uint8Array( totalLength );
+		let offset = 0;
+		for ( const arr of arrays ) {
+
+			result.set( arr, offset );
+			offset += arr.length;
+
+		}
+
+		return result;
+
+	}
+
+	function box( type, ...contents ) {
+
+		const data = concat( ...contents );
+		const size = data.length + 8;
+		return concat( u32( size ), str( type ), data );
+
+	}
+
+	function fullBox( type, version, flags, ...contents ) {
+
+		return box( type, new Uint8Array( [ version, ( flags >> 16 ) & 0xFF, ( flags >> 8 ) & 0xFF, flags & 0xFF ] ), ...contents );
+
+	}
+
+	// ftyp
+	const ftyp = box( 'ftyp',
+		str( 'isom' ),
+		u32( 512 ),
+		str( 'isom' ), str( 'iso2' ), str( 'avc1' ), str( 'mp41' )
+	);
+
+	// Collect sample info
+	const sampleSizes = [];
+	const syncSamples = [];
+
+	for ( let i = 0; i < chunks.length; i ++ ) {
+
+		sampleSizes.push( chunks[ i ].data.length );
+		if ( chunks[ i ].type === 'key' ) syncSamples.push( i + 1 );
+
+	}
+
+	// mdat
+	const mdatHeader = concat( u32( 0 ), str( 'mdat' ) );
+	let mdatSize = 8;
+	for ( const chunk of chunks ) mdatSize += chunk.data.length;
+
+	// stsd - Sample Description
+	const avc1 = box( 'avc1',
+		new Uint8Array( 6 ), // reserved
+		u16( 1 ), // data reference index
+		new Uint8Array( 16 ), // pre-defined + reserved
+		u16( width ),
+		u16( height ),
+		u32( 0x00480000 ), // horizontal resolution 72 dpi
+		u32( 0x00480000 ), // vertical resolution 72 dpi
+		u32( 0 ), // reserved
+		u16( 1 ), // frame count
+		new Uint8Array( 32 ), // compressor name
+		u16( 0x0018 ), // depth
+		new Uint8Array( [ 0xFF, 0xFF ] ), // pre-defined
+		box( 'avcC', avcC )
+	);
+
+	const stsd = fullBox( 'stsd', 0, 0, u32( 1 ), avc1 );
+
+	// stts - Time-to-Sample
+	const stts = fullBox( 'stts', 0, 0,
+		u32( 1 ),
+		u32( chunks.length ),
+		u32( frameDuration )
+	);
+
+	// stsc - Sample-to-Chunk
+	const stsc = fullBox( 'stsc', 0, 0,
+		u32( 1 ),
+		u32( 1 ), u32( chunks.length ), u32( 1 )
+	);
+
+	// stsz - Sample Sizes
+	const stszData = [ u32( 0 ), u32( chunks.length ) ];
+	for ( const size of sampleSizes ) stszData.push( u32( size ) );
+	const stsz = fullBox( 'stsz', 0, 0, ...stszData );
+
+	// stco - Chunk Offsets (placeholder, will be updated)
+	const stco = fullBox( 'stco', 0, 0, u32( 1 ), u32( 0 ) );
+
+	// stss - Sync Samples
+	const stssData = [ u32( syncSamples.length ) ];
+	for ( const sync of syncSamples ) stssData.push( u32( sync ) );
+	const stss = fullBox( 'stss', 0, 0, ...stssData );
+
+	// stbl
+	const stbl = box( 'stbl', stsd, stts, stsc, stsz, stco, stss );
+
+	// dinf
+	const dref = fullBox( 'dref', 0, 0,
+		u32( 1 ),
+		fullBox( 'url ', 0, 1 )
+	);
+	const dinf = box( 'dinf', dref );
+
+	// vmhd
+	const vmhd = fullBox( 'vmhd', 0, 1, new Uint8Array( 8 ) );
+
+	// minf
+	const minf = box( 'minf', vmhd, dinf, stbl );
+
+	// hdlr
+	const hdlr = fullBox( 'hdlr', 0, 0,
+		u32( 0 ), // pre-defined
+		str( 'vide' ),
+		new Uint8Array( 12 ), // reserved
+		str( 'VideoHandler' ), new Uint8Array( 1 )
+	);
+
+	// mdhd
+	const durationInTimescale = chunks.length * frameDuration;
+	const mdhd = fullBox( 'mdhd', 0, 0,
+		u32( 0 ), // creation time
+		u32( 0 ), // modification time
+		u32( timescale ),
+		u32( durationInTimescale ),
+		u16( 0x55C4 ), // language (und)
+		u16( 0 ) // quality
+	);
+
+	// mdia
+	const mdia = box( 'mdia', mdhd, hdlr, minf );
+
+	// tkhd
+	const tkhd = fullBox( 'tkhd', 0, 3,
+		u32( 0 ), // creation time
+		u32( 0 ), // modification time
+		u32( 1 ), // track id
+		u32( 0 ), // reserved
+		u32( durationInTimescale ),
+		new Uint8Array( 8 ), // reserved
+		u16( 0 ), // layer
+		u16( 0 ), // alternate group
+		u16( 0 ), // volume
+		u16( 0 ), // reserved
+		// matrix
+		u32( 0x00010000 ), u32( 0 ), u32( 0 ),
+		u32( 0 ), u32( 0x00010000 ), u32( 0 ),
+		u32( 0 ), u32( 0 ), u32( 0x40000000 ),
+		u32( width << 16 ), // width (16.16 fixed point)
+		u32( height << 16 ) // height (16.16 fixed point)
+	);
+
+	// trak
+	const trak = box( 'trak', tkhd, mdia );
+
+	// mvhd
+	const mvhd = fullBox( 'mvhd', 0, 0,
+		u32( 0 ), // creation time
+		u32( 0 ), // modification time
+		u32( timescale ),
+		u32( durationInTimescale ),
+		u32( 0x00010000 ), // rate (1.0)
+		u16( 0x0100 ), // volume (1.0)
+		new Uint8Array( 10 ), // reserved
+		// matrix
+		u32( 0x00010000 ), u32( 0 ), u32( 0 ),
+		u32( 0 ), u32( 0x00010000 ), u32( 0 ),
+		u32( 0 ), u32( 0 ), u32( 0x40000000 ),
+		new Uint8Array( 24 ), // pre-defined
+		u32( 2 ) // next track id
+	);
+
+	// moov
+	const moov = box( 'moov', mvhd, trak );
+
+	// Calculate actual mdat offset and update stco
+	const mdatOffset = ftyp.length + moov.length;
+	const moovArray = new Uint8Array( moov );
+	// Find and update stco offset (search for 'stco' in moov)
+	for ( let i = 0; i < moovArray.length - 16; i ++ ) {
+
+		if ( moovArray[ i ] === 0x73 && moovArray[ i + 1 ] === 0x74 &&
+			 moovArray[ i + 2 ] === 0x63 && moovArray[ i + 3 ] === 0x6F ) {
+
+			// Found 'stco', offset value is at i + 12
+			const offset = mdatOffset + 8;
+			moovArray[ i + 12 ] = ( offset >> 24 ) & 0xFF;
+			moovArray[ i + 13 ] = ( offset >> 16 ) & 0xFF;
+			moovArray[ i + 14 ] = ( offset >> 8 ) & 0xFF;
+			moovArray[ i + 15 ] = offset & 0xFF;
+			break;
+
+		}
+
+	}
+
+	// Update mdat size
+	const mdatSizeBytes = u32( mdatSize );
+
+	// Combine all parts
+	const result = new Uint8Array( ftyp.length + moovArray.length + mdatSize );
+	let offset = 0;
+	result.set( ftyp, offset ); offset += ftyp.length;
+	result.set( moovArray, offset ); offset += moovArray.length;
+	result.set( mdatSizeBytes, offset );
+	result.set( str( 'mdat' ), offset + 4 );
+	offset += 8;
+
+	for ( const chunk of chunks ) {
+
+		result.set( chunk.data, offset );
+		offset += chunk.data.length;
+
+	}
+
+	return result;
 
 }
 

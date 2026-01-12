@@ -102,6 +102,7 @@ function Strings( config ) {
 			'menubar/render': 'رندر',
 			'menubar/render/image': 'عکس',
 			'menubar/render/video': 'ویدیو',
+			'menubar/render/quality': 'کیفیت',
 			'menubar/render/cancel': 'لغو',
 
 			'menubar/help': 'کمک',
@@ -509,6 +510,7 @@ function Strings( config ) {
 			'menubar/render': 'Render',
 			'menubar/render/image': 'Image',
 			'menubar/render/video': 'Video',
+			'menubar/render/quality': 'Quality',
 			'menubar/render/cancel': 'Cancel',
 
 			'menubar/help': 'Help',
@@ -917,6 +919,7 @@ function Strings( config ) {
 			'menubar/render': 'Rendu',
 			'menubar/render/image': 'Image',
 			'menubar/render/video': 'Vidéo',
+			'menubar/render/quality': 'Qualité',
 			'menubar/render/cancel': 'Annuler',
 
 			'menubar/help': 'Aide',
@@ -1325,6 +1328,7 @@ function Strings( config ) {
 			'menubar/render': '渲染',
 			'menubar/render/image': '图片',
 			'menubar/render/video': '视频',
+			'menubar/render/quality': '质量',
 			'menubar/render/cancel': '取消',
 
 			'menubar/help': '帮助',
@@ -1733,6 +1737,7 @@ function Strings( config ) {
 			'menubar/render': 'レンダー',
 			'menubar/render/image': '画像',
 			'menubar/render/video': '動画',
+			'menubar/render/quality': '品質',
 			'menubar/render/cancel': 'キャンセル',
 
 			'menubar/help': 'ヘルプ',
@@ -2140,6 +2145,7 @@ function Strings( config ) {
 			'menubar/render': '렌더',
 			'menubar/render/image': '이미지',
 			'menubar/render/video': '비디오',
+			'menubar/render/quality': '품질',
 			'menubar/render/cancel': '취소',
 
 			'menubar/help': '도움말',
