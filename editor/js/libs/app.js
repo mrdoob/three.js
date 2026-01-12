@@ -2,7 +2,7 @@ const APP = {
 
 	Player: function () {
 
-		const renderer = new THREE.WebGLRenderer( { antialias: true } );
+		const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
 
 		const loader = new THREE.ObjectLoader();

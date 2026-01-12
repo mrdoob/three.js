@@ -208,7 +208,7 @@ class RenderImageDialog {
 
 			const scene = await loader.parseAsync( json.scene );
 
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
 
 			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
