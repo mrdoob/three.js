@@ -819,26 +819,9 @@ select {
 }
 
 .Dialog-title {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 	padding: 10px 15px;
 	color: #666;
 	text-transform: uppercase;
-}
-
-.Dialog-close {
-	background: transparent;
-	border: none;
-	font-size: 20px;
-	cursor: pointer;
-	padding: 0 5px;
-	color: #888;
-}
-
-.Dialog-close:hover {
-	color: #333;
-	background: transparent;
 }
 
 .Dialog-body {
@@ -873,14 +856,6 @@ select {
 		color: #888;
 	}
 
-	.Dialog-close {
-		color: #666;
-	}
-
-	.Dialog-close:hover {
-		color: #aaa;
-		background: transparent;
-	}
 
 
 }
