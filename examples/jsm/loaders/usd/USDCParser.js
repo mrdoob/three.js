@@ -4,6 +4,7 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
+	Euler,
 	Group,
 	Matrix4,
 	NoColorSpace,
@@ -537,11 +538,12 @@ class ValueRep {
 
 class USDCParser {
 
-	parse( buffer, assets = {} ) {
+	parse( buffer, assets = {}, variantSelections = {} ) {
 
 		this.buffer = buffer instanceof ArrayBuffer ? buffer : buffer.buffer;
 		this.reader = new BinaryReader( this.buffer );
 		this.assets = assets;
+		this.externalVariantSelections = variantSelections;
 		this.version = { major: 0, minor: 0, patch: 0 };
 		this.textureLoader = new TextureLoader();
 		this.textureCache = {};
@@ -1388,6 +1390,25 @@ class USDCParser {
 
 			}
 
+			case TypeEnum.VariantSelectionMap: {
+
+				const elementCount = reader.readUint64();
+				const map = {};
+
+				for ( let i = 0; i < elementCount; i ++ ) {
+
+					const keyIdx = reader.readUint32();
+					const valueIdx = reader.readUint32();
+					const key = this.tokens[ this.strings[ keyIdx ] ];
+					const value = this.tokens[ this.strings[ valueIdx ] ];
+					if ( key && value ) map[ key ] = value;
+
+				}
+
+				return map;
+
+			}
+
 			default:
 				console.warn( 'USDCParser: Unsupported scalar type', type );
 				return null;
@@ -1727,13 +1748,72 @@ class USDCParser {
 
 		const prefix = parentPath === '/' ? '/' : parentPath + '/';
 
-		// Find all direct children of this path
+		// Build list of variant paths to also search for children
+		const parentSpec = this.specsByPath[ parentPath ];
+		const variantSetChildren = parentSpec && parentSpec.fields ? parentSpec.fields.variantSetChildren : null;
+		const variantPaths = [];
+
+		if ( variantSetChildren && variantSetChildren.length > 0 ) {
+
+			for ( const variantSetName of variantSetChildren ) {
+
+				// External variant selections (from referencing prim) take priority
+				let selectedVariant = this.externalVariantSelections[ variantSetName ] || null;
+
+				// Fall back to file's internal variant selection
+				if ( ! selectedVariant ) {
+
+					const variantSelection = parentSpec.fields.variantSelection;
+					selectedVariant = variantSelection ? variantSelection[ variantSetName ] : null;
+
+				}
+
+				// Fall back to first variant child
+				if ( ! selectedVariant ) {
+
+					const variantSetPath = parentPath + '/{' + variantSetName + '=}';
+					const variantSetSpec = this.specsByPath[ variantSetPath ];
+					if ( variantSetSpec && variantSetSpec.fields && variantSetSpec.fields.variantChildren ) {
+
+						selectedVariant = variantSetSpec.fields.variantChildren[ 0 ];
+
+					}
+
+				}
+
+				if ( selectedVariant ) {
+
+					const variantPath = parentPath + '/{' + variantSetName + '=' + selectedVariant + '}';
+					variantPaths.push( variantPath );
+
+				}
+
+			}
+
+		}
+
 		for ( const path in this.specsByPath ) {
 
 			const spec = this.specsByPath[ path ];
 
-			// Check if this is a direct child
-			if ( ! this._isDirectChild( parentPath, path, prefix ) ) continue;
+			let isChild = this._isDirectChild( parentPath, path, prefix );
+			if ( ! isChild ) {
+
+				for ( const vp of variantPaths ) {
+
+					const vpPrefix = vp + '/';
+					if ( this._isDirectChild( vp, path, vpPrefix ) ) {
+
+						isChild = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			if ( ! isChild ) continue;
 
 			// Only process Prim specs
 			if ( spec.specType !== SpecType.Prim ) continue;
@@ -1878,6 +1958,32 @@ class USDCParser {
 
 		}
 
+		// Apply displayColor if no texture/color was set
+		const displayColor = attrs[ 'primvars:displayColor' ];
+		if ( displayColor && displayColor.length >= 3 ) {
+
+			const applyDisplayColor = ( mat ) => {
+
+				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
+
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ] );
+
+				}
+
+			};
+
+			if ( Array.isArray( material ) ) {
+
+				material.forEach( applyDisplayColor );
+
+			} else {
+
+				applyDisplayColor( material );
+
+			}
+
+		}
+
 		let mesh;
 
 		if ( hasSkinning ) {
@@ -1907,7 +2013,7 @@ class USDCParser {
 
 		}
 
-		// Apply transform from mesh spec fields and attributes
+		// Apply transforms to the Object3D (handles both simple and pivot transforms)
 		this._applyTransform( mesh, spec.fields, attrs );
 
 		return mesh;
@@ -2285,22 +2391,139 @@ class USDCParser {
 		// Merge fields and attrs (attrs take precedence for transforms)
 		const data = { ...fields, ...attrs };
 
-		// Check for transform matrix
 		const xformOpOrder = data[ 'xformOpOrder' ];
 
-		if ( xformOpOrder && xformOpOrder.includes( 'xformOp:transform' ) ) {
+		// If we have xformOpOrder, apply transforms in order using matrices
+		// USD uses row-vector convention (p' = p * M), Three.js uses column-vector (p' = M * p)
+		// To get equivalent transformation, iterate xformOpOrder FORWARD with right-multiply
+		if ( xformOpOrder && xformOpOrder.length > 0 ) {
 
-			const matrix = data[ 'xformOp:transform' ];
-			if ( matrix && matrix.length === 16 ) {
+			const matrix = new Matrix4();
+			const tempMatrix = new Matrix4();
 
-				obj.matrix.fromArray( matrix );
-				obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+			// Iterate FORWARD for Three.js column-vector convention
+			for ( let i = 0; i < xformOpOrder.length; i ++ ) {
+
+				const op = xformOpOrder[ i ];
+				const isInverse = op.startsWith( '!invert!' );
+				const opName = isInverse ? op.slice( 8 ) : op;
+
+				if ( opName === 'xformOp:transform' ) {
+
+					const m = data[ 'xformOp:transform' ];
+					if ( m && m.length === 16 ) {
+
+						tempMatrix.fromArray( m );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:translate' ) {
+
+					const t = data[ 'xformOp:translate' ];
+					if ( t ) {
+
+						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:translate:pivot' ) {
+
+					const t = data[ 'xformOp:translate:pivot' ];
+					if ( t ) {
+
+						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:scale' ) {
+
+					const s = data[ 'xformOp:scale' ];
+					if ( s ) {
+
+						if ( Array.isArray( s ) ) {
+
+							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+						} else {
+
+							tempMatrix.makeScale( s, s, s );
+
+						}
+
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateXYZ' ) {
+
+					const r = data[ 'xformOp:rotateXYZ' ];
+					if ( r ) {
+
+						// USD rotateXYZ: matrix = Rx * Ry * Rz
+						// Three.js Euler 'ZYX' order produces Rx * Ry * Rz
+						const euler = new Euler(
+							r[ 0 ] * Math.PI / 180,
+							r[ 1 ] * Math.PI / 180,
+							r[ 2 ] * Math.PI / 180,
+							'ZYX'
+						);
+						tempMatrix.makeRotationFromEuler( euler );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateX' ) {
+
+					const r = data[ 'xformOp:rotateX' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationX( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateY' ) {
+
+					const r = data[ 'xformOp:rotateY' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationY( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateZ' ) {
+
+					const r = data[ 'xformOp:rotateZ' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationZ( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				}
 
 			}
 
+			obj.matrix.copy( matrix );
+			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+			return;
+
 		}
 
-		// Handle individual transform ops
+		// Fallback: handle individual transform ops without order
 		if ( data[ 'xformOp:translate' ] ) {
 
 			const t = data[ 'xformOp:translate' ];

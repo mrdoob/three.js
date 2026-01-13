@@ -2,7 +2,9 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
+	Euler,
 	Group,
+	Matrix4,
 	NoColorSpace,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -13,6 +15,8 @@ import {
 	Object3D,
 	Vector2
 } from 'three';
+
+import { USDCParser } from './USDCParser.js';
 
 class USDAParser {
 
@@ -30,8 +34,6 @@ class USDAParser {
 		// Parse USDA file
 
 		for ( const line of lines ) {
-
-			// console.log( line );
 
 			if ( line.includes( '=' ) ) {
 
@@ -110,46 +112,167 @@ class USDAParser {
 
 	}
 
-	parse( text, assets ) {
+	parse( text, assets, basePath = '' ) {
 
 		const root = this.parseText( text );
 
-		// Build scene graph
+		// Store references to parsers for re-parsing with variant selections
+		const usdc = new USDCParser();
 
-		function findMeshGeometry( data ) {
+		function resolvePath( refPath, currentBasePath ) {
 
-			if ( ! data ) return undefined;
+			if ( refPath.startsWith( './' ) ) {
 
-			if ( 'prepend references' in data ) {
-
-				const reference = data[ 'prepend references' ];
-				const parts = reference.split( '@' );
-				const path = parts[ 1 ].replace( /^.\//, '' );
-				const id = parts[ 2 ].replace( /^<\//, '' ).replace( />$/, '' );
-
-				return findGeometry( assets[ path ], id );
+				refPath = refPath.slice( 2 );
 
 			}
 
-			return findGeometry( data );
+			if ( currentBasePath ) {
+
+				return currentBasePath + '/' + refPath;
+
+			}
+
+			return refPath;
 
 		}
 
-		function findGeometry( data, id ) {
+		function getBasePath( filePath ) {
 
-			if ( ! data ) return undefined;
+			const lastSlash = filePath.lastIndexOf( '/' );
+			return lastSlash >= 0 ? filePath.slice( 0, lastSlash ) : '';
 
-			if ( id !== undefined ) {
+		}
 
-				const def = `def Mesh "${id}"`;
+		function findMainDef( data ) {
 
-				if ( def in data ) {
+			for ( const key in data ) {
 
-					return data[ def ];
+				if ( key.startsWith( 'def ' ) ) {
+
+					return data[ key ];
 
 				}
 
 			}
+
+			return null;
+
+		}
+
+		function getVariantSelections( data ) {
+
+			const variants = {};
+
+			if ( ! data || ! data.variants ) return variants;
+
+			for ( const key in data.variants ) {
+
+				// Parse "string modelingVariant" = "\"ChairB\""
+				const match = key.match( /string\s+(\w+)/ );
+				if ( match ) {
+
+					const variantSetName = match[ 1 ];
+					const value = data.variants[ key ];
+					// Remove quotes from value
+					const cleanValue = value.replace( /"/g, '' );
+					variants[ variantSetName ] = cleanValue;
+
+				}
+
+			}
+
+			return variants;
+
+		}
+
+		function resolveReference( data, currentBasePath, variantSelections = {} ) {
+
+			if ( ! data ) return { asset: undefined, basePath: currentBasePath };
+
+			// If data is a Three.js object, return it directly
+			if ( data.isGroup || data.isObject3D ) {
+
+				return { asset: data, basePath: currentBasePath };
+
+			}
+
+			// Extract variant selections from this level
+			// External (referencing) variant selections have HIGHER priority per USD spec
+			const localVariants = getVariantSelections( data );
+			const mergedVariants = { ...localVariants, ...variantSelections };
+
+			// Check for references or payload
+			const refValue = data[ 'prepend references' ] || data[ 'payload' ];
+
+			if ( refValue ) {
+
+				const parts = refValue.split( '@' );
+				const refPath = parts[ 1 ];
+				const resolvedPath = resolvePath( refPath, currentBasePath );
+				const newBasePath = getBasePath( resolvedPath );
+
+				// Check if we need to re-parse with variant selections
+				if ( Object.keys( mergedVariants ).length > 0 ) {
+
+					const bufferKey = resolvedPath + ':buffer';
+					if ( assets[ bufferKey ] ) {
+
+						const reparse = usdc.parse( assets[ bufferKey ], assets, mergedVariants );
+						return { asset: reparse, basePath: newBasePath };
+
+					}
+
+				}
+
+				const asset = assets[ resolvedPath ];
+				if ( asset ) {
+
+					return resolveReference( asset, newBasePath, mergedVariants );
+
+				}
+
+				return { asset, basePath: newBasePath };
+
+			}
+
+			// If this is a standalone parsed USDA file (has header), look inside the main def
+			if ( '#usda 1.0' in data ) {
+
+				const mainDef = findMainDef( data );
+				if ( mainDef ) {
+
+					return resolveReference( mainDef, currentBasePath, mergedVariants );
+
+				}
+
+			}
+
+			return { asset: data, basePath: currentBasePath };
+
+		}
+
+		function findMeshGeometry( data, currentBasePath ) {
+
+			if ( ! data ) return undefined;
+
+			const { asset } = resolveReference( data, currentBasePath );
+
+			if ( ! asset ) return undefined;
+
+			if ( asset.isGroup || asset.isObject3D ) {
+
+				return asset;
+
+			}
+
+			return findGeometry( asset );
+
+		}
+
+		function findGeometry( data ) {
+
+			if ( ! data ) return undefined;
 
 			for ( const name in data ) {
 
@@ -160,7 +283,6 @@ class USDAParser {
 					return object;
 
 				}
-
 
 				if ( typeof object === 'object' ) {
 
@@ -674,47 +796,209 @@ class USDAParser {
 
 		}
 
-		function buildObject( data ) {
+		function findXformKey( data, suffix ) {
 
-			const geometry = buildGeometry( findMeshGeometry( data ) );
-			const material = buildMaterial( findMeshMaterial( data ) );
+			for ( const key in data ) {
 
-			const mesh = geometry ? new Mesh( geometry, material ) : new Object3D();
-
-			if ( 'matrix4d xformOp:transform' in data ) {
-
-				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
-
-				mesh.matrix.fromArray( array );
-				mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+				if ( key.endsWith( suffix ) ) return key;
 
 			}
 
-			return mesh;
+			return null;
 
 		}
 
-		function buildHierarchy( data, group ) {
+		function parseXformVec3( str ) {
 
-			for ( const name in data ) {
+			return JSON.parse( '[' + str.replace( /[()]*/g, '' ) + ']' );
 
-				if ( name.startsWith( 'def Scope' ) ) {
+		}
 
-					buildHierarchy( data[ name ], group );
+		function applyTransform( obj, data ) {
 
-				} else if ( name.startsWith( 'def Xform' ) ) {
+			// Handle matrix transform
+			if ( 'matrix4d xformOp:transform' in data ) {
 
-					const mesh = buildObject( data[ name ] );
+				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
+				obj.matrix.fromArray( array );
+				obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+				return;
 
-					if ( /def Xform "(\w+)"/.test( name ) ) {
+			}
 
-						mesh.name = /def Xform "(\w+)"/.exec( name )[ 1 ];
+			// Check for xformOpOrder - if present, use matrix composition
+			const xformOpOrderKey = findXformKey( data, 'xformOpOrder' );
+
+			if ( xformOpOrderKey ) {
+
+				// Parse xformOpOrder: ["xformOp:translate", "xformOp:rotateZ"]
+				const xformOpOrder = data[ xformOpOrderKey ];
+				const ops = xformOpOrder
+					.replace( /[\[\]]/g, '' )
+					.split( ',' )
+					.map( s => s.trim().replace( /"/g, '' ) );
+
+				const matrix = new Matrix4();
+				const tempMatrix = new Matrix4();
+
+				// USD uses row-vector (p' = p * M), Three.js uses column-vector (p' = M * p)
+				// Iterate FORWARD for Three.js column-vector convention
+				for ( let i = 0; i < ops.length; i ++ ) {
+
+					const op = ops[ i ];
+					const isInverse = op.startsWith( '!invert!' );
+					const opName = isInverse ? op.slice( 8 ) : op;
+
+					if ( opName === 'xformOp:translate' ) {
+
+						const key = findXformKey( data, 'xformOp:translate' );
+						if ( key && ! key.includes( ':pivot' ) ) {
+
+							const t = parseXformVec3( data[ key ] );
+							tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:translate:pivot' ) {
+
+						const key = findXformKey( data, 'xformOp:translate:pivot' );
+						if ( key ) {
+
+							const t = parseXformVec3( data[ key ] );
+							tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:scale' ) {
+
+						const key = findXformKey( data, 'xformOp:scale' );
+						if ( key ) {
+
+							const s = parseXformVec3( data[ key ] );
+							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:rotateXYZ' ) {
+
+						const key = findXformKey( data, 'xformOp:rotateXYZ' );
+						if ( key ) {
+
+							const r = parseXformVec3( data[ key ] );
+							// USD rotateXYZ: matrix = Rx * Ry * Rz
+							// Three.js Euler 'ZYX' produces Rx * Ry * Rz
+							const euler = new Euler(
+								r[ 0 ] * Math.PI / 180,
+								r[ 1 ] * Math.PI / 180,
+								r[ 2 ] * Math.PI / 180,
+								'ZYX'
+							);
+							tempMatrix.makeRotationFromEuler( euler );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:rotateX' ) {
+
+						const key = findXformKey( data, 'xformOp:rotateX' );
+						if ( key ) {
+
+							const r = parseFloat( data[ key ] );
+							tempMatrix.makeRotationX( r * Math.PI / 180 );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:rotateY' ) {
+
+						const key = findXformKey( data, 'xformOp:rotateY' );
+						if ( key ) {
+
+							const r = parseFloat( data[ key ] );
+							tempMatrix.makeRotationY( r * Math.PI / 180 );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
+
+					} else if ( opName === 'xformOp:rotateZ' ) {
+
+						const key = findXformKey( data, 'xformOp:rotateZ' );
+						if ( key ) {
+
+							const r = parseFloat( data[ key ] );
+							tempMatrix.makeRotationZ( r * Math.PI / 180 );
+							if ( isInverse ) tempMatrix.invert();
+							matrix.multiply( tempMatrix );
+
+						}
 
 					}
 
-					group.add( mesh );
+				}
 
-					buildHierarchy( data[ name ], mesh );
+				obj.matrix.copy( matrix );
+				obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+				return;
+
+			}
+
+			// Fallback: simple handling for files without xformOpOrder
+			const translateKey = findXformKey( data, 'xformOp:translate' );
+			if ( translateKey && ! translateKey.includes( ':pivot' ) ) {
+
+				const values = parseXformVec3( data[ translateKey ] );
+				obj.position.set( values[ 0 ], values[ 1 ], values[ 2 ] );
+
+			}
+
+			const scaleKey = findXformKey( data, 'xformOp:scale' );
+			if ( scaleKey ) {
+
+				const values = parseXformVec3( data[ scaleKey ] );
+				obj.scale.set( values[ 0 ], values[ 1 ], values[ 2 ] );
+
+			}
+
+			// Handle rotation
+			const rotateXYZKey = findXformKey( data, 'xformOp:rotateXYZ' );
+			if ( rotateXYZKey ) {
+
+				const values = parseXformVec3( data[ rotateXYZKey ] );
+				obj.rotation.set(
+					values[ 0 ] * Math.PI / 180,
+					values[ 1 ] * Math.PI / 180,
+					values[ 2 ] * Math.PI / 180
+				);
+
+			} else {
+
+				const rotateXKey = findXformKey( data, 'xformOp:rotateX' );
+				if ( rotateXKey ) {
+
+					obj.rotation.x = parseFloat( data[ rotateXKey ] ) * Math.PI / 180;
+
+				}
+
+				const rotateYKey = findXformKey( data, 'xformOp:rotateY' );
+				if ( rotateYKey ) {
+
+					obj.rotation.y = parseFloat( data[ rotateYKey ] ) * Math.PI / 180;
+
+				}
+
+				const rotateZKey = findXformKey( data, 'xformOp:rotateZ' );
+				if ( rotateZKey ) {
+
+					obj.rotation.z = parseFloat( data[ rotateZKey ] ) * Math.PI / 180;
 
 				}
 
@@ -722,17 +1006,81 @@ class USDAParser {
 
 		}
 
-		function buildGroup( data ) {
+		function buildObject( data, currentBasePath ) {
+
+			const meshData = findMeshGeometry( data, currentBasePath );
+
+			let obj;
+
+			if ( meshData && ( meshData.isGroup || meshData.isObject3D ) ) {
+
+				obj = meshData.clone();
+
+			} else {
+
+				const geometry = buildGeometry( meshData );
+				const material = buildMaterial( findMeshMaterial( data ) );
+				obj = geometry ? new Mesh( geometry, material ) : new Object3D();
+
+			}
+
+			applyTransform( obj, data );
+
+			return obj;
+
+		}
+
+		function buildHierarchy( data, group, currentBasePath ) {
+
+			for ( const name in data ) {
+
+				if ( name.startsWith( 'def Scope' ) ) {
+
+					buildHierarchy( data[ name ], group, currentBasePath );
+
+				} else if ( name.startsWith( 'def Xform' ) || /^def "\w+"/.test( name ) ) {
+
+					const mesh = buildObject( data[ name ], currentBasePath );
+
+					const match = /def (?:Xform )?"(\w+)"/.exec( name );
+
+					if ( match ) {
+
+						mesh.name = match[ 1 ];
+
+					}
+
+					group.add( mesh );
+
+					buildHierarchy( data[ name ], mesh, currentBasePath );
+
+				}
+
+			}
+
+		}
+
+		function buildGroup( data, currentBasePath ) {
 
 			const group = new Group();
 
-			buildHierarchy( data, group );
+			buildHierarchy( data, group, currentBasePath );
 
 			return group;
 
 		}
 
-		return buildGroup( root );
+		const group = buildGroup( root, basePath );
+
+		// Handle Z-up to Y-up conversion
+		const header = root[ '#usda 1.0' ];
+		if ( header && header.upAxis === '"Z"' ) {
+
+			group.rotation.x = - Math.PI / 2;
+
+		}
+
+		return group;
 
 	}
 

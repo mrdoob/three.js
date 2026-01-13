@@ -115,11 +115,15 @@ class USDLoader extends Loader {
 					if ( isCrateFile( zip[ filename ] ) ) {
 
 						data[ filename ] = usdc.parse( zip[ filename ].buffer, data );
+						// Store raw buffer for re-parsing with variant selections
+						data[ filename + ':buffer' ] = zip[ filename ].buffer;
 
 					} else {
 
 						const text = fflate.strFromU8( zip[ filename ] );
 						data[ filename ] = usda.parseText( text );
+						// Store raw text for re-parsing with variant selections
+						data[ filename + ':text' ] = text;
 
 					}
 
@@ -151,15 +155,18 @@ class USDLoader extends Loader {
 
 		function findUSD( zip ) {
 
-			if ( zip.length < 1 ) return undefined;
+			if ( zip.length < 1 ) return { file: undefined, basePath: '' };
 
 			const firstFileName = Object.keys( zip )[ 0 ];
 			let isCrate = false;
 
+			const lastSlash = firstFileName.lastIndexOf( '/' );
+			const basePath = lastSlash >= 0 ? firstFileName.slice( 0, lastSlash ) : '';
+
 			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
 			// ASCII files can end in either .usda or .usd.
 			// See https://openusd.org/release/spec_usdz.html#layout
-			if ( firstFileName.endsWith( 'usda' ) ) return zip[ firstFileName ];
+			if ( firstFileName.endsWith( 'usda' ) ) return { file: zip[ firstFileName ], basePath };
 
 			if ( firstFileName.endsWith( 'usdc' ) ) {
 
@@ -170,7 +177,7 @@ class USDLoader extends Loader {
 				// If this is not a crate file, we assume it is a plain USDA file.
 				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
 
-					return zip[ firstFileName ];
+					return { file: zip[ firstFileName ], basePath };
 
 				} else {
 
@@ -182,9 +189,11 @@ class USDLoader extends Loader {
 
 			if ( isCrate ) {
 
-				return zip[ firstFileName ];
+				return { file: zip[ firstFileName ], basePath };
 
 			}
+
+			return { file: undefined, basePath: '' };
 
 		}
 
@@ -210,9 +219,7 @@ class USDLoader extends Loader {
 
 		const assets = parseAssets( zip );
 
-		// console.log( assets );
-
-		const file = findUSD( zip );
+		const { file, basePath } = findUSD( zip );
 
 		// Check if the main file is USDC (binary) or USDA (ASCII)
 		if ( isCrateFile( file ) ) {
@@ -223,7 +230,7 @@ class USDLoader extends Loader {
 
 		const text = fflate.strFromU8( file );
 
-		return usda.parse( text, assets );
+		return usda.parse( text, assets, basePath );
 
 	}
 
