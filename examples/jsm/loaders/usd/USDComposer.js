@@ -1,0 +1,2129 @@
+import {
+	AnimationClip,
+	BufferAttribute,
+	BufferGeometry,
+	ClampToEdgeWrapping,
+	Euler,
+	Group,
+	Matrix4,
+	Mesh,
+	MeshPhysicalMaterial,
+	MirroredRepeatWrapping,
+	NoColorSpace,
+	Object3D,
+	QuaternionKeyframeTrack,
+	RepeatWrapping,
+	SkinnedMesh,
+	Skeleton,
+	Bone,
+	SRGBColorSpace,
+	TextureLoader,
+	VectorKeyframeTrack
+} from 'three';
+
+// Spec types (must match USDCParser)
+const SpecType = {
+	Unknown: 0,
+	Attribute: 1,
+	Connection: 2,
+	Expression: 3,
+	Mapper: 4,
+	MapperArg: 5,
+	Prim: 6,
+	PseudoRoot: 7,
+	Relationship: 8,
+	RelationshipTarget: 9,
+	Variant: 10,
+	VariantSet: 11
+};
+
+/**
+ * USDComposer handles scene composition from parsed USD data.
+ * This includes reference resolution, variant selection, transform handling,
+ * and building the Three.js scene graph.
+ *
+ * Works with specsByPath format from USDCParser.
+ */
+class USDComposer {
+
+	constructor() {
+
+		this.textureLoader = new TextureLoader();
+		this.textureCache = {};
+		this.skinnedMeshes = [];
+
+	}
+
+	/**
+	 * Compose a Three.js scene from parsed USD data.
+	 * @param {Object} parsedData - Data from USDCParser or USDAParser
+	 * @param {Object} assets - Dictionary of referenced assets (specsByPath or blob URLs)
+	 * @param {Object} variantSelections - External variant selections
+	 * @param {string} basePath - Base path for resolving relative references
+	 * @returns {Group} Three.js scene graph
+	 */
+	compose( parsedData, assets = {}, variantSelections = {}, basePath = '' ) {
+
+		this.specsByPath = parsedData.specsByPath;
+		this.assets = assets;
+		this.externalVariantSelections = variantSelections;
+		this.basePath = basePath;
+		this.skinnedMeshes = [];
+		this.skeletons = {};
+
+		// Get FPS from root spec
+		const rootSpec = this.specsByPath[ '/' ];
+		const rootFields = rootSpec ? rootSpec.fields : {};
+		this.fps = rootFields.framesPerSecond || rootFields.timeCodesPerSecond || 30;
+
+		const group = new Group();
+		this._buildHierarchy( group, '/' );
+
+		// Bind skeletons to skinned meshes
+		this._bindSkeletons();
+
+		// Build animations
+		group.animations = this._buildAnimations();
+
+		// Handle Z-up to Y-up conversion
+		if ( rootSpec && rootSpec.fields && rootSpec.fields.upAxis === 'Z' ) {
+
+			group.rotation.x = - Math.PI / 2;
+
+		}
+
+		return group;
+
+	}
+
+	/**
+	 * Apply USD transforms to a Three.js object.
+	 * Handles xformOpOrder with proper matrix composition.
+	 * USD uses row-vector convention, Three.js uses column-vector.
+	 */
+	applyTransform( obj, fields, attrs = {} ) {
+
+		const data = { ...fields, ...attrs };
+		const xformOpOrder = data[ 'xformOpOrder' ];
+
+		// If we have xformOpOrder, apply transforms using matrices
+		if ( xformOpOrder && xformOpOrder.length > 0 ) {
+
+			const matrix = new Matrix4();
+			const tempMatrix = new Matrix4();
+
+			// Iterate FORWARD for Three.js column-vector convention
+			for ( let i = 0; i < xformOpOrder.length; i ++ ) {
+
+				const op = xformOpOrder[ i ];
+				const isInverse = op.startsWith( '!invert!' );
+				const opName = isInverse ? op.slice( 8 ) : op;
+
+				if ( opName === 'xformOp:transform' ) {
+
+					const m = data[ 'xformOp:transform' ];
+					if ( m && m.length === 16 ) {
+
+						tempMatrix.fromArray( m );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:translate' ) {
+
+					const t = data[ 'xformOp:translate' ];
+					if ( t ) {
+
+						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:translate:pivot' ) {
+
+					const t = data[ 'xformOp:translate:pivot' ];
+					if ( t ) {
+
+						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:scale' ) {
+
+					const s = data[ 'xformOp:scale' ];
+					if ( s ) {
+
+						if ( Array.isArray( s ) ) {
+
+							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+						} else {
+
+							tempMatrix.makeScale( s, s, s );
+
+						}
+
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateXYZ' ) {
+
+					const r = data[ 'xformOp:rotateXYZ' ];
+					if ( r ) {
+
+						// USD rotateXYZ: matrix = Rx * Ry * Rz
+						// Three.js Euler 'ZYX' order produces same result
+						const euler = new Euler(
+							r[ 0 ] * Math.PI / 180,
+							r[ 1 ] * Math.PI / 180,
+							r[ 2 ] * Math.PI / 180,
+							'ZYX'
+						);
+						tempMatrix.makeRotationFromEuler( euler );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateX' ) {
+
+					const r = data[ 'xformOp:rotateX' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationX( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateY' ) {
+
+					const r = data[ 'xformOp:rotateY' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationY( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				} else if ( opName === 'xformOp:rotateZ' ) {
+
+					const r = data[ 'xformOp:rotateZ' ];
+					if ( r !== undefined ) {
+
+						tempMatrix.makeRotationZ( r * Math.PI / 180 );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
+				}
+
+			}
+
+			obj.matrix.copy( matrix );
+			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+			return;
+
+		}
+
+		// Fallback: handle individual transform ops without order
+		if ( data[ 'xformOp:translate' ] ) {
+
+			const t = data[ 'xformOp:translate' ];
+			obj.position.set( t[ 0 ], t[ 1 ], t[ 2 ] );
+
+		}
+
+		if ( data[ 'xformOp:scale' ] ) {
+
+			const s = data[ 'xformOp:scale' ];
+
+			if ( Array.isArray( s ) ) {
+
+				obj.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+			} else {
+
+				obj.scale.set( s, s, s );
+
+			}
+
+		}
+
+		if ( data[ 'xformOp:rotateXYZ' ] ) {
+
+			const r = data[ 'xformOp:rotateXYZ' ];
+			obj.rotation.set(
+				r[ 0 ] * Math.PI / 180,
+				r[ 1 ] * Math.PI / 180,
+				r[ 2 ] * Math.PI / 180
+			);
+
+		}
+
+	}
+
+	/**
+	 * Check if a path is a direct child of parentPath.
+	 */
+	_isDirectChild( parentPath, path, prefix ) {
+
+		if ( ! path.startsWith( prefix ) ) return false;
+
+		const remainder = path.slice( prefix.length );
+		if ( remainder.length === 0 ) return false;
+
+		// Check for variant paths or simple names
+		if ( remainder.startsWith( '{' ) ) {
+
+			return false; // Variant paths are not direct children
+
+		}
+
+		return ! remainder.includes( '/' );
+
+	}
+
+	/**
+	 * Build the scene hierarchy recursively.
+	 */
+	_buildHierarchy( parent, parentPath ) {
+
+		const prefix = parentPath === '/' ? '/' : parentPath + '/';
+
+		// Get variant paths to search
+		const variantPaths = this._getVariantPaths( parentPath );
+
+		for ( const path in this.specsByPath ) {
+
+			const spec = this.specsByPath[ path ];
+
+			// Check if direct child of parent or variant paths
+			let isChild = this._isDirectChild( parentPath, path, prefix );
+
+			if ( ! isChild ) {
+
+				for ( const vp of variantPaths ) {
+
+					const vpPrefix = vp + '/';
+					if ( this._isDirectChild( vp, path, vpPrefix ) ) {
+
+						isChild = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			if ( ! isChild ) continue;
+			if ( spec.specType !== SpecType.Prim ) continue;
+
+			const name = path.split( '/' ).pop();
+			const typeName = spec.fields.typeName;
+
+			// Check for references/payloads
+			const refValue = this._getReference( path, spec );
+			if ( refValue ) {
+
+				// Get local variant selections from this prim
+				const localVariants = this._getLocalVariantSelections( spec.fields );
+
+				// Resolve the reference
+				const referencedGroup = this._resolveReference( refValue, localVariants );
+				if ( referencedGroup ) {
+
+					// Create a container for the referenced content
+					const obj = new Object3D();
+					obj.name = name;
+					const attrs = this._getAttributes( path );
+					this.applyTransform( obj, spec.fields, attrs );
+
+					// Add all children from the referenced group
+					while ( referencedGroup.children.length > 0 ) {
+
+						obj.add( referencedGroup.children[ 0 ] );
+
+					}
+
+					parent.add( obj );
+
+					// Still build local children (overrides)
+					this._buildHierarchy( obj, path );
+					continue;
+
+				}
+
+			}
+
+			// Build appropriate object based on type
+			if ( typeName === 'SkelRoot' ) {
+
+				// Skeletal root - treat as transform but track for skeleton binding
+				const obj = new Object3D();
+				obj.name = name;
+				obj.userData.isSkelRoot = true;
+				const attrs = this._getAttributes( path );
+				this.applyTransform( obj, spec.fields, attrs );
+				parent.add( obj );
+				this._buildHierarchy( obj, path );
+
+			} else if ( typeName === 'Skeleton' ) {
+
+				// Build skeleton and store it
+				const skeleton = this._buildSkeleton( path );
+				if ( skeleton ) {
+
+					this.skeletons[ path ] = skeleton;
+
+				}
+
+				// Recursively build children (may contain SkelAnimation)
+				this._buildHierarchy( parent, path );
+
+			} else if ( typeName === 'SkelAnimation' ) {
+
+				// Skip - animations are processed separately in _buildAnimations
+
+			} else if ( typeName === 'Mesh' ) {
+
+				const obj = this._buildMesh( path, spec );
+				if ( obj ) {
+
+					parent.add( obj );
+
+				}
+
+			} else if ( typeName === 'Material' || typeName === 'Shader' ) {
+
+				// Skip materials/shaders, they're referenced by meshes
+
+			} else {
+
+				// Transform node, group, or unknown type
+				const obj = new Object3D();
+				obj.name = name;
+				const attrs = this._getAttributes( path );
+				this.applyTransform( obj, spec.fields, attrs );
+				parent.add( obj );
+				this._buildHierarchy( obj, path );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Get variant paths for a parent path based on variant selections.
+	 */
+	_getVariantPaths( parentPath ) {
+
+		const parentSpec = this.specsByPath[ parentPath ];
+		const variantSetChildren = parentSpec?.fields?.variantSetChildren;
+		const variantPaths = [];
+
+		if ( ! variantSetChildren || variantSetChildren.length === 0 ) {
+
+			return variantPaths;
+
+		}
+
+		for ( const variantSetName of variantSetChildren ) {
+
+			// External selections take priority
+			let selectedVariant = this.externalVariantSelections[ variantSetName ] || null;
+
+			// Fall back to file's internal selection
+			if ( ! selectedVariant ) {
+
+				const variantSelection = parentSpec.fields.variantSelection;
+				selectedVariant = variantSelection ? variantSelection[ variantSetName ] : null;
+
+			}
+
+			// Fall back to first variant child
+			if ( ! selectedVariant ) {
+
+				const variantSetPath = parentPath + '/{' + variantSetName + '=}';
+				const variantSetSpec = this.specsByPath[ variantSetPath ];
+				if ( variantSetSpec?.fields?.variantChildren ) {
+
+					selectedVariant = variantSetSpec.fields.variantChildren[ 0 ];
+
+				}
+
+			}
+
+			if ( selectedVariant ) {
+
+				const variantPath = parentPath + '/{' + variantSetName + '=' + selectedVariant + '}';
+				variantPaths.push( variantPath );
+
+			}
+
+		}
+
+		return variantPaths;
+
+	}
+
+	/**
+	 * Resolve a file path relative to basePath.
+	 */
+	_resolveFilePath( refPath ) {
+
+		let cleanPath = refPath;
+
+		// Remove ./ prefix
+		if ( cleanPath.startsWith( './' ) ) {
+
+			cleanPath = cleanPath.slice( 2 );
+
+		}
+
+		// Combine with base path
+		if ( this.basePath ) {
+
+			return this.basePath + '/' + cleanPath;
+
+		}
+
+		return cleanPath;
+
+	}
+
+	/**
+	 * Resolve a USD reference and return the composed content.
+	 * @param {string} refValue - Reference value like "@./path/to/file.usdc@"
+	 * @param {Object} localVariants - Variant selections to apply
+	 * @returns {Group|null} Composed content or null
+	 */
+	_resolveReference( refValue, localVariants = {} ) {
+
+		if ( ! refValue ) return null;
+
+		// Parse reference: @./path/to/file.usd@</PrimPath>
+		// Can also be in format: @./path.usd@</Path>
+		const match = refValue.match( /@([^@]+)@(?:<([^>]+)>)?/ );
+		if ( ! match ) return null;
+
+		const filePath = match[ 1 ];
+		const primPath = match[ 2 ] || '';
+
+		const resolvedPath = this._resolveFilePath( filePath );
+
+		// Merge variant selections - external takes priority, then local
+		const mergedVariants = { ...localVariants, ...this.externalVariantSelections };
+
+		// Look up pre-parsed data in assets
+		const referencedData = this.assets[ resolvedPath ];
+		if ( ! referencedData ) return null;
+
+		// If it's specsByPath data, compose it
+		if ( referencedData.specsByPath ) {
+
+			const composer = new USDComposer();
+			const newBasePath = this._getBasePath( resolvedPath );
+			return composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
+
+		}
+
+		// If it's already a Three.js Group (legacy support), clone it
+		if ( referencedData.isGroup || referencedData.isObject3D ) {
+
+			return referencedData.clone();
+
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * Get the base path (directory) from a file path.
+	 */
+	_getBasePath( filePath ) {
+
+		const lastSlash = filePath.lastIndexOf( '/' );
+		return lastSlash >= 0 ? filePath.slice( 0, lastSlash ) : '';
+
+	}
+
+	/**
+	 * Extract variant selections from a spec's fields.
+	 */
+	_getLocalVariantSelections( fields ) {
+
+		const variants = {};
+
+		if ( fields.variantSelection ) {
+
+			for ( const key in fields.variantSelection ) {
+
+				variants[ key ] = fields.variantSelection[ key ];
+
+			}
+
+		}
+
+		return variants;
+
+	}
+
+	/**
+	 * Get reference value from a prim spec.
+	 * Checks for references in USDC format (fields.references) and
+	 * USDA format (relationship specs).
+	 */
+	_getReference( path, spec ) {
+
+		// USDC format: references stored in fields
+		if ( spec.fields.references && spec.fields.references.length > 0 ) {
+
+			const ref = spec.fields.references[ 0 ];
+			// Reference can be string or object with assetPath
+			if ( typeof ref === 'string' ) return ref;
+			if ( ref.assetPath ) return '@' + ref.assetPath + '@';
+
+		}
+
+		// USDC format: payload stored in fields
+		if ( spec.fields.payload ) {
+
+			const payload = spec.fields.payload;
+			if ( typeof payload === 'string' ) return payload;
+			if ( payload.assetPath ) return '@' + payload.assetPath + '@';
+
+		}
+
+		// USDA format: check relationship specs
+		const prependRefPath = path + '.prepend:references';
+		const prependRefSpec = this.specsByPath[ prependRefPath ];
+		if ( prependRefSpec && prependRefSpec.fields.default ) {
+
+			return prependRefSpec.fields.default;
+
+		}
+
+		const payloadPath = path + '.payload';
+		const payloadSpec = this.specsByPath[ payloadPath ];
+		if ( payloadSpec && payloadSpec.fields.default ) {
+
+			return payloadSpec.fields.default;
+
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * Get attributes for a path from attribute specs.
+	 */
+	_getAttributes( path ) {
+
+		const attrs = {};
+		const prefix = path + '.';
+
+		for ( const attrPath in this.specsByPath ) {
+
+			if ( ! attrPath.startsWith( prefix ) ) continue;
+
+			const attrSpec = this.specsByPath[ attrPath ];
+			const attrName = attrPath.slice( prefix.length );
+
+			if ( attrSpec.fields?.default !== undefined ) {
+
+				attrs[ attrName ] = attrSpec.fields.default;
+
+			}
+
+			// Include elementSize for skinning attributes
+			if ( attrSpec.fields?.elementSize !== undefined ) {
+
+				attrs[ attrName + ':elementSize' ] = attrSpec.fields.elementSize;
+
+			}
+
+			if ( attrName.startsWith( 'primvars:' ) && attrSpec.fields?.typeName !== undefined ) {
+
+				attrs[ attrName + ':typeName' ] = attrSpec.fields.typeName;
+
+			}
+
+		}
+
+		return attrs;
+
+	}
+
+	/**
+	 * Build a mesh from a Mesh spec.
+	 */
+	_buildMesh( path, spec ) {
+
+		const attrs = this._getAttributes( path );
+
+		// Check for skinning data
+		const jointIndices = attrs[ 'primvars:skel:jointIndices' ];
+		const jointWeights = attrs[ 'primvars:skel:jointWeights' ];
+		const hasSkinning = jointIndices && jointWeights &&
+			jointIndices.length > 0 && jointWeights.length > 0;
+
+		// Collect GeomSubsets for multi-material support
+		const geomSubsets = this._getGeomSubsets( path );
+
+		let geometry, material;
+
+		if ( geomSubsets.length > 0 ) {
+
+			geometry = this._buildGeometryWithSubsets( attrs, geomSubsets, hasSkinning );
+			material = geomSubsets.map( subset => this._buildMaterialForPath( subset.materialPath ) );
+
+		} else {
+
+			geometry = this._buildGeometry( path, attrs, hasSkinning );
+			material = this._buildMaterial( path, spec.fields );
+
+		}
+
+		// Apply displayColor if no texture/color was set
+		const displayColor = attrs[ 'primvars:displayColor' ];
+		if ( displayColor && displayColor.length >= 3 ) {
+
+			const applyDisplayColor = ( mat ) => {
+
+				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
+
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ] );
+
+				}
+
+			};
+
+			if ( Array.isArray( material ) ) {
+
+				material.forEach( applyDisplayColor );
+
+			} else {
+
+				applyDisplayColor( material );
+
+			}
+
+		}
+
+		let mesh;
+
+		if ( hasSkinning ) {
+
+			mesh = new SkinnedMesh( geometry, material );
+
+			// Find skeleton path from skel:skeleton relationship
+			const skelBindingPath = path + '.skel:skeleton';
+			const skelBindingSpec = this.specsByPath[ skelBindingPath ];
+			let skeletonPath = null;
+
+			if ( skelBindingSpec && skelBindingSpec.fields.targetPaths && skelBindingSpec.fields.targetPaths.length > 0 ) {
+
+				skeletonPath = skelBindingSpec.fields.targetPaths[ 0 ];
+
+			}
+
+			// Get per-mesh joint mapping
+			const localJoints = attrs[ 'skel:joints' ];
+
+			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints } );
+
+		} else {
+
+			mesh = new Mesh( geometry, material );
+
+		}
+
+		mesh.name = path.split( '/' ).pop();
+		this.applyTransform( mesh, spec.fields, attrs );
+
+		return mesh;
+
+	}
+
+	_getGeomSubsets( meshPath ) {
+
+		const subsets = [];
+		const prefix = meshPath + '/';
+
+		for ( const p in this.specsByPath ) {
+
+			if ( ! p.startsWith( prefix ) ) continue;
+
+			const spec = this.specsByPath[ p ];
+			if ( spec.fields.typeName !== 'GeomSubset' ) continue;
+
+			const attrs = this._getAttributes( p );
+			const indices = attrs[ 'indices' ];
+			if ( ! indices || indices.length === 0 ) continue;
+
+			// Get material binding
+			const bindingPath = p + '.material:binding';
+			const bindingSpec = this.specsByPath[ bindingPath ];
+			let materialPath = null;
+			if ( bindingSpec && bindingSpec.fields.targetPaths && bindingSpec.fields.targetPaths.length > 0 ) {
+
+				materialPath = bindingSpec.fields.targetPaths[ 0 ];
+
+			}
+
+			subsets.push( {
+				name: p.split( '/' ).pop(),
+				indices: indices,
+				materialPath: materialPath
+			} );
+
+		}
+
+		return subsets;
+
+	}
+
+	_buildGeometry( path, fields, hasSkinning = false ) {
+
+		const geometry = new BufferGeometry();
+
+		const points = fields[ 'points' ];
+		if ( ! points || points.length === 0 ) return geometry;
+
+		const faceVertexIndices = fields[ 'faceVertexIndices' ];
+		const faceVertexCounts = fields[ 'faceVertexCounts' ];
+
+		let indices = faceVertexIndices;
+		if ( faceVertexCounts && faceVertexCounts.length > 0 ) {
+
+			indices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
+
+		}
+
+		let positions = points;
+		if ( indices && indices.length > 0 ) {
+
+			positions = this._expandAttribute( points, indices, 3 );
+
+		}
+
+		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
+
+		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+		if ( normals && normals.length > 0 ) {
+
+			let normalData = normals;
+			if ( normals.length === points.length ) {
+
+				// Per-vertex normals
+				if ( indices && indices.length > 0 ) {
+
+					normalData = this._expandAttribute( normals, indices, 3 );
+
+				}
+
+			} else if ( indices ) {
+
+				// Per-face-vertex normals
+				const normalIndices = this._triangulateIndices(
+					Array.from( { length: normals.length / 3 }, ( _, i ) => i ),
+					faceVertexCounts
+				);
+				normalData = this._expandAttribute( normals, normalIndices, 3 );
+
+			}
+
+			geometry.setAttribute( 'normal', new BufferAttribute( new Float32Array( normalData ), 3 ) );
+
+		} else {
+
+			geometry.computeVertexNormals();
+
+		}
+
+		const { uvs, uvIndices } = this._findUVPrimvar( fields );
+
+		if ( uvs && uvs.length > 0 ) {
+
+			let uvData = uvs;
+
+			if ( uvIndices && uvIndices.length > 0 ) {
+
+				const triangulatedUvIndices = this._triangulateIndices( uvIndices, faceVertexCounts );
+				uvData = this._expandAttribute( uvs, triangulatedUvIndices, 2 );
+
+			} else if ( indices && uvs.length / 2 === points.length / 3 ) {
+
+				uvData = this._expandAttribute( uvs, indices, 2 );
+
+			}
+
+			geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( uvData ), 2 ) );
+
+		}
+
+		// Add skinning attributes
+		if ( hasSkinning ) {
+
+			const jointIndices = fields[ 'primvars:skel:jointIndices' ];
+			const jointWeights = fields[ 'primvars:skel:jointWeights' ];
+			const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
+
+			if ( jointIndices && jointWeights ) {
+
+				const numVertices = positions.length / 3;
+
+				let skinIndexData, skinWeightData;
+
+				if ( indices && indices.length > 0 ) {
+
+					skinIndexData = this._expandAttribute( jointIndices, indices, elementSize );
+					skinWeightData = this._expandAttribute( jointWeights, indices, elementSize );
+
+				} else {
+
+					skinIndexData = jointIndices;
+					skinWeightData = jointWeights;
+
+				}
+
+				const skinIndices = new Uint16Array( numVertices * 4 );
+				const skinWeights = new Float32Array( numVertices * 4 );
+
+				for ( let i = 0; i < numVertices; i ++ ) {
+
+					for ( let j = 0; j < 4; j ++ ) {
+
+						if ( j < elementSize ) {
+
+							skinIndices[ i * 4 + j ] = skinIndexData[ i * elementSize + j ] || 0;
+							skinWeights[ i * 4 + j ] = skinWeightData[ i * elementSize + j ] || 0;
+
+						} else {
+
+							skinIndices[ i * 4 + j ] = 0;
+							skinWeights[ i * 4 + j ] = 0;
+
+						}
+
+					}
+
+				}
+
+				geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndices, 4 ) );
+				geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeights, 4 ) );
+
+			}
+
+		}
+
+		return geometry;
+
+	}
+
+	_buildGeometryWithSubsets( fields, geomSubsets, hasSkinning = false ) {
+
+		const geometry = new BufferGeometry();
+
+		const points = fields[ 'points' ];
+		if ( ! points || points.length === 0 ) return geometry;
+
+		const faceVertexIndices = fields[ 'faceVertexIndices' ];
+		const faceVertexCounts = fields[ 'faceVertexCounts' ];
+
+		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
+
+		const { uvs, uvIndices } = this._findUVPrimvar( fields );
+		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+
+		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
+		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
+		const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
+
+		// Build face-to-triangle mapping
+		const faceTriangleOffset = [];
+		let triangleCount = 0;
+
+		for ( let i = 0; i < faceVertexCounts.length; i ++ ) {
+
+			faceTriangleOffset.push( triangleCount );
+			const count = faceVertexCounts[ i ];
+			if ( count >= 3 ) triangleCount += count - 2;
+
+		}
+
+		const triangleToSubset = new Int32Array( triangleCount ).fill( - 1 );
+
+		for ( let si = 0; si < geomSubsets.length; si ++ ) {
+
+			const subset = geomSubsets[ si ];
+
+			for ( let i = 0; i < subset.indices.length; i ++ ) {
+
+				const faceIdx = subset.indices[ i ];
+				if ( faceIdx >= faceVertexCounts.length ) continue;
+
+				const triStart = faceTriangleOffset[ faceIdx ];
+				const triCount = faceVertexCounts[ faceIdx ] - 2;
+
+				for ( let t = 0; t < triCount; t ++ ) {
+
+					triangleToSubset[ triStart + t ] = si;
+
+				}
+
+			}
+
+		}
+
+		// Sort triangles by subset
+		const sortedTriangles = [];
+
+		for ( let tri = 0; tri < triangleCount; tri ++ ) {
+
+			sortedTriangles.push( { original: tri, subset: triangleToSubset[ tri ] } );
+
+		}
+
+		sortedTriangles.sort( ( a, b ) => a.subset - b.subset );
+
+		const groups = [];
+		let currentSubset = sortedTriangles.length > 0 ? sortedTriangles[ 0 ].subset : - 1;
+		let groupStart = 0;
+
+		for ( let i = 0; i < sortedTriangles.length; i ++ ) {
+
+			if ( sortedTriangles[ i ].subset !== currentSubset ) {
+
+				if ( currentSubset >= 0 ) {
+
+					groups.push( {
+						start: groupStart * 3,
+						count: ( i - groupStart ) * 3,
+						materialIndex: currentSubset
+					} );
+
+				}
+
+				currentSubset = sortedTriangles[ i ].subset;
+				groupStart = i;
+
+			}
+
+		}
+
+		if ( currentSubset >= 0 && sortedTriangles.length > groupStart ) {
+
+			groups.push( {
+				start: groupStart * 3,
+				count: ( sortedTriangles.length - groupStart ) * 3,
+				materialIndex: currentSubset
+			} );
+
+		}
+
+		for ( const group of groups ) {
+
+			geometry.addGroup( group.start, group.count, group.materialIndex );
+
+		}
+
+		// Triangulate original data
+		const origIndices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
+		const origUvIndices = uvIndices ? this._triangulateIndices( uvIndices, faceVertexCounts ) : null;
+
+		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
+		const origNormalIndices = hasFaceVaryingNormals
+			? this._triangulateIndices( Array.from( { length: numFaceVertices }, ( _, i ) => i ), faceVertexCounts )
+			: null;
+
+		// Build reordered vertex data
+		const vertexCount = triangleCount * 3;
+		const positions = new Float32Array( vertexCount * 3 );
+		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
+		const normalData = normals ? new Float32Array( vertexCount * 3 ) : null;
+		const skinIndexData = jointIndices ? new Uint16Array( vertexCount * 4 ) : null;
+		const skinWeightData = jointWeights ? new Float32Array( vertexCount * 4 ) : null;
+
+		for ( let i = 0; i < sortedTriangles.length; i ++ ) {
+
+			const origTri = sortedTriangles[ i ].original;
+
+			for ( let v = 0; v < 3; v ++ ) {
+
+				const origIdx = origTri * 3 + v;
+				const newIdx = i * 3 + v;
+
+				const pointIdx = origIndices[ origIdx ];
+				positions[ newIdx * 3 ] = points[ pointIdx * 3 ];
+				positions[ newIdx * 3 + 1 ] = points[ pointIdx * 3 + 1 ];
+				positions[ newIdx * 3 + 2 ] = points[ pointIdx * 3 + 2 ];
+
+				if ( uvData && uvs ) {
+
+					if ( origUvIndices ) {
+
+						const uvIdx = origUvIndices[ origIdx ];
+						uvData[ newIdx * 2 ] = uvs[ uvIdx * 2 ];
+						uvData[ newIdx * 2 + 1 ] = uvs[ uvIdx * 2 + 1 ];
+
+					} else if ( uvs.length / 2 === points.length / 3 ) {
+
+						uvData[ newIdx * 2 ] = uvs[ pointIdx * 2 ];
+						uvData[ newIdx * 2 + 1 ] = uvs[ pointIdx * 2 + 1 ];
+
+					}
+
+				}
+
+				if ( normalData && normals ) {
+
+					if ( origNormalIndices ) {
+
+						const normalIdx = origNormalIndices[ origIdx ];
+						normalData[ newIdx * 3 ] = normals[ normalIdx * 3 ];
+						normalData[ newIdx * 3 + 1 ] = normals[ normalIdx * 3 + 1 ];
+						normalData[ newIdx * 3 + 2 ] = normals[ normalIdx * 3 + 2 ];
+
+					} else if ( normals.length === points.length ) {
+
+						normalData[ newIdx * 3 ] = normals[ pointIdx * 3 ];
+						normalData[ newIdx * 3 + 1 ] = normals[ pointIdx * 3 + 1 ];
+						normalData[ newIdx * 3 + 2 ] = normals[ pointIdx * 3 + 2 ];
+
+					}
+
+				}
+
+				if ( skinIndexData && skinWeightData && jointIndices && jointWeights ) {
+
+					for ( let j = 0; j < 4; j ++ ) {
+
+						if ( j < elementSize ) {
+
+							skinIndexData[ newIdx * 4 + j ] = jointIndices[ pointIdx * elementSize + j ] || 0;
+							skinWeightData[ newIdx * 4 + j ] = jointWeights[ pointIdx * elementSize + j ] || 0;
+
+						} else {
+
+							skinIndexData[ newIdx * 4 + j ] = 0;
+							skinWeightData[ newIdx * 4 + j ] = 0;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+
+		if ( uvData ) {
+
+			geometry.setAttribute( 'uv', new BufferAttribute( uvData, 2 ) );
+
+		}
+
+		if ( normalData ) {
+
+			geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
+
+		} else {
+
+			geometry.computeVertexNormals();
+
+		}
+
+		if ( skinIndexData ) {
+
+			geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndexData, 4 ) );
+
+		}
+
+		if ( skinWeightData ) {
+
+			geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeightData, 4 ) );
+
+		}
+
+		return geometry;
+
+	}
+
+	_findUVPrimvar( fields ) {
+
+		for ( const key in fields ) {
+
+			if ( ! key.startsWith( 'primvars:' ) ) continue;
+			if ( key.endsWith( ':typeName' ) || key.endsWith( ':elementSize' ) || key.endsWith( ':indices' ) ) continue;
+			if ( key.includes( 'skel:' ) ) continue;
+
+			const typeName = fields[ key + ':typeName' ];
+			if ( typeName && typeName.includes( 'texCoord' ) ) {
+
+				return {
+					uvs: fields[ key ],
+					uvIndices: fields[ key + ':indices' ]
+				};
+
+			}
+
+		}
+
+		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
+		const uvIndices = fields[ 'primvars:st:indices' ];
+		return { uvs, uvIndices };
+
+	}
+
+	_triangulateIndices( indices, counts ) {
+
+		const triangulated = [];
+		let offset = 0;
+
+		for ( let i = 0; i < counts.length; i ++ ) {
+
+			const count = counts[ i ];
+
+			if ( count === 3 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ]
+				);
+
+			} else if ( count === 4 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ],
+					indices[ offset ],
+					indices[ offset + 2 ],
+					indices[ offset + 3 ]
+				);
+
+			} else if ( count > 4 ) {
+
+				// Fan triangulation for n-gons
+				for ( let j = 1; j < count - 1; j ++ ) {
+
+					triangulated.push(
+						indices[ offset ],
+						indices[ offset + j ],
+						indices[ offset + j + 1 ]
+					);
+
+				}
+
+			}
+
+			offset += count;
+
+		}
+
+		return triangulated;
+
+	}
+
+	_expandAttribute( data, indices, itemSize ) {
+
+		const expanded = new Array( indices.length * itemSize );
+
+		for ( let i = 0; i < indices.length; i ++ ) {
+
+			const srcIdx = indices[ i ];
+
+			for ( let j = 0; j < itemSize; j ++ ) {
+
+				expanded[ i * itemSize + j ] = data[ srcIdx * itemSize + j ];
+
+			}
+
+		}
+
+		return expanded;
+
+	}
+
+	_buildMaterial( meshPath, fields ) {
+
+		const material = new MeshPhysicalMaterial();
+
+		let materialPath = null;
+		let materialBinding = fields[ 'material:binding' ];
+
+		if ( ! materialBinding ) {
+
+			const bindingPath = meshPath + '.material:binding';
+			const bindingSpec = this.specsByPath[ bindingPath ];
+			if ( bindingSpec && bindingSpec.specType === SpecType.Relationship ) {
+
+				materialBinding = bindingSpec.fields.targetPaths || bindingSpec.fields.default;
+
+			}
+
+		}
+
+		if ( materialBinding ) {
+
+			materialPath = Array.isArray( materialBinding ) ? materialBinding[ 0 ] : materialBinding;
+
+		}
+
+		if ( ! materialPath ) {
+
+			const materialPaths = [];
+			const prefix = meshPath + '/';
+
+			for ( const path in this.specsByPath ) {
+
+				if ( ! path.startsWith( prefix ) ) continue;
+				if ( ! path.endsWith( '.material:binding' ) ) continue;
+
+				const bindingSpec = this.specsByPath[ path ];
+				if ( ! bindingSpec ) continue;
+
+				const targetPaths = bindingSpec.fields.targetPaths;
+				if ( targetPaths && targetPaths.length > 0 ) {
+
+					materialPaths.push( targetPaths[ 0 ] );
+
+				}
+
+			}
+
+			if ( materialPaths.length > 0 ) {
+
+				materialPath = this._pickBestMaterial( materialPaths );
+
+			}
+
+		}
+
+		if ( ! materialPath ) {
+
+			const meshParts = meshPath.split( '/' );
+			const rootPath = '/' + meshParts[ 1 ];
+
+			for ( const path in this.specsByPath ) {
+
+				const spec = this.specsByPath[ path ];
+				if ( spec.specType !== SpecType.Prim ) continue;
+				if ( spec.fields.typeName !== 'Material' ) continue;
+
+				if ( path.startsWith( rootPath + '/Looks/' ) ||
+					path.startsWith( rootPath + '/Materials/' ) ) {
+
+					materialPath = path;
+					break;
+
+				}
+
+			}
+
+		}
+
+		if ( materialPath ) {
+
+			this._applyMaterial( material, materialPath );
+
+		}
+
+		return material;
+
+	}
+
+	_buildMaterialForPath( materialPath ) {
+
+		const material = new MeshPhysicalMaterial();
+
+		if ( materialPath ) {
+
+			this._applyMaterial( material, materialPath );
+
+		}
+
+		return material;
+
+	}
+
+	_pickBestMaterial( materialPaths ) {
+
+		for ( const materialPath of materialPaths ) {
+
+			const prefix = materialPath + '/';
+
+			for ( const path in this.specsByPath ) {
+
+				if ( ! path.startsWith( prefix ) ) continue;
+
+				const spec = this.specsByPath[ path ];
+				if ( spec.fields.typeName !== 'Shader' ) continue;
+
+				const attrs = this._getAttributes( path );
+				if ( attrs[ 'info:id' ] === 'UsdUVTexture' && attrs[ 'inputs:file' ] ) {
+
+					return materialPath;
+
+				}
+
+			}
+
+		}
+
+		return materialPaths[ 0 ];
+
+	}
+
+	_applyMaterial( material, materialPath ) {
+
+		const materialSpec = this.specsByPath[ materialPath ];
+		if ( ! materialSpec ) return;
+
+		const prefix = materialPath + '/';
+
+		for ( const path in this.specsByPath ) {
+
+			if ( ! path.startsWith( prefix ) ) continue;
+
+			const spec = this.specsByPath[ path ];
+			const typeName = spec.fields.typeName;
+
+			if ( typeName !== 'Shader' ) continue;
+
+			const shaderAttrs = this._getAttributes( path );
+			const infoId = shaderAttrs[ 'info:id' ] || spec.fields[ 'info:id' ];
+
+			if ( infoId === 'UsdPreviewSurface' ) {
+
+				this._applyPreviewSurface( material, path );
+
+			}
+
+		}
+
+	}
+
+	_applyPreviewSurface( material, shaderPath ) {
+
+		const fields = this._getAttributes( shaderPath );
+
+		const getAttrSpec = ( attrName ) => {
+
+			const attrPath = shaderPath + '.' + attrName;
+			return this.specsByPath[ attrPath ];
+
+		};
+
+		const applyTextureFromConnection = ( attrName, textureProperty, colorSpace, valueCallback ) => {
+
+			const spec = getAttrSpec( attrName );
+
+			if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
+
+				const connPath = spec.fields.connectionPaths[ 0 ];
+				const texture = this._getTextureFromConnection( connPath );
+
+				if ( texture ) {
+
+					texture.colorSpace = colorSpace;
+					material[ textureProperty ] = texture;
+					return true;
+
+				}
+
+			}
+
+			if ( fields[ attrName ] !== undefined && valueCallback ) {
+
+				valueCallback( fields[ attrName ] );
+
+			}
+
+			return false;
+
+		};
+
+		// Diffuse color / base color map
+		applyTextureFromConnection(
+			'inputs:diffuseColor',
+			'map',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+
+				}
+
+			}
+		);
+
+		// Emissive
+		applyTextureFromConnection(
+			'inputs:emissiveColor',
+			'emissiveMap',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+
+				}
+
+			}
+		);
+
+		if ( material.emissiveMap ) {
+
+			material.emissive.set( 0xffffff );
+
+		}
+
+		// Normal map
+		applyTextureFromConnection( 'inputs:normal', 'normalMap', NoColorSpace, null );
+
+		// Roughness
+		const hasRoughnessMap = applyTextureFromConnection(
+			'inputs:roughness',
+			'roughnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				material.roughness = value;
+
+			}
+		);
+
+		if ( hasRoughnessMap ) {
+
+			material.roughness = 1.0;
+
+		}
+
+		// Metallic
+		const hasMetalnessMap = applyTextureFromConnection(
+			'inputs:metallic',
+			'metalnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				material.metalness = value;
+
+			}
+		);
+
+		if ( hasMetalnessMap ) {
+
+			material.metalness = 1.0;
+
+		}
+
+		// Occlusion
+		applyTextureFromConnection( 'inputs:occlusion', 'aoMap', NoColorSpace, null );
+
+		// IOR
+		if ( fields[ 'inputs:ior' ] !== undefined ) {
+
+			material.ior = fields[ 'inputs:ior' ];
+
+		}
+
+		// Clearcoat
+		if ( fields[ 'inputs:clearcoat' ] !== undefined ) {
+
+			material.clearcoat = fields[ 'inputs:clearcoat' ];
+
+		}
+
+		// Clearcoat roughness
+		if ( fields[ 'inputs:clearcoatRoughness' ] !== undefined ) {
+
+			material.clearcoatRoughness = fields[ 'inputs:clearcoatRoughness' ];
+
+		}
+
+		// Opacity
+		if ( fields[ 'inputs:opacity' ] !== undefined ) {
+
+			const opacity = fields[ 'inputs:opacity' ];
+			if ( opacity < 1.0 ) {
+
+				material.transparent = true;
+				material.opacity = opacity;
+
+			}
+
+		}
+
+	}
+
+	_getTextureFromConnection( connPath ) {
+
+		// connPath is like /Material/Shader.outputs:rgb
+		const shaderPath = connPath.split( '.' )[ 0 ];
+		const shaderSpec = this.specsByPath[ shaderPath ];
+
+		if ( ! shaderSpec ) return null;
+
+		const attrs = this._getAttributes( shaderPath );
+		const infoId = attrs[ 'info:id' ] || shaderSpec.fields[ 'info:id' ];
+
+		if ( infoId !== 'UsdUVTexture' ) return null;
+
+		const filePath = attrs[ 'inputs:file' ];
+		if ( ! filePath ) return null;
+
+		// Check for UsdTransform2d connection via inputs:st
+		let transformAttrs = null;
+		const stAttrPath = shaderPath + '.inputs:st';
+		const stAttrSpec = this.specsByPath[ stAttrPath ];
+
+		if ( stAttrSpec?.fields?.connectionPaths?.length > 0 ) {
+
+			const stConnPath = stAttrSpec.fields.connectionPaths[ 0 ];
+			const stPath = stConnPath.replace( /<|>/g, '' ).split( '.' )[ 0 ];
+			const stSpec = this.specsByPath[ stPath ];
+
+			if ( stSpec ) {
+
+				const stAttrs = this._getAttributes( stPath );
+				const stInfoId = stAttrs[ 'info:id' ] || stSpec.fields[ 'info:id' ];
+
+				if ( stInfoId === 'UsdTransform2d' ) {
+
+					transformAttrs = stAttrs;
+
+				}
+
+			}
+
+		}
+
+		if ( this.textureCache[ filePath ] ) {
+
+			const cachedTexture = this.textureCache[ filePath ].clone();
+			this._applyTextureTransforms( cachedTexture, transformAttrs );
+			return cachedTexture;
+
+		}
+
+		const texture = this._loadTexture( filePath, attrs, transformAttrs );
+
+		if ( texture ) {
+
+			this.textureCache[ filePath ] = texture;
+
+		}
+
+		return texture;
+
+	}
+
+	_applyTextureTransforms( texture, attrs ) {
+
+		if ( ! attrs ) return;
+
+		const scale = attrs[ 'inputs:scale' ];
+		if ( scale && Array.isArray( scale ) && scale.length >= 2 ) {
+
+			texture.repeat.set( scale[ 0 ], scale[ 1 ] );
+
+		}
+
+		const translation = attrs[ 'inputs:translation' ];
+		if ( translation && Array.isArray( translation ) && translation.length >= 2 ) {
+
+			texture.offset.set( translation[ 0 ], translation[ 1 ] );
+
+		}
+
+		const rotation = attrs[ 'inputs:rotation' ];
+		if ( typeof rotation === 'number' ) {
+
+			texture.rotation = rotation * Math.PI / 180;
+
+		}
+
+	}
+
+	_loadTexture( filePath, textureAttrs, transformAttrs ) {
+
+		let cleanPath = filePath;
+		if ( cleanPath.startsWith( '@' ) ) cleanPath = cleanPath.slice( 1 );
+		if ( cleanPath.endsWith( '@' ) ) cleanPath = cleanPath.slice( 0, - 1 );
+
+		const assetData = this.assets[ cleanPath ];
+
+		if ( ! assetData ) {
+
+			const baseName = cleanPath.split( '/' ).pop();
+
+			for ( const key in this.assets ) {
+
+				if ( key.endsWith( baseName ) || key.endsWith( '/' + baseName ) ) {
+
+					return this._createTextureFromData( this.assets[ key ], textureAttrs, transformAttrs );
+
+				}
+
+			}
+
+			return null;
+
+		}
+
+		return this._createTextureFromData( assetData, textureAttrs, transformAttrs );
+
+	}
+
+	_createTextureFromData( data, textureAttrs, transformAttrs ) {
+
+		if ( ! data ) return null;
+
+		let texture;
+
+		if ( typeof data === 'string' ) {
+
+			texture = this.textureLoader.load( data );
+
+		} else if ( data instanceof Uint8Array || data instanceof ArrayBuffer ) {
+
+			const blob = new Blob( [ data ] );
+			const url = URL.createObjectURL( blob );
+			texture = this.textureLoader.load( url, () => {
+
+				URL.revokeObjectURL( url );
+
+			} );
+
+		} else {
+
+			return null;
+
+		}
+
+		if ( textureAttrs ) {
+
+			texture.wrapS = this._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+			texture.wrapT = this._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+
+		}
+
+		this._applyTextureTransforms( texture, transformAttrs );
+
+		return texture;
+
+	}
+
+	_getWrapMode( wrapValue ) {
+
+		if ( wrapValue === 'repeat' ) return RepeatWrapping;
+		if ( wrapValue === 'mirror' ) return MirroredRepeatWrapping;
+		if ( wrapValue === 'clamp' ) return ClampToEdgeWrapping;
+		return RepeatWrapping;
+
+	}
+
+	// ========================================================================
+	// Skeletal Animation
+	// ========================================================================
+
+	_buildSkeleton( path ) {
+
+		const attrs = this._getAttributes( path );
+
+		// Get joint names (paths like "root", "root/body_joint", etc.)
+		const joints = attrs[ 'joints' ];
+		if ( ! joints || joints.length === 0 ) return null;
+
+		// Get bind transforms (world-space bind pose matrices)
+		const bindTransforms = attrs[ 'bindTransforms' ];
+		const restTransforms = attrs[ 'restTransforms' ];
+
+		// Build bones
+		const bones = [];
+		const bonesByPath = {};
+		const boneInverses = [];
+
+		for ( let i = 0; i < joints.length; i ++ ) {
+
+			const jointPath = joints[ i ];
+			const jointName = jointPath.split( '/' ).pop();
+
+			const bone = new Bone();
+			bone.name = jointName;
+			bones.push( bone );
+			bonesByPath[ jointPath ] = { bone, index: i };
+
+			// Compute inverse bind matrix
+			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
+
+				const bindMatrix = new Matrix4();
+				// USD matrices are row-major. When loaded via fromArray into Three.js
+				// column-major storage, they get automatically transposed.
+				bindMatrix.fromArray( bindTransforms, i * 16 );
+				const inverseBindMatrix = bindMatrix.clone().invert();
+				boneInverses.push( inverseBindMatrix );
+
+			} else {
+
+				boneInverses.push( new Matrix4() );
+
+			}
+
+		}
+
+		// Build parent-child relationships based on joint paths
+		for ( let i = 0; i < joints.length; i ++ ) {
+
+			const jointPath = joints[ i ];
+			const parts = jointPath.split( '/' );
+
+			if ( parts.length > 1 ) {
+
+				const parentPath = parts.slice( 0, - 1 ).join( '/' );
+				const parentData = bonesByPath[ parentPath ];
+
+				if ( parentData ) {
+
+					parentData.bone.add( bones[ i ] );
+
+				}
+
+			}
+
+		}
+
+		// Apply rest transforms to bones (local transforms)
+		if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
+
+			for ( let i = 0; i < joints.length; i ++ ) {
+
+				const matrix = new Matrix4();
+				// USD matrices are row-major. When loaded via fromArray into Three.js
+				// column-major storage, they get automatically transposed.
+				matrix.fromArray( restTransforms, i * 16 );
+				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
+
+			}
+
+		}
+
+		// Find root bone(s) - bones without a parent bone
+		const rootBones = bones.filter( bone => ! bone.parent || ! bone.parent.isBone );
+
+		// Get animation source path
+		const animSourceSpec = this.specsByPath[ path + '.skel:animationSource' ];
+		let animationPath = null;
+		if ( animSourceSpec && animSourceSpec.fields.targetPaths && animSourceSpec.fields.targetPaths.length > 0 ) {
+
+			animationPath = animSourceSpec.fields.targetPaths[ 0 ];
+
+		}
+
+		return {
+			skeleton: new Skeleton( bones, boneInverses ),
+			joints: joints,
+			rootBones: rootBones,
+			animationPath: animationPath,
+			path: path
+		};
+
+	}
+
+	_bindSkeletons() {
+
+		for ( const meshData of this.skinnedMeshes ) {
+
+			const { mesh, skeletonPath, localJoints } = meshData;
+
+			let skeletonData = null;
+			for ( const skelPath in this.skeletons ) {
+
+				if ( skeletonPath && skeletonPath.includes( skelPath ) ) {
+
+					skeletonData = this.skeletons[ skelPath ];
+					break;
+
+				}
+
+			}
+
+			// Fallback to first skeleton for single-skeleton files
+			if ( ! skeletonData ) {
+
+				const skeletonPaths = Object.keys( this.skeletons );
+				if ( skeletonPaths.length > 0 ) {
+
+					skeletonData = this.skeletons[ skeletonPaths[ 0 ] ];
+
+				}
+
+			}
+
+			if ( skeletonData ) {
+
+				const { skeleton, rootBones, joints } = skeletonData;
+
+				// Remap local joint indices to global skeleton indices
+				// Each mesh can have its own skel:joints array that defines which
+				// subset of skeleton joints it uses (and in what order)
+				if ( localJoints && localJoints.length > 0 ) {
+
+					const skinIndex = mesh.geometry.attributes.skinIndex;
+					if ( skinIndex ) {
+
+						// Build mapping: local index -> global skeleton index
+						const localToGlobal = [];
+						for ( let i = 0; i < localJoints.length; i ++ ) {
+
+							const jointName = localJoints[ i ];
+							const globalIdx = joints.indexOf( jointName );
+							localToGlobal[ i ] = globalIdx >= 0 ? globalIdx : 0;
+
+						}
+
+						// Remap all joint indices
+						const arr = skinIndex.array;
+						for ( let i = 0; i < arr.length; i ++ ) {
+
+							const localIdx = arr[ i ];
+							if ( localIdx < localToGlobal.length ) {
+
+								arr[ i ] = localToGlobal[ localIdx ];
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Add root bones to the mesh first
+				for ( const rootBone of rootBones ) {
+
+					mesh.add( rootBone );
+
+				}
+
+				// Bind the skeleton to the mesh with identity bind matrix
+				// We pass a bind matrix to prevent Three.js from overwriting
+				// our carefully computed boneInverses via calculateInverses()
+				mesh.bind( skeleton, new Matrix4() );
+
+			}
+
+		}
+
+	}
+
+	_buildAnimations() {
+
+		const animations = [];
+
+		// Find all SkelAnimation prims
+		for ( const path in this.specsByPath ) {
+
+			const spec = this.specsByPath[ path ];
+			if ( spec.specType !== SpecType.Prim ) continue;
+			if ( spec.fields.typeName !== 'SkelAnimation' ) continue;
+
+			const clip = this._buildAnimationClip( path );
+			if ( clip ) {
+
+				animations.push( clip );
+
+			}
+
+		}
+
+		return animations;
+
+	}
+
+	_buildAnimationClip( path ) {
+
+		const attrs = this._getAttributes( path );
+		const joints = attrs[ 'joints' ];
+
+		if ( ! joints || joints.length === 0 ) return null;
+
+		const tracks = [];
+
+		// Get rotation time samples
+		const rotationsAttr = this._getTimeSampledAttribute( path, 'rotations' );
+		if ( rotationsAttr && rotationsAttr.times && rotationsAttr.values ) {
+
+			const { times, values } = rotationsAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const quatData = values[ t ];
+					if ( ! quatData || quatData.length < ( jointIdx + 1 ) * 4 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+
+					// USD GfQuatf stores imaginary (x,y,z) first, then real (w)
+					// This matches Three.js quaternion order (x,y,z,w)
+					const x = quatData[ jointIdx * 4 + 0 ];
+					const y = quatData[ jointIdx * 4 + 1 ];
+					const z = quatData[ jointIdx * 4 + 2 ];
+					const w = quatData[ jointIdx * 4 + 3 ];
+					keyframeValues.push( x, y, z, w );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new QuaternionKeyframeTrack(
+						jointName + '.quaternion',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		// Get translation time samples
+		const translationsAttr = this._getTimeSampledAttribute( path, 'translations' );
+		if ( translationsAttr && translationsAttr.times && translationsAttr.values ) {
+
+			const { times, values } = translationsAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const transData = values[ t ];
+					if ( ! transData || transData.length < ( jointIdx + 1 ) * 3 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+					keyframeValues.push(
+						transData[ jointIdx * 3 + 0 ],
+						transData[ jointIdx * 3 + 1 ],
+						transData[ jointIdx * 3 + 2 ]
+					);
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						jointName + '.position',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		// Get scale time samples
+		const scalesAttr = this._getTimeSampledAttribute( path, 'scales' );
+		if ( scalesAttr && scalesAttr.times && scalesAttr.values ) {
+
+			const { times, values } = scalesAttr;
+
+			for ( let jointIdx = 0; jointIdx < joints.length; jointIdx ++ ) {
+
+				const jointName = joints[ jointIdx ].split( '/' ).pop();
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let t = 0; t < times.length; t ++ ) {
+
+					const scaleData = values[ t ];
+					if ( ! scaleData || scaleData.length < ( jointIdx + 1 ) * 3 ) continue;
+
+					keyframeTimes.push( times[ t ] / this.fps );
+					keyframeValues.push(
+						scaleData[ jointIdx * 3 + 0 ],
+						scaleData[ jointIdx * 3 + 1 ],
+						scaleData[ jointIdx * 3 + 2 ]
+					);
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						jointName + '.scale',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		if ( tracks.length === 0 ) return null;
+
+		const clipName = path.split( '/' ).pop();
+		return new AnimationClip( clipName, - 1, tracks );
+
+	}
+
+	_getTimeSampledAttribute( primPath, attrName ) {
+
+		// Look for the attribute spec with time samples
+		const attrPath = primPath + '.' + attrName;
+		const attrSpec = this.specsByPath[ attrPath ];
+
+		if ( attrSpec && attrSpec.fields.timeSamples ) {
+
+			const timeSamples = attrSpec.fields.timeSamples;
+			if ( timeSamples.times && timeSamples.values ) {
+
+				return timeSamples;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+}
+
+export { USDComposer, SpecType };

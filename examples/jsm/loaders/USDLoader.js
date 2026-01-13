@@ -6,6 +6,7 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 import { USDAParser } from './usd/USDAParser.js';
 import { USDCParser } from './usd/USDCParser.js';
+import { USDComposer } from './usd/USDComposer.js';
 
 /**
  * A loader for the USD format (USDA, USDC, USDZ).
@@ -114,14 +115,17 @@ class USDLoader extends Loader {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
 
-						data[ filename ] = usdc.parse( zip[ filename ].buffer, data );
+						// Store parsed data (specsByPath) for on-demand composition
+						const parsedData = usdc.parseData( zip[ filename ].buffer );
+						data[ filename ] = parsedData;
 						// Store raw buffer for re-parsing with variant selections
 						data[ filename + ':buffer' ] = zip[ filename ].buffer;
 
 					} else {
 
 						const text = fflate.strFromU8( zip[ filename ] );
-						data[ filename ] = usda.parseText( text );
+						// Store parsed data (specsByPath) for on-demand composition
+						data[ filename ] = usda.parseData( text );
 						// Store raw text for re-parsing with variant selections
 						data[ filename + ':text' ] = text;
 
@@ -197,19 +201,23 @@ class USDLoader extends Loader {
 
 		}
 
-		// USDA
+		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
-			return usda.parse( buffer, {} );
+			const composer = new USDComposer();
+			const data = usda.parseData( buffer );
+			return composer.compose( data, {} );
 
 		}
 
-		// USDC
+		// USDC (standalone)
 
 		if ( isCrateFile( buffer ) ) {
 
-			return usdc.parse( buffer );
+			const composer = new USDComposer();
+			const data = usdc.parseData( buffer );
+			return composer.compose( data, {} );
 
 		}
 
@@ -221,16 +229,22 @@ class USDLoader extends Loader {
 
 		const { file, basePath } = findUSD( zip );
 
-		// Check if the main file is USDC (binary) or USDA (ASCII)
+		// Compose the main file using USDComposer (works for both USDC and USDA)
+		const composer = new USDComposer();
+		let data;
+
 		if ( isCrateFile( file ) ) {
 
-			return usdc.parse( file.buffer, assets );
+			data = usdc.parseData( file.buffer );
+
+		} else {
+
+			const text = fflate.strFromU8( file );
+			data = usda.parseData( text );
 
 		}
 
-		const text = fflate.strFromU8( file );
-
-		return usda.parse( text, assets, basePath );
+		return composer.compose( data, assets, {}, basePath );
 
 	}
 
