@@ -845,24 +845,20 @@ function _getGGXShader( lodMax, width, height ) {
 			vec3 importanceSampleGGX_VNDF(vec2 Xi, vec3 V, float roughness) {
 				float alpha = roughness * roughness;
 
-				// Section 3.2: Transform view direction to hemisphere configuration
-				vec3 Vh = normalize(vec3(alpha * V.x, alpha * V.y, V.z));
-
 				// Section 4.1: Orthonormal basis
-				float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
-				vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) / sqrt(lensq) : vec3(1.0, 0.0, 0.0);
-				vec3 T2 = cross(Vh, T1);
+				vec3 T1 = vec3(1.0, 0.0, 0.0);
+				vec3 T2 = cross(V, T1);
 
 				// Section 4.2: Parameterization of projected area
 				float r = sqrt(Xi.x);
 				float phi = 2.0 * PI * Xi.y;
 				float t1 = r * cos(phi);
 				float t2 = r * sin(phi);
-				float s = 0.5 * (1.0 + Vh.z);
+				float s = 0.5 * (1.0 + V.z);
 				t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
 
 				// Section 4.3: Reprojection onto hemisphere
-				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * V;
 
 				// Section 3.4: Transform back to ellipsoid configuration
 				return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(0.0, Nh.z)));
