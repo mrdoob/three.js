@@ -87,9 +87,9 @@ is created automatically.</p>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders the
-scene once per frame in its <a href="ViewportTextureNode.html#updateBefore">ViewportTextureNode#updateBefore</a> method.</p>
-						<p>Default is <code>'frame'</code>.</p>
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.RENDER</code> since the node should extract
+the current contents of the bound framebuffer for each render call.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#updateBeforeType">TextureNode#updateBeforeType</a></dt>

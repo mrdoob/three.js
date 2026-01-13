@@ -21576,7 +21576,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.useColor = parameters.vertexColors;
+		this.vertexColors = parameters.vertexColors;
 
 		/**
 		 * The dash offset.
@@ -21653,7 +21653,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		const { renderer } = builder;
 
 		const useAlphaToCoverage = this._useAlphaToCoverage;
-		const useColor = this.useColor;
+		const vertexColors = this.vertexColors;
 		const useDash = this._useDash;
 		const useWorldUnits = this._useWorldUnits;
 
@@ -21954,7 +21954,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			} else {
 
-				if ( useColor ) {
+				if ( vertexColors ) {
 
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
@@ -33208,19 +33208,19 @@ class StackNode extends Node {
 
 	getElementType( builder ) {
 
-		return this.hasOutput ? this.outputNode.getElementType( builder ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getElementType( builder ) : 'void';
 
 	}
 
 	getNodeType( builder ) {
 
-		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -33429,9 +33429,9 @@ class StackNode extends Node {
 
 	}
 
-	get hasOutput() {
+	hasOutput( builder ) {
 
-		return this.outputNode && this.outputNode.isNode;
+		return this.outputNode && this.outputNode.isNode && this.outputNode.getNodeType( builder ) !== 'void';
 
 	}
 
@@ -33510,7 +33510,7 @@ class StackNode extends Node {
 
 		let result;
 
-		if ( this.hasOutput ) {
+		if ( this.hasOutput( builder ) ) {
 
 			result = this.outputNode.build( builder, ...params );
 
@@ -33839,11 +33839,17 @@ class OutputStructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	getNodeType( /*builder*/ ) {
 
-		const properties = builder.getNodeProperties( this );
+		return 'OutputType';
 
-		if ( properties.membersLayout === undefined ) {
+	}
+
+	generate( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.membersLayout === undefined ) {
 
 			const members = this.members;
 			const membersLayout = [];
@@ -33857,16 +33863,12 @@ class OutputStructNode extends Node {
 
 			}
 
-			properties.membersLayout = membersLayout;
-			properties.structType = builder.getOutputStructTypeFromNode( this, properties.membersLayout );
+			nodeData.membersLayout = membersLayout;
+			nodeData.structType = builder.getOutputStructTypeFromNode( this, nodeData.membersLayout );
 
 		}
 
-		return properties.structType.name;
-
-	}
-
-	generate( builder ) {
+		//
 
 		const propertyName = builder.getOutputStructName();
 		const members = this.members;
@@ -81378,7 +81380,7 @@ class BundleGroup extends Group {
 		/**
 		 * Whether the bundle is static or not. When set to `true`, the structure
 		 * is assumed to be static and does not change. E.g. no new objects are
-		 * added to the group
+		 * added to the group.
 		 *
 		 * If a change is required, an update can still be forced by setting the
 		 * `needsUpdate` flag to `true`.

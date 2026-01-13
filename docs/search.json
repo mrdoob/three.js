@@ -985,6 +985,50 @@
 			"kind": "class"
 		},
 		{
+			"title": "BlendMode",
+			"kind": "class"
+		},
+		{
+			"title": "BlendMode#blendDst",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blendDstAlpha",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blendEquation",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blendEquationAlpha",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blendSrc",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blendSrcAlpha",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#blending",
+			"kind": "member"
+		},
+		{
+			"title": "BlendMode#clone",
+			"kind": "function"
+		},
+		{
+			"title": "BlendMode#copy",
+			"kind": "function"
+		},
+		{
+			"title": "BlendMode#premultiplyAlpha",
+			"kind": "member"
+		},
+		{
 			"title": "Bone",
 			"kind": "class"
 		},
@@ -4901,7 +4945,7 @@
 			"kind": "function"
 		},
 		{
-			"title": "Line2NodeMaterial#useColor",
+			"title": "Line2NodeMaterial#vertexColors",
 			"kind": "member"
 		},
 		{
@@ -5237,7 +5281,15 @@
 			"kind": "class"
 		},
 		{
+			"title": "MRTNode#blendModes",
+			"kind": "member"
+		},
+		{
 			"title": "MRTNode#get",
+			"kind": "function"
+		},
+		{
+			"title": "MRTNode#getBlendMode",
 			"kind": "function"
 		},
 		{
@@ -5251,6 +5303,10 @@
 		{
 			"title": "MRTNode#outputNodes",
 			"kind": "member"
+		},
+		{
+			"title": "MRTNode#setBlendMode",
+			"kind": "function"
 		},
 		{
 			"title": "Material",
@@ -8871,6 +8927,10 @@
 		{
 			"title": "Object3D#setRotationFromQuaternion",
 			"kind": "function"
+		},
+		{
+			"title": "Object3D#static",
+			"kind": "member"
 		},
 		{
 			"title": "Object3D#toJSON",
@@ -13082,10 +13142,6 @@
 		},
 		{
 			"title": "Texture3DNode#setUpdateMatrix",
-			"kind": "function"
-		},
-		{
-			"title": "Texture3DNode#setupUV",
 			"kind": "function"
 		},
 		{
@@ -21299,6 +21355,26 @@
 			"kind": "class"
 		},
 		{
+			"title": "SkyMesh#cloudCoverage",
+			"kind": "member"
+		},
+		{
+			"title": "SkyMesh#cloudDensity",
+			"kind": "member"
+		},
+		{
+			"title": "SkyMesh#cloudElevation",
+			"kind": "member"
+		},
+		{
+			"title": "SkyMesh#cloudScale",
+			"kind": "member"
+		},
+		{
+			"title": "SkyMesh#cloudSpeed",
+			"kind": "member"
+		},
+		{
 			"title": "SkyMesh#mieCoefficient",
 			"kind": "member"
 		},
@@ -24025,6 +24101,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "MaterialBlending",
+			"kind": "member"
+		},
+		{
 			"title": "MaterialLoader.createMaterialFromType",
 			"kind": "function"
 		},
@@ -25835,6 +25915,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "exponentialHeightFogFactor",
+			"kind": "function"
+		},
+		{
 			"title": "expression",
 			"kind": "function"
 		},
@@ -27368,6 +27452,10 @@
 		},
 		{
 			"title": "viewportMipTexture",
+			"kind": "function"
+		},
+		{
+			"title": "viewportOpaqueMipTexture",
 			"kind": "function"
 		},
 		{

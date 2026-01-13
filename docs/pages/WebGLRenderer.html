@@ -98,7 +98,7 @@ Points in space whose dot product with the plane is negative are cut away.</p>
 <li><code>checkShaderErrors</code>: If it is <code>true</code>, defines whether material shader programs are
 checked for errors during compilation and linkage process. It may be useful to disable
 this check in production for performance gain. It is strongly recommended to keep these
-checks enabled during development. If the shader does not compile and link - it will not
+checks enabled during development. If the shader does not compile and link, it will not
 work and associated material will not render.</li>
 <li><code>onShaderError(gl, program, glVertexShader,glFragmentShader)</code>: A callback function that
 can be used for custom error reporting. The callback receives the WebGL context, an instance
@@ -110,7 +110,7 @@ Assigning a custom function disables the default error reporting.</li>
 				<div class="member">
 					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLCanvasElement | OffscreenCanvas</span> </h3>
 					<div class="description">
-						<p>A canvas where the renderer draws its output.This is automatically created by the renderer
+						<p>A canvas where the renderer draws its output. This is automatically created by the renderer
 in the constructor (if not provided already); you just need to add it to your page like so:</p>
 <pre><code class="language-js">document.body.appendChild( renderer.domElement );
 </code></pre>

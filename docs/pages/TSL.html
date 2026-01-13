@@ -4281,6 +4281,32 @@ background.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="exponentialHeightFogFactor" translate="no">.<a href="#exponentialHeightFogFactor">exponentialHeightFogFactor</a><span class="signature">( density : <span class="param-type"><a href="Node.html">Node</a></span>, height : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new height fog factor node. This fog factor requires a Y-up coordinate system.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>density</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the fog density.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height threshold in world space. Everything below this y-coordinate is affected by fog.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="expression" translate="no">.<a href="#expression">expression</a><span class="signature">( snippet : <span class="param-type">string</span>, nodeType : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ExpressionNode.html">ExpressionNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -11481,6 +11507,36 @@ compared to ColorAdjustment#saturation.</p>
 									</td>
 									<td class="description last">
 										<p>A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="viewportOpaqueMipTexture" translate="no">.<a href="#viewportOpaqueMipTexture">viewportOpaqueMipTexture</a><span class="signature">( uv : <span class="param-type"><a href="Node.html">Node</a></span>, level : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ViewportTextureNode.html">ViewportTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a viewport texture node with enabled mipmap generation.
+The texture should only contain the opaque rendering objects.</p>
+<p>This should be used just in transparent or transmissive materials.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uv</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>screenUV</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>level</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
