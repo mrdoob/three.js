@@ -70,6 +70,7 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		material.colorNode = TSL_Texture( texture, uvNode, 0 );
 		material.side = BackSide;
 		material.blending = NoBlending;
+		material.depthTest = false;
 
 		const mesh = new Mesh( geometry, material );
 

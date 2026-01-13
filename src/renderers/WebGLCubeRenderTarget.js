@@ -128,7 +128,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			side: BackSide,
-			blending: NoBlending
+			blending: NoBlending,
+			depthTest: false,
 
 		} );
 
