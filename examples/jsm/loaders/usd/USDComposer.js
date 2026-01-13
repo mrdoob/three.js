@@ -17,7 +17,7 @@ import {
 	Skeleton,
 	Bone,
 	SRGBColorSpace,
-	TextureLoader,
+	Texture,
 	VectorKeyframeTrack
 } from 'three';
 
@@ -48,7 +48,6 @@ class USDComposer {
 
 	constructor() {
 
-		this.textureLoader = new TextureLoader();
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 
@@ -1645,9 +1644,7 @@ class USDComposer {
 
 		if ( this.textureCache[ filePath ] ) {
 
-			const cachedTexture = this.textureCache[ filePath ].clone();
-			this._applyTextureTransforms( cachedTexture, transformAttrs );
-			return cachedTexture;
+			return this.textureCache[ filePath ];
 
 		}
 
@@ -1725,42 +1722,48 @@ class USDComposer {
 		if ( ! data ) return null;
 
 		const scope = this;
-		let texture;
+		const texture = new Texture();
 
-		const onLoad = function ( tex ) {
-
-			if ( textureAttrs ) {
-
-				tex.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
-				tex.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
-
-			}
-
-			scope._applyTextureTransforms( tex, transformAttrs );
-			tex.needsUpdate = true;
-
-		};
+		let url;
 
 		if ( typeof data === 'string' ) {
 
-			texture = this.textureLoader.load( data, onLoad );
+			url = data;
 
 		} else if ( data instanceof Uint8Array || data instanceof ArrayBuffer ) {
 
 			const blob = new Blob( [ data ] );
-			const url = URL.createObjectURL( blob );
-			texture = this.textureLoader.load( url, ( tex ) => {
-
-				URL.revokeObjectURL( url );
-				onLoad( tex );
-
-			} );
+			url = URL.createObjectURL( blob );
 
 		} else {
 
 			return null;
 
 		}
+
+		const image = new Image();
+		image.onload = function () {
+
+			texture.image = image;
+
+			if ( textureAttrs ) {
+
+				texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+				texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+
+			}
+
+			scope._applyTextureTransforms( texture, transformAttrs );
+			texture.needsUpdate = true;
+
+			if ( ! ( typeof data === 'string' ) ) {
+
+				URL.revokeObjectURL( url );
+
+			}
+
+		};
+		image.src = url;
 
 		return texture;
 
