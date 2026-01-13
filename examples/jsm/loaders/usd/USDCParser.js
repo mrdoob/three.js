@@ -1163,7 +1163,18 @@ class USDCParser {
 			case TypeEnum.Variability:
 				return payload;
 
-			// Inlined vectors are encoded as signed 8-bit integers
+			// Vec2h: Two half-floats fit in 4 bytes, stored directly
+			case TypeEnum.Vec2h: {
+
+				const buf = new ArrayBuffer( 4 );
+				const view = new DataView( buf );
+				view.setUint32( 0, payload, true );
+				return [ this._halfToFloat( view.getUint16( 0, true ) ), this._halfToFloat( view.getUint16( 2, true ) ) ];
+
+			}
+
+			// Inlined vectors that don't fit in 4 bytes are encoded as signed 8-bit integers
+			// Vec2f = 8 bytes (2x float32), Vec3f = 12 bytes, Vec4f = 16 bytes, etc.
 			case TypeEnum.Vec2f:
 			case TypeEnum.Vec2i: {
 
@@ -1668,7 +1679,12 @@ class USDCParser {
 
 	_readHalf() {
 
-		const h = this.reader.readUint16();
+		return this._halfToFloat( this.reader.readUint16() );
+
+	}
+
+	_halfToFloat( h ) {
+
 		// Convert half to float (IEEE 754 half-precision)
 		const sign = ( h & 0x8000 ) >> 15;
 		const exp = ( h & 0x7C00 ) >> 10;

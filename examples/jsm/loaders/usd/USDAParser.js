@@ -11,8 +11,6 @@ class USDAParser {
 
 		const stack = [ root ];
 
-		// Parse USDA file
-
 		for ( const line of lines ) {
 
 			if ( line.includes( '=' ) ) {
@@ -45,6 +43,20 @@ class USDAParser {
 				} else {
 
 					target[ lhs ] = rhs;
+
+				}
+
+			} else if ( line.includes( ':' ) && ! line.includes( '=' ) ) {
+
+				// Handle dictionary entries like "0: [(...)...]" for timeSamples
+				const colonIdx = line.indexOf( ':' );
+				const key = line.slice( 0, colonIdx ).trim();
+				const value = line.slice( colonIdx + 1 ).trim();
+
+				// Only process if key looks like a number (timeSamples frame)
+				if ( /^[\d.]+$/.test( key ) ) {
+
+					target[ key ] = value;
 
 				}
 
@@ -231,22 +243,58 @@ class USDAParser {
 			}
 
 			// Handle typed attributes
-			const attrMatch = key.match( /^(\w+(?:\[\])?)\s+(.+)$/ );
+			// Format: [qualifier] type attrName (e.g., "uniform token[] joints", "float3 position")
+			const attrMatch = key.match( /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/ );
 			if ( attrMatch ) {
 
 				const valueType = attrMatch[ 1 ];
 				const attrName = attrMatch[ 2 ];
 				const rawValue = data[ key ];
 
-				// Parse value based on type
-				const parsedValue = this._parseAttributeValue( valueType, rawValue );
+				// Handle timeSamples attributes specially
+				if ( attrName.endsWith( '.timeSamples' ) && typeof rawValue === 'object' ) {
 
-				// Store as attribute spec
-				const attrPath = path + '.' + attrName;
-				specsByPath[ attrPath ] = {
-					specType: SpecType.Attribute,
-					fields: { default: parsedValue, typeName: valueType }
-				};
+					const baseAttrName = attrName.slice( 0, - 12 ); // Remove '.timeSamples'
+					const attrPath = path + '.' + baseAttrName;
+
+					// Parse timeSamples dictionary into times and values arrays
+					const times = [];
+					const values = [];
+
+					for ( const frameKey in rawValue ) {
+
+						const frame = parseFloat( frameKey );
+						if ( isNaN( frame ) ) continue;
+
+						times.push( frame );
+						values.push( this._parseAttributeValue( valueType, rawValue[ frameKey ] ) );
+
+					}
+
+					// Sort by time
+					const sorted = times.map( ( t, i ) => ( { t, v: values[ i ] } ) ).sort( ( a, b ) => a.t - b.t );
+
+					specsByPath[ attrPath ] = {
+						specType: SpecType.Attribute,
+						fields: {
+							timeSamples: { times: sorted.map( s => s.t ), values: sorted.map( s => s.v ) },
+							typeName: valueType
+						}
+					};
+
+				} else {
+
+					// Parse value based on type
+					const parsedValue = this._parseAttributeValue( valueType, rawValue );
+
+					// Store as attribute spec
+					const attrPath = path + '.' + attrName;
+					specsByPath[ attrPath ] = {
+						specType: SpecType.Attribute,
+						fields: { default: parsedValue, typeName: valueType }
+					};
+
+				}
 
 			}
 
@@ -258,7 +306,7 @@ class USDAParser {
 
 		if ( rawValue === undefined || rawValue === null ) return undefined;
 
-		const str = String( rawValue );
+		const str = String( rawValue ).trim();
 
 		// Array types
 		if ( valueType.endsWith( '[]' ) ) {
@@ -267,7 +315,9 @@ class USDAParser {
 			try {
 
 				// Handle arrays with parentheses like [(1,2,3), (4,5,6)]
-				const cleaned = str.replace( /\(/g, '[' ).replace( /\)/g, ']' );
+				// Remove trailing comma (valid in USDA but not JSON)
+				let cleaned = str.replace( /\(/g, '[' ).replace( /\)/g, ']' );
+				if ( cleaned.endsWith( ',' ) ) cleaned = cleaned.slice( 0, - 1 );
 				const parsed = JSON.parse( cleaned );
 
 				// Flatten nested arrays for types like point3f[]

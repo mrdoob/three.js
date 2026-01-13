@@ -512,13 +512,11 @@ class USDComposer {
 
 		if ( ! refValue ) return null;
 
-		// Parse reference: @./path/to/file.usd@</PrimPath>
-		// Can also be in format: @./path.usd@</Path>
 		const match = refValue.match( /@([^@]+)@(?:<([^>]+)>)?/ );
 		if ( ! match ) return null;
 
 		const filePath = match[ 1 ];
-		const primPath = match[ 2 ] || '';
+		// primPath (match[2]) is not yet used - we compose the entire referenced file
 
 		const resolvedPath = this._resolveFilePath( filePath );
 
@@ -640,7 +638,16 @@ class USDComposer {
 			if ( ! attrPath.startsWith( prefix ) ) continue;
 
 			const attrSpec = this.specsByPath[ attrPath ];
-			const attrName = attrPath.slice( prefix.length );
+			let attrName = attrPath.slice( prefix.length );
+
+			// USDA includes type annotations like "token[] joints" or "matrix4d[] bindTransforms"
+			// Extract the actual attribute name after the type annotation
+			const typeMatch = attrName.match( /^[a-zA-Z0-9]+(?:\[\])?\s+(.+)$/ );
+			if ( typeMatch ) {
+
+				attrName = typeMatch[ 1 ];
+
+			}
 
 			if ( attrSpec.fields?.default !== undefined ) {
 
@@ -730,13 +737,28 @@ class USDComposer {
 			mesh = new SkinnedMesh( geometry, material );
 
 			// Find skeleton path from skel:skeleton relationship
-			const skelBindingPath = path + '.skel:skeleton';
-			const skelBindingSpec = this.specsByPath[ skelBindingPath ];
+			// USDC uses ".skel:skeleton", USDA uses ".rel skel:skeleton"
+			let skelBindingSpec = this.specsByPath[ path + '.skel:skeleton' ];
+			if ( ! skelBindingSpec ) {
+
+				skelBindingSpec = this.specsByPath[ path + '.rel skel:skeleton' ];
+
+			}
+
 			let skeletonPath = null;
 
-			if ( skelBindingSpec && skelBindingSpec.fields.targetPaths && skelBindingSpec.fields.targetPaths.length > 0 ) {
+			if ( skelBindingSpec ) {
 
-				skeletonPath = skelBindingSpec.fields.targetPaths[ 0 ];
+				if ( skelBindingSpec.fields.targetPaths && skelBindingSpec.fields.targetPaths.length > 0 ) {
+
+					skeletonPath = skelBindingSpec.fields.targetPaths[ 0 ];
+
+				} else if ( skelBindingSpec.fields.default ) {
+
+					// USDA stores relationship targets in default field with angle brackets
+					skeletonPath = skelBindingSpec.fields.default.replace( /<|>/g, '' );
+
+				}
 
 			}
 
@@ -1702,19 +1724,35 @@ class USDComposer {
 
 		if ( ! data ) return null;
 
+		const scope = this;
 		let texture;
+
+		const onLoad = function ( tex ) {
+
+			if ( textureAttrs ) {
+
+				tex.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+				tex.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+
+			}
+
+			scope._applyTextureTransforms( tex, transformAttrs );
+			tex.needsUpdate = true;
+
+		};
 
 		if ( typeof data === 'string' ) {
 
-			texture = this.textureLoader.load( data );
+			texture = this.textureLoader.load( data, onLoad );
 
 		} else if ( data instanceof Uint8Array || data instanceof ArrayBuffer ) {
 
 			const blob = new Blob( [ data ] );
 			const url = URL.createObjectURL( blob );
-			texture = this.textureLoader.load( url, () => {
+			texture = this.textureLoader.load( url, ( tex ) => {
 
 				URL.revokeObjectURL( url );
+				onLoad( tex );
 
 			} );
 
@@ -1723,15 +1761,6 @@ class USDComposer {
 			return null;
 
 		}
-
-		if ( textureAttrs ) {
-
-			texture.wrapS = this._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
-			texture.wrapT = this._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
-
-		}
-
-		this._applyTextureTransforms( texture, transformAttrs );
 
 		return texture;
 
@@ -1759,8 +1788,12 @@ class USDComposer {
 		if ( ! joints || joints.length === 0 ) return null;
 
 		// Get bind transforms (world-space bind pose matrices)
-		const bindTransforms = attrs[ 'bindTransforms' ];
-		const restTransforms = attrs[ 'restTransforms' ];
+		// These can be nested arrays (USDA) or flat arrays (USDC)
+		const rawBindTransforms = attrs[ 'bindTransforms' ];
+		const rawRestTransforms = attrs[ 'restTransforms' ];
+
+		const bindTransforms = this._flattenMatrixArray( rawBindTransforms, joints.length );
+		const restTransforms = this._flattenMatrixArray( rawRestTransforms, joints.length );
 
 		// Build bones
 		const bones = [];
@@ -1781,8 +1814,6 @@ class USDComposer {
 			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
 
 				const bindMatrix = new Matrix4();
-				// USD matrices are row-major. When loaded via fromArray into Three.js
-				// column-major storage, they get automatically transposed.
 				bindMatrix.fromArray( bindTransforms, i * 16 );
 				const inverseBindMatrix = bindMatrix.clone().invert();
 				boneInverses.push( inverseBindMatrix );
@@ -1822,8 +1853,6 @@ class USDComposer {
 			for ( let i = 0; i < joints.length; i ++ ) {
 
 				const matrix = new Matrix4();
-				// USD matrices are row-major. When loaded via fromArray into Three.js
-				// column-major storage, they get automatically transposed.
 				matrix.fromArray( restTransforms, i * 16 );
 				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
 
@@ -1860,12 +1889,25 @@ class USDComposer {
 			const { mesh, skeletonPath, localJoints } = meshData;
 
 			let skeletonData = null;
-			for ( const skelPath in this.skeletons ) {
 
-				if ( skeletonPath && skeletonPath.includes( skelPath ) ) {
+			// Try exact match first
+			if ( skeletonPath && this.skeletons[ skeletonPath ] ) {
 
-					skeletonData = this.skeletons[ skelPath ];
-					break;
+				skeletonData = this.skeletons[ skeletonPath ];
+
+			}
+
+			// Try includes match as fallback
+			if ( ! skeletonData ) {
+
+				for ( const skelPath in this.skeletons ) {
+
+					if ( skeletonPath && ( skeletonPath.includes( skelPath ) || skelPath.includes( skeletonPath ) ) ) {
+
+						skeletonData = this.skeletons[ skelPath ];
+						break;
+
+					}
 
 				}
 
@@ -1883,38 +1925,36 @@ class USDComposer {
 
 			}
 
-			if ( skeletonData ) {
+			if ( ! skeletonData ) {
 
-				const { skeleton, rootBones, joints } = skeletonData;
+				console.warn( 'USDComposer: No skeleton found for skinned mesh', mesh.name );
+				continue;
 
-				// Remap local joint indices to global skeleton indices
-				// Each mesh can have its own skel:joints array that defines which
-				// subset of skeleton joints it uses (and in what order)
-				if ( localJoints && localJoints.length > 0 ) {
+			}
 
-					const skinIndex = mesh.geometry.attributes.skinIndex;
-					if ( skinIndex ) {
+			const { skeleton, rootBones, joints } = skeletonData;
 
-						// Build mapping: local index -> global skeleton index
-						const localToGlobal = [];
-						for ( let i = 0; i < localJoints.length; i ++ ) {
+			if ( localJoints && localJoints.length > 0 ) {
 
-							const jointName = localJoints[ i ];
-							const globalIdx = joints.indexOf( jointName );
-							localToGlobal[ i ] = globalIdx >= 0 ? globalIdx : 0;
+				const skinIndex = mesh.geometry.attributes.skinIndex;
+				if ( skinIndex ) {
 
-						}
+					const localToGlobal = [];
+					for ( let i = 0; i < localJoints.length; i ++ ) {
 
-						// Remap all joint indices
-						const arr = skinIndex.array;
-						for ( let i = 0; i < arr.length; i ++ ) {
+						const jointName = localJoints[ i ];
+						const globalIdx = joints.indexOf( jointName );
+						localToGlobal[ i ] = globalIdx >= 0 ? globalIdx : 0;
 
-							const localIdx = arr[ i ];
-							if ( localIdx < localToGlobal.length ) {
+					}
 
-								arr[ i ] = localToGlobal[ localIdx ];
+					const arr = skinIndex.array;
+					for ( let i = 0; i < arr.length; i ++ ) {
 
-							}
+						const localIdx = arr[ i ];
+						if ( localIdx < localToGlobal.length ) {
+
+							arr[ i ] = localToGlobal[ localIdx ];
 
 						}
 
@@ -1922,19 +1962,15 @@ class USDComposer {
 
 				}
 
-				// Add root bones to the mesh first
-				for ( const rootBone of rootBones ) {
+			}
 
-					mesh.add( rootBone );
+			for ( const rootBone of rootBones ) {
 
-				}
-
-				// Bind the skeleton to the mesh with identity bind matrix
-				// We pass a bind matrix to prevent Three.js from overwriting
-				// our carefully computed boneInverses via calculateInverses()
-				mesh.bind( skeleton, new Matrix4() );
+				mesh.add( rootBone );
 
 			}
+
+			mesh.bind( skeleton, new Matrix4() );
 
 		}
 
@@ -2121,6 +2157,38 @@ class USDComposer {
 		}
 
 		return null;
+
+	}
+
+	_flattenMatrixArray( matrices, numMatrices ) {
+
+		if ( ! matrices || matrices.length === 0 ) return null;
+
+		if ( typeof matrices[ 0 ] === 'number' ) return matrices;
+
+		const flatArray = [];
+
+		for ( let m = 0; m < numMatrices; m ++ ) {
+
+			for ( let row = 0; row < 4; row ++ ) {
+
+				const rowData = matrices[ m * 4 + row ];
+
+				if ( rowData && rowData.length === 4 ) {
+
+					flatArray.push( rowData[ 0 ], rowData[ 1 ], rowData[ 2 ], rowData[ 3 ] );
+
+				} else {
+
+					flatArray.push( row === 0 ? 1 : 0, row === 1 ? 1 : 0, row === 2 ? 1 : 0, row === 3 ? 1 : 0 );
+
+				}
+
+			}
+
+		}
+
+		return flatArray;
 
 	}
 
