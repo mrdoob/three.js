@@ -166,12 +166,22 @@ function SidebarProjectResources( editor ) {
 
 	}
 
-	signals.editorCleared.add( refreshUI );
-	signals.sceneGraphChanged.add( refreshUI );
-	signals.geometryChanged.add( refreshGeometriesUI );
-	signals.materialAdded.add( refreshMaterialsUI );
-	signals.materialChanged.add( refreshMaterialsUI );
-	signals.materialRemoved.add( refreshMaterialsUI );
+	let timeout;
+
+	function refreshUIDelayed() {
+
+		clearTimeout( timeout );
+
+		timeout = setTimeout( refreshUI, 100 );
+
+	}
+
+	signals.editorCleared.add( refreshUIDelayed );
+	signals.sceneGraphChanged.add( refreshUIDelayed );
+	signals.geometryChanged.add( refreshUIDelayed );
+	signals.materialAdded.add( refreshUIDelayed );
+	signals.materialChanged.add( refreshUIDelayed );
+	signals.materialRemoved.add( refreshUIDelayed );
 
 	signals.objectSelected.add( function ( object ) {
 
