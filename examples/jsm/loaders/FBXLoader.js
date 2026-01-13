@@ -565,19 +565,22 @@ class FBXTreeParser {
 
 		const parameters = {};
 
-		if ( materialNode.BumpFactor || materialNode[ 'Maya|normalCameraFactor' ] ) {
+		if ( materialNode.BumpFactor) {
 
-			// parameters.bumpScale = materialNode.BumpFactor?.value ?? materialNode['Maya|normalCameraFactor'].value;
-			parameters.bumpScale = materialNode.BumpFactor && materialNode.BumpFactor.value !== undefined ? materialNode.BumpFactor.value : materialNode[ 'Maya|normalCameraFactor' ] && materialNode[ 'Maya|normalCameraFactor' ].value !== undefined ? materialNode[ 'Maya|normalCameraFactor' ].value : undefined;
+			parameters.bumpScale = materialNode.BumpFactor.value;
 
+		} else if(materialNode[ 'Maya|normalCameraFactor' ]){
+			parameters.bumpScale = materialNode[ 'Maya|normalCameraFactor' ].value;
 		}
 
-		if ( materialNode.Diffuse || materialNode[ 'Maya|baseColor' ] ) {
+		if ( materialNode.Diffuse ) {
 
-			// parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse?.value || materialNode['Maya|baseColor'].value ), SRGBColorSpace );
-			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( ( materialNode.Diffuse && materialNode.Diffuse.value !== undefined ) ? materialNode.Diffuse.value : materialNode[ 'Maya|baseColor' ].value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
 
-		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
+		} else if ( materialNode[ 'Maya|baseColor' ] ) {
+			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode[ 'Maya|baseColor' ].value ), SRGBColorSpace );
+		}
+		else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports diffuse here instead of in materialNode.Diffuse
 			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.DiffuseColor.value ), SRGBColorSpace );
@@ -590,10 +593,12 @@ class FBXTreeParser {
 
 		}
 
-		if ( materialNode.Emissive || materialNode[ 'Maya|emissionColor' ] ) {
+		if ( materialNode.Emissive ) {
 
-			// parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive?.value || materialNode['Maya|emissionColor'].value ), SRGBColorSpace );
-			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( ( materialNode.Emissive && materialNode.Emissive.value !== undefined ) ? materialNode.Emissive.value : materialNode[ 'Maya|emissionColor' ].value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive.value), SRGBColorSpace );
+
+		} else if( materialNode[ 'Maya|emissionColor' ] ) {
+			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode[ 'Maya|emissionColor' ].value ), SRGBColorSpace );
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
@@ -601,13 +606,13 @@ class FBXTreeParser {
 			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.EmissiveColor.value ), SRGBColorSpace );
 
 		}
+		
+		if ( materialNode.EmissiveFactor ) {
 
-		if ( materialNode.EmissiveFactor || materialNode[ 'Maya|emissionLuminance' ] ) {
+			parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor.value );
 
-			// parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor?.value ?? materialNode['Maya|emissionLuminance'].value );
-			parameters.emissiveIntensity = parseFloat( ( materialNode.EmissiveFactor && materialNode.EmissiveFactor.value !== undefined ) ? materialNode.EmissiveFactor.value : materialNode[ 'Maya|emissionLuminance' ].value
-			);
-
+		}else if( materialNode[ 'Maya|emissionLuminance' ] ){
+			parameters.emissiveIntensity = parseFloat( materialNode[ 'Maya|emissionLuminance' ].value );
 		}
 
 		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
