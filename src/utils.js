@@ -44,7 +44,7 @@ function arrayMax( array ) {
 
 /**
  * Checks if an array contains values that require Uint32 representation.
- * 
+ *
  * This function determines whether the array contains any values >= 65535,
  * which would require a Uint32Array rather than a Uint16Array for proper storage.
  * The function iterates from the end of the array, assuming larger values are
@@ -113,7 +113,7 @@ function isTypedArray( array ) {
 
 /**
  * Creates an XHTML element with the specified tag name.
- * 
+ *
  * This function uses the XHTML namespace to create DOM elements,
  * ensuring proper element creation in XML-based contexts.
  *
@@ -128,7 +128,7 @@ function createElementNS( name ) {
 
 /**
  * Creates a canvas element configured for block display.
- * 
+ *
  * This is a convenience function that creates a canvas element with
  * display style set to 'block', which is commonly used in three.js
  * rendering contexts to avoid inline element spacing issues.
@@ -161,7 +161,7 @@ let _setConsoleFunction = null;
 
 /**
  * Sets a custom function to handle console output.
- * 
+ *
  * This allows external code to intercept and handle console.log, console.warn,
  * and console.error calls made by three.js, which is useful for custom logging,
  * testing, or debugging workflows.
@@ -188,7 +188,7 @@ function getConsoleFunction() {
 
 /**
  * Logs an informational message with the 'THREE.' prefix.
- * 
+ *
  * If a custom console function is set via setConsoleFunction(), it will be used
  * instead of the native console.log. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
@@ -214,7 +214,7 @@ function log( ...params ) {
 
 /**
  * Logs a warning message with the 'THREE.' prefix.
- * 
+ *
  * If a custom console function is set via setConsoleFunction(), it will be used
  * instead of the native console.warn. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
@@ -240,7 +240,7 @@ function warn( ...params ) {
 
 /**
  * Logs an error message with the 'THREE.' prefix.
- * 
+ *
  * If a custom console function is set via setConsoleFunction(), it will be used
  * instead of the native console.error. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
@@ -266,7 +266,7 @@ function error( ...params ) {
 
 /**
  * Logs a warning message only once, preventing duplicate warnings.
- * 
+ *
  * This function maintains an internal cache of warning messages and will only
  * output each unique warning message once. Useful for warnings that may be
  * triggered repeatedly but should only be shown to the user once.
@@ -287,7 +287,7 @@ function warnOnce( ...params ) {
 
 /**
  * Asynchronously probes for WebGL sync object completion.
- * 
+ *
  * This function creates a promise that resolves when the WebGL sync object
  * signals completion or rejects if the sync operation fails. It uses polling
  * at the specified interval to check the sync status without blocking the
@@ -330,7 +330,7 @@ function probeAsync( gl, sync, interval ) {
 /**
  * Converts a projection matrix from normalized device coordinates (NDC)
  * range [-1, 1] to [0, 1].
- * 
+ *
  * This conversion is commonly needed when working with depth textures or
  * render targets that expect depth values in the [0, 1] range rather than
  * the standard OpenGL NDC range of [-1, 1]. The function modifies the
@@ -352,7 +352,7 @@ function toNormalizedProjectionMatrix( projectionMatrix ) {
 
 /**
  * Reverses the depth range of a projection matrix.
- * 
+ *
  * This function inverts the depth mapping of a projection matrix, which is
  * useful for reversed-Z depth buffer techniques that can improve depth
  * precision. The function handles both perspective and orthographic projection
