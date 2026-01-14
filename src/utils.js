@@ -152,6 +152,7 @@ function createCanvasElement() {
 /**
  * Internal cache for tracking warning messages to prevent duplicate warnings.
  *
+ * @private
  * @type {Object<string, boolean>}
  */
 const _cache = {};
@@ -159,6 +160,7 @@ const _cache = {};
 /**
  * Custom console function handler for intercepting log, warn, and error calls.
  *
+ * @private
  * @type {Function|null}
  */
 let _setConsoleFunction = null;
