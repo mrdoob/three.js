@@ -355,6 +355,16 @@ class USDAParser {
 
 		}
 
+		// Quaternion types (quatf, quatd, quath)
+		if ( valueType.startsWith( 'quat' ) ) {
+
+			// Parse (w, x, y, z) format
+			const cleaned = str.replace( /[()]/g, '' );
+			const values = cleaned.split( ',' ).map( s => parseFloat( s.trim() ) );
+			return values;
+
+		}
+
 		// Matrix types
 		if ( valueType.includes( 'matrix' ) ) {
 

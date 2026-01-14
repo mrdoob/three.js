@@ -11,6 +11,7 @@ import {
 	MirroredRepeatWrapping,
 	NoColorSpace,
 	Object3D,
+	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
 	SkinnedMesh,
@@ -223,6 +224,20 @@ class USDComposer {
 
 					}
 
+				} else if ( opName === 'xformOp:orient' ) {
+
+					const q = data[ 'xformOp:orient' ];
+					if ( q && q.length === 4 ) {
+
+						// USD quaternion format is (w, x, y, z) - real part first
+						// Three.js Quaternion is (x, y, z, w)
+						const quat = new Quaternion( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+						tempMatrix.makeRotationFromQuaternion( quat );
+						if ( isInverse ) tempMatrix.invert();
+						matrix.multiply( tempMatrix );
+
+					}
+
 				}
 
 			}
@@ -265,6 +280,19 @@ class USDComposer {
 				r[ 1 ] * Math.PI / 180,
 				r[ 2 ] * Math.PI / 180
 			);
+
+		}
+
+		if ( data[ 'xformOp:orient' ] ) {
+
+			const q = data[ 'xformOp:orient' ];
+			if ( q && q.length === 4 ) {
+
+				// USD quaternion format is (w, x, y, z) - real part first
+				// Three.js Quaternion is (x, y, z, w)
+				obj.quaternion.set( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+
+			}
 
 		}
 
@@ -1999,7 +2027,126 @@ class USDComposer {
 
 		}
 
+		// Build transform animations from time-sampled xformOps
+		const transformTracks = this._buildTransformAnimations();
+		if ( transformTracks.length > 0 ) {
+
+			animations.push( new AnimationClip( 'TransformAnimation', - 1, transformTracks ) );
+
+		}
+
 		return animations;
+
+	}
+
+	_buildTransformAnimations() {
+
+		const tracks = [];
+
+		for ( const path in this.specsByPath ) {
+
+			const spec = this.specsByPath[ path ];
+			if ( spec.specType !== SpecType.Prim ) continue;
+
+			const typeName = spec.fields?.typeName;
+			if ( typeName !== 'Xform' && typeName !== 'Scope' && typeName !== 'Mesh' ) continue;
+
+			const objectName = path.split( '/' ).pop();
+
+			// Check for animated xformOp:orient
+			const orientPath = path + '.xformOp:orient';
+			const orientSpec = this.specsByPath[ orientPath ];
+			if ( orientSpec?.fields?.timeSamples ) {
+
+				const { times, values } = orientSpec.fields.timeSamples;
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					keyframeTimes.push( times[ i ] / this.fps );
+
+					// Convert USD quaternion (w, x, y, z) to Three.js (x, y, z, w)
+					const q = values[ i ];
+					keyframeValues.push( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new QuaternionKeyframeTrack(
+						objectName + '.quaternion',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+			// Check for animated xformOp:translate
+			const translatePath = path + '.xformOp:translate';
+			const translateSpec = this.specsByPath[ translatePath ];
+			if ( translateSpec?.fields?.timeSamples ) {
+
+				const { times, values } = translateSpec.fields.timeSamples;
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					keyframeTimes.push( times[ i ] / this.fps );
+
+					const t = values[ i ];
+					keyframeValues.push( t[ 0 ], t[ 1 ], t[ 2 ] );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.position',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+			// Check for animated xformOp:scale
+			const scalePath = path + '.xformOp:scale';
+			const scaleSpec = this.specsByPath[ scalePath ];
+			if ( scaleSpec?.fields?.timeSamples ) {
+
+				const { times, values } = scaleSpec.fields.timeSamples;
+				const keyframeTimes = [];
+				const keyframeValues = [];
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					keyframeTimes.push( times[ i ] / this.fps );
+
+					const s = values[ i ];
+					keyframeValues.push( s[ 0 ], s[ 1 ], s[ 2 ] );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.scale',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+		}
+
+		return tracks;
 
 	}
 
