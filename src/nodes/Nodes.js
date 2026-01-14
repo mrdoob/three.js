@@ -135,6 +135,7 @@ export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 export { default as ShadowBaseNode } from './lighting/ShadowBaseNode.js';
 export { default as ShadowNode } from './lighting/ShadowNode.js';
+export { default as PointShadowNode } from './lighting/PointShadowNode.js';
 
 // pmrem
 export { default as PMREMNode } from './pmrem/PMREMNode.js';
