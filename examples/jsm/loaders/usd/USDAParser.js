@@ -118,7 +118,7 @@ class USDAParser {
 	_preprocess( text ) {
 
 		// Remove block comments /* ... */
-		text = text.replace( /\/\*[\s\S]*?\*\//g, '' );
+		text = this._stripBlockComments( text );
 
 		// Remove line comments # ... (but preserve #usda header)
 		// Only remove # comments that aren't at the start of a line or after whitespace
@@ -209,6 +209,50 @@ class USDAParser {
 		}
 
 		return processed.join( '\n' );
+
+	}
+
+	_stripBlockComments( text ) {
+
+		// Iteratively remove /* ... */ comments without regex backtracking
+		let result = '';
+		let i = 0;
+
+		while ( i < text.length ) {
+
+			// Check for block comment start
+			if ( text[ i ] === '/' && i + 1 < text.length && text[ i + 1 ] === '*' ) {
+
+				// Find the closing */
+				let j = i + 2;
+
+				while ( j < text.length ) {
+
+					if ( text[ j ] === '*' && j + 1 < text.length && text[ j + 1 ] === '/' ) {
+
+						// Found closing, skip past it
+						j += 2;
+						break;
+
+					}
+
+					j ++;
+
+				}
+
+				// Move past the comment (or to end if unclosed)
+				i = j;
+
+			} else {
+
+				result += text[ i ];
+				i ++;
+
+			}
+
+		}
+
+		return result;
 
 	}
 
