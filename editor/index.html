@@ -112,6 +112,10 @@
 
 						await editor.fromJSON( state );
 
+					} else {
+
+						editor.signals.sceneEnvironmentChanged.dispatch( 'Default' );
+
 					}
 
 					const selected = editor.config.getKey( 'selected' );
