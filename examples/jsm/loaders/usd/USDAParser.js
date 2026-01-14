@@ -2,6 +2,9 @@ class USDAParser {
 
 	parseText( text ) {
 
+		// Preprocess: strip comments and normalize multiline values
+		text = this._preprocess( text );
+
 		const root = {};
 
 		const lines = text.split( '\n' );
@@ -15,10 +18,18 @@ class USDAParser {
 
 			if ( line.includes( '=' ) ) {
 
-				const assignment = line.split( '=' );
+				// Find the first '=' that's not inside quotes
+				const eqIdx = this._findAssignmentOperator( line );
 
-				const lhs = assignment[ 0 ].trim();
-				const rhs = assignment[ 1 ].trim();
+				if ( eqIdx === - 1 ) {
+
+					string = line.trim();
+					continue;
+
+				}
+
+				const lhs = line.slice( 0, eqIdx ).trim();
+				const rhs = line.slice( eqIdx + 1 ).trim();
 
 				if ( rhs.endsWith( '{' ) ) {
 
@@ -101,6 +112,245 @@ class USDAParser {
 		}
 
 		return root;
+
+	}
+
+	_preprocess( text ) {
+
+		// Remove block comments /* ... */
+		text = this._stripBlockComments( text );
+
+		// Remove line comments # ... (but preserve #usda header)
+		// Only remove # comments that aren't at the start of a line or after whitespace
+		const lines = text.split( '\n' );
+		const processed = [];
+
+		let inMultilineValue = false;
+		let bracketDepth = 0;
+		let parenDepth = 0;
+		let accumulated = '';
+
+		for ( let i = 0; i < lines.length; i ++ ) {
+
+			let line = lines[ i ];
+
+			// Strip inline comments (but not inside strings)
+			line = this._stripInlineComment( line );
+
+			// Track bracket/paren depth for multiline values
+			const trimmed = line.trim();
+
+			if ( inMultilineValue ) {
+
+				// Continue accumulating multiline value
+				accumulated += ' ' + trimmed;
+
+				// Update depths
+				for ( const ch of trimmed ) {
+
+					if ( ch === '[' ) bracketDepth ++;
+					else if ( ch === ']' ) bracketDepth --;
+					else if ( ch === '(' && bracketDepth > 0 ) parenDepth ++;
+					else if ( ch === ')' && bracketDepth > 0 ) parenDepth --;
+
+				}
+
+				// Check if multiline value is complete
+				if ( bracketDepth === 0 && parenDepth === 0 ) {
+
+					processed.push( accumulated );
+					accumulated = '';
+					inMultilineValue = false;
+
+				}
+
+			} else {
+
+				// Check if this line starts a multiline array value
+				// Look for patterns like "attr = [" or "attr = @path@[" without closing ]
+				if ( trimmed.includes( '=' ) ) {
+
+					const eqIdx = this._findAssignmentOperator( trimmed );
+
+					if ( eqIdx !== - 1 ) {
+
+						const rhs = trimmed.slice( eqIdx + 1 ).trim();
+
+						// Count brackets in the value part
+						let openBrackets = 0;
+						let closeBrackets = 0;
+
+						for ( const ch of rhs ) {
+
+							if ( ch === '[' ) openBrackets ++;
+							else if ( ch === ']' ) closeBrackets ++;
+
+						}
+
+						if ( openBrackets > closeBrackets ) {
+
+							// Multiline array detected
+							inMultilineValue = true;
+							bracketDepth = openBrackets - closeBrackets;
+							parenDepth = 0;
+							accumulated = trimmed;
+							continue;
+
+						}
+
+					}
+
+				}
+
+				processed.push( trimmed );
+
+			}
+
+		}
+
+		return processed.join( '\n' );
+
+	}
+
+	_stripBlockComments( text ) {
+
+		// Iteratively remove /* ... */ comments without regex backtracking
+		let result = '';
+		let i = 0;
+
+		while ( i < text.length ) {
+
+			// Check for block comment start
+			if ( text[ i ] === '/' && i + 1 < text.length && text[ i + 1 ] === '*' ) {
+
+				// Find the closing */
+				let j = i + 2;
+
+				while ( j < text.length ) {
+
+					if ( text[ j ] === '*' && j + 1 < text.length && text[ j + 1 ] === '/' ) {
+
+						// Found closing, skip past it
+						j += 2;
+						break;
+
+					}
+
+					j ++;
+
+				}
+
+				// Move past the comment (or to end if unclosed)
+				i = j;
+
+			} else {
+
+				result += text[ i ];
+				i ++;
+
+			}
+
+		}
+
+		return result;
+
+	}
+
+	_stripInlineComment( line ) {
+
+		// Don't strip if line starts with #usda
+		if ( line.trim().startsWith( '#usda' ) ) return line;
+
+		// Find # that's not inside a string
+		let inString = false;
+		let stringChar = null;
+		let escaped = false;
+
+		for ( let i = 0; i < line.length; i ++ ) {
+
+			const ch = line[ i ];
+
+			if ( escaped ) {
+
+				escaped = false;
+				continue;
+
+			}
+
+			if ( ch === '\\' ) {
+
+				escaped = true;
+				continue;
+
+			}
+
+			if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
+
+				inString = true;
+				stringChar = ch;
+
+			} else if ( inString && ch === stringChar ) {
+
+				inString = false;
+				stringChar = null;
+
+			} else if ( ! inString && ch === '#' ) {
+
+				// Found comment start outside of string
+				return line.slice( 0, i ).trimEnd();
+
+			}
+
+		}
+
+		return line;
+
+	}
+
+	_findAssignmentOperator( line ) {
+
+		// Find the first '=' that's not inside quotes
+		let inString = false;
+		let stringChar = null;
+		let escaped = false;
+
+		for ( let i = 0; i < line.length; i ++ ) {
+
+			const ch = line[ i ];
+
+			if ( escaped ) {
+
+				escaped = false;
+				continue;
+
+			}
+
+			if ( ch === '\\' ) {
+
+				escaped = true;
+				continue;
+
+			}
+
+			if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
+
+				inString = true;
+				stringChar = ch;
+
+			} else if ( inString && ch === stringChar ) {
+
+				inString = false;
+				stringChar = null;
+
+			} else if ( ! inString && ch === '=' ) {
+
+				return i;
+
+			}
+
+		}
+
+		return - 1;
 
 	}
 
@@ -438,19 +688,66 @@ class USDAParser {
 		// String/token types
 		if ( valueType === 'string' || valueType === 'token' ) {
 
-			return str.replace( /"/g, '' );
+			return this._parseString( str );
 
 		}
 
 		// Asset path
 		if ( valueType === 'asset' ) {
 
-			return str.replace( /@/g, '' );
+			return str.replace( /@/g, '' ).replace( /"/g, '' );
 
 		}
 
 		// Default: return as string with quotes removed
-		return str.replace( /"/g, '' );
+		return this._parseString( str );
+
+	}
+
+	_parseString( str ) {
+
+		// Remove surrounding quotes
+		if ( ( str.startsWith( '"' ) && str.endsWith( '"' ) ) ||
+			( str.startsWith( '\'' ) && str.endsWith( '\'' ) ) ) {
+
+			str = str.slice( 1, - 1 );
+
+		}
+
+		// Handle escape sequences
+		let result = '';
+		let i = 0;
+
+		while ( i < str.length ) {
+
+			if ( str[ i ] === '\\' && i + 1 < str.length ) {
+
+				const next = str[ i + 1 ];
+
+				switch ( next ) {
+
+					case 'n': result += '\n'; break;
+					case 't': result += '\t'; break;
+					case 'r': result += '\r'; break;
+					case '\\': result += '\\'; break;
+					case '"': result += '"'; break;
+					case '\'': result += '\''; break;
+					default: result += next; break;
+
+				}
+
+				i += 2;
+
+			} else {
+
+				result += str[ i ];
+				i ++;
+
+			}
+
+		}
+
+		return result;
 
 	}
 
