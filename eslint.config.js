@@ -99,6 +99,7 @@ export default [
 			'no-irregular-whitespace': 'error',
 			'no-duplicate-imports': 'error',
 			'prefer-spread': 'error',
+			// 'eqeqeq': 'error',
 
 			'no-useless-escape': 'off',
 			'no-case-declarations': 'off',
@@ -118,6 +119,16 @@ export default [
 			'jsdoc/require-param-description': 'off',
 			'jsdoc/require-returns-description': 'off',
 			'jsdoc/require-param-type': 'error'
+		}
+	},
+
+	// editor rules
+	{
+		name: 'editor rules',
+		files: [ 'editor/**/*.js' ],
+		languageOptions: {
+			ecmaVersion: 2020,
+			sourceType: 'module'
 		}
 	}
 ];
