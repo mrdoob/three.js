@@ -262,9 +262,18 @@ export default /* glsl */`
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
-			// Calculate perspective depth for cube shadow map
-			// Standard perspective depth formula: depth = (far * (z - near)) / (z * (far - near))
-			float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+			// viewZ to perspective depth
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+
+			#else
+
+				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+
+			#endif
+			
 			dp += shadowBias;
 
 			// Hardware PCF with LinearFilter gives us 4-tap filtering per sample
@@ -317,9 +326,18 @@ export default /* glsl */`
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
-			// Calculate perspective depth for cube shadow map
-			// Standard perspective depth formula: depth = (far * (z - near)) / (z * (far - near))
-			float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+			// viewZ to perspective depth
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+
+			#else
+
+				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
+
+			#endif
+
 			dp += shadowBias;
 
 			// Direction from light to fragment
