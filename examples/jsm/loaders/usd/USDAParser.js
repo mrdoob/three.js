@@ -251,6 +251,32 @@ class USDAParser {
 				const attrName = attrMatch[ 2 ];
 				const rawValue = data[ key ];
 
+				// Handle connection attributes (e.g., "inputs:normal.connect = </path>")
+				if ( attrName.endsWith( '.connect' ) ) {
+
+					const baseAttrName = attrName.slice( 0, - 8 ); // Remove '.connect'
+					const attrPath = path + '.' + baseAttrName;
+
+					// Parse connection path - extract from <path> format
+					let connPath = String( rawValue ).trim();
+					if ( connPath.startsWith( '<' ) ) connPath = connPath.slice( 1 );
+					if ( connPath.endsWith( '>' ) ) connPath = connPath.slice( 0, - 1 );
+
+					// Get or create the attribute spec
+					if ( ! specsByPath[ attrPath ] ) {
+
+						specsByPath[ attrPath ] = {
+							specType: SpecType.Attribute,
+							fields: { typeName: valueType }
+						};
+
+					}
+
+					specsByPath[ attrPath ].fields.connectionPaths = [ connPath ];
+					continue;
+
+				}
+
 				// Handle timeSamples attributes specially
 				if ( attrName.endsWith( '.timeSamples' ) && typeof rawValue === 'object' ) {
 
