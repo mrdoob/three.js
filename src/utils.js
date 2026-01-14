@@ -74,6 +74,7 @@ function arrayNeedsUint32( array ) {
  * Map of typed array constructor names to their constructors.
  * This mapping enables dynamic creation of typed arrays based on string type names.
  *
+ * @private
  * @constant
  * @type {Object<string, TypedArrayConstructor>}
  */
@@ -137,7 +138,6 @@ function createElementNS( name ) {
  * display style set to 'block', which is commonly used in three.js
  * rendering contexts to avoid inline element spacing issues.
  *
- * @private
  * @return {HTMLCanvasElement} A canvas element with display set to 'block'.
  */
 function createCanvasElement() {
