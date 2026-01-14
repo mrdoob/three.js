@@ -1,6 +1,7 @@
 /**
  * Finds the minimum value in an array.
  *
+ * @private
  * @param {Array<number>} array - The array to search for the minimum value.
  * @return {number} The minimum value in the array, or Infinity if the array is empty.
  */
@@ -23,6 +24,7 @@ function arrayMin( array ) {
 /**
  * Finds the maximum value in an array.
  *
+ * @private
  * @param {Array<number>} array - The array to search for the maximum value.
  * @return {number} The maximum value in the array, or -Infinity if the array is empty.
  */
@@ -50,6 +52,7 @@ function arrayMax( array ) {
  * The function iterates from the end of the array, assuming larger values are
  * typically located at the end.
  *
+ * @private
  * @param {Array<number>} array - The array to check.
  * @return {boolean} True if the array contains values >= 65535, false otherwise.
  */
@@ -89,6 +92,7 @@ const TYPED_ARRAYS = {
 /**
  * Creates a typed array of the specified type from the given buffer.
  *
+ * @private
  * @param {string} type - The name of the typed array type (e.g., 'Float32Array', 'Uint16Array').
  * @param {ArrayBuffer} buffer - The buffer to create the typed array from.
  * @return {TypedArray} A new typed array of the specified type.
@@ -117,6 +121,7 @@ function isTypedArray( array ) {
  * This function uses the XHTML namespace to create DOM elements,
  * ensuring proper element creation in XML-based contexts.
  *
+ * @private
  * @param {string} name - The tag name of the element to create (e.g., 'canvas', 'div').
  * @return {HTMLElement} The created XHTML element.
  */
@@ -133,6 +138,7 @@ function createElementNS( name ) {
  * display style set to 'block', which is commonly used in three.js
  * rendering contexts to avoid inline element spacing issues.
  *
+ * @private
  * @return {HTMLCanvasElement} A canvas element with display set to 'block'.
  */
 function createCanvasElement() {
@@ -166,6 +172,7 @@ let _setConsoleFunction = null;
  * and console.error calls made by three.js, which is useful for custom logging,
  * testing, or debugging workflows.
  *
+ * @private
  * @param {Function} fn - The function to handle console output. Should accept
  *                        (type, message, ...params) where type is 'log', 'warn', or 'error'.
  */
@@ -178,6 +185,7 @@ function setConsoleFunction( fn ) {
 /**
  * Gets the currently set custom console function.
  *
+ * @private
  * @return {Function|null} The custom console function, or null if not set.
  */
 function getConsoleFunction() {
@@ -193,6 +201,7 @@ function getConsoleFunction() {
  * instead of the native console.log. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
  *
+ * @private
  * @param {...any} params - The message components. The first param is used as
  *                          the method name and prefixed with 'THREE.'.
  */
@@ -219,6 +228,7 @@ function log( ...params ) {
  * instead of the native console.warn. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
  *
+ * @private
  * @param {...any} params - The message components. The first param is used as
  *                          the method name and prefixed with 'THREE.'.
  */
@@ -245,6 +255,7 @@ function warn( ...params ) {
  * instead of the native console.error. The first parameter is treated as the
  * method name and is automatically prefixed with 'THREE.'.
  *
+ * @private
  * @param {...any} params - The message components. The first param is used as
  *                          the method name and prefixed with 'THREE.'.
  */
@@ -271,6 +282,7 @@ function error( ...params ) {
  * output each unique warning message once. Useful for warnings that may be
  * triggered repeatedly but should only be shown to the user once.
  *
+ * @private
  * @param {...any} params - The warning message components.
  */
 function warnOnce( ...params ) {
@@ -293,6 +305,7 @@ function warnOnce( ...params ) {
  * at the specified interval to check the sync status without blocking the
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
+ * @private
  * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
@@ -336,6 +349,7 @@ function probeAsync( gl, sync, interval ) {
  * the standard OpenGL NDC range of [-1, 1]. The function modifies the
  * projection matrix in place.
  *
+ * @private
  * @param {Matrix4} projectionMatrix - The projection matrix to convert (modified in place).
  */
 function toNormalizedProjectionMatrix( projectionMatrix ) {
@@ -362,6 +376,7 @@ function toNormalizedProjectionMatrix( projectionMatrix ) {
  * reversed with an offset. For orthographic matrices, a simpler reversal
  * is applied.
  *
+ * @private
  * @param {Matrix4} projectionMatrix - The projection matrix to reverse (modified in place).
  */
 function toReversedProjectionMatrix( projectionMatrix ) {
