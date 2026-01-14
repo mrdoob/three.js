@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2010-2025 Three.js Authors
+ * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 const REVISION = '183dev';
@@ -13669,6 +13669,16 @@ class Object3D extends EventDispatcher {
 		 */
 		this.userData = {};
 
+		/**
+		 * The pivot point for rotation and scale transformations.
+		 * When set, rotation and scale are applied around this point
+		 * instead of the object's origin.
+		 *
+		 * @type {?Vector3}
+		 * @default null
+		 */
+		this.pivot = null;
+
 	}
 
 	/**
@@ -14416,6 +14426,19 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
+		const pivot = this.pivot;
+
+		if ( pivot !== null ) {
+
+			const px = pivot.x, py = pivot.y, pz = pivot.z;
+			const te = this.matrix.elements;
+
+			te[ 12 ] += px - te[ 0 ] * px - te[ 4 ] * py - te[ 8 ] * pz;
+			te[ 13 ] += py - te[ 1 ] * px - te[ 5 ] * py - te[ 9 ] * pz;
+			te[ 14 ] += pz - te[ 2 ] * px - te[ 6 ] * py - te[ 10 ] * pz;
+
+		}
+
 		this.matrixWorldNeedsUpdate = true;
 
 	}
@@ -14580,6 +14603,8 @@ class Object3D extends EventDispatcher {
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
 		object.up = this.up.toArray();
+
+		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
@@ -14855,6 +14880,12 @@ class Object3D extends EventDispatcher {
 		this.rotation.order = source.rotation.order;
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
+
+		if ( source.pivot !== null ) {
+
+			this.pivot = source.pivot.clone();
+
+		}
 
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );
@@ -48997,6 +49028,8 @@ class ObjectLoader extends Loader {
 
 		if ( data.up !== undefined ) object.up.fromArray( data.up );
 
+		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
+
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
@@ -56548,6 +56581,9 @@ const _vector$3 = /*@__PURE__*/ new Vector3();
 /**
  * This displays a cone shaped helper object for a {@link SpotLight}.
  *
+ * When the spot light or its target are transformed or light properties are
+ * changed, it's necessary to call the `update()` method of the respective helper.
+ *
  * ```js
  * const spotLight = new THREE.SpotLight( 0xffffff );
  * spotLight.position.set( 10, 10, 10 );
@@ -57006,6 +57042,9 @@ const _color2 = /*@__PURE__*/ new Color();
  * Creates a visual aid consisting of a spherical mesh for a
  * given {@link HemisphereLight}.
  *
+ * When the hemisphere light is transformed or its light properties are changed,
+ * it's necessary to call the `update()` method of the respective helper.
+ *
  * ```js
  * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
  * const helper = new THREE.HemisphereLightHelper( light, 5 );
@@ -57313,8 +57352,11 @@ const _v3 = /*@__PURE__*/ new Vector3();
 
 /**
  * Helper object to assist with visualizing a {@link DirectionalLight}'s
- * effect on the scene. This consists of plane and a line representing the
+ * effect on the scene. This consists of a plane and a line representing the
  * light's position and direction.
+ *
+ * When the directional light or its target are transformed or light properties
+ * are changed, it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
  * const light = new THREE.DirectionalLight( 0xFFFFFF );
@@ -57453,6 +57495,9 @@ const _camera = /*@__PURE__*/ new Camera();
  * Based on frustum visualization in [lightgl.js shadowmap example](https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html).
  *
  * `CameraHelper` must be a child of the scene.
+ *
+ * When the camera is transformed or its projection matrix is changed, it's necessary
+ * to call the `update()` method of the respective helper.
  *
  * ```js
  * const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );

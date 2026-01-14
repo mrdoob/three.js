@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2010-2025 Three.js Authors
+ * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, Compatibility, LessCompare, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RGFormat, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessEqualCompare, PCFShadowMap, PCFSoftShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
@@ -17813,13 +17813,14 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Transforms the given vertex normal via skinning.
+	 * Transforms the given vertex normal and tangent via skinning.
 	 *
 	 * @param {Node} [boneMatrices=this.boneMatricesNode] - The bone matrices
 	 * @param {Node<vec3>} [normal=normalLocal] - The vertex normal in local space.
-	 * @return {Node<vec3>} The transformed vertex normal.
+	 * @param {Node<vec3>} [tangent=tangentLocal] - The vertex tangent in local space.
+	 * @return {{skinNormal: Node<vec3>, skinTangent:Node<vec3>}} The transformed vertex normal and tangent.
 	 */
-	getSkinnedNormal( boneMatrices = this.boneMatricesNode, normal = normalLocal ) {
+	getSkinnedNormalAndTangent( boneMatrices = this.boneMatricesNode, normal = normalLocal, tangent = tangentLocal ) {
 
 		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode } = this;
 
@@ -17828,7 +17829,7 @@ class SkinningNode extends Node {
 		const boneMatZ = boneMatrices.element( skinIndexNode.z );
 		const boneMatW = boneMatrices.element( skinIndexNode.w );
 
-		// NORMAL
+		// NORMAL and TANGENT
 
 		let skinMatrix = add(
 			skinWeightNode.x.mul( boneMatX ),
@@ -17839,7 +17840,10 @@ class SkinningNode extends Node {
 
 		skinMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
 
-		return skinMatrix.transformDirection( normal ).xyz;
+		const skinNormal = skinMatrix.transformDirection( normal ).xyz;
+		const skinTangent = skinMatrix.transformDirection( tangent ).xyz;
+
+		return { skinNormal, skinTangent };
 
 	}
 
@@ -17887,13 +17891,13 @@ class SkinningNode extends Node {
 
 		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-			const skinNormal = this.getSkinnedNormal();
+			const { skinNormal, skinTangent } = this.getSkinnedNormalAndTangent();
 
 			normalLocal.assign( skinNormal );
 
 			if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-				tangentLocal.assign( skinNormal );
+				tangentLocal.assign( skinTangent );
 
 			}
 
@@ -24855,30 +24859,24 @@ const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
 // GGX VNDF importance sampling (Eric Heitz 2018)
 // "Sampling the GGX Distribution of Visible Normals"
 // https://jcgt.org/published/0007/04/01/
-const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughness_immutable ] ) => {
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V, roughness ] ) => {
 
-	const V = vec3( V_immutable ).toVar();
-	const roughness = float( roughness_immutable );
-	const alpha = roughness.mul( roughness ).toVar();
-
-	// Section 3.2: Transform view direction to hemisphere configuration
-	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
+	const alpha = roughness.mul( roughness ).toConst();
 
 	// Section 4.1: Orthonormal basis
-	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
-	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
-	const T2 = cross( Vh, T1 ).toVar();
+	const T1 = vec3( 1.0, 0.0, 0.0 ).toConst();
+	const T2 = cross( V, T1 ).toConst();
 
 	// Section 4.2: Parameterization of projected area
-	const r = sqrt( Xi.x );
-	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
-	const t1 = r.mul( cos( phi ) ).toVar();
+	const r = sqrt( Xi.x ).toConst();
+	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y ).toConst();
+	const t1 = r.mul( cos( phi ) ).toConst();
 	const t2 = r.mul( sin( phi ) ).toVar();
-	const s = mul( 0.5, Vh.z.add( 1.0 ) );
+	const s = mul( 0.5, V.z.add( 1.0 ) ).toConst();
 	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
 
 	// Section 4.3: Reprojection onto hemisphere
-	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max$1( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( V.mul( sqrt( max$1( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
 
 	// Section 3.4: Transform back to ellipsoid configuration
 	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max$1( 0.0, Nh.z ) ) );
@@ -33702,6 +33700,21 @@ class StructNode extends Node {
 	getMemberType( builder, name ) {
 
 		return this.structTypeNode.getMemberType( builder, name );
+
+	}
+
+	_getChildren() {
+
+		// Ensure struct type is the last child for correct code generation order
+
+		const children = super._getChildren();
+
+		const structTypeProperty = children.find( child => child.childNode === this.structTypeNode );
+
+		children.splice( children.indexOf( structTypeProperty ), 1 );
+		children.push( structTypeProperty );
+
+		return children;
 
 	}
 
@@ -76051,17 +76064,21 @@ class WebGPUUtils {
 
 		let format;
 
-		if ( renderContext.depthTexture !== null ) {
+		if ( renderContext.depth ) {
 
-			format = this.getTextureFormatGPU( renderContext.depthTexture );
+			if ( renderContext.depthTexture !== null ) {
 
-		} else if ( renderContext.depth && renderContext.stencil ) {
+				format = this.getTextureFormatGPU( renderContext.depthTexture );
 
-			format = GPUTextureFormat.Depth24PlusStencil8;
+			} else if ( renderContext.stencil ) {
 
-		} else if ( renderContext.depth ) {
+				format = GPUTextureFormat.Depth24PlusStencil8;
 
-			format = GPUTextureFormat.Depth24Plus;
+			} else {
+
+				format = GPUTextureFormat.Depth24Plus;
+
+			}
 
 		}
 
