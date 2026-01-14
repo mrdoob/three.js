@@ -203,23 +203,23 @@ class USDAParser {
 			// Skip nested defs (handled by walkTree)
 			if ( key.startsWith( 'def ' ) ) continue;
 
-			// Handle references/payloads
-			if ( key === 'prepend references' || key === 'payload' ) {
+			if ( key === 'prepend references' ) {
 
-				// Store as relationship
-				const relPath = path + '.' + key.replace( ' ', ':' );
-				specsByPath[ relPath ] = {
-					specType: SpecType.Relationship,
-					fields: { default: data[ key ] }
-				};
+				primFields.references = [ data[ key ] ];
 				continue;
 
 			}
 
-			// Handle material binding
+			if ( key === 'payload' ) {
+
+				primFields.payload = data[ key ];
+				continue;
+
+			}
+
 			if ( key.startsWith( 'rel ' ) ) {
 
-				const relName = key.slice( 4 ); // Remove 'rel '
+				const relName = key.slice( 4 );
 				const relPath = path + '.' + relName;
 				const target = data[ key ].replace( /[<>]/g, '' );
 				specsByPath[ relPath ] = {

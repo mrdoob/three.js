@@ -359,7 +359,7 @@ class USDComposer {
 			const typeName = spec.fields.typeName;
 
 			// Check for references/payloads
-			const refValue = this._getReference( path, spec );
+			const refValue = this._getReference( spec );
 			if ( refValue ) {
 
 				// Get local variant selections from this prim
@@ -729,44 +729,22 @@ class USDComposer {
 
 	/**
 	 * Get reference value from a prim spec.
-	 * Checks for references in USDC format (fields.references) and
-	 * USDA format (relationship specs).
 	 */
-	_getReference( path, spec ) {
+	_getReference( spec ) {
 
-		// USDC format: references stored in fields
 		if ( spec.fields.references && spec.fields.references.length > 0 ) {
 
 			const ref = spec.fields.references[ 0 ];
-			// Reference can be string or object with assetPath
 			if ( typeof ref === 'string' ) return ref;
 			if ( ref.assetPath ) return '@' + ref.assetPath + '@';
 
 		}
 
-		// USDC format: payload stored in fields
 		if ( spec.fields.payload ) {
 
 			const payload = spec.fields.payload;
 			if ( typeof payload === 'string' ) return payload;
 			if ( payload.assetPath ) return '@' + payload.assetPath + '@';
-
-		}
-
-		// USDA format: check relationship specs
-		const prependRefPath = path + '.prepend:references';
-		const prependRefSpec = this.specsByPath[ prependRefPath ];
-		if ( prependRefSpec && prependRefSpec.fields.default ) {
-
-			return prependRefSpec.fields.default;
-
-		}
-
-		const payloadPath = path + '.payload';
-		const payloadSpec = this.specsByPath[ payloadPath ];
-		if ( payloadSpec && payloadSpec.fields.default ) {
-
-			return payloadSpec.fields.default;
 
 		}
 
@@ -877,7 +855,6 @@ class USDComposer {
 			mesh = new SkinnedMesh( geometry, material );
 
 			// Find skeleton path from skel:skeleton relationship
-			// USDC uses ".skel:skeleton", USDA uses ".rel skel:skeleton"
 			let skelBindingSpec = this.specsByPath[ path + '.skel:skeleton' ];
 			if ( ! skelBindingSpec ) {
 
@@ -895,7 +872,6 @@ class USDComposer {
 
 				} else if ( skelBindingSpec.fields.default ) {
 
-					// USDA stores relationship targets in default field with angle brackets
 					skeletonPath = skelBindingSpec.fields.default.replace( /<|>/g, '' );
 
 				}
