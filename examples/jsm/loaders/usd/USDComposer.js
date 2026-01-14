@@ -19,6 +19,7 @@ import {
 	Bone,
 	SRGBColorSpace,
 	Texture,
+	Vector2,
 	Vector3,
 	VectorKeyframeTrack
 } from 'three';
@@ -1092,6 +1093,28 @@ class USDComposer {
 
 		}
 
+		// Second UV set (st1) for lightmaps/AO
+		const { uvs2, uv2Indices } = this._findUV2Primvar( fields );
+
+		if ( uvs2 && uvs2.length > 0 ) {
+
+			let uv2Data = uvs2;
+
+			if ( uv2Indices && uv2Indices.length > 0 ) {
+
+				const triangulatedUv2Indices = this._triangulateIndices( uv2Indices, faceVertexCounts );
+				uv2Data = this._expandAttribute( uvs2, triangulatedUv2Indices, 2 );
+
+			} else if ( indices && uvs2.length / 2 === points.length / 3 ) {
+
+				uv2Data = this._expandAttribute( uvs2, indices, 2 );
+
+			}
+
+			geometry.setAttribute( 'uv1', new BufferAttribute( new Float32Array( uv2Data ), 2 ) );
+
+		}
+
 		// Add skinning attributes
 		if ( hasSkinning ) {
 
@@ -1164,6 +1187,7 @@ class USDComposer {
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
+		const { uvs2, uv2Indices } = this._findUV2Primvar( fields );
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
 
 		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
@@ -1261,6 +1285,7 @@ class USDComposer {
 		// Triangulate original data
 		const origIndices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
 		const origUvIndices = uvIndices ? this._triangulateIndices( uvIndices, faceVertexCounts ) : null;
+		const origUv2Indices = uv2Indices ? this._triangulateIndices( uv2Indices, faceVertexCounts ) : null;
 
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
@@ -1272,6 +1297,7 @@ class USDComposer {
 		const vertexCount = triangleCount * 3;
 		const positions = new Float32Array( vertexCount * 3 );
 		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
+		const uv1Data = uvs2 ? new Float32Array( vertexCount * 2 ) : null;
 		const normalData = normals ? new Float32Array( vertexCount * 3 ) : null;
 		const skinIndexData = jointIndices ? new Uint16Array( vertexCount * 4 ) : null;
 		const skinWeightData = jointWeights ? new Float32Array( vertexCount * 4 ) : null;
@@ -1302,6 +1328,23 @@ class USDComposer {
 
 						uvData[ newIdx * 2 ] = uvs[ pointIdx * 2 ];
 						uvData[ newIdx * 2 + 1 ] = uvs[ pointIdx * 2 + 1 ];
+
+					}
+
+				}
+
+				if ( uv1Data && uvs2 ) {
+
+					if ( origUv2Indices ) {
+
+						const uv2Idx = origUv2Indices[ origIdx ];
+						uv1Data[ newIdx * 2 ] = uvs2[ uv2Idx * 2 ];
+						uv1Data[ newIdx * 2 + 1 ] = uvs2[ uv2Idx * 2 + 1 ];
+
+					} else if ( uvs2.length / 2 === points.length / 3 ) {
+
+						uv1Data[ newIdx * 2 ] = uvs2[ pointIdx * 2 ];
+						uv1Data[ newIdx * 2 + 1 ] = uvs2[ pointIdx * 2 + 1 ];
 
 					}
 
@@ -1358,6 +1401,12 @@ class USDComposer {
 
 		}
 
+		if ( uv1Data ) {
+
+			geometry.setAttribute( 'uv1', new BufferAttribute( uv1Data, 2 ) );
+
+		}
+
 		if ( normalData ) {
 
 			geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
@@ -1407,6 +1456,15 @@ class USDComposer {
 		const uvs = fields[ 'primvars:st' ] || fields[ 'primvars:UVMap' ];
 		const uvIndices = fields[ 'primvars:st:indices' ];
 		return { uvs, uvIndices };
+
+	}
+
+	_findUV2Primvar( fields ) {
+
+		// Look for second UV set (st1, commonly used for lightmaps/AO)
+		const uvs2 = fields[ 'primvars:st1' ];
+		const uv2Indices = fields[ 'primvars:st1:indices' ];
+		return { uvs2, uv2Indices };
 
 	}
 
@@ -1754,6 +1812,15 @@ class USDComposer {
 		// Normal map
 		applyTextureFromConnection( 'inputs:normal', 'normalMap', NoColorSpace, null );
 
+		// Apply normal map scale from UsdUVTexture scale input
+		if ( material.normalMap && material.normalMap.userData.scale ) {
+
+			const scale = material.normalMap.userData.scale;
+			// UsdUVTexture scale is float4 (r,g,b,a), use first two components for normalScale
+			material.normalScale = new Vector2( scale[ 0 ], scale[ 1 ] );
+
+		}
+
 		// Roughness
 		const hasRoughnessMap = applyTextureFromConnection(
 			'inputs:roughness',
@@ -1814,10 +1881,26 @@ class USDComposer {
 
 		}
 
-		// Opacity
-		if ( fields[ 'inputs:opacity' ] !== undefined ) {
+		// Opacity and opacity modes
+		const opacity = fields[ 'inputs:opacity' ] !== undefined ? fields[ 'inputs:opacity' ] : 1.0;
+		const opacityThreshold = fields[ 'inputs:opacityThreshold' ] !== undefined ? fields[ 'inputs:opacityThreshold' ] : 0.0;
+		const opacityMode = fields[ 'inputs:opacityMode' ] || 'transparent';
 
-			const opacity = fields[ 'inputs:opacity' ];
+		if ( opacityMode === 'presence' ) {
+
+			// Presence mode: use alpha testing (cutout transparency)
+			material.alphaTest = opacityThreshold;
+			material.transparent = false;
+
+			if ( opacity < 1.0 ) {
+
+				material.opacity = opacity;
+
+			}
+
+		} else if ( opacityMode === 'transparent' ) {
+
+			// Transparent mode: traditional alpha blending
 			if ( opacity < 1.0 ) {
 
 				material.transparent = true;
@@ -1826,6 +1909,7 @@ class USDComposer {
 			}
 
 		}
+		// opacityMode === 'opaque': ignore opacity entirely (default material state)
 
 	}
 
@@ -1845,8 +1929,9 @@ class USDComposer {
 		const filePath = attrs[ 'inputs:file' ];
 		if ( ! filePath ) return null;
 
-		// Check for UsdTransform2d connection via inputs:st
+		// Check for UsdTransform2d connection via inputs:st and trace to PrimvarReader
 		let transformAttrs = null;
+		let uvChannel = 0; // Default to first UV set
 		const stAttrPath = shaderPath + '.inputs:st';
 		const stAttrSpec = this.specsByPath[ stAttrPath ];
 
@@ -1865,15 +1950,48 @@ class USDComposer {
 
 					transformAttrs = stAttrs;
 
+					// Trace to PrimvarReader to find UV set
+					const inAttrPath = stPath + '.inputs:in';
+					const inAttrSpec = this.specsByPath[ inAttrPath ];
+
+					if ( inAttrSpec?.fields?.connectionPaths?.length > 0 ) {
+
+						const inConnPath = inAttrSpec.fields.connectionPaths[ 0 ];
+						const primvarPath = inConnPath.replace( /<|>/g, '' ).split( '.' )[ 0 ];
+						const primvarAttrs = this._getAttributes( primvarPath );
+
+						// Check varname to determine UV channel
+						const varname = primvarAttrs[ 'inputs:varname' ];
+						if ( varname === 'st1' ) uvChannel = 1;
+						else if ( varname === 'st2' ) uvChannel = 2;
+
+					}
+
+				} else if ( stInfoId === 'UsdPrimvarReader_float2' ) {
+
+					// Direct connection to PrimvarReader
+					const varname = stAttrs[ 'inputs:varname' ];
+					if ( varname === 'st1' ) uvChannel = 1;
+					else if ( varname === 'st2' ) uvChannel = 2;
+
 				}
 
 			}
 
 		}
 
-		if ( this.textureCache[ filePath ] ) {
+		// Extract scale and bias for texture value modification
+		const scale = attrs[ 'inputs:scale' ];
+		const bias = attrs[ 'inputs:bias' ];
 
-			return this.textureCache[ filePath ];
+		// Create cache key that includes scale/bias if present
+		let cacheKey = filePath;
+		if ( scale ) cacheKey += ':s' + scale.join( ',' );
+		if ( bias ) cacheKey += ':b' + bias.join( ',' );
+
+		if ( this.textureCache[ cacheKey ] ) {
+
+			return this.textureCache[ cacheKey ];
 
 		}
 
@@ -1881,7 +1999,12 @@ class USDComposer {
 
 		if ( texture ) {
 
-			this.textureCache[ filePath ] = texture;
+			// Store scale/bias and UV channel in userData
+			if ( scale ) texture.userData.scale = scale;
+			if ( bias ) texture.userData.bias = bias;
+			if ( uvChannel !== 0 ) texture.channel = uvChannel;
+
+			this.textureCache[ cacheKey ] = texture;
 
 		}
 
