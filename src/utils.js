@@ -1,6 +1,7 @@
 /**
  * Finds the minimum value in an array.
  *
+ * @private
  * @param {Array<number>} array - The array to search for the minimum value.
  * @return {number} The minimum value in the array, or Infinity if the array is empty.
  */
@@ -23,6 +24,7 @@ function arrayMin( array ) {
 /**
  * Finds the maximum value in an array.
  *
+ * @private
  * @param {Array<number>} array - The array to search for the maximum value.
  * @return {number} The maximum value in the array, or -Infinity if the array is empty.
  */
@@ -50,6 +52,7 @@ function arrayMax( array ) {
  * The function iterates from the end of the array, assuming larger values are
  * typically located at the end.
  *
+ * @private
  * @param {Array<number>} array - The array to check.
  * @return {boolean} True if the array contains values >= 65535, false otherwise.
  */
@@ -89,6 +92,7 @@ const TYPED_ARRAYS = {
 /**
  * Creates a typed array of the specified type from the given buffer.
  *
+ * @private
  * @param {string} type - The name of the typed array type (e.g., 'Float32Array', 'Uint16Array').
  * @param {ArrayBuffer} buffer - The buffer to create the typed array from.
  * @return {TypedArray} A new typed array of the specified type.
@@ -133,6 +137,7 @@ function createElementNS( name ) {
  * display style set to 'block', which is commonly used in three.js
  * rendering contexts to avoid inline element spacing issues.
  *
+ * @private
  * @return {HTMLCanvasElement} A canvas element with display set to 'block'.
  */
 function createCanvasElement() {
@@ -291,6 +296,7 @@ function warnOnce( ...params ) {
  * at the specified interval to check the sync status without blocking the
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
+ * @private
  * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
@@ -334,6 +340,7 @@ function probeAsync( gl, sync, interval ) {
  * the standard OpenGL NDC range of [-1, 1]. The function modifies the
  * projection matrix in place.
  *
+ * @private
  * @param {Matrix4} projectionMatrix - The projection matrix to convert (modified in place).
  */
 function toNormalizedProjectionMatrix( projectionMatrix ) {
@@ -360,6 +367,7 @@ function toNormalizedProjectionMatrix( projectionMatrix ) {
  * reversed with an offset. For orthographic matrices, a simpler reversal
  * is applied.
  *
+ * @private
  * @param {Matrix4} projectionMatrix - The projection matrix to reverse (modified in place).
  */
 function toReversedProjectionMatrix( projectionMatrix ) {
