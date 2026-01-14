@@ -172,7 +172,7 @@ function lz4DecompressBlock( input, inputOffset, inputEnd, output, outputOffset,
 // USD uses TfFastCompression which wraps LZ4 with chunk headers
 function decompressLZ4( input, uncompressedSize ) {
 
-	// USD's TfFastCompression format:
+	// TfFastCompression format (used by OpenUSD):
 	// Single chunk (byte 0 == 0): [0] + LZ4 data
 	// Multi chunk (byte 0 > 0): [numChunks] + [compressedSizes...] + [chunkData...]
 
@@ -1362,7 +1362,64 @@ class USDCParser {
 
 			}
 
-			case TypeEnum.Dictionary:
+			case TypeEnum.Dictionary: {
+
+				// Dictionary format:
+				// u64 elementCount
+				// For each element: u32 keyIndex + i64 valueOffset (relative)
+				const elementCount = reader.readUint64();
+				const dict = {};
+
+				for ( let i = 0; i < elementCount; i ++ ) {
+
+					const keyIdx = reader.readUint32();
+					const key = this.tokens[ keyIdx ];
+
+					// Value offset is relative to current position
+					const currentPos = reader.position;
+					const valueOffset = reader.readInt64();
+					const valuePos = currentPos + valueOffset;
+
+					// Save position, read value, restore position
+					const savedPos = reader.position;
+					reader.position = valuePos;
+
+					// Read the value representation at the offset
+					const valueRepData = reader.readUint64();
+					const valueRep = new ValueRep( valueRepData );
+
+					// Read the value based on the representation
+					let value = null;
+					if ( valueRep.isInlined ) {
+
+						value = this._readInlinedValue( valueRep );
+
+					} else if ( valueRep.isArray ) {
+
+						reader.position = valueRep.payload;
+						value = this._readArrayValue( valueRep );
+
+					} else {
+
+						reader.position = valueRep.payload;
+						value = this._readScalarValue( valueRep );
+
+					}
+
+					reader.position = savedPos;
+
+					if ( key !== undefined && value !== null ) {
+
+						dict[ key ] = value;
+
+					}
+
+				}
+
+				return dict;
+
+			}
+
 			case TypeEnum.TokenListOp:
 			case TypeEnum.StringListOp:
 			case TypeEnum.IntListOp:
