@@ -856,6 +856,35 @@ class USDComposer {
 
 		}
 
+		// Apply displayOpacity for transparency
+		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
+		if ( displayOpacity && displayOpacity.length >= 1 ) {
+
+			const opacity = displayOpacity[ 0 ];
+
+			const applyDisplayOpacity = ( mat ) => {
+
+				if ( opacity < 1 ) {
+
+					mat.opacity = opacity;
+					mat.transparent = true;
+
+				}
+
+			};
+
+			if ( Array.isArray( material ) ) {
+
+				material.forEach( applyDisplayOpacity );
+
+			} else {
+
+				applyDisplayOpacity( material );
+
+			}
+
+		}
+
 		let mesh;
 
 		if ( hasSkinning ) {
