@@ -33,6 +33,13 @@ void main() {
 		#else
 
 			float depth = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ).r;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				depth = 1.0 - depth;
+
+			#endif
+
 			mean += depth;
 			squared_mean += depth * depth;
 

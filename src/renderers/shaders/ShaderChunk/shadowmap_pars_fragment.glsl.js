@@ -132,14 +132,24 @@ export default /* glsl */`
 				float radius = shadowRadius * texelSize.x;
 
 				// Use IGN to rotate sampling pattern per pixel
-				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * 6.28318530718; // 2*PI
+				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
+
+				#ifdef USE_REVERSED_DEPTH_BUFFER
+
+					float dp = 1.0 - shadowCoord.z;
+
+				#else
+
+					float dp = shadowCoord.z;
+
+				#endif
 
 				shadow = (
-					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 0, 5, phi ) * radius, shadowCoord.z ) ) +
-					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 1, 5, phi ) * radius, shadowCoord.z ) ) +
-					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 2, 5, phi ) * radius, shadowCoord.z ) ) +
-					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 3, 5, phi ) * radius, shadowCoord.z ) ) +
-					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 4, 5, phi ) * radius, shadowCoord.z ) )
+					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 0, 5, phi ) * radius, dp ) ) +
+					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 1, 5, phi ) * radius, dp ) ) +
+					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 2, 5, phi ) * radius, dp ) ) +
+					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 3, 5, phi ) * radius, dp ) ) +
+					texture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 4, 5, phi ) * radius, dp ) )
 				) * 0.2;
 
 			}
@@ -167,15 +177,7 @@ export default /* glsl */`
 				float mean = distribution.x;
 				float variance = distribution.y * distribution.y;
 
-				#ifdef USE_REVERSED_DEPTH_BUFFER
-
-					float hard_shadow = step( mean, shadowCoord.z );
-
-				#else
-
-					float hard_shadow = step( shadowCoord.z, mean );
-
-				#endif
+				float hard_shadow = step( shadowCoord.z, mean );
 
 				// Early return if fully lit
 				if ( hard_shadow == 1.0 ) {
@@ -224,13 +226,11 @@ export default /* glsl */`
 
 				#ifdef USE_REVERSED_DEPTH_BUFFER
 
-					shadow = step( depth, shadowCoord.z );
-
-				#else
-
-					shadow = step( shadowCoord.z, depth );
+					depth = 1.0 - depth;
 
 				#endif
+
+				shadow = step( shadowCoord.z, depth );
 
 			}
 
@@ -287,7 +287,7 @@ export default /* glsl */`
 			vec3 bitangent = cross( bd3D, tangent );
 
 			// Use IGN to rotate sampling pattern per pixel
-			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * 6.28318530718;
+			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
 
 			vec2 sample0 = vogelDiskSample( 0, 5, phi );
 			vec2 sample1 = vogelDiskSample( 1, 5, phi );
@@ -328,16 +328,7 @@ export default /* glsl */`
 
 			// viewZ to perspective depth
 
-			#ifdef USE_REVERSED_DEPTH_BUFFER
-
-				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-
-			#else
-
-				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-
-			#endif
-
+			float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
 			dp += shadowBias;
 
 			// Direction from light to fragment
@@ -347,13 +338,11 @@ export default /* glsl */`
 
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 
-				shadow = step( depth, dp );
-
-			#else
-
-				shadow = step( dp, depth );
+				depth = 1.0 - depth;
 
 			#endif
+
+			shadow = step( dp, depth );
 
 		}
 
