@@ -19,6 +19,7 @@ import {
 } from '../constants.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { InstancedMesh } from '../objects/InstancedMesh.js';
@@ -1113,6 +1114,8 @@ class ObjectLoader extends Loader {
 		}
 
 		if ( data.up !== undefined ) object.up.fromArray( data.up );
+
+		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
 
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;

@@ -19,6 +19,7 @@ import {
 	Bone,
 	SRGBColorSpace,
 	Texture,
+	Vector3,
 	VectorKeyframeTrack
 } from 'three';
 
@@ -253,6 +254,13 @@ class USDComposer {
 
 			const t = data[ 'xformOp:translate' ];
 			obj.position.set( t[ 0 ], t[ 1 ], t[ 2 ] );
+
+		}
+
+		if ( data[ 'xformOp:translate:pivot' ] ) {
+
+			const p = data[ 'xformOp:translate:pivot' ];
+			obj.pivot = new Vector3( p[ 0 ], p[ 1 ], p[ 2 ] );
 
 		}
 
