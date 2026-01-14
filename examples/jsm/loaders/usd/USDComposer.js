@@ -861,7 +861,7 @@ class USDComposer {
 
 				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
 
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ] );
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace );
 
 				}
 
@@ -1676,7 +1676,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
 
 				}
 
@@ -1692,7 +1692,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
 
 				}
 
