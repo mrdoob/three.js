@@ -369,23 +369,47 @@ class USDComposer {
 				const referencedGroup = this._resolveReference( refValue, localVariants );
 				if ( referencedGroup ) {
 
-					// Create a container for the referenced content
-					const obj = new Object3D();
-					obj.name = name;
 					const attrs = this._getAttributes( path );
-					this.applyTransform( obj, spec.fields, attrs );
 
-					// Add all children from the referenced group
-					while ( referencedGroup.children.length > 0 ) {
+					// Check if the referenced content is a single mesh (or container with single mesh)
+					// This handles the USDZExporter pattern: Xform references geometry file
+					const singleMesh = this._findSingleMesh( referencedGroup );
 
-						obj.add( referencedGroup.children[ 0 ] );
+					if ( singleMesh && ( typeName === 'Xform' || ! typeName ) ) {
+
+						// Merge the mesh into this prim
+						singleMesh.name = name;
+						this.applyTransform( singleMesh, spec.fields, attrs );
+
+						// Apply material binding from the referencing prim if present
+						this._applyMaterialBinding( singleMesh, path );
+
+						parent.add( singleMesh );
+
+						// Still build local children (overrides)
+						this._buildHierarchy( singleMesh, path );
+
+					} else {
+
+						// Create a container for the referenced content
+						const obj = new Object3D();
+						obj.name = name;
+						this.applyTransform( obj, spec.fields, attrs );
+
+						// Add all children from the referenced group
+						while ( referencedGroup.children.length > 0 ) {
+
+							obj.add( referencedGroup.children[ 0 ] );
+
+						}
+
+						parent.add( obj );
+
+						// Still build local children (overrides)
+						this._buildHierarchy( obj, path );
 
 					}
 
-					parent.add( obj );
-
-					// Still build local children (overrides)
-					this._buildHierarchy( obj, path );
 					continue;
 
 				}
@@ -543,7 +567,7 @@ class USDComposer {
 		if ( ! match ) return null;
 
 		const filePath = match[ 1 ];
-		// primPath (match[2]) is not yet used - we compose the entire referenced file
+		const primPath = match[ 2 ]; // e.g., "/Geometry"
 
 		const resolvedPath = this._resolveFilePath( filePath );
 
@@ -559,7 +583,42 @@ class USDComposer {
 
 			const composer = new USDComposer();
 			const newBasePath = this._getBasePath( resolvedPath );
-			return composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
+			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
+
+			// If a primPath is specified, find and return just that subtree
+			if ( primPath ) {
+
+				const primName = primPath.split( '/' ).pop();
+
+				// Find the direct child with this name (not a deep search)
+				// This is important because there may be multiple objects with the same name
+				let targetObject = null;
+				for ( const child of composedGroup.children ) {
+
+					if ( child.name === primName ) {
+
+						targetObject = child;
+						break;
+
+					}
+
+				}
+
+				if ( targetObject ) {
+
+					// Detach from parent for re-parenting
+					composedGroup.remove( targetObject );
+
+					// Wrap in a group to maintain consistent return type
+					const wrapper = new Group();
+					wrapper.add( targetObject );
+					return wrapper;
+
+				}
+
+			}
+
+			return composedGroup;
 
 		}
 
@@ -571,6 +630,69 @@ class USDComposer {
 		}
 
 		return null;
+
+	}
+
+	/**
+	 * Find a single mesh in the group's shallow hierarchy.
+	 * Only returns a mesh if it's at depth 0 or 1, not deeply nested.
+	 * This preserves transforms in complex hierarchies like Kitchen Set
+	 * while supporting USDZExporter round-trip (Xform > Xform > Mesh pattern).
+	 */
+	_findSingleMesh( group ) {
+
+		// Check direct children first
+		for ( const child of group.children ) {
+
+			if ( child.isMesh ) {
+
+				group.remove( child );
+				return child;
+
+			}
+
+		}
+
+		// Check grandchildren (USDZExporter pattern: Xform > Geometry > Mesh)
+		// Only if there's exactly one child with exactly one grandchild
+		if ( group.children.length === 1 ) {
+
+			const child = group.children[ 0 ];
+
+			if ( child.children && child.children.length === 1 ) {
+
+				const grandchild = child.children[ 0 ];
+
+				if ( grandchild.isMesh && ! this._hasNonIdentityTransform( child ) ) {
+
+					// Safe to merge - intermediate has identity transform
+					child.remove( grandchild );
+					return grandchild;
+
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * Check if an object has a non-identity local transform.
+	 */
+	_hasNonIdentityTransform( obj ) {
+
+		const pos = obj.position;
+		const rot = obj.rotation;
+		const scale = obj.scale;
+
+		const hasPosition = pos.x !== 0 || pos.y !== 0 || pos.z !== 0;
+		const hasRotation = rot.x !== 0 || rot.y !== 0 || rot.z !== 0;
+		const hasScale = scale.x !== 1 || scale.y !== 1 || scale.z !== 1;
+
+		return hasPosition || hasRotation || hasScale;
 
 	}
 
@@ -1412,6 +1534,39 @@ class USDComposer {
 		}
 
 		return material;
+
+	}
+
+	/**
+	 * Apply material binding from a prim path to a mesh.
+	 * Used when merging referenced geometry into a prim that has material binding.
+	 */
+	_applyMaterialBinding( mesh, primPath ) {
+
+		// Look for material:binding on this prim
+		const bindingPath = primPath + '.material:binding';
+		const bindingSpec = this.specsByPath[ bindingPath ];
+
+		if ( ! bindingSpec ) return;
+
+		let materialPath = null;
+		const targetPaths = bindingSpec.fields?.targetPaths || bindingSpec.fields?.default;
+
+		if ( targetPaths ) {
+
+			materialPath = Array.isArray( targetPaths ) ? targetPaths[ 0 ] : targetPaths;
+
+		}
+
+		if ( ! materialPath ) return;
+
+		// Clean the material path
+		materialPath = String( materialPath ).replace( /^<|>$/g, '' );
+
+		// Build and apply the material
+		const material = new MeshPhysicalMaterial();
+		this._applyMaterial( material, materialPath );
+		mesh.material = material;
 
 	}
 
