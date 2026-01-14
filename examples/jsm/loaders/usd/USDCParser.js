@@ -1261,6 +1261,8 @@ class USDCParser {
 
 		switch ( type ) {
 
+			case TypeEnum.Invalid:
+				return null;
 			case TypeEnum.Bool:
 				return reader.readUint8() !== 0;
 			case TypeEnum.UChar:
@@ -1402,7 +1404,7 @@ class USDCParser {
 					} else {
 
 						reader.position = valueRep.payload;
-						value = this._readScalarValue( valueRep );
+						value = this._readScalarValue( valueRep.typeEnum );
 
 					}
 
