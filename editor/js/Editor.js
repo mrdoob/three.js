@@ -686,10 +686,12 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
-		if ( json.environment === 'Room' ||
-			 json.environment === 'ModelViewer' /* DEPRECATED */ ) {
+		if ( json.environment == null ||
+			 json.environment === 'Default' ||
+			 json.environment === 'Room' /* COMPAT */ ||
+			 json.environment === 'ModelViewer' /* COMPAT */ ) {
 
-			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
+			this.signals.sceneEnvironmentChanged.dispatch( 'Default' );
 			this.signals.refreshSidebarEnvironment.dispatch();
 
 		}
@@ -721,7 +723,7 @@ Editor.prototype = {
 
 		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
 
-			environment = 'Room';
+			environment = 'Default';
 
 		}
 

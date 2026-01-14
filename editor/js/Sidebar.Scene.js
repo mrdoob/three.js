@@ -154,12 +154,13 @@ function SidebarScene( editor ) {
 
 	const backgroundType = new UISelect().setOptions( {
 
-		'None': '',
+		'Default': 'Default',
 		'Color': 'Color',
 		'Texture': 'Texture',
 		'Equirectangular': 'Equirect'
 
 	} ).setWidth( '150px' );
+	backgroundType.setValue( 'Default' );
 	backgroundType.onChange( function () {
 
 		onBackgroundChanged();
@@ -233,7 +234,7 @@ function SidebarScene( editor ) {
 
 		const type = backgroundType.getValue();
 
-		backgroundType.setWidth( type === 'None' ? '150px' : '110px' );
+		backgroundType.setWidth( type === 'Default' ? '150px' : '110px' );
 		backgroundColor.setDisplay( type === 'Color' ? '' : 'none' );
 		backgroundTexture.setDisplay( type === 'Texture' ? '' : 'none' );
 		backgroundEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
@@ -257,13 +258,13 @@ function SidebarScene( editor ) {
 
 	const environmentType = new UISelect().setOptions( {
 
-		'None': '',
+		'Default': 'Default',
 		'Background': 'Background',
 		'Equirectangular': 'Equirect',
-		'Room': 'Room'
+		'None': 'None'
 
 	} ).setWidth( '150px' );
-	environmentType.setValue( 'None' );
+	environmentType.setValue( 'Default' );
 	environmentType.onChange( function () {
 
 		onEnvironmentChanged();
@@ -327,7 +328,7 @@ function SidebarScene( editor ) {
 	const fogTypeRow = new UIRow();
 	const fogType = new UISelect().setOptions( {
 
-		'None': '',
+		'None': 'None',
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
@@ -445,7 +446,7 @@ function SidebarScene( editor ) {
 
 		} else {
 
-			backgroundType.setValue( 'None' );
+			backgroundType.setValue( 'Default' );
 			backgroundTexture.setValue( null );
 			backgroundEquirectangularTexture.setValue( null );
 			backgroundColorSpace.setValue( THREE.NoColorSpace );
@@ -465,13 +466,13 @@ function SidebarScene( editor ) {
 
 			} else if ( scene.environment.isRenderTargetTexture === true ) {
 
-				environmentType.setValue( 'Room' );
+				environmentType.setValue( 'Default' );
 
 			}
 
 		} else {
 
-			environmentType.setValue( 'None' );
+			environmentType.setValue( 'Default' );
 			environmentEquirectangularTexture.setValue( null );
 
 		}
