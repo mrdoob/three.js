@@ -167,15 +167,7 @@ export default /* glsl */`
 				float mean = distribution.x;
 				float variance = distribution.y * distribution.y;
 
-				#ifdef USE_REVERSED_DEPTH_BUFFER
-
-					float hard_shadow = step( mean, shadowCoord.z );
-
-				#else
-
-					float hard_shadow = step( shadowCoord.z, mean );
-
-				#endif
+				float hard_shadow = step( shadowCoord.z, mean );
 
 				// Early return if fully lit
 				if ( hard_shadow == 1.0 ) {
@@ -224,13 +216,11 @@ export default /* glsl */`
 
 				#ifdef USE_REVERSED_DEPTH_BUFFER
 
-					shadow = step( depth, shadowCoord.z );
-
-				#else
-
-					shadow = step( shadowCoord.z, depth );
+					depth = 1.0 - depth;
 
 				#endif
+
+				shadow = step( shadowCoord.z, depth );
 
 			}
 
@@ -328,16 +318,7 @@ export default /* glsl */`
 
 			// viewZ to perspective depth
 
-			#ifdef USE_REVERSED_DEPTH_BUFFER
-
-				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-
-			#else
-
-				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-
-			#endif
-
+			float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
 			dp += shadowBias;
 
 			// Direction from light to fragment
@@ -347,13 +328,11 @@ export default /* glsl */`
 
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 
-				shadow = step( depth, dp );
-
-			#else
-
-				shadow = step( dp, depth );
+				depth = 1.0 - depth;
 
 			#endif
+
+			shadow = step( dp, depth );
 
 		}
 
