@@ -217,6 +217,34 @@ class USDAParser {
 
 			}
 
+			if ( key === 'variants' ) {
+
+				const variantSelection = {};
+				const variants = data[ key ];
+
+				for ( const vKey in variants ) {
+
+					const match = vKey.match( /^string\s+(\w+)$/ );
+					if ( match ) {
+
+						const variantSetName = match[ 1 ];
+						const variantValue = variants[ vKey ].replace( /"/g, '' );
+						variantSelection[ variantSetName ] = variantValue;
+
+					}
+
+				}
+
+				if ( Object.keys( variantSelection ).length > 0 ) {
+
+					primFields.variantSelection = variantSelection;
+
+				}
+
+				continue;
+
+			}
+
 			if ( key.startsWith( 'rel ' ) ) {
 
 				const relName = key.slice( 4 );

@@ -766,6 +766,34 @@ class USDComposer {
 	_getAttributes( path ) {
 
 		const attrs = {};
+
+		this._collectAttributesFromPath( path, attrs );
+
+		// Collect overrides from sibling variants
+		const variantMatch = path.match( /^(.+?)\/\{(\w+)=(\w+)\}\/(.+)$/ );
+		if ( variantMatch ) {
+
+			const basePath = variantMatch[ 1 ];
+			const relativePath = variantMatch[ 4 ];
+			const variantPaths = this._getVariantPaths( basePath );
+
+			for ( const vp of variantPaths ) {
+
+				if ( path.startsWith( vp ) ) continue;
+
+				const overridePath = vp + '/' + relativePath;
+				this._collectAttributesFromPath( overridePath, attrs );
+
+			}
+
+		}
+
+		return attrs;
+
+	}
+
+	_collectAttributesFromPath( path, attrs ) {
+
 		const prefix = path + '.';
 
 		for ( const attrPath in this.specsByPath ) {
@@ -781,7 +809,6 @@ class USDComposer {
 
 			}
 
-			// Include elementSize for skinning attributes
 			if ( attrSpec.fields?.elementSize !== undefined ) {
 
 				attrs[ attrName + ':elementSize' ] = attrSpec.fields.elementSize;
@@ -795,8 +822,6 @@ class USDComposer {
 			}
 
 		}
-
-		return attrs;
 
 	}
 
@@ -830,7 +855,6 @@ class USDComposer {
 
 		}
 
-		// Apply displayColor if no texture/color was set
 		const displayColor = attrs[ 'primvars:displayColor' ];
 		if ( displayColor && displayColor.length >= 3 ) {
 
@@ -856,7 +880,6 @@ class USDComposer {
 
 		}
 
-		// Apply displayOpacity for transparency
 		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
 		if ( displayOpacity && displayOpacity.length >= 1 ) {
 
