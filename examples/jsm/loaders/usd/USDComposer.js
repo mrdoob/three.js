@@ -787,16 +787,7 @@ class USDComposer {
 			if ( ! attrPath.startsWith( prefix ) ) continue;
 
 			const attrSpec = this.specsByPath[ attrPath ];
-			let attrName = attrPath.slice( prefix.length );
-
-			// USDA includes type annotations like "token[] joints" or "matrix4d[] bindTransforms"
-			// Extract the actual attribute name after the type annotation
-			const typeMatch = attrName.match( /^[a-zA-Z0-9]+(?:\[\])?\s+(.+)$/ );
-			if ( typeMatch ) {
-
-				attrName = typeMatch[ 1 ];
-
-			}
+			const attrName = attrPath.slice( prefix.length );
 
 			if ( attrSpec.fields?.default !== undefined ) {
 
