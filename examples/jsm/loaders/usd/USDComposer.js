@@ -769,7 +769,7 @@ class USDComposer {
 
 		this._collectAttributesFromPath( path, attrs );
 
-		// Collect overrides from sibling variants
+		// Collect overrides from sibling variants (when path is inside a variant)
 		const variantMatch = path.match( /^(.+?)\/\{(\w+)=(\w+)\}\/(.+)$/ );
 		if ( variantMatch ) {
 
@@ -783,6 +783,25 @@ class USDComposer {
 
 				const overridePath = vp + '/' + relativePath;
 				this._collectAttributesFromPath( overridePath, attrs );
+
+			}
+
+		} else {
+
+			// Check for variant overrides at ancestor levels
+			const parts = path.split( '/' );
+			for ( let i = 1; i < parts.length - 1; i ++ ) {
+
+				const ancestorPath = parts.slice( 0, i + 1 ).join( '/' );
+				const relativePath = parts.slice( i + 1 ).join( '/' );
+				const variantPaths = this._getVariantPaths( ancestorPath );
+
+				for ( const vp of variantPaths ) {
+
+					const overridePath = vp + '/' + relativePath;
+					this._collectAttributesFromPath( overridePath, attrs );
+
+				}
 
 			}
 
