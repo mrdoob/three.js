@@ -286,7 +286,7 @@ class USDComposer {
 		if ( data[ 'xformOp:orient' ] ) {
 
 			const q = data[ 'xformOp:orient' ];
-			if ( q && q.length === 4 ) {
+			if ( q.length === 4 ) {
 
 				// USD quaternion format is (w, x, y, z) - real part first
 				// Three.js Quaternion is (x, y, z, w)
@@ -1784,7 +1784,7 @@ class USDComposer {
 			scope._applyTextureTransforms( texture, transformAttrs );
 			texture.needsUpdate = true;
 
-			if ( ! ( typeof data === 'string' ) ) {
+			if ( typeof data !== 'string' ) {
 
 				URL.revokeObjectURL( url );
 

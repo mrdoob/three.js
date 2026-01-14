@@ -72,29 +72,6 @@ const FIELD_SET_TERMINATOR = 0xFFFFFFFF;
 const FLOAT_COMPRESSION_INT = 0x69; // 'i' - compressed as integers
 const FLOAT_COMPRESSION_LUT = 0x74; // 't' - lookup table
 
-// Spec types
-const SpecType = {
-	Unknown: 0,
-	Attribute: 1,
-	Connection: 2,
-	Expression: 3,
-	Mapper: 4,
-	MapperArg: 5,
-	Prim: 6,
-	PseudoRoot: 7,
-	Relationship: 8,
-	RelationshipTarget: 9,
-	Variant: 10,
-	VariantSet: 11
-};
-
-// Specifier values
-const Specifier = {
-	Def: 0,
-	Over: 1,
-	Class: 2
-};
-
 // ============================================================================
 // LZ4 Decompression (minimal implementation for USD)
 // Based on LZ4 block format specification
