@@ -14,6 +14,7 @@ import {
 	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
+	ShapeUtils,
 	SkinnedMesh,
 	Skeleton,
 	Bone,
@@ -297,8 +298,6 @@ class USDComposer {
 			const q = data[ 'xformOp:orient' ];
 			if ( q.length === 4 ) {
 
-				// USD quaternion format is (w, x, y, z) - real part first
-				// Three.js Quaternion is (x, y, z, w)
 				obj.quaternion.set( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
 
 			}
@@ -1024,10 +1023,20 @@ class USDComposer {
 		const faceVertexIndices = fields[ 'faceVertexIndices' ];
 		const faceVertexCounts = fields[ 'faceVertexCounts' ];
 
+		// Parse polygon holes (Arnold format: [holeFaceIdx, parentFaceIdx, ...])
+		const polygonHoles = fields[ 'primvars:arnold:polygon_holes' ];
+		const holeMap = this._buildHoleMap( polygonHoles );
+
+		// Compute triangulation pattern once using actual vertex positions
+		// This pattern will be reused for normals, UVs, etc.
 		let indices = faceVertexIndices;
+		let triPattern = null;
+
 		if ( faceVertexCounts && faceVertexCounts.length > 0 ) {
 
-			indices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
+			const result = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
+			indices = result.indices;
+			triPattern = result.pattern;
 
 		}
 
@@ -1041,10 +1050,19 @@ class USDComposer {
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
 
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+		const normalIndicesRaw = fields[ 'normals:indices' ] || fields[ 'primvars:normals:indices' ];
+
 		if ( normals && normals.length > 0 ) {
 
 			let normalData = normals;
-			if ( normals.length === points.length ) {
+
+			if ( normalIndicesRaw && normalIndicesRaw.length > 0 && triPattern ) {
+
+				// Indexed normals - apply triangulation pattern to indices
+				const triangulatedNormalIndices = this._applyTriangulationPattern( normalIndicesRaw, triPattern );
+				normalData = this._expandAttribute( normals, triangulatedNormalIndices, 3 );
+
+			} else if ( normals.length === points.length ) {
 
 				// Per-vertex normals
 				if ( indices && indices.length > 0 ) {
@@ -1053,12 +1071,12 @@ class USDComposer {
 
 				}
 
-			} else if ( indices ) {
+			} else if ( triPattern ) {
 
-				// Per-face-vertex normals
-				const normalIndices = this._triangulateIndices(
+				// Per-face-vertex normals (no separate indices) - use same triangulation pattern
+				const normalIndices = this._applyTriangulationPattern(
 					Array.from( { length: normals.length / 3 }, ( _, i ) => i ),
-					faceVertexCounts
+					triPattern
 				);
 				normalData = this._expandAttribute( normals, normalIndices, 3 );
 
@@ -1078,9 +1096,9 @@ class USDComposer {
 
 			let uvData = uvs;
 
-			if ( uvIndices && uvIndices.length > 0 ) {
+			if ( uvIndices && uvIndices.length > 0 && triPattern ) {
 
-				const triangulatedUvIndices = this._triangulateIndices( uvIndices, faceVertexCounts );
+				const triangulatedUvIndices = this._applyTriangulationPattern( uvIndices, triPattern );
 				uvData = this._expandAttribute( uvs, triangulatedUvIndices, 2 );
 
 			} else if ( indices && uvs.length / 2 === points.length / 3 ) {
@@ -1100,9 +1118,9 @@ class USDComposer {
 
 			let uv2Data = uvs2;
 
-			if ( uv2Indices && uv2Indices.length > 0 ) {
+			if ( uv2Indices && uv2Indices.length > 0 && triPattern ) {
 
-				const triangulatedUv2Indices = this._triangulateIndices( uv2Indices, faceVertexCounts );
+				const triangulatedUv2Indices = this._applyTriangulationPattern( uv2Indices, triPattern );
 				uv2Data = this._expandAttribute( uvs2, triangulatedUv2Indices, 2 );
 
 			} else if ( indices && uvs2.length / 2 === points.length / 3 ) {
@@ -1186,23 +1204,52 @@ class USDComposer {
 
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
+		const polygonHoles = fields[ 'primvars:arnold:polygon_holes' ];
+		const holeMap = this._buildHoleMap( polygonHoles );
+		const holeFaces = holeMap.holeFaces;
+		const parentToHoles = holeMap.parentToHoles;
+
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
 		const { uvs2, uv2Indices } = this._findUV2Primvar( fields );
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+		const normalIndicesRaw = fields[ 'normals:indices' ] || fields[ 'primvars:normals:indices' ];
 
 		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
 		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
 		const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
 
-		// Build face-to-triangle mapping
+		// Build face-to-triangle mapping (accounting for holes)
 		const faceTriangleOffset = [];
 		let triangleCount = 0;
 
 		for ( let i = 0; i < faceVertexCounts.length; i ++ ) {
 
 			faceTriangleOffset.push( triangleCount );
+
+			// Skip hole faces - they're triangulated with their parent
+			if ( holeFaces.has( i ) ) continue;
+
 			const count = faceVertexCounts[ i ];
-			if ( count >= 3 ) triangleCount += count - 2;
+			const holes = parentToHoles.get( i );
+
+			if ( holes && holes.length > 0 ) {
+
+				// For faces with holes, count triangles based on total vertices
+				// Earcut produces (total_vertices - 2) triangles for any polygon including holes
+				let totalVerts = count;
+				for ( const holeIdx of holes ) {
+
+					totalVerts += faceVertexCounts[ holeIdx ];
+
+				}
+
+				triangleCount += totalVerts - 2;
+
+			} else if ( count >= 3 ) {
+
+				triangleCount += count - 2;
+
+			}
 
 		}
 
@@ -1282,16 +1329,19 @@ class USDComposer {
 
 		}
 
-		// Triangulate original data
-		const origIndices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
-		const origUvIndices = uvIndices ? this._triangulateIndices( uvIndices, faceVertexCounts ) : null;
-		const origUv2Indices = uv2Indices ? this._triangulateIndices( uv2Indices, faceVertexCounts ) : null;
+		// Triangulate original data using consistent pattern
+		const { indices: origIndices, pattern: triPattern } = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
+		const origUvIndices = uvIndices ? this._applyTriangulationPattern( uvIndices, triPattern ) : null;
+		const origUv2Indices = uv2Indices ? this._applyTriangulationPattern( uv2Indices, triPattern ) : null;
 
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const hasIndexedNormals = normals && normalIndicesRaw && normalIndicesRaw.length > 0;
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
-		const origNormalIndices = hasFaceVaryingNormals
-			? this._triangulateIndices( Array.from( { length: numFaceVertices }, ( _, i ) => i ), faceVertexCounts )
-			: null;
+		const origNormalIndices = hasIndexedNormals
+			? this._applyTriangulationPattern( normalIndicesRaw, triPattern )
+			: ( hasFaceVaryingNormals
+				? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
+				: null );
 
 		// Build reordered vertex data
 		const vertexCount = triangleCount * 3;
@@ -1461,10 +1511,389 @@ class USDComposer {
 
 	_findUV2Primvar( fields ) {
 
-		// Look for second UV set (st1, commonly used for lightmaps/AO)
 		const uvs2 = fields[ 'primvars:st1' ];
 		const uv2Indices = fields[ 'primvars:st1:indices' ];
 		return { uvs2, uv2Indices };
+
+	}
+
+	_buildHoleMap( polygonHoles ) {
+
+		// polygonHoles is in Arnold format: [holeFaceIdx, parentFaceIdx, holeFaceIdx, parentFaceIdx, ...]
+		// Returns a map: parentFaceIdx -> [holeFaceIdx1, holeFaceIdx2, ...]
+		// Also returns a set of hole face indices to skip during triangulation
+		if ( ! polygonHoles || polygonHoles.length === 0 ) {
+
+			return { parentToHoles: new Map(), holeFaces: new Set() };
+
+		}
+
+		const parentToHoles = new Map();
+		const holeFaces = new Set();
+
+		for ( let i = 0; i < polygonHoles.length; i += 2 ) {
+
+			const holeFaceIdx = polygonHoles[ i ];
+			const parentFaceIdx = polygonHoles[ i + 1 ];
+
+			holeFaces.add( holeFaceIdx );
+
+			if ( ! parentToHoles.has( parentFaceIdx ) ) {
+
+				parentToHoles.set( parentFaceIdx, [] );
+
+			}
+
+			parentToHoles.get( parentFaceIdx ).push( holeFaceIdx );
+
+		}
+
+		return { parentToHoles, holeFaces };
+
+	}
+
+	_triangulateIndicesWithPattern( indices, counts, points = null, holeMap = null ) {
+
+		const triangulated = [];
+		const pattern = []; // Stores face-local indices for each triangle vertex
+
+		// Build face offset lookup for accessing hole face data
+		const faceOffsets = [];
+		let offsetAccum = 0;
+		for ( let i = 0; i < counts.length; i ++ ) {
+
+			faceOffsets.push( offsetAccum );
+			offsetAccum += counts[ i ];
+
+		}
+
+		const parentToHoles = holeMap?.parentToHoles || new Map();
+		const holeFaces = holeMap?.holeFaces || new Set();
+
+		let offset = 0;
+
+		for ( let i = 0; i < counts.length; i ++ ) {
+
+			const count = counts[ i ];
+
+			// Skip faces that are holes - they will be triangulated with their parent
+			if ( holeFaces.has( i ) ) {
+
+				offset += count;
+				continue;
+
+			}
+
+			// Check if this face has holes
+			const holes = parentToHoles.get( i );
+
+			if ( holes && holes.length > 0 && points && points.length > 0 ) {
+
+				// Triangulate face with holes using vertex -> face-vertex mapping
+				const vertexToFaceVertex = new Map();
+
+				const faceIndices = [];
+				for ( let j = 0; j < count; j ++ ) {
+
+					const vertIdx = indices[ offset + j ];
+					faceIndices.push( vertIdx );
+					vertexToFaceVertex.set( vertIdx, offset + j );
+
+				}
+
+				const holeContours = [];
+				for ( const holeFaceIdx of holes ) {
+
+					const holeOffset = faceOffsets[ holeFaceIdx ];
+					const holeCount = counts[ holeFaceIdx ];
+					const holeIndices = [];
+					for ( let j = 0; j < holeCount; j ++ ) {
+
+						const vertIdx = indices[ holeOffset + j ];
+						holeIndices.push( vertIdx );
+						vertexToFaceVertex.set( vertIdx, holeOffset + j );
+
+					}
+
+					holeContours.push( holeIndices );
+
+				}
+
+				const triangles = this._triangulateNGonWithHoles( faceIndices, holeContours, points );
+
+				for ( const tri of triangles ) {
+
+					triangulated.push( tri[ 0 ], tri[ 1 ], tri[ 2 ] );
+					pattern.push(
+						vertexToFaceVertex.get( tri[ 0 ] ),
+						vertexToFaceVertex.get( tri[ 1 ] ),
+						vertexToFaceVertex.get( tri[ 2 ] )
+					);
+
+				}
+
+			} else if ( count === 3 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ]
+				);
+				pattern.push( offset, offset + 1, offset + 2 );
+
+			} else if ( count === 4 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ],
+					indices[ offset ],
+					indices[ offset + 2 ],
+					indices[ offset + 3 ]
+				);
+				pattern.push(
+					offset, offset + 1, offset + 2,
+					offset, offset + 2, offset + 3
+				);
+
+			} else if ( count > 4 ) {
+
+				// Use ear-clipping for complex n-gons if we have vertex positions
+				if ( points && points.length > 0 ) {
+
+					const faceIndices = [];
+					for ( let j = 0; j < count; j ++ ) {
+
+						faceIndices.push( indices[ offset + j ] );
+
+					}
+
+					const triangles = this._triangulateNGon( faceIndices, points );
+
+					for ( const tri of triangles ) {
+
+						triangulated.push( tri[ 0 ], tri[ 1 ], tri[ 2 ] );
+						// Find local indices within the face
+						pattern.push(
+							offset + faceIndices.indexOf( tri[ 0 ] ),
+							offset + faceIndices.indexOf( tri[ 1 ] ),
+							offset + faceIndices.indexOf( tri[ 2 ] )
+						);
+
+					}
+
+				} else {
+
+					// Fallback to fan triangulation
+					for ( let j = 1; j < count - 1; j ++ ) {
+
+						triangulated.push(
+							indices[ offset ],
+							indices[ offset + j ],
+							indices[ offset + j + 1 ]
+						);
+						pattern.push( offset, offset + j, offset + j + 1 );
+
+					}
+
+				}
+
+			}
+
+			offset += count;
+
+		}
+
+		return { indices: triangulated, pattern };
+
+	}
+
+	_applyTriangulationPattern( indices, pattern ) {
+
+		const result = [];
+		for ( let i = 0; i < pattern.length; i ++ ) {
+
+			result.push( indices[ pattern[ i ] ] );
+
+		}
+
+		return result;
+
+	}
+
+	_triangulateNGon( faceIndices, points ) {
+
+		// Project 3D polygon to 2D for triangulation using Newell's method for normal
+		const contour2D = [];
+		const contour3D = [];
+
+		for ( const idx of faceIndices ) {
+
+			contour3D.push( new Vector3(
+				points[ idx * 3 ],
+				points[ idx * 3 + 1 ],
+				points[ idx * 3 + 2 ]
+			) );
+
+		}
+
+		// Calculate polygon normal using Newell's method
+		const normal = new Vector3();
+		for ( let i = 0; i < contour3D.length; i ++ ) {
+
+			const curr = contour3D[ i ];
+			const next = contour3D[ ( i + 1 ) % contour3D.length ];
+			normal.x += ( curr.y - next.y ) * ( curr.z + next.z );
+			normal.y += ( curr.z - next.z ) * ( curr.x + next.x );
+			normal.z += ( curr.x - next.x ) * ( curr.y + next.y );
+
+		}
+
+		normal.normalize();
+
+		// Create tangent basis for projection
+		const tangent = new Vector3();
+		const bitangent = new Vector3();
+
+		if ( Math.abs( normal.y ) > 0.9 ) {
+
+			tangent.set( 1, 0, 0 );
+
+		} else {
+
+			tangent.set( 0, 1, 0 );
+
+		}
+
+		bitangent.crossVectors( normal, tangent ).normalize();
+		tangent.crossVectors( bitangent, normal ).normalize();
+
+		// Project to 2D
+		for ( const p of contour3D ) {
+
+			contour2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+		}
+
+		// Triangulate using ShapeUtils
+		const triangles = ShapeUtils.triangulateShape( contour2D, [] );
+
+		// Map back to original indices
+		const result = [];
+		for ( const tri of triangles ) {
+
+			result.push( [
+				faceIndices[ tri[ 0 ] ],
+				faceIndices[ tri[ 1 ] ],
+				faceIndices[ tri[ 2 ] ]
+			] );
+
+		}
+
+		return result;
+
+	}
+
+	_triangulateNGonWithHoles( outerIndices, holeContours, points ) {
+
+		// Project 3D polygon with holes to 2D for triangulation
+		const outer3D = [];
+
+		for ( const idx of outerIndices ) {
+
+			outer3D.push( new Vector3(
+				points[ idx * 3 ],
+				points[ idx * 3 + 1 ],
+				points[ idx * 3 + 2 ]
+			) );
+
+		}
+
+		// Calculate polygon normal using Newell's method
+		const normal = new Vector3();
+		for ( let i = 0; i < outer3D.length; i ++ ) {
+
+			const curr = outer3D[ i ];
+			const next = outer3D[ ( i + 1 ) % outer3D.length ];
+			normal.x += ( curr.y - next.y ) * ( curr.z + next.z );
+			normal.y += ( curr.z - next.z ) * ( curr.x + next.x );
+			normal.z += ( curr.x - next.x ) * ( curr.y + next.y );
+
+		}
+
+		normal.normalize();
+
+		// Create tangent basis for projection
+		const tangent = new Vector3();
+		const bitangent = new Vector3();
+
+		if ( Math.abs( normal.y ) > 0.9 ) {
+
+			tangent.set( 1, 0, 0 );
+
+		} else {
+
+			tangent.set( 0, 1, 0 );
+
+		}
+
+		bitangent.crossVectors( normal, tangent ).normalize();
+		tangent.crossVectors( bitangent, normal ).normalize();
+
+		// Project outer contour to 2D
+		const outer2D = [];
+		for ( const p of outer3D ) {
+
+			outer2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+		}
+
+		// Project hole contours to 2D
+		const holes2D = [];
+
+		for ( const holeIndices of holeContours ) {
+
+			const hole2D = [];
+
+			for ( const idx of holeIndices ) {
+
+				const p = new Vector3(
+					points[ idx * 3 ],
+					points[ idx * 3 + 1 ],
+					points[ idx * 3 + 2 ]
+				);
+				hole2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+			}
+
+			holes2D.push( hole2D );
+
+		}
+
+		// Build combined index array: outer contour followed by all holes
+		const allIndices = [ ...outerIndices ];
+		for ( const holeIndices of holeContours ) {
+
+			allIndices.push( ...holeIndices );
+
+		}
+
+		// Triangulate using ShapeUtils with holes
+		const triangles = ShapeUtils.triangulateShape( outer2D, holes2D );
+
+		// Map back to original vertex indices
+		const result = [];
+		for ( const tri of triangles ) {
+
+			result.push( [
+				allIndices[ tri[ 0 ] ],
+				allIndices[ tri[ 1 ] ],
+				allIndices[ tri[ 2 ] ]
+			] );
+
+		}
+
+		return result;
 
 	}
 
@@ -1725,6 +2154,10 @@ class USDComposer {
 
 				this._applyPreviewSurface( material, path );
 
+			} else if ( infoId === 'arnold:openpbr_surface' ) {
+
+				this._applyOpenPBRSurface( material, path );
+
 			}
 
 		}
@@ -1913,6 +2346,424 @@ class USDComposer {
 
 	}
 
+	_applyOpenPBRSurface( material, shaderPath ) {
+
+		const fields = this._getAttributes( shaderPath );
+
+		const getAttrSpec = ( attrName ) => {
+
+			const attrPath = shaderPath + '.' + attrName;
+			return this.specsByPath[ attrPath ];
+
+		};
+
+		const applyTextureFromConnection = ( attrName, textureProperty, colorSpace, valueCallback ) => {
+
+			const spec = getAttrSpec( attrName );
+
+			if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
+
+				// Try each connection path until one resolves to a texture
+				for ( const connPath of spec.fields.connectionPaths ) {
+
+					const texture = this._getTextureFromOpenPBRConnection( connPath );
+
+					if ( texture ) {
+
+						texture.colorSpace = colorSpace;
+						material[ textureProperty ] = texture;
+						return true;
+
+					}
+
+				}
+
+			}
+
+			if ( fields[ attrName ] !== undefined && valueCallback ) {
+
+				valueCallback( fields[ attrName ] );
+
+			}
+
+			return false;
+
+		};
+
+		// Base color (diffuse)
+		applyTextureFromConnection(
+			'inputs:base_color',
+			'map',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
+		// Base metalness
+		applyTextureFromConnection(
+			'inputs:base_metalness',
+			'metalnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				if ( typeof value === 'number' ) {
+
+					material.metalness = value;
+
+				}
+
+			}
+		);
+
+		// Specular roughness
+		applyTextureFromConnection(
+			'inputs:specular_roughness',
+			'roughnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				if ( typeof value === 'number' ) {
+
+					material.roughness = value;
+
+				}
+
+			}
+		);
+
+		// Emission color
+		const hasEmissionMap = applyTextureFromConnection(
+			'inputs:emission_color',
+			'emissiveMap',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
+		// Emission luminance/weight - multiply emissive by this factor
+		const emissionLuminance = fields[ 'inputs:emission_luminance' ];
+
+		if ( emissionLuminance !== undefined && emissionLuminance > 0 ) {
+
+			if ( hasEmissionMap ) {
+
+				material.emissiveIntensity = emissionLuminance;
+
+			} else {
+
+				// Scale the emissive color by luminance
+				material.emissive.multiplyScalar( emissionLuminance );
+
+			}
+
+		}
+
+		// Transmission (transparency)
+		const transmissionWeight = fields[ 'inputs:transmission_weight' ];
+
+		if ( transmissionWeight !== undefined && transmissionWeight > 0 ) {
+
+			material.transmission = transmissionWeight;
+
+			const transmissionDepth = fields[ 'inputs:transmission_depth' ];
+
+			if ( transmissionDepth !== undefined ) {
+
+				material.thickness = transmissionDepth;
+
+			}
+
+			const transmissionColor = fields[ 'inputs:transmission_color' ];
+
+			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
+
+				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				material.attenuationDistance = transmissionDepth || 1.0;
+
+			}
+
+		}
+
+		// Geometry opacity (overall surface opacity)
+		const geometryOpacity = fields[ 'inputs:geometry_opacity' ];
+
+		if ( geometryOpacity !== undefined && geometryOpacity < 1.0 ) {
+
+			material.opacity = geometryOpacity;
+			material.transparent = true;
+
+		}
+
+		// Specular IOR
+		const specularIOR = fields[ 'inputs:specular_ior' ];
+
+		if ( specularIOR !== undefined ) {
+
+			material.ior = specularIOR;
+
+		}
+
+		// Coat (clearcoat)
+		const coatWeight = fields[ 'inputs:coat_weight' ];
+
+		if ( coatWeight !== undefined && coatWeight > 0 ) {
+
+			material.clearcoat = coatWeight;
+
+			const coatRoughness = fields[ 'inputs:coat_roughness' ];
+
+			if ( coatRoughness !== undefined ) {
+
+				material.clearcoatRoughness = coatRoughness;
+
+			}
+
+		}
+
+		// Thin film (iridescence)
+		const thinFilmWeight = fields[ 'inputs:thin_film_weight' ];
+
+		if ( thinFilmWeight !== undefined && thinFilmWeight > 0 ) {
+
+			material.iridescence = thinFilmWeight;
+
+			const thinFilmIOR = fields[ 'inputs:thin_film_ior' ];
+
+			if ( thinFilmIOR !== undefined ) {
+
+				material.iridescenceIOR = thinFilmIOR;
+
+			}
+
+			const thinFilmThickness = fields[ 'inputs:thin_film_thickness' ];
+
+			if ( thinFilmThickness !== undefined ) {
+
+				// OpenPBR uses micrometers, Three.js uses nanometers
+				const thicknessNm = thinFilmThickness * 1000;
+				material.iridescenceThicknessRange = [ thicknessNm, thicknessNm ];
+
+			}
+
+		}
+
+		// Specular
+		const specularWeight = fields[ 'inputs:specular_weight' ];
+
+		if ( specularWeight !== undefined ) {
+
+			material.specularIntensity = specularWeight;
+
+		}
+
+		const specularColor = fields[ 'inputs:specular_color' ];
+
+		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
+
+			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+
+		}
+
+		// Anisotropy
+		const anisotropy = fields[ 'inputs:specular_roughness_anisotropy' ];
+
+		if ( anisotropy !== undefined && anisotropy > 0 ) {
+
+			material.anisotropy = anisotropy;
+
+		}
+
+		// Geometry normal (normal map)
+		applyTextureFromConnection(
+			'inputs:geometry_normal',
+			'normalMap',
+			NoColorSpace,
+			null
+		);
+
+	}
+
+	_getTextureFromOpenPBRConnection( connPath ) {
+
+		// connPath is like /Material/NodeGraph.outputs:baseColor or /Material/Shader.outputs:out
+		const cleanPath = connPath.replace( /<|>/g, '' );
+		const shaderPath = cleanPath.split( '.' )[ 0 ];
+		const shaderSpec = this.specsByPath[ shaderPath ];
+
+		if ( ! shaderSpec ) return null;
+
+		const attrs = this._getAttributes( shaderPath );
+		const infoId = attrs[ 'info:id' ] || shaderSpec.fields[ 'info:id' ];
+		const typeName = shaderSpec.fields.typeName;
+
+		// Handle NodeGraph - follow output connection to internal shader
+		if ( typeName === 'NodeGraph' ) {
+
+			// Get the output attribute that's connected
+			const outputName = cleanPath.split( '.' )[ 1 ]; // e.g., "outputs:baseColor"
+			const outputAttrPath = shaderPath + '.' + outputName;
+			const outputSpec = this.specsByPath[ outputAttrPath ];
+
+			if ( outputSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				// Follow the internal connection
+				return this._getTextureFromOpenPBRConnection( outputSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle arnold:image - Arnold's texture node
+		if ( infoId === 'arnold:image' ) {
+
+			const filePath = attrs[ 'inputs:filename' ];
+			if ( ! filePath ) return null;
+
+			return this._loadTextureFromPath( filePath );
+
+		}
+
+		// Handle MaterialX image nodes (ND_image_color4, ND_image_color3, etc.)
+		if ( infoId && infoId.startsWith( 'ND_image_' ) ) {
+
+			const filePath = attrs[ 'inputs:file' ];
+			if ( ! filePath ) return null;
+
+			return this._loadTextureFromPath( filePath );
+
+		}
+
+		// Handle Maya file texture - follow the inColor connection to the actual image
+		if ( infoId === 'MayaND_fileTexture_color4' ) {
+
+			const inColorPath = shaderPath + '.inputs:inColor';
+			const inColorSpec = this.specsByPath[ inColorPath ];
+
+			if ( inColorSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inColorSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle color conversion nodes - follow the input connection
+		if ( infoId && infoId.startsWith( 'ND_convert_' ) ) {
+
+			const inPath = shaderPath + '.inputs:in';
+			const inSpec = this.specsByPath[ inPath ];
+
+			if ( inSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle Arnold bump2d - follow the bump_map input
+		if ( infoId === 'arnold:bump2d' ) {
+
+			const bumpMapPath = shaderPath + '.inputs:bump_map';
+			const bumpMapSpec = this.specsByPath[ bumpMapPath ];
+
+			if ( bumpMapSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( bumpMapSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle Arnold color_correct - follow the input connection
+		if ( infoId === 'arnold:color_correct' ) {
+
+			const inputPath = shaderPath + '.inputs:input';
+			const inputSpec = this.specsByPath[ inputPath ];
+
+			if ( inputSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inputSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle nested shader paths (e.g., /Material/file2/cc.outputs:a)
+		// Check if parent path is an image node
+		const parentPath = shaderPath.substring( 0, shaderPath.lastIndexOf( '/' ) );
+
+		if ( parentPath ) {
+
+			const parentSpec = this.specsByPath[ parentPath ];
+
+			if ( parentSpec ) {
+
+				const parentAttrs = this._getAttributes( parentPath );
+				const parentInfoId = parentAttrs[ 'info:id' ] || parentSpec.fields[ 'info:id' ];
+
+				if ( parentInfoId === 'arnold:image' ) {
+
+					const filePath = parentAttrs[ 'inputs:filename' ];
+					if ( filePath ) return this._loadTextureFromPath( filePath );
+
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	_loadTextureFromPath( filePath ) {
+
+		if ( ! filePath ) return null;
+
+		// Check cache first
+		if ( this.textureCache[ filePath ] ) {
+
+			return this.textureCache[ filePath ];
+
+		}
+
+		const texture = this._loadTexture( filePath, null, null );
+
+		if ( texture ) {
+
+			this.textureCache[ filePath ] = texture;
+
+		}
+
+		return texture;
+
+	}
+
 	_getTextureFromConnection( connPath ) {
 
 		// connPath is like /Material/Shader.outputs:rgb
@@ -2061,6 +2912,7 @@ class USDComposer {
 
 			}
 
+			console.warn( 'USDLoader: Texture not found:', cleanPath );
 			return null;
 
 		}
