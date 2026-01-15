@@ -31,7 +31,6 @@ class WebGPUBackend extends Backend {
 	 * @typedef {Object} WebGPUBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @property {boolean} [compatibilityMode=false] - Whether the backend should be in compatibility mode or not.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
@@ -64,7 +63,6 @@ class WebGPUBackend extends Backend {
 
 		// some parameters require default values other than "undefined"
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
-		this.parameters.compatibilityMode = ( parameters.compatibilityMode === undefined ) ? false : parameters.compatibilityMode;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
@@ -73,7 +71,7 @@ class WebGPUBackend extends Backend {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.compatibilityMode = this.parameters.compatibilityMode;
+		this.compatibilityMode = undefined;
 
 		/**
 		 * A reference to the device.
@@ -175,7 +173,7 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: parameters.compatibilityMode ? 'compatibility' : undefined
+				featureLevel: 'compatibility'
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -214,6 +212,8 @@ class WebGPUBackend extends Backend {
 			device = parameters.device;
 
 		}
+
+		parameters.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
 		device.lost.then( ( info ) => {
 
