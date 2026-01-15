@@ -298,8 +298,6 @@ class USDComposer {
 			const q = data[ 'xformOp:orient' ];
 			if ( q.length === 4 ) {
 
-				// USD quaternion format is (w, x, y, z) - real part first
-				// Three.js Quaternion is (x, y, z, w)
 				obj.quaternion.set( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
 
 			}
@@ -1197,7 +1195,6 @@ class USDComposer {
 
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
-		// Parse polygon holes (Arnold format: [holeFaceIdx, parentFaceIdx, ...])
 		const polygonHoles = fields[ 'primvars:arnold:polygon_holes' ];
 		const holeMap = this._buildHoleMap( polygonHoles );
 		const holeFaces = holeMap.holeFaces;
@@ -1501,7 +1498,6 @@ class USDComposer {
 
 	_findUV2Primvar( fields ) {
 
-		// Look for second UV set (st1, commonly used for lightmaps/AO)
 		const uvs2 = fields[ 'primvars:st1' ];
 		const uv2Indices = fields[ 'primvars:st1:indices' ];
 		return { uvs2, uv2Indices };
