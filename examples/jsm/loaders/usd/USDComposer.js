@@ -1725,6 +1725,10 @@ class USDComposer {
 
 				this._applyPreviewSurface( material, path );
 
+			} else if ( infoId === 'arnold:openpbr_surface' ) {
+
+				this._applyOpenPBRSurface( material, path );
+
 			}
 
 		}
@@ -1910,6 +1914,345 @@ class USDComposer {
 
 		}
 		// opacityMode === 'opaque': ignore opacity entirely (default material state)
+
+	}
+
+	_applyOpenPBRSurface( material, shaderPath ) {
+
+		const fields = this._getAttributes( shaderPath );
+
+		const getAttrSpec = ( attrName ) => {
+
+			const attrPath = shaderPath + '.' + attrName;
+			return this.specsByPath[ attrPath ];
+
+		};
+
+		const applyTextureFromConnection = ( attrName, textureProperty, colorSpace, valueCallback ) => {
+
+			const spec = getAttrSpec( attrName );
+
+			if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
+
+				// Try each connection path until one resolves to a texture
+				for ( const connPath of spec.fields.connectionPaths ) {
+
+					const texture = this._getTextureFromOpenPBRConnection( connPath );
+
+					if ( texture ) {
+
+						texture.colorSpace = colorSpace;
+						material[ textureProperty ] = texture;
+						return true;
+
+					}
+
+				}
+
+			}
+
+			if ( fields[ attrName ] !== undefined && valueCallback ) {
+
+				valueCallback( fields[ attrName ] );
+
+			}
+
+			return false;
+
+		};
+
+		// Base color (diffuse)
+		applyTextureFromConnection(
+			'inputs:base_color',
+			'map',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
+		// Base metalness
+		applyTextureFromConnection(
+			'inputs:base_metalness',
+			'metalnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				if ( typeof value === 'number' ) {
+
+					material.metalness = value;
+
+				}
+
+			}
+		);
+
+		// Specular roughness
+		applyTextureFromConnection(
+			'inputs:specular_roughness',
+			'roughnessMap',
+			NoColorSpace,
+			( value ) => {
+
+				if ( typeof value === 'number' ) {
+
+					material.roughness = value;
+
+				}
+
+			}
+		);
+
+		// Emission color
+		const hasEmissionMap = applyTextureFromConnection(
+			'inputs:emission_color',
+			'emissiveMap',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
+		// Emission luminance/weight - multiply emissive by this factor
+		const emissionLuminance = fields[ 'inputs:emission_luminance' ];
+
+		if ( emissionLuminance !== undefined && emissionLuminance > 0 ) {
+
+			if ( hasEmissionMap ) {
+
+				material.emissiveIntensity = emissionLuminance;
+
+			} else {
+
+				// Scale the emissive color by luminance
+				material.emissive.multiplyScalar( emissionLuminance );
+
+			}
+
+		}
+
+		// Transmission (transparency)
+		const transmissionWeight = fields[ 'inputs:transmission_weight' ];
+
+		if ( transmissionWeight !== undefined && transmissionWeight > 0 ) {
+
+			material.transmission = transmissionWeight;
+			material.transparent = true;
+
+		}
+
+		// Specular IOR
+		const specularIOR = fields[ 'inputs:specular_ior' ];
+
+		if ( specularIOR !== undefined ) {
+
+			material.ior = specularIOR;
+
+		}
+
+		// Coat (clearcoat)
+		const coatWeight = fields[ 'inputs:coat_weight' ];
+
+		if ( coatWeight !== undefined && coatWeight > 0 ) {
+
+			material.clearcoat = coatWeight;
+
+			const coatRoughness = fields[ 'inputs:coat_roughness' ];
+
+			if ( coatRoughness !== undefined ) {
+
+				material.clearcoatRoughness = coatRoughness;
+
+			}
+
+		}
+
+		// Geometry normal (normal map)
+		applyTextureFromConnection(
+			'inputs:geometry_normal',
+			'normalMap',
+			NoColorSpace,
+			null
+		);
+
+	}
+
+	_getTextureFromOpenPBRConnection( connPath ) {
+
+		// connPath is like /Material/NodeGraph.outputs:baseColor or /Material/Shader.outputs:out
+		const cleanPath = connPath.replace( /<|>/g, '' );
+		const shaderPath = cleanPath.split( '.' )[ 0 ];
+		const shaderSpec = this.specsByPath[ shaderPath ];
+
+		if ( ! shaderSpec ) return null;
+
+		const attrs = this._getAttributes( shaderPath );
+		const infoId = attrs[ 'info:id' ] || shaderSpec.fields[ 'info:id' ];
+		const typeName = shaderSpec.fields.typeName;
+
+		// Handle NodeGraph - follow output connection to internal shader
+		if ( typeName === 'NodeGraph' ) {
+
+			// Get the output attribute that's connected
+			const outputName = cleanPath.split( '.' )[ 1 ]; // e.g., "outputs:baseColor"
+			const outputAttrPath = shaderPath + '.' + outputName;
+			const outputSpec = this.specsByPath[ outputAttrPath ];
+
+			if ( outputSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				// Follow the internal connection
+				return this._getTextureFromOpenPBRConnection( outputSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle arnold:image - Arnold's texture node
+		if ( infoId === 'arnold:image' ) {
+
+			const filePath = attrs[ 'inputs:filename' ];
+			if ( ! filePath ) return null;
+
+			return this._loadTextureFromPath( filePath );
+
+		}
+
+		// Handle MaterialX image nodes (ND_image_color4, ND_image_color3, etc.)
+		if ( infoId && infoId.startsWith( 'ND_image_' ) ) {
+
+			const filePath = attrs[ 'inputs:file' ];
+			if ( ! filePath ) return null;
+
+			return this._loadTextureFromPath( filePath );
+
+		}
+
+		// Handle Maya file texture - follow the inColor connection to the actual image
+		if ( infoId === 'MayaND_fileTexture_color4' ) {
+
+			const inColorPath = shaderPath + '.inputs:inColor';
+			const inColorSpec = this.specsByPath[ inColorPath ];
+
+			if ( inColorSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inColorSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle color conversion nodes - follow the input connection
+		if ( infoId && infoId.startsWith( 'ND_convert_' ) ) {
+
+			const inPath = shaderPath + '.inputs:in';
+			const inSpec = this.specsByPath[ inPath ];
+
+			if ( inSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle Arnold bump2d - follow the bump_map input
+		if ( infoId === 'arnold:bump2d' ) {
+
+			const bumpMapPath = shaderPath + '.inputs:bump_map';
+			const bumpMapSpec = this.specsByPath[ bumpMapPath ];
+
+			if ( bumpMapSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( bumpMapSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle Arnold color_correct - follow the input connection
+		if ( infoId === 'arnold:color_correct' ) {
+
+			const inputPath = shaderPath + '.inputs:input';
+			const inputSpec = this.specsByPath[ inputPath ];
+
+			if ( inputSpec?.fields?.connectionPaths?.length > 0 ) {
+
+				return this._getTextureFromOpenPBRConnection( inputSpec.fields.connectionPaths[ 0 ] );
+
+			}
+
+			return null;
+
+		}
+
+		// Handle nested shader paths (e.g., /Material/file2/cc.outputs:a)
+		// Check if parent path is an image node
+		const parentPath = shaderPath.substring( 0, shaderPath.lastIndexOf( '/' ) );
+
+		if ( parentPath ) {
+
+			const parentSpec = this.specsByPath[ parentPath ];
+
+			if ( parentSpec ) {
+
+				const parentAttrs = this._getAttributes( parentPath );
+				const parentInfoId = parentAttrs[ 'info:id' ] || parentSpec.fields[ 'info:id' ];
+
+				if ( parentInfoId === 'arnold:image' ) {
+
+					const filePath = parentAttrs[ 'inputs:filename' ];
+					if ( filePath ) return this._loadTextureFromPath( filePath );
+
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	_loadTextureFromPath( filePath ) {
+
+		if ( ! filePath ) return null;
+
+		// Check cache first
+		if ( this.textureCache[ filePath ] ) {
+
+			return this.textureCache[ filePath ];
+
+		}
+
+		const texture = this._loadTexture( filePath, null, null );
+
+		if ( texture ) {
+
+			this.textureCache[ filePath ] = texture;
+
+		}
+
+		return texture;
 
 	}
 
