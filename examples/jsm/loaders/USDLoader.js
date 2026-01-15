@@ -221,30 +221,42 @@ class USDLoader extends Loader {
 
 		}
 
+		const bytes = new Uint8Array( buffer );
+
 		// USDZ
 
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
+		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
 
-		const assets = parseAssets( zip );
+			const zip = fflate.unzipSync( bytes );
 
-		const { file, basePath } = findUSD( zip );
+			const assets = parseAssets( zip );
 
-		// Compose the main file using USDComposer (works for both USDC and USDA)
-		const composer = new USDComposer();
-		let data;
+			const { file, basePath } = findUSD( zip );
 
-		if ( isCrateFile( file ) ) {
+			const composer = new USDComposer();
+			let data;
 
-			data = usdc.parseData( file.buffer );
+			if ( isCrateFile( file ) ) {
 
-		} else {
+				data = usdc.parseData( file.buffer );
 
-			const text = fflate.strFromU8( file );
-			data = usda.parseData( text );
+			} else {
+
+				const text = fflate.strFromU8( file );
+				data = usda.parseData( text );
+
+			}
+
+			return composer.compose( data, assets, {}, basePath );
 
 		}
 
-		return composer.compose( data, assets, {}, basePath );
+		// USDA (standalone, as ArrayBuffer)
+
+		const composer = new USDComposer();
+		const text = fflate.strFromU8( bytes );
+		const data = usda.parseData( text );
+		return composer.compose( data, {} );
 
 	}
 
