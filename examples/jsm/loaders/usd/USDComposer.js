@@ -1089,6 +1089,7 @@ class USDComposer {
 		}
 
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
+		const numFaceVertices = faceVertexIndices ? faceVertexIndices.length : 0;
 
 		if ( uvs && uvs.length > 0 ) {
 
@@ -1102,6 +1103,15 @@ class USDComposer {
 			} else if ( indices && uvs.length / 2 === points.length / 3 ) {
 
 				uvData = this._expandAttribute( uvs, indices, 2 );
+
+			} else if ( triPattern && uvs.length / 2 === numFaceVertices ) {
+
+				// Per-face-vertex UVs (faceVarying, no separate indices)
+				const uvIndicesFromPattern = this._applyTriangulationPattern(
+					Array.from( { length: numFaceVertices }, ( _, i ) => i ),
+					triPattern
+				);
+				uvData = this._expandAttribute( uvs, uvIndicesFromPattern, 2 );
 
 			}
 
@@ -1124,6 +1134,15 @@ class USDComposer {
 			} else if ( indices && uvs2.length / 2 === points.length / 3 ) {
 
 				uv2Data = this._expandAttribute( uvs2, indices, 2 );
+
+			} else if ( triPattern && uvs2.length / 2 === numFaceVertices ) {
+
+				// Per-face-vertex UV2 (faceVarying, no separate indices)
+				const uv2IndicesFromPattern = this._applyTriangulationPattern(
+					Array.from( { length: numFaceVertices }, ( _, i ) => i ),
+					triPattern
+				);
+				uv2Data = this._expandAttribute( uvs2, uv2IndicesFromPattern, 2 );
 
 			}
 
