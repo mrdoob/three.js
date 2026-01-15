@@ -1050,10 +1050,19 @@ class USDComposer {
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
 
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+		const normalIndicesRaw = fields[ 'normals:indices' ] || fields[ 'primvars:normals:indices' ];
+
 		if ( normals && normals.length > 0 ) {
 
 			let normalData = normals;
-			if ( normals.length === points.length ) {
+
+			if ( normalIndicesRaw && normalIndicesRaw.length > 0 && triPattern ) {
+
+				// Indexed normals - apply triangulation pattern to indices
+				const triangulatedNormalIndices = this._applyTriangulationPattern( normalIndicesRaw, triPattern );
+				normalData = this._expandAttribute( normals, triangulatedNormalIndices, 3 );
+
+			} else if ( normals.length === points.length ) {
 
 				// Per-vertex normals
 				if ( indices && indices.length > 0 ) {
@@ -1064,7 +1073,7 @@ class USDComposer {
 
 			} else if ( triPattern ) {
 
-				// Per-face-vertex normals - use same triangulation pattern
+				// Per-face-vertex normals (no separate indices) - use same triangulation pattern
 				const normalIndices = this._applyTriangulationPattern(
 					Array.from( { length: normals.length / 3 }, ( _, i ) => i ),
 					triPattern
@@ -1203,6 +1212,7 @@ class USDComposer {
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
 		const { uvs2, uv2Indices } = this._findUV2Primvar( fields );
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
+		const normalIndicesRaw = fields[ 'normals:indices' ] || fields[ 'primvars:normals:indices' ];
 
 		const jointIndices = hasSkinning ? fields[ 'primvars:skel:jointIndices' ] : null;
 		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
@@ -1325,10 +1335,13 @@ class USDComposer {
 		const origUv2Indices = uv2Indices ? this._applyTriangulationPattern( uv2Indices, triPattern ) : null;
 
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const hasIndexedNormals = normals && normalIndicesRaw && normalIndicesRaw.length > 0;
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
-		const origNormalIndices = hasFaceVaryingNormals
-			? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
-			: null;
+		const origNormalIndices = hasIndexedNormals
+			? this._applyTriangulationPattern( normalIndicesRaw, triPattern )
+			: ( hasFaceVaryingNormals
+				? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
+				: null );
 
 		// Build reordered vertex data
 		const vertexCount = triangleCount * 3;
