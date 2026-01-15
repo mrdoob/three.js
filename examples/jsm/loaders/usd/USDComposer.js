@@ -1850,11 +1850,9 @@ class USDComposer {
 
 		// Project hole contours to 2D
 		const holes2D = [];
-		const holes3D = [];
 
 		for ( const holeIndices of holeContours ) {
 
-			const hole3D = [];
 			const hole2D = [];
 
 			for ( const idx of holeIndices ) {
@@ -1864,12 +1862,10 @@ class USDComposer {
 					points[ idx * 3 + 1 ],
 					points[ idx * 3 + 2 ]
 				);
-				hole3D.push( p );
 				hole2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
 
 			}
 
-			holes3D.push( hole3D );
 			holes2D.push( hole2D );
 
 		}
