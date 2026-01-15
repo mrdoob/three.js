@@ -77,17 +77,23 @@ class TorusGeometry extends BufferGeometry {
 
 				const u = i / tubularSegments * arc;
 
+				// vertex
+
 				vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
 				vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
 				vertex.z = tube * Math.sin( v );
 
 				vertices.push( vertex.x, vertex.y, vertex.z );
 
+				// normal
+
 				center.x = radius * Math.cos( u );
 				center.y = radius * Math.sin( u );
-
 				normal.subVectors( vertex, center ).normalize();
+
 				normals.push( normal.x, normal.y, normal.z );
+
+				// uv
 
 				uvs.push( i / tubularSegments );
 				uvs.push( j / radialSegments );
