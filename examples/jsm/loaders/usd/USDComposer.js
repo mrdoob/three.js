@@ -3340,6 +3340,85 @@ class USDComposer {
 
 			}
 
+			// Check for animated xformOp:transform (matrix animations)
+			// These can have suffixes like xformOp:transform:transform
+			const properties = spec.fields?.properties || [];
+			for ( const prop of properties ) {
+
+				if ( ! prop.startsWith( 'xformOp:transform' ) ) continue;
+
+				const transformPath = path + '.' + prop;
+				const transformSpec = this.specsByPath[ transformPath ];
+
+				if ( ! transformSpec?.fields?.timeSamples ) continue;
+
+				const { times, values } = transformSpec.fields.timeSamples;
+				const positionTimes = [];
+				const positionValues = [];
+				const quaternionTimes = [];
+				const quaternionValues = [];
+				const scaleTimes = [];
+				const scaleValues = [];
+
+				const matrix = new Matrix4();
+				const position = new Vector3();
+				const quaternion = new Quaternion();
+				const scale = new Vector3();
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					const m = values[ i ];
+					if ( ! m || m.length < 16 ) continue;
+
+					const t = times[ i ] / this.fps;
+
+					// USD matrices are row-major, Three.js is column-major
+					matrix.set(
+						m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+						m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+						m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+						m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+					);
+
+					matrix.decompose( position, quaternion, scale );
+
+					positionTimes.push( t );
+					positionValues.push( position.x, position.y, position.z );
+
+					quaternionTimes.push( t );
+					quaternionValues.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+
+					scaleTimes.push( t );
+					scaleValues.push( scale.x, scale.y, scale.z );
+
+				}
+
+				if ( positionTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.position',
+						new Float32Array( positionTimes ),
+						new Float32Array( positionValues )
+					) );
+
+					tracks.push( new QuaternionKeyframeTrack(
+						objectName + '.quaternion',
+						new Float32Array( quaternionTimes ),
+						new Float32Array( quaternionValues )
+					) );
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.scale',
+						new Float32Array( scaleTimes ),
+						new Float32Array( scaleValues )
+					) );
+
+				}
+
+				break; // Only process first transform op
+
+			}
+
 		}
 
 		return tracks;
