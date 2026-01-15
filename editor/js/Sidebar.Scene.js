@@ -259,7 +259,6 @@ function SidebarScene( editor ) {
 	const environmentType = new UISelect().setOptions( {
 
 		'Default': 'Default',
-		'Background': 'Background',
 		'Equirectangular': 'Equirect',
 		'None': 'None'
 
@@ -417,62 +416,41 @@ function SidebarScene( editor ) {
 
 		}
 
-		if ( scene.background ) {
+		backgroundType.setValue( editor.backgroundType );
 
-			if ( scene.background.isColor ) {
+		switch ( editor.backgroundType ) {
 
-				backgroundType.setValue( 'Color' );
+			case 'Color':
 				backgroundColor.setHexValue( scene.background.getHex() );
+				break;
 
-			} else if ( scene.background.isTexture ) {
-
-				if ( scene.background.mapping === THREE.EquirectangularReflectionMapping ) {
-
-					backgroundType.setValue( 'Equirectangular' );
-					backgroundEquirectangularTexture.setValue( scene.background );
-					backgroundBlurriness.setValue( scene.backgroundBlurriness );
-					backgroundIntensity.setValue( scene.backgroundIntensity );
-
-				} else {
-
-					backgroundType.setValue( 'Texture' );
-					backgroundTexture.setValue( scene.background );
-
-				}
-
+			case 'Texture':
+				backgroundTexture.setValue( scene.background );
 				backgroundColorSpace.setValue( scene.background.colorSpace );
+				break;
 
-			}
+			case 'Equirectangular':
+				backgroundEquirectangularTexture.setValue( scene.background );
+				backgroundBlurriness.setValue( scene.backgroundBlurriness );
+				backgroundIntensity.setValue( scene.backgroundIntensity );
+				backgroundColorSpace.setValue( scene.background.colorSpace );
+				break;
 
-		} else {
-
-			backgroundType.setValue( 'Default' );
-			backgroundTexture.setValue( null );
-			backgroundEquirectangularTexture.setValue( null );
-			backgroundColorSpace.setValue( THREE.NoColorSpace );
+			default:
+				backgroundTexture.setValue( null );
+				backgroundEquirectangularTexture.setValue( null );
+				backgroundColorSpace.setValue( THREE.NoColorSpace );
 
 		}
 
-		if ( scene.environment ) {
+		environmentType.setValue( editor.environmentType );
 
-			if ( scene.background && scene.background.isTexture && scene.background.uuid === scene.environment.uuid ) {
+		if ( editor.environmentType === 'Equirectangular' ) {
 
-				environmentType.setValue( 'Background' );
-
-			} else if ( scene.environment.mapping === THREE.EquirectangularReflectionMapping ) {
-
-				environmentType.setValue( 'Equirectangular' );
-				environmentEquirectangularTexture.setValue( scene.environment );
-
-			} else if ( scene.environment.isRenderTargetTexture === true ) {
-
-				environmentType.setValue( 'Default' );
-
-			}
+			environmentEquirectangularTexture.setValue( scene.environment );
 
 		} else {
 
-			environmentType.setValue( 'Default' );
 			environmentEquirectangularTexture.setValue( null );
 
 		}
@@ -524,8 +502,6 @@ function SidebarScene( editor ) {
 	signals.editorCleared.add( refreshUI );
 
 	signals.sceneGraphChanged.add( refreshUI );
-
-	signals.refreshSidebarEnvironment.add( refreshUI );
 
 	signals.objectChanged.add( function ( object ) {
 

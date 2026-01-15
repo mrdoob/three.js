@@ -68,6 +68,7 @@ const assets = [
 	'../examples/jsm/interactive/HTMLMesh.js',
 	'../examples/jsm/interactive/InteractiveGroup.js',
 
+	'../examples/jsm/environments/ColorEnvironment.js',
 	'../examples/jsm/environments/RoomEnvironment.js',
 
 	'../examples/jsm/exporters/DRACOExporter.js',
@@ -78,6 +79,7 @@ const assets = [
 	'../examples/jsm/exporters/USDZExporter.js',
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
+	'../examples/jsm/helpers/ViewHelper.js',
 
 	'../examples/jsm/utils/BufferGeometryUtils.js',
 

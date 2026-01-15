@@ -84,7 +84,6 @@ function Editor() {
 
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		refreshSidebarEnvironment: new Signal(),
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
@@ -111,6 +110,9 @@ function Editor() {
 
 	this.sceneHelpers = new THREE.Scene();
 	this.sceneHelpers.add( new THREE.HemisphereLight( 0xffffff, 0x888888, 2 ) );
+
+	this.backgroundType = 'Default';
+	this.environmentType = 'Default';
 
 	this.object = {};
 	this.geometries = {};
@@ -161,6 +163,8 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = true;
 		this.signals.sceneGraphChanged.dispatch();
+
+		this.signals.sceneEnvironmentChanged.dispatch( this.environmentType, scene.environment );
 
 	},
 
@@ -652,6 +656,9 @@ Editor.prototype = {
 
 		this.deselect();
 
+		this.backgroundType = 'Default';
+		this.environmentType = 'Default';
+
 		this.signals.editorCleared.dispatch();
 
 	},
@@ -684,17 +691,12 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		this.setScene( await loader.parseAsync( json.scene ) );
+		const scene = await loader.parseAsync( json.scene );
 
-		if ( json.environment == null ||
-			 json.environment === 'Default' ||
-			 json.environment === 'Room' /* COMPAT */ ||
-			 json.environment === 'ModelViewer' /* COMPAT */ ) {
+		this.backgroundType = json.backgroundType || 'Default';
+		this.environmentType = json.environmentType || 'Default';
 
-			this.signals.sceneEnvironmentChanged.dispatch( 'Default' );
-			this.signals.refreshSidebarEnvironment.dispatch();
-
-		}
+		this.setScene( scene );
 
 	},
 
@@ -717,18 +719,6 @@ Editor.prototype = {
 
 		}
 
-		// honor neutral environment
-
-		let environment = null;
-
-		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
-
-			environment = 'Default';
-
-		}
-
-		//
-
 		return {
 
 			metadata: {},
@@ -743,7 +733,8 @@ Editor.prototype = {
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
-			environment: environment
+			backgroundType: this.backgroundType,
+			environmentType: this.environmentType
 
 		};
 
