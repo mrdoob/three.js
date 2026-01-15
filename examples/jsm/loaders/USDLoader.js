@@ -9,7 +9,7 @@ import { USDCParser } from './usd/USDCParser.js';
 import { USDComposer } from './usd/USDComposer.js';
 
 /**
- * A loader for the USD format (USDA, USDC, USDZ).
+ * A loader for the USD format (USD, USDA, USDC, USDZ).
  *
  * Supports both ASCII (USDA) and binary (USDC) USD files, as well as
  * USDZ archives containing either format.
