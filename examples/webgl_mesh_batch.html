@@ -118,18 +118,34 @@
 
 		function initGeometries() {
 
-			geometries = [
-				new THREE.ConeGeometry( 1.0, 2.0 ),
-				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-				new THREE.SphereGeometry( 1.0, 16, 8 ),
-			];
+			const cone = new THREE.ConeGeometry( 1.0, 2.0 );
+			const box = new THREE.BoxGeometry( 2.0, 2.0, 2.0 );
+			const sphere = new THREE.SphereGeometry( 1.0, 16, 8 );
+
+			geometries = [ cone, box, sphere ];
+
+			for ( const geometry of geometries ) {
+
+				// add vertex colors for testing
+				const count = geometry.getAttribute( 'position' ).count;
+				const attribute = new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 );
+				geometry.setAttribute( 'color', attribute );
+
+				for ( let i = 0, l = attribute.array.length; i < l; ++ i ) {
+
+					attribute.array[ i ] = 1.0;
+
+				}
+
+			}
 
 		}
 
 		function createMaterial() {
 
 			return new THREE.MeshBasicMaterial( {
-				transparent: true
+				transparent: true,
+				vertexColors: true
 			} );
 
 		}
