@@ -2300,6 +2300,22 @@ class USDComposer {
 
 		}
 
+		// Specular color
+		applyTextureFromConnection(
+			'inputs:specularColor',
+			'specularColorMap',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
 		// Clearcoat
 		if ( fields[ 'inputs:clearcoat' ] !== undefined ) {
 
