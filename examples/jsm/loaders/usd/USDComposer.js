@@ -1576,15 +1576,18 @@ class USDComposer {
 
 			if ( holes && holes.length > 0 && points && points.length > 0 ) {
 
-				// Triangulate face with holes
+				// Triangulate face with holes using vertex -> face-vertex mapping
+				const vertexToFaceVertex = new Map();
+
 				const faceIndices = [];
 				for ( let j = 0; j < count; j ++ ) {
 
-					faceIndices.push( indices[ offset + j ] );
+					const vertIdx = indices[ offset + j ];
+					faceIndices.push( vertIdx );
+					vertexToFaceVertex.set( vertIdx, offset + j );
 
 				}
 
-				// Collect hole contours
 				const holeContours = [];
 				for ( const holeFaceIdx of holes ) {
 
@@ -1593,7 +1596,9 @@ class USDComposer {
 					const holeIndices = [];
 					for ( let j = 0; j < holeCount; j ++ ) {
 
-						holeIndices.push( indices[ holeOffset + j ] );
+						const vertIdx = indices[ holeOffset + j ];
+						holeIndices.push( vertIdx );
+						vertexToFaceVertex.set( vertIdx, holeOffset + j );
 
 					}
 
@@ -1606,9 +1611,11 @@ class USDComposer {
 				for ( const tri of triangles ) {
 
 					triangulated.push( tri[ 0 ], tri[ 1 ], tri[ 2 ] );
-					// For faces with holes, we use -1 as pattern since vertex mapping is complex
-					// This will trigger per-vertex normal/UV computation
-					pattern.push( - 1, - 1, - 1 );
+					pattern.push(
+						vertexToFaceVertex.get( tri[ 0 ] ),
+						vertexToFaceVertex.get( tri[ 1 ] ),
+						vertexToFaceVertex.get( tri[ 2 ] )
+					);
 
 				}
 
