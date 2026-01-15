@@ -58,6 +58,7 @@ export { default as EventNode } from './utils/EventNode.js';
 
 // math
 export { default as BitcastNode } from './math/BitcastNode.js';
+export { default as ConditionalNode } from './math/ConditionalNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';

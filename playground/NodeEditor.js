@@ -5,6 +5,7 @@ import { FileEditor } from './editors/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
 import { init, ClassLib, getNodeEditorClass, getNodeList } from './NodeEditorLib.js';
 import { SplitscreenManager } from './SplitscreenManager.js';
+import { getBuiltinMaterialTypes } from './BuiltinGraphExtractor.js';
 
 init();
 
@@ -48,6 +49,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		this.nodesContext = null;
 		this.examplesContext = null;
+		this.builtinGraphsContext = null;
 
 		this._initSplitview();
 		this._initUpload();
@@ -56,6 +58,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this._initSearch();
 		this._initNodesContext();
 		this._initExamplesContext();
+		this._initBuiltinGraphsContext();
 		this._initShortcuts();
 		this._initParams();
 
@@ -269,6 +272,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		const splitscreenButton = new ButtonInput().setIcon( 'ti ti-layout-sidebar-right-expand' ).setToolTip( 'Splitscreen' );
 		const menuButton = new ButtonInput().setIcon( 'ti ti-apps' ).setToolTip( 'Add' );
 		const examplesButton = new ButtonInput().setIcon( 'ti ti-file-symlink' ).setToolTip( 'Examples' );
+		const builtinGraphsButton = new ButtonInput().setIcon( 'ti ti-package' ).setToolTip( 'Built-in Graphs' );
 		const newButton = new ButtonInput().setIcon( 'ti ti-file' ).setToolTip( 'New' );
 		const openButton = new ButtonInput().setIcon( 'ti ti-upload' ).setToolTip( 'Open' );
 		const saveButton = new ButtonInput().setIcon( 'ti ti-download' ).setToolTip( 'Save' );
@@ -287,6 +291,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
+		builtinGraphsButton.onClick( () => this.builtinGraphsContext.open() );
 
 		newButton.onClick( () => {
 
@@ -335,6 +340,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 			.add( splitscreenButton )
 			.add( newButton )
 			.add( examplesButton )
+			.add( builtinGraphsButton )
 			.add( openButton )
 			.add( saveButton )
 			.add( menuButton );
@@ -402,6 +408,74 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this.examplesContext = context;
 
 	}
+
+	_initBuiltinGraphsContext() {
+
+		const context = new ContextMenu();
+
+		const materialTypes = getBuiltinMaterialTypes();
+
+		const onClickMaterial = async ( button ) => {
+
+			this.builtinGraphsContext.hide();
+
+			const materialType = button.getExtra();
+			const materialInfo = materialTypes.find( m => m.name === materialType );
+
+			if ( ! materialInfo ) return;
+
+			try {
+
+				// Get the Material Editor class
+				const editorClassName = materialInfo.editorClass;
+				const materialEditorClass = ClassLib[ editorClassName ];
+
+				if ( ! materialEditorClass ) {
+
+					this.tips.error( `Material editor "${editorClassName}" not found` );
+					return;
+
+				}
+
+				// Create a Material Editor instance
+				// This will automatically create the material and set up the node graph
+				const materialEditor = new materialEditorClass();
+
+				// Position the editor in the center of the canvas
+				const canvas = this.canvas;
+				materialEditor.setPosition(
+					( canvas.width / 2 ) - 150,
+					( canvas.height / 2 ) - 100
+				);
+
+				// Add to canvas
+				this.add( materialEditor );
+
+				this.tips.success( `Loaded ${materialInfo.label} graph` );
+
+			} catch ( e ) {
+
+				console.error( 'Failed to load built-in graph:', e );
+				this.tips.error( `Failed to load ${materialInfo.label}: ${e.message}` );
+
+			}
+
+		};
+
+		for ( const materialInfo of materialTypes ) {
+
+			context.add( new ButtonInput( materialInfo.label )
+				.setIcon( materialInfo.icon )
+				.onClick( onClickMaterial )
+				.setExtra( materialInfo.name )
+			);
+
+		}
+
+		this.builtinGraphsContext = context;
+
+	}
+
 
 	_initShortcuts() {
 
