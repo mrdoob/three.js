@@ -496,10 +496,10 @@ class RenderVideoDialog {
 			} );
 
 			const qualityToBitrate = {
-				'low': 2_000_000,
-				'medium': 5_000_000,
-				'high': 10_000_000,
-				'ultra': 20_000_000
+				'low': 2e6,
+				'medium': 5e6, 
+				'high': 10e6,
+				'ultra': 20e6
 			};
 
 			videoEncoder.configure( {
