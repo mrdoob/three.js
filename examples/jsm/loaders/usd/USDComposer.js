@@ -2329,25 +2329,33 @@ class USDComposer {
 		}
 
 		// Opacity and opacity modes
-		const opacity = fields[ 'inputs:opacity' ] !== undefined ? fields[ 'inputs:opacity' ] : 1.0;
 		const opacityThreshold = fields[ 'inputs:opacityThreshold' ] !== undefined ? fields[ 'inputs:opacityThreshold' ] : 0.0;
-		const opacityMode = fields[ 'inputs:opacityMode' ] || 'transparent';
 
-		if ( opacityMode === 'presence' ) {
+		// Check if opacity is connected to a texture (e.g., diffuse texture's alpha)
+		const opacitySpec = getAttrSpec( 'inputs:opacity' );
+		const hasOpacityConnection = opacitySpec?.fields?.connectionPaths?.length > 0;
 
-			// Presence mode: use alpha testing (cutout transparency)
-			material.alphaTest = opacityThreshold;
-			material.transparent = false;
+		if ( hasOpacityConnection ) {
 
-			if ( opacity < 1.0 ) {
+			// Opacity from texture alpha - use the diffuse map's alpha channel
+			if ( opacityThreshold > 0 ) {
 
-				material.opacity = opacity;
+				// Alpha cutoff mode
+				material.alphaTest = opacityThreshold;
+				material.transparent = false;
+
+			} else {
+
+				// Alpha blend mode
+				material.transparent = true;
 
 			}
 
-		} else if ( opacityMode === 'transparent' ) {
+		} else {
 
-			// Transparent mode: traditional alpha blending
+			// Direct opacity value
+			const opacity = fields[ 'inputs:opacity' ] !== undefined ? fields[ 'inputs:opacity' ] : 1.0;
+
 			if ( opacity < 1.0 ) {
 
 				material.transparent = true;
@@ -2356,7 +2364,6 @@ class USDComposer {
 			}
 
 		}
-		// opacityMode === 'opaque': ignore opacity entirely (default material state)
 
 	}
 
