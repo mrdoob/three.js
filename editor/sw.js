@@ -235,7 +235,7 @@ self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( cacheName );
 
-	assets.forEach( async function ( asset ) {
+	await Promise.all( assets.map( async function ( asset ) {
 
 		try {
 
@@ -247,7 +247,27 @@ self.addEventListener( 'install', async function () {
 
 		}
 
-	} );
+	} ) );
+
+	self.skipWaiting();
+
+} );
+
+self.addEventListener( 'activate', async function ( event ) {
+
+	event.waitUntil(
+		caches.keys().then( function ( names ) {
+
+			return Promise.all(
+				names.filter( name => name !== cacheName ).map( name => caches.delete( name ) )
+			);
+
+		} ).then( function () {
+
+			self.clients.claim();
+
+		} )
+	);
 
 } );
 
