@@ -14,6 +14,7 @@ import {
 	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
+	ShapeUtils,
 	SkinnedMesh,
 	Skeleton,
 	Bone,
@@ -1024,10 +1025,20 @@ class USDComposer {
 		const faceVertexIndices = fields[ 'faceVertexIndices' ];
 		const faceVertexCounts = fields[ 'faceVertexCounts' ];
 
+		// Parse polygon holes (Arnold format: [holeFaceIdx, parentFaceIdx, ...])
+		const polygonHoles = fields[ 'primvars:arnold:polygon_holes' ];
+		const holeMap = this._buildHoleMap( polygonHoles );
+
+		// Compute triangulation pattern once using actual vertex positions
+		// This pattern will be reused for normals, UVs, etc.
 		let indices = faceVertexIndices;
+		let triPattern = null;
+
 		if ( faceVertexCounts && faceVertexCounts.length > 0 ) {
 
-			indices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
+			const result = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
+			indices = result.indices;
+			triPattern = result.pattern;
 
 		}
 
@@ -1053,12 +1064,12 @@ class USDComposer {
 
 				}
 
-			} else if ( indices ) {
+			} else if ( triPattern ) {
 
-				// Per-face-vertex normals
-				const normalIndices = this._triangulateIndices(
+				// Per-face-vertex normals - use same triangulation pattern
+				const normalIndices = this._applyTriangulationPattern(
 					Array.from( { length: normals.length / 3 }, ( _, i ) => i ),
-					faceVertexCounts
+					triPattern
 				);
 				normalData = this._expandAttribute( normals, normalIndices, 3 );
 
@@ -1078,9 +1089,9 @@ class USDComposer {
 
 			let uvData = uvs;
 
-			if ( uvIndices && uvIndices.length > 0 ) {
+			if ( uvIndices && uvIndices.length > 0 && triPattern ) {
 
-				const triangulatedUvIndices = this._triangulateIndices( uvIndices, faceVertexCounts );
+				const triangulatedUvIndices = this._applyTriangulationPattern( uvIndices, triPattern );
 				uvData = this._expandAttribute( uvs, triangulatedUvIndices, 2 );
 
 			} else if ( indices && uvs.length / 2 === points.length / 3 ) {
@@ -1100,9 +1111,9 @@ class USDComposer {
 
 			let uv2Data = uvs2;
 
-			if ( uv2Indices && uv2Indices.length > 0 ) {
+			if ( uv2Indices && uv2Indices.length > 0 && triPattern ) {
 
-				const triangulatedUv2Indices = this._triangulateIndices( uv2Indices, faceVertexCounts );
+				const triangulatedUv2Indices = this._applyTriangulationPattern( uv2Indices, triPattern );
 				uv2Data = this._expandAttribute( uvs2, triangulatedUv2Indices, 2 );
 
 			} else if ( indices && uvs2.length / 2 === points.length / 3 ) {
@@ -1186,6 +1197,12 @@ class USDComposer {
 
 		if ( ! faceVertexCounts || faceVertexCounts.length === 0 ) return geometry;
 
+		// Parse polygon holes (Arnold format: [holeFaceIdx, parentFaceIdx, ...])
+		const polygonHoles = fields[ 'primvars:arnold:polygon_holes' ];
+		const holeMap = this._buildHoleMap( polygonHoles );
+		const holeFaces = holeMap.holeFaces;
+		const parentToHoles = holeMap.parentToHoles;
+
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
 		const { uvs2, uv2Indices } = this._findUV2Primvar( fields );
 		const normals = fields[ 'normals' ] || fields[ 'primvars:normals' ];
@@ -1194,15 +1211,38 @@ class USDComposer {
 		const jointWeights = hasSkinning ? fields[ 'primvars:skel:jointWeights' ] : null;
 		const elementSize = fields[ 'primvars:skel:jointIndices:elementSize' ] || 4;
 
-		// Build face-to-triangle mapping
+		// Build face-to-triangle mapping (accounting for holes)
 		const faceTriangleOffset = [];
 		let triangleCount = 0;
 
 		for ( let i = 0; i < faceVertexCounts.length; i ++ ) {
 
 			faceTriangleOffset.push( triangleCount );
+
+			// Skip hole faces - they're triangulated with their parent
+			if ( holeFaces.has( i ) ) continue;
+
 			const count = faceVertexCounts[ i ];
-			if ( count >= 3 ) triangleCount += count - 2;
+			const holes = parentToHoles.get( i );
+
+			if ( holes && holes.length > 0 ) {
+
+				// For faces with holes, count triangles based on total vertices
+				// Earcut produces (total_vertices - 2) triangles for any polygon including holes
+				let totalVerts = count;
+				for ( const holeIdx of holes ) {
+
+					totalVerts += faceVertexCounts[ holeIdx ];
+
+				}
+
+				triangleCount += totalVerts - 2;
+
+			} else if ( count >= 3 ) {
+
+				triangleCount += count - 2;
+
+			}
 
 		}
 
@@ -1282,15 +1322,15 @@ class USDComposer {
 
 		}
 
-		// Triangulate original data
-		const origIndices = this._triangulateIndices( faceVertexIndices, faceVertexCounts );
-		const origUvIndices = uvIndices ? this._triangulateIndices( uvIndices, faceVertexCounts ) : null;
-		const origUv2Indices = uv2Indices ? this._triangulateIndices( uv2Indices, faceVertexCounts ) : null;
+		// Triangulate original data using consistent pattern
+		const { indices: origIndices, pattern: triPattern } = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
+		const origUvIndices = uvIndices ? this._applyTriangulationPattern( uvIndices, triPattern ) : null;
+		const origUv2Indices = uv2Indices ? this._applyTriangulationPattern( uv2Indices, triPattern ) : null;
 
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
 		const origNormalIndices = hasFaceVaryingNormals
-			? this._triangulateIndices( Array.from( { length: numFaceVertices }, ( _, i ) => i ), faceVertexCounts )
+			? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
 			: null;
 
 		// Build reordered vertex data
@@ -1465,6 +1505,383 @@ class USDComposer {
 		const uvs2 = fields[ 'primvars:st1' ];
 		const uv2Indices = fields[ 'primvars:st1:indices' ];
 		return { uvs2, uv2Indices };
+
+	}
+
+	_buildHoleMap( polygonHoles ) {
+
+		// polygonHoles is in Arnold format: [holeFaceIdx, parentFaceIdx, holeFaceIdx, parentFaceIdx, ...]
+		// Returns a map: parentFaceIdx -> [holeFaceIdx1, holeFaceIdx2, ...]
+		// Also returns a set of hole face indices to skip during triangulation
+		if ( ! polygonHoles || polygonHoles.length === 0 ) {
+
+			return { parentToHoles: new Map(), holeFaces: new Set() };
+
+		}
+
+		const parentToHoles = new Map();
+		const holeFaces = new Set();
+
+		for ( let i = 0; i < polygonHoles.length; i += 2 ) {
+
+			const holeFaceIdx = polygonHoles[ i ];
+			const parentFaceIdx = polygonHoles[ i + 1 ];
+
+			holeFaces.add( holeFaceIdx );
+
+			if ( ! parentToHoles.has( parentFaceIdx ) ) {
+
+				parentToHoles.set( parentFaceIdx, [] );
+
+			}
+
+			parentToHoles.get( parentFaceIdx ).push( holeFaceIdx );
+
+		}
+
+		return { parentToHoles, holeFaces };
+
+	}
+
+	_triangulateIndicesWithPattern( indices, counts, points = null, holeMap = null ) {
+
+		const triangulated = [];
+		const pattern = []; // Stores face-local indices for each triangle vertex
+
+		// Build face offset lookup for accessing hole face data
+		const faceOffsets = [];
+		let offsetAccum = 0;
+		for ( let i = 0; i < counts.length; i ++ ) {
+
+			faceOffsets.push( offsetAccum );
+			offsetAccum += counts[ i ];
+
+		}
+
+		const parentToHoles = holeMap?.parentToHoles || new Map();
+		const holeFaces = holeMap?.holeFaces || new Set();
+
+		let offset = 0;
+
+		for ( let i = 0; i < counts.length; i ++ ) {
+
+			const count = counts[ i ];
+
+			// Skip faces that are holes - they will be triangulated with their parent
+			if ( holeFaces.has( i ) ) {
+
+				offset += count;
+				continue;
+
+			}
+
+			// Check if this face has holes
+			const holes = parentToHoles.get( i );
+
+			if ( holes && holes.length > 0 && points && points.length > 0 ) {
+
+				// Triangulate face with holes
+				const faceIndices = [];
+				for ( let j = 0; j < count; j ++ ) {
+
+					faceIndices.push( indices[ offset + j ] );
+
+				}
+
+				// Collect hole contours
+				const holeContours = [];
+				for ( const holeFaceIdx of holes ) {
+
+					const holeOffset = faceOffsets[ holeFaceIdx ];
+					const holeCount = counts[ holeFaceIdx ];
+					const holeIndices = [];
+					for ( let j = 0; j < holeCount; j ++ ) {
+
+						holeIndices.push( indices[ holeOffset + j ] );
+
+					}
+
+					holeContours.push( holeIndices );
+
+				}
+
+				const triangles = this._triangulateNGonWithHoles( faceIndices, holeContours, points );
+
+				for ( const tri of triangles ) {
+
+					triangulated.push( tri[ 0 ], tri[ 1 ], tri[ 2 ] );
+					// For faces with holes, we use -1 as pattern since vertex mapping is complex
+					// This will trigger per-vertex normal/UV computation
+					pattern.push( - 1, - 1, - 1 );
+
+				}
+
+			} else if ( count === 3 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ]
+				);
+				pattern.push( offset, offset + 1, offset + 2 );
+
+			} else if ( count === 4 ) {
+
+				triangulated.push(
+					indices[ offset ],
+					indices[ offset + 1 ],
+					indices[ offset + 2 ],
+					indices[ offset ],
+					indices[ offset + 2 ],
+					indices[ offset + 3 ]
+				);
+				pattern.push(
+					offset, offset + 1, offset + 2,
+					offset, offset + 2, offset + 3
+				);
+
+			} else if ( count > 4 ) {
+
+				// Use ear-clipping for complex n-gons if we have vertex positions
+				if ( points && points.length > 0 ) {
+
+					const faceIndices = [];
+					for ( let j = 0; j < count; j ++ ) {
+
+						faceIndices.push( indices[ offset + j ] );
+
+					}
+
+					const triangles = this._triangulateNGon( faceIndices, points );
+
+					for ( const tri of triangles ) {
+
+						triangulated.push( tri[ 0 ], tri[ 1 ], tri[ 2 ] );
+						// Find local indices within the face
+						pattern.push(
+							offset + faceIndices.indexOf( tri[ 0 ] ),
+							offset + faceIndices.indexOf( tri[ 1 ] ),
+							offset + faceIndices.indexOf( tri[ 2 ] )
+						);
+
+					}
+
+				} else {
+
+					// Fallback to fan triangulation
+					for ( let j = 1; j < count - 1; j ++ ) {
+
+						triangulated.push(
+							indices[ offset ],
+							indices[ offset + j ],
+							indices[ offset + j + 1 ]
+						);
+						pattern.push( offset, offset + j, offset + j + 1 );
+
+					}
+
+				}
+
+			}
+
+			offset += count;
+
+		}
+
+		return { indices: triangulated, pattern };
+
+	}
+
+	_applyTriangulationPattern( indices, pattern ) {
+
+		const result = [];
+		for ( let i = 0; i < pattern.length; i ++ ) {
+
+			result.push( indices[ pattern[ i ] ] );
+
+		}
+
+		return result;
+
+	}
+
+	_triangulateNGon( faceIndices, points ) {
+
+		// Project 3D polygon to 2D for triangulation using Newell's method for normal
+		const contour2D = [];
+		const contour3D = [];
+
+		for ( const idx of faceIndices ) {
+
+			contour3D.push( new Vector3(
+				points[ idx * 3 ],
+				points[ idx * 3 + 1 ],
+				points[ idx * 3 + 2 ]
+			) );
+
+		}
+
+		// Calculate polygon normal using Newell's method
+		const normal = new Vector3();
+		for ( let i = 0; i < contour3D.length; i ++ ) {
+
+			const curr = contour3D[ i ];
+			const next = contour3D[ ( i + 1 ) % contour3D.length ];
+			normal.x += ( curr.y - next.y ) * ( curr.z + next.z );
+			normal.y += ( curr.z - next.z ) * ( curr.x + next.x );
+			normal.z += ( curr.x - next.x ) * ( curr.y + next.y );
+
+		}
+
+		normal.normalize();
+
+		// Create tangent basis for projection
+		const tangent = new Vector3();
+		const bitangent = new Vector3();
+
+		if ( Math.abs( normal.y ) > 0.9 ) {
+
+			tangent.set( 1, 0, 0 );
+
+		} else {
+
+			tangent.set( 0, 1, 0 );
+
+		}
+
+		bitangent.crossVectors( normal, tangent ).normalize();
+		tangent.crossVectors( bitangent, normal ).normalize();
+
+		// Project to 2D
+		for ( const p of contour3D ) {
+
+			contour2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+		}
+
+		// Triangulate using ShapeUtils
+		const triangles = ShapeUtils.triangulateShape( contour2D, [] );
+
+		// Map back to original indices
+		const result = [];
+		for ( const tri of triangles ) {
+
+			result.push( [
+				faceIndices[ tri[ 0 ] ],
+				faceIndices[ tri[ 1 ] ],
+				faceIndices[ tri[ 2 ] ]
+			] );
+
+		}
+
+		return result;
+
+	}
+
+	_triangulateNGonWithHoles( outerIndices, holeContours, points ) {
+
+		// Project 3D polygon with holes to 2D for triangulation
+		const outer3D = [];
+
+		for ( const idx of outerIndices ) {
+
+			outer3D.push( new Vector3(
+				points[ idx * 3 ],
+				points[ idx * 3 + 1 ],
+				points[ idx * 3 + 2 ]
+			) );
+
+		}
+
+		// Calculate polygon normal using Newell's method
+		const normal = new Vector3();
+		for ( let i = 0; i < outer3D.length; i ++ ) {
+
+			const curr = outer3D[ i ];
+			const next = outer3D[ ( i + 1 ) % outer3D.length ];
+			normal.x += ( curr.y - next.y ) * ( curr.z + next.z );
+			normal.y += ( curr.z - next.z ) * ( curr.x + next.x );
+			normal.z += ( curr.x - next.x ) * ( curr.y + next.y );
+
+		}
+
+		normal.normalize();
+
+		// Create tangent basis for projection
+		const tangent = new Vector3();
+		const bitangent = new Vector3();
+
+		if ( Math.abs( normal.y ) > 0.9 ) {
+
+			tangent.set( 1, 0, 0 );
+
+		} else {
+
+			tangent.set( 0, 1, 0 );
+
+		}
+
+		bitangent.crossVectors( normal, tangent ).normalize();
+		tangent.crossVectors( bitangent, normal ).normalize();
+
+		// Project outer contour to 2D
+		const outer2D = [];
+		for ( const p of outer3D ) {
+
+			outer2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+		}
+
+		// Project hole contours to 2D
+		const holes2D = [];
+		const holes3D = [];
+
+		for ( const holeIndices of holeContours ) {
+
+			const hole3D = [];
+			const hole2D = [];
+
+			for ( const idx of holeIndices ) {
+
+				const p = new Vector3(
+					points[ idx * 3 ],
+					points[ idx * 3 + 1 ],
+					points[ idx * 3 + 2 ]
+				);
+				hole3D.push( p );
+				hole2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+
+			}
+
+			holes3D.push( hole3D );
+			holes2D.push( hole2D );
+
+		}
+
+		// Build combined index array: outer contour followed by all holes
+		const allIndices = [ ...outerIndices ];
+		for ( const holeIndices of holeContours ) {
+
+			allIndices.push( ...holeIndices );
+
+		}
+
+		// Triangulate using ShapeUtils with holes
+		const triangles = ShapeUtils.triangulateShape( outer2D, holes2D );
+
+		// Map back to original vertex indices
+		const result = [];
+		for ( const tri of triangles ) {
+
+			result.push( [
+				allIndices[ tri[ 0 ] ],
+				allIndices[ tri[ 1 ] ],
+				allIndices[ tri[ 2 ] ]
+			] );
+
+		}
+
+		return result;
 
 	}
 
