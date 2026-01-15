@@ -103,7 +103,7 @@ class USDAParser {
 
 				target = stack[ stack.length - 1 ];
 
-			} else {
+			} else if ( line.trim() ) {
 
 				string = line.trim();
 
@@ -660,12 +660,12 @@ class USDAParser {
 		}
 
 		// Quaternion types (quatf, quatd, quath)
+		// Text format is (w, x, y, z), convert to (x, y, z, w)
 		if ( valueType.startsWith( 'quat' ) ) {
 
-			// Parse (w, x, y, z) format
 			const cleaned = str.replace( /[()]/g, '' );
 			const values = cleaned.split( ',' ).map( s => parseFloat( s.trim() ) );
-			return values;
+			return [ values[ 1 ], values[ 2 ], values[ 3 ], values[ 0 ] ];
 
 		}
 

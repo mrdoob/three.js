@@ -1182,6 +1182,39 @@ class USDCParser {
 
 			}
 
+			case TypeEnum.Matrix2d: {
+
+				// Inlined Matrix2d stores diagonal values as 2 signed int8 values
+				const buf = new ArrayBuffer( 4 );
+				const view = new DataView( buf );
+				view.setUint32( 0, payload, true );
+				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 );
+				return [ d0, 0, 0, d1 ];
+
+			}
+
+			case TypeEnum.Matrix3d: {
+
+				// Inlined Matrix3d stores diagonal values as 3 signed int8 values
+				const buf = new ArrayBuffer( 4 );
+				const view = new DataView( buf );
+				view.setUint32( 0, payload, true );
+				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 ), d2 = view.getInt8( 2 );
+				return [ d0, 0, 0, 0, d1, 0, 0, 0, d2 ];
+
+			}
+
+			case TypeEnum.Matrix4d: {
+
+				// Inlined Matrix4d stores diagonal values as 4 signed int8 values
+				const buf = new ArrayBuffer( 4 );
+				const view = new DataView( buf );
+				view.setUint32( 0, payload, true );
+				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 ), d2 = view.getInt8( 2 ), d3 = view.getInt8( 3 );
+				return [ d0, 0, 0, 0, 0, d1, 0, 0, 0, 0, d2, 0, 0, 0, 0, d3 ];
+
+			}
+
 			default:
 				return payload;
 

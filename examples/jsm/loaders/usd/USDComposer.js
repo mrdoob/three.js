@@ -232,9 +232,7 @@ class USDComposer {
 					const q = data[ 'xformOp:orient' ];
 					if ( q && q.length === 4 ) {
 
-						// USD quaternion format is (w, x, y, z) - real part first
-						// Three.js Quaternion is (x, y, z, w)
-						const quat = new Quaternion( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+						const quat = new Quaternion( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 						tempMatrix.makeRotationFromQuaternion( quat );
 						if ( isInverse ) tempMatrix.invert();
 						matrix.multiply( tempMatrix );
@@ -298,7 +296,7 @@ class USDComposer {
 			const q = data[ 'xformOp:orient' ];
 			if ( q.length === 4 ) {
 
-				obj.quaternion.set( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+				obj.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 			}
 
@@ -1091,6 +1089,7 @@ class USDComposer {
 		}
 
 		const { uvs, uvIndices } = this._findUVPrimvar( fields );
+		const numFaceVertices = faceVertexIndices ? faceVertexIndices.length : 0;
 
 		if ( uvs && uvs.length > 0 ) {
 
@@ -1104,6 +1103,15 @@ class USDComposer {
 			} else if ( indices && uvs.length / 2 === points.length / 3 ) {
 
 				uvData = this._expandAttribute( uvs, indices, 2 );
+
+			} else if ( triPattern && uvs.length / 2 === numFaceVertices ) {
+
+				// Per-face-vertex UVs (faceVarying, no separate indices)
+				const uvIndicesFromPattern = this._applyTriangulationPattern(
+					Array.from( { length: numFaceVertices }, ( _, i ) => i ),
+					triPattern
+				);
+				uvData = this._expandAttribute( uvs, uvIndicesFromPattern, 2 );
 
 			}
 
@@ -1126,6 +1134,15 @@ class USDComposer {
 			} else if ( indices && uvs2.length / 2 === points.length / 3 ) {
 
 				uv2Data = this._expandAttribute( uvs2, indices, 2 );
+
+			} else if ( triPattern && uvs2.length / 2 === numFaceVertices ) {
+
+				// Per-face-vertex UV2 (faceVarying, no separate indices)
+				const uv2IndicesFromPattern = this._applyTriangulationPattern(
+					Array.from( { length: numFaceVertices }, ( _, i ) => i ),
+					triPattern
+				);
+				uv2Data = this._expandAttribute( uvs2, uv2IndicesFromPattern, 2 );
 
 			}
 
@@ -2300,6 +2317,22 @@ class USDComposer {
 
 		}
 
+		// Specular color
+		applyTextureFromConnection(
+			'inputs:specularColor',
+			'specularColorMap',
+			SRGBColorSpace,
+			( color ) => {
+
+				if ( Array.isArray( color ) && color.length >= 3 ) {
+
+					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+
+				}
+
+			}
+		);
+
 		// Clearcoat
 		if ( fields[ 'inputs:clearcoat' ] !== undefined ) {
 
@@ -2315,25 +2348,33 @@ class USDComposer {
 		}
 
 		// Opacity and opacity modes
-		const opacity = fields[ 'inputs:opacity' ] !== undefined ? fields[ 'inputs:opacity' ] : 1.0;
 		const opacityThreshold = fields[ 'inputs:opacityThreshold' ] !== undefined ? fields[ 'inputs:opacityThreshold' ] : 0.0;
-		const opacityMode = fields[ 'inputs:opacityMode' ] || 'transparent';
 
-		if ( opacityMode === 'presence' ) {
+		// Check if opacity is connected to a texture (e.g., diffuse texture's alpha)
+		const opacitySpec = getAttrSpec( 'inputs:opacity' );
+		const hasOpacityConnection = opacitySpec?.fields?.connectionPaths?.length > 0;
 
-			// Presence mode: use alpha testing (cutout transparency)
-			material.alphaTest = opacityThreshold;
-			material.transparent = false;
+		if ( hasOpacityConnection ) {
 
-			if ( opacity < 1.0 ) {
+			// Opacity from texture alpha - use the diffuse map's alpha channel
+			if ( opacityThreshold > 0 ) {
 
-				material.opacity = opacity;
+				// Alpha cutoff mode
+				material.alphaTest = opacityThreshold;
+				material.transparent = false;
+
+			} else {
+
+				// Alpha blend mode
+				material.transparent = true;
 
 			}
 
-		} else if ( opacityMode === 'transparent' ) {
+		} else {
 
-			// Transparent mode: traditional alpha blending
+			// Direct opacity value
+			const opacity = fields[ 'inputs:opacity' ] !== undefined ? fields[ 'inputs:opacity' ] : 1.0;
+
 			if ( opacity < 1.0 ) {
 
 				material.transparent = true;
@@ -2342,7 +2383,6 @@ class USDComposer {
 			}
 
 		}
-		// opacityMode === 'opaque': ignore opacity entirely (default material state)
 
 	}
 
@@ -2896,8 +2936,18 @@ class USDComposer {
 		if ( cleanPath.startsWith( '@' ) ) cleanPath = cleanPath.slice( 1 );
 		if ( cleanPath.endsWith( '@' ) ) cleanPath = cleanPath.slice( 0, - 1 );
 
-		const assetData = this.assets[ cleanPath ];
+		// Resolve relative to basePath first
+		const resolvedPath = this._resolveFilePath( cleanPath );
+		let assetData = this.assets[ resolvedPath ];
 
+		// Fallback to unresolved path
+		if ( ! assetData ) {
+
+			assetData = this.assets[ cleanPath ];
+
+		}
+
+		// Last resort: search by basename
 		if ( ! assetData ) {
 
 			const baseName = cleanPath.split( '/' ).pop();
@@ -3242,9 +3292,8 @@ class USDComposer {
 
 					keyframeTimes.push( times[ i ] / this.fps );
 
-					// Convert USD quaternion (w, x, y, z) to Three.js (x, y, z, w)
 					const q = values[ i ];
-					keyframeValues.push( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+					keyframeValues.push( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 				}
 
@@ -3317,6 +3366,85 @@ class USDComposer {
 					) );
 
 				}
+
+			}
+
+			// Check for animated xformOp:transform (matrix animations)
+			// These can have suffixes like xformOp:transform:transform
+			const properties = spec.fields?.properties || [];
+			for ( const prop of properties ) {
+
+				if ( ! prop.startsWith( 'xformOp:transform' ) ) continue;
+
+				const transformPath = path + '.' + prop;
+				const transformSpec = this.specsByPath[ transformPath ];
+
+				if ( ! transformSpec?.fields?.timeSamples ) continue;
+
+				const { times, values } = transformSpec.fields.timeSamples;
+				const positionTimes = [];
+				const positionValues = [];
+				const quaternionTimes = [];
+				const quaternionValues = [];
+				const scaleTimes = [];
+				const scaleValues = [];
+
+				const matrix = new Matrix4();
+				const position = new Vector3();
+				const quaternion = new Quaternion();
+				const scale = new Vector3();
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					const m = values[ i ];
+					if ( ! m || m.length < 16 ) continue;
+
+					const t = times[ i ] / this.fps;
+
+					// USD matrices are row-major, Three.js is column-major
+					matrix.set(
+						m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+						m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+						m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+						m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+					);
+
+					matrix.decompose( position, quaternion, scale );
+
+					positionTimes.push( t );
+					positionValues.push( position.x, position.y, position.z );
+
+					quaternionTimes.push( t );
+					quaternionValues.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+
+					scaleTimes.push( t );
+					scaleValues.push( scale.x, scale.y, scale.z );
+
+				}
+
+				if ( positionTimes.length > 0 ) {
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.position',
+						new Float32Array( positionTimes ),
+						new Float32Array( positionValues )
+					) );
+
+					tracks.push( new QuaternionKeyframeTrack(
+						objectName + '.quaternion',
+						new Float32Array( quaternionTimes ),
+						new Float32Array( quaternionValues )
+					) );
+
+					tracks.push( new VectorKeyframeTrack(
+						objectName + '.scale',
+						new Float32Array( scaleTimes ),
+						new Float32Array( scaleValues )
+					) );
+
+				}
+
+				break; // Only process first transform op
 
 			}
 
