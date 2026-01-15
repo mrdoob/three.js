@@ -2936,8 +2936,18 @@ class USDComposer {
 		if ( cleanPath.startsWith( '@' ) ) cleanPath = cleanPath.slice( 1 );
 		if ( cleanPath.endsWith( '@' ) ) cleanPath = cleanPath.slice( 0, - 1 );
 
-		const assetData = this.assets[ cleanPath ];
+		// Resolve relative to basePath first
+		const resolvedPath = this._resolveFilePath( cleanPath );
+		let assetData = this.assets[ resolvedPath ];
 
+		// Fallback to unresolved path
+		if ( ! assetData ) {
+
+			assetData = this.assets[ cleanPath ];
+
+		}
+
+		// Last resort: search by basename
 		if ( ! assetData ) {
 
 			const baseName = cleanPath.split( '/' ).pop();
