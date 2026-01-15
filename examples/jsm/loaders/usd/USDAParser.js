@@ -103,7 +103,7 @@ class USDAParser {
 
 				target = stack[ stack.length - 1 ];
 
-			} else {
+			} else if ( line.trim() ) {
 
 				string = line.trim();
 
