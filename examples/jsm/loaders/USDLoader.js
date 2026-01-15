@@ -3,7 +3,7 @@ import {
 	Loader
 } from 'three';
 
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 import { USDAParser } from './usd/USDAParser.js';
 import { USDCParser } from './usd/USDCParser.js';
 import { USDComposer } from './usd/USDComposer.js';
@@ -123,7 +123,7 @@ class USDLoader extends Loader {
 
 					} else {
 
-						const text = fflate.strFromU8( zip[ filename ] );
+						const text = new TextDecoder().decode( zip[ filename ] );
 						// Store parsed data (specsByPath) for on-demand composition
 						data[ filename ] = usda.parseData( text );
 						// Store raw text for re-parsing with variant selections
@@ -227,7 +227,7 @@ class USDLoader extends Loader {
 
 		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
 
-			const zip = fflate.unzipSync( bytes );
+			const zip = unzipSync( bytes );
 
 			const assets = parseAssets( zip );
 
@@ -242,7 +242,7 @@ class USDLoader extends Loader {
 
 			} else {
 
-				const text = fflate.strFromU8( file );
+				const text = new TextDecoder().decode( file );
 				data = usda.parseData( text );
 
 			}
@@ -254,7 +254,7 @@ class USDLoader extends Loader {
 		// USDA (standalone, as ArrayBuffer)
 
 		const composer = new USDComposer();
-		const text = fflate.strFromU8( bytes );
+		const text = new TextDecoder().decode( bytes );
 		const data = usda.parseData( text );
 		return composer.compose( data, {} );
 
