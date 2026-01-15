@@ -2821,6 +2821,7 @@ class USDComposer {
 
 			}
 
+			console.warn( 'USDLoader: Texture not found:', cleanPath );
 			return null;
 
 		}

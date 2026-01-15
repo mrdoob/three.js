@@ -1434,13 +1434,26 @@ class USDCParser {
 
 			case TypeEnum.PathListOp: {
 
-				// PathListOp format:
-				// Byte 0: flags (bit 0 = hasExplicitItems, bit 1 = hasAddedItems, etc.)
-				// For explicit items: count (uint64) + path indices (uint32 each)
+				// PathListOp format (from AOUSD Core Spec 16.3.10.25):
+				// Header byte bitmask:
+				// - bit 0 (0x01): Make Explicit (clears list)
+				// - bit 1 (0x02): Add Explicit Items
+				// - bit 2 (0x04): Add Items
+				// - bit 3 (0x08): Delete Items
+				// - bit 4 (0x10): Reorder Items
+				// - bit 5 (0x20): Prepend Items
+				// - bit 6 (0x40): Append Items
+				// Arrays follow in order: Explicit, Add, Prepend, Append, Delete, Reorder
+				// Each array: uint64 count + count * uint32 path indices
 				const flags = reader.readUint8();
-				const hasExplicitItems = ( flags & 1 ) !== 0;
+				const hasExplicitItems = ( flags & 0x02 ) !== 0;
+				const hasAddItems = ( flags & 0x04 ) !== 0;
+				const hasDeleteItems = ( flags & 0x08 ) !== 0;
+				const hasReorderItems = ( flags & 0x10 ) !== 0;
+				const hasPrependItems = ( flags & 0x20 ) !== 0;
+				const hasAppendItems = ( flags & 0x40 ) !== 0;
 
-				if ( hasExplicitItems ) {
+				const readPathList = () => {
 
 					const itemCount = reader.readUint64();
 					const paths = [];
@@ -1453,7 +1466,26 @@ class USDCParser {
 
 					return paths;
 
-				}
+				};
+
+				// Read arrays in spec order: Explicit, Add, Prepend, Append, Delete, Reorder
+				let explicitPaths = null;
+				let addPaths = null;
+				let prependPaths = null;
+				let appendPaths = null;
+
+				if ( hasExplicitItems ) explicitPaths = readPathList();
+				if ( hasAddItems ) addPaths = readPathList();
+				if ( hasPrependItems ) prependPaths = readPathList();
+				if ( hasAppendItems ) appendPaths = readPathList();
+				if ( hasDeleteItems ) readPathList(); // Skip delete items
+				if ( hasReorderItems ) readPathList(); // Skip reorder items
+
+				// Return the first non-empty list (connections are typically prepended)
+				if ( prependPaths && prependPaths.length > 0 ) return prependPaths;
+				if ( explicitPaths && explicitPaths.length > 0 ) return explicitPaths;
+				if ( appendPaths && appendPaths.length > 0 ) return appendPaths;
+				if ( addPaths && addPaths.length > 0 ) return addPaths;
 
 				return null;
 
