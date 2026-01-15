@@ -130,6 +130,9 @@ function Editor() {
 	this.viewportCamera = this.camera;
 	this.viewportShading = 'default';
 
+	this.environmentType = 'Default';
+	this.environmentTexture = null;
+
 	this.addCamera( this.camera );
 
 }
@@ -686,15 +689,21 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
-		if ( json.environment == null ||
-			 json.environment === 'Default' ||
-			 json.environment === 'Room' /* COMPAT */ ||
-			 json.environment === 'ModelViewer' /* COMPAT */ ) {
+		if (
+			json.environment === 'Equirectangular'
+			|| json.environment === 'Background'
+			|| json.environment === 'None'
+		) {
+
+			this.signals.sceneEnvironmentChanged.dispatch( json.environment, json.environmentEquirectangularTexture );
+
+		} else {
 
 			this.signals.sceneEnvironmentChanged.dispatch( 'Default' );
-			this.signals.refreshSidebarEnvironment.dispatch();
 
 		}
+
+		this.signals.refreshSidebarEnvironment.dispatch();
 
 	},
 
@@ -717,18 +726,6 @@ Editor.prototype = {
 
 		}
 
-		// honor neutral environment
-
-		let environment = null;
-
-		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
-
-			environment = 'Default';
-
-		}
-
-		//
-
 		return {
 
 			metadata: {},
@@ -743,7 +740,8 @@ Editor.prototype = {
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
-			environment: environment
+			environment: this.environmentType,
+			environmentEquirectangularTexture: this.environmentTexture
 
 		};
 

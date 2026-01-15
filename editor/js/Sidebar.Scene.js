@@ -453,30 +453,6 @@ function SidebarScene( editor ) {
 
 		}
 
-		if ( scene.environment ) {
-
-			if ( scene.background && scene.background.isTexture && scene.background.uuid === scene.environment.uuid ) {
-
-				environmentType.setValue( 'Background' );
-
-			} else if ( scene.environment.mapping === THREE.EquirectangularReflectionMapping ) {
-
-				environmentType.setValue( 'Equirectangular' );
-				environmentEquirectangularTexture.setValue( scene.environment );
-
-			} else if ( scene.environment.isRenderTargetTexture === true ) {
-
-				environmentType.setValue( 'Default' );
-
-			}
-
-		} else {
-
-			environmentType.setValue( 'Default' );
-			environmentEquirectangularTexture.setValue( null );
-
-		}
-
 		if ( scene.fog ) {
 
 			fogColor.setHexValue( scene.fog.color.getHex() );
@@ -604,6 +580,18 @@ function SidebarScene( editor ) {
 
 			onEnvironmentChanged();
 			refreshEnvironmentUI();
+
+		}
+
+	} );
+
+	signals.sceneEnvironmentChanged.add( function ( environment, environmentTexture ) {
+
+		environmentType.setValue( environment );
+
+		if ( environment === 'Equirectangular' ) {
+
+			environmentEquirectangularTexture.setValue( environmentTexture );
 
 		}
 

@@ -564,6 +564,9 @@ function Viewport( editor ) {
 
 		useBackgroundAsEnvironment = false;
 
+		editor.environmentType = environmentType;
+		editor.environmentTexture = environmentEquirectangularTexture;
+
 		switch ( environmentType ) {
 
 
