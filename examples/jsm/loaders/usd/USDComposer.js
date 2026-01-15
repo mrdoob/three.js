@@ -232,9 +232,7 @@ class USDComposer {
 					const q = data[ 'xformOp:orient' ];
 					if ( q && q.length === 4 ) {
 
-						// USD quaternion format is (w, x, y, z) - real part first
-						// Three.js Quaternion is (x, y, z, w)
-						const quat = new Quaternion( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+						const quat = new Quaternion( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 						tempMatrix.makeRotationFromQuaternion( quat );
 						if ( isInverse ) tempMatrix.invert();
 						matrix.multiply( tempMatrix );
@@ -298,7 +296,7 @@ class USDComposer {
 			const q = data[ 'xformOp:orient' ];
 			if ( q.length === 4 ) {
 
-				obj.quaternion.set( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+				obj.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 			}
 
@@ -3258,9 +3256,8 @@ class USDComposer {
 
 					keyframeTimes.push( times[ i ] / this.fps );
 
-					// Convert USD quaternion (w, x, y, z) to Three.js (x, y, z, w)
 					const q = values[ i ];
-					keyframeValues.push( q[ 1 ], q[ 2 ], q[ 3 ], q[ 0 ] );
+					keyframeValues.push( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 				}
 
