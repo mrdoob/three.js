@@ -2482,6 +2482,32 @@ class USDComposer {
 		if ( transmissionWeight !== undefined && transmissionWeight > 0 ) {
 
 			material.transmission = transmissionWeight;
+
+			const transmissionDepth = fields[ 'inputs:transmission_depth' ];
+
+			if ( transmissionDepth !== undefined ) {
+
+				material.thickness = transmissionDepth;
+
+			}
+
+			const transmissionColor = fields[ 'inputs:transmission_color' ];
+
+			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
+
+				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				material.attenuationDistance = transmissionDepth || 1.0;
+
+			}
+
+		}
+
+		// Geometry opacity (overall surface opacity)
+		const geometryOpacity = fields[ 'inputs:geometry_opacity' ];
+
+		if ( geometryOpacity !== undefined && geometryOpacity < 1.0 ) {
+
+			material.opacity = geometryOpacity;
 			material.transparent = true;
 
 		}
@@ -2509,6 +2535,59 @@ class USDComposer {
 				material.clearcoatRoughness = coatRoughness;
 
 			}
+
+		}
+
+		// Thin film (iridescence)
+		const thinFilmWeight = fields[ 'inputs:thin_film_weight' ];
+
+		if ( thinFilmWeight !== undefined && thinFilmWeight > 0 ) {
+
+			material.iridescence = thinFilmWeight;
+
+			const thinFilmIOR = fields[ 'inputs:thin_film_ior' ];
+
+			if ( thinFilmIOR !== undefined ) {
+
+				material.iridescenceIOR = thinFilmIOR;
+
+			}
+
+			const thinFilmThickness = fields[ 'inputs:thin_film_thickness' ];
+
+			if ( thinFilmThickness !== undefined ) {
+
+				// OpenPBR uses micrometers, Three.js uses nanometers
+				const thicknessNm = thinFilmThickness * 1000;
+				material.iridescenceThicknessRange = [ thicknessNm, thicknessNm ];
+
+			}
+
+		}
+
+		// Specular
+		const specularWeight = fields[ 'inputs:specular_weight' ];
+
+		if ( specularWeight !== undefined ) {
+
+			material.specularIntensity = specularWeight;
+
+		}
+
+		const specularColor = fields[ 'inputs:specular_color' ];
+
+		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
+
+			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+
+		}
+
+		// Anisotropy
+		const anisotropy = fields[ 'inputs:specular_roughness_anisotropy' ];
+
+		if ( anisotropy !== undefined && anisotropy > 0 ) {
+
+			material.anisotropy = anisotropy;
 
 		}
 
