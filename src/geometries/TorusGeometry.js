@@ -28,7 +28,7 @@ class TorusGeometry extends BufferGeometry {
 	 * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
 	 * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
 	 */
-	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ){
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
