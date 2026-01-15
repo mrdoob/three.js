@@ -3,7 +3,6 @@
  * for use in the node playground.
  */
 
-import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
 // Note: Materials are imported dynamically in getBuiltinMaterialTypes()
@@ -162,7 +161,7 @@ function createDefaultMaterialGraph( material ) {
 		roughnessNode: 'float'
 	};
 
-	for ( const [ property, type ] of Object.entries( nodeTypes ) ) {
+	for ( const [ property ] of Object.entries( nodeTypes ) ) {
 
 		if ( material[ property.replace( 'Node', '' ) ] !== undefined ) {
 
