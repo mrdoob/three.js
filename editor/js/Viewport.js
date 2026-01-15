@@ -16,6 +16,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
+import { ColorEnvironment } from 'three/addons/environments/ColorEnvironment.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
@@ -293,7 +294,8 @@ function Viewport( editor ) {
 		pathtracer.reset();
 
 		initPT();
-		render();
+
+		signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 	} );
 
@@ -499,6 +501,8 @@ function Viewport( editor ) {
 
 	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundColorSpace, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
 
+		editor.backgroundType = backgroundType;
+
 		scene.background = null;
 
 		switch ( backgroundType ) {
@@ -535,17 +539,15 @@ function Viewport( editor ) {
 					scene.backgroundIntensity = backgroundIntensity;
 					scene.backgroundRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
 
-					if ( useBackgroundAsEnvironment ) {
-
-						scene.environment = scene.background;
-						scene.environmentRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
-
-					}
-
-
 				}
 
 				break;
+
+		}
+
+		if ( useBackgroundAsEnvironment ) {
+
+			signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 		}
 
@@ -560,26 +562,13 @@ function Viewport( editor ) {
 
 	signals.sceneEnvironmentChanged.add( function ( environmentType, environmentEquirectangularTexture ) {
 
+		editor.environmentType = environmentType;
+
 		scene.environment = null;
 
 		useBackgroundAsEnvironment = false;
 
 		switch ( environmentType ) {
-
-
-			case 'Background':
-
-				useBackgroundAsEnvironment = true;
-
-				if ( scene.background !== null && scene.background.isTexture ) {
-
-					scene.environment = scene.background;
-					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-					scene.environmentRotation.y = scene.backgroundRotation.y;
-
-				}
-
-				break;
 
 			case 'Equirectangular':
 
@@ -594,7 +583,27 @@ function Viewport( editor ) {
 
 			case 'Default':
 
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+				useBackgroundAsEnvironment = true;
+
+				if ( scene.background !== null ) {
+
+					if ( scene.background.isColor ) {
+
+						scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
+
+					} else if ( scene.background.isTexture ) {
+
+						scene.environment = scene.background;
+						scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+						scene.environmentRotation.y = scene.backgroundRotation.y;
+
+					}
+
+				} else {
+
+					scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				}
 
 				break;
 
