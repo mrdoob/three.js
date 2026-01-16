@@ -64,6 +64,7 @@
 			count: 256,
 			dynamic: 16,
 
+			transparent: true,
 			sortObjects: true,
 			perObjectFrustumCulled: true,
 			opacity: 1,
@@ -144,8 +145,9 @@
 		function createMaterial() {
 
 			return new THREE.MeshBasicMaterial( {
+				vertexColors: true,
 				transparent: true,
-				vertexColors: true
+				depthWrite: false
 			} );
 
 		}
@@ -194,13 +196,12 @@
 
 		function initRegularMesh() {
 
-			const color = new THREE.Color();
 			mesh = new THREE.Group();
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
 				const material = createMaterial();
-				material.color.copy( randomizeColor( color ) );
+				randomizeColor( material.color );
 				material.opacity = randomizeAlpha();
 
 				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
@@ -300,6 +301,20 @@
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 			gui.add( api, 'method', Method ).onChange( initMesh );
+
+			gui.add( api, 'transparent' ).onChange( v => mesh.traverse( node => {
+
+				if ( node instanceof THREE.Mesh ) {
+
+					const material = node.material;
+					material.transparent = v;
+					material.depthWrite = ! v;
+					material.needsUpdate = true;
+
+				}
+
+			} ) );
+
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
