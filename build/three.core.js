@@ -1753,6 +1753,26 @@ const Compatibility = {
  * @property {string} EITHER - Flat interpolation using either vertex.
  */
 
+/**
+ * Finds the minimum value in an array.
+ *
+ * @private
+ * @param {Array<number>} array - The array to search for the minimum value.
+ * @return {number} The minimum value in the array, or Infinity if the array is empty.
+ */
+
+/**
+ * Checks if an array contains values that require Uint32 representation.
+ *
+ * This function determines whether the array contains any values >= 65535,
+ * which would require a Uint32Array rather than a Uint16Array for proper storage.
+ * The function iterates from the end of the array, assuming larger values are
+ * typically located at the end.
+ *
+ * @private
+ * @param {Array<number>} array - The array to check.
+ * @return {boolean} True if the array contains values >= 65535, false otherwise.
+ */
 function arrayNeedsUint32( array ) {
 
 	// assumes larger values usually on last
@@ -1767,6 +1787,14 @@ function arrayNeedsUint32( array ) {
 
 }
 
+/**
+ * Map of typed array constructor names to their constructors.
+ * This mapping enables dynamic creation of typed arrays based on string type names.
+ *
+ * @private
+ * @constant
+ * @type {Object<string, TypedArrayConstructor>}
+ */
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -1779,6 +1807,14 @@ const TYPED_ARRAYS = {
 	Float64Array: Float64Array
 };
 
+/**
+ * Creates a typed array of the specified type from the given buffer.
+ *
+ * @private
+ * @param {string} type - The name of the typed array type (e.g., 'Float32Array', 'Uint16Array').
+ * @param {ArrayBuffer} buffer - The buffer to create the typed array from.
+ * @return {TypedArray} A new typed array of the specified type.
+ */
 function getTypedArray( type, buffer ) {
 
 	return new TYPED_ARRAYS[ type ]( buffer );
@@ -1797,12 +1833,31 @@ function isTypedArray( array ) {
 
 }
 
+/**
+ * Creates an XHTML element with the specified tag name.
+ *
+ * This function uses the XHTML namespace to create DOM elements,
+ * ensuring proper element creation in XML-based contexts.
+ *
+ * @private
+ * @param {string} name - The tag name of the element to create (e.g., 'canvas', 'div').
+ * @return {HTMLElement} The created XHTML element.
+ */
 function createElementNS( name ) {
 
 	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
 
 }
 
+/**
+ * Creates a canvas element configured for block display.
+ *
+ * This is a convenience function that creates a canvas element with
+ * display style set to 'block', which is commonly used in three.js
+ * rendering contexts to avoid inline element spacing issues.
+ *
+ * @return {HTMLCanvasElement} A canvas element with display set to 'block'.
+ */
 function createCanvasElement() {
 
 	const canvas = createElementNS( 'canvas' );
@@ -1811,22 +1866,59 @@ function createCanvasElement() {
 
 }
 
+/**
+ * Internal cache for tracking warning messages to prevent duplicate warnings.
+ *
+ * @private
+ * @type {Object<string, boolean>}
+ */
 const _cache = {};
 
+/**
+ * Custom console function handler for intercepting log, warn, and error calls.
+ *
+ * @private
+ * @type {Function|null}
+ */
 let _setConsoleFunction = null;
 
+/**
+ * Sets a custom function to handle console output.
+ *
+ * This allows external code to intercept and handle console.log, console.warn,
+ * and console.error calls made by three.js, which is useful for custom logging,
+ * testing, or debugging workflows.
+ *
+ * @param {Function} fn - The function to handle console output. Should accept
+ *                        (type, message, ...params) where type is 'log', 'warn', or 'error'.
+ */
 function setConsoleFunction( fn ) {
 
 	_setConsoleFunction = fn;
 
 }
 
+/**
+ * Gets the currently set custom console function.
+ *
+ * @return {Function|null} The custom console function, or null if not set.
+ */
 function getConsoleFunction() {
 
 	return _setConsoleFunction;
 
 }
 
+/**
+ * Logs an informational message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.log. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function log( ...params ) {
 
 	const message = 'THREE.' + params.shift();
@@ -1843,6 +1935,16 @@ function log( ...params ) {
 
 }
 
+/**
+ * Logs a warning message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.warn. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function warn( ...params ) {
 
 	const message = 'THREE.' + params.shift();
@@ -1859,6 +1961,16 @@ function warn( ...params ) {
 
 }
 
+/**
+ * Logs an error message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.error. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function error( ...params ) {
 
 	const message = 'THREE.' + params.shift();
@@ -1875,6 +1987,15 @@ function error( ...params ) {
 
 }
 
+/**
+ * Logs a warning message only once, preventing duplicate warnings.
+ *
+ * This function maintains an internal cache of warning messages and will only
+ * output each unique warning message once. Useful for warnings that may be
+ * triggered repeatedly but should only be shown to the user once.
+ *
+ * @param {...any} params - The warning message components.
+ */
 function warnOnce( ...params ) {
 
 	const message = params.join( ' ' );
@@ -1887,6 +2008,20 @@ function warnOnce( ...params ) {
 
 }
 
+/**
+ * Asynchronously probes for WebGL sync object completion.
+ *
+ * This function creates a promise that resolves when the WebGL sync object
+ * signals completion or rejects if the sync operation fails. It uses polling
+ * at the specified interval to check the sync status without blocking the
+ * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
+ *
+ * @private
+ * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGLSync} sync - The WebGL sync object to wait for.
+ * @param {number} interval - The polling interval in milliseconds.
+ * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
+ */
 function probeAsync( gl, sync, interval ) {
 
 	return new Promise( function ( resolve, reject ) {
@@ -28081,12 +28216,10 @@ class BatchedMesh extends Mesh {
 			nextVertexStart += geometryInfo.reservedVertexCount;
 			geometryInfo.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
 
-			// step the next geometry points to the shifted position
-			this._nextIndexStart = geometry.index ? geometryInfo.indexStart + geometryInfo.reservedIndexCount : 0;
-			this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
-
 		}
 
+		this._nextIndexStart = nextIndexStart;
+		this._nextVertexStart = nextVertexStart;
 		this._visibilityChanged = true;
 
 		return this;
@@ -37466,8 +37599,10 @@ class TorusGeometry extends BufferGeometry {
 	 * @param {number} [radialSegments=12] - The number of radial segments.
 	 * @param {number} [tubularSegments=48] - The number of tubular segments.
 	 * @param {number} [arc=Math.PI*2] - Central angle in radians.
+	 * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
 	 */
-	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -37485,7 +37620,9 @@ class TorusGeometry extends BufferGeometry {
 			tube: tube,
 			radialSegments: radialSegments,
 			tubularSegments: tubularSegments,
-			arc: arc
+			arc: arc,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength,
 		};
 
 		radialSegments = Math.floor( radialSegments );
@@ -37508,10 +37645,11 @@ class TorusGeometry extends BufferGeometry {
 
 		for ( let j = 0; j <= radialSegments; j ++ ) {
 
+			const v = thetaStart + ( j / radialSegments ) * thetaLength;
+
 			for ( let i = 0; i <= tubularSegments; i ++ ) {
 
 				const u = i / tubularSegments * arc;
-				const v = j / radialSegments * Math.PI * 2;
 
 				// vertex
 

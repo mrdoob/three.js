@@ -75360,7 +75360,7 @@ ${ flowData.code }
 
 					} else if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
 
-						attributesSnippet += ` @interpolate( ${ this.renderer.backend.compatibilityMode ? 'flat, either' : 'flat' } )`;
+						attributesSnippet += ' @interpolate(flat, either)';
 
 					}
 
