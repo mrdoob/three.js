@@ -2357,7 +2357,7 @@ class GLTFWriter {
 
 		const nodeDef = {};
 
-		if ( options.trs ) {
+		if ( options.trs && object.pivot === null ) {
 
 			const rotation = object.quaternion.toArray();
 			const position = object.position.toArray();
@@ -2392,6 +2392,12 @@ class GLTFWriter {
 			if ( isIdentityMatrix( object.matrix ) === false ) {
 
 				nodeDef.matrix = object.matrix.elements;
+
+			}
+
+			if ( object.pivot !== null ) {
+
+				console.warn( 'THREE.GLTFExporter: Pivot not supported by GLTF. Baking into matrix.', object );
 
 			}
 
