@@ -56,6 +56,15 @@ const _childaddedEvent = { type: 'childadded', child: null };
 const _childremovedEvent = { type: 'childremoved', child: null };
 
 /**
+ * Fires when the object's visibility has changed.
+ *
+ * @event Object3D#visibilitychange
+ * @type {Object}
+ * @property {boolean} visible - The new visibility state.
+ */
+const _visibilitychangeEvent = { type: 'visibilitychange', visible: null };
+
+/**
  * This is the base class for most objects in three.js and provides a set of
  * properties and methods for manipulating objects in 3D space.
  *
@@ -141,6 +150,7 @@ class Object3D extends EventDispatcher {
 		const rotation = new Euler();
 		const quaternion = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
+		let visible = true;
 
 		function onRotationChange() {
 
@@ -222,6 +232,34 @@ class Object3D extends EventDispatcher {
 			 */
 			normalMatrix: {
 				value: new Matrix3()
+			},
+			/**
+			 * When set to `true`, the 3D object gets rendered.
+			 *
+			 * @name Object3D#visible
+			 * @type {boolean}
+			 * @default true
+			 */
+			visible: {
+				configurable: true,
+				enumerable: true,
+				get() {
+
+					return visible;
+
+				},
+				set( value ) {
+
+					if ( visible !== value ) {
+
+						visible = value;
+						_visibilitychangeEvent.visible = value;
+						this.dispatchEvent( _visibilitychangeEvent );
+						_visibilitychangeEvent.visible = null;
+
+					}
+
+				}
 			}
 		} );
 
@@ -279,14 +317,6 @@ class Object3D extends EventDispatcher {
 		 * @type {Layers}
 		 */
 		this.layers = new Layers();
-
-		/**
-		 * When set to `true`, the 3D object gets rendered.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.visible = true;
 
 		/**
 		 * When set to `true`, the 3D object gets rendered into shadow maps.
