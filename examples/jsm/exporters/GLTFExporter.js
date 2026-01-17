@@ -2355,9 +2355,16 @@ class GLTFWriter {
 
 		if ( ! json.nodes ) json.nodes = [];
 
+		// Handle pivot by creating a container node
+		if ( object.pivot !== null ) {
+
+			return await this._processNodeWithPivotAsync( object );
+
+		}
+
 		const nodeDef = {};
 
-		if ( options.trs && object.pivot === null ) {
+		if ( options.trs ) {
 
 			const rotation = object.quaternion.toArray();
 			const position = object.position.toArray();
@@ -2392,12 +2399,6 @@ class GLTFWriter {
 			if ( isIdentityMatrix( object.matrix ) === false ) {
 
 				nodeDef.matrix = object.matrix.elements;
-
-			}
-
-			if ( object.pivot !== null ) {
-
-				console.warn( 'THREE.GLTFExporter: Pivot not supported by GLTF. Baking into matrix.', object );
 
 			}
 
@@ -2454,6 +2455,126 @@ class GLTFWriter {
 		} );
 
 		return nodeIndex;
+
+	}
+
+	/**
+	 * Process Object3D node with pivot using container approach
+	 * @param {THREE.Object3D} object Object3D with pivot
+	 * @return {Promise<number>} Index of the container node
+	 */
+	async _processNodeWithPivotAsync( object ) {
+
+		const json = this.json;
+		const options = this.options;
+		const nodeMap = this.nodeMap;
+
+		const pivot = object.pivot;
+
+		// Container node: holds position + pivot offset, rotation, scale
+		// Animations will target this node
+		const containerDef = {};
+
+		const rotation = object.quaternion.toArray();
+		const position = [
+			object.position.x + pivot.x,
+			object.position.y + pivot.y,
+			object.position.z + pivot.z
+		];
+		const scale = object.scale.toArray();
+
+		if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+
+			containerDef.rotation = rotation;
+
+		}
+
+		if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
+
+			containerDef.translation = position;
+
+		}
+
+		if ( ! equalArray( scale, [ 1, 1, 1 ] ) ) {
+
+			containerDef.scale = scale;
+
+		}
+
+		// Store pivot in extras for round-trip reconstruction
+		containerDef.extras = { pivot: pivot.toArray() };
+
+		if ( object.name !== '' ) containerDef.name = String( object.name );
+
+		this.serializeUserData( object, containerDef );
+
+		const containerIndex = json.nodes.push( containerDef ) - 1;
+
+		// Map original object to container so animations target it
+		nodeMap.set( object, containerIndex );
+
+		// Child node: holds mesh with -pivot offset
+		const childDef = {};
+
+		const childPosition = [ - pivot.x, - pivot.y, - pivot.z ];
+
+		if ( ! equalArray( childPosition, [ 0, 0, 0 ] ) ) {
+
+			childDef.translation = childPosition;
+
+		}
+
+		if ( object.isMesh || object.isLine || object.isPoints ) {
+
+			const meshIndex = await this.processMeshAsync( object );
+
+			if ( meshIndex !== null ) childDef.mesh = meshIndex;
+
+		} else if ( object.isCamera ) {
+
+			childDef.camera = this.processCamera( object );
+
+		}
+
+		if ( object.isSkinnedMesh ) this.skins.push( object );
+
+		const childIndex = json.nodes.push( childDef ) - 1;
+
+		// Build children array for container
+		const containerChildren = [ childIndex ];
+
+		// Process object's children as children of the child node
+		if ( object.children.length > 0 ) {
+
+			const grandchildren = [];
+
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+				const child = object.children[ i ];
+
+				if ( child.visible || options.onlyVisible === false ) {
+
+					const childNodeIndex = await this.processNodeAsync( child );
+
+					if ( childNodeIndex !== null ) grandchildren.push( childNodeIndex );
+
+				}
+
+			}
+
+			if ( grandchildren.length > 0 ) childDef.children = grandchildren;
+
+		}
+
+		containerDef.children = containerChildren;
+
+		await this._invokeAllAsync( function ( ext ) {
+
+			ext.writeNode && ext.writeNode( object, containerDef );
+
+		} );
+
+		return containerIndex;
 
 	}
 
