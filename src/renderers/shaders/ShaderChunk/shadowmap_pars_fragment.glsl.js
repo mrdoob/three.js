@@ -155,7 +155,16 @@ export default /* glsl */`
 			float shadow = 1.0;
 
 			shadowCoord.xyz /= shadowCoord.w;
-			shadowCoord.z += shadowBias;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				shadowCoord.z -= shadowBias;
+
+			#else
+
+				shadowCoord.z += shadowBias;
+
+			#endif
 
 			bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
 			bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
@@ -167,8 +176,16 @@ export default /* glsl */`
 				float mean = distribution.x;
 				float variance = distribution.y * distribution.y;
 
-				float hard_shadow = step( shadowCoord.z, mean );
+				#ifdef USE_REVERSED_DEPTH_BUFFER
 
+					float hard_shadow = step( mean, shadowCoord.z );
+
+				#else
+
+					float hard_shadow = step( shadowCoord.z, mean );
+
+				#endif
+				
 				// Early return if fully lit
 				if ( hard_shadow == 1.0 ) {
 
@@ -205,7 +222,16 @@ export default /* glsl */`
 			float shadow = 1.0;
 
 			shadowCoord.xyz /= shadowCoord.w;
-			shadowCoord.z += shadowBias;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				shadowCoord.z -= shadowBias;
+
+			#else
+
+				shadowCoord.z += shadowBias;
+
+			#endif
 
 			bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
 			bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
@@ -216,11 +242,13 @@ export default /* glsl */`
 
 				#ifdef USE_REVERSED_DEPTH_BUFFER
 
-					depth = 1.0 - depth;
+					shadow = step( depth, shadowCoord.z );
+
+				#else
+
+					shadow = step( shadowCoord.z, depth );
 
 				#endif
-
-				shadow = step( shadowCoord.z, depth );
 
 			}
 
