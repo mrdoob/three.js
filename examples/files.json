@@ -446,6 +446,7 @@
 		"webgpu_shadowmap_array",
 		"webgpu_shadowmap_csm",
 		"webgpu_shadowmap_opacity",
+		"webgpu_shadowmap_pcf",
 		"webgpu_shadowmap_pointlight",
 		"webgpu_shadowmap_progressive",
 		"webgpu_shadowmap_vsm",

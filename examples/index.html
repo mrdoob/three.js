@@ -215,7 +215,7 @@
 				<div class="card">
 					<a href="${ href }" target="viewer">
 						<div class="cover">
-							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" onerror="this.onerror=null; this.src='screenshots/${ file }.webp';" />
 							${ community }
 						</div>
 						<div class="title">${ getName( file ) }</div>

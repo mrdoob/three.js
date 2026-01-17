@@ -8,6 +8,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 import { NoBlending } from '../../constants.js';
+import { Loop } from '../utils/LoopNode.js'
 
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 
@@ -74,14 +75,52 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
 	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
 
-	// 5 samples using Vogel disk distribution
-	return add(
-		depthCompare( shadowCoord.xy.add( vogelDiskSample( 0, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vogelDiskSample( 1, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vogelDiskSample( 2, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vogelDiskSample( 3, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vogelDiskSample( 4, 5, phi ).mul( radiusScaled ) ), shadowCoord.z )
-	).mul( 1 / 5 );
+	// sample using Vogel disk distribution
+
+	// eslint-disable-next-line -- WIP unused with JS-side loop unrolling, but then rebuilds don't happen on change.
+	const blurSamples = reference( 'blurSamples', 'int', shadow ).setGroup( renderGroup );
+
+	/*
+
+	WIP Attempt as JS-side loop unrolling, which makes the shader significantly
+	faster with larger sample size.
+	Not sure how to trigger rebuild on shadow.blurSamples changes. So this
+	currently uses the *initial* value only.
+	How to rebuild on change?
+
+	const samples = [];
+
+	for ( let i = 0, l = shadow.blurSamples; i < l; i ++ ) {
+
+		samples.push(
+
+			depthCompare( shadowCoord.xy.add( vogelDiskSample( i, shadow.blurSamples, phi ).mul( radiusScaled ) ), shadowCoord.z ),
+
+		);
+
+	}
+
+	return add( ...samples ).mul( 1 / shadow.blurSamples );
+
+	*/
+
+	/*
+
+	WIP This updates on shadow.blurSamples changes, but is significantly slower
+	on larger sample size, and the shadow shows up only *sometimes* initially.
+	Reload an example and sometimes the shadow apears, sometimes not.
+
+	*/
+
+	let sum = float( 0 ).toVar();
+
+	Loop( blurSamples, ( { i } ) => {
+
+		sum.addAssign( depthCompare( shadowCoord.xy.add( vogelDiskSample( i, shadow.blurSamples, phi ).mul( radiusScaled ) ), shadowCoord.z ) );
+
+	} );
+
+	return sum.mul( float( 1 ).div( float( blurSamples ) ) );
 
 } );
 

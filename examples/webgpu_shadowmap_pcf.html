@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - pcf shadows example</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>PCF Shadows</span>
+			</div>
+
+			<small>
+				PCF shadows blur radius and blur samples.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, clock;
+			let dirLight, spotLight;
+			let dirGroup;
+
+			const config = {
+				spotlightResolution: 256,
+				spotlightRadius: 4,
+				spotlightSamples: 8,
+				spotlightBias: 0,
+				spotlightNormalBias: 0,
+				spotlightIntensity: 1,
+				spotlightFocus: 1,
+
+				dirlightResolution: 256,
+				dirlightRadius: 4,
+				dirlightSamples: 8,
+				dirlightBias: 0,
+				dirlightNormalBias: 0,
+				dirlightIntensity: 1,
+
+				animationSpeed: 1,
+			};
+
+			init();
+
+			function init() {
+
+				initScene();
+				initMisc();
+
+				// Init gui
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				const resolutions = [ 64, 128, 256, 512, 1024, 2048 ];
+
+				const spotlightFolder = gui.addFolder( 'Spotlight Shadow' );
+
+				spotlightFolder.add( config, 'spotlightResolution', resolutions ).name( 'resolution' ).onChange( function ( value ) {
+
+					// WIP this is not working, changing the size freezes the rendering
+
+					spotLight.shadow.mapSize.width = value;
+					spotLight.shadow.mapSize.height = value;
+					spotLight.needsUpdate = true;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightRadius', 0, 20 ).name( 'radius' ).onChange( function ( value ) {
+
+					spotLight.shadow.radius = value;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightSamples', 1, 50, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					spotLight.shadow.blurSamples = value;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightBias', -0.05, 0.05, 0.001 ).name( 'bias' ).onChange( function ( value ) {
+
+					spotLight.shadow.bias = value;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightNormalBias', -1, 1, 0.001 ).name( 'normal bias' ).onChange( function ( value ) {
+
+					spotLight.shadow.normalBias = value;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightIntensity', 0, 1 ).name( 'intensity' ).onChange( function ( value ) {
+
+					spotLight.shadow.intensity = value;
+
+				} );
+
+				spotlightFolder.add( config, 'spotlightFocus', 0, 1, 0.01 ).name( 'focus' ).onChange( function ( value ) {
+
+					spotLight.shadow.focus = value;
+
+				} );
+
+				const dirlightFolder = gui.addFolder( 'Directional Light Shadow' );
+
+				dirlightFolder.add( config, 'dirlightResolution', resolutions ).name( 'resolution' ).onChange( function ( value ) {
+
+					// WIP this is not working, changing the size freezes the rendering
+
+					dirLight.shadow.mapSize.width = value;
+					dirLight.shadow.mapSize.height = value;
+					dirLight.needsUpdate = true;
+
+				} );
+
+				dirlightFolder.add( config, 'dirlightRadius', 0, 20 ).name( 'radius' ).onChange( function ( value ) {
+
+					dirLight.shadow.radius = value;
+
+				} );
+
+				dirlightFolder.add( config, 'dirlightSamples', 1, 50, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					dirLight.shadow.blurSamples = value;
+
+				} );
+
+				dirlightFolder.add( config, 'dirlightBias', -0.005, 0.005, 0.0001 ).name( 'bias' ).onChange( function ( value ) {
+
+					dirLight.shadow.bias = value;
+
+				} );
+
+				dirlightFolder.add( config, 'dirlightNormalBias', -1, 1, 0.001 ).name( 'normal bias' ).onChange( function ( value ) {
+
+					dirLight.shadow.normalBias = value;
+
+				} );
+
+				dirlightFolder.add( config, 'dirlightIntensity', 0, 1 ).name( 'intensity' ).onChange( function ( value ) {
+
+					dirLight.shadow.intensity = value;
+
+				} );
+
+				gui.add( config, 'animationSpeed', 0, 1, 0.01 );
+
+				document.body.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function initScene() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 10, 30 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222244 );
+				scene.fog = new THREE.Fog( 0x222244, 50, 100 );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+				spotLight = new THREE.SpotLight( 0xff8888, 400 );
+				spotLight.angle = Math.PI / 4;
+				spotLight.penumbra = 0.3;
+				spotLight.position.set( 10, 16, 7 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 8;
+				spotLight.shadow.camera.far = 200;
+				spotLight.shadow.mapSize.width = config.spotlightResolution;
+				spotLight.shadow.mapSize.height = config.spotlightResolution;
+				spotLight.shadow.radius = config.spotlightRadius;
+				spotLight.shadow.blurSamples = config.spotlightSamples;
+				spotLight.shadow.bias = config.spotlightBias;
+				spotLight.shadow.intensity = config.spotlightIntensity;
+				scene.add( spotLight );
+
+
+				dirLight = new THREE.DirectionalLight( 0x8888ff, 3 );
+				dirLight.position.set( 3, 12, 17 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = 0.1;
+				dirLight.shadow.camera.far = 500;
+				dirLight.shadow.camera.right = 17;
+				dirLight.shadow.camera.left = - 17;
+				dirLight.shadow.camera.top	= 17;
+				dirLight.shadow.camera.bottom = - 17;
+				dirLight.shadow.mapSize.width = config.dirlightResolution;
+				dirLight.shadow.mapSize.height = config.dirlightResolution;
+				dirLight.shadow.radius = config.dirlightRadius;
+				dirLight.shadow.blurSamples = config.dirlightSamples;
+				dirLight.shadow.bias = config.dirlightBias;
+				dirLight.shadow.intensity = config.dirlightIntensity;
+
+				dirGroup = new THREE.Group();
+				dirGroup.add( dirLight );
+				scene.add( dirGroup );
+
+				// Geometry
+
+
+				// WIP the phong material works, the physical material causes
+				// the floor to not show shadow and occasionally the floor goes
+				// entirely black
+
+				// const material = new THREE.MeshPhysicalMaterial( {
+				// 	color: 0x999999,
+				// 	metalness: 0.5,
+				// 	roughness: 0.5
+				// } );
+
+				const material = new THREE.MeshPhongMaterial( {
+					color: 0x999999,
+
+					// WIP shininess other than 0 breaks shadow on floor just like the physical material
+					shininess: 0,
+					// shininess: 100,
+
+					specular: 0x222222
+				} );
+
+
+				// WIP the directional shadow incorrectly fades the entire
+				// Lucy100k model when the shadow reaches the model.
+				// This looks like the same problem with the shadow on the floor
+				// when physical material is used or when phong material has
+				// non-zero shininess.
+				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
+
+					geometry.scale( 0.0072, 0.0072, 0.0072 );
+					geometry.computeVertexNormals();
+					geometry.computeBoundingBox()
+
+					const minY = geometry.boundingBox.min.y;
+					console.log(minY)
+					geometry.translate( 0, - minY, 0 );
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.rotation.y = - Math.PI / 2;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					scene.add( mesh );
+
+				} );
+
+				const geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
+				const torusKnot = new THREE.Mesh( geometry, material );
+				torusKnot.scale.multiplyScalar( 1 / 18 );
+				torusKnot.position.y = 3;
+				torusKnot.position.x = 5;
+				torusKnot.castShadow = true;
+				torusKnot.receiveShadow = true;
+				scene.add( torusKnot );
+
+				const cylinderGeometry = new THREE.CylinderGeometry( 0.75, 0.75, 7, 32 );
+
+				const pillar1 = new THREE.Mesh( cylinderGeometry, material );
+				pillar1.position.set( 8, 3.5, 8 );
+				pillar1.castShadow = true;
+				pillar1.receiveShadow = true;
+
+				const pillar2 = pillar1.clone();
+				pillar2.position.set( 8, 3.5, - 8 );
+				const pillar3 = pillar1.clone();
+				pillar3.position.set( - 8, 3.5, 8 );
+				const pillar4 = pillar1.clone();
+				pillar4.position.set( - 8, 3.5, - 8 );
+
+				scene.add( pillar1 );
+				scene.add( pillar2 );
+				scene.add( pillar3 );
+				scene.add( pillar4 );
+
+				const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
+
+				// WIP the phong material works, the physical material shows no shadow
+				// const planeMaterial = new THREE.MeshPhysicalMaterial( { color: 0x999999, roughness: 1 } );
+				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0x999999, shininess: 0 } );
+
+				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.scale.multiplyScalar( 3 );
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+			}
+
+			function initMisc() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				// Mouse control
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
+
+				clock = new THREE.Clock();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate( time ) {
+
+				const delta = clock.getDelta();
+
+				dirGroup.rotation.y += 0.7 * delta * config.animationSpeed;
+				dirLight.position.z = 27 + Math.sin( time * 0.001 ) * 5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
