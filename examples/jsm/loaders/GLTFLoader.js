@@ -607,17 +607,17 @@ function GLTFRegistry() {
 /********** EXTENSIONS ***********/
 /*********************************/
 
-function getExtensionData( parser, materialIndex, extensionName ) {
+function getMaterialExtension( parser, materialIndex, extensionName ) {
 
 	const materialDef = parser.json.materials[ materialIndex ];
 
-	if ( ! materialDef.extensions || ! materialDef.extensions[ extensionName ] ) {
+	if ( materialDef.extensions && materialDef.extensions[ extensionName ] ) {
 
-		return null;
+		return materialDef.extensions[ extensionName ];
 
 	}
 
-	return { materialDef, extension: materialDef.extensions[ extensionName ] };
+	return null;
 
 }
 
@@ -858,13 +858,13 @@ class GLTFMaterialsEmissiveStrengthExtension {
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
-		if ( data.extension.emissiveStrength !== undefined ) {
+		if ( extension.emissiveStrength !== undefined ) {
 
-			materialParams.emissiveIntensity = data.extension.emissiveStrength;
+			materialParams.emissiveIntensity = extension.emissiveStrength;
 
 		}
 
@@ -892,20 +892,19 @@ class GLTFMaterialsClearcoatExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		if ( extension.clearcoatFactor !== undefined ) {
 
@@ -969,19 +968,19 @@ class GLTFMaterialsDispersionExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
-		materialParams.dispersion = data.extension.dispersion !== undefined ? data.extension.dispersion : 0;
+		materialParams.dispersion = extension.dispersion !== undefined ? extension.dispersion : 0;
 
 		return Promise.resolve();
 
@@ -1007,20 +1006,19 @@ class GLTFMaterialsIridescenceExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		if ( extension.iridescenceFactor !== undefined ) {
 
@@ -1088,20 +1086,19 @@ class GLTFMaterialsSheenExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		materialParams.sheenColor = new Color( 0, 0, 0 );
 		materialParams.sheenRoughness = 0;
@@ -1157,20 +1154,19 @@ class GLTFMaterialsTransmissionExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		if ( extension.transmissionFactor !== undefined ) {
 
@@ -1208,20 +1204,19 @@ class GLTFMaterialsVolumeExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		materialParams.thickness = extension.thicknessFactor !== undefined ? extension.thicknessFactor : 0;
 
@@ -1260,19 +1255,19 @@ class GLTFMaterialsIorExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
-		materialParams.ior = data.extension.ior !== undefined ? data.extension.ior : 1.5;
+		materialParams.ior = extension.ior !== undefined ? extension.ior : 1.5;
 
 		return Promise.resolve();
 
@@ -1298,20 +1293,19 @@ class GLTFMaterialsSpecularExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		materialParams.specularIntensity = extension.specularFactor !== undefined ? extension.specularFactor : 1.0;
 
@@ -1355,20 +1349,19 @@ class GLTFMaterialsBumpExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		materialParams.bumpScale = extension.bumpFactor !== undefined ? extension.bumpFactor : 1.0;
 
@@ -1402,20 +1395,19 @@ class GLTFMaterialsAnisotropyExtension {
 
 	getMaterialType( materialIndex ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		return data !== null ? MeshPhysicalMaterial : null;
+		return extension !== null ? MeshPhysicalMaterial : null;
 
 	}
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const data = getExtensionData( this.parser, materialIndex, this.name );
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
 
-		if ( data === null ) return Promise.resolve();
+		if ( extension === null ) return Promise.resolve();
 
 		const pending = [];
-		const extension = data.extension;
 
 		if ( extension.anisotropyStrength !== undefined ) {
 
