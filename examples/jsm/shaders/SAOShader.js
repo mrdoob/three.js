@@ -86,6 +86,17 @@ const SAOShader = {
 
 		#include <packing>
 
+		#ifdef USE_REVERSED_DEPTH_BUFFER
+
+			const float depthThreshold = 0.0 + EPSILON;
+
+		#else
+
+			const float depthThreshold = 1.0 - EPSILON;
+
+		#endif
+
+
 		vec4 getDefaultColor( const in vec2 screenPosition ) {
 			#if DIFFUSE_TEXTURE == 1
 			return texture2D( tDiffuse, vUv );
@@ -153,7 +164,7 @@ const SAOShader = {
 				angle += ANGLE_STEP;
 
 				float sampleDepth = getDepth( sampleUv );
-				if( sampleDepth >= ( 1.0 - EPSILON ) ) {
+				if( sampleDepth >= depthThreshold ) {
 					continue;
 				}
 
@@ -170,7 +181,7 @@ const SAOShader = {
 
 		void main() {
 			float centerDepth = getDepth( vUv );
-			if( centerDepth >= ( 1.0 - EPSILON ) ) {
+			if( centerDepth >= depthThreshold ) {
 				discard;
 			}
 
