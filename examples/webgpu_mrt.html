@@ -44,7 +44,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -110,9 +110,9 @@
 
 				// post processing - mrt
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
-				postProcessing.outputNode = Fn( () => {
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
+				renderPipeline.outputNode = Fn( () => {
 
 					const output = scenePass.getTextureNode( 'output' ); // output name is optional here
 					const normal = scenePass.getTextureNode( 'normal' );
@@ -153,7 +153,7 @@
 
 			function render() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

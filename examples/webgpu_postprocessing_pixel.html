@@ -41,7 +41,7 @@
 		import { uniform } from 'three/tsl';
 		import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
 
-		let camera, scene, renderer, postProcessing, crystalMesh, timer;
+		let camera, scene, renderer, renderPipeline, crystalMesh, timer;
 		let effectController;
 
 		init();
@@ -145,9 +145,9 @@
 				pixelAlignedPanning: true
 			};
 
-			postProcessing = new THREE.PostProcessing( renderer );
+			renderPipeline = new THREE.RenderPipeline( renderer );
 			const scenePass = pixelationPass( scene, camera, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
-			postProcessing.outputNode = scenePass;
+			renderPipeline.outputNode = scenePass;
 
 			window.addEventListener( 'resize', onWindowResize );
 
@@ -206,7 +206,7 @@
 
 			}
 
-			postProcessing.render();
+			renderPipeline.render();
 
 		}
 

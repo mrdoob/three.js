@@ -46,7 +46,7 @@
 
 
 			let camera;
-			let postProcessing, renderer, mixer, timer;
+			let renderPipeline, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -95,14 +95,14 @@
 
 				//
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 
 				const bloomPass = bloom( scenePassColor ).toInspector( 'Bloom' );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				//
 
@@ -167,7 +167,7 @@
 
 				mixer.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -41,7 +41,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
-			let postProcessing;
+			let renderPipeline;
 
 			const params = {
 				enabled: true
@@ -94,12 +94,12 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				const scenePass = pass( scene, camera );
 
-				postProcessing.outputNode = sobel( renderOutput( scenePass ) );
+				renderPipeline.outputNode = sobel( renderOutput( scenePass ) );
 
 				//
 
@@ -128,7 +128,7 @@
 
 				if ( params.enabled === true ) {
 
-					postProcessing.render();
+					renderPipeline.render();
 
 				} else {
 

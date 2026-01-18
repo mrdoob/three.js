@@ -44,7 +44,7 @@
 			let camera, scene, renderer;
 			let mixer, objects, timer;
 			let model, floor, floorPosition;
-			let postProcessing;
+			let renderPipeline;
 			let controls;
 
 			init();
@@ -221,8 +221,8 @@
 
 				const vignette = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus().toInspector( 'Post-Processing / Vignette' );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
 
 				//
 
@@ -264,7 +264,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

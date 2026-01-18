@@ -51,7 +51,7 @@
 				compose, tileInfluence,
 				lighting,
 				count,
-				postProcessing;
+				renderPipeline;
 
 			init();
 
@@ -176,7 +176,7 @@
 				compose = scenePass.add( bloomPass );
 				tileInfluence = uniform( 0 );
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				updatePostProcessing();
 
@@ -193,8 +193,8 @@
 
 				const debugBlockIndexes = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio ).getBlock().toColor().div( count * 2 );
 
-				postProcessing.outputNode = compose.add( debugBlockIndexes.mul( tileInfluence ) );
-				postProcessing.needsUpdate = true;
+				renderPipeline.outputNode = compose.add( debugBlockIndexes.mul( tileInfluence ) );
+				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -227,7 +227,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

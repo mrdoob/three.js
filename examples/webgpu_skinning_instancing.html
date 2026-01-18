@@ -40,7 +40,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			let mixer, timer;
 
@@ -146,8 +146,8 @@
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
 				scenePassColorBlurred.directionNode = scenePassDepth;
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePassColorBlurred;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = scenePassColorBlurred;
 
 
 				// events
@@ -173,7 +173,7 @@
 
 				if ( mixer ) mixer.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 
