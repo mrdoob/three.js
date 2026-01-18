@@ -863,7 +863,15 @@ class USDComposer {
 		if ( geomSubsets.length > 0 ) {
 
 			geometry = this._buildGeometryWithSubsets( attrs, geomSubsets, hasSkinning );
-			material = geomSubsets.map( subset => this._buildMaterialForPath( subset.materialPath ) );
+
+			const meshMaterialPath = this._getMaterialPath( path, spec.fields );
+
+			material = geomSubsets.map( subset => {
+
+				const matPath = subset.materialPath || meshMaterialPath;
+				return this._buildMaterialForPath( matPath );
+
+			} );
 
 		} else {
 
@@ -1982,6 +1990,36 @@ class USDComposer {
 		}
 
 		return expanded;
+
+	}
+
+	/**
+	 * Get the material path for a mesh, checking various binding sources.
+	 */
+	_getMaterialPath( meshPath, fields ) {
+
+		let materialPath = null;
+		let materialBinding = fields[ 'material:binding' ];
+
+		if ( ! materialBinding ) {
+
+			const bindingPath = meshPath + '.material:binding';
+			const bindingSpec = this.specsByPath[ bindingPath ];
+			if ( bindingSpec && bindingSpec.specType === SpecType.Relationship ) {
+
+				materialBinding = bindingSpec.fields.targetPaths || bindingSpec.fields.default;
+
+			}
+
+		}
+
+		if ( materialBinding ) {
+
+			materialPath = Array.isArray( materialBinding ) ? materialBinding[ 0 ] : materialBinding;
+
+		}
+
+		return materialPath;
 
 	}
 
