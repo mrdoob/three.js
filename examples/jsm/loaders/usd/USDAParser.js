@@ -120,6 +120,9 @@ class USDAParser {
 		// Remove block comments /* ... */
 		text = this._stripBlockComments( text );
 
+		// Collapse triple-quoted strings into single lines
+		text = this._collapseTripleQuotedStrings( text );
+
 		// Remove line comments # ... (but preserve #usda header)
 		// Only remove # comments that aren't at the start of a line or after whitespace
 		const lines = text.split( '\n' );
@@ -249,6 +252,64 @@ class USDAParser {
 				i ++;
 
 			}
+
+		}
+
+		return result;
+
+	}
+
+	_collapseTripleQuotedStrings( text ) {
+
+		let result = '';
+		let i = 0;
+
+		while ( i < text.length ) {
+
+			if ( i + 2 < text.length ) {
+
+				const triple = text.slice( i, i + 3 );
+
+				if ( triple === '\'\'\'' || triple === '"""' ) {
+
+					const quoteChar = triple;
+					result += quoteChar;
+					i += 3;
+
+					while ( i < text.length ) {
+
+						if ( i + 2 < text.length && text.slice( i, i + 3 ) === quoteChar ) {
+
+							result += quoteChar;
+							i += 3;
+							break;
+
+						} else {
+
+							if ( text[ i ] === '\n' ) {
+
+								result += '\\n';
+
+							} else if ( text[ i ] !== '\r' ) {
+
+								result += text[ i ];
+
+							}
+
+							i ++;
+
+						}
+
+					}
+
+					continue;
+
+				}
+
+			}
+
+			result += text[ i ];
+			i ++;
 
 		}
 
