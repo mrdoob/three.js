@@ -83,7 +83,7 @@ class RenderPipeline {
 		 * @type {QuadMesh}
 		 */
 		this._quadMesh = new QuadMesh( material );
-		this._quadMesh.name = 'Post-Processing';
+		this._quadMesh.name = 'Render Pipeline';
 
 		/**
 		 * The context of the post processing stack.
