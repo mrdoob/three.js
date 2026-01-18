@@ -6,15 +6,15 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { warnOnce } from '../../utils.js';
 
 /**
- * This module is responsible to manage the post processing setups in apps.
+ * This module is responsible to manage the rendering pipeline and post processing setups in apps.
  * You usually create a single instance of this class and use it to define
  * the output of your post processing effect chain.
  * ```js
- * const postProcessing = new RenderPipeline( renderer );
+ * const renderPipeline = new RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
- * postProcessing.outputNode = scenePass;
+ * renderPipeline.outputNode = scenePass;
  * ```
  *
  * Note: This module can only be used with `WebGPURenderer`.
@@ -97,7 +97,7 @@ class RenderPipeline {
 	}
 
 	/**
-	 * When `PostProcessing` is used to apply post processing effects,
+	 * When `RenderPipeline` is used to apply rendering pipeline and post processing effects,
 	 * the application must use this version of `render()` inside
 	 * its animation loop (not the one from the renderer).
 	 */
@@ -203,7 +203,7 @@ class RenderPipeline {
 	}
 
 	/**
-	 * When `RenderPipeline` is used to apply post processing effects,
+	 * When `RenderPipeline` is used to apply rendering pipeline and post processing effects,
 	 * the application must use this version of `renderAsync()` inside
 	 * its animation loop (not the one from the renderer).
 	 *
