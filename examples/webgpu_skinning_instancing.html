@@ -42,7 +42,7 @@
 			let camera, scene, renderer;
 			let postProcessing;
 
-			let mixer, clock;
+			let mixer, timer;
 
 			init();
 
@@ -54,7 +54,8 @@
 				scene = new THREE.Scene();
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -166,7 +167,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

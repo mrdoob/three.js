@@ -36,7 +36,7 @@
 
 			}
 
-			const clock = new THREE.Clock( true );
+			const timer = new THREE.Clock( true );
 
 			init();
 
@@ -155,6 +155,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 
 				stats.update();
@@ -163,7 +165,7 @@
 
 			function render() {
 
-				const time = clock.getElapsedTime();
+				const time = timer.getElapsed();
 
 				const r = 3000;
 				camera.position.set( Math.sin( time / 10 ) * r, 1500 + 1000 * Math.cos( time / 5 ), Math.cos( time / 10 ) * r );

@@ -43,7 +43,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 			let dirLight;
 			let torusKnot, dirGroup;
 			let tsmHelper;
@@ -146,7 +146,8 @@
 				controls.maxPolarAngle = Math.PI / 2 - 0.1; // Prevent camera from going below ground
 				controls.update();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				window.addEventListener( 'resize', resize );
 
@@ -392,7 +393,9 @@
 
 			async function animate( time ) {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				// Rotate the central torus knot
 				torusKnot.rotation.x += 0.25 * delta;

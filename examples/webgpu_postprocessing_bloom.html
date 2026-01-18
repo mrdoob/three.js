@@ -46,7 +46,7 @@
 
 
 			let camera;
-			let postProcessing, renderer, mixer, clock;
+			let postProcessing, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -59,7 +59,8 @@
 
 			async function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -160,7 +161,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

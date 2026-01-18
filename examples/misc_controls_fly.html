@@ -69,7 +69,8 @@
 			let d, dPlanet, dMoon;
 			const dMoonVec = new THREE.Vector3();
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -241,6 +242,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -250,7 +253,7 @@
 
 				// rotate the planet and clouds
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;

@@ -53,10 +53,11 @@
 			let normal = new THREE.Vector3();
 			const relativeVelocity = new THREE.Vector3();
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const funfairs = [];
 			const train = new THREE.Object3D();
-			const rcdelta = clock.getDelta() * 0.8; // slow down simulation
+			const rcdelta = timer.getDelta() * 0.8; // slow down simulation
 			const PI2 = Math.PI * 2;
 			let rccamera = null;
 			let rcscene = null;
@@ -626,6 +627,8 @@
 
 			function render() {
 
+				timer.update();
+
 				renderer.xr.renderLayers( );
 
 				handleController( controller1 );
@@ -635,7 +638,7 @@
 				horseLayer.rotation.y -= 0.02;
 
 				//
-				const delta = clock.getDelta() * 0.8;
+				const delta = timer.getDelta() * 0.8;
 
 				const range = 3 - radius;
 

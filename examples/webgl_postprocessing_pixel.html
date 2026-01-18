@@ -35,7 +35,7 @@
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		let camera, scene, renderer, composer, crystalMesh, clock;
+		let camera, scene, renderer, composer, crystalMesh, timer;
 		let gui, params;
 
 		init();
@@ -51,7 +51,8 @@
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x151729 );
 
-			clock = new THREE.Clock();
+			timer = new THREE.Timer();
+			timer.connect( document );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.shadowMap.enabled = true;
@@ -172,7 +173,9 @@
 
 		function animate() {
 
-			const t = clock.getElapsedTime();
+			timer.update();
+
+			const t = timer.getElapsed();
 
 			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;

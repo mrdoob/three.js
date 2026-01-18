@@ -43,7 +43,8 @@
 			let renderer, postProcessing, transitionController, transitionPass;
 
 			const textures = [];
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const effectController = {
 				animateScene: true,
@@ -232,6 +233,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				if ( effectController.animateTransition ) TWEEN.update();
 
 				if ( textures[ effectController.texture ] ) {
@@ -241,7 +244,7 @@
 
 				}
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 				fxSceneA.update( delta );
 				fxSceneB.update( delta );
 
