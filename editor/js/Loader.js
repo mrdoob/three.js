@@ -958,7 +958,6 @@ function Loader( editor ) {
 						loader.parse( file.buffer, '', function ( result ) {
 
 							const scene = result.scene;
-							scene.name = path;
 
 							scene.animations.push( ...result.animations );
 
@@ -1001,7 +1000,6 @@ function Loader( editor ) {
 						loader.parse( strFromU8( file ), '', function ( result ) {
 
 							const scene = result.scene;
-							scene.name = path;
 
 							scene.animations.push( ...result.animations );
 
