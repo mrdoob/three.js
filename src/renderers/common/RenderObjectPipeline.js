@@ -9,7 +9,7 @@ import Pipeline from './Pipeline.js';
 class RenderObjectPipeline extends Pipeline {
 
 	/**
-	 * Constructs a new render pipeline.
+	 * Constructs a new render object pipeline.
 	 *
 	 * @param {string} cacheKey - The pipeline's cache key.
 	 * @param {ProgrammableStage} vertexProgram - The pipeline's vertex shader.
