@@ -22,7 +22,7 @@ const _cacheKeyValues = [];
  * @private
  * @augments DataMap
  */
-class Nodes extends DataMap {
+class NodeManager extends DataMap {
 
 	/**
 	 * Constructs a new nodes management component.
@@ -837,4 +837,4 @@ class Nodes extends DataMap {
 
 }
 
-export default Nodes;
+export default NodeManager;
