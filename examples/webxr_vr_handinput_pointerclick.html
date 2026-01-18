@@ -511,7 +511,7 @@
 			timer.update();
 
 			const delta = timer.getDelta();
-			const elapsedTime = timer.elapsedTime;
+			const elapsedTime = timer.getElapsed();
 			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );

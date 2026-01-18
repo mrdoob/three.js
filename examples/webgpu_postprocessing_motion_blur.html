@@ -228,7 +228,7 @@
 				const speed = params.speed;
 
 				boxRight.rotation.y += delta * 4 * speed;
-				boxLeft.scale.setScalar( 1 + Math.sin( timer.elapsedTime * 10 * speed ) * .2 );
+				boxLeft.scale.setScalar( 1 + Math.sin( timer.getElapsed() * 10 * speed ) * .2 );
 
 				if ( model ) {
 

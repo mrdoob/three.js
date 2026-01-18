@@ -259,7 +259,7 @@
 
 				for ( const object of objects.children ) {
 
-					object.position.y = Math.sin( timer.elapsedTime + object.id ) * .3;
+					object.position.y = Math.sin( timer.getElapsed() + object.id ) * .3;
 					object.rotation.y += delta * .3;
 
 				}

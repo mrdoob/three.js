@@ -36,7 +36,8 @@
 
 			}
 
-			const timer = new THREE.Clock( true );
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
