@@ -6,9 +6,9 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { warnOnce } from '../../utils.js';
 
 /**
- * This module is responsible to manage the rendering pipeline and post processing setups in apps.
+ * This module is responsible to manage the rendering pipeline setups in apps.
  * You usually create a single instance of this class and use it to define
- * the output of your post processing effect chain.
+ * the output of your render pipeline and post processing effect chain.
  * ```js
  * const renderPipeline = new RenderPipeline( renderer );
  *
@@ -22,7 +22,7 @@ import { warnOnce } from '../../utils.js';
 class RenderPipeline {
 
 	/**
-	 * Constructs a new post processing management module.
+	 * Constructs a new render pipeline management module.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
 	 * @param {Node<vec4>} outputNode - An optional output node.
@@ -37,8 +37,8 @@ class RenderPipeline {
 		this.renderer = renderer;
 
 		/**
-		 * A node which defines the final output of the post
-		 * processing. This is usually the last node in a chain
+		 * A node which defines the final output of the rendering
+		 * pipeline. This is usually the last node in a chain
 		 * of effect nodes.
 		 *
 		 * @type {Node<vec4>}
@@ -86,7 +86,7 @@ class RenderPipeline {
 		this._quadMesh.name = 'Render Pipeline';
 
 		/**
-		 * The context of the post processing stack.
+		 * The context of the render pipeline stack.
 		 *
 		 * @private
 		 * @type {?Object}
@@ -134,7 +134,7 @@ class RenderPipeline {
 	}
 
 	/**
-	 * Returns the current context of the post processing stack.
+	 * Returns the current context of the render pipeline stack.
 	 *
 	 * @readonly
 	 * @type {?Object}
