@@ -28,7 +28,7 @@
 			import * as THREE from 'three';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
-			let camera, scene, renderer, sphere, clock;
+			let camera, scene, renderer, sphere, timer;
 
 			init();
 
@@ -36,7 +36,8 @@
 
 				const container = document.getElementById( 'container' );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
@@ -114,11 +115,13 @@
 
 			function animate() {
 
+				timer.update();
+
 				// If we are not presenting move the camera a little so the effect is visible
 
 				if ( renderer.xr.isPresenting === false ) {
 
-					const time = clock.getElapsedTime();
+					const time = timer.getElapsed();
 
 					sphere.rotation.y += 0.001;
 					sphere.position.x = Math.sin( time ) * 0.2;

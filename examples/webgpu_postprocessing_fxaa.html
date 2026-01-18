@@ -43,7 +43,7 @@
 				animated: false
 			};
 
-			let camera, scene, renderer, clock, group;
+			let camera, scene, renderer, timer, group;
 			let postProcessing;
 
 			init();
@@ -56,7 +56,8 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -163,7 +164,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( params.animated === true ) {
 

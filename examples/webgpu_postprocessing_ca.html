@@ -51,7 +51,7 @@
 				cameraDistance: 40
 			};
 
-			let camera, scene, renderer, clock, mainGroup;
+			let camera, scene, renderer, timer, mainGroup;
 			let controls, postProcessing;
 
 			init();
@@ -84,7 +84,8 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// Create main group
 				mainGroup = new THREE.Group();
@@ -296,7 +297,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				controls.update();
 

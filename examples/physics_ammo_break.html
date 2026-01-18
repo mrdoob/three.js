@@ -41,7 +41,8 @@
 		let container, stats;
 		let camera, controls, scene, renderer;
 		let textureLoader;
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 
 		const mouseCoords = new THREE.Vector2();
 		const raycaster = new THREE.Raycaster();
@@ -432,6 +433,8 @@
 
 		function animate() {
 
+			timer.update();
+
 			render();
 			stats.update();
 
@@ -439,7 +442,7 @@
 
 		function render() {
 
-			const deltaTime = clock.getDelta();
+			const deltaTime = timer.getDelta();
 
 			updatePhysics( deltaTime );
 

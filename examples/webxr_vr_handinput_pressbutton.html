@@ -330,7 +330,8 @@
 		};
 
 		const world = new World();
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 		let camera, scene, renderer;
 
 		init();
@@ -564,8 +565,10 @@
 
 		function animate() {
 
-			const delta = clock.getDelta();
-			const elapsedTime = clock.elapsedTime;
+			timer.update();
+
+			const delta = timer.getDelta();
+			const elapsedTime = timer.getElapsed();
 			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );

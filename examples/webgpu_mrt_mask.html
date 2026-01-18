@@ -44,7 +44,7 @@
 			let camera, scene, renderer;
 			let postProcessing;
 			let spheres, rotate = true;
-			let mixer, clock;
+			let mixer, timer;
 
 			init();
 
@@ -57,7 +57,8 @@
 				scene.backgroundNode = screenUV.y.mix( color( 0x66bbff ), color( 0x4466ff ) ).mul( .05 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -164,7 +165,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 
