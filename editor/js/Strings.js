@@ -409,7 +409,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'شیدر راس',
 			'script/title/fragmentShader': 'شیدر فرگمنت',
-			'script/title/programInfo': 'خواص برنامه'
+			'script/title/programInfo': 'خواص برنامه',
+
+			'dialog/gltf/title': 'Import glTF',
+			'dialog/gltf/asScene': 'Import glTF as root scene',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Cancel'
 
 		},
 		en: {
@@ -819,7 +824,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'Vertex Shader',
 			'script/title/fragmentShader': 'Fragment Shader',
-			'script/title/programInfo': 'Program Properties'
+			'script/title/programInfo': 'Program Properties',
+
+			'dialog/gltf/title': 'Import glTF',
+			'dialog/gltf/asScene': 'Import glTF as root scene',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Cancel'
 
 		},
 
@@ -1230,7 +1240,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'Vertex Shader',
 			'script/title/fragmentShader': 'Fragment Shader',
-			'script/title/programInfo': 'Propriétés du programme'
+			'script/title/programInfo': 'Propriétés du programme',
+
+			'dialog/gltf/title': 'Importer glTF',
+			'dialog/gltf/asScene': 'Importer glTF comme scène racine',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Annuler'
 
 		},
 
@@ -1641,7 +1656,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '顶点着色器',
 			'script/title/fragmentShader': '片段着色器',
-			'script/title/programInfo': '程序属性'
+			'script/title/programInfo': '程序属性',
+
+			'dialog/gltf/title': '导入 glTF',
+			'dialog/gltf/asScene': '将 glTF 导入为根场景',
+			'dialog/ok': '确定',
+			'dialog/cancel': '取消'
 
 		},
 
@@ -2052,7 +2072,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '頂点シェーダー',
 			'script/title/fragmentShader': 'フラグメントシェーダ',
-			'script/title/programInfo': 'プログラムのプロパティ'
+			'script/title/programInfo': 'プログラムのプロパティ',
+
+			'dialog/gltf/title': 'glTFをインポート',
+			'dialog/gltf/asScene': 'glTFをルートシーンとしてインポート',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'キャンセル'
 
 		},
 
@@ -2462,7 +2487,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '버텍스 셰이더',
 			'script/title/fragmentShader': '프래그먼트 셰이더',
-			'script/title/programInfo': '프로그램 속성'
+			'script/title/programInfo': '프로그램 속성',
+
+			'dialog/gltf/title': 'glTF 가져오기',
+			'dialog/gltf/asScene': 'glTF를 루트 씬으로 가져오기',
+			'dialog/ok': '확인',
+			'dialog/cancel': '취소'
 		}
 	};
 

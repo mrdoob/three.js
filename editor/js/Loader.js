@@ -3,8 +3,11 @@ import * as THREE from 'three';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
+
+import { GLTFImportDialog } from './GLTFImportDialog.js';
 
 import { unzipSync, strFromU8 } from 'three/addons/libs/fflate.module.js';
 
@@ -268,20 +271,40 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const loader = await createGLTFLoader();
+					try {
 
-					loader.parse( contents, '', function ( result ) {
+						const dialog = new GLTFImportDialog( editor.strings );
+						const options = await dialog.show();
 
-						const scene = result.scene;
-						scene.name = filename;
+						const loader = await createGLTFLoader();
 
-						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						loader.parse( contents, '', function ( result ) {
 
-						loader.dracoLoader.dispose();
-						loader.ktx2Loader.dispose();
+							const scene = result.scene;
+							scene.name = filename;
 
-					} );
+							scene.animations.push( ...result.animations );
+
+							if ( options.asScene ) {
+
+								editor.execute( new SetSceneCommand( editor, scene ) );
+
+							} else {
+
+								editor.execute( new AddObjectCommand( editor, scene ) );
+
+							}
+
+							loader.dracoLoader.dispose();
+							loader.ktx2Loader.dispose();
+
+						} );
+
+					} catch ( e ) {
+
+						// Import cancelled
+
+					}
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -298,20 +321,40 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const loader = await createGLTFLoader( manager );
+					try {
 
-					loader.parse( contents, '', function ( result ) {
+						const dialog = new GLTFImportDialog( editor.strings );
+						const options = await dialog.show();
 
-						const scene = result.scene;
-						scene.name = filename;
+						const loader = await createGLTFLoader( manager );
 
-						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						loader.parse( contents, '', function ( result ) {
 
-						loader.dracoLoader.dispose();
-						loader.ktx2Loader.dispose();
+							const scene = result.scene;
+							scene.name = filename;
 
-					} );
+							scene.animations.push( ...result.animations );
+
+							if ( options.asScene ) {
+
+								editor.execute( new SetSceneCommand( editor, scene ) );
+
+							} else {
+
+								editor.execute( new AddObjectCommand( editor, scene ) );
+
+							}
+
+							loader.dracoLoader.dispose();
+							loader.ktx2Loader.dispose();
+
+						} );
+
+					} catch ( e ) {
+
+						// Import cancelled
+
+					}
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -905,19 +948,40 @@ function Loader( editor ) {
 
 				{
 
-					const loader = await createGLTFLoader();
+					try {
 
-					loader.parse( file.buffer, '', function ( result ) {
+						const dialog = new GLTFImportDialog( editor.strings );
+						const options = await dialog.show();
 
-						const scene = result.scene;
+						const loader = await createGLTFLoader();
 
-						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						loader.parse( file.buffer, '', function ( result ) {
 
-						loader.dracoLoader.dispose();
-						loader.ktx2Loader.dispose();
+							const scene = result.scene;
+							scene.name = path;
 
-					} );
+							scene.animations.push( ...result.animations );
+
+							if ( options.asScene ) {
+
+								editor.execute( new SetSceneCommand( editor, scene ) );
+
+							} else {
+
+								editor.execute( new AddObjectCommand( editor, scene ) );
+
+							}
+
+							loader.dracoLoader.dispose();
+							loader.ktx2Loader.dispose();
+
+						} );
+
+					} catch ( e ) {
+
+						// Import cancelled
+
+					}
 
 					break;
 
@@ -927,19 +991,40 @@ function Loader( editor ) {
 
 				{
 
-					const loader = await createGLTFLoader( manager );
+					try {
 
-					loader.parse( strFromU8( file ), '', function ( result ) {
+						const dialog = new GLTFImportDialog( editor.strings );
+						const options = await dialog.show();
 
-						const scene = result.scene;
+						const loader = await createGLTFLoader( manager );
 
-						scene.animations.push( ...result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						loader.parse( strFromU8( file ), '', function ( result ) {
 
-						loader.dracoLoader.dispose();
-						loader.ktx2Loader.dispose();
+							const scene = result.scene;
+							scene.name = path;
 
-					} );
+							scene.animations.push( ...result.animations );
+
+							if ( options.asScene ) {
+
+								editor.execute( new SetSceneCommand( editor, scene ) );
+
+							} else {
+
+								editor.execute( new AddObjectCommand( editor, scene ) );
+
+							}
+
+							loader.dracoLoader.dispose();
+							loader.ktx2Loader.dispose();
+
+						} );
+
+					} catch ( e ) {
+
+						// Import cancelled
+
+					}
 
 					break;
 
