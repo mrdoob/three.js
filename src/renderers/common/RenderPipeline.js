@@ -107,7 +107,7 @@ class RenderPipeline {
 
 		this._update();
 
-		if ( this._context.onBeforePostProcessing !== null ) this._context.onBeforePostProcessing();
+		if ( this._context.onBeforeRenderPipeline !== null ) this._context.onBeforeRenderPipeline();
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
@@ -129,7 +129,7 @@ class RenderPipeline {
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
 
-		if ( this._context.onAfterPostProcessing !== null ) this._context.onAfterPostProcessing();
+		if ( this._context.onAfterRenderPipeline !== null ) this._context.onAfterRenderPipeline();
 
 	}
 
@@ -169,9 +169,9 @@ class RenderPipeline {
 			const outputColorSpace = renderer.outputColorSpace;
 
 			const context = {
-				postProcessing: this,
-				onBeforePostProcessing: null,
-				onAfterPostProcessing: null
+				renderPipeline: this,
+				onBeforeRenderPipeline: null,
+				onAfterRenderPipeline: null
 			};
 
 			let outputNode = this.outputNode;
