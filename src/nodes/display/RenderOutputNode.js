@@ -13,10 +13,10 @@ import { ColorManagement } from '../../math/ColorManagement.js';
  * in the effect chain.
  *
  * When applying tone mapping and color space conversion manually with this node,
- * you have to set {@link PostProcessing#outputColorTransform} to `false`.
+ * you have to set {@link RenderPipeline#outputColorTransform} to `false`.
  *
  * ```js
- * const postProcessing = new PostProcessing( renderer );
+ * const postProcessing = new RenderPipeline( renderer );
  * postProcessing.outputColorTransform = false;
  *
  * const scenePass = pass( scene, camera );

@@ -6,7 +6,7 @@ export { default as Lighting } from './renderers/common/Lighting.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
-export { default as PostProcessing } from './renderers/common/PostProcessing.js';
+export { default as RenderPipeline } from './renderers/common/RenderPipeline.js';
 import * as RendererUtils from './renderers/common/RendererUtils.js';
 export { RendererUtils };
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';

@@ -10,7 +10,7 @@ import { warnOnce } from '../../utils.js';
  * You usually create a single instance of this class and use it to define
  * the output of your post processing effect chain.
  * ```js
- * const postProcessing = new PostProcessing( renderer );
+ * const postProcessing = new RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
@@ -19,7 +19,7 @@ import { warnOnce } from '../../utils.js';
  *
  * Note: This module can only be used with `WebGPURenderer`.
  */
-class PostProcessing {
+class RenderPipeline {
 
 	/**
 	 * Constructs a new post processing management module.
@@ -73,7 +73,7 @@ class PostProcessing {
 		this.needsUpdate = true;
 
 		const material = new NodeMaterial();
-		material.name = 'PostProcessing';
+		material.name = 'RenderPipeline';
 
 		/**
 		 * The full screen quad that is used to render
@@ -203,7 +203,7 @@ class PostProcessing {
 	}
 
 	/**
-	 * When `PostProcessing` is used to apply post processing effects,
+	 * When `RenderPipeline` is used to apply post processing effects,
 	 * the application must use this version of `renderAsync()` inside
 	 * its animation loop (not the one from the renderer).
 	 *
@@ -213,7 +213,7 @@ class PostProcessing {
 	 */
 	async renderAsync() {
 
-		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+		warnOnce( 'RenderPipeline: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		await this.renderer.init();
 
@@ -223,4 +223,4 @@ class PostProcessing {
 
 }
 
-export default PostProcessing;
+export default RenderPipeline;
