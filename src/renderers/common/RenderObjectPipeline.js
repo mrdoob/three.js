@@ -6,10 +6,10 @@ import Pipeline from './Pipeline.js';
  * @private
  * @augments Pipeline
  */
-class RenderPipeline extends Pipeline {
+class RenderObjectPipeline extends Pipeline {
 
 	/**
-	 * Constructs a new render pipeline.
+	 * Constructs a new render object pipeline.
 	 *
 	 * @param {string} cacheKey - The pipeline's cache key.
 	 * @param {ProgrammableStage} vertexProgram - The pipeline's vertex shader.
@@ -37,4 +37,4 @@ class RenderPipeline extends Pipeline {
 
 }
 
-export default RenderPipeline;
+export default RenderObjectPipeline;
