@@ -63,6 +63,12 @@ function WebGLMaterials( renderer, properties ) {
 			refreshUniformsCommon( uniforms, material );
 			refreshUniformsPhong( uniforms, material );
 
+			if ( material.envMap ) {
+
+				uniforms.envMapIntensity.value = material.envMapIntensity;
+
+			}
+
 		} else if ( material.isMeshStandardMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );

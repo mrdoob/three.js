@@ -66,7 +66,8 @@ const ShaderLib = {
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
-				shininess: { value: 30 }
+				shininess: { value: 30 },
+				envMapIntensity: { value: 1 }
 			}
 		] ),
 
