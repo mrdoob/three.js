@@ -146,8 +146,8 @@
 
 			return new THREE.MeshBasicMaterial( {
 				vertexColors: true,
-				transparent: true,
-				depthWrite: false
+				transparent: api.transparent,
+				depthWrite: ! api.transparent
 			} );
 
 		}
