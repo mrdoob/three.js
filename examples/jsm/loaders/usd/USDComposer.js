@@ -53,10 +53,11 @@ const SpecType = {
  */
 class USDComposer {
 
-	constructor() {
+	constructor( manager = null ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
+		this.manager = manager;
 
 	}
 
@@ -746,7 +747,7 @@ class USDComposer {
 		// If it's specsByPath data, compose it
 		if ( referencedData.specsByPath ) {
 
-			const composer = new USDComposer();
+			const composer = new USDComposer( this.manager );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 
@@ -3135,6 +3136,19 @@ class USDComposer {
 				if ( key.endsWith( baseName ) || key.endsWith( '/' + baseName ) ) {
 
 					return this._createTextureFromData( this.assets[ key ], textureAttrs, transformAttrs );
+
+				}
+
+			}
+
+			// Try loading via LoadingManager if available
+			if ( this.manager ) {
+
+				const url = this.manager.resolveURL( baseName );
+				if ( url !== baseName ) {
+
+					// URL modifier found a match - load it
+					return this._createTextureFromData( url, textureAttrs, transformAttrs );
 
 				}
 

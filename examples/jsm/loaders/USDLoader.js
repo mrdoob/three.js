@@ -201,11 +201,13 @@ class USDLoader extends Loader {
 
 		}
 
+		const scope = this;
+
 		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
-			const composer = new USDComposer();
+			const composer = new USDComposer( scope.manager );
 			const data = usda.parseData( buffer );
 			return composer.compose( data, {} );
 
@@ -215,7 +217,7 @@ class USDLoader extends Loader {
 
 		if ( isCrateFile( buffer ) ) {
 
-			const composer = new USDComposer();
+			const composer = new USDComposer( scope.manager );
 			const data = usdc.parseData( buffer );
 			return composer.compose( data, {} );
 
@@ -233,7 +235,7 @@ class USDLoader extends Loader {
 
 			const { file, basePath } = findUSD( zip );
 
-			const composer = new USDComposer();
+			const composer = new USDComposer( scope.manager );
 			let data;
 
 			if ( isCrateFile( file ) ) {
@@ -253,7 +255,7 @@ class USDLoader extends Loader {
 
 		// USDA (standalone, as ArrayBuffer)
 
-		const composer = new USDComposer();
+		const composer = new USDComposer( scope.manager );
 		const text = new TextDecoder().decode( bytes );
 		const data = usda.parseData( text );
 		return composer.compose( data, {} );
