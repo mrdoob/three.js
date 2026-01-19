@@ -1,11 +1,30 @@
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
 import { arrayNeedsUint32 } from '../../utils.js';
 
+/**
+ * Manages WebGL geometry resources, including geometry registration, updates, and wireframe attribute generation.
+ * This class handles the lifecycle of geometries in the WebGL renderer, tracking them for proper cleanup
+ * and managing wireframe rendering attributes.
+ *
+ * @private
+ * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGLAttributes} attributes - The WebGL attributes manager for buffer management.
+ * @param {WebGLInfo} info - The WebGL info object for tracking memory usage.
+ * @param {WebGLBindingStates} bindingStates - The WebGL binding states manager for VAO management.
+ */
 function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	const geometries = {};
 	const wireframeAttributes = new WeakMap();
 
+	/**
+	 * Handles geometry disposal events, cleaning up associated WebGL resources.
+	 * This function is called when a geometry is disposed, ensuring all buffers,
+	 * attributes, and binding states are properly released.
+	 *
+	 * @private
+	 * @param {Event} event - The dispose event containing the geometry as event.target.
+	 */
 	function onGeometryDispose( event ) {
 
 		const geometry = event.target;
@@ -49,6 +68,17 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	/**
+	 * Registers a geometry with the WebGL renderer and sets up disposal handling.
+	 * If the geometry is already registered, it returns immediately. Otherwise,
+	 * it registers the geometry, increments the memory counter, and sets up
+	 * the disposal event listener.
+	 *
+	 * @private
+	 * @param {Object3D} object - The 3D object containing the geometry (currently unused but kept for API consistency).
+	 * @param {BufferGeometry} geometry - The geometry to register.
+	 * @return {BufferGeometry} The registered geometry.
+	 */
 	function get( object, geometry ) {
 
 		if ( geometries[ geometry.id ] === true ) return geometry;
@@ -63,6 +93,15 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	/**
+	 * Updates all attributes of a geometry in the WebGL context.
+	 * This function iterates through all geometry attributes and updates
+	 * their corresponding WebGL buffers. The index buffer is handled separately
+	 * in WebGLBindingStates.
+	 *
+	 * @private
+	 * @param {BufferGeometry} geometry - The geometry whose attributes should be updated.
+	 */
 	function update( geometry ) {
 
 		const geometryAttributes = geometry.attributes;
@@ -77,6 +116,16 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	/**
+	 * Generates or updates wireframe attributes for a geometry.
+	 * Creates line segments from triangle indices or position data to enable
+	 * wireframe rendering. The function handles both indexed and non-indexed geometries,
+	 * automatically selecting the appropriate buffer type (Uint16 or Uint32) based on
+	 * the maximum index value.
+	 *
+	 * @private
+	 * @param {BufferGeometry} geometry - The geometry to generate wireframe attributes for.
+	 */
 	function updateWireframeAttribute( geometry ) {
 
 		const indices = [];
@@ -138,6 +187,16 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	/**
+	 * Retrieves the wireframe attribute for a geometry, creating it if necessary.
+	 * This function checks if a wireframe attribute exists and is up-to-date.
+	 * If the geometry's index has been updated since the wireframe attribute was created,
+	 * it regenerates the attribute. Otherwise, it returns the cached attribute.
+	 *
+	 * @private
+	 * @param {BufferGeometry} geometry - The geometry to get wireframe attributes for.
+	 * @return {BufferAttribute|null} The wireframe attribute, or null if the geometry has no valid data.
+	 */
 	function getWireframeAttribute( geometry ) {
 
 		const currentAttribute = wireframeAttributes.get( geometry );
