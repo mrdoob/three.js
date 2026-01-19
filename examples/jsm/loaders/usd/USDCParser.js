@@ -1,5 +1,17 @@
 const textDecoder = new TextDecoder();
 
+// Pre-computed half-float exponent lookup table for fast conversion
+// Math.pow(2, exp - 15) for exp = 0..31
+const HALF_EXPONENT_TABLE = new Float32Array( 32 );
+for ( let i = 0; i < 32; i ++ ) {
+
+	HALF_EXPONENT_TABLE[ i ] = Math.pow( 2, i - 15 );
+
+}
+
+// Pre-computed constant for denormalized half-floats: 2^-14
+const HALF_DENORM_SCALE = Math.pow( 2, - 14 );
+
 // Type enum values from crateDataTypes.h
 const TypeEnum = {
 	Invalid: 0,
@@ -501,6 +513,9 @@ class USDCParser {
 		this.buffer = buffer instanceof ArrayBuffer ? buffer : buffer.buffer;
 		this.reader = new BinaryReader( this.buffer );
 		this.version = { major: 0, minor: 0, patch: 0 };
+
+		this._conversionBuffer = new ArrayBuffer( 4 );
+		this._conversionView = new DataView( this._conversionBuffer );
 
 		this._readBootstrap();
 		this._readTOC();
@@ -1101,6 +1116,7 @@ class USDCParser {
 
 		const type = valueRep.typeEnum;
 		const payload = valueRep.getInlinedValue();
+		const view = this._conversionView;
 
 		switch ( type ) {
 
@@ -1113,18 +1129,16 @@ class USDCParser {
 				return payload;
 			case TypeEnum.Float: {
 
-				const buf = new ArrayBuffer( 4 );
-				new DataView( buf ).setUint32( 0, payload, true );
-				return new DataView( buf ).getFloat32( 0, true );
+				view.setUint32( 0, payload, true );
+				return view.getFloat32( 0, true );
 
 			}
 
 			case TypeEnum.Double: {
 
 				// When a double is inlined, it's stored as float32 bits in the payload
-				const buf = new ArrayBuffer( 4 );
-				new DataView( buf ).setUint32( 0, payload, true );
-				return new DataView( buf ).getFloat32( 0, true );
+				view.setUint32( 0, payload, true );
+				return view.getFloat32( 0, true );
 
 			}
 
@@ -1143,8 +1157,6 @@ class USDCParser {
 			// Vec2h: Two half-floats fit in 4 bytes, stored directly
 			case TypeEnum.Vec2h: {
 
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				return [ this._halfToFloat( view.getUint16( 0, true ) ), this._halfToFloat( view.getUint16( 2, true ) ) ];
 
@@ -1155,8 +1167,6 @@ class USDCParser {
 			case TypeEnum.Vec2f:
 			case TypeEnum.Vec2i: {
 
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				return [ view.getInt8( 0 ), view.getInt8( 1 ) ];
 
@@ -1165,8 +1175,6 @@ class USDCParser {
 			case TypeEnum.Vec3f:
 			case TypeEnum.Vec3i: {
 
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				return [ view.getInt8( 0 ), view.getInt8( 1 ), view.getInt8( 2 ) ];
 
@@ -1175,8 +1183,6 @@ class USDCParser {
 			case TypeEnum.Vec4f:
 			case TypeEnum.Vec4i: {
 
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				return [ view.getInt8( 0 ), view.getInt8( 1 ), view.getInt8( 2 ), view.getInt8( 3 ) ];
 
@@ -1185,8 +1191,6 @@ class USDCParser {
 			case TypeEnum.Matrix2d: {
 
 				// Inlined Matrix2d stores diagonal values as 2 signed int8 values
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 );
 				return [ d0, 0, 0, d1 ];
@@ -1196,8 +1200,6 @@ class USDCParser {
 			case TypeEnum.Matrix3d: {
 
 				// Inlined Matrix3d stores diagonal values as 3 signed int8 values
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 ), d2 = view.getInt8( 2 );
 				return [ d0, 0, 0, 0, d1, 0, 0, 0, d2 ];
@@ -1207,8 +1209,6 @@ class USDCParser {
 			case TypeEnum.Matrix4d: {
 
 				// Inlined Matrix4d stores diagonal values as 4 signed int8 values
-				const buf = new ArrayBuffer( 4 );
-				const view = new DataView( buf );
 				view.setUint32( 0, payload, true );
 				const d0 = view.getInt8( 0 ), d1 = view.getInt8( 1 ), d2 = view.getInt8( 2 ), d3 = view.getInt8( 3 );
 				return [ d0, 0, 0, 0, 0, d1, 0, 0, 0, 0, d2, 0, 0, 0, 0, d3 ];
@@ -1786,7 +1786,6 @@ class USDCParser {
 
 	_halfToFloat( h ) {
 
-		// Convert half to float (IEEE 754 half-precision)
 		const sign = ( h & 0x8000 ) >> 15;
 		const exp = ( h & 0x7C00 ) >> 10;
 		const frac = h & 0x03FF;
@@ -1801,7 +1800,7 @@ class USDCParser {
 			}
 
 			// Denormalized: value = ±2^-14 × (frac/1024)
-			return ( sign ? - 1 : 1 ) * Math.pow( 2, - 14 ) * ( frac / 1024 );
+			return ( sign ? - 1 : 1 ) * HALF_DENORM_SCALE * ( frac / 1024 );
 
 		} else if ( exp === 31 ) {
 
@@ -1809,7 +1808,7 @@ class USDCParser {
 
 		}
 
-		return ( sign ? - 1 : 1 ) * Math.pow( 2, exp - 15 ) * ( 1 + frac / 1024 );
+		return ( sign ? - 1 : 1 ) * HALF_EXPONENT_TABLE[ exp ] * ( 1 + frac / 1024 );
 
 	}
 
