@@ -47,6 +47,12 @@ function WebGLMaterials( renderer, properties ) {
 
 			refreshUniformsCommon( uniforms, material );
 
+			if ( material.envMap ) {
+
+				uniforms.envMapIntensity.value = material.envMapIntensity;
+
+			}
+
 		} else if ( material.isMeshToonMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
