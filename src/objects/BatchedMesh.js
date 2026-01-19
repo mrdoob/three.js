@@ -1130,7 +1130,7 @@ class BatchedMesh extends Mesh {
 	 *
 	 * @param {number} instanceId - The ID of an instance to get the color of.
 	 * @param {Color|Vector4} color - The target object that is used to store the method's result.
-	 * @return {Color|Vector4} The instance's color.
+	 * @return {Color|Vector4} The instance's color.  Use a `Vector4` to also retrieve alpha.
 	 */
 	getColorAt( instanceId, color ) {
 
