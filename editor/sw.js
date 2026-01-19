@@ -138,6 +138,7 @@ const assets = [
 	'./js/History.js',
 	'./js/Loader.js',
 	'./js/LoaderUtils.js',
+	'./js/GLTFImportDialog.js',
 	'./js/Menubar.js',
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',
