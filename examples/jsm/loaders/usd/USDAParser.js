@@ -1,3 +1,8 @@
+// Pre-compiled regex patterns for performance
+const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
+const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
+const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
+
 class USDAParser {
 
 	parseText( text ) {
@@ -466,7 +471,7 @@ class USDAParser {
 
 				// Check for primitive definitions
 				// Matches both 'def TypeName "name"' and 'def "name"' (no type)
-				const defMatch = key.match( /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/ );
+				const defMatch = key.match( DEF_MATCH_REGEX );
 				if ( defMatch ) {
 
 					const typeName = defMatch[ 1 ] || '';
@@ -535,7 +540,7 @@ class USDAParser {
 
 				for ( const vKey in variants ) {
 
-					const match = vKey.match( /^string\s+(\w+)$/ );
+					const match = vKey.match( VARIANT_STRING_REGEX );
 					if ( match ) {
 
 						const variantSetName = match[ 1 ];
@@ -583,7 +588,7 @@ class USDAParser {
 
 			// Handle typed attributes
 			// Format: [qualifier] type attrName (e.g., "uniform token[] joints", "float3 position")
-			const attrMatch = key.match( /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/ );
+			const attrMatch = key.match( ATTR_MATCH_REGEX );
 			if ( attrMatch ) {
 
 				const valueType = attrMatch[ 1 ];

@@ -25,6 +25,9 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
+// Pre-compiled regex patterns for performance
+const VARIANT_PATH_REGEX = /^(.+?)\/\{(\w+)=(\w+)\}\/(.+)$/;
+
 // Spec types (must match USDCParser)
 const SpecType = {
 	Unknown: 0,
@@ -73,6 +76,9 @@ class USDComposer {
 		this.basePath = basePath;
 		this.skinnedMeshes = [];
 		this.skeletons = {};
+
+		// Build indexes for O(1) lookups
+		this._buildIndexes();
 
 		// Get FPS from root spec
 		const rootSpec = this.specsByPath[ '/' ];
@@ -305,6 +311,100 @@ class USDComposer {
 	}
 
 	/**
+	 * Build indexes for efficient lookups.
+	 * Called once during compose() to avoid O(n) scans per lookup.
+	 */
+	_buildIndexes() {
+
+		// childrenByPath: parentPath -> [childName1, childName2, ...]
+		this.childrenByPath = new Map();
+
+		// attributesByPrimPath: primPath -> Map(attrName -> attrSpec)
+		this.attributesByPrimPath = new Map();
+
+		// materialsByRoot: rootPath -> [materialPath1, materialPath2, ...]
+		this.materialsByRoot = new Map();
+
+		for ( const path in this.specsByPath ) {
+
+			const spec = this.specsByPath[ path ];
+
+			if ( spec.specType === SpecType.Prim ) {
+
+				// Build parent-child index
+				const lastSlash = path.lastIndexOf( '/' );
+
+				if ( lastSlash > 0 ) {
+
+					const parentPath = path.slice( 0, lastSlash );
+					const childName = path.slice( lastSlash + 1 );
+
+					if ( ! this.childrenByPath.has( parentPath ) ) {
+
+						this.childrenByPath.set( parentPath, [] );
+
+					}
+
+					this.childrenByPath.get( parentPath ).push( { name: childName, path: path } );
+
+				} else if ( lastSlash === 0 && path.length > 1 ) {
+
+					// Direct child of root
+					const childName = path.slice( 1 );
+
+					if ( ! this.childrenByPath.has( '/' ) ) {
+
+						this.childrenByPath.set( '/', [] );
+
+					}
+
+					this.childrenByPath.get( '/' ).push( { name: childName, path: path } );
+
+				}
+
+				// Build material index
+				if ( spec.fields.typeName === 'Material' ) {
+
+					const parts = path.split( '/' );
+					const rootPath = parts.length > 1 ? '/' + parts[ 1 ] : '/';
+
+					if ( ! this.materialsByRoot.has( rootPath ) ) {
+
+						this.materialsByRoot.set( rootPath, [] );
+
+					}
+
+					this.materialsByRoot.get( rootPath ).push( path );
+
+				}
+
+			} else if ( spec.specType === SpecType.Attribute || spec.specType === SpecType.Relationship ) {
+
+				// Build attribute index
+				const dotIndex = path.lastIndexOf( '.' );
+
+				if ( dotIndex > 0 ) {
+
+					const primPath = path.slice( 0, dotIndex );
+					const attrName = path.slice( dotIndex + 1 );
+
+					if ( ! this.attributesByPrimPath.has( primPath ) ) {
+
+						this.attributesByPrimPath.set( primPath, new Map() );
+
+					}
+
+					this.attributesByPrimPath.get( primPath ).set( attrName, spec );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Check if a path is a direct child of parentPath.
 	 */
 	_isDirectChild( parentPath, path, prefix ) {
@@ -327,30 +427,47 @@ class USDComposer {
 
 	/**
 	 * Build the scene hierarchy recursively.
+	 * Uses childrenByPath index for O(1) child lookup instead of O(n) iteration.
 	 */
 	_buildHierarchy( parent, parentPath ) {
 
-		const prefix = parentPath === '/' ? '/' : parentPath + '/';
+		// Collect children from parentPath and any active variant paths
+		const childEntries = [];
+		const seenPaths = new Set();
 
-		// Get variant paths to search
+		// Get direct children using the index
+		const directChildren = this.childrenByPath.get( parentPath );
+
+		if ( directChildren ) {
+
+			for ( const child of directChildren ) {
+
+				if ( ! seenPaths.has( child.path ) ) {
+
+					seenPaths.add( child.path );
+					childEntries.push( child );
+
+				}
+
+			}
+
+		}
+
+		// Also get children from active variant paths
 		const variantPaths = this._getVariantPaths( parentPath );
 
-		for ( const path in this.specsByPath ) {
+		for ( const vp of variantPaths ) {
 
-			const spec = this.specsByPath[ path ];
+			const variantChildren = this.childrenByPath.get( vp );
 
-			// Check if direct child of parent or variant paths
-			let isChild = this._isDirectChild( parentPath, path, prefix );
+			if ( variantChildren ) {
 
-			if ( ! isChild ) {
+				for ( const child of variantChildren ) {
 
-				for ( const vp of variantPaths ) {
+					if ( ! seenPaths.has( child.path ) ) {
 
-					const vpPrefix = vp + '/';
-					if ( this._isDirectChild( vp, path, vpPrefix ) ) {
-
-						isChild = true;
-						break;
+						seenPaths.add( child.path );
+						childEntries.push( child );
 
 					}
 
@@ -358,10 +475,14 @@ class USDComposer {
 
 			}
 
-			if ( ! isChild ) continue;
-			if ( spec.specType !== SpecType.Prim ) continue;
+		}
 
-			const name = path.split( '/' ).pop();
+		// Process each child
+		for ( const { name, path } of childEntries ) {
+
+			const spec = this.specsByPath[ path ];
+			if ( ! spec || spec.specType !== SpecType.Prim ) continue;
+
 			const typeName = spec.fields.typeName;
 
 			// Check for references/payloads
@@ -768,7 +889,7 @@ class USDComposer {
 		this._collectAttributesFromPath( path, attrs );
 
 		// Collect overrides from sibling variants (when path is inside a variant)
-		const variantMatch = path.match( /^(.+?)\/\{(\w+)=(\w+)\}\/(.+)$/ );
+		const variantMatch = path.match( VARIANT_PATH_REGEX );
 		if ( variantMatch ) {
 
 			const basePath = variantMatch[ 1 ];
@@ -811,14 +932,12 @@ class USDComposer {
 
 	_collectAttributesFromPath( path, attrs ) {
 
-		const prefix = path + '.';
+		// Use the attribute index for O(1) lookup instead of O(n) iteration
+		const attrMap = this.attributesByPrimPath.get( path );
 
-		for ( const attrPath in this.specsByPath ) {
+		if ( ! attrMap ) return;
 
-			if ( ! attrPath.startsWith( prefix ) ) continue;
-
-			const attrSpec = this.specsByPath[ attrPath ];
-			const attrName = attrPath.slice( prefix.length );
+		for ( const [ attrName, attrSpec ] of attrMap ) {
 
 			if ( attrSpec.fields?.default !== undefined ) {
 
@@ -2080,20 +2199,23 @@ class USDComposer {
 
 		if ( ! materialPath ) {
 
+			// Use material index for O(1) lookup instead of O(n) iteration
 			const meshParts = meshPath.split( '/' );
 			const rootPath = '/' + meshParts[ 1 ];
 
-			for ( const path in this.specsByPath ) {
+			const materialsInRoot = this.materialsByRoot.get( rootPath );
 
-				const spec = this.specsByPath[ path ];
-				if ( spec.specType !== SpecType.Prim ) continue;
-				if ( spec.fields.typeName !== 'Material' ) continue;
+			if ( materialsInRoot ) {
 
-				if ( path.startsWith( rootPath + '/Looks/' ) ||
-					path.startsWith( rootPath + '/Materials/' ) ) {
+				for ( const path of materialsInRoot ) {
 
-					materialPath = path;
-					break;
+					if ( path.startsWith( rootPath + '/Looks/' ) ||
+						path.startsWith( rootPath + '/Materials/' ) ) {
+
+						materialPath = path;
+						break;
+
+					}
 
 				}
 
@@ -2219,25 +2341,25 @@ class USDComposer {
 
 	}
 
-	_applyPreviewSurface( material, shaderPath ) {
+	/**
+	 * Shared helper for applying texture or value from shader attribute.
+	 * Reduces duplication between _applyPreviewSurface and _applyOpenPBRSurface.
+	 */
+	_applyTextureOrValue( material, shaderPath, fields, attrName, textureProperty, colorSpace, valueCallback, textureGetter ) {
 
-		const fields = this._getAttributes( shaderPath );
+		const attrPath = shaderPath + '.' + attrName;
+		const spec = this.specsByPath[ attrPath ];
 
-		const getAttrSpec = ( attrName ) => {
+		if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
 
-			const attrPath = shaderPath + '.' + attrName;
-			return this.specsByPath[ attrPath ];
+			// For OpenPBR, try all connection paths; for PreviewSurface, just the first
+			const paths = textureGetter === this._getTextureFromOpenPBRConnection
+				? spec.fields.connectionPaths
+				: [ spec.fields.connectionPaths[ 0 ] ];
 
-		};
+			for ( const connPath of paths ) {
 
-		const applyTextureFromConnection = ( attrName, textureProperty, colorSpace, valueCallback ) => {
-
-			const spec = getAttrSpec( attrName );
-
-			if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
-
-				const connPath = spec.fields.connectionPaths[ 0 ];
-				const texture = this._getTextureFromConnection( connPath );
+				const texture = textureGetter.call( this, connPath );
 
 				if ( texture ) {
 
@@ -2249,18 +2371,40 @@ class USDComposer {
 
 			}
 
-			if ( fields[ attrName ] !== undefined && valueCallback ) {
+		}
 
-				valueCallback( fields[ attrName ] );
+		if ( fields[ attrName ] !== undefined && valueCallback ) {
 
-			}
+			valueCallback( fields[ attrName ] );
 
-			return false;
+		}
+
+		return false;
+
+	}
+
+	_applyPreviewSurface( material, shaderPath ) {
+
+		const fields = this._getAttributes( shaderPath );
+
+		const applyTexture = ( attrName, textureProperty, colorSpace, valueCallback ) => {
+
+			return this._applyTextureOrValue(
+				material, shaderPath, fields, attrName, textureProperty, colorSpace, valueCallback,
+				this._getTextureFromConnection
+			);
+
+		};
+
+		const getAttrSpec = ( attrName ) => {
+
+			const attrPath = shaderPath + '.' + attrName;
+			return this.specsByPath[ attrPath ];
 
 		};
 
 		// Diffuse color / base color map
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:diffuseColor',
 			'map',
 			SRGBColorSpace,
@@ -2276,7 +2420,7 @@ class USDComposer {
 		);
 
 		// Emissive
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:emissiveColor',
 			'emissiveMap',
 			SRGBColorSpace,
@@ -2298,7 +2442,7 @@ class USDComposer {
 		}
 
 		// Normal map
-		applyTextureFromConnection( 'inputs:normal', 'normalMap', NoColorSpace, null );
+		applyTexture( 'inputs:normal', 'normalMap', NoColorSpace, null );
 
 		// Apply normal map scale from UsdUVTexture scale input
 		if ( material.normalMap && material.normalMap.userData.scale ) {
@@ -2310,7 +2454,7 @@ class USDComposer {
 		}
 
 		// Roughness
-		const hasRoughnessMap = applyTextureFromConnection(
+		const hasRoughnessMap = applyTexture(
 			'inputs:roughness',
 			'roughnessMap',
 			NoColorSpace,
@@ -2328,7 +2472,7 @@ class USDComposer {
 		}
 
 		// Metallic
-		const hasMetalnessMap = applyTextureFromConnection(
+		const hasMetalnessMap = applyTexture(
 			'inputs:metallic',
 			'metalnessMap',
 			NoColorSpace,
@@ -2346,7 +2490,7 @@ class USDComposer {
 		}
 
 		// Occlusion
-		applyTextureFromConnection( 'inputs:occlusion', 'aoMap', NoColorSpace, null );
+		applyTexture( 'inputs:occlusion', 'aoMap', NoColorSpace, null );
 
 		// IOR
 		if ( fields[ 'inputs:ior' ] !== undefined ) {
@@ -2356,7 +2500,7 @@ class USDComposer {
 		}
 
 		// Specular color
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:specularColor',
 			'specularColorMap',
 			SRGBColorSpace,
@@ -2428,48 +2572,17 @@ class USDComposer {
 
 		const fields = this._getAttributes( shaderPath );
 
-		const getAttrSpec = ( attrName ) => {
+		const applyTexture = ( attrName, textureProperty, colorSpace, valueCallback ) => {
 
-			const attrPath = shaderPath + '.' + attrName;
-			return this.specsByPath[ attrPath ];
-
-		};
-
-		const applyTextureFromConnection = ( attrName, textureProperty, colorSpace, valueCallback ) => {
-
-			const spec = getAttrSpec( attrName );
-
-			if ( spec && spec.fields.connectionPaths && spec.fields.connectionPaths.length > 0 ) {
-
-				// Try each connection path until one resolves to a texture
-				for ( const connPath of spec.fields.connectionPaths ) {
-
-					const texture = this._getTextureFromOpenPBRConnection( connPath );
-
-					if ( texture ) {
-
-						texture.colorSpace = colorSpace;
-						material[ textureProperty ] = texture;
-						return true;
-
-					}
-
-				}
-
-			}
-
-			if ( fields[ attrName ] !== undefined && valueCallback ) {
-
-				valueCallback( fields[ attrName ] );
-
-			}
-
-			return false;
+			return this._applyTextureOrValue(
+				material, shaderPath, fields, attrName, textureProperty, colorSpace, valueCallback,
+				this._getTextureFromOpenPBRConnection
+			);
 
 		};
 
 		// Base color (diffuse)
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:base_color',
 			'map',
 			SRGBColorSpace,
@@ -2485,7 +2598,7 @@ class USDComposer {
 		);
 
 		// Base metalness
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:base_metalness',
 			'metalnessMap',
 			NoColorSpace,
@@ -2501,7 +2614,7 @@ class USDComposer {
 		);
 
 		// Specular roughness
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:specular_roughness',
 			'roughnessMap',
 			NoColorSpace,
@@ -2517,7 +2630,7 @@ class USDComposer {
 		);
 
 		// Emission color
-		const hasEmissionMap = applyTextureFromConnection(
+		const hasEmissionMap = applyTexture(
 			'inputs:emission_color',
 			'emissiveMap',
 			SRGBColorSpace,
@@ -2666,7 +2779,7 @@ class USDComposer {
 		}
 
 		// Geometry normal (normal map)
-		applyTextureFromConnection(
+		applyTexture(
 			'inputs:geometry_normal',
 			'normalMap',
 			NoColorSpace,
