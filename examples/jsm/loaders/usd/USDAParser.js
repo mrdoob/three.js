@@ -1,3 +1,8 @@
+// Pre-compiled regex patterns for performance
+const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
+const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
+const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
+
 class USDAParser {
 
 	parseText( text ) {
@@ -119,6 +124,9 @@ class USDAParser {
 
 		// Remove block comments /* ... */
 		text = this._stripBlockComments( text );
+
+		// Collapse triple-quoted strings into single lines
+		text = this._collapseTripleQuotedStrings( text );
 
 		// Remove line comments # ... (but preserve #usda header)
 		// Only remove # comments that aren't at the start of a line or after whitespace
@@ -249,6 +257,64 @@ class USDAParser {
 				i ++;
 
 			}
+
+		}
+
+		return result;
+
+	}
+
+	_collapseTripleQuotedStrings( text ) {
+
+		let result = '';
+		let i = 0;
+
+		while ( i < text.length ) {
+
+			if ( i + 2 < text.length ) {
+
+				const triple = text.slice( i, i + 3 );
+
+				if ( triple === '\'\'\'' || triple === '"""' ) {
+
+					const quoteChar = triple;
+					result += quoteChar;
+					i += 3;
+
+					while ( i < text.length ) {
+
+						if ( i + 2 < text.length && text.slice( i, i + 3 ) === quoteChar ) {
+
+							result += quoteChar;
+							i += 3;
+							break;
+
+						} else {
+
+							if ( text[ i ] === '\n' ) {
+
+								result += '\\n';
+
+							} else if ( text[ i ] !== '\r' ) {
+
+								result += text[ i ];
+
+							}
+
+							i ++;
+
+						}
+
+					}
+
+					continue;
+
+				}
+
+			}
+
+			result += text[ i ];
+			i ++;
 
 		}
 
@@ -405,7 +471,7 @@ class USDAParser {
 
 				// Check for primitive definitions
 				// Matches both 'def TypeName "name"' and 'def "name"' (no type)
-				const defMatch = key.match( /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/ );
+				const defMatch = key.match( DEF_MATCH_REGEX );
 				if ( defMatch ) {
 
 					const typeName = defMatch[ 1 ] || '';
@@ -474,7 +540,7 @@ class USDAParser {
 
 				for ( const vKey in variants ) {
 
-					const match = vKey.match( /^string\s+(\w+)$/ );
+					const match = vKey.match( VARIANT_STRING_REGEX );
 					if ( match ) {
 
 						const variantSetName = match[ 1 ];
@@ -522,7 +588,7 @@ class USDAParser {
 
 			// Handle typed attributes
 			// Format: [qualifier] type attrName (e.g., "uniform token[] joints", "float3 position")
-			const attrMatch = key.match( /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/ );
+			const attrMatch = key.match( ATTR_MATCH_REGEX );
 			if ( attrMatch ) {
 
 				const valueType = attrMatch[ 1 ];

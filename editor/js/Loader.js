@@ -635,7 +635,8 @@ function Loader( editor ) {
 
 					const { USDLoader } = await import( 'three/addons/loaders/USDLoader.js' );
 
-					const group = new USDLoader().parse( contents );
+					const loader = new USDLoader( manager );
+					const group = loader.parse( contents );
 					group.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, group ) );
@@ -758,6 +759,15 @@ function Loader( editor ) {
 				break;
 
 			}
+
+			case 'bmp':
+			case 'gif':
+			case 'jpg':
+			case 'jpeg':
+			case 'png':
+			case 'tga':
+
+				break; // Image files are handled as textures by other loaders
 
 			default:
 
