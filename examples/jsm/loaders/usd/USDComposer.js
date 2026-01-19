@@ -325,6 +325,12 @@ class USDComposer {
 		// materialsByRoot: rootPath -> [materialPath1, materialPath2, ...]
 		this.materialsByRoot = new Map();
 
+		// shadersByMaterialPath: materialPath -> [shaderPath1, shaderPath2, ...]
+		this.shadersByMaterialPath = new Map();
+
+		// geomSubsetsByMeshPath: meshPath -> [subsetPath1, subsetPath2, ...]
+		this.geomSubsetsByMeshPath = new Map();
+
 		for ( const path in this.specsByPath ) {
 
 			const spec = this.specsByPath[ path ];
@@ -362,8 +368,10 @@ class USDComposer {
 
 				}
 
+				const typeName = spec.fields.typeName;
+
 				// Build material index
-				if ( spec.fields.typeName === 'Material' ) {
+				if ( typeName === 'Material' ) {
 
 					const parts = path.split( '/' );
 					const rootPath = parts.length > 1 ? '/' + parts[ 1 ] : '/';
@@ -375,6 +383,36 @@ class USDComposer {
 					}
 
 					this.materialsByRoot.get( rootPath ).push( path );
+
+				}
+
+				// Build shader index (shaders are children of materials)
+				if ( typeName === 'Shader' && lastSlash > 0 ) {
+
+					const materialPath = path.slice( 0, lastSlash );
+
+					if ( ! this.shadersByMaterialPath.has( materialPath ) ) {
+
+						this.shadersByMaterialPath.set( materialPath, [] );
+
+					}
+
+					this.shadersByMaterialPath.get( materialPath ).push( path );
+
+				}
+
+				// Build GeomSubset index (subsets are children of meshes)
+				if ( typeName === 'GeomSubset' && lastSlash > 0 ) {
+
+					const meshPath = path.slice( 0, lastSlash );
+
+					if ( ! this.geomSubsetsByMeshPath.has( meshPath ) ) {
+
+						this.geomSubsetsByMeshPath.set( meshPath, [] );
+
+					}
+
+					this.geomSubsetsByMeshPath.get( meshPath ).push( path );
 
 				}
 
@@ -1103,14 +1141,10 @@ class USDComposer {
 	_getGeomSubsets( meshPath ) {
 
 		const subsets = [];
-		const prefix = meshPath + '/';
+		const subsetPaths = this.geomSubsetsByMeshPath.get( meshPath );
+		if ( ! subsetPaths ) return subsets;
 
-		for ( const p in this.specsByPath ) {
-
-			if ( ! p.startsWith( prefix ) ) continue;
-
-			const spec = this.specsByPath[ p ];
-			if ( spec.fields.typeName !== 'GeomSubset' ) continue;
+		for ( const p of subsetPaths ) {
 
 			const attrs = this._getAttributes( p );
 			const indices = attrs[ 'indices' ];
@@ -2284,14 +2318,10 @@ class USDComposer {
 
 		for ( const materialPath of materialPaths ) {
 
-			const prefix = materialPath + '/';
+			const shaderPaths = this.shadersByMaterialPath.get( materialPath );
+			if ( ! shaderPaths ) continue;
 
-			for ( const path in this.specsByPath ) {
-
-				if ( ! path.startsWith( prefix ) ) continue;
-
-				const spec = this.specsByPath[ path ];
-				if ( spec.fields.typeName !== 'Shader' ) continue;
+			for ( const path of shaderPaths ) {
 
 				const attrs = this._getAttributes( path );
 				if ( attrs[ 'info:id' ] === 'UsdUVTexture' && attrs[ 'inputs:file' ] ) {
@@ -2313,16 +2343,13 @@ class USDComposer {
 		const materialSpec = this.specsByPath[ materialPath ];
 		if ( ! materialSpec ) return;
 
-		const prefix = materialPath + '/';
+		const shaderPaths = this.shadersByMaterialPath.get( materialPath );
+		if ( ! shaderPaths ) return;
 
-		for ( const path in this.specsByPath ) {
-
-			if ( ! path.startsWith( prefix ) ) continue;
+		for ( const path of shaderPaths ) {
 
 			const spec = this.specsByPath[ path ];
-			const typeName = spec.fields.typeName;
-
-			if ( typeName !== 'Shader' ) continue;
+			if ( ! spec ) continue;
 
 			const shaderAttrs = this._getAttributes( path );
 			const infoId = shaderAttrs[ 'info:id' ] || spec.fields[ 'info:id' ];
