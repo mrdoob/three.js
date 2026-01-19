@@ -30570,10 +30570,10 @@ class Pipeline {
  * @private
  * @augments Pipeline
  */
-class RenderPipeline extends Pipeline {
+class RenderObjectPipeline extends Pipeline {
 
 	/**
-	 * Constructs a new render pipeline.
+	 * Constructs a new render object pipeline.
 	 *
 	 * @param {string} cacheKey - The pipeline's cache key.
 	 * @param {ProgrammableStage} vertexProgram - The pipeline's vertex shader.
@@ -30859,7 +30859,7 @@ class Pipelines extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
-	 * @return {RenderPipeline} The render pipeline.
+	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
 	getForRender( renderObject, promises = null ) {
 
@@ -31057,7 +31057,7 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
-	 * @return {RenderPipeline} The render pipeline.
+	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
 	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
 
@@ -31069,7 +31069,7 @@ class Pipelines extends DataMap {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new RenderPipeline( cacheKey, stageVertex, stageFragment );
+			pipeline = new RenderObjectPipeline( cacheKey, stageVertex, stageFragment );
 
 			this.caches.set( cacheKey, pipeline );
 
@@ -52858,6 +52858,38 @@ class NodeFunctionInput {
 NodeFunctionInput.isNodeFunctionInput = true;
 
 /**
+ * Module for representing ambient lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
+class AmbientLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'AmbientLightNode';
+
+	}
+
+	/**
+	 * Constructs a new ambient light node.
+	 *
+	 * @param {?AmbientLight} [light=null] - The ambient light source.
+	 */
+	constructor( light = null ) {
+
+		super( light );
+
+	}
+
+	setup( { context } ) {
+
+		context.irradiance.addAssign( this.colorNode );
+
+	}
+
+}
+
+/**
  * Module for representing directional lights as nodes.
  *
  * @augments AnalyticLightNode
@@ -52892,123 +52924,78 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 }
 
-const _matrix41 = /*@__PURE__*/ new Matrix4();
-const _matrix42 = /*@__PURE__*/ new Matrix4();
-
-let _ltcLib = null;
-
 /**
- * Module for representing rect area lights as nodes.
+ * Module for representing hemisphere lights as nodes.
  *
  * @augments AnalyticLightNode
  */
-class RectAreaLightNode extends AnalyticLightNode {
+class HemisphereLightNode extends AnalyticLightNode {
 
 	static get type() {
 
-		return 'RectAreaLightNode';
+		return 'HemisphereLightNode';
 
 	}
 
 	/**
-	 * Constructs a new rect area light node.
+	 * Constructs a new hemisphere light node.
 	 *
-	 * @param {?RectAreaLight} [light=null] - The rect area light source.
+	 * @param {?HemisphereLight} [light=null] - The hemisphere light source.
 	 */
 	constructor( light = null ) {
 
 		super( light );
 
 		/**
-		 * Uniform node representing the half height of the are light.
+		 * Uniform node representing the light's position.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.halfHeight = uniform( new Vector3() ).setGroup( renderGroup );
+		this.lightPositionNode = lightPosition( light );
 
 		/**
-		 * Uniform node representing the half width of the are light.
+		 * A node representing the light's direction.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.lightDirectionNode = this.lightPositionNode.normalize();
+
+		/**
+		 * Uniform node representing the light's ground color.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.halfWidth = uniform( new Vector3() ).setGroup( renderGroup );
-
-		/**
-		 * The `updateType` is set to `NodeUpdateType.RENDER` since the light
-		 * relies on `viewMatrix` which might vary per render call.
-		 *
-		 * @type {string}
-		 * @default 'render'
-		 */
-		this.updateType = NodeUpdateType.RENDER;
+		this.groundColorNode = uniform( new Color() ).setGroup( renderGroup );
 
 	}
 
 	/**
-	 * Overwritten to updated rect area light specific uniforms.
+	 * Overwritten to updated hemisphere light specific uniforms.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	update( frame ) {
 
-		super.update( frame );
-
 		const { light } = this;
 
-		const viewMatrix = frame.camera.matrixWorldInverse;
+		super.update( frame );
 
-		_matrix42.identity();
-		_matrix41.copy( light.matrixWorld );
-		_matrix41.premultiply( viewMatrix );
-		_matrix42.extractRotation( _matrix41 );
+		this.lightPositionNode.object3d = light;
 
-		this.halfWidth.value.set( light.width * 0.5, 0.0, 0.0 );
-		this.halfHeight.value.set( 0.0, light.height * 0.5, 0.0 );
-
-		this.halfWidth.value.applyMatrix4( _matrix42 );
-		this.halfHeight.value.applyMatrix4( _matrix42 );
+		this.groundColorNode.value.copy( light.groundColor ).multiplyScalar( light.intensity );
 
 	}
 
-	setupDirectRectArea( builder ) {
+	setup( builder ) {
 
-		let ltc_1, ltc_2;
+		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		if ( builder.isAvailable( 'float32Filterable' ) ) {
+		const dotNL = normalWorld.dot( lightDirectionNode );
+		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
-			ltc_1 = texture( _ltcLib.LTC_FLOAT_1 );
-			ltc_2 = texture( _ltcLib.LTC_FLOAT_2 );
+		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
 
-		} else {
-
-			ltc_1 = texture( _ltcLib.LTC_HALF_1 );
-			ltc_2 = texture( _ltcLib.LTC_HALF_2 );
-
-		}
-
-		const { colorNode, light } = this;
-
-		const lightPosition = lightViewPosition( light );
-
-		return {
-			lightColor: colorNode,
-			lightPosition,
-			halfWidth: this.halfWidth,
-			halfHeight: this.halfHeight,
-			ltc_1,
-			ltc_2
-		};
-
-	}
-
-	/**
-	 * Used to configure the internal BRDF approximation texture data.
-	 *
-	 * @param {RectAreaLightTexturesLib} ltc - The BRDF approximation texture data.
-	 */
-	static setLTC( ltc ) {
-
-		_ltcLib = ltc;
+		builder.context.irradiance.addAssign( irradiance );
 
 	}
 
@@ -53217,6 +53204,72 @@ class IESSpotLightNode extends SpotLightNode {
 
 }
 
+/**
+ * Module for representing light probes as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
+class LightProbeNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'LightProbeNode';
+
+	}
+
+	/**
+	 * Constructs a new light probe node.
+	 *
+	 * @param {?LightProbe} [light=null] - The light probe.
+	 */
+	constructor( light = null ) {
+
+		super( light );
+
+		const array = [];
+
+		for ( let i = 0; i < 9; i ++ ) array.push( new Vector3() );
+
+		/**
+		 * Light probe represented as a uniform of spherical harmonics.
+		 *
+		 * @type {UniformArrayNode}
+		 */
+		this.lightProbe = uniformArray( array );
+
+	}
+
+	/**
+	 * Overwritten to updated light probe specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		const { light } = this;
+
+		super.update( frame );
+
+		//
+
+		for ( let i = 0; i < 9; i ++ ) {
+
+			this.lightProbe.array[ i ].copy( light.sh.coefficients[ i ] ).multiplyScalar( light.intensity );
+
+		}
+
+	}
+
+	setup( builder ) {
+
+		const irradiance = getShIrradianceAt( normalWorld, this.lightProbe );
+
+		builder.context.irradiance.addAssign( irradiance );
+
+	}
+
+}
+
 const sdBox = /*@__PURE__*/ Fn( ( [ p, b ] ) => {
 
 	const d = p.abs().sub( b );
@@ -53299,176 +53352,123 @@ class ProjectorLightNode extends SpotLightNode {
 
 }
 
+const _matrix41 = /*@__PURE__*/ new Matrix4();
+const _matrix42 = /*@__PURE__*/ new Matrix4();
+
+let _ltcLib = null;
+
 /**
- * Module for representing ambient lights as nodes.
+ * Module for representing rect area lights as nodes.
  *
  * @augments AnalyticLightNode
  */
-class AmbientLightNode extends AnalyticLightNode {
+class RectAreaLightNode extends AnalyticLightNode {
 
 	static get type() {
 
-		return 'AmbientLightNode';
+		return 'RectAreaLightNode';
 
 	}
 
 	/**
-	 * Constructs a new ambient light node.
+	 * Constructs a new rect area light node.
 	 *
-	 * @param {?AmbientLight} [light=null] - The ambient light source.
-	 */
-	constructor( light = null ) {
-
-		super( light );
-
-	}
-
-	setup( { context } ) {
-
-		context.irradiance.addAssign( this.colorNode );
-
-	}
-
-}
-
-/**
- * Module for representing hemisphere lights as nodes.
- *
- * @augments AnalyticLightNode
- */
-class HemisphereLightNode extends AnalyticLightNode {
-
-	static get type() {
-
-		return 'HemisphereLightNode';
-
-	}
-
-	/**
-	 * Constructs a new hemisphere light node.
-	 *
-	 * @param {?HemisphereLight} [light=null] - The hemisphere light source.
+	 * @param {?RectAreaLight} [light=null] - The rect area light source.
 	 */
 	constructor( light = null ) {
 
 		super( light );
 
 		/**
-		 * Uniform node representing the light's position.
+		 * Uniform node representing the half height of the are light.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.lightPositionNode = lightPosition( light );
+		this.halfHeight = uniform( new Vector3() ).setGroup( renderGroup );
 
 		/**
-		 * A node representing the light's direction.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.lightDirectionNode = this.lightPositionNode.normalize();
-
-		/**
-		 * Uniform node representing the light's ground color.
+		 * Uniform node representing the half width of the are light.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.groundColorNode = uniform( new Color() ).setGroup( renderGroup );
+		this.halfWidth = uniform( new Vector3() ).setGroup( renderGroup );
+
+		/**
+		 * The `updateType` is set to `NodeUpdateType.RENDER` since the light
+		 * relies on `viewMatrix` which might vary per render call.
+		 *
+		 * @type {string}
+		 * @default 'render'
+		 */
+		this.updateType = NodeUpdateType.RENDER;
 
 	}
 
 	/**
-	 * Overwritten to updated hemisphere light specific uniforms.
+	 * Overwritten to updated rect area light specific uniforms.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	update( frame ) {
 
-		const { light } = this;
-
 		super.update( frame );
-
-		this.lightPositionNode.object3d = light;
-
-		this.groundColorNode.value.copy( light.groundColor ).multiplyScalar( light.intensity );
-
-	}
-
-	setup( builder ) {
-
-		const { colorNode, groundColorNode, lightDirectionNode } = this;
-
-		const dotNL = normalWorld.dot( lightDirectionNode );
-		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
-
-		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
-
-		builder.context.irradiance.addAssign( irradiance );
-
-	}
-
-}
-
-/**
- * Module for representing light probes as nodes.
- *
- * @augments AnalyticLightNode
- */
-class LightProbeNode extends AnalyticLightNode {
-
-	static get type() {
-
-		return 'LightProbeNode';
-
-	}
-
-	/**
-	 * Constructs a new light probe node.
-	 *
-	 * @param {?LightProbe} [light=null] - The light probe.
-	 */
-	constructor( light = null ) {
-
-		super( light );
-
-		const array = [];
-
-		for ( let i = 0; i < 9; i ++ ) array.push( new Vector3() );
-
-		/**
-		 * Light probe represented as a uniform of spherical harmonics.
-		 *
-		 * @type {UniformArrayNode}
-		 */
-		this.lightProbe = uniformArray( array );
-
-	}
-
-	/**
-	 * Overwritten to updated light probe specific uniforms.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	update( frame ) {
 
 		const { light } = this;
 
-		super.update( frame );
+		const viewMatrix = frame.camera.matrixWorldInverse;
 
-		//
+		_matrix42.identity();
+		_matrix41.copy( light.matrixWorld );
+		_matrix41.premultiply( viewMatrix );
+		_matrix42.extractRotation( _matrix41 );
 
-		for ( let i = 0; i < 9; i ++ ) {
+		this.halfWidth.value.set( light.width * 0.5, 0.0, 0.0 );
+		this.halfHeight.value.set( 0.0, light.height * 0.5, 0.0 );
 
-			this.lightProbe.array[ i ].copy( light.sh.coefficients[ i ] ).multiplyScalar( light.intensity );
+		this.halfWidth.value.applyMatrix4( _matrix42 );
+		this.halfHeight.value.applyMatrix4( _matrix42 );
+
+	}
+
+	setupDirectRectArea( builder ) {
+
+		let ltc_1, ltc_2;
+
+		if ( builder.isAvailable( 'float32Filterable' ) ) {
+
+			ltc_1 = texture( _ltcLib.LTC_FLOAT_1 );
+			ltc_2 = texture( _ltcLib.LTC_FLOAT_2 );
+
+		} else {
+
+			ltc_1 = texture( _ltcLib.LTC_HALF_1 );
+			ltc_2 = texture( _ltcLib.LTC_HALF_2 );
 
 		}
 
+		const { colorNode, light } = this;
+
+		const lightPosition = lightViewPosition( light );
+
+		return {
+			lightColor: colorNode,
+			lightPosition,
+			halfWidth: this.halfWidth,
+			halfHeight: this.halfHeight,
+			ltc_1,
+			ltc_2
+		};
+
 	}
 
-	setup( builder ) {
+	/**
+	 * Used to configure the internal BRDF approximation texture data.
+	 *
+	 * @param {RectAreaLightTexturesLib} ltc - The BRDF approximation texture data.
+	 */
+	static setLTC( ltc ) {
 
-		const irradiance = getShIrradianceAt( normalWorld, this.lightProbe );
-
-		builder.context.irradiance.addAssign( irradiance );
+		_ltcLib = ltc;
 
 	}
 
@@ -53758,7 +53758,7 @@ const _cacheKeyValues = [];
  * @private
  * @augments DataMap
  */
-class Nodes extends DataMap {
+class NodeManager extends DataMap {
 
 	/**
 	 * Constructs a new nodes management component.
@@ -57523,7 +57523,7 @@ class Renderer {
 		 * A reference to a renderer module for managing node related logic.
 		 *
 		 * @private
-		 * @type {?Nodes}
+		 * @type {?NodeManager}
 		 * @default null
 		 */
 		this._nodes = null;
@@ -57977,7 +57977,7 @@ class Renderer {
 
 			}
 
-			this._nodes = new Nodes( this, backend );
+			this._nodes = new NodeManager( this, backend );
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
@@ -82131,4 +82131,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InspectorBase, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
