@@ -1763,7 +1763,9 @@ class ColladaParser {
 			instanceLights: [],
 			instanceGeometries: [],
 			instanceNodes: [],
-			transforms: {}
+			transforms: {},
+			transformData: {},
+			transformOrder: []
 		};
 
 		for ( let i = 0; i < xml.childNodes.length; i ++ ) {
@@ -1804,27 +1806,59 @@ class ColladaParser {
 				case 'matrix':
 					array = parseFloats( child.textContent );
 					data.matrix.multiply( matrix.fromArray( array ).transpose() );
-					data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
+					{
+
+						const sid = child.getAttribute( 'sid' );
+						data.transforms[ sid ] = child.nodeName;
+						data.transformData[ sid ] = { type: 'matrix', array: array };
+						data.transformOrder.push( sid );
+
+					}
+
 					break;
 
 				case 'translate':
 					array = parseFloats( child.textContent );
 					vector.fromArray( array );
 					data.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
-					data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
+					{
+
+						const sid = child.getAttribute( 'sid' );
+						data.transforms[ sid ] = child.nodeName;
+						data.transformData[ sid ] = { type: 'translate', x: array[ 0 ], y: array[ 1 ], z: array[ 2 ] };
+						data.transformOrder.push( sid );
+
+					}
+
 					break;
 
 				case 'rotate':
 					array = parseFloats( child.textContent );
-					const angle = MathUtils.degToRad( array[ 3 ] );
-					data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
-					data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
+					{
+
+						const angle = MathUtils.degToRad( array[ 3 ] );
+						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
+						const sid = child.getAttribute( 'sid' );
+						data.transforms[ sid ] = child.nodeName;
+						data.transformData[ sid ] = { type: 'rotate', axis: [ array[ 0 ], array[ 1 ], array[ 2 ] ], angle: array[ 3 ] };
+						data.transformOrder.push( sid );
+
+					}
+
 					break;
 
 				case 'scale':
 					array = parseFloats( child.textContent );
 					data.matrix.scale( vector.fromArray( array ) );
-					data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
+					{
+
+						const sid = child.getAttribute( 'sid' );
+						data.transforms[ sid ] = child.nodeName;
+						data.transformData[ sid ] = { type: 'scale', x: array[ 0 ], y: array[ 1 ], z: array[ 2 ] };
+						data.transformOrder.push( sid );
+
+					}
+
 					break;
 
 				case 'extra':

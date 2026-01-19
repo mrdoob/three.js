@@ -130,22 +130,44 @@ class ColladaComposer {
 		const samplers = data.samplers;
 		const sources = data.sources;
 
-		for ( const target in channels ) {
+		// Aggregate channels by node ID and transform SID
+		const aggregated = this.aggregateAnimationChannels( channels, samplers, sources );
 
-			if ( channels.hasOwnProperty( target ) ) {
+		// Build tracks for each node
+		for ( const nodeId in aggregated ) {
 
-				const channel = channels[ target ];
-				const sampler = samplers[ channel.sampler ];
+			const nodeData = this.library.nodes[ nodeId ];
+			if ( ! nodeData ) continue;
 
-				const inputId = sampler.inputs.INPUT;
-				const outputId = sampler.inputs.OUTPUT;
+			const object3D = this.getNode( nodeId );
+			const nodeChannels = aggregated[ nodeId ];
 
-				const inputSource = sources[ inputId ];
-				const outputSource = sources[ outputId ];
+			// Process each transform SID
+			for ( const sid in nodeChannels ) {
 
-				const animation = this.buildAnimationChannel( channel, inputSource, outputSource );
+				const transformType = nodeData.transforms[ sid ];
+				const transformInfo = nodeData.transformData[ sid ];
+				const channelData = nodeChannels[ sid ];
 
-				this.createKeyframeTracks( animation, tracks );
+				switch ( transformType ) {
+
+					case 'matrix':
+						this.buildMatrixTracks( object3D, channelData, nodeData, tracks );
+						break;
+
+					case 'translate':
+						this.buildTranslateTrack( object3D, channelData, transformInfo, tracks );
+						break;
+
+					case 'rotate':
+						this.buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks );
+						break;
+
+					case 'scale':
+						this.buildScaleTrack( object3D, channelData, transformInfo, tracks );
+						break;
+
+				}
 
 			}
 
@@ -161,76 +183,243 @@ class ColladaComposer {
 
 	}
 
-	buildAnimationChannel( channel, inputSource, outputSource ) {
+	aggregateAnimationChannels( channels, samplers, sources ) {
 
-		const node = this.library.nodes[ channel.id ];
-		const object3D = this.getNode( node.id );
+		// Group channels by node ID and transform SID
+		// Structure: aggregated[nodeId][sid][member] = { times: [], values: [] }
 
-		const transform = node.transforms[ channel.sid ];
-		const defaultMatrix = node.matrix.clone().transpose();
+		const aggregated = {};
 
-		let time, stride;
-		let i, il, j, jl;
+		for ( const target in channels ) {
 
+			if ( ! channels.hasOwnProperty( target ) ) continue;
+
+			const channel = channels[ target ];
+			const sampler = samplers[ channel.sampler ];
+
+			const inputId = sampler.inputs.INPUT;
+			const outputId = sampler.inputs.OUTPUT;
+
+			const inputSource = sources[ inputId ];
+			const outputSource = sources[ outputId ];
+
+			const nodeId = channel.id;
+			const sid = channel.sid;
+			const member = channel.member || 'default';
+
+			if ( ! aggregated[ nodeId ] ) aggregated[ nodeId ] = {};
+			if ( ! aggregated[ nodeId ][ sid ] ) aggregated[ nodeId ][ sid ] = {};
+
+			// Store times and values for this component
+			aggregated[ nodeId ][ sid ][ member ] = {
+				times: inputSource.array,
+				values: outputSource.array,
+				stride: outputSource.stride,
+				arraySyntax: channel.arraySyntax,
+				indices: channel.indices
+			};
+
+		}
+
+		return aggregated;
+
+	}
+
+	buildMatrixTracks( object3D, channelData, nodeData, tracks ) {
+
+		const defaultMatrix = nodeData.matrix.clone().transpose();
 		const data = {};
 
-		// the collada spec allows the animation of data in various ways.
-		// depending on the transform type (matrix, translate, rotate, scale), we execute different logic
+		// Combine all matrix component channels into unified keyframe data
+		for ( const member in channelData ) {
 
-		switch ( transform ) {
+			const component = channelData[ member ];
+			const times = component.times;
+			const values = component.values;
+			const stride = component.stride;
 
-			case 'matrix':
+			for ( let i = 0, il = times.length; i < il; i ++ ) {
 
-				for ( i = 0, il = inputSource.array.length; i < il; i ++ ) {
+				const time = times[ i ];
+				const valueOffset = i * stride;
 
-					time = inputSource.array[ i ];
-					stride = i * outputSource.stride;
+				if ( data[ time ] === undefined ) data[ time ] = {};
 
-					if ( data[ time ] === undefined ) data[ time ] = {};
+				if ( component.arraySyntax === true ) {
 
-					if ( channel.arraySyntax === true ) {
+					const value = values[ valueOffset ];
+					const index = component.indices[ 0 ] + 4 * component.indices[ 1 ];
+					data[ time ][ index ] = value;
 
-						const value = outputSource.array[ stride ];
-						const index = channel.indices[ 0 ] + 4 * channel.indices[ 1 ];
+				} else {
 
-						data[ time ][ index ] = value;
+					for ( let j = 0; j < stride; j ++ ) {
 
-					} else {
-
-						for ( j = 0, jl = outputSource.stride; j < jl; j ++ ) {
-
-							data[ time ][ j ] = outputSource.array[ stride + j ];
-
-						}
+						data[ time ][ j ] = values[ valueOffset + j ];
 
 					}
 
 				}
 
-				break;
-
-			case 'translate':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
-
-			case 'rotate':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
-
-			case 'scale':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
+			}
 
 		}
 
 		const keyframes = this.prepareAnimationData( data, defaultMatrix );
+		const animation = { name: object3D.uuid, keyframes: keyframes };
+		this.createKeyframeTracks( animation, tracks );
 
-		const animation = {
-			name: object3D.uuid,
-			keyframes: keyframes
-		};
+	}
 
-		return animation;
+	buildTranslateTrack( object3D, channelData, transformInfo, tracks ) {
+
+		// Get all unique times from all components
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+
+		// For each time, get interpolated X, Y, Z values
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+
+			values.push( x, y, z );
+
+		}
+
+		tracks.push( new VectorKeyframeTrack(
+			object3D.uuid + '.position',
+			times,
+			values
+		) );
+
+	}
+
+	buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks ) {
+
+		// For rotation, we need to handle axis-angle animations
+		// The channel data contains ANGLE values (in degrees)
+
+		const angleData = channelData.ANGLE || channelData.default;
+		if ( ! angleData ) return;
+
+		const times = Array.from( angleData.times );
+		if ( times.length === 0 ) return;
+
+		const axis = new Vector3( transformInfo.axis[ 0 ], transformInfo.axis[ 1 ], transformInfo.axis[ 2 ] );
+		const quaternion = new Quaternion();
+		const values = [];
+
+		// Build quaternion keyframes from axis-angle
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const angleDegrees = angleData.values[ i ];
+			const angleRadians = MathUtils.degToRad( angleDegrees );
+
+			quaternion.setFromAxisAngle( axis, angleRadians );
+			values.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+
+		}
+
+		tracks.push( new QuaternionKeyframeTrack(
+			object3D.uuid + '.quaternion',
+			times,
+			values
+		) );
+
+	}
+
+	buildScaleTrack( object3D, channelData, transformInfo, tracks ) {
+
+		// Get all unique times from all components
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+
+		// For each time, get interpolated X, Y, Z values
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+
+			values.push( x, y, z );
+
+		}
+
+		tracks.push( new VectorKeyframeTrack(
+			object3D.uuid + '.scale',
+			times,
+			values
+		) );
+
+	}
+
+	getTimesForAllAxes( channelData ) {
+
+		// Combine times from all axes and remove duplicates
+		let times = [];
+
+		if ( channelData.X ) times = times.concat( Array.from( channelData.X.times ) );
+		if ( channelData.Y ) times = times.concat( Array.from( channelData.Y.times ) );
+		if ( channelData.Z ) times = times.concat( Array.from( channelData.Z.times ) );
+		if ( channelData.ANGLE ) times = times.concat( Array.from( channelData.ANGLE.times ) );
+		if ( channelData.default ) times = times.concat( Array.from( channelData.default.times ) );
+
+		// Remove duplicates and sort
+		times = [ ...new Set( times ) ].sort( ( a, b ) => a - b );
+
+		return times;
+
+	}
+
+	getValueAtTime( componentData, time, defaultValue ) {
+
+		if ( ! componentData ) return defaultValue;
+
+		const times = componentData.times;
+		const values = componentData.values;
+
+		// Find the keyframe at or interpolate
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			if ( times[ i ] === time ) {
+
+				return values[ i ];
+
+			}
+
+			if ( times[ i ] > time ) {
+
+				if ( i === 0 ) {
+
+					return values[ 0 ];
+
+				}
+
+				// Interpolate between previous and current
+				const prevTime = times[ i - 1 ];
+				const nextTime = times[ i ];
+				const prevValue = values[ i - 1 ];
+				const nextValue = values[ i ];
+
+				const t = ( time - prevTime ) / ( nextTime - prevTime );
+				return prevValue + t * ( nextValue - prevValue );
+
+			}
+
+		}
+
+		// Time is after all keyframes
+		return values[ values.length - 1 ];
 
 	}
 
