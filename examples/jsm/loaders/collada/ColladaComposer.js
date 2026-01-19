@@ -143,30 +143,39 @@ class ColladaComposer {
 			const object3D = this.getNode( nodeId );
 			const nodeChannels = aggregated[ nodeId ];
 
-			// Process each transform SID
-			for ( const sid in nodeChannels ) {
+			// Check if this node has pivot transforms that require matrix baking
+			if ( this.hasPivotTransforms( nodeData ) ) {
 
-				const transformType = nodeData.transforms[ sid ];
-				const transformInfo = nodeData.transformData[ sid ];
-				const channelData = nodeChannels[ sid ];
+				this.buildBakedAnimationTracks( object3D, nodeChannels, nodeData, tracks );
 
-				switch ( transformType ) {
+			} else {
 
-					case 'matrix':
-						this.buildMatrixTracks( object3D, channelData, nodeData, tracks );
-						break;
+				// Process each transform SID directly
+				for ( const sid in nodeChannels ) {
 
-					case 'translate':
-						this.buildTranslateTrack( object3D, channelData, transformInfo, tracks );
-						break;
+					const transformType = nodeData.transforms[ sid ];
+					const transformInfo = nodeData.transformData[ sid ];
+					const channelData = nodeChannels[ sid ];
 
-					case 'rotate':
-						this.buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks );
-						break;
+					switch ( transformType ) {
 
-					case 'scale':
-						this.buildScaleTrack( object3D, channelData, transformInfo, tracks );
-						break;
+						case 'matrix':
+							this.buildMatrixTracks( object3D, channelData, nodeData, tracks );
+							break;
+
+						case 'translate':
+							this.buildTranslateTrack( object3D, channelData, transformInfo, tracks );
+							break;
+
+						case 'rotate':
+							this.buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks );
+							break;
+
+						case 'scale':
+							this.buildScaleTrack( object3D, channelData, transformInfo, tracks );
+							break;
+
+					}
 
 				}
 
@@ -175,6 +184,215 @@ class ColladaComposer {
 		}
 
 		return tracks;
+
+	}
+
+	hasPivotTransforms( nodeData ) {
+
+		// Check if the node has Maya-style pivot transforms
+		const pivotSids = [
+			'rotatePivot', 'rotatePivotInverse', 'rotatePivotTranslation',
+			'scalePivot', 'scalePivotInverse', 'scalePivotTranslation'
+		];
+
+		for ( const sid of pivotSids ) {
+
+			if ( nodeData.transforms[ sid ] !== undefined ) {
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	buildBakedAnimationTracks( object3D, nodeChannels, nodeData, tracks ) {
+
+		// For nodes with pivot transforms, we need to rebuild the full matrix
+		// at each keyframe time and decompose to get position/quaternion/scale
+
+		// Collect all unique keyframe times from all animated channels
+		const allTimes = new Set();
+
+		for ( const sid in nodeChannels ) {
+
+			const channelData = nodeChannels[ sid ];
+
+			for ( const member in channelData ) {
+
+				const data = channelData[ member ];
+				if ( data.times ) {
+
+					for ( const t of data.times ) {
+
+						allTimes.add( t );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		const times = [ ...allTimes ].sort( ( a, b ) => a - b );
+		if ( times.length === 0 ) return;
+
+		const positionData = [];
+		const quaternionData = [];
+		const scaleData = [];
+
+		const matrix = new Matrix4();
+		const tempMatrix = new Matrix4();
+		const position = new Vector3();
+		const quaternion = new Quaternion();
+		const scale = new Vector3();
+		const axis = new Vector3();
+
+		// For each time, rebuild the full transform chain
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+			matrix.identity();
+
+			// Apply transforms in order
+			for ( const sid of nodeData.transformOrder ) {
+
+				const transformInfo = nodeData.transformData[ sid ];
+				const animatedData = nodeChannels[ sid ];
+
+				switch ( transformInfo.type ) {
+
+					case 'translate': {
+
+						let x = transformInfo.x;
+						let y = transformInfo.y;
+						let z = transformInfo.z;
+
+						// Check if this transform is animated
+						if ( animatedData ) {
+
+							if ( animatedData.X ) x = this.getValueAtTime( animatedData.X, time, x );
+							if ( animatedData.Y ) y = this.getValueAtTime( animatedData.Y, time, y );
+							if ( animatedData.Z ) z = this.getValueAtTime( animatedData.Z, time, z );
+							if ( animatedData.default && animatedData.default.stride === 3 ) {
+
+								const idx = this.getKeyframeIndex( animatedData.default.times, time );
+								if ( idx >= 0 ) {
+
+									x = animatedData.default.values[ idx * 3 ];
+									y = animatedData.default.values[ idx * 3 + 1 ];
+									z = animatedData.default.values[ idx * 3 + 2 ];
+
+								}
+
+							}
+
+						}
+
+						matrix.multiply( tempMatrix.makeTranslation( x, y, z ) );
+						break;
+
+					}
+
+					case 'rotate': {
+
+						let angle = transformInfo.angle;
+
+						// Check if this transform is animated
+						if ( animatedData ) {
+
+							if ( animatedData.ANGLE ) angle = this.getValueAtTime( animatedData.ANGLE, time, angle );
+							if ( animatedData.default ) angle = this.getValueAtTime( animatedData.default, time, angle );
+
+						}
+
+						axis.set( transformInfo.axis[ 0 ], transformInfo.axis[ 1 ], transformInfo.axis[ 2 ] );
+						matrix.multiply( tempMatrix.makeRotationAxis( axis, MathUtils.degToRad( angle ) ) );
+						break;
+
+					}
+
+					case 'scale': {
+
+						let x = transformInfo.x;
+						let y = transformInfo.y;
+						let z = transformInfo.z;
+
+						// Check if this transform is animated
+						if ( animatedData ) {
+
+							if ( animatedData.X ) x = this.getValueAtTime( animatedData.X, time, x );
+							if ( animatedData.Y ) y = this.getValueAtTime( animatedData.Y, time, y );
+							if ( animatedData.Z ) z = this.getValueAtTime( animatedData.Z, time, z );
+
+						}
+
+						matrix.multiply( tempMatrix.makeScale( x, y, z ) );
+						break;
+
+					}
+
+					case 'matrix': {
+
+						// For animated matrices, this is more complex - skip for now
+						// as pivot transforms typically don't use matrix animations
+						tempMatrix.fromArray( transformInfo.array ).transpose();
+						matrix.multiply( tempMatrix );
+						break;
+
+					}
+
+				}
+
+			}
+
+			// Decompose the final matrix
+			matrix.decompose( position, quaternion, scale );
+
+			positionData.push( position.x, position.y, position.z );
+			quaternionData.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+			scaleData.push( scale.x, scale.y, scale.z );
+
+		}
+
+		// Create tracks
+		tracks.push( new VectorKeyframeTrack(
+			object3D.uuid + '.position',
+			times,
+			positionData
+		) );
+
+		tracks.push( new QuaternionKeyframeTrack(
+			object3D.uuid + '.quaternion',
+			times,
+			quaternionData
+		) );
+
+		tracks.push( new VectorKeyframeTrack(
+			object3D.uuid + '.scale',
+			times,
+			scaleData
+		) );
+
+	}
+
+	getKeyframeIndex( times, time ) {
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			if ( Math.abs( times[ i ] - time ) < 0.0001 ) {
+
+				return i;
+
+			}
+
+		}
+
+		return - 1;
 
 	}
 
