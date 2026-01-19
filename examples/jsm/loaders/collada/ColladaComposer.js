@@ -61,6 +61,11 @@ class ColladaComposer {
 		this.quaternion = new Quaternion();
 		this.matrix = new Matrix4();
 
+		// Storage for deferred pivot animation data
+		// Nodes with pivot transforms need all their animation channels collected
+		// before building tracks, as channels may be split across animation elements
+		this.deferredPivotAnimations = {};
+
 	}
 
 	compose() {
@@ -140,15 +145,18 @@ class ColladaComposer {
 			const nodeData = this.library.nodes[ nodeId ];
 			if ( ! nodeData ) continue;
 
-			const object3D = this.getNode( nodeId );
 			const nodeChannels = aggregated[ nodeId ];
 
 			// Check if this node has pivot transforms that require matrix baking
 			if ( this.hasPivotTransforms( nodeData ) ) {
 
-				this.buildBakedAnimationTracks( object3D, nodeChannels, nodeData, tracks );
+				// Defer building tracks for pivot nodes - collect all channels first
+				// Channels may be split across multiple animation elements
+				this.collectDeferredPivotAnimation( nodeId, nodeChannels );
 
 			} else {
+
+				const object3D = this.getNode( nodeId );
 
 				// Process each transform SID directly
 				for ( const sid in nodeChannels ) {
@@ -184,6 +192,38 @@ class ColladaComposer {
 		}
 
 		return tracks;
+
+	}
+
+	collectDeferredPivotAnimation( nodeId, nodeChannels ) {
+
+		// Merge channels into deferred storage
+		// Multiple animation elements may target the same node
+
+		if ( ! this.deferredPivotAnimations[ nodeId ] ) {
+
+			this.deferredPivotAnimations[ nodeId ] = {};
+
+		}
+
+		const deferred = this.deferredPivotAnimations[ nodeId ];
+
+		for ( const sid in nodeChannels ) {
+
+			if ( ! deferred[ sid ] ) {
+
+				deferred[ sid ] = {};
+
+			}
+
+			for ( const member in nodeChannels[ sid ] ) {
+
+				// Store channel data, later entries override earlier if duplicate
+				deferred[ sid ][ member ] = nodeChannels[ sid ][ member ];
+
+			}
+
+		}
 
 	}
 
@@ -2817,6 +2857,10 @@ class ColladaComposer {
 
 				}
 
+				// Build deferred pivot animation tracks
+				// These were collected from multiple animation elements
+				this.buildDeferredPivotAnimationTracks( tracks );
+
 				this.animations.push( new AnimationClip( 'default', - 1, tracks ) );
 
 			}
@@ -2828,6 +2872,25 @@ class ColladaComposer {
 				this.animations.push( this.getAnimationClip( id ) );
 
 			}
+
+		}
+
+	}
+
+	buildDeferredPivotAnimationTracks( tracks ) {
+
+		// Build baked animation tracks for all nodes with pivot transforms
+		// All channels have been collected from all animation elements
+
+		for ( const nodeId in this.deferredPivotAnimations ) {
+
+			const nodeData = this.library.nodes[ nodeId ];
+			if ( ! nodeData ) continue;
+
+			const object3D = this.getNode( nodeId );
+			const mergedChannels = this.deferredPivotAnimations[ nodeId ];
+
+			this.buildBakedAnimationTracks( object3D, mergedChannels, nodeData, tracks );
 
 		}
 
