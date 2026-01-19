@@ -777,12 +777,14 @@ function Viewport( editor ) {
 
 	let prevActionsInUse = 0;
 
-	const clock = new THREE.Clock(); // only used for animations
+	const timer = new THREE.Timer(); // only used for animations
 
 	function animate() {
 
+		timer.update();
+
 		const mixer = editor.mixer;
-		const delta = clock.getDelta();
+		const delta = timer.getDelta();
 
 		let needsUpdate = false;
 
