@@ -1103,7 +1103,7 @@ class BatchedMesh extends Mesh {
 	 * Sets the given color to the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to set the color of.
-	 * @param {Color} color - The color to set the instance to.
+	 * @param {Color|Vector4} color - The color to set the instance to. Use a `Vector4` to also define alpha.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	setColorAt( instanceId, color ) {
@@ -1127,8 +1127,8 @@ class BatchedMesh extends Mesh {
 	 * Returns the color of the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to get the color of.
-	 * @param {Color} color - The target object that is used to store the method's result.
-	 * @return {Color} The instance's color.
+	 * @param {Color|Vector4} color - The target object that is used to store the method's result.
+	 * @return {Color|Vector4} The instance's color.  Use a `Vector4` to also retrieve alpha.
 	 */
 	getColorAt( instanceId, color ) {
 
