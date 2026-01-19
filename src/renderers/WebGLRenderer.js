@@ -2132,10 +2132,10 @@ class WebGLRenderer {
 
 			// always update environment and fog - changing these trigger an getProgram call, but it's possible that the program doesn't change
 
-			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial ) ? scene.environment : null;
+			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
 
-			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap );
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
 			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
@@ -2267,9 +2267,9 @@ class WebGLRenderer {
 			textures.resetTextureUnits();
 
 			const fog = scene.fog;
-			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial ) ? scene.environment : null;
+			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
-			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap );
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			const envMap = environments.get( material.envMap || environment, usePMREM );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !! geometry.attributes.tangent && ( !! material.normalMap || material.anisotropy > 0 );
@@ -2595,7 +2595,7 @@ class WebGLRenderer {
 
 			}
 
-			if ( ( material.isMeshStandardMaterial || material.isMeshLambertMaterial ) && material.envMap === null && scene.environment !== null ) {
+			if ( ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) && material.envMap === null && scene.environment !== null ) {
 
 				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
 
