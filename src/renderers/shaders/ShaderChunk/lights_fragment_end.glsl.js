@@ -1,6 +1,12 @@
 export default /* glsl */`
 #if defined( RE_IndirectDiffuse )
 
+	#ifdef LAMBERT
+
+		irradiance += iblIrradiance;
+
+	#endif
+
 	RE_IndirectDiffuse( irradiance, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
 
 #endif
