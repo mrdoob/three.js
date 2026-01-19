@@ -14,7 +14,7 @@ const _rgb = { r: 0, b: 0, g: 0 };
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
-function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha ) {
+function WebGLBackground( renderer, environments, state, objects, alpha, premultipliedAlpha ) {
 
 	const clearColor = new Color( 0x000000 );
 	let clearAlpha = alpha === true ? 0 : 1;
@@ -33,7 +33,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 		if ( background && background.isTexture ) {
 
 			const usePMREM = scene.backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
-			background = ( usePMREM ? cubeuvmaps : cubemaps ).get( background );
+			background = environments.get( background, usePMREM );
 
 		}
 
