@@ -11,6 +11,7 @@ import {
 	Float32BufferAttribute,
 	FrontSide,
 	Group,
+	InterpolateDiscrete,
 	Line,
 	LineBasicMaterial,
 	LineSegments,
@@ -186,7 +187,7 @@ class ColladaComposer {
 	aggregateAnimationChannels( channels, samplers, sources ) {
 
 		// Group channels by node ID and transform SID
-		// Structure: aggregated[nodeId][sid][member] = { times: [], values: [] }
+		// Structure: aggregated[nodeId][sid][member] = { times: [], values: [], interpolation: [], ... }
 
 		const aggregated = {};
 
@@ -203,6 +204,15 @@ class ColladaComposer {
 			const inputSource = sources[ inputId ];
 			const outputSource = sources[ outputId ];
 
+			// Get interpolation data if available
+			const interpolationId = sampler.inputs.INTERPOLATION;
+			const inTangentId = sampler.inputs.IN_TANGENT;
+			const outTangentId = sampler.inputs.OUT_TANGENT;
+
+			const interpolationSource = interpolationId ? sources[ interpolationId ] : null;
+			const inTangentSource = inTangentId ? sources[ inTangentId ] : null;
+			const outTangentSource = outTangentId ? sources[ outTangentId ] : null;
+
 			const nodeId = channel.id;
 			const sid = channel.sid;
 			const member = channel.member || 'default';
@@ -210,13 +220,18 @@ class ColladaComposer {
 			if ( ! aggregated[ nodeId ] ) aggregated[ nodeId ] = {};
 			if ( ! aggregated[ nodeId ][ sid ] ) aggregated[ nodeId ][ sid ] = {};
 
-			// Store times and values for this component
+			// Store times, values, and interpolation data for this component
 			aggregated[ nodeId ][ sid ][ member ] = {
 				times: inputSource.array,
 				values: outputSource.array,
 				stride: outputSource.stride,
 				arraySyntax: channel.arraySyntax,
-				indices: channel.indices
+				indices: channel.indices,
+				interpolation: interpolationSource ? interpolationSource.array : null,
+				inTangent: inTangentSource ? inTangentSource.array : null,
+				outTangent: outTangentSource ? outTangentSource.array : null,
+				inTangentStride: inTangentSource ? inTangentSource.stride : 0,
+				outTangentStride: outTangentSource ? outTangentSource.stride : 0
 			};
 
 		}
@@ -273,13 +288,37 @@ class ColladaComposer {
 
 	buildTranslateTrack( object3D, channelData, transformInfo, tracks ) {
 
-		// Get all unique times from all components
+		// Handle whole-vector animation (target="node/translate" with stride=3)
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const times = Array.from( data.times );
+			const values = Array.from( data.values );
+
+			const track = new VectorKeyframeTrack(
+				object3D.uuid + '.position',
+				times,
+				values
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo );
+			tracks.push( track );
+			return;
+
+		}
+
+		// Handle component-based animation (target="node/translate.X", etc.)
 		const times = this.getTimesForAllAxes( channelData );
 		if ( times.length === 0 ) return;
 
 		const values = [];
 
+		// Determine interpolation mode from first available component
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
 		// For each time, get interpolated X, Y, Z values
+		// Note: getValueAtTime handles BEZIER interpolation internally
 		for ( let i = 0; i < times.length; i ++ ) {
 
 			const time = times[ i ];
@@ -292,11 +331,14 @@ class ColladaComposer {
 
 		}
 
-		tracks.push( new VectorKeyframeTrack(
+		const track = new VectorKeyframeTrack(
 			object3D.uuid + '.position',
 			times,
 			values
-		) );
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
 
 	}
 
@@ -315,10 +357,15 @@ class ColladaComposer {
 		const quaternion = new Quaternion();
 		const values = [];
 
+		// Determine interpolation mode
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
 		// Build quaternion keyframes from axis-angle
+		// Note: getValueAtTime handles BEZIER interpolation for angles internally
 		for ( let i = 0; i < times.length; i ++ ) {
 
-			const angleDegrees = angleData.values[ i ];
+			const time = times[ i ];
+			const angleDegrees = this.getValueAtTime( angleData, time, transformInfo.angle );
 			const angleRadians = MathUtils.degToRad( angleDegrees );
 
 			quaternion.setFromAxisAngle( axis, angleRadians );
@@ -326,23 +373,50 @@ class ColladaComposer {
 
 		}
 
-		tracks.push( new QuaternionKeyframeTrack(
+		const track = new QuaternionKeyframeTrack(
 			object3D.uuid + '.quaternion',
 			times,
 			values
-		) );
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
 
 	}
 
 	buildScaleTrack( object3D, channelData, transformInfo, tracks ) {
 
-		// Get all unique times from all components
+		// Handle whole-vector animation (target="node/scale" with stride=3)
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const times = Array.from( data.times );
+			const values = Array.from( data.values );
+
+			const track = new VectorKeyframeTrack(
+				object3D.uuid + '.scale',
+				times,
+				values
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo );
+			tracks.push( track );
+			return;
+
+		}
+
+		// Handle component-based animation (target="node/scale.X", etc.)
 		const times = this.getTimesForAllAxes( channelData );
 		if ( times.length === 0 ) return;
 
 		const values = [];
 
+		// Determine interpolation mode from first available component
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
 		// For each time, get interpolated X, Y, Z values
+		// Note: getValueAtTime handles BEZIER interpolation internally
 		for ( let i = 0; i < times.length; i ++ ) {
 
 			const time = times[ i ];
@@ -355,11 +429,14 @@ class ColladaComposer {
 
 		}
 
-		tracks.push( new VectorKeyframeTrack(
+		const track = new VectorKeyframeTrack(
 			object3D.uuid + '.scale',
 			times,
 			values
-		) );
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
 
 	}
 
@@ -387,8 +464,9 @@ class ColladaComposer {
 
 		const times = componentData.times;
 		const values = componentData.values;
+		const interpolation = componentData.interpolation;
 
-		// Find the keyframe at or interpolate
+		// Find the segment containing this time
 		for ( let i = 0; i < times.length; i ++ ) {
 
 			if ( times[ i ] === time ) {
@@ -405,14 +483,31 @@ class ColladaComposer {
 
 				}
 
-				// Interpolate between previous and current
-				const prevTime = times[ i - 1 ];
-				const nextTime = times[ i ];
-				const prevValue = values[ i - 1 ];
-				const nextValue = values[ i ];
+				const i0 = i - 1;
+				const i1 = i;
+				const t0 = times[ i0 ];
+				const t1 = times[ i1 ];
+				const v0 = values[ i0 ];
+				const v1 = values[ i1 ];
 
-				const t = ( time - prevTime ) / ( nextTime - prevTime );
-				return prevValue + t * ( nextValue - prevValue );
+				// Check interpolation type for this segment
+				const interp = interpolation ? interpolation[ i0 ] : 'LINEAR';
+
+				if ( interp === 'STEP' ) {
+
+					return v0;
+
+				} else if ( interp === 'BEZIER' && componentData.inTangent && componentData.outTangent ) {
+
+					return this.evaluateBezierComponent( componentData, i0, i1, t0, t1, time );
+
+				} else {
+
+					// LINEAR interpolation
+					const t = ( time - t0 ) / ( t1 - t0 );
+					return v0 + t * ( v1 - v0 );
+
+				}
 
 			}
 
@@ -420,6 +515,132 @@ class ColladaComposer {
 
 		// Time is after all keyframes
 		return values[ values.length - 1 ];
+
+	}
+
+	evaluateBezierComponent( componentData, i0, i1, t0, t1, time ) {
+
+		const values = componentData.values;
+		const inTangent = componentData.inTangent;
+		const outTangent = componentData.outTangent;
+		const tangentStride = componentData.inTangentStride || 1;
+
+		const v0 = values[ i0 ];
+		const v1 = values[ i1 ];
+
+		let c0x, c0y, c1x, c1y;
+
+		if ( tangentStride === 2 ) {
+
+			// 2D control points (time, value)
+			c0x = outTangent[ i0 * 2 ];
+			c0y = outTangent[ i0 * 2 + 1 ];
+			c1x = inTangent[ i1 * 2 ];
+			c1y = inTangent[ i1 * 2 + 1 ];
+
+		} else {
+
+			// 1D tangents - control points at 1/3 and 2/3 of interval
+			c0x = t0 + ( t1 - t0 ) / 3;
+			c0y = outTangent[ i0 ];
+			c1x = t1 - ( t1 - t0 ) / 3;
+			c1y = inTangent[ i1 ];
+
+		}
+
+		// Solve for parameter s where Bx(s) = time using Newton-Raphson
+		let s = ( time - t0 ) / ( t1 - t0 );
+
+		for ( let iter = 0; iter < 8; iter ++ ) {
+
+			const s2 = s * s;
+			const s3 = s2 * s;
+			const oneMinusS = 1 - s;
+			const oneMinusS2 = oneMinusS * oneMinusS;
+			const oneMinusS3 = oneMinusS2 * oneMinusS;
+
+			// Bezier X(s)
+			const bx = oneMinusS3 * t0 + 3 * oneMinusS2 * s * c0x + 3 * oneMinusS * s2 * c1x + s3 * t1;
+
+			// Derivative dX/ds
+			const dbx = 3 * oneMinusS2 * ( c0x - t0 ) + 6 * oneMinusS * s * ( c1x - c0x ) + 3 * s2 * ( t1 - c1x );
+
+			if ( Math.abs( dbx ) < 1e-10 ) break;
+
+			const error = bx - time;
+			if ( Math.abs( error ) < 1e-10 ) break;
+
+			s = s - error / dbx;
+			s = Math.max( 0, Math.min( 1, s ) );
+
+		}
+
+		// Evaluate Bezier Y(s)
+		const s2 = s * s;
+		const s3 = s2 * s;
+		const oneMinusS = 1 - s;
+		const oneMinusS2 = oneMinusS * oneMinusS;
+		const oneMinusS3 = oneMinusS2 * oneMinusS;
+
+		return oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
+
+	}
+
+	getInterpolationInfo( channelData ) {
+
+		// Check all components to determine interpolation type
+		// Returns { type: 'LINEAR'|'STEP'|'BEZIER', uniform: boolean }
+
+		const components = [ 'X', 'Y', 'Z', 'ANGLE', 'default' ];
+		let interpolationType = null;
+		let isUniform = true;
+
+		for ( const comp of components ) {
+
+			const data = channelData[ comp ];
+			if ( ! data || ! data.interpolation ) continue;
+
+			const interpArray = data.interpolation;
+
+			for ( let i = 0; i < interpArray.length; i ++ ) {
+
+				const interp = interpArray[ i ];
+
+				if ( interpolationType === null ) {
+
+					interpolationType = interp;
+
+				} else if ( interp !== interpolationType ) {
+
+					isUniform = false;
+					// For mixed interpolation, default to LINEAR
+					// (could also use the first or most common type)
+
+				}
+
+			}
+
+		}
+
+		return {
+			type: interpolationType || 'LINEAR',
+			uniform: isUniform
+		};
+
+	}
+
+	applyInterpolation( track, interpolationInfo ) {
+
+		// BEZIER interpolation is pre-baked during track building via evaluateBezierComponent
+		// Only STEP needs special handling here
+
+		if ( interpolationInfo.type === 'STEP' && interpolationInfo.uniform ) {
+
+			// Use Three.js discrete interpolation
+			track.setInterpolation( InterpolateDiscrete );
+
+		}
+		// For LINEAR, BEZIER (pre-baked), or mixed types, use default (InterpolateLinear)
 
 	}
 
