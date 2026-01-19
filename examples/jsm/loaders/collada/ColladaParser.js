@@ -38,16 +38,7 @@ function parseStrings( text ) {
 
 	if ( text.length === 0 ) return [];
 
-	const parts = text.trim().split( /\s+/ );
-	const array = new Array( parts.length );
-
-	for ( let i = 0, l = parts.length; i < l; i ++ ) {
-
-		array[ i ] = parts[ i ];
-
-	}
-
-	return array;
+	return text.trim().split( /\s+/ );
 
 }
 
@@ -55,16 +46,7 @@ function parseFloats( text ) {
 
 	if ( text.length === 0 ) return [];
 
-	const parts = text.trim().split( /\s+/ );
-	const array = new Array( parts.length );
-
-	for ( let i = 0, l = parts.length; i < l; i ++ ) {
-
-		array[ i ] = parseFloat( parts[ i ] );
-
-	}
-
-	return array;
+	return text.trim().split( /\s+/ ).map( parseFloat );
 
 }
 
@@ -72,16 +54,7 @@ function parseInts( text ) {
 
 	if ( text.length === 0 ) return [];
 
-	const parts = text.trim().split( /\s+/ );
-	const array = new Array( parts.length );
-
-	for ( let i = 0, l = parts.length; i < l; i ++ ) {
-
-		array[ i ] = parseInt( parts[ i ] );
-
-	}
-
-	return array;
+	return text.trim().split( /\s+/ ).map( s => parseInt( s ) );
 
 }
 
@@ -201,7 +174,7 @@ class ColladaParser {
 
 	parserErrorToText( parserError ) {
 
-		let result = '';
+		const parts = [];
 		const stack = [ parserError ];
 
 		while ( stack.length ) {
@@ -210,18 +183,18 @@ class ColladaParser {
 
 			if ( node.nodeType === Node.TEXT_NODE ) {
 
-				result += node.textContent;
+				parts.push( node.textContent );
 
 			} else {
 
-				result += '\n';
+				parts.push( '\n' );
 				stack.push( ...node.childNodes );
 
 			}
 
 		}
 
-		return result.trim();
+		return parts.join( '' ).trim();
 
 	}
 
@@ -320,7 +293,6 @@ class ColladaParser {
 					break;
 
 				default:
-					console.log( child );
 
 			}
 
@@ -1178,6 +1150,7 @@ class ColladaParser {
 
 					data.technique = child.nodeName;
 					data.parameters = this.parseLightParameters( child );
+					break;
 
 			}
 
@@ -1269,7 +1242,6 @@ class ColladaParser {
 					break;
 
 				default:
-					console.log( child );
 
 			}
 
@@ -1859,7 +1831,6 @@ class ColladaParser {
 					break;
 
 				default:
-					console.log( child );
 
 			}
 

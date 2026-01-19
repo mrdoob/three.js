@@ -1488,6 +1488,7 @@ class ColladaComposer {
 
 			const visualElementName = visualElement.getAttribute( 'name' );
 			const joint = kinematicsModel.joints[ jointIndex ];
+			const transforms = self.buildTransformList( visualElement );
 
 			visualScene.traverse( function ( object ) {
 
@@ -1495,7 +1496,7 @@ class ColladaComposer {
 
 					jointMap[ jointIndex ] = {
 						object: object,
-						transforms: self.buildTransformList( visualElement ),
+						transforms: transforms,
 						joint: joint,
 						position: joint.zeroPosition
 					};
@@ -1614,7 +1615,7 @@ class ColladaComposer {
 
 				} else {
 
-					console.log( 'THREE.ColladaLoader: ' + jointIndex + ' does not exist.' );
+					console.warn( 'THREE.ColladaLoader: Joint ' + jointIndex + ' does not exist.' );
 
 				}
 
