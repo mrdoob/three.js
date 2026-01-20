@@ -64,7 +64,7 @@ function euclideanModulo( n, m ) {
 
 /**
  * Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>`
- * for the given value.
+ * for the given value. `a2` must be greater than `a1`.
  *
  * @param {number} x - The value to be mapped.
  * @param {number} a1 - Minimum value for range A.
@@ -155,13 +155,13 @@ function pingpong( x, length = 1 ) {
 /**
  * Returns a value in the range `[0,1]` that represents the percentage that `x` has
  * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
- * the `min` and `max`.
+ * the `min` and `max`. `max` must be greater than `min`.
  *
  * See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
  *
- * @param {number} x - The value to evaluate based on its position between min and max.
- * @param {number} min - The min value. Any x value below min will be `0`.
- * @param {number} max - The max value. Any x value above max will be `1`.
+ * @param {number} x - The value to evaluate based on its position between `min` and `max`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`.
  * @return {number} The alternated value.
  */
 function smoothstep( x, min, max ) {
@@ -177,11 +177,11 @@ function smoothstep( x, min, max ) {
 
 /**
  * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
- * that has zero 1st and 2nd order derivatives at x=0 and x=1.
+ * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`. `max` must be greater than `min`.
  *
- * @param {number} x - The value to evaluate based on its position between min and max.
- * @param {number} min - The min value. Any x value below min will be `0`.
- * @param {number} max - The max value. Any x value above max will be `1`.
+ * @param {number} x - The value to evaluate based on its position between `min` and `max`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`.
  * @return {number} The alternated value.
  */
 function smootherstep( x, min, max ) {
@@ -294,7 +294,7 @@ function isPowerOfTwo( value ) {
 /**
  * Returns the smallest power of two that is greater than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for.
+ * @param {number} value - The value to find a POT for. Must be greater than 0.
  * @return {number} The smallest power of two that is greater than or equal to the given number.
  */
 function ceilPowerOfTwo( value ) {
@@ -306,7 +306,7 @@ function ceilPowerOfTwo( value ) {
 /**
  * Returns the largest power of two that is less than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for.
+ * @param {number} value - The value to find a POT for. Must be greater than 0.
  * @return {number} The largest power of two that is less than or equal to the given number.
  */
 function floorPowerOfTwo( value ) {
