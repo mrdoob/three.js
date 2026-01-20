@@ -47,7 +47,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			let aoPass, traaPass, transparentMesh;
 
@@ -102,7 +102,7 @@
 
 				// post-processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// pre-pass
 
@@ -150,7 +150,7 @@
 				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
 				traaPass.useSubpixelCorrection = false;
 
-				postProcessing.outputNode = traaPass;
+				renderPipeline.outputNode = traaPass;
 
 				// models
 
@@ -195,16 +195,16 @@
 
 					if ( value === true ) {
 
-						postProcessing.outputNode = vec4( vec3( aoPass.r ), 1 );
+						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
 
 					} else {
 
 
-						postProcessing.outputNode = traaPass;
+						renderPipeline.outputNode = traaPass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -239,7 +239,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

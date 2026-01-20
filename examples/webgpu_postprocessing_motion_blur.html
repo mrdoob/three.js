@@ -43,7 +43,7 @@
 
 			let camera, scene, renderer;
 			let boxLeft, boxRight, model, mixer, timer;
-			let postProcessing;
+			let renderPipeline;
 			let controls;
 
 			const params = {
@@ -193,8 +193,8 @@
 
 				const vignette = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mBlur.mul( vignette );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = mBlur.mul( vignette );
 
 				//
 
@@ -236,7 +236,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

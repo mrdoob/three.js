@@ -40,7 +40,7 @@
 			import { uniform, pass } from 'three/tsl';
 			import { transition } from 'three/addons/tsl/display/TransitionNode.js';
 
-			let renderer, postProcessing, transitionController, transitionPass;
+			let renderer, renderPipeline, transitionController, transitionPass;
 
 			const textures = [];
 			const timer = new THREE.Timer();
@@ -168,14 +168,14 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
 				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
 
 				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode( textures[ effectController.texture ] ), effectController._transition, effectController.threshold, effectController._useTexture );
 
-				postProcessing.outputNode = transitionPass;
+				renderPipeline.outputNode = transitionPass;
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 
@@ -265,7 +265,7 @@
 
 				} else {
 
-					postProcessing.render();
+					renderPipeline.render();
 
 				}
 

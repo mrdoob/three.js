@@ -14,7 +14,7 @@ import PassNode from './PassNode.js';
  * will receive the outline.
  *
  * ```js
- * const postProcessing = new PostProcessing( renderer );
+ * const postProcessing = new RenderPipeline( renderer );
  *
  * const scenePass = toonOutlinePass( scene, camera );
  *

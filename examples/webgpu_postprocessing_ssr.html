@@ -60,7 +60,7 @@
 			enabled: true
 		};
 
-		let camera, scene, model, renderer, postProcessing, ssrPass;
+		let camera, scene, model, renderer, renderPipeline, ssrPass;
 		let controls;
 
 		init();
@@ -126,7 +126,7 @@
 
 			//
 
-			postProcessing = new THREE.PostProcessing( renderer );
+			renderPipeline = new THREE.RenderPipeline( renderer );
 
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
@@ -170,7 +170,7 @@
 
 			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
 
-			postProcessing.outputNode = outputNode;
+			renderPipeline.outputNode = outputNode;
 
 			//
 
@@ -193,15 +193,15 @@
 
 				if ( params.enabled === true ) {
 
-					postProcessing.outputNode = outputNode;
+					renderPipeline.outputNode = outputNode;
 
 				} else {
 
-					postProcessing.outputNode = scenePass;
+					renderPipeline.outputNode = scenePass;
 
 				}
 
-				postProcessing.needsUpdate = true;
+				renderPipeline.needsUpdate = true;
 
 			} );
 			const modelFolder = gui.addFolder( 'Model' );
@@ -246,7 +246,7 @@
 
 			controls.update();
 
-			postProcessing.render();
+			renderPipeline.render();
 		
 		}
 

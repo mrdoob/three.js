@@ -434,20 +434,20 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const postProcessing = builder.context.postProcessing;
+		const renderPipeline = builder.context.renderPipeline;
 
-		if ( postProcessing ) {
+		if ( renderPipeline ) {
 
 			this._needsPostProcessingSync = true;
 
-			postProcessing.context.onBeforePostProcessing = () => {
+			renderPipeline.context.onBeforeRenderPipeline = () => {
 
 				const size = builder.renderer.getDrawingBufferSize( _size );
 				this.setViewOffset( size.width, size.height );
 
 			};
 
-			postProcessing.context.onAfterPostProcessing = () => {
+			renderPipeline.context.onAfterRenderPipeline = () => {
 
 				this.clearViewOffset();
 

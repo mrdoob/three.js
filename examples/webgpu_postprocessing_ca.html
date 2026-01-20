@@ -52,7 +52,7 @@
 			};
 
 			let camera, scene, renderer, timer, mainGroup;
-			let controls, postProcessing;
+			let controls, renderPipeline;
 
 			init();
 
@@ -100,8 +100,8 @@
 				scene.add( gridHelper );
 
 				// post processing
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				// scene pass
 				const scenePass = pass( scene, camera );
@@ -116,7 +116,7 @@
 				const caPass = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
 
 				// Set initial output based on params
-				postProcessing.outputNode = params.enabled ? caPass : outputPass;
+				renderPipeline.outputNode = params.enabled ? caPass : outputPass;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -126,8 +126,8 @@
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 
-					postProcessing.outputNode = value ? caPass : outputPass;
-					postProcessing.needsUpdate = true;
+					renderPipeline.outputNode = value ? caPass : outputPass;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -336,7 +336,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 			
 			}
 

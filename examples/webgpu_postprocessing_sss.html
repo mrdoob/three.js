@@ -45,7 +45,7 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			init();
 
@@ -130,7 +130,7 @@
 
 				// post-processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// pre-pass
 
@@ -165,7 +165,7 @@
 				// traa
 
 				const traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
-				postProcessing.outputNode = traaPass;
+				renderPipeline.outputNode = traaPass;
 
 				//
 
@@ -198,15 +198,15 @@
 
 					if ( params.output === 2 ) {
 
-						postProcessing.outputNode = vec4( vec3( sssPass.r ), 1 );
+						renderPipeline.outputNode = vec4( vec3( sssPass.r ), 1 );
 
 					} else {
 
-						postProcessing.outputNode = sssPass.useTemporalFiltering ? traaPass : scenePass;
+						renderPipeline.outputNode = sssPass.useTemporalFiltering ? traaPass : scenePass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 
 				}
@@ -231,7 +231,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

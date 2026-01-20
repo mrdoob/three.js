@@ -46,7 +46,7 @@
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 
 			let container;
-			let camera, scene, renderer, postProcessing;
+			let camera, scene, renderer, renderPipeline;
 			let controls, water, sun, sky, mesh, bloomPass;
 
 			init();
@@ -75,7 +75,7 @@
 
 				// Post-processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode( 'output' );
@@ -85,7 +85,7 @@
 				bloomPass.strength.value = 0.1;
 				bloomPass.radius.value = 0;
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				//
 
@@ -226,7 +226,7 @@
 				mesh.rotation.x = time * 0.5;
 				mesh.rotation.z = time * 0.51;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

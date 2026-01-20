@@ -48,7 +48,7 @@
 			let volumetricMesh;
 			let rectLight1, rectLight2, rectLight3;
 			let timer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -216,7 +216,7 @@
 
 				// Post-Processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// Layers
 
@@ -249,7 +249,7 @@
 
 				const scenePassColor = scenePass.add( blurredVolumetricPass.mul( volumetricLightingIntensity ) );
 
-				postProcessing.outputNode = scenePassColor;
+				renderPipeline.outputNode = scenePassColor;
 
 				// GUI
 
@@ -274,8 +274,8 @@
 
 					const scenePassColor = scenePass.add( volumetric.mul( volumetricLightingIntensity ) );
 
-					postProcessing.outputNode = scenePassColor;
-					postProcessing.needsUpdate = true;
+					renderPipeline.outputNode = scenePassColor;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -306,7 +306,7 @@
 				rectLight2.rotation.y += delta * .5;
 				rectLight3.rotation.y += delta;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

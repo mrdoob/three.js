@@ -150,7 +150,7 @@ class PassMultipleTextureNode extends PassTextureNode {
  * via MRT for further processing.
  *
  * ```js
- * const postProcessing = new PostProcessing( renderer );
+ * const postProcessing = new RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
