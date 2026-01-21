@@ -83,7 +83,6 @@ class WebXRManager extends EventDispatcher {
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
 
-		let _previousFrameTime = null;
 		//
 
 		/**
@@ -1073,10 +1072,7 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			const deltaTime = ( _previousFrameTime === null ) ? 0 : ( time - _previousFrameTime ) / 1000;
-  			_previousFrameTime = time;
-
-			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame, deltaTime );
+			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
 			if ( frame.detectedPlanes ) {
 
@@ -1095,8 +1091,6 @@ class WebXRManager extends EventDispatcher {
 		this.setAnimationLoop = function ( callback ) {
 
 			onAnimationFrameCallback = callback;
-
-			_previousFrameTime = null;
 
 		};
 
