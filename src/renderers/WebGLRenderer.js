@@ -1530,19 +1530,28 @@ class WebGLRenderer {
 
 		let onAnimationFrameCallback = null;
 
+		let _previousFrameTime = null;
+
 		function onAnimationFrame( time ) {
 
-			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
+			const deltaTime = ( _previousFrameTime === null ) ? 0 : ( time - _previousFrameTime ) / 1000;
+  			_previousFrameTime = time;
 
+  			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, undefined, deltaTime );
+		
 		}
 
 		function onXRSessionStart() {
+
+			_previousFrameTime = null;
 
 			animation.stop();
 
 		}
 
 		function onXRSessionEnd() {
+
+			_previousFrameTime = null;
 
 			animation.start();
 
@@ -1563,6 +1572,9 @@ class WebGLRenderer {
 		this.setAnimationLoop = function ( callback ) {
 
 			onAnimationFrameCallback = callback;
+
+			_previousFrameTime = null;
+
 			xr.setAnimationLoop( callback );
 
 			( callback === null ) ? animation.stop() : animation.start();
