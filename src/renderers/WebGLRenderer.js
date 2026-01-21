@@ -1538,6 +1538,7 @@ class WebGLRenderer {
   			_previousFrameTime = time;
 
   			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, undefined, deltaTime );
+			
 		}
 
 		function onXRSessionStart() {
