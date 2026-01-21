@@ -134,7 +134,12 @@ class USDComposer {
 					const m = data[ 'xformOp:transform' ];
 					if ( m && m.length === 16 ) {
 
-						tempMatrix.fromArray( m );
+						tempMatrix.set(
+							m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+							m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+							m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+							m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+						);
 						if ( isInverse ) tempMatrix.invert();
 						matrix.multiply( tempMatrix );
 
@@ -981,6 +986,18 @@ class USDComposer {
 			if ( attrSpec.fields?.default !== undefined ) {
 
 				attrs[ attrName ] = attrSpec.fields.default;
+
+			} else if ( attrSpec.fields?.timeSamples ) {
+
+				// For animated attributes without default, use the first time sample (rest pose)
+				const { times, values } = attrSpec.fields.timeSamples;
+				if ( times && values && times.length > 0 ) {
+
+					// Find time 0, or use the first available time
+					const idx = times.indexOf( 0 );
+					attrs[ attrName ] = idx >= 0 ? values[ idx ] : values[ 0 ];
+
+				}
 
 			}
 
@@ -3486,6 +3503,46 @@ class USDComposer {
 
 					const q = values[ i ];
 					keyframeValues.push( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new QuaternionKeyframeTrack(
+						objectName + '.quaternion',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+			// Check for animated xformOp:rotateXYZ
+			const rotateXYZPath = path + '.xformOp:rotateXYZ';
+			const rotateXYZSpec = this.specsByPath[ rotateXYZPath ];
+			if ( rotateXYZSpec?.fields?.timeSamples ) {
+
+				const { times, values } = rotateXYZSpec.fields.timeSamples;
+				const keyframeTimes = [];
+				const keyframeValues = [];
+				const tempEuler = new Euler();
+				const tempQuat = new Quaternion();
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					keyframeTimes.push( times[ i ] / this.fps );
+
+					const r = values[ i ];
+					// USD rotateXYZ: matrix = Rx * Ry * Rz, use 'ZYX' order in Three.js
+					tempEuler.set(
+						r[ 0 ] * Math.PI / 180,
+						r[ 1 ] * Math.PI / 180,
+						r[ 2 ] * Math.PI / 180,
+						'ZYX'
+					);
+					tempQuat.setFromEuler( tempEuler );
+					keyframeValues.push( tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w );
 
 				}
 
