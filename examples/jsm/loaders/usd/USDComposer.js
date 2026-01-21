@@ -122,6 +122,9 @@ class USDComposer {
 			const matrix = new Matrix4();
 			const tempMatrix = new Matrix4();
 
+			// Track scale for handling negative scale with rotation
+			let scaleValues = null;
+
 			// Iterate FORWARD for Three.js column-vector convention
 			for ( let i = 0; i < xformOpOrder.length; i ++ ) {
 
@@ -175,10 +178,12 @@ class USDComposer {
 						if ( Array.isArray( s ) ) {
 
 							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+							scaleValues = [ s[ 0 ], s[ 1 ], s[ 2 ] ];
 
 						} else {
 
 							tempMatrix.makeScale( s, s, s );
+							scaleValues = [ s, s, s ];
 
 						}
 
@@ -257,6 +262,32 @@ class USDComposer {
 
 			obj.matrix.copy( matrix );
 			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+
+			// Fix for negative scale: decompose() may absorb negative scale into quaternion
+			// Restore original scale signs to keep animation consistent
+			if ( scaleValues ) {
+
+				const negX = scaleValues[ 0 ] < 0;
+				const negY = scaleValues[ 1 ] < 0;
+				const negZ = scaleValues[ 2 ] < 0;
+				const negCount = ( negX ? 1 : 0 ) + ( negY ? 1 : 0 ) + ( negZ ? 1 : 0 );
+
+				// decompose() absorbs pairs of negative scales into rotation
+				// For [-1,-1,-1] → [-1,1,1], Y and Z were absorbed, flip quat.y and quat.w
+				if ( negCount === 3 ) {
+
+					obj.scale.set( scaleValues[ 0 ], scaleValues[ 1 ], scaleValues[ 2 ] );
+					obj.quaternion.set(
+						obj.quaternion.x,
+						- obj.quaternion.y,
+						obj.quaternion.z,
+						- obj.quaternion.w
+					);
+
+				}
+
+			}
+
 			return;
 
 		}
