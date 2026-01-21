@@ -1141,7 +1141,10 @@ class USDComposer {
 			// Get per-mesh joint mapping
 			const localJoints = attrs[ 'skel:joints' ];
 
-			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints } );
+			// Get geomBindTransform if present
+			const geomBindTransform = attrs[ 'primvars:skel:geomBindTransform' ];
+
+			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints, geomBindTransform } );
 
 		} else {
 
@@ -3280,7 +3283,14 @@ class USDComposer {
 			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
 
 				const bindMatrix = new Matrix4();
-				bindMatrix.fromArray( bindTransforms, i * 16 );
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = bindTransforms.slice( i * 16, ( i + 1 ) * 16 );
+				bindMatrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
 				const inverseBindMatrix = bindMatrix.clone().invert();
 				boneInverses.push( inverseBindMatrix );
 
@@ -3319,7 +3329,14 @@ class USDComposer {
 			for ( let i = 0; i < joints.length; i ++ ) {
 
 				const matrix = new Matrix4();
-				matrix.fromArray( restTransforms, i * 16 );
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = restTransforms.slice( i * 16, ( i + 1 ) * 16 );
+				matrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
 				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
 
 			}
@@ -3352,7 +3369,7 @@ class USDComposer {
 
 		for ( const meshData of this.skinnedMeshes ) {
 
-			const { mesh, skeletonPath, localJoints } = meshData;
+			const { mesh, skeletonPath, localJoints, geomBindTransform } = meshData;
 
 			let skeletonData = null;
 
@@ -3436,7 +3453,23 @@ class USDComposer {
 
 			}
 
-			mesh.bind( skeleton, new Matrix4() );
+			// Use geomBindTransform if available, otherwise use identity matrix
+			let bindMatrix = new Matrix4();
+
+			if ( geomBindTransform && geomBindTransform.length === 16 ) {
+
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = geomBindTransform;
+				bindMatrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
+
+			}
+
+			mesh.bind( skeleton, bindMatrix );
 
 		}
 
