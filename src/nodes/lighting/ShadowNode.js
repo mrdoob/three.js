@@ -341,7 +341,7 @@ class ShadowNode extends ShadowBaseNode {
 		const { shadow } = this;
 		const { renderer } = builder;
 
-		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+		const bias = shadow.biasNode || reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 
 		let shadowCoord = shadowPosition;
 		let coordZ;
