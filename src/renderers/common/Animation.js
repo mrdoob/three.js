@@ -61,6 +61,8 @@ class Animation {
 		 */
 		this._requestId = null;
 
+		this._previousTime = null;
+
 	}
 
 	/**
@@ -68,9 +70,16 @@ class Animation {
 	 */
 	start() {
 
+		this._previousTime = null;
+
 		const update = ( time, xrFrame ) => {
 
 			this._requestId = this._context.requestAnimationFrame( update );
+
+			const deltaTime =
+        		( time === undefined || this._previousTime === null ) ? 0 : ( time - this._previousTime ) / 1000;
+
+			if ( time !== undefined ) this._previousTime = time;
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
@@ -80,7 +89,7 @@ class Animation {
 
 			this.renderer._inspector.begin();
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
+			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame, deltaTime );
 
 			this.renderer._inspector.finish();
 
@@ -98,6 +107,8 @@ class Animation {
 		this._context.cancelAnimationFrame( this._requestId );
 
 		this._requestId = null;
+
+		this._previousTime = null;
 
 	}
 
