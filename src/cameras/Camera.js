@@ -116,7 +116,16 @@ class Camera extends Object3D {
 		// exclude scale from view matrix to be glTF conform
 
 		this.matrixWorld.decompose( _position, _quaternion, _scale );
-		this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
+
+		if ( _scale.x === 1 && _scale.y === 1 && _scale.z === 1 ) {
+
+			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+
+		} else {
+
+			this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
+
+		}
 
 	}
 
@@ -127,7 +136,16 @@ class Camera extends Object3D {
 		// exclude scale from view matrix to be glTF conform
 
 		this.matrixWorld.decompose( _position, _quaternion, _scale );
-		this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
+
+		if ( _scale.x === 1 && _scale.y === 1 && _scale.z === 1 ) {
+
+			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+
+		} else {
+
+			this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
+
+		}
 
 	}
 
