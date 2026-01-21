@@ -67,11 +67,14 @@ class WebGPUBackend extends Backend {
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		/**
-		 * Indicates whether the backend is in compatibility mode or not.
-		 * @type {boolean}
-		 * @default false
+		 * Indicates whether the backend is in WebGPU compatibility mode or not.
+		 * The backend must be initialized before the property can be evaluated.
+		 *
+		 * @type {?boolean}
+		 * @readonly
+		 * @default null
 		 */
-		this.compatibilityMode = undefined;
+		this.compatibilityMode = null;
 
 		/**
 		 * A reference to the device.
@@ -213,7 +216,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		parameters.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
+		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
 		device.lost.then( ( info ) => {
 
