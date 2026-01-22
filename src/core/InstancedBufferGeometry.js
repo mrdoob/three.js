@@ -43,9 +43,9 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 	}
 
-	toJSON() {
+	toJSON( meta ) {
 
-		const data = super.toJSON();
+		const data = super.toJSON( meta );
 
 		data.instanceCount = this.instanceCount;
 

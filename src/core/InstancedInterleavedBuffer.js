@@ -58,14 +58,15 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 	}
 
-	toJSON( data ) {
+	toJSON( meta ) {
 
-		const json = super.toJSON( data );
+		const uuid = super.toJSON( meta );
 
-		json.isInstancedInterleavedBuffer = true;
-		json.meshPerAttribute = this.meshPerAttribute;
+		// Add instanced properties to the stored interleaved buffer entry
+		meta.buffers.interleaved[ uuid ].class = 'InstancedInterleavedBuffer';
+		meta.buffers.interleaved[ uuid ].meshPerAttribute = this.meshPerAttribute;
 
-		return json;
+		return uuid;
 
 	}
 

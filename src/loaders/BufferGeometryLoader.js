@@ -7,6 +7,7 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
+import { InstancedInterleavedBuffer } from '../core/InstancedInterleavedBuffer.js';
 import { getTypedArray, error } from '../utils.js';
 
 /**
@@ -100,7 +101,19 @@ class BufferGeometryLoader extends Loader {
 			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
 
 			const array = getTypedArray( interleavedBuffer.type, buffer );
-			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			let ib;
+
+			if ( interleavedBuffer.class === 'InstancedInterleavedBuffer' || interleavedBuffer.isInstancedInterleavedBuffer /* JSON4 */ ) {
+
+				ib = new InstancedInterleavedBuffer( array, interleavedBuffer.stride, interleavedBuffer.meshPerAttribute );
+
+			} else {
+
+				ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			}
+
 			ib.uuid = uuid;
 
 			interleavedBufferMap[ uuid ] = ib;
@@ -124,7 +137,7 @@ class BufferGeometryLoader extends Loader {
 
 		}
 
-		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
+		const geometry = json.type === 'InstancedBufferGeometry' || json.isInstancedBufferGeometry /* JSON4 */ ? new InstancedBufferGeometry() : new BufferGeometry();
 
 		const index = json.data.index;
 
@@ -142,16 +155,20 @@ class BufferGeometryLoader extends Loader {
 			const attribute = attributes[ key ];
 			let bufferAttribute;
 
-			if ( attribute.type === 'InterleavedBufferAttribute' ) {
+			if ( attribute.class === 'InterleavedBufferAttribute' ) {
 
 				const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
 				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
 
+			} else if ( attribute.class === 'InstancedBufferAttribute' || attribute.isInstancedBufferAttribute /* JSON4 */ ) {
+
+				const typedArray = getTypedArray( attribute.type, attribute.array );
+				bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+
 			} else {
 
 				const typedArray = getTypedArray( attribute.type, attribute.array );
-				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+				bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
 
 			}
 
@@ -177,7 +194,7 @@ class BufferGeometryLoader extends Loader {
 					const attribute = attributeArray[ i ];
 					let bufferAttribute;
 
-					if ( attribute.type === 'InterleavedBufferAttribute' ) {
+					if ( attribute.class === 'InterleavedBufferAttribute' ) {
 
 						const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
 						bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
@@ -208,7 +225,9 @@ class BufferGeometryLoader extends Loader {
 
 		}
 
-		const groups = json.data.groups || json.data.drawcalls || json.data.offsets;
+		const groups = json.data.groups
+			|| json.data.drawcalls /* JSON4 */
+			|| json.data.offsets; /* pre-JSON4 */
 
 		if ( groups !== undefined ) {
 

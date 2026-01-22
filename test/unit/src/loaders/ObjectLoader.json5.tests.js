@@ -10,8 +10,13 @@ import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry.js';
+import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAttribute.js';
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute.js';
+import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer.js';
+import { InstancedMesh } from '../../../../src/objects/InstancedMesh.js';
 
 export default QUnit.module( 'Loaders', () => {
 
@@ -356,14 +361,14 @@ export default QUnit.module( 'Loaders', () => {
 						data: {
 							attributes: {
 								position: {
-									type: 'InterleavedBufferAttribute',
+									class: 'InterleavedBufferAttribute',
 									itemSize: 3,
 									data: 'interleaved-1',
 									offset: 0,
 									normalized: false
 								},
 								uv: {
-									type: 'InterleavedBufferAttribute',
+									class: 'InterleavedBufferAttribute',
 									itemSize: 2,
 									data: 'interleaved-1',
 									offset: 3,
@@ -462,6 +467,189 @@ export default QUnit.module( 'Loaders', () => {
 			// Verify data integrity
 			assert.strictEqual( loadedPosition.getX( 1 ), 1, 'Position data preserved' );
 			assert.strictEqual( loadedNormal.getZ( 0 ), 1, 'Normal data preserved' );
+
+		} );
+
+		QUnit.test( 'round-trip - InstancedBufferGeometry with InterleavedBufferAttribute', ( assert ) => {
+
+			const scene = new Scene();
+
+			// Create an instanced geometry with interleaved attributes
+			const geometry = new InstancedBufferGeometry();
+
+			// Interleaved: position (3) + uv (2) = stride 5
+			const interleavedData = new Float32Array( [
+				// vertex 0
+				0, 0, 0, 0, 0,
+				// vertex 1
+				1, 0, 0, 1, 0,
+				// vertex 2
+				0, 1, 0, 0, 1
+			] );
+
+			const interleavedBuffer = new InterleavedBuffer( interleavedData, 5 );
+			const positionAttr = new InterleavedBufferAttribute( interleavedBuffer, 3, 0 );
+			const uvAttr = new InterleavedBufferAttribute( interleavedBuffer, 2, 3 );
+
+			geometry.setAttribute( 'position', positionAttr );
+			geometry.setAttribute( 'uv', uvAttr );
+			geometry.instanceCount = 10;
+
+			const material = new MeshBasicMaterial( { color: 0xffffff } );
+			const mesh = new InstancedMesh( geometry, material, 10 );
+			scene.add( mesh );
+
+			const json = scene.toJSON();
+
+			// Verify buffers structure exists
+			assert.ok( json.buffers, 'Buffers object exists in JSON' );
+			assert.ok( json.buffers.array, 'Array buffers exist' );
+			assert.ok( json.buffers.interleaved, 'Interleaved buffers exist' );
+
+			const loader = new ObjectLoader();
+			const loadedScene = loader.parse( json );
+
+			const loadedGeometry = loadedScene.children[ 0 ].geometry;
+			const loadedPosition = loadedGeometry.getAttribute( 'position' );
+			const loadedUv = loadedGeometry.getAttribute( 'uv' );
+
+			assert.ok( loadedGeometry.isInstancedBufferGeometry, 'Loaded geometry is InstancedBufferGeometry' );
+			assert.ok( loadedPosition.isInterleavedBufferAttribute, 'Loaded position is InterleavedBufferAttribute' );
+			assert.ok( loadedUv.isInterleavedBufferAttribute, 'Loaded uv is InterleavedBufferAttribute' );
+			assert.strictEqual( loadedPosition.data, loadedUv.data, 'They share the same InterleavedBuffer' );
+			assert.strictEqual( loadedPosition.data.stride, 5, 'Stride is preserved' );
+
+		} );
+
+		QUnit.test( 'round-trip - InstancedBufferAttribute', ( assert ) => {
+
+			const scene = new Scene();
+
+			// Create a geometry with instanced buffer attributes
+			const geometry = new InstancedBufferGeometry();
+
+			// Base geometry (a simple triangle)
+			const positions = new Float32BufferAttribute( [
+				0, 0, 0,
+				1, 0, 0,
+				0, 1, 0
+			], 3 );
+			geometry.setAttribute( 'position', positions );
+
+			// Instance offsets with meshPerAttribute = 1
+			const offsets = new InstancedBufferAttribute(
+				new Float32Array( [
+					0, 0, 0,
+					2, 0, 0,
+					4, 0, 0,
+					6, 0, 0
+				] ),
+				3,
+				false,
+				1
+			);
+			geometry.setAttribute( 'offset', offsets );
+
+			// Instance colors with meshPerAttribute = 2 (each color used for 2 instances)
+			const colors = new InstancedBufferAttribute(
+				new Float32Array( [
+					1, 0, 0,
+					0, 1, 0
+				] ),
+				3,
+				false,
+				2
+			);
+			geometry.setAttribute( 'color', colors );
+
+			geometry.instanceCount = 4;
+
+			const material = new MeshBasicMaterial( { color: 0xffffff } );
+			const mesh = new Mesh( geometry, material );
+			scene.add( mesh );
+
+			const json = scene.toJSON();
+
+			const loader = new ObjectLoader();
+			const loadedScene = loader.parse( json );
+
+			const loadedGeometry = loadedScene.children[ 0 ].geometry;
+			const loadedOffset = loadedGeometry.getAttribute( 'offset' );
+			const loadedColor = loadedGeometry.getAttribute( 'color' );
+
+			assert.ok( loadedGeometry.isInstancedBufferGeometry, 'Loaded geometry is InstancedBufferGeometry' );
+			assert.ok( loadedOffset.isInstancedBufferAttribute, 'Loaded offset is InstancedBufferAttribute' );
+			assert.ok( loadedColor.isInstancedBufferAttribute, 'Loaded color is InstancedBufferAttribute' );
+			assert.strictEqual( loadedOffset.meshPerAttribute, 1, 'Offset meshPerAttribute preserved' );
+			assert.strictEqual( loadedColor.meshPerAttribute, 2, 'Color meshPerAttribute preserved' );
+
+			// Verify data integrity
+			assert.strictEqual( loadedOffset.getX( 2 ), 4, 'Offset data preserved' );
+			assert.strictEqual( loadedColor.getY( 1 ), 1, 'Color data preserved' );
+
+		} );
+
+		QUnit.test( 'round-trip - InstancedInterleavedBuffer', ( assert ) => {
+
+			const scene = new Scene();
+
+			// Create a geometry with instanced interleaved buffer
+			const geometry = new InstancedBufferGeometry();
+
+			// Base geometry (a simple triangle)
+			const positions = new Float32BufferAttribute( [
+				0, 0, 0,
+				1, 0, 0,
+				0, 1, 0
+			], 3 );
+			geometry.setAttribute( 'position', positions );
+
+			// Instanced interleaved data: offset (3) + scale (1) = stride 4
+			// meshPerAttribute = 1 means each value is for one instance
+			const instanceData = new Float32Array( [
+				// instance 0: offset + scale
+				0, 0, 0, 1,
+				// instance 1: offset + scale
+				2, 0, 0, 0.5,
+				// instance 2: offset + scale
+				4, 0, 0, 1.5
+			] );
+
+			const instancedInterleavedBuffer = new InstancedInterleavedBuffer( instanceData, 4, 1 );
+			const offsetAttr = new InterleavedBufferAttribute( instancedInterleavedBuffer, 3, 0 );
+			const scaleAttr = new InterleavedBufferAttribute( instancedInterleavedBuffer, 1, 3 );
+
+			geometry.setAttribute( 'instanceOffset', offsetAttr );
+			geometry.setAttribute( 'instanceScale', scaleAttr );
+			geometry.instanceCount = 3;
+
+			const material = new MeshBasicMaterial( { color: 0xffffff } );
+			const mesh = new Mesh( geometry, material );
+			scene.add( mesh );
+
+			const json = scene.toJSON();
+
+			// Verify buffers structure exists
+			assert.ok( json.buffers, 'Buffers object exists in JSON' );
+			assert.ok( json.buffers.interleaved, 'Interleaved buffers exist' );
+
+			const loader = new ObjectLoader();
+			const loadedScene = loader.parse( json );
+
+			const loadedGeometry = loadedScene.children[ 0 ].geometry;
+			const loadedOffset = loadedGeometry.getAttribute( 'instanceOffset' );
+			const loadedScale = loadedGeometry.getAttribute( 'instanceScale' );
+
+			assert.ok( loadedOffset.isInterleavedBufferAttribute, 'Loaded instanceOffset is InterleavedBufferAttribute' );
+			assert.ok( loadedScale.isInterleavedBufferAttribute, 'Loaded instanceScale is InterleavedBufferAttribute' );
+			assert.strictEqual( loadedOffset.data, loadedScale.data, 'They share the same InterleavedBuffer' );
+			assert.ok( loadedOffset.data.isInstancedInterleavedBuffer, 'Buffer is InstancedInterleavedBuffer' );
+			assert.strictEqual( loadedOffset.data.meshPerAttribute, 1, 'meshPerAttribute preserved' );
+			assert.strictEqual( loadedOffset.data.stride, 4, 'Stride preserved' );
+
+			// Verify data integrity
+			assert.strictEqual( loadedOffset.getX( 1 ), 2, 'Offset data preserved' );
+			assert.strictEqual( loadedScale.getX( 1 ), 0.5, 'Scale data preserved' );
 
 		} );
 
