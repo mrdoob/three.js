@@ -142,7 +142,7 @@ class BufferGeometryLoader extends Loader {
 			const attribute = attributes[ key ];
 			let bufferAttribute;
 
-			if ( attribute.isInterleavedBufferAttribute ) {
+			if ( attribute.type === 'InterleavedBufferAttribute' ) {
 
 				const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
 				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
@@ -177,7 +177,7 @@ class BufferGeometryLoader extends Loader {
 					const attribute = attributeArray[ i ];
 					let bufferAttribute;
 
-					if ( attribute.isInterleavedBufferAttribute ) {
+					if ( attribute.type === 'InterleavedBufferAttribute' ) {
 
 						const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
 						bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
