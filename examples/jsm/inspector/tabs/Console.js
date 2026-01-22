@@ -101,8 +101,23 @@ class Console extends Tab {
 
 	copyAll( button ) {
 
-		const messages = this.logContainer.querySelectorAll( '.log-message:not(.hidden)' );
-		const text = Array.from( messages ).map( msg => msg.dataset.rawText ).join( '\n' );
+		const win = this.logContainer.ownerDocument.defaultView;
+		const selection = win.getSelection();
+		const selectedText = selection.toString();
+		const textInConsole = selectedText && this.logContainer.contains( selection.anchorNode );
+
+		let text;
+		if ( textInConsole ) {
+
+			text = selectedText;
+
+		} else {
+
+			const messages = this.logContainer.querySelectorAll( '.log-message:not(.hidden)' );
+			text = Array.from( messages ).map( msg => msg.dataset.rawText ).join( '\n' );
+
+		}
+
 		navigator.clipboard.writeText( text );
 
 		button.classList.add( 'copied' );
