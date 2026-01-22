@@ -302,6 +302,8 @@ class LightShadow {
 
 		this.mapSize.copy( source.mapSize );
 
+		this.biasNode = source.biasNode;
+
 		return this;
 
 	}
