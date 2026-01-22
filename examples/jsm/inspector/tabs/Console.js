@@ -33,6 +33,12 @@ class Console extends Tab {
 
 		} );
 
+		const copyButton = document.createElement( 'button' );
+		copyButton.className = 'console-copy-button';
+		copyButton.title = 'Copy all';
+		copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+		copyButton.addEventListener( 'click', () => this.copyAll( copyButton ) );
+
 		const filtersGroup = document.createElement( 'div' );
 		filtersGroup.className = 'console-filters-group';
 
@@ -71,6 +77,7 @@ class Console extends Tab {
 
 		header.appendChild( filterInput );
 		header.appendChild( filtersGroup );
+		header.appendChild( copyButton );
 		this.content.appendChild( header );
 
 	}
@@ -89,6 +96,17 @@ class Console extends Tab {
 			msg.classList.toggle( 'hidden', ! ( showByType && showByText ) );
 
 		} );
+
+	}
+
+	copyAll( button ) {
+
+		const messages = this.logContainer.querySelectorAll( '.log-message:not(.hidden)' );
+		const text = Array.from( messages ).map( msg => msg.dataset.rawText ).join( '\n' );
+		navigator.clipboard.writeText( text );
+
+		button.classList.add( 'copied' );
+		setTimeout( () => button.classList.remove( 'copied' ), 350 );
 
 	}
 
