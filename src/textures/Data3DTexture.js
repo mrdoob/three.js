@@ -1,4 +1,5 @@
 import { Texture } from './Texture.js';
+import { Source } from './Source.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
 /**
@@ -118,24 +119,26 @@ class Data3DTexture extends Texture {
 		super.copy( source );
 
 		// Clone the TypedArray data to avoid sharing references
+		// Since image is a getter that returns this.source.data, we need to create
+		// a new Source with cloned data to avoid sharing the same source object
 		const image = source.image;
 		if ( image.data !== null ) {
 
-			this.image = {
+			this.source = new Source( {
 				data: image.data.slice(),
 				width: image.width,
 				height: image.height,
 				depth: image.depth
-			};
+			} );
 
 		} else {
 
-			this.image = {
+			this.source = new Source( {
 				data: null,
 				width: image.width,
 				height: image.height,
 				depth: image.depth
-			};
+			} );
 
 		}
 
