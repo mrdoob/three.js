@@ -1241,13 +1241,13 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		data.data = { attributes: {} };
+		const bufferData = { attributes: {} };
 
 		const index = this.index;
 
 		if ( index !== null ) {
 
-			data.data.index = {
+			bufferData.index = {
 				type: index.array.constructor.name,
 				array: Array.from( index.array )
 			};
@@ -1260,7 +1260,7 @@ class BufferGeometry extends EventDispatcher {
 
 			const attribute = attributes[ key ];
 
-			data.data.attributes[ key ] = attribute.toJSON( meta );
+			bufferData.attributes[ key ] = attribute.toJSON( meta );
 
 		}
 
@@ -1293,8 +1293,8 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( hasMorphAttributes ) {
 
-			data.data.morphAttributes = morphAttributes;
-			data.data.morphTargetsRelative = this.morphTargetsRelative;
+			bufferData.morphAttributes = morphAttributes;
+			bufferData.morphTargetsRelative = this.morphTargetsRelative;
 
 		}
 
@@ -1302,7 +1302,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( groups.length > 0 ) {
 
-			data.data.groups = JSON.parse( JSON.stringify( groups ) );
+			bufferData.groups = JSON.parse( JSON.stringify( groups ) );
 
 		}
 
@@ -1310,9 +1310,11 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( boundingSphere !== null ) {
 
-			data.data.boundingSphere = boundingSphere.toJSON();
+			bufferData.boundingSphere = boundingSphere.toJSON();
 
 		}
+
+		data.data = bufferData;
 
 		return data;
 
