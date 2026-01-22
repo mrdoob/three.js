@@ -250,14 +250,14 @@ class InterleavedBuffer {
 	/**
 	 * Serializes the interleaved buffer into JSON.
 	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized interleaved buffer.
+	 * @param {Object} [meta] - An optional value holding meta information about the serialization.
+	 * @return {string} The UUID of the interleaved buffer.
 	 */
-	toJSON( data ) {
+	toJSON( meta ) {
 
-		if ( data.arrayBuffers === undefined ) {
+		if ( meta.buffers === undefined ) {
 
-			data.arrayBuffers = {};
+			meta.buffers = { array: {}, interleaved: {} };
 
 		}
 
@@ -269,20 +269,27 @@ class InterleavedBuffer {
 
 		}
 
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+		// store ArrayBuffer
 
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
+		if ( meta.buffers.array[ this.array.buffer._uuid ] === undefined ) {
+
+			meta.buffers.array[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
 
 		}
 
-		//
+		// store InterleavedBuffer
 
-		return {
-			uuid: this.uuid,
-			buffer: this.array.buffer._uuid,
-			type: this.array.constructor.name,
-			stride: this.stride
-		};
+		if ( meta.buffers.interleaved[ this.uuid ] === undefined ) {
+
+			meta.buffers.interleaved[ this.uuid ] = {
+				buffer: this.array.buffer._uuid,
+				type: this.array.constructor.name,
+				stride: this.stride
+			};
+
+		}
+
+		return this.uuid;
 
 	}
 

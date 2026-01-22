@@ -616,7 +616,7 @@ class Material extends EventDispatcher {
 
 		const data = {
 			metadata: {
-				version: 4.7,
+				version: 5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}

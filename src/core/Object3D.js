@@ -1272,6 +1272,10 @@ class Object3D extends EventDispatcher {
 
 			// initialize meta obj
 			meta = {
+				buffers: {
+					array: {},
+					interleaved: {}
+				},
 				geometries: {},
 				materials: {},
 				textures: {},
@@ -1283,7 +1287,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.7,
+				version: 5,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -1513,23 +1517,24 @@ class Object3D extends EventDispatcher {
 
 		if ( isRootObject ) {
 
-			const geometries = extractFromCache( meta.geometries );
-			const materials = extractFromCache( meta.materials );
-			const textures = extractFromCache( meta.textures );
-			const images = extractFromCache( meta.images );
-			const shapes = extractFromCache( meta.shapes );
-			const skeletons = extractFromCache( meta.skeletons );
-			const animations = extractFromCache( meta.animations );
-			const nodes = extractFromCache( meta.nodes );
+			removeMetadata( meta.geometries );
+			removeMetadata( meta.materials );
+			removeMetadata( meta.textures );
+			removeMetadata( meta.images );
+			removeMetadata( meta.shapes );
+			removeMetadata( meta.skeletons );
+			removeMetadata( meta.animations );
+			removeMetadata( meta.nodes );
 
-			if ( geometries.length > 0 ) output.geometries = geometries;
-			if ( materials.length > 0 ) output.materials = materials;
-			if ( textures.length > 0 ) output.textures = textures;
-			if ( images.length > 0 ) output.images = images;
-			if ( shapes.length > 0 ) output.shapes = shapes;
-			if ( skeletons.length > 0 ) output.skeletons = skeletons;
-			if ( animations.length > 0 ) output.animations = animations;
-			if ( nodes.length > 0 ) output.nodes = nodes;
+			if ( Object.keys( meta.buffers.array ).length > 0 ) output.buffers = meta.buffers;
+			if ( Object.keys( meta.geometries ).length > 0 ) output.geometries = meta.geometries;
+			if ( Object.keys( meta.materials ).length > 0 ) output.materials = meta.materials;
+			if ( Object.keys( meta.textures ).length > 0 ) output.textures = meta.textures;
+			if ( Object.keys( meta.images ).length > 0 ) output.images = meta.images;
+			if ( Object.keys( meta.shapes ).length > 0 ) output.shapes = meta.shapes;
+			if ( Object.keys( meta.skeletons ).length > 0 ) output.skeletons = meta.skeletons;
+			if ( Object.keys( meta.animations ).length > 0 ) output.animations = meta.animations;
+			if ( Object.keys( meta.nodes ).length > 0 ) output.nodes = meta.nodes;
 
 		}
 
@@ -1537,21 +1542,14 @@ class Object3D extends EventDispatcher {
 
 		return output;
 
-		// extract data from the cache hash
-		// remove metadata on each item
-		// and return as array
-		function extractFromCache( cache ) {
+		// remove metadata from each item in the cache
+		function removeMetadata( cache ) {
 
-			const values = [];
 			for ( const key in cache ) {
 
-				const data = cache[ key ];
-				delete data.metadata;
-				values.push( data );
+				delete cache[ key ].metadata;
 
 			}
-
-			return values;
 
 		}
 

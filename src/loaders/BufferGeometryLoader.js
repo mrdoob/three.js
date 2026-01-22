@@ -101,7 +101,7 @@ class BufferGeometryLoader extends Loader {
 
 			const array = getTypedArray( interleavedBuffer.type, buffer );
 			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
-			ib.uuid = interleavedBuffer.uuid;
+			ib.uuid = uuid;
 
 			interleavedBufferMap[ uuid ] = ib;
 

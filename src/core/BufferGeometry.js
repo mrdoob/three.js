@@ -1207,13 +1207,14 @@ class BufferGeometry extends EventDispatcher {
 	/**
 	 * Serializes the geometry into JSON.
 	 *
+	 * @param {Object} [meta] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized geometry.
 	 */
-	toJSON() {
+	toJSON( meta ) {
 
 		const data = {
 			metadata: {
-				version: 4.7,
+				version: 5,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}
@@ -1261,7 +1262,7 @@ class BufferGeometry extends EventDispatcher {
 
 			const attribute = attributes[ key ];
 
-			data.data.attributes[ key ] = attribute.toJSON( data.data );
+			data.data.attributes[ key ] = attribute.toJSON( meta );
 
 		}
 
@@ -1278,7 +1279,7 @@ class BufferGeometry extends EventDispatcher {
 
 				const attribute = attributeArray[ i ];
 
-				array.push( attribute.toJSON( data.data ) );
+				array.push( attribute.toJSON( meta ) );
 
 			}
 

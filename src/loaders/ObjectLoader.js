@@ -196,7 +196,7 @@ class ObjectLoader extends Loader {
 
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
-		const geometries = this.parseGeometries( json.geometries, shapes );
+		const geometries = this.parseGeometries( json.geometries, shapes, json.buffers );
 
 		const images = this.parseImages( json.images, function () {
 
@@ -248,7 +248,7 @@ class ObjectLoader extends Loader {
 
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
-		const geometries = this.parseGeometries( json.geometries, shapes );
+		const geometries = this.parseGeometries( json.geometries, shapes, json.buffers );
 
 		const images = await this.parseImagesAsync( json.images );
 
@@ -273,11 +273,26 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
 
-				const shape = new Shape().fromJSON( json[ i ] );
+				for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-				shapes[ shape.uuid ] = shape;
+					const shape = new Shape().fromJSON( json[ i ] );
+
+					shapes[ shape.uuid ] = shape;
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					const shape = new Shape().fromJSON( json[ uuid ] );
+
+					shapes[ shape.uuid ] = shape;
+
+				}
 
 			}
 
@@ -304,11 +319,26 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
 
-				const skeleton = new Skeleton().fromJSON( json[ i ], bones );
+				for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-				skeletons[ skeleton.uuid ] = skeleton;
+					const skeleton = new Skeleton().fromJSON( json[ i ], bones );
+
+					skeletons[ skeleton.uuid ] = skeleton;
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					const skeleton = new Skeleton().fromJSON( json[ uuid ], bones );
+
+					skeletons[ skeleton.uuid ] = skeleton;
+
+				}
 
 			}
 
@@ -318,7 +348,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseGeometries( json, shapes ) {
+	parseGeometries( json, shapes, buffers ) {
 
 		const geometries = {};
 
@@ -326,15 +356,23 @@ class ObjectLoader extends Loader {
 
 			const bufferGeometryLoader = new BufferGeometryLoader();
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			function parseGeometry( data ) {
 
 				let geometry;
-				const data = json[ i ];
 
 				switch ( data.type ) {
 
 					case 'BufferGeometry':
 					case 'InstancedBufferGeometry':
+
+						// inject scene-level buffers into geometry data for BufferGeometryLoader
+
+						if ( buffers !== undefined ) {
+
+							data.data.interleavedBuffers = buffers.interleaved;
+							data.data.arrayBuffers = buffers.array;
+
+						}
 
 						geometry = bufferGeometryLoader.parse( data );
 						break;
@@ -362,6 +400,25 @@ class ObjectLoader extends Loader {
 
 			}
 
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
+
+				for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+					parseGeometry( json[ i ] );
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					parseGeometry( json[ uuid ] );
+
+				}
+
+			}
+
 		}
 
 		return geometries;
@@ -378,9 +435,7 @@ class ObjectLoader extends Loader {
 			const loader = new MaterialLoader();
 			loader.setTextures( textures );
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
-
-				const data = json[ i ];
+			function parseMaterial( data ) {
 
 				if ( cache[ data.uuid ] === undefined ) {
 
@@ -389,6 +444,25 @@ class ObjectLoader extends Loader {
 				}
 
 				materials[ data.uuid ] = cache[ data.uuid ];
+
+			}
+
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
+
+				for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+					parseMaterial( json[ i ] );
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					parseMaterial( json[ uuid ] );
+
+				}
 
 			}
 
@@ -404,13 +478,30 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			for ( let i = 0; i < json.length; i ++ ) {
-
-				const data = json[ i ];
+			function parseAnimation( data ) {
 
 				const clip = AnimationClip.parse( data );
 
 				animations[ clip.uuid ] = clip;
+
+			}
+
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
+
+				for ( let i = 0; i < json.length; i ++ ) {
+
+					parseAnimation( json[ i ] );
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					parseAnimation( json[ uuid ] );
+
+				}
 
 			}
 
@@ -474,57 +565,81 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( json !== undefined && json.length > 0 ) {
+		function parseImage( data ) {
 
-			const manager = new LoadingManager( onLoad );
+			const url = data.url;
 
-			loader = new ImageLoader( manager );
-			loader.setCrossOrigin( this.crossOrigin );
+			if ( Array.isArray( url ) ) {
 
-			for ( let i = 0, il = json.length; i < il; i ++ ) {
+				// load array of images e.g CubeTexture
 
-				const image = json[ i ];
-				const url = image.url;
+				const imageArray = [];
 
-				if ( Array.isArray( url ) ) {
+				for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
-					// load array of images e.g CubeTexture
+					const currentUrl = url[ j ];
 
-					const imageArray = [];
+					const deserializedImage = deserializeImage( currentUrl );
 
-					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
+					if ( deserializedImage !== null ) {
 
-						const currentUrl = url[ j ];
+						if ( deserializedImage instanceof HTMLImageElement ) {
 
-						const deserializedImage = deserializeImage( currentUrl );
+							imageArray.push( deserializedImage );
 
-						if ( deserializedImage !== null ) {
+						} else {
 
-							if ( deserializedImage instanceof HTMLImageElement ) {
+							// special case: handle array of data textures for cube textures
 
-								imageArray.push( deserializedImage );
-
-							} else {
-
-								// special case: handle array of data textures for cube textures
-
-								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
-
-							}
+							imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 						}
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+				}
+
+				images[ data.uuid ] = new Source( imageArray );
+
+			} else {
+
+				// load single image
+
+				const deserializedImage = deserializeImage( data.url );
+				images[ data.uuid ] = new Source( deserializedImage );
+
+			}
+
+		}
+
+		if ( json !== undefined ) {
+
+			// backwards compatibility for v4 format
+			const isArray = Array.isArray( json );
+			const hasImages = isArray ? json.length > 0 : Object.keys( json ).length > 0;
+
+			if ( hasImages ) {
+
+				const manager = new LoadingManager( onLoad );
+
+				loader = new ImageLoader( manager );
+				loader.setCrossOrigin( this.crossOrigin );
+
+				if ( isArray ) {
+
+					for ( let i = 0, il = json.length; i < il; i ++ ) {
+
+						parseImage( json[ i ] );
+
+					}
 
 				} else {
 
-					// load single image
+					for ( const uuid in json ) {
 
-					const deserializedImage = deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+						parseImage( json[ uuid ] );
 
+					}
 
 				}
 
@@ -573,54 +688,79 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( json !== undefined && json.length > 0 ) {
+		async function parseImage( data ) {
 
-			loader = new ImageLoader( this.manager );
-			loader.setCrossOrigin( this.crossOrigin );
+			const url = data.url;
 
-			for ( let i = 0, il = json.length; i < il; i ++ ) {
+			if ( Array.isArray( url ) ) {
 
-				const image = json[ i ];
-				const url = image.url;
+				// load array of images e.g CubeTexture
 
-				if ( Array.isArray( url ) ) {
+				const imageArray = [];
 
-					// load array of images e.g CubeTexture
+				for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
-					const imageArray = [];
+					const currentUrl = url[ j ];
 
-					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
+					const deserializedImage = await deserializeImage( currentUrl );
 
-						const currentUrl = url[ j ];
+					if ( deserializedImage !== null ) {
 
-						const deserializedImage = await deserializeImage( currentUrl );
+						if ( deserializedImage instanceof HTMLImageElement ) {
 
-						if ( deserializedImage !== null ) {
+							imageArray.push( deserializedImage );
 
-							if ( deserializedImage instanceof HTMLImageElement ) {
+						} else {
 
-								imageArray.push( deserializedImage );
+							// special case: handle array of data textures for cube textures
 
-							} else {
-
-								// special case: handle array of data textures for cube textures
-
-								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
-
-							}
+							imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 						}
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+				}
+
+				images[ data.uuid ] = new Source( imageArray );
+
+			} else {
+
+				// load single image
+
+				const deserializedImage = await deserializeImage( data.url );
+				images[ data.uuid ] = new Source( deserializedImage );
+
+			}
+
+		}
+
+		if ( json !== undefined ) {
+
+			// backwards compatibility for v4 format
+			const isArray = Array.isArray( json );
+			const hasImages = isArray ? json.length > 0 : Object.keys( json ).length > 0;
+
+			if ( hasImages ) {
+
+				loader = new ImageLoader( this.manager );
+				loader.setCrossOrigin( this.crossOrigin );
+
+				if ( isArray ) {
+
+					for ( let i = 0, il = json.length; i < il; i ++ ) {
+
+						await parseImage( json[ i ] );
+
+					}
 
 				} else {
 
-					// load single image
+					for ( const uuid in json ) {
 
-					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+						await parseImage( json[ uuid ] );
+
+					}
 
 				}
 
@@ -648,9 +788,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
-
-				const data = json[ i ];
+			function parseTexture( data ) {
 
 				if ( data.image === undefined ) {
 
@@ -731,6 +869,25 @@ class ObjectLoader extends Loader {
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 
 				textures[ data.uuid ] = texture;
+
+			}
+
+			// backwards compatibility for v4 format
+			if ( Array.isArray( json ) ) {
+
+				for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+					parseTexture( json[ i ] );
+
+				}
+
+			} else {
+
+				for ( const uuid in json ) {
+
+					parseTexture( json[ uuid ] );
+
+				}
 
 			}
 

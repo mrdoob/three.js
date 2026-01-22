@@ -481,14 +481,14 @@ class InterleavedBufferAttribute {
 	/**
 	 * Serializes the buffer attribute into JSON.
 	 *
-	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
+	 * If no parameter is provided, serializing an interleaved buffer attribute will de-interleave buffer data.
 	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
+	 * @param {Object} [meta] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized buffer attribute.
 	 */
-	toJSON( data ) {
+	toJSON( meta ) {
 
-		if ( data === undefined ) {
+		if ( meta === undefined ) {
 
 			log( 'InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
 
@@ -519,17 +519,7 @@ class InterleavedBufferAttribute {
 
 			// save as true interleaved attribute
 
-			if ( data.interleavedBuffers === undefined ) {
-
-				data.interleavedBuffers = {};
-
-			}
-
-			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
-
-				data.interleavedBuffers[ this.data.uuid ] = this.data.toJSON( data );
-
-			}
+			this.data.toJSON( meta );
 
 			return {
 				isInterleavedBufferAttribute: true,

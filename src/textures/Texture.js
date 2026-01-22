@@ -578,7 +578,7 @@ class Texture extends EventDispatcher {
 		const output = {
 
 			metadata: {
-				version: 4.7,
+				version: 5,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
