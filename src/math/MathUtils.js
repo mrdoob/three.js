@@ -177,7 +177,7 @@ function smoothstep( x, min, max ) {
 
 /**
  * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
- * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`. 
+ * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`.
  *
  * @param {number} x - The value to evaluate based on its position between `min` and `max`.
  * @param {number} min - The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
