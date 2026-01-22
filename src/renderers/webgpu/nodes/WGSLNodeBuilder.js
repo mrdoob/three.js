@@ -525,7 +525,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		}
 
-		uvSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
+		const textureDimensionMargin = ( vecType === 'vec3' ) ? 'vec3<u32>(1,1,1)' : 'vec2<u32>(1,1)';
+
+		uvSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } - ${ textureDimensionMargin } ) )`;
 
 		return this.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, null );
 
