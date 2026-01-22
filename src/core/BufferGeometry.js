@@ -1249,7 +1249,7 @@ class BufferGeometry extends EventDispatcher {
 
 			data.data.index = {
 				type: index.array.constructor.name,
-				array: Array.prototype.slice.call( index.array )
+				array: Array.from( index.array )
 			};
 
 		}
