@@ -155,13 +155,13 @@ function pingpong( x, length = 1 ) {
 /**
  * Returns a value in the range `[0,1]` that represents the percentage that `x` has
  * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
- * the `min` and `max`. `max` must be greater than `min`.
+ * the `min` and `max`.
  *
  * See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
  *
  * @param {number} x - The value to evaluate based on its position between `min` and `max`.
- * @param {number} min - The min value. Any `x` value below `min` will be `0`.
- * @param {number} max - The max value. Any `x` value above `max` will be `1`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
  * @return {number} The alternated value.
  */
 function smoothstep( x, min, max ) {
@@ -177,11 +177,11 @@ function smoothstep( x, min, max ) {
 
 /**
  * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
- * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`. `max` must be greater than `min`.
+ * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`. 
  *
  * @param {number} x - The value to evaluate based on its position between `min` and `max`.
- * @param {number} min - The min value. Any `x` value below `min` will be `0`.
- * @param {number} max - The max value. Any `x` value above `max` will be `1`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
  * @return {number} The alternated value.
  */
 function smootherstep( x, min, max ) {
