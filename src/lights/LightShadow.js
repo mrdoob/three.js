@@ -53,6 +53,16 @@ class LightShadow {
 		this.bias = 0;
 
 		/**
+		 * A node version of `bias`. Only supported with `WebGPURenderer`.
+		 *
+		 * If a bias node is defined, `bias` has no effect.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.biasNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -291,6 +301,8 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+
+		this.biasNode = source.biasNode;
 
 		return this;
 
