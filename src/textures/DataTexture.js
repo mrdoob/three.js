@@ -1,5 +1,6 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
+import { warn } from '../utils.js';
 
 /**
  * Creates a texture directly from raw buffer data.
@@ -30,6 +31,20 @@ class DataTexture extends Texture {
 	 * @param {string} [colorSpace=NoColorSpace] - The color space.
 	 */
 	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, colorSpace ) {
+
+		if ( ! Number.isInteger( width ) || width <= 0 ) {
+
+			warn( `DataTexture: width must be a positive integer, got ${ width }.` );
+			width = 1;
+
+		}
+
+		if ( ! Number.isInteger( height ) || height <= 0 ) {
+
+			warn( `DataTexture: height must be a positive integer, got ${ height }.` );
+			height = 1;
+
+		}
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
@@ -75,7 +90,7 @@ class DataTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;

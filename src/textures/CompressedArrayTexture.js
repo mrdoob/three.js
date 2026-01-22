@@ -1,5 +1,6 @@
 import { ClampToEdgeWrapping } from '../constants.js';
 import { CompressedTexture } from './CompressedTexture.js';
+import { warn } from '../utils.js';
 
 /**
  * Creates a texture 2D array based on data in compressed form.
@@ -70,6 +71,20 @@ class CompressedArrayTexture extends CompressedTexture {
 	 * @param {number} layerIndex - The layer index that should be updated.
 	 */
 	addLayerUpdate( layerIndex ) {
+
+		if ( typeof layerIndex !== 'number' || ! Number.isInteger( layerIndex ) ) {
+
+			warn( 'CompressedArrayTexture.addLayerUpdate: layerIndex must be an integer.' );
+			return;
+
+		}
+
+		if ( layerIndex < 0 || layerIndex >= this.image.depth ) {
+
+			warn( `CompressedArrayTexture.addLayerUpdate: layerIndex ${ layerIndex } is out of bounds [0, ${ this.image.depth - 1 }].` );
+			return;
+
+		}
 
 		this.layerUpdates.add( layerIndex );
 

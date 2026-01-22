@@ -1005,6 +1005,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 										if ( texture.layerUpdates.size > 0 ) {
 
+											if ( mipmap.data === null || mipmap.data === undefined ) {
+
+												warn( 'WebGLRenderer: Cannot update compressed texture layers, mipmap.data is null or undefined.' );
+												texture.clearLayerUpdates();
+												continue;
+
+											}
+
 											const layerByteLength = getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
 
 											for ( const layerIndex of texture.layerUpdates ) {
@@ -1130,6 +1138,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					if ( dataReady ) {
 
 						if ( texture.layerUpdates.size > 0 ) {
+
+							if ( image.data === null ) {
+
+								warn( 'WebGLRenderer: Cannot update layers, image.data is null.' );
+								texture.clearLayerUpdates();
+								return;
+
+							}
 
 							const layerByteLength = getByteLength( image.width, image.height, texture.format, texture.type );
 

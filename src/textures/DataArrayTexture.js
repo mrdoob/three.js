@@ -1,5 +1,6 @@
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
+import { warn } from '../utils.js';
 
 /**
  * Creates an array of textures directly from raw buffer data.
@@ -17,6 +18,27 @@ class DataArrayTexture extends Texture {
 	 * @param {number} [depth=1] - The depth of the texture.
 	 */
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
+
+		if ( ! Number.isInteger( width ) || width <= 0 ) {
+
+			warn( `DataArrayTexture: width must be a positive integer, got ${ width }.` );
+			width = 1;
+
+		}
+
+		if ( ! Number.isInteger( height ) || height <= 0 ) {
+
+			warn( `DataArrayTexture: height must be a positive integer, got ${ height }.` );
+			height = 1;
+
+		}
+
+		if ( ! Number.isInteger( depth ) || depth <= 0 ) {
+
+			warn( `DataArrayTexture: depth must be a positive integer, got ${ depth }.` );
+			depth = 1;
+
+		}
 
 		super( null );
 
@@ -91,7 +113,7 @@ class DataArrayTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
@@ -115,6 +137,20 @@ class DataArrayTexture extends Texture {
 	 * @param {number} layerIndex - The layer index that should be updated.
 	 */
 	addLayerUpdate( layerIndex ) {
+
+		if ( typeof layerIndex !== 'number' || ! Number.isInteger( layerIndex ) ) {
+
+			warn( 'DataArrayTexture.addLayerUpdate: layerIndex must be an integer.' );
+			return;
+
+		}
+
+		if ( layerIndex < 0 || layerIndex >= this.image.depth ) {
+
+			warn( `DataArrayTexture.addLayerUpdate: layerIndex ${ layerIndex } is out of bounds [0, ${ this.image.depth - 1 }].` );
+			return;
+
+		}
 
 		this.layerUpdates.add( layerIndex );
 

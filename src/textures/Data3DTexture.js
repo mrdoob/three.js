@@ -1,5 +1,6 @@
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
+import { warn } from '../utils.js';
 
 /**
  * Creates a three-dimensional texture from raw data, with parameters to
@@ -18,6 +19,27 @@ class Data3DTexture extends Texture {
 	 * @param {number} [depth=1] - The depth of the texture.
 	 */
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
+
+		if ( ! Number.isInteger( width ) || width <= 0 ) {
+
+			warn( `Data3DTexture: width must be a positive integer, got ${ width }.` );
+			width = 1;
+
+		}
+
+		if ( ! Number.isInteger( height ) || height <= 0 ) {
+
+			warn( `Data3DTexture: height must be a positive integer, got ${ height }.` );
+			height = 1;
+
+		}
+
+		if ( ! Number.isInteger( depth ) || depth <= 0 ) {
+
+			warn( `Data3DTexture: depth must be a positive integer, got ${ depth }.` );
+			depth = 1;
+
+		}
 
 		// We're going to add .setXXX() methods for setting properties later.
 		// Users can still set in Data3DTexture directly.
@@ -100,7 +122,7 @@ class Data3DTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
