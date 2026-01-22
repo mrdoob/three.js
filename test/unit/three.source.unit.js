@@ -158,6 +158,9 @@ import './src/loaders/LoaderUtils.tests.js';
 import './src/loaders/LoadingManager.tests.js';
 import './src/loaders/MaterialLoader.tests.js';
 import './src/loaders/ObjectLoader.tests.js';
+import './src/loaders/ObjectLoader.json4.tests.js';
+import './src/loaders/ObjectLoader.json5.tests.js';
+import './src/loaders/BufferGeometryLoader.json.tests.js';
 import './src/loaders/TextureLoader.tests.js';
 
 

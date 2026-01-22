@@ -1084,7 +1084,7 @@ export default QUnit.module( 'Core', () => {
 
 			const gold = {
 				'metadata': {
-					'version': 4.7,
+					'version': 5,
 					'type': 'Object',
 					'generator': 'Object3D.toJSON'
 				},
