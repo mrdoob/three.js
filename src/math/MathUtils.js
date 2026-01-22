@@ -294,7 +294,7 @@ function isPowerOfTwo( value ) {
 /**
  * Returns the smallest power of two that is greater than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for. Must be greater than 0.
+ * @param {number} value - The value to find a POT for. Must be greater than `0`.
  * @return {number} The smallest power of two that is greater than or equal to the given number.
  */
 function ceilPowerOfTwo( value ) {
@@ -306,7 +306,7 @@ function ceilPowerOfTwo( value ) {
 /**
  * Returns the largest power of two that is less than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for. Must be greater than 0.
+ * @param {number} value - The value to find a POT for. Must be greater than `0`.
  * @return {number} The largest power of two that is less than or equal to the given number.
  */
 function floorPowerOfTwo( value ) {
