@@ -129,6 +129,45 @@ class DataArrayTexture extends Texture {
 
 	}
 
+	/**
+	 * Copies the values of the given data array texture to this instance.
+	 *
+	 * @param {DataArrayTexture} source - The data array texture to copy.
+	 * @return {DataArrayTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		// Clone the TypedArray data to avoid sharing references
+		const image = source.image;
+		if ( image.data !== null ) {
+
+			this.image = {
+				data: image.data.slice(),
+				width: image.width,
+				height: image.height,
+				depth: image.depth
+			};
+
+		} else {
+
+			this.image = {
+				data: null,
+				width: image.width,
+				height: image.height,
+				depth: image.depth
+			};
+
+		}
+
+		// Clone the layerUpdates Set
+		this.layerUpdates = new Set( source.layerUpdates );
+
+		return this;
+
+	}
+
 }
 
 export { DataArrayTexture };

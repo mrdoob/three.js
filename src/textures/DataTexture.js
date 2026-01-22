@@ -82,6 +82,40 @@ class DataTexture extends Texture {
 
 	}
 
+	/**
+	 * Copies the values of the given data texture to this instance.
+	 *
+	 * @param {DataTexture} source - The data texture to copy.
+	 * @return {DataTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		// Clone the TypedArray data to avoid sharing references
+		const image = source.image;
+		if ( image.data !== null ) {
+
+			this.image = {
+				data: image.data.slice(),
+				width: image.width,
+				height: image.height
+			};
+
+		} else {
+
+			this.image = {
+				data: null,
+				width: image.width,
+				height: image.height
+			};
+
+		}
+
+		return this;
+
+	}
+
 }
 
 export { DataTexture };

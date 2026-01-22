@@ -107,6 +107,42 @@ class Data3DTexture extends Texture {
 
 	}
 
+	/**
+	 * Copies the values of the given data 3D texture to this instance.
+	 *
+	 * @param {Data3DTexture} source - The data 3D texture to copy.
+	 * @return {Data3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		// Clone the TypedArray data to avoid sharing references
+		const image = source.image;
+		if ( image.data !== null ) {
+
+			this.image = {
+				data: image.data.slice(),
+				width: image.width,
+				height: image.height,
+				depth: image.depth
+			};
+
+		} else {
+
+			this.image = {
+				data: null,
+				width: image.width,
+				height: image.height,
+				depth: image.depth
+			};
+
+		}
+
+		return this;
+
+	}
+
 }
 
 export { Data3DTexture };
