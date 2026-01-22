@@ -159,11 +159,11 @@ class Source {
 
 					if ( data[ i ].isDataTexture ) {
 
-						url.push( serializeImage( data[ i ].image ) );
+						url.push( serializeImage( data[ i ].image, meta ) );
 
 					} else {
 
-						url.push( serializeImage( data[ i ] ) );
+						url.push( serializeImage( data[ i ], meta ) );
 
 					}
 
@@ -173,7 +173,7 @@ class Source {
 
 				// texture
 
-				url = serializeImage( data );
+				url = serializeImage( data, meta );
 
 			}
 
@@ -193,35 +193,38 @@ class Source {
 
 }
 
-function serializeImage( image ) {
+function serializeImage( image, meta ) {
+
+	const stringify = meta === undefined || meta.stringify !== false;
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
-		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
-		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
-
-		// default images
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
 
 		return ImageUtils.getDataURL( image );
 
-	} else {
+	} else if ( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
 
-		if ( image.data ) {
+		if ( stringify ) {
 
-			// images of DataTexture
-
-			return {
-				data: Array.from( image.data ),
-				width: image.width,
-				height: image.height,
-				type: image.data.constructor.name
-			};
-
-		} else {
-
-			warn( 'Texture: Unable to serialize Texture.' );
-			return {};
+			return ImageUtils.getDataURL( image );
 
 		}
+
+		return image;
+
+	} else if ( image.data ) {
+
+		return {
+			data: stringify ? Array.from( image.data ) : image.data,
+			width: image.width,
+			height: image.height,
+			type: image.data.constructor.name
+		};
+
+	} else {
+
+		warn( 'Texture: Unable to serialize Texture.' );
+		return {};
 
 	}
 

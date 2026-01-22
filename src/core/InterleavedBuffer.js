@@ -250,14 +250,14 @@ class InterleavedBuffer {
 	/**
 	 * Serializes the interleaved buffer into JSON.
 	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
+	 * @param {Object} [meta] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized interleaved buffer.
 	 */
-	toJSON( data ) {
+	toJSON( meta ) {
 
-		if ( data.arrayBuffers === undefined ) {
+		if ( meta.arrayBuffers === undefined ) {
 
-			data.arrayBuffers = {};
+			meta.arrayBuffers = {};
 
 		}
 
@@ -269,9 +269,9 @@ class InterleavedBuffer {
 
 		}
 
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+		if ( meta.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
 
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
+			meta.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
 
 		}
 

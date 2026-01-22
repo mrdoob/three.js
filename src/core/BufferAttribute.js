@@ -656,14 +656,17 @@ class BufferAttribute {
 	/**
 	 * Serializes the buffer attribute into JSON.
 	 *
+	 * @param {Object} [meta] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized buffer attribute.
 	 */
-	toJSON() {
+	toJSON( meta ) {
+
+		const stringify = meta === undefined || meta.stringify !== false;
 
 		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.from( this.array ),
+			array: stringify ? Array.from( this.array ) : this.array,
 			normalized: this.normalized
 		};
 

@@ -454,6 +454,10 @@ class ObjectLoader extends Loader {
 
 				return loadImage( path );
 
+			} else if ( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
+
+				return image;
+
 			} else {
 
 				if ( image.data ) {
@@ -552,6 +556,10 @@ class ObjectLoader extends Loader {
 				const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( url ) ? url : scope.resourcePath + url;
 
 				return await loader.loadAsync( path );
+
+			} else if ( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
+
+				return image;
 
 			} else {
 
