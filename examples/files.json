@@ -182,6 +182,7 @@
 		"webgl_multiple_elements_text",
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
+		"webgl_overlay",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
 		"webgl_points_billboards",

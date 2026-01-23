@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - overlay</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ffffff;
+				color: #333;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+				line-height: 1.6;
+			}
+
+			#canvas-bg, #canvas-fg {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				pointer-events: none;
+			}
+
+			#canvas-bg {
+				z-index: -100;
+			}
+
+			#canvas-fg {
+				z-index: 100;
+			}
+
+			.content {
+				max-width: 700px;
+				margin: 0 auto;
+				padding: 40px 20px;
+			}
+
+			h1 {
+				font-size: 2.5em;
+				font-weight: 300;
+				margin-bottom: 0.5em;
+				color: #222;
+			}
+
+			h2 {
+				font-size: 1.4em;
+				font-weight: 600;
+				margin-top: 2em;
+				margin-bottom: 0.5em;
+				color: #333;
+			}
+
+			p {
+				margin-bottom: 1em;
+				color: #555;
+			}
+
+			a {
+				color: #0066cc;
+			}
+
+			code {
+				background: #f4f4f4;
+				padding: 2px 6px;
+				border-radius: 3px;
+				font-family: 'Monaco', 'Menlo', monospace;
+				font-size: 0.9em;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1em 0;
+			}
+
+			th, td {
+				text-align: left;
+				padding: 8px 12px;
+				border-bottom: 1px solid #ddd;
+			}
+
+			th {
+				font-weight: 600;
+				color: #333;
+			}
+
+			pre {
+				background: #f8f8f8;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				padding: 12px;
+				overflow-x: auto;
+				font-size: 0.85em;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="canvas-bg"></div>
+		<div id="canvas-fg"></div>
+
+		<div class="content">
+			<h1>WebGL Overlay</h1>
+			<p>
+				This example demonstrates a technique for rendering three.js canvases
+				that integrate with scrollable HTML content. 3D elements can appear both
+				in front of and behind HTML elements.
+			</p>
+
+			<h2>How It Works</h2>
+			<p>
+				The overlay system uses two separate WebGL renderers: one positioned behind
+				the HTML content (background) and one in front (foreground). By adjusting
+				the camera's near and far clipping planes for each render pass, objects
+				closer than a threshold depth render in the foreground, while objects
+				further away render in the background.
+			</p>
+			<p>
+				The camera position is synchronized with the scroll position of the page,
+				creating the illusion that the 3D scene exists in the same coordinate
+				space as the HTML document. A forced pixels-per-meter calculation ensures
+				consistent sizing across different viewport dimensions.
+			</p>
+
+			<h2>Element Mapping</h2>
+			<p>
+				HTML elements can be mapped to 3D representations. In this demo, paragraph
+				elements are visualized as wireframe boxes in 3D space, allowing for
+				potential interaction between 3D objects and page content.
+			</p>
+
+			<h2>Keymappings</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Action</th>
+						<th>Key</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>Toggle Rendering Mode</td><td><code>1</code>, <code>2</code>, <code>3</code></td></tr>
+					<tr><td>Toggle Positioning</td><td><code>P</code></td></tr>
+				</tbody>
+			</table>
+			<p>
+				Press <code>1</code> for background only, <code>2</code> for foreground only,
+				or <code>3</code> for combined foreground and background rendering.
+			</p>
+
+			<h2>Applications</h2>
+			<p>
+				This technique enables creative web experiences where 3D graphics seamlessly
+				blend with traditional HTML layouts. Use cases include decorative page
+				elements, interactive visualizations embedded in articles, and immersive
+				scrolling experiences.
+			</p>
+
+			<h2>Credits</h2>
+			<p>
+				Based on <a href="https://github.com/zalo/ThreeOverlay">ThreeOverlay</a>
+				by Johnathon Selstad.
+			</p>
+
+			<pre id="debug">Scroll to see 3D elements interact with the page.</pre>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, rendererBg, rendererFg;
+			let containerBg, containerFg;
+			let pixelsPerMeter, forcedPixelsPerMeter = 100.0;
+			let cameraDepth = 5.0;
+			let renderingMode = 2; // 0: bg only, 1: fg only, 2: both
+			let positioningMode = 1; // 0: fixed, 1: absolute
+
+			const elementBoxes = [];
+			let cube;
+
+			init();
+
+			function init() {
+
+				containerBg = document.getElementById( 'canvas-bg' );
+				containerFg = document.getElementById( 'canvas-fg' );
+
+				// Scene
+				scene = new THREE.Scene();
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.0, 1000 );
+				camera.position.set( 0.0, 0.0, cameraDepth );
+				camera.layers.enableAll();
+				scene.add( camera );
+
+				forcePixelsPerMeter();
+
+				// Lights
+				const spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.2;
+				spotLight.position.set( -2, 3, 3 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.far = 20;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				scene.add( spotLight );
+
+				const dirLight = new THREE.DirectionalLight( 0x55505a, Math.PI * 10.0 );
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = -10;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 3;
+				dirLight.shadow.camera.left = -3;
+				dirLight.shadow.camera.top = 3;
+				dirLight.shadow.camera.bottom = -3;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+				// Grid helpers (background decoration)
+				for ( let i = 0; i < 10; i++ ) {
+
+					const grid = new THREE.GridHelper( 20, 20 );
+					grid.material.opacity = 0.2;
+					grid.material.transparent = true;
+					grid.position.set( ( window.innerWidth * 0.5 ) / pixelsPerMeter, i * -5.0, 0 );
+					scene.add( grid );
+
+				}
+
+				// Demo cube (positioned in 3D space relative to page)
+				cube = new THREE.Mesh(
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.MeshPhysicalMaterial( { color: 0x00ff00 } )
+				);
+				cube.position.set( ( window.innerWidth * 0.5 ) / pixelsPerMeter, -5.0, 0.0 );
+				scene.add( cube );
+
+				// Background renderer
+				rendererBg = new THREE.WebGLRenderer( { antialias: true } );
+				rendererBg.setPixelRatio( 1.0 );
+				rendererBg.shadowMap.enabled = true;
+				rendererBg.setClearColor( 0x000000, 0 );
+				rendererBg.setAnimationLoop( animate );
+				containerBg.appendChild( rendererBg.domElement );
+
+				// Foreground renderer
+				rendererFg = new THREE.WebGLRenderer( { antialias: true } );
+				rendererFg.setPixelRatio( 1.0 );
+				rendererFg.shadowMap.enabled = true;
+				rendererFg.setClearColor( 0x000000, 0 );
+				containerFg.appendChild( rendererFg.domElement );
+
+				// Create element boxes for paragraph elements
+				recomputeElementBoxes();
+
+				// Event listeners
+				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener( 'orientationchange', onWindowResize );
+				window.addEventListener( 'scroll', onScroll );
+				document.addEventListener( 'keydown', onKeyDown );
+
+				onWindowResize();
+
+			}
+
+			function recomputePixelsPerMeter() {
+
+				const oldPosition = camera.position.clone();
+				camera.position.set( 0.0, 0.0, cameraDepth );
+				camera.updateMatrixWorld();
+				camera.updateProjectionMatrix();
+
+				const testPoint = new THREE.Vector3( 0.0, 0, 0.0 );
+				testPoint.project( camera );
+				testPoint.y = 1.0 / window.innerHeight;
+				testPoint.unproject( camera );
+
+				camera.position.copy( oldPosition );
+				camera.updateMatrixWorld();
+				camera.updateProjectionMatrix();
+
+				pixelsPerMeter = 1.0 / ( testPoint.y * 2.0 );
+				return pixelsPerMeter;
+
+			}
+
+			function forcePixelsPerMeter() {
+
+				for ( let i = 0; i < 10; i++ ) {
+
+					const curPixelsPerMeter = recomputePixelsPerMeter();
+					camera.fov *= curPixelsPerMeter / forcedPixelsPerMeter;
+					camera.updateProjectionMatrix();
+
+				}
+
+			}
+
+			function recomputeElementBoxes() {
+
+				const boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+				const boxMaterial = new THREE.MeshPhysicalMaterial( {
+					color: 0xffffff,
+					wireframe: true,
+					opacity: 0.05,
+					transparent: true
+				} );
+
+				const elements = document.getElementsByTagName( 'p' );
+
+				for ( let i = 0; i < elements.length; i++ ) {
+
+					if ( i >= elementBoxes.length ) {
+
+						const box = new THREE.Mesh( boxGeometry, boxMaterial );
+						scene.add( box );
+						elementBoxes.push( box );
+
+					}
+
+					const rect = elements[ i ].getBoundingClientRect();
+					elementBoxes[ i ].position.set(
+						( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter,
+						( rect.top + window.scrollY + rect.height * 0.5 ) / -pixelsPerMeter,
+						0.0
+					);
+					elementBoxes[ i ].scale.set(
+						rect.width / pixelsPerMeter,
+						rect.height / pixelsPerMeter,
+						0.5
+					);
+
+				}
+
+			}
+
+			function setScroll() {
+
+				const scrollX = window.scrollX;
+				const scrollY = window.scrollY;
+
+				camera.position.set(
+					( scrollX + window.innerWidth * 0.5 ) / pixelsPerMeter,
+					-( scrollY + window.innerHeight * 0.5 ) / pixelsPerMeter,
+					cameraDepth
+				);
+
+				if ( positioningMode === 1 ) {
+
+					containerBg.style.position = 'absolute';
+					containerFg.style.position = 'absolute';
+					containerBg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
+					containerFg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
+
+				} else {
+
+					containerBg.style.position = 'fixed';
+					containerFg.style.position = 'fixed';
+					containerBg.style.transform = 'translate(0px, 0px)';
+					containerFg.style.transform = 'translate(0px, 0px)';
+
+				}
+
+			}
+
+			function render() {
+
+				if ( renderingMode === 2 ) {
+
+					// Combined: background then foreground
+					camera.near = cameraDepth;
+					camera.far = 1000;
+					camera.updateProjectionMatrix();
+					rendererBg.render( scene, camera );
+
+					camera.near = 2.0;
+					camera.far = cameraDepth + 0.01;
+					camera.updateProjectionMatrix();
+					rendererFg.render( scene, camera );
+
+				} else {
+
+					camera.near = 2.0;
+					camera.far = 1000;
+					camera.updateProjectionMatrix();
+
+					if ( renderingMode === 0 ) {
+
+						rendererBg.render( scene, camera );
+						rendererFg.clear();
+
+					} else {
+
+						rendererBg.clear();
+						rendererFg.render( scene, camera );
+
+					}
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				rendererBg.setSize( width, height );
+				rendererFg.setSize( width, height );
+
+				forcePixelsPerMeter();
+				recomputeElementBoxes();
+				setScroll();
+
+			}
+
+			function onScroll() {
+
+				setScroll();
+				render();
+
+			}
+
+			function onKeyDown( event ) {
+
+				switch ( event.code ) {
+
+					case 'Digit1':
+						renderingMode = 0;
+						updateDebug();
+						break;
+
+					case 'Digit2':
+						renderingMode = 1;
+						updateDebug();
+						break;
+
+					case 'Digit3':
+						renderingMode = 2;
+						updateDebug();
+						break;
+
+					case 'KeyP':
+						positioningMode = positioningMode === 0 ? 1 : 0;
+						setScroll();
+						updateDebug();
+						break;
+
+				}
+
+			}
+
+			function updateDebug() {
+
+				const modes = [ 'Background only', 'Foreground only', 'Combined' ];
+				const positions = [ 'Fixed', 'Absolute' ];
+				document.getElementById( 'debug' ).textContent =
+					`Mode: ${modes[ renderingMode ]} | Position: ${positions[ positioningMode ]}`;
+
+			}
+
+			function animate( time ) {
+
+				// Rotate cube for visual interest
+				cube.rotation.x = time * 0.0005;
+				cube.rotation.y = time * 0.001;
+
+				setScroll();
+				render();
+
+			}
+
+		</script>
+	</body>
+</html>
