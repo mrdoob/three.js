@@ -54,60 +54,50 @@ class USDLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
+		loader.load( url, function ( data ) {
 
-			try {
-
-				onLoad( scope.parse( text ) );
-
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
-
-			}
+			scope.parse( data, onLoad, onError );
 
 		}, onProgress, onError );
 
 	}
 
 	/**
-	 * Parses the given USDZ data and returns the resulting group.
+	 * Parses the given USDZ data and passes the resulting group to the `onLoad()` callback.
 	 *
 	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
-	 * @return {Group} The parsed asset as a group.
+	 * @param {function(Group)} onLoad - Executed when the parsing process has been finished.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 */
-	parse( buffer ) {
+	parse( buffer, onLoad, onError ) {
 
 		const usda = new USDAParser();
 		const usdc = new USDCParser();
 
-		function parseAssets( zip ) {
+		async function parseAssets( zip ) {
 
 			const data = {};
-			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
+			const imagePromises = [];
 
 			for ( const filename in zip ) {
 
 				if ( filename.endsWith( 'png' ) || filename.endsWith( 'jpg' ) || filename.endsWith( 'jpeg' ) ) {
 
-					const type = filename.endsWith( 'png' ) ? 'image/png' : 'image/jpeg';
-					const blob = new Blob( [ zip[ filename ] ], { type } );
-					data[ filename ] = URL.createObjectURL( blob );
+					// Create ImageBitmap from raw image data
+					const blob = new Blob( [ zip[ filename ] ] );
+					imagePromises.push(
+						createImageBitmap( blob, { colorSpaceConversion: 'none', imageOrientation: 'flipY' } ).then( imageBitmap => {
+
+							data[ filename ] = imageBitmap;
+
+						} )
+					);
 
 				}
 
 			}
+
+			await Promise.all( imagePromises );
 
 			for ( const filename in zip ) {
 
@@ -203,62 +193,99 @@ class USDLoader extends Loader {
 
 		const scope = this;
 
-		// USDA (standalone)
+		async function doParse() {
 
-		if ( typeof buffer === 'string' ) {
+			// USDA (standalone)
 
-			const composer = new USDComposer( scope.manager );
-			const data = usda.parseData( buffer );
-			return composer.compose( data, {} );
+			if ( typeof buffer === 'string' ) {
 
-		}
-
-		// USDC (standalone)
-
-		if ( isCrateFile( buffer ) ) {
-
-			const composer = new USDComposer( scope.manager );
-			const data = usdc.parseData( buffer );
-			return composer.compose( data, {} );
-
-		}
-
-		const bytes = new Uint8Array( buffer );
-
-		// USDZ
-
-		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
-
-			const zip = unzipSync( bytes );
-
-			const assets = parseAssets( zip );
-
-			const { file, basePath } = findUSD( zip );
-
-			const composer = new USDComposer( scope.manager );
-			let data;
-
-			if ( isCrateFile( file ) ) {
-
-				data = usdc.parseData( file.buffer );
-
-			} else {
-
-				const text = new TextDecoder().decode( file );
-				data = usda.parseData( text );
+				const composer = new USDComposer( scope.manager );
+				const data = usda.parseData( buffer );
+				return composer.compose( data, {} );
 
 			}
 
-			return composer.compose( data, assets, {}, basePath );
+			// USDC (standalone)
+
+			if ( isCrateFile( buffer ) ) {
+
+				const composer = new USDComposer( scope.manager );
+				const data = usdc.parseData( buffer );
+				return composer.compose( data, {} );
+
+			}
+
+			const bytes = new Uint8Array( buffer );
+
+			// USDZ
+
+			if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
+
+				const zip = unzipSync( bytes );
+
+				const assets = await parseAssets( zip );
+
+				const { file, basePath } = findUSD( zip );
+
+				const composer = new USDComposer( scope.manager );
+				let data;
+
+				if ( isCrateFile( file ) ) {
+
+					data = usdc.parseData( file.buffer );
+
+				} else {
+
+					const text = new TextDecoder().decode( file );
+					data = usda.parseData( text );
+
+				}
+
+				return composer.compose( data, assets, {}, basePath );
+
+			}
+
+			// USDA (standalone, as ArrayBuffer)
+
+			const composer = new USDComposer( scope.manager );
+			const text = new TextDecoder().decode( bytes );
+			const data = usda.parseData( text );
+			return composer.compose( data, {} );
 
 		}
 
-		// USDA (standalone, as ArrayBuffer)
+		doParse().then( onLoad ).catch( e => {
 
-		const composer = new USDComposer( scope.manager );
-		const text = new TextDecoder().decode( bytes );
-		const data = usda.parseData( text );
-		return composer.compose( data, {} );
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+		} );
+
+	}
+
+	/**
+	 * Async version of {@link USDLoader#parse}.
+	 *
+	 * @async
+	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
+	 * @return {Promise<Group>} A Promise that resolves with the parsed group when the parsing has been finished.
+	 */
+	parseAsync( buffer ) {
+
+		const scope = this;
+
+		return new Promise( function ( resolve, reject ) {
+
+			scope.parse( buffer, resolve, reject );
+
+		} );
 
 	}
 

@@ -679,7 +679,7 @@ function Loader( editor ) {
 					const { USDLoader } = await import( 'three/addons/loaders/USDLoader.js' );
 
 					const loader = new USDLoader( manager );
-					const group = loader.parse( contents );
+					const group = await loader.parseAsync( contents );
 					group.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, group ) );

@@ -3170,6 +3170,26 @@ class USDComposer {
 		const scope = this;
 		const texture = new Texture();
 
+		// Handle ImageBitmap (from pre-loaded assets)
+		if ( typeof ImageBitmap !== 'undefined' && data instanceof ImageBitmap ) {
+
+			texture.image = data;
+
+			if ( textureAttrs ) {
+
+				texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+				texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+
+			}
+
+			scope._applyTextureTransforms( texture, transformAttrs );
+			texture.needsUpdate = true;
+
+			return texture;
+
+		}
+
+		// Handle URL string or raw data (fallback for standalone files)
 		let url;
 
 		if ( typeof data === 'string' ) {
