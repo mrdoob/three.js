@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title><?js= title || 'Home' ?> - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+
+<body>
+	<?js if (augments && augments.length) {
+		var self = this;
+	?>
+		<p class="inheritance" translate="no"><?js augments.forEach(function(a, i) { ?><?js= self.linkto(a, a) ?><?js if (i < augments.length - 1) { ?> → <?js } ?><?js }); ?> → </p>
+	<?js } ?>
+	<h1 translate="no"><?js= title ?></h1>
+	<?js= content ?>
+
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

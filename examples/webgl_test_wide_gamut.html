@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - test - wide gamut</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			.container {
+				position: absolute;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+
+			/* based on https://github.com/Paul-Browne/image-comparison-slider */
+
+			.slider {
+			    position: absolute;
+			    width: 200px;
+			    height: 100%;
+			    top: 0;
+			    left: 0;
+			    z-index: 1;
+			}
+
+			.slider:before,
+			.slider:after {
+			    position: absolute;
+			    left: 50%;
+			    content: "";
+			    background: #fff;
+			    cursor: grab;
+			}
+
+			.slider:before {
+			    top: 0;
+			    transform: translateX(-50%);
+			    width: 1px;
+			    height: 100%;
+			}
+
+			.slider:after {
+			    top: 50%;
+			    transform: translate(-50%, -50%);
+			    width: 5px;
+			    height: 33%;
+			    border-radius: 5px;
+			}
+
+			.label {
+				position: fixed;
+				top: calc(50% - 1em);
+				height: 2em;
+				line-height: 2em;
+				background: rgba(0, 0, 0, 0.5);
+				margin: 0;
+				padding: 0.2em 0.5em;
+				border-radius: 4px;
+				font-size: 14px;
+				user-select: none;
+				-webkit-user-select: none;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - wide gamut test<br />
+		</div>
+
+		<div class="container">
+			<div class="slider"></div>
+			<p class="label" style="left: 1em;">sRGB</p>
+			<p class="label" style="right: 1em;">Display P3</p>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { DisplayP3ColorSpace, DisplayP3ColorSpaceImpl, LinearDisplayP3ColorSpace, LinearDisplayP3ColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
+
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			let container, camera, renderer, loader;
+			let sceneL, sceneR, textureL, textureR;
+
+			let sliderPos = window.innerWidth / 2;
+
+			const slider = document.querySelector( '.slider' );
+
+			const isP3Context = WebGL.isColorSpaceAvailable( DisplayP3ColorSpace );
+
+			THREE.ColorManagement.define( {
+
+				[ DisplayP3ColorSpace ]: DisplayP3ColorSpaceImpl,
+				[ LinearDisplayP3ColorSpace ]: LinearDisplayP3ColorSpaceImpl
+
+			} );
+
+			if ( isP3Context ) {
+
+				THREE.ColorManagement.workingColorSpace = LinearDisplayP3ColorSpace;
+
+			}
+
+			init();
+
+			function init() {
+
+				container = document.querySelector( '.container' );
+
+				sceneL = new THREE.Scene();
+				sceneR = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 6;
+
+				loader = new THREE.TextureLoader();
+
+				initTextures();
+				initSlider();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.setScissorTest( true );
+				container.appendChild( renderer.domElement );
+
+				if ( isP3Context && window.matchMedia( '( color-gamut: p3 )' ).matches ) {
+
+					renderer.outputColorSpace = DisplayP3ColorSpace;
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize );
+				window.matchMedia( '( color-gamut: p3 )' ).addEventListener( 'change', onGamutChange );
+
+			}
+
+			async function initTextures() {
+
+				const path = 'textures/wide_gamut/logo_{colorSpace}.png';
+
+				textureL = await loader.loadAsync( path.replace( '{colorSpace}', 'srgb' ) );
+				textureR = await loader.loadAsync( path.replace( '{colorSpace}', 'p3' ) );
+
+				textureL.colorSpace = THREE.SRGBColorSpace;
+				textureR.colorSpace = DisplayP3ColorSpace;
+
+				sceneL.background = THREE.TextureUtils.contain( textureL, window.innerWidth / window.innerHeight );
+				sceneR.background = THREE.TextureUtils.contain( textureR, window.innerWidth / window.innerHeight );
+
+			}
+
+			function initSlider() {
+
+				function onPointerDown() {
+
+					if ( event.isPrimary === false ) return;
+
+					window.addEventListener( 'pointermove', onPointerMove );
+					window.addEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerUp() {
+
+					window.removeEventListener( 'pointermove', onPointerMove );
+					window.removeEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerMove( e ) {
+
+					if ( event.isPrimary === false ) return;
+
+					updateSlider( e.pageX );
+
+				}
+
+				updateSlider( sliderPos );
+
+				slider.style.touchAction = 'none'; // disable touch scroll
+				slider.addEventListener( 'pointerdown', onPointerDown );
+
+			}
+
+			function updateSlider( offset ) {
+
+				sliderPos = Math.max( 10, Math.min( window.innerWidth - 10, offset ) );
+
+				slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				THREE.TextureUtils.contain( sceneL.background, window.innerWidth / window.innerHeight );
+				THREE.TextureUtils.contain( sceneR.background, window.innerWidth / window.innerHeight );
+
+				updateSlider( sliderPos );
+
+			}
+
+			function onGamutChange( { matches } ) {
+
+				renderer.outputColorSpace = isP3Context && matches ? DisplayP3ColorSpace : THREE.SRGBColorSpace;
+
+				textureL.needsUpdate = true;
+				textureR.needsUpdate = true;
+
+			}
+
+			function animate() {
+
+				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
+				renderer.render( sceneL, camera );
+
+				renderer.setScissor( sliderPos, 0, window.innerWidth, window.innerHeight );
+				renderer.render( sceneR, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

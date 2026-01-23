@@ -1,0 +1,542 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のテクスチャ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のテクスチャ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のテクスチャ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事はthree.jsについてのシリーズ記事の一つです。
+最初の記事は<a href="fundamentals.html">Three.jsの基礎知識</a>です。
+まだ読んでない人は、そちらから先に読んでみるといいかもしれません。</p>
+<p>テクスチャはThree.jsの大きなトピックの一つです。
+どのレベルで説明するといいか100%承知してはいませんが、やってみようと思います。
+Three.jsにはたくさんのトピックがあり、互いに関係しているので、一度に説明するのが難しいのです。
+これがこの記事の内容の早見表です。</p>
+<ul>
+<li><a href="#hello">ハロー・テクスチャ</a></li>
+<li><a href="#six">立方体の各面に異なる6つのテクスチャを貼り付ける</a></li>
+<li><a href="#loading">テクスチャの読み込み</a></li>
+<ul>
+  <li><a href="#easy">簡単な方法</a></li>
+  <li><a href="#wait1">テクスチャの読み込みを待つ</a></li>
+  <li><a href="#waitmany">複数テクスチャの読み込みを待つ</a></li>
+  <li><a href="#cors">異なるオリジンからのテクスチャの読み込み</a></li>
+</ul>
+<li><a href="#memory">メモリ使用</a></li>
+<li><a href="#format">JPG vs PNG</a></li>
+<li><a href="#filtering-and-mips">フィルタリングとMIP</a></li>
+<li><a href="#uvmanipulation">テクスチャの繰り返し、オフセット、回転、ラッピング</a></li>
+</ul>
+
+<h2 id="-a-name-hello-a-"><a name="hello"></a> ハロー・テクスチャ</h2>
+<p>テクスチャは<em>一般的に</em>PhotoshopやGIMPのような3rdパーティーのプログラムで最もよく作られる画像です。
+例えば、この画像を立方体に乗せてみましょう。</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
+</div>
+
+<p>最初の例を修正してみましょう。<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作ることで、必要なことはすべてできます。
+<a href="/docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>を画像のURLを引数にして呼び、<code class="notranslate" translate="no">color</code>を設定する代わりに、
+マテリアルの<code class="notranslate" translate="no">map</code>属性にその結果を渡してください。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load( 'resources/images/wall.jpg' );
++texture.colorSpace = THREE.SRGBColorSpace;
+
+const material = new THREE.MeshBasicMaterial({
+-  color: 0xFF8844,
++  map: texture,
+});
+</pre>
+<p><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使っているので、光源が必要ないことに注意してください。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<h2 id="-a-name-six-a-6-"><a name="six"></a> 立方体の各面に異なる6つのテクスチャを貼り付ける</h2>
+<p>立方体の各面に貼り付ける、6つのテクスチャはどのようなものでしょうか。</p>
+<div class="threejs_center">
+  <div>
+    <img src="../examples/resources/images/flower-1.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-2.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-3.jpg" style="width: 100px;" class="border">
+  </div>
+  <div>
+    <img src="../examples/resources/images/flower-4.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-5.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-6.jpg" style="width: 100px;" class="border">
+  </div>
+</div>
+
+<p><a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作るときに、単に6つのマテリアルを作り、配列として渡します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+-const texture = loader.load( 'resources/images/wall.jpg' );
+-texture.colorSpace = THREE.SRGBColorSpace;
+
+-const material = new THREE.MeshBasicMaterial({
+-  map: texture,
+-});
++const materials = [
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-6.jpg')}),
++];
+-const cube = new THREE.Mesh(geometry, material);
++const cube = new THREE.Mesh(geometry, materials);
+
++function loadColorTexture( path ) {
++  const texture = loader.load( path );
++  texture.colorSpace = THREE.SRGBColorSpace;
++  return texture;
++}
+</pre>
+<p>動きました！</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-6-textures.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-6-textures.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>ただし、全ての種類のジオメトリが複数のマテリアルに対応しているわけではないことに注意してください。
+<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>と<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>は、それぞれの面に6つのマテリアルを使えます。
+<a href="/docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>と<a href="/docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>は2つのマテリアルを使うことができ、一つは底面、一つは円錐面に適用されます。
+<a href="/docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>と<a href="/docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>は3つのマテリアルを使うことができ、一つは底面、一つは上面、一つは側面に適用されます。
+その他のケースでは、カスタムジオメトリのビルドや読み込み、テクスチャの座標の修正が必要になります。</p>
+<p>1つのジオメトリに複数の画像を適用したいなら、
+<a href="https://en.wikipedia.org/wiki/Texture_atlas">テクスチャアトラス</a>を使うのが、ほかの3Dエンジンでははるかに一般的で、はるかに高性能です。
+テクスチャアトラスは、一つのテクスチャに複数の画像を配置し、ジオメトリの頂点の座標を使って
+テクスチャのどの部分がジオメトリのおのおのの三角形に使われるか、選択するものです。</p>
+<p>テクスチャの座標とはなんでしょうか？ジオメトリ頂点に与えられたデータのことで、
+テクスチャのどの部分がその頂点に対応するか指定するものです。
+<a href="custom-buffergeometry.html">カスタムジオメトリの構築</a>を始めるときに説明します。</p>
+<h2 id="-a-name-loading-a-"><a name="loading"></a> テクスチャの読み込み</h2>
+<h3 id="-a-name-easy-a-"><a name="easy"></a> 簡単な方法</h3>
+<p>このサイトのコードのほとんどは、もっとも簡単なテクスチャの読み込み方を使っています。
+<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作り、その<a href="/docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>メソッドを呼びます。
+これは<a href="/docs/#api/ja/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>オブジェクトを返します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
+</pre>
+<p>このメソッドを使うと、画像がthree.jsによって非同期的に読み込まれるまで、テクスチャが透明になります。読み込まれた時点で、テクスチャをダウンロードした画像に更新します。</p>
+<p>この方法では、テクスチャの読み込みを待つ必要がなく、ページをすぐにレンダリングし始めることができるという、大きな利点があります。
+多くのケースでこの方法で問題ありませんが、テクスチャをダウンロードし終えたときにthree.jsに通知してもらうこともできます。</p>
+<h3 id="-a-name-wait1-a-"><a name="wait1"></a> テクスチャの読み込みを待つ</h3>
+<p>テクスチャの読み込みを待つために、テクスチャローダーの<code class="notranslate" translate="no">load</code>メソッドは、テクスチャの読み込みが終了したときに呼ばれるコールバックを取ります。
+冒頭の例に戻り、このように、<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作りシーンに追加する前に、テクスチャの読み込みを待つことができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+loader.load('resources/images/wall.jpg', (texture) =&gt; {
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+  cubes.push(cube);  // add to our list of cubes to rotate
+});
+</pre>
+<p>ブラウザのキャッシュをクリアし、接続が遅くならない限り、違いが分かることはないと思いますが、
+ちゃんとテクスチャが読み込まれるのを待っているので、安心してください。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-texture.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-texture.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<h3 id="-a-name-waitmany-a-"><a name="waitmany"></a> 複数テクスチャの読み込みを待つ</h3>
+<p>全てのテクスチャが読み込まれたことを待つために、<a href="/docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>を使うことができます。
+<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を渡すと、<a href="/docs/#api/ja/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>属性がコールバックに設定されます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
+*const loader = new THREE.TextureLoader(loadManager);
+
+const materials = [
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-1.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-2.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-3.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-4.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-5.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-6.jpg')}),
+];
+
++loadManager.onLoad = () =&gt; {
++  const cube = new THREE.Mesh(geometry, materials);
++  scene.add(cube);
++  cubes.push(cube);  // add to our list of cubes to rotate
++};
+</pre>
+<p><a href="/docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>は<a href="/docs/#api/ja/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>属性もあり、
+プログレスインジケーターを表示するためのコールバックを設定できます。</p>
+<p>まず、HTMLにプログレスバーを追加しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="loading"&gt;
++    &lt;div class="progress"&gt;&lt;div class="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>そしてCSSにも追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#loading .progress {
+    margin: 1.5em;
+    border: 1px solid white;
+    width: 50vw;
+}
+#loading .progressbar {
+    margin: 2px;
+    background: white;
+    height: 1em;
+    transform-origin: top left;
+    transform: scaleX(0);
+}
+</pre>
+<p>そうすると、コード内で<code class="notranslate" translate="no">onProgress</code>コールバックの<code class="notranslate" translate="no">progressbar</code>のスケールが更新できます。
+これは、最後のアイテムが読み込まれるURL、いま読み込まれているアイテムの数、アイテムの合計数を渡して呼ばれます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadingElem = document.querySelector('#loading');
++const progressBarElem = loadingElem.querySelector('.progressbar');
+
+loadManager.onLoad = () =&gt; {
++  loadingElem.style.display = 'none';
+  const cube = new THREE.Mesh(geometry, materials);
+  scene.add(cube);
+  cubes.push(cube);  // add to our list of cubes to rotate
+};
+
++loadManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) =&gt; {
++  const progress = itemsLoaded / itemsTotal;
++  progressBarElem.style.transform = `scaleX(${progress})`;
++};
+</pre>
+<p>キャッシュを削除して低速なコネクションを作らない限りは、プログレスバーを見ることできないかもしれません。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-all-textures.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-all-textures.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<h2 id="-a-name-cors-a-"><a name="cors"></a> 異なるオリジンからのテクスチャの読み込み</h2>
+<p>異なるサーバーの画像を使うため、そのサーバーは正しいヘッダーを送る必要があります。
+そうしないと、three.jsでその画像を使うことができず、エラーを受け取るでしょう。
+もし皆さんが画像を提供するサーバーを運用しているなら、
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">正しいヘッダーを送る</a>を確認してください。
+画像をホスティングしているサーバーに手を入れられず、権限用のヘッダーを送ることができないなら、
+そのサーバーからの画像を使うことはできません。</p>
+<p>例えば、<a href="https://imgur.com">imgur</a>、<a href="https://flickr.com">flickr</a>、そして
+<a href="https://github.com">github</a>は全て、ホストしている画像を
+three.jsで使うことができるようなヘッダーを送っています。</p>
+<h2 id="-a-name-memory-a-"><a name="memory"></a>メモリ使用</h2>
+<p>多くの場合、テクスチャはthree.jsアプリの中で最もメモリを使っています。
+<em>一般的に</em>テクスチャは<code class="notranslate" translate="no">幅 * 高さ * 4 * 1.33</code>バイトのメモリを消費していることを理解するのは重要です。</p>
+<p>圧縮については言及していないことに注意してください。.jpgイメージを作り、超高圧縮することもできます。
+例えば、家のシーンを作っているとしましょう。家の中には、テーブルがあり、上面に木目のテクスチャを置くことに決めました。</p>
+<div class="threejs_center"><img class="border" src="../resources/images/compressed-but-large-wood-texture.jpg" align="center" style="width: 300px"></div>
+
+
+<p>このイメージはたった157kなので、比較的速くダウンロードすることができます。しかし、
+<a href="resources/images/compressed-but-large-wood-texture.jpg">ピクセルだと3024 x 3761の大きさ</a>です。
+前述した式によると、</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">3024 * 3761 * 4 * 1.33 = 60505764.5
+</pre><p>となり、three.jsの<strong>60メガのメモリ！</strong>を消費するでしょう。
+このようなテクスチャがいくつかあるだけで、メモリリークしてしまうでしょう。</p>
+<p>この例を持ち出したのは、テクスチャを使用することの隠れたコストを知っているのが重要だからです。
+three.jsでテクスチャを使うためには、テクスチャのデータをGPUに渡し、<em>一般的に</em>非圧縮にしておく必要があります。</p>
+<p>この話の教訓は、テクスチャをファイルサイズだけでなく、次元も小さくすることです。
+ファイルサイズの小ささ = 高速なダウンロードです。次元の小ささ = 省メモリです。
+では、どのように小さくできるのでしょうか？
+できるだけ小さく、そして十分見えるくらいです。</p>
+<h2 id="-a-name-format-a-jpg-vs-png"><a name="format"></a> JPG vs PNG</h2>
+<p>これは通常のHTMLとほぼ同じで、PNGはロスレス圧縮なので、lossy圧縮のJPGよりも
+一般的にダウンロードが遅くなります。
+しかし、PNGは透過性があります。PNGは法線マップや後ほど説明する非画像マップのような非画像データにも適したフォーマットです。</p>
+<p>WebGLにおいて、JPGがPNGよりも省メモリではないことを覚えておいてください。上記を参照してください。</p>
+<h2 id="-a-name-filtering-and-mips-a-mip"><a name="filtering-and-mips"></a> フィルタリングとMIP</h2>
+<p>この16x16のテクスチャを</p>
+<div class="threejs_center"><img src="../resources/images/mip-low-res-enlarged.png" class="nobg" align="center"></div>
+
+<p>立方体に適用してみます。</p>
+<div class="spread"><div data-diagram="filterCube"></div></div>
+
+<p>この立方体をとても小さく描画してみましょう。</p>
+<div class="spread"><div data-diagram="filterCubeSmall"></div></div>
+
+<p>ふーむ、見えにくいです。小さな立方体を拡大してみましょう。</p>
+<div class="spread"><div data-diagram="filterCubeSmallLowRes"></div></div>
+
+<p>GPUは小さな立方体のどのピクセルにどの色を使うか、どうやって知るのでしょうか？
+立方体が小さすぎて1、2ピクセルしかないとしたらどうでしょうか？</p>
+<p>フィルタリングとはこういうものです。</p>
+<p>もしフォトショップなら近くの全てのピクセルを平均して、1、2ピクセルの色を見つけます。
+これはとても遅い操作です。GPUはミップマップを使ってこの問題を解決します。</p>
+<p>MIPはテクスチャのコピーで、ピクセルがブレンドされて次の小さいMIPを作られます。そのため、前のMIPの半分の幅と半分の高さになっています。
+MIPは1x1ピクセルのMIPが得られるまで作られます。
+全てのMIP上の画像はこのようになります。</p>
+<div class="threejs_center"><img src="../resources/images/mipmap-low-res-enlarged.png" class="nobg" align="center"></div>
+
+<p>さて、立方体が1、2ピクセルの小ささに描かれたとき、どんな色にするか決めるため、GPUは最も小さなMIPレベルか次に小さいMIPか選ぶことができます。</p>
+<p>three.jsでは、テクスチャが元の大きさより大きく描かれたときと、小さく描かれたときの両方で、処理の設定を選ぶことができます。</p>
+<p>テクスチャが元の大きさより大きく描かれたときのフィルタ設定として、<a href="/docs/#api/ja/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a>属性に<code class="notranslate" translate="no">THREE.NearestFilter</code>か<code class="notranslate" translate="no">THREE.LinearFilter</code>を設定することができます。
+<code class="notranslate" translate="no">NearestFilter</code>は元のテクスチャから最も近い1ピクセルを使用するということです。
+低解像度のテクスチャでは、マインクラフトのようにピクセル化された見た目になります。</p>
+<p><code class="notranslate" translate="no">LinearFilter</code>はテクスチャから、色を決めたいピクセルに最も近い4ピクセルを選び、
+実際の点が4つのピクセルからどれだけ離れているかに応じて適切な比率で混ぜ合わせます。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="filterCubeMagNearest" style="height: 250px;"></div>
+    <div class="code">Nearest</div>
+  </div>
+  <div>
+    <div data-diagram="filterCubeMagLinear" style="height: 250px;"></div>
+    <div class="code">Linear</div>
+  </div>
+</div>
+
+<p>元の大きさよりもテクスチャが小さく描画された時のフィルタ設定では、
+<a href="/docs/#api/ja/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a>属性を6つの値から一つ設定できます。</p>
+<ul>
+<li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
+<p> 上と同様に、テクスチャの最も近いピクセルを選ぶ。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearFilter</code></p>
+<p> 上と同様に、テクスチャから4ピクセルを選んで混ぜ合わせる。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.NearestMipmapNearestFilter</code></p>
+<p> 適切なMIPを選び、ピクセルを一つ選ぶ。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.NearestMipmapLinearFilter</code></p>
+<p> 2つMIPを選び、それぞれからピクセルを選んで、その2つを混ぜる。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearMipmapNearestFilter</code></p>
+<p> 適切なMIPを選び、4ピクセルを選んで混ぜ合わせる。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearMipmapLinearFilter</code></p>
+<p>2つMIPを選び、それぞれから4ピクセルを選んで、8つ全部を混ぜ合わせて1ピクセルにする。</p>
+</li>
+</ul>
+<p>ここで6つ全ての設定の例を見せましょう。</p>
+<div class="spread">
+  <div data-diagram="filterModes" style="
+    height: 450px;
+    position: relative;
+  ">
+    <div style="
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    ">
+      <div style="
+        background: rgba(255,0,0,.8);
+        color: white;
+        padding: .5em;
+        margin: 1em;
+        font-size: small;
+        border-radius: .5em;
+        line-height: 1.2;
+        user-select: none;">click to<br>change<br>texture</div>
+    </div>
+    <div class="filter-caption" style="left: 0.5em; top: 0.5em;">nearest</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; top: 0.5em;">linear</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; top: 0.5em;">nearest<br>mipmap<br>nearest</div>
+    <div class="filter-caption" style="left: 0.5em; text-align: left; bottom: 0.5em;">nearest<br>mipmap<br>linear</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; bottom: 0.5em;">linear<br>mipmap<br>nearest</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; bottom: 0.5em;">linear<br>mipmap<br>linear</div>
+  </div>
+</div>
+
+<p>注意することは、左上と中央上は<code class="notranslate" translate="no">NearestFilter</code>を使っていて、<code class="notranslate" translate="no">LinearFilter</code>はMIPを使っていないことです。GPUが元のテクスチャからピクセルを選ぶので、遠くはちらついて見えます。
+左側はたった一つのピクセルが選ばれ、中央は4つのピクセルが選ばれて混ぜ合わされます。しかし、
+良い色の表現には至っていません。
+ほかの4つの中では、右下の<code class="notranslate" translate="no">LinearMipmapLinearFilter</code>が一番良いです。</p>
+<p>上の画像をクリックすると、上で使用しているテクスチャと、MIPレベルごとに色が異なるテクスチャが切り替わります。</p>
+<div class="threejs_center">
+  <div data-texture-diagram="differentColoredMips"></div>
+</div>
+
+<p>これで、起きていることが分かりやすいでしょう。
+左上と中央上は、最初のMIPがずっと遠くまで使われているのが分かります。
+右上と中央下は、別のMIPが使われているのがよく分かります。</p>
+<p>元のテクスチャに切り替えると、右下が滑らか、つまり高品質であることが分かります。
+なぜ常にこのモードにしないのか聞きたいかもしれません。
+最も明らかな理由は、レトロ感を出すために、ピクセル化してほしいとかです。
+次の理由は、8ピクセルを読み込んで混ぜ合わせることは、1ピクセルを読んで混ぜ合わせるよりも遅いことです。
+1つのテクスチャの速度では違いが出るように思えないかもしれませんが、
+記事が進むにつれて、最終的に4、5のテクスチャを一度に持つマテリアルが出てくるでしょう。
+4テクスチャ * 8ピクセル（テクスチャごと）は、どのピクセルを描画するにも32ピクセル探すことになります。
+これはモバイルデバイスで考えるときに特に重要になります。</p>
+<h2 id="-a-name-uvmanipulation-a-"><a name="uvmanipulation"></a> テクスチャの繰り返し、オフセット、回転、ラッピング</h2>
+<p>テクスチャは、繰り返し、オフセット、回転の設定があります。</p>
+<p>three.jsのデフォルトのテクスチャは繰り返されません。
+テクスチャが繰り返されるかどうかの設定には、2つの属性があります。
+水平方向のラッピングに<a href="/docs/#api/ja/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a>と、垂直方向のラッピングに<a href="/docs/#api/ja/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a>です。</p>
+<p>以下のどれかが設定されます：</p>
+<ul>
+<li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
+<p> それぞれの角の最後のピクセルが永遠に繰り返されます。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.RepeatWrapping</code></p>
+<p> テクスチャが繰り返されます。</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.MirroredRepeatWrapping</code></p>
+<p> テクスチャの鏡像が取られ、繰り返されます。</p>
+</li>
+</ul>
+<p>例えば、両方向にラッピングすると、</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">someTexture.wrapS = THREE.RepeatWrapping;
+someTexture.wrapT = THREE.RepeatWrapping;
+</pre>
+<p>繰り返しは<code class="notranslate" translate="no">repeat</code>属性で設定されます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const timesToRepeatHorizontally = 4;
+const timesToRepeatVertically = 2;
+someTexture.repeat.set(timesToRepeatHorizontally, timesToRepeatVertically);
+</pre>
+<p>テクスチャのオフセットは<code class="notranslate" translate="no">offset</code>属性でできます。
+テクスチャは1単位 = 1テクスチャの大きさにオフセットされます。
+言い換えると、0 = オフセットなし、1 = テクスチャ全体の大きさということです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const xOffset = .5;   // offset by half the texture
+const yOffset = .25;  // offset by 1/4 the texture
+someTexture.offset.set(xOffset, yOffset);
+</pre>
+<p>テクスチャの回転は、<code class="notranslate" translate="no">rotation</code>属性で、ラジアンで指定します。
+同様に <code class="notranslate" translate="no">center</code>属性で回転の中心を指定します。
+デフォルトは0,0で、左下の角で回転します。
+オフセットと同じように、単位はテクスチャの大きさなので、<code class="notranslate" translate="no">.5, .5</code>に設定すると、
+テクスチャの中心での回転になります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">someTexture.center.set(.5, .5);
+someTexture.rotation = THREE.MathUtils.degToRad(45);
+</pre>
+<p>最初に取り上げたサンプルでこれらの値を試してみましょう。</p>
+<p>最初に、テクスチャを操作できるように参照を保持しておきます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const texture = loader.load('resources/images/wall.jpg');
+const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('resources/images/wall.jpg');
++  map: texture,
+});
+</pre>
+<p>ここでも、簡単なインターフェースを提供するために<a href="https://github.com/georgealways/lil-gui">lil-gui</a>を使います。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<p>以前のlil-guiの例でしたように、lil-guiに度数で操作できるオブジェクトを与え、
+ラジアン単位でプロパティを設定する簡単なクラスを使います。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class DegRadHelper {
+  constructor(obj, prop) {
+    this.obj = obj;
+    this.prop = prop;
+  }
+  get value() {
+    return THREE.MathUtils.radToDeg(this.obj[this.prop]);
+  }
+  set value(v) {
+    this.obj[this.prop] = THREE.MathUtils.degToRad(v);
+  }
+}
+</pre>
+<p><code class="notranslate" translate="no">"123"</code>といった文字列から<code class="notranslate" translate="no">123</code>といった数値に変換するクラスも必要です。
+これは、three.jsは<code class="notranslate" translate="no">wrapS</code>や<code class="notranslate" translate="no">wrapT</code>のようなenumの設定として数値が必要ですが、
+lil-guiはenumに文字列のみを使うためです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class StringToNumberHelper {
+  constructor(obj, prop) {
+    this.obj = obj;
+    this.prop = prop;
+  }
+  get value() {
+    return this.obj[this.prop];
+  }
+  set value(v) {
+    this.obj[this.prop] = parseFloat(v);
+  }
+}
+</pre>
+<p>このクラスを使って、上記設定のための簡単なGUIをセットアップできます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const wrapModes = {
+  'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
+  'RepeatWrapping': THREE.RepeatWrapping,
+  'MirroredRepeatWrapping': THREE.MirroredRepeatWrapping,
+};
+
+function updateTexture() {
+  texture.needsUpdate = true;
+}
+
+const gui = new GUI();
+gui.add(new StringToNumberHelper(texture, 'wrapS'), 'value', wrapModes)
+  .name('texture.wrapS')
+  .onChange(updateTexture);
+gui.add(new StringToNumberHelper(texture, 'wrapT'), 'value', wrapModes)
+  .name('texture.wrapT')
+  .onChange(updateTexture);
+gui.add(texture.repeat, 'x', 0, 5, .01).name('texture.repeat.x');
+gui.add(texture.repeat, 'y', 0, 5, .01).name('texture.repeat.y');
+gui.add(texture.offset, 'x', -2, 2, .01).name('texture.offset.x');
+gui.add(texture.offset, 'y', -2, 2, .01).name('texture.offset.y');
+gui.add(texture.center, 'x', -.5, 1.5, .01).name('texture.center.x');
+gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
+gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
+  .name('texture.rotation');
+</pre>
+<p>最後に特記することは、もしテクスチャの<code class="notranslate" translate="no">wrapS</code>や<code class="notranslate" translate="no">wrapT</code>を変えるなら、
+three.jsが設定の適用を知るために、<a href="/docs/#api/ja/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>も設定しなければならないことです。ほかの設定は自動的に適用されます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-adjust.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-adjust.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これはテクスチャのトピックへの第一歩にすぎません。
+ある時点で、テクスチャの座標や、マテリアルが適用できる別の9種のテクスチャについても説明します。</p>
+<p>今のところは、<a href="lights.html">光源</a>に進みましょう。</p>
+<!--
+alpha
+ao
+env
+light
+specular
+bumpmap ?
+normalmap ?
+metalness
+roughness
+-->
+<p><link rel="stylesheet" href="../resources/threejs-textures.css"></p>
+<script type="module" src="../resources/threejs-textures.js"></script>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

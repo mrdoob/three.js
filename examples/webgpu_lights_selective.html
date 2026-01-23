@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - selective lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Selective Lights</span>
+			</div>
+
+			<small>
+				<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { fog, rangeFogFactor, color, lights, texture, normalMap } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			let camera, scene, renderer,
+				light1, light2, light3, light4,
+				controls;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.z = 7;
+
+				scene = new THREE.Scene();
+				scene.fogNode = fog( color( 0xFF00FF ), rangeFogFactor( 12, 30 ) );
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.1, 16, 8 );
+
+				// textures
+
+				const textureLoader = new THREE.TextureLoader();
+
+				const normalMapTexture = textureLoader.load( './textures/water/Water_1_M_Normal.jpg' );
+				normalMapTexture.wrapS = THREE.RepeatWrapping;
+				normalMapTexture.wrapT = THREE.RepeatWrapping;
+
+				const alphaTexture = textureLoader.load( './textures/roughness_map.jpg' );
+				alphaTexture.wrapS = THREE.RepeatWrapping;
+				alphaTexture.wrapT = THREE.RepeatWrapping;
+
+				// lights
+
+				const addLight = ( hexColor, power = 1700, distance = 100 ) => {
+
+					const material = new THREE.MeshStandardNodeMaterial();
+					material.colorNode = color( hexColor );
+					material.lights = false;
+
+					const mesh = new THREE.Mesh( sphereGeometry, material );
+
+					const light = new THREE.PointLight( hexColor, 1, distance );
+					light.power = power;
+					light.add( mesh );
+
+					scene.add( light );
+
+					return light;
+
+				};
+
+				light1 = addLight( 0xff0040 );
+				light2 = addLight( 0x0040ff );
+				light3 = addLight( 0x80ff80 );
+				light4 = addLight( 0xffaa00 );
+
+				// light nodes ( selective lights )
+
+				const redLightsNode = lights( [ light1 ] );
+				const blueLightsNode = lights( [ light2 ] );
+
+				// models
+
+				const geometryTeapot = new TeapotGeometry( .8, 18 );
+
+				const leftObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				leftObject.material.lightsNode = redLightsNode;
+				leftObject.material.roughnessNode = texture( alphaTexture );
+				leftObject.material.metalness = 0;
+				leftObject.position.x = - 3;
+				scene.add( leftObject );
+
+				const centerObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				centerObject.material.normalNode = normalMap( texture( normalMapTexture ) );
+				centerObject.material.metalness = .5;
+				centerObject.material.roughness = .5;
+				scene.add( centerObject );
+
+				const rightObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardNodeMaterial( { color: 0x555555 } ) );
+				rightObject.material.lightsNode = blueLightsNode;
+				rightObject.material.metalnessNode = texture( alphaTexture );
+				rightObject.position.x = 3;
+				scene.add( rightObject );
+
+				leftObject.rotation.y = centerObject.rotation.y = rightObject.rotation.y = Math.PI * - 0.5;
+				leftObject.position.y = centerObject.position.y = rightObject.position.y = - 1;
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 3;
+				controls.maxDistance = 25;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Material' );
+
+				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
+				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const time = performance.now() / 1000;
+				const lightTime = time * 0.5;
+
+				light1.position.x = Math.sin( lightTime * 0.7 ) * 3;
+				light1.position.y = Math.cos( lightTime * 0.5 ) * 4;
+				light1.position.z = Math.cos( lightTime * 0.3 ) * 3;
+
+				light2.position.x = Math.cos( lightTime * 0.3 ) * 3;
+				light2.position.y = Math.sin( lightTime * 0.5 ) * 4;
+				light2.position.z = Math.sin( lightTime * 0.7 ) * 3;
+
+				light3.position.x = Math.sin( lightTime * 0.7 ) * 3;
+				light3.position.y = Math.cos( lightTime * 0.3 ) * 4;
+				light3.position.z = Math.sin( lightTime * 0.5 ) * 3;
+
+				light4.position.x = Math.sin( lightTime * 0.3 ) * 3;
+				light4.position.y = Math.cos( lightTime * 0.7 ) * 4;
+				light4.position.z = Math.sin( lightTime * 0.5 ) * 3;
+				/*
+				@TODO: Used to test scene light change ( currently unavailable )
+
+				if ( time > 2.0 && light1.parent === null ) scene.add( light1 );
+				if ( time > 2.5 && light2.parent === null ) scene.add( light2 );
+				if ( time > 3.0 && light3.parent === null ) scene.add( light3 );
+				if ( time > 3.5 && light4.parent === null ) scene.add( light4 );
+				*/
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

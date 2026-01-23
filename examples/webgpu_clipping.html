@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - clipping planes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Clipping Planes</span>
+			</div>
+
+			<small>Clipping 3D objects via Clipping Planes.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, startTime, object;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 16 );
+
+				camera.position.set( 0, 1.3, 3 );
+
+				scene = new THREE.Scene();
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				const spotLight = new THREE.SpotLight( 0xffffff, 60 );
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.2;
+				spotLight.position.set( 2, 3, 3 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 3;
+				spotLight.shadow.camera.far = 10;
+				spotLight.shadow.mapSize.width = 2048;
+				spotLight.shadow.mapSize.height = 2048;
+				spotLight.shadow.radius = 4;
+				scene.add( spotLight );
+
+				const dirLight = new THREE.DirectionalLight( 0x55505a, 3 );
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 10;
+
+				dirLight.shadow.camera.right = 1;
+				dirLight.shadow.camera.left = - 1;
+				dirLight.shadow.camera.top	= 1;
+				dirLight.shadow.camera.bottom = - 1;
+
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+				// Clipping planes
+
+				const globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
+				const localPlane1 = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
+				const localPlane2 = new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0.1 );
+
+				// Clipping Groups
+
+				const globalClippingGroup = new THREE.ClippingGroup();
+				globalClippingGroup.clippingPlanes = [ globalPlane ];
+
+				const knotClippingGroup = new THREE.ClippingGroup();
+				knotClippingGroup.clippingPlanes = [ localPlane1, localPlane2 ];
+				knotClippingGroup.clipIntersection = true;
+
+				scene.add( globalClippingGroup );
+				globalClippingGroup.add( knotClippingGroup );
+
+				// Geometry
+
+				const material = new THREE.MeshPhongNodeMaterial( {
+					color: 0x80ee10,
+					shininess: 0,
+					side: THREE.DoubleSide,
+
+					// ***** Clipping setup (material): *****
+					alphaToCoverage: true
+				} );
+
+				const geometry = new THREE.TorusKnotGeometry( 0.4, 0.08, 95, 20 );
+
+				object = new THREE.Mesh( geometry, material );
+				object.castShadow = true;
+				knotClippingGroup.add( object );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
+					new THREE.MeshPhongNodeMaterial( { color: 0xa0adaf, shininess: 150, alphaToCoverage: true } )
+				);
+
+				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
+				ground.receiveShadow = true;
+				globalClippingGroup.add( ground );
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.shadowMap.enabled = true;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				window.addEventListener( 'resize', onWindowResize );
+				document.body.appendChild( renderer.domElement );
+
+				// Controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Clipping settings' );
+				const props = {
+					alphaToCoverage: true,
+				};
+			
+				const folderKnot = gui.addFolder( 'Knot Clipping Group' );
+				const propsKnot = {
+
+					get 'Enabled'() {
+
+						return knotClippingGroup.enabled;
+
+					},
+					set 'Enabled'( v ) {
+
+						knotClippingGroup.enabled = v;
+
+					},
+
+					get 'Shadows'() {
+
+						return knotClippingGroup.clipShadows;
+
+					},
+					set 'Shadows'( v ) {
+
+						knotClippingGroup.clipShadows = v;
+
+					},
+
+					get 'Intersection'() {
+
+						return knotClippingGroup.clipIntersection;
+
+					},
+
+					set 'Intersection'( v ) {
+
+						knotClippingGroup.clipIntersection = v;
+
+					},
+
+					get 'Plane'() {
+
+						return localPlane1.constant;
+
+					},
+					set 'Plane'( v ) {
+
+						localPlane1.constant = v;
+
+					}
+
+				};
+
+				const folderGlobal = gui.addFolder( 'Global Clipping Group' );
+				const propsGlobal = {
+
+					get 'Enabled'() {
+
+						return globalClippingGroup.enabled;
+
+					},
+					set 'Enabled'( v ) {
+
+						globalClippingGroup.enabled = v;
+
+					},
+
+					get 'Plane'() {
+
+						return globalPlane.constant;
+
+					},
+					set 'Plane'( v ) {
+
+						globalPlane.constant = v;
+
+					}
+
+				};
+
+				gui.add( props, 'alphaToCoverage' ).onChange( function ( value ) {
+
+					ground.material.alphaToCoverage = value;
+					ground.material.needsUpdate = true;
+
+					material.alphaToCoverage = value;
+					material.needsUpdate = true;
+
+				} );
+
+				folderKnot.add( propsKnot, 'Enabled' );
+				folderKnot.add( propsKnot, 'Shadows' );
+				folderKnot.add( propsKnot, 'Intersection' );
+				folderKnot.add( propsKnot, 'Plane', 0.3, 1.25 );
+
+				folderGlobal.add( propsGlobal, 'Enabled' );
+				folderGlobal.add( propsGlobal, 'Plane', - 0.4, 3 );
+
+				// Start
+
+				startTime = Date.now();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate( currentTime ) {
+
+				const time = ( currentTime - startTime ) / 1000;
+
+				object.position.y = 0.8;
+				object.rotation.x = time * 0.5;
+				object.rotation.y = time * 0.2;
+				object.scale.setScalar( Math.cos( time ) * 0.125 + 0.875 );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

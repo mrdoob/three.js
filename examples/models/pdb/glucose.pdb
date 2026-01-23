@@ -1,0 +1,59 @@
+COMPND                                                                
+REMARK   1 PDB to MMOD atom-numbering translation table; the mmod numbers
+REMARK   1 pertain to the .dat file from which this file was created,
+REMARK   1 not to one created from this file:
+REMARK   1  PDB:     1     2     3     4     5     6     7     8     9  
+REMARK   1 MMOD:     1     2     3     4     5     6     7     8     9 /
+REMARK   1  PDB:    10    11    12    13    14    15    16    17    18  
+REMARK   1 MMOD:    10    11    23    12    13    14    15    16    17 /
+REMARK   1  PDB:    19    20    21    22    23    24  
+REMARK   1 MMOD:    18    19    20    21    22    24 /
+HETATM    1  C01 UNK A   1     -10.447   3.465   0.000  0.00  0.00   0
+HETATM    2  C02 UNK A   1     -11.071   4.006   1.273  0.00  0.00   0
+HETATM    3  C03 UNK A   1     -12.577   4.148   1.128  0.00  0.00   0
+HETATM    4  C04 UNK A   1     -12.891   4.988  -0.105  0.00  0.00   0
+HETATM    5  C05 UNK A   1     -12.200   4.411  -1.349  0.00  0.00   0
+HETATM    6  O06 UNK A   1     -10.802   4.239  -1.130  0.00  0.00   0
+HETATM    7  O07 UNK A   1     -10.803   3.104   2.323  0.00  0.00   0
+HETATM    8  O08 UNK A   1     -13.072   4.770   2.296  0.00  0.00   0
+HETATM    9  O09 UNK A   1     -14.294   4.984  -0.281  0.00  0.00   0
+HETATM   10  C10 UNK A   1     -12.311   5.317  -2.577  0.00  0.00   0
+HETATM   11  O11 UNK A   1     -13.660   5.466  -2.961  0.00  0.00   0
+HETATM   12  O23 UNK A   1      -9.045   3.478   0.138  0.00  0.00   0
+HETATM   13  H12 UNK A   1      -9.995   3.339   2.755  0.00  0.00   0
+HETATM   14  H13 UNK A   1     -12.863   4.206   3.024  0.00  0.00   0
+HETATM   15  H14 UNK A   1     -13.704   6.000  -3.739  0.00  0.00   0
+HETATM   16  H15 UNK A   1     -10.793   2.419  -0.156  0.00  0.00   0
+HETATM   17  H16 UNK A   1     -10.626   4.997   1.513  0.00  0.00   0
+HETATM   18  H17 UNK A   1     -13.037   3.141   1.020  0.00  0.00   0
+HETATM   19  H18 UNK A   1     -12.542   6.032   0.061  0.00  0.00   0
+HETATM   20  H19 UNK A   1     -12.653   3.423  -1.588  0.00  0.00   0
+HETATM   21  H20 UNK A   1     -14.475   5.505  -1.044  0.00  0.00   0
+HETATM   22  H21 UNK A   1     -11.886   6.317  -2.335  0.00  0.00   0
+HETATM   23  H22 UNK A   1     -11.738   4.866  -3.418  0.00  0.00   0
+HETATM   24  H24 UNK A   1      -8.822   2.951   0.906  0.00  0.00   0
+CONECT    1    2    6   12   16
+CONECT    2    1    3    7   17
+CONECT    3    2    4    8   18
+CONECT    4    3    5    9   19
+CONECT    5    4    6   10   20
+CONECT    6    5    1
+CONECT    7    2   13
+CONECT    8    3   14
+CONECT    9    4   21
+CONECT   10    5   11   22   23
+CONECT   11   10   15
+CONECT   12    1   24
+CONECT   13    7
+CONECT   14    8
+CONECT   15   11
+CONECT   16    1
+CONECT   17    2
+CONECT   18    3
+CONECT   19    4
+CONECT   20    5
+CONECT   21    9
+CONECT   22   10
+CONECT   23   10
+CONECT   24   12
+END

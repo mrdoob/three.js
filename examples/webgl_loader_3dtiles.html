@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js loader - 3d tiles</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #111;
+				color: #eee;
+			}
+
+			a {
+				color: #b3e5fc;
+				text-decoration: underline;
+				pointer-events: all;
+			}
+
+			#credits {
+				pointer-events: none;
+				position: absolute;
+				left: 10px;
+				bottom: 5px;
+			}
+
+			img {
+				height: 25px;
+				margin-right: 0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> 3d tiles - <a href="https://github.com/NASA-AMMOS/3DTilesRendererJS" target="_blank" rel="noopener">3d-tiles-renderer</a><br/>
+			See <a href="https://github.com/NASA-AMMOS/3DTilesRendererJS" target="_blank" rel="noopener">main project repository</a> for more information and examples on loading 3d tiles
+			<br/>
+			and other tiled data formats. <a href="https://developers.google.com/maps/documentation/tile/3d-tiles">Google Photorealistic Tiles</a> token courtesy of <a href="https://ion.cesium.com/">Cesium Ion</a>.
+		</div>
+
+		<div id="credits">
+			<img src="./textures/google_on_non_white_hdpi.png" />
+			<a href="https://ion.cesium.com/"><img src="./textures/cesiumion.png" /></a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/examples/": "./",
+					"3d-tiles-renderer": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.4.8/src/index.js",
+					"3d-tiles-renderer/plugins": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.4.8/src/plugins/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+			import { TilesRenderer, GlobeControls } from '3d-tiles-renderer';
+			import { CesiumIonAuthPlugin, GLTFExtensionsPlugin, TilesFadePlugin, UpdateOnChangePlugin } from '3d-tiles-renderer/plugins';
+
+			// Ion key provided by Cesium for use on threejs.org
+			// A personal Cesium Ion key can be used for development.
+			const ION_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMTFiZTRmZS1mMWIxLTQ5YzYtYjA4Zi0xYTE0MjFmYzQ5OGYiLCJpZCI6MjY3NzgzLCJpYXQiOjE3MzY0NzQxMDh9.ppGPgpse1lq7QeNyljX7THUyK5w1x_4HksSHSlhe5sY';
+
+			let camera, scene, renderer;
+			let tiles, controls;
+
+			init();
+
+			function init() {
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( - 1, 1, 1 ).normalize().multiplyScalar( 10 );
+				camera.position.set( - 8000000, 10000000, - 14720000 );
+				camera.lookAt( 0, 0, 0 );
+
+				// scene
+				scene = new THREE.Scene();
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// loader
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
+				dracoLoader.setDecoderConfig( { type: 'js' } );
+
+				// tiles
+				tiles = new TilesRenderer();
+				tiles.registerPlugin( new CesiumIonAuthPlugin( { apiToken: ION_KEY, assetId: '2275207', autoRefreshToken: true } ) );
+				tiles.registerPlugin( new GLTFExtensionsPlugin( { dracoLoader } ) );
+				tiles.registerPlugin( new TilesFadePlugin() );
+				tiles.registerPlugin( new UpdateOnChangePlugin() );
+				tiles.setCamera( camera );
+				tiles.setResolutionFromRenderer( camera, renderer );
+				scene.add( tiles.group );
+
+				// rotate the globe so the north pole is up
+				tiles.group.rotation.x = - Math.PI / 2;
+
+				// controls
+				controls = new GlobeControls( scene, camera, renderer.domElement, tiles );
+				controls.enableDamping = true;
+
+				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				tiles.setResolutionFromRenderer( camera, renderer );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				tiles.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - 2D compressed texture array</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Texture Gradient</span>
+			</div>
+
+			<small>
+				Loop from the movie Spirited away
+				by the <a href="https://www.ghibli.jp/" target="_blank" rel="noopener">Studio Ghibli</a>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { texture, uniform, uv } from 'three/tsl';
+
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			//
+
+			let camera, scene, mesh, renderer, timer;
+
+			const depth = uniform( 0 );
+
+			const planeWidth = 50;
+			const planeHeight = 25;
+
+			let depthStep = 1;
+
+			init();
+
+			async function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera.position.z = 70;
+
+				scene = new THREE.Scene();
+
+				//
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				//
+
+				const ktx2Loader = new KTX2Loader();
+				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
+				ktx2Loader.detectSupport( renderer );
+
+				ktx2Loader.load( 'textures/spiritedaway.ktx2', function ( texturearray ) {
+
+					const material = new THREE.NodeMaterial();
+
+					material.colorNode = texture( texturearray, uv().flipY() ).depth( depth );
+					const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+
+					mesh = new THREE.Mesh( geometry, material );
+
+					scene.add( mesh );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( mesh ) {
+
+					const delta = timer.getDelta() * 10;
+
+					depthStep += delta;
+
+					const value = depthStep % 5;
+
+					depth.value = value;
+
+				}
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

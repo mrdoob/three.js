@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing smaa</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SMAA</span>
+			</div>
+
+			<small>Subpixel Morphological Anti-Aliasing.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass } from 'three/tsl';
+			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline;
+
+			const params = {
+				enabled: true,
+				autoRotate: true
+
+			};
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 300;
+
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 100;
+				scene.add( mesh1 );
+
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				texture.colorSpace = THREE.SRGBColorSpace;
+
+				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
+
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 100;
+				scene.add( mesh2 );
+
+				// post processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+				const smaaPass = smaa( scenePass );
+
+				renderPipeline.outputNode = smaaPass;
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				const smaaFolder = gui.addFolder( 'SMAA' );
+				smaaFolder.add( params, 'enabled' ).onChange( ( value ) => {
+			
+					if ( value === true ) {
+
+						renderPipeline.outputNode = smaaPass;
+
+					} else {
+
+						renderPipeline.outputNode = scenePass;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+				const sceneFolder = gui.addFolder( 'Scene' );
+				sceneFolder.add( params, 'autoRotate' );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				if ( params.autoRotate === true ) {
+
+					for ( let i = 0; i < scene.children.length; i ++ ) {
+
+						const child = scene.children[ i ];
+
+						child.rotation.x += 0.005;
+						child.rotation.y += 0.01;
+
+					}
+
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

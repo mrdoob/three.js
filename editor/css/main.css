@@ -1,0 +1,872 @@
+:root {
+	color-scheme: light dark;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid #ccc;
+}
+
+.Button {
+	position: relative;
+}
+
+.Input {
+	vertical-align: middle;
+}
+
+	.Input[type="color"]::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+	.Input[type="color"]::-webkit-color-swatch {
+		border: none;
+	}
+
+.TextArea {
+	tab-size: 4;
+	white-space: pre;
+	word-wrap: normal;
+}
+
+	.TextArea.success {
+		border-color: #8b8 !important;
+	}
+
+	.TextArea.fail {
+		border-color: #f00 !important;
+		background-color: rgba(255,0,0,0.05);
+	}
+
+.TextArea, .Input { outline: none; } /* osx */
+
+.Panel {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+	/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+}
+
+.TabbedPanel {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+	/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+	position: relative;
+	display: block;
+	width: 100%;
+	min-width: 335px;
+}
+
+.TabbedPanel .Tabs {
+	position: relative;
+	z-index: 1; /** Above .Panels **/
+	display: block;
+	width: 100%;
+	white-space: pre;
+	overflow: hidden;
+	overflow-x: auto;
+}
+
+	.TabbedPanel .Tabs::-webkit-scrollbar {
+		height: 5px;
+		background: #eee;
+	}
+	.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
+		background: #08f3;
+	}
+	.TabbedPanel .Tabs:hover::-webkit-scrollbar-thumb {
+		background: #08f;
+		cursor: ew-resize;
+	}
+
+	.TabbedPanel .Tabs .Tab {
+		padding: 10px 9px;
+		text-transform: uppercase;
+	}
+
+	.TabbedPanel .Panels {
+		position: absolute;
+		top: 40px;
+		display: block;
+		width: 100%;
+	}
+
+/* Listbox */
+.Listbox {
+	color: #444;
+	background-color: #fff;
+	padding: 0;
+	width: 100%;
+	min-height: 180px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+}
+
+.Listbox .ListboxItem {
+	padding: 4px;
+	color: #666;
+	white-space: nowrap;
+}
+
+.Listbox .ListboxItem:hover {
+	background-color: rgba(0, 0, 0, 0.02);
+}
+
+.Listbox .ListboxItem.active {
+	background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* CodeMirror */
+
+.CodeMirror {
+
+	position: absolute !important;
+	top: 37px;
+	width: 100% !important;
+	height: calc(100% - 37px) !important;
+
+}
+
+	.CodeMirror .errorLine {
+
+		background: rgba(255,0,0,0.25);
+
+	}
+
+	.CodeMirror .esprima-error {
+
+		color: #f00;
+		text-align: right;
+		padding: 0 20px;
+
+	}
+
+/* outliner */
+
+#outliner .opener {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin: 0px 4px;
+	vertical-align: top;
+	text-align: center;
+}
+
+	#outliner .opener.open:after {
+		content: '−';
+	}
+
+	#outliner .opener.closed:after {
+		content: '+';
+	}
+
+#outliner .option {
+
+	border: 1px solid transparent;
+
+}
+
+#outliner .option.drag {
+
+	border: 1px dashed #999;
+
+}
+
+#outliner .option.dragTop {
+
+	border-top: 1px dashed #999;
+
+}
+
+#outliner .option.dragBottom {
+
+	border-bottom: 1px dashed #999;
+
+}
+
+#outliner .type {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	color: #ddd;
+	text-align: center;
+}
+
+#outliner .type:after {
+	content: '●';
+}
+
+/* */
+
+#outliner .Scene {
+	color: #8888dd;
+}
+
+#outliner .Camera {
+	color: #dd8888;
+}
+
+#outliner .Light {
+	color: #dddd88;
+}
+
+/* */
+
+#outliner .Object3D {
+	color: #aaaaee;
+}
+
+#outliner .Mesh {
+	color: #8888ee;
+}
+
+#outliner .Line {
+	color: #88ee88;
+}
+
+#outliner .LineSegments {
+	color: #88ee88;
+}
+
+#outliner .Points {
+	color: #ee8888;
+}
+
+/* */
+
+#outliner .Geometry {
+	color: #aaeeaa;
+}
+
+#outliner .Material {
+	color: #eeaaee;
+}
+
+/* */
+
+#outliner .Script:after {
+	content: '◎'
+}
+
+/*  */
+
+.Button {
+	color: #555;
+	background-color: #ddd;
+	border: 0px;
+	margin: 0px; /* GNOME Web */
+	padding: 5px 8px;
+	font-size: 12px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+	.Button:hover {
+		background-color: #fff;
+	}
+
+	.Button.selected {
+		background-color: #fff;
+	}
+
+.Input, .TextArea {
+	border: 1px solid transparent;
+	color: #444;
+}
+
+.Input.Number {
+	color: #08f!important;
+	font-size: 12px;
+	border: 0px;
+	padding: 2px;
+}
+
+.Select {
+	color: #666;
+	background-color: #ddd;
+	border: 0px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+	.Select:hover {
+		background-color: #fff;
+	}
+
+/* UI */
+
+#resizer {
+	position: absolute;
+	z-index: 2; /* Above #sidebar */
+	top: 32px;
+	right: 350px;
+	width: 5px;
+	bottom: 0px;
+	transform: translatex(2.5px);
+	cursor: col-resize;
+}
+
+	#resizer:hover {
+		background-color: #08f8;
+		transition-property: background-color;
+		transition-delay: 0.1s;
+		transition-duration: 0.2s;
+	}
+
+	#resizer:active {
+		background-color: #08f;
+	}
+
+#viewport {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	right: 350px;
+	bottom: 0;
+}
+
+	#viewport .Text {
+		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+		pointer-events: none;
+	}
+
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	right: 350px;
+	bottom: 0;
+	opacity: 0.9;
+}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	right: 350px;
+	bottom: 0;
+}
+
+#menubar {
+	position: absolute;
+	width: 100%;
+	height: 32px;
+	background: #eee;
+	padding: 0;
+	margin: 0;
+	right: 0;
+	top: 0;
+}
+
+	#menubar .menu {
+		float: left;
+		cursor: pointer;
+		padding-right: 8px;
+	}
+
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		padding-right: 0;
+		text-align: right;
+	}
+
+		#menubar .menu .title {
+			display: inline-block;
+			color: #888;
+			margin: 0;
+			padding: 8px;
+			line-height: 16px;
+		}
+
+		#menubar .menu .key {
+			position: absolute;
+			right: 10px;
+			color: #ccc;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 9px;
+			padding: 2px 4px;
+			right: 10px;
+			pointer-events: none;
+		}
+
+		#menubar .menu .options {
+			position: fixed;
+			z-index: 1; /* higher than resizer */
+			display: none;
+			padding: 5px 0;
+			background: #eee;
+			min-width: 150px;
+			max-height: calc(100vh - 80px);
+			overflow: auto;
+		}
+
+		#menubar .menu:hover .options {
+			display: block;
+			box-shadow: 0 10px 10px -5px #00000033;
+		}
+
+			#menubar .menu .options hr {
+				border-color: #ddd;
+			}
+
+			#menubar .menu .options .option {
+				color: #666;
+				background-color: transparent;
+				padding: 5px 10px;
+				margin: 0 !important;
+			}
+
+				#menubar .menu .options .option:hover {
+					color: #fff;
+					background-color: #08f;
+				}
+
+				#menubar .menu .options .option:not(.submenu-title):active {
+					color: #666;
+					background: transparent;
+				}
+
+				#menubar .menu .options .option.toggle::before {
+
+					content: ' ';
+					display: inline-block;
+					width: 16px;
+
+				}
+
+				#menubar .menu .options .option.toggle-on::before {
+
+					content: '✔';
+					font-size: 12px;
+
+				}
+
+				#menubar .submenu-title::after {
+					content: '⏵';
+					float: right;
+				}
+
+		#menubar .menu .options .inactive {
+			color: #bbb;
+			background-color: transparent;
+			padding: 5px 10px;
+			margin: 0 !important;
+			cursor: not-allowed;
+		}
+
+		
+
+#sidebar {
+	position: absolute;
+	right: 0;
+	top: 32px;
+	bottom: 0;
+	width: 350px;
+	background: #eee;
+	overflow: auto;
+	overflow-x: hidden;
+}
+
+	#sidebar .Panel {
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #ccc;
+	}
+
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0;
+	}
+
+	#sidebar .Row {
+		display: flex;
+		align-items: center;
+		min-height: 24px;
+		margin-bottom: 10px;
+	}
+
+	#sidebar .Row .Label {
+
+		width: 120px;
+
+	}
+
+#tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	#tabs span {
+		color: #aaa;
+		border-right: 1px solid #ccc;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #eee;
+	}
+
+#toolbar {
+	position: absolute;
+	left: 10px;
+	top: 42px;
+	width: 32px;
+	background: #eee;
+	text-align: center;
+}
+
+	#toolbar .Button, #toolbar .Input {
+		height: 32px;
+	}
+
+		#toolbar .Button img {
+			width: 16px;
+			opacity: 0.5;
+		}
+
+.Outliner {
+	color: #444;
+	background-color: #fff;
+	padding: 0;
+	width: 100%;
+	height: 180px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+	resize: vertical;
+	outline: none !important;
+}
+
+	.Outliner .option {
+		padding: 4px;
+		color: #666;
+		white-space: nowrap;
+	}
+
+	.Outliner .option:hover {
+		background-color: rgba(0,0,0,0.02);
+	}
+
+	.Outliner .option.active {
+		background-color: rgba(0,0,0,0.04);
+	}
+
+
+.TabbedPanel .Tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	.TabbedPanel .Tab {
+		color: #aaa;
+		border-right: 1px solid #ccc;
+	}
+
+	.TabbedPanel .Tab.selected {
+		color: #888;
+		background-color: #eee;
+	}
+
+.Listbox {
+	color: #444;
+	background-color: #fff;
+}
+
+.Panel {
+	color: #888;
+}
+
+/* */
+
+@media all and ( max-width: 600px ) {
+
+	#resizer {
+		display: none;
+	}
+
+	#menubar .menu .options {
+		max-height: calc(100% - 80px);
+	}
+
+	#menubar .menu.right {
+		display: none;
+	}
+
+	#viewport {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#script {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#player {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#sidebar {
+		left: 0;
+		width: 100%;
+		top: calc(100% - 320px);
+		bottom: 0;
+	}
+
+}
+
+/* DARK MODE */
+
+@media ( prefers-color-scheme: dark ) {
+
+	.Button {
+		color: #aaa;
+		background-color: #222;
+	}
+
+		.Button:hover {
+			color: #ccc;
+			background-color: #444;
+		}
+
+		.Button.selected {
+			color: #fff;
+			background-color: #08f;
+		}
+
+	.Input, .TextArea {
+		background-color: #222;
+		border: 1px solid transparent;
+		color: #888;
+	}
+
+	.Select {
+		color: #aaa;
+		background-color: #222;
+	}
+
+		.Select:hover {
+			color: #ccc;
+			background-color: #444;
+		}
+
+	/* UI */
+
+	#menubar {
+		background: #111;
+	}
+
+			#menubar .menu .key {
+				color: #444;
+				border-color: #444;
+			}
+
+			#menubar .menu .options {
+				background: #111;
+			}
+
+				#menubar .menu .options hr {
+					border-color: #222;
+				}
+
+				#menubar .menu .options .option {
+					color: #888;
+				}
+
+			#menubar .menu .options .inactive {
+				color: #444;
+			}
+
+	#sidebar {
+		background-color: #111;
+	}
+
+		#sidebar .Panel {
+			border-top: 1px solid #222;
+		}
+
+		#sidebar .Panel.Material canvas {
+			border: solid 1px #5A5A5A;
+		}
+
+	#tabs {
+		background-color: #1b1b1b;
+		border-top: 1px solid #222;
+	}
+
+		#tabs span {
+			color: #555;
+			border-right: 1px solid #222;
+		}
+
+		#tabs span.selected {
+			background-color: #111;
+		}
+
+	#toolbar {
+		background-color: #111;
+	}
+
+		#toolbar img {
+			filter: invert(1);
+		}
+
+	.Outliner {
+		background: #222;
+	}
+
+		.Outliner .option {
+			color: #999;
+		}
+
+		.Outliner .option:hover {
+			background-color: rgba(21,60,94,0.5);
+		}
+
+		.Outliner .option.active {
+			background-color: rgba(21,60,94,1);
+		}
+
+	.TabbedPanel .Tabs {
+		background-color: #1b1b1b;
+		border-top: 1px solid #222;
+	}
+
+		.TabbedPanel .Tabs::-webkit-scrollbar {
+			background: #111;
+		}
+
+		.TabbedPanel .Tab {
+			color: #555;
+			border-right: 1px solid #222;
+		}
+
+		.TabbedPanel .Tab.selected {
+			color: #888;
+			background-color: #111;
+		}
+
+	.Listbox {
+		color: #888;
+		background: #222;
+	}
+
+	.Listbox .ListboxItem:hover {
+		background-color: rgba(21,60,94,0.5);
+	}
+
+	.Listbox .ListboxItem.active {
+		background-color: rgba(21,60,94,1);
+	}
+
+}
+
+/* Dialog */
+
+.Dialog {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.Dialog-background {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.Dialog-content {
+	position: relative;
+	background: #eee;
+	min-width: 300px;
+	max-width: 90%;
+	max-height: 90%;
+	overflow: auto;
+}
+
+.Dialog-title {
+	padding: 10px 15px;
+	color: #666;
+	text-transform: uppercase;
+}
+
+.Dialog-body {
+	padding: 15px;
+}
+
+.Dialog-body .Row {
+	display: flex;
+	align-items: center;
+	min-height: 24px;
+	margin-bottom: 10px;
+}
+
+.Dialog-body .Row .Label {
+	width: 120px;
+	color: #888;
+}
+
+.Dialog-buttons {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 15px;
+}
+
+@media ( prefers-color-scheme: dark ) {
+
+	.Dialog-content {
+		background: #111;
+	}
+
+	.Dialog-title {
+		color: #888;
+	}
+
+
+
+}
+
+/* Temporary Chrome fix (#24794) */
+
+[draggable="true"] {
+	transform: translate(0, 0);
+	z-index: 0;
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Cibles de rendu</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Cibles de rendu">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Cibles de rendu</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Une cible de rendu dans three.js est essentiellement une texture sur laquelle vous pouvez effectuer un rendu.
+Une fois le rendu effectué, vous pouvez utiliser cette texture comme n'importe quelle autre texture.</p>
+<p>Faisons un exemple simple. Nous allons commencer par un exemple tiré de <a href="responsive.html">l'article sur la responsivité</a>.</p>
+<p>Rendre sur une cible de rendu est presque exactement la même chose qu'un rendu normal. D'abord, nous créons un <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+const rtHeight = 512;
+const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+</pre>
+<p>Ensuite, nous avons besoin d'une <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> et d'une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+const rtAspect = rtWidth / rtHeight;
+const rtNear = 0.1;
+const rtFar = 5;
+const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+rtCamera.position.z = 2;
+
+const rtScene = new THREE.Scene();
+rtScene.background = new THREE.Color('red');
+</pre>
+<p>Notez que nous avons défini l'aspect sur celui de la cible de rendu, et non sur celui du canvas.
+Le bon aspect à utiliser dépend de ce pour quoi nous rendons. Dans ce cas,
+nous utiliserons la texture de la cible de rendu sur la face d'un cube. Puisque les faces de
+du cube sont carrées, nous voulons un aspect de 1.0.</p>
+<p>Nous remplissons la scène. Dans ce cas, nous utilisons la lumière et les 3 cubes <a href="responsive.html">de l'article précédent</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+*  rtScene.add(light);
+}
+
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+*  rtScene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+
+*const rtCubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre>
+<p>La <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> et la <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> de l'article précédent sont toujours là. Nous les utiliserons pour rendre sur le canvas.
+Il nous suffit d'ajouter des éléments à rendre.</p>
+<p>Ajoutons un cube qui utilise la texture de la cible de rendu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  map: renderTarget.texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+</pre>
+<p>Maintenant, au moment du rendu, nous rendons d'abord la scène de la cible de rendu sur la cible de rendu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  ...
+
+  // faire tourner tous les cubes dans la scène de la cible de rendu
+  rtCubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  // dessiner la scène de la cible de rendu sur la cible de rendu
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
+</pre>
+<p>Ensuite, nous rendons la scène avec le cube unique qui utilise la texture de la cible de rendu sur le canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // faire tourner le cube dans la scène
+  cube.rotation.x = time;
+  cube.rotation.y = time * 1.1;
+
+  // rendre la scène sur le canvas
+  renderer.render(scene, camera);
+</pre>
+<p>And voilà</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Le cube est rouge car nous avons défini le <code class="notranslate" translate="no">background</code> de la <code class="notranslate" translate="no">rtScene</code> sur rouge, de sorte que la
+texture de la cible de rendu est effacée en rouge.</p>
+<p>Les cibles de rendu sont utilisées pour toutes sortes de choses. <a href="shadows.html">Les ombres</a> utilisent des cibles de rendu.
+<a href="picking.html">La sélection (picking) peut utiliser une cible de rendu</a>. Divers types d'<a href="post-processing.html">effets de post-traitement</a>
+nécessitent des cibles de rendu. Rendre un rétroviseur dans une voiture ou une vue en direct sur un moniteur à l'intérieur d'une scène 3D
+pourrait utiliser une cible de rendu.</p>
+<p>Quelques notes sur l'utilisation de <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<ul>
+<li><p>Par défaut, <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> crée 2 textures. Une texture de couleur et une texture de profondeur/stencil. Si vous n'avez pas besoin des textures de profondeur ou de stencil, vous pouvez demander à ne pas les créer en passant des options. Exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+</pre>
+</li>
+<li><p>Vous pourriez avoir besoin de changer la taille d'une cible de rendu</p>
+<p>Dans l'exemple ci-dessus, nous créons une cible de rendu de taille fixe, 512x512. Pour des choses comme le post-traitement, vous devez généralement créer une cible de rendu de la même taille que votre canvas. Dans notre code, cela signifierait que lorsque nous changeons la taille du canvas, nous mettons également à jour la taille de la cible de rendu et la caméra que nous utilisons lors du rendu sur la cible de rendu. Exemple :</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+
++    renderTarget.setSize(canvas.width, canvas.height);
++    rtCamera.aspect = camera.aspect;
++    rtCamera.updateProjectionMatrix();
+}
+</pre></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <surfacematerial name="mat_ifgreater_blue" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
+  </surfacematerial>
+  <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" output="out" nodegraph="ifgreater_blue" />
+  </standard_surface>
+  <nodegraph name="ifgreater_blue">
+    <image name="input_image" type="float">
+      <input name="file" type="filename" value="resources/Images/grid.png" />
+      <input name="default" type="float" value="0.0" />
+    </image>
+    <!-- Output a gradient of blue based on the image value for debugging -->
+    <combine3 name="blue_gradient" type="color3">
+      <input name="in1" type="float" value="0.0" />
+      <input name="in2" type="float" value="0.0" />
+      <input name="in3" type="float" nodename="input_image" />
+    </combine3>
+    <!-- Use ifgreater to output bright blue above threshold, dark blue below -->
+    <ifgreater name="ifgreater1" type="color3">
+      <input name="value1" type="float" nodename="input_image" />
+      <input name="value2" type="float" value="0.5" />
+      <input name="in1" type="color3" value="0.2, 0.2, 1.0" /> <!-- bright blue -->
+      <input name="in2" type="color3" value="0.0, 0.0, 0.2" /> <!-- dark blue -->
+    </ifgreater>
+    <!-- Mix between the blue_gradient and the thresholded blue for debug visualization -->
+    <mix name="debug_mix" type="color3">
+      <input name="bg" type="color3" nodename="blue_gradient" />
+      <input name="fg" type="color3" nodename="ifgreater1" />
+      <input name="mix" type="float" value="0.5" />
+    </mix>
+    <output name="out" type="color3" nodename="debug_mix" />
+  </nodegraph>
+</materialx>

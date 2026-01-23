@@ -1,0 +1,294 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - WebXR - Look to Select w/cursor</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.xr.enabled = true;
+	document.body.appendChild( VRButton.createButton( renderer ) );
+
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 50;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.set( 0, 1.6, 0 );
+
+	const scene = new THREE.Scene();
+	{
+
+		const loader = new THREE.CubeTextureLoader();
+		const texture = loader.load( [
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+		] );
+		scene.background = texture;
+
+	}
+
+	{
+
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
+
+	}
+
+	function makeDataTexture( data, width, height ) {
+
+		const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+		texture.minFilter = THREE.NearestFilter;
+		texture.magFilter = THREE.NearestFilter;
+		texture.needsUpdate = true;
+		return texture;
+
+	}
+
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const boxGeometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
+
+	const sphereRadius = 0.5;
+	const sphereGeometry = new THREE.SphereGeometry( sphereRadius );
+
+	function makeInstance( geometry, color, x ) {
+
+		const material = new THREE.MeshPhongMaterial( { color } );
+
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		cube.position.x = x;
+		cube.position.y = 1.6;
+		cube.position.z = - 2;
+
+		return cube;
+
+	}
+
+	const meshToMeshMap = new Map();
+	[
+		{ x: 0, boxColor: 0x44aa88, sphereColor: 0xFF4444, },
+		{ x: 2, boxColor: 0x8844aa, sphereColor: 0x44FF44, },
+		{ x: - 2, boxColor: 0xaa8844, sphereColor: 0x4444FF, },
+	].forEach( ( info ) => {
+
+		const { x, boxColor, sphereColor } = info;
+		const sphere = makeInstance( sphereGeometry, sphereColor, x );
+		const box = makeInstance( boxGeometry, boxColor, x );
+		// hide the sphere
+		sphere.visible = false;
+		// map the sphere to the box
+		meshToMeshMap.set( box, sphere );
+		// map the box to the sphere
+		meshToMeshMap.set( sphere, box );
+
+	} );
+
+	class PickHelper {
+
+		constructor( camera ) {
+
+			this.raycaster = new THREE.Raycaster();
+			this.pickedObject = null;
+			this.pickedObjectSavedColor = 0;
+
+			const cursorColors = new Uint8Array( [
+				64, 64, 64, 64, // dark gray
+				255, 255, 255, 255, // white
+			] );
+			this.cursorTexture = makeDataTexture( cursorColors, 2, 1 );
+
+			const ringRadius = 0.4;
+			const tubeRadius = 0.1;
+			const tubeSegments = 4;
+			const ringSegments = 64;
+			const cursorGeometry = new THREE.TorusGeometry(
+				ringRadius, tubeRadius, tubeSegments, ringSegments );
+
+			const cursorMaterial = new THREE.MeshBasicMaterial( {
+				color: 'white',
+				map: this.cursorTexture,
+				transparent: true,
+				blending: THREE.CustomBlending,
+				blendSrc: THREE.OneMinusDstColorFactor,
+				blendDst: THREE.OneMinusSrcColorFactor,
+			} );
+			const cursor = new THREE.Mesh( cursorGeometry, cursorMaterial );
+			camera.add( cursor );
+			cursor.position.z = - 1;
+			const scale = 0.05;
+			cursor.scale.set( scale, scale, scale );
+			this.cursor = cursor;
+
+			this.selectTimer = 0;
+			this.selectDuration = 2;
+			this.lastTime = 0;
+
+		}
+		pick( normalizedPosition, scene, camera, time ) {
+
+			const elapsedTime = time - this.lastTime;
+			this.lastTime = time;
+
+			const lastPickedObject = this.pickedObject;
+			// restore the color if there is a picked object
+			if ( this.pickedObject ) {
+
+				this.pickedObject = undefined;
+
+			}
+
+			// cast a ray through the frustum
+			this.raycaster.setFromCamera( normalizedPosition, camera );
+			// get the list of objects the ray intersected
+			const intersectedObjects = this.raycaster.intersectObjects( scene.children );
+			if ( intersectedObjects.length ) {
+
+				// pick the first object. It's the closest one
+				this.pickedObject = intersectedObjects[ 0 ].object;
+
+			}
+
+			// show or hide cursor
+			this.cursor.visible = this.pickedObject ? true : false;
+
+			let selected = false;
+
+			// if we're looking at the same object as before
+			// increment time select timer
+			if ( this.pickedObject && lastPickedObject === this.pickedObject ) {
+
+				this.selectTimer += elapsedTime;
+				if ( this.selectTimer >= this.selectDuration ) {
+
+					this.selectTimer = 0;
+					selected = true;
+
+				}
+
+			} else {
+
+				this.selectTimer = 0;
+
+			}
+
+			// set cursor material to show the timer state
+			const fromStart = 0;
+			const fromEnd = this.selectDuration;
+			const toStart = - 0.5;
+			const toEnd = 0.5;
+			this.cursorTexture.offset.x = THREE.MathUtils.mapLinear(
+				this.selectTimer,
+				fromStart, fromEnd,
+				toStart, toEnd );
+
+			return selected ? this.pickedObject : undefined;
+
+		}
+
+	}
+
+	const pickHelper = new PickHelper( camera );
+	scene.add( camera );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		let ndx = 0;
+		for ( const mesh of meshToMeshMap.keys() ) {
+
+			const speed = 1 + ndx * .1;
+			const rot = time * speed;
+			mesh.rotation.x = rot;
+			mesh.rotation.y = rot;
+			++ ndx;
+
+		}
+
+		// 0, 0 is the center of the view in normalized coordinates.
+		const selectedObject = pickHelper.pick( { x: 0, y: 0 }, scene, camera, time );
+		if ( selectedObject ) {
+
+			selectedObject.visible = false;
+			const partnerObject = meshToMeshMap.get( selectedObject );
+			partnerObject.visible = true;
+
+		}
+
+		renderer.render( scene, camera );
+
+	}
+
+	renderer.setAnimationLoop( render );
+
+}
+
+main();
+</script>
+</html>

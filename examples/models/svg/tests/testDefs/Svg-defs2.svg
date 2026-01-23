@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by User:Pietn for Wikipedia -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="105"
+   height="85"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="Svg-defs2.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata15">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1489"
+     inkscape:window-height="909"
+     id="namedview13"
+     showgrid="false"
+     inkscape:zoom="2.7764706"
+     inkscape:cx="52.5"
+     inkscape:cy="42.5"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg11" />
+  <title
+     id="title2">...</title>
+  <defs
+     id="defs5">
+    <circle
+       r="30"
+       id="schijf" />
+  </defs>
+  <use
+     x="35"
+     y="35"
+     xlink:href="#schijf"
+     fill="darkorchid"
+     id="use7" />
+  <use
+     x="70"
+     y="50"
+     xlink:href="#schijf"
+     id="use9"
+     transform="matrix(1,0,0,1.2221045,0,-17.768362)"
+     style="fill:#ff4500"
+     width="100%"
+     height="100%" />
+</svg>

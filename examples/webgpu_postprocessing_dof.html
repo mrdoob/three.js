@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing dof</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>DoF</span>
+			</div>
+
+			<small>High-Quality Depth-of-Field effect.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { cubeTexture, positionWorld, oscSine, time, pass, uniform } from 'three/tsl';
+			import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			//
+
+			let camera, scene, renderer, mesh, controls;
+
+			let width = window.innerWidth;
+			let height = window.innerHeight;
+
+			let renderPipeline;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 3500 );
+				camera.position.z = 200;
+
+				scene = new THREE.Scene();
+
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				const xgrid = 14, ygrid = 9, zgrid = 14;
+				const count = xgrid * ygrid * zgrid;
+
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
+				const cubeTextureNode = cubeTexture( textureCube );
+				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( time.mul( .2 ) ) );
+
+				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = cubeTextureNode.mul( oscPos );
+
+				mesh = new THREE.InstancedMesh( geometry, material, count );
+				scene.add( mesh );
+
+				const matrix = new THREE.Matrix4();
+
+				let index = 0;
+
+				for ( let i = 0; i < xgrid; i ++ ) {
+
+					for ( let j = 0; j < ygrid; j ++ ) {
+
+						for ( let k = 0; k < zgrid; k ++ ) {
+
+							const x = 200 * ( i - xgrid / 2 );
+							const y = 200 * ( j - ygrid / 2 );
+							const z = 200 * ( k - zgrid / 2 );
+
+							mesh.setMatrixAt( index, matrix.identity().setPosition( x, y, z ) );
+							index ++;
+
+						}
+
+					}
+
+				}
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				const effectController = {
+					focusDistance: uniform( 500 ),
+					focalLength: uniform( 200 ),
+					bokehScale: uniform( 10 )
+				};
+
+				// post processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+
+				const scenePassColor = scenePass.getTextureNode().toInspector( 'Color' );
+				const scenePassViewZ = scenePass.getViewZNode();
+
+				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focusDistance, effectController.focalLength, effectController.bokehScale );
+
+				renderPipeline.outputNode = dofPass;
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( effectController.focusDistance, 'value', 10.0, 3000.0 ).name( 'focus distance' );
+				gui.add( effectController.focalLength, 'value', 50, 750 ).name( 'focal length' );
+				gui.add( effectController.bokehScale, 'value', 1, 20 ).name( 'bokeh scale' );
+
+			}
+
+			function onWindowResize() {
+
+				width = window.innerWidth;
+				height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - galaxy</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Galaxy</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/animated-galaxy" target="_blank" rel="noopener">Three.js Journey</a> lessons.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { color, cos, float, mix, range, sin, time, uniform, uv, vec3, vec4, TWO_PI } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, controls;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 4, 2, 5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x201919 );
+
+				// galaxy
+
+				const material = new THREE.SpriteNodeMaterial( {
+					depthWrite: false,
+					blending: THREE.AdditiveBlending
+				} );
+
+				const size = uniform( 0.08 );
+				material.scaleNode = range( 0, 1 ).mul( size );
+
+				const radiusRatio = range( 0, 1 );
+				const radius = radiusRatio.pow( 1.5 ).mul( 5 ).toVar();
+
+				const branches = 3;
+				const branchAngle = range( 0, branches ).floor().mul( TWO_PI.div( branches ) );
+				const angle = branchAngle.add( time.mul( radiusRatio.oneMinus() ) );
+
+				const position = vec3(
+					cos( angle ),
+					0,
+					sin( angle )
+				).mul( radius );
+
+				const randomOffset = range( vec3( - 1 ), vec3( 1 ) ).pow3().mul( radiusRatio ).add( 0.2 );
+
+				material.positionNode = position.add( randomOffset );
+
+				const colorInside = uniform( color( '#ffa575' ) );
+				const colorOutside = uniform( color( '#311599' ) );
+				const colorFinal = mix( colorInside, colorOutside, radiusRatio.oneMinus().pow( 2 ).oneMinus() );
+				const alpha = float( 0.1 ).div( uv().sub( 0.5 ).length() ).sub( 0.2 );
+				material.colorNode = vec4( colorFinal, alpha );
+
+				const mesh = new THREE.InstancedMesh( new THREE.PlaneGeometry( 1, 1 ), material, 20000 );
+				scene.add( mesh );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 0.1;
+				controls.maxDistance = 50;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// debug
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+
+				gui.add( size, 'value', 0, 1, 0.001 ).name( 'size' );
+
+				gui.addColor( { color: colorInside.value.getHex( THREE.SRGBColorSpace ) }, 'color' )
+					.name( 'colorInside' )
+					.onChange( function ( value ) {
+
+						colorInside.value.set( value );
+
+					} );
+
+				gui.addColor( { color: colorOutside.value.getHex( THREE.SRGBColorSpace ) }, 'color' )
+					.name( 'colorOutside' )
+					.onChange( function ( value ) {
+
+						colorOutside.value.set( value );
+
+					} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

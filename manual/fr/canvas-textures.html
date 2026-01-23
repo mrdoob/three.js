@@ -1,0 +1,403 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Textures sur Canvas</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Textures sur Canvas">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Textures sur Canvas</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Cet article fait suite à <a href="textures.html">l'article sur les textures</a>.
+Si vous ne l'avez pas encore lu, vous devriez probablement commencer par là.</p>
+<p>Dans <a href="textures.html">l'article précédent sur les textures</a>, nous avons principalement utilisé
+des fichiers image pour les textures. Cependant, il arrive parfois que nous souhaitions générer une texture
+à l'exécution. Une façon de procéder est d'utiliser une <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>.</p>
+<p>Une texture sur canvas prend un <code class="notranslate" translate="no">&lt;canvas&gt;</code> en entrée. Si vous ne savez pas comment
+dessiner avec l'API canvas 2D sur un canvas, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial">il existe un bon tutoriel sur MDN</a>.</p>
+<p>Créons un simple programme canvas. En voici un qui dessine des points à des endroits aléatoires et dans des couleurs aléatoires.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ctx = document.createElement('canvas').getContext('2d');
+document.body.appendChild(ctx.canvas);
+ctx.canvas.width = 256;
+ctx.canvas.height = 256;
+ctx.fillStyle = '#FFF';
+ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+function randInt(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.random() * (max - min) + min | 0;
+}
+
+function drawRandomDot() {
+  ctx.fillStyle = `#${randInt(0x1000000).toString(16).padStart(6, '0')}`;
+  ctx.beginPath();
+
+  const x = randInt(256);
+  const y = randInt(256);
+  const radius = randInt(10, 64);
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function render() {
+  drawRandomDot();
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</pre>
+<p>C'est assez simple.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-random-dots.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/canvas-random-dots.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Utilisons-le maintenant pour texturer quelque chose. Nous allons commencer avec l'exemple de texturation
+d'un cube tiré de <a href="textures.html">l'article précédent</a>.
+Nous allons supprimer le code qui charge une image et utiliser à la place
+notre canvas en créant une <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> et en lui passant le canvas que nous avons créé.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [];  // juste un tableau que nous pouvons utiliser pour faire tourner les cubes
+-const loader = new THREE.TextureLoader();
+-
++const ctx = document.createElement('canvas').getContext('2d');
++ctx.canvas.width = 256;
++ctx.canvas.height = 256;
++ctx.fillStyle = '#FFF';
++ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
++const texture = new THREE.CanvasTexture(ctx.canvas);
+
+const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('resources/images/wall.jpg'),
++  map: texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+cubes.push(cube);  // add to our list of cubes to rotate
+</pre>
+<p>Puis appelez le code pour dessiner un point aléatoire dans notre boucle de rendu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  drawRandomDot();
++  texture.needsUpdate = true;
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = .2 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>La seule chose supplémentaire que nous devons faire est de définir la propriété <code class="notranslate" translate="no">needsUpdate</code>
+de la <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> pour indiquer à three.js de mettre à jour la texture avec
+le contenu le plus récent du canvas.</p>
+<p>Et avec cela, nous avons un cube texturé sur canvas.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-cube.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/canvas-textured-cube.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Notez que si vous souhaitez utiliser three.js pour dessiner dans le canvas, vous êtes
+il est préférable d'utiliser un <code class="notranslate" translate="no">RenderTarget</code>, ce qui est abordé dans <a href="rendertargets.html">cet article</a>.</p>
+<p>Un cas d'utilisation courant pour les textures sur canvas est d'afficher du texte dans une scène.
+Par exemple, si vous vouliez afficher le nom d'une personne sur le badge de son personnage,
+vous pourriez utiliser une texture sur canvas pour texturer le badge.</p>
+<p>Créons une scène avec 3 personnes et donnons à chaque personne un badge
+ou une étiquette.</p>
+<p>Reprenons l'exemple ci-dessus et supprimons tout ce qui est lié au cube. Ensuite, mettons le fond en blanc et ajoutons deux <a href="lights.html">lumières</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color('white');
++
++function addLight(position) {
++  const color = 0xFFFFFF;
++  const intensity = 1;
++  const light = new THREE.DirectionalLight(color, intensity);
++  light.position.set(...position);
++  scene.add(light);
++  scene.add(light.target);
++}
++addLight([-3, 1, 1]);
++addLight([ 2, 1, .5]);
+</pre>
+<p>Écrivons du code pour créer une étiquette en utilisant le canvas 2D.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makeLabelCanvas(size, name) {
++  const borderSize = 2;
++  const ctx = document.createElement('canvas').getContext('2d');
++  const font =  `${size}px bold sans-serif`;
++  ctx.font = font;
++  // mesurer la longueur du nom
++  const doubleBorderSize = borderSize * 2;
++  const width = ctx.measureText(name).width + doubleBorderSize;
++  const height = size + doubleBorderSize;
++  ctx.canvas.width = width;
++  ctx.canvas.height = height;
++
++  // besoin de redéfinir la police après avoir redimensionné le canvas
++  ctx.font = font;
++  ctx.textBaseline = 'top';
++
++  ctx.fillStyle = 'blue';
++  ctx.fillRect(0, 0, width, height);
++  ctx.fillStyle = 'white';
++  ctx.fillText(name, borderSize, borderSize);
++
++  return ctx.canvas;
++}
+</pre>
+<p>Ensuite, nous allons créer des personnages simples à partir d'un cylindre pour le corps, d'une sphère
+pour la tête et d'un plan pour l'étiquette.</p>
+<p>Commençons par créer la géométrie partagée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const bodyRadiusTop = .4;
++const bodyRadiusBottom = .2;
++const bodyHeight = 2;
++const bodyRadialSegments = 6;
++const bodyGeometry = new THREE.CylinderGeometry(
++    bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments);
++
++const headRadius = bodyRadiusTop * 0.8;
++const headLonSegments = 12;
++const headLatSegments = 5;
++const headGeometry = new THREE.SphereGeometry(
++    headRadius, headLonSegments, headLatSegments);
++
++const labelGeometry = new THREE.PlaneGeometry(1, 1);
+</pre>
+<p>Ensuite, créons une fonction pour construire une personne à partir de ces
+éléments.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makePerson(x, size, name, color) {
++  const canvas = makeLabelCanvas(size, name);
++  const texture = new THREE.CanvasTexture(canvas);
++  // parce que notre canvas n'est probablement pas une puissance de 2
++  // dans les deux dimensions, définissez le filtrage de manière appropriée.
++  texture.minFilter = THREE.LinearFilter;
++  texture.wrapS = THREE.ClampToEdgeWrapping;
++  texture.wrapT = THREE.ClampToEdgeWrapping;
++
++  const labelMaterial = new THREE.MeshBasicMaterial({
++    map: texture,
++    side: THREE.DoubleSide,
++    transparent: true,
++  });
++  const bodyMaterial = new THREE.MeshPhongMaterial({
++    color,
++    flatShading: true,
++  });
++
++  const root = new THREE.Object3D();
++  root.position.x = x;
++
++  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
++  root.add(body);
++  body.position.y = bodyHeight / 2;
++
++  const head = new THREE.Mesh(headGeometry, bodyMaterial);
++  root.add(head);
++  head.position.y = bodyHeight + headRadius * 1.1;
++
++  const label = new THREE.Mesh(labelGeometry, labelMaterial);
++  root.add(label);
++  label.position.y = bodyHeight * 4 / 5;
++  label.position.z = bodyRadiusTop * 1.01;
++
++  // si les unités sont des mètres, alors 0.01 ici ajuste la taille
++  // de l'étiquette en centimètres.
++  const labelBaseScale = 0.01;
++  label.scale.x = canvas.width  * labelBaseScale;
++  label.scale.y = canvas.height * labelBaseScale;
++
++  scene.add(root);
++  return root;
++}
+</pre>
+<p>Vous pouvez voir ci-dessus que nous plaçons le corps, la tête et l'étiquette sur un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> racine et ajustons leurs positions. Cela nous permettrait de déplacer l'objet racine si nous voulions déplacer les personnages. Le corps mesure 2 unités de haut. Si 1 unité équivaut à 1 mètre, alors le code ci-dessus tente de créer l'étiquette en centimètres, de sorte qu'elle mesurera 'size' centimètres de haut et la largeur nécessaire pour contenir le texte.</p>
+<p>Nous pouvons ensuite créer des personnages avec des étiquettes.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+makePerson(-3, 32, 'Purple People Eater', 'purple');
++makePerson(-0, 32, 'Green Machine', 'green');
++makePerson(+3, 32, 'Red Menace', 'red');
+</pre>
+<p>Il ne reste plus qu'à ajouter des <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>
+afin de pouvoir déplacer la caméra.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 50;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.set(0, 2, 5);
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 2, 0);
++controls.update();
+</pre>
+<p>et nous obtenons des étiquettes simples.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/canvas-textured-labels.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Quelques points à noter.</p>
+<ul>
+<li>Si vous zoomez, les étiquettes deviennent de faible résolution.</li>
+</ul>
+<p>Il n'y a pas de solution simple. Il existe des techniques de rendu de police plus complexes, mais je ne connais pas de solutions sous forme de plugin. De plus, elles nécessiteraient que l'utilisateur télécharge les données de la police, ce qui serait lent.</p>
+<p>Une solution consiste à augmenter la résolution des étiquettes.
+Essayez de doubler la taille passée en paramètre et de diviser par deux la valeur actuelle de <code class="notranslate" translate="no">labelBaseScale</code>.</p>
+<ul>
+<li>Les étiquettes s'allongent plus le nom est long.</li>
+</ul>
+<p>Si vous vouliez résoudre ce problème, vous choisiriez plutôt une étiquette de taille fixe et compresseriez le texte.</p>
+<p>C'est assez facile. Passez une largeur de base et adaptez le texte à cette largeur comme ceci :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeLabelCanvas(size, name) {
++function makeLabelCanvas(baseWidth, size, name) {
+  const borderSize = 2;
+-  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${size}px bold sans-serif`;
+  ctx.font = font;
+  // mesurer la longueur du nom
++  const textWidth = ctx.measureText(name).width;
+
+  const doubleBorderSize = borderSize * 2;
+-  const width = ctx.measureText(name).width + doubleBorderSize;
++  const width = baseWidth + doubleBorderSize;
+  const height = size + doubleBorderSize;
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
+
+  // besoin de redéfinir la police après avoir redimensionné le canvas
+  ctx.font = font;
+-  ctx.textBaseline = 'top';
++  ctx.textBaseline = 'middle';
++  ctx.textAlign = 'center';
+
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(0, 0, width, height);
+
++  // adapter à la taille mais ne pas étirer
++  const scaleFactor = Math.min(1, baseWidth / textWidth);
++  ctx.translate(width / 2, height / 2);
++  ctx.scale(scaleFactor, 1);
+  ctx.fillStyle = 'white';
+  ctx.fillText(name, borderSize, borderSize);
+
+  return ctx.canvas;
+}
+</pre>
+<p>Nous pouvons ensuite passer une largeur pour les étiquettes.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makePerson(x, size, name, color) {
+-  const canvas = makeLabelCanvas(size, name);
++function makePerson(x, labelWidth, size, name, color) {
++  const canvas = makeLabelCanvas(labelWidth, size, name);
+
+...
+
+}
+
+-makePerson(-3, 32, 'Purple People Eater', 'purple');
+-makePerson(-0, 32, 'Green Machine', 'green');
+-makePerson(+3, 32, 'Red Menace', 'red');
++makePerson(-3, 150, 32, 'Purple People Eater', 'purple');
++makePerson(-0, 150, 32, 'Green Machine', 'green');
++makePerson(+3, 150, 32, 'Red Menace', 'red');
+</pre>
+<p>et nous obtenons des étiquettes dont le texte est centré et adapté à la taille.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels-scale-to-fit.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/canvas-textured-labels-scale-to-fit.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Ci-dessus, nous avons utilisé un nouveau canvas pour chaque texture. Utiliser ou non un canvas par texture dépend de vous. Si vous avez besoin de les mettre à jour souvent, avoir un canvas par texture est probablement la meilleure option. Si elles sont rarement ou jamais mises à jour, vous pouvez choisir d'utiliser un seul canvas pour plusieurs textures en forçant three.js à utiliser la texture. Modifions le code ci-dessus pour faire exactement cela.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const ctx = document.createElement('canvas').getContext('2d');
+
+function makeLabelCanvas(baseWidth, size, name) {
+  const borderSize = 2;
+-  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${size}px bold sans-serif`;
+
+  ...
+
+}
+
++const forceTextureInitialization = function() {
++  const material = new THREE.MeshBasicMaterial();
++  const geometry = new THREE.PlaneGeometry();
++  const scene = new THREE.Scene();
++  scene.add(new THREE.Mesh(geometry, material));
++  const camera = new THREE.Camera();
++
++  return function forceTextureInitialization(texture) {
++    material.map = texture;
++    renderer.render(scene, camera);
++  };
++}();
+
+function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // parce que notre canvas n'est probablement pas une puissance de 2
+  // dans les deux dimensions, définissez le filtrage de manière appropriée.
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
++  forceTextureInitialization(texture);
+
+  ...
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels-one-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/canvas-textured-labels-one-canvas.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Un autre problème est que les étiquettes ne font pas toujours face à la caméra. Si vous utilisez les étiquettes comme des badges, c'est probablement une bonne chose. Si vous utilisez les étiquettes pour afficher les noms des joueurs dans un jeu en 3D, vous pourriez vouloir que les étiquettes fassent toujours face à la caméra. Nous aborderons comment faire cela dans <a href="billboards.html">un article sur les billboards</a>.</p>
+<p>Pour les étiquettes en particulier, <a href="align-html-elements-to-3d.html">une autre solution consiste à utiliser le HTML</a>. Les étiquettes dans cet article sont <em>à l'intérieur du monde 3D</em>, ce qui est bien si vous voulez qu'elles soient cachées par d'autres objets, tandis que les <a href="align-html-elements-to-3d.html">étiquettes HTML</a> sont toujours au-dessus.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

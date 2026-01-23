@@ -1,0 +1,492 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Optimize Lots of Objects Animated</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Optimize Lots of Objects Animated">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Optimize Lots of Objects Animated</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>This article is a continuation of <a href="optimize-lots-of-objects.html">an article about optimizing lots of objects
+</a>. If you haven't read that
+yet please read it before proceeding. </p>
+<p>In the previous article we merged around 19000 cubes into a
+single geometry. This had the advantage that it optimized our drawing
+of 19000 cubes but it had the disadvantage of make it harder to
+move any individual cube.</p>
+<p>Depending on what we are trying to accomplish there are different solutions.
+In this case let's graph multiple sets of data and animate between the sets.</p>
+<p>The first thing we need to do is get multiple sets of data. Ideally we'd
+probably pre-process data offline but in this case let's load 2 sets of
+data and generate 2 more</p>
+<p>Here's our old loading code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+  .then(parseData)
+  .then(addBoxes)
+  .then(render);
+</pre>
+<p>Let's change it to something like this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadData(info) {
+  const text = await loadFile(info.url);
+  info.file = parseData(text);
+}
+
+async function loadAll() {
+  const fileInfos = [
+    {name: 'men',   hueRange: [0.7, 0.3], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+    {name: 'women', hueRange: [0.9, 1.1], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+  ];
+
+  await Promise.all(fileInfos.map(loadData));
+
+  ...
+}
+loadAll();
+</pre>
+<p>The code above will load all the files in <code class="notranslate" translate="no">fileInfos</code> and when done each object
+in <code class="notranslate" translate="no">fileInfos</code> will have a <code class="notranslate" translate="no">file</code> property with the loaded file. <code class="notranslate" translate="no">name</code> and <code class="notranslate" translate="no">hueRange</code>
+we'll use later. <code class="notranslate" translate="no">name</code> will be for a UI field. <code class="notranslate" translate="no">hueRange</code> will be used to
+choose a range of hues to map over.</p>
+<p>The two files above are apparently the number of men per area and the number of
+women per area as of 2010. Note, I have no idea if this data is correct but
+it's not important really. The important part is showing different sets
+of data.</p>
+<p>Let's generate 2 more sets of data. One being the places where the number
+men are greater than the number of women and vice versa, the places where
+the number of women are greater than the number of men. </p>
+<p>The first thing let's write a function that given a 2 dimensional array
+of arrays like we had before will map over it to generate a new 2 dimensional
+array of arrays</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function mapValues(data, fn) {
+  return data.map((row, rowNdx) =&gt; {
+    return row.map((value, colNdx) =&gt; {
+      return fn(value, rowNdx, colNdx);
+    });
+  });
+}
+</pre>
+<p>Like the normal <code class="notranslate" translate="no">Array.map</code> function the <code class="notranslate" translate="no">mapValues</code> function calls a function
+<code class="notranslate" translate="no">fn</code> for each value in the array of arrays. It passes it the value and both the
+row and column indices.</p>
+<p>Now let's make some code to generate a new file that is a comparison between 2
+files</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDiffFile(baseFile, otherFile, compareFn) {
+  let min;
+  let max;
+  const baseData = baseFile.data;
+  const otherData = otherFile.data;
+  const data = mapValues(baseData, (base, rowNdx, colNdx) =&gt; {
+    const other = otherData[rowNdx][colNdx];
+      if (base === undefined || other === undefined) {
+        return undefined;
+      }
+      const value = compareFn(base, other);
+      min = Math.min(min === undefined ? value : min, value);
+      max = Math.max(max === undefined ? value : max, value);
+      return value;
+  });
+  // make a copy of baseFile and replace min, max, and data
+  // with the new data
+  return {...baseFile, min, max, data};
+}
+</pre>
+<p>The code above uses <code class="notranslate" translate="no">mapValues</code> to generate a new set of data that is
+a comparison based on the <code class="notranslate" translate="no">compareFn</code> function passed in. It also tracks
+the <code class="notranslate" translate="no">min</code> and <code class="notranslate" translate="no">max</code> comparison results. Finally it makes a new file with
+all the same properties as <code class="notranslate" translate="no">baseFile</code> except with a new <code class="notranslate" translate="no">min</code>, <code class="notranslate" translate="no">max</code> and <code class="notranslate" translate="no">data</code>.</p>
+<p>Then let's use that to make 2 new sets of data</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const menInfo = fileInfos[0];
+  const womenInfo = fileInfos[1];
+  const menFile = menInfo.file;
+  const womenFile = womenInfo.file;
+
+  function amountGreaterThan(a, b) {
+    return Math.max(a - b, 0);
+  }
+  fileInfos.push({
+    name: '&gt;50%men',
+    hueRange: [0.6, 1.1],
+    file: makeDiffFile(menFile, womenFile, (men, women) =&gt; {
+      return amountGreaterThan(men, women);
+    }),
+  });
+  fileInfos.push({
+    name: '&gt;50% women',
+    hueRange: [0.0, 0.4],
+    file: makeDiffFile(womenFile, menFile, (women, men) =&gt; {
+      return amountGreaterThan(women, men);
+    }),
+  });
+}
+</pre>
+<p>Now let's generate a UI to select between these sets of data. First we need
+some UI html</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="ui"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>and some CSS to make it appear in the top left area</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+}
+#ui&gt;div {
+  font-size: 20pt;
+  padding: 1em;
+  display: inline-block;
+}
+#ui&gt;div.selected {
+  color: red;
+}
+</pre>
+<p>Then we can go over each file and generate a set of merged boxes per
+set of data and an element which when hovered over will show that set
+and hide all others.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
+  fileInfos.forEach((info) =&gt; {
+    const visible = fileInfo === info;
+    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
+  });
+  requestRenderIfNotRequested();
+}
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+  const boxes = addBoxes(info.file, info.hueRange);
+  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  div.addEventListener('mouseover', () =&gt; {
+    showFileInfo(fileInfos, info);
+  });
+});
+// show the first set of data
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>The one more change we need from the previous example is we need to make
+<code class="notranslate" translate="no">addBoxes</code> take a <code class="notranslate" translate="no">hueRange</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
++function addBoxes(file, hueRange) {
+
+  ...
+
+    // compute a color
+-    const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
++    const hue = THREE.MathUtils.lerp(...hueRange, amount);
+
+  ...
+</pre>
+<p>and with that we should be able to show 4 sets of data. Hover the mouse over the labels
+or touch them to switch sets</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-multiple-data-sets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-multiple-data-sets.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Note, there are a few strange data points that really stick out. I wonder what's up
+with those!??! In any case how do we animate between these 4 sets of data.</p>
+<p>Lots of ideas.</p>
+<ul>
+<li><p>Just fade between them using <a href="/docs/#api/en/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a></p>
+<p>The problem with this solution is the cubes perfectly overlap which
+means there will be z-fighting issues. It's possible we could fix
+that by changing the depth function and using blending. We should
+probably look into it.</p>
+</li>
+<li><p>Scale up the set we want to see and scale down the other sets</p>
+<p>Because all the boxes have their origin at the center of the planet
+if we scale them below 1.0 they will sink into the planet. At first that
+sounds like a good idea but the issue is all the low height boxes
+will disappear almost immediately and not be replaced until the new
+data set scales up to 1.0. This makes the transition not very pleasant.
+We could maybe fix that with a fancy custom shader.</p>
+</li>
+<li><p>Use Morphtargets</p>
+<p>Morphtargets are a way were we supply multiple values for each vertex
+in the geometry and <em>morph</em> or lerp (linear interpolate) between them.
+Morphtargets are most commonly used for facial animation of 3D characters
+but that's not their only use.</p>
+</li>
+</ul>
+<p>Let's try morphtargets.</p>
+<p>We'll still make a geometry for each set of data but we'll then extract
+the <code class="notranslate" translate="no">position</code> attribute from each one and use them as morphtargets.</p>
+<p>First let's change <code class="notranslate" translate="no">addBoxes</code> to just make and return the merged geometry.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file, hueRange) {
++function makeBoxes(file, hueRange) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
+-      geometries, false);
+-  const material = new THREE.MeshBasicMaterial({
+-    vertexColors: true,
+-  });
+-  const mesh = new THREE.Mesh(mergedGeometry, material);
+-  scene.add(mesh);
+-  return mesh;
++  return BufferGeometryUtils.mergeGeometries(
++     geometries, false);
+}
+</pre>
+<p>There's one more thing we need to do here though. Morphtargets are required to
+all have exactly the same number of vertices. Vertex #123 in one target needs
+have a corresponding Vertex #123 in all other targets. But, as it is now
+different data sets might have some data points with no data so no box will be
+generated for that point which would mean no corresponding vertices for another
+set. So, we need to check across all data sets and either always generate
+something if there is data in any set or, generate nothing if there is data
+missing in any set. Let's do the latter.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dataMissingInAnySet(fileInfos, latNdx, lonNdx) {
++  for (const fileInfo of fileInfos) {
++    if (fileInfo.file.data[latNdx][lonNdx] === undefined) {
++      return true;
++    }
++  }
++  return false;
++}
+
+-function makeBoxes(file, hueRange) {
++function makeBoxes(file, hueRange, fileInfos) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+  const geometries = [];
+  data.forEach((row, latNdx) =&gt; {
+    row.forEach((value, lonNdx) =&gt; {
++      if (dataMissingInAnySet(fileInfos, latNdx, lonNdx)) {
++        return;
++      }
+      const amount = (value - min) / range;
+
+  ...
+</pre>
+<p>Now we'll change the code that was calling <code class="notranslate" translate="no">addBoxes</code> to use <code class="notranslate" translate="no">makeBoxes</code>
+and setup morphtargets</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// make geometry for each data set
++const geometries = fileInfos.map((info) =&gt; {
++  return makeBoxes(info.file, info.hueRange, fileInfos);
++});
++
++// use the first geometry as the base
++// and add all the geometries as morphtargets
++const baseGeometry = geometries[0];
++baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('position');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++const material = new THREE.MeshBasicMaterial({
++  vertexColors: true,
++});
++const mesh = new THREE.Mesh(baseGeometry, material);
++scene.add(mesh);
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+-  const boxes = addBoxes(info.file, info.hueRange);
+-  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  function show() {
+    showFileInfo(fileInfos, info);
+  }
+  div.addEventListener('mouseover', show);
+  div.addEventListener('touchstart', show);
+});
+// show the first set of data
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>Above we make geometry for each data set, use the first one as the base,
+then get a <code class="notranslate" translate="no">position</code> attribute from each geometry and add it as
+a morphtarget to the base geometry for <code class="notranslate" translate="no">position</code>.</p>
+<p>Now we need to change how we're showing and hiding the various data sets.
+Instead of showing or hiding a mesh we need to change the influence of the
+morphtargets. For the data set we want to see we need to have an influence of 1
+and for all the ones we don't want to see to we need to have an influence of 0.</p>
+<p>We could just set them to 0 or 1 directly but if we did that we wouldn't see any
+animation, it would just snap which would be no different than what we already
+have. We could also write some custom animation code which would be easy but
+because the original webgl globe uses
+<a href="https://github.com/tweenjs/tween.js/">an animation library</a> let's use the same one here.</p>
+<p>We need to include the library</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
+</pre>
+<p>And then create a <code class="notranslate" translate="no">Tween</code> to animate the influences.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
++  const targets = {};
+-  fileInfos.forEach((info) =&gt; {
++  fileInfos.forEach((info, i) =&gt; {
+    const visible = fileInfo === info;
+-    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
++    targets[i] = visible ? 1 : 0;
+  });
++  const durationInMs = 1000;
++  new TWEEN.Tween(mesh.morphTargetInfluences)
++    .to(targets, durationInMs)
++    .start();
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>We're also suppose to call <code class="notranslate" translate="no">TWEEN.update</code> every frame inside our render loop
+but that points out a problem. "tween.js" is designed for continuous rendering
+but we are <a href="rendering-on-demand.html">rendering on demand</a>. We could
+switch to continuous rendering but it's sometimes nice to only render on demand
+as it well stop using the user's power when nothing is happening
+so let's see if we can make it animate on demand.</p>
+<p>We'll make a <code class="notranslate" translate="no">TweenManager</code> to help. We'll use it to create the <code class="notranslate" translate="no">Tween</code>s and
+track them. It will have an <code class="notranslate" translate="no">update</code> method that will return <code class="notranslate" translate="no">true</code>
+if we need to call it again and <code class="notranslate" translate="no">false</code> if all the animations are finished.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class TweenManger {
+  constructor() {
+    this.numTweensRunning = 0;
+  }
+  _handleComplete() {
+    --this.numTweensRunning;
+    console.assert(this.numTweensRunning &gt;= 0);
+  }
+  createTween(targetObject) {
+    const self = this;
+    ++this.numTweensRunning;
+    let userCompleteFn = () =&gt; {};
+    // create a new tween and install our own onComplete callback
+    const tween = new TWEEN.Tween(targetObject).onComplete(function(...args) {
+      self._handleComplete();
+      userCompleteFn.call(this, ...args);
+    });
+    // replace the tween's onComplete function with our own
+    // so we can call the user's callback if they supply one.
+    tween.onComplete = (fn) =&gt; {
+      userCompleteFn = fn;
+      return tween;
+    };
+    return tween;
+  }
+  update() {
+    TWEEN.update();
+    return this.numTweensRunning &gt; 0;
+  }
+}
+</pre>
+<p>To use it we'll create one </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const tweenManager = new TweenManger();
+
+  ...
+</pre>
+<p>We'll use it to create our <code class="notranslate" translate="no">Tween</code>s.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
+  const targets = {};
+  fileInfos.forEach((info, i) =&gt; {
+    const visible = fileInfo === info;
+    info.elem.className = visible ? 'selected' : '';
+    targets[i] = visible ? 1 : 0;
+  });
+  const durationInMs = 1000;
+-  new TWEEN.Tween(mesh.morphTargetInfluences)
++  tweenManager.createTween(mesh.morphTargetInfluences)
+    .to(targets, durationInMs)
+    .start();
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>Then we'll update our render loop to update the tweens and keep rendering
+if there are still animations running.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  if (tweenManager.update()) {
++    requestRenderIfNotRequested();
++  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+render();
+</pre>
+<p>And with that we should be animating between data sets.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>I hope going through this was helpful. Using morphtargets is a common technique to
+move lots of objects. As an example we could give every cube a random place in
+another target and morph from that to their first positions on the globe. That
+might be a cool way to introduce the globe.</p>
+<p>Next you might be interested in adding labels to a globe which is covered
+in <a href="align-html-elements-to-3d.html">Aligning HTML Elements to 3D</a>.</p>
+<p>Note: We could try to just graph percent of men or percent of women or the raw
+difference but based on how we are displaying the info, cubes that grow from the
+surface of the earth, we'd prefer most cubes to be low. If we used one of these
+other comparisons most cubes would be about 1/2 their maximum height which would
+not make a good visualization. Feel free to change the <code class="notranslate" translate="no">amountGreaterThan</code> from
+<a href="/docs/#api/en/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> to something like <code class="notranslate" translate="no">(a - b)</code> "raw difference" or <code class="notranslate" translate="no">a / (a +
+b)</code> "percent" and you'll see what I mean.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

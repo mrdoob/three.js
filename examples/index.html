@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js examples</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
+		<link rel="stylesheet" type="text/css" href="../files/main.css">
+	</head>
+	<body>
+
+		<div id="panel">
+
+			<div id="header" translate="no">
+				<h1><a href="https://threejs.org">three.js</a></h1>
+
+				<div id="sections">
+					<span class="selected">examples</span>
+				</div>
+
+				<div id="expandButton"></div>
+			</div>
+
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="clearSearchButton"></div>
+				</div>
+
+				<div id="content">
+					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
+				</div>
+			</div>
+
+		</div>
+
+		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
+
+		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
+
+		<script>
+
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const viewer = document.getElementById( 'viewer' );
+		const filterInput = document.getElementById( 'filterInput' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const viewSrcButton = document.getElementById( 'button' );
+		const panelScrim = document.getElementById( 'panelScrim' );
+		const previewsToggler = document.getElementById( 'previewsToggler' );
+
+		const links = {};
+		const validRedirects = new Map();
+		const fragment = document.createDocumentFragment();
+
+		let selected = null;
+
+		init();
+
+		async function init() {
+
+			viewSrcButton.style.display = 'none';
+
+			const files = await ( await fetch( 'files.json' ) ).json();
+			const tags = await ( await fetch( 'tags.json' ) ).json();
+
+			for ( const key in files ) {
+
+				const category = files[ key ];
+
+				const header = document.createElement( 'h2' );
+				header.textContent = key;
+				header.setAttribute( 'data-category', key );
+				fragment.appendChild( header );
+
+				for ( let i = 0; i < category.length; i ++ ) {
+
+					const file = category[ i ];
+
+					const link = createLink( file, tags[ file ] );
+					fragment.appendChild( link );
+
+					links[ file ] = link;
+					validRedirects.set( file, file + '.html' );
+
+				}
+
+			}
+
+			content.appendChild( fragment );
+
+			if ( window.location.hash !== '' ) {
+
+				const file = window.location.hash.substring( 1 );
+
+				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
+
+				if ( validRedirects.has( file ) === true ) {
+
+					selectFile( file );
+					viewer.src = validRedirects.get( file );
+					viewer.style.display = 'unset';
+
+				}
+
+			}
+
+			if ( selected === null ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
+			if ( viewer.src === '' ) {
+
+				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
+				viewer.style.display = 'unset';
+
+			}
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+				updateFilter( files, tags );
+
+			}
+
+			// Events
+
+			filterInput.onfocus = function ( ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function ( ) {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			clearSearchButton.onclick = function ( ) {
+
+				filterInput.value = '';
+				updateFilter( files, tags );
+				filterInput.focus();
+
+			};
+
+			filterInput.addEventListener( 'input', function () {
+
+				updateFilter( files, tags );
+
+			} );
+
+
+			expandButton.addEventListener( 'click', function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			} );
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			previewsToggler.onclick = function ( event ) {
+
+				event.preventDefault();
+				content.classList.toggle( 'minimal' );
+
+			};
+
+			// iOS iframe auto-resize workaround
+
+			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+				viewer.style.width = getComputedStyle( viewer ).width;
+				viewer.style.height = getComputedStyle( viewer ).height;
+				viewer.setAttribute( 'scrolling', 'no' );
+
+			}
+
+		}
+
+		function createLink( file, tags ) {
+
+			const community = Array.isArray( tags ) && tags.includes( 'community' ) ? '<span class="tag">community</span>' : '';
+
+			let href = file + '.html';
+
+			if ( file === 'css3d_mixed' ) {
+
+				href += `?${ new Date().getTime() }`;
+
+			}
+
+			const template = `
+				<div class="card">
+					<a href="${ href }" target="viewer">
+						<div class="cover">
+							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+							${ community }
+						</div>
+						<div class="title">${ getName( file ) }</div>
+					</a>
+				</div>
+			`;
+
+			const link = createElementFromHTML( template );
+
+			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
+
+				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
+				selectFile( file );
+
+			} );
+
+			return link;
+
+		}
+
+		function selectFile( file ) {
+
+			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
+
+			links[ file ].classList.add( 'selected' );
+
+			window.location.hash = file;
+			viewer.focus();
+			viewer.style.display = 'unset';
+
+			panel.classList.remove( 'open' );
+
+			selected = file;
+
+			// Reveal "View source" button and set attributes to this example
+			viewSrcButton.style.display = '';
+			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
+			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+
+		}
+
+		function escapeRegExp( string ) {
+
+			string = string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
+
+			return '(?=.*' + string.split( ' ' ).join( ')(?=.*' ) + ')'; // match all words, in any order
+
+		}
+
+		function updateFilter( files, tags ) {
+
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+			} else {
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
+			}
+
+			const exp = new RegExp( escapeRegExp( v ), 'gi' );
+
+			for ( const key in files ) {
+
+				const section = files[ key ];
+
+				for ( let i = 0; i < section.length; i ++ ) {
+
+					filterExample( section[ i ], exp, tags );
+
+				}
+
+			}
+
+			layoutList( files );
+
+		}
+
+		function filterExample( file, exp, tags ) {
+
+			const link = links[ file ];
+			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
+			const res = file.replace( /_+/g, ' ' ).match( exp );
+
+			if ( res && res.length > 0 ) {
+
+				link.classList.remove( 'hidden' );
+
+			} else {
+
+				link.classList.add( 'hidden' );
+
+			}
+
+		}
+
+		function getName( file ) {
+
+			const name = file.split( '_' );
+			name.shift();
+			return name.join( ' / ' );
+
+		}
+
+		function layoutList( files ) {
+
+			for ( const key in files ) {
+
+				let collapsed = true;
+
+				const section = files[ key ];
+
+				for ( let i = 0; i < section.length; i ++ ) {
+
+					const file = section[ i ];
+
+					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
+
+						collapsed = false;
+						break;
+
+					}
+
+				}
+
+				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
+
+				if ( collapsed ) {
+
+					element.classList.add( 'hidden' );
+
+				} else {
+
+					element.classList.remove( 'hidden' );
+
+				}
+
+			}
+
+		}
+
+		function extractQuery() {
+
+			const search = window.location.search;
+
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
+
+				return decodeURI( search.slice( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
+		function createElementFromHTML( htmlString ) {
+
+			const div = document.createElement( 'div' );
+			div.innerHTML = htmlString.trim();
+			return div.firstChild;
+
+		}
+
+		</script>
+		<template id="PlaceholderHTML">
+			<!DOCTYPE html>
+				<html lang="en">
+					<head>
+						<meta charset="utf-8">
+						<title>three.js examples</title>
+						<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+						<link rel="stylesheet" type="text/css" href="../files/main.css">
+						<style>
+						html, body {
+							height: 100%;
+						}
+						body {
+							height: 100%;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							user-select: none;
+						}
+						</style>
+					</head>
+					<body>
+						Select an example from the sidebar
+					</body>
+				</html>
+		</template>
+	</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+    margin: 0;
+    font-family: sans-serif;
+    overflow: hidden;
+    height: 100vh;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+iframe {
+    display: block;
+    border: none;
+}
+.frame {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #444;
+    color: #AAA;
+}
+.tabs {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #666;
+}
+.panes {
+    display: flex;
+    flex: 1 1 auto;
+    height: 50%;  /* this is needed for firefox. It won't actually be 50% because the flex: 1 1 auto means stretch */
+}
+.panes>div {
+    display: none;
+    flex: 1 1 50%;
+    flex-direction: column;
+    min-width: 0;
+}
+.panes .code {
+    flex: 1 1 auto;
+    position: relative;
+    height: 100%;
+}
+.panes .code > div {
+    height: 100%;
+}
+.panes .files {
+    position: relative;
+}
+.panes .fileSelected {
+    color: white;
+    background: #666;
+}
+.panes .files > div {
+    border: 1px solid black;
+    font-family: monospace;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.panes>div.other {
+    display: block
+}
+.editor {
+    g-overflow: auto;
+}
+.result {
+    overflow: auto;
+}
+.result>iframe {
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+.result .console .log {
+    white-space: pre-line;
+}
+.other>div,
+.other>div>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    font-size: xx-large;
+}
+.other>div {
+    height: 100%;
+    flex-direction: column;
+}
+
+.other .loading {
+    height: 2em;
+    width: 2em;
+    animation: rotate 0.8s infinite linear;
+    border: 0.4em solid #fff;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+.dialog {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dialog>div {
+  background: #444;
+  color: white;
+  padding: 1em;
+  outline: none;
+  max-width: 90%;
+}
+.dialog p {
+  margin-left: 0.25em;
+}
+.dialog a {
+  color: lightseagreen;
+}
+.dialog a:hover {
+  color: orange;
+}
+/* ---- */
+.export .export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.export .export-buttons button {
+  width: 8em;
+}
+/* ---- */
+.copy-dialog .copy-area {
+  height: 8em;
+  overflow: auto;
+  user-select: all;
+  background: #222;
+  padding: 0.5em;
+}
+/* ---- */
+@keyframes rotate {
+    0%    { transform: rotate(0deg); }
+    100%  { transform: rotate(360deg); }
+}
+
+.tabs>div {
+    padding: 0.125em;
+}
+button {
+    padding: 0.5em;
+    border: none;
+    background: #AAA;
+    border-bottom: 5px solid black;
+    margin: 0.25em;
+    width: 5em;
+    cursor: pointer;
+}
+button:hover {
+  background-color: orange;
+}
+button:focus {
+    outline: none;
+}
+.panelogo {
+    font-size: medium;
+}
+.panelogo>*>* {
+    vertical-align: middle;
+    display: inline-block;
+    color: #CCC;
+}
+.show {
+    background: #FFF !important;
+    border-bottom: none !important;
+    border-top: 5px solid #666 !important;
+}
+.button-result {
+    margin-left: 2em !important;
+}
+.panebuttons>.button-fullscreen {
+    background-image: url(editor-fullscreen-icon.svg);
+    background-size: 80% 80%;
+    background-position: center center;
+    background-repeat: no-repeat no-repeat;
+}
+.fullscreen .panebuttons>.button-fullscreen {
+    background-image: url(editor-unfullscreen-icon.svg) !important;
+}
+
+@media ( max-width: 950px ) {
+    .panebuttons>button, body {
+      font-size: x-small;
+    }
+}
+
+@media ( max-width: 740px ) {
+    .panelogo>div>a:nth-child(1) {
+        display: none;
+    }
+}
+
+@media ( max-width: 590px ) {
+    .tabs {
+        display: none;
+    }
+    .panes>div {
+        display: none !important;
+        height: auto;
+    }
+    .panes>.result {
+        display: block !important;
+    }
+}
+</style>
+</head>
+<body>
+<div class="frame notranslate">
+    <div class="tabs">
+        <div class="panebuttons">
+            <button class="button-js">JS</button>
+            <button class="button-html">HTML</button>
+            <button class="button-css">CSS</button>
+            <button class="button-export">Export</button>
+            <button class="button-result">Result</button>
+            <button class="button-run">Run</button>
+            <button class="button-fullscreen">&nbsp;</button>
+        </div>
+        <div class="panelogo">
+          <div><a href="/" target="_blank"><span data-subst="textContent|name"></span>&nbsp;</a><a href="/" target="_blank"><img data-subst="src|icon" width="32" height="32"/></a></div>
+        </div>
+    </div>
+    <div class="panes">
+        <div class="js"><div class="files"></div><div class="code"></div></div>
+        <div class="html"><div class="files"></div><div class="code"></div></div>
+        <div class="css"><div class="files"></div><div class="code"></div></div>
+        <div class="result"><iframe></iframe></div>
+        <div class="other">
+          <div>
+            <div><a href="/"><span data-subst="textContent|name"></span>&nbsp;</a><a href="/"><img data-subst="src|icon" width="64" height="64"/></a></div>
+            <div class="loading"></div>
+          </div>
+        </div>
+    </div>
+</div>
+<div class="dialog export" style="display: none;">
+  <div tabindex="-1">
+    <p>Export To: </p>
+    <div class="export-buttons">
+      <button class="button-jsgist">jsGist</button>
+      <button class="button-codepen">Codepen</button>
+      <button class="button-jsfiddle">JSFiddle</button>
+      <button class="button-codesandbox">CodeSandbox</button>
+      <button class="button-stackoverflow">Stack Overflow</button>
+    </div>
+  </div>
+</div>
+<div class="dialog copy-dialog" style="display: none;">
+  <div tabindex="-1">
+    <p>Copy and paste the text below into a <a href="" target="_blank">stack overflow question</a>.</p>
+    <pre class="copy-area"></pre>
+  </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+<script src="editor-settings.js"></script>
+<script src="editor.js"></script>
+
+</html>

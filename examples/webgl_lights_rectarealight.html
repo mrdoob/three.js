@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - rect area light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - THREE.RectAreaLight<br/>
+			by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+			import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+			let renderer, scene, camera;
+			let rectLight1, rectLight2, rectLight3;
+			let timer, stats;
+
+			init();
+
+			function init() {
+
+				timer = new THREE.Timer();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 5, - 15 );
+
+				scene = new THREE.Scene();
+
+				RectAreaLightUniformsLib.init();
+
+				rectLight1 = new THREE.RectAreaLight( 0xff0000, 5, 4, 10 );
+				rectLight1.position.set( - 5, 6, 5 );
+				scene.add( rectLight1 );
+
+				rectLight2 = new THREE.RectAreaLight( 0x00ff00, 5, 4, 10 );
+				rectLight2.position.set( 0, 6, 5 );
+				scene.add( rectLight2 );
+
+				rectLight3 = new THREE.RectAreaLight( 0x0000ff, 5, 4, 10 );
+				rectLight3.position.set( 5, 6, 5 );
+				scene.add( rectLight3 );
+
+				scene.add( new RectAreaLightHelper( rectLight1 ) );
+				scene.add( new RectAreaLightHelper( rectLight2 ) );
+				scene.add( new RectAreaLightHelper( rectLight3 ) );
+
+				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0x444444 } );
+				matStdFloor.roughnessMap = createCheckerTexture( 400 );
+				const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
+				scene.add( mshStdFloor );
+
+				const geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 200, 16 );
+				const matKnot = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0, metalness: 0 } );
+				const meshKnot = new THREE.Mesh( geoKnot, matKnot );
+				meshKnot.position.set( 0, 5.5, 0 );
+				scene.add( meshKnot );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.copy( meshKnot.position );
+				controls.update();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+			}
+
+			function createCheckerTexture( repeat = 1 ) {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 2;
+				canvas.height = 2;
+
+				const ctx = canvas.getContext( '2d' );
+				ctx.fillStyle = '#000';
+				ctx.fillRect( 0, 0, 2, 2 );
+				ctx.fillStyle = '#fff';
+				ctx.fillRect( 0, 0, 1, 1 );
+				ctx.fillRect( 1, 1, 1, 1 );
+
+				const texture = new THREE.CanvasTexture( canvas );
+				texture.repeat.set( repeat, repeat );
+				texture.magFilter = THREE.NearestFilter;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				return texture;
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = ( window.innerWidth / window.innerHeight );
+				camera.updateProjectionMatrix();
+
+			}
+
+			function animation() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				rectLight1.rotation.y += - delta;
+				rectLight2.rotation.y += delta * .5;
+				rectLight3.rotation.y += delta;
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>

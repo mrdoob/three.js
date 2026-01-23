@@ -1,0 +1,1089 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>OffscreenCanvas</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – OffscreenCanvas">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>OffscreenCanvas</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a>
+est une fonctionnalité de navigateur relativement nouvelle, actuellement disponible uniquement dans Chrome mais apparemment
+à venir sur d'autres navigateurs. <code class="notranslate" translate="no">OffscreenCanvas</code> permet à un web worker de rendre
+sur un canevas. C'est une façon de décharger le travail lourd, comme le rendu d'une scène 3D complexe,
+sur un web worker afin de ne pas ralentir la réactivité du navigateur. Cela
+signifie également que les données sont chargées et analysées dans le worker, ce qui réduit potentiellement les saccades pendant
+le chargement de la page.</p>
+<p>Commencer à l'utiliser est assez simple. Portons l'exemple des 3 cubes en rotation depuis <a href="responsive.html">l'article sur la réactivité</a>.</p>
+<p>En général, les workers ont leur code séparé
+dans un autre fichier script, tandis que la plupart des exemples sur ce site ont leurs
+scripts intégrés dans le fichier HTML de la page sur laquelle ils se trouvent.</p>
+<p>Dans notre cas, nous allons créer un fichier appelé <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> et
+y copier tout le JavaScript depuis <a href="responsive.html">l'exemple réactif</a>. Nous apporterons ensuite
+les modifications nécessaires pour qu'il s'exécute dans un worker.</p>
+<p>Nous avons encore besoin de JavaScript dans notre fichier HTML. La première chose
+à faire est de trouver le canevas, puis de transférer son contrôle
+pour qu'il soit offscreen en appelant <code class="notranslate" translate="no">canvas.transferControlToOffscreen</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+
+  ...
+</pre>
+<p>Nous pouvons ensuite démarrer notre worker avec <code class="notranslate" translate="no">new Worker(pathToScript, {type: 'module'})</code>.
+et lui passer l'objet <code class="notranslate" translate="no">offscreen</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+}
+main();
+</pre>
+<p>Il est important de noter que les workers ne peuvent pas accéder au <code class="notranslate" translate="no">DOM</code>. Ils
+ne peuvent pas regarder les éléments HTML ni recevoir les événements de souris ou
+de clavier. La seule chose qu'ils peuvent généralement faire est de répondre
+aux messages qui leur sont envoyés et de renvoyer des messages à la page.</p>
+<p>Pour envoyer un message à un worker, nous appelons <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> et
+lui passons 1 ou 2 arguments. Le premier argument est un objet JavaScript
+qui sera <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">cloné</a>
+et envoyé au worker. Le second argument est un tableau optionnel
+d'objets qui font partie du premier objet et que nous voulons <em>transférer</em>
+au worker. Ces objets ne seront pas clonés. Au lieu de cela, ils seront <em>transférés</em>
+et cesseront d'exister dans la page principale. Cesser d'exister est probablement
+la mauvaise description, ils sont plutôt neutralisés. Seuls certains types d'objets
+peuvent être transférés au lieu d'être clonés. Ils incluent <code class="notranslate" translate="no">OffscreenCanvas</code>,
+donc une fois transféré, l'objet <code class="notranslate" translate="no">offscreen</code> dans la page principale devient inutile.</p>
+<p>Les workers reçoivent les messages via leur gestionnaire <code class="notranslate" translate="no">onmessage</code>. L'objet
+que nous avons passé à <code class="notranslate" translate="no">postMessage</code> arrive sur <code class="notranslate" translate="no">event.data</code> passé au gestionnaire <code class="notranslate" translate="no">onmessage</code>
+sur le worker. Le code ci-dessus déclare un <code class="notranslate" translate="no">type: 'main'</code> dans l'objet qu'il passe
+au worker. Cet objet n'a aucune signification pour le navigateur. Il est entièrement destiné
+à notre propre usage. Nous allons créer un gestionnaire qui, basé sur le <code class="notranslate" translate="no">type</code>, appelle
+une fonction différente dans le worker. Ensuite, nous pourrons ajouter des fonctions au besoin et
+les appeler facilement depuis la page principale.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
+  main,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Vous pouvez voir ci-dessus que nous recherchons simplement le gestionnaire basé sur le <code class="notranslate" translate="no">type</code> et que nous lui passons les <code class="notranslate" translate="no">data</code>
+qui ont été envoyées depuis la page principale.</p>
+<p>Il ne nous reste plus qu'à commencer à modifier la fonction <code class="notranslate" translate="no">main</code> que nous avons collée dans
+<code class="notranslate" translate="no">offscreencanvas-cubes.js</code> depuis <a href="responsive.html">l'article sur la réactivité</a>.</p>
+<p>Au lieu de rechercher le canevas depuis le DOM, nous le recevrons des données d'événement.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
+-  const canvas = document.querySelector('#c');
++function main(data) {
++  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
+  ...
+</pre>
+<p>En gardant à l'esprit que les workers ne peuvent pas voir le DOM du tout, le premier problème
+que nous rencontrons est que <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> ne peut pas lire <code class="notranslate" translate="no">canvas.clientWidth</code>
+et <code class="notranslate" translate="no">canvas.clientHeight</code> car ce sont des valeurs DOM. Voici le code original</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>Au lieu de cela, nous devrons envoyer les tailles au worker dès qu'elles changent.
+Ajoutons donc un état global et conservons la largeur et la hauteur à cet endroit.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
+  width: 300,  // par défaut du canevas
+  height: 150,  // par défaut du canevas
+};
+</pre>
+<p>Ensuite, ajoutons un gestionnaire <code class="notranslate" translate="no">'size'</code> pour mettre à jour ces valeurs. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
++  state.width = data.width;
++  state.height = data.height;
++}
+
+const handlers = {
+  main,
++  size,
+};
+</pre>
+<p>Maintenant, nous pouvons modifier <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> pour utiliser <code class="notranslate" translate="no">state.width</code> et <code class="notranslate" translate="no">state.height</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = canvas.clientWidth;
+-  const height = canvas.clientHeight;
++  const width = state.width;
++  const height = state.height;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>et là où nous calculons l'aspect, nous avons besoin de changements similaires</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.aspect = state.width / state.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>De retour dans la page principale, nous enverrons un événement <code class="notranslate" translate="no">size</code> chaque fois que la page change de taille.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
++function sendSize() {
++  worker.postMessage({
++    type: 'size',
++    width: canvas.clientWidth,
++    height: canvas.clientHeight,
++  });
++}
++
++window.addEventListener('resize', sendSize);
++sendSize();
+</pre>
+<p>Nous l'appelons également une fois pour envoyer la taille initiale.</p>
+<p>Et avec ces quelques modifications seulement, en supposant que votre navigateur prenne entièrement en charge <code class="notranslate" translate="no">OffscreenCanvas</code>,
+cela devrait fonctionner. Avant de l'exécuter, vérifions si le navigateur prend réellement en charge
+<code class="notranslate" translate="no">OffscreenCanvas</code> et, si ce n'est pas le cas, affichons une erreur. Ajoutons d'abord du HTML pour afficher l'erreur.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
++    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>et un peu de CSS pour cela</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    color: white;
+}
+</pre>
+<p>et ensuite nous pouvons vérifier l'existence de <code class="notranslate" translate="no">transferControlToOffscreen</code> pour voir
+si le navigateur prend en charge <code class="notranslate" translate="no">OffscreenCanvas</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
++  if (!canvas.transferControlToOffscreen) {
++    canvas.style.display = 'none';
++    document.querySelector('#noOffscreenCanvas').style.display = '';
++    return;
++  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-picking.js', {type: 'module});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  ...
+</pre>
+<p>et avec cela, si votre navigateur prend en charge <code class="notranslate" translate="no">OffscreenCanvas</code>, cet exemple devrait fonctionner</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>C'est formidable, mais comme tous les navigateurs ne prennent pas en charge <code class="notranslate" translate="no">OffscreenCanvas</code> pour le moment,
+modifions le code pour qu'il fonctionne à la fois avec <code class="notranslate" translate="no">OffscreenCanvas</code> et, si ce n'est pas le cas, pour qu'il revienne à l'utilisation
+du canevas dans la page principale comme d'habitude.</p>
+<blockquote>
+<p>En aparté, si vous avez besoin de OffscreenCanvas pour rendre votre page réactive, alors
+l'intérêt d'avoir un fallback n'est pas évident. Peut-être que selon si
+vous exécutez sur la page principale ou dans un worker, vous pourriez ajuster la quantité
+de travail effectué afin que lorsque vous exécutez dans un worker, vous puissiez faire plus que lorsque
+vous exécutez dans la page principale. Ce que vous faites dépend entièrement de vous.</p>
+</blockquote>
+<p>La première chose que nous devrions probablement faire est de séparer le code three.js
+du code spécifique au worker. De cette façon, nous pouvons
+utiliser le même code sur la page principale et sur le worker. En d'autres termes,
+nous aurons maintenant 3 fichiers</p>
+<ol>
+<li><p>notre fichier html.</p>
+<p><code class="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
+</li>
+<li><p>un fichier JavaScript qui contient notre code three.js.</p>
+<p><code class="notranslate" translate="no">shared-cubes.js</code></p>
+</li>
+<li><p>notre code de support pour le worker</p>
+<p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
+</li>
+</ol>
+<p><code class="notranslate" translate="no">shared-cubes.js</code> et <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> sont essentiellement
+la séparation de notre fichier <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> précédent. Nous
+copions d'abord tout le contenu de <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> dans <code class="notranslate" translate="no">shared-cube.js</code>. Ensuite,
+nous renommons <code class="notranslate" translate="no">main</code> en <code class="notranslate" translate="no">init</code> car nous avons déjà une fonction <code class="notranslate" translate="no">main</code> dans notre
+fichier HTML, et nous devons exporter <code class="notranslate" translate="no">init</code> et <code class="notranslate" translate="no">state</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+
+-const state = {
++export const state = {
+  width: 300,   // par défaut du canevas
+  height: 150,  // par défaut du canevas
+};
+
+-function main(data) {
++export function init(data) {
+  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+</pre>
+<p>et découpons juste les parties non liées à three.js</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
+-  state.width = data.width;
+-  state.height = data.height;
+-}
+-
+-const handlers = {
+-  main,
+-  size,
+-};
+-
+-self.onmessage = function(e) {
+-  const fn = handlers[e.data.type];
+-  if (typeof fn !== 'function') {
+-    throw new Error('no handler for type: ' + e.data.type);
+-  }
+-  fn(e.data);
+-};
+</pre>
+<p>Ensuite, nous copions les parties que nous venons de supprimer dans <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code>
+et importons <code class="notranslate" translate="no">shared-cubes.js</code> ainsi qu'appelons <code class="notranslate" translate="no">init</code> au lieu de <code class="notranslate" translate="no">main</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
+
+function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
+const handlers = {
+-  main,
++  init,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>De même, nous devons inclure <code class="notranslate" translate="no">shared-cubes.js</code> dans la page principale</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
++import {init, state} from './shared-cubes.js';
+</pre>
+<p>Nous pouvons supprimer le HTML et le CSS que nous avons ajoutés précédemment</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+-  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
+-    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
+-  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>et un peu de CSS pour cela</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
+-    display: flex;
+-    width: 100%;
+-    height: 100%;
+-    align-items: center;
+-    justify-content: center;
+-    background: red;
+-    color: white;
+-}
+</pre>
+<p>Ensuite, modifions le code dans la page principale pour appeler une fonction de démarrage ou une autre
+selon que le navigateur prend en charge <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  if (!canvas.transferControlToOffscreen) {
+-    canvas.style.display = 'none';
+-    document.querySelector('#noOffscreenCanvas').style.display = '';
+-    return;
+-  }
+-  const offscreen = canvas.transferControlToOffscreen();
+-  const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  if (canvas.transferControlToOffscreen) {
++    startWorker(canvas);
++  } else {
++    startMainPage(canvas);
++  }
+  ...
+</pre>
+<p>Nous allons déplacer tout le code que nous avions pour configurer le worker à l'intérieur de <code class="notranslate" translate="no">startWorker</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');
+}
+</pre>
+<p>et envoyer <code class="notranslate" translate="no">init</code> au lieu de <code class="notranslate" translate="no">main</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+</pre>
+<p>pour démarrer dans la page principale, nous pouvons faire ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+  init({canvas});
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');
+}
+</pre>
+<p>et avec cela, notre exemple s'exécutera soit dans un OffscreenCanvas, soit il
+reviendra à s'exécuter dans la page principale.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>C'était donc relativement facile. Essayons le picking. Nous allons prendre du code de
+l'exemple <code class="notranslate" translate="no">RayCaster</code> depuis <a href="picking.html">l'article sur le picking</a>
+et le faire fonctionner offscreen.</p>
+<p>Copions le fichier <code class="notranslate" translate="no">shared-cube.js</code> vers <code class="notranslate" translate="no">shared-picking.js</code> et ajoutons les parties de picking. Nous copions le <code class="notranslate" translate="no">PickHelper</code> </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+
+const pickPosition = {x: 0, y: 0};
+const pickHelper = new PickHelper();
+</pre>
+<p>Nous avons mis à jour <code class="notranslate" translate="no">pickPosition</code> à partir de la souris comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // notez que nous inversons Y
+}
+window.addEventListener('mousemove', setPickPosition);
+</pre>
+<p>Un worker ne peut pas lire la position de la souris directement, donc tout comme le code de taille,
+envoyons un message avec la position de la souris. Comme pour le code de taille, nous enverrons
+la position de la souris et mettrons à jour <code class="notranslate" translate="no">pickPosition</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
++function mouse(data) {
++  pickPosition.x = data.x;
++  pickPosition.y = data.y;
++}
+
+const handlers = {
+  init,
++  mouse,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>De retour dans notre page principale, nous devons ajouter du code pour passer la souris
+au worker ou à la page principale.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
+
+function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
+  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+
++  sendMouse = (x, y) =&gt; {
++    worker.postMessage({
++      type: 'mouse',
++      x,
++      y,
++    });
++  };
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+
+function startMainPage(canvas) {
+  init({canvas});
+
++  sendMouse = (x, y) =&gt; {
++    pickPosition.x = x;
++    pickPosition.y = y;
++  };
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>Ensuite, nous pouvons copier tout le code de gestion de la souris dans la page principale et
+apporter juste des modifications mineures pour utiliser <code class="notranslate" translate="no">sendMouse</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  sendMouse(
++      (pos.x / canvas.clientWidth ) *  2 - 1,
++      (pos.y / canvas.clientHeight) * -2 + 1);  // notez que nous inversons Y
+}
+
+function clearPickPosition() {
+  // Contrairement à la souris qui a toujours une position
+  // si l'utilisateur arrête de toucher l'écran, nous voulons
+  // arrêter le picking. Pour l'instant, nous choisissons juste une valeur
+  // peu susceptible de sélectionner quelque chose
+-  pickPosition.x = -100000;
+-  pickPosition.y = -100000;
++  sendMouse(-100000, -100000);
+}
+window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
+
+window.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>et avec cela, le picking devrait fonctionner avec <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Allons un peu plus loin et ajoutons les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.
+Cela sera un peu plus complexe. Les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> utilisent
+le DOM de manière assez extensive pour vérifier la souris, les événements tactiles,
+et le clavier.</p>
+<p>Contrairement à notre code jusqu'à présent, nous ne pouvons pas vraiment utiliser un objet <code class="notranslate" translate="no">state</code> global
+sans réécrire tout le code des OrbitControls pour qu'il fonctionne avec.
+Les OrbitControls prennent un <code class="notranslate" translate="no">HTMLElement</code> auquel ils attachent la plupart
+des événements DOM qu'ils utilisent. Peut-être pourrions-nous passer notre propre
+objet qui a la même surface d'API qu'un élément DOM.
+Nous n'avons besoin de prendre en charge que les fonctionnalités dont les OrbitControls ont besoin.</p>
+<p>En fouillant dans le <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">code source des OrbitControls</a>,
+il semble que nous devions gérer les événements suivants.</p>
+<ul>
+<li>contextmenu</li>
+<li>pointerdown</li>
+<li>pointermove</li>
+<li>pointerup</li>
+<li>touchstart</li>
+<li>touchmove</li>
+<li>touchend</li>
+<li>wheel</li>
+<li>keydown</li>
+</ul>
+<p>Pour les événements de pointeur, nous avons besoin des propriétés <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
+<code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code> et <code class="notranslate" translate="no">pageY</code>.</p>
+<p>Pour les événements keydown, nous avons besoin des propriétés <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>
+et <code class="notranslate" translate="no">keyCode</code>.</p>
+<p>Pour l'événement wheel, nous n'avons besoin que de la propriété <code class="notranslate" translate="no">deltaY</code>.</p>
+<p>Et pour les événements tactiles, nous n'avons besoin que de <code class="notranslate" translate="no">pageX</code> et <code class="notranslate" translate="no">pageY</code> de
+la propriété <code class="notranslate" translate="no">touches</code>.</p>
+<p>Alors, créons une paire d'objets proxy. Une partie s'exécutera dans la page principale,
+capturera tous ces événements et transmettra les valeurs de propriété pertinentes
+au worker. L'autre partie s'exécutera dans le worker, recevra ces
+événements et les transmettra en utilisant des événements qui ont la même structure
+que les événements DOM originaux, de sorte que les OrbitControls ne pourront pas
+faire la différence.</p>
+<p>Voici le code pour la partie worker.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from 'three';
+
+class ElementProxyReceiver extends EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
+}
+</pre>
+<p>Tout ce qu'il fait est, s'il reçoit un message, de le dispatcher.
+Il hérite de <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> qui fournit des méthodes comme
+<code class="notranslate" translate="no">addEventListener</code> et <code class="notranslate" translate="no">removeEventListener</code>, tout comme un élément DOM,
+donc si nous le passons aux OrbitControls, cela devrait fonctionner.</p>
+<p><code class="notranslate" translate="no">ElementProxyReceiver</code> gère 1 élément. Dans notre cas, nous n'en avons besoin que d'un,
+mais il est préférable d'anticiper, alors créons un gestionnaire pour gérer
+plus d'un.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
+  constructor() {
+    this.targets = {};
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+  makeProxy(data) {
+    const {id} = data;
+    const proxy = new ElementProxyReceiver();
+    this.targets[id] = proxy;
+  }
+  getProxy(id) {
+    return this.targets[id];
+  }
+  handleEvent(data) {
+    this.targets[data.id].handleEvent(data.data);
+  }
+}
+</pre>
+<p>Nous pouvons créer une instance de <code class="notranslate" translate="no">ProxyManager</code> et appeler sa méthode <code class="notranslate" translate="no">makeProxy</code>
+avec un identifiant, ce qui créera un <code class="notranslate" translate="no">ElementProxyReceiver</code> qui
+répondra aux messages avec cet identifiant.</p>
+<p>Connectons-le au gestionnaire de messages de notre worker.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
+
+function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+
+function makeProxy(data) {
+  proxyManager.makeProxy(data);
+}
+
+...
+
+const handlers = {
+-  init,
+-  mouse,
++  start,
++  makeProxy,
++  event: proxyManager.handleEvent,
+   size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Dans notre code three.js partagé, nous devons importer les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> et les configurer.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+export function init(data) {
+-  const {canvas} = data;
++  const {canvas, inputElement} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
++  const controls = new OrbitControls(camera, inputElement);
++  controls.target.set(0, 0, 0);
++  controls.update();
+</pre>
+<p>Notez que nous passons notre proxy aux OrbitControls via <code class="notranslate" translate="no">inputElement</code>
+au lieu de passer le canevas comme nous le faisons dans d'autres exemples sans OffscreenCanvas.</p>
+<p>Ensuite, nous pouvons déplacer tout le code des événements de picking du fichier HTML
+vers le code three.js partagé également, tout en changeant
+<code class="notranslate" translate="no">canvas</code> en <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+-  const rect = canvas.getBoundingClientRect();
++  const rect = inputElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  sendMouse(
+-      (pos.x / canvas.clientWidth ) *  2 - 1,
+-      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
++  pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
++  pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // notez que nous inversons Y
+}
+
+function clearPickPosition() {
+  // Contrairement à la souris qui a toujours une position
+  // si l'utilisateur arrête de toucher l'écran, nous voulons
+  // arrêter le picking. Pour l'instant, nous choisissons juste une valeur
+  // peu susceptible de sélectionner quelque chose
+-  sendMouse(-100000, -100000);
++  pickPosition.x = -100000;
++  pickPosition.y = -100000;
+}
+
+*inputElement.addEventListener('mousemove', setPickPosition);
+*inputElement.addEventListener('mouseout', clearPickPosition);
+*inputElement.addEventListener('mouseleave', clearPickPosition);
+
+*inputElement.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+*inputElement.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+*inputElement.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>De retour dans la page principale, nous avons besoin de code pour envoyer des messages pour
+tous les événements que nous avons énumérés ci-dessus.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
+class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+  }
+}
+</pre>
+<p><code class="notranslate" translate="no">ElementProxy</code> prend l'élément dont nous voulons proxifier les événements. Il
+enregistre ensuite un identifiant auprès du worker en en choisissant un et en l'envoyant
+via le message <code class="notranslate" translate="no">makeProxy</code> que nous avons configuré précédemment. Le worker créera
+un <code class="notranslate" translate="no">ElementProxyReceiver</code> et l'enregistrera avec cet identifiant.</p>
+<p>Nous avons ensuite un objet de gestionnaires d'événements à enregistrer. De cette façon,
+nous pouvons passer des gestionnaires uniquement pour les événements que nous voulons transmettre au
+worker.</p>
+<p>Lorsque nous démarrons le worker, nous créons d'abord un proxy et passons nos gestionnaires d'événements.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
+
++  const eventHandlers = {
++    contextmenu: preventDefaultHandler,
++    mousedown: mouseEventHandler,
++    mousemove: mouseEventHandler,
++    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
++    touchstart: touchEventHandler,
++    touchmove: touchEventHandler,
++    touchend: touchEventHandler,
++    wheel: wheelEventHandler,
++    keydown: filteredKeydownEventHandler,
++  };
++  const proxy = new ElementProxy(canvas, worker, eventHandlers);
+  worker.postMessage({
+    type: 'start',
+    canvas: offscreen,
++    canvasId: proxy.id,
+  }, [offscreen]);
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>Et voici les gestionnaires d'événements. Tout ce qu'ils font est de copier une liste de propriétés
+à partir de l'événement qu'ils reçoivent. On leur passe une fonction <code class="notranslate" translate="no">sendEvent</code> à laquelle ils passent les données
+qu'ils créent. Cette fonction ajoutera l'identifiant correct et l'enverra au worker.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mouseEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'button',
+  'pointerType',
+  'clientX',
+  'clientY',
+  'pointerId',
+  'pageX',
+  'pageY',
+]);
+const wheelEventHandlerImpl = makeSendPropertiesHandler([
+  'deltaX',
+  'deltaY',
+]);
+const keydownEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'keyCode',
+]);
+
+function wheelEventHandler(event, sendFn) {
+  event.preventDefault();
+  wheelEventHandlerImpl(event, sendFn);
+}
+
+function preventDefaultHandler(event) {
+  event.preventDefault();
+}
+
+function copyProperties(src, properties, dst) {
+  for (const name of properties) {
+      dst[name] = src[name];
+  }
+}
+
+function makeSendPropertiesHandler(properties) {
+  return function sendProperties(event, sendFn) {
+    const data = {type: event.type};
+    copyProperties(event, properties, data);
+    sendFn(data);
+  };
+}
+
+function touchEventHandler(event, sendFn) {
+  // preventDefault() corrige les événements mousemove, mouseup et mousedown
+  // qui se déclenchent lors d'un simple toucher/relâcher
+  // Cela n'arrive qu'avec OffscreenCanvas
+  event.preventDefault();
+  const touches = [];
+  const data = {type: event.type, touches};
+  for (let i = 0; i &lt; event.touches.length; ++i) {
+    const touch = event.touches[i];
+    touches.push({
+      pageX: touch.pageX,
+      pageY: touch.pageY,
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+  }
+  sendFn(data);
+}
+
+// Les quatre touches fléchées
+const orbitKeys = {
+  '37': true,  // left
+  '38': true,  // up
+  '39': true,  // right
+  '40': true,  // down
+};
+function filteredKeydownEventHandler(event, sendFn) {
+  const {keyCode} = event;
+  if (orbitKeys[keyCode]) {
+    event.preventDefault();
+    keydownEventHandler(event, sendFn);
+  }
+}
+</pre>
+<p>Cela semble proche de fonctionner, mais si nous l'essayons réellement, nous verrons
+que les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> ont besoin de quelques éléments supplémentaires.</p>
+<p>L'une d'elles est qu'ils appellent <code class="notranslate" translate="no">element.focus</code>. Nous n'avons pas besoin que cela se produise
+dans le worker, alors ajoutons simplement un stub.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
++  focus() {
++    // sans opération
++  }
+}
+</pre>
+<p>Une autre chose est qu'ils appellent <code class="notranslate" translate="no">event.preventDefault</code> et <code class="notranslate" translate="no">event.stopPropagation</code>.
+Nous gérons déjà cela dans la page principale, donc ceux-ci peuvent également être un noop (sans opération).</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function noop() {
++}
+
+class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
++    data.preventDefault = noop;
++    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // sans opération
+  }
+}
+</pre>
+<p>Une autre chose est qu'ils regardent <code class="notranslate" translate="no">clientWidth</code> et <code class="notranslate" translate="no">clientHeight</code>. Nous
+passions la taille auparavant, mais nous pouvons mettre à jour la paire de proxies
+pour passer cela également.</p>
+<p>Dans le worker...</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
++  get clientWidth() {
++    return this.width;
++  }
++  get clientHeight() {
++    return this.height;
++  }
++  getBoundingClientRect() {
++    return {
++      left: this.left,
++      top: this.top,
++      width: this.width,
++      height: this.height,
++      right: this.left + this.width,
++      bottom: this.top + this.height,
++    };
++  }
+  handleEvent(data) {
++    if (data.type === 'size') {
++      this.left = data.left;
++      this.top = data.top;
++      this.width = data.width;
++      this.height = data.height;
++      return;
++    }
+    data.preventDefault = noop;
+    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // sans opération
+  }
+}
+</pre>
+<p>de retour dans la page principale, nous devons envoyer la taille ainsi que les positions gauche et haut également.
+Notez qu'en l'état, nous ne gérons pas si le canevas se déplace, seulement s'il redimensionne. Si vous vouliez
+gérer le déplacement, vous devriez appeler <code class="notranslate" translate="no">sendSize</code> chaque fois que quelque chose déplace le canevas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
++    sendSize();
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+
++    function sendSize() {
++      const rect = element.getBoundingClientRect();
++      sendEvent({
++        type: 'size',
++        left: rect.left,
++        top: rect.top,
++        width: element.clientWidth,
++        height: element.clientHeight,
++      });
++    }
++
++    window.addEventListener('resize', sendSize);
+  }
+}
+</pre>
+<p>et dans notre code three.js partagé, nous n'avons plus besoin de <code class="notranslate" translate="no">state</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
+-  width: 300,   // par défaut du canevas
+-  height: 150,  // par défaut du canevas
+-};
+
+...
+
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = state.width;
+-  const height = state.height;
++  const width = inputElement.clientWidth;
++  const height = inputElement.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+
+function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = state.width / state.height;
++    camera.aspect = inputElement.clientWidth / inputElement.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>Quelques hacks supplémentaires. Les OrbitControls ajoutent des événements <code class="notranslate" translate="no">pointermove</code> et <code class="notranslate" translate="no">pointerup</code> à l'<code class="notranslate" translate="no">ownerDocument</code>
+de l'élément pour gérer la capture de la souris (lorsque la souris sort de la fenêtre).</p>
+<p>De plus, le code référence le <code class="notranslate" translate="no">document</code> global, mais il n'y a pas de document global
+dans un worker. </p>
+<p>Nous pouvons résoudre tout cela avec 2 hacks rapides. Dans notre code worker,
+nous allons réutiliser notre proxy pour les deux problèmes.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
++  proxy.ownerDocument = proxy; // HACK!
++  self.document = {} // HACK!
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+</pre>
+<p>Cela donnera aux <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> quelque chose à inspecter qui
+correspond à leurs attentes.</p>
+<p>Je sais que c'était un peu difficile à suivre. La version courte est la suivante :
+<code class="notranslate" translate="no">ElementProxy</code> s'exécute sur la page principale et transmet les événements DOM
+à <code class="notranslate" translate="no">ElementProxyReceiver</code> dans le worker, qui se fait passer pour un <code class="notranslate" translate="no">HTMLElement</code>
+que nous pouvons utiliser à la fois avec les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> et avec notre propre code.</p>
+<p>La dernière chose est notre fallback lorsque nous n'utilisons pas OffscreenCanvas.
+Tout ce que nous avons à faire est de passer le canevas lui-même comme notre <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+-  init({canvas});
++  init({canvas, inputElement: canvas});
+  console.log('using regular canvas');
+}
+</pre>
+<p>et maintenant nous devrions avoir les OrbitControls fonctionnant avec OffscreenCanvas</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>C'est probablement l'exemple le plus compliqué sur ce site. Il est un
+peu difficile à suivre car il y a 3 fichiers impliqués pour chaque
+exemple. Le fichier HTML, le fichier worker, le code three.js partagé.</p>
+<p>J'espère que ce n'était pas trop difficile à comprendre et que cela a fourni
+des exemples utiles pour travailler avec three.js, OffscreenCanvas et les web workers.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

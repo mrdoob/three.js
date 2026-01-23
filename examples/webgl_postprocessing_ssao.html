@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #aaa;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+			let container, stats;
+			let camera, scene, renderer;
+			let composer;
+			let group;
+
+			init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
+
+				scene.add( new THREE.DirectionalLight( 0xffffff, 4 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
+
+				group = new THREE.Group();
+				scene.add( group );
+
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
+				const material = new THREE.MeshLambertMaterial();
+
+				const mesh = new THREE.InstancedMesh( geometry, material, 100 );
+				const dummy = new THREE.Object3D();
+				const color = new THREE.Color();
+
+				for ( let i = 0; i < 100; i ++ ) {
+
+					dummy.position.x = Math.random() * 400 - 200;
+					dummy.position.y = Math.random() * 400 - 200;
+					dummy.position.z = Math.random() * 400 - 200;
+					dummy.rotation.x = Math.random();
+					dummy.rotation.y = Math.random();
+					dummy.rotation.z = Math.random();
+
+					dummy.scale.setScalar( Math.random() * 10 + 2 );
+
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
+
+					color.setHex( Math.random() * 0xffffff );
+					mesh.setColorAt( i, color );
+
+				}
+
+				group.add( mesh );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				composer = new EffectComposer( renderer );
+
+				const renderPass = new RenderPass( scene, camera );
+				composer.addPass( renderPass );
+
+				const ssaoPass = new SSAOPass( scene, camera, width, height );
+				composer.addPass( ssaoPass );
+
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
+
+				// Init gui
+				const gui = new GUI();
+
+				gui.add( ssaoPass, 'output', {
+					'Default': SSAOPass.OUTPUT.Default,
+					'SSAO Only': SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
+					'Depth': SSAOPass.OUTPUT.Depth,
+					'Normal': SSAOPass.OUTPUT.Normal
+				} ).onChange( function ( value ) {
+
+					ssaoPass.output = value;
+
+				} );
+				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
+				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
+				gui.add( ssaoPass, 'enabled' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				const timer = performance.now();
+				group.rotation.x = timer * 0.0002;
+				group.rotation.y = timer * 0.0001;
+
+				composer.render();
+
+			}
+
+		</script>
+	</body>
+</html>

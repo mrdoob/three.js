@@ -1,0 +1,5 @@
+decal-diffuse.png
+decal-normal.jpg
+
+Licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication License:
+http://creativecommons.org/publicdomain/zero/1.0/

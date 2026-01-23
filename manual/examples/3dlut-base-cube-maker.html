@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<head>
+<title>3DLUT Base Cube Maker</title>
+<style>
+canvas {
+  min-width: 512px;
+  min-height: 64px;
+  image-rendering: pixelated;
+}
+#cube {
+  max-width: calc(100% - 20px);
+  overflow: auto;
+}
+</style>
+</head>
+<body>
+<h1>Color Cube Image Maker</h1>
+<div>size:<input id="size" type="number" value="8" min="2" max="64"/></div>
+<p><button type="button">Save...</button></p>
+<div id="cube"><canvas></canvas></div>
+<div>( note: actual image size is
+<span id="width"></span>x<span id="height"></span> )</div>
+</p>
+</body>
+<script type="module">
+
+const ctx = document.querySelector( 'canvas' ).getContext( '2d' );
+
+function drawColorCubeImage( ctx, size ) {
+
+	const canvas = ctx.canvas;
+	canvas.width = size * size;
+	canvas.height = size;
+
+	for ( let zz = 0; zz < size; ++ zz ) {
+
+		for ( let yy = 0; yy < size; ++ yy ) {
+
+			for ( let xx = 0; xx < size; ++ xx ) {
+
+				const r = Math.floor( xx / ( size - 1 ) * 255 );
+				const g = Math.floor( yy / ( size - 1 ) * 255 );
+				const b = Math.floor( zz / ( size - 1 ) * 255 );
+				ctx.fillStyle = `rgb(${r},${g},${b})`;
+				ctx.fillRect( zz * size + xx, yy, 1, 1 );
+
+			}
+
+		}
+
+	}
+
+	document.querySelector( '#width' ).textContent = canvas.width;
+	document.querySelector( '#height' ).textContent = canvas.height;
+
+}
+
+drawColorCubeImage( ctx, 8 );
+
+function handleSizeChange( event ) {
+
+	const elem = event.target;
+	elem.style.background = '';
+	try {
+
+		const size = parseInt( elem.value );
+		if ( size >= 2 && size <= 64 ) {
+
+			drawColorCubeImage( ctx, size );
+
+		}
+
+	} catch ( e ) {
+
+		elem.style.background = 'red';
+
+	}
+
+}
+
+const sizeElem = document.querySelector( '#size' );
+sizeElem.addEventListener( 'change', handleSizeChange, true );
+
+const saveData = ( function () {
+
+	const a = document.createElement( 'a' );
+	document.body.appendChild( a );
+	a.style.display = 'none';
+	return function saveData( blob, fileName ) {
+
+		const url = window.URL.createObjectURL( blob );
+		a.href = url;
+		a.download = fileName;
+		a.click();
+
+	};
+
+}() );
+
+document.querySelector( 'button' ).addEventListener( 'click', () => {
+
+	ctx.canvas.toBlob( ( blob ) => {
+
+		saveData( blob, `identity-lut-s${ctx.canvas.height}.png` );
+
+	} );
+
+} );
+
+</script>
+</html>

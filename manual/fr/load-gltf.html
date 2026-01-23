@@ -1,0 +1,588 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Chargement d'un fichier .GLTF</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Chargement d'un fichier .GLTF">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Chargement d'un fichier .GLTF</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Dans une leçon précédente, nous avons <a href="load-obj.html">chargé un fichier .OBJ</a>. Si vous ne l'avez pas lue, vous pourriez vouloir la consulter d'abord.</p>
+<p>Comme indiqué là-bas, le format de fichier .OBJ est très ancien et assez simple. Il ne fournit aucun graphe de scène, donc tout ce qui est chargé est un seul grand maillage. Il a été conçu principalement comme un moyen simple de passer des données entre des éditeurs 3D.</p>
+<p><a href="https://github.com/KhronosGroup/glTF">Le format gLTF</a> est en réalité un format conçu dès le départ pour être utilisé pour afficher des graphiques. Les formats 3D peuvent être divisés en 3 ou 4 types de base.</p>
+<ul>
+<li><p>Formats d'éditeurs 3D</p>
+<p>Ce sont des formats spécifiques à une seule application. .blend (Blender), .max (3d Studio Max), .mb et .ma (Maya), etc...</p>
+</li>
+<li><p>Formats d'échange</p>
+<p>Ce sont des formats comme .OBJ, .DAE (Collada), .FBX. Ils sont conçus pour aider à échanger des informations entre les éditeurs 3D. En tant que tels, ils sont généralement beaucoup plus volumineux que nécessaire avec des informations supplémentaires utilisées uniquement à l'intérieur des éditeurs 3D.</p>
+</li>
+<li><p>Formats d'application</p>
+<p>Ceux-ci sont généralement spécifiques à certaines applications, généralement des jeux.</p>
+</li>
+<li><p>Formats de transmission</p>
+<p>gLTF pourrait être le premier véritable format de transmission. Je suppose que VRML pourrait être considéré comme tel, mais VRML était en réalité un très mauvais format.</p>
+<p>gLTF est conçu pour bien faire certaines choses que tous ces autres formats ne font pas</p>
+<ol>
+<li><p>Être petit pour la transmission</p>
+<p>Par exemple, cela signifie qu'une grande partie de leurs données volumineuses, comme les sommets, est stockée en binaire. Lorsque vous téléchargez un fichier .gLTF, ces données peuvent être téléchargées sur le GPU sans aucun traitement. Elles sont prêtes telles quelles. C'est en contraste avec, par exemple, VRML, .OBJ ou .DAE où les sommets sont stockés sous forme de texte et doivent être analysés. Les positions de sommets en texte peuvent facilement être 3 à 5 fois plus volumineuses qu'en binaire.</p>
+</li>
+<li><p>Être prêt à être rendu</p>
+<p>C'est encore différent des autres formats, sauf peut-être les formats d'application. Les données d'un fichier glTF sont destinées à être rendues, pas éditées. Les données qui ne sont pas importantes pour le rendu ont généralement été supprimées. Les polygones ont été convertis en triangles. Les matériaux ont des valeurs connues qui sont censées fonctionner partout.</p>
+</li>
+</ol>
+</li>
+</ul>
+<p>gLTF a été spécifiquement conçu pour que vous puissiez télécharger un fichier glTF et l'afficher avec un minimum de problèmes. Croisons les doigts pour que ce soit vraiment le cas, car aucun autre format n'a été capable de faire cela.</p>
+<p>Je n'étais pas vraiment sûr de ce que je devais montrer. À un certain niveau, le chargement et l'affichage d'un fichier gLTF sont plus simples qu'un fichier .OBJ. Contrairement à un fichier .OBJ, les matériaux font directement partie du format. Cela dit, j'ai pensé que je devais au moins en charger un et je pense qu'examiner les problèmes que j'ai rencontrés pourrait fournir de bonnes informations.</p>
+<p>En cherchant sur le net, j'ai trouvé <a href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6">cette ville low-poly</a> par <a href="https://sketchfab.com/antonmoek">antonmoek</a> qui semblait, si nous avons de la chance, faire un bon exemple.</p>
+<div class="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
+
+<p>En partant d'<a href="load-obj.html">un exemple de l'article sur les fichiers .OBJ</a>, j'ai supprimé le code de chargement de .OBJ et je l'ai remplacé par le code de chargement de .GLTF.</p>
+<p>L'ancien code .OBJ était</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
+mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
+  mtl.preload();
+  mtl.materials.Material.side = THREE.DoubleSide;
+  objLoader.setMaterials(mtl);
+  objLoader.load('resources/models/windmill/windmill.obj', (event) =&gt; {
+    const root = event.detail.loaderRootNode;
+    scene.add(root);
+    ...
+  });
+});
+</pre>
+<p>Le nouveau code .GLTF est</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const gltfLoader = new GLTFLoader();
+  const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
+  gltfLoader.load(url, (gltf) =&gt; {
+    const root = gltf.scene;
+    scene.add(root);
+    ...
+  });
+</pre>
+<p>J'ai gardé le code de cadrage automatique comme auparavant.</p>
+<p>Nous devons également inclure le <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> et nous pouvons nous débarrasser du <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+-import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+-import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
++import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+</pre>
+<p>Et en exécutant cela, nous obtenons</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Magie ! Ça fonctionne tout seul, textures comprises.</p>
+<p>Ensuite, je voulais voir si je pouvais animer les voitures qui circulent, j'ai donc eu besoin de vérifier si la scène avait les voitures comme entités séparées et si elles étaient configurées d'une manière que je pouvais utiliser.</p>
+<p>J'ai écrit du code pour afficher le graphe de scène dans la <a href="debugging-javascript.html">console JavaScript</a>.</p>
+<p>Voici le code pour imprimer le graphe de scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+  const localPrefix = isLast ? '└─' : '├─';
+  lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
+  const newPrefix = prefix + (isLast ? '  ' : '│ ');
+  const lastNdx = obj.children.length - 1;
+  obj.children.forEach((child, ndx) =&gt; {
+    const isLast = ndx === lastNdx;
+    dumpObject(child, lines, isLast, newPrefix);
+  });
+  return lines;
+}
+</pre>
+<p>Et je l'ai appelée juste après avoir chargé la scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
+  const root = gltf.scene;
+  scene.add(root);
+  console.log(dumpObject(root).join('\n'));
+</pre>
+<p><a href="../examples/load-gltf-dump-scenegraph.html">En exécutant cela</a>, j'ai obtenu cette liste</p>
+<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+  └─RootNode_(gltf_orientation_matrix) [Object3D]
+    └─RootNode_(model_correction_matrix) [Object3D]
+      └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
+        └─RootNode [Object3D]
+          │ ...
+          ├─Cars [Object3D]
+          │ ├─CAR_03_1 [Object3D]
+          │ │ └─CAR_03_1_World_ap_0 [Mesh]
+          │ ├─CAR_03 [Object3D]
+          │ │ └─CAR_03_World_ap_0 [Mesh]
+          │ ├─Car_04 [Object3D]
+          │ │ └─Car_04_World_ap_0 [Mesh]
+          │ ├─CAR_03_2 [Object3D]
+          │ │ └─CAR_03_2_World_ap_0 [Mesh]
+          │ ├─Car_04_1 [Object3D]
+          │ │ └─Car_04_1_World_ap_0 [Mesh]
+          │ ├─Car_04_2 [Object3D]
+          │ │ └─Car_04_2_World_ap_0 [Mesh]
+          │ ├─Car_04_3 [Object3D]
+          │ │ └─Car_04_3_World_ap_0 [Mesh]
+          │ ├─Car_04_4 [Object3D]
+          │ │ └─Car_04_4_World_ap_0 [Mesh]
+          │ ├─Car_08_4 [Object3D]
+          │ │ └─Car_08_4_World_ap8_0 [Mesh]
+          │ ├─Car_08_3 [Object3D]
+          │ │ └─Car_08_3_World_ap9_0 [Mesh]
+          │ ├─Car_04_1_2 [Object3D]
+          │ │ └─Car_04_1_2_World_ap_0 [Mesh]
+          │ ├─Car_08_2 [Object3D]
+          │ │ └─Car_08_2_World_ap11_0 [Mesh]
+          │ ├─CAR_03_1_2 [Object3D]
+          │ │ └─CAR_03_1_2_World_ap_0 [Mesh]
+          │ ├─CAR_03_2_2 [Object3D]
+          │ │ └─CAR_03_2_2_World_ap_0 [Mesh]
+          │ ├─Car_04_2_2 [Object3D]
+          │ │ └─Car_04_2_2_World_ap_0 [Mesh]
+          ...
+</pre>
+<p>À partir de cela, nous pouvons voir que toutes les voitures se trouvent sous un parent appelé <code class="notranslate" translate="no">"Cars"</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
+          │ ├─CAR_03_1 [Object3D]
+          │ │ └─CAR_03_1_World_ap_0 [Mesh]
+          │ ├─CAR_03 [Object3D]
+          │ │ └─CAR_03_World_ap_0 [Mesh]
+          │ ├─Car_04 [Object3D]
+          │ │ └─Car_04_World_ap_0 [Mesh]
+</pre>
+<p>Donc, comme test simple, j'ai pensé que j'essaierais juste de faire tourner tous les enfants du nœud "Cars" autour de leur axe Y.</p>
+<p>J'ai cherché le nœud "Cars" après avoir chargé la scène et j'ai sauvegardé le résultat.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
+{
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
+    const root = gltf.scene;
+    scene.add(root);
++    cars = root.getObjectByName('Cars');
+</pre>
+<p>Ensuite, dans la fonction <code class="notranslate" translate="no">render</code>, nous pouvons simplement définir la rotation de chaque enfant de <code class="notranslate" translate="no">cars</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
++  time *= 0.001;  // convertir en secondes
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  if (cars) {
++    for (const car of cars.children) {
++      car.rotation.y = time;
++    }
++  }
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Et nous obtenons</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Hmmm, il semble que malheureusement cette scène n'a pas été conçue pour animer les voitures, car leurs origines ne sont pas configurées à cette fin. Les camions tournent dans la mauvaise direction.</p>
+<p>Cela soulève un point important : si vous allez faire quelque chose en 3D, vous devez planifier à l'avance et concevoir vos éléments de manière à ce que leurs origines soient aux bons endroits, qu'ils aient la bonne échelle, etc.</p>
+<p>Comme je ne suis pas un artiste et que je ne connais pas très bien Blender, je vais bricoler cet exemple. Nous allons prendre chaque voiture et la faire appartenir à un autre <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Nous allons ensuite déplacer ces objets <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> pour déplacer les voitures, mais séparément, nous pouvons définir l'<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> d'origine de la voiture pour la réorienter afin qu'elle soit à peu près là où nous en avons vraiment besoin.</p>
+<p>En regardant à nouveau la liste du graphe de scène, il semble qu'il n'y ait en réalité que 3 types de voitures : "Car_08", "CAR_03" et "Car_04". Espérons que chaque type de voiture fonctionnera avec les mêmes ajustements.</p>
+<p>J'ai écrit ce code pour passer en revue chaque voiture, la faire appartenir à un nouvel <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, faire appartenir ce nouvel <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> à la scène, appliquer des paramètres par *type* de voiture pour corriger son orientation, et ajouter le nouvel <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> à un tableau <code class="notranslate" translate="no">cars</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
++const cars = [];
+{
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
+    const root = gltf.scene;
+    scene.add(root);
+
+-    cars = root.getObjectByName('Cars');
++    const loadedCars = root.getObjectByName('Cars');
++    const fixes = [
++      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
++      { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
++      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
++    ];
++
++    root.updateMatrixWorld();
++    for (const car of loadedCars.children.slice()) {
++      const fix = fixes.find(fix =&gt; car.name.startsWith(fix.prefix));
++      const obj = new THREE.Object3D();
++      car.getWorldPosition(obj.position);
++      car.position.set(0, 0, 0);
++      car.rotation.set(...fix.rot);
++      obj.add(car);
++      scene.add(obj);
++      cars.push(obj);
++    }
+     ...
+</pre>
+<p>Cela corrige l'orientation des voitures.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Maintenant, faisons-les rouler.</p>
+<p>Faire même un simple système de conduite est trop pour ce post, mais il semble qu'au lieu de cela, nous pourrions simplement créer un chemin alambiqué qui parcourt toutes les routes, puis placer les voitures sur ce chemin. Voici une image de Blender à mi-chemin de la construction du chemin.</p>
+<div class="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
+
+<p>J'avais besoin d'un moyen d'obtenir les données de ce chemin depuis Blender. Heureusement, j'ai pu sélectionner juste mon chemin et exporter en .OBJ en cochant "write nurbs".</p>
+<div class="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
+
+<p>En ouvrant le fichier .OBJ, j'ai pu obtenir une liste de points que j'ai formatée ainsi</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
+  [1.118281, 5.115846, -3.681386],
+  [3.948875, 5.115846, -3.641834],
+  [3.960072, 5.115846, -0.240352],
+  [3.985447, 5.115846, 4.585005],
+  [-3.793631, 5.115846, 4.585006],
+  [-3.826839, 5.115846, -14.736200],
+  [-14.542292, 5.115846, -14.765865],
+  [-14.520929, 5.115846, -3.627002],
+  [-5.452815, 5.115846, -3.634418],
+  [-5.467251, 5.115846, 4.549161],
+  [-13.266233, 5.115846, 4.567083],
+  [-13.250067, 5.115846, -13.499271],
+  [4.081842, 5.115846, -13.435463],
+  [4.125436, 5.115846, -5.334928],
+  [-14.521364, 5.115846, -5.239871],
+  [-14.510466, 5.115846, 5.486727],
+  [5.745666, 5.115846, 5.510492],
+  [5.787942, 5.115846, -14.728308],
+  [-5.423720, 5.115846, -14.761919],
+  [-5.373599, 5.115846, -3.704133],
+  [1.004861, 5.115846, -3.641834],
+];
+</pre>
+<p>THREE.js possède des classes de courbes. La <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> semblait pouvoir fonctionner. L'intérêt de ce type de courbe est qu'elle essaie de créer une courbe lisse passant par les points.</p>
+<p>En fait, l'insertion directe de ces points générera une courbe comme celle-ci</p>
+<div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
+
+<p>mais nous voulons des coins plus marqués. Il semblait que si nous calculions des points supplémentaires, nous pourrions obtenir ce que nous voulons. Pour chaque paire de points, nous allons calculer un point à 10 % du chemin entre les 2 points et un autre à 90 % du chemin entre les 2 points, et passer le résultat à <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>.</p>
+<p>Cela nous donnera une courbe comme celle-ci</p>
+<div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
+
+<p>Voici le code pour créer la courbe</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
+let curveObject;
+{
+  const controlPoints = [
+    [1.118281, 5.115846, -3.681386],
+    [3.948875, 5.115846, -3.641834],
+    [3.960072, 5.115846, -0.240352],
+    [3.985447, 5.115846, 4.585005],
+    [-3.793631, 5.115846, 4.585006],
+    [-3.826839, 5.115846, -14.736200],
+    [-14.542292, 5.115846, -14.765865],
+    [-14.520929, 5.115846, -3.627002],
+    [-5.452815, 5.115846, -3.634418],
+    [-5.467251, 5.115846, 4.549161],
+    [-13.266233, 5.115846, 4.567083],
+    [-13.250067, 5.115846, -13.499271],
+    [4.081842, 5.115846, -13.435463],
+    [4.125436, 5.115846, -5.334928],
+    [-14.521364, 5.115846, -5.239871],
+    [-14.510466, 5.115846, 5.486727],
+    [5.745666, 5.115846, 5.510492],
+    [5.787942, 5.115846, -14.728308],
+    [-5.423720, 5.115846, -14.761919],
+    [-5.373599, 5.115846, -3.704133],
+    [1.004861, 5.115846, -3.641834],
+  ];
+  const p0 = new THREE.Vector3();
+  const p1 = new THREE.Vector3();
+  curve = new THREE.CatmullRomCurve3(
+    controlPoints.map((p, ndx) =&gt; {
+      p0.set(...p);
+      p1.set(...controlPoints[(ndx + 1) % controlPoints.length]);
+      return [
+        (new THREE.Vector3()).copy(p0),
+        (new THREE.Vector3()).lerpVectors(p0, p1, 0.1),
+        (new THREE.Vector3()).lerpVectors(p0, p1, 0.9),
+      ];
+    }).flat(),
+    true,
+  );
+  {
+    const points = curve.getPoints(250);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({color: 0xff0000});
+    curveObject = new THREE.Line(geometry, material);
+    scene.add(curveObject);
+  }
+}
+</pre>
+<p>La première partie de ce code crée une courbe. La deuxième partie de ce code génère 250 points à partir de la courbe, puis crée un objet pour afficher les lignes formées en connectant ces 250 points.</p>
+<p>En exécutant <a href="../examples/load-gltf-car-path.html">l'exemple</a>, je n'ai pas vu la courbe. Pour la rendre visible, je l'ai fait ignorer le test de profondeur et la rendre en dernier.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
++    material.depthTest = false;
++    curveObject.renderOrder = 1;
+</pre>
+<p>Et c'est là que j'ai découvert qu'elle était beaucoup trop petite.</p>
+<div class="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
+
+<p>En vérifiant la hiérarchie dans Blender, j'ai découvert que l'artiste avait mis à l'échelle le nœud parent de toutes les voitures.</p>
+<div class="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
+
+<p>La mise à l'échelle est mauvaise pour les applications 3D en temps réel. Elle cause toutes sortes de problèmes et finit par être une source de frustration infinie lors de la création d'applications 3D en temps réel. Les artistes ne le savent souvent pas car il est si facile de mettre à l'échelle une scène entière dans un programme d'édition 3D, mais si vous décidez de créer une application 3D en temps réel, je vous suggère de demander à vos artistes de ne jamais rien mettre à l'échelle. S'ils modifient l'échelle, ils devraient trouver un moyen d'appliquer cette échelle aux sommets afin que, lorsqu'elle arrive dans votre application, vous puissiez ignorer l'échelle.</p>
+<p>Et, pas seulement l'échelle, dans ce cas, les voitures sont tournées et décalées par leur parent, le nœud <code class="notranslate" translate="no">Cars</code>. Cela rendra difficile au moment de l'exécution de déplacer les voitures dans l'espace mondial. Pour être clair, dans ce cas, nous voulons que les voitures circulent dans l'espace mondial, c'est pourquoi ces problèmes se posent. Si quelque chose est destiné à être manipulé dans un espace local, comme la lune tournant autour de la terre, c'est moins problématique.</p>
+<p>Pour en revenir à la fonction que nous avons écrite ci-dessus pour afficher le graphe de scène, affichons la position, la rotation et l'échelle de chaque nœud.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
++  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
++}
+
+function dumpObject(obj, lines, isLast = true, prefix = '') {
+  const localPrefix = isLast ? '└─' : '├─';
+  lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
++  const dataPrefix = obj.children.length
++     ? (isLast ? '  │ ' : '│ │ ')
++     : (isLast ? '    ' : '│   ');
++  lines.push(`${prefix}${dataPrefix}  pos: ${dumpVec3(obj.position)}`);
++  lines.push(`${prefix}${dataPrefix}  rot: ${dumpVec3(obj.rotation)}`);
++  lines.push(`${prefix}${dataPrefix}  scl: ${dumpVec3(obj.scale)}`);
+  const newPrefix = prefix + (isLast ? '  ' : '│ ');
+  const lastNdx = obj.children.length - 1;
+  obj.children.forEach((child, ndx) =&gt; {
+    const isLast = ndx === lastNdx;
+    dumpObject(child, lines, isLast, newPrefix);
+  });
+  return lines;
+}
+</pre>
+<p>Et le résultat de <a href="../examples/load-gltf-dump-scenegraph-extra.html">l'exécution</a></p>
+<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+  │   pos: 0.000, 0.000, 0.000
+  │   rot: 0.000, 0.000, 0.000
+  │   scl: 1.000, 1.000, 1.000
+  └─RootNode_(gltf_orientation_matrix) [Object3D]
+    │   pos: 0.000, 0.000, 0.000
+    │   rot: -1.571, 0.000, 0.000
+    │   scl: 1.000, 1.000, 1.000
+    └─RootNode_(model_correction_matrix) [Object3D]
+      │   pos: 0.000, 0.000, 0.000
+      │   rot: 0.000, 0.000, 0.000
+      │   scl: 1.000, 1.000, 1.000
+      └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
+        │   pos: 0.000, 0.000, 0.000
+        │   rot: 1.571, 0.000, 0.000
+        │   scl: 1.000, 1.000, 1.000
+        └─RootNode [Object3D]
+          │   pos: 0.000, 0.000, 0.000
+          │   rot: 0.000, 0.000, 0.000
+          │   scl: 1.000, 1.000, 1.000
+          ├─Cars [Object3D]
+*          │ │   pos: -369.069, -90.704, -920.159
+*          │ │   rot: 0.000, 0.000, 0.000
+*          │ │   scl: 1.000, 1.000, 1.000
+          │ ├─CAR_03_1 [Object3D]
+          │ │ │   pos: 22.131, 14.663, -475.071
+          │ │ │   rot: -3.142, 0.732, 3.142
+          │ │ │   scl: 1.500, 1.500, 1.500
+          │ │ └─CAR_03_1_World_ap_0 [Mesh]
+          │ │       pos: 0.000, 0.000, 0.000
+          │ │       rot: 0.000, 0.000, 0.000
+          │ │       scl: 1.000, 1.000, 1.000
+</pre>
+<p>Cela nous montre que l'<code class="notranslate" translate="no">Cars</code> dans la scène originale a vu sa rotation et son échelle supprimées et appliquées à ses enfants. Cela suggère que soit l'exportateur utilisé pour créer le fichier .GLTF a fait un travail spécial ici, soit plus probablement l'artiste a exporté une version différente du fichier que le fichier .blend correspondant, ce qui explique pourquoi les choses ne correspondent pas.</p>
+<p>La morale de l'histoire est que j'aurais probablement dû télécharger le fichier .blend et exporter moi-même. Avant d'exporter, j'aurais dû inspecter tous les nœuds principaux et supprimer toute transformation.</p>
+<p>Tous ces nœuds en haut</p>
+<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+  │   pos: 0.000, 0.000, 0.000
+  │   rot: 0.000, 0.000, 0.000
+  │   scl: 1.000, 1.000, 1.000
+  └─RootNode_(gltf_orientation_matrix) [Object3D]
+    │   pos: 0.000, 0.000, 0.000
+    │   rot: -1.571, 0.000, 0.000
+    │   scl: 1.000, 1.000, 1.000
+    └─RootNode_(model_correction_matrix) [Object3D]
+      │   pos: 0.000, 0.000, 0.000
+      │   rot: 0.000, 0.000, 0.000
+      │   scl: 1.000, 1.000, 1.000
+      └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
+        │   pos: 0.000, 0.000, 0.000
+        │   rot: 1.571, 0.000, 0.000
+        │   scl: 1.000, 1.000, 1.000
+</pre>
+<p>sont également un gaspillage.</p>
+<p>Idéalement, la scène devrait se composer d'un seul nœud "racine" sans position, rotation ou échelle. Au moment de l'exécution, je pourrais alors retirer tous les enfants de cette racine et les faire appartenir à la scène elle-même. Il pourrait y avoir des enfants de la racine comme "Cars" qui m'aideraient à trouver toutes les voitures, mais idéalement, il n'aurait pas non plus de translation, rotation ou échelle afin que je puisse rattacher les voitures à la scène avec un minimum de travail.</p>
+<p>En tout cas, la solution la plus rapide, même si ce n'est peut-être pas la meilleure, est de simplement ajuster l'objet que nous utilisons pour visualiser la courbe.</p>
+<p>Voici ce que j'ai obtenu au final.</p>
+<p>D'abord, j'ai ajusté la position de la courbe et trouvé des valeurs qui semblaient fonctionner. Je l'ai ensuite cachée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const points = curve.getPoints(250);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({color: 0xff0000});
+  curveObject = new THREE.Line(geometry, material);
++  curveObject.scale.set(100, 100, 100);
++  curveObject.position.y = -621;
++  curveObject.visible = false;
+  material.depthTest = false;
+  curveObject.renderOrder = 1;
+  scene.add(curveObject);
+}
+</pre>
+<p>Ensuite, j'ai écrit du code pour déplacer les voitures le long de la courbe. Pour chaque voiture, nous choisissons une position de 0 à 1 le long de la courbe et calculons un point dans l'espace mondial en utilisant l'<code class="notranslate" translate="no">curveObject</code> pour transformer le point. Nous choisissons ensuite un autre point légèrement plus loin sur la courbe. Nous définissons l'orientation de la voiture en utilisant <code class="notranslate" translate="no">lookAt</code> et plaçons la voiture au point médian entre les 2 points.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// créer 2 Vector3 que nous pouvons utiliser pour les calculs de chemin
+const carPosition = new THREE.Vector3();
+const carTarget = new THREE.Vector3();
+
+function render(time) {
+  ...
+
+-  for (const car of cars) {
+-    car.rotation.y = time;
+-  }
+
++  {
++    const pathTime = time * .01;
++    const targetOffset = 0.01;
++    cars.forEach((car, ndx) =&gt; {
++      // un nombre entre 0 et 1 pour espacer uniformément les voitures
++      const u = pathTime + ndx / cars.length;
++
++      // obtenir le premier point
++      curve.getPointAt(u % 1, carPosition);
++      carPosition.applyMatrix4(curveObject.matrixWorld);
++
++      // obtenir un deuxième point légèrement plus loin sur la courbe
++      curve.getPointAt((u + targetOffset) % 1, carTarget);
++      carTarget.applyMatrix4(curveObject.matrixWorld);
++
++      // placer la voiture au premier point (temporairement)
++      car.position.copy(carPosition);
++      // orienter la voiture vers le deuxième point
++      car.lookAt(carTarget);
++
++      // placer la voiture entre les 2 points
++      car.position.lerpVectors(carPosition, carTarget, 0.5);
++    });
++  }
+</pre>
+<p>et quand je l'ai exécuté, j'ai découvert que pour chaque type de voiture, leur hauteur au-dessus de leurs origines n'est pas définie de manière cohérente, et j'ai donc dû décaler chacune un peu.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
+const fixes = [
+-  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
+-  { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
+-  { prefix: 'Car_04', rot: [0, Math.PI, 0], },
++  { prefix: 'Car_08', y: 0,  rot: [Math.PI * .5, 0, Math.PI * .5], },
++  { prefix: 'CAR_03', y: 33, rot: [0, Math.PI, 0], },
++  { prefix: 'Car_04', y: 40, rot: [0, Math.PI, 0], },
+];
+
+root.updateMatrixWorld();
+for (const car of loadedCars.children.slice()) {
+  const fix = fixes.find(fix =&gt; car.name.startsWith(fix.prefix));
+  const obj = new THREE.Object3D();
+  car.getWorldPosition(obj.position);
+-  car.position.set(0, 0, 0);
++  car.position.set(0, fix.y, 0);
+  car.rotation.set(...fix.rot);
+  obj.add(car);
+  scene.add(obj);
+  cars.push(obj);
+}
+</pre>
+<p>Et le résultat.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Pas mal pour quelques minutes de travail.</p>
+<p>La dernière chose que je voulais faire est d'activer les ombres.</p>
+<p>Pour ce faire, j'ai pris tout le code GUI de l'exemple d'ombres <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> dans <a href="shadows.html">l'article sur les ombres</a> et l'ai collé dans notre dernier code.</p>
+<p>Ensuite, après le chargement, nous devons activer les ombres sur tous les objets.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
+    const root = gltf.scene;
+    scene.add(root);
+
++    root.traverse((obj) =&gt; {
++      if (obj.castShadow !== undefined) {
++        obj.castShadow = true;
++        obj.receiveShadow = true;
++      }
++    });
+</pre>
+<p>J'ai ensuite passé près de 4 heures à essayer de comprendre pourquoi les helpers d'ombre ne fonctionnaient pas. C'était parce que j'avais oublié d'activer les ombres avec</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
+</pre>
+<p>😭</p>
+<p>J'ai ensuite ajusté les valeurs jusqu'à ce que la caméra d'ombre de notre <code class="notranslate" translate="no">DirectionLight</code> ait un frustum qui couvrait toute la scène. Voici les paramètres avec lesquels j'ai fini.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
++  light.castShadow = true;
+*  light.position.set(-250, 800, -850);
+*  light.target.position.set(-550, 40, -450);
+
++  light.shadow.bias = -0.004;
++  light.shadow.mapSize.width = 2048;
++  light.shadow.mapSize.height = 2048;
+
+  scene.add(light);
+  scene.add(light.target);
++  const cam = light.shadow.camera;
++  cam.near = 1;
++  cam.far = 2000;
++  cam.left = -1500;
++  cam.right = 1500;
++  cam.top = 1500;
++  cam.bottom = -1500;
+...
+</pre>
+<p>et j'ai défini la couleur de fond en bleu clair.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+-scene.background = new THREE.Color('black');
++scene.background = new THREE.Color('#DEFEFF');
+</pre>
+<p>Et ... les ombres</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>J'espère que parcourir ce projet a été utile et a montré de bons exemples de résolution de certains des problèmes liés au chargement d'un fichier avec un graphe de scène.</p>
+<p>Une chose intéressante est qu'en comparant le fichier .blend au fichier .gltf, le fichier .blend a plusieurs lumières mais elles ne sont pas des lumières après avoir été chargées dans la scène. Un fichier .GLTF est juste un fichier JSON, vous pouvez donc facilement regarder à l'intérieur. Il se compose de plusieurs tableaux de choses et chaque élément dans un tableau est référencé par index ailleurs. Bien qu'il y ait des extensions en cours de développement, elles soulignent un problème commun à presque tous les formats 3D. <strong>Ils ne peuvent jamais couvrir tous les cas</strong>.</p>
+<p>Il y a toujours un besoin de plus de données. Par exemple, nous avons exporté manuellement un chemin pour les voitures à suivre. Idéalement, cette information aurait pu être dans le fichier .GLTF, mais pour ce faire, nous aurions besoin d'écrire notre propre exportateur et de marquer d'une manière ou d'une autre les nœuds pour la façon dont nous voulons qu'ils soient exportés, ou utiliser un schéma de nommage ou quelque chose de similaire pour obtenir les données de l'outil que nous utilisons pour créer les données dans notre application.</p>
+<p>Tout cela est laissé comme un exercice pour le lecteur.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

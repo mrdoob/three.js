@@ -1,0 +1,252 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - tsl editor</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<style>
+			#source {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 50%;
+				height: 100%;
+			}
+			#result {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 50%;
+				height: 100%;
+			}
+			#renderer {
+				position: absolute;
+				bottom: 15px;
+				right: calc( 50% + 15px );
+				width: 200px;
+				height: 200px;
+				z-index: 100;
+				pointer-events: none;
+			}
+		</style>
+
+		<div id="source"></div>
+		<div id="result"></div>
+		<div id="renderer"></div>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { vec4 } from 'three/tsl';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			init();
+
+			function init() {
+
+				// add the dependencies
+
+				const width = 200;
+				const height = 200;
+
+				const camera = new THREE.PerspectiveCamera( 70, width / height, 0.1, 10 );
+				camera.position.z = .72;
+				camera.lookAt( 0, 0, 0 );
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				const rendererDOM = document.getElementById( 'renderer' );
+
+				const renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( 200, 200 );
+				rendererDOM.appendChild( renderer.domElement );
+
+				const material = new THREE.NodeMaterial();
+				material.fragmentNode = vec4( 0, 0, 0, 1 );
+
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				scene.add( mesh );
+
+				//
+
+				let compiling = false;
+
+				renderer.setAnimationLoop( () => {
+
+					if ( compiling ) return;
+
+					renderer.render( scene, camera );
+
+				} );
+
+				// editor
+
+				window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } } );
+
+				require( [ 'vs/editor/editor.main' ], () => {
+
+					const options = {
+						shader: 'fragment',
+						outputColorSpace: THREE.SRGBColorSpace,
+						output: 'WGSL',
+						preview: true
+					};
+
+					let timeout = null;
+					let rawShader = null;
+
+					const editorDOM = document.getElementById( 'source' );
+					const resultDOM = document.getElementById( 'result' );
+
+					const tslCode = `// Simple uv.x animation
+
+const { texture, uniform, vec2, vec4, uv, oscSine, time, grayscale } = await import( 'three/tsl' );
+
+const samplerTexture = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
+samplerTexture.wrapS = THREE.RepeatWrapping;
+samplerTexture.colorSpace = THREE.SRGBColorSpace;
+
+const scaledTime = time.mul( .5 ); // .5 is speed
+const uv0 = uv();
+const animateUv = vec2( uv0.x.add( oscSine( scaledTime ) ), uv0.y );
+
+// .setName() is optional
+const myMap = texture( samplerTexture, animateUv ).rgb.setName( 'myTexture' );
+const myColor = uniform( new THREE.Color( 0x0066ff ) ).setName( 'myColor' );
+const opacity = .7;
+
+const desaturatedMap = grayscale( myMap.rgb );
+
+const finalColor = desaturatedMap.add( myColor );
+
+output = vec4( finalColor, opacity );
+`;
+
+					const editor = window.monaco.editor.create( editorDOM, {
+						value: tslCode,
+						language: 'javascript',
+						theme: 'vs-dark',
+						automaticLayout: true,
+						minimap: { enabled: false }
+					} );
+
+					const result = window.monaco.editor.create( resultDOM, {
+						value: '',
+						language: 'wgsl',
+						theme: 'vs-dark',
+						automaticLayout: true,
+						readOnly: true,
+						minimap: { enabled: false }
+					} );
+
+					const showCode = () => {
+
+						result.setValue( rawShader[ options.shader + 'Shader' ] );
+						result.revealLine( 1 );
+
+					};
+
+					const webGLRenderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+
+					const build = async () => {
+
+						try {
+
+							const AsyncFunction = async function () {}.constructor;
+
+							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
+							const nodes = await ( new AsyncFunction( 'THREE', tslCode )( THREE ) );
+
+							mesh.material.fragmentNode = nodes.output;
+							mesh.material.needsUpdate = true;
+
+							compiling = true;
+
+							if ( options.output === 'WGSL' ) {
+
+								rawShader = await renderer.debug.getShaderAsync( scene, camera, mesh );
+
+
+							} else if ( options.output === 'GLSL ES 3.0' ) {
+
+								rawShader = await webGLRenderer.debug.getShaderAsync( scene, camera, mesh );
+
+							}
+
+							compiling = false;
+
+							showCode();
+
+							// extra debug info
+
+							/*const style = 'background-color: #333; color: white; font-style: italic; border: 2px solid #777; font-size: 22px;';
+
+							console.log( '%c  [ WGSL ] Vertex Shader      ', style );
+							console.log( rawShader.vertexShader );
+							console.log( '%c  [ WGSL ] Fragment Shader    ', style );
+							console.log( rawShader.fragmentShader );/**/
+
+						} catch ( e ) {
+
+							result.setValue( 'Error: ' + e.message );
+
+						}
+
+					};
+
+					build();
+
+					editor.getModel().onDidChangeContent( () => {
+
+						if ( timeout ) clearTimeout( timeout );
+
+						timeout = setTimeout( build, 1000 );
+
+					} );
+
+					// gui
+
+					const gui = new GUI();
+
+					gui.add( options, 'output', [ 'WGSL', 'GLSL ES 3.0' ] ).onChange( build );
+					gui.add( options, 'shader', [ 'vertex', 'fragment' ] ).onChange( showCode );
+
+					gui.add( options, 'outputColorSpace', [ THREE.LinearSRGBColorSpace, THREE.SRGBColorSpace ] ).onChange( ( value ) => {
+
+						renderer.outputColorSpace = value;
+
+						build();
+
+					} );
+
+					gui.add( options, 'preview' ).onChange( ( value ) => {
+
+						rendererDOM.style.display = value ? '' : 'none';
+
+					} );
+
+				} );
+
+			}
+
+		</script>
+	</body>
+</html>

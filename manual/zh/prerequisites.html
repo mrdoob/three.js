@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>先决条件</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 先决条件">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>先决条件</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>这些文章意在帮助你学习如何使用three.js。
+假设你知道怎么使用JavaScript编程。假设
+你知道DOM是什么，怎么写HTML以及使用JavaScript创建
+DOM元素。假设你知道如何使用 <code class="notranslate" translate="no">&lt;script&gt;</code>标签来
+引用外部的JavaScript文件以及行内脚本。
+假设你了解CSS并且知道
+<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS选择器</a>.
+还假设你了解ES5、 ES6或者一些ES7。
+假设你知道浏览器通过事件和回调函数来运行JavaScript。
+假设你知道什么是闭包。</p>
+<p>这有一些简单的复习和笔记。</p>
+<h2 id="-document-queryselector-and-document-queryselectorall-"><code class="notranslate" translate="no">document.querySelector</code> and <code class="notranslate" translate="no">document.querySelectorAll</code></h2>
+<p>你可以使用<code class="notranslate" translate="no">document.querySelector</code>来选择和CSS选择器
+匹配的第一个元素。 <code class="notranslate" translate="no">document.querySelectorAll</code>返回
+所有和CSS选择器匹配的元素。</p>
+<h2 id="you-don-t-need-onbody-">You don't need <code class="notranslate" translate="no">onbody</code></h2>
+<p>很多20年前的页面像这样使用HTML</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body onload="somefunction()"&gt;
+</pre><p>这种风格已经被弃用了。将你的脚本放在
+页面的底部。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;html&gt;
+  &lt;head&gt;
+    ...
+  &lt;/head&gt;
+  &lt;body&gt;
+     ...
+  &lt;/body&gt;
+  &lt;script&gt;
+    // inline javascript
+  &lt;/script&gt;
+&lt;/html&gt;
+</pre>
+<p>or <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script">use the <code class="notranslate" translate="no">defer</code> property</a>.</p>
+<h2 id="-">了解闭包如何工作</h2>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function a(v) {
+  const foo = v;
+  return function() {
+     return foo;
+  };
+}
+
+const f = a(123);
+const g = a(456);
+console.log(f());  // prints 123
+console.log(g());  // prints 456
+</pre>
+<p>在上面的代码中函数<code class="notranslate" translate="no">a</code>每次被调用都会创建一个新的函数。新函数
+会封存变量<code class="notranslate" translate="no">foo</code>. 这里有 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures">更多信息</a>.</p>
+<h2 id="-this-">理解<code class="notranslate" translate="no">this</code>的工作原理</h2>
+<p><code class="notranslate" translate="no">this</code>并不是什么魔法。它实际上像是一个像被自动传给函数的参数一样的变量。
+简单的说就是像这样直接调用函数</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code>将会为<code class="notranslate" translate="no">null</code> (使用严格模式时) 当你使用<code class="notranslate" translate="no">.</code>操作符像这样调用函数时</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">someobject.somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code>将会被设置为<code class="notranslate" translate="no">someobject</code>。</p>
+<p>令人困惑的部分是使用回调函数。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction;
+ loader.load(callback);
+</pre><p>并没有像不熟悉的所期望的那样工作，因为当
+<code class="notranslate" translate="no">loader.load</code>调用回调函数时并没有使用<code class="notranslate" translate="no">.</code>操作符。
+所以默认<code class="notranslate" translate="no">this</code>将会为null (除非loader明确将他设置为某些东西)。
+如果你希望<code class="notranslate" translate="no">this</code>为<code class="notranslate" translate="no">someobject</code>当回调函数执行时你需要
+通过将this绑定到函数来告诉JavaScript。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction.bind(someobject);
+ loader.load(callback);
+</pre><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this"><em>this</em> article might help explain <code class="notranslate" translate="no">this</code></a>.</p>
+<h2 id="es5-es6-es7-">ES5/ES6/ES7 特性</h2>
+<h3 id="-var-const-let-"><code class="notranslate" translate="no">var</code>已经被弃用，使用<code class="notranslate" translate="no">const</code>和<code class="notranslate" translate="no">let</code></h3>
+<p>没有<strong>任何</strong>理由再使用<code class="notranslate" translate="no">var</code>，基于此使用它被认为是
+坏习惯。大所数时间如果变量不会被重新分配使用<code class="notranslate" translate="no">const</code>。
+变量会改变的情况下使用<code class="notranslate" translate="no">let</code>。这将会帮助避免大量bug。</p>
+<h3 id="-for-elem-of-collection-for-elem-in-collection-">使用<code class="notranslate" translate="no">for(elem of collection)</code>而不是<code class="notranslate" translate="no">for(elem in collection)</code></h3>
+<p><code class="notranslate" translate="no">for of</code>是新的，<code class="notranslate" translate="no">for in</code>是旧的。 <code class="notranslate" translate="no">for of</code>解决了<code class="notranslate" translate="no">for in</code>的问题。</p>
+<p>举个例子，你可以像这样迭代一个对象的所有键/值对</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const [key, value] of Object.entries(someObject)) {
+  console.log(key, value);
+}
+</pre>
+<h3 id="-foreach-map-filter-">使用 <code class="notranslate" translate="no">forEach</code>, <code class="notranslate" translate="no">map</code>, 和 <code class="notranslate" translate="no">filter</code></h3>
+<p>数组新增的函数<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a>、
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a>和
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code class="notranslate" translate="no">filter</code></a>
+在现代JavaScript中使用都是相当广泛的。</p>
+<h3 id="-">使用解构赋值</h3>
+<p>假设有一个对象<code class="notranslate" translate="no">const dims = {width: 300, height: 150}</code></p>
+<p>老的代码</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const width = dims.width;
+ const height = dims.height;
+</pre><p>新代码</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const {width, height} = dims;
+</pre><h3 id="-">使用对象声明简写</h3>
+<p>老的代码</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width: width,
+   height: height,
+   area: function() {
+     return this.width * this.height
+   },
+ };
+</pre>
+<p>新代码</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width,
+   height,
+   area() {
+     return this.width * this.height;
+   },
+ };
+</pre>
+<h3 id="-">使用扩展运算符<code class="notranslate" translate="no">...</code></h3>
+<p>扩展运算符有大量的用途。例如</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> function log(className, ...args) {
+   const elem = document.createElement('div');
+   elem.className = className;
+   elem.textContent = [...args].join(' ');
+   document.body.appendChild(elem);
+ }
+</pre>
+<p>另一个例子</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const position = [1, 2, 3];
+somemesh.position.set(...position);
+</pre>
+<h3 id="-class-">使用<code class="notranslate" translate="no">class</code></h3>
+<p>大多数人都不熟悉在ES5之前生成类对象的语法。
+ES5之后你现在可以<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">使用<code class="notranslate" translate="no">class</code>
+关键字</a>
+接近于C++/C#/Java的语法。</p>
+<h3 id="-getters-setters">理解 getters 和 setters</h3>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">Getters</a>和
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set">setters</a>是
+在大多数现代语言中常见的。ES6<code class="notranslate" translate="no">class</code>语法
+让他们比ES6之前的更容易。</p>
+<h3 id="-">合理使用箭头函数</h3>
+<p>回调函数和promise使用箭头函数非常有用</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loader.load((texture) =&gt; {
+  // use textrue
+});
+</pre>
+<p>箭头函数会绑定<code class="notranslate" translate="no">this</code>，它是下面的简写</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">(function(args) {/* code */}).bind(this))
+</pre>
+<h3 id="promises-async-await">Promises 以及 async/await</h3>
+<p>Promises改善异步代码的处理。Async/await改善
+promise的使用。</p>
+<p>这是一个需要深入了解的话题你可以<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">在这里
+细读promises</a>
+和<a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">async/await</a>.</p>
+<h3 id="-">使用模板字符串</h3>
+<p>模板字符串是使用反引号代替引号的字符串。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const foo = `this is a template literal`;
+</pre><p>模板字符串有两个基本的特点。一个是它可以多行</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = `this
+is
+a
+template
+literal`;
+const bar = "this\nis\na\ntemplate\nliteral";
+</pre>
+<p>上面的<code class="notranslate" translate="no">foo</code>和<code class="notranslate" translate="no">bar</code>是一样的。</p>
+<p>另一个是你可以超越字符串模式
+使用<code class="notranslate" translate="no">${javascript表达式}</code>插入JavaScript代码段。这是模板部分。比如:</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const r = 192;
+const g = 255;
+const b = 64;
+const rgbCSSColor = `rgb(${r},${g},${b})`;
+</pre>
+<p>or</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = [192, 255, 64];
+const rgbCSSColor = `rgb(${color.join(',')})`;
+</pre>
+<p>or</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const aWidth = 10;
+const bWidth = 20;
+someElement.style.width = `${aWidth + bWidth}px`;
+</pre>
+<h1 id="-javascript-">学习JavaScript代码风格。</h1>
+<p>尽管欢迎您以任何方式组织您的代码，但至少有一个约定您应该知道。
+在JavaScript中变量、函数名、方法名
+都是小驼峰。构造函数、类名都是
+大驼峰。如果你遵守这些约定你的diamagnetic将会和大部分JavaScript匹配。</p>
+<h1 id="-visual-studio-code">考虑使用Visual Studio Code</h1>
+<p>当然你想想用什么编辑器就用什么但是如果你没尝试过它那就考虑下
+使用<a href="https://code.visualstudio.com/">Visual Studio Code</a>来写JavaScript。
+安装完之后<a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">设置
+eslint</a>。
+可能会花几分钟来设置但是会对你寻找JavaScript的bug有极大的帮助。</p>
+<p>一些例子</p>
+<p>如果你开启<a href="https://eslint.org/docs/rules/no-undef"><code class="notranslate" translate="no">no-undef</code>规则</a>然后
+VSCode通过ESLint将会警告你很多没有定义的变量。 </p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-defined.png"></div>
+
+<p>上面你可以看到我将<code class="notranslate" translate="no">doTheThing</code>误写成了<code class="notranslate" translate="no">doThing</code>。有一个红色的曲线
+在<code class="notranslate" translate="no">doThing</code>下面并且鼠标悬停会提醒我们它未定义。这样就避免了一个错误。</p>
+<p>使用<code class="notranslate" translate="no">THREE</code>会得到警告所以将<code class="notranslate" translate="no">/* global THREE */</code>放在你的
+JavaScript文件的顶部来告诉eslint<code class="notranslate" translate="no">THREE</code>的存在。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-a-constructor.png"></div>
+
+<p>上面你可以看到eslint知道使用<code class="notranslate" translate="no">UpperCaseNames</code>规则的是构造函数
+所以你应该使用<code class="notranslate" translate="no">new</code>操作符。另一个错误被捕捉并避免了。这是<a href="https://eslint.org/docs/rules/new-cap">the
+<code class="notranslate" translate="no">new-cap</code>规则</a>。</p>
+<p>这里有<a href="https://eslint.org/docs/rules/">100多条规则你可以打开或者关闭或者自定义
+</a>。比如上面我提醒你
+应该使用<code class="notranslate" translate="no">const</code>和<code class="notranslate" translate="no">let</code>代替<code class="notranslate" translate="no">var</code>。</p>
+<p>这里我使用了<code class="notranslate" translate="no">var</code>它警告我应该使用<code class="notranslate" translate="no">let</code>或者<code class="notranslate" translate="no">const</code></p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-var.png"></div>
+
+<p>这里我是用了<code class="notranslate" translate="no">let</code>但是它发现我一直没改变值所以建议我使<code class="notranslate" translate="no">const</code>。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-let.png"></div>
+
+<p>当然如果你更希望继续使用<code class="notranslate" translate="no">var</code>你只要关闭那条规则。
+如我上面所说所以我更喜欢使用<code class="notranslate" translate="no">const</code>和<code class="notranslate" translate="no">let</code>而不是<code class="notranslate" translate="no">var</code>因为
+他们工作的更好而且能减少bugs。</p>
+<p>对于确实需要重写这些规则的情况<a href="https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments">你可以添加注释
+来禁用
+他们</a>
+通过单行或者一段代码。</p>
+<h1 id="-">如果你确实需要支持老的浏览器请使用编译器</h1>
+<p>大多数现代浏览器都是自动更新的，所以使用这些新的特性会帮助你提高效率
+和避免bug。意思是说，如果你正在做一个需要支持老的浏览器的项目，
+<a href="https://babeljs.io">有工具会把ES5/ES6/ES7代码
+转换成ES5之前的Javascript</a>.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

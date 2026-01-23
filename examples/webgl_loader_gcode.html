@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - GCode loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GCode loader
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, controls, loader;
+
+			let model;
+
+			const params = {
+				asset: 'benchy'
+			};
+
+			const assets = [
+				'benchy',
+				'test_m82',
+				'test_m83',
+			];
+
+			const positions = [
+				new THREE.Vector3( - 100, - 20, 100 ),
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( 0, 0, 0 ),
+			];
+
+			init();
+			render();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 70 );
+
+				scene = new THREE.Scene();
+
+				loader = new GCodeLoader();
+				loadAsset( params.asset );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 10;
+				controls.maxDistance = 100;
+
+				window.addEventListener( 'resize', resize );
+
+				const gui = new GUI();
+
+			
+				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+
+					if ( model ) {
+
+						model.traverse( function ( object ) {
+
+							if ( object.material ) object.material.dispose();
+							if ( object.geometry ) object.geometry.dispose();
+
+						} );
+
+						scene.remove( model );
+
+					}
+
+					loadAsset( value );
+
+				} );
+
+				gui.open();
+
+
+			}
+
+			function loadAsset( asset ) {
+
+				loader.load( 'models/gcode/' + asset + '.gcode', function ( object ) {
+
+					model = object;
+					model.position.copy( positions[ assets.indexOf( asset ) ] );
+					scene.add( model );
+					controls.reset();
+
+				} );
+
+			}
+
+			function resize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

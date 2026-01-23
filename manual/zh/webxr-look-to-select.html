@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<title>VR - 用目光进行选择</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@threejs">
+	<meta name="twitter:title" content="Three.js – VR - 用目光进行选择">
+	<meta property="og:image" content="https://threejs.org/files/share.png">
+	<link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+	<link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+	<link rel="stylesheet" href="../resources/lesson.css">
+	<link rel="stylesheet" href="../resources/lang.css">
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "../../build/three.module.js"
+		  }
+		}
+	</script>
+</head>
+<body>
+<div class="container">
+	<div class="lesson-title">
+		<h1>VR - 用目光进行选择</h1>
+	</div>
+	<div class="lesson">
+		<div class="lesson-main">
+			<p><strong>注意：本页示例需要支持VR的设备。没有这样的设备则无法运行。参见 <a href="webxr.html">上一篇文章</a> 了解原因</strong></p>
+			<p>在 <a href="webxr.html">上一篇文章</a> 中，我们介绍了一个使用 three.js 的非常简单的 VR 示例，并讨论了各种类型的 VR 系统。</p>
+			<p>最简单且可能是最常见的类型是谷歌 Cardboard 风格的 VR，它基本上就是将手机放入一个 5 到 50 美元的面罩中。这种 VR 没有控制器，因此人们必须想出创造性的解决方案来实现用户输入。</p>
+			<p>最常见的解决方案是“用目光进行选择”，即如果用户将头部对准某个物体一段时间，该物体就会被选中。</p>
+			<p>让我们来实现“用目光进行选择”功能！我们将从 <a href="webxr.html">上一篇文章中的示例</a> 开始，并添加我们在 <a href="picking.html">拾取文章</a> 中创建的 <code class="notranslate" translate="no">PickHelper</code>。代码如下：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // 如果有被选中的物体，则恢复其颜色
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // 从视锥体发射一条射线
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // 获取射线相交的物体列表
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // 选择第一个物体。它是最接近的那个
+      this.pickedObject = intersectedObjects[0].object;
+      // 保存其颜色
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // 将其自发光颜色设置为闪烁的红/黄色
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+</pre>
+			<p>有关该代码的解释，请参见 <a href="picking.html">拾取文章</a>。</p>
+			<p>要使用它，我们只需创建一个实例并在渲染循环中调用它：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
+
+...
+function render(time) {
+  time *= 0.001;
+
+  ...
+
++  // 0, 0 是归一化坐标中视图的中心。
++  pickHelper.pick({x: 0, y: 0}, scene, camera, time);
+</pre>
+			<p>在原始的拾取示例中，我们将鼠标坐标从 CSS 像素转换为归一化坐标，该坐标在画布上从 -1 到 +1。</p>
+			<p>但在这种情况下，我们将始终选择相机所对准的位置，即屏幕中心，因此我们为 <code class="notranslate" translate="no">x</code> 和 <code class="notranslate" translate="no">y</code> 都传入 <code class="notranslate" translate="no">0</code>，这在归一化坐标中就是中心。</p>
+			<p>这样，当我们注视物体时，它们就会闪烁</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/webxr-look-to-select.html" target="_blank">点击此处以在新窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>通常我们不希望选择是立即发生的。相反，我们要求用户将相机对准他们想要选择的物体几秒钟，以便他们有机会避免意外选择某些东西。</p>
+			<p>为此，我们需要某种计量器或指示器，或某种方式来传达用户必须持续注视以及需要注视多长时间。</p>
+			<p>一种简单的方法是制作一个双色纹理，并使用纹理偏移在模型上滑动纹理。</p>
+			<p>让我们先单独实现这个效果，看看它如何工作，然后再将其添加到 VR 示例中。</p>
+			<p>首先，我们创建一个 <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">正交相机</code></a></p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // 使用左、右、上、下
+const right = 2;    // 的值来匹配默认
+const top = 1;      // 画布大小。
+const bottom = -1;
+const near = -1;
+const far = 1;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+</pre>
+			<p>当然，如果画布大小改变，我们也需要更新它</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    const aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.left = -aspect;
++    camera.right = aspect;
+    camera.updateProjectionMatrix();
+  }
+  ...
+</pre>
+			<p>现在我们有了一个相机，它显示中心上下各 2 个单位，左右各 aspect 个单位。</p>
+			<p>接下来，让我们制作一个双色纹理。我们将使用 <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>，
+				它在其他<a href="indexed-textures.html">地方</a>和<a href="post-processing-3dlut.html">示例</a>中也用过。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
+  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+  texture.minFilter = THREE.NearestFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+const cursorColors = new Uint8Array([
+  64, 64, 64, 64,       // 深灰色
+  255, 255, 255, 255,   // 白色
+]);
+const cursorTexture = makeDataTexture(cursorColors, 2, 1);
+</pre>
+			<p>然后我们将该纹理应用于一个 <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a></p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
+const tubeRadius = 0.1;
+const tubeSegments = 4;
+const ringSegments = 64;
+const cursorGeometry = new THREE.TorusGeometry(
+    ringRadius, tubeRadius, tubeSegments, ringSegments);
+
+const cursorMaterial = new THREE.MeshBasicMaterial({
+  color: 'white',
+  map: cursorTexture,
+  transparent: true,
+  blending: THREE.CustomBlending,
+  blendSrc: THREE.OneMinusDstColorFactor,
+  blendDst: THREE.OneMinusSrcColorFactor,
+});
+const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+scene.add(cursor);
+</pre>
+			<p>然后在 <code class="notranslate" translate="no">render</code> 中调整纹理的偏移</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    const aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.left = -aspect;
+    camera.right = aspect;
+    camera.updateProjectionMatrix();
+  }
+
++  const fromStart = 0;
++  const fromEnd = 2;
++  const toStart = -0.5;
++  const toEnd = 0.5;
++  cursorTexture.offset.x = THREE.MathUtils.mapLinear(
++      time % 2,
++      fromStart, fromEnd,
++      toStart, toEnd);
+
+  renderer.render(scene, camera);
+}
+</pre>
+			<p><code class="notranslate" translate="no">THREE.MathUtils.mapLinear</code> 将一个在 <code class="notranslate" translate="no">fromStart</code> 和 <code class="notranslate" translate="no">fromEnd</code> 之间变化的值映射到 <code class="notranslate" translate="no">toStart</code> 和 <code class="notranslate" translate="no">toEnd</code> 之间的值。在上面的例子中，我们取 <code class="notranslate" translate="no">time % 2</code>，即一个从 0 到 2 变化的值，并将其映射到从 -0.5 到 0.5 变化的值。</p>
+			<p><a href="textures.html">纹理</a> 使用从 0 到 1 的归一化纹理坐标映射到几何体上。这意味着我们的 2x1 像素图像，设置为默认的 <code class="notranslate" translate="no">THREE.ClampToEdge</code> 包装模式，如果我们调整纹理坐标为 -0.5，则整个网格将显示第一种颜色；如果调整为 +0.5，则整个网格将显示第二种颜色。在两者之间，由于过滤设置为 <code class="notranslate" translate="no">THREE.NearestFilter</code>，我们能够将两种颜色之间的过渡移动通过几何体。</p>
+			<p>让我们顺便添加一个背景纹理，就像我们在 <a href="backgrounds.html">背景文章</a> 中介绍的那样。我们将只使用一组 2x2 的颜色，但设置纹理的重复属性，使其形成一个 8x8 的网格。这样可以为我们的光标提供一个渲染背景，以便我们检查它在不同颜色上的显示效果。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const backgroundColors = new Uint8Array([
++    0,   0,   0, 255,  // 黑色
++   90,  38,  38, 255,  // 深红色
++  100, 175, 103, 255,  // 中等绿色
++  255, 239, 151, 255,  // 浅黄色
++]);
++const backgroundTexture = makeDataTexture(backgroundColors, 2, 2);
++backgroundTexture.wrapS = THREE.RepeatWrapping;
++backgroundTexture.wrapT = THREE.RepeatWrapping;
++backgroundTexture.repeat.set(4, 4);
+
+const scene = new THREE.Scene();
++scene.background = backgroundTexture;
+</pre>
+			<p>现在如果我们运行它，你会看到我们得到了一个类似圆圈的计量器，并且我们可以设置计量器的位置。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-selector.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/webxr-look-to-select-selector.html" target="_blank">点击此处以在新窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>请注意并尝试以下几点：</p>
+			<ul>
+				<li><p>我们设置了 <code class="notranslate" translate="no">cursorMaterial</code> 的 <code class="notranslate" translate="no">blending</code>、<code class="notranslate" translate="no">blendSrc</code> 和 <code class="notranslate" translate="no">blendDst</code> 属性如下：</p>
+					<pre class="prettyprint showlinemods notranslate notranslate" translate="no">  blending: THREE.CustomBlending,
+  blendSrc: THREE.OneMinusDstColorFactor,
+  blendDst: THREE.OneMinusSrcColorFactor,
+</pre><p>这产生了一种<em>反相</em>效果。注释掉这三行代码，你就能看到区别。我猜测这种反相效果在这里是最好的，因为这样无论光标在什么颜色上，我们都应该能看到它。</p>
+				</li>
+				<li><p>我们使用了 <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> 而不是 <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a></p>
+					<p>出于某些原因，<a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> 使用了平面的 UV 映射方案。因此，如果我们使用 <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>，纹理会在环上水平滑动，而不是像上面那样环绕它。</p>
+					<p>尝试一下，将 <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> 改为 <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>（在上面的示例中它只是被注释掉了），你就会明白我的意思。</p>
+					<p>（在某种定义下的）<em>正确</em>做法是：要么使用 <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> 但修正纹理坐标，使其环绕环形；要么自己生成环形几何体。但是，圆环体效果很好。直接放置在相机前方，使用 <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>，它看起来会完全像一个环，并且纹理坐标环绕环形，因此它符合我们的需求。</p>
+				</li>
+			</ul>
+			<p>让我们将它与上面的 VR 代码集成起来。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+-  constructor() {
++  constructor(camera) {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+-    this.pickedObjectSavedColor = 0;
+
++    const cursorColors = new Uint8Array([
++      64, 64, 64, 64,       // 深灰色
++      255, 255, 255, 255,   // 白色
++    ]);
++    this.cursorTexture = makeDataTexture(cursorColors, 2, 1);
++
++    const ringRadius = 0.4;
++    const tubeRadius = 0.1;
++    const tubeSegments = 4;
++    const ringSegments = 64;
++    const cursorGeometry = new THREE.TorusGeometry(
++        ringRadius, tubeRadius, tubeSegments, ringSegments);
++
++    const cursorMaterial = new THREE.MeshBasicMaterial({
++      color: 'white',
++      map: this.cursorTexture,
++      transparent: true,
++      blending: THREE.CustomBlending,
++      blendSrc: THREE.OneMinusDstColorFactor,
++      blendDst: THREE.OneMinusSrcColorFactor,
++    });
++    const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
++    // 将光标作为相机的子对象添加
++    camera.add(cursor);
++    // 并将其移动到相机前方
++    cursor.position.z = -1;
++    const scale = 0.05;
++    cursor.scale.set(scale, scale, scale);
++    this.cursor = cursor;
++
++    this.selectTimer = 0;
++    this.selectDuration = 2;
++    this.lastTime = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
++    const elapsedTime = time - this.lastTime;
++    this.lastTime = time;
+
+-    // 如果有被选中的物体，则恢复其颜色
+-    if (this.pickedObject) {
+-      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+-      this.pickedObject = undefined;
+-    }
+
++    const lastPickedObject = this.pickedObject;
++    this.pickedObject = undefined;
+
+    // 从视锥体发射一条射线
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // 获取射线相交的物体列表
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // 选择第一个物体。它是最接近的那个
+      this.pickedObject = intersectedObjects[0].object;
+-      // 保存其颜色
+-      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+-      // 将其自发光颜色设置为闪烁的红/黄色
+-      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+
++    // 仅当光标击中物体时才显示
++    this.cursor.visible = this.pickedObject ? true : false;
++
++    let selected = false;
++
++    // 如果我们正在注视的物体与之前相同
++    // 则增加选择计时器的时间
++    if (this.pickedObject &amp;&amp; lastPickedObject === this.pickedObject) {
++      this.selectTimer += elapsedTime;
++      if (this.selectTimer &gt;= this.selectDuration) {
++        this.selectTimer = 0;
++        selected = true;
++      }
++    } else {
++      this.selectTimer = 0;
++    }
++
++    // 设置光标材质以显示计时器状态
++    const fromStart = 0;
++    const fromEnd = this.selectDuration;
++    const toStart = -0.5;
++    const toEnd = 0.5;
++    this.cursorTexture.offset.x = THREE.MathUtils.mapLinear(
++        this.selectTimer,
++        fromStart, fromEnd,
++        toStart, toEnd);
++
++    return selected ? this.pickedObject : undefined;
+  }
+}
+</pre>
+			<p>你可以看到上面的代码中，我们添加了所有创建光标几何体、纹理和材质的代码，并将其作为相机的子对象添加，因此它将始终位于相机前方。请注意，我们需要将相机添加到场景中，否则光标将不会被渲染。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+scene.add(camera);
+</pre>
+			<p>然后我们检查这次拾取的物体是否与上次相同。如果是，我们将经过的时间加到计时器中，如果计时器达到其限制，我们就返回选中的项目。</p>
+			<p>现在让我们使用它来选择立方体。作为一个简单的例子，我们还将添加 3 个球体。当一个立方体被选中时，我们将隐藏该立方体并显示相应的球体。</p>
+			<p>因此，首先我们创建一个球体几何体</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++const boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++
++const sphereRadius = 0.5;
++const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
+</pre>
+			<p>然后让我们创建 3 对立方体和球体网格。我们将使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">Map</code></a>，以便我们可以将每个 <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 与其对应的伙伴关联起来。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0),
+-  makeInstance(geometry, 0x8844aa, -2),
+-  makeInstance(geometry, 0xaa8844,  2),
+-];
++const meshToMeshMap = new Map();
++[
++  { x:  0, boxColor: 0x44aa88, sphereColor: 0xFF4444, },
++  { x:  2, boxColor: 0x8844aa, sphereColor: 0x44FF44, },
++  { x: -2, boxColor: 0xaa8844, sphereColor: 0x4444FF, },
++].forEach((info) =&gt; {
++  const {x, boxColor, sphereColor} = info;
++  const sphere = makeInstance(sphereGeometry, sphereColor, x);
++  const box = makeInstance(boxGeometry, boxColor, x);
++  // 隐藏球体
++  sphere.visible = false;
++  // 将球体映射到立方体
++  meshToMeshMap.set(box, sphere);
++  // 将立方体映射到球体
++  meshToMeshMap.set(sphere, box);
++});
+</pre>
+			<p>在 <code class="notranslate" translate="no">render</code> 中，当我们旋转立方体时，需要遍历 <code class="notranslate" translate="no">meshToMeshMap</code> 而不是 <code class="notranslate" translate="no">cubes</code>。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-cubes.forEach((cube, ndx) =&gt; {
++let ndx = 0;
++for (const mesh of meshToMeshMap.keys()) {
+  const speed = 1 + ndx * .1;
+  const rot = time * speed;
+-  cube.rotation.x = rot;
+-  cube.rotation.y = rot;
+-});
++  mesh.rotation.x = rot;
++  mesh.rotation.y = rot;
++  ++ndx;
++}
+</pre>
+
+				<p>现在我们可以使用我们新的 <code class="notranslate" translate="no">PickHelper</code> 实现来选择其中一个物体。当物体被选中时，我们隐藏该物体并显示其对应的伙伴物体。</p>
+				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 0, 0 是归一化坐标中视图的中心。
+-pickHelper.pick({x: 0, y: 0}, scene, camera, time);
++const selectedObject = pickHelper.pick({x: 0, y: 0}, scene, camera, time);
++if (selectedObject) {
++  selectedObject.visible = false;
++  const partnerObject = meshToMeshMap.get(selectedObject);
++  partnerObject.visible = true;
++}
+</pre>
+				<p>有了这些，我们就应该有了一个相当不错的“注视选择”实现。</p>
+				<p></p><div translate="no" class="threejs_example_container notranslate">
+				<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-w-cursor.html"></iframe></div>
+				<a class="threejs_center" href="/manual/examples/webxr-look-to-select-w-cursor.html" target="_blank">点击此处以在新窗口中打开</a>
+			</div>
+
+				<p></p>
+				<p>希望这个示例能给你一些关于如何实现像 Google Cardboard 级别的“注视选择”用户体验的想法。使用纹理坐标偏移来滑动纹理也是一种常用且有用的技术。</p>
+				<p>接下来，<a href="webxr-point-to-select.html">让我们允许拥有 VR 控制器的用户指向并移动物体</a>。</p>
+
+		</div>
+	</div>
+</div>
+
+<script src="../resources/prettify.js"></script>
+<script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

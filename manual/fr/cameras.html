@@ -1,0 +1,567 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Caméras</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Caméras">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Caméras</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Cet article fait partie d'une série d'articles sur three.js.
+Le premier article traitait <a href="fundamentals.html">des bases</a>.
+Si vous ne l'avez pas encore lu, vous pourriez vouloir commencer par là.</p>
+<p>Parlons des caméras dans three.js. Nous avons abordé une partie de cela dans le <a href="fundamentals.html">premier article</a>, mais nous allons le couvrir plus en détail ici.</p>
+<p>La caméra la plus courante dans three.js, et celle que nous avons utilisée jusqu'à présent, est
+la <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Elle donne une vue 3D où les objets au loin apparaissent
+plus petits que les objets proches.</p>
+<p>La <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> définit un <em>frustum</em>. <a href="https://en.wikipedia.org/wiki/Frustum">Un <em>frustum</em> est une forme pyramidale solide dont l'extrémité est coupée</a>.
+Par nom de solide, j'entends par exemple qu'un cube, un cône, une sphère, un cylindre
+et un frustum sont tous des noms de différents types de solides.</p>
+<div class="spread">
+  <div><div data-diagram="shapeCube"></div><div>cube</div></div>
+  <div><div data-diagram="shapeCone"></div><div>cône</div></div>
+  <div><div data-diagram="shapeSphere"></div><div>sphère</div></div>
+  <div><div data-diagram="shapeCylinder"></div><div>cylindre</div></div>
+  <div><div data-diagram="shapeFrustum"></div><div>frustum</div></div>
+</div>
+
+<p>Je ne le signale que parce que je ne le savais pas pendant des années. Un livre ou une page mentionnait
+<em>frustum</em> et mes yeux se voilaient. Comprendre que c'est le nom d'un type de forme solide
+a rendu ces descriptions soudainement plus logiques 😅</p>
+<p>Une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> définit son frustum en fonction de 4 propriétés. <code class="notranslate" translate="no">near</code> définit où
+commence l'avant du frustum. <code class="notranslate" translate="no">far</code> définit où il se termine. <code class="notranslate" translate="no">fov</code>, le champ de vision, définit
+la hauteur de l'avant et de l'arrière du frustum en calculant la hauteur correcte pour obtenir
+le champ de vision spécifié à <code class="notranslate" translate="no">near</code> unités de la caméra. L'<code class="notranslate" translate="no">aspect</code> définit
+la largeur de l'avant et de l'arrière du frustum. La largeur du frustum est simplement la hauteur
+multipliée par l'aspect.</p>
+<p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
+<p>Utilisons la scène de <a href="lights.html">l'article précédent</a> qui contient un plan au sol,
+une sphère et un cube, et faisons en sorte de pouvoir ajuster les paramètres de la caméra.</p>
+<p>Pour ce faire, nous allons créer un <code class="notranslate" translate="no">MinMaxGUIHelper</code> pour les paramètres <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> afin que <code class="notranslate" translate="no">far</code>
+soit toujours supérieur à <code class="notranslate" translate="no">near</code>. Il aura des propriétés <code class="notranslate" translate="no">min</code> et <code class="notranslate" translate="no">max</code> que lil-gui
+ajustera. Lorsqu'elles seront ajustées, elles définiront les 2 propriétés que nous spécifions.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class MinMaxGUIHelper {
+  constructor(obj, minProp, maxProp, minDif) {
+    this.obj = obj;
+    this.minProp = minProp;
+    this.maxProp = maxProp;
+    this.minDif = minDif;
+  }
+  get min() {
+    return this.obj[this.minProp];
+  }
+  set min(v) {
+    this.obj[this.minProp] = v;
+    this.obj[this.maxProp] = Math.max(this.obj[this.maxProp], v + this.minDif);
+  }
+  get max() {
+    return this.obj[this.maxProp];
+  }
+  set max(v) {
+    this.obj[this.maxProp] = v;
+    this.min = this.min;  // ceci appellera le setter de min
+  }
+}
+</pre>
+<p>Maintenant, nous pouvons configurer notre interface graphique comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
+  camera.updateProjectionMatrix();
+}
+
+const gui = new GUI();
+gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
+const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
+</pre>
+<p>Chaque fois que les paramètres de la caméra changent, nous devons appeler la fonction
+<a href="/docs/#api/en/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a> de la caméra.
+Nous avons donc créé une fonction nommée <code class="notranslate" translate="no">updateCamera</code> et l'avons passée à lil-gui pour qu'elle soit appelée lorsque les choses changent.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-perspective.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Vous pouvez ajuster les valeurs et voir comment elles fonctionnent. Notez que nous n'avons pas rendu l'<code class="notranslate" translate="no">aspect</code> modifiable car
+il est tiré de la taille de la fenêtre. Donc, si vous voulez ajuster l'aspect, ouvrez l'exemple
+dans une nouvelle fenêtre et redimensionnez-la.</p>
+<p>Néanmoins, je pense que c'est un peu difficile à voir, alors changeons l'exemple pour qu'il comporte 2 caméras.
+L'une montrera notre scène telle que nous la voyons ci-dessus, l'autre montrera une autre caméra regardant la
+scène que la première caméra dessine et affichant le frustum de cette caméra.</p>
+<p>Pour ce faire, nous pouvons utiliser la fonction scissor de three.js.
+Changeons-le pour dessiner 2 scènes avec 2 caméras côte à côte en utilisant la fonction scissor.</p>
+<p>Tout d'abord, utilisons du HTML et du CSS pour définir 2 éléments côte à côte. Cela nous
+aidera également avec les événements afin que les deux caméras puissent facilement avoir leurs propres <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div class="split"&gt;
++     &lt;div id="view1" tabindex="1"&gt;&lt;/div&gt;
++     &lt;div id="view2" tabindex="2"&gt;&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>Et le CSS qui fera apparaître ces 2 vues côte à côte superposées sur
+le canvas</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">.split {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.split&gt;div {
+  width: 100%;
+  height: 100%;
+}
+</pre>
+<p>Puis dans notre code, nous ajouterons un <a href="/docs/#api/en/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>. Un <a href="/docs/#api/en/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> dessine le frustum d'une <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(camera);
+
+...
+
+scene.add(cameraHelper);
+</pre>
+<p>Maintenant, cherchons les 2 éléments de vue.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const view1Elem = document.querySelector('#view1');
+const view2Elem = document.querySelector('#view2');
+</pre>
+<p>Et nous configurerons nos <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> existants pour qu'ils ne répondent qu'au premier
+élément de vue.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const controls = new OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, view1Elem);
+</pre>
+<p>Créons une deuxième <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> et un deuxième <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.
+Le deuxième <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> est lié à la deuxième caméra et reçoit l'entrée
+du deuxième élément de vue.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera2 = new THREE.PerspectiveCamera(
+  60,  // fov
+  2,   // aspect
+  0.1, // near
+  500, // far
+);
+camera2.position.set(40, 10, 30);
+camera2.lookAt(0, 5, 0);
+
+const controls2 = new OrbitControls(camera2, view2Elem);
+controls2.target.set(0, 5, 0);
+controls2.update();
+</pre>
+<p>Enfin, nous devons rendre la scène du point de vue de chaque
+caméra en utilisant la fonction scissor pour ne rendre qu'une partie du canvas.</p>
+<p>Voici une fonction qui, étant donné un élément, calculera le rectangle
+de cet élément qui chevauche le canvas. Elle définira ensuite le scissor
+et le viewport sur ce rectangle et renverra l'aspect pour cette taille.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setScissorForElement(elem) {
+  const canvasRect = canvas.getBoundingClientRect();
+  const elemRect = elem.getBoundingClientRect();
+
+  // calculer un rectangle relatif au canvas
+  const right = Math.min(elemRect.right, canvasRect.right) - canvasRect.left;
+  const left = Math.max(0, elemRect.left - canvasRect.left);
+  const bottom = Math.min(elemRect.bottom, canvasRect.bottom) - canvasRect.top;
+  const top = Math.max(0, elemRect.top - canvasRect.top);
+
+  const width = Math.min(canvasRect.width, right - left);
+  const height = Math.min(canvasRect.height, bottom - top);
+
+  // configurer le scissor pour ne rendre que cette partie du canvas
+  const positiveYUpBottom = canvasRect.height - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
+
+  // retourner l'aspect
+  return width / height;
+}
+</pre>
+<p>Et maintenant, nous pouvons utiliser cette fonction pour dessiner la scène deux fois dans notre fonction <code class="notranslate" translate="no">render</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  function render() {
+
+-    if (resizeRendererToDisplaySize(renderer)) {
+-      const canvas = renderer.domElement;
+-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+-      camera.updateProjectionMatrix();
+-    }
+
++    resizeRendererToDisplaySize(renderer);
++
++    // activer le scissor
++    renderer.setScissorTest(true);
++
++    // rendre la vue originale
++    {
++      const aspect = setScissorForElement(view1Elem);
++
++      // ajuster la caméra pour cet aspect
++      camera.aspect = aspect;
++      camera.updateProjectionMatrix();
++      cameraHelper.update();
++
++      // ne pas dessiner l'helper de caméra dans la vue originale
++      cameraHelper.visible = false;
++
++      scene.background.set(0x000000);
++
++      // rendre
++      renderer.render(scene, camera);
++    }
++
++    // rendre depuis la 2ème caméra
++    {
++      const aspect = setScissorForElement(view2Elem);
++
++      // ajuster la caméra pour cet aspect
++      camera2.aspect = aspect;
++      camera2.updateProjectionMatrix();
++
++      // dessiner l'helper de caméra dans la 2ème vue
++      cameraHelper.visible = true;
++
++      scene.background.set(0x000040);
++
++      renderer.render(scene, camera2);
++    }
+
+-    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Le code ci-dessus définit la couleur de fond de la scène lors du rendu de la
+deuxième vue sur bleu foncé juste pour faciliter la distinction entre les deux vues.</p>
+<p>Nous pouvons également supprimer notre code <code class="notranslate" translate="no">updateCamera</code> puisque nous mettons tout à jour
+dans la fonction <code class="notranslate" translate="no">render</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function updateCamera() {
+-  camera.updateProjectionMatrix();
+-}
+
+const gui = new GUI();
+-gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
++gui.add(camera, 'fov', 1, 180);
+const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+-gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+-gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
++gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
++gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
+</pre>
+<p>Et maintenant, vous pouvez utiliser une vue pour voir le frustum de l'autre.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-perspective-2-scenes.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>À gauche, vous pouvez voir la vue originale et à droite, vous pouvez
+voir une vue montrant le frustum de la caméra de gauche. En ajustant
+<code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>, <code class="notranslate" translate="no">fov</code> et en déplaçant la caméra avec la souris, vous pouvez voir que
+seul ce qui se trouve à l'intérieur du frustum affiché à droite apparaît dans la scène de
+gauche.</p>
+<p>Ajustez <code class="notranslate" translate="no">near</code> jusqu'à environ 20 et vous verrez facilement l'avant des objets
+disparaître car ils ne sont plus dans le frustum. Ajustez <code class="notranslate" translate="no">far</code> en dessous d'environ 35
+et vous commencerez à voir le plan au sol disparaître car il n'est plus dans
+le frustum.</p>
+<p>Cela soulève la question : pourquoi ne pas simplement régler <code class="notranslate" translate="no">near</code> sur 0.0000000001 et <code class="notranslate" translate="no">far</code>
+sur 10000000000000 ou quelque chose de similaire afin de tout voir ?
+La raison est que votre GPU n'a qu'une précision limitée pour décider si quelque chose
+est devant ou derrière autre chose. Cette précision est répartie entre
+<code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>. Pire encore, par défaut, la précision près de la caméra est détaillée
+et la précision loin de la caméra est grossière. Les unités commencent à <code class="notranslate" translate="no">near</code>
+et s'étendent lentement à mesure qu'elles s'approchent de <code class="notranslate" translate="no">far</code>.</p>
+<p>En partant de l'exemple du haut, changeons le code pour insérer 20 sphères d'affilée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const sphereRadius = 3;
+  const sphereWidthDivisions = 32;
+  const sphereHeightDivisions = 16;
+  const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+  const numSpheres = 20;
+  for (let i = 0; i &lt; numSpheres; ++i) {
+    const sphereMat = new THREE.MeshPhongMaterial();
+    sphereMat.color.setHSL(i * .73, 1, 0.5);
+    const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+    mesh.position.set(-sphereRadius - 1, sphereRadius + 2, i * sphereRadius * -2.2);
+    scene.add(mesh);
+  }
+}
+</pre>
+<p>et réglons <code class="notranslate" translate="no">near</code> sur 0.00001</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 45;
+const aspect = 2;  // the canvas default
+-const near = 0.1;
++const near = 0.00001;
+const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+</pre>
+<p>Nous devons également ajuster un peu le code de l'interface graphique pour permettre 0.00001 si la valeur est éditée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
++gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
+</pre>
+<p>Que pensez-vous qu'il va se passer ?</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-z-fighting.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>C'est un exemple de <em>z-fighting</em> (chevauchement en Z) où le GPU de votre ordinateur n'a pas
+assez de précision pour décider quels pixels sont devant et quels pixels sont derrière.</p>
+<p>Juste au cas où le problème n'apparaîtrait pas sur votre machine, voici ce que je vois sur la mienne</p>
+<div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
+
+<p>Une solution consiste à indiquer à three.js d'utiliser une méthode différente pour calculer quels
+pixels sont devant et quels pixels sont derrière. Nous pouvons le faire en activant
+<code class="notranslate" translate="no">logarithmicDepthBuffer</code> lorsque nous créons le <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++const renderer = new THREE.WebGLRenderer({
++  antialias: true,
++  canvas,
++  logarithmicDepthBuffer: true,
++});
+</pre>
+<p>et avec cela, cela pourrait fonctionner</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-logarithmic-depth-buffer.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Si cela n'a pas résolu le problème pour vous, alors vous avez rencontré l'une des raisons pour lesquelles
+vous ne pouvez pas toujours utiliser cette solution. Cette raison est que seuls certains GPU
+la supportent. En septembre 2018, presque aucun appareil mobile ne supportait cette
+solution, alors que la plupart des ordinateurs de bureau le faisaient.</p>
+<p>Une autre raison de ne pas choisir cette solution est qu'elle peut être significativement plus lente
+que la solution standard.</p>
+<p>Même avec cette solution, la résolution reste limitée. Rendez <code class="notranslate" translate="no">near</code> encore
+plus petit ou <code class="notranslate" translate="no">far</code> encore plus grand et vous rencontrerez finalement les mêmes problèmes.</p>
+<p>Ce que cela signifie, c'est que vous devriez toujours faire un effort pour choisir un paramètre <code class="notranslate" translate="no">near</code>
+et <code class="notranslate" translate="no">far</code> qui convient à votre cas d'utilisation. Réglez <code class="notranslate" translate="no">near</code> aussi loin de la caméra
+que possible sans que les objets ne disparaissent. Réglez <code class="notranslate" translate="no">far</code> aussi près de la caméra
+que possible sans que les objets ne disparaissent. Si vous essayez de dessiner une scène géante
+et de montrer un gros plan du visage de quelqu'un afin que vous puissiez voir ses cils
+tout en voyant à l'arrière-plan des montagnes à 50 kilomètres
+de distance, eh bien, vous devrez alors trouver d'autres solutions créatives que
+nous aborderons peut-être plus tard. Pour l'instant, sachez simplement que vous devez faire attention
+à choisir des valeurs <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> appropriées à vos besoins.</p>
+<p>La deuxième caméra la plus courante est l'<a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>. Au lieu
+de spécifier un frustum, elle spécifie une boîte avec les paramètres <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>
+<code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>. Comme elle projette une boîte,
+il n'y a pas de perspective.</p>
+<p>Changeons l'exemple à 2 vues ci-dessus pour utiliser une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>
+dans la première vue.</p>
+<p>Tout d'abord, configurons une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -1;
+const right = 1;
+const top = 1;
+const bottom = -1;
+const near = 5;
+const far = 50;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+camera.zoom = 0.2;
+</pre>
+<p>Nous réglons <code class="notranslate" translate="no">left</code> et <code class="notranslate" translate="no">bottom</code> à -1 et <code class="notranslate" translate="no">right</code> et <code class="notranslate" translate="no">top</code> à 1. Cela créerait
+une boîte de 2 unités de large et 2 unités de haut, mais nous allons ajuster <code class="notranslate" translate="no">left</code> et <code class="notranslate" translate="no">top</code>
+en fonction de l'aspect du rectangle dans lequel nous dessinons. Nous utiliserons la propriété
+<code class="notranslate" translate="no">zoom</code> pour faciliter l'ajustement du nombre d'unités réellement affichées par la caméra.</p>
+<p>Ajoutons un paramètre GUI pour <code class="notranslate" translate="no">zoom</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
++gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
+</pre>
+<p>L'appel à <code class="notranslate" translate="no">listen</code> indique à lil-gui de surveiller les changements. Ceci est ici car
+les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> peuvent également contrôler le zoom. Par exemple, la molette de la souris effectuera
+un zoom via les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
+<p>Enfin, il nous suffit de modifier la partie qui rend le côté
+gauche pour mettre à jour l'<a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const aspect = setScissorForElement(view1Elem);
+
+  // mettre à jour la caméra pour cet aspect
+-  camera.aspect = aspect;
++  camera.left   = -aspect;
++  camera.right  =  aspect;
+  camera.updateProjectionMatrix();
+  cameraHelper.update();
+
+  // ne pas dessiner l'helper de caméra dans la vue originale
+  cameraHelper.visible = false;
+
+  scene.background.set(0x000000);
+  renderer.render(scene, camera);
+}
+</pre>
+<p>et maintenant vous pouvez voir une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> en action.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-orthographic-2-scenes.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Une autre utilisation courante pour une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> est de dessiner les
+vues du dessus, du dessous, de gauche, de droite, de face, d'arrière d'un programme de modélisation
+3D ou de l'éditeur d'un moteur de jeu.</p>
+<div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
+
+<p>Dans la capture d'écran ci-dessus, vous pouvez voir qu'une vue est une vue en perspective et 3 vues sont
+des vues orthographiques.</p>
+<p>Une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> est le plus souvent utilisée si vous utilisez three.js
+pour dessiner des éléments 2D. Vous décidez combien d'unités vous voulez que la caméra
+affiche. Par exemple, si vous voulez qu'un pixel du canvas corresponde
+à une unité dans la caméra, vous pourriez faire quelque chose comme</p>
+<p>Pour placer l'origine au centre et avoir 1 pixel = 1 unité three.js, quelque chose comme</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">camera.left = -canvas.width / 2;
+camera.right = canvas.width / 2;
+camera.top = canvas.height / 2;
+camera.bottom = -canvas.height / 2;
+camera.near = -1;
+camera.far = 1;
+camera.zoom = 1;
+</pre>
+<p>Ou si nous voulions que l'origine soit en haut à gauche, comme sur un
+canvas 2D, nous pourrions utiliser ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">camera.left = 0;
+camera.right = canvas.width;
+camera.top = 0;
+camera.bottom = canvas.height;
+camera.near = -1;
+camera.far = 1;
+camera.zoom = 1;
+</pre>
+<p>Dans ce cas, le coin supérieur gauche serait 0,0, comme sur un canvas 2D.</p>
+<p>Essayons ! Tout d'abord, configurons la caméra.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = 0;
+const right = 300;  // taille par défaut du canvas
+const top = 0;
+const bottom = 150;  // taille par défaut du canvas
+const near = -1;
+const far = 1;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+camera.zoom = 1;
+</pre>
+<p>Puis chargeons 6 textures et créons 6 plans, un pour chaque texture.
+Nous associerons chaque plan à un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> pour faciliter le décalage
+du plan afin que son centre apparaisse à son coin supérieur gauche.</p>
+<p>Si vous l'exécutez localement, vous devrez également avoir effectué la <a href="setup.html">configuration</a>.
+Vous pourriez également vouloir lire l'article sur l'<a href="textures.html">utilisation des textures</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const textures = [
+  loader.load('resources/images/flower-1.jpg'),
+  loader.load('resources/images/flower-2.jpg'),
+  loader.load('resources/images/flower-3.jpg'),
+  loader.load('resources/images/flower-4.jpg'),
+  loader.load('resources/images/flower-5.jpg'),
+  loader.load('resources/images/flower-6.jpg'),
+];
+const planeSize = 256;
+const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+const planes = textures.map((texture) =&gt; {
+  const planePivot = new THREE.Object3D();
+  scene.add(planePivot);
+  texture.magFilter = THREE.NearestFilter;
+  const planeMat = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(planeGeo, planeMat);
+  planePivot.add(mesh);
+  // déplacer le plan pour que le coin supérieur gauche soit l'origine
+  mesh.position.set(planeSize / 2, planeSize / 2, 0);
+  return planePivot;
+});
+</pre>
+<p>et nous devons mettre à jour la caméra si la taille du canvas
+change.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    camera.right = canvas.width;
+    camera.bottom = canvas.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p><code class="notranslate" translate="no">planes</code> est un tableau de <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>, un pour chaque plan.
+Déplaçons-les en fonction du temps.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;  // convertir en secondes ;
+
+  ...
+
+  const distAcross = Math.max(20, canvas.width - planeSize);
+  const distDown = Math.max(20, canvas.height - planeSize);
+
+  // distance totale pour se déplacer en travers et en arrière
+  const xRange = distAcross * 2;
+  const yRange = distDown * 2;
+  const speed = 180;
+
+  planes.forEach((plane, ndx) =&gt; {
+    // calculer un temps unique pour chaque plan
+    const t = time * speed + ndx * 300;
+
+    // obtenir une valeur entre 0 et la plage
+    const xt = t % xRange;
+    const yt = t % yRange;
+
+    // définir notre position en avant si 0 à la moitié de la plage
+    // et en arrière si la moitié de la plage à la plage
+    const x = xt &lt; distAcross ? xt : xRange - xt;
+    const y = yt &lt; distDown   ? yt : yRange - yt;
+
+    plane.position.set(x, y, 0);
+  });
+
+  renderer.render(scene, camera);
+</pre>
+<p>Et vous pouvez voir les images rebondir parfaitement au pixel près sur les bords du
+canvas en utilisant des calculs de pixels, tout comme un canvas 2D.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Une autre utilisation courante pour une <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> est de dessiner les
+vues du dessus, du dessous, de gauche, de droite, de face, d'arrière d'un programme de modélisation
+3D ou de l'éditeur d'un moteur de jeu.</p>
+<div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
+
+<p>Dans la capture d'écran ci-dessus, vous pouvez voir qu'une vue est une vue en perspective et 3 vues sont
+des vues orthographiques.</p>
+<p>Voilà les bases des caméras. Nous aborderons quelques méthodes courantes pour déplacer les caméras
+dans d'autres articles. Pour l'instant, passons aux <a href="shadows.html">ombres</a>.</p>
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-cameras.js"></script>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

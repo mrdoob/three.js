@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Arrière-plans et Skyboxes</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Arrière-plans et Skyboxes">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Arrière-plans et Skyboxes</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>La plupart des articles ici utilisent une couleur unie pour l'arrière-plan.</p>
+<p>Ajouter un arrière-plan statique peut être aussi simple que de définir du CSS. En prenant
+un exemple de <a href="responsive.html">l'article sur comment rendre THREE.js responsive</a>
+nous n'avons besoin de changer que 2 choses.</p>
+<p>Nous devons ajouter du CSS à notre canvas pour définir son arrière-plan comme une image.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    background: url(resources/images/daikanyama.jpg) no-repeat center center;
++    background-size: cover;
+}
+&lt;/style&gt;
+</pre>
+<p>et nous devons dire au <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> d'utiliser <code class="notranslate" translate="no">alpha</code> pour que les endroits où nous ne dessinons rien soient transparents.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
++    canvas,
++    alpha: true,
++  });
+</pre>
+<p>Et nous obtenons un arrière-plan.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-css.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-css.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Si nous voulons que l'arrière-plan puisse être affecté par des <a href="post-processing.html">effets de post-traitement</a>
+alors nous devons dessiner l'arrière-plan en utilisant
+THREE.js.</p>
+<p>THREE.js rend cela quelque peu simple. Nous pouvons simplement définir l'arrière-plan de la scène sur
+une texture.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
+scene.background = bgTexture;
+</pre>
+<p>ce qui nous donne</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Cela nous donne une image de fond, mais elle est étirée pour s'adapter à l'écran.</p>
+<p>Nous pouvons résoudre ce problème en définissant les propriétés <code class="notranslate" translate="no">repeat</code> et <code class="notranslate" translate="no">offset</code> de
+la texture pour n'afficher qu'une partie de l'image.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
+
++  // Définir les propriétés repeat et offset de la texture de fond
++  // pour maintenir l'aspect correct de l'image.
++  // Note : l'image peut ne pas avoir encore été chargée.
++  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
++  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
++  const aspect = imageAspect / canvasAspect;
++
++  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
++  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
++
++  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
++  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>et maintenant THREE.js dessine l'arrière-plan. Il n'y a pas de différence visible avec
+la version CSS en haut, mais maintenant si nous utilisions un <a href="post-processing.html">effet de post-traitement</a>
+l'arrière-plan serait également affecté.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background-fixed-aspect.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background-fixed-aspect.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Bien sûr, un arrière-plan statique n'est généralement pas ce que l'on souhaite dans une scène 3D. Au lieu
+de cela, nous voulons généralement une sorte de <em>skybox</em>. Une skybox est exactement cela, une boîte avec le ciel
+dessiné dessus. Nous plaçons la caméra à l'intérieur de la boîte et on dirait qu'il y a un ciel en arrière-plan.</p>
+<p>La manière la plus courante d'implémenter une skybox est de créer un cube, d'y appliquer une texture,
+et de le dessiner depuis l'intérieur. Sur chaque côté du cube, placez une texture (en utilisant
+les coordonnées de texture) qui ressemble à une image de l'horizon. Il est également fréquent
+d'utiliser une sphère ou un dôme céleste avec une texture dessinée dessus. Vous pouvez
+probablement le comprendre par vous-même. Il suffit de faire un cube ou une sphère,
+<a href="textures.html">appliquer une texture</a>, le marquer comme <code class="notranslate" translate="no">THREE.BackSide</code> pour que nous
+rendions l'intérieur au lieu de l'extérieur, et soit de le mettre directement dans votre scène
+comme ci-dessus, soit de créer 2 scènes : une spéciale pour dessiner la skybox/sphère/dôme et la
+scène normale pour dessiner tout le reste. Vous utiliseriez votre <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> normale pour
+dessiner. Pas besoin de la <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
+<p>Une autre solution consiste à utiliser une <em>Cubemap</em>. Une Cubemap est un type de texture
+spécial qui a 6 côtés, les côtés d'un cube. Au lieu d'utiliser des coordonnées de texture
+standard, elle utilise une direction depuis le centre pointant vers l'extérieur pour décider
+où obtenir une couleur.</p>
+<p>Voici les 6 images d'une cubemap provenant du musée d'histoire de l'ordinateur à Mountain
+View, Californie.</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-y.jpg" style="width: 200px" class="border">
+</div>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-y.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-z.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px" class="border">
+</div>
+
+<p>Pour les utiliser, nous utilisons le <a href="/docs/#api/en/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> pour les charger, puis nous l'utilisons comme arrière-plan de la scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+  ]);
+  scene.background = texture;
+}
+</pre>
+<p>Au moment du rendu, nous n'avons pas besoin d'ajuster la texture comme nous l'avons fait ci-dessus</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
+
+-  // Définir les propriétés repeat et offset de la texture de fond
+-  // pour maintenir l'aspect correct de l'image.
+-  // Note : l'image peut ne pas avoir encore été chargée.
+-  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+-  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+-  const aspect = imageAspect / canvasAspect;
+-
+-  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
+-  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
+-
+-  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
+-  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Ajoutons des contrôles pour pouvoir faire pivoter la caméra.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 3;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();
+</pre>
+<p>et essayez-le. Faites glisser l'exemple pour faire pivoter la caméra et voir la cubemap nous entourer.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-cubemap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-cubemap.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Une autre option consiste à utiliser une carte équirectangulaire. C'est le type d'image qu'une <a href="https://google.com/search?q=360+camera">caméra 360</a> prend.</p>
+<p><a href="https://hdrihaven.com/hdri/?h=tears_of_steel_bridge">En voici une</a> que j'ai trouvée sur <a href="https://hdrihaven.com">ce site</a>.</p>
+<div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+-  const loader = new THREE.CubeTextureLoader();
+-  const texture = loader.load([
+-    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+-  ]);
+-  scene.background = texture;
++  const loader = new THREE.TextureLoader();
++  const texture = loader.load(
++    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
++    () =&gt; {
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
++    });
+}
+</pre>
+<p>Et c'est tout ce qu'il y a à faire.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-equirectangularmap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-equirectangularmap.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Plutôt que de le faire au moment du chargement, vous pouvez également convertir une image équirectangulaire
+en cubemap au préalable. <a href="https://matheowis.github.io/HDRI-to-CubeMap/">Voici un site qui le fera pour vous</a>.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

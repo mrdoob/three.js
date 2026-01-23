@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - equirectangular video panorama</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				touch-action: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
+		</div>
+
+		<div id="container"></div>
+
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
+			<source src="textures/pano.webm">
+			<source src="textures/pano.mp4">
+		</video>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, renderer;
+
+			let isUserInteracting = false,
+				lon = 0, lat = 0,
+				phi = 0, theta = 0,
+				onPointerDownPointerX = 0,
+				onPointerDownPointerY = 0,
+				onPointerDownLon = 0,
+				onPointerDownLat = 0;
+
+			const distance = .5;
+
+			init();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .25, 10 );
+
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.SphereGeometry( 5, 60, 40 );
+				// invert the geometry on the x-axis so that all of the faces point inward
+				geometry.scale( - 1, 1, 1 );
+
+				const video = document.getElementById( 'video' );
+				video.play();
+
+				const texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onPointerDown( event ) {
+
+				isUserInteracting = true;
+
+				onPointerDownPointerX = event.clientX;
+				onPointerDownPointerY = event.clientY;
+
+				onPointerDownLon = lon;
+				onPointerDownLat = lat;
+
+			}
+
+			function onPointerMove( event ) {
+
+				if ( isUserInteracting === true ) {
+
+					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
+					lat = ( onPointerDownPointerY - event.clientY ) * 0.1 + onPointerDownLat;
+
+				}
+
+			}
+
+			function onPointerUp() {
+
+				isUserInteracting = false;
+
+			}
+
+			function animate() {
+
+				lat = Math.max( - 85, Math.min( 85, lat ) );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
+
+				camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
+				camera.position.y = distance * Math.cos( phi );
+				camera.position.z = distance * Math.sin( phi ) * Math.sin( theta );
+
+				camera.lookAt( 0, 0, 0 );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

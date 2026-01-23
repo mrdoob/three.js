@@ -1,0 +1,492 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Optimiser de nombreux objets animés</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Optimiser de nombreux objets animés">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Optimiser de nombreux objets animés</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Cet article est une continuation de <a href="optimize-lots-of-objects.html">un article sur l'optimisation de nombreux objets
+</a>. Si vous ne l'avez pas encore lu,
+veuillez le lire avant de poursuivre. </p>
+<p>Dans l'article précédent, nous avons fusionné environ 19000 cubes en une
+seule géométrie. Cela a eu l'avantage d'optimiser notre dessin
+de 19000 cubes, mais cela a eu l'inconvénient de rendre plus difficile
+le déplacement d'un cube individuel.</p>
+<p>Selon ce que nous essayons d'accomplir, il existe différentes solutions.
+Dans ce cas, affichons plusieurs ensembles de données et animons la transition entre les ensembles.</p>
+<p>La première chose à faire est d'obtenir plusieurs ensembles de données. Idéalement, nous
+pré-traiterions probablement les données hors ligne, mais dans ce cas, chargeons 2 ensembles de
+données et générons-en 2 autres.</p>
+<p>Voici notre ancien code de chargement</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+  .then(parseData)
+  .then(addBoxes)
+  .then(render);
+</pre>
+<p>Changeons-le pour quelque chose comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadData(info) {
+  const text = await loadFile(info.url);
+  info.file = parseData(text);
+}
+
+async function loadAll() {
+  const fileInfos = [
+    {name: 'men',   hueRange: [0.7, 0.3], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+    {name: 'women', hueRange: [0.9, 1.1], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+  ];
+
+  await Promise.all(fileInfos.map(loadData));
+
+  ...
+}
+loadAll();
+</pre>
+<p>Le code ci-dessus chargera tous les fichiers dans <code class="notranslate" translate="no">fileInfos</code> et une fois terminé, chaque objet
+dans <code class="notranslate" translate="no">fileInfos</code> aura une propriété <code class="notranslate" translate="no">file</code> contenant le fichier chargé. <code class="notranslate" translate="no">name</code> et <code class="notranslate" translate="no">hueRange</code>
+seront utilisés plus tard. <code class="notranslate" translate="no">name</code> sera pour un champ d'interface utilisateur. <code class="notranslate" translate="no">hueRange</code> sera utilisé pour
+choisir une plage de teintes à appliquer.</p>
+<p>Les deux fichiers ci-dessus sont apparemment le nombre d'hommes par zone et le nombre de
+femmes par zone en 2010. Notez que je n'ai aucune idée si ces données sont correctes, mais
+ce n'est pas vraiment important. L'important est de montrer différents ensembles
+de données.</p>
+<p>Générons 2 ensembles de données supplémentaires. L'un représentant les lieux où le nombre
+d'hommes est supérieur au nombre de femmes, et inversement, les lieux où
+le nombre de femmes est supérieur au nombre d'hommes. </p>
+<p>La première chose, écrivons une fonction qui, étant donné un tableau bidimensionnel
+de tableaux comme nous avions précédemment, va l'appliquer pour générer un nouveau tableau bidimensionnel
+de tableaux.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function mapValues(data, fn) {
+  return data.map((row, rowNdx) =&gt; {
+    return row.map((value, colNdx) =&gt; {
+      return fn(value, rowNdx, colNdx);
+    });
+  });
+}
+</pre>
+<p>Comme la fonction normale <code class="notranslate" translate="no">Array.map</code>, la fonction <code class="notranslate" translate="no">mapValues</code> appelle une fonction
+<code class="notranslate" translate="no">fn</code> pour chaque valeur dans le tableau de tableaux. Elle lui passe la valeur ainsi que les
+indices de ligne et de colonne.</p>
+<p>Maintenant, écrivons du code pour générer un nouveau fichier qui est une comparaison entre 2
+fichiers.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDiffFile(baseFile, otherFile, compareFn) {
+  let min;
+  let max;
+  const baseData = baseFile.data;
+  const otherData = otherFile.data;
+  const data = mapValues(baseData, (base, rowNdx, colNdx) =&gt; {
+    const other = otherData[rowNdx][colNdx];
+      if (base === undefined || other === undefined) {
+        return undefined;
+      }
+      const value = compareFn(base, other);
+      min = Math.min(min === undefined ? value : min, value);
+      max = Math.max(max === undefined ? value : max, value);
+      return value;
+  });
+  // make a copy of baseFile and replace min, max, and data
+  // with the new data
+  return {...baseFile, min, max, data};
+}
+</pre>
+<p>Le code ci-dessus utilise <code class="notranslate" translate="no">mapValues</code> pour générer un nouvel ensemble de données qui est
+une comparaison basée sur la fonction <code class="notranslate" translate="no">compareFn</code> passée en paramètre. Il suit également
+les résultats <code class="notranslate" translate="no">min</code> et <code class="notranslate" translate="no">max</code> de la comparaison. Enfin, il crée un nouveau fichier avec
+toutes les mêmes propriétés que <code class="notranslate" translate="no">baseFile</code>, sauf avec de nouvelles valeurs pour <code class="notranslate" translate="no">min</code>, <code class="notranslate" translate="no">max</code> et <code class="notranslate" translate="no">data</code>.</p>
+<p>Ensuite, utilisons cela pour créer 2 nouveaux ensembles de données.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const menInfo = fileInfos[0];
+  const womenInfo = fileInfos[1];
+  const menFile = menInfo.file;
+  const womenFile = womenInfo.file;
+
+  function amountGreaterThan(a, b) {
+    return Math.max(a - b, 0);
+  }
+  fileInfos.push({
+    name: '&gt;50%men',
+    hueRange: [0.6, 1.1],
+    file: makeDiffFile(menFile, womenFile, (men, women) =&gt; {
+      return amountGreaterThan(men, women);
+    }),
+  });
+  fileInfos.push({
+    name: '&gt;50% women',
+    hueRange: [0.0, 0.4],
+    file: makeDiffFile(womenFile, menFile, (women, men) =&gt; {
+      return amountGreaterThan(women, men);
+    }),
+  });
+}
+</pre>
+<p>Maintenant, générons une interface utilisateur pour sélectionner parmi ces ensembles de données. Nous avons d'abord besoin
+d'un peu de HTML pour l'interface utilisateur.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="ui"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>et du CSS pour le faire apparaître en haut à gauche</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+}
+#ui&gt;div {
+  font-size: 20pt;
+  padding: 1em;
+  display: inline-block;
+}
+#ui&gt;div.selected {
+  color: red;
+}
+</pre>
+<p>Ensuite, nous pouvons parcourir chaque fichier et générer un ensemble de boîtes fusionnées par
+ensemble de données, ainsi qu'un élément qui, au survol, affichera cet ensemble
+et masquera tous les autres.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// afficher les données sélectionnées, masquer les autres
+function showFileInfo(fileInfos, fileInfo) {
+  fileInfos.forEach((info) =&gt; {
+    const visible = fileInfo === info;
+    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
+  });
+  requestRenderIfNotRequested();
+}
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+  const boxes = addBoxes(info.file, info.hueRange);
+  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  div.addEventListener('mouseover', () =&gt; {
+    showFileInfo(fileInfos, info);
+  });
+});
+// afficher le premier ensemble de données
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>Une autre modification dont nous avons besoin par rapport à l'exemple précédent est de faire en sorte
+que <code class="notranslate" translate="no">addBoxes</code> accepte un <code class="notranslate" translate="no">hueRange</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
++function addBoxes(file, hueRange) {
+
+  ...
+
+    // calculer une couleur
+-    const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
++    const hue = THREE.MathUtils.lerp(...hueRange, amount);
+
+  ...
+</pre>
+<p>et avec cela, nous devrions pouvoir afficher 4 ensembles de données. Survolez les étiquettes
+avec la souris ou touchez-les pour changer d'ensemble.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-multiple-data-sets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-multiple-data-sets.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Notez qu'il y a quelques points de données étranges qui ressortent vraiment. Je me demande ce qui se passe
+avec ceux-là !??! Dans tous les cas, comment animer entre ces 4 ensembles de données.</p>
+<p>Beaucoup d'idées.</p>
+<ul>
+<li><p>Faites simplement un fondu entre eux en utilisant <a href="/docs/#api/en/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a></p>
+<p>Le problème avec cette solution est que les cubes se superposent parfaitement, ce qui
+entraînera des problèmes de z-fighting. Il est possible de résoudre
+cela en changeant la fonction de profondeur et en utilisant le blending. Nous devrions
+probablement examiner cette option.</p>
+</li>
+<li><p>Agrandissez l'ensemble que nous voulons voir et réduisez les autres ensembles</p>
+<p>Parce que toutes les boîtes ont leur origine au centre de la planète,
+si nous les réduisons en dessous de 1.0, elles s'enfonceront dans la planète. Au début, cela
+semble une bonne idée, mais le problème est que toutes les boîtes de faible hauteur
+disparaîtront presque immédiatement et ne seront pas remplacées tant que le nouvel
+ensemble de données n'aura pas atteint 1.0. Cela rend la transition peu agréable.
+On pourrait peut-être résoudre cela avec un shader personnalisé sophistiqué.</p>
+</li>
+<li><p>Utiliser les Morphtargets</p>
+<p>Les Morphtargets sont un moyen de fournir plusieurs valeurs pour chaque sommet
+de la géométrie et de les <em>morpher</em> ou de les interpoler linéairement (lerp).
+Les Morphtargets sont le plus souvent utilisés pour l'animation faciale de personnages
+3D, mais ce n'est pas leur seule utilisation.</p>
+</li>
+</ul>
+<p>Essayons les morphtargets.</p>
+<p>Nous créerons toujours une géométrie pour chaque ensemble de données, mais nous extrairons
+ensuite l'attribut <code class="notranslate" translate="no">position</code> de chacun et les utiliserons comme morphtargets.</p>
+<p>Changeons d'abord <code class="notranslate" translate="no">addBoxes</code> pour qu'elle crée et retourne simplement la géométrie fusionnée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
++function makeBoxes(file, hueRange) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
+-      geometries, false);
+-  const material = new THREE.MeshBasicMaterial({
+-    vertexColors: true,
+-  });
+-  const mesh = new THREE.Mesh(mergedGeometry, material);
+-  scene.add(mesh);
+-  return mesh;
++  return BufferGeometryUtils.mergeGeometries(
++     geometries, false);
+}
+</pre>
+<p>Il y a cependant une autre chose que nous devons faire ici. Les morphtargets doivent
+tous avoir exactement le même nombre de sommets. Le sommet #123 dans une cible doit
+avoir un sommet correspondant #123 dans toutes les autres cibles. Mais, tel que c'est actuellement,
+différents ensembles de données pourraient avoir des points de données sans données, donc aucune boîte ne sera
+générée pour ce point, ce qui signifierait l'absence de sommets correspondants pour un autre
+ensemble. Nous devons donc vérifier tous les ensembles de données et soit toujours générer
+quelque chose s'il y a des données dans n'importe quel ensemble, soit ne rien générer s'il
+manque des données dans n'importe quel ensemble. Faisons le second cas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dataMissingInAnySet(fileInfos, latNdx, lonNdx) {
++  for (const fileInfo of fileInfos) {
++    if (fileInfo.file.data[latNdx][lonNdx] === undefined) {
++      return true;
++    }
++  }
++  return false;
++}
+
+-function makeBoxes(file, hueRange) {
++function makeBoxes(file, hueRange, fileInfos) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+  const geometries = [];
+  data.forEach((row, latNdx) =&gt; {
+    row.forEach((value, lonNdx) =&gt; {
++      if (dataMissingInAnySet(fileInfos, latNdx, lonNdx)) {
++        return;
++      }
+      const amount = (value - min) / range;
+
+  ...
+</pre>
+<p>Maintenant, nous allons changer le code qui appelait <code class="notranslate" translate="no">addBoxes</code> pour qu'il utilise <code class="notranslate" translate="no">makeBoxes</code>
+et configure les morphtargets.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// créer la géométrie pour chaque ensemble de données
++const geometries = fileInfos.map((info) =&gt; {
++  return makeBoxes(info.file, info.hueRange, fileInfos);
++});
++
++// utiliser la première géométrie comme base
++// et ajouter toutes les géométries comme morphtargets
++const baseGeometry = geometries[0];
++baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('position');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++const material = new THREE.MeshBasicMaterial({
++  vertexColors: true,
++});
++const mesh = new THREE.Mesh(baseGeometry, material);
++scene.add(mesh);
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+-  const boxes = addBoxes(info.file, info.hueRange);
+-  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  function show() {
+    showFileInfo(fileInfos, info);
+  }
+  div.addEventListener('mouseover', show);
+  div.addEventListener('touchstart', show);
+});
+// afficher le premier ensemble de données
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>Ci-dessus, nous créons une géométrie pour chaque ensemble de données, utilisons la première comme base,
+puis obtenons un attribut <code class="notranslate" translate="no">position</code> de chaque géométrie et l'ajoutons comme
+morphtarget à la géométrie de base pour <code class="notranslate" translate="no">position</code>.</p>
+<p>Maintenant, nous devons changer la manière dont nous affichons et masquons les différents ensembles de données.
+Au lieu d'afficher ou de masquer un maillage, nous devons modifier l'influence des
+morphtargets. Pour l'ensemble de données que nous voulons voir, nous devons avoir une influence de 1,
+et pour tous ceux que nous ne voulons pas voir, nous devons avoir une influence de 0.</p>
+<p>Nous pourrions simplement les régler directement à 0 ou 1, mais si nous faisions cela, nous ne verrions aucune
+animation, cela se ferait instantanément, ce qui ne serait pas différent de ce que nous avons déjà.
+Nous pourrions également écrire du code d'animation personnalisé, ce qui serait facile,
+mais comme le globe webgl original utilise
+<a href="https://github.com/tweenjs/tween.js/">une bibliothèque d'animation</a>, utilisons la même ici.</p>
+<p>Nous devons inclure la bibliothèque</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
+</pre>
+<p>Et ensuite, créer un <code class="notranslate" translate="no">Tween</code> pour animer les influences.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// afficher les données sélectionnées, masquer les autres
+function showFileInfo(fileInfos, fileInfo) {
++  const targets = {};
+-  fileInfos.forEach((info) =&gt; {
++  fileInfos.forEach((info, i) =&gt; {
+    const visible = fileInfo === info;
+-    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
++    targets[i] = visible ? 1 : 0;
+  });
++  const durationInMs = 1000;
++  new TWEEN.Tween(mesh.morphTargetInfluences)
++    .to(targets, durationInMs)
++    .start();
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>Nous sommes également censés appeler <code class="notranslate" translate="no">TWEEN.update</code> à chaque image dans notre boucle de rendu,
+mais cela soulève un problème. « tween.js » est conçu pour un rendu continu,
+mais nous <a href="rendering-on-demand.html">rendons à la demande</a>. Nous pourrions
+passer au rendu continu, mais il est parfois agréable de ne rendre qu'à la demande
+car cela permet d'économiser l'énergie de l'utilisateur lorsque rien ne se passe,
+alors voyons si nous pouvons le faire animer à la demande.</p>
+<p>Nous allons créer un <code class="notranslate" translate="no">TweenManager</code> pour nous aider. Nous l'utiliserons pour créer les <code class="notranslate" translate="no">Tween</code>s
+et les suivre. Il aura une méthode <code class="notranslate" translate="no">update</code> qui retournera <code class="notranslate" translate="no">true</code>
+si nous devons l'appeler à nouveau, et <code class="notranslate" translate="no">false</code> si toutes les animations sont terminées.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class TweenManger {
+  constructor() {
+    this.numTweensRunning = 0;
+  }
+  _handleComplete() {
+    --this.numTweensRunning;
+    console.assert(this.numTweensRunning &gt;= 0);
+  }
+  createTween(targetObject) {
+    const self = this;
+    ++this.numTweensRunning;
+    let userCompleteFn = () =&gt; {};
+    // create a new tween and install our own onComplete callback
+    const tween = new TWEEN.Tween(targetObject).onComplete(function(...args) {
+      self._handleComplete();
+      userCompleteFn.call(this, ...args);
+    });
+    // replace the tween's onComplete function with our own
+    // so we can call the user's callback if they supply one.
+    tween.onComplete = (fn) =&gt; {
+      userCompleteFn = fn;
+      return tween;
+    };
+    return tween;
+  }
+  update() {
+    TWEEN.update();
+    return this.numTweensRunning &gt; 0;
+  }
+}
+</pre>
+<p>Pour l'utiliser, nous allons en créer un</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const tweenManager = new TweenManger();
+
+  ...
+</pre>
+<p>Nous l'utiliserons pour créer nos <code class="notranslate" translate="no">Tween</code>s.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// afficher les données sélectionnées, masquer les autres
+function showFileInfo(fileInfos, fileInfo) {
+  const targets = {};
+  fileInfos.forEach((info, i) =&gt; {
+    const visible = fileInfo === info;
+    info.elem.className = visible ? 'selected' : '';
+    targets[i] = visible ? 1 : 0;
+  });
+  const durationInMs = 1000;
+-  new TWEEN.Tween(mesh.morphTargetInfluences)
++  tweenManager.createTween(mesh.morphTargetInfluences)
+    .to(targets, durationInMs)
+    .start();
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>Ensuite, nous mettrons à jour notre boucle de rendu pour mettre à jour les tweens et continuer à rendre
+s'il y a encore des animations en cours.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  if (tweenManager.update()) {
++    requestRenderIfNotRequested();
++  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+render();
+</pre>
+<p>Et avec cela, nous devrions pouvoir animer entre les ensembles de données.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets.html" target="_blank">cliquer ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>J'espère que parcourir ceci a été utile. L'utilisation des morphtargets est une technique courante pour
+déplacer de nombreux objets. Par exemple, nous pourrions donner à chaque cube un endroit aléatoire
+dans une autre cible et morpher de là à leurs premières positions sur le globe.
+Cela pourrait être une façon intéressante de présenter le globe.</p>
+<p>Ensuite, vous pourriez être intéressé par l'ajout d'étiquettes à un globe, ce qui est abordé
+dans <a href="align-html-elements-to-3d.html">Aligner les éléments HTML sur la 3D</a>.</p>
+<p>Note : Nous pourrions essayer de simplement représenter le pourcentage d'hommes ou de femmes, ou la différence
+brute, mais compte tenu de la manière dont nous affichons les informations, des cubes qui poussent
+depuis la surface de la terre, nous préférerions que la plupart des cubes soient bas. Si nous
+utilisions l'une de ces autres comparaisons, la plupart des cubes auraient environ la moitié
+de leur hauteur maximale, ce qui ne donnerait pas une bonne visualisation. N'hésitez pas
+à changer <code class="notranslate" translate="no">amountGreaterThan</code> de <a href="/docs/#api/en/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> à quelque chose comme <code class="notranslate" translate="no">(a - b)</code>
+« différence brute » ou <code class="notranslate" translate="no">a / (a + b)</code> « pourcentage » et vous verrez ce que je veux dire.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

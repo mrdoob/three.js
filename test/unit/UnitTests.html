@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>ThreeJS Unit Tests - Using Files in /src</title>
+		<link rel="stylesheet" href="../../node_modules/qunit/qunit/qunit.css">
+	</head>
+	<body>
+
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+
+		<script src="../../node_modules/qunit/qunit/qunit.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+
+		<!-- add sources to test below -->
+		<script src="./three.source.unit.js" type="module"></script>
+	</body>
+</html>
+

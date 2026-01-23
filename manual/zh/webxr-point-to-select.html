@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<title>VR - 3DOF 指向选择</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@threejs">
+	<meta name="twitter:title" content="Three.js – VR - 3DOF 指向选择">
+	<meta property="og:image" content="https://threejs.org/files/share.png">
+	<link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+	<link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+	<link rel="stylesheet" href="../resources/lesson.css">
+	<link rel="stylesheet" href="../resources/lang.css">
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "../../build/three.module.js"
+		  }
+		}
+	</script>
+</head>
+<body>
+<div class="container">
+	<div class="lesson-title">
+		<h1>VR - 3DOF 指向选择</h1>
+	</div>
+	<div class="lesson">
+		<div class="lesson-main">
+			<p><strong>注意：本页示例需要支持 VR 的设备和一个指向设备。如果没有，它们将无法工作。请参阅 <a
+				href="webxr.html">这篇文章</a> 了解原因。</strong></p>
+			<p>在 <a href="webxr-look-to-select.html">上一篇文章</a> 中，我们介绍了一个非常简单的 VR
+				示例，用户可以通过注视来选择物体。在本文中，我们将更进一步，让用户使用一个指向设备来选择。</p>
+			<p>Three.js 提供了两个 VR 控制器对象，从而相对容易地处理单个 3DOF 控制器或两个 6DOF 控制器的情况。每个控制器都是一个
+				<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+				对象，可以提供控制器的朝向和位置。它们还会在用户开始按下、正在按下和松开控制器主按钮时，分别触发 <code
+					class="notranslate" translate="no">selectstart</code>、<code class="notranslate" translate="no">select</code>
+				和 <code class="notranslate" translate="no">selectend</code> 事件。</p>
+			<p>从 <a href="webxr-look-to-select.html">上一个示例</a> 开始，让我们将 <code class="notranslate"
+																						 translate="no">PickHelper</code>
+				更改为 <code class="notranslate" translate="no">ControllerPickHelper</code>。</p>
+			<p>新的实现会在选中对象时发出一个 <code class="notranslate" translate="no">select</code> 事件。我们只需像这样使用它：
+			</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+pickHelper.addEventListener('select', (event) =&gt; {
+  event.selectedObject.visible = false;
+  const partnerObject = meshToMeshMap.get(event.selectedObject);
+  partnerObject.visible = true;
+});
+</pre>
+
+			<p>请记住，我们在之前的代码中使用了 <code class="notranslate" translate="no">meshToMeshMap</code>
+				来将立方体与球体进行映射。这样我们就可以通过一个对象来查找与之对应的另一个对象。在这里，我们只是隐藏了被选中的对象，并显示其对应对象。
+			</p>
+
+			<p>关于 <code class="notranslate" translate="no">ControllerPickHelper</code> 的具体实现，首先我们需要将 VR
+				控制器对象添加到场景中，并为它们添加一些 3D 线条，以可视化用户的指向方向。我们会保存这些控制器和线条。</p>
+
+			<!-- 以下为代码块和进一步内容... -->
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+  constructor(scene) {
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
+  }
+}
+</pre>
+
+			<p>
+				即使没有其他任何操作，仅仅这样设置，我们就可以在场景中看到一条或两条线，显示出用户的指向设备的位置和方向。</p>
+
+			<p>但我们面临一个问题，我们并不希望 <code class="notranslate" translate="no">RayCaster</code>
+				本身去拾取这些线条。一个简单的解决方案是，将可拾取对象与不可拾取对象分开，方法是将它们分别放到不同的 <a
+					href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+				父对象下面。</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++// 用于放置可拾取对象，以便将其与不可拾取对象分离
++const pickRoot = new THREE.Object3D();
++scene.add(pickRoot);
+
+...
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+-  scene.add(cube);
++  pickRoot.add(cube);
+
+...
+</pre>
+
+			<p>接下来让我们添加一些代码，用来通过控制器进行拾取。这是我们第一次通过非相机的方式进行拾取。在我们关于<a
+				href="picking.html">拾取的文章</a>中，用户使用鼠标或手指进行拾取，射线从相机出发，穿过屏幕。在<a
+				href="webxr-look-to-select.html">上一篇文章</a>中，我们是根据用户的注视方向进行拾取，也就是依赖相机方向。而这次，我们是从控制器的位置出发进行拾取，不再使用相机。
+			</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+  constructor(scene) {
++    this.raycaster = new THREE.Raycaster();
++    this.objectToColorMap = new Map();
++    this.controllerToObjectMap = new Map();
++    this.tempMatrix = new THREE.Matrix4();
+
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
+  }
++  update(pickablesParent, time) {
++    this.reset();
++    for (const {controller, line} of this.controllers) {
++      // 从控制器发射一条射线
++      this.tempMatrix.identity().extractRotation(controller.matrixWorld);
++      this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
++      this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
++      // 获取射线与对象的交集
++      const intersections = this.raycaster.intersectObjects(pickablesParent.children);
++      if (intersections.length) {
++        const intersection = intersections[0];
++        // 调整线条长度，使其刚好触碰到对象
++        line.scale.z = intersection.distance;
++        // 选中第一个对象（最近的）
++        const pickedObject = intersection.object;
++        // 保存控制器选中的对象
++        this.controllerToObjectMap.set(controller, pickedObject);
++        // 如果尚未高亮该对象，则进行高亮
++        if (this.objectToColorMap.get(pickedObject) === undefined) {
++          // 保存其原始颜色
++          this.objectToColorMap.set(pickedObject, pickedObject.material.emissive.getHex());
++          // 设置为闪烁的红色/黄色
++          pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFF2000 : 0xFF0000);
++        }
++      } else {
++        line.scale.z = 5;
++      }
++    }
++  }
+}
+</pre>
+
+			<p>就像之前一样，我们使用了 <a href="/docs/#api/en/core/Raycaster"><code class="notranslate" translate="no">Raycaster</code></a>，不过这次射线是从控制器发出的。在以前的
+				<code class="notranslate" translate="no">PickHelper</code> 中，只有一个拾取点（相机），但这里我们有两个控制器，每个都可能在拾取对象。我们在
+				<code class="notranslate" translate="no">controllerToObjectMap</code> 中保存每个控制器所指向的对象，同时在
+				<code class="notranslate" translate="no">objectToColorMap</code> 中保存对象原本的高光颜色，并让射线刚好触碰到对象表面。
+			</p>
+
+			<p>我们需要添加代码，在每一帧重置这些设置。</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+
+  ...
+
++  _reset() {
++    // 恢复颜色
++    this.objectToColorMap.forEach((color, object) =&gt; {
++      object.material.emissive.setHex(color);
++    });
++    this.objectToColorMap.clear();
++    this.controllerToObjectMap.clear();
++  }
+  update(pickablesParent, time) {
++    this._reset();
+
+    ...
+
+}
+</pre>
+
+			<p>接下来，我们希望在用户点击控制器时触发一个 <code class="notranslate" translate="no">select</code>
+				事件。为此，我们可以扩展 three.js 的 <a href="/docs/#api/en/core/EventDispatcher"><code
+					class="notranslate" translate="no">EventDispatcher</code></a>，然后监听来自控制器的 <code
+					class="notranslate" translate="no">select</code> 事件，如果控制器当前指向某个对象，就向外派发一个带有该对象的自定义
+				<code class="notranslate" translate="no">select</code> 事件。</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class ControllerPickHelper {
++class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
++    super();
+    this.raycaster = new THREE.Raycaster();
+    this.objectToColorMap = new Map();  // 保存颜色和被选中对象
+    this.controllerToObjectMap = new Map();
+    this.tempMatrix = new THREE.Matrix4();
+
+    const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+
+    this.controllers = [];
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
++      controller.addEventListener('select', (event) =&gt; {
++        const controller = event.target;
++        const selectedObject = this.controllerToObjectMap.get(controller);
++        if (selectedObject) {
++          this.dispatchEvent({type: 'select', controller, selectedObject});
++        }
++      });
+      scene.add(controller);
+
+      const line = new THREE.Line(pointerGeometry);
+      line.scale.z = 5;
+      controller.add(line);
+      this.controllers.push({controller, line});
+    }
+  }
+}
+</pre>
+
+			<p>现在我们只需在渲染循环中调用 <code class="notranslate" translate="no">update</code> 方法即可：</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+  ...
+
++  pickHelper.update(pickablesParent, time);
+
+  renderer.render(scene, camera);
+}
+</pre>
+
+			<p>只要你有一个带控制器的 VR 设备，就应该能够用控制器来选择物体。</p>
+
+			<div translate="no" class="threejs_example_container notranslate">
+				<div>
+					<iframe class="threejs_example notranslate" translate="no" style=" "
+							src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select.html"></iframe>
+				</div>
+				<a class="threejs_center" href="/manual/examples/webxr-point-to-select.html"
+				   target="_blank">点击这里在新窗口中打开</a>
+			</div>
+			<p>那如果我们想要能够移动这些物体呢？</p>
+			<p>其实相对简单。我们只需要把控制器的 <code class="notranslate" translate="no">select</code>
+				事件监听器代码提取到一个函数中，以便我们可以用于多个用途。</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
++    const selectListener = (event) =&gt; {
++      const controller = event.target;
++      const selectedObject = this.controllerToObjectMap.get(event.target);
++      if (selectedObject) {
++        this.dispatchEvent({type: 'select', controller, selectedObject});
++      }
++    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+-      controller.addEventListener('select', (event) =&gt; {
+-        const controller = event.target;
+-        const selectedObject = this.controllerToObjectMap.get(event.target);
+-        if (selectedObject) {
+-          this.dispatchEvent({type: 'select', controller, selectedObject});
+-        }
+-      });
++      controller.addEventListener('select', selectListener);
+
+       ...
+</pre>
+
+			<p>然后我们将其同时用于 <code class="notranslate" translate="no">selectstart</code> 和 <code
+				class="notranslate" translate="no">select</code> 事件：</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
+    const selectListener = (event) =&gt; {
+      const controller = event.target;
+      const selectedObject = this.controllerToObjectMap.get(event.target);
+      if (selectedObject) {
+-        this.dispatchEvent({type: 'select', controller, selectedObject});
++        this.dispatchEvent({type: event.type, controller, selectedObject});
+      }
+    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      controller.addEventListener('select', selectListener);
+      controller.addEventListener('selectstart', selectListener);
+
+       ...
+</pre>
+
+			<p>我们还要传递 <code class="notranslate" translate="no">selectend</code> 事件，这是 three.js 在用户松开控制器按钮时发送的：
+			</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+  constructor(scene) {
+    super();
+
+    ...
+
+    this.controllers = [];
+
+    const selectListener = (event) =&gt; {
+      const controller = event.target;
+      const selectedObject = this.controllerToObjectMap.get(event.target);
+      if (selectedObject) {
+        this.dispatchEvent({type: event.type, controller, selectedObject});
+      }
+    };
+
++    const endListener = (event) =&gt; {
++      const controller = event.target;
++      this.dispatchEvent({type: event.type, controller});
++    };
+
+    for (let i = 0; i &lt; 2; ++i) {
+      const controller = renderer.xr.getController(i);
+      controller.addEventListener('select', selectListener);
+      controller.addEventListener('selectstart', selectListener);
++      controller.addEventListener('selectend', endListener);
+
+       ...
+</pre>
+
+			<p>现在我们可以修改代码，使得当我们收到 <code class="notranslate" translate="no">selectstart</code>
+				事件时，把被选中的物体从场景中移除，并作为控制器的子对象。这样它就会跟随控制器移动。当我们收到 <code
+					class="notranslate" translate="no">selectend</code> 事件时，再把它放回原来的位置。</p>
+
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+-pickHelper.addEventListener('select', (event) =&gt; {
+-  event.selectedObject.visible = false;
+-  const partnerObject = meshToMeshMap.get(event.selectedObject);
+-  partnerObject.visible = true;
+-});
+
++const controllerToSelection = new Map();
++pickHelper.addEventListener('selectstart', (event) =&gt; {
++  const {controller, selectedObject} = event;
++  const existingSelection = controllerToSelection.get(controller);
++  if (!existingSelection) {
++    controllerToSelection.set(controller, {
++      object: selectedObject,
++      parent: selectedObject.parent,
++    });
++    controller.attach(selectedObject);
++  }
++});
++
++pickHelper.addEventListener('selectend', (event) =&gt; {
++  const {controller} = event;
++  const selection = controllerToSelection.get(controller);
++  if (selection) {
++    controllerToSelection.delete(controller);
++    selection.parent.attach(selection.object);
++  }
++});
+</pre>
+
+			<p>当物体被选中时，我们保存该物体及其原始父级。当用户完成后，我们可以将物体放回原来的地方。</p>
+
+			<p>我们使用了 <a href="/docs/#api/en/core/Object3D.attach"><code class="notranslate" translate="no">Object3D.attach</code></a>
+				来重新设置选中物体的父级。这个函数允许我们在不改变对象位置和朝向的情况下更换其父对象。</p>
+
+			<p>有了这些，我们现在就可以使用 6DOF 控制器来移动物体，或者使用 3DOF 控制器来改变它们的朝向。</p>
+
+			<div translate="no" class="threejs_example_container notranslate">
+				<div>
+					<iframe class="threejs_example notranslate" translate="no" style=" "
+							src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select-w-move.html"></iframe>
+				</div>
+				<a class="threejs_center" href="/manual/examples/webxr-point-to-select-w-move.html" target="_blank">点击这里在新窗口中打开</a>
+			</div>
+
+			<p>说实话，我并不确定这个 <code class="notranslate" translate="no">ControllerPickHelper</code>
+				是否是组织代码的最佳方式，但它在展示如何用 Three.js 在 VR 中实现基础交互方面非常实用。</p>
+
+
+		</div>
+	</div>
+</div>
+
+<script src="../resources/prettify.js"></script>
+<script src="../resources/lesson.js"></script>
+
+
+</body>
+</html>

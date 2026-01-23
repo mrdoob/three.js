@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Conditions préalables</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Conditions préalables">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Conditions préalables</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Ces articles sont destinés à vous aider à apprendre à utiliser three.js.
+Ils supposent que vous savez programmer en JavaScript. Ils supposent
+que vous savez ce qu'est le DOM, comment écrire du code HTML et comment créer des éléments DOM
+en JavaScript. Ils supposent que vous savez utiliser
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">les modules es6</a>
+via import et via les balises <code class="notranslate" translate="no">&lt;script type="module"&gt;</code>. Ils supposent que vous savez utiliser les import maps.
+Ils supposent que vous connaissez un peu de CSS et que vous savez ce que
+<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">sont les sélecteurs CSS</a>.
+Ils supposent également que vous connaissez ES5, ES6 et peut-être un peu ES7.
+Ils supposent que vous savez que le navigateur n'exécute du JavaScript que via des événements et des callbacks.
+Ils supposent que vous savez ce qu'est une closure.</p>
+<p>Voici quelques rappels et notes</p>
+<h2 id="es6-modules">modules es6</h2>
+<p>Les modules es6 peuvent être chargés via le mot-clé <code class="notranslate" translate="no">import</code> dans un script
+ou en ligne via une balise <code class="notranslate" translate="no">&lt;script type="module"&gt;</code>. Voici un exemple</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">
+&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "./path/to/three.module.js",
+    "three/addons/": "./different/path/to/examples/jsm/"
+  }
+}
+&lt;/script&gt;
+
+&lt;script type="module"&gt;
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+...
+
+&lt;/script&gt;
+</pre>
+<p>Voir plus de détails au bas de <a href="fundamentals.html">cet article</a>.</p>
+<h2 id="-document-queryselector-and-document-queryselectorall-"><code class="notranslate" translate="no">document.querySelector</code> et <code class="notranslate" translate="no">document.querySelectorAll</code></h2>
+<p>Vous pouvez utiliser <code class="notranslate" translate="no">document.querySelector</code> pour sélectionner le premier élément
+qui correspond à un sélecteur CSS. <code class="notranslate" translate="no">document.querySelectorAll</code> retourne
+tous les éléments qui correspondent à un sélecteur CSS.</p>
+<h2 id="you-don-t-need-onload-">Vous n'avez pas besoin de <code class="notranslate" translate="no">onload</code></h2>
+<p>Beaucoup de pages vieilles de 20 ans utilisent du HTML comme ceci</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body onload="somefunction()"&gt;
+</pre><p>Ce style est obsolète. Mettez vos scripts
+au bas de la page.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;html&gt;
+  &lt;head&gt;
+    ...
+  &lt;/head&gt;
+  &lt;body&gt;
+     ...
+  &lt;/body&gt;
+  &lt;script&gt;
+    // javascript inline
+  &lt;/script&gt;
+&lt;/html&gt;
+</pre>
+<p>ou <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script">utilisez la propriété <code class="notranslate" translate="no">defer</code></a>.</p>
+<h2 id="know-how-closures-work">Savoir comment fonctionnent les closures</h2>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function a(v) {
+  const foo = v;
+  return function() {
+     return foo;
+  };
+}
+
+const f = a(123);
+const g = a(456);
+console.log(f());  // imprime 123
+console.log(g());  // imprime 456
+</pre>
+<p>Dans le code ci-dessus, la fonction <code class="notranslate" translate="no">a</code> crée une nouvelle fonction à chaque fois qu'elle est appelée. Cette
+fonction <em>englobe</em> la variable <code class="notranslate" translate="no">foo</code>. Voici <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures">plus d'informations</a>.</p>
+<h2 id="understand-how-this-works">Comprendre comment fonctionne <code class="notranslate" translate="no">this</code></h2>
+<p><code class="notranslate" translate="no">this</code> n'est pas magique. C'est effectivement une variable qui est automatiquement passée aux fonctions, tout comme
+un argument est passé à une fonction. L'explication simple est que lorsque vous appelez une fonction directement
+comme ceci</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code> sera <code class="notranslate" translate="no">null</code> (en mode strict ou dans un module), alors que lorsque vous appelez une fonction via l'opérateur point <code class="notranslate" translate="no">.</code> comme ceci</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">someobject.somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code> sera défini sur <code class="notranslate" translate="no">someobject</code>.</p>
+<p>Là où les gens se perdent, c'est avec les callbacks.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction;
+ loader.load(callback);
+</pre><p>ne fonctionne pas comme une personne inexpérimentée pourrait s'attendre, car lorsque
+<code class="notranslate" translate="no">loader.load</code> appelle le callback, il ne l'appelle pas avec l'opérateur point <code class="notranslate" translate="no">.</code>
+donc par défaut <code class="notranslate" translate="no">this</code> sera null (sauf si le loader le définit explicitement sur autre chose).
+Si vous voulez que <code class="notranslate" translate="no">this</code> soit <code class="notranslate" translate="no">someobject</code> lorsque le callback a lieu, vous devez
+le dire à JavaScript en le liant à la fonction.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction.bind(someobject);
+ loader.load(callback);
+</pre><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this"><em>Cet</em> article pourrait aider à expliquer <code class="notranslate" translate="no">this</code></a>.</p>
+<h2 id="es5-es6-es7-stuff">Éléments ES5/ES6/ES7</h2>
+<h3 id="-var-is-deprecated-use-const-and-or-let-"><code class="notranslate" translate="no">var</code> est obsolète. Utilisez <code class="notranslate" translate="no">const</code> et/ou <code class="notranslate" translate="no">let</code></h3>
+<p>Il n'y a aucune raison d'utiliser <code class="notranslate" translate="no">var</code> <strong>JAMAIS</strong> et à ce stade, il est considéré comme une mauvaise pratique
+de l'utiliser du tout. Utilisez <code class="notranslate" translate="no">const</code> si la variable ne sera jamais réassignée, ce qui est la plupart du temps.
+Utilisez <code class="notranslate" translate="no">let</code> dans les cas où la valeur change. Cela aidera à éviter des tonnes de bugs.</p>
+<h3 id="use-for-elem-of-collection-never-for-elem-in-collection-">Utilisez <code class="notranslate" translate="no">for(elem of collection)</code> jamais <code class="notranslate" translate="no">for(elem in collection)</code></h3>
+<p><code class="notranslate" translate="no">for of</code> est nouveau, <code class="notranslate" translate="no">for in</code> est ancien. <code class="notranslate" translate="no">for in</code> avait des problèmes qui sont résolus par <code class="notranslate" translate="no">for of</code></p>
+<p>Par exemple, vous pouvez itérer sur toutes les paires clé/valeur d'un objet avec</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const [key, value] of Object.entries(someObject)) {
+  console.log(key, value);
+}
+</pre>
+<h3 id="use-foreach-map-and-filter-where-useful">Utilisez <code class="notranslate" translate="no">forEach</code>, <code class="notranslate" translate="no">map</code> et <code class="notranslate" translate="no">filter</code> là où c'est utile</h3>
+<p>Les tableaux ont ajouté les fonctions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a>,
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a> et
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code class="notranslate" translate="no">filter</code></a> et
+sont assez largement utilisés dans le JavaScript moderne.</p>
+<h3 id="use-destructuring">Utilisez la déstructuration</h3>
+<p>Supposons un objet <code class="notranslate" translate="no">const dims = {width: 300, height: 150}</code></p>
+<p>ancien code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const width = dims.width;
+const height = dims.height;
+</pre>
+<p>nouveau code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const {width, height} = dims;
+</pre>
+<p>La déstructuration fonctionne aussi avec les tableaux. Supposons un tableau <code class="notranslate" translate="no">const position = [5, 6, 7, 1]</code>;</p>
+<p>ancien code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const y = position[1];
+const z = position[2];
+</pre>
+<p>nouveau code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const [, y, z] = position;
+</pre>
+<p>La déstructuration fonctionne également dans les arguments de fonction</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const dims = {width: 300, height: 150};
+const vector = [3, 4];
+
+function lengthOfVector([x, y]) {
+  return Math.sqrt(x * x + y * y);
+}
+
+const dist = lengthOfVector(vector);  // dist = 5
+
+function area({width, height}) {
+  return width * height;
+}
+const a = area(dims);  // a = 45000
+</pre>
+<h3 id="use-object-declaration-short-cuts">Utilisez les raccourcis de déclaration d'objet</h3>
+<p>ancien code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width: width,
+   height: height,
+   area: function() {
+     return this.width * this.height
+   },
+ };
+</pre>
+<p>nouveau code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width,
+   height,
+   area() {
+     return this.width * this.height;
+   },
+ };
+</pre>
+<h3 id="use-the-rest-parameter-and-the-spread-operator-">Utilisez le paramètre rest et l'opérateur spread <code class="notranslate" translate="no">...</code></h3>
+<p>Le paramètre rest peut être utilisé pour consommer un nombre quelconque de paramètres. Exemple</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> function log(className, ...args) {
+   const elem = document.createElement('div');
+   elem.className = className;
+   elem.textContent = args.join(' ');
+   document.body.appendChild(elem);
+ }
+</pre>
+<p>L'opérateur spread peut être utilisé pour étendre un itérable en arguments</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const position = [1, 2, 3];
+someMesh.position.set(...position);
+</pre>
+<p>ou copier un tableau</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const copiedPositionArray = [...position];
+copiedPositionArray.push(4); // [1,2,3,4]
+console.log(position); // [1,2,3] position n'est pas affectée
+</pre>
+<p>ou pour fusionner des objets</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const a = {abc: 123};
+const b = {def: 456};
+const c = {...a, ...b};  // c est maintenant {abc: 123, def: 456}
+</pre><h3 id="use-class-">Utilisez <code class="notranslate" translate="no">class</code></h3>
+<p>La syntaxe pour créer des objets de type classe avant ES5 était peu familière à la plupart
+des programmeurs. À partir d'ES5, vous pouvez maintenant <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">utiliser le mot-clé <code class="notranslate" translate="no">class</code></a>
+qui est plus proche du style C++/C#/Java.</p>
+<h3 id="understand-getters-and-setters">Comprendre les getters et setters</h3>
+<p>Les <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">getters</a> et
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set">setters</a> sont
+courants dans la plupart des langages modernes. La syntaxe <code class="notranslate" translate="no">class</code>
+d'ES5 les rend beaucoup plus faciles qu'avant ES5.</p>
+<h3 id="use-arrow-functions-where-appropriate">Utilisez les fonctions fléchées (arrow functions) là où c'est approprié</h3>
+<p>C'est particulièrement utile avec les callbacks et les promises.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loader.load((texture) =&gt; {
+  // utiliser la texture
+});
+</pre>
+<p>Les fonctions fléchées lient <code class="notranslate" translate="no">this</code> au contexte dans lequel vous créez la fonction fléchée.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = (args) =&gt; {/* code */};
+</pre>
+<p>est un raccourci pour</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = (function(args) {/* code */}).bind(this));
+</pre>
+<p>Voir le lien ci-dessus pour plus d'informations sur <code class="notranslate" translate="no">this</code>.</p>
+<h3 id="promises-as-well-as-async-await">Promises ainsi que async/await</h3>
+<p>Les Promises aident avec le code asynchrone. Async/await aident à
+utiliser les promises.</p>
+<p>C'est un sujet trop vaste pour être abordé ici, mais vous pouvez <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">lire sur
+les promises ici</a>
+et sur <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">async/await ici</a>.</p>
+<h3 id="use-template-literals">Utilisez les littéraux de gabarit (Template Literals)</h3>
+<p>Les littéraux de gabarit sont des chaînes utilisant des accents graves (backticks) au lieu de guillemets.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const foo = `this is a template literal`;
+</pre><p>Les littéraux de gabarit ont fondamentalement 2 fonctionnalités. La première est qu'ils peuvent être multi-lignes</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = `this
+is
+a
+template
+literal`;
+const bar = "this\nis\na\ntemplate\nliteral";
+</pre>
+<p><code class="notranslate" translate="no">foo</code> et <code class="notranslate" translate="no">bar</code> ci-dessus sont identiques.</p>
+<p>L'autre est que vous pouvez sortir du mode chaîne et insérer des fragments de
+JavaScript en utilisant <code class="notranslate" translate="no">${javascript-expression}</code>. C'est la partie gabarit. Exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const r = 192;
+const g = 255;
+const b = 64;
+const rgbCSSColor = `rgb(${r},${g},${b})`;
+</pre>
+<p>ou</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = [192, 255, 64];
+const rgbCSSColor = `rgb(${color.join(',')})`;
+</pre>
+<p>ou</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const aWidth = 10;
+const bWidth = 20;
+someElement.style.width = `${aWidth + bWidth}px`;
+</pre>
+<h1 id="learn-javascript-coding-conventions-">Apprenez les conventions de codage JavaScript.</h1>
+<p>Bien que vous soyez libre de formater votre code comme bon vous semble, il existe au moins une
+convention dont vous devriez être conscient. Les variables, noms de fonctions, noms de méthodes, en
+JavaScript sont tous en lowerCasedCamelCase. Les constructeurs, les noms de classes sont
+en CapitalizedCamelCase. Si vous suivez cette règle, votre code correspondra à la plupart des autres
+codes JavaScript. Beaucoup de <a href="https://eslint.org">linters</a>, des programmes qui vérifient les erreurs évidentes dans votre code,
+vous signaleront des erreurs si vous utilisez la mauvaise casse, car en suivant la convention
+ci-dessus, ils peuvent savoir quand vous utilisez quelque chose de manière incorrecte.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const v = new vector(); // clairement une erreur si toutes les classes commencent par une majuscule
+const v = Vector();     // clairement une erreur si toutes les fonctions commencent par une minuscule.
+</pre>
+<h1 id="consider-using-visual-studio-code">Envisagez d'utiliser Visual Studio Code</h1>
+<p>Bien sûr, utilisez l'éditeur que vous voulez, mais si vous ne l'avez pas essayé, envisagez
+d'utiliser <a href="https://code.visualstudio.com/">Visual Studio Code</a> pour JavaScript et
+après l'avoir installé, <a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">configurez
+eslint</a>.
+Cela pourrait prendre quelques minutes à configurer, mais cela vous aidera énormément à trouver
+les bugs dans votre JavaScript.</p>
+<p>Quelques exemples</p>
+<p>Si vous activez <a href="https://eslint.org/docs/rules/no-undef">la règle <code class="notranslate" translate="no">no-undef</code></a> alors
+VSCode via ESLint vous avertira de nombreuses variables non définies. </p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-defined.png"></div>
+
+<p>Ci-dessus, vous pouvez voir que j'ai mal orthographié <code class="notranslate" translate="no">doTheThing</code> en <code class="notranslate" translate="no">doThing</code>. Il y a un trait ondulé rouge
+sous <code class="notranslate" translate="no">doThing</code> et en survolant, il me dit qu'il n'est pas défini. Une erreur
+évitée.</p>
+<p>Si vous utilisez des balises <code class="notranslate" translate="no">&lt;script&gt;</code> pour inclure three.js, vous recevrez des avertissements en utilisant <code class="notranslate" translate="no">THREE</code>, alors ajoutez <code class="notranslate" translate="no">/* global THREE */</code> en haut de vos
+fichiers JavaScript pour dire à eslint que <code class="notranslate" translate="no">THREE</code> existe. (ou mieux, utilisez <code class="notranslate" translate="no">import</code> 😉)</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-a-constructor.png"></div>
+
+<p>Ci-dessus, vous pouvez voir qu'eslint connaît la règle selon laquelle les <code class="notranslate" translate="no">UpperCaseNames</code> sont des constructeurs
+et que vous devriez donc utiliser <code class="notranslate" translate="no">new</code>. Une autre erreur détectée et évitée. C'est <a href="https://eslint.org/docs/rules/new-cap">la
+règle <code class="notranslate" translate="no">new-cap</code></a>.</p>
+<p>Il existe <a href="https://eslint.org/docs/rules/">des centaines de règles que vous pouvez activer ou désactiver ou
+personnaliser</a>. Par exemple, j'ai mentionné ci-dessus que vous
+devriez utiliser <code class="notranslate" translate="no">const</code> et <code class="notranslate" translate="no">let</code> plutôt que <code class="notranslate" translate="no">var</code>.</p>
+<p>Ici, j'ai utilisé <code class="notranslate" translate="no">var</code> et il m'a averti que je devrais utiliser <code class="notranslate" translate="no">let</code> ou <code class="notranslate" translate="no">const</code></p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-var.png"></div>
+
+<p>Ici, j'ai utilisé <code class="notranslate" translate="no">let</code>, mais il a vu que je ne changeais jamais la valeur, alors il a suggéré que j'utilise <code class="notranslate" translate="no">const</code>.</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-let.png"></div>
+
+<p>Bien sûr, si vous préférez continuer à utiliser <code class="notranslate" translate="no">var</code>, vous pouvez simplement désactiver cette règle.
+Comme je l'ai dit ci-dessus, je préfère utiliser <code class="notranslate" translate="no">const</code> et <code class="notranslate" translate="no">let</code> plutôt que <code class="notranslate" translate="no">var</code> car ils
+fonctionnent mieux et préviennent les bugs.</p>
+<p>Dans les cas où vous avez vraiment besoin de outrepasser une règle, <a href="https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments">vous pouvez ajouter des commentaires pour les désactiver</a>
+pour une seule ligne ou une section de code.</p>
+<h1 id="if-you-really-need-to-support-legacy-browsers-use-a-transpiler">Si vous avez vraiment besoin de prendre en charge les anciens navigateurs, utilisez un transpiler</h1>
+<p>La plupart des navigateurs modernes sont mis à jour automatiquement, donc l'utilisation de toutes ces fonctionnalités vous aidera à
+être productif et à éviter les bugs. Cela dit, si vous êtes sur un projet qui doit absolument
+prendre en charge les anciens navigateurs, il existe <a href="https://babeljs.io">des outils qui prendront votre code ES5/ES6/ES7
+et le transpileront vers du JavaScript pré-ES5</a>.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

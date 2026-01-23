@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Примитивы </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Примитивы ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Примитивы </h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья является частью серии статей о three.js.
+Первая была <a href="fundamentals.html">об основах</a>.
+Если вы её еще не читали, советую вам сделать это.</p>
+<p>Three.js имеет большое количество примитивов. Примитивы, как правило,
+представляют собой трехмерные фигуры, которые генерируются во время
+выполнения с помощью набора параметров.</p>
+<p>Примитивы используются для таких вещей, как сфера для глобуса или куча
+прямоугольников для рисования трехмерного графика. Особенно часто
+используются примитивы для экспериментов и начала работы с 3D.
+Для большинства 3D-приложений художник чаще всего создает 3D-модели
+в программе 3D-моделирования. Позже в этой серии мы рассмотрим
+создание и загрузку данных из нескольких программ 3D-моделирования.
+А сейчас давайте рассмотрим некоторые из доступных примитивов.</p>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">Прямоугольный параллелепипед</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">Круг</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">Конус</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">Цилиндр</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Додекаэдр (12 граней)</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Выдавленная 2d фигура с скругленными краями.
+Здесь мы выдавливаем форму сердца. Обратите внимание, это основа
+для <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> и <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> соответственно.</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Икосаэдр (20 граней)</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Форма, созданная вращением линии. Например, лампы, кегли для боулинга, свечи, подсвечники, бокалы для вина, стаканы для питья и т. Д. Вы указываете 2-мерный силуэт в виде серии точек, а затем указываете three.js , сколько секций нужно сделать, когда он вращает силуэт вокруг оси.</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Октаэдр (8 граней)</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">Поверхность, созданная путем предоставления функции, которая берет 2d точку из сетки и возвращает соответствующую 3d точку.</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2D плоскость</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">Берет набор треугольников с центром вокруг точки и проецирует их на сферу</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">2D диск с отверстием в центре</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">2D контур, который строится из треугольников</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">Сфера</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">Тераэдр (4 грани)</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">3D-текст, сгенерированный из 3D-шрифта и строки</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">Тор (пончик)</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">Торический узел</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">Труба - круг проходящий путь</div>
+<div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">Вспомогательный объект, который принимает другую геометрию в качестве входных данных и генерирует ребра, только если угол между гранями больше некоторого порога. Например, если вы посмотрите на прямоугольник сверху, он показывает линию, проходящую через каждую грань, показывая каждый треугольник, из которого состоит прямоугольник. Используя EdgesGeometry, вместо этого удаляются средние линии.</div>
+<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Создает геометрию, которая содержит один отрезок (2 точки) на ребро в заданной геометрии. Без этого вы часто теряете ребра или получаете дополнительные ребра, поскольку WebGL обычно требует 2 точки на отрезок. Например, если бы у вас был только один треугольник, было бы только 3 очка. Если вы попытаетесь нарисовать его, используя материал с <code class="notranslate" translate="no">wireframe: true</code> вы получите только одну линию. А передача этой triangle geometry в <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a> создаст новую геометрию, которая имеет 3 отрезка линий, используя 6 точек..</div>
+
+<p>Мы рассмотрим создание пользовательской геометрии в другой статье.
+А пока давайте создадим пример создания каждого типа примитива.
+Начнем с <a href="responsive.html">примеров из предыдущей статьи</a>.</p>
+<p>Близ вершины давайте установим цвет фона в светло-серый</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color(0xAAAAAA);
+</pre><p>Камера должна изменить положение, чтобы мы могли видеть все объекты.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">-const fov = 75;
++const fov = 40;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 1000;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 120;
+</pre><p>Давайте добавим функцию, <code class="notranslate" translate="no">addObject</code>, которая добавляет
+объект <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> на сцену в позицию x, y.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const objects = [];
+const spread = 15;
+
+function addObject(x, y, obj) {
+  obj.position.x = x * spread;
+  obj.position.y = y * spread;
+
+  scene.add(obj);
+  objects.push(obj);
+}
+</pre><p>Давайте также сделаем функцию для создания случайно раскрашенного материала.
+Мы будем использовать особенность <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a> которая позволяет вам установить цвет
+на основе оттенка, насыщенности и яркости (hue, saturation, luminance).</p>
+<p><code class="notranslate" translate="no">hue</code> идет от 0 до 1 вокруг цветового круга с красным на 0,
+зеленым на .33 и синим на .66. <code class="notranslate" translate="no">saturation</code>
+изменяется от 0 до 1, где 0 не имеет цвета, а 1 наиболее насыщен.
+<code class="notranslate" translate="no">luminance</code> изменяется от 0 до 1, где 0 - черный, 1 - белый,
+а 0.5 максимальное количество цвета. Другими словами,
+<code class="notranslate" translate="no">luminance</code> от 0,0 до 0,5 цвет будет изменяться с черного на <code class="notranslate" translate="no">hue</code>.
+От 0,5 до 1,0 цвет изменится <code class="notranslate" translate="no">hue</code> на белый.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function createMaterial() {
+  const material = new THREE.MeshPhongMaterial({
+    side: THREE.DoubleSide,
+  });
+
+  const hue = Math.random();
+  const saturation = 1;
+  const luminance = .5;
+  material.color.setHSL(hue, saturation, luminance);
+
+  return material;
+}
+</pre><p>Мы также передаем материалу <code class="notranslate" translate="no">side: THREE.DoubleSide</code>.
+Это говорит three нарисовать обе стороны треугольников,
+которые составляют форму. Для сплошной (solid)  формы,
+такой как сфера или куб, обычно нет причин рисовать
+задние стороны треугольников, поскольку все они обращены
+внутрь фигуры. В нашем случае мы рисуем несколько вещей,
+таких как  <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> и <a href="/docs/#api/en/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>
+которые являются двухмерными и поэтому не имеют внутренней
+части. Без установки <code class="notranslate" translate="no">side: THREE.DoubleSide</code> они исчезнут,
+при взгляде на их задние стороны.</p>
+<p>Я должен отметить, что отрисовка быстрее, когда <strong>не</strong> установлено
+<code class="notranslate" translate="no">side: THREE.DoubleSide</code> в реальной работе, мы бы устанавливали
+его только для материалов, которые действительно в этом нуждаются,
+но в этом случае мы не рисуем слишком много, поэтому нет
+причин для беспокойства.</p>
+<p>Давайте создадим функцию <code class="notranslate" translate="no">addSolidGeometry</code>, которой мы передадим
+геометрию, и она создаст случайно раскрашенный материал
+<code class="notranslate" translate="no">createMaterial</code> и <code class="notranslate" translate="no">addObject</code> добавит его в сцену.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function addSolidGeometry(x, y, geometry) {
+  const mesh = new THREE.Mesh(geometry, createMaterial());
+  addObject(x, y, mesh);
+}
+</pre><p>Теперь мы можем использовать это для большинства примитивов,
+которые мы создаем. Например, создание прямоугольного параллелепипеда</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">{
+  const width = 8;
+  const height = 8;
+  const depth = 8;
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
+}
+</pre><p>Если вы посмотрите на код ниже, вы увидите похожую часть для
+каждого типа геометрии.</p>
+<p>Вот результат:</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Есть несколько заметных исключений из шаблона выше.
+Самым большим, вероятно, является <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Он должен
+загрузить данные 3D шрифта, прежде чем он сможет сгенерировать
+сетку для текста. Эти данные загружаются асинхронно, поэтому
+нам нужно дождаться их загрузки, прежде чем пытаться создать
+геометрию. Вы можете увидеть ниже, мы создаем <a href="/docs/#api/en/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>
+и передаем его URL нашему шрифту и обратному вызову (callback).
+Обратный вызов срабатывает после загрузки шрифта.
+В обратном вызове мы создаем геометрию и вызываем <code class="notranslate" translate="no">addObject</code>,
+чтобы добавить к ней сцену.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">{
+  const loader = new FontLoader();
+  loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font) =&gt; {
+    const geometry = new TextGeometry('three.js', {
+      font: font,
+      size: 3.0,
+      height: .2,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.15,
+      bevelSize: .3,
+      bevelSegments: 5,
+    });
+    const mesh = new THREE.Mesh(geometry, createMaterial());
+    geometry.computeBoundingBox();
+    geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+
+    const parent = new THREE.Object3D();
+    parent.add(mesh);
+
+    addObject(-1, 1, parent);
+  });
+}
+</pre><p>Есть еще одно отличие. Мы хотим вращать текст вокруг его центра,
+но по умолчанию three.js создает текст таким образом, чтобы его
+центр вращения находился на левом краю. Чтобы обойти это, мы
+можем попросить three.js вычислить ограничивающую
+рамку (bounding box) геометрии. Затем мы можем вызвать <code class="notranslate" translate="no">getCenter</code>
+метод bounding box и передать ему объект позиции нашей полигональной
+сетки (mesh). <code class="notranslate" translate="no">getCenter</code> копирует центр коробки в указанное положение.
+Он также возвращает объект position, поэтому мы можем вызвать
+<code class="notranslate" translate="no">multiplyScaler(-1)</code> для позиционирования всего объекта таким образом,
+чтобы его центр вращения находился в центре объекта.</p>
+<p>Если бы мы тогда просто вызвали <code class="notranslate" translate="no">addSolidGeometry</code> как в предыдущих
+примерах, это снова установило бы позицию, что не годится.
+Итак, в этом случае мы создаем <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> стандартный узел для графа
+сцены three.js. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> так же наследуется от <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Мы рассмотрим,
+<a href="scenegraph.html">как работает график сцены, в другой статье</a>.
+На данный момент достаточно знать, что, как и DOM-узлы, дети рисуются
+относительно своего родителя. Сделав <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> и сделав нашу сетку
+дочерней по отношению к этому, мы можем расположить <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>  в то
+место, где мы хотим, и при этом сохранить смещение центра,
+которое мы установили раньше.</p>
+<p>Если бы мы этого не делали, текст был бы оторван от центра.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives-text.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives-text.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Обратите внимание, что то что слева не вращается вокруг своего центра,
+как то, что справа.</p>
+<p>Другие исключения - это 2-строчные примеры для <a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
+и <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Вместо того, чтобы вызвать <code class="notranslate" translate="no">addSolidGeometry</code>
+они вызвают <code class="notranslate" translate="no">addLineGeometry</code> который выглядит так</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function addLineGeometry(x, y, geometry) {
+  const material = new THREE.LineBasicMaterial({color: 0x000000});
+  const mesh = new THREE.LineSegments(geometry, material);
+  addObject(x, y, mesh);
+}
+</pre><p>Он создает черный цвет <a href="/docs/#api/en/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a>, а затем создает <a href="/docs/#api/en/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>,
+который является оберткой <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, который помогает three знать, что вы
+отрисовываете отрезки линии (2 точки на отрезок).</p>
+<p>Каждый из примитивов имеет несколько параметров, которые вы можете
+передать при создании, и лучше всего <a href="https://threejs.org/docs/">посмотреть в документации</a>
+по всем из них, а не повторять их здесь. Вы также можете нажать на ссылку выше рядом с
+каждой фигурой, чтобы перейти непосредственно к документам для этой фигурой.</p>
+<p>Еще одна важная вещь - это то, что почти все фигуры имеют различные настройки того,
+как их разделить на полигоны. Хорошим примером может служить геометрия сферы.
+Сферы берут параметры для количества делений вокруг и количества делений сверху вниз.
+Например</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
+</div>
+
+<p>Первая сфера имеет 5 сегментов вокруг и 3 высоты, что составляет 15 сегментов
+или 30 треугольников. Вторая сфера имеет 24 сегмента на 10. Это 240 сегментов
+или 480 треугольников. Последний имеет 50 на 50, что составляет 2500 сегментов
+или 5000 треугольников.</p>
+<p>Вам решать, сколько сегментов вам нужно. Может показаться, что вам нужно
+большое количество сегментов, но удалите линии и плоскую штриховку,
+и мы получим это</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
+</div>
+
+<p>Сейчас не очень понятно, что тот, который справа с 5000 треугольниками,
+полностью лучше, чем тот, что в середине с 480. Если вы рисуете только
+несколько сфер, как, например, один глобус для карты земли, то одна
+сфера из 10000 треугольников - неплохой выбор. Если, с другой стороны,
+вы пытаетесь нарисовать 1000 сфер, то 1000 сфер на 10000 треугольников
+каждый - это 10 миллионов треугольников. Для плавной анимации вам нужно,
+чтобы браузер рисовал со скоростью 60 кадров в секунду, поэтому вы должны
+просить браузер рисовать 600 миллионов треугольников в секунду. Это много
+вычислений.</p>
+<p>Иногда выбрать легко. Например, вы можете выбрать разделение для плоскости.</p>
+<div class="spread">
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
+</div>
+
+<p>Плоскость слева - это 2 треугольника. Плоскость справа - это 200 треугольников.
+В отличие от сферы, в большинстве случаев использования плоскости действительно
+нет компромисса в качестве. Скорее всего, вы подразделяете плоскость только в
+том случае, если вы хотите изменить или деформировать её каким-либо образом.
+Для Box аналогично.</p>
+<p>Итак, выберите то, что подходит для вашей ситуации. Чем меньше разбиений
+вы выберете, тем более вероятно, что все будет работать гладко и тем меньше
+памяти они будут занимать. Вы должны решить для себя, каков правильный
+компромисс для вашей конкретной ситуации.</p>
+<p>Далее давайте рассмотрим <a href="scenegraph.html">как работает граф сцены и как его использовать</a>.</p>
+<p><script type="module" src="../resources/threejs-primitives.js"></script></p>
+<link rel="stylesheet" href="../resources/threejs-primitives.css">
+
+        </div>
+      </div>
+    </div>
+
+  <script defer src="../resources/prettify.js"></script>
+  <script defer src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

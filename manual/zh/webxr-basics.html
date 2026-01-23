@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+	<meta charset="utf-8">
+	<title>VR</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@threejs">
+	<meta name="twitter:title" content="Three.js – VR">
+	<meta property="og:image" content="https://threejs.org/files/share.png">
+	<link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+	<link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+	<link rel="stylesheet" href="../resources/lesson.css">
+	<link rel="stylesheet" href="../resources/lang.css">
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "../../build/three.module.js"
+		  }
+		}
+	</script>
+</head>
+<body>
+<div class="container">
+	<div class="lesson-title">
+		<h1>VR</h1>
+	</div>
+	<div class="lesson">
+		<div class="lesson-main">
+			<p>在 three.js 中制作一个 VR 应用相当简单。你基本上只需要告诉 three.js 你想使用 WebXR。关于 WebXR，有几点应该很容易理解。摄像机的朝向是由 VR 系统提供的，因为用户会转动头部来选择观看的方向。同样，视野范围（field of view）和长宽比也是由 VR 系统提供的，因为每个系统的视野和显示比例都不同。</p>
+			<p>我们来看一个来自<a href="responsive.html">制作响应式网页</a>的示例，并让它支持 VR。</p>
+			<p>在开始之前，你需要一台支持 VR 的设备，比如 Android 智能手机、Google Daydream、Oculus Go、Oculus Rift、Vive、Samsung Gear VR，或者一部安装了<a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">WebXR 浏览器</a>的 iPhone。</p>
+			<p>接下来，如果你在本地运行，你需要像<a href="setup.html">设置教程</a>中提到的那样运行一个简单的 Web 服务器。</p>
+			<p>如果你用于查看 VR 的设备不是运行服务的同一台电脑，那么你需要通过 https 来访问网页，否则浏览器将不允许使用 WebXR API。<a href="setup.html">设置教程</a>中提到的名为 <a href="https://greggman.github.io/servez" target="_blank">Servez</a> 的服务器支持启用 https。勾选该选项并启动服务器。</p>
+			<div class="threejs_center"><img src="../resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
+			<p>请注意 URL，你需要使用你电脑的本地 IP 地址。它通常会以 <code class="notranslate" translate="no">192</code>、<code class="notranslate" translate="no">172</code> 或 <code class="notranslate" translate="no">10</code> 开头。在 VR 设备的浏览器中输入完整地址，包括 <code class="notranslate" translate="no">https://</code> 部分。注意：你的电脑和 VR 设备必须在同一个本地网络或 WiFi 上，并且最好是在家庭网络中。注意：许多咖啡馆的网络配置不允许设备间直接通信。</p>
+			<p>你可能会看到如下图所示的错误提示。点击“高级”，然后点击<em>继续</em>。</p>
+			<div class="threejs_center"><img src="../resources/images/https-warning.gif"></div>
+			<p>现在你可以运行示例代码了。</p>
+			<p>如果你打算真正进行 WebXR 开发，你还应该了解一下 <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">远程调试</a>，这样你就可以查看控制台警告、错误，当然也可以<a href="debugging-javascript.html">调试你的代码</a>。</p>
+			<p>如果你只是想看看下面的代码是否可运行，你可以直接在本网站运行它。</p>
+			<p>我们首先需要在引入 three.js 之后引入对 VR 的支持：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {VRButton} from 'three/addons/webxr/VRButton.js';  // 引入 VR 按钮模块
+</pre>
+			<p>然后我们需要启用 three.js 的 WebXR 支持，并将 VR 按钮添加到页面中：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  renderer.xr.enabled = true;  // 启用 WebXR 支持
++  document.body.appendChild(VRButton.createButton(renderer));  // 将 VR 按钮添加到页面
+</pre>
+			<p>我们需要让 three.js 来运行渲染循环。在此之前我们一直使用 <code class="notranslate" translate="no">requestAnimationFrame</code> 循环，但为了支持 VR，我们需要让 three.js 自己控制渲染循环。我们可以调用 <a href="/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> 并传入一个回调函数来实现：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);  // 原来的 requestAnimationFrame 被移除
+}
+
+-requestAnimationFrame(render);  // 原调用被注释
++renderer.setAnimationLoop(render);  // 改为使用 WebXR 的渲染循环方式
+</pre>
+			<p>还有一个细节：我们最好设置一个摄像机的高度，使其符合站立用户的平均视角高度。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
++camera.position.set(0, 1.6, 0);  // 设置摄像机高度为 1.6 米，符合站立用户的平均视角
+</pre>
+			<p>并将立方体上移，使其位于摄像机前方：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+cube.position.x = x;
++cube.position.y = 1.6;  // 与摄像机高度一致
++cube.position.z = -2;  // 放置在摄像机前方 2 米处
+</pre>
+			<p>我们将 z 设置为 <code class="notranslate" translate="no">-2</code>，因为摄像机现在位于 <code class="notranslate" translate="no">z = 0</code>，默认朝向 -z 轴方向。</p>
+			<p>这引出了一个非常重要的点：<strong>VR 中的单位是以米为单位</strong>。换句话说，<strong>一个单位 = 一米</strong>。这意味着摄像机在距离地面 1.6 米的位置，立方体的中心位于摄像机前方 2 米处。每个立方体的大小是 1x1x1 米。这一点非常关键，因为 VR 需要将虚拟世界中的尺寸与用户在现实世界中的动作相匹配。</p>
+			<p>现在，我们应该可以在摄像机前方看到三个旋转的立方体，并且有一个进入 VR 的按钮。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/webxr-basic.html" target="_blank">点击此处在新窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>我发现 VR 效果更好一些时，是摄像机周围有一些参考物，比如一个房间。因此我们来添加一个简单的网格立方体贴图，就像我们在<a href="backgrounds.html">背景文章</a>中讲到的那样。我们会使用相同的网格纹理贴图在立方体的每一面上，这样可以创建一个“网格房间”。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++{
++  const loader = new THREE.CubeTextureLoader();  // 创建立方体贴图加载器
++  const texture = loader.load([
++    'resources/images/grid-1024.png',  // 六个面的纹理都用同一张图
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++  ]);
++  scene.background = texture;  // 设置场景背景为加载的立方体贴图
++}
+</pre>
+			<p>这样看起来会更好一些。</p>
+
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic-w-background.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/webxr-basic-w-background.html" target="_blank">点击此处在新窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>注意：要实际看到 VR 效果，你需要一台兼容 WebXR 的设备。我相信大多数 Android 手机在使用 Chrome 或 Firefox 时都支持 WebXR。至于 iOS，你也许可以使用这个 <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">WebXR 应用</a>，但总体上 WebXR 在 iOS 上的支持在 2019 年 5 月时仍处于不支持状态。</p>
+			<p>在 Android 或 iPhone 上使用 WebXR，你需要一个<em>手机专用的 VR 头显</em>。你可以以很便宜的价格购买，比如用纸板做的只需约 5 美元，高端一些的可能需要 100 美元左右。不幸的是，我也不清楚该推荐哪款产品。我这些年买过 6 个设备，质量参差不齐，最贵的也没超过 25 美元。</p>
+			<p>以下是一些可能遇到的问题：</p>
+			<ol>
+				<li><p>是否适配你的手机尺寸</p>
+					<p>手机尺寸各异，因此 VR 头显需要与之匹配。很多头显声称支持多种尺寸。从我的经验来看，适配尺寸越多，实际效果越差，因为它们不得不在多个尺寸之间做出妥协。不幸的是，支持多尺寸的头显是最常见的类型。</p>
+				</li>
+				<li><p>是否能够调节焦距以适配你的脸型</p>
+					<p>有些设备的可调节性更强。通常最多提供两种调节方式：镜片与眼睛之间的距离，以及两只眼睛之间的镜片间距。</p>
+				</li>
+				<li><p>镜片是否太反光</p>
+					<p>许多头显的镜片连接区域是一段塑料通道。如果这些塑料材质是光滑或反光的，那么它会像镜子一样反射屏幕内容，造成强烈干扰。</p>
+					<p>几乎没有评论会提及这个问题。</p>
+				</li>
+				<li><p>佩戴是否舒适</p>
+					<p>大多数设备像眼镜一样压在鼻梁上。几分钟后可能就会感觉不适。有些设备配有环绕头部的固定带，有些还有一条从上方穿过头顶的第三条带子。这些可能或可能不会起到将设备固定在合适位置的作用。</p>
+					<p>事实是，对大多数（甚至所有）设备来说，眼睛必须正对镜片中心。如果镜片略微偏高或偏低，图像就会变模糊。这可能非常令人沮丧，因为一开始图像是清晰的，但使用 45 到 60 秒后设备稍微移位 1 毫米，你会突然发现自己在努力看一个模糊的图像。</p>
+				</li>
+				<li><p>是否支持眼镜</p>
+					<p>如果你戴眼镜，你需要查看评论确认该设备是否支持眼镜佩戴。</p>
+				</li>
+			</ol>
+			<p>很遗憾，我没法给出推荐。<a href="https://vr.google.com/cardboard/get-cardboard/">Google 提供了一些便宜的纸板 VR 眼镜建议</a>，有些仅需 5 美元左右，不妨从那里开始尝试。如果你喜欢这个体验，再考虑升级。5 美元也就一杯咖啡的钱，试一试也无妨！</p>
+			<p>VR 设备大致可以分为 3 种类型：</p>
+			<ol>
+				<li><p>三自由度（3DoF），无输入设备</p>
+					<p>这通常指的是手机类设备，尽管有时也可以购买第三方输入设备。所谓三自由度是指你可以上下转头（1）、左右转头（2）、以及左右倾斜头部（3）。</p>
+				</li>
+
+				<li><p>三自由度（3DoF）+ 一个三自由度输入设备</p>
+					<p>这类设备包括 Google Daydream 和 Oculus GO。</p>
+					<p>它们同样支持三自由度，并配有一个小型控制器，在 VR 中像激光指针一样使用。激光指针本身也只有三自由度，系统只能识别它的指向方向，不能识别它的位置。</p>
+				</li>
+
+				<li><p>六自由度（6DoF）+ 六自由度输入设备</p>
+					<p>这些是<em>真正的 VR 设备</em>（哈哈）。六自由度意味着设备不仅知道你头部的朝向，还知道你头部的实际位置。这意味着你左右移动、前后移动、或坐下/站起，设备都能感知并在 VR 中进行同步。</p>
+					<p>体验非常真实，令人惊艳。在一个好的演示中你可能会被震撼到，我至今仍然会被打动。</p>
+					<p>此外，这类设备通常配有两个控制器，分别对应左右手。系统可以准确识别你双手的位置和朝向，因此你可以在 VR 中通过触摸、推动、扭动等手势操作物体。</p>
+					<p>支持六自由度的设备包括 Vive、Vive Pro、Oculus Rift、Quest 以及我相信所有 Windows MR 设备。</p>
+				</li>
+			</ol>
+
+			<p>讲了这么多，我也不能完全确认哪些设备确实能与 WebXR 配合使用。但我 99% 确信，大多数 Android 手机在使用 Chrome 时是可以的。你可能需要在 <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a> 中启用 WebXR 支持。我也知道 Google Daydream 是可用的，同样需要在 <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a> 中启用支持。Oculus Rift、Vive、Vive Pro 可以通过 Chrome 或 Firefox 使用。我对 Oculus Go 和 Oculus Quest 不太确定，因为它们使用的是定制操作系统，但根据网络信息，它们似乎也是可以的。</p>
+
+			<p>好了，介绍完 VR 设备和 WebXR，我们继续讲其他内容。</p>
+
+			<ul>
+				<li><p>同时支持 VR 和 非 VR 模式</p>
+					<p>据我所知（截至 r112 版本），three.js 并没有提供一个简单的方法来同时支持 VR 和非 VR 模式。理想情况下，如果不处于 VR 模式，我们希望可以使用任何方式控制摄像机，例如使用 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>，并且在切换进出 VR 模式时可以接收到事件，以便启用或禁用控制器。</p>
+				</li>
+			</ul>
+
+			<p>如果 future 的 three.js 添加了支持，我会尝试更新本文。在此之前，你可能需要制作两个版本的页面，或者在 URL 中传入一个标记参数，例如：</p>
+			<pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
+</pre>
+			<p>然后我们可以加一些链接来切换模式：</p>
+			<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div class="mode"&gt;
++    &lt;a href="?allowvr=true" id="vr"&gt;启用 VR 模式&lt;/a&gt;
++    &lt;a href="?" id="nonvr"&gt;使用非 VR 模式&lt;/a&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+
+			<p>并加上一些 CSS 来定位这些链接：</p>
+			<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
++.mode {
++  position: absolute;
++  right: 1em;  /* 右上角显示 */
++  top: 1em;
++}
+</pre>
+
+			<p>你可以在代码中这样读取参数：</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+-  renderer.xr.enabled = true;
+-  document.body.appendChild(VRButton.createButton(renderer));
+
+  const fov = 75;
+  const aspect = 2;  // canvas 默认宽高比
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1.6, 0);
+
++  const params = (new URL(document.location)).searchParams;
++  const allowvr = params.get('allowvr') === 'true';  // 从 URL 中读取 allowvr 参数
++  if (allowvr) {
++    renderer.xr.enabled = true;
++    document.body.appendChild(VRButton.createButton(renderer));
++    document.querySelector('#vr').style.display = 'none';  // 隐藏“启用 VR”按钮
++  } else {
++    // 非 VR 模式，添加控制器
++    const controls = new OrbitControls(camera, canvas);
++    controls.target.set(0, 1.6, -2);
++    controls.update();
++    document.querySelector('#nonvr').style.display = 'none';  // 隐藏“非 VR 模式”按钮
++  }
+</pre>
+
+			<p>这到底好不好我也说不准。我感觉 VR 模式和非 VR 模式之间所需的实现差异通常非常大，
+				所以除了最简单的应用场景外，或许制作两个单独的页面会更合适？你需要自己决定。</p>
+
+			<p>注意：由于种种原因，这段代码在本网站的在线编辑器中是无法运行的，
+				所以如果你想试试看，可以<a href="../examples/webxr-basic-vr-optional.html" target="_blank">点击这里</a>。
+				页面会以非 VR 模式启动，你可以用鼠标或手指来移动摄像机。
+				点击“允许 VR”按钮后，页面会切换为支持 VR 模式，
+				如果你使用的是 VR 设备，就可以点击“进入 VR”按钮。</p>
+			<ul>
+				<li>
+					<p>决定支持哪种等级的 VR 设备</p>
+					<p>上文我们介绍了三种类型的 VR 设备。</p>
+
+					<ul>
+						<li>3DOF 无输入设备</li>
+						<li>3DOF + 3DOF 输入设备</li>
+						<li>6DOF + 6DOF 输入设备</li>
+					</ul>
+
+					<p>你需要决定你愿意投入多少精力来支持每种类型的设备。</p>
+
+					<p>例如，对于最简单的无输入设备，你能做的通常就是在用户视野中放置一些按钮或物体，
+						当用户将视图中心的某个指示器对准这些物体大约 0.5 秒时，就触发点击。
+						常见的用户体验方式是在目标物体上显示一个小型的计时圈，
+						表示“如果你继续把视线保持在这里一会儿，这个按钮将被选中”。</p>
+
+					<p>由于没有其他输入方式，这已经是你能做的最好的交互方式了。</p>
+
+					<p>下一级别是用户拥有一个 3DOF 的输入设备。通常它可以用来指向目标，
+						并且用户至少有两个按钮可以使用。Daydream 控制器还有一个触控板，
+						可以提供常规的触摸输入。</p>
+
+					<p>无论如何，如果用户使用这类设备，让他们使用控制器指向目标，
+						会比强迫他们通过头部移动去“看”目标舒适得多。</p>
+
+					<p>一个类似等级的设备可能是 3DOF 或 6DOF 的头显配合游戏手柄使用。
+						你需要自己决定该如何支持这种情况。常见的方式是用户仍然需要转头瞄准目标，
+						而手柄只是用来触发按钮。</p>
+
+					<p>最后一个层级是使用 6DOF 头显配合两个 6DOF 控制器的用户。
+						对于这类用户来说，如果你的应用只有 3DOF 的交互，
+						往往会让他们感到沮丧。同样，他们通常期望能够在 VR 中用手操作物体，
+						你需要决定是否要支持这种高度自由的交互方式。</p>
+				</ul>
+
+				<p>如你所见，入门 VR 开发相对简单，但如果你真的想做出一个可发布的 VR 应用，
+					那就需要大量的决策和设计。</p>
+
+				<p>这篇文章只是使用 three.js 进行 VR 开发的简要介绍。
+					我们将在 <a href="webxr-look-to-select.html">后续文章</a> 中介绍各种输入方式。</p>
+		</div>
+	</div>
+</div>
+
+<script src="../resources/prettify.js"></script>
+<script src="../resources/lesson.js"></script>

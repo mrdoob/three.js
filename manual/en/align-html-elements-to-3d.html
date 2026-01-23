@@ -1,0 +1,726 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Aligning HTML Elements to 3D</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Aligning HTML Elements to 3D">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Aligning HTML Elements to 3D</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>This article is part of a series of articles about three.js. The first article
+is <a href="fundamentals.html">three.js fundamentals</a>. If you haven't read that
+yet and you're new to three.js you might want to consider starting there. </p>
+<p>Sometimes you'd like to display some text in your 3D scene. You have many options
+each with pluses and minuses.</p>
+<ul>
+<li><p>Use 3D text</p>
+<p>If you look at the <a href="primitives.html">primitives article</a> you'll see <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> which
+makes 3D text. This might be useful for flying logos but probably not so useful for stats, info,
+or labelling lots of things.</p>
+</li>
+<li><p>Use a texture with 2D text drawn into it.</p>
+<p>The article on <a href="canvas-textures.html">using a Canvas as a texture</a> shows using
+a canvas as a texture. You can draw text into a canvas and <a href="billboards.html">display it as a billboard</a>.
+The plus here might be that the text is integrated into the 3D scene. For something like a computer terminal
+shown in a 3D scene this might be perfect.</p>
+</li>
+<li><p>Use HTML Elements and position them to match the 3D</p>
+<p>The benefits to this approach is you can use all of HTML. Your HTML can have multiple elements. It can
+by styled with CSS. It can also be selected by the user as it is actual text. </p>
+</li>
+</ul>
+<p>This article will cover this last approach.</p>
+<p>Let's start simple. We'll make a 3D scene with a few primitives and then add a label to each primitive. We'll start
+with an example from <a href="responsive.html">the article on responsive pages</a> </p>
+<p>We'll add some <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> like we did in <a href="lights.html">the article on lighting</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0, 0);
+controls.update();
+</pre>
+<p>We need to provide an HTML element to contain our label elements</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+-  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="container"&gt;
++    &lt;canvas id="c"&gt;&lt;/canvas&gt;
++    &lt;div id="labels"&gt;&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>By putting both the canvas and the <code class="notranslate" translate="no">&lt;div id="labels"&gt;</code> inside a
+parent container we can make them overlap with this CSS</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+-    width: 100%;
+-    height: 100%;
++    width: 100%;  /* let our container decide our size */
++    height: 100%;
+    display: block;
+}
++#container {
++  position: relative;  /* makes this the origin of its children */
++  width: 100%;
++  height: 100%;
++  overflow: hidden;
++}
++#labels {
++  position: absolute;  /* let us position ourself inside the container */
++  left: 0;             /* make our position the top left of the container */
++  top: 0;
++  color: white;
++}
+</pre>
+<p>let's also add some CSS for the labels themselves</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
+  position: absolute;  /* let us position them inside the container */
+  left: 0;             /* make their default position the top left of the container */
+  top: 0;
+  cursor: pointer;     /* change the cursor to a hand when over us */
+  font-size: large;
+  user-select: none;   /* don't let the text get selected */
+  text-shadow:         /* create a black outline */
+    -1px -1px 0 #000,
+     0   -1px 0 #000,
+     1px -1px 0 #000,
+     1px  0   0 #000,
+     1px  1px 0 #000,
+     0    1px 0 #000,
+    -1px  1px 0 #000,
+    -1px  0   0 #000;
+}
+#labels&gt;div:hover {
+  color: red;
+}
+</pre>
+<p>Now into our code we don't have to add too much. We had a function
+<code class="notranslate" translate="no">makeInstance</code> that we used to generate cubes. Let's make it
+so it also adds a label element.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const labelContainerElem = document.querySelector('#labels');
+
+-function makeInstance(geometry, color, x) {
++function makeInstance(geometry, color, x, name) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.x = x;
+
++  const elem = document.createElement('div');
++  elem.textContent = name;
++  labelContainerElem.appendChild(elem);
+
+-  return cube;
++  return {cube, elem};
+}
+</pre>
+<p>As you can see we're adding a <code class="notranslate" translate="no">&lt;div&gt;</code> to the container, one for each cube. We're
+also returning an object with both the <code class="notranslate" translate="no">cube</code> and the <code class="notranslate" translate="no">elem</code> for the label.</p>
+<p>Calling it we need to provide a name for each</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0),
+-  makeInstance(geometry, 0x8844aa, -2),
+-  makeInstance(geometry, 0xaa8844,  2),
++  makeInstance(geometry, 0x44aa88,  0, 'Aqua'),
++  makeInstance(geometry, 0x8844aa, -2, 'Purple'),
++  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
+];
+</pre>
+<p>What remains is positioning the label elements at render time</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+
+...
+
+-cubes.forEach((cube, ndx) =&gt; {
++cubes.forEach((cubeInfo, ndx) =&gt; {
++  const {cube, elem} = cubeInfo;
+  const speed = 1 + ndx * .1;
+  const rot = time * speed;
+  cube.rotation.x = rot;
+  cube.rotation.y = rot;
+
++  // get the position of the center of the cube
++  cube.updateWorldMatrix(true, false);
++  cube.getWorldPosition(tempV);
++
++  // get the normalized screen coordinate of that position
++  // x and y will be in the -1 to +1 range with x = -1 being
++  // on the left and y = -1 being on the bottom
++  tempV.project(camera);
++
++  // convert the normalized position to CSS coordinates
++  const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
++  const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
++
++  // move the elem to that position
++  elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+});
+</pre>
+<p>And with that we have labels aligned to their corresponding objects.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>There are a couple of issues we probably want to deal with.</p>
+<p>One is that if we rotate the objects so they overlap all the labels
+overlap as well.</p>
+<div class="threejs_center"><img src="../resources/images/overlapping-labels.png" style="width: 307px;"></div>
+
+<p>Another is that if we zoom way out so that the objects go outside
+the frustum the labels will still appear.</p>
+<p>A possible solution to the problem of overlapping objects is to use
+the <a href="picking.html">picking code from the article on picking</a>.
+We'll pass in the position of the object on the screen and then
+ask the <code class="notranslate" translate="no">RayCaster</code> to tell us which objects were intersected.
+If our object is not the first one then we are not in the front.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
++const raycaster = new THREE.Raycaster();
+
+...
+
+cubes.forEach((cubeInfo, ndx) =&gt; {
+  const {cube, elem} = cubeInfo;
+  const speed = 1 + ndx * .1;
+  const rot = time * speed;
+  cube.rotation.x = rot;
+  cube.rotation.y = rot;
+
+  // get the position of the center of the cube
+  cube.updateWorldMatrix(true, false);
+  cube.getWorldPosition(tempV);
+
+  // get the normalized screen coordinate of that position
+  // x and y will be in the -1 to +1 range with x = -1 being
+  // on the left and y = -1 being on the bottom
+  tempV.project(camera);
+
++  // ask the raycaster for all the objects that intersect
++  // from the eye toward this object's position
++  raycaster.setFromCamera(tempV, camera);
++  const intersectedObjects = raycaster.intersectObjects(scene.children);
++  // We're visible if the first intersection is this object.
++  const show = intersectedObjects.length &amp;&amp; cube === intersectedObjects[0].object;
++
++  if (!show) {
++    // hide the label
++    elem.style.display = 'none';
++  } else {
++    // un-hide the label
++    elem.style.display = '';
+
+    // convert the normalized position to CSS coordinates
+    const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
+    const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+
+    // move the elem to that position
+    elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
++  }
+});
+</pre>
+<p>This handles overlapping.</p>
+<p>To handle going outside the frustum we can add this check if the origin of
+the object is outside the frustum by checking <code class="notranslate" translate="no">tempV.z</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  if (!show) {
++  if (!show || Math.abs(tempV.z) &gt; 1) {
+    // hide the label
+    elem.style.display = 'none';
+</pre>
+<p>This <em>kind of</em> works because the normalized coordinates we computed include a <code class="notranslate" translate="no">z</code>
+value that goes from -1 when at the <code class="notranslate" translate="no">near</code> part of our camera frustum to +1 when
+at the <code class="notranslate" translate="no">far</code> part of our camera frustum.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-hiding.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-hiding.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>For the frustum check, the solution above fails as we're only checking the origin of the object. For a large
+object. That origin might go outside the frustum but half of the object might still be in the frustum.</p>
+<p>A more correct solution would be to check if the object itself is in the frustum
+or not. Unfortunate that check is slow. For 3 cubes it will not be a problem
+but for many objects it might be.</p>
+<p>Three.js provides some functions to check if an object's bounding sphere is
+in a frustum</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// at init time
+const frustum = new THREE.Frustum();
+const viewProjection = new THREE.Matrix4();
+
+...
+
+// before checking
+camera.updateMatrix();
+camera.updateMatrixWorld();
+camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
+...
+
+// then for each mesh
+someMesh.updateMatrix();
+someMesh.updateMatrixWorld();
+
+viewProjection.multiplyMatrices(
+    camera.projectionMatrix, camera.matrixWorldInverse);
+frustum.setFromProjectionMatrix(viewProjection);
+const inFrustum = frustum.contains(someMesh));
+</pre>
+<p>Our current overlapping solution has similar issues. Picking is slow. We could
+use gpu based picking like we covered in the <a href="picking.html">picking
+article</a> but that is also not free. Which solution you
+chose depends on your needs.</p>
+<p>Another issue is the order the labels appear. If we change the code to have
+longer labels</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0, 'Aqua'),
+-  makeInstance(geometry, 0x8844aa, -2, 'Purple'),
+-  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
++  makeInstance(geometry, 0x44aa88,  0, 'Aqua Colored Box'),
++  makeInstance(geometry, 0x8844aa, -2, 'Purple Colored Box'),
++  makeInstance(geometry, 0xaa8844,  2, 'Gold Colored Box'),
+];
+</pre>
+<p>and set the CSS so these don't wrap</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
++  white-space: nowrap;
+</pre>
+<p>Then we can run into this issue</p>
+<div class="threejs_center"><img src="../resources/images/label-sorting-issue.png" style="width: 401px;"></div>
+
+<p>You can see above the purple box is in the back but its label is in front of the aqua box.</p>
+<p>We can fix this by setting the <code class="notranslate" translate="no">zIndex</code> of each element. The projected position has a <code class="notranslate" translate="no">z</code> value
+that goes from -1 in front to positive 1 in back. <code class="notranslate" translate="no">zIndex</code> is required to be an integer and goes the
+opposite direction meaning for <code class="notranslate" translate="no">zIndex</code> greater values are in front so the following code should work.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// convert the normalized position to CSS coordinates
+const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
+const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+
+// move the elem to that position
+elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
++// set the zIndex for sorting
++elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
+</pre>
+<p>Because of the way the projected z value works we need to pick a large number to spread out the values
+otherwise many will have the same value. To make sure the labels don't overlap with other parts of
+the page we can tell the browser to create a new <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context">stacking context</a>
+by setting the <code class="notranslate" translate="no">z-index</code> of the container of the labels</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
+  position: absolute;  /* let us position ourself inside the container */
++  z-index: 0;          /* make a new stacking context so children don't sort with rest of page */
+  left: 0;             /* make our position the top left of the container */
+  top: 0;
+  color: white;
+  z-index: 0;
+}
+</pre>
+<p>and now the labels should always be in the correct order.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-sorting.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-sorting.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>While we're at it let's do one more example to show one more issue.
+Let's draw a globe like Google Maps and label the countries.</p>
+<p>I found <a href="http://thematicmapping.org/downloads/world_borders.php">this data</a>
+which contains the borders of countries. It's licensed as
+<a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
+<p>I <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">wrote some code</a>
+to load the data, and generate country outlines and some JSON data with the names
+of the countries and their locations.</p>
+<div class="threejs_center"><img src="../examples/resources/data/world/country-outlines-4k.png" style="background: black; width: 700px"></div>
+
+<p>The JSON data is an array of entries something like this</p>
+<pre class="prettyprint showlinemods notranslate lang-json" translate="no">[
+  {
+    "name": "Algeria",
+    "min": [
+      -8.667223,
+      18.976387
+    ],
+    "max": [
+      11.986475,
+      37.091385
+    ],
+    "area": 238174,
+    "lat": 28.163,
+    "lon": 2.632,
+    "population": {
+      "2005": 32854159
+    }
+  },
+  ...
+</pre>
+<p>where min, max, lat, lon, are all in latitude and longitude degrees.</p>
+<p>Let's load it up. The code is based on the examples from <a href="optimize-lots-of-objects.html">optimizing lots of
+objects</a> though we are not drawing lots
+of objects we'll be using the same solutions for <a href="rendering-on-demand.html">rendering on
+demand</a>.</p>
+<p>The first thing is to make a sphere and use the outline texture.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
+  const material = new THREE.MeshBasicMaterial({map: texture});
+  scene.add(new THREE.Mesh(geometry, material));
+}
+</pre>
+<p>Then let's load the JSON file by first making a loader</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadJSON(url) {
+  const req = await fetch(url);
+  return req.json();
+}
+</pre>
+<p>and then calling it</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let countryInfos;
+async function loadCountryData() {
+  countryInfos = await loadJSON('resources/data/world/country-info.json');
+     ...
+  }
+  requestRenderIfNotRequested();
+}
+loadCountryData();
+</pre>
+<p>Now let's use that data to generate and place the labels.</p>
+<p>In the article on <a href="optimize-lots-of-objects.html">optimizing lots of objects</a>
+we had setup a small scene graph of helper objects to make it easy to
+compute latitude and longitude positions on our globe. See that article
+for an explanation of how they work.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lonFudge = Math.PI * 1.5;
+const latFudge = Math.PI;
+// these helpers will make it easy to position the boxes
+// We can rotate the lon helper on its Y axis to the longitude
+const lonHelper = new THREE.Object3D();
+// We rotate the latHelper on its X axis to the latitude
+const latHelper = new THREE.Object3D();
+lonHelper.add(latHelper);
+// The position helper moves the object to the edge of the sphere
+const positionHelper = new THREE.Object3D();
+positionHelper.position.z = 1;
+latHelper.add(positionHelper);
+</pre>
+<p>We'll use that to compute a position for each label</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
+for (const countryInfo of countryInfos) {
+  const {lat, lon, name} = countryInfo;
+
+  // adjust the helpers to point to the latitude and longitude
+  lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
+  latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
+
+  // get the position of the lat/lon
+  positionHelper.updateWorldMatrix(true, false);
+  const position = new THREE.Vector3();
+  positionHelper.getWorldPosition(position);
+  countryInfo.position = position;
+
+  // add an element for each country
+  const elem = document.createElement('div');
+  elem.textContent = name;
+  labelParentElem.appendChild(elem);
+  countryInfo.elem = elem;
+</pre>
+<p>The code above looks very similar to the code we wrote for making cube labels
+making an element per label. When we're done we have an array, <code class="notranslate" translate="no">countryInfos</code>,
+with one entry for each country to which we've added an <code class="notranslate" translate="no">elem</code> property for
+the label element for that country and a <code class="notranslate" translate="no">position</code> with its position on the
+globe.</p>
+<p>Just like we did for the cubes we need to update the position of the
+labels and render time.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+
+function updateLabels() {
+  // exit if we have not yet loaded the JSON file
+  if (!countryInfos) {
+    return;
+  }
+
+  for (const countryInfo of countryInfos) {
+    const {position, elem} = countryInfo;
+
+    // get the normalized screen coordinate of that position
+    // x and y will be in the -1 to +1 range with x = -1 being
+    // on the left and y = -1 being on the bottom
+    tempV.copy(position);
+    tempV.project(camera);
+
+    // convert the normalized position to CSS coordinates
+    const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
+    const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+
+    // move the elem to that position
+    elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+    // set the zIndex for sorting
+    elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
+  }
+}
+</pre>
+<p>You can see the code above is substantially similar to the cube example before.
+The only major difference is we pre-computed the label positions at init time.
+We can do this because the globe never moves. Only our camera moves.</p>
+<p>Lastly we need to call <code class="notranslate" translate="no">updateLabels</code> in our render loop</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  controls.update();
+
++  updateLabels();
+
+  renderer.render(scene, camera);
+}
+</pre>
+<p>And this is what we get</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>That is way too many labels!</p>
+<p>We have 2 problems.</p>
+<ol>
+<li><p>Labels facing away from us are showing up.</p>
+</li>
+<li><p>There are too many labels.</p>
+</li>
+</ol>
+<p>For issue #1 we can't really use the <code class="notranslate" translate="no">RayCaster</code> like we did above as there is
+nothing to intersect except the sphere. Instead what we can do is check if that
+particular country is facing away from us or not. This works because the label
+positions are around a sphere. In fact we're using a unit sphere, a sphere with
+a radius of 1.0. That means the positions are already unit directions making
+the math relatively easy.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
++const cameraToPoint = new THREE.Vector3();
++const cameraPosition = new THREE.Vector3();
++const normalMatrix = new THREE.Matrix3();
+
+function updateLabels() {
+  // exit if we have not yet loaded the JSON file
+  if (!countryInfos) {
+    return;
+  }
+
++  const minVisibleDot = 0.2;
++  // get a matrix that represents a relative orientation of the camera
++  normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
++  // get the camera's position
++  camera.getWorldPosition(cameraPosition);
+  for (const countryInfo of countryInfos) {
+    const {position, elem} = countryInfo;
+
++    // Orient the position based on the camera's orientation.
++    // Since the sphere is at the origin and the sphere is a unit sphere
++    // this gives us a camera relative direction vector for the position.
++    tempV.copy(position);
++    tempV.applyMatrix3(normalMatrix);
++
++    // compute the direction to this position from the camera
++    cameraToPoint.copy(position);
++    cameraToPoint.applyMatrix4(camera.matrixWorldInverse).normalize();
++
++    // get the dot product of camera relative direction to this position
++    // on the globe with the direction from the camera to that point.
++    // 1 = facing directly towards the camera
++    // 0 = exactly on tangent of the sphere from the camera
++    // &lt; 0 = facing away
++    const dot = tempV.dot(cameraToPoint);
++
++    // if the orientation is not facing us hide it.
++    if (dot &lt; minVisibleDot) {
++      elem.style.display = 'none';
++      continue;
++    }
++
++    // restore the element to its default display style
++    elem.style.display = '';
+
+    // get the normalized screen coordinate of that position
+    // x and y will be in the -1 to +1 range with x = -1 being
+    // on the left and y = -1 being on the bottom
+    tempV.copy(position);
+    tempV.project(camera);
+
+    // convert the normalized position to CSS coordinates
+    const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
+    const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+
+    // move the elem to that position
+    countryInfo.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+    // set the zIndex for sorting
+    elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
+  }
+}
+</pre>
+<p>Above we use the positions as a direction and get that direction relative to the
+camera. Then we get the camera relative direction from the camera to that
+position on the globe and take the <em>dot product</em>. The dot product returns the cosine
+of the angle between the to vectors. This gives us a value from -1
+to +1 where -1 means the label is facing the camera, 0 means the label is directly
+on the edge of the sphere relative to the camera, and anything greater than zero is
+behind. We then use that value to show or hide the element.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="dotProduct" style="height: 400px"></div>
+  </div>
+</div>
+
+<p>In the diagram above we can see the dot product of the direction the label is
+facing to direction from the camera to that position. If you rotate the
+direction you'll see the dot product is -1.0 when the direction is directly
+facing the camera, it's 0.0 when exactly on the tangent of the sphere relative
+to the camera or to put it another way it's 0 when the 2 vectors are
+perpendicular to each other, 90 degrees It's greater than zero with the label is
+behind the sphere.</p>
+<p>For issue #2, too many labels we need some way to decide which labels
+to show. One way would be to only show labels for large countries.
+The data we're loading contains min and max values for the area a
+country covers. From that we can compute an area and then use that
+area to decide whether or not to display the country.</p>
+<p>At init time let's compute the area</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
+for (const countryInfo of countryInfos) {
+  const {lat, lon, min, max, name} = countryInfo;
+
+  // adjust the helpers to point to the latitude and longitude
+  lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
+  latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
+
+  // get the position of the lat/lon
+  positionHelper.updateWorldMatrix(true, false);
+  const position = new THREE.Vector3();
+  positionHelper.getWorldPosition(position);
+  countryInfo.position = position;
+
++  // compute the area for each country
++  const width = max[0] - min[0];
++  const height = max[1] - min[1];
++  const area = width * height;
++  countryInfo.area = area;
+
+  // add an element for each country
+  const elem = document.createElement('div');
+  elem.textContent = name;
+  labelParentElem.appendChild(elem);
+  countryInfo.elem = elem;
+}
+</pre>
+<p>Then at render time let's use the area to decide to display the label
+or not</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const large = 20 * 20;
+const maxVisibleDot = 0.2;
+// get a matrix that represents a relative orientation of the camera
+normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
+// get the camera's position
+camera.getWorldPosition(cameraPosition);
+for (const countryInfo of countryInfos) {
+-  const {position, elem} = countryInfo;
++  const {position, elem, area} = countryInfo;
++  // large enough?
++  if (area &lt; large) {
++    elem.style.display = 'none';
++    continue;
++  }
+
+  ...
+</pre>
+<p>Finally, since I'm not sure what good values are for these settings lets
+add a GUI so we can play with them</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const settings = {
++  minArea: 20,
++  maxVisibleDot: -0.2,
++};
++const gui = new GUI({width: 300});
++gui.add(settings, 'minArea', 0, 50).onChange(requestRenderIfNotRequested);
++gui.add(settings, 'maxVisibleDot', -1, 1, 0.01).onChange(requestRenderIfNotRequested);
+
+function updateLabels() {
+  if (!countryInfos) {
+    return;
+  }
+
+-  const large = 20 * 20;
+-  const maxVisibleDot = -0.2;
++  const large = settings.minArea * settings.minArea;
+  // get a matrix that represents a relative orientation of the camera
+  normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
+  // get the camera's position
+  camera.getWorldPosition(cameraPosition);
+  for (const countryInfo of countryInfos) {
+
+    ...
+
+    // if the orientation is not facing us hide it.
+-    if (dot &gt; maxVisibleDot) {
++    if (dot &gt; settings.maxVisibleDot) {
+      elem.style.display = 'none';
+      continue;
+    }
+</pre>
+<p>and here's the result</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>You can see as you rotate the earth labels that go behind disappear.
+Adjust the <code class="notranslate" translate="no">minVisibleDot</code> to see the cutoff change.
+You can also adjust the <code class="notranslate" translate="no">minArea</code> value to see larger or smaller countries
+appear.</p>
+<p>The more I worked on this the more I realized just how much
+work is put into Google Maps. They have also have to decide which labels to
+show. I'm pretty sure they use all kinds of criteria. For example your current
+location, your default language setting, your account settings if you have an
+account, they probably use population or popularity, they might give priority
+to the countries in the center of the view, etc ... Lots to think about.</p>
+<p>In any case I hope these examples gave you some idea of how to align HTML
+elements with your 3D. A few things I might change.</p>
+<p>Next up let's make it so you can <a href="indexed-textures.html">pick and highlight a country</a>.</p>
+<p><link rel="stylesheet" href="../resources/threejs-align-html-elements-to-3d.css"></p>
+<script type="module" src="../resources/threejs-align-html-elements-to-3d.js"></script>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

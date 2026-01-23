@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada - skinning</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - skinning<br/>
+			Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let container, stats, timer, controls;
+			let camera, scene, renderer, mixer;
+
+			init();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 15, 10, - 15 );
+
+				scene = new THREE.Scene();
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				// collada
+
+				const loader = new ColladaLoader();
+				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
+
+					const avatar = collada.scene;
+					const animations = avatar.animations;
+
+					mixer = new THREE.AnimationMixer( avatar );
+					mixer.clipAction( animations[ 0 ] ).play();
+
+					scene.add( avatar );
+
+				} );
+
+				//
+
+				const gridHelper = new THREE.GridHelper( 10, 20, 0xc1c1c1, 0x8d8d8d );
+				scene.add( gridHelper );
+
+				//
+
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.6 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 1.5, 1, - 1.5 );
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.screenSpacePanning = true;
+				controls.minDistance = 5;
+				controls.maxDistance = 40;
+				controls.target.set( 0, 2, 0 );
+				controls.update();
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				const delta = timer.getDelta();
+
+				if ( mixer !== undefined ) {
+
+					mixer.update( delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

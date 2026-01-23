@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Backdrop Area</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Backdrop Area</span>
+			</div>
+
+			<small>
+				Backdrop area effect.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { color, positionWorld, linearDepth, viewportLinearDepth, viewportSharedTexture, screenUV, hue, time, checker, uv, modelScale } from 'three/tsl';
+			import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+			let mixer, timer;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 25 );
+				camera.position.set( 3, 2, 3 );
+
+				scene = new THREE.Scene();
+				scene.backgroundNode = hue( screenUV.y.mix( color( 0x66bbff ), color( 0x4466ff ) ), time.mul( 0.1 ) );
+				camera.lookAt( 0, 1, 0 );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				const ambient = new THREE.AmbientLight( 0xffffff, 2.5 );
+				scene.add( ambient );
+			
+				// model
+
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
+
+					const object = gltf.scene;
+					mixer = new THREE.AnimationMixer( object );
+
+					const action = mixer.clipAction( gltf.animations[ 0 ] );
+					action.play();
+
+					scene.add( object );
+
+				} );
+
+				// volume
+
+				// compare depth from viewportLinearDepth with linearDepth() to create a distance field
+				// viewportLinearDepth return the linear depth of the scene
+				// linearDepth() returns the linear depth of the mesh
+				const depthDistance = viewportLinearDepth.distance( linearDepth() );
+
+				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 10 ).saturate();
+				const depthBlurred = hashBlur( viewportSharedTexture(), depthDistance.smoothstep( 0, .6 ).mul( 40 ).clamp().mul( .1 ) );
+
+				const blurredBlur = new THREE.MeshBasicNodeMaterial();
+				blurredBlur.backdropNode = depthBlurred.add( depthAlphaNode.mix( color( 0x003399 ).mul( .3 ), 0 ) );
+				blurredBlur.transparent = true;
+				blurredBlur.side = THREE.DoubleSide;
+
+				const depthMaterial = new THREE.MeshBasicNodeMaterial();
+				depthMaterial.backdropNode = depthAlphaNode;
+				depthMaterial.transparent = true;
+				depthMaterial.side = THREE.DoubleSide;
+
+				const checkerMaterial = new THREE.MeshBasicNodeMaterial();
+				checkerMaterial.backdropNode = hashBlur( viewportSharedTexture(), .05 );
+				checkerMaterial.backdropAlphaNode = checker( uv().mul( 3 ).mul( modelScale.xy ) );
+				checkerMaterial.opacityNode = checkerMaterial.backdropAlphaNode;
+				checkerMaterial.transparent = true;
+				checkerMaterial.side = THREE.DoubleSide;
+
+				const pixelMaterial = new THREE.MeshBasicNodeMaterial();
+				pixelMaterial.backdropNode = viewportSharedTexture( screenUV.mul( 100 ).floor().div( 100 ) );
+				pixelMaterial.transparent = true;
+
+				// box / floor
+
+				const box = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ), blurredBlur );
+				box.position.set( 0, 1, 0 );
+				box.renderOrder = 1;
+				scene.add( box );
+
+				const floor = new THREE.Mesh( new THREE.BoxGeometry( 5, .01, 5 ), new THREE.MeshBasicNodeMaterial( {
+					color: 0xff6600,
+					opacityNode: positionWorld.xz.distance( 0 ).oneMinus().clamp(),
+					transparent: true,
+					depthWrite: false
+				} ) );
+				floor.position.set( 0, 0, 0 );
+				scene.add( floor );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( /*{ antialias: true }*/ );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = .9;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// gui
+
+				const materials = {
+					'blurred': blurredBlur,
+					'depth': depthMaterial,
+					'checker': checkerMaterial,
+					'pixel': pixelMaterial
+				};
+
+				const options = { material: 'blurred' };
+				box.material = materials[ options.material ];
+
+				const gui = renderer.inspector.createParameters( 'Scene settings' );
+				gui.add( box.scale, 'x', 0.1, 2, 0.01 ).name( 'box scale x' );
+				gui.add( box.scale, 'y', 0.1, 2, 0.01 ).name( 'box scale y' );
+				gui.add( options, 'material', Object.keys( materials ) ).onChange( name => {
+
+					box.material = materials[ name ];
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( mixer ) mixer.update( delta );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

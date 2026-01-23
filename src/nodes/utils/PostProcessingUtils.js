@@ -1,0 +1,154 @@
+import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4, fract, dot, cos, sin } from '../tsl/TSLBase.js';
+import { sqrt } from '../math/MathNode.js';
+import { textureSize } from '../accessors/TextureSizeNode.js';
+import { textureLoad } from '../accessors/TextureNode.js';
+import { WebGPUCoordinateSystem } from '../../constants.js';
+
+/**
+ * Computes a position in view space based on a fragment's screen position expressed as uv coordinates, the fragments
+ * depth value and the camera's inverse projection matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} screenPosition - The fragment's screen position expressed as uv coordinates.
+ * @param {Node<float>} depth - The fragment's depth value.
+ * @param {Node<mat4>} projectionMatrixInverse - The camera's inverse projection matrix.
+ * @return {Node<vec3>} The fragments position in view space.
+ */
+export const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, projectionMatrixInverse ], builder ) => {
+
+	let clipSpacePosition;
+
+	if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+		screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
+		clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
+
+	} else {
+
+		clipSpacePosition = vec4( vec3( screenPosition.x, screenPosition.y.oneMinus(), depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
+
+	}
+
+	const viewSpacePosition = vec4( projectionMatrixInverse.mul( clipSpacePosition ) );
+
+	return viewSpacePosition.xyz.div( viewSpacePosition.w );
+
+} );
+
+/**
+ * Computes a screen position expressed as uv coordinates based on a fragment's position in view space
+ * and the camera's projection matrix
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} viewPosition - The fragments position in view space.
+ * @param {Node<mat4>} projectionMatrix - The camera's projection matrix.
+ * @return {Node<vec2>} The fragment's screen position expressed as uv coordinates.
+ */
+export const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatrix ] ) => {
+
+	const sampleClipPos = projectionMatrix.mul( vec4( viewPosition, 1.0 ) );
+	const sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
+	return vec2( sampleUv.x, sampleUv.y.oneMinus() );
+
+} );
+
+/**
+ * Computes a normal vector based on depth data. Can be used as a fallback when no normal render
+ * target is available or if flat surface normals are required.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} uv - The texture coordinate.
+ * @param {DepthTexture} depthTexture - The depth texture.
+ * @param {Node<mat4>} projectionMatrixInverse - The camera's inverse projection matrix.
+ * @return {Node<vec3>} The computed normal vector.
+ */
+export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projectionMatrixInverse ] ) => {
+
+	const size = textureSize( textureLoad( depthTexture ) );
+	const p = ivec2( uv.mul( size ) ).toVar();
+
+	const c0 = textureLoad( depthTexture, p ).toVar();
+
+	const l2 = textureLoad( depthTexture, p.sub( ivec2( 2, 0 ) ) ).toVar();
+	const l1 = textureLoad( depthTexture, p.sub( ivec2( 1, 0 ) ) ).toVar();
+	const r1 = textureLoad( depthTexture, p.add( ivec2( 1, 0 ) ) ).toVar();
+	const r2 = textureLoad( depthTexture, p.add( ivec2( 2, 0 ) ) ).toVar();
+	const b2 = textureLoad( depthTexture, p.add( ivec2( 0, 2 ) ) ).toVar();
+	const b1 = textureLoad( depthTexture, p.add( ivec2( 0, 1 ) ) ).toVar();
+	const t1 = textureLoad( depthTexture, p.sub( ivec2( 0, 1 ) ) ).toVar();
+	const t2 = textureLoad( depthTexture, p.sub( ivec2( 0, 2 ) ) ).toVar();
+
+	const dl = abs( sub( float( 2 ).mul( l1 ).sub( l2 ), c0 ) ).toVar();
+	const dr = abs( sub( float( 2 ).mul( r1 ).sub( r2 ), c0 ) ).toVar();
+	const db = abs( sub( float( 2 ).mul( b1 ).sub( b2 ), c0 ) ).toVar();
+	const dt = abs( sub( float( 2 ).mul( t1 ).sub( t2 ), c0 ) ).toVar();
+
+	const ce = getViewPosition( uv, c0, projectionMatrixInverse ).toVar();
+
+	const dpdx = dl.lessThan( dr ).select( ce.sub( getViewPosition( uv.sub( vec2( float( 1 ).div( size.x ), 0 ) ), l1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.add( vec2( float( 1 ).div( size.x ), 0 ) ), r1, projectionMatrixInverse ) ) );
+	const dpdy = db.lessThan( dt ).select( ce.sub( getViewPosition( uv.add( vec2( 0, float( 1 ).div( size.y ) ) ), b1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.sub( vec2( 0, float( 1 ).div( size.y ) ) ), t1, projectionMatrixInverse ) ) );
+
+	return normalize( cross( dpdx, dpdy ) );
+
+} );
+
+/**
+ * Interleaved Gradient Noise (IGN) from Jimenez 2014.
+ *
+ * IGN has "low discrepancy" resulting in evenly distributed samples. It's superior compared to
+ * default white noise, blue noise or Bayer.
+ *
+ * References:
+ * - {@link https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/}
+ * - {@link https://blog.demofox.org/2022/01/01/interleaved-gradient-noise-a-different-kind-of-low-discrepancy-sequence/}
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} position - The input position, usually screen coordinates.
+ * @return {Node<float>} The noise value.
+ */
+export const interleavedGradientNoise = Fn( ( [ position ] ) => {
+
+	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
+
+} ).setLayout( {
+	name: 'interleavedGradientNoise',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec2' }
+	]
+} );
+
+/**
+ * Vogel disk sampling for uniform circular distribution.
+ *
+ * This function generates sample points distributed uniformly on a disk using the golden angle,
+ * resulting in an efficient low-discrepancy sequence for sampling. The rotation parameter (phi)
+ * allows randomizing the pattern per-pixel when combined with IGN.
+ *
+ * @tsl
+ * @function
+ * @param {Node<int>} sampleIndex - The index of the current sample (0-based).
+ * @param {Node<int>} samplesCount - The total number of samples.
+ * @param {Node<float>} phi - Rotation angle in radians (typically from IGN * 2π).
+ * @return {Node<vec2>} A 2D point on the unit disk.
+ */
+export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
+
+	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
+	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );
+	const theta = float( sampleIndex ).mul( goldenAngle ).add( phi );
+	return vec2( cos( theta ), sin( theta ) ).mul( r );
+
+} ).setLayout( {
+	name: 'vogelDiskSample',
+	type: 'vec2',
+	inputs: [
+		{ name: 'sampleIndex', type: 'int' },
+		{ name: 'samplesCount', type: 'int' },
+		{ name: 'phi', type: 'float' }
+	]
+} );

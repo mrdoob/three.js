@@ -1,0 +1,1756 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Créer un jeu</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Créer un jeu">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Créer un jeu</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Beaucoup de gens veulent écrire des jeux en utilisant three.js. Cet article
+vous donnera, je l'espère, quelques idées sur la façon de commencer.</p>
+<p>Au moment où j'écris cet article, il s'agit probablement de l'article le plus long de ce site.
+Il est possible que le code ici soit massivement sur-conçu, mais à mesure que j'écrivais chaque nouvelle fonctionnalité, je rencontrais un problème qui nécessitait une solution à laquelle je suis habitué depuis d'autres jeux que j'ai écrits.
+En d'autres termes, chaque nouvelle solution semblait importante, je vais donc essayer de montrer pourquoi.
+Bien sûr, plus votre jeu est petit, moins vous pourriez avoir besoin de certaines des solutions présentées ici, mais il s'agit d'un jeu assez petit et pourtant, avec les complexités des personnages 3D, beaucoup de choses demandent plus d'organisation qu'elles ne le feraient avec des personnages 2D.</p>
+<p>Par exemple, si vous créez PacMan en 2D, lorsque PacMan tourne dans un coin,
+cela se produit instantanément à 90 degrés. Il n'y a pas d'étape intermédiaire.
+Mais dans un jeu 3D, nous avons souvent besoin que le personnage pivote sur plusieurs images.
+Ce simple changement peut ajouter beaucoup de complexité et nécessiter des solutions différentes.</p>
+<p>La majorité du code ici ne sera pas vraiment three.js et
+c'est important à noter, <strong>three.js n'est pas un moteur de jeu</strong>.
+Three.js est une bibliothèque 3D. Elle fournit un <a href="scenegraph.html">graphe de scène</a>
+et des fonctionnalités pour afficher les objets 3D ajoutés à ce graphe de scène,
+mais elle ne fournit pas toutes les autres choses nécessaires pour créer un jeu.
+Pas de collisions, pas de physique, pas de systèmes d'entrée, pas de recherche de chemin, etc., etc...
+Donc, nous devrons fournir ces choses nous-mêmes.</p>
+<p>J'ai fini par écrire pas mal de code pour créer cette simple chose <em>inachevée</em>
+ressemblant à un jeu, et encore une fois, il est certainement possible que j'aie sur-conçu
+et qu'il existe des solutions plus simples, mais j'ai l'impression de ne pas avoir écrit
+assez de code et j'espère pouvoir expliquer ce qui, à mon avis, manque.</p>
+<p>Beaucoup des idées ici sont fortement influencées par <a href="https://unity.com">Unity</a>.
+Si vous n'êtes pas familier avec Unity, cela n'a probablement pas d'importance.
+Je n'en parle que parce que des dizaines de milliers de jeux ont été publiés en utilisant
+ces idées.</p>
+<p>Commençons par les parties three.js. Nous devons charger des modèles pour notre jeu.</p>
+<p>Sur <a href="https://opengameart.org">opengameart.org</a> j'ai trouvé ce <a href="https://opengameart.org/content/lowpoly-animated-knight">modèle de chevalier
+animé</a> par <a href="https://opengameart.org/users/quaternius">quaternius</a></p>
+<div class="threejs_center"><img src="../resources/images/knight.jpg" style="width: 375px;"></div>
+
+<p><a href="https://opengameart.org/users/quaternius">quaternius</a> a également créé <a href="https://opengameart.org/content/lowpoly-animated-farm-animal-pack">ces animaux animés</a>.</p>
+<div class="threejs_center"><img src="../resources/images/animals.jpg" style="width: 606px;"></div>
+
+<p>Ceux-ci semblent être de bons modèles pour commencer, donc la première chose à
+faire est de les charger.</p>
+<p>Nous avons abordé <a href="load-gltf.html">le chargement de fichiers glTF auparavant</a>.
+La différence cette fois est que nous devons charger plusieurs modèles et
+nous ne pouvons pas démarrer le jeu tant que tous les modèles ne sont pas chargés.</p>
+<p>Heureusement, three.js fournit le <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> juste à cette fin.
+Nous créons un <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> et le passons aux autres chargeurs. Le
+<a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> fournit à la fois les propriétés <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> et
+<a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> auxquelles nous pouvons attacher des callbacks.
+Le callback <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> sera appelé lorsque
+tous les fichiers auront été chargés. Le callback <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>
+est appelé après l'arrivée de chaque fichier individuel pour nous donner une chance de montrer
+la progression du chargement.</p>
+<p>En partant du code de <a href="load-gltf.html">chargement d'un fichier glTF</a>, j'ai supprimé tout
+le code lié au cadrage de la scène et ajouté ce code pour charger tous les modèles.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
+manager.onLoad = init;
+const models = {
+  pig:    { url: 'resources/models/animals/Pig.gltf' },
+  cow:    { url: 'resources/models/animals/Cow.gltf' },
+  llama:  { url: 'resources/models/animals/Llama.gltf' },
+  pug:    { url: 'resources/models/animals/Pug.gltf' },
+  sheep:  { url: 'resources/models/animals/Sheep.gltf' },
+  zebra:  { url: 'resources/models/animals/Zebra.gltf' },
+  horse:  { url: 'resources/models/animals/Horse.gltf' },
+  knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
+};
+{
+  const gltfLoader = new GLTFLoader(manager);
+  for (const model of Object.values(models)) {
+    gltfLoader.load(model.url, (gltf) =&gt; {
+      model.gltf = gltf;
+    });
+  }
+}
+
+function init() {
+  // TBD
+}
+</pre>
+<p>Ce code chargera tous les modèles ci-dessus et le <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> appellera
+<code class="notranslate" translate="no">init</code> une fois terminé. Nous utiliserons l'objet <code class="notranslate" translate="no">models</code> plus tard pour accéder aux
+modèles chargés, de sorte que le callback du <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> pour chaque modèle individuel attache
+les données chargées aux informations de ce modèle.</p>
+<p>Tous les modèles avec toutes leurs animations font actuellement environ 6,6 Mo. C'est un
+téléchargement assez important. En supposant que votre serveur prenne en charge la compression (ce qui est le cas du serveur sur lequel ce site fonctionne), il peut les compresser à environ 1,4 Mo. C'est
+nettement mieux que 6,6 Mo, mais ce n'est toujours pas une petite quantité de données. Il serait
+probablement bon d'ajouter une barre de progression pour que l'utilisateur ait une idée du temps qu'il
+lui reste à attendre.</p>
+<p>Alors, ajoutons un callback <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>. Il sera
+appelé avec 3 arguments : l'<code class="notranslate" translate="no">url</code> du dernier objet chargé, puis le nombre
+d'éléments chargés jusqu'à présent, ainsi que le nombre total d'éléments.</p>
+<p>Mettons en place du code HTML pour une barre de chargement</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="loading"&gt;
++    &lt;div&gt;
++      &lt;div&gt;...chargement...&lt;/div&gt;
++      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>Nous allons rechercher la div <code class="notranslate" translate="no">#progressbar</code> et nous pourrons définir la largeur de 0 % à 100 %
+pour montrer notre progression. Tout ce que nous avons à faire est de définir cela dans notre callback.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
+manager.onLoad = init;
+
++const progressbarElem = document.querySelector('#progressbar');
++manager.onProgress = (url, itemsLoaded, itemsTotal) =&gt; {
++  progressbarElem.style.width = `${itemsLoaded / itemsTotal * 100 | 0}%`;
++};
+</pre>
+<p>Nous avons déjà configuré <code class="notranslate" translate="no">init</code> pour être appelé lorsque tous les modèles sont chargés, nous pouvons donc
+désactiver la barre de progression en masquant l'élément <code class="notranslate" translate="no">#loading</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
++  // masquer la barre de chargement
++  const loadingElem = document.querySelector('#loading');
++  loadingElem.style.display = 'none';
+}
+</pre>
+<p>Voici un tas de CSS pour styler la barre. Le CSS rend la <code class="notranslate" translate="no">#loading</code> <code class="notranslate" translate="no">&lt;div&gt;</code>
+de la taille totale de la page et centre ses enfants. Le CSS crée une zone <code class="notranslate" translate="no">.progress</code>
+pour contenir la barre de progression. Le CSS donne également à la barre de progression
+une animation CSS de rayures diagonales.</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#loading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: xx-large;
+  font-family: sans-serif;
+}
+#loading&gt;div&gt;div {
+  padding: 2px;
+}
+.progress {
+  width: 50vw;
+  border: 1px solid black;
+}
+#progressbar {
+  width: 0;
+  transition: width ease-out .5s;
+  height: 1em;
+  background-color: #888;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, .5) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, .5) 50%,
+    rgba(255, 255, 255, .5) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 50px 50px;
+  animation: progressanim 2s linear infinite;
+}
+
+@keyframes progressanim {
+  0% {
+    background-position: 50px 50px;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+</pre>
+<p>Maintenant que nous avons une barre de progression, occupons-nous des modèles. Ces modèles
+ont des animations et nous voulons pouvoir y accéder.
+Les animations sont stockées dans un tableau par défaut, mais nous aimerions pouvoir y accéder
+facilement par leur nom. Configurons donc une propriété <code class="notranslate" translate="no">animations</code> pour
+chaque modèle afin de faire cela. Notez bien sûr que cela signifie que les animations doivent avoir des noms uniques.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function prepModelsAndAnimations() {
++  Object.values(models).forEach(model =&gt; {
++    const animsByName = {};
++    model.gltf.animations.forEach((clip) =&gt; {
++      animsByName[clip.name] = clip;
++    });
++    model.animations = animsByName;
++  });
++}
+
+function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
++  prepModelsAndAnimations();
+}
+</pre>
+<p>Affichons les modèles animés.</p>
+<p>Contrairement à l'<a href="load-gltf.html">exemple précédent de chargement d'un fichier glTF</a>,
+cette fois-ci, nous voulons probablement pouvoir afficher plus d'une instance
+de chaque modèle. Pour ce faire, au lieu d'ajouter
+directement la scène glTF chargée, comme nous l'avons fait dans <a href="load-gltf.html">l'article sur le chargement d'un glTF</a>,
+nous voulons plutôt cloner la scène et, en particulier, nous voulons la cloner
+pour les personnages animés avec skinning. Heureusement, il existe une fonction utilitaire,
+<code class="notranslate" translate="no">SkeletonUtils.clone</code>, que nous pouvons utiliser pour cela. Donc, nous devons d'abord inclure
+les utilitaires.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
++import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+</pre>
+<p>Ensuite, nous pouvons cloner les modèles que nous venons de charger</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
+  prepModelsAndAnimations();
+
++  Object.values(models).forEach((model, ndx) =&gt; {
++    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
++    const root = new THREE.Object3D();
++    root.add(clonedScene);
++    scene.add(root);
++    root.position.x = (ndx - 3) * 3;
++  });
+}
+</pre>
+<p>Ci-dessus, pour chaque modèle, nous clonons la <code class="notranslate" translate="no">gltf.scene</code> que nous avons chargée et
+nous en faisons l'enfant d'un nouveau <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Nous devons l'attacher à un autre objet,
+car lorsque nous jouons des animations, l'animation appliquera des positions animées aux nœuds
+de la scène chargée, ce qui signifie que nous n'aurons pas le contrôle sur ces positions.</p>
+<p>Pour jouer les animations, chaque modèle que nous clonons a besoin d'un <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>.
+Un <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> contient 1 ou plusieurs <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s. Une
+<a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> référence un <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. Les <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
+ont toutes sortes de paramètres pour jouer, puis enchaîner avec une autre
+action ou faire un crossfade entre les actions. Prenons simplement le premier
+<a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> et créons une action pour celui-ci. La valeur par défaut est qu'une
+action joue son clip en boucle indéfiniment.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
+
+function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
+  prepModelsAndAnimations();
+
+  Object.values(models).forEach((model, ndx) =&gt; {
+    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
+    const root = new THREE.Object3D();
+    root.add(clonedScene);
+    scene.add(root);
+    root.position.x = (ndx - 3) * 3;
+
++    const mixer = new THREE.AnimationMixer(clonedScene);
++    const firstClip = Object.values(model.animations)[0];
++    const action = mixer.clipAction(firstClip);
++    action.play();
++    mixers.push(mixer);
+  });
+}
+</pre>
+<p>Nous avons appelé <a href="/docs/#api/en/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> pour démarrer l'action et stocké
+tous les <code class="notranslate" translate="no">AnimationMixers</code> dans un tableau appelé <code class="notranslate" translate="no">mixers</code>. Enfin,
+nous devons mettre à jour chaque <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> dans notre boucle de rendu en calculant
+le temps écoulé depuis la dernière image et en le passant à <a href="/docs/#api/en/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let then = 0;
+function render(now) {
++  now *= 0.001;  // convertir en secondes
++  const deltaTime = now - then;
++  then = now;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  for (const mixer of mixers) {
++    mixer.update(deltaTime);
++  }
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Et avec cela, chaque modèle devrait être chargé et jouer sa première animation.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-load-models.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-load-models.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Faisons en sorte que nous puissions vérifier toutes les animations.
+Nous ajouterons tous les clips en tant qu'actions, puis nous n'en activerons qu'un
+seul à la fois.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const mixers = [];
++const mixerInfos = [];
+
+function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
+  prepModelsAndAnimations();
+
+  Object.values(models).forEach((model, ndx) =&gt; {
+    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
+    const root = new THREE.Object3D();
+    root.add(clonedScene);
+    scene.add(root);
+    root.position.x = (ndx - 3) * 3;
+
+    const mixer = new THREE.AnimationMixer(clonedScene);
+-    const firstClip = Object.values(model.animations)[0];
+-    const action = mixer.clipAction(firstClip);
+-    action.play();
+-    mixers.push(mixer);
++    const actions = Object.values(model.animations).map((clip) =&gt; {
++      return mixer.clipAction(clip);
++    });
++    const mixerInfo = {
++      mixer,
++      actions,
++      actionNdx: -1,
++    };
++    mixerInfos.push(mixerInfo);
++    playNextAction(mixerInfo);
+  });
+}
+
++function playNextAction(mixerInfo) {
++  const {actions, actionNdx} = mixerInfo;
++  const nextActionNdx = (actionNdx + 1) % actions.length;
++  mixerInfo.actionNdx = nextActionNdx;
++  actions.forEach((action, ndx) =&gt; {
++    const enabled = ndx === nextActionNdx;
++    action.enabled = enabled;
++    if (enabled) {
++      action.play();
++    }
++  });
++}
+</pre>
+<p>Le code ci-dessus crée un tableau de <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s,
+une pour chaque <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. Il crée un tableau d'objets, <code class="notranslate" translate="no">mixerInfos</code>,
+avec des références au <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> et à toutes les <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
+pour chaque modèle. Il appelle ensuite <code class="notranslate" translate="no">playNextAction</code> qui définit la propriété <code class="notranslate" translate="no">enabled</code> à
+l'exception d'une seule action pour ce mixeur.</p>
+<p>Nous devons mettre à jour la boucle de rendu pour le nouveau tableau</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-for (const mixer of mixers) {
++for (const {mixer} of mixerInfos) {
+  mixer.update(deltaTime);
+}
+</pre>
+<p>Faisons en sorte qu'en appuyant sur une touche de 1 à 8, l'animation suivante soit jouée
+pour chaque modèle</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('keydown', (e) =&gt; {
+  const mixerInfo = mixerInfos[e.keyCode - 49];
+  if (!mixerInfo) {
+    return;
+  }
+  playNextAction(mixerInfo);
+});
+</pre>
+<p>Maintenant, vous devriez pouvoir cliquer sur l'exemple, puis appuyer sur les touches 1 à 8
+pour faire défiler chaque modèle à travers ses animations disponibles.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-check-animations.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-check-animations.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>On peut donc dire que c'est la somme totale de la partie three.js de cet article.
+Nous avons abordé le chargement de plusieurs fichiers, le clonage de modèles skinnés,
+et la lecture d'animations sur ceux-ci. Dans un vrai jeu, vous auriez beaucoup plus
+de manipulations à faire sur les objets <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>.</p>
+<p>Commençons à créer une infrastructure de jeu</p>
+<p>Un modèle courant pour créer un jeu moderne est d'utiliser un
+<a href="https://www.google.com/search?q=entity+component+system">Entity Component System</a>.
+Dans un Entity Component System, un objet dans un jeu est appelé une <em>entité</em> qui
+se compose d'un ensemble de <em>composants</em>. Vous construisez des entités en décidant quels composants
+leur attacher. Alors, créons un Entity Component System.</p>
+<p>Nous appellerons nos entités <code class="notranslate" translate="no">GameObject</code>. C'est effectivement juste une collection
+de composants et un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> de three.js.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function removeArrayElement(array, element) {
+  const ndx = array.indexOf(element);
+  if (ndx &gt;= 0) {
+    array.splice(ndx, 1);
+  }
+}
+
+class GameObject {
+  constructor(parent, name) {
+    this.name = name;
+    this.components = [];
+    this.transform = new THREE.Object3D();
+    parent.add(this.transform);
+  }
+  addComponent(ComponentType, ...args) {
+    const component = new ComponentType(this, ...args);
+    this.components.push(component);
+    return component;
+  }
+  removeComponent(component) {
+    removeArrayElement(this.components, component);
+  }
+  getComponent(ComponentType) {
+    return this.components.find(c =&gt; c instanceof ComponentType);
+  }
+  update() {
+    for (const component of this.components) {
+      component.update();
+    }
+  }
+}
+</pre>
+<p>L'appel de <code class="notranslate" translate="no">GameObject.update</code> appelle la fonction <code class="notranslate" translate="no">update</code> sur tous les composants.</p>
+<p>J'ai inclus un nom uniquement pour faciliter le débogage, de sorte que si j'examine un <code class="notranslate" translate="no">GameObject</code>
+dans le débogueur, je puisse voir un nom pour l'aider à l'identifier.</p>
+<p>Quelques choses qui pourraient sembler un peu étranges :</p>
+<p><code class="notranslate" translate="no">GameObject.addComponent</code> est utilisé pour créer des composants. Que ce
+soit une bonne ou une mauvaise idée, je ne suis pas sûr. Ma pensée était qu'il n'a aucun sens
+pour un composant d'exister en dehors d'un gameobject, alors j'ai pensé
+qu'il pourrait être bon que la création d'un composant ajoute automatiquement ce composant
+au gameobject et passe le gameobject au constructeur du composant.
+En d'autres termes, pour ajouter un composant, vous faites ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
+gameObject.addComponent(TypeOfComponent);
+</pre>
+<p>Si je ne le faisais pas de cette façon, vous feriez plutôt quelque chose comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
+const component = new TypeOfComponent(gameObject);
+gameObject.addComponent(component);
+</pre>
+<p>Est-ce mieux que la première méthode soit plus courte et plus automatisée, ou est-ce pire
+parce que cela sort de l'ordinaire ? Je ne sais pas.</p>
+<p><code class="notranslate" translate="no">GameObject.getComponent</code> recherche les composants par type. Cela
+implique que vous ne pouvez pas avoir 2 composants du même
+type sur un seul objet de jeu, ou du moins si vous en avez, vous ne pouvez
+rechercher que le premier sans ajouter une autre API.</p>
+<p>Il est courant qu'un composant en recherche un autre, et lors de cette recherche, ils
+doivent correspondre par type, sinon vous pourriez obtenir le mauvais. Nous pourrions à la place
+donner un nom à chaque composant et vous pourriez les rechercher par leur nom. Ce serait
+plus flexible car vous pourriez avoir plus d'un composant du même type, mais ce
+serait aussi plus fastidieux. Encore une fois, je ne suis pas sûr de ce qui est le mieux.</p>
+<p>Passons aux composants eux-mêmes. Voici leur classe de base.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Base pour tous les composants
+class Component {
+  constructor(gameObject) {
+    this.gameObject = gameObject;
+  }
+  update() {
+  }
+}
+</pre>
+<p>Les composants ont-ils besoin d'une classe de base ? JavaScript n'est pas comme la plupart des langages strictement
+typés, donc en pratique, nous pourrions ne pas avoir de classe de base et laisser
+chaque composant faire ce qu'il veut dans son constructeur, sachant que le premier
+argument est toujours le gameobject du composant. S'il ne se soucie pas du gameobject, il
+ne le stockerait pas. J'ai un peu l'impression que cette base commune est bonne cependant.
+Cela signifie que si vous avez une référence à un
+composant, vous savez que vous pouvez toujours trouver son gameobject parent, et à partir de son
+parent, vous pouvez facilement rechercher d'autres composants ainsi que regarder sa
+transformation.</p>
+<p>Pour gérer les gameobjects, nous avons probablement besoin d'une sorte de gestionnaire de gameobjects. Vous
+pourriez penser que nous pourrions simplement garder un tableau de gameobjects, mais dans un vrai jeu, les
+composants d'un gameobject pourraient ajouter et supprimer d'autres gameobjects pendant l'exécution.
+Par exemple, un gameobject d'arme pourrait ajouter un gameobject de balle chaque fois que l'arme
+tire. Un gameobject de monstre pourrait se supprimer s'il a été tué. Nous
+aurions alors un problème : nous pourrions avoir du code comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const gameObject of globalArrayOfGameObjects) {
+  gameObject.update();
+}
+</pre>
+<p>La boucle ci-dessus échouerait ou ferait des choses inattendues si
+des gameobjects étaient ajoutés ou supprimés de <code class="notranslate" translate="no">globalArrayOfGameObjects</code>
+au milieu de la boucle dans la fonction <code class="notranslate" translate="no">update</code> d'un composant.</p>
+<p>Pour essayer de prévenir ce problème, nous avons besoin de quelque chose d'un peu plus sûr.
+Voici une tentative.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class SafeArray {
+  constructor() {
+    this.array = [];
+    this.addQueue = [];
+    this.removeQueue = new Set();
+  }
+  get isEmpty() {
+    return this.addQueue.length + this.array.length &gt; 0;
+  }
+  add(element) {
+    this.addQueue.push(element);
+  }
+  remove(element) {
+    this.removeQueue.add(element);
+  }
+  forEach(fn) {
+    this._addQueued();
+    this._removeQueued();
+    for (const element of this.array) {
+      if (this.removeQueue.has(element)) {
+        continue;
+      }
+      fn(element);
+    }
+    this._removeQueued();
+  }
+  _addQueued() {
+    if (this.addQueue.length) {
+      this.array.splice(this.array.length, 0, ...this.addQueue);
+      this.addQueue = [];
+    }
+  }
+  _removeQueued() {
+    if (this.removeQueue.size) {
+      this.array = this.array.filter(element =&gt; !this.removeQueue.has(element));
+      this.removeQueue.clear();
+    }
+  }
+}
+</pre>
+<p>La classe ci-dessus vous permet d'ajouter ou de supprimer des éléments du <code class="notranslate" translate="no">SafeArray</code>
+sans altérer le tableau lui-même pendant qu'il est parcouru. Au lieu
+de cela, les nouveaux éléments sont ajoutés à <code class="notranslate" translate="no">addQueue</code> et les éléments supprimés
+à <code class="notranslate" translate="no">removeQueue</code>, puis ajoutés ou supprimés en dehors de la boucle.</p>
+<p>En utilisant cela, voici notre classe pour gérer les gameobjects.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GameObjectManager {
+  constructor() {
+    this.gameObjects = new SafeArray();
+  }
+  createGameObject(parent, name) {
+    const gameObject = new GameObject(parent, name);
+    this.gameObjects.add(gameObject);
+    return gameObject;
+  }
+  removeGameObject(gameObject) {
+    this.gameObjects.remove(gameObject);
+  }
+  update() {
+    this.gameObjects.forEach(gameObject =&gt; gameObject.update());
+  }
+}
+</pre>
+<p>Avec tout cela, créons maintenant notre premier composant. Ce composant
+gérera simplement un objet three.js skinné comme ceux que nous venons de créer.
+Pour rester simple, il n'aura qu'une seule méthode, <code class="notranslate" translate="no">setAnimation</code>, qui
+prend le nom de l'animation à jouer et la lance.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class SkinInstance extends Component {
+  constructor(gameObject, model) {
+    super(gameObject);
+    this.model = model;
+    this.animRoot = SkeletonUtils.clone(this.model.gltf.scene);
+    this.mixer = new THREE.AnimationMixer(this.animRoot);
+    gameObject.transform.add(this.animRoot);
+    this.actions = {};
+  }
+  setAnimation(animName) {
+    const clip = this.model.animations[animName];
+    // turn off all current actions
+    for (const action of Object.values(this.actions)) {
+      action.enabled = false;
+    }
+    // get or create existing action for clip
+    const action = this.mixer.clipAction(clip);
+    action.enabled = true;
+    action.reset();
+    action.play();
+    this.actions[animName] = action;
+  }
+  update() {
+    this.mixer.update(globals.deltaTime);
+  }
+}
+</pre>
+<p>Vous pouvez voir qu'il s'agit essentiellement du code que nous avions auparavant qui clone la scène que nous avons chargée,
+puis configure un <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> ajoute une <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> pour un
+<a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> particulier s'il n'existe pas déjà, et désactive toutes
+les actions existantes.</p>
+<p>Le code référence <code class="notranslate" translate="no">globals.deltaTime</code>. Créons un objet globals</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
+  time: 0,
+  deltaTime: 0,
+};
+</pre>
+<p>Et mettons-le à jour dans la boucle de rendu</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let then = 0;
+function render(now) {
+  // convertir en secondes
+  globals.time = now * 0.001;
+  // s'assurer que le temps delta n'est pas trop grand.
+  globals.deltaTime = Math.min(globals.time - then, 1 / 20);
+  then = globals.time;
+</pre>
+<p>La vérification ci-dessus pour s'assurer que <code class="notranslate" translate="no">deltaTime</code> ne dépasse pas 1/20ème
+de seconde est due au fait que, sinon, nous obtiendrions une valeur énorme pour <code class="notranslate" translate="no">deltaTime</code>
+si nous masquions l'onglet. Nous pourrions le masquer pendant des secondes ou des minutes, et ensuite,
+lorsque notre onglet serait ramené au premier plan, <code class="notranslate" translate="no">deltaTime</code> serait énorme
+et pourrait téléporter des personnages à travers notre monde de jeu si nous avions du code comme</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">position += velocity * deltaTime;
+</pre>
+<p>En limitant le maximum <code class="notranslate" translate="no">deltaTime</code>, ce problème est évité.</p>
+<p>Créons maintenant un composant pour le joueur.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const kForward = new THREE.Vector3(0, 0, 1);
+const globals = {
+  time: 0,
+  deltaTime: 0,
++  moveSpeed: 16,
+};
+
+class Player extends Component {
+  constructor(gameObject) {
+    super(gameObject);
+    const model = models.knight;
+    this.skinInstance = gameObject.addComponent(SkinInstance, model);
+    this.skinInstance.setAnimation('Run');
++    this.turnSpeed = globals.moveSpeed / 4;
+  }
++  update() {
++    const {deltaTime, moveSpeed} = globals;
++    const {transform} = this.gameObject;
++    const delta = (inputManager.keys.left.down  ?  1 : 0) +
++                  (inputManager.keys.right.down ? -1 : 0);
++    transform.rotation.y += this.turnSpeed * delta * deltaTime;
++    transform.translateOnAxis(kForward, moveSpeed * deltaTime);
++  }
+}
+</pre>
+<p>Le code ci-dessus utilise <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> pour faire avancer le joueur.
+<a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> fonctionne dans l'espace local, il ne fonctionne donc que
+si l'objet en question est à la racine de la scène, pas s'il est un enfant de quelque chose d'autre <a class="footnote" href="#parented" id="parented-backref">1</a></p>
+<p>Nous avons également ajouté une vitesse de déplacement globale (<code class="notranslate" translate="no">moveSpeed</code>) et basé une vitesse de rotation (<code class="notranslate" translate="no">turnSpeed</code>) sur la vitesse de déplacement.
+La vitesse de rotation est basée sur la vitesse de déplacement pour essayer de s'assurer qu'un personnage
+peut tourner assez brusquement pour atteindre sa cible. Si <code class="notranslate" translate="no">turnSpeed</code> est trop faible,
+un personnage tournera en rond autour de sa cible sans jamais l'atteindre.
+Je n'ai pas pris la peine de faire les calculs pour déterminer la vitesse de rotation requise
+pour une vitesse de déplacement donnée. J'ai juste deviné.</p>
+<p>Le code jusqu'à présent fonctionnerait, mais si le joueur sort de l'écran, il n'y a
+aucun moyen de savoir où il se trouve. Faisons en sorte que s'il est hors écran
+pendant plus d'un certain temps, il soit téléporté à l'origine.
+Nous pouvons le faire en utilisant la classe <a href="/docs/#api/en/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> de three.js pour vérifier si un point
+est à l'intérieur du frustum de vue de la caméra.</p>
+<p>Nous devons construire un frustum à partir de la caméra. Nous pourrions le faire dans le composant Player,
+mais d'autres objets pourraient vouloir l'utiliser également, alors ajoutons un autre
+gameobject avec un composant pour gérer un frustum.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class CameraInfo extends Component {
+  constructor(gameObject) {
+    super(gameObject);
+    this.projScreenMatrix = new THREE.Matrix4();
+    this.frustum = new THREE.Frustum();
+  }
+  update() {
+    const {camera} = globals;
+    this.projScreenMatrix.multiplyMatrices(
+        camera.projectionMatrix,
+        camera.matrixWorldInverse);
+    this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
+  }
+}
+</pre>
+<p>Configurons ensuite un autre gameobject au moment de l'initialisation.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
+  prepModelsAndAnimations();
+
++  {
++    const gameObject = gameObjectManager.createGameObject(camera, 'camera');
++    globals.cameraInfo = gameObject.addComponent(CameraInfo);
++  }
+
+  {
+    const gameObject = gameObjectManager.createGameObject(scene, 'player');
+    gameObject.addComponent(Player);
+  }
+}
+</pre>
+<p>et maintenant nous pouvons l'utiliser dans le composant <code class="notranslate" translate="no">Player</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
+  constructor(gameObject) {
+    super(gameObject);
+    const model = models.knight;
+    this.skinInstance = gameObject.addComponent(SkinInstance, model);
+    this.skinInstance.setAnimation('Run');
+    this.turnSpeed = globals.moveSpeed / 4;
++    this.offscreenTimer = 0;
++    this.maxTimeOffScreen = 3;
+  }
+  update() {
+-    const {deltaTime, moveSpeed} = globals;
++    const {deltaTime, moveSpeed, cameraInfo} = globals;
+    const {transform} = this.gameObject;
+    const delta = (inputManager.keys.left.down  ?  1 : 0) +
+                  (inputManager.keys.right.down ? -1 : 0);
+    transform.rotation.y += this.turnSpeed * delta * deltaTime;
+    transform.translateOnAxis(kForward, moveSpeed * deltaTime);
+
++    const {frustum} = cameraInfo;
++    if (frustum.containsPoint(transform.position)) {
++      this.offscreenTimer = 0;
++    } else {
++      this.offscreenTimer += deltaTime;
++      if (this.offscreenTimer &gt;= this.maxTimeOffScreen) {
++        transform.position.set(0, 0, 0);
++      }
++    }
+  }
+}
+</pre>
+<p>Une dernière chose avant d'essayer, ajoutons le support des écrans tactiles
+pour mobile. Tout d'abord, ajoutons un peu de code HTML pour le toucher</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="ui"&gt;
++    &lt;div id="left"&gt;&lt;img src="../resources/images/left.svg"&gt;&lt;/div&gt;
++    &lt;div style="flex: 0 0 40px;"&gt;&lt;/div&gt;
++    &lt;div id="right"&gt;&lt;img src="../resources/images/right.svg"&gt;&lt;/div&gt;
++  &lt;/div&gt;
+  &lt;div id="loading"&gt;
+    &lt;div&gt;
+      &lt;div&gt;...chargement...&lt;/div&gt;
+      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
++  &lt;div id="labels"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>et un peu de CSS pour le styler</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-items: center;
+  align-content: stretch;
+}
+#ui&gt;div {
+  display: flex;
+  align-items: flex-end;
+  flex: 1 1 auto;
+}
+.bright {
+  filter: brightness(2);
+}
+#left {
+  justify-content: flex-end;
+}
+#right {
+  justify-content: flex-start;
+}
+#ui img {
+  padding: 10px;
+  width: 80px;
+  height: 80px;
+  display: block;
+}
+#labels {
+  position: absolute;  /* nous permet de nous positionner à l'intérieur du conteneur */
+  left: 0;             /* fait que notre position est en haut à gauche du conteneur */
+  top: 0;
+  color: white;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+#labels&gt;div {
+  position: absolute;  /* nous permet de les positionner à l'intérieur du conteneur */
+  left: 0;             /* fait que leur position par défaut est en haut à gauche du conteneur */
+  top: 0;
+  font-size: large;
+  font-family: monospace;
+  user-select: none;   /* n'autorise pas la sélection du texte */
+  text-shadow:         /* crée un contour noir */
+    -1px -1px 0 #000,
+     0   -1px 0 #000,
+     1px -1px 0 #000,
+     1px  0   0 #000,
+     1px  1px 0 #000,
+     0    1px 0 #000,
+    -1px  1px 0 #000,
+    -1px  0   0 #000;
+}
+</pre>
+<p>L'idée ici est d'avoir une div, <code class="notranslate" translate="no">#ui</code>, qui
+couvre toute la page. À l'intérieur, il y aura 2 divs, <code class="notranslate" translate="no">#left</code> et <code class="notranslate" translate="no">#right</code>,
+chacune occupant près de la moitié de la largeur de la page et toute la hauteur de l'écran.
+Entre les deux, il y a un séparateur de 40px. Si l'utilisateur glisse son doigt
+sur le côté gauche ou droit, nous devons mettre à jour <code class="notranslate" translate="no">keys.left</code> et <code class="notranslate" translate="no">keys.right</code>
+dans l'<code class="notranslate" translate="no">InputManager</code>. Cela rend tout l'écran sensible au toucher,
+ce qui semble mieux que de simples petites flèches.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class InputManager {
+  constructor() {
+    this.keys = {};
+    const keyMap = new Map();
+
+    const setKey = (keyName, pressed) =&gt; {
+      const keyState = this.keys[keyName];
+      keyState.justPressed = pressed &amp;&amp; !keyState.down;
+      keyState.down = pressed;
+    };
+
+    const addKey = (keyCode, name) =&gt; {
+      this.keys[name] = { down: false, justPressed: false };
+      keyMap.set(keyCode, name);
+    };
+
+    const setKeyFromKeyCode = (keyCode, pressed) =&gt; {
+      const keyName = keyMap.get(keyCode);
+      if (!keyName) {
+        return;
+      }
+      setKey(keyName, pressed);
+    };
+
+    addKey(37, 'left');
+    addKey(39, 'right');
+    addKey(38, 'up');
+    addKey(40, 'down');
+    addKey(90, 'a');
+    addKey(88, 'b');
+
+    window.addEventListener('keydown', (e) =&gt; {
+      setKeyFromKeyCode(e.keyCode, true);
+    });
+    window.addEventListener('keyup', (e) =&gt; {
+      setKeyFromKeyCode(e.keyCode, false);
+    });
+
++    const sides = [
++      { elem: document.querySelector('#left'),  key: 'left'  },
++      { elem: document.querySelector('#right'), key: 'right' },
++    ];
++
++    const clearKeys = () =&gt; {
++      for (const {key} of sides) {
++          setKey(key, false);
++      }
++    };
++
++    const handleMouseMove = (e) =&gt; {
++      e.preventDefault();
++      // ceci est nécessaire car nous appelons preventDefault();
++      // nous avons également donné au canvas un tabindex afin qu'il puisse
++      // obtenir le focus
++      canvas.focus();
++      window.addEventListener('pointermove', handleMouseMove);
++      window.addEventListener('pointerup', handleMouseUp);
++
++      for (const {elem, key} of sides) {
++        let pressed = false;
++        const rect = elem.getBoundingClientRect();
++        const x = e.clientX;
++        const y = e.clientY;
++        const inRect = x &gt;= rect.left &amp;&amp; x &lt; rect.right &amp;&amp;
++                       y &gt;= rect.top &amp;&amp; y &lt; rect.bottom;
++        if (inRect) {
++          pressed = true;
++        }
++        setKey(key, pressed);
++      }
++    };
++
++    function handleMouseUp() {
++      clearKeys();
++      window.removeEventListener('pointermove', handleMouseMove, {passive: false});
++      window.removeEventListener('pointerup', handleMouseUp);
++    }
++
++    const uiElem = document.querySelector('#ui');
++    uiElem.addEventListener('pointerdown', handleMouseMove, {passive: false});
++
++    uiElem.addEventListener('touchstart', (e) =&gt; {
++      // empêcher le défilement
++      e.preventDefault();
++    }, {passive: false});
+  }
+  update() {
+    for (const keyState of Object.values(this.keys)) {
+      if (keyState.justPressed) {
+        keyState.justPressed = false;
+      }
+    }
+  }
+}
+</pre>
+<p>Et maintenant, nous devrions pouvoir contrôler le personnage avec les touches curseur gauche et droite
+ou avec nos doigts sur un écran tactile.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-player-input.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-player-input.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Idéalement, nous ferions quelque chose d'autre si le joueur sortait de l'écran, comme déplacer
+la caméra ou peut-être considérer que hors écran = mort, mais cet article va déjà être
+trop long, donc pour l'instant, se téléporter au milieu était la chose la plus simple.</p>
+<p>Ajoutons quelques animaux. Nous pouvons commencer de manière similaire au <code class="notranslate" translate="no">Player</code> en créant
+un composant <code class="notranslate" translate="no">Animal</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Animal extends Component {
+  constructor(gameObject, model) {
+    super(gameObject);
+    const skinInstance = gameObject.addComponent(SkinInstance, model);
+    skinInstance.mixer.timeScale = globals.moveSpeed / 4;
+    skinInstance.setAnimation('Idle');
+  }
+}
+</pre>
+<p>Le code ci-dessus définit le <a href="/docs/#api/en/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a> pour régler la vitesse de lecture
+des animations par rapport à la vitesse de déplacement. De cette façon, si nous
+ajustons la vitesse de déplacement, l'animation accélérera ou ralentira également.</p>
+<p>Pour commencer, nous pourrions configurer un animal de chaque type</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+  // masquer la barre de chargement
+  const loadingElem = document.querySelector('#loading');
+  loadingElem.style.display = 'none';
+
+  prepModelsAndAnimations();
+  {
+    const gameObject = gameObjectManager.createGameObject(camera, 'camera');
+    globals.cameraInfo = gameObject.addComponent(CameraInfo);
+  }
+
+  {
+    const gameObject = gameObjectManager.createGameObject(scene, 'player');
+    globals.player = gameObject.addComponent(Player);
+    globals.congaLine = [gameObject];
+  }
+
++  const animalModelNames = [
++    'pig',
++    'cow',
++    'llama',
++    'pug',
++    'sheep',
++    'zebra',
++    'horse',
++  ];
++  animalModelNames.forEach((name, ndx) =&gt; {
++    const gameObject = gameObjectManager.createGameObject(scene, name);
++    gameObject.addComponent(Animal, models[name]);
++    gameObject.transform.position.x = (ndx + 1) * 5;
++  });
+}
+</pre>
+<p>Et cela nous donnerait des animaux debout à l'écran, mais nous voulons qu'ils fassent quelque chose.</p>
+<p>Faisons en sorte qu'ils suivent le joueur en file indienne, mais seulement si le joueur s'approche suffisamment.
+Pour cela, nous avons besoin de plusieurs états.</p>
+<ul>
+<li><p>Inactif :</p>
+<p>L'animal attend que le joueur s'approche</p>
+</li>
+<li><p>Attendre la fin de la ligne :</p>
+<p>L'animal a été "tagué" par le joueur, mais doit maintenant attendre que l'animal
+au bout de la ligne arrive pour pouvoir rejoindre la fin de la ligne.</p>
+</li>
+<li><p>Aller au dernier :</p>
+<p>L'animal doit marcher jusqu'à l'endroit où se trouvait l'animal qu'il suit,
+tout en enregistrant un historique de la position actuelle de l'animal qu'il suit.</p>
+</li>
+<li><p>Suivre</p>
+<p>L'animal doit continuer à enregistrer un historique de la position de l'animal qu'il suit
+tout en se déplaçant vers l'endroit où se trouvait cet animal auparavant.</p>
+</li>
+</ul>
+<p>Il existe de nombreuses façons de gérer différents états comme ceux-ci. Une méthode courante consiste à utiliser
+une <a href="https://www.google.com/search?q=finite+state+machine">machine à états finis</a> (Finite State Machine) et
+à construire une classe pour nous aider à gérer l'état.</p>
+<p>Alors, faisons cela.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class FiniteStateMachine {
+  constructor(states, initialState) {
+    this.states = states;
+    this.transition(initialState);
+  }
+  get state() {
+    return this.currentState;
+  }
+  transition(state) {
+    const oldState = this.states[this.currentState];
+    if (oldState &amp;&amp; oldState.exit) {
+      oldState.exit.call(this);
+    }
+    this.currentState = state;
+    const newState = this.states[state];
+    if (newState.enter) {
+      newState.enter.call(this);
+    }
+  }
+  update() {
+    const state = this.states[this.currentState];
+    if (state.update) {
+      state.update.call(this);
+    }
+  }
+}
+</pre>
+<p>Voici une classe simple. Nous lui passons un objet contenant un ensemble d'états.
+Chaque état a 3 fonctions optionnelles : <code class="notranslate" translate="no">enter</code>, <code class="notranslate" translate="no">update</code> et <code class="notranslate" translate="no">exit</code>.
+Pour changer d'état, nous appelons <code class="notranslate" translate="no">FiniteStateMachine.transition</code> et lui passons
+le nom du nouvel état. Si l'état actuel a une fonction <code class="notranslate" translate="no">exit</code>,
+elle est appelée. Ensuite, si le nouvel état a une fonction <code class="notranslate" translate="no">enter</code>,
+elle est appelée. Enfin, à chaque image, <code class="notranslate" translate="no">FiniteStateMachine.update</code> appelle la fonction <code class="notranslate" translate="no">update</code>
+de l'état actuel.</p>
+<p>Utilisons-le pour gérer les états des animaux.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Retourne vrai si obj1 et obj2 sont proches
+function isClose(obj1, obj1Radius, obj2, obj2Radius) {
+  const minDist = obj1Radius + obj2Radius;
+  const dist = obj1.position.distanceTo(obj2.position);
+  return dist &lt; minDist;
+}
+
+// maintient v entre -min et +min
+function minMagnitude(v, min) {
+  return Math.abs(v) &gt; min
+      ? min * Math.sign(v)
+      : v;
+}
+
+const aimTowardAndGetDistance = function() {
+  const delta = new THREE.Vector3();
+
+  return function aimTowardAndGetDistance(source, targetPos, maxTurn) {
+    delta.subVectors(targetPos, source.position);
+    // calculer la direction dans laquelle nous voulons faire face
+    const targetRot = Math.atan2(delta.x, delta.z) + Math.PI * 1.5;
+    // tourner dans la direction la plus courte
+    const deltaRot = (targetRot - source.rotation.y + Math.PI * 1.5) % (Math.PI * 2) - Math.PI;
+    // s'assurer que nous ne tournons pas plus vite que maxTurn
+    const deltaRotation = minMagnitude(deltaRot, maxTurn);
+    // maintenir la rotation entre 0 et Math.PI * 2
+    source.rotation.y = THREE.MathUtils.euclideanModulo(
+        source.rotation.y + deltaRotation, Math.PI * 2);
+    // retourner la distance à la cible
+    return delta.length();
+  };
+}();
+
+class Animal extends Component {
+  constructor(gameObject, model) {
+    super(gameObject);
++    const hitRadius = model.size / 2;
+    const skinInstance = gameObject.addComponent(SkinInstance, model);
+    skinInstance.mixer.timeScale = globals.moveSpeed / 4;
++    const transform = gameObject.transform;
++    const playerTransform = globals.player.gameObject.transform;
++    const maxTurnSpeed = Math.PI * (globals.moveSpeed / 4);
++    const targetHistory = [];
++    let targetNdx = 0;
++
++    function addHistory() {
++      const targetGO = globals.congaLine[targetNdx];
++      const newTargetPos = new THREE.Vector3();
++      newTargetPos.copy(targetGO.transform.position);
++      targetHistory.push(newTargetPos);
++    }
++
++    this.fsm = new FiniteStateMachine({
++      idle: {
++        enter: () =&gt; {
++          skinInstance.setAnimation('Idle');
++        },
++        update: () =&gt; {
++          // vérifier si le joueur est proche
++          if (isClose(transform, hitRadius, playerTransform, globals.playerRadius)) {
++            this.fsm.transition('waitForEnd');
++          }
++        },
++      },
++      waitForEnd: {
++        enter: () =&gt; {
++          skinInstance.setAnimation('Jump');
++        },
++        update: () =&gt; {
++          // obtenir le gameObject à la fin de la file indienne
++          const lastGO = globals.congaLine[globals.congaLine.length - 1];
++          const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
++          const targetPos = lastGO.transform.position;
++          aimTowardAndGetDistance(transform, targetPos, deltaTurnSpeed);
++          // vérifier si le dernier élément de la file indienne est proche
++          if (isClose(transform, hitRadius, lastGO.transform, globals.playerRadius)) {
++            this.fsm.transition('goToLast');
++          }
++        },
++      },
++      goToLast: {
++        enter: () =&gt; {
++          // se souvenir de qui nous suivons
++          targetNdx = globals.congaLine.length - 1;
++          // nous ajouter à la file indienne
++          globals.congaLine.push(gameObject);
++          skinInstance.setAnimation('Walk');
++        },
++        update: () =&gt; {
++          addHistory();
++          // marcher jusqu'au point le plus ancien de l'historique
++          const targetPos = targetHistory[0];
++          const maxVelocity = globals.moveSpeed * globals.deltaTime;
++          const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
++          const distance = aimTowardAndGetDistance(transform, targetPos, deltaTurnSpeed);
++          const velocity = distance;
++          transform.translateOnAxis(kForward, Math.min(velocity, maxVelocity));
++          if (distance &lt;= maxVelocity) {
++            this.fsm.transition('follow');
++          }
++        },
++      },
++      follow: {
++        update: () =&gt; {
++          addHistory();
++          // supprimer l'historique le plus ancien et nous placer simplement là.
++          const targetPos = targetHistory.shift();
++          transform.position.copy(targetPos);
++          const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
++          aimTowardAndGetDistance(transform, targetHistory[0], deltaTurnSpeed);
++        },
++      },
++    }, 'idle');
++  }
++  update() {
++    this.fsm.update();
++  }
+}
+</pre>
+<p>C'était un gros morceau de code, mais il fait ce qui a été décrit ci-dessus.
+J'espère que si vous parcourez chaque état, ce sera clair.</p>
+<p>Quelques choses que nous devons ajouter. Nous devons faire en sorte que le joueur s'ajoute
+aux variables globales afin que les animaux puissent le trouver, et nous devons commencer la
+file indienne avec le <code class="notranslate" translate="no">GameObject</code> du joueur.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+
+  ...
+
+  {
+    const gameObject = gameObjectManager.createGameObject(scene, 'player');
++    globals.player = gameObject.addComponent(Player);
++    globals.congaLine = [gameObject];
+  }
+
+}
+</pre>
+<p>Nous devons également calculer une taille pour chaque modèle</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
++  const box = new THREE.Box3();
++  const size = new THREE.Vector3();
+  Object.values(models).forEach(model =&gt; {
++    box.setFromObject(model.gltf.scene);
++    box.getSize(size);
++    model.size = size.length();
+    const animsByName = {};
+    model.gltf.animations.forEach((clip) =&gt; {
+      animsByName[clip.name] = clip;
+      // Devrait vraiment être corrigé dans le fichier .blend
+      if (clip.name === 'Walk') {
+        clip.duration /= 2;
+      }
+    });
+    model.animations = animsByName;
+  });
+}
+</pre>
+<p>Et nous avons besoin que le joueur enregistre sa taille</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
+  constructor(gameObject) {
+    super(gameObject);
+    const model = models.knight;
++    globals.playerRadius = model.size / 2;
+</pre>
+<p>En y pensant maintenant, il aurait probablement été plus judicieux
+que les animaux ciblent simplement la tête de la file indienne
+au lieu du joueur spécifiquement. Peut-être que je reviendrai dessus
+et modifierai cela plus tard.</p>
+<p>Lorsque j'ai commencé cela, j'ai utilisé un seul rayon pour tous les animaux,
+mais bien sûr, ce n'était pas bon, car le carlin est beaucoup plus petit que le cheval.
+J'ai donc ajouté les différentes tailles, mais je voulais pouvoir visualiser
+les choses. Pour ce faire, j'ai créé un composant <code class="notranslate" translate="no">StatusDisplayHelper</code>.</p>
+<p>J'utilise un <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> pour dessiner un cercle autour de chaque personnage,
+et il utilise des éléments html pour permettre à chaque personnage d'afficher un certain statut en utilisant
+les techniques couvertes dans <a href="align-html-elements-to-3d.html">l'article sur l'alignement des éléments html en 3D</a>.</p>
+<p>Nous devons d'abord ajouter du code HTML pour héberger ces éléments</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+  &lt;div id="ui"&gt;
+    &lt;div id="left"&gt;&lt;img src="../resources/images/left.svg"&gt;&lt;/div&gt;
+    &lt;div style="flex: 0 0 40px;"&gt;&lt;/div&gt;
+    &lt;div id="right"&gt;&lt;img src="../resources/images/right.svg"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="loading"&gt;
+    &lt;div&gt;
+      &lt;div&gt;...chargement...&lt;/div&gt;
+      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
++  &lt;div id="labels"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>Et ajouter du CSS pour eux</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-items: center;
+  align-content: stretch;
+}
+#ui&gt;div {
+  display: flex;
+  align-items: flex-end;
+  flex: 1 1 auto;
+}
+.bright {
+  filter: brightness(2);
+}
+#left {
+  justify-content: flex-end;
+}
+#right {
+  justify-content: flex-start;
+}
+#ui img {
+  padding: 10px;
+  width: 80px;
+  height: 80px;
+  display: block;
+}
+#labels {
+  position: absolute;  /* nous permet de nous positionner à l'intérieur du conteneur */
+  left: 0;             /* fait que notre position est en haut à gauche du conteneur */
+  top: 0;
+  color: white;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+#labels&gt;div {
+  position: absolute;  /* nous permet de les positionner à l'intérieur du conteneur */
+  left: 0;             /* fait que leur position par défaut est en haut à gauche du conteneur */
+  top: 0;
+  font-size: large;
+  font-family: monospace;
+  user-select: none;   /* n'autorise pas la sélection du texte */
+  text-shadow:         /* crée un contour noir */
+    -1px -1px 0 #000,
+     0   -1px 0 #000,
+     1px -1px 0 #000,
+     1px  0   0 #000,
+     1px  1px 0 #000,
+     0    1px 0 #000,
+    -1px  1px 0 #000,
+    -1px  0   0 #000;
+}
+</pre>
+<p>Voici ensuite le composant</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelContainerElem = document.querySelector('#labels');
+
+class StateDisplayHelper extends Component {
+  constructor(gameObject, size) {
+    super(gameObject);
+    this.elem = document.createElement('div');
+    labelContainerElem.appendChild(this.elem);
+    this.pos = new THREE.Vector3();
+
+    this.helper = new THREE.PolarGridHelper(size / 2, 1, 1, 16);
+    gameObject.transform.add(this.helper);
+  }
+  setState(s) {
+    this.elem.textContent = s;
+  }
+  setColor(cssColor) {
+    this.elem.style.color = cssColor;
+    this.helper.material.color.set(cssColor);
+  }
+  update() {
+    const {pos} = this;
+    const {transform} = this.gameObject;
+    const {canvas} = globals;
+    pos.copy(transform.position);
+
+    // obtenir les coordonnées d'écran normalisées de cette position
+    // x et y seront dans la plage -1 à +1, avec x = -1 étant
+    // à gauche et y = -1 étant en bas
+    pos.project(globals.camera);
+
+    // convertir la position normalisée en coordonnées CSS
+    const x = (pos.x *  .5 + .5) * canvas.clientWidth;
+    const y = (pos.y * -.5 + .5) * canvas.clientHeight;
+
+    // déplacer l'élément à cette position
+    this.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+  }
+}
+</pre>
+<p>Et nous pouvons ensuite les ajouter aux animaux comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Animal extends Component {
+  constructor(gameObject, model) {
+    super(gameObject);
++    this.helper = gameObject.addComponent(StateDisplayHelper, model.size);
+
+     ...
+
+  }
+  update() {
+    this.fsm.update();
++    const dir = THREE.MathUtils.radToDeg(this.gameObject.transform.rotation.y);
++    this.helper.setState(`${this.fsm.state}:${dir.toFixed(0)}`);
+  }
+}
+</pre>
+<p>Pendant que nous y sommes, faisons en sorte que nous puissions les activer/désactiver en utilisant lil-gui, comme
+nous l'avons fait ailleurs.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const gui = new GUI();
++gui.add(globals, 'debug').onChange(showHideDebugInfo);
++showHideDebugInfo();
+
+const labelContainerElem = document.querySelector('#labels');
++function showHideDebugInfo() {
++  labelContainerElem.style.display = globals.debug ? '' : 'none';
++}
++showHideDebugInfo();
+
+class StateDisplayHelper extends Component {
+
+  ...
+
+  update() {
++    this.helper.visible = globals.debug;
++    if (!globals.debug) {
++      return;
++    }
+
+    ...
+  }
+}
+</pre>
+<p>Et avec cela, nous obtenons une sorte de début de jeu.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-conga-line.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>À l'origine, j'avais l'intention de créer un <a href="https://www.google.com/search?q=snake+game">jeu de serpent</a>
+où, à mesure que vous ajoutez des animaux à votre ligne, cela devient plus difficile car vous devez éviter
+de les heurter. J'aurais également placé des obstacles dans la scène et peut-être une clôture ou une sorte
+de barrière autour du périmètre.</p>
+<p>Malheureusement, les animaux sont longs et minces. Vu d'en haut, voici le zèbre.</p>
+<div class="threejs_center"><img src="../resources/images/zebra.png" style="width: 113px;"></div>
+
+<p>Le code jusqu'à présent utilise des collisions circulaires, ce qui signifie que si nous avions des obstacles comme une clôture,
+cela serait considéré comme une collision</p>
+<div class="threejs_center"><img src="../resources/images/zebra-collisions.svg" style="width: 400px;"></div>
+
+<p>Ce n'est pas bon. Même d'animal à animal, nous aurions le même problème.</p>
+<p>J'ai pensé à écrire un système de collision rectangle à rectangle en 2D, mais j'ai
+rapidement réalisé que cela pourrait vraiment représenter beaucoup de code. Vérifier si 2 boîtes
+orientées arbitrairement se chevauchent n'est pas trop de code, et pour notre jeu avec seulement quelques
+objets, cela pourrait fonctionner, mais en y regardant de plus près, après quelques objets, vous
+commencez rapidement à avoir besoin d'optimiser la vérification des collisions. Tout d'abord, vous pourriez parcourir tous
+les objets qui peuvent potentiellement entrer en collision les uns avec les autres et vérifier leurs
+sphères englobantes, leurs cercles englobants ou leurs boîtes englobantes alignées sur les axes. Une fois que vous
+savez quels objets <em>pourraient</em> entrer en collision, vous devez faire plus de travail pour vérifier s'ils
+entrent <em>réellement</em> en collision. Souvent, même la vérification des sphères englobantes est trop
+de travail, et vous avez besoin d'une sorte de meilleure structure spatiale pour les objets afin de pouvoir
+vérifier plus rapidement uniquement les objets potentiellement proches les uns des autres.</p>
+<p>Ensuite, une fois que vous avez écrit le code pour vérifier si 2 objets entrent en collision, vous voulez généralement
+créer un système de collision plutôt que de demander manuellement "est-ce que je collisionne avec ces
+objets". Un système de collision émet des événements ou appelle des callbacks en relation avec
+les collisions. L'avantage est qu'il peut vérifier toutes les collisions en une seule fois, de sorte qu'aucun
+objet n'est vérifié plus d'une fois, alors que si vous appelez manuellement une fonction
+"est-ce que je collisionne", les objets sont souvent vérifiés plus d'une fois, ce qui fait perdre du temps.</p>
+<p>Créer ce système de collision ne représenterait probablement pas plus de 100 à 300 lignes de code
+pour vérifier uniquement les rectangles orientés arbitrairement, mais c'est toujours beaucoup plus de code,
+il a donc semblé préférable de l'omettre.</p>
+<p>Une autre solution aurait été d'essayer de trouver d'autres personnages qui sont majoritairement
+circulaires vus du dessus. D'autres personnages humanoïdes par exemple, au lieu
+d'animaux, auquel cas la vérification circulaire pourrait fonctionner d'animal à animal.
+Cela ne fonctionnerait pas d'animal à clôture ; eh bien, nous devrions ajouter une vérification de cercle à rectangle. J'ai
+pensé à faire de la clôture une clôture de buissons ou de poteaux, quelque chose de circulaire,
+mais alors il me faudrait probablement 120 à 200 d'entre eux pour entourer la zone de jeu,
+ce qui entraînerait les problèmes d'optimisation mentionnés ci-dessus.</p>
+<p>Ce sont des raisons pour lesquelles de nombreux jeux utilisent une solution existante. Souvent, ces solutions
+font partie d'une bibliothèque de physique. La bibliothèque de physique a besoin de savoir si les objets
+entrent en collision les uns avec les autres, donc en plus de fournir la physique, elles peuvent également être utilisées
+pour détecter les collisions.</p>
+<p>Si vous cherchez une solution, certains exemples three.js utilisent
+<a href="https://github.com/kripken/ammo.js/">ammo.js</a>, cela pourrait donc être une option.</p>
+<p>Une autre solution aurait pu être de placer les obstacles sur une grille
+et d'essayer de faire en sorte que chaque animal et le joueur n'aient qu'à regarder
+la grille. Bien que cela serait performant, j'ai estimé qu'il valait mieux laisser
+cela comme un exercice pour le lecteur 😜</p>
+<p>Une chose de plus, de nombreux systèmes de jeu ont ce qu'on appelle des <a href="https://www.google.com/search?q=coroutines"><em>coroutines</em></a>.
+Les coroutines sont des routines qui peuvent se mettre en pause pendant l'exécution et reprendre plus tard.</p>
+<p>Faisons en sorte que le personnage principal émette des notes de musique comme s'il dirigeait
+la ligne en chantant. Il existe de nombreuses façons de mettre cela en œuvre, mais pour l'instant,
+faisons-le en utilisant des coroutines.</p>
+<p>Tout d'abord, voici une classe pour gérer les coroutines</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* waitSeconds(duration) {
+  while (duration &gt; 0) {
+    duration -= globals.deltaTime;
+    yield;
+  }
+}
+
+class CoroutineRunner {
+  constructor() {
+    this.generatorStacks = [];
+    this.addQueue = [];
+    this.removeQueue = new Set();
+  }
+  isBusy() {
+    return this.addQueue.length + this.generatorStacks.length &gt; 0;
+  }
+  add(generator, delay = 0) {
+    const genStack = [generator];
+    if (delay) {
+      genStack.push(waitSeconds(delay));
+    }
+    this.addQueue.push(genStack);
+  }
+  remove(generator) {
+    this.removeQueue.add(generator);
+  }
+  update() {
+    this._addQueued();
+    this._removeQueued();
+    for (const genStack of this.generatorStacks) {
+      const main = genStack[0];
+      // Gérer si une coroutine en supprime une autre
+      if (this.removeQueue.has(main)) {
+        continue;
+      }
+      while (genStack.length) {
+        const topGen = genStack[genStack.length - 1];
+        const {value, done} = topGen.next();
+        if (done) {
+          if (genStack.length === 1) {
+            this.removeQueue.add(topGen);
+            break;
+          }
+          genStack.pop();
+        } else if (value) {
+          genStack.push(value);
+        } else {
+          break;
+        }
+      }
+    }
+    this._removeQueued();
+  }
+  _addQueued() {
+    if (this.addQueue.length) {
+      this.generatorStacks.splice(this.generatorStacks.length, 0, ...this.addQueue);
+      this.addQueue = [];
+    }
+  }
+  _removeQueued() {
+    if (this.removeQueue.size) {
+      this.generatorStacks = this.generatorStacks.filter(genStack =&gt; !this.removeQueue.has(genStack[0]));
+      this.removeQueue.clear();
+    }
+  }
+}
+</pre>
+<p>Il fait des choses similaires à <code class="notranslate" translate="no">SafeArray</code> pour s'assurer qu'il est sûr d'ajouter ou de supprimer
+des coroutines pendant que d'autres coroutines s'exécutent. Il gère également les coroutines imbriquées.</p>
+<p>Pour créer une coroutine, vous créez une <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">fonction génératrice JavaScript</a>.
+Une fonction génératrice est précédée du mot-clé <code class="notranslate" translate="no">function*</code> (l'astérisque est important !)</p>
+<p>Les fonctions génératrices peuvent <code class="notranslate" translate="no">yield</code> (céder). Par exemple</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+  for (let i = 0; i &lt; 10; ++i) {
+    console.log(i);
+    yield;
+  }
+}
+</pre>
+<p>Si nous ajoutions cette fonction au <code class="notranslate" translate="no">CoroutineRunner</code> ci-dessus, elle imprimerait
+chaque nombre, de 0 à 9, une fois par image, ou plutôt une fois par appel de <code class="notranslate" translate="no">runner.update</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const runner = new CoroutineRunner();
+runner.add(count0To9);
+while(runner.isBusy()) {
+  runner.update();
+}
+</pre>
+<p>Les coroutines sont supprimées automatiquement lorsqu'elles sont terminées.</p>
+<p>Pour supprimer une coroutine prématurément, avant qu'elle n'atteigne la fin, vous devez conserver
+une référence à son générateur comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gen = count0To9();
+runner.add(gen);
+
+// plus tard
+
+runner.remove(gen);
+</pre>
+<p>En tout cas, dans le joueur, utilisons une coroutine pour émettre une note toutes les demi-secondes à 1 seconde.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
+  constructor(gameObject) {
+
+    ...
+
++    this.runner = new CoroutineRunner();
++
++    function* emitNotes() {
++      for (;;) {
++        yield waitSeconds(rand(0.5, 1));
++        const noteGO = gameObjectManager.createGameObject(scene, 'note');
++        noteGO.transform.position.copy(gameObject.transform.position);
++        noteGO.transform.position.y += 5;
++        noteGO.addComponent(Note);
++      }
++    }
++
++    this.runner.add(emitNotes());
+  }
+  update() {
++    this.runner.update();
+
+  ...
+
+  }
+}
+
+function rand(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.random() * (max - min) + min;
+}
+</pre>
+<p>Vous pouvez voir que nous créons un <code class="notranslate" translate="no">CoroutineRunner</code> et ajoutons une coroutine <code class="notranslate" translate="no">emitNotes</code>.
+Cette fonction s'exécutera indéfiniment, attendant 0,5 à 1 seconde, puis créant un objet de jeu
+avec un composant <code class="notranslate" translate="no">Note</code>.</p>
+<p>Pour le composant <code class="notranslate" translate="no">Note</code>, créons d'abord une texture avec une note dessus et,
+au lieu de charger une image de note, créons-en une à l'aide d'un canvas, comme nous l'avons vu dans <a href="canvas-textures.html">l'article sur les textures de canvas</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTextTexture(str) {
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.canvas.width = 64;
+  ctx.canvas.height = 64;
+  ctx.font = '60px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#FFF';
+  ctx.fillText(str, ctx.canvas.width / 2, ctx.canvas.height / 2);
+  return new THREE.CanvasTexture(ctx.canvas);
+}
+const noteTexture = makeTextTexture('♪');
+</pre>
+<p>La texture que nous créons ci-dessus est blanche, ce qui signifie que lorsque nous l'utilisons,
+nous pouvons définir la couleur du matériau et obtenir une note de n'importe quelle couleur.</p>
+<p>Maintenant que nous avons une texture de note, voici le composant <code class="notranslate" translate="no">Note</code>.
+Il utilise <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> et un <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, comme nous l'avons vu dans
+<a href="billboards.html">l'article sur les billboards</a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Note extends Component {
+  constructor(gameObject) {
+    super(gameObject);
+    const {transform} = gameObject;
+    const noteMaterial = new THREE.SpriteMaterial({
+      color: new THREE.Color().setHSL(rand(1), 1, 0.5),
+      map: noteTexture,
+      side: THREE.DoubleSide,
+      transparent: true,
+    });
+    const note = new THREE.Sprite(noteMaterial);
+    note.scale.setScalar(3);
+    transform.add(note);
+    this.runner = new CoroutineRunner();
+    const direction = new THREE.Vector3(rand(-0.2, 0.2), 1, rand(-0.2, 0.2));
+
+    function* moveAndRemove() {
+      for (let i = 0; i &lt; 60; ++i) {
+        transform.translateOnAxis(direction, globals.deltaTime * 10);
+        noteMaterial.opacity = 1 - (i / 60);
+        yield;
+      }
+      transform.parent.remove(transform);
+      gameObjectManager.removeGameObject(gameObject);
+    }
+
+    this.runner.add(moveAndRemove());
+  }
+  update() {
+    this.runner.update();
+  }
+}
+</pre>
+<p>Tout ce qu'il fait est de configurer un <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, puis de choisir une vitesse aléatoire et de déplacer
+la transformation à cette vitesse pendant 60 images, tout en estompant la note
+en définissant l'<a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> du matériau.
+Après la boucle, il supprime la transformation
+de la scène et la note elle-même des gameobjects actifs.</p>
+<p>Une dernière chose, ajoutons quelques animaux supplémentaires.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+
+   ...
+
+  const animalModelNames = [
+    'pig',
+    'cow',
+    'llama',
+    'pug',
+    'sheep',
+    'zebra',
+    'horse',
+  ];
++  const base = new THREE.Object3D();
++  const offset = new THREE.Object3D();
++  base.add(offset);
++
++  // positionner les animaux en spirale.
++  const numAnimals = 28;
++  const arc = 10;
++  const b = 10 / (2 * Math.PI);
++  let r = 10;
++  let phi = r / b;
++  for (let i = 0; i &lt; numAnimals; ++i) {
++    const name = animalModelNames[rand(animalModelNames.length) | 0];
+    const gameObject = gameObjectManager.createGameObject(scene, name);
+    gameObject.addComponent(Animal, models[name]);
++    base.rotation.y = phi;
++    offset.position.x = r;
++    offset.updateWorldMatrix(true, false);
++    offset.getWorldPosition(gameObject.transform.position);
++    phi += arc / r;
++    r = b * phi;
+  }
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line-w-notes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-conga-line-w-notes.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Vous pourriez vous demander, pourquoi ne pas utiliser <code class="notranslate" translate="no">setTimeout</code> ? Le problème avec <code class="notranslate" translate="no">setTimeout</code>
+est qu'il n'est pas lié à l'horloge du jeu. Par exemple, ci-dessus, nous avons défini le temps
+maximum autorisé à s'écouler entre les images à 1/20ème de seconde.
+Notre système de coroutine respectera cette limite, mais <code class="notranslate" translate="no">setTimeout</code> ne le ferait pas.</p>
+<p>Bien sûr, nous aurions pu créer un simple minuteur nous-mêmes</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player ... {
+  update() {
+    this.noteTimer -= globals.deltaTime;
+    if (this.noteTimer &lt;= 0) {
+      // réinitialiser le minuteur
+      this.noteTimer = rand(0.5, 1);
+      // créer un gameobject avec un composant de note
+    }
+  }
+</pre>
+<p>Et pour ce cas particulier, cela aurait peut-être été mieux, mais à mesure que vous ajoutez
+de plus en plus de choses, vous aurez de plus en plus de variables ajoutées à vos classes,
+alors qu'avec les coroutines, vous pouvez souvent simplement <em>lancer et oublier</em>.</p>
+<p>Étant donné les états simples de nos animaux, nous aurions également pu les implémenter
+avec une coroutine sous la forme de</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// pseudo-code !
+function* animalCoroutine() {
+   setAnimation('Idle');
+   while(playerIsTooFar()) {
+     yield;
+   }
+   const target = endOfLine;
+   setAnimation('Jump');
+   while(targetIsTooFar()) {
+     aimAt(target);
+     yield;
+   }
+   setAnimation('Walk')
+   while(notAtOldestPositionOfTarget()) {
+     addHistory();
+     aimAt(target);
+     yield;
+   }
+   for(;;) {
+     addHistory();
+     const pos = history.unshift();
+     transform.position.copy(pos);
+     aimAt(history[0]);
+     yield;
+   }
+}
+</pre>
+<p>Cela aurait fonctionné, mais bien sûr, dès que nos états n'auraient pas été si linéaires,
+nous aurions dû passer à une <code class="notranslate" translate="no">FiniteStateMachine</code>.</p>
+<p>Il ne m'était pas non plus clair si les coroutines devaient s'exécuter indépendamment de leurs
+composants. Nous aurions pu créer un <code class="notranslate" translate="no">CoroutineRunner</code> global et y placer toutes
+les coroutines. Cela rendrait leur nettoyage plus difficile. En l'état actuel,
+si le gameobject est supprimé, tous ses composants sont supprimés et
+donc les CoroutineRunner créés ne sont plus appelés, et tout sera collecté par le
+ramasse-miettes. Si nous avions un CoroutineRunner global, il incomberait alors
+à chaque composant de supprimer toute coroutine qu'il aurait ajoutée, ou bien un autre
+mécanisme d'enregistrement des coroutines auprès d'un composant ou d'un gameobject particulier
+serait nécessaire afin que la suppression de l'un supprime les autres.</p>
+<p>Il y a beaucoup d'autres problèmes qu'un
+moteur de jeu normal gérerait. En l'état actuel, il n'y a pas d'ordre dans la façon dont
+les gameobjects ou leurs composants sont exécutés. Ils sont simplement exécutés dans l'ordre
+d'ajout. De nombreux systèmes de jeu ajoutent une priorité pour que l'ordre puisse être défini ou modifié.</p>
+<p>Un autre problème que nous avons rencontré est que le composant <code class="notranslate" translate="no">Note</code> supprime la transformation de son gameobject de la scène.
+Cela semble être quelque chose qui devrait se produire dans <code class="notranslate" translate="no">GameObject</code> puisque c'est <code class="notranslate" translate="no">GameObject</code>
+qui a ajouté la transformation en premier lieu. Peut-être que <code class="notranslate" translate="no">GameObject</code> devrait avoir
+une méthode <code class="notranslate" translate="no">dispose</code> qui est appelée par <code class="notranslate" translate="no">GameObjectManager.removeGameObject</code> ?</p>
+<p>Encore un autre problème est la façon dont nous appelons manuellement <code class="notranslate" translate="no">gameObjectManager.update</code> et <code class="notranslate" translate="no">inputManager.update</code>.
+Peut-être qu'il devrait y avoir un <code class="notranslate" translate="no">SystemManager</code> auquel ces services globaux pourraient s'ajouter,
+et chaque service aurait sa fonction <code class="notranslate" translate="no">update</code> appelée. De cette façon, si nous ajoutions un nouveau
+service comme <code class="notranslate" translate="no">CollisionManager</code>, nous pourrions simplement l'ajouter au gestionnaire de système sans
+avoir à modifier la boucle de rendu.</p>
+<p>Je vous laisse le soin de régler ce genre de problèmes.
+J'espère que cet article vous a donné quelques idées pour votre propre moteur de jeu.</p>
+<p>Peut-être devrais-je promouvoir un game jam. Si vous cliquez sur les boutons <em>jsfiddle</em> ou <em>codepen</em>
+au-dessus du dernier exemple, ils s'ouvriront sur ces sites prêts à être modifiés. Ajoutez des fonctionnalités,
+changez le jeu pour qu'un carlin mène un groupe de chevaliers. Utilisez l'animation de roulade du chevalier
+comme boule de bowling et faites un jeu de bowling avec des animaux. Faites une course de relais avec des animaux.
+Si vous créez un jeu sympa, postez un lien dans les commentaires ci-dessous.</p>
+<div class="footnotes">
+[<a id="parented">1</a>] : techniquement, cela fonctionnerait toujours si aucun des parents n'a de translation, de rotation ou d'échelle <a href="#parented-backref">§</a>.
+</div>
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

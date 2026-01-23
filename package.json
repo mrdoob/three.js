@@ -1,0 +1,122 @@
+{
+  "name": "three",
+  "version": "0.182.0",
+  "description": "JavaScript 3D library",
+  "type": "module",
+  "main": "./build/three.cjs",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./addons": "./examples/jsm/Addons.js",
+    "./addons/*": "./examples/jsm/*",
+    "./src/*": "./src/*",
+    "./webgpu": "./build/three.webgpu.js",
+    "./tsl": "./build/three.tsl.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
+  "sideEffects": [
+    "./src/nodes/**/*"
+  ],
+  "files": [
+    "build",
+    "examples/jsm",
+    "examples/fonts",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
+  ],
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
+  "scripts": {
+    "start": "npm run dev",
+    "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
+    "build": "rollup -c utils/build/rollup.config.js",
+    "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
+    "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
+    "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
+    "preview": "node utils/build/preview.js",
+    "lint-core": "eslint src",
+    "lint-addons": "eslint examples/jsm",
+    "lint-examples": "eslint examples",
+    "lint-editor": "eslint editor",
+    "lint-playground": "eslint playground",
+    "lint-manual": "eslint manual",
+    "lint-test": "eslint test",
+    "lint-utils": "eslint utils",
+    "lint": "npm run lint-core",
+    "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-playground -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
+    "test-unit": "qunit test/unit/three.source.unit.js",
+    "test-unit-addons": "qunit test/unit/three.addons.unit.js",
+    "test-e2e": "node test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
+    "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
+  },
+  "keywords": [
+    "three",
+    "three.js",
+    "javascript",
+    "3d",
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webgpu",
+    "webxr",
+    "canvas",
+    "svg",
+    "html5"
+  ],
+  "author": "mrdoob",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrdoob/three.js/issues"
+  },
+  "homepage": "https://threejs.org/",
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "eslint": "^9.0.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-compat": "^6.0.0",
+    "eslint-plugin-html": "^8.1.3",
+    "eslint-plugin-jsdoc": "^62.0.0",
+    "globals": "^17.0.0",
+    "jpeg-js": "^0.4.4",
+    "jsdoc": "^4.0.5",
+    "pngjs": "^7.0.0",
+    "magic-string": "^0.30.0",
+    "puppeteer": "^24.25.0",
+    "qunit": "^2.19.4",
+    "rollup": "^4.6.0"
+  },
+  "jspm": {
+    "files": [
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "build/three.js",
+      "build/three.min.js",
+      "build/three.module.js"
+    ],
+    "directories": {}
+  }
+}

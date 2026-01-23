@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - custom fog background</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Custom Fog Background</span>
+			</div>
+
+			<small>
+				Custom Fog Background via Post-Processing.<br/>
+				Battle Damaged Sci-fi Helmet by <a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>.
+				<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, color, rangeFogFactor } from 'three/tsl';
+
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			let camera, scene, renderer;
+			let renderPipeline;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NoToneMapping; // apply tone mapping in post processing, instead
+				document.body.appendChild( renderer.domElement );
+
+				// post processing
+
+				// render scene pass
+				const scenePass = pass( scene, camera );
+				const scenePassViewZ = scenePass.getViewZNode();
+
+				// fog color
+				const fogColor = color( 0x4080cc ); // in sRGB color space
+
+				// get fog factor from the scene pass context
+				// equivalent to: scene.fog = new THREE.Fog( 0x4080cc, 2.7, 4 );
+				const fogFactor = rangeFogFactor( 2.7, 4 ).context( { getViewZ: () => scenePassViewZ } );
+
+				// tone-mapped scene pass
+				const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping, 1 );
+
+				// mix fog using fog factor and fog color
+				const compose = fogFactor.mix( scenePassTM, fogColor );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
+				renderPipeline.outputNode = compose;
+
+				//
+
+				new UltraHDRLoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+						scene.environment = texture;
+
+						// model
+
+						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+							scene.add( gltf.scene );
+
+						} );
+
+					} );
+
+				//
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 5;
+				controls.target.set( 0, - 0.1, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

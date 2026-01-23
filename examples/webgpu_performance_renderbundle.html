@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgpu - Render Bundle</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Render Bundle</span>
+			</div>
+
+			<small>
+				Performance Optimization with Render Bundles. Only supported with WebGPU.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+			let controls;
+			let gui;
+			let geometries, group;
+
+			//
+
+			const position = new THREE.Vector3();
+			const rotation = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const scale = new THREE.Vector3();
+
+			//
+
+			const api = {
+				webgpu: true,
+				renderBundle: true,
+				count: 4000,
+				opacity: 1,
+				dynamic: false
+			};
+
+
+			init();
+
+			//
+
+			function randomizeMatrix( matrix ) {
+
+				position.x = Math.random() * 80 - 40;
+				position.y = Math.random() * 80 - 40;
+				position.z = Math.random() * 80 - 40;
+
+				rotation.x = Math.random() * 2 * Math.PI;
+				rotation.y = Math.random() * 2 * Math.PI;
+				rotation.z = Math.random() * 2 * Math.PI;
+
+				quaternion.setFromEuler( rotation );
+
+				scale.x = scale.y = scale.z = 0.35 + ( Math.random() * 0.5 );
+
+				return matrix.compose( position, quaternion, scale );
+
+			}
+
+			function randomizeRotationSpeed( rotation ) {
+
+				rotation.x = Math.random() * .05;
+				rotation.y = Math.random() * .05;
+				rotation.z = Math.random() * .05;
+				return rotation;
+
+			}
+
+			function initGeometries() {
+
+				geometries = [
+					new THREE.ConeGeometry( 1.0, 2.0, 3, 1 ),
+					new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+					new THREE.PlaneGeometry( 2.0, 2, 1, 1 ),
+					new THREE.CapsuleGeometry( ),
+					new THREE.CircleGeometry( 1.0, 3 ),
+					new THREE.CylinderGeometry( 1.0, 1.0, 2.0, 3, 1 ),
+					new THREE.DodecahedronGeometry( 1.0, 0 ),
+					new THREE.IcosahedronGeometry( 1.0, 0 ),
+					new THREE.OctahedronGeometry( 1.0, 0 ),
+					new THREE.PolyhedronGeometry( [ 0, 0, 0 ], [ 0, 0, 0 ], 1, 0 ),
+					new THREE.RingGeometry( 1.0, 1.5, 3 ),
+					new THREE.SphereGeometry( 1.0, 3, 2 ),
+					new THREE.TetrahedronGeometry( 1.0, 0 ),
+					new THREE.TorusGeometry( 1.0, 0.5, 3, 3 ),
+					new THREE.TorusKnotGeometry( 1.0, 0.5, 20, 3, 1, 1 ),
+				];
+
+			}
+
+			function initMesh( count ) {
+
+				initRegularMesh( count );
+
+			}
+
+
+			function initRegularMesh( count ) {
+
+				group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const material = new THREE.MeshToonNodeMaterial( {
+						color: new THREE.Color( Math.random() * 0xffffff ),
+						side: THREE.DoubleSide,
+					} );
+
+					const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
+					randomizeMatrix( child.matrix );
+					child.matrix.decompose( child.position, child.quaternion, child.scale );
+					child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
+					child.frustumCulled = false;
+					group.add( child );
+
+				}
+
+				scene.add( group );
+
+			}
+
+			function init() {
+
+				const searchParams = new URLSearchParams( window.location.search );
+				api.webgpu = searchParams.get( 'backend' ) !== 'webgl';
+				api.renderBundle = searchParams.get( 'renderBundle' ) !== 'false';
+				api.count = parseFloat( searchParams.get( 'count' ) || 4000 );
+
+				const count = api.count;
+
+				// camera
+
+				const aspect = window.innerWidth / window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
+				camera.position.z = 50;
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: ! api.webgpu } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.inspector = new Inspector();
+				renderer.setAnimationLoop( animate );
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xc1c1c1 );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3.4 );
+				scene.add( light );
+
+				document.body.appendChild( renderer.domElement );
+
+				initGeometries();
+				initMesh( count );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 1.0;
+
+				// gui
+
+				gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( api, 'renderBundle' ).name( 'render bundle' ).onChange( reload );
+
+				gui.add( api, 'webgpu' ).onChange( reload );
+
+				gui.add( api, 'dynamic' ).onChange( () => {
+
+					group.static = ! group.static;
+
+				} );
+
+
+				// listeners
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					const width = window.innerWidth;
+					const height = window.innerHeight;
+
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( width, height );
+					group.needsUpdate = true;
+
+				}
+
+				function reload() {
+
+					const backendParam = 'backend=' + ( api.webgpu ? 'webgpu' : 'webgl' );
+					const renderBundleParam = '&renderBundle=' + ( api.renderBundle ? 'true' : 'false' );
+					const countParam = '&count=' + api.count;
+
+					location.href = location.pathname + '?' + backendParam + renderBundleParam + countParam; // relative redirect with parameters
+
+				}
+
+				function animate() {
+
+					animateMeshes();
+
+					controls.update();
+
+					renderer.render( scene, camera );
+
+				}
+
+				function animateMeshes() {
+
+					const count = api.count;
+					const loopNum = api.dynamic ? count : 0;
+
+					for ( let i = 0; i < loopNum; i ++ ) {
+
+						const child = group.children[ i ];
+						const rotationSpeed = child.userData.rotationSpeed;
+
+						child.rotation.set(
+							child.rotation.x + rotationSpeed.x,
+							child.rotation.y + rotationSpeed.y,
+							child.rotation.z + rotationSpeed.z
+						);
+
+					}
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

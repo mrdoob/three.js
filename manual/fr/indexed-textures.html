@@ -1,0 +1,631 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Textures Indexées pour la Sélection et la Couleur</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Textures Indexées pour la Sélection et la Couleur">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Textures Indexées pour la Sélection et la Couleur</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Cet article est une continuation de <a href="align-html-elements-to-3d.html">un article sur l'alignement des éléments HTML en 3D</a>.
+Si vous ne l'avez pas encore lu, vous devriez commencer par là avant de continuer ici.</p>
+<p>Parfois, l'utilisation de three.js nécessite de trouver des solutions créatives.
+Je ne suis pas sûr que ce soit une excellente solution, mais j'ai pensé la partager et
+vous pouvez voir si elle suggère des solutions pour vos besoins.</p>
+<p>Dans <a href="align-html-elements-to-3d.html">l'article précédent</a>, nous
+avons affiché les noms de pays autour d'un globe 3D. Comment pourrions-nous permettre à
+l'utilisateur de sélectionner un pays et d'afficher sa sélection ?</p>
+<p>La première idée qui vient à l'esprit est de générer la géométrie pour chaque pays.
+Nous pourrions <a href="picking.html">utiliser une solution de picking</a> comme nous l'avons vu précédemment.
+Nous construirions une géométrie 3D pour chaque pays. Si l'utilisateur clique sur le maillage de
+ce pays, nous saurions quel pays a été cliqué.</p>
+<p>Donc, juste pour vérifier cette solution, j'ai essayé de générer des maillages 3D de tous les pays
+en utilisant les mêmes données que celles que j'ai utilisées pour générer les contours
+<a href="align-html-elements-to-3d.html">dans l'article précédent</a>.
+Le résultat était un fichier GLTF (.glb) binaire de 15,5 Mo. Faire télécharger 15,5 Mo
+à l'utilisateur me semble excessif.</p>
+<p>Il existe de nombreuses façons de compresser les données. La première serait probablement
+d'appliquer un algorithme pour réduire la résolution des contours. Je n'ai pas passé
+de temps à explorer cette solution. Pour les frontières des États-Unis, c'est probablement un
+gain énorme. Pour les frontières du Canada, probablement beaucoup moins.</p>
+<p>Une autre solution serait d'utiliser simplement la compression de données réelle. Par exemple, la compression Gzip
+du fichier l'a réduit à 11 Mo. C'est 30% de moins, mais probablement pas suffisant.</p>
+<p>Nous pourrions stocker toutes les données sous forme de valeurs de plage sur 16 bits au lieu de valeurs flottantes sur 32 bits.
+Ou nous pourrions utiliser quelque chose comme <a href="https://google.github.io/draco/">la compression Draco</a>
+et peut-être que cela suffirait. Je n'ai pas vérifié et je vous encourage à vérifier
+par vous-même et à me dire comment ça se passe, car j'aimerais le savoir. 😅</p>
+<p>Dans mon cas, j'ai pensé à <a href="picking.html">la solution de picking GPU</a>
+que nous avons abordée à la fin de <a href="picking.html">l'article sur le picking</a>. Dans
+cette solution, nous avons dessiné chaque maillage avec une couleur unique qui représentait
+l'ID de ce maillage. Nous avons ensuite dessiné tous les maillages et regardé la couleur
+sur laquelle on a cliqué.</p>
+<p>En nous inspirant de cela, nous pourrions pré-générer une carte des pays où
+la couleur de chaque pays est son numéro d'index dans notre tableau de pays. Nous pourrions
+alors utiliser une technique de picking GPU similaire. Nous dessinerions le globe hors écran en utilisant
+cette texture d'index. Regarder la couleur du pixel sur lequel l'utilisateur clique
+nous donnerait l'ID du pays.</p>
+<p>Donc, j'<a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">ai écrit du code</a>
+pour générer une telle texture. La voici.</p>
+<div class="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
+
+<p>Note : Les données utilisées pour générer cette texture proviennent de <a href="http://thematicmapping.org/downloads/world_borders.php">ce site web</a>
+et sont donc sous licence <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
+<p>Elle ne fait que 217 Ko, bien mieux que les 14 Mo pour les maillages de pays. En fait, nous pourrions probablement
+même réduire la résolution, mais 217 Ko semble suffisant pour l'instant.</p>
+<p>Alors essayons de l'utiliser pour sélectionner des pays.</p>
+<p>En prenant du code de <a href="picking.html">l'exemple de picking GPU</a>, nous avons besoin
+d'une scène pour le picking.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
+pickingScene.background = new THREE.Color(0);
+</pre>
+<p>et nous devons ajouter le globe avec notre texture d'index à la
+scène de picking.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.TextureLoader();
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
+
++  const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
++  indexTexture.minFilter = THREE.NearestFilter;
++  indexTexture.magFilter = THREE.NearestFilter;
++
++  const pickingMaterial = new THREE.MeshBasicMaterial({map: indexTexture});
++  pickingScene.add(new THREE.Mesh(geometry, pickingMaterial));
+
+  const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
+  const material = new THREE.MeshBasicMaterial({map: texture});
+  scene.add(new THREE.Mesh(geometry, material));
+}
+</pre>
+<p>Ensuite, copions la classe <code class="notranslate" translate="no">GPUPickingHelper</code> que nous avons
+utilisée précédemment avec quelques modifications mineures.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GPUPickHelper {
+  constructor() {
+    // créer une cible de rendu de 1x1 pixel
+    this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
+    this.pixelBuffer = new Uint8Array(4);
+-    this.pickedObject = null;
+-    this.pickedObjectSavedColor = 0;
+  }
+  pick(cssPosition, scene, camera) {
+    const {pickingTexture, pixelBuffer} = this;
+
+    // définir le décalage de la vue pour représenter juste un seul pixel sous la souris
+    const pixelRatio = renderer.getPixelRatio();
+    camera.setViewOffset(
+        renderer.getContext().drawingBufferWidth,   // largeur totale
+        renderer.getContext().drawingBufferHeight,  // haut total
+        cssPosition.x * pixelRatio | 0,             // coordonnée x du rectangle
+        cssPosition.y * pixelRatio | 0,             // coordonnée y du rectangle
+        1,                                          // largeur du rectangle
+        1,                                          // hauteur du rectangle
+    );
+    // effectuer le rendu de la scène
+    renderer.setRenderTarget(pickingTexture);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    // effacer le décalage de la vue pour que le rendu revienne à la normale
+    camera.clearViewOffset();
+    // lire le pixel
+    renderer.readRenderTargetPixels(
+        pickingTexture,
+        0,   // x
+        0,   // y
+        1,   // width
+        1,   // height
+        pixelBuffer);
+
++    const id =
++        (pixelBuffer[0] &lt;&lt; 16) |
++        (pixelBuffer[1] &lt;&lt;  8) |
++        (pixelBuffer[2] &lt;&lt;  0);
++
++    return id;
+-    const id =
+-        (pixelBuffer[0] &lt;&lt; 16) |
+-        (pixelBuffer[1] &lt;&lt;  8) |
+-        (pixelBuffer[2]      );
+-    const intersectedObject = idToObject[id];
+-    if (intersectedObject) {
+-      // pick the first object. It's the closest one
+-      this.pickedObject = intersectedObject;
+-      // save its color
+-      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+-      // set its emissive color to flashing red/yellow
+-      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+-    }
+  }
+}
+</pre>
+<p>Maintenant, nous pouvons l'utiliser pour sélectionner des pays.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
+
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function pickCountry(event) {
+  // sortir si les données ne sont pas encore chargées
+  if (!countryInfos) {
+    return;
+  }
+
+  const position = getCanvasRelativePosition(event);
+  const id = pickHelper.pick(position, pickingScene, camera);
+  if (id &gt; 0) {
+    // nous avons cliqué sur un pays. Basculer sa propriété 'selected'
+    const countryInfo = countryInfos[id - 1];
+    const selected = !countryInfo.selected;
+    // si nous sélectionnons ce pays et que les touches modificatrices ne sont pas
+    // enfoncées, désélectionner tout le reste.
+    if (selected &amp;&amp; !event.shiftKey &amp;&amp; !event.ctrlKey &amp;&amp; !event.metaKey) {
+      unselectAllCountries();
+    }
+    numCountriesSelected += selected ? 1 : -1;
+    countryInfo.selected = selected;
+  } else if (numCountriesSelected) {
+    // l'océan ou le ciel a été cliqué
+    unselectAllCountries();
+  }
+  requestRenderIfNotRequested();
+}
+
+function unselectAllCountries() {
+  numCountriesSelected = 0;
+  countryInfos.forEach((countryInfo) =&gt; {
+    countryInfo.selected = false;
+  });
+}
+
+canvas.addEventListener('pointerup', pickCountry);
+</pre>
+<p>Le code ci-dessus définit/annule la propriété <code class="notranslate" translate="no">selected</code> sur
+le tableau de pays. Si <code class="notranslate" translate="no">shift</code> ou <code class="notranslate" translate="no">ctrl</code> ou <code class="notranslate" translate="no">cmd</code>
+est enfoncé, vous pouvez sélectionner plus d'un pays.</p>
+<p>Il ne reste plus qu'à afficher les pays sélectionnés. Pour l'instant,
+mettons simplement à jour les labels.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
+  // sortir si les données ne sont pas encore chargées
+  if (!countryInfos) {
+    return;
+  }
+
+  const large = settings.minArea * settings.minArea;
+  // obtenir une matrice qui représente une orientation relative de la caméra
+  normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
+  // obtenir la position de la caméra
+  camera.getWorldPosition(cameraPosition);
+  for (const countryInfo of countryInfos) {
+-    const {position, elem, area} = countryInfo;
+-    // large enough?
+-    if (area &lt; large) {
++    const {position, elem, area, selected} = countryInfo;
++    const largeEnough = area &gt;= large;
++    const show = selected || (numCountriesSelected === 0 &amp;&amp; largeEnough);
++    if (!show) {
+      elem.style.display = 'none';
+      continue;
+    }
+
+    ...
+</pre>
+<p>et avec cela, nous devrions pouvoir sélectionner des pays</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Le code affiche toujours les pays en fonction de leur superficie, mais si vous
+en cliquez sur un, seul celui-ci aura un label.</p>
+<p>Cela semble donc une solution raisonnable pour sélectionner des pays,
+mais qu'en est-il de la mise en évidence des pays sélectionnés ?</p>
+<p>Pour cela, nous pouvons nous inspirer des <em>graphiques palettisés</em>.</p>
+<p><a href="https://en.wikipedia.org/wiki/Palette_%28computing%29">Les graphiques palettisés</a>
+ou <a href="https://en.wikipedia.org/wiki/Indexed_color">couleurs indexées</a> sont
+ce qu'utilisaient les anciens systèmes comme l'Atari 800, l'Amiga, la NES,
+la Super Nintendo et même les anciens PC IBM. Au lieu de stocker des images bitmap
+en couleurs RGBA (8 bits par couleur, 32 octets par pixel ou plus), ils stockaient
+des images bitmap en valeurs de 8 bits ou moins. La valeur de chaque pixel était un index
+dans une palette. Par exemple, une valeur
+de 3 dans l'image signifie "afficher la couleur 3". La couleur que représente la couleur n°3 est
+définie ailleurs dans ce qu'on appelle une "palette".</p>
+<p>En JavaScript, vous pouvez l'imaginer comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
+  0, 1, 1, 1, 1, 1, 0,
+  1, 0, 0, 0, 0, 0, 1,
+  1, 0, 2, 0, 2, 0, 1,
+  1, 0, 0, 0, 0, 0, 1,
+  1, 0, 3, 3, 3, 0, 1,
+  1, 0, 0, 0, 0, 0, 1,
+  0, 1, 1, 1, 1, 1, 1,
+];
+
+const palette = [
+  [255, 255, 255],  // white
+  [  0,   0,   0],  // black
+  [  0, 255, 255],  // cyan
+  [255,   0,   0],  // red
+];
+</pre>
+<p>Où chaque pixel dans les données de l'image est un index dans la palette. Si vous interprétiez
+les données de l'image à travers la palette ci-dessus, vous obtiendriez cette image</p>
+<div class="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
+
+<p>Dans notre cas, nous avons déjà une texture ci-dessus qui a un ID différent
+par pays. Ainsi, nous pourrions utiliser cette même texture à travers une texture de palette
+pour donner à chaque pays sa propre couleur. En modifiant la texture de palette,
+nous pouvons colorer chaque pays individuellement. Par exemple, en mettant
+toute la texture de palette en noir, puis en attribuant une couleur différente à l'entrée
+d'un pays dans la palette, nous pouvons mettre en évidence uniquement ce pays.</p>
+<p>Pour réaliser des graphiques à index palettisés, il faut du code shader personnalisé.
+Modifions les shaders par défaut dans three.js.
+De cette façon, nous pourrons utiliser l'éclairage et d'autres fonctionnalités si nous le souhaitons.</p>
+<p>Comme nous l'avons vu dans <a href="optimize-lots-of-objects-animated.html">l'article sur l'animation de nombreux objets</a>,
+nous pouvons modifier les shaders par défaut en ajoutant une fonction à la propriété
+<code class="notranslate" translate="no">onBeforeCompile</code> d'un matériau.</p>
+<p>Le shader de fragment par défaut ressemble à ceci avant la compilation.</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
+#include &lt;color_pars_fragment&gt;
+#include &lt;uv_pars_fragment&gt;
+#include &lt;map_pars_fragment&gt;
+#include &lt;alphamap_pars_fragment&gt;
+#include &lt;aomap_pars_fragment&gt;
+#include &lt;lightmap_pars_fragment&gt;
+#include &lt;envmap_pars_fragment&gt;
+#include &lt;fog_pars_fragment&gt;
+#include &lt;specularmap_pars_fragment&gt;
+#include &lt;logdepthbuf_pars_fragment&gt;
+#include &lt;clipping_planes_pars_fragment&gt;
+void main() {
+    #include &lt;clipping_planes_fragment&gt;
+    vec4 diffuseColor = vec4( diffuse, opacity );
+    #include &lt;logdepthbuf_fragment&gt;
+    #include &lt;map_fragment&gt;
+    #include &lt;color_fragment&gt;
+    #include &lt;alphamap_fragment&gt;
+    #include &lt;alphatest_fragment&gt;
+    #include &lt;specularmap_fragment&gt;
+    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
+    #ifdef USE_LIGHTMAP
+        reflectedLight.indirectDiffuse += texture2D( lightMap, vLightMapUv ).xyz * lightMapIntensity;
+    #else
+        reflectedLight.indirectDiffuse += vec3( 1.0 );
+    #endif
+    #include &lt;aomap_fragment&gt;
+    reflectedLight.indirectDiffuse *= diffuseColor.rgb;
+    vec3 outgoingLight = reflectedLight.indirectDiffuse;
+    #include &lt;envmap_fragment&gt;
+    gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+    #include &lt;premultiplied_alpha_fragment&gt;
+    #include &lt;tonemapping_fragment&gt;
+    #include &lt;colorspace_fragment&gt;
+    #include &lt;fog_fragment&gt;
+}
+</pre>
+<p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">En fouillant dans tous ces extraits</a>,
+nous constatons que three.js utilise une variable appelée <code class="notranslate" translate="no">diffuseColor</code> pour gérer la
+couleur de base du matériau. Il la définit dans l'<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">extrait</a> <code class="notranslate" translate="no">&lt;color_fragment&gt;</code>,
+nous devrions donc pouvoir la modifier après ce point.</p>
+<p><code class="notranslate" translate="no">diffuseColor</code> à ce stade du shader devrait déjà être la couleur de
+notre texture de contour, nous pouvons donc chercher la couleur dans une texture de palette
+et les mélanger pour le résultat final.</p>
+<p>Comme nous l'<a href="optimize-lots-of-objects-animated.html">avons fait précédemment</a>, nous allons créer un tableau
+de chaînes de recherche et de remplacement et les appliquer au shader dans
+<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.TextureLoader();
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
+
+  const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
+  indexTexture.minFilter = THREE.NearestFilter;
+  indexTexture.magFilter = THREE.NearestFilter;
+
+  const pickingMaterial = new THREE.MeshBasicMaterial({map: indexTexture});
+  pickingScene.add(new THREE.Mesh(geometry, pickingMaterial));
+
++  const fragmentShaderReplacements = [
++    {
++      from: '#include &lt;common&gt;',
++      to: `
++        #include &lt;common&gt;
++        uniform sampler2D indexTexture;
++        uniform sampler2D paletteTexture;
++        uniform float paletteTextureWidth;
++      `,
++    },
++    {
++      from: '#include &lt;color_fragment&gt;',
++      to: `
++        #include &lt;color_fragment&gt;
++        {
++          vec4 indexColor = texture2D(indexTexture, vUv);
++          float index = indexColor.r * 255.0 + indexColor.g * 255.0 * 256.0;
++          vec2 paletteUV = vec2((index + 0.5) / paletteTextureWidth, 0.5);
++          vec4 paletteColor = texture2D(paletteTexture, paletteUV);
++          // diffuseColor.rgb += paletteColor.rgb;   // white outlines
++          diffuseColor.rgb = paletteColor.rgb - diffuseColor.rgb;  // black outlines
++        }
++      `,
++    },
++  ];
+
+  const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
+  const material = new THREE.MeshBasicMaterial({map: texture});
++  material.onBeforeCompile = function(shader) {
++    fragmentShaderReplacements.forEach((rep) =&gt; {
++      shader.fragmentShader = shader.fragmentShader.replace(rep.from, rep.to);
++    });
++  };
+  scene.add(new THREE.Mesh(geometry, material));
+}
+</pre>
+<p>Comme vous pouvez le voir ci-dessus, nous ajoutons 3 uniformes, <code class="notranslate" translate="no">indexTexture</code>, <code class="notranslate" translate="no">paletteTexture</code>,
+et <code class="notranslate" translate="no">paletteTextureWidth</code>. Nous obtenons une couleur à partir de <code class="notranslate" translate="no">indexTexture</code>
+et la convertissons en index. <code class="notranslate" translate="no">vUv</code> sont les coordonnées de texture fournies par
+three.js. Nous utilisons ensuite cet index pour obtenir une couleur à partir de la texture de palette.
+Nous mélangeons ensuite le résultat avec la <code class="notranslate" translate="no">diffuseColor</code> actuelle. La <code class="notranslate" translate="no">diffuseColor</code>
+à ce stade est notre texture de contour noir et blanc, donc si nous ajoutons les 2 couleurs,
+nous obtiendrons des contours blancs. Si nous soustrayons la couleur diffuse actuelle, nous obtiendrons
+des contours noirs.</p>
+<p>Avant de pouvoir effectuer le rendu, nous devons configurer la texture de palette
+et ces 3 uniformes.</p>
+<p>Pour la texture de palette, elle doit juste être suffisamment large pour
+contenir une couleur par pays + une pour l'océan (id = 0).
+Il y a 240 et quelques pays. Nous pourrions attendre que la
+liste des pays se charge pour obtenir un nombre exact ou le chercher.
+Il n'y a pas beaucoup de mal à choisir un nombre plus grand,
+donc choisissons 512.</p>
+<p>Voici le code pour créer la texture de palette</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
+const paletteTextureWidth = maxNumCountries;
+const paletteTextureHeight = 1;
+const palette = new Uint8Array(paletteTextureWidth * 4);
+const paletteTexture = new THREE.DataTexture(
+    palette, paletteTextureWidth, paletteTextureHeight);
+paletteTexture.minFilter = THREE.NearestFilter;
+paletteTexture.magFilter = THREE.NearestFilter;
+</pre>
+<p>Une <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> nous permet de donner des données brutes à une texture. Dans ce cas,
+nous lui donnons 512 couleurs RGBA, 4 octets chacune où chaque octet représente
+respectivement le rouge, le vert et le bleu en utilisant des valeurs allant de 0 à 255.</p>
+<p>Remplissons-la avec des couleurs aléatoires juste pour voir si ça fonctionne</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
+  palette[i] = Math.random() * 256;
+}
+// définir la couleur de l'océan (index #0)
+palette.set([100, 200, 255, 255], 0);
+paletteTexture.needsUpdate = true;
+</pre>
+<p>Chaque fois que nous voulons que three.js mette à jour la texture de palette avec
+le contenu du tableau <code class="notranslate" translate="no">palette</code>, nous devons définir <code class="notranslate" translate="no">paletteTexture.needsUpdate</code>
+sur <code class="notranslate" translate="no">true</code>.</p>
+<p>Et ensuite, nous devons toujours définir les uniformes sur le matériau.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
+const material = new THREE.MeshBasicMaterial({map: texture});
+material.onBeforeCompile = function(shader) {
+  fragmentShaderReplacements.forEach((rep) =&gt; {
+    shader.fragmentShader = shader.fragmentShader.replace(rep.from, rep.to);
+  });
++  shader.uniforms.paletteTexture = {value: paletteTexture};
++  shader.uniforms.indexTexture = {value: indexTexture};
++  shader.uniforms.paletteTextureWidth = {value: paletteTextureWidth};
+};
+scene.add(new THREE.Mesh(geometry, material));
+</pre>
+<p>et avec cela, nous obtenons des pays colorés aléatoirement.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Maintenant que nous pouvons voir que les textures d'index et de palette fonctionnent,
+manipulons la palette pour la mise en évidence.</p>
+<p>Faisons d'abord une fonction qui nous permettra de passer une couleur de style three.js
+et de nous donner les valeurs que nous pouvons mettre dans la texture de palette.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
+function get255BasedColor(color) {
+  tempColor.set(color);
+  const base = tempColor.toArray().map(v =&gt; v * 255);
+  base.push(255); // alpha
+  return base;
+}
+</pre>
+<p>L'appeler comme ceci <code class="notranslate" translate="no">color = get255BasedColor('red')</code> retournera
+un tableau comme <code class="notranslate" translate="no">[255, 0, 0, 255]</code>.</p>
+<p>Ensuite, utilisons-la pour créer quelques couleurs et remplir la
+palette.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
+const unselectedColor = get255BasedColor('#444');
+const oceanColor = get255BasedColor('rgb(100,200,255)');
+resetPalette();
+
+function setPaletteColor(index, color) {
+  palette.set(color, index * 4);
+}
+
+function resetPalette() {
+  // définir toutes les couleurs sur la couleur non sélectionnée
+  for (let i = 1; i &lt; maxNumCountries; ++i) {
+    setPaletteColor(i, unselectedColor);
+  }
+
+  // définir la couleur de l'océan (index #0)
+  setPaletteColor(0, oceanColor);
+  paletteTexture.needsUpdate = true;
+}
+</pre>
+<p>Maintenant, utilisons ces fonctions pour mettre à jour la palette lorsqu'un pays
+est sélectionné</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function pickCountry(event) {
+  // sortir si les données ne sont pas encore chargées
+  if (!countryInfos) {
+    return;
+  }
+
+  const position = getCanvasRelativePosition(event);
+  const id = pickHelper.pick(position, pickingScene, camera);
+  if (id &gt; 0) {
+    const countryInfo = countryInfos[id - 1];
+    const selected = !countryInfo.selected;
+    if (selected &amp;&amp; !event.shiftKey &amp;&amp; !event.ctrlKey &amp;&amp; !event.metaKey) {
+      unselectAllCountries();
+    }
+    numCountriesSelected += selected ? 1 : -1;
+    countryInfo.selected = selected;
++    setPaletteColor(id, selected ? selectedColor : unselectedColor);
++    paletteTexture.needsUpdate = true;
+  } else if (numCountriesSelected) {
+    unselectAllCountries();
+  }
+  requestRenderIfNotRequested();
+}
+
+function unselectAllCountries() {
+  numCountriesSelected = 0;
+  countryInfos.forEach((countryInfo) =&gt; {
+    countryInfo.selected = false;
+  });
++  resetPalette();
+}
+</pre>
+<p>et avec cela, nous devrions pouvoir mettre en évidence 1 ou plusieurs pays.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Cela semble fonctionner !</p>
+<p>Un petit détail est que nous ne pouvons pas faire tourner le globe sans changer
+l'état de sélection. Si nous sélectionnons un pays et voulons ensuite
+faire pivoter le globe, la sélection changera.</p>
+<p>Essayons de régler cela. Rapidement, nous pouvons vérifier 2 choses.
+Le temps écoulé entre le clic et le lâcher. Une autre est de savoir si
+l'utilisateur a réellement déplacé la souris. Si le
+temps est court ou s'il n'a pas bougé la souris, c'était
+probablement un clic. Sinon, il essayait probablement de
+faire glisser le globe.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
++const maxMoveDeltaSq = 5 * 5;
++const startPosition = {};
++let startTimeMs;
++
++function recordStartTimeAndPosition(event) {
++  startTimeMs = performance.now();
++  const pos = getCanvasRelativePosition(event);
++  startPosition.x = pos.x;
++  startPosition.y = pos.y;
++}
+
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function pickCountry(event) {
+  // sortir si les données ne sont pas encore chargées
+  if (!countryInfos) {
+    return;
+  }
+
++  // s'il s'est écoulé un certain temps depuis que l'utilisateur a commencé
++  // alors supposer qu'il s'agissait d'une action de glissement, pas de sélection
++  const clickTimeMs = performance.now() - startTimeMs;
++  if (clickTimeMs &gt; maxClickTimeMs) {
++    return;
++  }
++
++  // s'ils ont bougé, supposer qu'il s'agissait d'une action de glissement
++  const position = getCanvasRelativePosition(event);
++  const moveDeltaSq = (startPosition.x - position.x) ** 2 +
++                      (startPosition.y - position.y) ** 2;
++  if (moveDeltaSq &gt; maxMoveDeltaSq) {
++    return;
++  }
+
+-  const position = {x: event.clientX, y: event.clientY};
+  const id = pickHelper.pick(position, pickingScene, camera);
+  if (id &gt; 0) {
+    const countryInfo = countryInfos[id - 1];
+    const selected = !countryInfo.selected;
+    if (selected &amp;&amp; !event.shiftKey &amp;&amp; !event.ctrlKey &amp;&amp; !event.metaKey) {
+      unselectAllCountries();
+    }
+    numCountriesSelected += selected ? 1 : -1;
+    countryInfo.selected = selected;
+    setPaletteColor(id, selected ? selectedColor : unselectedColor);
+    paletteTexture.needsUpdate = true;
+  } else if (numCountriesSelected) {
+    unselectAllCountries();
+  }
+  requestRenderIfNotRequested();
+}
+
+function unselectAllCountries() {
+  numCountriesSelected = 0;
+  countryInfos.forEach((countryInfo) =&gt; {
+    countryInfo.selected = false;
+  });
+  resetPalette();
+}
+
++canvas.addEventListener('pointerdown', recordStartTimeAndPosition);
+canvas.addEventListener('pointerup', pickCountry);
+</pre>
+<p>et avec ces modifications, il <em>semble</em> que cela fonctionne pour moi.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Je ne suis pas expert en UX, donc j'aimerais savoir s'il existe une meilleure
+solution.</p>
+<p>J'espère que cela vous a donné une idée de l'utilité des graphiques indexés et de la façon dont vous pouvez modifier les shaders créés par three.js pour ajouter des fonctionnalités simples. L'utilisation de GLSL, le langage dans lequel les shaders sont écrits, est trop vaste pour cet article. Il y a quelques liens vers des informations dans <a href="post-processing.html">l'article sur le post-traitement</a>.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

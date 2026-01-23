@@ -1,0 +1,50 @@
+#material-table {
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+}
+#material-table tr:nth-child(even) {
+    background: #def;
+}
+#material-table thead>td {
+    vertical-align: bottom;
+    padding: .5em;
+}
+#material-table thead>td>a {
+    text-orientation: upright;
+    writing-mode: vertical-lr;
+    text-decoration: none;
+    display: block;
+    letter-spacing: -2px;
+}
+#material-table table {
+    border-collapse: collapse;
+    background: #cde;
+}
+#material-table td:nth-child(1) {
+    text-align: right;
+}
+#material-table td {
+    border: 1px solid black;
+    padding: .1em .5em .1em .5em;
+}
+#material-table td {
+  border: 1px solid black;
+}
+@media (max-width: 500px) {
+  #material-table {
+    font-size: small;
+  }
+  #material-table thead>td {
+      vertical-align: bottom;
+      padding: .5em 0 .5em 0;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  #material-table table {
+      background: #06488a;
+  }
+  #material-table tr:nth-child(even) {
+      background: #185795;
+  }
+}

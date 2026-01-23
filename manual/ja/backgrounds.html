@@ -1,0 +1,248 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>の背景とスカイボックス</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – の背景とスカイボックス">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>の背景とスカイボックス</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>このサイトのほとんどの記事では、背景に無地の色を使っています。</p>
+<p>静的な背景として追加するには、CSSを設定するだけで簡単にできます。
+<a href="responsive.html">Three.jsのレスポンシブデザインの記事</a>を例にすると、変更が必要なのは2箇所だけです。</p>
+<p>キャンバスにCSSを追加して背景を画像に設定する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    background: url(resources/images/daikanyama.jpg) no-repeat center center;
++    background-size: cover;
+}
+&lt;/style&gt;
+</pre>
+<p>そして、何も描画していない場所が透明になるように <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">alpha</code> を指定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
++    canvas,
++    alpha: true,
++  });
+</pre>
+<p>これで背景を設定できました。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-css.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-css.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>背景に<a href="post-processing.html">ポストプロセス効果</a>を与えたい場合は、Three.jsを使い背景を描画する必要があります。</p>
+<p>THREE.jsで簡単にできます。シーンの背景をテクスチャに設定すれば良いのです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
+scene.background = bgTexture;
+</pre>
+<p>このようになります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>背景画像がありますが、画面に合わせて引き伸ばされています。</p>
+<p>この問題はテクスチャの <code class="notranslate" translate="no">repeat</code> と <code class="notranslate" translate="no">offset</code> プロパティを設定して画像の一部だけを表示する事で解決できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
+
++  // Set the repeat and offset properties of the background texture
++  // to keep the image's aspect correct.
++  // Note the image may not have loaded yet.
++  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
++  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
++  const aspect = imageAspect / canvasAspect;
++
++  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
++  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
++
++  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
++  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>今度はThree.jsで背景を描画してます。
+CSSの時と比べて目に見える違いはありませんが、<a href="post-processing.html">ポストプロセス効果</a>を使うと背景にも影響が出て違いがわかります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background-fixed-aspect.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background-fixed-aspect.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>もちろん、静的な背景は通常は3Dシーンに求めるものではありません。
+その代わりに何らかの <em>スカイボックス</em> が欲しいです。
+スカイボックスとは空の絵が描かれたキューブの事です。
+キューブの中にカメラを入れると背景に空があるように見えます。</p>
+<p>スカイボックスを実装する最も一般的な方法は、キューブを作りテクスチャを適用して内側から描画する事です。
+キューブの各面に地平線の画像のようなテクスチャ（テクスチャ座標を使用）を貼り付けます。
+また、スカイボックスの代わりに天球やスカイドームを使う事もよくあります。
+それらでの実装は自分で調べればわかると思います。
+キューブや球体を作り<a href="textures.html">テクスチャを適用</a>し、<code class="notranslate" translate="no">THREE.BackSide</code> としてマークを付けます。
+そして、外側ではなく内側にレンダリングし、直接シーンに入れるか、上記のようにするか、2つのシーンを作るか、スカイボックス/球体/ドームを描くための特別なシーンと
+他の全てのものを描画するために使用します。
+描画には通常の <a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> を使います。<a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> は必要ないです。</p>
+<p>もう1つの解決策は <em>キューブマップ</em> を使用する事です。
+キューブマップは、キューブの側面である6つの側面を持つ特殊な種類のテクスチャです。
+標準的なテクスチャ座標を使用するのではなく、中心から外側に向けた方向を使用し、どこで色を取得するかを決定します。</p>
+<p>カリフォルニア州マウンテンビューにあるコンピュータ歴史博物館のキューブマップの画像6枚をご紹介します。</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-y.jpg" style="width: 200px" class="border">
+</div>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-y.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-z.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px" class="border">
+</div>
+
+<p><a href="/docs/#api/ja/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> を使用してキューブマップ画像を読み込み、シーンの背景として使用します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+  ]);
+  scene.background = texture;
+}
+</pre>
+<p>レンダリング時には、repeatやoffsetプロパティでテクスチャを調整する必要はありません。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
+
+-  // Set the repeat and offset properties of the background texture
+-  // to keep the image's aspect correct.
+-  // Note the image may not have loaded yet.
+-  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+-  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+-  const aspect = imageAspect / canvasAspect;
+-
+-  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
+-  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
+-
+-  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
+-  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>カメラを回転できるようにコントロールを追加してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 3;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();
+</pre>
+<p>これを試してみて下さい。
+ドラッグしてカメラを回転させ、キューブマップが周囲を取り囲んでいるのを見てみましょう。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-cubemap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-cubemap.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>もう1つの方法は正距円筒図を使用する事です。
+<a href="https://google.com/search?q=360+camera">360カメラ</a>で撮るとこんな感じの写真になります。</p>
+<p><a href="https://hdrihaven.com">このサイト</a>で見つけたのが<a href="https://hdrihaven.com/hdri/?h=tears_of_steel_bridge">こちら</a>です。</p>
+<div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
+
+<p>たいして変わらないですね。
+まず、正距円筒図をテクスチャとして読み込み、読み込み後のコールバックで <a href="/docs/#api/ja/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a> を呼び出して、正距円筒図テクスチャからキューブマップを生成します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+-  const loader = new THREE.CubeTextureLoader();
+-  const texture = loader.load([
+-    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+-  ]);
+-  scene.background = texture;
++  const loader = new THREE.TextureLoader();
++  const texture = loader.load(
++    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
++    () =&gt; {
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
++    });
+}
+</pre>
+<p>そして、これが全てです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-equirectangularmap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-equirectangularmap.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>テクスチャを読み込み時に行うのではなく、あらかじめ等角画像をキューブマップに変換しておく事ともできます。<a href="https://matheowis.github.io/HDRI-to-CubeMap/">こんなサイトもあります</a>。</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

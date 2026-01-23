@@ -1,0 +1,123 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Shadertoy Basic x40</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.autoClearColor = false;
+
+	const camera = new THREE.OrthographicCamera(
+		- 1, // left
+		1, // right
+		1, // top
+		- 1, // bottom
+		- 1, // near,
+		1, // far
+	);
+	const scene = new THREE.Scene();
+	const plane = new THREE.PlaneGeometry( 2, 2 );
+
+	const fragmentShader = `
+  #include <common>
+
+  uniform vec3 iResolution;
+  uniform float iTime;
+
+  // By iq: https://www.shadertoy.com/user/iq
+  // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+  void mainImage( out vec4 fragColor, in vec2 fragCoord )
+  {
+      // Normalized pixel coordinates (from 0 to 1)
+      vec2 uv = fragCoord/iResolution.xy;
+
+      // Time varying pixel color
+      vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx*40.0+vec3(0,2,4));
+
+      // Output to screen
+      fragColor = vec4(col,1.0);
+  }
+
+  void main() {
+    mainImage(gl_FragColor, gl_FragCoord.xy);
+  }
+  `;
+	const uniforms = {
+		iTime: { value: 0 },
+		iResolution: { value: new THREE.Vector3() },
+	};
+	const material = new THREE.ShaderMaterial( {
+		fragmentShader,
+		uniforms,
+	} );
+	scene.add( new THREE.Mesh( plane, material ) );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001; // convert to seconds
+
+		resizeRendererToDisplaySize( renderer );
+
+		const canvas = renderer.domElement;
+		uniforms.iResolution.value.set( canvas.width, canvas.height, 1 );
+		uniforms.iTime.value = time;
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
+}
+
+main();
+</script>
+</html>

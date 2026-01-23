@@ -1,0 +1,1010 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>OffscreenCanvas</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – OffscreenCanvas">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>OffscreenCanvas</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a> - это относительно новая функция браузера, которая в настоящее время доступна только в Chrome,
+ но, очевидно, будет доступна и в других браузерах. <code class="notranslate" translate="no">OffscreenCanvas</code> позволяет веб-воркеру выполнять
+ рендеринг на холст. Это способ переложить тяжелую работу, такую ​​как рендеринг сложной 3D-сцены, на веб-воркера, чтобы не замедлить скорость отклика браузера.
+ Это также означает, что данные загружаются и анализируются в воркере, поэтому возможно меньше мусора во время загрузки страницы.</p>
+<p>Начать использовать его довольно просто. Давайте разберём пример 3 вращающихся кубов из  <a href="responsive.html">статьи об отзывчивости</a>.</p>
+<p>Обычно у воркера есть свой код, разделенный в другой файл сценария. Для большинства примеров на этом сайте скрипты встроены в HTML-файл страницы, на которой они находятся.</p>
+<p>В нашем случае мы создадим файл с именем <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> и скопируем в него весь JavaScript из <a href="responsive.html">адаптивного примера</a>. Затем мы внесем изменения, необходимые для его работы в воркере.</p>
+<p>Нам все еще нужен JavaScript в нашем HTML-файле. Первое, что нам нужно сделать там, это найти холст,
+а затем передать управление этим холстом за пределы экрана, вызвав <code class="notranslate" translate="no">canvas.transferControlToOffscreen</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+
+  ...
+</pre>
+<p>Затем мы можем запустить наш воркер с  <code class="notranslate" translate="no">new Worker(pathToScript, {type: 'module'})</code>.
+и передать ему <code class="notranslate" translate="no">offscreen</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+}
+main();
+</pre>
+<p>Важно отметить, что воркеры не могут получить доступ к <code class="notranslate" translate="no">DOM</code>. Они не могут просматривать элементы HTML, а также получать события мыши или клавиатуры.
+Единственное, что они обычно могут делать, - это отвечать на отправленные им сообщения.</p>
+<p>Чтобы отправить сообщение воркеру, мы вызываем <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> and
+и передаем ему 1 или 2 аргумента. Первый аргумент - это объект JavaScript, который будет <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">клонирован</a>
+и отправлен исполнителю. Второй аргумент - это необязательный массив объектов,
+которые являются частью первого объекта, который мы хотим передать воркеру.
+Эти объекты не будут клонированы. Вместо этого они будут перенесены и перестанут существовать на главной странице.
+Прекращение существования - это, вероятно, неправильное описание, скорее они кастрированы.
+Вместо клонирования можно передавать только определенные типы объектов.
+Они включают <code class="notranslate" translate="no">OffscreenCanvas</code>, поэтому после переноса <code class="notranslate" translate="no">offscreen</code> обратно на главную страницу он бесполезен.</p>
+<p>Воркеры получают сообщения от своего обработчика сообщений <code class="notranslate" translate="no">onmessage</code>. Объект,
+который мы передали в <code class="notranslate" translate="no">postMessage</code>, прибывает в объект <code class="notranslate" translate="no">event.data</code>, переданный
+обработчику <code class="notranslate" translate="no">onmessage</code> на воркере. В приведенном выше коде объявляется <code class="notranslate" translate="no">type: 'main'</code> в объекте, который он передает воркеру. Мы создадим обработчик,
+который на основе типа будет вызывать другую функцию в воркере. Затем мы можем добавлять функции по мере необходимости и легко вызывать их с главной страницы.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
+  main,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Вы можете видеть выше, что мы просто ищем обработчик в зависимости от <code class="notranslate" translate="no">type</code>, передаем ему <code class="notranslate" translate="no">data</code>, которые были отправлены с главной страницы.</p>
+<p>Итак, теперь нам просто нужно начать изменять основной файл, который мы вставили в <code class="notranslate" translate="no">offscreencanvas-cubes.js</code>
+ <a href="responsive.html">из адаптивной статьи</a>.</p>
+<p>Затем вместо того, чтобы искать холст в DOM, мы получим его из данных события.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
+-  const canvas = document.querySelector('#c');
++function main(data) {
++  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
+  ...
+</pre>
+<p>Помня о том, что воркеры вообще не видят DOM, первая проблема, с которой мы сталкиваемся, -
+<code class="notranslate" translate="no">resizeRendererToDisplaySize</code> не может смотреть на <code class="notranslate" translate="no">canvas.clientWidth</code> и <code class="notranslate" translate="no">canvas.clientHeight</code>, поскольку это значения DOM. Вот исходный код</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>Вместо этого нам нужно будет отправлять размеры по мере их изменения воркеру. Итак, давайте добавим некоторое глобальное состояние и сохраним там ширину и высоту.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
+  width: 300,  // canvas default
+  height: 150,  // canvas default
+};
+</pre>
+<p>Затем добавим обработчик <code class="notranslate" translate="no">size</code> для обновления этих значений.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
++  state.width = data.width;
++  state.height = data.height;
++}
+
+const handlers = {
+  main,
++  size,
+};
+</pre>
+<p>Теперь мы можем изменить <code class="notranslate" translate="no">resizeRendererToDisplaySize</code>, чтобы использовать <code class="notranslate" translate="no">state.width</code> и <code class="notranslate" translate="no">state.height</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = canvas.clientWidth;
+-  const height = canvas.clientHeight;
++  const width = state.width;
++  const height = state.height;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>и где мы вычисляем аспект, который нам нужен, аналогичные изменения</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.aspect = state.width / state.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>Вернувшись на главную страницу, мы будем отправлять событие <code class="notranslate" translate="no">size</code> каждый раз, когда страница меняет размер.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
++function sendSize() {
++  worker.postMessage({
++    type: 'size',
++    width: canvas.clientWidth,
++    height: canvas.clientHeight,
++  });
++}
++
++window.addEventListener('resize', sendSize);
++sendSize();
+</pre>
+<p>Мы также вызываем его один раз, чтобы отправить начальный размер.</p>
+<p>И всего с этими несколькими изменениями, если ваш браузер полностью
+поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>, он должен работать. Прежде чем запустить его,
+давайте проверим, действительно ли браузер поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>,
+и не отобразит ли он ошибку. Сначала добавим HTML-код для отображения ошибки.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
++    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>и немного CSS для этого</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    color: white;
+}
+</pre>
+<p>а затем мы можем проверить наличие <code class="notranslate" translate="no">transferControlToOffscreen</code>, чтобы узнать, поддерживает ли браузер <code class="notranslate" translate="no">OffscreenCanvas</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
++  if (!canvas.transferControlToOffscreen) {
++    canvas.style.display = 'none';
++    document.querySelector('#noOffscreenCanvas').style.display = '';
++    return;
++  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-picking.js', {type: 'module});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  ...
+</pre>
+<p>и при этом, если ваш браузер поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>, этот пример должен работать</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Так что это здорово, но поскольку не каждый браузер поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code> на данный момент,
+давайте изменим код для работы с <code class="notranslate" translate="no">OffscreenCanvas</code>, а если нет, то вернемся к использованию холста на главной странице, как обычно.</p>
+<p>Кстати, если вам нужен OffscreenCanvas, чтобы ваша страница была отзывчивой, тогда неясно,
+в чем смысл использования запасного варианта. Возможно, в зависимости от того, выполняете ли
+вы в конечном итоге работу на главной странице или в воркере, вы можете настроить объем выполняемой работы так,
+чтобы при работе в воркере вы могли делать больше, чем при работе на главной странице. Что вы делаете, действительно зависит от вас.</p>
+<p>Первое, что нам, вероятно, следует сделать, - это отделить код three.js от кода,
+специфичного для воркера. Что мы можем использовать один и тот же код как на главной странице, так и на рабочем. Другими словами, теперь у нас будет 3 файла</p>
+<ol>
+<li><p>наш html файл.</p>
+<p><code class="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
+</li>
+<li><p>JavaScript, содержащий наш код three.js.</p>
+<p><code class="notranslate" translate="no">shared-cubes.js</code></p>
+</li>
+<li><p>наш код поддержки воркера </p>
+<p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
+</li>
+</ol>
+<p><code class="notranslate" translate="no">shared-cubes.js</code> и <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> по сути являются разделением нашего
+предыдущего файла <code class="notranslate" translate="no">offscreencanvas-cubes.js</code>. Сначала мы копируем весь файл <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> в <code class="notranslate" translate="no">shared-cube.js</code>. Затем мы переименовываем <code class="notranslate" translate="no">main</code> в <code class="notranslate" translate="no">init</code>, так как у нас уже есть <code class="notranslate" translate="no">main</code> в нашем HTML-файле, и нам нужно экспортировать <code class="notranslate" translate="no">init</code> и состояние</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+
+-const state = {
++export const state = {
+  width: 300,   // canvas default
+  height: 150,  // canvas default
+};
+
+-function main(data) {
++export function init(data) {
+  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+</pre>
+<p>и вырезать только части, не относящиеся к three.js</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
+-  state.width = data.width;
+-  state.height = data.height;
+-}
+-
+-const handlers = {
+-  main,
+-  size,
+-};
+-
+-self.onmessage = function(e) {
+-  const fn = handlers[e.data.type];
+-  if (typeof fn !== 'function') {
+-    throw new Error('no handler for type: ' + e.data.type);
+-  }
+-  fn(e.data);
+-};
+</pre>
+<p>Затем мы копируем те части, которые мы только что удалили в <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code>.
+и импорт <code class="notranslate" translate="no">shared-cubes.js</code>, а также вызов <code class="notranslate" translate="no">init</code> вместо <code class="notranslate" translate="no">main</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
+
+function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
+const handlers = {
+-  main,
++  init,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Точно так же нам нужно включить three.js и <code class="notranslate" translate="no">shared-cubes.js</code> на главную страницу.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
++import {init, state} from './shared-cubes.js';
+</pre>
+<p>Мы можем удалить HTML и CSS, которые мы добавили ранее</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+-  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
+-    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
+-  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>и немного CSS для этого</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
+-    display: flex;
+-    width: 100%;
+-    height: 100%;
+-    align-items: center;
+-    justify-content: center;
+-    background: red;
+-    color: white;
+-}
+</pre>
+<p>Затем давайте изменим код на главной странице для вызова той или иной функции запуска в зависимости от того, поддерживает ли браузер <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  if (!canvas.transferControlToOffscreen) {
+-    canvas.style.display = 'none';
+-    document.querySelector('#noOffscreenCanvas').style.display = '';
+-    return;
+-  }
+-  const offscreen = canvas.transferControlToOffscreen();
+-  const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  if (canvas.transferControlToOffscreen) {
++    startWorker(canvas);
++  } else {
++    startMainPage(canvas);
++  }
+  ...
+</pre>
+<p>Мы переместим весь код, который у нас был для настройки воркера, внутрь <code class="notranslate" translate="no">startWorker</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');
+}
+</pre>
+<p>и отправить <code class="notranslate" translate="no">init</code> вместо <code class="notranslate" translate="no">main</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+</pre>
+<p>для начала на главной странице мы можем сделать это</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+  init({canvas});
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');
+}
+</pre>
+<p>и с этим наш пример будет запускаться либо в <code class="notranslate" translate="no">OffscreenCanvas</code>, либо в качестве альтернативы запуску на главной странице.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Так что это было относительно легко. Попробуем поковырять.
+Мы возьмем код из примера RayCaster из  и  <a href="picking.html">статьи о выборе</a>
+заставим его работать за экраном.</p>
+<p>Давайте скопируем <code class="notranslate" translate="no">shared-cube.js</code> в <code class="notranslate" translate="no">shared-picking.js</code> и добавим части выбора. Копируем в <code class="notranslate" translate="no">PickHelper</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+
+const pickPosition = {x: 0, y: 0};
+const pickHelper = new PickHelper();
+</pre>
+<p>Мы обновили <code class="notranslate" translate="no">pickPosition</code> с помощью мыши вот так</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+}
+window.addEventListener('mousemove', setPickPosition);
+</pre>
+<p>Воркер не может напрямую считывать положение мыши, поэтому, как и код размера, давайте отправим сообщение с указанием положения мыши.
+Как и код размера, мы отправим позицию мыши и обновим <code class="notranslate" translate="no">pickPosition</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
++function mouse(data) {
++  pickPosition.x = data.x;
++  pickPosition.y = data.y;
++}
+
+const handlers = {
+  init,
++  mouse,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Вернувшись на нашу главную страницу, нам нужно добавить код, чтобы передать мышь воркеру или главной странице.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
+
+function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
+  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+
++  sendMouse = (x, y) =&gt; {
++    worker.postMessage({
++      type: 'mouse',
++      x,
++      y,
++    });
++  };
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+
+function startMainPage(canvas) {
+  init({canvas});
+
++  sendMouse = (x, y) =&gt; {
++    pickPosition.x = x;
++    pickPosition.y = y;
++  };
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>Затем мы можем скопировать весь код обработки мыши на главную страницу и внести незначительные изменения, чтобы использовать <code class="notranslate" translate="no">sendMouse</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  sendMouse(
++      (pos.x / canvas.clientWidth ) *  2 - 1,
++      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  pickPosition.x = -100000;
+-  pickPosition.y = -100000;
++  sendMouse(-100000, -100000);
+}
+window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
+
+window.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>и с этим выбором следует работать с <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Сделаем еще один шаг и добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. Это будет немного больше.
+<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> довольно широко используют DOM для проверки мыши, событий касания и клавиатуры.</p>
+<p>В отличие от нашего кода, мы не можем использовать объект глобального <code class="notranslate" translate="no">state</code>, не переписав весь код <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> для работы с ним. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> принимают элемент, к которому они присоединяют большинство используемых ими событий DOM. Возможно, мы могли бы передать наш собственный объект, имеющий ту же поверхность API, что и элемент DOM. Нам нужно только поддерживать функции, которые необходимы <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
+<p>Копаясь в  <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">исходном коде OrbitControls</a>
+похоже, что нам нужно обработать следующие события.</p>
+<ul>
+<li>contextmenu</li>
+<li>pointerdown</li>
+<li>pointermove</li>
+<li>pointerup</li>
+<li>touchstart</li>
+<li>touchmove</li>
+<li>touchend</li>
+<li>wheel</li>
+<li>keydown</li>
+</ul>
+<p>Для событий мыши нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
+<code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, и <code class="notranslate" translate="no">pageY</code>.</p>
+<p>Для событий нажатия клавиатуры нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
+и <code class="notranslate" translate="no">keyCode</code>.</p>
+<p>Для события wheel нам нужно только свойство <code class="notranslate" translate="no">deltaY</code></p>
+<p>А для событий касания нам понадобятся только <code class="notranslate" translate="no">pageX</code> и <code class="notranslate" translate="no">pageY</code> из свойства <code class="notranslate" translate="no">touches</code>.</p>
+<p>Итак, создадим пару прокси-объектов. Одна часть будет работать на главной странице, получать все эти события и передавать соответствующие значения свойств воркеру. Другая часть будет запускаться в воркере, получать эти события и передавать их, используя события, которые имеют ту же структуру, что и исходные события DOM, поэтому <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> не сможет определить разницу.</p>
+<p>Вот код рабочей части.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from 'three';
+
+class ElementProxyReceiver extends EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
+}
+</pre>
+<p>Все, что он делает, - это если он получает сообщение, то отправляет его. Он наследуется от <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>, который предоставляет такие методы, как <code class="notranslate" translate="no">addEventListener</code> и <code class="notranslate" translate="no">removeEventListener</code>, точно так же, как элемент DOM, поэтому, если мы передадим его в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, он должен работать.</p>
+<p><code class="notranslate" translate="no">ElementProxyReceiver</code> обрабатывает 1 элемент. В нашем случае нам нужен только один, но лучше думать головой, так что давайте заставим менеджера управлять более чем одним из них.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
+  constructor() {
+    this.targets = {};
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+  makeProxy(data) {
+    const {id} = data;
+    const proxy = new ElementProxyReceiver();
+    this.targets[id] = proxy;
+  }
+  getProxy(id) {
+    return this.targets[id];
+  }
+  handleEvent(data) {
+    this.targets[data.id].handleEvent(data.data);
+  }
+}
+</pre>
+<p>Мы можем создать экземпляр <code class="notranslate" translate="no">ProxyManager</code> и вызвать его метод makeProxy с идентификатором, который создаст <code class="notranslate" translate="no">ElementProxyReceiver</code>, который будет отвечать на сообщения с этим идентификатором.</p>
+<p>Давайте подключим его к обработчику сообщений нашего воркера.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
+
+function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+
+function makeProxy(data) {
+  proxyManager.makeProxy(data);
+}
+
+...
+
+const handlers = {
+-  init,
+-  mouse,
++  start,
++  makeProxy,
++  event: proxyManager.handleEvent,
+   size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Нам также нужно добавить <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> в начало скрипта.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+export function init(data) {
+-  const {canvas} = data;
++  const {canvas, inputElement} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
++  const controls = new OrbitControls(camera, inputElement);
++  controls.target.set(0, 0, 0);
++  controls.update();
+</pre>
+<p>Обратите внимание, что мы передаем <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нашему прокси через <code class="notranslate" translate="no">inputElement</code> вместо передачи холста, как в других примерах, отличных от <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<p>Затем мы можем переместить весь код события выбора из файла HTML в общий код three.js, а также изменить <code class="notranslate" translate="no">canvas</code> на <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+-  const rect = canvas.getBoundingClientRect();
++  const rect = inputElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  sendMouse(
+-      (pos.x / canvas.clientWidth ) *  2 - 1,
+-      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
++  pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
++  pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  sendMouse(-100000, -100000);
++  pickPosition.x = -100000;
++  pickPosition.y = -100000;
+}
+
+*inputElement.addEventListener('mousemove', setPickPosition);
+*inputElement.addEventListener('mouseout', clearPickPosition);
+*inputElement.addEventListener('mouseleave', clearPickPosition);
+
+*inputElement.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+*inputElement.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+*inputElement.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>Вернувшись на главную страницу, нам нужен код для отправки сообщений для всех событий, которые мы перечислили выше.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
+class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+  }
+}
+</pre>
+<p><code class="notranslate" translate="no">ElementProxy</code> берет элемент, события которого мы хотим проксировать. Затем он регистрирует идентификатор у воркера, выбирая его и отправляя через сообщение <code class="notranslate" translate="no">makeProxy</code>, которое мы настроили ранее. Рабочий создаст <code class="notranslate" translate="no">ElementProxyReceiver</code> и зарегистрирует его для этого идентификатора.</p>
+<p>Затем у нас есть объект обработчиков событий для регистрации. Таким образом, мы можем передавать обработчики только тех событий, которые мы хотим переслать воркеру.</p>
+<p>Когда мы запускаем воркер, мы сначала создаем прокси и передаем наши обработчики событий.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
+
++  const eventHandlers = {
++    contextmenu: preventDefaultHandler,
++    mousedown: mouseEventHandler,
++    mousemove: mouseEventHandler,
++    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
++    touchstart: touchEventHandler,
++    touchmove: touchEventHandler,
++    touchend: touchEventHandler,
++    wheel: wheelEventHandler,
++    keydown: filteredKeydownEventHandler,
++  };
++  const proxy = new ElementProxy(canvas, worker, eventHandlers);
+  worker.postMessage({
+    type: 'start',
+    canvas: offscreen,
++    canvasId: proxy.id,
+  }, [offscreen]);
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>А вот и обработчики событий. Все, что они делают, - это копируют список свойств из полученного события. Им передается функция <code class="notranslate" translate="no">sendEvent</code>, в которую они передают созданные данные. Эта функция добавит правильный идентификатор и отправит его воркеру.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mouseEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'button',
+  'pointerType',
+  'clientX',
+  'clientY',
+  'pointerId',
+  'pageX',
+  'pageY',
+]);
+const wheelEventHandlerImpl = makeSendPropertiesHandler([
+  'deltaX',
+  'deltaY',
+]);
+const keydownEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'keyCode',
+]);
+
+function wheelEventHandler(event, sendFn) {
+  event.preventDefault();
+  wheelEventHandlerImpl(event, sendFn);
+}
+
+function preventDefaultHandler(event) {
+  event.preventDefault();
+}
+
+function copyProperties(src, properties, dst) {
+  for (const name of properties) {
+      dst[name] = src[name];
+  }
+}
+
+function makeSendPropertiesHandler(properties) {
+  return function sendProperties(event, sendFn) {
+    const data = {type: event.type};
+    copyProperties(event, properties, data);
+    sendFn(data);
+  };
+}
+
+function touchEventHandler(event, sendFn) {
+  // preventDefault() fixes mousemove, mouseup and mousedown 
+  // firing when doing a simple touchup touchdown
+  // Happens only at offscreen canvas
+  event.preventDefault(); 
+  const touches = [];
+  const data = {type: event.type, touches};
+  for (let i = 0; i &lt; event.touches.length; ++i) {
+    const touch = event.touches[i];
+    touches.push({
+      pageX: touch.pageX,
+      pageY: touch.pageY,
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+  }
+  sendFn(data);
+}
+
+// The four arrow keys
+const orbitKeys = {
+  '37': true,  // left
+  '38': true,  // up
+  '39': true,  // right
+  '40': true,  // down
+};
+function filteredKeydownEventHandler(event, sendFn) {
+  const {keyCode} = event;
+  if (orbitKeys[keyCode]) {
+    event.preventDefault();
+    keydownEventHandler(event, sendFn);
+  }
+}
+</pre>
+<p>Это кажется близким к запуску, но если мы действительно попробуем, то увидим, что <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нужно еще кое-что.</p>
+<p>Один из них - <code class="notranslate" translate="no">element.focus</code>. Нам не нужно, чтобы это происходило в воркере, поэтому давайте просто добавим заглушку.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
++  focus() {
++    // no-op
++  }
+}
+</pre>
+<p>Другой - они вызывают <code class="notranslate" translate="no">event.preventDefault</code> и <code class="notranslate" translate="no">event.stopPropagation</code>. Мы уже обрабатываем это на главной странице, так что это тоже может быть пустышкой.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function noop() {
++}
+
+class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
++    data.preventDefault = noop;
++    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // no-op
+  }
+}
+</pre>
+<p>Другой - они смотрят на <code class="notranslate" translate="no">clientWidth</code> и <code class="notranslate" translate="no">clientHeight</code>. Раньше мы передавали размер, но мы можем обновить пару прокси, чтобы передать его.</p>
+<p>В воркере...</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
++  get clientWidth() {
++    return this.width;
++  }
++  get clientHeight() {
++    return this.height;
++  }
++  getBoundingClientRect() {
++    return {
++      left: this.left,
++      top: this.top,
++      width: this.width,
++      height: this.height,
++      right: this.left + this.width,
++      bottom: this.top + this.height,
++    };
++  }
+  handleEvent(data) {
++    if (data.type === 'size') {
++      this.left = data.left;
++      this.top = data.top;
++      this.width = data.width;
++      this.height = data.height;
++      return;
++    }
+    data.preventDefault = noop;
+    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // no-op
+  }
+}
+</pre>
+<p>обратно на главную страницу нам нужно отправить размер, а также левую и верхнюю позиции. Обратите внимание, что мы не обрабатываем перемещение холста, только если оно меняет размер. Если вы хотите обрабатывать перемещение, вам нужно будет вызывать <code class="notranslate" translate="no">sendSize</code> каждый раз, когда что-то перемещает холст.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
++    sendSize();
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+
++    function sendSize() {
++      const rect = element.getBoundingClientRect();
++      sendEvent({
++        type: 'size',
++        left: rect.left,
++        top: rect.top,
++        width: element.clientWidth,
++        height: element.clientHeight,
++      });
++    }
++
++    window.addEventListener('resize', sendSize);
+  }
+}
+</pre>
+<p>и в нашем общем коде three.js нам больше не нужно <code class="notranslate" translate="no">state</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
+-  width: 300,   // canvas default
+-  height: 150,  // canvas default
+-};
+
+...
+
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = state.width;
+-  const height = state.height;
++  const width = inputElement.clientWidth;
++  const height = inputElement.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+
+function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = state.width / state.height;
++    camera.aspect = inputElement.clientWidth / inputElement.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>Еще несколько приемов. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> добавляют события <code class="notranslate" translate="no">pointermove</code> и <code class="notranslate" translate="no">pointerup</code> в <code class="notranslate" translate="no">ownerDocument</code> элемента для обработки захвата мыши (когда мышь выходит за пределы окна).</p>
+<p>Далее код ссылается на глобальный <code class="notranslate" translate="no">document</code>, но в воркере нет глобального документа.</p>
+<p>Мы можем решить все это с помощью 2 быстрых приемов. В нашем рабочем коде мы повторно используем прокси для обеих задач</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
++  proxy.ownerDocument = proxy; // HACK!
++  self.document = {} // HACK!
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+</pre>
+<p>Это даст <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> возможность проверить, что соответствует их ожиданиям.</p>
+<p>Я знаю, что это было довольно сложно. Краткая версия:<code class="notranslate" translate="no">ElementProxy</code> запускается на главной странице и пересылает события DOM в <code class="notranslate" translate="no">ElementProxyReceiver</code>
+в воркере, который маскируется под <code class="notranslate" translate="no">HTMLElement</code>, который мы можем использовать как с <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, так и с нашим собственным кодом.</p>
+<p>И последнее - это наш запасной вариант, когда мы не используем OffscreenCanvas. Все, что нам нужно сделать, это передать сам холст как наш <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+-  init({canvas});
++  init({canvas, inputElement: canvas});
+  console.log('using regular canvas');
+}
+</pre>
+<p>и теперь у нас должен быть OrbitControls, работающий с OffscreenCanvas</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Это, наверное, самый сложный пример на этом сайте.
+Это немного сложно понять, потому что для каждого образца задействовано 3 файла. HTML-файл, рабочий файл, общий код three.js.</p>
+<p>Я надеюсь, что это было не так уж сложно понять, и что он предоставил несколько полезных примеров работы с three.js, OffscreenCanvas и веб-воркерами.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

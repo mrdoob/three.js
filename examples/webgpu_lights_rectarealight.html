@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - rect area light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Rect Area Light</span>
+			</div>
+
+			<small>
+				Rect area light by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+			import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
+
+			import { checker, uv } from 'three/tsl';
+
+			let renderer, scene, camera;
+			let rectLight1, rectLight2, rectLight3;
+			let timer;
+
+			init();
+
+			function init() {
+
+				THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
+
+				timer = new THREE.Timer();
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 5, - 15 );
+
+				scene = new THREE.Scene();
+
+				rectLight1 = new THREE.RectAreaLight( 0xff0000, 5, 4, 10 );
+				rectLight1.position.set( - 5, 6, 5 );
+				scene.add( rectLight1 );
+
+				rectLight2 = new THREE.RectAreaLight( 0x00ff00, 5, 4, 10 );
+				rectLight2.position.set( 0, 6, 5 );
+				scene.add( rectLight2 );
+
+				rectLight3 = new THREE.RectAreaLight( 0x0000ff, 5, 4, 10 );
+				rectLight3.position.set( 5, 6, 5 );
+				scene.add( rectLight3 );
+
+				scene.add( new RectAreaLightHelper( rectLight1 ) );
+				scene.add( new RectAreaLightHelper( rectLight2 ) );
+				scene.add( new RectAreaLightHelper( rectLight3 ) );
+
+				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0x444444 } );
+				matStdFloor.roughnessNode = checker( uv().mul( 400 ) );
+				const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
+				scene.add( mshStdFloor );
+
+				const geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 200, 16 );
+				const matKnot = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0, metalness: 0 } );
+				const meshKnot = new THREE.Mesh( geoKnot, matKnot );
+				meshKnot.position.set( 0, 5.5, 0 );
+				scene.add( meshKnot );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.copy( meshKnot.position );
+				controls.update();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = ( window.innerWidth / window.innerHeight );
+				camera.updateProjectionMatrix();
+
+			}
+
+			function animation() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				rectLight1.rotation.y += - delta;
+				rectLight2.rotation.y += delta * .5;
+				rectLight3.rotation.y += delta;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

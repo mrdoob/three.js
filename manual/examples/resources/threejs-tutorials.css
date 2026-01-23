@@ -1,0 +1,171 @@
+/* Licensed under a BSD license. See ../license.html for license */
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  user-select: none;
+}
+
+body {
+  background-color: #aaa;
+  font-family: Sans-Serif;
+}
+
+#uiContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  font-family: monospace;
+  pointer-events: none;
+
+  text-shadow:
+   -1px -1px 0 #FFF,
+    1px -1px 0 #FFF,
+    -1px 1px 0 #FFF,
+     1px 1px 0 #FFF;
+}
+#ui {
+  opacity: 0.8;
+}
+#ui>div {
+  pointer-events: none;
+}
+#ui input, #ui select, #ui option, #ui canvas {
+  pointer-events: auto;
+}
+
+.gman-slider-label, .gman-widget-label, .gman-checkbox-label {
+  font-size: small;
+  min-width: 10em;
+  text-align: right;
+}
+.gman-checkbox-label {
+  pointer-events: auto;
+}
+.gman-widget-value {
+  float: right;
+  font-size: small;
+  order: 1;
+  min-width: 3em;
+}
+
+.gman-slider-upper {
+  height: 1.5em;
+}
+.gman-slider-outer, .gman-widget-outer {
+  float: right;
+  display: flex;
+  align-items: center;
+  height: 1.7em;
+}
+.gman-widget-slider, .gman-widget-checkbox, .gman-widget-select {
+  opacity: 0.5;
+  font-size: large;
+  margin-left: .3em;
+  margin-right: .3em;
+}
+.gman-widget-select {
+  font-size: small;
+}
+.gman-widget-slider {
+  min-width: 120px;
+}
+
+
+/* styles to apply if in an iframe */
+
+html.iframe {
+    height: 100%;
+}
+body.iframe {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.iframe>.description {
+  display: none;
+}
+.iframe .divcavnas {
+  width: 100%;
+  height: 100%;
+}
+.iframe>#example {
+  width: 100%;
+  height: 100%;
+}
+#ui #rotation>canvas {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+#ui {
+    width: 200px;
+}
+
+.console {
+    font-family: monospace;
+    max-height: 50%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: auto;
+    background: #DDD;
+}
+.console>div {
+    white-space: pre-wrap;
+    border-top: 1px solid black;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.console>.error {
+    background: red;
+    color: white;
+}
+
+.contextlost {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    z-index: 10000;
+}
+.contextlost>div {
+    padding: 1em;
+    border-radius: 0.5em;
+    background: red;
+    color: white;
+}
+
+@media (max-width: 390px) {
+  pre {
+    font-size: xx-small !important;
+    max-width: 300px !important;
+  }
+  canvas {
+    width: 100%;
+  }
+  .iframe canvas {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  #uiContainer {
+    top: 120px;
+  }
+  .iframe #uiContainer {
+      top: 10px;
+  }
+}
+
+
+

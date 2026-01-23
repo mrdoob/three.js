@@ -1,0 +1,78 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - TabIndex</title>
+    <style>
+    .spread {
+      display: flex;
+      font-size: x-small;
+      text-align: center;
+    }
+    canvas {
+        margin: 5px;
+        background: pink;
+    }
+    #c3:focus {
+        outline: none;
+    }
+  </style>
+  </head>
+  <body>
+    <div class="spread">
+      <div>
+          <canvas width="100" height="100" id="c1"></canvas>
+          <div>tabindex not set</div>
+      </div>
+      <div>
+        <canvas width="100" height="100" id="c2" tabindex="0"></canvas>
+        <div>focus style not set</div>
+      </div>
+      <div>
+        <canvas width="100" height="100" id="c3" tabindex="1"></canvas>
+        <div>tabindex and<br/>focus style set</div>
+      </div>
+    </div>
+  </body>
+<script type="module">
+
+document.querySelectorAll( 'canvas' ).forEach( ( canvas ) => {
+
+	const ctx = canvas.getContext( '2d' );
+
+	function draw( str ) {
+
+		ctx.clearRect( 0, 0, canvas.width, canvas.height );
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText( str, canvas.width / 2, canvas.height / 2 );
+
+	}
+
+	draw( canvas.id );
+
+	canvas.addEventListener( 'focus', () => {
+
+		draw( 'has focus press a key' );
+
+	} );
+
+	canvas.addEventListener( 'blur', () => {
+
+		draw( 'lost focus' );
+
+	} );
+
+	canvas.addEventListener( 'keydown', ( e ) => {
+
+		draw( `keyCode: ${e.keyCode}` );
+
+	} );
+
+} );
+
+</script>
+</html>
+

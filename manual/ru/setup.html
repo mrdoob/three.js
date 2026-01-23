@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Настройка окружения </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Настройка окружения ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Настройка окружения </h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья является частью серии статей о three.js.
+Первая статья - <a href="fundamentals.html">основы Three.js</a>.
+Если вы её еще не читали, советую вам сделать это.</p>
+<p>Прежде чем мы пойдем дальше, нам нужно поговорить о настройке вашего компьютера для разработки.
+В частности, по соображениям безопасности WebGL не может напрямую использовать изображения с
+вашего жесткого диска. Это означает, что для разработки вам необходимо использовать веб-сервер.
+К счастью, веб-серверы разработки очень просты в настройке и использовании.</p>
+<p>Прежде всего, если вы хотите, вы можете скачать весь этот сайт по <a href="https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip">этой ссылке</a>.
+После загрузки дважды щелкните по zip-файлу, чтобы распаковать файлы.</p>
+<p>Затем загрузите один из этих простых веб-серверов или воспользуйтесь средствами вашего ide</p>
+<p>Если вы предпочитаете веб-сервер с пользовательским интерфейсом, есть
+<a href="https://greggman.github.io/servez" target="_blank">Servez</a>.</p>
+<p></p><div class="threejs_image border">
+  <img class="" src="../resources/servez.gif">
+</div>
+
+<p></p>
+<p>Просто укажите на папку, в которую вы распаковали файлы, нажмите "Start", затем
+перейдите в браузере на <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a> или, если
+вы хотите просмотреть примеры, перейдите в <a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>.</p>
+<p>Чтобы остановить сервер нажмите stop или выйдите из Servez.</p>
+<p>Если вы предпочитаете командную строку (как я), еще один способ заключается
+в использовании <a href="https://nodejs.org" target="_blank">node.js</a>.
+Загрузите его, установите его, затем откройте окно командной строки / консоли / терминала.
+Если вы работаете в Windows, установщик добавит специальную "Node Command Prompt", используйте ее.</p>
+<p>Затем установите <a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a> набрав в консоли</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
+</pre><p>Если вы используете OSX</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
+</pre><p>Как только вы сделали это, напишите</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
+</pre><p>Это должно вывести что-то вроде</p>
+<p></p><div class="threejs_image ">
+  <img class="" src="../resources/servez-response.png">
+</div>
+
+<p></p>
+<p>Затем в вашем браузере перейдите на <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>.</p>
+<p>Если вы не укажете путь, тогда http-сервер будет хостить(размещать на сервере) текущую папку.</p>
+<p>Если какой-либо из этих вариантов вам не по вкусу,
+<a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver" target="_blank">есть много других простых серверов на выбор</a>.</p>
+<p>Теперь, когда вы настроили сервер, мы можем перейти к <a href="textures.html">текстурам</a>.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

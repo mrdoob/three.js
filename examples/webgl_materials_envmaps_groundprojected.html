@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>
+			threejs webgl - materials - ground projected environment mapping
+		</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Ground projected environment mapping.<br>
+			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a><br>
+			<a href="https://polyhaven.com/a/blouberg_sunrise_2" target="_blank" rel="noopener">Blouberg Sunrise 2</a> by <a href="https://gregzaal.com/" target="_blank" rel="noopener">Greg Zaal</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from 'three';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+
+			const params = {
+				height: 15,
+				radius: 100,
+				enabled: true,
+			};
+
+			let camera, scene, renderer, skybox;
+
+			init().then( render );
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera(
+					40,
+					window.innerWidth / window.innerHeight,
+					1,
+					1000
+				);
+				camera.position.set( - 20, 7, 20 );
+				camera.lookAt( 0, 4, 0 );
+
+				scene = new THREE.Scene();
+
+				const hdrLoader = new HDRLoader();
+				const envMap = await hdrLoader.loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
+
+				skybox = new GroundedSkybox( envMap, params.height, params.radius );
+				skybox.position.y = params.height - 0.01;
+				scene.add( skybox );
+
+				scene.environment = envMap;
+
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+
+				const shadow = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
+
+				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
+
+					const bodyMaterial = new THREE.MeshPhysicalMaterial( {
+						color: 0x000000, metalness: 1.0, roughness: 0.8,
+						clearcoat: 1.0, clearcoatRoughness: 0.2
+					} );
+
+					const detailsMaterial = new THREE.MeshStandardMaterial( {
+						color: 0xffffff, metalness: 1.0, roughness: 0.5
+					} );
+
+					const glassMaterial = new THREE.MeshPhysicalMaterial( {
+						color: 0xffffff, metalness: 0.25, roughness: 0, transmission: 1.0
+					} );
+
+					const carModel = gltf.scene.children[ 0 ];
+					carModel.scale.multiplyScalar( 4 );
+					carModel.rotation.y = Math.PI;
+
+					carModel.getObjectByName( 'body' ).material = bodyMaterial;
+
+					carModel.getObjectByName( 'rim_fl' ).material = detailsMaterial;
+					carModel.getObjectByName( 'rim_fr' ).material = detailsMaterial;
+					carModel.getObjectByName( 'rim_rr' ).material = detailsMaterial;
+					carModel.getObjectByName( 'rim_rl' ).material = detailsMaterial;
+					carModel.getObjectByName( 'trim' ).material = detailsMaterial;
+
+					carModel.getObjectByName( 'glass' ).material = glassMaterial;
+
+					// shadow
+					const mesh = new THREE.Mesh(
+						new THREE.PlaneGeometry( 0.655 * 4, 1.3 * 4 ),
+						new THREE.MeshBasicMaterial( {
+							map: shadow, blending: THREE.MultiplyBlending, toneMapped: false, transparent: true, premultipliedAlpha: true
+						} )
+					);
+					mesh.rotation.x = - Math.PI / 2;
+					carModel.add( mesh );
+
+					scene.add( carModel );
+
+					render();
+
+				} );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				//
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.target.set( 0, 2, 0 );
+				controls.maxPolarAngle = THREE.MathUtils.degToRad( 90 );
+				controls.maxDistance = 80;
+				controls.minDistance = 20;
+				controls.enablePan = false;
+				controls.update();
+
+				document.body.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				gui.add( params, 'enabled' ).name( 'Grounded' ).onChange( function ( value ) {
+
+					if ( value ) {
+
+						scene.add( skybox );
+						scene.background = null;
+
+					} else {
+
+						scene.remove( skybox );
+						scene.background = scene.environment;
+
+					}
+
+					render();
+
+				} );
+
+				gui.open();
+			
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+		</script>
+	</body>
+</html>

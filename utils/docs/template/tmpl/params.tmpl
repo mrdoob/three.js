@@ -1,0 +1,74 @@
+<?js
+	var params = obj;
+
+	/* sort subparams under their parent params (like opts.classname) */
+	var parentParam = null;
+	params.forEach(function(param, i) {
+		var paramRegExp;
+
+		if (!param) {
+			return;
+		}
+
+		if (parentParam && parentParam.name && param.name) {
+			try {
+				paramRegExp = new RegExp('^(?:' + parentParam.name + '(?:\\[\\])*)\\.(.+)$');
+			}
+			catch (e) {
+				// there's probably a typo in the JSDoc comment that resulted in a weird
+				// parameter name
+				return;
+			}
+
+			if ( paramRegExp.test(param.name) ) {
+				param.name = RegExp.$1;
+				parentParam.subparams = parentParam.subparams || [];
+				parentParam.subparams.push(param);
+				params[i] = null;
+			}
+			else {
+				parentParam = param;
+			}
+		}
+		else {
+			parentParam = param;
+		}
+	});
+
+	/* determine if we need extra columns, "attributes" and "default" */
+	params.hasName = false;
+
+	params.forEach(function(param) {
+		if (!param) { return; }
+
+		if (param.name) {
+			params.hasName = true;
+		}
+	});
+?>
+						<table class="params">
+							<tbody>
+								<?js
+									var self = this;
+									params.forEach(function(param) {
+										if (!param) { return; }
+								?>
+								<tr>
+									<?js if (params.hasName) {?>
+									<td class="name">
+										<strong><?js= param.name ?></strong>
+									</td>
+									<?js } ?>
+									<td class="description last">
+										<?js= param.description ?>
+										<?js if (typeof param.defaultvalue !== 'undefined') { ?>
+										<p>Default is <code><?js= self.htmlsafe(param.defaultvalue) ?></code>.</p>
+										<?js } ?>
+										<?js if (param.subparams) { ?>
+										<?js= self.partial('params.tmpl', param.subparams) ?>
+										<?js } ?>
+									</td>
+								</tr>
+								<?js }); ?>
+							</tbody>
+						</table>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webaudio - visualizer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			uniform sampler2D tAudioData;
+			varying vec2 vUv;
+
+			void main() {
+
+				vec3 backgroundColor = vec3( 0.125, 0.125, 0.125 );
+				vec3 color = vec3( 1.0, 1.0, 0.0 );
+
+				float f = texture2D( tAudioData, vec2( vUv.x, 0.0 ) ).r;
+
+				float i = step( vUv.y, f ) * step( f - 0.0125, vUv.y );
+
+				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
+
+			}
+
+		</script>
+
+	</head>
+	<body>
+		<div id="overlay">
+			<button id="startButton">Play</button>
+		</div>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer<br/>
+			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let scene, camera, renderer, analyser, uniforms;
+
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
+
+			function init() {
+
+				const fftSize = 128;
+
+				//
+
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
+				//
+
+				const container = document.getElementById( 'container' );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.Camera();
+
+				//
+
+				const listener = new THREE.AudioListener();
+
+				const audio = new THREE.Audio( listener );
+				const file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
+
+				if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+					const loader = new THREE.AudioLoader();
+					loader.load( file, function ( buffer ) {
+
+						audio.setBuffer( buffer );
+						audio.play();
+
+					} );
+
+				} else {
+
+					const mediaElement = new Audio( file );
+					mediaElement.play();
+
+					audio.setMediaElementSource( mediaElement );
+
+				}
+
+				analyser = new THREE.AudioAnalyser( audio, fftSize );
+
+				//
+
+				uniforms = {
+
+					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.RedFormat ) }
+
+				};
+
+				const material = new THREE.ShaderMaterial( {
+
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+				} );
+
+				const geometry = new THREE.PlaneGeometry( 1, 1 );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				analyser.getFrequencyData();
+
+				uniforms.tAudioData.value.needsUpdate = true;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

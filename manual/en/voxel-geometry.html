@@ -1,0 +1,1133 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Voxel(Minecraft Like) Geometry</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Voxel(Minecraft Like) Geometry">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Voxel(Minecraft Like) Geometry</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>I've seen this topic come up more than once in various places.
+That is basically, "How do I make a voxel display like Minecraft".</p>
+<p>Most people first attempt this by making a cube geometry and then
+making a mesh at each voxel position. Just for fun I tried
+this. I made a 16777216 element <code class="notranslate" translate="no">Uint8Array</code> to represent
+a 256x256x256 cube of voxels.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cellSize = 256;
+const cell = new Uint8Array(cellSize * cellSize * cellSize);
+</pre>
+<p>I then made a single layer with a kind of hills of
+sine waves like this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let y = 0; y &lt; cellSize; ++y) {
+  for (let z = 0; z &lt; cellSize; ++z) {
+    for (let x = 0; x &lt; cellSize; ++x) {
+      const height = (Math.sin(x / cellSize * Math.PI * 4) + Math.sin(z / cellSize * Math.PI * 6)) * 20 + cellSize / 2;
+      if (height &gt; y &amp;&amp; height &lt; y + 1) {
+        const offset = y * cellSize * cellSize +
+                       z * cellSize +
+                       x;
+        cell[offset] = 1;
+      }
+    }
+  }
+}
+</pre>
+<p>I then walked through all the cells and if they were not
+0 I created a mesh with a cube.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshPhongMaterial({color: 'green'});
+
+for (let y = 0; y &lt; cellSize; ++y) {
+  for (let z = 0; z &lt; cellSize; ++z) {
+    for (let x = 0; x &lt; cellSize; ++x) {
+      const offset = y * cellSize * cellSize +
+                     z * cellSize +
+                     x;
+      const block = cell[offset];
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(x, y, z);
+      scene.add(mesh);
+    }
+  }
+}
+</pre>
+<p>The rest of the code is based on the example from
+<a href="rendering-on-demand.html">the article on rendering on demand</a>.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/voxel-geometry-separate-cubes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/voxel-geometry-separate-cubes.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>It takes a while to start and if you try to move the camera
+it's likely too slow. Like <a href="optimize-lots-of-objects.html">the article on how to optimize lots of objects</a>
+the problem is there are just way too many objects. 256x256
+is 65536 boxes!</p>
+<p>Using <a href="rendering-on-demand.html">the technique of merging the geometry</a>
+will fix the issue for this example but what if instead of just making
+a single layer we filled in everything below the ground with voxel.
+In other words change the loop filling in the voxels to this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let y = 0; y &lt; cellSize; ++y) {
+  for (let z = 0; z &lt; cellSize; ++z) {
+    for (let x = 0; x &lt; cellSize; ++x) {
+      const height = (Math.sin(x / cellSize * Math.PI * 4) + Math.sin(z / cellSize * Math.PI * 6)) * 20 + cellSize / 2;
+-      if (height &gt; y &amp;&amp; height &lt; y + 1) {
++      if (height &lt; y + 1) {
+        const offset = y * cellSize * cellSize +
+                       z * cellSize +
+                       x;
+        cell[offset] = 1;
+      }
+    }
+  }
+}
+</pre>
+<p>I tried it once just to see the results. It churned for
+about a minute and then crashed with <em>out of memory</em> 😅</p>
+<p>There are several issues but the biggest issue is
+we're making all these faces inside the cubes that
+we can actually never see.</p>
+<p>In other words lets say we have a box of voxels
+3x2x2. By merging cubes we're getting this</p>
+<div class="spread">
+  <div data-diagram="mergedCubes" style="height: 300px;"></div>
+</div>
+
+<p>but we really want this</p>
+<div class="spread">
+  <div data-diagram="culledCubes" style="height: 300px;"></div>
+</div>
+
+<p>In the top box there are faces between the voxels. Faces
+that are a waste since they can't be seen. It's not just
+one face between each voxel, there are 2 faces, one for
+each voxel facing its neighbor that are a waste. All these extra faces,
+especially for a large volume of voxels will kill performance.</p>
+<p>It should be clear that we can't just merge geometry.
+We need to build it ourselves, taking into account that
+if a voxel has an adjacent neighbor it doesn't need the
+face facing that neighbor.</p>
+<p>The next issue is that 256x256x256 is just too big. 16meg is a lot of memory and
+if nothing else in much of the space nothing is there so that's a lot of wasted
+memory. It's also a huge number of voxels, 16 million! That's too much to
+consider at once.</p>
+<p>A solution is to divide the area into smaller areas.
+Any area that has nothing in it needs no storage. Let's use
+32x32x32 areas (that's 32k) and only create an area if something is in it.
+We'll call one of these larger 32x32x32 areas a "cell".</p>
+<p>Let's break this into pieces. First let's make a class to manage the voxel data.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
+  }
+}
+</pre>
+<p>Let's make the function that makes geometry for a cell.
+Let's assume you pass in a cell position.
+In other words if you want the geometry for the cell that covers voxels (0-31x, 0-31y, 0-31z)
+then you'd pass in 0,0,0. For the cell that covers voxels (32-63x, 0-31y, 0-31z) you'd
+pass in 1,0,0.</p>
+<p>We need to be able to check the neighboring voxels so let's assume our class
+has a function <code class="notranslate" translate="no">getVoxel</code> that given a voxel position returns the value of
+the voxel there. In other words if you pass it 35,0,0 and the cellSize is 32
+it's going to look at cell 1,0,0 and in that cell it will look at voxel 3,0,0.
+Using this function we can look at a voxel's neighboring voxels even if they
+happen to be in neighboring cells.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
+  }
++  generateGeometryDataForCell(cellX, cellY, cellZ) {
++    const {cellSize} = this;
++    const startX = cellX * cellSize;
++    const startY = cellY * cellSize;
++    const startZ = cellZ * cellSize;
++
++    for (let y = 0; y &lt; cellSize; ++y) {
++      const voxelY = startY + y;
++      for (let z = 0; z &lt; cellSize; ++z) {
++        const voxelZ = startZ + z;
++        for (let x = 0; x &lt; cellSize; ++x) {
++          const voxelX = startX + x;
++          const voxel = this.getVoxel(voxelX, voxelY, voxelZ);
++          if (voxel) {
++            for (const {dir} of VoxelWorld.faces) {
++              const neighbor = this.getVoxel(
++                  voxelX + dir[0],
++                  voxelY + dir[1],
++                  voxelZ + dir[2]);
++              if (!neighbor) {
++                // this voxel has no neighbor in this direction so we need a face
++                // here.
++              }
++            }
++          }
++        }
++      }
++    }
++  }
+}
+
++VoxelWorld.faces = [
++  { // left
++    dir: [ -1,  0,  0, ],
++  },
++  { // right
++    dir: [  1,  0,  0, ],
++  },
++  { // bottom
++    dir: [  0, -1,  0, ],
++  },
++  { // top
++    dir: [  0,  1,  0, ],
++  },
++  { // back
++    dir: [  0,  0, -1, ],
++  },
++  { // front
++    dir: [  0,  0,  1, ],
++  },
++];
+</pre>
+<p>So using the code above we know when we need a face. Let's generate the faces.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
+  }
+  generateGeometryDataForCell(cellX, cellY, cellZ) {
+    const {cellSize} = this;
++    const positions = [];
++    const normals = [];
++    const indices = [];
+    const startX = cellX * cellSize;
+    const startY = cellY * cellSize;
+    const startZ = cellZ * cellSize;
+
+    for (let y = 0; y &lt; cellSize; ++y) {
+      const voxelY = startY + y;
+      for (let z = 0; z &lt; cellSize; ++z) {
+        const voxelZ = startZ + z;
+        for (let x = 0; x &lt; cellSize; ++x) {
+          const voxelX = startX + x;
+          const voxel = this.getVoxel(voxelX, voxelY, voxelZ);
+          if (voxel) {
+-            for (const {dir} of VoxelWorld.faces) {
++            for (const {dir, corners} of VoxelWorld.faces) {
+              const neighbor = this.getVoxel(
+                  voxelX + dir[0],
+                  voxelY + dir[1],
+                  voxelZ + dir[2]);
+              if (!neighbor) {
+                // this voxel has no neighbor in this direction so we need a face.
++                const ndx = positions.length / 3;
++                for (const pos of corners) {
++                  positions.push(pos[0] + x, pos[1] + y, pos[2] + z);
++                  normals.push(...dir);
++                }
++                indices.push(
++                  ndx, ndx + 1, ndx + 2,
++                  ndx + 2, ndx + 1, ndx + 3,
++                );
+              }
+            }
+          }
+        }
+      }
+    }
++    return {
++      positions,
++      normals,
++      indices,
+    };
+  }
+}
+
+VoxelWorld.faces = [
+  { // left
+    dir: [ -1,  0,  0, ],
++    corners: [
++      [ 0, 1, 0 ],
++      [ 0, 0, 0 ],
++      [ 0, 1, 1 ],
++      [ 0, 0, 1 ],
++    ],
+  },
+  { // right
+    dir: [  1,  0,  0, ],
++    corners: [
++      [ 1, 1, 1 ],
++      [ 1, 0, 1 ],
++      [ 1, 1, 0 ],
++      [ 1, 0, 0 ],
++    ],
+  },
+  { // bottom
+    dir: [  0, -1,  0, ],
++    corners: [
++      [ 1, 0, 1 ],
++      [ 0, 0, 1 ],
++      [ 1, 0, 0 ],
++      [ 0, 0, 0 ],
++    ],
+  },
+  { // top
+    dir: [  0,  1,  0, ],
++    corners: [
++      [ 0, 1, 1 ],
++      [ 1, 1, 1 ],
++      [ 0, 1, 0 ],
++      [ 1, 1, 0 ],
++    ],
+  },
+  { // back
+    dir: [  0,  0, -1, ],
++    corners: [
++      [ 1, 0, 0 ],
++      [ 0, 0, 0 ],
++      [ 1, 1, 0 ],
++      [ 0, 1, 0 ],
++    ],
+  },
+  { // front
+    dir: [  0,  0,  1, ],
++    corners: [
++      [ 0, 0, 1 ],
++      [ 1, 0, 1 ],
++      [ 0, 1, 1 ],
++      [ 1, 1, 1 ],
++    ],
+  },
+];
+</pre>
+<p>The code above would make basic geometry data for us. We just need to supply
+the <code class="notranslate" translate="no">getVoxel</code> function. Let's start with just one hard coded cell.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
++    this.cell = new Uint8Array(cellSize * cellSize * cellSize);
+  }
++  getCellForVoxel(x, y, z) {
++    const {cellSize} = this;
++    const cellX = Math.floor(x / cellSize);
++    const cellY = Math.floor(y / cellSize);
++    const cellZ = Math.floor(z / cellSize);
++    if (cellX !== 0 || cellY !== 0 || cellZ !== 0) {
++      return null
++    }
++    return this.cell;
++  }
++  getVoxel(x, y, z) {
++    const cell = this.getCellForVoxel(x, y, z);
++    if (!cell) {
++      return 0;
++    }
++    const {cellSize} = this;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
++    const voxelOffset = voxelY * cellSize * cellSize +
++                        voxelZ * cellSize +
++                        voxelX;
++    return cell[voxelOffset];
++  }
+  generateGeometryDataForCell(cellX, cellY, cellZ) {
+
+  ...
+}
+</pre>
+<p>This seems like it would work. Let's make a <code class="notranslate" translate="no">setVoxel</code> function
+so we can set some data.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
+    this.cell = new Uint8Array(cellSize * cellSize * cellSize);
+  }
+  getCellForVoxel(x, y, z) {
+    const {cellSize} = this;
+    const cellX = Math.floor(x / cellSize);
+    const cellY = Math.floor(y / cellSize);
+    const cellZ = Math.floor(z / cellSize);
+    if (cellX !== 0 || cellY !== 0 || cellZ !== 0) {
+      return null
+    }
+    return this.cell;
+  }
++  setVoxel(x, y, z, v) {
++    let cell = this.getCellForVoxel(x, y, z);
++    if (!cell) {
++      return;  // TODO: add a new cell?
++    }
++    const {cellSize} = this;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
++    const voxelOffset = voxelY * cellSize * cellSize +
++                        voxelZ * cellSize +
++                        voxelX;
++    cell[voxelOffset] = v;
++  }
+  getVoxel(x, y, z) {
+    const cell = this.getCellForVoxel(x, y, z);
+    if (!cell) {
+      return 0;
+    }
+    const {cellSize} = this;
+    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
+    const voxelOffset = voxelY * cellSize * cellSize +
+                        voxelZ * cellSize +
+                        voxelX;
+    return cell[voxelOffset];
+  }
+  generateGeometryDataForCell(cellX, cellY, cellZ) {
+
+  ...
+}
+</pre>
+<p>Hmmm, I see a lot of repeated code. Let's fix that up</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
++    this.cellSliceSize = cellSize * cellSize;
+    this.cell = new Uint8Array(cellSize * cellSize * cellSize);
+  }
+  getCellForVoxel(x, y, z) {
+    const {cellSize} = this;
+    const cellX = Math.floor(x / cellSize);
+    const cellY = Math.floor(y / cellSize);
+    const cellZ = Math.floor(z / cellSize);
+    if (cellX !== 0 || cellY !== 0 || cellZ !== 0) {
+      return null;
+    }
+    return this.cell;
+  }
++  computeVoxelOffset(x, y, z) {
++    const {cellSize, cellSliceSize} = this;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
++    return voxelY * cellSliceSize +
++           voxelZ * cellSize +
++           voxelX;
++  }
+  setVoxel(x, y, z, v) {
+    const cell = this.getCellForVoxel(x, y, z);
+    if (!cell) {
+      return;  // TODO: add a new cell?
+    }
+-    const {cellSize} = this;
+-    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+-    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+-    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
+-    const voxelOffset = voxelY * cellSize * cellSize +
+-                        voxelZ * cellSize +
+-                        voxelX;
++    const voxelOffset = this.computeVoxelOffset(x, y, z);
+    cell[voxelOffset] = v;
+  }
+  getVoxel(x, y, z) {
+    const cell = this.getCellForVoxel(x, y, z);
+    if (!cell) {
+      return 0;
+    }
+-    const {cellSize} = this;
+-    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+-    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+-    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
+-    const voxelOffset = voxelY * cellSize * cellSize +
+-                        voxelZ * cellSize +
+-                        voxelX;
++    const voxelOffset = this.computeVoxelOffset(x, y, z);
+    return cell[voxelOffset];
+  }
+  generateGeometryDataForCell(cellX, cellY, cellZ) {
+
+  ...
+}
+</pre>
+<p>Now let's make some code to fill out the first cell with voxels.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cellSize = 32;
+
+const world = new VoxelWorld(cellSize);
+
+for (let y = 0; y &lt; cellSize; ++y) {
+  for (let z = 0; z &lt; cellSize; ++z) {
+    for (let x = 0; x &lt; cellSize; ++x) {
+      const height = (Math.sin(x / cellSize * Math.PI * 2) + Math.sin(z / cellSize * Math.PI * 3)) * (cellSize / 6) + (cellSize / 2);
+      if (y &lt; height) {
+        world.setVoxel(x, y, z, 1);
+      }
+    }
+  }
+}
+</pre>
+<p>and some code to actually generate geometry like we covered in
+<a href="custom-buffergeometry.html">the article on custom BufferGeometry</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const {positions, normals, indices} = world.generateGeometryDataForCell(0, 0, 0);
+const geometry = new THREE.BufferGeometry();
+const material = new THREE.MeshLambertMaterial({color: 'green'});
+
+const positionNumComponents = 3;
+const normalNumComponents = 3;
+geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+geometry.setAttribute(
+    'normal',
+    new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
+geometry.setIndex(indices);
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+</pre>
+<p>let's try it</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/voxel-geometry-culled-faces.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/voxel-geometry-culled-faces.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>That seems to be working! Okay, let's add in textures.</p>
+<p>Searching on the net I found <a href="https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/resource-packs/1245961-16x-1-7-4-wip-flourish">this set</a>
+of <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA</a> licensed minecraft textures
+by <a href="https://www.minecraftforum.net/members/Joshtimus">Joshtimus</a>.
+I picked a few at random and built this <a href="https://www.google.com/search?q=texture+atlas">texture atlas</a>.</p>
+<div class="threejs_center"><img class="checkerboard" src="../examples/resources/images/minecraft/flourish-cc-by-nc-sa.png" style="width: 512px; image-rendering: pixelated;"></div>
+
+<p>To make things simple they are arranged a voxel type per column
+where the top row is the side of a voxel. The 2nd row is
+the top of voxel, and the 3rd row is the bottom of the voxel.</p>
+<p>Knowing that we can add info to our <code class="notranslate" translate="no">VoxelWorld.faces</code> data
+to specify for each face which row to use and the UVs to use
+for that face.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">VoxelWorld.faces = [
+  { // left
++    uvRow: 0,
+    dir: [ -1,  0,  0, ],
+    corners: [
+-      [ 0, 1, 0 ],
+-      [ 0, 0, 0 ],
+-      [ 0, 1, 1 ],
+-      [ 0, 0, 1 ],
++      { pos: [ 0, 1, 0 ], uv: [ 0, 1 ], },
++      { pos: [ 0, 0, 0 ], uv: [ 0, 0 ], },
++      { pos: [ 0, 1, 1 ], uv: [ 1, 1 ], },
++      { pos: [ 0, 0, 1 ], uv: [ 1, 0 ], },
+    ],
+  },
+  { // right
++    uvRow: 0,
+    dir: [  1,  0,  0, ],
+    corners: [
+-      [ 1, 1, 1 ],
+-      [ 1, 0, 1 ],
+-      [ 1, 1, 0 ],
+-      [ 1, 0, 0 ],
++      { pos: [ 1, 1, 1 ], uv: [ 0, 1 ], },
++      { pos: [ 1, 0, 1 ], uv: [ 0, 0 ], },
++      { pos: [ 1, 1, 0 ], uv: [ 1, 1 ], },
++      { pos: [ 1, 0, 0 ], uv: [ 1, 0 ], },
+    ],
+  },
+  { // bottom
++    uvRow: 1,
+    dir: [  0, -1,  0, ],
+    corners: [
+-      [ 1, 0, 1 ],
+-      [ 0, 0, 1 ],
+-      [ 1, 0, 0 ],
+-      [ 0, 0, 0 ],
++      { pos: [ 1, 0, 1 ], uv: [ 1, 0 ], },
++      { pos: [ 0, 0, 1 ], uv: [ 0, 0 ], },
++      { pos: [ 1, 0, 0 ], uv: [ 1, 1 ], },
++      { pos: [ 0, 0, 0 ], uv: [ 0, 1 ], },
+    ],
+  },
+  { // top
++    uvRow: 2,
+    dir: [  0,  1,  0, ],
+    corners: [
+-      [ 0, 1, 1 ],
+-      [ 1, 1, 1 ],
+-      [ 0, 1, 0 ],
+-      [ 1, 1, 0 ],
++      { pos: [ 0, 1, 1 ], uv: [ 1, 1 ], },
++      { pos: [ 1, 1, 1 ], uv: [ 0, 1 ], },
++      { pos: [ 0, 1, 0 ], uv: [ 1, 0 ], },
++      { pos: [ 1, 1, 0 ], uv: [ 0, 0 ], },
+    ],
+  },
+  { // back
++    uvRow: 0,
+    dir: [  0,  0, -1, ],
+    corners: [
+-      [ 1, 0, 0 ],
+-      [ 0, 0, 0 ],
+-      [ 1, 1, 0 ],
+-      [ 0, 1, 0 ],
++      { pos: [ 1, 0, 0 ], uv: [ 0, 0 ], },
++      { pos: [ 0, 0, 0 ], uv: [ 1, 0 ], },
++      { pos: [ 1, 1, 0 ], uv: [ 0, 1 ], },
++      { pos: [ 0, 1, 0 ], uv: [ 1, 1 ], },
+    ],
+  },
+  { // front
++    uvRow: 0,
+    dir: [  0,  0,  1, ],
+    corners: [
+-      [ 0, 0, 1 ],
+-      [ 1, 0, 1 ],
+-      [ 0, 1, 1 ],
+-      [ 1, 1, 1 ],
++      { pos: [ 0, 0, 1 ], uv: [ 0, 0 ], },
++      { pos: [ 1, 0, 1 ], uv: [ 1, 0 ], },
++      { pos: [ 0, 1, 1 ], uv: [ 0, 1 ], },
++      { pos: [ 1, 1, 1 ], uv: [ 1, 1 ], },
+    ],
+  },
+];
+</pre>
+<p>And we can update the code to use that data. We need to
+know the size of a tile in the texture atlas and the dimensions
+of the texture.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+-  constructor(cellSize) {
+-    this.cellSize = cellSize;
++  constructor(options) {
++    this.cellSize = options.cellSize;
++    this.tileSize = options.tileSize;
++    this.tileTextureWidth = options.tileTextureWidth;
++    this.tileTextureHeight = options.tileTextureHeight;
++    const {cellSize} = this;
++    this.cellSliceSize = cellSize * cellSize;
++    this.cell = new Uint8Array(cellSize * cellSize * cellSize);
+  }
+
+  ...
+
+  generateGeometryDataForCell(cellX, cellY, cellZ) {
+-    const {cellSize} = this;
++    const {cellSize, tileSize, tileTextureWidth, tileTextureHeight} = this;
+    const positions = [];
+    const normals = [];
++    const uvs = [];
+    const indices = [];
+    const startX = cellX * cellSize;
+    const startY = cellY * cellSize;
+    const startZ = cellZ * cellSize;
+
+    for (let y = 0; y &lt; cellSize; ++y) {
+      const voxelY = startY + y;
+      for (let z = 0; z &lt; cellSize; ++z) {
+        const voxelZ = startZ + z;
+        for (let x = 0; x &lt; cellSize; ++x) {
+          const voxelX = startX + x;
+          const voxel = this.getVoxel(voxelX, voxelY, voxelZ);
+          if (voxel) {
+            const uvVoxel = voxel - 1;  // voxel 0 is sky so for UVs we start at 0
+            // There is a voxel here but do we need faces for it?
+-            for (const {dir, corners} of VoxelWorld.faces) {
++            for (const {dir, corners, uvRow} of VoxelWorld.faces) {
+              const neighbor = this.getVoxel(
+                  voxelX + dir[0],
+                  voxelY + dir[1],
+                  voxelZ + dir[2]);
+              if (!neighbor) {
+                // this voxel has no neighbor in this direction so we need a face.
+                const ndx = positions.length / 3;
+-                for (const pos of corners) {
++                for (const {pos, uv} of corners) {
+                  positions.push(pos[0] + x, pos[1] + y, pos[2] + z);
+                  normals.push(...dir);
++                  uvs.push(
++                        (uvVoxel +   uv[0]) * tileSize / tileTextureWidth,
++                    1 - (uvRow + 1 - uv[1]) * tileSize / tileTextureHeight);
+                }
+                indices.push(
+                  ndx, ndx + 1, ndx + 2,
+                  ndx + 2, ndx + 1, ndx + 3,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      positions,
+      normals,
+      uvs,
+      indices,
+    };
+  }
+}
+</pre>
+<p>We then need to <a href="textures.html">load the texture</a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const texture = loader.load('resources/images/minecraft/flourish-cc-by-nc-sa.png', render);
+texture.magFilter = THREE.NearestFilter;
+texture.minFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
+</pre>
+<p>and pass the settings to the <code class="notranslate" translate="no">VoxelWorld</code> class</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const tileSize = 16;
++const tileTextureWidth = 256;
++const tileTextureHeight = 64;
+-const world = new VoxelWorld(cellSize);
++const world = new VoxelWorld({
++  cellSize,
++  tileSize,
++  tileTextureWidth,
++  tileTextureHeight,
++});
+</pre>
+<p>Let's actually use the UVs when we create the geometry
+and the texture when we make the material</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const {positions, normals, indices} = world.generateGeometryDataForCell(0, 0, 0);
++const {positions, normals, uvs, indices} = world.generateGeometryDataForCell(0, 0, 0);
+const geometry = new THREE.BufferGeometry();
+-const material = new THREE.MeshLambertMaterial({color: 'green'});
++const material = new THREE.MeshLambertMaterial({
++  map: texture,
++  side: THREE.DoubleSide,
++  alphaTest: 0.1,
++  transparent: true,
++});
+
+const positionNumComponents = 3;
+const normalNumComponents = 3;
++const uvNumComponents = 2;
+geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+geometry.setAttribute(
+    'normal',
+    new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
++geometry.setAttribute(
++    'uv',
++    new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
+geometry.setIndex(indices);
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+</pre>
+<p>One last thing, we actually need to set some voxels
+to use different textures.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let y = 0; y &lt; cellSize; ++y) {
+  for (let z = 0; z &lt; cellSize; ++z) {
+    for (let x = 0; x &lt; cellSize; ++x) {
+      const height = (Math.sin(x / cellSize * Math.PI * 2) + Math.sin(z / cellSize * Math.PI * 3)) * (cellSize / 6) + (cellSize / 2);
+      if (y &lt; height) {
+-        world.setVoxel(x, y, z, 1);
++        world.setVoxel(x, y, z, randInt(1, 17));
+      }
+    }
+  }
+}
+
++function randInt(min, max) {
++  return Math.floor(Math.random() * (max - min) + min);
++}
+</pre>
+<p>and with that we get textures!</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/voxel-geometry-culled-faces-with-textures.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/voxel-geometry-culled-faces-with-textures.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Let's make it support more than one cell.</p>
+<p>To do this lets store cells in an object using cell ids.
+A cell id will just be a cell's coordinates separated by
+a comma. In other words if we ask for voxel 35,0,0
+that is in cell 1,0,0 so its id is <code class="notranslate" translate="no">"1,0,0"</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class VoxelWorld {
+  constructor(options) {
+    this.cellSize = options.cellSize;
+    this.tileSize = options.tileSize;
+    this.tileTextureWidth = options.tileTextureWidth;
+    this.tileTextureHeight = options.tileTextureHeight;
+    const {cellSize} = this;
+    this.cellSliceSize = cellSize * cellSize;
+-    this.cell = new Uint8Array(cellSize * cellSize * cellSize);
++    this.cells = {};
+  }
++  computeCellId(x, y, z) {
++    const {cellSize} = this;
++    const cellX = Math.floor(x / cellSize);
++    const cellY = Math.floor(y / cellSize);
++    const cellZ = Math.floor(z / cellSize);
++    return `${cellX},${cellY},${cellZ}`;
++  }
++  getCellForVoxel(x, y, z) {
+-    const cellX = Math.floor(x / cellSize);
+-    const cellY = Math.floor(y / cellSize);
+-    const cellZ = Math.floor(z / cellSize);
+-    if (cellX !== 0 || cellY !== 0 || cellZ !== 0) {
+-      return null;
+-    }
+-    return this.cell;
++    return this.cells[this.computeCellId(x, y, z)];
+  }
+
+   ...
+}
+</pre>
+<p>and now we can make <code class="notranslate" translate="no">setVoxel</code> add new cells if
+we try to set a voxel in a cell that does not yet exist</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  setVoxel(x, y, z, v) {
+-    const cell = this.getCellForVoxel(x, y, z);
++    let cell = this.getCellForVoxel(x, y, z);
+    if (!cell) {
+-      return 0;
++      cell = this.addCellForVoxel(x, y, z);
+    }
+    const voxelOffset = this.computeVoxelOffset(x, y, z);
+    cell[voxelOffset] = v;
+  }
++  addCellForVoxel(x, y, z) {
++    const cellId = this.computeCellId(x, y, z);
++    let cell = this.cells[cellId];
++    if (!cell) {
++      const {cellSize} = this;
++      cell = new Uint8Array(cellSize * cellSize * cellSize);
++      this.cells[cellId] = cell;
++    }
++    return cell;
++  }
+</pre>
+<p>Let's make this editable.</p>
+<p>First we`ll add a UI. Using radio buttons we can make an 8x2
+array of tiles</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="ui"&gt;
++    &lt;div class="tiles"&gt;
++      &lt;input type="radio" name="voxel" id="voxel1" value="1"&gt;&lt;label for="voxel1" style="background-position:   -0% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel2" value="2"&gt;&lt;label for="voxel2" style="background-position: -100% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel3" value="3"&gt;&lt;label for="voxel3" style="background-position: -200% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel4" value="4"&gt;&lt;label for="voxel4" style="background-position: -300% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel5" value="5"&gt;&lt;label for="voxel5" style="background-position: -400% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel6" value="6"&gt;&lt;label for="voxel6" style="background-position: -500% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel7" value="7"&gt;&lt;label for="voxel7" style="background-position: -600% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel8" value="8"&gt;&lt;label for="voxel8" style="background-position: -700% -0%"&gt;&lt;/label&gt;
++    &lt;/div&gt;
++    &lt;div class="tiles"&gt;
++      &lt;input type="radio" name="voxel" id="voxel9"  value="9" &gt;&lt;label for="voxel9"  style="background-position:  -800% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel10" value="10"&gt;&lt;label for="voxel10" style="background-position:  -900% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel11" value="11"&gt;&lt;label for="voxel11" style="background-position: -1000% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel12" value="12"&gt;&lt;label for="voxel12" style="background-position: -1100% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel13" value="13"&gt;&lt;label for="voxel13" style="background-position: -1200% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel14" value="14"&gt;&lt;label for="voxel14" style="background-position: -1300% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel15" value="15"&gt;&lt;label for="voxel15" style="background-position: -1400% -0%"&gt;&lt;/label&gt;
++      &lt;input type="radio" name="voxel" id="voxel16" value="16"&gt;&lt;label for="voxel16" style="background-position: -1500% -0%"&gt;&lt;/label&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>And add some CSS to style it, display the tiles and highlight
+the current selection</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
++#ui {
++    position: absolute;
++    left: 10px;
++    top: 10px;
++    background: rgba(0, 0, 0, 0.8);
++    padding: 5px;
++}
++#ui input[type=radio] {
++  width: 0;
++  height: 0;
++  display: none;
++}
++#ui input[type=radio] + label {
++  background-image: url('resources/images/minecraft/flourish-cc-by-nc-sa.png');
++  background-size: 1600% 400%;
++  image-rendering: pixelated;
++  width: 64px;
++  height: 64px;
++  display: inline-block;
++}
++#ui input[type=radio]:checked + label {
++  outline: 3px solid red;
++}
++@media (max-width: 600px), (max-height: 600px) {
++  #ui input[type=radio] + label {
++    width: 32px;
++    height: 32px;
++  }
++}
+</pre>
+<p>The UX will be as follows. If no tile is selected and you click a voxel that
+voxel will be erased or if you click a voxel and are holding the shift key it
+will be erased. Otherwise if a tiles is selected it will be added. You can
+deselect the selected tile type by clicking it again.</p>
+<p>This code will let the user unselect the highlighted
+radio button.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let currentVoxel = 0;
+let currentId;
+
+document.querySelectorAll('#ui .tiles input[type=radio][name=voxel]').forEach((elem) =&gt; {
+  elem.addEventListener('click', allowUncheck);
+});
+
+function allowUncheck() {
+  if (this.id === currentId) {
+    this.checked = false;
+    currentId = undefined;
+    currentVoxel = 0;
+  } else {
+    currentId = this.id;
+    currentVoxel = parseInt(this.value);
+  }
+}
+</pre>
+<p>And this below code will let us set a voxel based on where
+the user clicks. It uses code similar to the code we
+made in <a href="picking.html">the article on picking</a>
+but it's not using the built in <code class="notranslate" translate="no">RayCaster</code>. Instead
+it's using <code class="notranslate" translate="no">VoxelWorld.intersectRay</code> which returns
+the position of intersection and the normal of the face
+hit.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function placeVoxel(event) {
+  const pos = getCanvasRelativePosition(event);
+  const x = (pos.x / canvas.width ) *  2 - 1;
+  const y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+
+  const start = new THREE.Vector3();
+  const end = new THREE.Vector3();
+  start.setFromMatrixPosition(camera.matrixWorld);
+  end.set(x, y, 1).unproject(camera);
+
+  const intersection = world.intersectRay(start, end);
+  if (intersection) {
+    const voxelId = event.shiftKey ? 0 : currentVoxel;
+    // the intersection point is on the face. That means
+    // the math imprecision could put us on either side of the face.
+    // so go half a normal into the voxel if removing (currentVoxel = 0)
+    // our out of the voxel if adding (currentVoxel  &gt; 0)
+    const pos = intersection.position.map((v, ndx) =&gt; {
+      return v + intersection.normal[ndx] * (voxelId &gt; 0 ? 0.5 : -0.5);
+    });
+    world.setVoxel(...pos, voxelId);
+    updateVoxelGeometry(...pos);
+    requestRenderIfNotRequested();
+  }
+}
+
+const mouse = {
+  x: 0,
+  y: 0,
+};
+
+function recordStartPosition(event) {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+  mouse.moveX = 0;
+  mouse.moveY = 0;
+}
+function recordMovement(event) {
+  mouse.moveX += Math.abs(mouse.x - event.clientX);
+  mouse.moveY += Math.abs(mouse.y - event.clientY);
+}
+function placeVoxelIfNoMovement(event) {
+  if (mouse.moveX &lt; 5 &amp;&amp; mouse.moveY &lt; 5) {
+    placeVoxel(event);
+  }
+  window.removeEventListener('pointermove', recordMovement);
+  window.removeEventListener('pointerup', placeVoxelIfNoMovement);
+}
+canvas.addEventListener('pointerdown', (event) =&gt; {
+  event.preventDefault();
+  recordStartPosition(event);
+  window.addEventListener('pointermove', recordMovement);
+  window.addEventListener('pointerup', placeVoxelIfNoMovement);
+}, {passive: false});
+canvas.addEventListener('touchstart', (event) =&gt; {
+  // stop scrolling
+  event.preventDefault();
+}, {passive: false});
+</pre>
+<p>There's a lot going on in the code above. Basically the mouse
+has a dual purpose. One is to move the camera. The other is to
+edit the world. Placing/Erasing a voxel happen when you let off the mouse
+but only if you have not moved the mouse since you first pressed down.
+This is just a guess that if you did move the mouse you were trying
+to move the camera, not place a block. <code class="notranslate" translate="no">moveX</code> and <code class="notranslate" translate="no">moveY</code> are
+in absolute movement so if you move to the left 10 and then back to
+the right 10 you'll have moved 20 units. In that case the user likely
+was just rotating the model back and forth and does not want to
+place a block. I didn't do any testing to see if <code class="notranslate" translate="no">5</code> is a good range or not. </p>
+<p>In the code we call <code class="notranslate" translate="no">world.setVoxel</code> to set a voxel and
+then <code class="notranslate" translate="no">updateVoxelGeometry</code> to update the three.js geometry
+based on what's changed.</p>
+<p>Let's make that now. If the user clicks a
+voxel on the edge of a cell then the geometry for the voxel
+in the adjacent cell might need new geometry. This means
+we need to check the cell for the voxel we just edited
+as well as in all 6 directions from that cell.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const neighborOffsets = [
+  [ 0,  0,  0], // self
+  [-1,  0,  0], // left
+  [ 1,  0,  0], // right
+  [ 0, -1,  0], // down
+  [ 0,  1,  0], // up
+  [ 0,  0, -1], // back
+  [ 0,  0,  1], // front
+];
+function updateVoxelGeometry(x, y, z) {
+  const updatedCellIds = {};
+  for (const offset of neighborOffsets) {
+    const ox = x + offset[0];
+    const oy = y + offset[1];
+    const oz = z + offset[2];
+    const cellId = world.computeCellId(ox, oy, oz);
+    if (!updatedCellIds[cellId]) {
+      updatedCellIds[cellId] = true;
+      updateCellGeometry(ox, oy, oz);
+    }
+  }
+}
+</pre>
+<p>I thought about checking for adjacent cells like </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+if (voxelX === 0) {
+  // update cell to the left
+} else if (voxelX === cellSize - 1) {
+  // update cell to the right
+}
+</pre>
+<p>and there would be 4 more checks for the other 4 directions
+but it occurred to me the code would be much simpler with
+just an array of offsets and saving off the cell ids of
+the cells we already updated. If the updated voxel is not
+on the edge of a cell then the test will quickly reject updating
+the same cell.</p>
+<p>For <code class="notranslate" translate="no">updateCellGeometry</code> we're just going to take the code we
+had before that was generating the geometry for one cell
+and make it handle multiple cells.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cellIdToMesh = {};
+function updateCellGeometry(x, y, z) {
+  const cellX = Math.floor(x / cellSize);
+  const cellY = Math.floor(y / cellSize);
+  const cellZ = Math.floor(z / cellSize);
+  const cellId = world.computeCellId(x, y, z);
+  let mesh = cellIdToMesh[cellId];
+  const geometry = mesh ? mesh.geometry : new THREE.BufferGeometry();
+
+  const {positions, normals, uvs, indices} = world.generateGeometryDataForCell(cellX, cellY, cellZ);
+  const positionNumComponents = 3;
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+  const normalNumComponents = 3;
+  geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
+  const uvNumComponents = 2;
+  geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
+  geometry.setIndex(indices);
+  geometry.computeBoundingSphere();
+
+  if (!mesh) {
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.name = cellId;
+    cellIdToMesh[cellId] = mesh;
+    scene.add(mesh);
+    mesh.position.set(cellX * cellSize, cellY * cellSize, cellZ * cellSize);
+  }
+}
+</pre>
+<p>The code above checks a map of cell ids to meshes. If
+we ask for a cell that doesn't exist a new <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> is made
+and added to the correct place in world space.
+At the end we update the attributes and indices with the new data.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/voxel-geometry-culled-faces-ui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/voxel-geometry-culled-faces-ui.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Some notes:</p>
+<p><code class="notranslate" translate="no">RayCaster</code> might have worked just fine. I didn't try it.
+Instead I found <a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf">a voxel specific raycaster</a>.
+that is optimized for voxels.</p>
+<p>I made <code class="notranslate" translate="no">intersectRay</code> part of VoxelWorld because it seemed
+like if it gets too slow we could raycast against cells
+before raycasting on voxels as a simple speed up if it becomes
+too slow.</p>
+<p>You might want to change the length of the raycast
+as currently it's all the way to Z-far. I expect if the
+user clicks something too far way they don't really want
+to be placing blocks on the other side of the world that
+are 1 or 2 pixel large.</p>
+<p>Calling <code class="notranslate" translate="no">geometry.computeBoundingSphere</code> might be slow.
+We could just manually set the bounding sphere to the fit
+the entire cell.</p>
+<p>Do we want remove cells if all voxels in that cell are 0?
+That would probably be reasonable change if we wanted to ship this.</p>
+<p>Thinking about how this works it's clear the absolute
+worst case is a checkerboard of on and off voxels. I don't
+know off the top of my head what other strategies to use
+if things get too slow. Maybe getting too slow would just
+encourage the user not to make giant checkerboard areas.</p>
+<p>To keep it simple the texture atlas is just 1 column
+per voxel type. It would be better to make something more
+flexible where we have a table of voxel types and each
+type can specify where its face textures are in the atlas.
+As it is lots of space is wasted.</p>
+<p>Looking at real minecraft there are tiles that are not
+voxels, not cubes. Like a fence tile or flowers. To do that
+we'd again need some table of voxel types and for each
+voxel whether it's a cube or some other geometry. If it's
+not a cube the neighbor check when generating the geometry
+would also need to change. A flower voxel next to another
+voxel should not remove the faces between them.</p>
+<p>If you want to make some minecraft like thing using three.js
+I hope this has given you some ideas where to start and how
+to generate some what efficient geometry.</p>
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-voxel-geometry.js"></script>
+
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
