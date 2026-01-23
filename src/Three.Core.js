@@ -111,6 +111,7 @@ export { QuaternionLinearInterpolant } from './math/interpolants/QuaternionLinea
 export { LinearInterpolant } from './math/interpolants/LinearInterpolant.js';
 export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js';
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
+export { BezierInterpolant } from './math/interpolants/BezierInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
 export { MathUtils } from './math/MathUtils.js';
