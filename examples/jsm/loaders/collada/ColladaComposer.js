@@ -11,6 +11,8 @@ import {
 	Float32BufferAttribute,
 	FrontSide,
 	Group,
+	InterpolateBezier,
+	InterpolateDiscrete,
 	Line,
 	LineBasicMaterial,
 	LineSegments,
@@ -60,6 +62,15 @@ class ColladaComposer {
 		this.quaternion = new Quaternion();
 		this.matrix = new Matrix4();
 
+		// Storage for deferred pivot animation data
+		// Nodes with pivot transforms need all their animation channels collected
+		// before building tracks, as channels may be split across animation elements
+		this.deferredPivotAnimations = {};
+
+		// Storage for transform node hierarchy
+		// Maps nodeId -> transformSid -> Object3D for animation targeting
+		this.transformNodes = {};
+
 	}
 
 	compose() {
@@ -102,8 +113,6 @@ class ColladaComposer {
 
 	}
 
-	// get
-
 	getBuild( data, builder ) {
 
 		if ( data.build !== undefined ) return data.build;
@@ -120,8 +129,6 @@ class ColladaComposer {
 
 	}
 
-	// animation
-
 	buildAnimation( data ) {
 
 		const tracks = [];
@@ -130,22 +137,58 @@ class ColladaComposer {
 		const samplers = data.samplers;
 		const sources = data.sources;
 
-		for ( const target in channels ) {
+		const aggregated = this.aggregateAnimationChannels( channels, samplers, sources );
 
-			if ( channels.hasOwnProperty( target ) ) {
+		for ( const nodeId in aggregated ) {
 
-				const channel = channels[ target ];
-				const sampler = samplers[ channel.sampler ];
+			const nodeData = this.library.nodes[ nodeId ];
+			if ( ! nodeData ) continue;
 
-				const inputId = sampler.inputs.INPUT;
-				const outputId = sampler.inputs.OUTPUT;
+			const nodeChannels = aggregated[ nodeId ];
 
-				const inputSource = sources[ inputId ];
-				const outputSource = sources[ outputId ];
+			if ( this.hasPivotTransforms( nodeData ) ) {
 
-				const animation = this.buildAnimationChannel( channel, inputSource, outputSource );
+				// Defer - nodes haven't been built yet
+				this.collectDeferredPivotAnimation( nodeId, nodeChannels );
 
-				this.createKeyframeTracks( animation, tracks );
+			} else {
+
+				const object3D = this.getNode( nodeId );
+				let rotationTrackBuilt = false;
+
+				for ( const sid in nodeChannels ) {
+
+					const transformType = nodeData.transforms[ sid ];
+					const transformInfo = nodeData.transformData[ sid ];
+					const channelData = nodeChannels[ sid ];
+
+					switch ( transformType ) {
+
+						case 'matrix':
+							this.buildMatrixTracks( object3D, channelData, nodeData, tracks );
+							break;
+
+						case 'translate':
+							this.buildTranslateTrack( object3D, channelData, transformInfo, tracks );
+							break;
+
+						case 'rotate':
+							if ( ! rotationTrackBuilt ) {
+
+								this.buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks );
+								rotationTrackBuilt = true;
+
+							}
+
+							break;
+
+						case 'scale':
+							this.buildScaleTrack( object3D, channelData, transformInfo, tracks );
+							break;
+
+					}
+
+				}
 
 			}
 
@@ -155,82 +198,536 @@ class ColladaComposer {
 
 	}
 
+	collectDeferredPivotAnimation( nodeId, nodeChannels ) {
+
+		if ( ! this.deferredPivotAnimations[ nodeId ] ) {
+
+			this.deferredPivotAnimations[ nodeId ] = {};
+
+		}
+
+		const deferred = this.deferredPivotAnimations[ nodeId ];
+
+		for ( const sid in nodeChannels ) {
+
+			if ( ! deferred[ sid ] ) {
+
+				deferred[ sid ] = {};
+
+			}
+
+			for ( const member in nodeChannels[ sid ] ) {
+
+				deferred[ sid ][ member ] = nodeChannels[ sid ][ member ];
+
+			}
+
+		}
+
+	}
+
+	hasPivotTransforms( nodeData ) {
+
+		const pivotSids = [
+			'rotatePivot', 'rotatePivotInverse', 'rotatePivotTranslation',
+			'scalePivot', 'scalePivotInverse', 'scalePivotTranslation'
+		];
+
+		for ( const sid of pivotSids ) {
+
+			if ( nodeData.transforms[ sid ] !== undefined ) {
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
 	getAnimation( id ) {
 
 		return this.getBuild( this.library.animations[ id ], this.buildAnimation.bind( this ) );
 
 	}
 
-	buildAnimationChannel( channel, inputSource, outputSource ) {
+	aggregateAnimationChannels( channels, samplers, sources ) {
 
-		const node = this.library.nodes[ channel.id ];
-		const object3D = this.getNode( node.id );
+		const aggregated = {};
 
-		const transform = node.transforms[ channel.sid ];
-		const defaultMatrix = node.matrix.clone().transpose();
+		for ( const target in channels ) {
 
-		let time, stride;
-		let i, il, j, jl;
+			if ( ! channels.hasOwnProperty( target ) ) continue;
 
+			const channel = channels[ target ];
+			const sampler = samplers[ channel.sampler ];
+
+			const inputId = sampler.inputs.INPUT;
+			const outputId = sampler.inputs.OUTPUT;
+
+			const inputSource = sources[ inputId ];
+			const outputSource = sources[ outputId ];
+
+			const interpolationId = sampler.inputs.INTERPOLATION;
+			const inTangentId = sampler.inputs.IN_TANGENT;
+			const outTangentId = sampler.inputs.OUT_TANGENT;
+
+			const interpolationSource = interpolationId ? sources[ interpolationId ] : null;
+			const inTangentSource = inTangentId ? sources[ inTangentId ] : null;
+			const outTangentSource = outTangentId ? sources[ outTangentId ] : null;
+
+			const nodeId = channel.id;
+			const sid = channel.sid;
+			const member = channel.member || 'default';
+
+			if ( ! aggregated[ nodeId ] ) aggregated[ nodeId ] = {};
+			if ( ! aggregated[ nodeId ][ sid ] ) aggregated[ nodeId ][ sid ] = {};
+
+			aggregated[ nodeId ][ sid ][ member ] = {
+				times: inputSource.array,
+				values: outputSource.array,
+				stride: outputSource.stride,
+				arraySyntax: channel.arraySyntax,
+				indices: channel.indices,
+				interpolation: interpolationSource ? interpolationSource.array : null,
+				inTangent: inTangentSource ? inTangentSource.array : null,
+				outTangent: outTangentSource ? outTangentSource.array : null,
+				inTangentStride: inTangentSource ? inTangentSource.stride : 0,
+				outTangentStride: outTangentSource ? outTangentSource.stride : 0
+			};
+
+		}
+
+		return aggregated;
+
+	}
+
+	buildMatrixTracks( object3D, channelData, nodeData, tracks ) {
+
+		const defaultMatrix = nodeData.matrix.clone().transpose();
 		const data = {};
 
-		// the collada spec allows the animation of data in various ways.
-		// depending on the transform type (matrix, translate, rotate, scale), we execute different logic
+		for ( const member in channelData ) {
 
-		switch ( transform ) {
+			const component = channelData[ member ];
+			const times = component.times;
+			const values = component.values;
+			const stride = component.stride;
 
-			case 'matrix':
+			for ( let i = 0, il = times.length; i < il; i ++ ) {
 
-				for ( i = 0, il = inputSource.array.length; i < il; i ++ ) {
+				const time = times[ i ];
+				const valueOffset = i * stride;
 
-					time = inputSource.array[ i ];
-					stride = i * outputSource.stride;
+				if ( data[ time ] === undefined ) data[ time ] = {};
 
-					if ( data[ time ] === undefined ) data[ time ] = {};
+				if ( component.arraySyntax === true ) {
 
-					if ( channel.arraySyntax === true ) {
+					const value = values[ valueOffset ];
+					const index = component.indices[ 0 ] + 4 * component.indices[ 1 ];
+					data[ time ][ index ] = value;
 
-						const value = outputSource.array[ stride ];
-						const index = channel.indices[ 0 ] + 4 * channel.indices[ 1 ];
+				} else {
 
-						data[ time ][ index ] = value;
+					for ( let j = 0; j < stride; j ++ ) {
 
-					} else {
-
-						for ( j = 0, jl = outputSource.stride; j < jl; j ++ ) {
-
-							data[ time ][ j ] = outputSource.array[ stride + j ];
-
-						}
+						data[ time ][ j ] = values[ valueOffset + j ];
 
 					}
 
 				}
 
-				break;
-
-			case 'translate':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
-
-			case 'rotate':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
-
-			case 'scale':
-				console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
-				break;
+			}
 
 		}
 
 		const keyframes = this.prepareAnimationData( data, defaultMatrix );
+		const animation = { name: object3D.uuid, keyframes: keyframes };
+		this.createKeyframeTracks( animation, tracks );
 
-		const animation = {
-			name: object3D.uuid,
-			keyframes: keyframes
+	}
+
+	buildTranslateTrack( object3D, channelData, transformInfo, tracks ) {
+
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const times = Array.from( data.times );
+			const values = Array.from( data.values );
+
+			const track = new VectorKeyframeTrack(
+				object3D.uuid + '.position',
+				times,
+				values
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo, channelData );
+			tracks.push( track );
+			return;
+
+		}
+
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+
+			values.push( x, y, z );
+
+		}
+
+		const track = new VectorKeyframeTrack(
+			object3D.uuid + '.position',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
+
+	}
+
+	buildRotateTrack( object3D, sid, channelData, transformInfo, nodeData, tracks ) {
+
+		const angleData = channelData.ANGLE || channelData.default;
+		if ( ! angleData ) return;
+
+		const times = Array.from( angleData.times );
+		if ( times.length === 0 ) return;
+
+		// Collect all rotations to compose them in order
+		const rotations = [];
+
+		for ( const transformSid of nodeData.transformOrder ) {
+
+			const transformType = nodeData.transforms[ transformSid ];
+
+			if ( transformType === 'rotate' ) {
+
+				const info = nodeData.transformData[ transformSid ];
+				rotations.push( {
+					sid: transformSid,
+					axis: new Vector3( info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] ),
+					defaultAngle: info.angle
+				} );
+
+			}
+
+		}
+
+		const quaternion = new Quaternion();
+		const prevQuaternion = new Quaternion();
+		const tempQuat = new Quaternion();
+		const values = [];
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+			quaternion.identity();
+
+			for ( const rotation of rotations ) {
+
+				let angleDegrees;
+
+				if ( rotation.sid === sid ) {
+
+					angleDegrees = this.getValueAtTime( angleData, time, rotation.defaultAngle );
+
+				} else {
+
+					angleDegrees = rotation.defaultAngle;
+
+				}
+
+				const angleRadians = MathUtils.degToRad( angleDegrees );
+				tempQuat.setFromAxisAngle( rotation.axis, angleRadians );
+				quaternion.multiply( tempQuat );
+
+			}
+
+			// Ensure quaternion continuity
+			if ( i > 0 && prevQuaternion.dot( quaternion ) < 0 ) {
+
+				quaternion.x = - quaternion.x;
+				quaternion.y = - quaternion.y;
+				quaternion.z = - quaternion.z;
+				quaternion.w = - quaternion.w;
+
+			}
+
+			prevQuaternion.copy( quaternion );
+
+			values.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+
+		}
+
+		const track = new QuaternionKeyframeTrack(
+			object3D.uuid + '.quaternion',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
+
+	}
+
+	buildScaleTrack( object3D, channelData, transformInfo, tracks ) {
+
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const times = Array.from( data.times );
+			const values = Array.from( data.values );
+
+			const track = new VectorKeyframeTrack(
+				object3D.uuid + '.scale',
+				times,
+				values
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo, channelData );
+			tracks.push( track );
+			return;
+
+		}
+
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+
+			values.push( x, y, z );
+
+		}
+
+		const track = new VectorKeyframeTrack(
+			object3D.uuid + '.scale',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
+
+	}
+
+	getTimesForAllAxes( channelData ) {
+
+		let times = [];
+
+		if ( channelData.X ) times = times.concat( Array.from( channelData.X.times ) );
+		if ( channelData.Y ) times = times.concat( Array.from( channelData.Y.times ) );
+		if ( channelData.Z ) times = times.concat( Array.from( channelData.Z.times ) );
+		if ( channelData.ANGLE ) times = times.concat( Array.from( channelData.ANGLE.times ) );
+		if ( channelData.default ) times = times.concat( Array.from( channelData.default.times ) );
+
+		times = [ ...new Set( times ) ].sort( ( a, b ) => a - b );
+
+		return times;
+
+	}
+
+	getValueAtTime( componentData, time, defaultValue ) {
+
+		if ( ! componentData ) return defaultValue;
+
+		const times = componentData.times;
+		const values = componentData.values;
+		const interpolation = componentData.interpolation;
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			if ( times[ i ] === time ) {
+
+				return values[ i ];
+
+			}
+
+			if ( times[ i ] > time ) {
+
+				if ( i === 0 ) {
+
+					return values[ 0 ];
+
+				}
+
+				const i0 = i - 1;
+				const i1 = i;
+				const t0 = times[ i0 ];
+				const t1 = times[ i1 ];
+				const v0 = values[ i0 ];
+				const v1 = values[ i1 ];
+
+				const interp = interpolation ? interpolation[ i0 ] : 'LINEAR';
+
+				if ( interp === 'STEP' ) {
+
+					return v0;
+
+				} else if ( interp === 'BEZIER' && componentData.inTangent && componentData.outTangent ) {
+
+					return this.evaluateBezierComponent( componentData, i0, i1, t0, t1, time );
+
+				} else {
+
+					const t = ( time - t0 ) / ( t1 - t0 );
+					return v0 + t * ( v1 - v0 );
+
+				}
+
+			}
+
+		}
+
+		return values[ values.length - 1 ];
+
+	}
+
+	evaluateBezierComponent( componentData, i0, i1, t0, t1, time ) {
+
+		const values = componentData.values;
+		const inTangent = componentData.inTangent;
+		const outTangent = componentData.outTangent;
+		const tangentStride = componentData.inTangentStride || 1;
+
+		const v0 = values[ i0 ];
+		const v1 = values[ i1 ];
+
+		let c0x, c0y, c1x, c1y;
+
+		if ( tangentStride === 2 ) {
+
+			c0x = outTangent[ i0 * 2 ];
+			c0y = outTangent[ i0 * 2 + 1 ];
+			c1x = inTangent[ i1 * 2 ];
+			c1y = inTangent[ i1 * 2 + 1 ];
+
+		} else {
+
+			c0x = t0 + ( t1 - t0 ) / 3;
+			c0y = outTangent[ i0 ];
+			c1x = t1 - ( t1 - t0 ) / 3;
+			c1y = inTangent[ i1 ];
+
+		}
+
+		// Newton-Raphson to solve Bx(s) = time
+		let s = ( time - t0 ) / ( t1 - t0 );
+
+		for ( let iter = 0; iter < 8; iter ++ ) {
+
+			const s2 = s * s;
+			const s3 = s2 * s;
+			const oneMinusS = 1 - s;
+			const oneMinusS2 = oneMinusS * oneMinusS;
+			const oneMinusS3 = oneMinusS2 * oneMinusS;
+
+			const bx = oneMinusS3 * t0 + 3 * oneMinusS2 * s * c0x + 3 * oneMinusS * s2 * c1x + s3 * t1;
+			const dbx = 3 * oneMinusS2 * ( c0x - t0 ) + 6 * oneMinusS * s * ( c1x - c0x ) + 3 * s2 * ( t1 - c1x );
+
+			if ( Math.abs( dbx ) < 1e-10 ) break;
+
+			const error = bx - time;
+			if ( Math.abs( error ) < 1e-10 ) break;
+
+			s = s - error / dbx;
+			s = Math.max( 0, Math.min( 1, s ) );
+
+		}
+
+		const s2 = s * s;
+		const s3 = s2 * s;
+		const oneMinusS = 1 - s;
+		const oneMinusS2 = oneMinusS * oneMinusS;
+		const oneMinusS3 = oneMinusS2 * oneMinusS;
+
+		return oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
+
+	}
+
+	getInterpolationInfo( channelData ) {
+
+		const components = [ 'X', 'Y', 'Z', 'ANGLE', 'default' ];
+		let interpolationType = null;
+		let isUniform = true;
+
+		for ( const comp of components ) {
+
+			const data = channelData[ comp ];
+			if ( ! data || ! data.interpolation ) continue;
+
+			const interpArray = data.interpolation;
+
+			for ( let i = 0; i < interpArray.length; i ++ ) {
+
+				const interp = interpArray[ i ];
+
+				if ( interpolationType === null ) {
+
+					interpolationType = interp;
+
+				} else if ( interp !== interpolationType ) {
+
+					isUniform = false;
+
+				}
+
+			}
+
+		}
+
+		return {
+			type: interpolationType || 'LINEAR',
+			uniform: isUniform
 		};
 
-		return animation;
+	}
+
+	applyInterpolation( track, interpolationInfo, channelData = null ) {
+
+		if ( interpolationInfo.type === 'STEP' && interpolationInfo.uniform ) {
+
+			track.setInterpolation( InterpolateDiscrete );
+
+		} else if ( interpolationInfo.type === 'BEZIER' && interpolationInfo.uniform && channelData ) {
+
+			const data = channelData.default;
+
+			if ( data && data.inTangent && data.outTangent ) {
+
+				track.setInterpolation( InterpolateBezier );
+				track.settings = {
+					inTangents: new Float32Array( data.inTangent ),
+					outTangents: new Float32Array( data.outTangent )
+				};
+
+			}
+
+		}
 
 	}
 
@@ -238,19 +735,13 @@ class ColladaComposer {
 
 		const keyframes = [];
 
-		// transfer data into a sortable array
-
 		for ( const time in data ) {
 
 			keyframes.push( { time: parseFloat( time ), value: data[ time ] } );
 
 		}
 
-		// ensure keyframes are sorted by time
-
-		keyframes.sort( ascending );
-
-		// now we clean up all animation data, so we can use them for keyframe tracks
+		keyframes.sort( ( a, b ) => a.time - b.time );
 
 		for ( let i = 0; i < 16; i ++ ) {
 
@@ -259,14 +750,6 @@ class ColladaComposer {
 		}
 
 		return keyframes;
-
-		// array sort function
-
-		function ascending( a, b ) {
-
-			return a.time - b.time;
-
-		}
 
 	}
 
@@ -437,7 +920,6 @@ class ColladaComposer {
 
 	}
 
-	// animation clips
 
 	buildAnimationClip( data ) {
 
@@ -469,7 +951,6 @@ class ColladaComposer {
 
 	}
 
-	// controller
 
 	buildController( data ) {
 
@@ -614,7 +1095,6 @@ class ColladaComposer {
 
 	}
 
-	// image
 
 	buildImage( data ) {
 
@@ -640,7 +1120,6 @@ class ColladaComposer {
 
 	}
 
-	// effect
 
 	buildEffect( data ) {
 
@@ -654,7 +1133,6 @@ class ColladaComposer {
 
 	}
 
-	// material
 
 	getTextureLoader( image ) {
 
@@ -922,7 +1400,6 @@ class ColladaComposer {
 
 	}
 
-	// camera
 
 	buildCamera( data ) {
 
@@ -985,7 +1462,6 @@ class ColladaComposer {
 
 	}
 
-	// light
 
 	buildLight( data ) {
 
@@ -1034,7 +1510,6 @@ class ColladaComposer {
 
 	}
 
-	// geometry
 
 	groupPrimitives( primitives ) {
 
@@ -1414,7 +1889,6 @@ class ColladaComposer {
 
 	}
 
-	// kinematics
 
 	buildKinematicsModel( data ) {
 
@@ -1682,7 +2156,6 @@ class ColladaComposer {
 
 	}
 
-	// nodes
 
 	buildSkeleton( skeletons, joints ) {
 
@@ -1958,10 +2431,81 @@ class ColladaComposer {
 		}
 
 		object.name = ( type === 'JOINT' ) ? data.sid : data.name;
+
+		if ( type !== 'JOINT' && this.hasPivotTransforms( data ) ) {
+
+			return this.wrapWithTransformHierarchy( object, data );
+
+		}
+
 		object.matrix.copy( matrix );
 		object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 		return object;
+
+	}
+
+	wrapWithTransformHierarchy( contentObject, nodeData ) {
+
+		const nodeId = nodeData.id;
+		this.transformNodes[ nodeId ] = {};
+
+		const transformOrder = nodeData.transformOrder;
+		const transformData = nodeData.transformData;
+
+		const rootNode = new Group();
+		rootNode.name = nodeData.name;
+
+		let currentParent = rootNode;
+
+		for ( let i = 0; i < transformOrder.length; i ++ ) {
+
+			const sid = transformOrder[ i ];
+			const info = transformData[ sid ];
+
+			const transformNode = new Group();
+			transformNode.name = nodeData.name + '_' + sid;
+
+			switch ( info.type ) {
+
+				case 'translate':
+					transformNode.position.set( info.x, info.y, info.z );
+					break;
+
+				case 'rotate': {
+
+					const axis = new Vector3( info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] );
+					const angle = MathUtils.degToRad( info.angle );
+					transformNode.quaternion.setFromAxisAngle( axis, angle );
+					transformNode.userData.rotationAxis = axis;
+					break;
+
+				}
+
+				case 'scale':
+					transformNode.scale.set( info.x, info.y, info.z );
+					break;
+
+				case 'matrix': {
+
+					const matrix = new Matrix4().fromArray( info.array ).transpose();
+					matrix.decompose( transformNode.position, transformNode.quaternion, transformNode.scale );
+					break;
+
+				}
+
+			}
+
+			this.transformNodes[ nodeId ][ sid ] = transformNode;
+
+			currentParent.add( transformNode );
+			currentParent = transformNode;
+
+		}
+
+		currentParent.add( contentObject );
+
+		return rootNode;
 
 	}
 
@@ -2117,7 +2661,6 @@ class ColladaComposer {
 
 	}
 
-	// visual scenes
 
 	buildVisualScene( data ) {
 
@@ -2150,7 +2693,6 @@ class ColladaComposer {
 
 	}
 
-	// scenes
 
 	parseScene( xml ) {
 
@@ -2189,6 +2731,8 @@ class ColladaComposer {
 
 				}
 
+				this.buildDeferredPivotAnimationTracks( tracks );
+
 				this.animations.push( new AnimationClip( 'default', - 1, tracks ) );
 
 			}
@@ -2202,6 +2746,201 @@ class ColladaComposer {
 			}
 
 		}
+
+	}
+
+	buildDeferredPivotAnimationTracks( tracks ) {
+
+		for ( const nodeId in this.deferredPivotAnimations ) {
+
+			const nodeData = this.library.nodes[ nodeId ];
+			if ( ! nodeData ) continue;
+
+			const mergedChannels = this.deferredPivotAnimations[ nodeId ];
+			this.buildTransformHierarchyTracks( nodeId, mergedChannels, nodeData, tracks );
+
+		}
+
+	}
+
+	buildTransformHierarchyTracks( nodeId, nodeChannels, nodeData, tracks ) {
+
+		const transformNodes = this.transformNodes[ nodeId ];
+
+		if ( ! transformNodes ) {
+
+			console.warn( 'THREE.ColladaLoader: Transform hierarchy not found for node:', nodeId );
+			return;
+
+		}
+
+		for ( const sid in nodeChannels ) {
+
+			const transformNode = transformNodes[ sid ];
+			if ( ! transformNode ) continue;
+
+			const transformType = nodeData.transforms[ sid ];
+			const transformInfo = nodeData.transformData[ sid ];
+			const channelData = nodeChannels[ sid ];
+
+			switch ( transformType ) {
+
+				case 'translate':
+					this.buildHierarchyTranslateTrack( transformNode, channelData, transformInfo, tracks );
+					break;
+
+				case 'rotate':
+					this.buildHierarchyRotateTrack( transformNode, channelData, transformInfo, tracks );
+					break;
+
+				case 'scale':
+					this.buildHierarchyScaleTrack( transformNode, channelData, transformInfo, tracks );
+					break;
+
+			}
+
+		}
+
+	}
+
+	buildHierarchyTranslateTrack( transformNode, channelData, transformInfo, tracks ) {
+
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const track = new VectorKeyframeTrack(
+				transformNode.uuid + '.position',
+				Array.from( data.times ),
+				Array.from( data.values )
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo, channelData );
+			tracks.push( track );
+			return;
+
+		}
+
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+			values.push( x, y, z );
+
+		}
+
+		const track = new VectorKeyframeTrack(
+			transformNode.uuid + '.position',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
+
+	}
+
+	buildHierarchyRotateTrack( transformNode, channelData, transformInfo, tracks ) {
+
+		const angleData = channelData.ANGLE || channelData.default;
+		if ( ! angleData ) return;
+
+		const times = Array.from( angleData.times );
+		if ( times.length === 0 ) return;
+
+		const axis = transformNode.userData.rotationAxis ||
+			new Vector3( transformInfo.axis[ 0 ], transformInfo.axis[ 1 ], transformInfo.axis[ 2 ] );
+
+		const quaternion = new Quaternion();
+		const prevQuaternion = new Quaternion();
+		const values = [];
+
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+			const angleDegrees = this.getValueAtTime( angleData, time, transformInfo.angle );
+			const angleRadians = MathUtils.degToRad( angleDegrees );
+
+			quaternion.setFromAxisAngle( axis, angleRadians );
+
+			// Ensure quaternion continuity
+			if ( i > 0 && prevQuaternion.dot( quaternion ) < 0 ) {
+
+				quaternion.x = - quaternion.x;
+				quaternion.y = - quaternion.y;
+				quaternion.z = - quaternion.z;
+				quaternion.w = - quaternion.w;
+
+			}
+
+			prevQuaternion.copy( quaternion );
+			values.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+
+		}
+
+		const track = new QuaternionKeyframeTrack(
+			transformNode.uuid + '.quaternion',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
+
+	}
+
+	buildHierarchyScaleTrack( transformNode, channelData, transformInfo, tracks ) {
+
+		if ( channelData.default && channelData.default.stride === 3 ) {
+
+			const data = channelData.default;
+			const track = new VectorKeyframeTrack(
+				transformNode.uuid + '.scale',
+				Array.from( data.times ),
+				Array.from( data.values )
+			);
+
+			const interpolationInfo = this.getInterpolationInfo( channelData );
+			this.applyInterpolation( track, interpolationInfo, channelData );
+			tracks.push( track );
+			return;
+
+		}
+
+		const times = this.getTimesForAllAxes( channelData );
+		if ( times.length === 0 ) return;
+
+		const values = [];
+		const interpolationInfo = this.getInterpolationInfo( channelData );
+
+		for ( let i = 0; i < times.length; i ++ ) {
+
+			const time = times[ i ];
+			const x = this.getValueAtTime( channelData.X, time, transformInfo.x );
+			const y = this.getValueAtTime( channelData.Y, time, transformInfo.y );
+			const z = this.getValueAtTime( channelData.Z, time, transformInfo.z );
+			values.push( x, y, z );
+
+		}
+
+		const track = new VectorKeyframeTrack(
+			transformNode.uuid + '.scale',
+			times,
+			values
+		);
+
+		this.applyInterpolation( track, interpolationInfo );
+		tracks.push( track );
 
 	}
 
