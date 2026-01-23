@@ -122,6 +122,9 @@ class USDComposer {
 			const matrix = new Matrix4();
 			const tempMatrix = new Matrix4();
 
+			// Track scale for handling negative scale with rotation
+			let scaleValues = null;
+
 			// Iterate FORWARD for Three.js column-vector convention
 			for ( let i = 0; i < xformOpOrder.length; i ++ ) {
 
@@ -134,7 +137,12 @@ class USDComposer {
 					const m = data[ 'xformOp:transform' ];
 					if ( m && m.length === 16 ) {
 
-						tempMatrix.fromArray( m );
+						tempMatrix.set(
+							m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+							m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+							m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+							m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+						);
 						if ( isInverse ) tempMatrix.invert();
 						matrix.multiply( tempMatrix );
 
@@ -170,10 +178,12 @@ class USDComposer {
 						if ( Array.isArray( s ) ) {
 
 							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+							scaleValues = [ s[ 0 ], s[ 1 ], s[ 2 ] ];
 
 						} else {
 
 							tempMatrix.makeScale( s, s, s );
+							scaleValues = [ s, s, s ];
 
 						}
 
@@ -252,6 +262,32 @@ class USDComposer {
 
 			obj.matrix.copy( matrix );
 			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+
+			// Fix for negative scale: decompose() may absorb negative scale into quaternion
+			// Restore original scale signs to keep animation consistent
+			if ( scaleValues ) {
+
+				const negX = scaleValues[ 0 ] < 0;
+				const negY = scaleValues[ 1 ] < 0;
+				const negZ = scaleValues[ 2 ] < 0;
+				const negCount = ( negX ? 1 : 0 ) + ( negY ? 1 : 0 ) + ( negZ ? 1 : 0 );
+
+				// decompose() absorbs pairs of negative scales into rotation
+				// For [-1,-1,-1] → [-1,1,1], Y and Z were absorbed, flip quat.y and quat.w
+				if ( negCount === 3 ) {
+
+					obj.scale.set( scaleValues[ 0 ], scaleValues[ 1 ], scaleValues[ 2 ] );
+					obj.quaternion.set(
+						obj.quaternion.x,
+						- obj.quaternion.y,
+						obj.quaternion.z,
+						- obj.quaternion.w
+					);
+
+				}
+
+			}
+
 			return;
 
 		}
@@ -982,6 +1018,18 @@ class USDComposer {
 
 				attrs[ attrName ] = attrSpec.fields.default;
 
+			} else if ( attrSpec.fields?.timeSamples ) {
+
+				// For animated attributes without default, use the first time sample (rest pose)
+				const { times, values } = attrSpec.fields.timeSamples;
+				if ( times && values && times.length > 0 ) {
+
+					// Find time 0, or use the first available time
+					const idx = times.indexOf( 0 );
+					attrs[ attrName ] = idx >= 0 ? values[ idx ] : values[ 0 ];
+
+				}
+
 			}
 
 			if ( attrSpec.fields?.elementSize !== undefined ) {
@@ -1124,7 +1172,10 @@ class USDComposer {
 			// Get per-mesh joint mapping
 			const localJoints = attrs[ 'skel:joints' ];
 
-			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints } );
+			// Get geomBindTransform if present
+			const geomBindTransform = attrs[ 'primvars:skel:geomBindTransform' ];
+
+			this.skinnedMeshes.push( { mesh, skeletonPath, path, localJoints, geomBindTransform } );
 
 		} else {
 
@@ -3263,7 +3314,14 @@ class USDComposer {
 			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
 
 				const bindMatrix = new Matrix4();
-				bindMatrix.fromArray( bindTransforms, i * 16 );
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = bindTransforms.slice( i * 16, ( i + 1 ) * 16 );
+				bindMatrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
 				const inverseBindMatrix = bindMatrix.clone().invert();
 				boneInverses.push( inverseBindMatrix );
 
@@ -3302,7 +3360,14 @@ class USDComposer {
 			for ( let i = 0; i < joints.length; i ++ ) {
 
 				const matrix = new Matrix4();
-				matrix.fromArray( restTransforms, i * 16 );
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = restTransforms.slice( i * 16, ( i + 1 ) * 16 );
+				matrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
 				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
 
 			}
@@ -3335,7 +3400,7 @@ class USDComposer {
 
 		for ( const meshData of this.skinnedMeshes ) {
 
-			const { mesh, skeletonPath, localJoints } = meshData;
+			const { mesh, skeletonPath, localJoints, geomBindTransform } = meshData;
 
 			let skeletonData = null;
 
@@ -3419,9 +3484,97 @@ class USDComposer {
 
 			}
 
-			mesh.bind( skeleton, new Matrix4() );
+			// Use geomBindTransform if available, otherwise compute from mesh/skeleton alignment
+			let bindMatrix = new Matrix4();
+
+			if ( geomBindTransform && geomBindTransform.length === 16 ) {
+
+				// USD matrices are row-major, Three.js is column-major - need to transpose
+				const m = geomBindTransform;
+				bindMatrix.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
+
+			} else {
+
+				// Compute geomBindTransform by comparing mesh vertices with skeleton bind positions
+				bindMatrix = this._computeGeomBindTransform( mesh, skeleton );
+
+			}
+
+			mesh.bind( skeleton, bindMatrix );
 
 		}
+
+	}
+
+	_computeGeomBindTransform( mesh, skeleton ) {
+
+		const bindMatrix = new Matrix4();
+		const geometry = mesh.geometry;
+		const position = geometry.attributes.position;
+		const skinIndex = geometry.attributes.skinIndex;
+
+		if ( ! position || ! skinIndex || position.count === 0 ) {
+
+			return bindMatrix;
+
+		}
+
+		// Sample vertices and their influencing joints to compute average scale
+		const boneInverses = skeleton.boneInverses;
+		const sampleCount = Math.min( 50, position.count );
+		let sumRatioX = 0, sumRatioY = 0, sumRatioZ = 0;
+		let validSamples = 0;
+
+		for ( let i = 0; i < sampleCount; i ++ ) {
+
+			const vi = Math.floor( i * position.count / sampleCount );
+			const vx = position.getX( vi );
+			const vy = position.getY( vi );
+			const vz = position.getZ( vi );
+
+			// Get primary joint for this vertex
+			const jointIdx = skinIndex.getX( vi );
+			if ( jointIdx >= boneInverses.length ) continue;
+
+			// Get joint bind position from inverse bind matrix
+			const inverseBindMatrix = boneInverses[ jointIdx ];
+			const bindTransform = inverseBindMatrix.clone().invert();
+			const jx = bindTransform.elements[ 12 ];
+			const jy = bindTransform.elements[ 13 ];
+			const jz = bindTransform.elements[ 14 ];
+
+			// Compute ratio if both values are non-zero
+			if ( Math.abs( vx ) > 0.001 && Math.abs( jx ) > 0.001 ) {
+
+				sumRatioX += jx / vx;
+				sumRatioY += jy / vy;
+				sumRatioZ += jz / vz;
+				validSamples ++;
+
+			}
+
+		}
+
+		if ( validSamples > 0 ) {
+
+			// Use average scale to create geomBindTransform
+			const avgScale = ( sumRatioX + sumRatioY + sumRatioZ ) / ( validSamples * 3 );
+
+			// Only apply if scale is significantly different from 1
+			if ( Math.abs( avgScale - 1 ) > 0.1 ) {
+
+				bindMatrix.makeScale( avgScale, avgScale, avgScale );
+
+			}
+
+		}
+
+		return bindMatrix;
 
 	}
 
@@ -3486,6 +3639,46 @@ class USDComposer {
 
 					const q = values[ i ];
 					keyframeValues.push( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
+
+				}
+
+				if ( keyframeTimes.length > 0 ) {
+
+					tracks.push( new QuaternionKeyframeTrack(
+						objectName + '.quaternion',
+						new Float32Array( keyframeTimes ),
+						new Float32Array( keyframeValues )
+					) );
+
+				}
+
+			}
+
+			// Check for animated xformOp:rotateXYZ
+			const rotateXYZPath = path + '.xformOp:rotateXYZ';
+			const rotateXYZSpec = this.specsByPath[ rotateXYZPath ];
+			if ( rotateXYZSpec?.fields?.timeSamples ) {
+
+				const { times, values } = rotateXYZSpec.fields.timeSamples;
+				const keyframeTimes = [];
+				const keyframeValues = [];
+				const tempEuler = new Euler();
+				const tempQuat = new Quaternion();
+
+				for ( let i = 0; i < times.length; i ++ ) {
+
+					keyframeTimes.push( times[ i ] / this.fps );
+
+					const r = values[ i ];
+					// USD rotateXYZ: matrix = Rx * Ry * Rz, use 'ZYX' order in Three.js
+					tempEuler.set(
+						r[ 0 ] * Math.PI / 180,
+						r[ 1 ] * Math.PI / 180,
+						r[ 2 ] * Math.PI / 180,
+						'ZYX'
+					);
+					tempQuat.setFromEuler( tempEuler );
+					keyframeValues.push( tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w );
 
 				}
 
