@@ -1283,7 +1283,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.7,
+				version: 5,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -1513,23 +1513,33 @@ class Object3D extends EventDispatcher {
 
 		if ( isRootObject ) {
 
-			const geometries = extractFromCache( meta.geometries );
-			const materials = extractFromCache( meta.materials );
-			const textures = extractFromCache( meta.textures );
-			const images = extractFromCache( meta.images );
-			const shapes = extractFromCache( meta.shapes );
-			const skeletons = extractFromCache( meta.skeletons );
-			const animations = extractFromCache( meta.animations );
-			const nodes = extractFromCache( meta.nodes );
+			// Remove metadata and uuid (redundant since uuid is the key) from each item
+			const collections = [ meta.geometries, meta.materials, meta.textures, meta.images, meta.shapes, meta.skeletons, meta.animations, meta.nodes ];
 
-			if ( geometries.length > 0 ) output.geometries = geometries;
-			if ( materials.length > 0 ) output.materials = materials;
-			if ( textures.length > 0 ) output.textures = textures;
-			if ( images.length > 0 ) output.images = images;
-			if ( shapes.length > 0 ) output.shapes = shapes;
-			if ( skeletons.length > 0 ) output.skeletons = skeletons;
-			if ( animations.length > 0 ) output.animations = animations;
-			if ( nodes.length > 0 ) output.nodes = nodes;
+			for ( const collection of collections ) {
+
+				for ( const key in collection ) {
+
+					delete collection[ key ].metadata;
+					delete collection[ key ].uuid;
+
+				}
+
+			}
+
+			// Extract buffers from geometries to top-level
+			const buffers = extractBuffers( meta.geometries );
+			if ( Object.keys( buffers ).length > 0 ) output.buffers = buffers;
+
+			// Output collections as UUID-keyed objects
+			if ( Object.keys( meta.geometries ).length > 0 ) output.geometries = meta.geometries;
+			if ( Object.keys( meta.materials ).length > 0 ) output.materials = meta.materials;
+			if ( Object.keys( meta.textures ).length > 0 ) output.textures = meta.textures;
+			if ( Object.keys( meta.images ).length > 0 ) output.images = meta.images;
+			if ( Object.keys( meta.shapes ).length > 0 ) output.shapes = meta.shapes;
+			if ( Object.keys( meta.skeletons ).length > 0 ) output.skeletons = meta.skeletons;
+			if ( Object.keys( meta.animations ).length > 0 ) output.animations = meta.animations;
+			if ( Object.keys( meta.nodes ).length > 0 ) output.nodes = meta.nodes;
 
 		}
 
@@ -1537,21 +1547,58 @@ class Object3D extends EventDispatcher {
 
 		return output;
 
-		// extract data from the cache hash
-		// remove metadata on each item
-		// and return as array
-		function extractFromCache( cache ) {
+		// Extract buffer data from geometries to top-level buffers object
+		function extractBuffers( geometries ) {
 
-			const values = [];
-			for ( const key in cache ) {
+			const buffers = {};
 
-				const data = cache[ key ];
-				delete data.metadata;
-				values.push( data );
+			for ( const uuid in geometries ) {
+
+				const geometry = geometries[ uuid ];
+				const data = geometry.data;
+
+				if ( data === undefined ) continue;
+
+				// Extract arrayBuffers as typed array entries
+				if ( data.arrayBuffers !== undefined ) {
+
+					for ( const bufferUuid in data.arrayBuffers ) {
+
+						if ( buffers[ bufferUuid ] === undefined ) {
+
+							buffers[ bufferUuid ] = {
+								type: 'Uint32Array',
+								array: data.arrayBuffers[ bufferUuid ]
+							};
+
+						}
+
+					}
+
+					delete data.arrayBuffers;
+
+				}
+
+				// Extract interleavedBuffers
+				if ( data.interleavedBuffers !== undefined ) {
+
+					for ( const bufferUuid in data.interleavedBuffers ) {
+
+						if ( buffers[ bufferUuid ] === undefined ) {
+
+							buffers[ bufferUuid ] = data.interleavedBuffers[ bufferUuid ];
+
+						}
+
+					}
+
+					delete data.interleavedBuffers;
+
+				}
 
 			}
 
-			return values;
+			return buffers;
 
 		}
 

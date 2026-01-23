@@ -194,6 +194,10 @@ class ObjectLoader extends Loader {
 	 */
 	parse( json, onLoad ) {
 
+		// Prepare JSON for parsing
+		json = this._convertLegacyCollections( json );
+		json = this._distributeBuffers( json );
+
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
@@ -246,6 +250,10 @@ class ObjectLoader extends Loader {
 	 */
 	async parseAsync( json ) {
 
+		// Prepare JSON for parsing
+		json = this._convertLegacyCollections( json );
+		json = this._distributeBuffers( json );
+
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
@@ -267,17 +275,103 @@ class ObjectLoader extends Loader {
 
 	// internals
 
+	// Convert array to object keyed by uuid (for backwards compatibility)
+	_toObject( json ) {
+
+		if ( json === undefined || ! Array.isArray( json ) ) return json;
+
+		const obj = {};
+
+		for ( let i = 0; i < json.length; i ++ ) {
+
+			const item = json[ i ];
+			obj[ item.uuid ] = item;
+
+		}
+
+		return obj;
+
+	}
+
+	// Convert legacy v4 array collections to v5 object collections
+	_convertLegacyCollections( json ) {
+
+		const converted = { ...json };
+
+		converted.geometries = this._toObject( json.geometries );
+		converted.materials = this._toObject( json.materials );
+		converted.textures = this._toObject( json.textures );
+		converted.images = this._toObject( json.images );
+		converted.shapes = this._toObject( json.shapes );
+		converted.skeletons = this._toObject( json.skeletons );
+		converted.animations = this._toObject( json.animations );
+
+		return converted;
+
+	}
+
+	// Distribute top-level buffers into each geometry's data
+	_distributeBuffers( json ) {
+
+		if ( json.buffers === undefined || json.geometries === undefined ) {
+
+			return json;
+
+		}
+
+		const distributed = { ...json, geometries: { ...json.geometries } };
+
+		for ( const uuid in distributed.geometries ) {
+
+			const geometry = { ...distributed.geometries[ uuid ] };
+
+			if ( geometry.data !== undefined ) {
+
+				geometry.data = { ...geometry.data };
+				geometry.data.interleavedBuffers = { ...geometry.data.interleavedBuffers };
+				geometry.data.arrayBuffers = { ...geometry.data.arrayBuffers };
+
+				for ( const bufferUuid in json.buffers ) {
+
+					const buffer = json.buffers[ bufferUuid ];
+
+					if ( buffer.type === 'InterleavedBuffer' || buffer.type === 'InstancedInterleavedBuffer' ) {
+
+						geometry.data.interleavedBuffers[ bufferUuid ] = { ...buffer, uuid: bufferUuid };
+
+					} else {
+
+						geometry.data.arrayBuffers[ bufferUuid ] = buffer.array;
+
+					}
+
+				}
+
+				distributed.geometries[ uuid ] = geometry;
+
+			}
+
+		}
+
+		return distributed;
+
+	}
+
 	parseShapes( json ) {
 
 		const shapes = {};
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			for ( const uuid in json ) {
 
-				const shape = new Shape().fromJSON( json[ i ] );
+				const data = json[ uuid ];
 
-				shapes[ shape.uuid ] = shape;
+				const shape = new Shape().fromJSON( data );
+
+				shapes[ uuid ] = shape;
 
 			}
 
@@ -302,13 +396,17 @@ class ObjectLoader extends Loader {
 
 		// create skeletons
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			for ( const uuid in json ) {
 
-				const skeleton = new Skeleton().fromJSON( json[ i ], bones );
+				const data = json[ uuid ];
 
-				skeletons[ skeleton.uuid ] = skeleton;
+				const skeleton = new Skeleton().fromJSON( data, bones );
+
+				skeletons[ uuid ] = skeleton;
 
 			}
 
@@ -322,14 +420,16 @@ class ObjectLoader extends Loader {
 
 		const geometries = {};
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
 			const bufferGeometryLoader = new BufferGeometryLoader();
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			for ( const uuid in json ) {
 
 				let geometry;
-				const data = json[ i ];
+				const data = json[ uuid ];
 
 				switch ( data.type ) {
 
@@ -353,12 +453,12 @@ class ObjectLoader extends Loader {
 
 				}
 
-				geometry.uuid = data.uuid;
+				geometry.uuid = uuid;
 
 				if ( data.name !== undefined ) geometry.name = data.name;
 				if ( data.userData !== undefined ) geometry.userData = data.userData;
 
-				geometries[ data.uuid ] = geometry;
+				geometries[ uuid ] = geometry;
 
 			}
 
@@ -373,22 +473,24 @@ class ObjectLoader extends Loader {
 		const cache = {}; // MultiMaterial
 		const materials = {};
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
 			const loader = new MaterialLoader();
 			loader.setTextures( textures );
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			for ( const uuid in json ) {
 
-				const data = json[ i ];
+				const data = json[ uuid ];
 
-				if ( cache[ data.uuid ] === undefined ) {
+				if ( cache[ uuid ] === undefined ) {
 
-					cache[ data.uuid ] = loader.parse( data );
+					cache[ uuid ] = loader.parse( data );
 
 				}
 
-				materials[ data.uuid ] = cache[ data.uuid ];
+				materials[ uuid ] = cache[ uuid ];
 
 			}
 
@@ -402,15 +504,17 @@ class ObjectLoader extends Loader {
 
 		const animations = {};
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
-			for ( let i = 0; i < json.length; i ++ ) {
+			for ( const uuid in json ) {
 
-				const data = json[ i ];
+				const data = json[ uuid ];
 
 				const clip = AnimationClip.parse( data );
 
-				animations[ clip.uuid ] = clip;
+				animations[ uuid ] = clip;
 
 			}
 
@@ -474,16 +578,18 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( json !== undefined && json.length > 0 ) {
+		json = this._toObject( json );
+
+		if ( json !== undefined && Object.keys( json ).length > 0 ) {
 
 			const manager = new LoadingManager( onLoad );
 
 			loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( let i = 0, il = json.length; i < il; i ++ ) {
+			for ( const uuid in json ) {
 
-				const image = json[ i ];
+				const image = json[ uuid ];
 				const url = image.url;
 
 				if ( Array.isArray( url ) ) {
@@ -516,14 +622,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ uuid ] = new Source( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ uuid ] = new Source( deserializedImage );
 
 
 				}
@@ -573,14 +679,16 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( json !== undefined && json.length > 0 ) {
+		json = this._toObject( json );
+
+		if ( json !== undefined && Object.keys( json ).length > 0 ) {
 
 			loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( let i = 0, il = json.length; i < il; i ++ ) {
+			for ( const uuid in json ) {
 
-				const image = json[ i ];
+				const image = json[ uuid ];
 				const url = image.url;
 
 				if ( Array.isArray( url ) ) {
@@ -613,14 +721,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ uuid ] = new Source( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ uuid ] = new Source( deserializedImage );
 
 				}
 
@@ -646,15 +754,17 @@ class ObjectLoader extends Loader {
 
 		const textures = {};
 
+		json = this._toObject( json );
+
 		if ( json !== undefined ) {
 
-			for ( let i = 0, l = json.length; i < l; i ++ ) {
+			for ( const uuid in json ) {
 
-				const data = json[ i ];
+				const data = json[ uuid ];
 
 				if ( data.image === undefined ) {
 
-					warn( 'ObjectLoader: No "image" specified for', data.uuid );
+					warn( 'ObjectLoader: No "image" specified for', uuid );
 
 				}
 
@@ -693,7 +803,7 @@ class ObjectLoader extends Loader {
 
 				texture.source = source;
 
-				texture.uuid = data.uuid;
+				texture.uuid = uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
 
@@ -730,7 +840,7 @@ class ObjectLoader extends Loader {
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 
-				textures[ data.uuid ] = texture;
+				textures[ uuid ] = texture;
 
 			}
 

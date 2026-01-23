@@ -1213,7 +1213,7 @@ class BufferGeometry extends EventDispatcher {
 
 		const data = {
 			metadata: {
-				version: 4.7,
+				version: 5,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}
