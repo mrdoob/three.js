@@ -1202,15 +1202,8 @@ class USDComposer {
 			const indices = attrs[ 'indices' ];
 			if ( ! indices || indices.length === 0 ) continue;
 
-			// Get material binding
-			const bindingPath = p + '.material:binding';
-			const bindingSpec = this.specsByPath[ bindingPath ];
-			let materialPath = null;
-			if ( bindingSpec && bindingSpec.fields.targetPaths && bindingSpec.fields.targetPaths.length > 0 ) {
-
-				materialPath = bindingSpec.fields.targetPaths[ 0 ];
-
-			}
+			// Get material binding - check direct path and variant paths
+			let materialPath = this._getMaterialBindingTarget( p );
 
 			subsets.push( {
 				name: p.split( '/' ).pop(),
@@ -1221,6 +1214,49 @@ class USDComposer {
 		}
 
 		return subsets;
+
+	}
+
+	/**
+	 * Get material binding target path, checking variant paths if needed.
+	 */
+	_getMaterialBindingTarget( primPath ) {
+
+		const attrName = 'material:binding';
+
+		// First check direct path
+		const directPath = primPath + '.' + attrName;
+		const directSpec = this.specsByPath[ directPath ];
+		if ( directSpec?.fields?.targetPaths?.length > 0 ) {
+
+			return directSpec.fields.targetPaths[ 0 ];
+
+		}
+
+		// Check variant paths at ancestor levels
+		const parts = primPath.split( '/' );
+		for ( let i = 1; i < parts.length; i ++ ) {
+
+			const ancestorPath = parts.slice( 0, i + 1 ).join( '/' );
+			const relativePath = parts.slice( i + 1 ).join( '/' );
+			const variantPaths = this._getVariantPaths( ancestorPath );
+
+			for ( const vp of variantPaths ) {
+
+				const overridePath = relativePath ? vp + '/' + relativePath + '.' + attrName : vp + '.' + attrName;
+				const overrideSpec = this.specsByPath[ overridePath ];
+
+				if ( overrideSpec?.fields?.targetPaths?.length > 0 ) {
+
+					return overrideSpec.fields.targetPaths[ 0 ];
+
+				}
+
+			}
+
+		}
+
+		return null;
 
 	}
 
@@ -2206,21 +2242,16 @@ class USDComposer {
 		let materialPath = null;
 		let materialBinding = fields[ 'material:binding' ];
 
-		if ( ! materialBinding ) {
-
-			const bindingPath = meshPath + '.material:binding';
-			const bindingSpec = this.specsByPath[ bindingPath ];
-			if ( bindingSpec && bindingSpec.specType === SpecType.Relationship ) {
-
-				materialBinding = bindingSpec.fields.targetPaths || bindingSpec.fields.default;
-
-			}
-
-		}
-
 		if ( materialBinding ) {
 
 			materialPath = Array.isArray( materialBinding ) ? materialBinding[ 0 ] : materialBinding;
+
+		}
+
+		// Use variant-aware lookup if no direct binding in fields
+		if ( ! materialPath ) {
+
+			materialPath = this._getMaterialBindingTarget( meshPath );
 
 		}
 
@@ -2235,21 +2266,16 @@ class USDComposer {
 		let materialPath = null;
 		let materialBinding = fields[ 'material:binding' ];
 
-		if ( ! materialBinding ) {
-
-			const bindingPath = meshPath + '.material:binding';
-			const bindingSpec = this.specsByPath[ bindingPath ];
-			if ( bindingSpec && bindingSpec.specType === SpecType.Relationship ) {
-
-				materialBinding = bindingSpec.fields.targetPaths || bindingSpec.fields.default;
-
-			}
-
-		}
-
 		if ( materialBinding ) {
 
 			materialPath = Array.isArray( materialBinding ) ? materialBinding[ 0 ] : materialBinding;
+
+		}
+
+		// Use variant-aware lookup if no direct binding in fields
+		if ( ! materialPath ) {
+
+			materialPath = this._getMaterialBindingTarget( meshPath );
 
 		}
 
