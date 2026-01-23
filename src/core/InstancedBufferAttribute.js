@@ -55,7 +55,7 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 		const data = super.toJSON( meta );
 
-		data.class = 'InstancedBufferAttribute';
+		data.attributeType = 'InstancedBufferAttribute';
 		data.meshPerAttribute = this.meshPerAttribute;
 
 		return data;

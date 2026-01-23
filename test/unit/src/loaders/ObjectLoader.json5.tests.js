@@ -361,14 +361,14 @@ export default QUnit.module( 'Loaders', () => {
 						data: {
 							attributes: {
 								position: {
-									class: 'InterleavedBufferAttribute',
+									attributeType: 'InterleavedBufferAttribute',
 									itemSize: 3,
 									data: 'interleaved-1',
 									offset: 0,
 									normalized: false
 								},
 								uv: {
-									class: 'InterleavedBufferAttribute',
+									attributeType: 'InterleavedBufferAttribute',
 									itemSize: 2,
 									data: 'interleaved-1',
 									offset: 3,

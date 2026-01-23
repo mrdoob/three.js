@@ -522,7 +522,7 @@ class InterleavedBufferAttribute {
 			this.data.toJSON( meta );
 
 			return {
-				class: 'InterleavedBufferAttribute',
+				attributeType: 'InterleavedBufferAttribute',
 				itemSize: this.itemSize,
 				data: this.data.uuid,
 				offset: this.offset,

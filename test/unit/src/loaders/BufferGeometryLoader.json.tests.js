@@ -170,14 +170,14 @@ export default QUnit.module( 'Loaders', () => {
 					},
 					attributes: {
 						position: {
-							class: 'InterleavedBufferAttribute',
+							attributeType: 'InterleavedBufferAttribute',
 							itemSize: 3,
 							data: interleavedBufferUuid,
 							offset: 0,
 							normalized: false
 						},
 						uv: {
-							class: 'InterleavedBufferAttribute',
+							attributeType: 'InterleavedBufferAttribute',
 							itemSize: 2,
 							data: interleavedBufferUuid,
 							offset: 3,
@@ -243,7 +243,7 @@ export default QUnit.module( 'Loaders', () => {
 					arrayBuffers: externalBuffers.array,
 					attributes: {
 						position: {
-							class: 'InterleavedBufferAttribute',
+							attributeType: 'InterleavedBufferAttribute',
 							itemSize: 3,
 							data: interleavedBufferUuid,
 							offset: 0,
@@ -261,7 +261,7 @@ export default QUnit.module( 'Loaders', () => {
 					arrayBuffers: externalBuffers.array,
 					attributes: {
 						position: {
-							class: 'InterleavedBufferAttribute',
+							attributeType: 'InterleavedBufferAttribute',
 							itemSize: 3,
 							data: interleavedBufferUuid,
 							offset: 0,
