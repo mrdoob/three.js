@@ -147,7 +147,8 @@ class NodeManager extends DataMap {
 		let groupData = this.groupsData.get( _chainKeys );
 		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = {} );
 
-		_chainKeys.length = 0;
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
 
 		if ( groupData.version !== groupNode.version ) {
 
@@ -444,7 +445,8 @@ class NodeManager extends DataMap {
 
 		}
 
-		_chainKeys.length = 0;
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
 
 		return cacheKeyData.cacheKey;
 
