@@ -876,10 +876,16 @@ function WebGLState( gl, extensions ) {
 
 			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				currentPolygonOffsetFactor = factor;
 				currentPolygonOffsetUnits = units;
+
+				if ( depthBuffer.getReversed() ) {
+
+					factor = - factor;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 
