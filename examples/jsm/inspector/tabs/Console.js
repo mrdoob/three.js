@@ -39,8 +39,8 @@ class Console extends Tab {
 		copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
 		copyButton.addEventListener( 'click', () => this.copyAll( copyButton ) );
 
-		const filtersGroup = document.createElement( 'div' );
-		filtersGroup.className = 'console-filters-group';
+		const buttonsGroup = document.createElement( 'div' );
+		buttonsGroup.className = 'console-buttons-group';
 
 		Object.keys( this.filters ).forEach( type => {
 
@@ -59,11 +59,11 @@ class Console extends Tab {
 			label.appendChild( checkbox );
 			label.appendChild( checkmark );
 			label.append( type.charAt( 0 ).toUpperCase() + type.slice( 1 ) );
-			filtersGroup.appendChild( label );
+			buttonsGroup.appendChild( label );
 
 		} );
 
-		filtersGroup.addEventListener( 'change', ( e ) => {
+		buttonsGroup.addEventListener( 'change', ( e ) => {
 
 			const type = e.target.dataset.type;
 			if ( type in this.filters ) {
@@ -75,9 +75,10 @@ class Console extends Tab {
 
 		} );
 
+		buttonsGroup.appendChild( copyButton );
+
 		header.appendChild( filterInput );
-		header.appendChild( filtersGroup );
-		header.appendChild( copyButton );
+		header.appendChild( buttonsGroup );
 		this.content.appendChild( header );
 
 	}

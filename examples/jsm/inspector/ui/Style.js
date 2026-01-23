@@ -1057,7 +1057,7 @@ export class Style {
 	justify-content: space-between;
 }
 
-.console-filters-group {
+.console-buttons-group {
 	display: flex;
 	gap: 20px;
 }
