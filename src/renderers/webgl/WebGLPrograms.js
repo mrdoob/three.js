@@ -305,7 +305,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			flatShading: material.wireframe === false && (
 				material.flatShading === true ||
-				( geometry.attributes.normal === undefined &&
+				( geometry.attributes.normal === undefined && HAS_NORMALMAP === false &&
 					( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial || material.isMeshPhysicalMaterial )
 				)
 			),
