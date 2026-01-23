@@ -1489,6 +1489,7 @@ class ColladaComposer {
 
 		if ( data.parameters.color ) light.color.copy( data.parameters.color );
 		if ( data.parameters.distance ) light.distance = data.parameters.distance;
+		if ( data.parameters.falloffAngle ) light.angle = MathUtils.degToRad( data.parameters.falloffAngle );
 
 		return light;
 
