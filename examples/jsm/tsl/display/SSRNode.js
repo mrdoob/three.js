@@ -262,6 +262,7 @@ class SSRNode extends TempNode {
 		this._copyMaterial = new NodeMaterial();
 		this._copyMaterial.name = 'SSRNode.Copy';
 
+
 		/**
 		 * The result of the effect is represented as a separate texture node.
 		 *
@@ -270,24 +271,13 @@ class SSRNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
 
-		let blurredTextureNode = null;
-
-		if ( this.roughnessNode !== null ) {
-
-			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const lod = float( this.roughnessNode ).mul( mips ).clamp( 0, mips );
-
-			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
-
-		}
-
 		/**
 		 * Holds the blurred SSR reflections.
 		 *
 		 * @private
-		 * @type {?PassTextureNode}
+		 * @type {?Node}
 		 */
-		this._blurredTextureNode = blurredTextureNode;
+		this._blurredTextureNode = null;
 
 	}
 
@@ -585,9 +575,10 @@ class SSRNode extends TempNode {
 						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 );
 						op.mulAssign( fresnelCoe );
 
-						// output
+						// output: RGB = color * opacity (premultiplied), A = normalized distance
 						const reflectColor = this.colorNode.sample( uvNode );
-						output.assign( vec4( reflectColor.rgb, op ) );
+						const normalizedDistance = distance.div( this.maxDistance ).clamp( 0, 1 );
+						output.assign( vec4( reflectColor.rgb.mul( op ), normalizedDistance ) );
 						Break();
 
 					} );
@@ -615,6 +606,33 @@ class SSRNode extends TempNode {
 
 		this._copyMaterial.fragmentNode = reflectionBuffer;
 		this._copyMaterial.needsUpdate = true;
+
+		// distance-aware blur sampling
+
+		if ( this.roughnessNode !== null ) {
+
+			const blurBuffer = texture( this._blurRenderTarget.texture );
+			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
+
+			// sample distance from unblurred SSR alpha and use roughness² * distance for LOD
+			// roughness² matches GGX microfacet distribution behavior
+			const distanceAwareSample = Fn( () => {
+
+				// get distance from the unblurred SSR texture's alpha channel
+				const reflectionDistance = reflectionBuffer.sample( uvNode ).a;
+				const r = float( this.roughnessNode );
+				// squared roughness for more physically accurate falloff (GGX-like)
+				const lod = r.mul( r ).mul( reflectionDistance ).mul( mips ).clamp( 0, mips );
+				const blurred = blurBuffer.sample( uvNode ).level( lod );
+
+				// output: RGB is premultiplied color, keep alpha as distance for potential further use
+				return blurred;
+
+			} );
+
+			this._blurredTextureNode = distanceAwareSample();
+
+		}
 
 		//
 
