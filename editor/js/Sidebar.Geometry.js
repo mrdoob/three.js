@@ -267,7 +267,7 @@ function SidebarGeometry( editor ) {
 
 				parameters.clear();
 
-				if ( geometry.type === 'BufferGeometry' ) {
+				if ( geometry.type === 'BufferGeometry' || geometry.type === 'InstancedBufferGeometry' ) {
 
 					parameters.add( new SidebarGeometryModifiers( editor, object ) );
 
