@@ -1314,6 +1314,9 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
+		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
+		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
+
 		// object specific properties
 
 		if ( this.isInstancedMesh ) {

@@ -806,6 +806,8 @@ function Viewport( editor ) {
 
 			}
 
+			signals.animationsUpdated.dispatch();
+
 		}
 
 		// View Helper

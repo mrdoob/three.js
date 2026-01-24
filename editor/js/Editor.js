@@ -35,6 +35,8 @@ function Editor() {
 
 		// notifications
 
+		animationsUpdated: new Signal(),
+
 		editorCleared: new Signal(),
 
 		savingStarted: new Signal(),
