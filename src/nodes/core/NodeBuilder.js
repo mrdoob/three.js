@@ -470,7 +470,7 @@ class NodeBuilder {
 	/**
 	 * Whether the material is using flat shading or not.
 	 *
-	 * @returns {boolean} Whether the material is using flat shading or not. 
+	 * @returns {boolean} Whether the material is using flat shading or not.
 	 */
 	isFlatShading() {
 
