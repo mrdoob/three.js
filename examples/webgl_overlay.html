@@ -114,7 +114,7 @@
 				containerFg = document.getElementById( 'canvas-fg' );
 				contentElement = document.querySelector( '.content' );
 
-				checkMobile();
+				checkSafari();
 
 				// Scene
 				scene = new THREE.Scene();
@@ -279,7 +279,7 @@
 
 					const rect = elements[ i ].getBoundingClientRect();
 					elementBoxes[ i ].position.set(
-						(( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter)-anchor.position.x,
+						(( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter) - anchor.position.x,
 						( rect.top + window.scrollY + rect.height * 0.5 ) / -pixelsPerMeter,
 						0.0
 					);
@@ -293,7 +293,7 @@
 
 			}
 
-			function checkMobile() {
+			function checkSafari() {
 
 				// Detect Safari browser
 				isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
