@@ -9,7 +9,7 @@ function ViewportInfo( editor ) {
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
-	container.setBottom( '20px' );
+	container.setBottom( '50px' );
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 	container.setTextTransform( 'lowercase' );
@@ -133,7 +133,7 @@ function ViewportInfo( editor ) {
 		samplesText.setHidden( ! isRealisticShading );
 		samplesUnitText.setHidden( ! isRealisticShading );
 
-		container.setBottom( isRealisticShading ? '32px' : '20px' );
+		container.setBottom( isRealisticShading ? '62px' : '50px' );
 
 	} );
 

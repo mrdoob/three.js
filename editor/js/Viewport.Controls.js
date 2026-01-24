@@ -8,12 +8,10 @@ function ViewportControls( editor ) {
 	container.setPosition( 'absolute' );
 	container.setRight( '10px' );
 	container.setTop( '10px' );
-	container.setColor( '#ffffff' );
 
 	// camera
 
 	const cameraSelect = new UISelect();
-	cameraSelect.setMarginLeft( '10px' );
 	cameraSelect.setMarginRight( '10px' );
 	cameraSelect.onChange( function () {
 

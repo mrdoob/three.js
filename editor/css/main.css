@@ -103,7 +103,7 @@ hr {
 
 	.TabbedPanel .Panels {
 		position: absolute;
-		top: 40px;
+		top: 36px;
 		display: block;
 		width: 100%;
 	}
@@ -303,7 +303,8 @@ hr {
 .Select {
 	color: #666;
 	background-color: #ddd;
-	border: 0px;
+	border: 3px solid #ddd;
+	border-radius: 4px;
 	text-transform: uppercase;
 	cursor: pointer;
 	outline: none;
@@ -318,7 +319,7 @@ hr {
 #resizer {
 	position: absolute;
 	z-index: 2; /* Above #sidebar */
-	top: 32px;
+	top: 36px;
 	right: 350px;
 	width: 5px;
 	bottom: 0px;
@@ -339,7 +340,7 @@ hr {
 
 #viewport {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
 	bottom: 0;
@@ -352,7 +353,7 @@ hr {
 
 #script {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
 	bottom: 0;
@@ -361,7 +362,7 @@ hr {
 
 #player {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
 	bottom: 0;
@@ -370,7 +371,7 @@ hr {
 #menubar {
 	position: absolute;
 	width: 100%;
-	height: 32px;
+	height: 36px;
 	background: #eee;
 	padding: 0;
 	margin: 0;
@@ -395,7 +396,7 @@ hr {
 			display: inline-block;
 			color: #888;
 			margin: 0;
-			padding: 8px;
+			padding: 10px;
 			line-height: 16px;
 		}
 
@@ -406,6 +407,7 @@ hr {
 			border: 1px solid #ccc;
 			border-radius: 4px;
 			font-size: 9px;
+			line-height: normal;
 			padding: 2px 4px;
 			right: 10px;
 			pointer-events: none;
@@ -435,6 +437,7 @@ hr {
 				color: #666;
 				background-color: transparent;
 				padding: 5px 10px;
+				line-height: 25px;
 				margin: 0 !important;
 			}
 
@@ -472,6 +475,7 @@ hr {
 			color: #bbb;
 			background-color: transparent;
 			padding: 5px 10px;
+			line-height: 25px;
 			margin: 0 !important;
 			cursor: not-allowed;
 		}
@@ -481,7 +485,7 @@ hr {
 #sidebar {
 	position: absolute;
 	right: 0;
-	top: 32px;
+	top: 36px;
 	bottom: 0;
 	width: 350px;
 	background: #eee;
@@ -530,15 +534,26 @@ hr {
 
 #toolbar {
 	position: absolute;
-	left: 10px;
-	top: 42px;
-	width: 32px;
+	left: calc(50% - 175px);
+	transform: translateX(-50%);
+	bottom: 20px;
+	height: 32px;
 	background: #eee;
 	text-align: center;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	border-radius: 6px;
+	border: 3px solid #eee;
+	overflow: hidden;
 }
 
 	#toolbar .Button, #toolbar .Input {
 		height: 32px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 		#toolbar .Button img {
@@ -617,22 +632,22 @@ hr {
 	#viewport {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#script {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#player {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#sidebar {
@@ -640,6 +655,12 @@ hr {
 		width: 100%;
 		top: calc(100% - 320px);
 		bottom: 0;
+	}
+
+	#toolbar {
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: 330px;
 	}
 
 }
@@ -672,6 +693,7 @@ hr {
 	.Select {
 		color: #aaa;
 		background-color: #222;
+		border-color: #222;
 	}
 
 		.Select:hover {
@@ -734,6 +756,7 @@ hr {
 
 	#toolbar {
 		background-color: #111;
+		border-color: #111;
 	}
 
 		#toolbar img {
