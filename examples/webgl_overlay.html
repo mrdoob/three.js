@@ -193,7 +193,7 @@
 				containerFg.appendChild( rendererFg.domElement );
 
 				// Create element boxes for paragraph elements
-				recomputeElementBoxes();
+				computeDivFrames3D();
 
 				// Event listeners
 				window.addEventListener( 'resize', onWindowResize );
@@ -230,38 +230,33 @@
 
 			}
 
-			function recomputeElementBoxes() {
-
-				const boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const boxMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0xffffff,
-					wireframe: true,
-					opacity: 0.05,
-					transparent: true
-				} );
+			function computeDivFrames3D() {
 
 				const elements = document.getElementsByTagName( 'p' );
 
 				for ( let i = 0; i < elements.length; i++ ) {
 
+					const rect = elements[ i ].getBoundingClientRect();
+					const centerX = (( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter ) - anchor.position.x;
+					const centerY = ( rect.top + window.scrollY + rect.height * 0.5 ) / - pixelsPerMeter;
+					const halfWidth = rect.width / pixelsPerMeter / 2;
+					const halfHeight = rect.height / pixelsPerMeter / 2;
+					const halfDepth = 0.25;
+
 					if ( i >= elementBoxes.length ) {
 
-						const box = new THREE.Mesh( boxGeometry, boxMaterial );
-						anchor.add( box );
-						elementBoxes.push( box );
+						const box = new THREE.Box3();
+						const helper = new THREE.Box3Helper( box, 0x000000 );
+						helper.material.opacity = 0.1;
+						helper.material.transparent = true;
+						anchor.add( helper );
+						elementBoxes.push( { box, helper } );
 
 					}
 
-					const rect = elements[ i ].getBoundingClientRect();
-					elementBoxes[ i ].position.set(
-						(( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter) - anchor.position.x,
-						( rect.top + window.scrollY + rect.height * 0.5 ) / -pixelsPerMeter,
-						0.0
-					);
-					elementBoxes[ i ].scale.set(
-						rect.width / pixelsPerMeter,
-						rect.height / pixelsPerMeter,
-						0.5
+					elementBoxes[ i ].box.set(
+						new THREE.Vector3( centerX - halfWidth, centerY - halfHeight, - halfDepth ),
+						new THREE.Vector3( centerX + halfWidth, centerY + halfHeight, halfDepth )
 					);
 
 				}
@@ -343,7 +338,7 @@
 
 				forcePixelsPerMeter();
 				updateAnchorPosition();
-				recomputeElementBoxes();
+				computeDivFrames3D();
 				setScrolledCameraPosition();
 
 			}
