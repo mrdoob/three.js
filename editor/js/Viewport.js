@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { PMREMGenerator } from 'three/webgpu';
 
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
@@ -291,7 +292,7 @@ function Viewport( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
-		pathtracer.reset();
+		if ( pathtracer ) pathtracer.reset();
 
 		initPT();
 
@@ -342,8 +343,18 @@ function Viewport( editor ) {
 		if ( renderer !== null ) {
 
 			renderer.setAnimationLoop( null );
+
+			try {
+
+				pmremGenerator.dispose();
+
+			} catch ( e ) {
+
+				console.warn( 'PMREMGenerator dispose error:', e );
+
+			}
+
 			renderer.dispose();
-			pmremGenerator.dispose();
 
 			container.dom.removeChild( renderer.domElement );
 
@@ -377,12 +388,24 @@ function Viewport( editor ) {
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
-		pmremGenerator = new THREE.PMREMGenerator( renderer );
-		pmremGenerator.compileEquirectangularShader();
+		if ( renderer.isWebGLRenderer ) {
 
-		pathtracer = new ViewportPathtracer( renderer );
+			pmremGenerator = new THREE.PMREMGenerator( renderer );
+			pmremGenerator.compileEquirectangularShader();
+
+			pathtracer = new ViewportPathtracer( renderer );
+
+		} else {
+
+			pmremGenerator = new PMREMGenerator( renderer );
+
+			pathtracer = null;
+
+		}
 
 		container.dom.appendChild( renderer.domElement );
+
+		signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 		render();
 
@@ -403,7 +426,7 @@ function Viewport( editor ) {
 
 	signals.cameraChanged.add( function () {
 
-		pathtracer.reset();
+		if ( pathtracer ) pathtracer.reset();
 
 		render();
 
@@ -682,7 +705,7 @@ function Viewport( editor ) {
 		switch ( viewportShading ) {
 
 			case 'realistic':
-				pathtracer.init( scene, editor.viewportCamera );
+				if ( pathtracer ) pathtracer.init( scene, editor.viewportCamera );
 				break;
 
 			case 'solid':
@@ -709,8 +732,10 @@ function Viewport( editor ) {
 
 		updateAspectRatio();
 
+		if ( renderer === null ) return;
+
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-		pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		if ( pathtracer ) pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		render();
 
@@ -831,7 +856,7 @@ function Viewport( editor ) {
 
 	function initPT() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.init( scene, editor.viewportCamera );
 
@@ -841,7 +866,7 @@ function Viewport( editor ) {
 
 	function updatePTBackground() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.setBackground( scene.background, scene.backgroundBlurriness );
 
@@ -851,7 +876,7 @@ function Viewport( editor ) {
 
 	function updatePTEnvironment() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.setEnvironment( scene.environment );
 
@@ -861,7 +886,7 @@ function Viewport( editor ) {
 
 	function updatePTMaterials() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.updateMaterials();
 
@@ -871,7 +896,7 @@ function Viewport( editor ) {
 
 	function updatePT() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
 			editor.signals.pathTracerUpdated.dispatch( pathtracer.getSamples() );
@@ -886,6 +911,8 @@ function Viewport( editor ) {
 	let endTime = 0;
 
 	function render() {
+
+		if ( renderer === null ) return;
 
 		startTime = performance.now();
 

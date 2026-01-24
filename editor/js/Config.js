@@ -15,6 +15,7 @@ function Config() {
 		'project/editable': false,
 		'project/vr': false,
 
+		'project/renderer/type': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
 		'project/renderer/shadowType': 1, // PCF
