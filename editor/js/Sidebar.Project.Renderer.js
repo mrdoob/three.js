@@ -111,7 +111,7 @@ function SidebarProjectRenderer( editor ) {
 
 		if ( rendererType === 'WebGPURenderer' ) {
 
-			currentRenderer = new WebGPURenderer( { antialias: antialias } );
+			currentRenderer = new WebGPURenderer( { antialias: antialias, logarithmicDepthBuffer: true } );
 			await currentRenderer.init();
 
 		} else {

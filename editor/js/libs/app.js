@@ -32,7 +32,7 @@ const APP = {
 			if ( project.renderer === 'WebGPURenderer' ) {
 
 				const { WebGPURenderer } = await import( 'three/webgpu' );
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new WebGPURenderer( { antialias: true, logarithmicDepthBuffer: true } );
 				await renderer.init();
 
 			} else {
