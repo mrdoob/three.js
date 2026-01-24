@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { WebGPURenderer } from 'three/webgpu';
 
 import { UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
@@ -13,6 +14,20 @@ function SidebarProjectRenderer( editor ) {
 
 	const container = new UIPanel();
 	container.setBorderTop( '0px' );
+
+	// Renderer
+
+	const rendererRow = new UIRow();
+	container.add( rendererRow );
+
+	rendererRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setClass( 'Label' ) );
+
+	const rendererTypeSelect = new UISelect().setOptions( {
+		'WebGLRenderer': 'WebGL',
+		'WebGPURenderer': 'WebGPU'
+	} ).setWidth( '150px' ).onChange( createRenderer );
+	rendererTypeSelect.setValue( config.getKey( 'project/renderer/type' ) );
+	rendererRow.add( rendererTypeSelect );
 
 	// Antialias
 
@@ -89,9 +104,22 @@ function SidebarProjectRenderer( editor ) {
 
 	//
 
-	function createRenderer() {
+	async function createRenderer() {
 
-		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue(), logarithmicDepthBuffer: true } );
+		const rendererType = rendererTypeSelect.getValue();
+		const antialias = antialiasBoolean.getValue();
+
+		if ( rendererType === 'WebGPURenderer' ) {
+
+			currentRenderer = new WebGPURenderer( { antialias: antialias, logarithmicDepthBuffer: true } );
+			await currentRenderer.init();
+
+		} else {
+
+			currentRenderer = new THREE.WebGLRenderer( { antialias: antialias, logarithmicDepthBuffer: true } );
+
+		}
+
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
 		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
 		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
@@ -111,7 +139,7 @@ function SidebarProjectRenderer( editor ) {
 
 		currentRenderer.shadowMap.enabled = true;
 		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
-		currentRenderer.toneMapping = THREE.NoToneMapping;
+		currentRenderer.toneMapping = THREE.NeutralToneMapping;
 		currentRenderer.toneMappingExposure = 1;
 
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
@@ -127,6 +155,7 @@ function SidebarProjectRenderer( editor ) {
 	signals.rendererUpdated.add( function () {
 
 		config.setKey(
+			'project/renderer/type', rendererTypeSelect.getValue(),
 			'project/renderer/antialias', antialiasBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
 			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),

@@ -351,6 +351,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'حذف',
 
 			'sidebar/project': 'پروژه ها',
+			'sidebar/project/renderer': 'رندرر',
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
 			'sidebar/project/toneMapping': 'تون مپینگ',
@@ -766,6 +767,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
+			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
 			'sidebar/project/toneMapping': 'Tonemapping',
@@ -1182,6 +1184,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
+			'sidebar/project/renderer': 'Moteur',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
@@ -1598,6 +1601,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
+			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/toneMapping': '色调映射',
@@ -2014,6 +2018,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '削除',
 
 			'sidebar/project': 'プロジェクト',
+			'sidebar/project/renderer': 'レンダラー',
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
 			'sidebar/project/toneMapping': 'トーンマッピング',
@@ -2429,6 +2434,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '삭제',
 
 			'sidebar/project': '프로젝트',
+			'sidebar/project/renderer': '렌더러',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',

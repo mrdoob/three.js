@@ -411,7 +411,7 @@ class RenderVideoDialog {
 		renderButton.onClick( async () => {
 
 			const player = new APP.Player();
-			player.load( editor.toJSON() );
+			await player.load( editor.toJSON() );
 			player.setPixelRatio( 1 );
 			player.setSize( videoWidth.getValue(), videoHeight.getValue() );
 

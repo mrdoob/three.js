@@ -723,6 +723,7 @@ Editor.prototype = {
 
 			metadata: {},
 			project: {
+				renderer: this.config.getKey( 'project/renderer/type' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
