@@ -1,5 +1,8 @@
 import { TSL } from 'three/webgpu';
 
+export * from './nodes/materialx/MaterialXNodes.js';
+export * from './nodes/Nodes.js';
+
 export const BRDF_GGX = TSL.BRDF_GGX;
 export const BRDF_Lambert = TSL.BRDF_Lambert;
 export const BasicPointShadowFilter = TSL.BasicPointShadowFilter;

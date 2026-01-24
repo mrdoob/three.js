@@ -17,9 +17,9 @@ class NumberNodeUniform extends NumberUniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -52,6 +52,12 @@ class NumberNodeUniform extends NumberUniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -68,9 +74,9 @@ class Vector2NodeUniform extends Vector2Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -103,6 +109,12 @@ class Vector2NodeUniform extends Vector2Uniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -119,9 +131,9 @@ class Vector3NodeUniform extends Vector3Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -154,6 +166,12 @@ class Vector3NodeUniform extends Vector3Uniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -170,9 +188,9 @@ class Vector4NodeUniform extends Vector4Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -205,6 +223,12 @@ class Vector4NodeUniform extends Vector4Uniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -221,9 +245,9 @@ class ColorNodeUniform extends ColorUniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -256,6 +280,12 @@ class ColorNodeUniform extends ColorUniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 
@@ -273,9 +303,9 @@ class Matrix2NodeUniform extends Matrix2Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -308,6 +338,12 @@ class Matrix2NodeUniform extends Matrix2Uniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -324,9 +360,9 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -359,6 +395,12 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 
 	}
 
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
+
+	}
+
 }
 
 /**
@@ -375,9 +417,9 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 	 *
 	 * @param {NodeUniform} nodeUniform - The node uniform.
 	 */
-	constructor( nodeUniform ) {
+	constructor(nodeUniform) {
 
-		super( nodeUniform.name, nodeUniform.value );
+		super(nodeUniform.name, nodeUniform.value);
 
 		/**
 		 * The node uniform.
@@ -407,6 +449,12 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 	getType() {
 
 		return this.nodeUniform.type;
+
+	}
+
+	clone() {
+
+		return new this.constructor(this.nodeUniform);
 
 	}
 

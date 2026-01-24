@@ -25,7 +25,7 @@ class NodeBuilderState {
 	 * @param {NodeMaterialObserver} observer - A node material observer.
 	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
 	 */
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, transforms = [] ) {
+	constructor(vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, transforms = []) {
 
 		/**
 		 * The native vertex shader code.
@@ -120,24 +120,24 @@ class NodeBuilderState {
 
 		const bindings = [];
 
-		for ( const instanceGroup of this.bindings ) {
+		for (const instanceGroup of this.bindings) {
 
-			const shared = instanceGroup.bindings[ 0 ].groupNode.shared; // All bindings in the group must have the same groupNode.
+			const shared = instanceGroup.bindings[0].groupNode ? instanceGroup.bindings[0].groupNode.shared : false; // All bindings in the group must have the same groupNode.
 
-			if ( shared !== true ) {
+			if (shared !== true) {
 
-				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index, instanceGroup.bindingsReference );
-				bindings.push( bindingsGroup );
+				const bindingsGroup = new BindGroup(instanceGroup.name, [], instanceGroup.index, instanceGroup.bindingsReference);
+				bindings.push(bindingsGroup);
 
-				for ( const instanceBinding of instanceGroup.bindings ) {
+				for (const instanceBinding of instanceGroup.bindings) {
 
-					bindingsGroup.bindings.push( instanceBinding.clone() );
+					bindingsGroup.bindings.push(instanceBinding.clone());
 
 				}
 
 			} else {
 
-				bindings.push( instanceGroup );
+				bindings.push(instanceGroup);
 
 			}
 

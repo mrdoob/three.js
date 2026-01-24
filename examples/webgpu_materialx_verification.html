@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgpu - materialx verification</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="example.css">
+</head>
+
+<body>
+
+	<div id="info">
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>MaterialX
+				Verification</span>
+		</div>
+		<small>Verifying new MaterialX nodes.</small>
+	</div>
+
+	<script type="importmap">
+            {
+                "imports": {
+                    "three": "../build/three.webgpu.js",
+                    "three/webgpu": "../build/three.webgpu.js",
+                    "three/tsl": "../build/three.tsl.js",
+                    "three/addons/": "./jsm/"
+                }
+            }
+        </script>
+
+	<script type="module">
+
+		import * as THREE from 'three/webgpu';
+		import {
+			time, uv, float, vec3,
+			mx_sin, mx_cos, mx_abs, mx_noise_vec3,
+			mx_position, mx_normal,
+			mx_burn, mx_dodge, mx_screen, mx_overlay, mx_difference
+		} from 'three/tsl';
+
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+		let container;
+		let camera, scene, renderer;
+		let group;
+
+		init();
+
+		function init() {
+
+			container = document.createElement('div');
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 1000);
+			camera.position.z = 50;
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color(0x222222);
+
+			group = new THREE.Group();
+			scene.add(group);
+
+			const geometry = new THREE.SphereGeometry(4, 32, 16);
+
+			// --- MATERIAL SETUP ---
+			// 0. Minimal Red Test
+			const redMaterial = new THREE.MeshBasicNodeMaterial();
+			redMaterial.colorNode = vec3(1, 0, 0);
+			addMesh(geometry, redMaterial, 0, 0, "Minimal Red");
+
+			// 1. Math Nodes
+			const mathMaterial = new THREE.MeshBasicNodeMaterial();
+			mathMaterial.colorNode = vec3(mx_sin(time), mx_cos(time), mx_abs(mx_sin(time.mul(3))));
+			addMesh(geometry, mathMaterial, -15, 5, "Math");
+
+			// 2. Geometric Nodes
+			const geomMaterial = new THREE.MeshBasicNodeMaterial();
+			geomMaterial.colorNode = mx_normal().mix(mx_position('local').normalize(), 0.5);
+			addMesh(geometry, geomMaterial, 0, 5, "Normal/Pos");
+
+			// 3. Composite (Burn)
+			const burnMaterial = new THREE.MeshBasicNodeMaterial();
+			const noise = mx_noise_vec3(uv().mul(10).add(time));
+			const base = vec3(0.5, 0.5, 0.5);
+			burnMaterial.colorNode = mx_burn(base, noise);
+			addMesh(geometry, burnMaterial, 15, 5, "Burn");
+
+			// --- RENDERER SETUP ---
+			renderer = new THREE.WebGPURenderer({
+				forceWebGL: true,
+				antialias: false,
+				stencil: false,
+				depth: true,
+				powerPreference: "high-performance"
+			});
+
+			renderer.setPixelRatio(1);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setAnimationLoop(render);
+			container.appendChild(renderer.domElement);
+
+			new OrbitControls(camera, renderer.domElement);
+			window.addEventListener('resize', onWindowResize);
+
+		}
+
+		function addMesh(geometry, material, x, y, labelText) {
+			const mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(x, y, 0);
+			group.add(mesh);
+		}
+
+		function onWindowResize() {
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+			renderer.setSize(width, height);
+		}
+
+		function render() {
+			renderer.render(scene, camera);
+		}
+
+	</script>
+</body>
+
+</html>

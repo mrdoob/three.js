@@ -30,7 +30,7 @@ class NodeManager extends DataMap {
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Backend} backend - The renderer's backend.
 	 */
-	constructor( renderer, backend ) {
+	constructor(renderer, backend) {
 
 		super();
 
@@ -92,23 +92,26 @@ class NodeManager extends DataMap {
 	 * @param {NodeUniformsGroup} nodeUniformsGroup - The node uniforms group.
 	 * @return {boolean} Whether the node uniforms group requires an update or not.
 	 */
-	updateGroup( nodeUniformsGroup ) {
+	updateGroup(nodeUniformsGroup) {
 
 		const groupNode = nodeUniformsGroup.groupNode;
+
+		if (groupNode === undefined) return false; // Anti-UBO: Loose uniforms handled by backend
+
 		const name = groupNode.name;
 
 		// objectGroup is always updated
 
-		if ( name === objectGroup.name ) return true;
+		if (name === objectGroup.name) return true;
 
 		// renderGroup is updated once per render/compute call
 
-		if ( name === renderGroup.name ) {
+		if (name === renderGroup.name) {
 
-			const uniformsGroupData = this.get( nodeUniformsGroup );
+			const uniformsGroupData = this.get(nodeUniformsGroup);
 			const renderId = this.nodeFrame.renderId;
 
-			if ( uniformsGroupData.renderId !== renderId ) {
+			if (uniformsGroupData.renderId !== renderId) {
 
 				uniformsGroupData.renderId = renderId;
 
@@ -122,12 +125,12 @@ class NodeManager extends DataMap {
 
 		// frameGroup is updated once per frame
 
-		if ( name === frameGroup.name ) {
+		if (name === frameGroup.name) {
 
-			const uniformsGroupData = this.get( nodeUniformsGroup );
+			const uniformsGroupData = this.get(nodeUniformsGroup);
 			const frameId = this.nodeFrame.frameId;
 
-			if ( uniformsGroupData.frameId !== frameId ) {
+			if (uniformsGroupData.frameId !== frameId) {
 
 				uniformsGroupData.frameId = frameId;
 
@@ -141,16 +144,16 @@ class NodeManager extends DataMap {
 
 		// other groups are updated just when groupNode.needsUpdate is true
 
-		_chainKeys[ 0 ] = groupNode;
-		_chainKeys[ 1 ] = nodeUniformsGroup;
+		_chainKeys[0] = groupNode;
+		_chainKeys[1] = nodeUniformsGroup;
 
-		let groupData = this.groupsData.get( _chainKeys );
-		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = {} );
+		let groupData = this.groupsData.get(_chainKeys);
+		if (groupData === undefined) this.groupsData.set(_chainKeys, groupData = {});
 
-		_chainKeys[ 0 ] = null;
-		_chainKeys[ 1 ] = null;
+		_chainKeys[0] = null;
+		_chainKeys[1] = null;
 
-		if ( groupData.version !== groupNode.version ) {
+		if (groupData.version !== groupNode.version) {
 
 			groupData.version = groupNode.version;
 
@@ -168,7 +171,7 @@ class NodeManager extends DataMap {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {number} The cache key.
 	 */
-	getForRenderCacheKey( renderObject ) {
+	getForRenderCacheKey(renderObject) {
 
 		return renderObject.initialCacheKey;
 
@@ -180,34 +183,34 @@ class NodeManager extends DataMap {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {NodeBuilderState} The node builder state.
 	 */
-	getForRender( renderObject ) {
+	getForRender(renderObject) {
 
-		const renderObjectData = this.get( renderObject );
+		const renderObjectData = this.get(renderObject);
 
 		let nodeBuilderState = renderObjectData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined ) {
+		if (nodeBuilderState === undefined) {
 
 			const { nodeBuilderCache } = this;
 
-			const cacheKey = this.getForRenderCacheKey( renderObject );
+			const cacheKey = this.getForRenderCacheKey(renderObject);
 
-			nodeBuilderState = nodeBuilderCache.get( cacheKey );
+			nodeBuilderState = nodeBuilderCache.get(cacheKey);
 
-			if ( nodeBuilderState === undefined ) {
+			if (nodeBuilderState === undefined) {
 
-				const createNodeBuilder = ( material ) => {
+				const createNodeBuilder = (material) => {
 
-					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+					const nodeBuilder = this.backend.createNodeBuilder(renderObject.object, this.renderer);
 					nodeBuilder.scene = renderObject.scene;
 					nodeBuilder.material = material;
 					nodeBuilder.camera = renderObject.camera;
 					nodeBuilder.context.material = material;
 					nodeBuilder.lightsNode = renderObject.lightsNode;
-					nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
-					nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+					nodeBuilder.environmentNode = this.getEnvironmentNode(renderObject.scene);
+					nodeBuilder.fogNode = this.getFogNode(renderObject.scene);
 					nodeBuilder.clippingContext = renderObject.clippingContext;
-					if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+					if (this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false) {
 
 						nodeBuilder.enableMultiview();
 
@@ -217,28 +220,28 @@ class NodeManager extends DataMap {
 
 				};
 
-				let nodeBuilder = createNodeBuilder( renderObject.material );
+				let nodeBuilder = createNodeBuilder(renderObject.material);
 
 				try {
 
 					nodeBuilder.build();
 
-				} catch ( e ) {
+				} catch (e) {
 
-					nodeBuilder = createNodeBuilder( new NodeMaterial() );
+					nodeBuilder = createNodeBuilder(new NodeMaterial());
 					nodeBuilder.build();
 
-					error( 'TSL: ' + e );
+					error('TSL: ' + e);
 
 				}
 
-				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+				nodeBuilderState = this._createNodeBuilderState(nodeBuilder);
 
-				nodeBuilderCache.set( cacheKey, nodeBuilderState );
+				nodeBuilderCache.set(cacheKey, nodeBuilderState);
 
 			}
 
-			nodeBuilderState.usedTimes ++;
+			nodeBuilderState.usedTimes++;
 
 			renderObjectData.nodeBuilderState = nodeBuilderState;
 
@@ -254,22 +257,22 @@ class NodeManager extends DataMap {
 	 * @param {any} object - The object to delete.
 	 * @return {?Object} The deleted dictionary.
 	 */
-	delete( object ) {
+	delete(object) {
 
-		if ( object.isRenderObject ) {
+		if (object.isRenderObject) {
 
-			const nodeBuilderState = this.get( object ).nodeBuilderState;
-			nodeBuilderState.usedTimes --;
+			const nodeBuilderState = this.get(object).nodeBuilderState;
+			nodeBuilderState.usedTimes--;
 
-			if ( nodeBuilderState.usedTimes === 0 ) {
+			if (nodeBuilderState.usedTimes === 0) {
 
-				this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
+				this.nodeBuilderCache.delete(this.getForRenderCacheKey(object));
 
 			}
 
 		}
 
-		return super.delete( object );
+		return super.delete(object);
 
 	}
 
@@ -279,18 +282,18 @@ class NodeManager extends DataMap {
 	 * @param {Node} computeNode - The compute node.
 	 * @return {NodeBuilderState} The node builder state.
 	 */
-	getForCompute( computeNode ) {
+	getForCompute(computeNode) {
 
-		const computeData = this.get( computeNode );
+		const computeData = this.get(computeNode);
 
 		let nodeBuilderState = computeData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined ) {
+		if (nodeBuilderState === undefined) {
 
-			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+			const nodeBuilder = this.backend.createNodeBuilder(computeNode, this.renderer);
 			nodeBuilder.build();
 
-			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+			nodeBuilderState = this._createNodeBuilderState(nodeBuilder);
 
 			computeData.nodeBuilderState = nodeBuilderState;
 
@@ -307,7 +310,7 @@ class NodeManager extends DataMap {
 	 * @param {NodeBuilder} nodeBuilder - The node builder.
 	 * @return {NodeBuilderState} The node builder state.
 	 */
-	_createNodeBuilderState( nodeBuilder ) {
+	_createNodeBuilderState(nodeBuilder) {
 
 		return new NodeBuilderState(
 			nodeBuilder.vertexShader,
@@ -331,21 +334,21 @@ class NodeManager extends DataMap {
 	 * @param {Scene} scene - The scene.
 	 * @return {Node} A node representing the current scene environment.
 	 */
-	getEnvironmentNode( scene ) {
+	getEnvironmentNode(scene) {
 
-		this.updateEnvironment( scene );
+		this.updateEnvironment(scene);
 
 		let environmentNode = null;
 
-		if ( scene.environmentNode && scene.environmentNode.isNode ) {
+		if (scene.environmentNode && scene.environmentNode.isNode) {
 
 			environmentNode = scene.environmentNode;
 
 		} else {
 
-			const sceneData = this.get( scene );
+			const sceneData = this.get(scene);
 
-			if ( sceneData.environmentNode ) {
+			if (sceneData.environmentNode) {
 
 				environmentNode = sceneData.environmentNode;
 
@@ -364,21 +367,21 @@ class NodeManager extends DataMap {
 	 * @param {Scene} scene - The scene.
 	 * @return {Node} A node representing the current scene background.
 	 */
-	getBackgroundNode( scene ) {
+	getBackgroundNode(scene) {
 
-		this.updateBackground( scene );
+		this.updateBackground(scene);
 
 		let backgroundNode = null;
 
-		if ( scene.backgroundNode && scene.backgroundNode.isNode ) {
+		if (scene.backgroundNode && scene.backgroundNode.isNode) {
 
 			backgroundNode = scene.backgroundNode;
 
 		} else {
 
-			const sceneData = this.get( scene );
+			const sceneData = this.get(scene);
 
-			if ( sceneData.backgroundNode ) {
+			if (sceneData.backgroundNode) {
 
 				backgroundNode = sceneData.backgroundNode;
 
@@ -396,11 +399,11 @@ class NodeManager extends DataMap {
 	 * @param {Scene} scene - The scene.
 	 * @return {Node} A node representing the current scene fog.
 	 */
-	getFogNode( scene ) {
+	getFogNode(scene) {
 
-		this.updateFog( scene );
+		this.updateFog(scene);
 
-		return scene.fogNode || this.get( scene ).fogNode || null;
+		return scene.fogNode || this.get(scene).fogNode || null;
 
 	}
 
@@ -414,39 +417,39 @@ class NodeManager extends DataMap {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @return {number} The cache key.
 	 */
-	getCacheKey( scene, lightsNode ) {
+	getCacheKey(scene, lightsNode) {
 
-		_chainKeys[ 0 ] = scene;
-		_chainKeys[ 1 ] = lightsNode;
+		_chainKeys[0] = scene;
+		_chainKeys[1] = lightsNode;
 
 		const callId = this.renderer.info.calls;
 
-		const cacheKeyData = this.callHashCache.get( _chainKeys ) || {};
+		const cacheKeyData = this.callHashCache.get(_chainKeys) || {};
 
-		if ( cacheKeyData.callId !== callId ) {
+		if (cacheKeyData.callId !== callId) {
 
-			const environmentNode = this.getEnvironmentNode( scene );
-			const fogNode = this.getFogNode( scene );
+			const environmentNode = this.getEnvironmentNode(scene);
+			const fogNode = this.getFogNode(scene);
 
-			if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
-			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
+			if (lightsNode) _cacheKeyValues.push(lightsNode.getCacheKey(true));
+			if (environmentNode) _cacheKeyValues.push(environmentNode.getCacheKey());
+			if (fogNode) _cacheKeyValues.push(fogNode.getCacheKey());
 
-			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.type );
+			_cacheKeyValues.push(this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0);
+			_cacheKeyValues.push(this.renderer.shadowMap.enabled ? 1 : 0);
+			_cacheKeyValues.push(this.renderer.shadowMap.type);
 
 			cacheKeyData.callId = callId;
-			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
+			cacheKeyData.cacheKey = hashArray(_cacheKeyValues);
 
-			this.callHashCache.set( _chainKeys, cacheKeyData );
+			this.callHashCache.set(_chainKeys, cacheKeyData);
 
 			_cacheKeyValues.length = 0;
 
 		}
 
-		_chainKeys[ 0 ] = null;
-		_chainKeys[ 1 ] = null;
+		_chainKeys[0] = null;
+		_chainKeys[1] = null;
 
 		return cacheKeyData.cacheKey;
 
@@ -470,54 +473,54 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {Scene} scene - The scene.
 	 */
-	updateBackground( scene ) {
+	updateBackground(scene) {
 
-		const sceneData = this.get( scene );
+		const sceneData = this.get(scene);
 		const background = scene.background;
 
-		if ( background ) {
+		if (background) {
 
-			const forceUpdate = ( scene.backgroundBlurriness === 0 && sceneData.backgroundBlurriness > 0 ) || ( scene.backgroundBlurriness > 0 && sceneData.backgroundBlurriness === 0 );
+			const forceUpdate = (scene.backgroundBlurriness === 0 && sceneData.backgroundBlurriness > 0) || (scene.backgroundBlurriness > 0 && sceneData.backgroundBlurriness === 0);
 
-			if ( sceneData.background !== background || forceUpdate ) {
+			if (sceneData.background !== background || forceUpdate) {
 
-				const backgroundNode = this.getCacheNode( 'background', background, () => {
+				const backgroundNode = this.getCacheNode('background', background, () => {
 
-					if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
+					if (background.isCubeTexture === true || (background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping)) {
 
-						if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
+						if (scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping) {
 
-							return pmremTexture( background );
+							return pmremTexture(background);
 
 						} else {
 
 							let envMap;
 
-							if ( background.isCubeTexture === true ) {
+							if (background.isCubeTexture === true) {
 
-								envMap = cubeTexture( background );
+								envMap = cubeTexture(background);
 
 							} else {
 
-								envMap = texture( background );
+								envMap = texture(background);
 
 							}
 
-							return cubeMapNode( envMap );
+							return cubeMapNode(envMap);
 
 						}
 
-					} else if ( background.isTexture === true ) {
+					} else if (background.isTexture === true) {
 
-						return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
+						return texture(background, screenUV.flipY()).setUpdateMatrix(true);
 
-					} else if ( background.isColor !== true ) {
+					} else if (background.isColor !== true) {
 
-						error( 'WebGPUNodes: Unsupported background configuration.', background );
+						error('WebGPUNodes: Unsupported background configuration.', background);
 
 					}
 
-				}, forceUpdate );
+				}, forceUpdate);
 
 				sceneData.backgroundNode = backgroundNode;
 				sceneData.background = background;
@@ -525,7 +528,7 @@ class NodeManager extends DataMap {
 
 			}
 
-		} else if ( sceneData.backgroundNode ) {
+		} else if (sceneData.backgroundNode) {
 
 			delete sceneData.backgroundNode;
 			delete sceneData.background;
@@ -544,16 +547,16 @@ class NodeManager extends DataMap {
 	 * @param {boolean} [forceUpdate=false] - Whether an update should be enforced or not.
 	 * @return {Node} The node representation.
 	 */
-	getCacheNode( type, object, callback, forceUpdate = false ) {
+	getCacheNode(type, object, callback, forceUpdate = false) {
 
-		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
+		const nodeCache = this.cacheLib[type] || (this.cacheLib[type] = new WeakMap());
 
-		let node = nodeCache.get( object );
+		let node = nodeCache.get(object);
 
-		if ( node === undefined || forceUpdate ) {
+		if (node === undefined || forceUpdate) {
 
 			node = callback();
-			nodeCache.set( object, node );
+			nodeCache.set(object, node);
 
 		}
 
@@ -567,39 +570,39 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {Scene} scene - The scene.
 	 */
-	updateFog( scene ) {
+	updateFog(scene) {
 
-		const sceneData = this.get( scene );
+		const sceneData = this.get(scene);
 		const sceneFog = scene.fog;
 
-		if ( sceneFog ) {
+		if (sceneFog) {
 
-			if ( sceneData.fog !== sceneFog ) {
+			if (sceneData.fog !== sceneFog) {
 
-				const fogNode = this.getCacheNode( 'fog', sceneFog, () => {
+				const fogNode = this.getCacheNode('fog', sceneFog, () => {
 
-					if ( sceneFog.isFogExp2 ) {
+					if (sceneFog.isFogExp2) {
 
-						const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
-						const density = reference( 'density', 'float', sceneFog ).setGroup( renderGroup );
+						const color = reference('color', 'color', sceneFog).setGroup(renderGroup);
+						const density = reference('density', 'float', sceneFog).setGroup(renderGroup);
 
-						return fog( color, densityFogFactor( density ) );
+						return fog(color, densityFogFactor(density));
 
-					} else if ( sceneFog.isFog ) {
+					} else if (sceneFog.isFog) {
 
-						const color = reference( 'color', 'color', sceneFog ).setGroup( renderGroup );
-						const near = reference( 'near', 'float', sceneFog ).setGroup( renderGroup );
-						const far = reference( 'far', 'float', sceneFog ).setGroup( renderGroup );
+						const color = reference('color', 'color', sceneFog).setGroup(renderGroup);
+						const near = reference('near', 'float', sceneFog).setGroup(renderGroup);
+						const far = reference('far', 'float', sceneFog).setGroup(renderGroup);
 
-						return fog( color, rangeFogFactor( near, far ) );
+						return fog(color, rangeFogFactor(near, far));
 
 					} else {
 
-						error( 'Renderer: Unsupported fog configuration.', sceneFog );
+						error('Renderer: Unsupported fog configuration.', sceneFog);
 
 					}
 
-				} );
+				});
 
 				sceneData.fogNode = fogNode;
 				sceneData.fog = sceneFog;
@@ -621,39 +624,39 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {Scene} scene - The scene.
 	 */
-	updateEnvironment( scene ) {
+	updateEnvironment(scene) {
 
-		const sceneData = this.get( scene );
+		const sceneData = this.get(scene);
 		const environment = scene.environment;
 
-		if ( environment ) {
+		if (environment) {
 
-			if ( sceneData.environment !== environment ) {
+			if (sceneData.environment !== environment) {
 
-				const environmentNode = this.getCacheNode( 'environment', environment, () => {
+				const environmentNode = this.getCacheNode('environment', environment, () => {
 
-					if ( environment.isCubeTexture === true ) {
+					if (environment.isCubeTexture === true) {
 
-						return cubeTexture( environment );
+						return cubeTexture(environment);
 
-					} else if ( environment.isTexture === true ) {
+					} else if (environment.isTexture === true) {
 
-						return texture( environment );
+						return texture(environment);
 
 					} else {
 
-						error( 'Nodes: Unsupported environment configuration.', environment );
+						error('Nodes: Unsupported environment configuration.', environment);
 
 					}
 
-				} );
+				});
 
 				sceneData.environmentNode = environmentNode;
 				sceneData.environment = environment;
 
 			}
 
-		} else if ( sceneData.environmentNode ) {
+		} else if (sceneData.environmentNode) {
 
 			delete sceneData.environmentNode;
 			delete sceneData.environment;
@@ -662,7 +665,7 @@ class NodeManager extends DataMap {
 
 	}
 
-	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null ) {
+	getNodeFrame(renderer = this.renderer, scene = null, object = null, camera = null, material = null) {
 
 		const nodeFrame = this.nodeFrame;
 		nodeFrame.renderer = renderer;
@@ -675,9 +678,9 @@ class NodeManager extends DataMap {
 
 	}
 
-	getNodeFrameForRender( renderObject ) {
+	getNodeFrameForRender(renderObject) {
 
-		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material );
+		return this.getNodeFrame(renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material);
 
 	}
 
@@ -701,9 +704,9 @@ class NodeManager extends DataMap {
 	 * @param {Texture} outputTarget - The output target.
 	 * @return {boolean} Whether the output configuration has changed or not.
 	 */
-	hasOutputChange( outputTarget ) {
+	hasOutputChange(outputTarget) {
 
-		const cacheKey = _outputNodeMap.get( outputTarget );
+		const cacheKey = _outputNodeMap.get(outputTarget);
 
 		return cacheKey !== this.getOutputCacheKey();
 
@@ -716,16 +719,16 @@ class NodeManager extends DataMap {
 	 * @param {Texture} outputTarget - The output target.
 	 * @return {Node} The output node.
 	 */
-	getOutputNode( outputTarget ) {
+	getOutputNode(outputTarget) {
 
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
 
 		const output = outputTarget.isArrayTexture ?
-			texture3D( outputTarget, vec3( screenUV, builtin( 'gl_ViewID_OVR' ) ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
-			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+			texture3D(outputTarget, vec3(screenUV, builtin('gl_ViewID_OVR'))).renderOutput(renderer.toneMapping, renderer.currentColorSpace) :
+			texture(outputTarget, screenUV).renderOutput(renderer.toneMapping, renderer.currentColorSpace);
 
-		_outputNodeMap.set( outputTarget, cacheKey );
+		_outputNodeMap.set(outputTarget, cacheKey);
 
 		return output;
 
@@ -737,15 +740,15 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 */
-	updateBefore( renderObject ) {
+	updateBefore(renderObject) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
-		for ( const node of nodeBuilder.updateBeforeNodes ) {
+		for (const node of nodeBuilder.updateBeforeNodes) {
 
 			// update frame state for each node
 
-			this.getNodeFrameForRender( renderObject ).updateBeforeNode( node );
+			this.getNodeFrameForRender(renderObject).updateBeforeNode(node);
 
 		}
 
@@ -757,15 +760,15 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 */
-	updateAfter( renderObject ) {
+	updateAfter(renderObject) {
 
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
-		for ( const node of nodeBuilder.updateAfterNodes ) {
+		for (const node of nodeBuilder.updateAfterNodes) {
 
 			// update frame state for each node
 
-			this.getNodeFrameForRender( renderObject ).updateAfterNode( node );
+			this.getNodeFrameForRender(renderObject).updateAfterNode(node);
 
 		}
 
@@ -777,14 +780,14 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {Node} computeNode - The compute node.
 	 */
-	updateForCompute( computeNode ) {
+	updateForCompute(computeNode) {
 
 		const nodeFrame = this.getNodeFrame();
-		const nodeBuilder = this.getForCompute( computeNode );
+		const nodeBuilder = this.getForCompute(computeNode);
 
-		for ( const node of nodeBuilder.updateNodes ) {
+		for (const node of nodeBuilder.updateNodes) {
 
-			nodeFrame.updateNode( node );
+			nodeFrame.updateNode(node);
 
 		}
 
@@ -796,14 +799,14 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 */
-	updateForRender( renderObject ) {
+	updateForRender(renderObject) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const nodeFrame = this.getNodeFrameForRender(renderObject);
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
-		for ( const node of nodeBuilder.updateNodes ) {
+		for (const node of nodeBuilder.updateNodes) {
 
-			nodeFrame.updateNode( node );
+			nodeFrame.updateNode(node);
 
 		}
 
@@ -815,12 +818,12 @@ class NodeManager extends DataMap {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {boolean} Whether the given render object requires a refresh or not.
 	 */
-	needsRefresh( renderObject ) {
+	needsRefresh(renderObject) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const nodeFrame = this.getNodeFrameForRender(renderObject);
 		const monitor = renderObject.getMonitor();
 
-		return monitor.needsRefresh( renderObject, nodeFrame );
+		return monitor.needsRefresh(renderObject, nodeFrame);
 
 	}
 

@@ -18,6 +18,9 @@ export * from './core/VaryingNode.js';
 export * from './core/OutputStructNode.js';
 export * from './core/MRTNode.js';
 
+// materialx
+export * from './materialx/MaterialXNodes.js';
+
 // math
 export * from './math/BitcastNode.js';
 export * from './math/BitcountNode.js';

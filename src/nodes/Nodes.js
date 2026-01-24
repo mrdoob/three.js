@@ -128,6 +128,7 @@ export { default as ShadowNode } from './lighting/ShadowNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 
 // math
+export * from './materialx/MaterialXNodes.js';
 export { default as BitcastNode } from './math/BitcastNode.js';
 export { default as BitcountNode } from './math/BitcountNode.js';
 export { default as ConditionalNode } from './math/ConditionalNode.js';
