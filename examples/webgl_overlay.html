@@ -98,7 +98,7 @@
 
 			let camera, scene, rendererBg, rendererFg;
 			let containerBg, containerFg, currentZoom, anchor;
-			let pixelsPerMeter, forcedPixelsPerMeter = 100.0;
+			let pixelsPerMeter = 100.0;
 			let cameraDepth = 5.0;
 			let isSafari = false;
 
@@ -214,36 +214,11 @@
 
 			}
 
-			function recomputePixelsPerMeter() {
-
-				const oldPosition = camera.position.clone();
-				camera.position.set( 0.0, 0.0, cameraDepth );
-				camera.updateMatrixWorld();
-				camera.updateProjectionMatrix();
-
-				const testPoint = new THREE.Vector3( 0.0, 0, 0.0 );
-				testPoint.project( camera );
-				testPoint.y = 1.0 / window.innerHeight;
-				testPoint.unproject( camera );
-
-				camera.position.copy( oldPosition );
-				camera.updateMatrixWorld();
-				camera.updateProjectionMatrix();
-
-				pixelsPerMeter = 1.0 / ( testPoint.y * 2.0 );
-				return pixelsPerMeter;
-
-			}
-
 			function forcePixelsPerMeter() {
 
-				for ( let i = 0; i < 10; i++ ) {
-
-					const curPixelsPerMeter = recomputePixelsPerMeter();
-					camera.fov *= curPixelsPerMeter / forcedPixelsPerMeter;
-					camera.updateProjectionMatrix();
-
-				}
+				camera.fov = 2 * Math.atan( window.innerHeight / 
+					( 2 * cameraDepth * pixelsPerMeter ) ) * THREE.MathUtils.RAD2DEG;
+				camera.updateProjectionMatrix();
 
 			}
 
