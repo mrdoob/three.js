@@ -26,7 +26,7 @@ function ViewportControls( editor ) {
 
 		if ( object.isCamera ) {
 
-			update( false );
+			updateCameraList();
 
 		}
 
@@ -59,7 +59,7 @@ function ViewportControls( editor ) {
 
 	//
 
-	function update( effect = true ) {
+	function updateCameraList() {
 
 		const options = {};
 
@@ -79,7 +79,15 @@ function ViewportControls( editor ) {
 			: editor.camera;
 
 		cameraSelect.setValue( selectedCamera.uuid );
-		if ( effect ) editor.setViewportCamera( selectedCamera.uuid );
+
+		return selectedCamera;
+
+	}
+
+	function update() {
+
+		const selectedCamera = updateCameraList();
+		editor.setViewportCamera( selectedCamera.uuid );
 
 	}
 
