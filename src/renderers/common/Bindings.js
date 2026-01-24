@@ -267,8 +267,17 @@ class Bindings extends DataMap {
 				const attribute = binding.attribute;
 				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
 
+				const bindingData = backend.get( binding );
+
 				this.attributes.update( attribute, attributeType );
 
+				if ( bindingData.attribute !== attribute ) {
+
+					bindingData.attribute = attribute;
+
+					needsBindingsUpdate = true;
+
+				}
 
 			}
 
