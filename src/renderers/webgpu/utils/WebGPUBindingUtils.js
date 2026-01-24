@@ -374,13 +374,15 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+							// Check texture's actual isArrayTexture property FIRST, before binding's cached isSampledTexture3D
+							// This handles cases where the texture's array status is set after shader compilation (e.g., XR textures)
+							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
 						} else if ( binding.isSampledTexture3D ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
-
-						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
-
-							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
 						} else {
 

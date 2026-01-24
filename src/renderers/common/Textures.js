@@ -86,7 +86,13 @@ class Textures extends DataMap {
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
 			depthTexture.renderTarget = renderTarget;
-			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
+
+			// Determine if depth texture should be an array texture:
+			// - Either useArrayDepthTexture is explicitly set, OR multiview is enabled (for backward compat)
+			// - AND there are multiple layers (depth > 1)
+			// - AND MSAA is not enabled (WebGPU doesn't support multisampled depth array textures)
+			const useArrayDepth = renderTarget.useArrayDepthTexture || renderTarget.multiview;
+			depthTexture.isArrayTexture = size.depth > 1 && renderTarget.samples <= 1 && useArrayDepth;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 

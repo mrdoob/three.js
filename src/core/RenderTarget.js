@@ -36,7 +36,8 @@ class RenderTarget extends EventDispatcher {
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
 	 * @property {number} [depth=1] - The texture depth.
-	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering.
+	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).
+	 * @property {boolean} [useArrayDepthTexture=false] - Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview to allow array depth textures without the multiview extension (e.g., for WebGPU XR).
 	 */
 
 	/**
@@ -62,7 +63,8 @@ class RenderTarget extends EventDispatcher {
 			samples: 0,
 			count: 1,
 			depth: 1,
-			multiview: false
+			multiview: false,
+			useArrayDepthTexture: false
 		}, options );
 
 		/**
@@ -199,6 +201,16 @@ class RenderTarget extends EventDispatcher {
 		 * @default false
 		 */
 		this.multiview = options.multiview;
+
+		/**
+		 * Whether to create the depth texture as an array texture for per-layer depth testing.
+		 * This is separate from multiview to allow array depth textures without the multiview
+		 * extension (e.g., for WebGPU XR which doesn't use OVR_multiview2).
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.useArrayDepthTexture = options.useArrayDepthTexture;
 
 	}
 
@@ -370,6 +382,8 @@ class RenderTarget extends EventDispatcher {
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
 		this.samples = source.samples;
+		this.multiview = source.multiview;
+		this.useArrayDepthTexture = source.useArrayDepthTexture;
 
 		return this;
 

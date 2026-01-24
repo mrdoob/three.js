@@ -227,6 +227,13 @@ class WebGPUTextureUtils {
 
 		if ( textureData.initialized ) {
 
+			// Skip creation for external XR textures - they are already set up
+			if ( textureData.externalTexture === true ) {
+
+				return;
+
+			}
+
 			throw new Error( 'WebGPUTextureUtils: Texture already initialized.' );
 
 		}
@@ -321,6 +328,17 @@ class WebGPUTextureUtils {
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
 			msaaTextureDescriptorGPU.sampleCount = samples;
 			msaaTextureDescriptorGPU.mipLevelCount = 1; // See https://www.w3.org/TR/webgpu/#texture-creation
+
+			// MSAA textures cannot be array textures - they must have exactly 1 layer
+			if ( msaaTextureDescriptorGPU.size.depthOrArrayLayers > 1 ) {
+
+				msaaTextureDescriptorGPU.size = {
+					width: msaaTextureDescriptorGPU.size.width,
+					height: msaaTextureDescriptorGPU.size.height,
+					depthOrArrayLayers: 1
+				};
+
+			}
 
 			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
 
