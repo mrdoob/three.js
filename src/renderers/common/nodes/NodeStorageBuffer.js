@@ -46,13 +46,24 @@ class NodeStorageBuffer extends StorageBuffer {
 	}
 
 	/**
+	 * The storage buffer attribute node.
+	 *
+	 * @type {StorageBufferAttribute}
+	 */
+	get attribute() {
+
+		return this.nodeUniform.value;
+
+	}
+
+	/**
 	 * The storage buffer.
 	 *
-	 * @type {BufferAttribute}
+	 * @type {Float32Array}
 	 */
 	get buffer() {
 
-		return this.nodeUniform.value;
+		return this.nodeUniform.value.array;
 
 	}
 
