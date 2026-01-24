@@ -52,7 +52,7 @@ export const normalViewGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( builder.material.flatShading === true ) {
+	if ( builder.material.flatShading === true || builder.geometry.hasAttribute( 'normal' ) === false ) {
 
 		node = normalFlat;
 
