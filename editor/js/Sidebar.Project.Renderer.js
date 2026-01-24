@@ -111,7 +111,7 @@ function SidebarProjectRenderer( editor ) {
 
 		currentRenderer.shadowMap.enabled = true;
 		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
-		currentRenderer.toneMapping = THREE.NoToneMapping;
+		currentRenderer.toneMapping = THREE.NeutralToneMapping;
 		currentRenderer.toneMappingExposure = 1;
 
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
