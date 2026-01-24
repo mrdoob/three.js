@@ -2,8 +2,7 @@ const APP = {
 
 	Player: function () {
 
-		const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
-		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
+		let renderer;
 
 		const loader = new THREE.ObjectLoader();
 		let camera, scene;
@@ -11,22 +10,45 @@ const APP = {
 		let events = {};
 
 		const dom = document.createElement( 'div' );
-		dom.appendChild( renderer.domElement );
 
 		this.dom = dom;
-		this.canvas = renderer.domElement;
 
 		this.width = 500;
 		this.height = 500;
 
-		this.load = function ( json ) {
+		this.load = async function ( json ) {
 
 			const project = json.project;
+
+			// Create renderer based on project settings
+
+			if ( renderer !== undefined ) {
+
+				renderer.dispose();
+				dom.removeChild( renderer.domElement );
+
+			}
+
+			if ( project.renderer === 'WebGPURenderer' ) {
+
+				const { WebGPURenderer } = await import( 'three/webgpu' );
+				renderer = new WebGPURenderer( { antialias: true } );
+				await renderer.init();
+
+			} else {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
+
+			}
+
+			renderer.setPixelRatio( window.devicePixelRatio );
 
 			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
 			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+
+			dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -129,7 +151,11 @@ const APP = {
 
 			}
 
-			renderer.setSize( width, height );
+			if ( renderer ) {
+
+				renderer.setSize( width, height );
+
+			}
 
 		};
 
@@ -205,7 +231,11 @@ const APP = {
 
 		this.dispose = function () {
 
-			renderer.dispose();
+			if ( renderer ) {
+
+				renderer.dispose();
+
+			}
 
 			camera = undefined;
 			scene = undefined;

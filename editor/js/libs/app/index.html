@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "./js/three.module.js"
+					"three": "./js/three.module.js",
+					"three/webgpu": "./js/three.webgpu.js"
 				}
 			}
 		</script>
@@ -33,10 +34,10 @@
 			window.THREE = THREE; // Used by APP Scripts.
 
 			var loader = new THREE.FileLoader();
-			loader.load( 'app.json', function ( text ) {
+			loader.load( 'app.json', async function ( text ) {
 
 				var player = new APP.Player();
-				player.load( JSON.parse( text ) );
+				await player.load( JSON.parse( text ) );
 				player.setSize( window.innerWidth, window.innerHeight );
 				player.play();
 
