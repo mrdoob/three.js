@@ -26,13 +26,8 @@
 				pointer-events: none;
 			}
 
-			#canvas-bg {
-				z-index: -100;
-			}
-
-			#canvas-fg {
-				z-index: 100;
-			}
+			#canvas-bg { z-index: -100; }
+			#canvas-fg { z-index:  100; }
 
 			.content {
 				max-width: 700px;
@@ -40,63 +35,7 @@
 				padding: 40px 20px;
 			}
 
-			h1 {
-				font-size: 2.5em;
-				font-weight: 300;
-				margin-bottom: 0.5em;
-				color: #222;
-			}
-
-			h2 {
-				font-size: 1.4em;
-				font-weight: 600;
-				margin-top: 2em;
-				margin-bottom: 0.5em;
-				color: #333;
-			}
-
-			p {
-				margin-bottom: 1em;
-				color: #555;
-			}
-
-			a {
-				color: #0066cc;
-			}
-
-			code {
-				background: #f4f4f4;
-				padding: 2px 6px;
-				border-radius: 3px;
-				font-family: 'Monaco', 'Menlo', monospace;
-				font-size: 0.9em;
-			}
-
-			table {
-				width: 100%;
-				border-collapse: collapse;
-				margin: 1em 0;
-			}
-
-			th, td {
-				text-align: left;
-				padding: 8px 12px;
-				border-bottom: 1px solid #ddd;
-			}
-
-			th {
-				font-weight: 600;
-				color: #333;
-			}
-
-			pre {
-				background: #f8f8f8;
-				border: 1px solid #ddd;
-				border-radius: 4px;
-				padding: 12px;
-				overflow-x: auto;
-				font-size: 0.85em;
-			}
+			a { color: #0066cc; }
 		</style>
 	</head>
 	<body>
@@ -133,23 +72,6 @@
 				potential interaction between 3D objects and page content.
 			</p>
 
-			<h2>Keymappings</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Action</th>
-						<th>Key</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr><td>Toggle Rendering Mode</td><td><code>1</code>, <code>2</code>, <code>3</code></td></tr>
-				</tbody>
-			</table>
-			<p>
-				Press <code>1</code> for background only, <code>2</code> for foreground only,
-				or <code>3</code> for combined foreground and background rendering.
-			</p>
-
 			<h2>Applications</h2>
 			<p>
 				This technique enables creative web experiences where 3D graphics seamlessly
@@ -158,13 +80,7 @@
 				scrolling experiences.
 			</p>
 
-			<h2>Credits</h2>
-			<p>
-				Based on <a href="https://github.com/zalo/ThreeOverlay">ThreeOverlay</a>
-				by Johnathon Selstad.
-			</p>
-
-			<pre id="debug">Scroll to see 3D elements interact with the page.</pre>
+			<p>Scroll to see 3D elements interact with the page.</p>
 		</div>
 
 		<script type="importmap">
@@ -181,11 +97,10 @@
 			import * as THREE from 'three';
 
 			let camera, scene, rendererBg, rendererFg;
-			let containerBg, containerFg;
+			let containerBg, containerFg, currentZoom, anchor;
 			let pixelsPerMeter, forcedPixelsPerMeter = 100.0;
 			let cameraDepth = 5.0;
-			let renderingMode = 2; // 0: bg only, 1: fg only, 2: both
-			let isMobile = false;
+			let isSafari = false;
 
 			const elementBoxes = [];
 			let cube;
@@ -210,7 +125,13 @@
 				camera.layers.enableAll();
 				scene.add( camera );
 
+				// Centered Anchor
+				anchor = new THREE.Object3D();
+				anchor.position.set( 0, 0, 0 );
+				scene.add( anchor );
+
 				forcePixelsPerMeter();
+				updateAnchorPosition();
 
 				// Lights
 				const spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
@@ -222,7 +143,7 @@
 				spotLight.shadow.camera.far = 20;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
-				scene.add( spotLight );
+				anchor.add( spotLight );
 
 				const dirLight = new THREE.DirectionalLight( 0x55505a, Math.PI * 10.0 );
 				dirLight.position.set( 0, 3, 0 );
@@ -235,7 +156,7 @@
 				dirLight.shadow.camera.bottom = -3;
 				dirLight.shadow.mapSize.width = 1024;
 				dirLight.shadow.mapSize.height = 1024;
-				scene.add( dirLight );
+				anchor.add( dirLight );
 
 				// Grid helpers (background decoration)
 				for ( let i = 0; i < 10; i++ ) {
@@ -243,8 +164,8 @@
 					const grid = new THREE.GridHelper( 20, 20 );
 					grid.material.opacity = 0.2;
 					grid.material.transparent = true;
-					grid.position.set( ( window.innerWidth * 0.5 ) / pixelsPerMeter, i * -5.0, 0 );
-					scene.add( grid );
+					grid.position.set( 0.0, i * -5.0, 0 );
+					anchor.add( grid );
 
 				}
 
@@ -253,8 +174,8 @@
 					new THREE.BoxGeometry( 1, 1, 1 ),
 					new THREE.MeshPhysicalMaterial( { color: 0x00ff00 } )
 				);
-				scene.add( cube );
-				updateCubePosition();
+				cube.position.y = -5.0;
+				anchor.add( cube );
 
 				// Background renderer
 				rendererBg = new THREE.WebGLRenderer( { antialias: true } );
@@ -277,8 +198,17 @@
 				// Event listeners
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'orientationchange', onWindowResize );
-				window.addEventListener( 'scroll', onScroll );
-				document.addEventListener( 'keydown', onKeyDown );
+				window.addEventListener( 'scroll', () => {
+
+					setScrolledCameraPosition();
+					render();
+
+				} );
+				
+				// Record the current zoom level detecting zoom on mobile
+				if (window.visualViewport) {
+					currentZoom = window.visualViewport.scale;
+				}
 
 				onWindowResize();
 
@@ -317,12 +247,11 @@
 
 			}
 
-			function updateCubePosition() {
+			function updateAnchorPosition() {
 
 				const rect = contentElement.getBoundingClientRect();
 				const centerX = rect.left + window.scrollX + rect.width * 0.5;
-				const cubeY = -5.0; // Fixed vertical position in 3D space
-				cube.position.set( centerX / pixelsPerMeter, cubeY, 0.0 );
+				anchor.position.x = centerX / pixelsPerMeter;
 
 			}
 
@@ -343,14 +272,14 @@
 					if ( i >= elementBoxes.length ) {
 
 						const box = new THREE.Mesh( boxGeometry, boxMaterial );
-						scene.add( box );
+						anchor.add( box );
 						elementBoxes.push( box );
 
 					}
 
 					const rect = elements[ i ].getBoundingClientRect();
 					elementBoxes[ i ].position.set(
-						( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter,
+						(( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter)-anchor.position.x,
 						( rect.top + window.scrollY + rect.height * 0.5 ) / -pixelsPerMeter,
 						0.0
 					);
@@ -367,11 +296,11 @@
 			function checkMobile() {
 
 				// Detect Safari browser
-				isMobile = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
+				isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
 
 			}
 
-			function setScroll() {
+			function setScrolledCameraPosition() {
 
 				const scrollX = window.scrollX;
 				const scrollY = window.scrollY;
@@ -382,7 +311,7 @@
 					cameraDepth
 				);
 
-				if ( isMobile ) {
+				if ( isSafari ) {
 
 					// Absolute positioning for mobile/iOS
 					containerBg.style.position = 'absolute';
@@ -412,38 +341,17 @@
 
 			function render() {
 
-				if ( renderingMode === 2 ) {
+				// Render background (objects beyond cameraDepth)
+				camera.near = cameraDepth;
+				camera.far = 1000;
+				camera.updateProjectionMatrix();
+				rendererBg.render( scene, camera );
 
-					// Combined: background then foreground
-					camera.near = cameraDepth;
-					camera.far = 1000;
-					camera.updateProjectionMatrix();
-					rendererBg.render( scene, camera );
-
-					camera.near = 2.0;
-					camera.far = cameraDepth + 0.01;
-					camera.updateProjectionMatrix();
-					rendererFg.render( scene, camera );
-
-				} else {
-
-					camera.near = 2.0;
-					camera.far = 1000;
-					camera.updateProjectionMatrix();
-
-					if ( renderingMode === 0 ) {
-
-						rendererBg.render( scene, camera );
-						rendererFg.clear();
-
-					} else {
-
-						rendererBg.clear();
-						rendererFg.render( scene, camera );
-
-					}
-
-				}
+				// Render foreground (objects closer than cameraDepth)
+				camera.near = 2.0;
+				camera.far = cameraDepth + 0.01;
+				camera.updateProjectionMatrix();
+				rendererFg.render( scene, camera );
 
 			}
 
@@ -459,53 +367,23 @@
 				rendererFg.setSize( width, height );
 
 				forcePixelsPerMeter();
-				updateCubePosition();
+				updateAnchorPosition();
 				recomputeElementBoxes();
-				setScroll();
-
-			}
-
-			function onScroll() {
-
-				setScroll();
-				render();
-
-			}
-
-			function onKeyDown( event ) {
-
-				switch ( event.code ) {
-
-					case 'Digit1':
-						renderingMode = 0;
-						updateDebug();
-						break;
-
-					case 'Digit2':
-						renderingMode = 1;
-						updateDebug();
-						break;
-
-					case 'Digit3':
-						renderingMode = 2;
-						updateDebug();
-						break;
-
-				}
-
-			}
-
-			function updateDebug() {
-
-				const modes = [ 'Background only', 'Foreground only', 'Combined' ];
-				document.getElementById( 'debug' ).textContent =
-					`Mode: ${modes[ renderingMode ]}`;
+				setScrolledCameraPosition();
 
 			}
 
 			function animate() {
 
-				setScroll();
+				// Catch zoom changes on mobile
+				if (window.visualViewport) {
+					if (currentZoom !== window.visualViewport.scale) {
+						onWindowResize();
+					}
+					currentZoom = window.visualViewport.scale;
+				}
+
+				setScrolledCameraPosition();
 				render();
 
 			}
