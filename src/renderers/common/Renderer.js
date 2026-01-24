@@ -1375,9 +1375,18 @@ class Renderer {
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
 
+		// WebGPU cannot render multiview into a multisampled array target, so XR falls
+		// back to sequential per-eye rendering in that specific case. WebGL keeps the
+		// array texture path even when MSAA is enabled.
+		const usePerEyeXRFrameBuffer = outputRenderTarget !== null && outputRenderTarget.texture.isArrayTexture &&
+			this.backend.isWebGPUBackend === true && this.samples > 0;
+		const useArrayFrameBufferTexture = outputRenderTarget !== null && outputRenderTarget.texture.isArrayTexture &&
+			usePerEyeXRFrameBuffer === false;
+		const frameBufferDepth = useArrayFrameBufferTexture && outputRenderTarget !== null ? outputRenderTarget.depth : 1;
+
 		if ( outputRenderTarget !== null ) {
 
-			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
+			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, frameBufferDepth );
 
 		} else {
 
@@ -1397,9 +1406,32 @@ class Renderer {
 		frameBufferTarget.viewport.multiplyScalar( pixelRatio );
 		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
 		frameBufferTarget.scissorTest = scissorTest;
-		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview && useArrayFrameBufferTexture : false;
+		frameBufferTarget.useArrayDepthTexture = outputRenderTarget !== null ? outputRenderTarget.useArrayDepthTexture && useArrayFrameBufferTexture : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
+
+		// Propagate samples from output render target (important for XR which may have samples=0)
+		// However, when the renderer has MSAA enabled (this.samples > 0), use the renderer's samples
+		// to ensure MSAA is applied during scene rendering. The MSAA resolve happens when copying to output.
+		if ( outputRenderTarget !== null ) {
+
+			frameBufferTarget.samples = this.samples > 0 ? this.samples : outputRenderTarget.samples;
+
+		}
+
+		// Propagate array texture flag for XR/multi-layer rendering
+		// IMPORTANT: When MSAA is enabled (this.samples > 0), we must NOT use array textures because
+		// WebGPU doesn't support multisampled array textures. Per-eye rendering will be used instead.
+		if ( useArrayFrameBufferTexture ) {
+
+			frameBufferTarget.texture.isArrayTexture = true;
+
+		} else {
+
+			frameBufferTarget.texture.isArrayTexture = false;
+
+		}
 
 		return frameBufferTarget;
 
@@ -1583,6 +1615,72 @@ class Renderer {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
+
+			// For XR with MSAA and ArrayCamera, we need to render each eye separately
+			// because MSAA textures cannot be array textures in WebGPU.
+			// Flow: left eye scene → left tone mapping → right eye scene → right tone mapping
+			if ( camera.isArrayCamera && frameBufferTarget !== null && outputRenderTarget !== null &&
+				outputRenderTarget.texture.isArrayTexture && frameBufferTarget.texture.isArrayTexture === false ) {
+
+				const xrCameras = camera.cameras;
+				const xrOutputRenderTarget = outputRenderTarget;
+				const xrOutputRenderTargetMultiview = xrOutputRenderTarget.multiview;
+
+				// When rendering eyes sequentially, the XR projection-layer target must
+				// behave like a single-layer array target. Leaving multiview enabled here
+				// would build multiview shader variants and attach both layers at once.
+				xrOutputRenderTarget.multiview = false;
+
+				try {
+
+					// Render each eye separately using the EXISTING render infrastructure
+					for ( let eyeIndex = 0; eyeIndex < xrCameras.length; eyeIndex ++ ) {
+
+						const eyeCamera = xrCameras[ eyeIndex ];
+
+						// Temporarily disable XR so _renderScene uses the single-layer framebuffer normally
+						xr.enabled = false;
+
+						// For scene rendering, output goes to the single-layer MSAA framebuffer
+						// (not directly to XR output - that happens in the tone mapping step)
+						this.setRenderTarget( frameBufferTarget, 0, activeMipmapLevel );
+
+						// Call the existing _renderScene to render this eye's scene
+						// This goes through the full initialization path
+						this._renderScene( scene, eyeCamera, false );
+
+						// Re-enable XR temporarily for proper output handling
+						xr.enabled = true;
+
+						// Now output the rendered frame to the appropriate XR layer
+						this.setRenderTarget( xrOutputRenderTarget, eyeIndex, activeMipmapLevel );
+						this._renderOutput( frameBufferTarget );
+
+					}
+
+				} finally {
+
+					xr.enabled = true;
+					xrOutputRenderTarget.multiview = xrOutputRenderTargetMultiview;
+
+				}
+
+				this.setRenderTarget( xrOutputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+				// Clean up and return
+				nodeFrame.renderId = previousRenderId;
+				this._currentRenderContext = previousRenderContext;
+				this._currentRenderObjectFunction = previousRenderObjectFunction;
+				this._handleObjectFunction = previousHandleObjectFunction;
+
+				this._callDepth --;
+
+				sceneRef.onAfterRender( this, scene, camera, renderTarget );
+				this.inspector.finishRender( null );
+
+				return null;
+
+			}
 
 		}
 
@@ -1838,7 +1936,34 @@ class Renderer {
 		this.autoClear = false;
 		this.xr.enabled = false;
 
-		this._renderScene( quad, quad.camera, false );
+		// For XR array textures, we need to render the output quad once per layer
+		// Each layer needs to sample from the correct array slice and write to the correct output layer
+		if ( renderTarget.texture.isArrayTexture && renderTarget.texture.image.depth > 1 ) {
+
+			const layerCount = renderTarget.texture.image.depth;
+
+			for ( let layer = 0; layer < layerCount; layer ++ ) {
+
+				// Set the layer index for sampling from the array texture
+				// This updates a renderGroup uniform that's synced before each draw
+				this._nodes.setOutputLayerIndex( layer );
+
+				// Set the active layer for the render target
+				this._activeCubeFace = layer;
+
+				this._renderScene( quad, quad.camera, false );
+
+			}
+
+			// Reset the layer index
+			this._nodes.setOutputLayerIndex( 0 );
+			this._activeCubeFace = 0;
+
+		} else {
+
+			this._renderScene( quad, quad.camera, false );
+
+		}
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
@@ -2619,7 +2744,12 @@ class Renderer {
 	 */
 	_resetXRState() {
 
-		this.backend.setXRTarget( null );
+		if ( this.backend.isWebGPUBackend !== true ) {
+
+			this.backend.setXRTarget( null );
+
+		}
+
 		this.setOutputRenderTarget( null );
 		this.setRenderTarget( null );
 
@@ -2628,6 +2758,74 @@ class Renderer {
 			canvasTarget.dispose();
 
 		}
+
+	}
+
+	/**
+	 * Swaps the current backend with a new one, saving the current state
+	 * for later restoration. Used by XRManager to switch from WebGPU to
+	 * WebGL when the XR session doesn't support WebGPU.
+	 *
+	 * @private
+	 * @param {Backend} newBackend - The new backend to use.
+	 * @return {Object} The saved state for restoration via _restoreBackend().
+	 */
+	_swapBackend( newBackend ) {
+
+		const savedState = {
+			backend: this.backend,
+			nodes: this._nodes,
+			attributes: this._attributes,
+			background: this._background,
+			geometries: this._geometries,
+			textures: this._textures,
+			pipelines: this._pipelines,
+			bindings: this._bindings,
+			objects: this._objects,
+			bundles: this._bundles,
+			renderContexts: this._renderContexts,
+		};
+
+		this.backend = newBackend;
+
+		this._nodes = new NodeManager( this, newBackend );
+		this._attributes = new Attributes( newBackend, this.info );
+		this._background = new Background( this, this._nodes );
+		this._geometries = new Geometries( this._attributes, this.info );
+		this._textures = new Textures( this, newBackend, this.info );
+		this._pipelines = new Pipelines( newBackend, this._nodes, this.info );
+		this._bindings = new Bindings( newBackend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
+		this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
+		this._bundles = new RenderBundles();
+		this._renderContexts = new RenderContexts( this );
+
+		this._animation.nodes = this._nodes;
+
+		return savedState;
+
+	}
+
+	/**
+	 * Restores the backend and subsystems from a previously saved state.
+	 *
+	 * @private
+	 * @param {Object} savedState - The state returned by _swapBackend().
+	 */
+	_restoreBackend( savedState ) {
+
+		this.backend = savedState.backend;
+		this._nodes = savedState.nodes;
+		this._attributes = savedState.attributes;
+		this._background = savedState.background;
+		this._geometries = savedState.geometries;
+		this._textures = savedState.textures;
+		this._pipelines = savedState.pipelines;
+		this._bindings = savedState.bindings;
+		this._objects = savedState.objects;
+		this._bundles = savedState.bundles;
+		this._renderContexts = savedState.renderContexts;
+
+		this._animation.nodes = this._nodes;
 
 	}
 

@@ -28,11 +28,11 @@
 				TreesGeometry,
 				SkyGeometry
 			} from 'three/addons/misc/RollerCoaster.js';
-			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { VRButtonGPU } from 'three/addons/webxr/VRButtonGPU.js';
 
 			let mesh, material, geometry;
 
-			const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, outputBufferType: THREE.UnsignedByteType, multiview: false } );
+			const renderer = new THREE.WebGPURenderer( { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: false } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
@@ -40,7 +40,7 @@
 			renderer.xr.setReferenceSpaceType( 'local' );
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( VRButton.createButton( renderer ) );
+			document.body.appendChild( VRButtonGPU.createButton( renderer ) );
 
 			//
 
@@ -250,7 +250,7 @@
 
 				let headingChange = Math.atan2( tangent2.x, tangent2.z ) - Math.atan2( tangent1.x, tangent1.z );
 				if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
-				if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+				if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
 				train.up.set( 0, 1, 0 );
 				bankQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );

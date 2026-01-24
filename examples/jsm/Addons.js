@@ -284,6 +284,7 @@ export * from './webxr/OculusHandModel.js';
 export * from './webxr/OculusHandPointerModel.js';
 export * from './webxr/Text2D.js';
 export * from './webxr/VRButton.js';
+export * from './webxr/VRButtonGPU.js';
 export * from './webxr/XRButton.js';
 export * from './webxr/XRControllerModelFactory.js';
 export * from './webxr/XREstimatedLight.js';

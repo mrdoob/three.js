@@ -83,6 +83,9 @@ class Textures extends DataMap {
 
 		let textureNeedsUpdate = false;
 
+		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview );
+		const supportsArrayDepthTexture = this.backend.isWebGPUBackend !== true || renderTarget.samples <= 1;
+
 		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
@@ -93,9 +96,14 @@ class Textures extends DataMap {
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
 			depthTexture.renderTarget = renderTarget;
-			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
+
+		}
+
+		if ( depthTexture ) {
+
+			depthTexture.isArrayTexture = useArrayDepth && supportsArrayDepthTexture;
 
 		}
 

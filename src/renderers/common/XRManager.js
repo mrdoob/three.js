@@ -7,7 +7,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
-import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor } from '../../constants.js';
+import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor, LinearFilter } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
@@ -16,6 +16,8 @@ import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { warn } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
+import { RenderTarget } from '../../core/RenderTarget.js';
+import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -85,6 +87,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraL = new PerspectiveCamera();
 		this._cameraL.viewport = new Vector4();
+		this._cameraL.matrixWorldAutoUpdate = false;
 
 		/**
 		 * Represents the camera for the right eye.
@@ -94,6 +97,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraR = new PerspectiveCamera();
 		this._cameraR.viewport = new Vector4();
+		this._cameraR.matrixWorldAutoUpdate = false;
 
 		/**
 		 * A list of cameras used for rendering the XR views.
@@ -182,6 +186,7 @@ class XRManager extends EventDispatcher {
 		 * @readonly
 		 */
 		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+		this._supportsWebGPUBinding = typeof globalThis.XRGPUBinding !== 'undefined';
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -341,6 +346,34 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._glBinding = null;
+
+		/**
+		* A reference to the current XR WebGPU binding (when using WebGPU backend).
+		*
+		* @private
+		* @type {?XRWebGLBinding}
+		 * @default null
+		*/
+
+		this._webgpuBinding = null;
+
+		/**
+		 * A reference to the current renderer backend (WebGL/WebGPU).
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._backend = null;
+
+		/**
+		 * Saved backend state when switching from WebGPU to WebGL for XR.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._savedBackendState = null;
 
 		/**
 		 * A reference to the current XR projection layer.
@@ -609,6 +642,18 @@ class XRManager extends EventDispatcher {
 		}
 
 		return this._glBinding;
+
+	}
+
+	getWebGPUBinding() {
+
+		if ( this._webgpuBinding === null && this._supportsWebGPUBinding ) {
+
+			this._webgpuBinding = new globalThis.XRGPUBinding( this._session, this._backend.device );
+
+		}
+
+		return this._webgpuBinding;
 
 	}
 
@@ -925,17 +970,14 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
-		const backend = renderer.backend;
+		this._backend = renderer.backend;
 
 		this._gl = renderer.getContext();
-		const gl = this._gl;
-		const attributes = gl.getContextAttributes();
+		let gl = this._gl;
 
 		this._session = session;
 
 		if ( session !== null ) {
-
-			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
@@ -946,8 +988,6 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
-			await backend.makeXRCompatible();
-
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
 
@@ -957,13 +997,57 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			if ( this._supportsLayers === true ) {
+			if ( ! this._session.enabledFeatures.includes( 'webgpu' ) && this._backend.isWebGPUBackend === true ) {
+
+				const xrCanvas = document.createElement( 'canvas' );
+				const glContext = xrCanvas.getContext( 'webgl2', { xrCompatible: true } );
+
+				const webglBackend = new WebGLBackend( { context: glContext } );
+				webglBackend.init( renderer );
+
+				this._savedBackendState = renderer._swapBackend( webglBackend );
+				this._backend = webglBackend;
+				this._gl = glContext;
+				gl = glContext;
+
+			}
+
+			if ( this._session.enabledFeatures.includes( 'webgpu' ) ) {
+
+				const glProjLayer = this.getWebGPUBinding().createProjectionLayer( {
+					colorFormat: this.getWebGPUBinding().getPreferredColorFormat(),
+					depthStencilFormat: 'depth24plus' } );
+				this._glProjLayer = glProjLayer;
+				const layersArray = [ glProjLayer ];
+
+				session.updateRenderState( { layers: layersArray } );
+
+				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
+				this._xrRenderTarget = new RenderTarget( glProjLayer.textureWidth, glProjLayer.textureHeight, {
+					depth: 2,
+					minFilter: LinearFilter,
+					magFilter: LinearFilter,
+					depthBuffer: true,
+					multiview: false,
+					useArrayDepthTexture: true,
+					samples: 0
+				} );
+
+				this._xrRenderTarget.texture.isArrayTexture = true;
+				this._useMultiview = false;
+
+			} else if ( this._supportsLayers === true ) {
 
 				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
 				let glDepthFormat = null;
+
+				const attributes = gl.getContextAttributes();
+				await this._backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				if ( renderer.depth ) {
 
@@ -1047,6 +1131,8 @@ class XRManager extends EventDispatcher {
 			} else {
 
 				// fallback to XRWebGLLayer
+				await this._backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				const layerInit = {
 					antialias: renderer.currentSamples > 0,
@@ -1083,8 +1169,6 @@ class XRManager extends EventDispatcher {
 			}
 
 			//
-
-			this.setFoveation( this.getFoveation() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
@@ -1387,9 +1471,66 @@ function onSessionEnd() {
 
 	renderer._resetXRState();
 
+	// Clean up the XR render target and its cached texture data
+	if ( this._xrRenderTarget !== null && renderer.backend.isWebGPUBackend ) {
+
+		// Delete backend's and textures module's cached data for XR textures before disposal
+		// This is necessary because XR textures are external (from XRGPUBinding)
+		// and their GPU resources are managed by WebXR, not Three.js
+		const backend = this._backend;
+		const texturesModule = renderer._textures;
+
+		// Clear the render target's descriptor cache in the backend first
+		if ( backend && backend.get ) {
+
+			const renderTargetData = backend.get( this._xrRenderTarget );
+			if ( renderTargetData ) {
+
+				renderTargetData.descriptors = undefined;
+
+			}
+
+		}
+
+		// Clear all textures in the textures array
+		const texturesArray = this._xrRenderTarget.textures;
+		if ( texturesArray ) {
+
+			for ( let i = 0; i < texturesArray.length; i ++ ) {
+
+				if ( backend && backend.delete ) backend.delete( texturesArray[ i ] );
+				if ( texturesModule && texturesModule.delete ) texturesModule.delete( texturesArray[ i ] );
+
+			}
+
+		}
+
+		if ( this._xrRenderTarget.depthTexture ) {
+
+			if ( backend && backend.delete ) backend.delete( this._xrRenderTarget.depthTexture );
+			if ( texturesModule && texturesModule.delete ) texturesModule.delete( this._xrRenderTarget.depthTexture );
+
+		}
+
+		// Also delete the render target data itself
+		if ( backend && backend.delete ) backend.delete( this._xrRenderTarget );
+		if ( texturesModule && texturesModule.delete ) texturesModule.delete( this._xrRenderTarget );
+
+		// Clear render contexts to remove any cached texture views
+		if ( renderer._renderContexts && renderer._renderContexts.dispose ) {
+
+			renderer._renderContexts.dispose();
+
+		}
+
+		this._xrRenderTarget.dispose();
+
+	}
+
 	this._session = null;
 	this._xrRenderTarget = null;
 	this._glBinding = null;
+	this._webgpuBinding = null;
 	this._glBaseLayer = null;
 	this._glProjLayer = null;
 
@@ -1438,6 +1579,14 @@ function onSessionEnd() {
 
 	this.isPresenting = false;
 	this._useMultiview = false;
+
+	if ( this._savedBackendState !== null ) {
+
+		renderer._restoreBackend( this._savedBackendState );
+		this._savedBackendState = null;
+		this._backend = renderer.backend;
+
+	}
 
 	renderer._animation.stop();
 	renderer._animation.setAnimationLoop( this._currentAnimationLoop );
@@ -1573,7 +1722,16 @@ function onAnimationFrame( time, frame ) {
 
 		const views = pose.views;
 
-		if ( this._glBaseLayer !== null ) {
+		// Check if we're using WebGPU backend with XRGPUBinding
+		const isWebGPUBackend = backend.isWebGPUBackend === true;
+		const webgpuBinding = isWebGPUBackend ? this.getWebGPUBinding() : null;
+
+		// For WebGPU path: collect color textures and view descriptors from all views
+		const colorTextures = [];
+		const viewDescriptors = [];
+		let depthTexture = null;
+
+		if ( this._glBaseLayer !== null && ! isWebGPUBackend ) {
 
 			backend.setXRTarget( glBaseLayer.framebuffer );
 
@@ -1596,8 +1754,32 @@ function onAnimationFrame( time, frame ) {
 
 			let viewport;
 
-			if ( this._supportsLayers === true ) {
+			if ( isWebGPUBackend && webgpuBinding !== null ) {
 
+				// WebGPU path: Use XRGPUBinding to get GPUTextures directly
+				const gpuSubImage = webgpuBinding.getViewSubImage( this._glProjLayer, view );
+				viewport = gpuSubImage.viewport;
+
+				// Collect color textures for each view (for MRT array)
+				colorTextures.push( gpuSubImage.colorTexture );
+
+				// Collect view descriptor for each view - this is critical for creating proper 2D views into the array texture
+				if ( gpuSubImage.getViewDescriptor ) {
+
+					viewDescriptors.push( gpuSubImage.getViewDescriptor() );
+
+				}
+
+				if ( i === 0 ) {
+
+					// add support for browser supplied depth texture later.
+					depthTexture = null;
+
+				}
+
+			} else if ( this._supportsLayers === true ) {
+
+				// WebGL path: Use XRWebGLBinding
 				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
 				viewport = glSubImage.viewport;
 
@@ -1625,6 +1807,7 @@ function onAnimationFrame( time, frame ) {
 				camera = new PerspectiveCamera();
 				camera.layers.enable( i );
 				camera.viewport = new Vector4();
+				camera.matrixWorldAutoUpdate = false;
 				this._cameras[ i ] = camera;
 
 			}
@@ -1647,6 +1830,18 @@ function onAnimationFrame( time, frame ) {
 				cameraXR.cameras.push( camera );
 
 			}
+
+		}
+
+		// WebGPU path: Register all collected color textures after the loop
+		if ( isWebGPUBackend && webgpuBinding !== null && colorTextures.length > 0 ) {
+
+			backend.setXRRenderTargetTextures(
+				this._xrRenderTarget,
+				colorTextures, // Array of GPUTextures, one per view
+				depthTexture,
+				viewDescriptors // Array of view descriptors, one per view
+			);
 
 		}
 

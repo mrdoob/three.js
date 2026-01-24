@@ -28,7 +28,7 @@
 			import * as THREE from 'three/webgpu';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
-			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { VRButtonGPU } from 'three/addons/webxr/VRButtonGPU.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			const timer = new THREE.Timer();
@@ -97,7 +97,7 @@
 
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, outputBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -149,7 +149,7 @@
 
 				//
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				document.body.appendChild( VRButtonGPU.createXRButton( renderer ) );
 
 			}
 
