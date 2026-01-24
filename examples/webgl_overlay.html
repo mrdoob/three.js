@@ -14,11 +14,15 @@
 			}
 
 			#canvas-bg, #canvas-fg {
-				position: absolute;
-				width: 100%;
-				height: 100%;
+				position: fixed;
+				width: 100vw;
+				height: 100vh;
 				top: 0;
 				left: 0;
+				pointer-events: none;
+			}
+
+			#canvas-bg canvas, #canvas-fg canvas {
 				pointer-events: none;
 			}
 
@@ -139,7 +143,6 @@
 				</thead>
 				<tbody>
 					<tr><td>Toggle Rendering Mode</td><td><code>1</code>, <code>2</code>, <code>3</code></td></tr>
-					<tr><td>Toggle Positioning</td><td><code>P</code></td></tr>
 				</tbody>
 			</table>
 			<p>
@@ -182,10 +185,11 @@
 			let pixelsPerMeter, forcedPixelsPerMeter = 100.0;
 			let cameraDepth = 5.0;
 			let renderingMode = 2; // 0: bg only, 1: fg only, 2: both
-			let positioningMode = 1; // 0: fixed, 1: absolute
+			let isMobile = false;
 
 			const elementBoxes = [];
 			let cube;
+			let contentElement;
 
 			init();
 
@@ -193,6 +197,9 @@
 
 				containerBg = document.getElementById( 'canvas-bg' );
 				containerFg = document.getElementById( 'canvas-fg' );
+				contentElement = document.querySelector( '.content' );
+
+				checkMobile();
 
 				// Scene
 				scene = new THREE.Scene();
@@ -241,13 +248,13 @@
 
 				}
 
-				// Demo cube (positioned in 3D space relative to page)
+				// Demo cube (positioned in 3D space relative to content)
 				cube = new THREE.Mesh(
 					new THREE.BoxGeometry( 1, 1, 1 ),
 					new THREE.MeshPhysicalMaterial( { color: 0x00ff00 } )
 				);
-				cube.position.set( ( window.innerWidth * 0.5 ) / pixelsPerMeter, -5.0, 0.0 );
 				scene.add( cube );
+				updateCubePosition();
 
 				// Background renderer
 				rendererBg = new THREE.WebGLRenderer( { antialias: true } );
@@ -310,6 +317,15 @@
 
 			}
 
+			function updateCubePosition() {
+
+				const rect = contentElement.getBoundingClientRect();
+				const centerX = rect.left + window.scrollX + rect.width * 0.5;
+				const cubeY = -5.0; // Fixed vertical position in 3D space
+				cube.position.set( centerX / pixelsPerMeter, cubeY, 0.0 );
+
+			}
+
 			function recomputeElementBoxes() {
 
 				const boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -348,6 +364,13 @@
 
 			}
 
+			function checkMobile() {
+
+				// Detect Safari browser
+				isMobile = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
+
+			}
+
 			function setScroll() {
 
 				const scrollX = window.scrollX;
@@ -359,19 +382,29 @@
 					cameraDepth
 				);
 
-				if ( positioningMode === 1 ) {
+				if ( isMobile ) {
 
+					// Absolute positioning for mobile/iOS
 					containerBg.style.position = 'absolute';
 					containerFg.style.position = 'absolute';
+					containerBg.style.width = '100%';
+					containerFg.style.width = '100%';
+					containerBg.style.height = '100%';
+					containerFg.style.height = '100%';
 					containerBg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
 					containerFg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
 
 				} else {
 
+					// Fixed positioning for desktop
 					containerBg.style.position = 'fixed';
 					containerFg.style.position = 'fixed';
-					containerBg.style.transform = 'translate(0px, 0px)';
-					containerFg.style.transform = 'translate(0px, 0px)';
+					containerBg.style.width = '100vw';
+					containerFg.style.width = '100vw';
+					containerBg.style.height = '100vh';
+					containerFg.style.height = '100vh';
+					containerBg.style.transform = '';
+					containerFg.style.transform = '';
 
 				}
 
@@ -426,6 +459,7 @@
 				rendererFg.setSize( width, height );
 
 				forcePixelsPerMeter();
+				updateCubePosition();
 				recomputeElementBoxes();
 				setScroll();
 
@@ -457,12 +491,6 @@
 						updateDebug();
 						break;
 
-					case 'KeyP':
-						positioningMode = positioningMode === 0 ? 1 : 0;
-						setScroll();
-						updateDebug();
-						break;
-
 				}
 
 			}
@@ -470,17 +498,12 @@
 			function updateDebug() {
 
 				const modes = [ 'Background only', 'Foreground only', 'Combined' ];
-				const positions = [ 'Fixed', 'Absolute' ];
 				document.getElementById( 'debug' ).textContent =
-					`Mode: ${modes[ renderingMode ]} | Position: ${positions[ positioningMode ]}`;
+					`Mode: ${modes[ renderingMode ]}`;
 
 			}
 
-			function animate( time ) {
-
-				// Rotate cube for visual interest
-				cube.rotation.x = time * 0.0005;
-				cube.rotation.y = time * 0.001;
+			function animate() {
 
 				setScroll();
 				render();
