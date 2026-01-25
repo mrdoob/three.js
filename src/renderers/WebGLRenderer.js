@@ -293,6 +293,7 @@ class WebGLRenderer {
 		const _this = this;
 
 		let _isContextLost = false;
+		let _nodeBuilder = null;
 
 		// internal state cache
 
@@ -1040,6 +1041,19 @@ class WebGLRenderer {
 		};
 
 		/**
+		 * Sets a compatibility node builder for rendering node materials with WebGLRenderer.
+		 * This enables using TSL (Three.js Shading Language) node materials to prepare
+		 * for migration to WebGPURenderer.
+		 *
+		 * @param {WebGLNodeBuilder} nodeBuilder - The node builder instance.
+		 */
+		this.setCompatibilityNodeBuilder = function ( nodeBuilder ) {
+
+			_nodeBuilder = nodeBuilder;
+
+		};
+
+		/**
 		 * Frees the GPU-related resources allocated by this instance. Call this
 		 * method whenever this instance is no longer used in your app.
 		 */
@@ -1599,6 +1613,13 @@ class WebGLRenderer {
 
 			if ( _isContextLost === true ) return;
 
+			// update node builder if available
+			if ( _nodeBuilder !== null ) {
+
+				_nodeBuilder.renderStart( scene, camera );
+
+			}
+
 			// use internal render target for HalfFloatType color buffer (only when tone mapping is enabled)
 
 			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
@@ -1789,6 +1810,12 @@ class WebGLRenderer {
 			} else {
 
 				currentRenderList = null;
+
+			}
+
+			if ( _nodeBuilder !== null ) {
+
+				_nodeBuilder.renderEnd();
 
 			}
 
@@ -2168,6 +2195,13 @@ class WebGLRenderer {
 
 				parameters.uniforms = programCache.getUniforms( material );
 
+				// Use node builder for node materials if available
+				if ( _nodeBuilder !== null && material.isNodeMaterial ) {
+
+					_nodeBuilder.build( material, object, parameters );
+
+				}
+
 				material.onBeforeCompile( parameters, _this );
 
 				program = programCache.acquireProgram( parameters, programCacheKey );
@@ -2433,6 +2467,14 @@ class WebGLRenderer {
 
 				program = getProgram( material, scene, object );
 
+				// notify the node builder that the program has changed so uniforms and update nodes can
+				// be cached and triggered.
+				if ( _nodeBuilder && material.isNodeMaterial ) {
+
+					_nodeBuilder.onUpdateProgram( program, material );
+
+				}
+
 			}
 
 			let refreshProgram = false;
@@ -2662,7 +2704,7 @@ class WebGLRenderer {
 
 			// UBOs
 
-			if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
+			if ( material.uniformsGroups !== undefined ) {
 
 				const groups = material.uniformsGroups;
 
