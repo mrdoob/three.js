@@ -35,8 +35,6 @@ function Editor() {
 
 		// notifications
 
-		animationsUpdated: new Signal(),
-
 		editorCleared: new Signal(),
 
 		savingStarted: new Signal(),
@@ -94,6 +92,9 @@ function Editor() {
 		intersectionsDetected: new Signal(),
 
 		pathTracerUpdated: new Signal(),
+
+		morphTargetsUpdated: new Signal()
+
 
 	};
 

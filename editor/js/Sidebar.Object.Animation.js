@@ -132,7 +132,7 @@ function SidebarObjectAnimation( editor ) {
 
 	} );
 
-	signals.animationsUpdated.add( function () {
+	signals.morphTargetsUpdated.add( function () {
 
 		// refresh UI
 

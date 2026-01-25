@@ -806,7 +806,7 @@ function Viewport( editor ) {
 
 			}
 
-			signals.animationsUpdated.dispatch();
+			signals.morphTargetsUpdated.dispatch();
 
 		}
 
