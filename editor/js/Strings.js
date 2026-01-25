@@ -159,8 +159,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': 'ترتیب رندر',
 			'sidebar/object/userdata': 'داده کاربر',
 			'sidebar/object/export': 'اکسپورت جیسون',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': 'انواع',
 			'sidebar/geometry/new': 'جدید',
@@ -173,6 +171,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'محاسبه مماس ها',
 			'sidebar/geometry/center': 'وسط',
 			'sidebar/geometry/export': 'اکسپورت جیسون',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'عرض',
 			'sidebar/geometry/box_geometry/height': 'ارتفاع',
@@ -353,6 +352,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'حذف',
 
 			'sidebar/project': 'پروژه ها',
+			'sidebar/project/renderer': 'رندرر',
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
 			'sidebar/project/toneMapping': 'تون مپینگ',
@@ -576,8 +576,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': 'Render Order',
 			'sidebar/object/userdata': 'User data',
 			'sidebar/object/export': 'Export JSON',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',
@@ -590,6 +588,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Export JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -770,6 +769,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
+			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
 			'sidebar/project/toneMapping': 'Tonemapping',
@@ -994,8 +994,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': 'Ordre de rendus',
 			'sidebar/object/userdata': 'Données utilisateur',
 			'sidebar/object/export': 'Exporter JSON',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'Nouveau',
@@ -1008,6 +1006,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Exporter JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -1188,6 +1187,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
+			'sidebar/project/renderer': 'Moteur',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
@@ -1412,8 +1412,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': '渲染次序',
 			'sidebar/object/userdata': '自定义数据',
 			'sidebar/object/export': '导出JSON',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': '类型',
 			'sidebar/geometry/new': '更新',
@@ -1426,6 +1424,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '计算切线',
 			'sidebar/geometry/center': '居中',
 			'sidebar/geometry/export': '导出JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -1606,6 +1605,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
+			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/toneMapping': '色调映射',
@@ -1830,8 +1830,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': '描画順序',
 			'sidebar/object/userdata': 'ユーザーデータ',
 			'sidebar/object/export': 'JSONをエクスポート',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': 'タイプ',
 			'sidebar/geometry/new': '新規',
@@ -1844,6 +1842,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '接線を計算',
 			'sidebar/geometry/center': '中央',
 			'sidebar/geometry/export': 'JSONをエクスポート',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '幅',
 			'sidebar/geometry/box_geometry/height': '高さ',
@@ -2024,6 +2023,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '削除',
 
 			'sidebar/project': 'プロジェクト',
+			'sidebar/project/renderer': 'レンダラー',
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
 			'sidebar/project/toneMapping': 'トーンマッピング',
@@ -2247,8 +2247,6 @@ function Strings( config ) {
 			'sidebar/object/renderorder': '렌더 순서',
 			'sidebar/object/userdata': '사용자 데이터',
 			'sidebar/object/export': 'JSON으로 내보내기',
-			'sidebar/objects/animations/clips': 'Animation Clips',
-			'sidebar/objects/animations/morphs': 'Morph Targets',
 
 			'sidebar/geometry/type': '타입',
 			'sidebar/geometry/new': '새로 만들기',
@@ -2261,6 +2259,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '접선 계산',
 			'sidebar/geometry/center': '중앙',
 			'sidebar/geometry/export': 'JSON으로 내보내기',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '너비',
 			'sidebar/geometry/box_geometry/height': '높이',
@@ -2441,6 +2440,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '삭제',
 
 			'sidebar/project': '프로젝트',
+			'sidebar/project/renderer': '렌더러',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',
