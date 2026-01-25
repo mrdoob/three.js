@@ -312,7 +312,17 @@ class WebGPUTextureUtils {
 
 		}
 
-		textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+		try {
+
+			textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+
+		} catch ( e ) {
+
+			warn( 'WebGPURenderer: Failed to create texture with descriptor:', textureDescriptorGPU );
+			this.createDefaultTexture( texture );
+			return;
+
+		}
 
 		if ( isMSAA ) {
 
