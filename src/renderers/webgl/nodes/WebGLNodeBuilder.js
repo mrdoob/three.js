@@ -264,6 +264,8 @@ export class WebGLNodeBuilder {
 			const { nodeFrame } = self;
 			nodeFrame.material = this;
 			nodeFrame.object = object;
+			renderer.info.render.frame ++;
+			nodeFrame.renderId ++;
 
 			// update the uniform groups and nodes for the program if they're available before rendering
 			if ( renderer.properties.has( this ) ) {
@@ -326,7 +328,6 @@ export class WebGLNodeBuilder {
 
 		const { nodeFrame, renderStack, renderer, sceneContexts } = this;
 		nodeFrame.update();
-		nodeFrame.renderId = nodeFrame.frameId;
 		nodeFrame.camera = camera;
 		nodeFrame.scene = scene;
 
