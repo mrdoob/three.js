@@ -3377,6 +3377,7 @@ class Renderer {
  * @callback onAnimationCallback
  * @param {DOMHighResTimeStamp} time - A timestamp indicating the end time of the previous frame's rendering.
  * @param {XRFrame} [frame] - A reference to the current XR frame. Only relevant when using XR rendering.
+ * @param {number} [deltaTime] - The time elapsed since the last frame in milliseconds. On the first frame, this will be 0.
  */
 
 export default Renderer;

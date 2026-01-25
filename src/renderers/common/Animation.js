@@ -61,6 +61,14 @@ class Animation {
 		 */
 		this._requestId = null;
 
+		/**
+		 * The timestamp of the previous frame, used to calculate deltaTime.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this._previousTime = null;
+
 	}
 
 	/**
@@ -80,7 +88,11 @@ class Animation {
 
 			this.renderer._inspector.begin();
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
+			// Calculate deltaTime (time since last frame)
+			const deltaTime = this._previousTime !== null ? time - this._previousTime : 0;
+			this._previousTime = time;
+
+			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame, deltaTime );
 
 			this.renderer._inspector.finish();
 
@@ -98,6 +110,7 @@ class Animation {
 		this._context.cancelAnimationFrame( this._requestId );
 
 		this._requestId = null;
+		this._previousTime = null;
 
 	}
 
