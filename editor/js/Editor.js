@@ -93,6 +93,9 @@ function Editor() {
 
 		pathTracerUpdated: new Signal(),
 
+		morphTargetsUpdated: new Signal()
+
+
 	};
 
 	this.config = new Config();

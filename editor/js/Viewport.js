@@ -831,6 +831,8 @@ function Viewport( editor ) {
 
 			}
 
+			signals.morphTargetsUpdated.dispatch();
+
 		}
 
 		// View Helper

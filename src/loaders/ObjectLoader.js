@@ -1117,6 +1117,9 @@ class ObjectLoader extends Loader {
 
 		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
 
+		if ( data.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, data.morphTargetDictionary );
+		if ( data.morphTargetInfluences !== undefined ) object.morphTargetInfluences = data.morphTargetInfluences.slice();
+
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
