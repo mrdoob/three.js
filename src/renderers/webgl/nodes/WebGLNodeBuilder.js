@@ -16,12 +16,14 @@ import {
 	densityFogFactor,
 	workingToColorSpace,
 } from 'three/tsl';
-import { NodeFrame } from '../../../nodes/Nodes.js';
-import { hashArray } from '../../../nodes/core/NodeUtils.js';
-import GLSLNodeBuilder from '../../webgl-fallback/nodes/GLSLNodeBuilder.js';
-import Lighting from '../../common/Lighting.js';
-import InspectorBase from '../../common/InspectorBase.js';
-import BasicNodeLibrary from '../../webgpu/nodes/BasicNodeLibrary.js';
+import {
+	NodeUtils,
+	NodeFrame,
+	Lighting,
+	InspectorBase,
+	GLSLNodeBuilder,
+	BasicNodeLibrary,
+} from 'three/webgpu';
 
 // Limitations
 // - VSM shadows not supported
@@ -79,7 +81,7 @@ class SceneContext {
 		const lightsHash = lightsNode.getCacheKey();
 		const envHash = environmentNode ? environmentNode.getCacheKey : 0;
 		const fogHash = fogNode ? fogNode.getCacheKey() : 0;
-		return hashArray( [ lightsHash, envHash, fogHash ] );
+		return NodeUtils.hashArray( [ lightsHash, envHash, fogHash ] );
 
 	}
 
