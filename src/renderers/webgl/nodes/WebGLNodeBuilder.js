@@ -35,7 +35,7 @@ import {
 // - instanced mesh geometry cannot be shared
 
 // overrides shadow nodes to use the built in shadow textures
-class OverrideNodeBuilder extends GLSLNodeBuilder {
+class WebGLRendererNodeBuilder extends GLSLNodeBuilder {
 
 	addNode( node ) {
 
@@ -238,18 +238,12 @@ class RendererProxy {
 export class WebGLNodeBuilder {
 
 	/**
-	 * Constructs a new WebGL renderer.
-	 *
-	 * @param {WebGLRenderer} [renderer] - The WebGLRenderer this builds and updates node materials for.
+	 * Constructs a new WebGL node adapter.
 	 */
-	constructor( renderer ) {
+	constructor() {
 
-		const rendererProxy = new RendererProxy( renderer );
-		const nodeFrame = new NodeFrame();
-		nodeFrame.renderer = rendererProxy;
-
-		this.renderer = rendererProxy;
-		this.nodeFrame = nodeFrame;
+		this.renderer = null;
+		this.nodeFrame = new NodeFrame();
 		this.sceneContexts = new Map();
 		this.programCache = new Map();
 		this.renderStack = [];
@@ -316,6 +310,14 @@ export class WebGLNodeBuilder {
 			return materialHash + sceneHash + rendererHash;
 
 		};
+
+	}
+
+	setRenderer( renderer ) {
+
+		const rendererProxy = new RendererProxy( renderer );
+		this.nodeFrame.renderer = rendererProxy;
+		this.renderer = rendererProxy;
 
 	}
 
@@ -411,7 +413,7 @@ export class WebGLNodeBuilder {
 		nodeFrame.object = object;
 
 		// create & run the builder
-		const builder = new OverrideNodeBuilder( object, renderer );
+		const builder = new WebGLRendererNodeBuilder( object, renderer );
 		builder.scene = scene;
 		builder.camera = camera;
 		builder.material = material;

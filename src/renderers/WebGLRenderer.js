@@ -1049,6 +1049,7 @@ class WebGLRenderer {
 		 */
 		this.setCompatibilityNodeBuilder = function ( nodeBuilder ) {
 
+			nodeBuilder.setRenderer( this );
 			_nodeBuilder = nodeBuilder;
 
 		};
