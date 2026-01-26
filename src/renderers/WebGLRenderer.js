@@ -293,7 +293,7 @@ class WebGLRenderer {
 		const _this = this;
 
 		let _isContextLost = false;
-		let _nodeBuilder = null;
+		let _nodesAdapter = null;
 
 		// internal state cache
 
@@ -1045,12 +1045,12 @@ class WebGLRenderer {
 		 * This enables using TSL (Three.js Shading Language) node materials to prepare
 		 * for migration to WebGPURenderer.
 		 *
-		 * @param {WebGLNodeBuilder} nodeBuilder - The node builder instance.
+		 * @param {WebGLNodeBuilder} nodesAdapter - The node builder instance.
 		 */
-		this.setCompatibilityNodeBuilder = function ( nodeBuilder ) {
+		this.setCompatibilityNodeBuilder = function ( nodesAdapter ) {
 
-			nodeBuilder.setRenderer( this );
-			_nodeBuilder = nodeBuilder;
+			nodesAdapter.setRenderer( this );
+			_nodesAdapter = nodesAdapter;
 
 		};
 
@@ -1615,9 +1615,9 @@ class WebGLRenderer {
 			if ( _isContextLost === true ) return;
 
 			// update node builder if available
-			if ( _nodeBuilder !== null ) {
+			if ( _nodesAdapter !== null ) {
 
-				_nodeBuilder.renderStart( scene, camera );
+				_nodesAdapter.renderStart( scene, camera );
 
 			}
 
@@ -1814,9 +1814,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( _nodeBuilder !== null ) {
+			if ( _nodesAdapter !== null ) {
 
-				_nodeBuilder.renderEnd();
+				_nodesAdapter.renderEnd();
 
 			}
 
@@ -2197,9 +2197,9 @@ class WebGLRenderer {
 				parameters.uniforms = programCache.getUniforms( material );
 
 				// Use node builder for node materials if available
-				if ( _nodeBuilder !== null && material.isNodeMaterial ) {
+				if ( _nodesAdapter !== null && material.isNodeMaterial ) {
 
-					_nodeBuilder.build( material, object, parameters );
+					_nodesAdapter.build( material, object, parameters );
 
 				}
 
@@ -2470,9 +2470,9 @@ class WebGLRenderer {
 
 				// notify the node builder that the program has changed so uniforms and update nodes can
 				// be cached and triggered.
-				if ( _nodeBuilder && material.isNodeMaterial ) {
+				if ( _nodesAdapter && material.isNodeMaterial ) {
 
-					_nodeBuilder.onUpdateProgram( program, material );
+					_nodesAdapter.onUpdateProgram( program, material );
 
 				}
 
