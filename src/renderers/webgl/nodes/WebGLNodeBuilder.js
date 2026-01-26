@@ -333,7 +333,7 @@ export class WebGLNodeBuilder {
 
 		if ( ! sceneContexts.get( scene ) ) {
 
-			sceneContexts.set( scene, new SceneContext( renderer, scene, camera ) );
+			sceneContexts.set( scene, new SceneContext( renderer, scene ) );
 
 		}
 
