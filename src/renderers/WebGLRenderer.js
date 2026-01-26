@@ -1045,9 +1045,9 @@ class WebGLRenderer {
 		 * This enables using TSL (Three.js Shading Language) node materials to prepare
 		 * for migration to WebGPURenderer.
 		 *
-		 * @param {WebGLNodeBuilder} nodesAdapter - The node builder instance.
+		 * @param {WebGLNodesAdapter} nodesAdapter - The node builder instance.
 		 */
-		this.setCompatibilityNodeBuilder = function ( nodesAdapter ) {
+		this.setWebGLNodesAdapter = function ( nodesAdapter ) {
 
 			nodesAdapter.setRenderer( this );
 			_nodesAdapter = nodesAdapter;

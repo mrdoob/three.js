@@ -35,7 +35,7 @@ import {
 // - instanced mesh geometry cannot be shared
 
 // overrides shadow nodes to use the built in shadow textures
-class WebGLRendererNodeBuilder extends GLSLNodeBuilder {
+class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 	addNode( node ) {
 
@@ -235,7 +235,7 @@ class RendererProxy {
 /**
  * Compatibility loader and builder for TSL Node materials in WebGLRenderer.
  */
-export class WebGLNodeBuilder {
+export class WebGLNodesAdapter {
 
 	/**
 	 * Constructs a new WebGL node adapter.
@@ -413,7 +413,7 @@ export class WebGLNodeBuilder {
 		nodeFrame.object = object;
 
 		// create & run the builder
-		const builder = new WebGLRendererNodeBuilder( object, renderer );
+		const builder = new WebGLNodeBuilder( object, renderer );
 		builder.scene = scene;
 		builder.camera = camera;
 		builder.material = material;
