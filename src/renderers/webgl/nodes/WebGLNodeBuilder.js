@@ -70,8 +70,10 @@ class SceneContext {
 		this.renderer = renderer;
 		this.scene = scene;
 		this.lightsNode = renderer.lighting.getNode( scene );
-		this.fogNode = this.getFogNode();
-		this.environmentNode = this.getEnvironmentNode();
+		this.fogNode = null;
+		this.environmentNode = null;
+		this.prevFog = null;
+		this.prevEnvironment = null;
 
 	}
 
@@ -85,9 +87,11 @@ class SceneContext {
 
 	}
 
-	updateLights() {
+	update() {
 
 		const { scene, lightsNode } = this;
+
+		// update lighting
 		const sceneLights = [];
 		scene.traverse( object => {
 
@@ -100,6 +104,22 @@ class SceneContext {
 		} );
 
 		lightsNode.setLights( sceneLights );
+
+		// update fog
+		if ( this.prevFog !== scene.fog ) {
+
+			this.fogNode = this.getFogNode();
+			this.prevFog = scene.fog;
+
+		}
+
+		// update environment
+		if ( this.prevEnvironment !== scene.environment ) {
+
+			this.environmentNode = this.getEnvironmentNode();
+			this.prevEnvironment = scene.environment;
+
+		}
 
 	}
 
@@ -340,7 +360,7 @@ export class WebGLNodeBuilder {
 		}
 
 		const sceneContext = sceneContexts.get( scene );
-		sceneContext.updateLights();
+		sceneContext.update();
 		renderStack.push( { sceneContext, camera } );
 
 	}
