@@ -1211,7 +1211,7 @@ ${ flowData.code }
 		if ( this.shaderStage === 'compute' ) {
 
 			return 'invocationIndex';
-			
+
 		}
 
 		throw new Error( 'getInvocationIndex() is only valid in compute shaders' );

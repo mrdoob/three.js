@@ -1045,7 +1045,7 @@ class NodeBuilder {
 	getInvocationIndex() {
 
 		warn( 'Abstract function.' );
-		
+
 	}
 	/**
 	 * Contextually returns either the vertex stage instance index builtin
