@@ -420,7 +420,7 @@ class RenderVideoDialog {
 			const width = videoWidth.getValue() / window.devicePixelRatio;
 			const height = videoHeight.getValue() / window.devicePixelRatio;
 
-			const canvas = player.dom.firstChild;
+			const canvas = player.canvas;
 			canvas.style.width = width + 'px';
 			canvas.style.height = height + 'px';
 
