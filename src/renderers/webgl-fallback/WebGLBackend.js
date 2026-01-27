@@ -2012,6 +2012,21 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Initializes the render target defined in the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	initRenderTarget( renderContext ) {
+
+		const { gl, state } = this;
+
+		this._setFramebuffer( renderContext );
+
+		state.bindFramebuffer( gl.FRAMEBUFFER, null );
+
+	}
+
+	/**
 	 * Configures the active framebuffer from the given render context.
 	 *
 	 * @private

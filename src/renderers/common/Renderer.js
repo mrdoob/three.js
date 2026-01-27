@@ -2690,6 +2690,37 @@ class Renderer {
 	}
 
 	/**
+	 * Initializes the given render target.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to intialize.
+	 */
+	initRenderTarget( renderTarget ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
+		}
+
+		this._textures.updateRenderTarget( renderTarget );
+
+		const renderTargetData = this._textures.get( renderTarget );
+
+		const renderContext = this._renderContexts.get( renderTarget );
+
+		renderContext.textures = renderTargetData.textures;
+		renderContext.depthTexture = renderTargetData.depthTexture;
+		renderContext.width = renderTargetData.width;
+		renderContext.height = renderTargetData.height;
+		renderContext.renderTarget = renderTarget;
+		renderContext.depth = renderTarget.depthBuffer;
+		renderContext.stencil = renderTarget.stencilBuffer;
+
+		this.backend.initRenderTarget( renderContext );
+
+	}
+
+	/**
 	 * Copies the current bound framebuffer into the given texture.
 	 *
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
