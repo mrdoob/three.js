@@ -5,7 +5,6 @@ import { AnimationPathHelper } from 'three/addons/helpers/AnimationPathHelper.js
 function Animation( editor ) {
 
 	const signals = editor.signals;
-	const strings = editor.strings;
 
 	const container = new UIPanel();
 	container.setId( 'animation' );
