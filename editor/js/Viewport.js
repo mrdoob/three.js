@@ -610,25 +610,7 @@ function Viewport( editor ) {
 
 				useBackgroundAsEnvironment = true;
 
-				if ( scene.background !== null ) {
-
-					if ( scene.background.isColor ) {
-
-						scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
-
-					} else if ( scene.background.isTexture ) {
-
-						scene.environment = scene.background;
-						scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-						scene.environmentRotation.y = scene.backgroundRotation.y;
-
-					}
-
-				} else {
-
-					scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
-
-				}
+				Viewport.setupSceneDefaultEnvironmentByPMREMGenerator( scene, pmremGenerator );
 
 				break;
 
@@ -941,6 +923,43 @@ function Viewport( editor ) {
 	return container;
 
 }
+
+//
+
+Viewport.setupSceneDefaultEnvironmentByPMREMGenerator = ( scene, pmremGenerator ) => {
+
+	if ( scene.background !== null ) {
+
+		if ( scene.background.isColor ) {
+
+			scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
+
+		} else if ( scene.background.isTexture ) {
+
+			scene.environment = scene.background;
+			scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+			scene.environmentRotation.y = scene.backgroundRotation.y;
+
+		}
+
+	} else {
+
+		scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+	}
+
+};
+
+Viewport.setupSceneDefaultEnvironmentByRenderer = ( scene, renderer ) => {
+
+	const pmremGenerator = new ( renderer.isWebGPURenderer ? PMREMGenerator : THREE.PMREMGenerator )( renderer );
+	pmremGenerator.compileEquirectangularShader();
+	Viewport.setupSceneDefaultEnvironmentByPMREMGenerator( scene, pmremGenerator );
+	pmremGenerator.dispose();
+
+};
+
+//
 
 function updateGridColors( grid1, grid2, colors ) {
 

@@ -4,6 +4,7 @@ import { UIPanel, UIRow, UIButton, UIInteger, UISelect, UIText } from './libs/ui
 
 import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 import { APP } from './libs/app.js';
+import { Viewport } from './Viewport.js';
 
 function MenubarRender( editor ) {
 
@@ -206,8 +207,6 @@ class RenderImageDialog {
 			camera.updateProjectionMatrix();
 			camera.updateMatrixWorld();
 
-			const scene = await loader.parseAsync( json.scene );
-
 			const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
 			renderer.setClearColor( editor.viewportColor );
@@ -216,6 +215,13 @@ class RenderImageDialog {
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
 			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+
+			const scene = await loader.parseAsync( json.scene );
+			if ( json.environmentType === 'Default' ) {
+
+				Viewport.setupSceneDefaultEnvironmentByRenderer( scene, renderer );
+
+			}
 
 			// popup
 

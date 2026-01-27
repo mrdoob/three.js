@@ -1,3 +1,5 @@
+import { Viewport } from '../Viewport.js';
+
 const APP = {
 
 	Player: function () {
@@ -53,7 +55,14 @@ const APP = {
 			dom.appendChild( renderer.domElement );
 			this.canvas = renderer.domElement;
 
-			this.setScene( loader.parse( json.scene ) );
+			const scene = loader.parse( json.scene );
+			if ( json.environmentType === 'Default' ) {
+			
+				Viewport.setupSceneDefaultEnvironmentByRenderer( scene, renderer );
+
+			}
+			this.setScene( scene );
+
 			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
