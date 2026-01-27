@@ -12,6 +12,7 @@ const APP = {
 		const dom = document.createElement( 'div' );
 
 		this.dom = dom;
+		this.canvas = null;
 
 		this.width = 500;
 		this.height = 500;
@@ -26,6 +27,7 @@ const APP = {
 
 				renderer.dispose();
 				dom.removeChild( renderer.domElement );
+				this.canvas = null;
 
 			}
 
@@ -49,6 +51,7 @@ const APP = {
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
 
 			dom.appendChild( renderer.domElement );
+			this.canvas = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
