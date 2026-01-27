@@ -14756,6 +14756,9 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
+		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
+		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
+
 		// object specific properties
 
 		if ( this.isInstancedMesh ) {
@@ -49389,6 +49392,9 @@ class ObjectLoader extends Loader {
 		if ( data.up !== undefined ) object.up.fromArray( data.up );
 
 		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
+
+		if ( data.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, data.morphTargetDictionary );
+		if ( data.morphTargetInfluences !== undefined ) object.morphTargetInfluences = data.morphTargetInfluences.slice();
 
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;

@@ -14205,7 +14205,7 @@ const normalViewGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( builder.material.flatShading === true ) {
+	if ( builder.isFlatShading() ) {
 
 		node = normalFlat;
 
@@ -14229,7 +14229,7 @@ const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let normal = normalViewGeometry.transformDirection( cameraViewMatrix );
 
-	if ( builder.material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		normal = normal.toVarying( 'v_normalWorldGeometry' );
 
@@ -14245,15 +14245,15 @@ const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context } ) => {
+const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'NORMAL' || subBuildFn === 'VERTEX' ) {
+	if ( builder.subBuildFn === 'NORMAL' || builder.subBuildFn === 'VERTEX' ) {
 
 		node = normalViewGeometry;
 
-		if ( material.flatShading !== true ) {
+		if ( builder.isFlatShading() !== true ) {
 
 			node = directionToFaceDirection( node );
 
@@ -14263,7 +14263,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context } ) => 
 
 		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-		node = context.setupNormal().context( { getUV: null } );
+		node = builder.context.setupNormal().context( { getUV: null } );
 
 	}
 
@@ -15239,11 +15239,11 @@ const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
  * @tsl
  * @type {Node<vec3>}
  */
-const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+const tangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+	if ( builder.subBuildFn === 'VERTEX' || builder.geometry.hasAttribute( 'tangent' ) ) {
 
 		node = modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize();
 
@@ -15253,7 +15253,7 @@ const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) =
 
 	}
 
-	if ( material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		node = directionToFaceDirection( node );
 
@@ -15280,11 +15280,11 @@ const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMat
  * @param {string} varyingName - The name of the varying to assign the bitangent to.
  * @returns {Node<vec3>} The bitangent node.
  */
-const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], { subBuildFn, material } ) => {
+const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], builder ) => {
 
 	let bitangent = crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
-	if ( subBuildFn === 'NORMAL' && material.flatShading !== true ) {
+	if ( builder.subBuildFn === 'NORMAL' && builder.isFlatShading() !== true ) {
 
 		bitangent = bitangent.toVarying( varyingName );
 
@@ -15316,11 +15316,11 @@ const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tangentLoc
  * @tsl
  * @type {Node<vec3>}
  */
-const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+const bitangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+	if ( builder.subBuildFn === 'VERTEX' || builder.geometry.hasAttribute( 'tangent' ) ) {
 
 		node = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize();
 
@@ -15330,7 +15330,7 @@ const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } )
 
 	}
 
-	if ( material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		node = directionToFaceDirection( node );
 
@@ -15485,7 +15485,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	setup( { material } ) {
+	setup( builder ) {
 
 		const { normalMapType, scaleNode, unpackNormalMode } = this;
 
@@ -15521,7 +15521,7 @@ class NormalMapNode extends TempNode {
 
 			let scale = scaleNode;
 
-			if ( material.flatShading === true ) {
+			if ( builder.isFlatShading() === true ) {
 
 				scale = directionToFaceDirection( scale );
 
@@ -49772,6 +49772,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Whether the material is using flat shading or not.
+	 *
+	 * @returns {boolean} Whether the material is using flat shading or not.
+	 */
+	isFlatShading() {
+
+		return this.material.flatShading === true || this.geometry.hasAttribute( 'normal' ) === false;
+
+	}
+
+	/**
 	 * Whether the material is opaque or not.
 	 *
 	 * @return {boolean} Whether the material is opaque or not.
@@ -72172,7 +72183,17 @@ class WebGPUTextureUtils {
 
 		}
 
-		textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+		try {
+
+			textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+
+		} catch ( e ) {
+
+			warn( 'WebGPURenderer: Failed to create texture with descriptor:', textureDescriptorGPU );
+			this.createDefaultTexture( texture );
+			return;
+
+		}
 
 		if ( isMSAA ) {
 
