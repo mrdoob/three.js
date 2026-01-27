@@ -1207,10 +1207,15 @@ ${ flowData.code }
 	 * @return {string} The instance index.
 	 */
 	getInvocationIndex() {
+
 		if ( this.shaderStage === 'compute' ) {
+
 			return 'invocationIndex';
+			
 		}
+
 		throw new Error( 'getInvocationIndex() is only valid in compute shaders' );
+
 	}
 
 	getInstanceIndex() {

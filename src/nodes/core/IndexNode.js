@@ -126,7 +126,7 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
 /**
  * TSL object that represents the global index of a compute shader invocation.
  * This is the linearized index across all workgroups, equivalent to the global invocation ID.
- * 
+ *
  * @tsl
  * @type {IndexNode}
  */

@@ -1043,7 +1043,9 @@ class NodeBuilder {
 	 * @return {string} The invocation index shader string.
 	 */
 	getInvocationIndex() {
+
 		warn( 'Abstract function.' );
+		
 	}
 	/**
 	 * Contextually returns either the vertex stage instance index builtin
