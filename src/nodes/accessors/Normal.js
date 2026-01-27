@@ -52,7 +52,7 @@ export const normalViewGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( builder.material.flatShading === true ) {
+	if ( builder.isFlatShading() ) {
 
 		node = normalFlat;
 
@@ -76,7 +76,7 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let normal = normalViewGeometry.transformDirection( cameraViewMatrix );
 
-	if ( builder.material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		normal = normal.toVarying( 'v_normalWorldGeometry' );
 
@@ -92,15 +92,15 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context } ) => {
+export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'NORMAL' || subBuildFn === 'VERTEX' ) {
+	if ( builder.subBuildFn === 'NORMAL' || builder.subBuildFn === 'VERTEX' ) {
 
 		node = normalViewGeometry;
 
-		if ( material.flatShading !== true ) {
+		if ( builder.isFlatShading() !== true ) {
 
 			node = directionToFaceDirection( node );
 
@@ -110,7 +110,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, material, context 
 
 		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
 
-		node = context.setupNormal().context( { getUV: null } );
+		node = builder.context.setupNormal().context( { getUV: null } );
 
 	}
 
