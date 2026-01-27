@@ -752,7 +752,17 @@ ${ flowData.code }
 
 			} else if ( uniform.type === 'cubeDepthTexture' ) {
 
-				snippet = `samplerCubeShadow ${ uniform.name };`;
+				const texture = uniform.node.value;
+
+				if ( texture.compareFunction ) {
+
+					snippet = `samplerCubeShadow ${ uniform.name };`;
+
+				} else {
+
+					snippet = `samplerCube ${ uniform.name };`;
+
+				}
 
 			} else if ( uniform.type === 'buffer' ) {
 
