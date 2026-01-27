@@ -385,6 +385,8 @@ function Viewport( editor ) {
 
 		}
 
+		renderer.getClearColor( editor.viewportColor );
+
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 

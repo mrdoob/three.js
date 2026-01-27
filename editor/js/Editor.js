@@ -134,6 +134,7 @@ function Editor() {
 
 	this.viewportCamera = this.camera;
 	this.viewportShading = 'default';
+	this.viewportColor = new THREE.Color();
 
 	this.addCamera( this.camera );
 

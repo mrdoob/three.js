@@ -210,6 +210,7 @@ class RenderImageDialog {
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
+			renderer.setClearColor( editor.viewportColor );
 
 			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
@@ -414,6 +415,7 @@ class RenderVideoDialog {
 			await player.load( editor.toJSON() );
 			player.setPixelRatio( 1 );
 			player.setSize( videoWidth.getValue(), videoHeight.getValue() );
+			player.setClearColor( editor.viewportColor );
 
 			//
 
