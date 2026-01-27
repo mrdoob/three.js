@@ -343,12 +343,54 @@ hr {
 	top: 36px;
 	left: 0;
 	right: 350px;
-	bottom: 0;
+	bottom: 36px;
 }
 
 	#viewport .Text {
 		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
 		pointer-events: none;
+	}
+
+#animation {
+	position: absolute;
+	left: 0;
+	right: 350px;
+	bottom: 0;
+	height: 36px;
+	background: #eee;
+	border-top: 1px solid #ccc;
+	display: none;
+	flex-direction: row;
+}
+
+	#animation .Panel {
+		color: #888;
+	}
+
+	#animation input[type="range"] {
+		accent-color: #08f;
+	}
+
+#animation-resizer {
+	position: absolute;
+	left: 0;
+	right: 350px;
+	bottom: 36px;
+	height: 5px;
+	transform: translateY(2.5px);
+	cursor: row-resize;
+	z-index: 2;
+}
+
+	#animation-resizer:hover {
+		background-color: #08f8;
+		transition-property: background-color;
+		transition-delay: 0.1s;
+		transition-duration: 0.2s;
+	}
+
+	#animation-resizer:active {
+		background-color: #08f;
 	}
 
 #script {
@@ -536,7 +578,7 @@ hr {
 	position: absolute;
 	left: calc(50% - 175px);
 	transform: translateX(-50%);
-	bottom: 20px;
+	bottom: 56px;
 	height: 32px;
 	background: #eee;
 	text-align: center;
@@ -621,6 +663,10 @@ hr {
 		display: none;
 	}
 
+	#animation-resizer {
+		display: none;
+	}
+
 	#menubar .menu .options {
 		max-height: calc(100% - 80px);
 	}
@@ -661,6 +707,10 @@ hr {
 		left: 50%;
 		transform: translateX(-50%);
 		bottom: 330px;
+	}
+
+	#animation {
+		display: none !important;
 	}
 
 }
@@ -738,6 +788,19 @@ hr {
 
 		#sidebar .Panel.Material canvas {
 			border: solid 1px #5A5A5A;
+		}
+
+	#animation {
+		background-color: #111;
+		border-top: 1px solid #222;
+	}
+
+		#animation .Panel {
+			border-bottom: 1px solid #222;
+		}
+
+		#animation .timeline-container {
+			background: rgba(255, 255, 255, 0.05);
 		}
 
 	#tabs {
