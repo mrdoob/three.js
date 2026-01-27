@@ -124,6 +124,15 @@ export default IndexNode;
 export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
 
 /**
+ * TSL object that represents the global index of a compute shader invocation.
+ * This is the linearized index across all workgroups, equivalent to the global invocation ID.
+ * 
+ * @tsl
+ * @type {IndexNode}
+ */
+export const invocationIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_GLOBAL );
+
+/**
  * TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
  *
  * @tsl

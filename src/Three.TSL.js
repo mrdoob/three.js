@@ -626,6 +626,7 @@ export const workgroupBarrier = TSL.workgroupBarrier;
 export const workgroupId = TSL.workgroupId;
 export const workingToColorSpace = TSL.workingToColorSpace;
 export const xor = TSL.xor;
+export const invocationIndex = TSL.invocationIndex;
 
 /*
 // Use this code to generate the export statements dynamically
