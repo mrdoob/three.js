@@ -142,6 +142,12 @@ const APP = {
 
 		};
 
+		this.setClearColor = function ( color ) {
+
+			renderer.setClearColor( color );
+
+		};
+
 		this.setSize = function ( width, height ) {
 
 			this.width = width;
