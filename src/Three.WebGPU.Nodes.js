@@ -22,7 +22,6 @@ export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoade
 export { default as InspectorBase } from './renderers/common/InspectorBase.js';
 export { default as CanvasTarget } from './renderers/common/CanvasTarget.js';
 export { default as BlendMode } from './renderers/common/BlendMode.js';
-
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
 import * as TSL from './nodes/TSL.js';
