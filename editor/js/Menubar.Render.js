@@ -420,7 +420,7 @@ class RenderVideoDialog {
 			const width = videoWidth.getValue() / window.devicePixelRatio;
 			const height = videoHeight.getValue() / window.devicePixelRatio;
 
-			const canvas = player.canvas;
+			const canvas = player.dom.firstChild;
 			canvas.style.width = width + 'px';
 			canvas.style.height = height + 'px';
 
@@ -497,7 +497,7 @@ class RenderVideoDialog {
 
 			const qualityToBitrate = {
 				'low': 2e6,
-				'medium': 5e6, 
+				'medium': 5e6,
 				'high': 10e6,
 				'ultra': 20e6
 			};
@@ -526,7 +526,7 @@ class RenderVideoDialog {
 				player.render( currentTime );
 
 				const bitmap = await createImageBitmap( canvas );
-				const frame = new VideoFrame( bitmap, { timestamp: i * ( 1_000_000 / fps ) } );
+				const frame = new VideoFrame( bitmap, { timestamp: i * ( 1e6 / fps ) } );
 
 				videoEncoder.encode( frame, { keyFrame: i % fps === 0 } );
 				frame.close();
