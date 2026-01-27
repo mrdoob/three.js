@@ -692,7 +692,7 @@ class Backend {
 	}
 
 	/**
-	 * Initializes render targets defined in the given render context.
+	 * Initializes the render target defined in the given render context.
 	 *
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.

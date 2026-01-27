@@ -2690,7 +2690,7 @@ class Renderer {
 	}
 
 	/**
-	 * Initializes render targets.
+	 * Initializes the given render target.
 	 *
 	 * @param {RenderTarget} renderTarget - The render target to intialize.
 	 */
