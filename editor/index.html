@@ -21,7 +21,8 @@
 
 					"three/examples/": "../examples/",
 					"three-gpu-pathtracer": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.23/build/index.module.js",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.4/build/index.module.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.4/build/index.module.js",
+					"@google/genai": "https://cdn.jsdelivr.net/npm/@google/genai/dist/web/index.mjs"
 				}
 			}
 		</script>
@@ -69,6 +70,7 @@
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
 			import { Resizer } from './js/Resizer.js';
+			import { Agent } from './js/Agent.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -101,6 +103,9 @@
 			const resizer = new Resizer( editor );
 			document.body.appendChild( resizer.dom );
 
+			const agent = new Agent( editor );
+			viewport.dom.appendChild( agent.dom );
+
 			//
 
 			editor.storage.init( function () {
@@ -126,6 +131,8 @@
 						editor.selectByUuid( selected );
 
 					}
+
+					editor.signals.storageLoaded.dispatch();
 
 				} );
 
