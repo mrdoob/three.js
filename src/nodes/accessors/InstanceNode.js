@@ -12,6 +12,7 @@ import { instanceIndex } from '../core/IndexNode.js';
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 /**
  * This node implements the vertex shader logic which is required
@@ -186,6 +187,12 @@ class InstanceNode extends Node {
 
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
 		positionLocal.assign( instancePosition );
+
+		if ( builder.material instanceof NodeMaterial && builder.material.instancePositionNode != null ) {
+
+			positionLocal.assign( builder.material.instancePositionNode );
+
+		}
 
 		if ( builder.needsPreviousData() ) {
 
