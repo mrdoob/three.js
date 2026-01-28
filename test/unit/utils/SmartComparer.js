@@ -30,10 +30,9 @@ function SmartComparer() {
 		if ( val1 === val2 ) return true;
 
 		// Null or undefined values.
-		/* jshint eqnull:true */
-		if ( val1 == null || val2 == null ) {
+		if ( val1 == null || val2 == null ) { // eslint-disable-line three/eqeqeq
 
-			if ( val1 != val2 ) {
+			if ( val1 != val2 ) { // eslint-disable-line three/eqeqeq
 
 				return makeFail( 'One value is undefined or null', val1, val2 );
 

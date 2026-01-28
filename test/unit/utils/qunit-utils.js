@@ -46,7 +46,7 @@ QUnit.assert.equalKey = function ( obj, ref, key ) {
 	const expected = ref[ key ];
 	const message = actual + ' should be equal to ' + expected + ' for key "' + key + '"';
 	this.pushResult( {
-		result: actual == expected,
+		result: actual == expected, // eslint-disable-line three/eqeqeq
 		actual: actual,
 		expected: expected,
 		message: message
