@@ -382,16 +382,6 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let levelNode = this.levelNode;
-
-		if ( levelNode === null && builder.context.getTextureLevel ) {
-
-			levelNode = builder.context.getTextureLevel( this );
-
-		}
-
-		//
-
 		let compareNode = null;
 		let compareStepNode = null;
 
@@ -416,7 +406,7 @@ class TextureNode extends UniformNode {
 		}
 
 		properties.uvNode = uvNode;
-		properties.levelNode = levelNode;
+		properties.levelNode = this.levelNode;
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
