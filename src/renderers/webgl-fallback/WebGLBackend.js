@@ -2044,7 +2044,7 @@ class WebGLBackend extends Backend {
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
 
-			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
+			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
