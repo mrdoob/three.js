@@ -404,7 +404,6 @@ class UltraHDRLoader extends Loader {
 			offsetSDR = ( offsetSDRN / commonDenominator ) * 255.0;
 
 			const offsetHDRN = view.getInt32( offset, false );
-			offset += 4;
 			offsetHDR = ( offsetHDRN / commonDenominator ) * 255.0;
 
 		} else {
@@ -451,7 +450,6 @@ class UltraHDRLoader extends Loader {
 			const offsetHDRN = view.getInt32( offset, false );
 			offset += 4;
 			const offsetHDRD = view.getUint32( offset, false );
-			offset += 4;
 			offsetHDR = ( offsetHDRN / offsetHDRD ) * 255.0;
 
 		}
