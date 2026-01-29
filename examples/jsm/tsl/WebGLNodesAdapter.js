@@ -41,6 +41,23 @@ function getObjectHash( object ) {
 
 }
 
+// Mirrors WebGLUniforms.seqWithValue from WebGLRenderer
+function generateUniformsList( program, uniforms ) {
+
+	const progUniforms = program.getUniforms();
+	const uniformsList = [];
+
+	for ( let i = 0; i < progUniforms.seq.length; i ++ ) {
+
+		const u = progUniforms.seq[ i ];
+		if ( u.id in uniforms ) uniformsList.push( u );
+
+	}
+
+	return uniformsList;
+
+}
+
 // overrides shadow nodes to use the built in shadow textures
 class WebGLNodeBuilder extends GLSLNodeBuilder {
 
@@ -355,18 +372,20 @@ export class WebGLNodesAdapter {
 		if ( ! programs.has( program ) ) {
 
 			const builder = material._latestBuilder;
+			const uniforms = materialProperties.uniforms;
 			programs.set( program, {
 				uniformsGroups: this.collectUniformsGroups( builder ),
-				uniforms: materialProperties.uniforms,
+				uniforms: uniforms,
+				uniformsList: generateUniformsList( program, uniforms ),
 				updateNodes: builder.updateNodes,
 			} );
 
 		}
 
-		const { uniformsGroups, uniforms, updateNodes } = programs.get( program );
+		const { uniformsGroups, uniforms, uniformsList, updateNodes } = programs.get( program );
 		material.uniformsGroups = uniformsGroups;
 		materialProperties.uniforms = uniforms;
-		materialProperties.uniformsList = null; // force regeneration
+		materialProperties.uniformsList = uniformsList;
 		this.updateNodes( updateNodes );
 
 	}
