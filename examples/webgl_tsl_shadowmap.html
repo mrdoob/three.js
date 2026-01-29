@@ -137,14 +137,6 @@
 				planeMaterial.shininess = 0;
 				planeMaterial.specular.setHex( 0x111111 );
 
-				planeMaterial.receivedShadowPositionNode = Fn( () => {
-
-					const pos = positionWorld.toVar();
-					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
-					return pos;
-
-				} )();
-
 				planeMaterial.colorNode = Fn( () => {
 
 					const pos = positionWorld.toVar();
