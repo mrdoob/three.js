@@ -40,8 +40,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { Inspector } from 'three/addons/inspector/Inspector.js';
-
 			let camera, scene, renderer, timer;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
@@ -171,7 +169,6 @@
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// Mouse control

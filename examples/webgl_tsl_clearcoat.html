@@ -34,8 +34,6 @@
 			import { WebGLNodesAdapter } from 'three/addons/tsl/WebGLNodesAdapter.js';
 			import { WebGLRenderer } from 'three';
 
-			import { Inspector } from 'three/addons/inspector/Inspector.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
@@ -188,7 +186,6 @@
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.25;
-				renderer.inspector = new Inspector();
 
 				// EVENTS
 
