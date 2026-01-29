@@ -2472,7 +2472,7 @@ class WebGLRenderer {
 				// be cached and triggered.
 				if ( _nodesAdapter && material.isNodeMaterial ) {
 
-					_nodesAdapter.onUpdateProgram( program, material );
+					_nodesAdapter.onUpdateProgram( material, program, materialProperties );
 
 				}
 

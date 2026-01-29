@@ -34,6 +34,12 @@ import {
 // - Fog / environment do not automatically update - must call "dispose"
 // - instanced mesh geometry cannot be shared
 
+function getObjectHash( object ) {
+
+	return '' + object.receiveShadow;
+
+}
+
 // overrides shadow nodes to use the built in shadow textures
 class WebGLNodeBuilder extends GLSLNodeBuilder {
 
@@ -290,12 +296,19 @@ export class WebGLNodesAdapter {
 				const programs = self.programCache.get( this );
 				if ( programs && programs.has( currentProgram ) ) {
 
-					const { uniformsGroups, updateNodes } = programs.get( currentProgram );
-					this.uniformsGroups = uniformsGroups;
+					// update the nodes for the current object
+					const { updateNodes } = programs.get( currentProgram );
 					self.updateNodes( updateNodes );
-					this.uniformsNeedsUpdate = true;
 
 				}
+
+			}
+
+			const objectHash = getObjectHash( object );
+			if ( this.prevObjectHash !== objectHash ) {
+
+				this.prevObjectHash = objectHash;
+				this.needsUpdate = true;
 
 			}
 
@@ -303,11 +316,12 @@ export class WebGLNodesAdapter {
 
 		this.customProgramCacheKeyCallback = function () {
 
-			const { renderStack, renderer } = self;
+			const { renderStack, renderer, nodeFrame } = self;
 			const sceneHash = renderStack[ renderStack.length - 1 ].sceneContext.getCacheKey();
 			const materialHash = this.constructor.prototype.customProgramCacheKey.call( this );
 			const rendererHash = renderer.getCacheKey();
-			return materialHash + sceneHash + rendererHash;
+
+			return materialHash + sceneHash + rendererHash + getObjectHash( nodeFrame.object );
 
 		};
 
@@ -321,7 +335,7 @@ export class WebGLNodesAdapter {
 
 	}
 
-	onUpdateProgram( program, material ) {
+	onUpdateProgram( material, program, materialProperties ) {
 
 		const { programCache } = this;
 		if ( ! programCache.has( material ) ) {
@@ -336,13 +350,16 @@ export class WebGLNodesAdapter {
 			const builder = material._latestBuilder;
 			programs.set( program, {
 				uniformsGroups: this.collectUniformsGroups( builder ),
+				uniforms: materialProperties.uniforms,
 				updateNodes: builder.updateNodes,
 			} );
 
 		}
 
-		const { uniformsGroups, updateNodes } = programs.get( program );
+		const { uniformsGroups, uniforms, updateNodes } = programs.get( program );
 		material.uniformsGroups = uniformsGroups;
+		materialProperties.uniforms = uniforms;
+		materialProperties.uniformsList = null; // force regeneration
 		this.updateNodes( updateNodes );
 
 	}
@@ -354,6 +371,7 @@ export class WebGLNodesAdapter {
 		nodeFrame.update();
 		nodeFrame.camera = camera;
 		nodeFrame.scene = scene;
+		nodeFrame.frameId ++;
 
 		if ( ! sceneContexts.get( scene ) ) {
 
@@ -364,6 +382,25 @@ export class WebGLNodesAdapter {
 		const sceneContext = sceneContexts.get( scene );
 		sceneContext.update();
 		renderStack.push( { sceneContext, camera } );
+
+		// ensure all node material callbacks are initialized before
+		// traversal and build
+		const {
+			customProgramCacheKeyCallback,
+			onBeforeRenderCallback,
+		} = this;
+
+		scene.traverse( object => {
+
+			if ( object.material && object.material.isNodeMaterial ) {
+
+				object.material.customProgramCacheKey = customProgramCacheKeyCallback;
+				object.material.onBeforeRender = onBeforeRenderCallback;
+
+			}
+
+		} );
+
 
 	}
 
@@ -390,9 +427,7 @@ export class WebGLNodesAdapter {
 			nodeFrame,
 			renderer,
 			getOutputCallback,
-			onBeforeRenderCallback,
 			onDisposeMaterialCallback,
-			customProgramCacheKeyCallback,
 			renderStack,
 		} = this;
 
@@ -433,8 +468,6 @@ export class WebGLNodesAdapter {
 
 		// set up callbacks for uniforms and node updates
 		material._latestBuilder = builder;
-		material.customProgramCacheKey = customProgramCacheKeyCallback;
-		material.onBeforeRender = onBeforeRenderCallback;
 		material.addEventListener( 'dispose', onDisposeMaterialCallback );
 
 	}
