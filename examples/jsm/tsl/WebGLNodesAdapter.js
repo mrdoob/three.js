@@ -429,7 +429,6 @@ export class WebGLNodesAdapter {
 
 		} );
 
-
 	}
 
 	renderEnd() {
