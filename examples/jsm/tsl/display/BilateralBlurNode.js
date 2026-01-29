@@ -274,7 +274,7 @@ class BilateralBlurNode extends TempNode {
 				const colorWeight1 = exp( diff1.mul( diff1 ).mul( colorSigmaFactor ) ).toVar();
 				const colorWeight2 = exp( diff2.mul( diff2 ).mul( colorSigmaFactor ) ).toVar();
 
-				// Combined bilateral weight = spatial weight * color/depth/normal weight
+				// Combined bilateral weight = spatial weight * color weight
 				const bilateralWeight1 = spatialWeight.mul( colorWeight1 );
 				const bilateralWeight2 = spatialWeight.mul( colorWeight2 );
 
