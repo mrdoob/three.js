@@ -835,7 +835,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.positionNode !== null ) {
+		if ( this.positionNode ) {
 
 			positionLocal.assign( subBuild( this.positionNode, 'POSITION', 'vec3' ) );
 
