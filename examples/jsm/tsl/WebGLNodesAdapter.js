@@ -33,6 +33,7 @@ import {
 // - Storage textures not supported
 // - Fog / environment do not automatically update - must call "dispose"
 // - instanced mesh geometry cannot be shared
+// - Node materials cannot be used with "compile" function
 
 function getObjectHash( object ) {
 
@@ -258,13 +259,19 @@ export class WebGLNodesAdapter {
 		this.onDisposeMaterialCallback = function () {
 
 			// dispose of all the uniform groups
-			self.programCache.get( this ).forEach( ( { uniformsGroups } ) => {
+			const { programCache } = self;
+			if ( programCache.has( this ) ) {
 
-				uniformsGroups.forEach( u => u.dispose() );
+				self.programCache.get( this ).forEach( ( { uniformsGroups } ) => {
 
-			} );
+					uniformsGroups.forEach( u => u.dispose() );
 
-			self.programCache.delete( this );
+				} );
+
+				self.programCache.delete( this );
+
+			}
+
 			this.removeEventListener( 'dispose', self.onDisposeMaterialCallback );
 
 		};
