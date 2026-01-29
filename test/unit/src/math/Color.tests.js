@@ -10,7 +10,7 @@ export default QUnit.module( 'Maths', () => {
 
 		const colorManagementEnabled = ColorManagement.enabled;
 
-		QUnit.testDone( () => {
+		  QUnit.testDone( () => {
 
 			ColorManagement.enabled = colorManagementEnabled;
 
@@ -837,5 +837,20 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 	} );
+
+} );
+
+
+QUnit.test( 'Alpha channel support', ( assert ) => {
+
+    const color = new Color( 1, 0, 0, 0.5 );
+
+    assert.strictEqual( color.a, 0.5, 'Alpha value is set correctly' );
+
+    const clone = color.clone();
+    assert.strictEqual( clone.a, 0.5, 'Alpha value is cloned correctly' );
+
+    const copied = new Color().copy( color );
+    assert.strictEqual( copied.a, 0.5, 'Alpha value is copied correctly' );
 
 } );
