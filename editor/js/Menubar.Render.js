@@ -219,7 +219,7 @@ class RenderImageDialog {
 			const scene = await loader.parseAsync( json.scene );
 			if ( json.environmentType === 'Default' ) {
 
-				Viewport.setupSceneDefaultEnvironmentByRenderer( scene, renderer );
+				Viewport.setupDefaultEnvironment( scene, renderer );
 
 			}
 

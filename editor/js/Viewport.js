@@ -610,7 +610,7 @@ function Viewport( editor ) {
 
 				useBackgroundAsEnvironment = true;
 
-				Viewport.setupSceneDefaultEnvironmentByPMREMGenerator( scene, pmremGenerator );
+				Viewport.setupDefaultEnvironment( scene, pmremGenerator );
 
 				break;
 
@@ -926,36 +926,42 @@ function Viewport( editor ) {
 
 //
 
-Viewport.setupSceneDefaultEnvironmentByPMREMGenerator = ( scene, pmremGenerator ) => {
+Viewport.setupDefaultEnvironment = ( scene, rendererOrPmremGenerator ) => {
 
-	if ( scene.background !== null ) {
+	if ( rendererOrPmremGenerator.isWebGPURenderer || rendererOrPmremGenerator.isWebGLRenderer ) {
 
-		if ( scene.background.isColor ) {
+		const renderer = rendererOrPmremGenerator;
 
-			scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
-
-		} else if ( scene.background.isTexture ) {
-
-			scene.environment = scene.background;
-			scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-			scene.environmentRotation.y = scene.backgroundRotation.y;
-
-		}
+		const pmremGenerator = new ( renderer.isWebGPURenderer ? PMREMGenerator : THREE.PMREMGenerator )( renderer );
+		pmremGenerator.compileEquirectangularShader();
+		Viewport.setupDefaultEnvironment( scene, pmremGenerator );
+		pmremGenerator.dispose();
 
 	} else {
 
-		scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+		const pmremGenerator = rendererOrPmremGenerator;
+
+		if ( scene.background !== null ) {
+
+			if ( scene.background.isColor ) {
+
+				scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
+
+			} else if ( scene.background.isTexture ) {
+
+				scene.environment = scene.background;
+				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+				scene.environmentRotation.y = scene.backgroundRotation.y;
+
+			}
+
+		} else {
+
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+		}
 
 	}
-
-};
-
-Viewport.setupSceneDefaultEnvironmentByRenderer = ( scene, renderer ) => {
-
-	const pmremGenerator = new ( renderer.isWebGPURenderer ? PMREMGenerator : THREE.PMREMGenerator )( renderer );
-	pmremGenerator.compileEquirectangularShader();
-	Viewport.setupSceneDefaultEnvironmentByPMREMGenerator( scene, pmremGenerator );
-	pmremGenerator.dispose();
 
 };
 

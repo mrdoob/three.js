@@ -58,7 +58,7 @@ const APP = {
 			const scene = loader.parse( json.scene );
 			if ( json.environmentType === 'Default' ) {
 			
-				Viewport.setupSceneDefaultEnvironmentByRenderer( scene, renderer );
+				Viewport.setupDefaultEnvironment( scene, renderer );
 
 			}
 			this.setScene( scene );
