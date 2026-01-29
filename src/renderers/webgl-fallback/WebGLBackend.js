@@ -446,13 +446,12 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.scissor ) {
 
-			const { x, y, width, height } = renderContext.scissorValue;
-
-			state.scissor( x, renderContext.height - height - y, width, height );
+			this.updateScissor( renderContext );
 
 		} else {
 
-			state.scissor( 0, 0, renderContext.width, renderContext.height );
+			const { width, height } = this.getDrawingBufferSize();
+			state.scissor( 0, 0, width, height );
 
 		}
 
