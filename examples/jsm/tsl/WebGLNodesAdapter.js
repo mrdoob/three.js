@@ -35,6 +35,8 @@ import {
 // - instanced mesh geometry cannot be shared
 // - Node materials cannot be used with "compile" function
 
+// hash any object parameters that will impact the resulting shader so we can force
+// a program update
 function getObjectHash( object ) {
 
 	return '' + object.receiveShadow;
