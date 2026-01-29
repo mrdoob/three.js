@@ -1,5 +1,5 @@
-import Node from "./Node.js";
-import { nodeObject } from "../tsl/TSLCore.js";
+import Node from './Node.js';
+import { nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * This node is used to build a sub-build in the node system.
@@ -10,12 +10,16 @@ import { nodeObject } from "../tsl/TSLCore.js";
  * @param {?string} [nodeType=null] - The type of the node, if known.
  */
 class SubBuildNode extends Node {
+
 	static get type() {
-		return "SubBuild";
+
+		return 'SubBuild';
+
 	}
 
-	constructor(node, name, nodeType = null) {
-		super(nodeType);
+	constructor( node, name, nodeType = null ) {
+
+		super( nodeType );
 
 		/**
 		 * The node to be built in the sub-build.
@@ -39,36 +43,48 @@ class SubBuildNode extends Node {
 		 * @default true
 		 */
 		this.isSubBuildNode = true;
+
 	}
 
-	getNodeType(builder) {
-		if (this.nodeType !== null) return this.nodeType;
+	getNodeType( builder ) {
 
-		builder.addSubBuild(this.name);
+		if ( this.nodeType !== null ) return this.nodeType;
 
-		const nodeType = this.node.getNodeType(builder);
+		builder.addSubBuild( this.name );
+
+		const nodeType = this.node.getNodeType( builder );
 
 		builder.removeSubBuild();
 
 		return nodeType;
+
 	}
 
-	build(builder, ...params) {
-		if (this.node === undefined || this.node === null) {
-			if (this.name === "POSITION") {
-				const attribute = builder.getAttribute("position", "vec3");
-				return attribute.name;
-			}
-			return builder.generateConst("vec3", 0.0);
-		}
-		builder.addSubBuild(this.name);
+	build( builder, ...params ) {
 
-		const data = this.node.build(builder, ...params);
+		if ( this.node === undefined || this.node === null ) {
+
+			if ( this.name === 'POSITION' ) {
+
+				const attribute = builder.getAttribute( 'position', 'vec3' );
+				return attribute.name;
+
+			}
+
+			return builder.generateConst( 'vec3', 0.0 );
+
+		}
+
+		builder.addSubBuild( this.name );
+
+		const data = this.node.build( builder, ...params );
 
 		builder.removeSubBuild();
 
 		return data;
+
 	}
+
 }
 
 export default SubBuildNode;
@@ -83,5 +99,5 @@ export default SubBuildNode;
  * @param {?string} [type=null] - The type of the node, if known.
  * @returns {Node} A node object wrapping the SubBuildNode instance.
  */
-export const subBuild = (node, name, type = null) =>
-	nodeObject(new SubBuildNode(nodeObject(node), name, type));
+export const subBuild = ( node, name, type = null ) =>
+	nodeObject( new SubBuildNode( nodeObject( node ), name, type ) );
