@@ -168,8 +168,6 @@ Editor.prototype = {
 		this.signals.sceneGraphChanged.active = true;
 		this.signals.sceneGraphChanged.dispatch();
 
-		this.signals.sceneEnvironmentChanged.dispatch( this.environmentType, scene.environment );
-
 	},
 
 	//
