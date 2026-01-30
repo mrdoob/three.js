@@ -206,6 +206,7 @@ class BufferAttribute {
 
 		this.usage = source.usage;
 		this.gpuType = source.gpuType;
+    this.version = source.version;
 
 		return this;
 
