@@ -1,4 +1,5 @@
 {
+	"webgl_animation_flag": [ "animation", "flag", "texture", "canvas" ],
 	"misc_controls_arcball": [ "rotation" ],
 	"misc_controls_drag": [ "translate" ],
 	"misc_controls_map": [ "drag" ],

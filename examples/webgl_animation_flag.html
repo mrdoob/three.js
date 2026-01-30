@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - flag</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl animation flag
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			// Flag dimensions (1:2 aspect ratio per Philippine flag specification)
+
+			const FLAG_WIDTH = 4;
+			const FLAG_HEIGHT = 2;
+			const SEGMENTS_X = 60;
+			const SEGMENTS_Y = 40;
+
+			// Wave parameters
+
+			const WAVE_AMPLITUDE = 0.15;
+			const WAVE_FREQUENCY = 4;
+			const WAVE_SPEED = 2;
+
+			let camera, scene, renderer, stats, controls;
+			let flagMesh, flagGeometry, originalPositions;
+
+			const timer = new THREE.Timer();
+			timer.connect( document );
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// Stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x87ceeb );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 1, 5 );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 1, 0.5, 0 );
+				controls.update();
+
+				// Lighting
+
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.6 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+				directionalLight.position.set( 5, 5, 5 );
+				scene.add( directionalLight );
+
+				// Ground
+
+				const groundGeometry = new THREE.PlaneGeometry( 20, 20 );
+				const groundMaterial = new THREE.MeshStandardMaterial( { color: 0x556b2f } );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.position.y = - 1.5;
+				scene.add( ground );
+
+				// Pole
+
+				createPole();
+
+				// Flag
+
+				createFlag();
+
+				// Events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function createPole() {
+
+				const poleHeight = FLAG_HEIGHT + 1.5;
+				const poleMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x8b7355,
+					metalness: 0.3,
+					roughness: 0.7
+				} );
+
+				const poleGeometry = new THREE.CylinderGeometry( 0.03, 0.03, poleHeight, 16 );
+				const pole = new THREE.Mesh( poleGeometry, poleMaterial );
+				pole.position.set( 0, poleHeight / 2 - 1.5, 0 );
+				scene.add( pole );
+
+				const capGeometry = new THREE.SphereGeometry( 0.06, 16, 16 );
+				const cap = new THREE.Mesh( capGeometry, poleMaterial );
+				cap.position.set( 0, poleHeight - 1.5, 0 );
+				scene.add( cap );
+
+			}
+
+			function createFlagTexture() {
+
+				const canvas = document.createElement( 'canvas' );
+				const width = 1024;
+				const height = 512;
+				canvas.width = width;
+				canvas.height = height;
+				const ctx = canvas.getContext( '2d' );
+
+				// Blue top band
+
+				ctx.fillStyle = '#0038A8';
+				ctx.fillRect( 0, 0, width, height / 2 );
+
+				// Red bottom band
+
+				ctx.fillStyle = '#CE1126';
+				ctx.fillRect( 0, height / 2, width, height / 2 );
+
+				// White equilateral triangle on the hoist side
+
+				const triangleApexX = height * Math.sqrt( 3 ) / 2;
+
+				ctx.beginPath();
+				ctx.moveTo( 0, 0 );
+				ctx.lineTo( triangleApexX, height / 2 );
+				ctx.lineTo( 0, height );
+				ctx.closePath();
+				ctx.fillStyle = '#FFFFFF';
+				ctx.fill();
+
+				// Golden sun at the centroid of the triangle
+
+				const sunCX = triangleApexX / 3;
+				const sunCY = height / 2;
+				const sunRadius = height * 0.08;
+				const rayLength = height * 0.13;
+
+				drawSun( ctx, sunCX, sunCY, sunRadius, rayLength );
+
+				// Three golden stars near each vertex of the triangle
+
+				const starRadius = height * 0.04;
+				const inset = height * 0.1;
+
+				// Top-left star
+
+				drawStar( ctx, inset * 1.2, inset * 1.4, starRadius );
+
+				// Bottom-left star
+
+				drawStar( ctx, inset * 1.2, height - inset * 1.4, starRadius );
+
+				// Right star (near apex)
+
+				drawStar( ctx, triangleApexX - inset * 1.8, height / 2, starRadius );
+
+				const texture = new THREE.CanvasTexture( canvas );
+				texture.colorSpace = THREE.SRGBColorSpace;
+				return texture;
+
+			}
+
+			function drawSun( ctx, cx, cy, radius, rayLength ) {
+
+				ctx.fillStyle = '#FCD116';
+				ctx.strokeStyle = '#FCD116';
+				ctx.lineWidth = 2;
+
+				// Central circle
+
+				ctx.beginPath();
+				ctx.arc( cx, cy, radius, 0, Math.PI * 2 );
+				ctx.fill();
+
+				// 8 major rays (triangular)
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					const angle = ( i / 8 ) * Math.PI * 2 - Math.PI / 2;
+					const halfSpread = Math.PI / 24;
+
+					const tipX = cx + Math.cos( angle ) * ( radius + rayLength );
+					const tipY = cy + Math.sin( angle ) * ( radius + rayLength );
+
+					const baseX1 = cx + Math.cos( angle - halfSpread ) * radius;
+					const baseY1 = cy + Math.sin( angle - halfSpread ) * radius;
+					const baseX2 = cx + Math.cos( angle + halfSpread ) * radius;
+					const baseY2 = cy + Math.sin( angle + halfSpread ) * radius;
+
+					ctx.beginPath();
+					ctx.moveTo( baseX1, baseY1 );
+					ctx.lineTo( tipX, tipY );
+					ctx.lineTo( baseX2, baseY2 );
+					ctx.closePath();
+					ctx.fill();
+
+				}
+
+				// 8 minor rays (lines between major rays)
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					const angle = ( ( i + 0.5 ) / 8 ) * Math.PI * 2 - Math.PI / 2;
+
+					ctx.beginPath();
+					ctx.moveTo(
+						cx + Math.cos( angle ) * radius,
+						cy + Math.sin( angle ) * radius
+					);
+					ctx.lineTo(
+						cx + Math.cos( angle ) * ( radius + rayLength * 0.6 ),
+						cy + Math.sin( angle ) * ( radius + rayLength * 0.6 )
+					);
+					ctx.stroke();
+
+				}
+
+			}
+
+			function drawStar( ctx, cx, cy, radius ) {
+
+				ctx.fillStyle = '#FCD116';
+				ctx.beginPath();
+
+				for ( let i = 0; i < 5; i ++ ) {
+
+					const outerAngle = ( i / 5 ) * Math.PI * 2 - Math.PI / 2;
+					const innerAngle = ( ( i + 0.5 ) / 5 ) * Math.PI * 2 - Math.PI / 2;
+					const innerRadius = radius * 0.4;
+
+					const ox = cx + Math.cos( outerAngle ) * radius;
+					const oy = cy + Math.sin( outerAngle ) * radius;
+					const ix = cx + Math.cos( innerAngle ) * innerRadius;
+					const iy = cy + Math.sin( innerAngle ) * innerRadius;
+
+					if ( i === 0 ) {
+
+						ctx.moveTo( ox, oy );
+
+					} else {
+
+						ctx.lineTo( ox, oy );
+
+					}
+
+					ctx.lineTo( ix, iy );
+
+				}
+
+				ctx.closePath();
+				ctx.fill();
+
+			}
+
+			function createFlag() {
+
+				flagGeometry = new THREE.PlaneGeometry(
+					FLAG_WIDTH, FLAG_HEIGHT, SEGMENTS_X, SEGMENTS_Y
+				);
+
+				// Store original positions for wave calculation baseline
+
+				originalPositions = flagGeometry.attributes.position.array.slice();
+
+				const texture = createFlagTexture();
+				const material = new THREE.MeshStandardMaterial( {
+					map: texture,
+					side: THREE.DoubleSide,
+					roughness: 0.8,
+					metalness: 0.0
+				} );
+
+				flagMesh = new THREE.Mesh( flagGeometry, material );
+
+				// Position flag so left edge aligns with the pole at x=0
+
+				flagMesh.position.set( FLAG_WIDTH / 2, FLAG_HEIGHT / 2, 0 );
+				scene.add( flagMesh );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const elapsed = timer.getElapsed();
+
+				// Wave animation on flag vertices
+
+				const positions = flagGeometry.attributes.position.array;
+				const vertexCount = positions.length / 3;
+
+				for ( let i = 0; i < vertexCount; i ++ ) {
+
+					const i3 = i * 3;
+
+					const origX = originalPositions[ i3 ];
+					const origY = originalPositions[ i3 + 1 ];
+
+					// Normalized distance from hoist (0 at left edge, 1 at right edge)
+
+					const t = ( origX + FLAG_WIDTH / 2 ) / FLAG_WIDTH;
+
+					// Primary wave along X axis
+
+					const z = Math.sin( origX * WAVE_FREQUENCY + elapsed * WAVE_SPEED ) * WAVE_AMPLITUDE * t;
+
+					// Secondary cross-wave for natural movement
+
+					const z2 = Math.sin( origY * 3.0 + elapsed * 1.5 ) * WAVE_AMPLITUDE * 0.15 * t;
+
+					positions[ i3 + 2 ] = z + z2;
+
+				}
+
+				flagGeometry.attributes.position.needsUpdate = true;
+				flagGeometry.computeVertexNormals();
+
+				controls.update();
+				stats.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
