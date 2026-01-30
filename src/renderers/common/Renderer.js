@@ -3304,6 +3304,16 @@ class Renderer {
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
+		if ( this._currentRenderBundle !== null ) {
+
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
+
+			renderBundleData.renderObjects.push( renderObject );
+
+			renderObject.bundle = this._currentRenderBundle.bundleGroup;
+
+		}
+
 		//
 
 		const needsRefresh = this._nodes.needsRefresh( renderObject );
@@ -3322,16 +3332,6 @@ class Renderer {
 		this._pipelines.updateForRender( renderObject );
 
 		//
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderBundleData = this.backend.get( this._currentRenderBundle );
-
-			renderBundleData.renderObjects.push( renderObject );
-
-			renderObject.bundle = this._currentRenderBundle.bundleGroup;
-
-		}
 
 		this.backend.draw( renderObject, this.info );
 
