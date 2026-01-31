@@ -1160,7 +1160,7 @@ class Object3D extends EventDispatcher {
 	 * `true` by default.  Set these flags to `false` if you need more control over the update matrix process.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
 	updateMatrixWorld( force ) {
 
