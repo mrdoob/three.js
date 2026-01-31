@@ -1,5 +1,3 @@
-import StackTrace from './StackTrace.js';
-
 /**
  * Custom error class for node-related errors, including stack trace information.
  */
