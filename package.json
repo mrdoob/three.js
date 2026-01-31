@@ -51,6 +51,7 @@
     "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
     "preview": "node utils/build/preview.js",
     "lint-core": "eslint src",
+    "lint-docs": "eslint docs",
     "lint-addons": "eslint examples/jsm",
     "lint-examples": "eslint examples",
     "lint-editor": "eslint editor",
