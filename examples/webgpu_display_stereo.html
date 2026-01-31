@@ -36,7 +36,7 @@
 			import * as THREE from 'three/webgpu';
 
 			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
-			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
+			import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
 			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -47,14 +47,34 @@
 
 			let mesh, dummy, timer;
 
+			let anaglyphFolder;
+
 			const position = new THREE.Vector3();
 
 			const params = {
 				effect: 'stereo',
 				eyeSep: 0.064,
+				anaglyphAlgorithm: 'dubois',
+				anaglyphColorMode: 'redCyan'
 			};
 
 			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
+
+			const anaglyphAlgorithms = {
+				'True': AnaglyphAlgorithm.TRUE,
+				'Grey': AnaglyphAlgorithm.GREY,
+				'Colour': AnaglyphAlgorithm.COLOUR,
+				'Half-Colour': AnaglyphAlgorithm.HALF_COLOUR,
+				'Dubois': AnaglyphAlgorithm.DUBOIS,
+				'Optimised': AnaglyphAlgorithm.OPTIMISED,
+				'Compromise': AnaglyphAlgorithm.COMPROMISE
+			};
+
+			const anaglyphColorModes = {
+				'Red / Cyan': AnaglyphColorMode.RED_CYAN,
+				'Magenta / Cyan': AnaglyphColorMode.MAGENTA_CYAN,
+				'Magenta / Green': AnaglyphColorMode.MAGENTA_GREEN
+			};
 
 			init();
 
@@ -126,6 +146,20 @@
 
 				} );
 
+				// Anaglyph-specific settings folder
+				anaglyphFolder = gui.addFolder( 'Anaglyph Options' );
+				anaglyphFolder.add( params, 'anaglyphAlgorithm', anaglyphAlgorithms ).name( 'Algorithm' ).onChange( function ( value ) {
+
+					anaglyph.algorithm = value;
+
+				} );
+				anaglyphFolder.add( params, 'anaglyphColorMode', anaglyphColorModes ).name( 'Color Mode' ).onChange( function ( value ) {
+
+					anaglyph.colorMode = value;
+
+				} );
+				anaglyphFolder.paramList.domElement.style.display = 'none';
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -139,14 +173,17 @@
 				if ( value === 'stereo' ) {
 
 					renderPipeline.outputNode = stereo;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				} else if ( value === 'anaglyph' ) {
 
 					renderPipeline.outputNode = anaglyph;
+					anaglyphFolder.paramList.domElement.style.display = '';
 
 				} else if ( value === 'parallaxBarrier' ) {
 
 					renderPipeline.outputNode = parallaxBarrier;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				}
 

@@ -3,10 +3,266 @@ import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 
 /**
+ * Anaglyph algorithm types.
+ * @readonly
+ * @enum {string}
+ */
+const AnaglyphAlgorithm = {
+	TRUE: 'true',
+	GREY: 'grey',
+	COLOUR: 'colour',
+	HALF_COLOUR: 'halfColour',
+	DUBOIS: 'dubois',
+	OPTIMISED: 'optimised',
+	COMPROMISE: 'compromise'
+};
+
+/**
+ * Anaglyph color modes.
+ * @readonly
+ * @enum {string}
+ */
+const AnaglyphColorMode = {
+	RED_CYAN: 'redCyan',
+	MAGENTA_CYAN: 'magentaCyan',
+	MAGENTA_GREEN: 'magentaGreen'
+};
+
+/**
+ * Standard luminance coefficients (ITU-R BT.601).
+ * @private
+ */
+const LUMINANCE = { R: 0.299, G: 0.587, B: 0.114 };
+
+/**
+ * Creates an anaglyph matrix pair from left and right channel specifications.
+ * This provides a more intuitive way to define how source RGB channels map to output RGB channels.
+ *
+ * Each specification object has keys 'r', 'g', 'b' for output channels.
+ * Each output channel value is [rCoef, gCoef, bCoef] defining how much of each input channel contributes.
+ *
+ * @private
+ * @param {Object} leftSpec - Specification for left eye contribution
+ * @param {Object} rightSpec - Specification for right eye contribution
+ * @returns {{left: number[], right: number[]}} Column-major arrays for Matrix3
+ */
+function createMatrixPair( leftSpec, rightSpec ) {
+
+	// Convert row-major specification to column-major array for Matrix3
+	// Matrix3.fromArray expects [col0row0, col0row1, col0row2, col1row0, col1row1, col1row2, col2row0, col2row1, col2row2]
+	// Which represents:
+	// | col0row0  col1row0  col2row0 |   | m[0]  m[3]  m[6] |
+	// | col0row1  col1row1  col2row1 | = | m[1]  m[4]  m[7] |
+	// | col0row2  col1row2  col2row2 |   | m[2]  m[5]  m[8] |
+
+	function specToColumnMajor( spec ) {
+
+		const r = spec.r || [ 0, 0, 0 ]; // Output red channel coefficients [fromR, fromG, fromB]
+		const g = spec.g || [ 0, 0, 0 ]; // Output green channel coefficients
+		const b = spec.b || [ 0, 0, 0 ]; // Output blue channel coefficients
+
+		// Row-major matrix would be:
+		// | r[0]  r[1]  r[2] |  (how input RGB maps to output R)
+		// | g[0]  g[1]  g[2] |  (how input RGB maps to output G)
+		// | b[0]  b[1]  b[2] |  (how input RGB maps to output B)
+
+		// Column-major for Matrix3:
+		return [
+			r[ 0 ], g[ 0 ], b[ 0 ], // Column 0: coefficients for input R
+			r[ 1 ], g[ 1 ], b[ 1 ], // Column 1: coefficients for input G
+			r[ 2 ], g[ 2 ], b[ 2 ]  // Column 2: coefficients for input B
+		];
+
+	}
+
+	return {
+		left: specToColumnMajor( leftSpec ),
+		right: specToColumnMajor( rightSpec )
+	};
+
+}
+
+/**
+ * Shorthand for luminance coefficients.
+ * @private
+ */
+const LUM = [ LUMINANCE.R, LUMINANCE.G, LUMINANCE.B ];
+
+/**
+ * Conversion matrices for different anaglyph algorithms.
+ * Based on research from "Introducing a New Anaglyph Method: Compromise Anaglyph" by Jure Ahtik
+ * and various other sources.
+ *
+ * Matrices are defined using createMatrixPair for clarity:
+ * - Each spec object defines how input RGB maps to output RGB
+ * - Keys 'r', 'g', 'b' represent output channels
+ * - Values are [rCoef, gCoef, bCoef] for input channel contribution
+ *
+ * @private
+ */
+const ANAGLYPH_MATRICES = {
+
+	// True Anaglyph - Red channel from left, luminance to cyan channel for right
+	// Paper: Left=[R,0,0], Right=[0,0,Lum]
+	[ AnaglyphAlgorithm.TRUE ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ] },                    // Left: R -> outR
+			{ g: LUM, b: LUM }                     // Right: Lum -> outG, Lum -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] },  // Left: R -> outR, partial B -> outB
+			{ g: LUM, b: [ 0, 0, 0.5 ] }           // Right: Lum -> outG, partial B
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ], b: LUM },            // Left: R -> outR, Lum -> outB
+			{ g: LUM }                              // Right: Lum -> outG
+		)
+	},
+
+	// Grey Anaglyph - Luminance-based, no color, minimal ghosting
+	// Paper: Left=[Lum,0,0], Right=[0,0,Lum]
+	[ AnaglyphAlgorithm.GREY ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: LUM },                            // Left: Lum -> outR
+			{ g: LUM, b: LUM }                     // Right: Lum -> outG, Lum -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] },   // Left: Lum -> outR, half-Lum -> outB
+			{ g: LUM, b: [ 0.15, 0.29, 0.06 ] }    // Right: Lum -> outG, half-Lum -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{ r: LUM, b: LUM },                    // Left: Lum -> outR, Lum -> outB
+			{ g: LUM }                              // Right: Lum -> outG
+		)
+	},
+
+	// Colour Anaglyph - Full color, high retinal rivalry
+	// Paper: Left=[R,0,0], Right=[0,G,B]
+	[ AnaglyphAlgorithm.COLOUR ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ] },                    // Left: R -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] },  // Left: R -> outR, partial B -> outB
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] }   // Right: G -> outG, partial B -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 1 ] },    // Left: R -> outR, B -> outB
+			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+		)
+	},
+
+	// Half-Colour Anaglyph - Luminance for left red, full color for right cyan
+	// Paper: Left=[Lum,0,0], Right=[0,G,B]
+	[ AnaglyphAlgorithm.HALF_COLOUR ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: LUM },                            // Left: Lum -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] },   // Left: Lum -> outR, half-Lum -> outB
+			{ g: [ 0, 1, 0 ], b: [ 0.15, 0.29, 0.06 ] } // Right: G -> outG, half-Lum -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{ r: LUM, b: LUM },                    // Left: Lum -> outR, Lum -> outB
+			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+		)
+	},
+
+	// Dubois Anaglyph - Least-squares optimized for specific glasses
+	// From https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf
+	[ AnaglyphAlgorithm.DUBOIS ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{
+				r: [ 0.4561, 0.500484, 0.176381 ],
+				g: [ - 0.0400822, - 0.0378246, - 0.0157589 ],
+				b: [ - 0.0152161, - 0.0205971, - 0.00546856 ]
+			},
+			{
+				r: [ - 0.0434706, - 0.0879388, - 0.00155529 ],
+				g: [ 0.378476, 0.73364, - 0.0184503 ],
+				b: [ - 0.0721527, - 0.112961, 1.2264 ]
+			}
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{
+				r: [ 0.4561, 0.500484, 0.176381 ],
+				g: [ - 0.0400822, - 0.0378246, - 0.0157589 ],
+				b: [ 0.088, 0.088, - 0.003 ]
+			},
+			{
+				r: [ - 0.0434706, - 0.0879388, - 0.00155529 ],
+				g: [ 0.378476, 0.73364, - 0.0184503 ],
+				b: [ 0.088, 0.088, 0.613 ]
+			}
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{
+				r: [ 0.4561, 0.500484, 0.176381 ],
+				b: [ - 0.0434706, - 0.0879388, - 0.00155529 ]
+			},
+			{
+				g: [ 0.378476 + 0.4561, 0.73364 + 0.500484, - 0.0184503 + 0.176381 ]
+			}
+		)
+	},
+
+	// Optimised Anaglyph - Improved color with reduced retinal rivalry
+	// Paper: Left=[0,0.7G+0.3B,0,0], Right=[0,G,B]
+	[ AnaglyphAlgorithm.OPTIMISED ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: [ 0, 0.7, 0.3 ] },                // Left: 0.7G+0.3B -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{ r: [ 0, 0.7, 0.3 ], b: [ 0, 0, 0.5 ] }, // Left: 0.7G+0.3B -> outR, partial B
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] }   // Right: G -> outG, partial B
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{ r: [ 0, 0.7, 0.3 ], b: [ 0, 0, 1 ] }, // Left: 0.7G+0.3B -> outR, B -> outB
+			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+		)
+	},
+
+	// Compromise Anaglyph - Best balance of color and stereo effect
+	// From Ahtik, J., "Techniques of Rendering Anaglyphs for Use in Art"
+	// Paper matrix [8]: Left=[0.439R+0.447G+0.148B, 0, 0], Right=[0, 0.095R+0.934G+0.005B, 0.018R+0.028G+1.057B]
+	[ AnaglyphAlgorithm.COMPROMISE ]: {
+		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
+			{ r: [ 0.439, 0.447, 0.148 ] },        // Left: weighted RGB -> outR
+			{
+				g: [ 0.095, 0.934, 0.005 ],        // Right: weighted RGB -> outG
+				b: [ 0.018, 0.028, 1.057 ]         // Right: weighted RGB -> outB
+			}
+		),
+		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
+			{
+				r: [ 0.439, 0.447, 0.148 ],
+				b: [ 0.009, 0.014, 0.074 ]         // Partial blue from left
+			},
+			{
+				g: [ 0.095, 0.934, 0.005 ],
+				b: [ 0.009, 0.014, 0.528 ]         // Partial blue from right
+			}
+		),
+		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
+			{
+				r: [ 0.439, 0.447, 0.148 ],
+				b: [ 0.018, 0.028, 1.057 ]
+			},
+			{
+				g: [ 0.095 + 0.439, 0.934 + 0.447, 0.005 + 0.148 ]
+			}
+		)
+	}
+};
+
+/**
  * A render pass node that creates an anaglyph effect.
  *
  * @augments StereoCompositePassNode
- * @three_import import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
+ * @three_import import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
  */
 class AnaglyphPassNode extends StereoCompositePassNode {
 
@@ -35,7 +291,23 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 */
 		this.isAnaglyphPassNode = true;
 
-		// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
+		/**
+		 * The current anaglyph algorithm.
+		 *
+		 * @private
+		 * @type {string}
+		 * @default 'dubois'
+		 */
+		this._algorithm = AnaglyphAlgorithm.DUBOIS;
+
+		/**
+		 * The current color mode.
+		 *
+		 * @private
+		 * @type {string}
+		 * @default 'redCyan'
+		 */
+		this._colorMode = AnaglyphColorMode.RED_CYAN;
 
 		/**
 		 * Color matrix node for the left eye.
@@ -43,11 +315,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
-		this._colorMatrixLeft = uniform( new Matrix3().fromArray( [
-			0.456100, - 0.0400822, - 0.0152161,
-			0.500484, - 0.0378246, - 0.0205971,
-			0.176381, - 0.0157589, - 0.00546856
-		] ) );
+		this._colorMatrixLeft = uniform( new Matrix3() );
 
 		/**
 		 * Color matrix node for the right eye.
@@ -55,11 +323,78 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
-		this._colorMatrixRight = uniform( new Matrix3().fromArray( [
-			- 0.0434706, 0.378476, - 0.0721527,
-			- 0.0879388, 0.73364, - 0.112961,
-			- 0.00155529, - 0.0184503, 1.2264
-		] ) );
+		this._colorMatrixRight = uniform( new Matrix3() );
+
+		// Initialize with default matrices
+		this._updateMatrices();
+
+	}
+
+	/**
+	 * Gets the current anaglyph algorithm.
+	 *
+	 * @type {string}
+	 */
+	get algorithm() {
+
+		return this._algorithm;
+
+	}
+
+	/**
+	 * Sets the anaglyph algorithm.
+	 *
+	 * @type {string}
+	 */
+	set algorithm( value ) {
+
+		if ( this._algorithm !== value ) {
+
+			this._algorithm = value;
+			this._updateMatrices();
+
+		}
+
+	}
+
+	/**
+	 * Gets the current color mode.
+	 *
+	 * @type {string}
+	 */
+	get colorMode() {
+
+		return this._colorMode;
+
+	}
+
+	/**
+	 * Sets the color mode.
+	 *
+	 * @type {string}
+	 */
+	set colorMode( value ) {
+
+		if ( this._colorMode !== value ) {
+
+			this._colorMode = value;
+			this._updateMatrices();
+
+		}
+
+	}
+
+	/**
+	 * Updates the color matrices based on current algorithm and color mode.
+	 *
+	 * @private
+	 */
+	_updateMatrices() {
+
+		const matrices = ANAGLYPH_MATRICES[ this._algorithm ][ this._colorMode ];
+
+		this._colorMatrixLeft.value.fromArray( matrices.left );
+		this._colorMatrixRight.value.fromArray( matrices.right );
 
 	}
 
@@ -96,6 +431,8 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 }
 
 export default AnaglyphPassNode;
+
+export { AnaglyphAlgorithm, AnaglyphColorMode };
 
 /**
  * TSL function for creating an anaglyph pass node.
