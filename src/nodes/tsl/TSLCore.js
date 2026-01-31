@@ -7,6 +7,7 @@ import SetNode from '../utils/SetNode.js';
 import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
+import StackTrace from '../core/StackTrace.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 import { warn, error } from '../../utils.js';
 
@@ -374,13 +375,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			error( `TSL: "${ tslName }" parameter length is less than minimum required.` );
+			error( `TSL: "${ tslName }" parameter length is less than minimum required.`, new StackTrace() );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			error( `TSL: "${ tslName }" parameter length exceeds limit.` );
+			error( `TSL: "${ tslName }" parameter length exceeds limit.`, new StackTrace() );
 
 			return params.slice( 0, maxParams );
 

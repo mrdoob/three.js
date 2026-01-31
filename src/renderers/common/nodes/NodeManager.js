@@ -228,7 +228,17 @@ class NodeManager extends DataMap {
 					nodeBuilder = createNodeBuilder( new NodeMaterial() );
 					nodeBuilder.build();
 
-					error( 'TSL: ' + e );
+					const message = 'TSL: ' + e;
+
+					if ( e.stackTrace ) {
+
+						error( message, e.stackTrace );
+
+					} else {
+
+						error( message );
+
+					}
 
 				}
 

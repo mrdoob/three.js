@@ -5,6 +5,8 @@ import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 import { warn, error } from '../../utils.js';
 
+import StackTrace from './StackTrace.js';
+
 const _parentBuildStage = {
 	analyze: 'setup',
 	generate: 'analyze'
@@ -141,6 +143,20 @@ class Node extends EventDispatcher {
 		this._cacheKeyVersion = 0;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+
+		/**
+		 * The stack trace of the node for debugging purposes.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.stackTrace = null;
+
+		if ( Node.enableStackTrace === true ) {
+
+			this.stackTrace = new StackTrace();
+
+		}
 
 	}
 
@@ -1079,5 +1095,13 @@ class Node extends EventDispatcher {
 	}
 
 }
+
+/**
+ * Enables or disables the automatic capturing of stack traces for nodes.
+ *
+ * @type {boolean}
+ * @default false
+ */
+Node.enableStackTrace = false;
 
 export default Node;
