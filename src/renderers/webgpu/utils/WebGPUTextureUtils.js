@@ -371,25 +371,7 @@ class WebGPUTextureUtils {
 
 		const textureData = this.backend.get( texture );
 
-		if ( texture.isCubeTexture ) {
-
-			for ( let i = 0; i < 6; i ++ ) {
-
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
-
-			}
-
-		} else {
-
-			const depth = texture.image.depth || 1;
-
-			for ( let i = 0; i < depth; i ++ ) {
-
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
-
-			}
-
-		}
+		this._generateMipmaps( textureData.texture, encoder );
 
 	}
 
