@@ -12,8 +12,10 @@ const IGNORED_FILES = [
  */
 function getFilteredTrace( stack ) {
 
-	// Pattern to extract: 1.Function, 2.File, 3.Line, 4.Column
-	const regex = /(?:at\s+)?([^@\s(]+)?(?:@|\s\()?.*?([^/)]+):(\d+):(\d+)/;
+	// Pattern to extract function name, file, line, and column from different browsers
+	// Chrome: "at functionName (file.js:1:2)" or "at file.js:1:2"
+	// Firefox: "functionName@file.js:1:2"
+	const regex = /(?:at\s+(.+?)\s+\()?(?:(.+?)@)?([^@\s()]+):(\d+):(\d+)/;
 
 	return stack.split( '\n' )
 		.map( line => {
@@ -21,11 +23,20 @@ function getFilteredTrace( stack ) {
 			const match = line.match( regex );
 			if ( ! match ) return null; // Skip if line format is invalid
 
+			// Chrome: match[1], Firefox: match[2]
+			const fn = match[ 1 ] || match[ 2 ] || '';
+			const file = match[ 3 ].split( '?' )[ 0 ]; // Clean file name (Vite/HMR)
+			const lineNum = parseInt( match[ 4 ], 10 );
+			const column = parseInt( match[ 5 ], 10 );
+
+			// Extract only the filename from full path
+			const fileName = file.split( '/' ).pop();
+
 			return {
-				fn: match[ 1 ] || 'anonymous', // Function name
-				file: match[ 2 ].split( '?' )[ 0 ], // Clean file name (Vite/HMR)
-				line: parseInt( match[ 3 ], 10 ), // Line number
-				column: parseInt( match[ 4 ], 10 ) // Column number (Added back)
+				fn: fn,
+				file: fileName,
+				line: lineNum,
+				column: column
 			};
 
 		} )
