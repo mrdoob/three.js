@@ -584,7 +584,7 @@ class NodeBuilder {
 
 			bindingsArray.push( binding );
 
-			sharedGroup = sharedGroup && binding.groupNode.shared !== true;
+			sharedGroup = sharedGroup && binding.groupNode.shared;
 
 		}
 
