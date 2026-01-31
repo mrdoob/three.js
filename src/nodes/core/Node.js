@@ -152,7 +152,7 @@ class Node extends EventDispatcher {
 		 */
 		this.stackTrace = null;
 
-		if ( Node.enableStackTrace === true ) {
+		if ( Node.captureStackTrace === true ) {
 
 			this.stackTrace = new StackTrace();
 
@@ -1102,6 +1102,6 @@ class Node extends EventDispatcher {
  * @type {boolean}
  * @default false
  */
-Node.enableStackTrace = false;
+Node.captureStackTrace = false;
 
 export default Node;
