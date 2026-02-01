@@ -119,8 +119,6 @@ export * from './code/ExpressionNode.js';
 export * from './code/CodeNode.js';
 export * from './code/FunctionCallNode.js';
 export * from './code/FunctionNode.js';
-export * from './code/ScriptableNode.js';
-export * from './code/ScriptableValueNode.js';
 
 // fog
 export * from './fog/Fog.js';
