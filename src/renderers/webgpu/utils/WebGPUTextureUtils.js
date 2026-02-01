@@ -822,13 +822,11 @@ class WebGPUTextureUtils {
 	 *
 	 * @private
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
-	 * @param {Object} textureDescriptorGPU - The texture descriptor.
-	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
+	_generateMipmaps( textureGPU, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
+		this._getPassUtils().generateMipmaps( textureGPU, encoder );
 
 	}
 
