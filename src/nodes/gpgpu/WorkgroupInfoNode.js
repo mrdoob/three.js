@@ -1,6 +1,7 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import Node from '../core/Node.js';
 import { warn } from '../../utils.js';
+import StackTrace from '../core/StackTrace.js';
 
 /**
  * Represents an element of a 'workgroup' scoped buffer.
@@ -149,7 +150,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
