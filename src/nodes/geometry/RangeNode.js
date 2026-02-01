@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import NodeError from '../core/NodeError.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
@@ -111,7 +112,7 @@ class RangeNode extends Node {
 
 		if ( output === null ) {
 
-			throw new Error( 'THREE.TSL: No "ConstNode" found in node graph.' );
+			throw new NodeError( 'THREE.TSL: No "ConstNode" found in node graph.', this.stackTrace );
 
 		}
 

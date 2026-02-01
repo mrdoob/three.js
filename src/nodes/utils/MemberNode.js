@@ -101,7 +101,7 @@ class MemberNode extends Node {
 
 		if ( this.hasMember( builder ) === false ) {
 
-			warn( `TSL: Member "${ this.property }" does not exist in struct.` );
+			warn( `TSL: Member "${ this.property }" does not exist in struct.`, this.stackTrace );
 
 			const type = this.getNodeType( builder );
 

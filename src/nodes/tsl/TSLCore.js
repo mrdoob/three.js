@@ -19,6 +19,8 @@ const NodeElements = new Map();
 
 export function addMethodChaining( name, nodeElement ) {
 
+	// No require StackTrace because this is internal API
+
 	if ( NodeElements.has( name ) ) {
 
 		warn( `TSL: Redefinition of method chaining '${ name }'.` );
@@ -67,7 +69,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		} else {
 
-			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
+			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().', new StackTrace() );
 
 		}
 
@@ -872,7 +874,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( param === undefined ) {
 
-				error( `TSL: Invalid parameter for the type "${ type }".` );
+				error( `TSL: Invalid parameter for the type "${ type }".`, new StackTrace() );
 
 				return new ConstNode( 0, type );
 
@@ -961,7 +963,7 @@ class FnNode extends Node {
 
 				} else {
 
-					error( 'TSL: Invalid layout type.' );
+					error( 'TSL: Invalid layout type.', new StackTrace() );
 
 				}
 
@@ -1045,7 +1047,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".', this.stackTrace );
 
 		return builder.generateConst( type );
 
@@ -1217,14 +1219,14 @@ addMethodChaining( 'convert', convert );
  */
 export const append = ( node ) => { // @deprecated, r176
 
-	warn( 'TSL: append() has been renamed to Stack().' );
+	warn( 'TSL: append() has been renamed to Stack().', new StackTrace() );
 	return Stack( node );
 
 };
 
 addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 
-	warn( 'TSL: .append() has been renamed to .toStack().' );
+	warn( 'TSL: .append() has been renamed to .toStack().', new StackTrace() );
 	return Stack( node );
 
 } );
