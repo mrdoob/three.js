@@ -54,7 +54,7 @@ class TimestampQueryPool {
 		this.isDisposed = false;
 
 		/**
-		 * TODO
+		 * The total frame duration until the next update.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -69,9 +69,11 @@ class TimestampQueryPool {
 		this.frames = [];
 
 		/**
-		 * TODO
+		 * This property is used to avoid multiple concurrent resolve operations.
+		 * The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds
+		 * the promise of the current resolve operation.
 		 *
-		 * @type {boolean}
+		 * @type {boolean|Promise<number>}
 		 * @default false
 		 */
 		this.pendingResolve = false;
