@@ -74,8 +74,6 @@ export { default as CodeNode } from './code/CodeNode.js';
 export { default as ExpressionNode } from './code/ExpressionNode.js';
 export { default as FunctionCallNode } from './code/FunctionCallNode.js';
 export { default as FunctionNode } from './code/FunctionNode.js';
-export { default as ScriptableNode } from './code/ScriptableNode.js';
-export { default as ScriptableValueNode } from './code/ScriptableValueNode.js';
 
 // display
 export { default as BumpMapNode } from './display/BumpMapNode.js';
