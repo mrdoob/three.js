@@ -238,7 +238,7 @@ class NodeManager extends DataMap {
 
 					}
 
-					error( 'TSL: ' + e, e.stackTrace || new StackTrace( e.stack ) );
+					error( 'TSL: ' + e, stackTrace );
 
 				}
 
