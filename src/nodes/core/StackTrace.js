@@ -1,3 +1,5 @@
+import NodeError from './NodeError.js';
+
 // Pre-compiled RegExp patterns for ignored files
 const IGNORED_FILES = [
 	/^StackTrace\.js$/,
@@ -10,7 +12,7 @@ const IGNORED_FILES = [
  * Parses the stack trace and filters out ignored files.
  * Returns an array with function name, file, line, and column.
  */
-function getFilteredTrace( stack ) {
+function getFilteredStack( stack ) {
 
 	// Pattern to extract function name, file, line, and column from different browsers
 	// Chrome: "at functionName (file.js:1:2)" or "at file.js:1:2"
@@ -56,10 +58,75 @@ class StackTrace {
 
 	/**
 	 * Creates a StackTrace instance by capturing and filtering the current stack trace.
+	 *
+	 * @param {Error|string|null} stackMessage - An optional stack trace to use instead of capturing a new one.
 	 */
-	constructor() {
+	constructor( stackMessage = null ) {
 
-		this.stack = getFilteredTrace( new Error().stack );
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isStackTrace = true;
+
+		/**
+		 * The stack trace.
+		 *
+		 * @type {Array<{fn: string, file: string, line: number, column: number}>}
+		 */
+		this.stack = getFilteredStack( stackMessage ? stackMessage : new Error().stack );
+
+	}
+
+	getMessage() {
+
+		if ( this.stack.length === 0 ) {
+
+			return '[Unknown location]';
+
+		}
+
+		const mainStack = this.stack[ 0 ];
+
+		const fn = mainStack.fn;
+		const fnName = fn ? `${ fn }() at ` : '';
+
+		return `${fnName}${mainStack.file}:${mainStack.line}`; // :${mainStack.column}
+
+	}
+
+	getError( message ) {
+
+		const error = new NodeError( message, this );
+
+		if ( this.stack.length === 0 ) {
+
+			return error;
+
+		}
+
+		// Format compatible with Chrome, Firefox and Safari
+		// Output: "Error: message\n    at functionName (file.js:line:column)"
+		const stackString = this.stack.map( frame => {
+
+			const location = `${ frame.file }:${ frame.line }:${ frame.column }`;
+
+			if ( frame.fn ) {
+
+				return `    at ${ frame.fn } (${ location })`;
+
+			}
+
+			return `    at ${ location }`;
+
+		} ).join( '\n' );
+
+		error.stack = `Error: ${ message }\n${ stackString }`;
+
+		return error;
 
 	}
 
