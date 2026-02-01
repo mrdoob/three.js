@@ -98,16 +98,6 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 	return textureSample( imgCube, imgSampler, faceMat[ Varys.vBaseArrayLayer ] * vec3f( fract( Varys.vTex ), 1 ) );
 
 }
-
-@group( 0 ) @binding( 1 )
-var imgCubeArray : texture_cube_array<f32>;
-
-@fragment
-fn main_cube_array( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
-
-	return textureSample( imgCubeArray, imgSampler, faceMat[ Varys.vBaseArrayLayer % 6 ] * vec3f( fract( Varys.vTex ), 1 ), Varys.vBaseArrayLayer );
-
-}
 `;
 
 		/**
