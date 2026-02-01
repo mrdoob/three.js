@@ -618,6 +618,144 @@ class NodeMaterialObserver {
 
 }
 
+// Pre-compiled RegExp patterns for ignored files
+const IGNORED_FILES = [
+	/^StackTrace\.js$/,
+	/^TSLCore\.js$/,
+	/^.*Node\.js$/,
+	/^three\.webgpu.*\.js$/
+];
+
+/**
+ * Parses the stack trace and filters out ignored files.
+ * Returns an array with function name, file, line, and column.
+ */
+function getFilteredStack( stack ) {
+
+	// Pattern to extract function name, file, line, and column from different browsers
+	// Chrome: "at functionName (file.js:1:2)" or "at file.js:1:2"
+	// Firefox: "functionName@file.js:1:2"
+	const regex = /(?:at\s+(.+?)\s+\()?(?:(.+?)@)?([^@\s()]+):(\d+):(\d+)/;
+
+	return stack.split( '\n' )
+		.map( line => {
+
+			const match = line.match( regex );
+			if ( ! match ) return null; // Skip if line format is invalid
+
+			// Chrome: match[1], Firefox: match[2]
+			const fn = match[ 1 ] || match[ 2 ] || '';
+			const file = match[ 3 ].split( '?' )[ 0 ]; // Clean file name (Vite/HMR)
+			const lineNum = parseInt( match[ 4 ], 10 );
+			const column = parseInt( match[ 5 ], 10 );
+
+			// Extract only the filename from full path
+			const fileName = file.split( '/' ).pop();
+
+			return {
+				fn: fn,
+				file: fileName,
+				line: lineNum,
+				column: column
+			};
+
+		} )
+		.filter( frame => {
+
+			// Only keep frames that are valid and not in the ignore list
+			return frame && ! IGNORED_FILES.some( regex => regex.test( frame.file ) );
+
+		} );
+
+}
+
+/**
+ * Class representing a stack trace for debugging purposes.
+ */
+class StackTrace {
+
+	/**
+	 * Creates a StackTrace instance by capturing and filtering the current stack trace.
+	 *
+	 * @param {Error|string|null} stackMessage - An optional stack trace to use instead of capturing a new one.
+	 */
+	constructor( stackMessage = null ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isStackTrace = true;
+
+		/**
+		 * The stack trace.
+		 *
+		 * @type {Array<{fn: string, file: string, line: number, column: number}>}
+		 */
+		this.stack = getFilteredStack( stackMessage ? stackMessage : new Error().stack );
+
+	}
+
+	/**
+	 * Returns a formatted location string of the top stack frame.
+	 *
+	 * @returns {string} The formatted stack trace message.
+	 */
+	getLocation() {
+
+		if ( this.stack.length === 0 ) {
+
+			return '[Unknown location]';
+
+		}
+
+		const mainStack = this.stack[ 0 ];
+
+		const fn = mainStack.fn;
+		const fnName = fn ? `"${ fn }()" at ` : '';
+
+		return `${fnName}"${mainStack.file}:${mainStack.line}"`; // :${mainStack.column}
+
+	}
+
+	/**
+	 * Returns the full error message including the stack trace.
+	 *
+	 * @param {string} message - The error message.
+	 * @returns {string} The full error message with stack trace.
+	 */
+	getError( message ) {
+
+		if ( this.stack.length === 0 ) {
+
+			return message;
+
+		}
+
+		// Output: "Error: message\n    at functionName (file.js:line:column)"
+		const stackString = this.stack.map( frame => {
+
+			const location = `${ frame.file }:${ frame.line }:${ frame.column }`;
+
+			if ( frame.fn ) {
+
+				return `    at ${ frame.fn } (${ location })`;
+
+			}
+
+			return `    at ${ location }`;
+
+		} ).join( '\n' );
+
+		return `${ message }\n${ stackString }`;
+
+	}
+
+}
+
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
 // Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.
@@ -765,7 +903,7 @@ function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
@@ -787,7 +925,7 @@ function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
@@ -809,7 +947,7 @@ function getAlignmentFromType( type ) {
 	if ( /mat3/.test( type ) ) return 16;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
@@ -1238,6 +1376,20 @@ class Node extends EventDispatcher {
 		this._cacheKeyVersion = 0;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+
+		/**
+		 * The stack trace of the node for debugging purposes.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.stackTrace = null;
+
+		if ( Node.captureStackTrace === true ) {
+
+			this.stackTrace = new StackTrace();
+
+		}
 
 	}
 
@@ -2178,6 +2330,14 @@ class Node extends EventDispatcher {
 }
 
 /**
+ * Enables or disables the automatic capturing of stack traces for nodes.
+ *
+ * @type {boolean}
+ * @default false
+ */
+Node.captureStackTrace = false;
+
+/**
  * Base class for representing element access on an array-like
  * node data structures.
  *
@@ -2516,7 +2676,7 @@ class JoinNode extends TempNode {
 
 			if ( length >= maxLength ) {
 
-				error( `TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
+				error( `TSL: Length of parameters exceeds maximum length of function '${ type }()' type.`, this.stackTrace );
 				break;
 
 			}
@@ -2527,7 +2687,7 @@ class JoinNode extends TempNode {
 
 			if ( length + inputTypeLength > maxLength ) {
 
-				error( `TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
+				error( `TSL: Length of '${ type }()' data exceeds maximum length of output type.`, this.stackTrace );
 
 				inputTypeLength = maxLength - length;
 				inputType = builder.getTypeFromLength( inputTypeLength );
@@ -3235,7 +3395,7 @@ class MemberNode extends Node {
 
 		if ( this.hasMember( builder ) === false ) {
 
-			warn( `TSL: Member "${ this.property }" does not exist in struct.` );
+			warn( `TSL: Member "${ this.property }" does not exist in struct.`, this.stackTrace );
 
 			const type = this.getNodeType( builder );
 
@@ -3258,6 +3418,8 @@ const NodeElements = new Map();
 // Extend Node Class for TSL using prototype
 
 function addMethodChaining( name, nodeElement ) {
+
+	// No require StackTrace because this is internal API
 
 	if ( NodeElements.has( name ) ) {
 
@@ -3307,7 +3469,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		} else {
 
-			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
+			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().', new StackTrace() );
 
 		}
 
@@ -3615,13 +3777,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			error( `TSL: "${ tslName }" parameter length is less than minimum required.` );
+			error( `TSL: "${ tslName }" parameter length is less than minimum required.`, new StackTrace() );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			error( `TSL: "${ tslName }" parameter length exceeds limit.` );
+			error( `TSL: "${ tslName }" parameter length exceeds limit.`, new StackTrace() );
 
 			return params.slice( 0, maxParams );
 
@@ -4112,7 +4274,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( param === undefined ) {
 
-				error( `TSL: Invalid parameter for the type "${ type }".` );
+				error( `TSL: Invalid parameter for the type "${ type }".`, new StackTrace() );
 
 				return new ConstNode( 0, type );
 
@@ -4201,7 +4363,7 @@ class FnNode extends Node {
 
 				} else {
 
-					error( 'TSL: Invalid layout type.' );
+					error( 'TSL: Invalid layout type.', new StackTrace() );
 
 				}
 
@@ -4285,7 +4447,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".', this.stackTrace );
 
 		return builder.generateConst( type );
 
@@ -4451,14 +4613,14 @@ addMethodChaining( 'convert', convert );
  */
 const append = ( node ) => { // @deprecated, r176
 
-	warn( 'TSL: append() has been renamed to Stack().' );
+	warn( 'TSL: append() has been renamed to Stack().', new StackTrace() );
 	return Stack( node );
 
 };
 
 addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 
-	warn( 'TSL: .append() has been renamed to .toStack().' );
+	warn( 'TSL: .append() has been renamed to .toStack().', new StackTrace() );
 	return Stack( node );
 
 } );
@@ -5033,7 +5195,7 @@ class UniformNode extends InputNode {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -6493,7 +6655,7 @@ addMethodChaining( 'decrement', decrement );
  */
 const modInt = ( a, b ) => { // @deprecated, r175
 
-	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.', new StackTrace() );
 	return mod( int( a ), int( b ) );
 
 };
@@ -6787,7 +6949,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.`, this.stackTrace );
 
 					method = '/*' + method + '*/';
 
@@ -7794,7 +7956,7 @@ class ConditionalNode extends Node {
 
 				if ( functionNode === null ) {
 
-					warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+					warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.', this.stackTrace );
 
 					ifSnippet = '// ' + ifSnippet;
 
@@ -7824,7 +7986,7 @@ class ConditionalNode extends Node {
 
 					if ( functionNode === null ) {
 
-						warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+						warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.', this.stackTrace );
 
 						elseSnippet = '// ' + elseSnippet;
 
@@ -8392,7 +8554,7 @@ class VarNode extends Node {
 
 			if ( this.isIntent( builder ) !== true ) {
 
-				error( 'TSL: ".toVar()" can not be used with void type.' );
+				error( 'TSL: ".toVar()" can not be used with void type.', this.stackTrace );
 
 			}
 
@@ -10108,7 +10270,7 @@ class ComputeNode extends Node {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -10200,7 +10362,7 @@ const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
 
-		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
+		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements', new StackTrace() );
 
 	}
 
@@ -10210,7 +10372,7 @@ const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 		if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
 
-			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
+			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer`, new StackTrace() );
 
 		}
 
@@ -11501,6 +11663,33 @@ class MaxMipLevelNode extends UniformNode {
  */
 const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode ).setParameterLength( 1 );
 
+/**
+ * Custom error class for node-related errors, including stack trace information.
+ */
+class NodeError extends Error {
+
+	constructor( message, stackTrace = null ) {
+
+		super( message );
+
+		/**
+		 * The name of the error.
+		 *
+		 * @type {string}
+		 */
+		this.name = 'NodeError';
+
+		/**
+		 * The stack trace associated with the error.
+		 *
+		 * @type {?StackTrace}
+		 */
+		this.stackTrace = stackTrace;
+
+	}
+
+}
+
 const EmptyTexture$1 = /*@__PURE__*/ new Texture();
 
 /**
@@ -11832,7 +12021,7 @@ class TextureNode extends UniformNode {
 
 		if ( ! texture || texture.isTexture !== true ) {
 
-			throw new Error( 'THREE.TSL: `texture( value )` function expects a valid instance of THREE.Texture().' );
+			throw new NodeError( 'THREE.TSL: `texture( value )` function expects a valid instance of THREE.Texture().', this.stackTrace );
 
 		}
 
@@ -13230,7 +13419,7 @@ const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.', new StackTrace() );
 
 	return screenSize;
 
@@ -18254,7 +18443,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.', this.stackTrace );
 
 								updateSnippet = 'break /* invalid update */';
 
@@ -33147,7 +33336,7 @@ class ParameterNode extends PropertyNode {
 
 		} else {
 
-			error( `TSL: Member "${ name }" not found in struct "${ type }".` );
+			error( `TSL: Member "${ name }" not found in struct "${ type }".`, new StackTrace() );
 
 			memberType = 'float';
 
@@ -33296,7 +33485,7 @@ class StackNode extends Node {
 
 		if ( node.isNode !== true ) {
 
-			error( 'TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.', new StackTrace() );
 			return this;
 
 		}
@@ -33408,7 +33597,7 @@ class StackNode extends Node {
 
 		} else {
 
-			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.', new StackTrace() );
 
 		}
 
@@ -37685,10 +37874,12 @@ class Texture3DNode extends TextureNode {
 	}
 
 	/**
-	 * TODO.
+	 * Computes the normal for the given uv. These texture coordiantes represent a
+	 * position inside the 3D texture. Unlike geometric normals, this normal
+	 * represents a slope or gradient of scalar data inside the 3D texture.
 	 *
-	 * @param {Node<vec3>} uvNode - The uv node .
-	 * @return {Node<vec3>} TODO.
+	 * @param {Node<vec3>} uvNode - The uv node that defines a position in the 3D texture.
+	 * @return {Node<vec3>} The normal representing the slope/gradient in the data.
 	 */
 	normal( uvNode ) {
 
@@ -40058,972 +40249,6 @@ const glslFn = ( code, includes ) => nativeFn( code, includes, 'glsl' );
 const wgslFn = ( code, includes ) => nativeFn( code, includes, 'wgsl' );
 
 /**
- * `ScriptableNode` uses this class to manage script inputs and outputs.
- *
- * @augments Node
- */
-class ScriptableValueNode extends Node {
-
-	static get type() {
-
-		return 'ScriptableValueNode';
-
-	}
-
-	/**
-	 * Constructs a new scriptable node.
-	 *
-	 * @param {any} [value=null] - The value.
-	 */
-	constructor( value = null ) {
-
-		super();
-
-		/**
-		 * A reference to the value.
-		 *
-		 * @private
-		 * @default null
-		 */
-		this._value = value;
-
-		/**
-		 * Depending on the type of `_value`, this property might cache parsed data.
-		 *
-		 * @private
-		 * @default null
-		 */
-		this._cache = null;
-
-		/**
-		 * If this node represents an input, this property represents the input type.
-		 *
-		 * @type {?string}
-		 * @default null
-		 */
-		this.inputType = null;
-
-		/**
-		 * If this node represents an output, this property represents the output type.
-		 *
-		 * @type {?string}
-		 * @default null
-		 */
-		this.outputType = null;
-
-		/**
-		 * An event dispatcher for managing events.
-		 *
-		 * @type {EventDispatcher}
-		 */
-		this.events = new EventDispatcher();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isScriptableValueNode = true;
-
-	}
-
-	/**
-	 * Whether this node represents an output or not.
-	 *
-	 * @type {boolean}
-	 * @readonly
-	 * @default true
-	 */
-	get isScriptableOutputNode() {
-
-		return this.outputType !== null;
-
-	}
-
-	set value( val ) {
-
-		if ( this._value === val ) return;
-
-		if ( this._cache && this.inputType === 'URL' && this.value.value instanceof ArrayBuffer ) {
-
-			URL.revokeObjectURL( this._cache );
-
-			this._cache = null;
-
-		}
-
-		this._value = val;
-
-		this.events.dispatchEvent( { type: 'change' } );
-
-		this.refresh();
-
-	}
-
-	/**
-	 * The node's value.
-	 *
-	 * @type {any}
-	 */
-	get value() {
-
-		return this._value;
-
-	}
-
-	/**
-	 * Dispatches the `refresh` event.
-	 */
-	refresh() {
-
-		this.events.dispatchEvent( { type: 'refresh' } );
-
-	}
-
-	/**
-	 * The `value` property usually represents a node or even binary data in form of array buffers.
-	 * In this case, this method tries to return the actual value behind the complex type.
-	 *
-	 * @return {any} The value.
-	 */
-	getValue() {
-
-		const value = this.value;
-
-		if ( value && this._cache === null && this.inputType === 'URL' && value.value instanceof ArrayBuffer ) {
-
-			this._cache = URL.createObjectURL( new Blob( [ value.value ] ) );
-
-		} else if ( value && value.value !== null && value.value !== undefined && (
-			( ( this.inputType === 'URL' || this.inputType === 'String' ) && typeof value.value === 'string' ) ||
-			( this.inputType === 'Number' && typeof value.value === 'number' ) ||
-			( this.inputType === 'Vector2' && value.value.isVector2 ) ||
-			( this.inputType === 'Vector3' && value.value.isVector3 ) ||
-			( this.inputType === 'Vector4' && value.value.isVector4 ) ||
-			( this.inputType === 'Color' && value.value.isColor ) ||
-			( this.inputType === 'Matrix3' && value.value.isMatrix3 ) ||
-			( this.inputType === 'Matrix4' && value.value.isMatrix4 )
-		) ) {
-
-			return value.value;
-
-		}
-
-		return this._cache || value;
-
-	}
-
-	/**
-	 * Overwritten since the node type is inferred from the value.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		return this.value && this.value.isNode ? this.value.getNodeType( builder ) : 'float';
-
-	}
-
-	setup() {
-
-		return this.value && this.value.isNode ? this.value : float();
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		if ( this.value !== null ) {
-
-			if ( this.inputType === 'ArrayBuffer' ) {
-
-				data.value = arrayBufferToBase64( this.value );
-
-			} else {
-
-				data.value = this.value ? this.value.toJSON( data.meta ).uuid : null;
-
-			}
-
-		} else {
-
-			data.value = null;
-
-		}
-
-		data.inputType = this.inputType;
-		data.outputType = this.outputType;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		let value = null;
-
-		if ( data.value !== null ) {
-
-			if ( data.inputType === 'ArrayBuffer' ) {
-
-				value = base64ToArrayBuffer( data.value );
-
-			} else if ( data.inputType === 'Texture' ) {
-
-				value = data.meta.textures[ data.value ];
-
-			} else {
-
-				value = data.meta.nodes[ data.value ] || null;
-
-			}
-
-		}
-
-		this.value = value;
-
-		this.inputType = data.inputType;
-		this.outputType = data.outputType;
-
-	}
-
-}
-
-/**
- * TSL function for creating a scriptable value node.
- *
- * @tsl
- * @function
- * @param {any} [value] - The value.
- * @returns {ScriptableValueNode}
- */
-const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode ).setParameterLength( 1 );
-
-/**
- * A Map-like data structure for managing resources of scriptable nodes.
- *
- * @augments Map
- */
-class Resources extends Map {
-
-	get( key, callback = null, ...params ) {
-
-		if ( this.has( key ) ) return super.get( key );
-
-		if ( callback !== null ) {
-
-			const value = callback( ...params );
-			this.set( key, value );
-			return value;
-
-		}
-
-	}
-
-}
-
-class Parameters {
-
-	constructor( scriptableNode ) {
-
-		this.scriptableNode = scriptableNode;
-
-	}
-
-	get parameters() {
-
-		return this.scriptableNode.parameters;
-
-	}
-
-	get layout() {
-
-		return this.scriptableNode.getLayout();
-
-	}
-
-	getInputLayout( id ) {
-
-		return this.scriptableNode.getInputLayout( id );
-
-	}
-
-	get( name ) {
-
-		const param = this.parameters[ name ];
-		const value = param ? param.getValue() : null;
-
-		return value;
-
-	}
-
-}
-
-/**
- * Defines the resources (e.g. namespaces) of scriptable nodes.
- *
- * @type {Resources}
- */
-const ScriptableNodeResources = new Resources();
-
-/**
- * This type of node allows to implement nodes with custom scripts. The script
- * section is represented as an instance of `CodeNode` written with JavaScript.
- * The script itself must adhere to a specific structure.
- *
- * - main(): Executed once by default and every time `node.needsUpdate` is set.
- * - layout: The layout object defines the script's interface (inputs and outputs).
- *
- * ```js
- * ScriptableNodeResources.set( 'TSL', TSL );
- *
- * const scriptableNode = scriptable( js( `
- * 	layout = {
- * 		outputType: 'node',
- * 		elements: [
- * 			{ name: 'source', inputType: 'node' },
- * 		]
- * 	};
- *
- * 	const { mul, oscSine } = TSL;
- *
- * 	function main() {
- * 		const source = parameters.get( 'source' ) || float();
- * 		return mul( source, oscSine() ) );
- * 	}
- *
- * ` ) );
- *
- * scriptableNode.setParameter( 'source', color( 1, 0, 0 ) );
- *
- * const material = new THREE.MeshBasicNodeMaterial();
- * material.colorNode = scriptableNode;
- * ```
- *
- * @augments Node
- */
-class ScriptableNode extends Node {
-
-	static get type() {
-
-		return 'ScriptableNode';
-
-	}
-
-	/**
-	 * Constructs a new scriptable node.
-	 *
-	 * @param {?CodeNode} [codeNode=null] - The code node.
-	 * @param {Object} [parameters={}] - The parameters definition.
-	 */
-	constructor( codeNode = null, parameters = {} ) {
-
-		super();
-
-		/**
-		 * The code node.
-		 *
-		 * @type {?CodeNode}
-		 * @default null
-		 */
-		this.codeNode = codeNode;
-
-		/**
-		 * The parameters definition.
-		 *
-		 * @type {Object}
-		 * @default {}
-		 */
-		this.parameters = parameters;
-
-		this._local = new Resources();
-		this._output = scriptableValue( null );
-		this._outputs = {};
-		this._source = this.source;
-		this._method = null;
-		this._object = null;
-		this._value = null;
-		this._needsOutputUpdate = true;
-
-		this.onRefresh = this.onRefresh.bind( this );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isScriptableNode = true;
-
-	}
-
-	/**
-	 * The source code of the scriptable node.
-	 *
-	 * @type {string}
-	 */
-	get source() {
-
-		return this.codeNode ? this.codeNode.code : '';
-
-	}
-
-	/**
-	 * Sets the reference of a local script variable.
-	 *
-	 * @param {string} name - The variable name.
-	 * @param {Object} value - The reference to set.
-	 * @return {Resources} The resource map
-	 */
-	setLocal( name, value ) {
-
-		return this._local.set( name, value );
-
-	}
-
-	/**
-	 * Gets the value of a local script variable.
-	 *
-	 * @param {string} name - The variable name.
-	 * @return {Object} The value.
-	 */
-	getLocal( name ) {
-
-		return this._local.get( name );
-
-	}
-
-	/**
-	 * Event listener for the `refresh` event.
-	 */
-	onRefresh() {
-
-		this._refresh();
-
-	}
-
-	/**
-	 * Returns an input from the layout with the given id/name.
-	 *
-	 * @param {string} id - The id/name of the input.
-	 * @return {Object} The element entry.
-	 */
-	getInputLayout( id ) {
-
-		for ( const element of this.getLayout() ) {
-
-			if ( element.inputType && ( element.id === id || element.name === id ) ) {
-
-				return element;
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Returns an output from the layout with the given id/name.
-	 *
-	 * @param {string} id - The id/name of the output.
-	 * @return {Object} The element entry.
-	 */
-	getOutputLayout( id ) {
-
-		for ( const element of this.getLayout() ) {
-
-			if ( element.outputType && ( element.id === id || element.name === id ) ) {
-
-				return element;
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Defines a script output for the given name and value.
-	 *
-	 * @param {string} name - The name of the output.
-	 * @param {Node} value - The node value.
-	 * @return {ScriptableNode} A reference to this node.
-	 */
-	setOutput( name, value ) {
-
-		const outputs = this._outputs;
-
-		if ( outputs[ name ] === undefined ) {
-
-			outputs[ name ] = scriptableValue( value );
-
-		} else {
-
-			outputs[ name ].value = value;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a script output for the given name.
-	 *
-	 * @param {string} name - The name of the output.
-	 * @return {ScriptableValueNode} The node value.
-	 */
-	getOutput( name ) {
-
-		return this._outputs[ name ];
-
-	}
-
-	/**
-	 * Returns a parameter for the given name
-	 *
-	 * @param {string} name - The name of the parameter.
-	 * @return {ScriptableValueNode} The node value.
-	 */
-	getParameter( name ) {
-
-		return this.parameters[ name ];
-
-	}
-
-	/**
-	 * Sets a value for the given parameter name.
-	 *
-	 * @param {string} name - The parameter name.
-	 * @param {any} value - The parameter value.
-	 * @return {ScriptableNode} A reference to this node.
-	 */
-	setParameter( name, value ) {
-
-		const parameters = this.parameters;
-
-		if ( value && value.isScriptableNode ) {
-
-			this.deleteParameter( name );
-
-			parameters[ name ] = value;
-			parameters[ name ].getDefaultOutput().events.addEventListener( 'refresh', this.onRefresh );
-
-		} else if ( value && value.isScriptableValueNode ) {
-
-			this.deleteParameter( name );
-
-			parameters[ name ] = value;
-			parameters[ name ].events.addEventListener( 'refresh', this.onRefresh );
-
-		} else if ( parameters[ name ] === undefined ) {
-
-			parameters[ name ] = scriptableValue( value );
-			parameters[ name ].events.addEventListener( 'refresh', this.onRefresh );
-
-		} else {
-
-			parameters[ name ].value = value;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the value of this node which is the value of
-	 * the default output.
-	 *
-	 * @return {Node} The value.
-	 */
-	getValue() {
-
-		return this.getDefaultOutput().getValue();
-
-	}
-
-	/**
-	 * Deletes a parameter from the script.
-	 *
-	 * @param {string} name - The parameter to remove.
-	 * @return {ScriptableNode} A reference to this node.
-	 */
-	deleteParameter( name ) {
-
-		let valueNode = this.parameters[ name ];
-
-		if ( valueNode ) {
-
-			if ( valueNode.isScriptableNode ) valueNode = valueNode.getDefaultOutput();
-
-			valueNode.events.removeEventListener( 'refresh', this.onRefresh );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Deletes all parameters from the script.
-	 *
-	 * @return {ScriptableNode} A reference to this node.
-	 */
-	clearParameters() {
-
-		for ( const name of Object.keys( this.parameters ) ) {
-
-			this.deleteParameter( name );
-
-		}
-
-		this.needsUpdate = true;
-
-		return this;
-
-	}
-
-	/**
-	 * Calls a function from the script.
-	 *
-	 * @param {string} name - The function name.
-	 * @param {...any} params - A list of parameters.
-	 * @return {any} The result of the function call.
-	 */
-	call( name, ...params ) {
-
-		const object = this.getObject();
-		const method = object[ name ];
-
-		if ( typeof method === 'function' ) {
-
-			return method( ...params );
-
-		}
-
-	}
-
-	/**
-	 * Asynchronously calls a function from the script.
-	 *
-	 * @param {string} name - The function name.
-	 * @param {...any} params - A list of parameters.
-	 * @return {Promise<any>} The result of the function call.
-	 */
-	async callAsync( name, ...params ) {
-
-		const object = this.getObject();
-		const method = object[ name ];
-
-		if ( typeof method === 'function' ) {
-
-			return method.constructor.name === 'AsyncFunction' ? await method( ...params ) : method( ...params );
-
-		}
-
-	}
-
-	/**
-	 * Overwritten since the node types is inferred from the script's output.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		return this.getDefaultOutputNode().getNodeType( builder );
-
-	}
-
-	/**
-	 * Refreshes the script node.
-	 *
-	 * @param {?string} [output=null] - An optional output.
-	 */
-	refresh( output = null ) {
-
-		if ( output !== null ) {
-
-			this.getOutput( output ).refresh();
-
-		} else {
-
-			this._refresh();
-
-		}
-
-	}
-
-	/**
-	 * Returns an object representation of the script.
-	 *
-	 * @return {Object} The result object.
-	 */
-	getObject() {
-
-		if ( this.needsUpdate ) this.dispose();
-		if ( this._object !== null ) return this._object;
-
-		//
-
-		const refresh = () => this.refresh();
-		const setOutput = ( id, value ) => this.setOutput( id, value );
-
-		const parameters = new Parameters( this );
-
-		const THREE = ScriptableNodeResources.get( 'THREE' );
-		const TSL = ScriptableNodeResources.get( 'TSL' );
-
-		const method = this.getMethod();
-		const params = [ parameters, this._local, ScriptableNodeResources, refresh, setOutput, THREE, TSL ];
-
-		this._object = method( ...params );
-
-		const layout = this._object.layout;
-
-		if ( layout ) {
-
-			if ( layout.cache === false ) {
-
-				this._local.clear();
-
-			}
-
-			// default output
-			this._output.outputType = layout.outputType || null;
-
-			if ( Array.isArray( layout.elements ) ) {
-
-				for ( const element of layout.elements ) {
-
-					const id = element.id || element.name;
-
-					if ( element.inputType ) {
-
-						if ( this.getParameter( id ) === undefined ) this.setParameter( id, null );
-
-						this.getParameter( id ).inputType = element.inputType;
-
-					}
-
-					if ( element.outputType ) {
-
-						if ( this.getOutput( id ) === undefined ) this.setOutput( id, null );
-
-						this.getOutput( id ).outputType = element.outputType;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return this._object;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		for ( const name in this.parameters ) {
-
-			let valueNode = this.parameters[ name ];
-
-			if ( valueNode.isScriptableNode ) valueNode = valueNode.getDefaultOutput();
-
-			valueNode.events.addEventListener( 'refresh', this.onRefresh );
-
-		}
-
-	}
-
-	/**
-	 * Returns the layout of the script.
-	 *
-	 * @return {Object} The script's layout.
-	 */
-	getLayout() {
-
-		return this.getObject().layout;
-
-	}
-
-	/**
-	 * Returns default node output of the script.
-	 *
-	 * @return {Node} The default node output.
-	 */
-	getDefaultOutputNode() {
-
-		const output = this.getDefaultOutput().value;
-
-		if ( output && output.isNode ) {
-
-			return output;
-
-		}
-
-		return float();
-
-	}
-
-	/**
-	 * Returns default output of the script.
-	 *
-	 * @return {ScriptableValueNode} The default output.
-	 */
-	getDefaultOutput()	{
-
-		return this._exec()._output;
-
-	}
-
-	/**
-	 * Returns a function created from the node's script.
-	 *
-	 * @return {Function} The function representing the node's code.
-	 */
-	getMethod() {
-
-		if ( this.needsUpdate ) this.dispose();
-		if ( this._method !== null ) return this._method;
-
-		//
-
-		const parametersProps = [ 'parameters', 'local', 'global', 'refresh', 'setOutput', 'THREE', 'TSL' ];
-		const interfaceProps = [ 'layout', 'init', 'main', 'dispose' ];
-
-		const properties = interfaceProps.join( ', ' );
-		const declarations = 'var ' + properties + '; var output = {};\n';
-		const returns = '\nreturn { ...output, ' + properties + ' };';
-
-		const code = declarations + this.codeNode.code + returns;
-
-		//
-
-		this._method = new Function( ...parametersProps, code );
-
-		return this._method;
-
-	}
-
-	/**
-	 * Frees all internal resources.
-	 */
-	dispose() {
-
-		if ( this._method === null ) return;
-
-		if ( this._object && typeof this._object.dispose === 'function' ) {
-
-			this._object.dispose();
-
-		}
-
-		this._method = null;
-		this._object = null;
-		this._source = null;
-		this._value = null;
-		this._needsOutputUpdate = true;
-		this._output.value = null;
-		this._outputs = {};
-
-	}
-
-	setup() {
-
-		return this.getDefaultOutputNode();
-
-	}
-
-	getCacheKey( force ) {
-
-		const values = [ hashString( this.source ), this.getDefaultOutputNode().getCacheKey( force ) ];
-
-		for ( const param in this.parameters ) {
-
-			values.push( this.parameters[ param ].getCacheKey( force ) );
-
-		}
-
-		return hashArray( values );
-
-	}
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.dispose();
-
-	}
-
-	get needsUpdate() {
-
-		return this.source !== this._source;
-
-	}
-
-	/**
-	 * Executes the `main` function of the script.
-	 *
-	 * @private
-	 * @return {ScriptableNode} A reference to this node.
-	 */
-	_exec()	{
-
-		if ( this.codeNode === null ) return this;
-
-		if ( this._needsOutputUpdate === true ) {
-
-			this._value = this.call( 'main' );
-
-			this._needsOutputUpdate = false;
-
-		}
-
-		this._output.value = this._value;
-
-		return this;
-
-	}
-
-	/**
-	 * Executes the refresh.
-	 *
-	 * @private
-	 */
-	_refresh() {
-
-		this.needsUpdate = true;
-
-		this._exec();
-
-		this._output.refresh();
-
-	}
-
-}
-
-/**
- * TSL function for creating a scriptable node.
- *
- * @tsl
- * @function
- * @param {CodeNode} [codeNode] - The code node.
- * @param {?Object} [parameters={}] - The parameters definition.
- * @returns {ScriptableNode}
- */
-const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode ).setParameterLength( 1, 2 );
-
-/**
  * Returns a node that represents the `z` coordinate in view space
  * for the current fragment. It's a different representation of the
  * default depth value.
@@ -41219,7 +40444,7 @@ class RangeNode extends Node {
 
 		if ( output === null ) {
 
-			throw new Error( 'THREE.TSL: No "ConstNode" found in node graph.' );
+			throw new NodeError( 'THREE.TSL: No "ConstNode" found in node graph.', this.stackTrace );
 
 		}
 
@@ -41766,7 +40991,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -47203,7 +46428,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	PointShadowFilter: PointShadowFilter,
 	Return: Return,
 	Schlick_to_F0: Schlick_to_F0,
-	ScriptableNodeResources: ScriptableNodeResources,
 	ShaderNode: ShaderNode,
 	Stack: Stack,
 	Switch: Switch,
@@ -47660,8 +46884,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	screenDPR: screenDPR,
 	screenSize: screenSize,
 	screenUV: screenUV,
-	scriptable: scriptable,
-	scriptableValue: scriptableValue,
 	select: select,
 	setCurrentStack: setCurrentStack,
 	setName: setName,
@@ -53986,7 +53208,17 @@ class NodeManager extends DataMap {
 					nodeBuilder = createNodeBuilder( new NodeMaterial() );
 					nodeBuilder.build();
 
-					error( 'TSL: ' + e );
+					let stackTrace = e.stackTrace;
+
+					if ( ! stackTrace && e.stack ) {
+
+						// Capture stack trace for JavaScript errors
+
+						stackTrace = new StackTrace( e.stack );
+
+					}
+
+					error( 'TSL: ' + e, stackTrace );
 
 				}
 
@@ -67916,7 +67148,7 @@ class TimestampQueryPool {
 		this.isDisposed = false;
 
 		/**
-		 * TODO
+		 * The total frame duration until the next update.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -67931,9 +67163,11 @@ class TimestampQueryPool {
 		this.frames = [];
 
 		/**
-		 * TODO
+		 * This property is used to avoid multiple concurrent resolve operations.
+		 * The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds
+		 * the promise of the current resolve operation.
 		 *
-		 * @type {boolean}
+		 * @type {boolean|Promise<number>}
 		 * @default false
 		 */
 		this.pendingResolve = false;
@@ -71648,7 +70882,7 @@ fn mainVS(
 
 	let p = pos[ vertexIndex ];
 	let mult = select( vec2f( 0.5, -0.5 ), vec2f( 0.5, 0.5 ), flipY != 0 );
-	Varys.vTex = p * vec2f( 0.5, -0.5 ) + vec2f( 0.5 );
+	Varys.vTex = p * mult + vec2f( 0.5 );
 	Varys.Position = vec4f( p, 0, 1 );
 	Varys.vBaseArrayLayer = instanceIndex;
 
@@ -71695,16 +70929,6 @@ var imgCube : texture_cube<f32>;
 fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 	return textureSample( imgCube, imgSampler, faceMat[ Varys.vBaseArrayLayer ] * vec3f( fract( Varys.vTex ), 1 ) );
-
-}
-
-@group( 0 ) @binding( 1 )
-var imgCubeArray : texture_cube_array<f32>;
-
-@fragment
-fn main_cube_array( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
-
-	return textureSample( imgCubeArray, imgSampler, faceMat[ Varys.vBaseArrayLayer % 6 ] * vec3f( fract( Varys.vTex ), 1 ), Varys.vBaseArrayLayer );
 
 }
 `;
@@ -71791,7 +71015,7 @@ fn main_cube_array( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 				layout: 'auto'
 			} );
 
-			this.transferPipelines[ format ] = pipeline;
+			this.transferPipelines[ key ] = pipeline;
 
 		}
 
@@ -72795,13 +72019,11 @@ class WebGPUTextureUtils {
 	 *
 	 * @private
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
-	 * @param {Object} textureDescriptorGPU - The texture descriptor.
-	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
+	_generateMipmaps( textureGPU, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
+		this._getPassUtils().generateMipmaps( textureGPU, encoder );
 
 	}
 
@@ -81165,7 +80387,8 @@ class IESSpotLight extends SpotLight {
 		super( color, intensity, distance, angle, penumbra, decay );
 
 		/**
-		 * TODO
+		 * The IES map. It's a lookup table that stores normalized attenuation factors
+		 * (0.0 to 1.0) that represent the light's intensity at a specific angle.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -82269,4 +81492,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };

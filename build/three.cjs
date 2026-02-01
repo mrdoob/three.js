@@ -1949,6 +1949,36 @@ function log( ...params ) {
 }
 
 /**
+ * Enhances log/warn/error messages related to TSL.
+ *
+ * @param {Array<any>} params - The original message parameters.
+ * @returns {Array<any>} The filtered and enhanced message parameters.
+ */
+function enhanceLogMessage( params ) {
+
+	const message = params[ 0 ];
+
+	if ( typeof message === 'string' && message.startsWith( 'TSL:' ) ) {
+
+		const stackTrace = params[ 1 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			params[ 0 ] += ' ' + stackTrace.getLocation();
+
+		} else {
+
+			params[ 1 ] = 'Stack trace not available. Enable "THREE.Node.captureStackTrace" to capture stack traces.';
+
+		}
+
+	}
+
+	return params;
+
+}
+
+/**
  * Logs a warning message with the 'THREE.' prefix.
  *
  * If a custom console function is set via setConsoleFunction(), it will be used
@@ -1960,6 +1990,8 @@ function log( ...params ) {
  */
 function warn( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -1968,7 +2000,17 @@ function warn( ...params ) {
 
 	} else {
 
-		console.warn( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.warn( stackTrace.getError( message ) );
+
+		} else {
+
+			console.warn( message, ...params );
+
+		}
 
 	}
 
@@ -1986,6 +2028,8 @@ function warn( ...params ) {
  */
 function error( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -1994,7 +2038,17 @@ function error( ...params ) {
 
 	} else {
 
-		console.error( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.error( stackTrace.getError( message ) );
+
+		} else {
+
+			console.error( message, ...params );
+
+		}
 
 	}
 
@@ -51465,7 +51519,7 @@ class PropertyMixer {
 		this._addIndex = 4;
 
 		/**
-		 * TODO
+		 * Accumulated weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51473,7 +51527,7 @@ class PropertyMixer {
 		this.cumulativeWeight = 0;
 
 		/**
-		 * TODO
+		 * Accumulated additive weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51481,7 +51535,7 @@ class PropertyMixer {
 		this.cumulativeWeightAdditive = 0;
 
 		/**
-		 * TODO
+		 * Number of active keyframe tracks currently using this property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51489,7 +51543,7 @@ class PropertyMixer {
 		this.useCount = 0;
 
 		/**
-		 * TODO
+		 * Number of keyframe tracks referencing this property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -57158,30 +57212,6 @@ class PointLightHelper extends Mesh {
 		this.matrixAutoUpdate = false;
 
 		this.update();
-
-
-		/*
-	// TODO: delete this comment?
-	const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-
-	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
-	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-
-	const d = light.distance;
-
-	if ( d === 0.0 ) {
-
-		this.lightDistance.visible = false;
-
-	} else {
-
-		this.lightDistance.scale.set( d, d, d );
-
-	}
-
-	this.add( this.lightDistance );
-	*/
 
 	}
 
