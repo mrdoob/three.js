@@ -182,7 +182,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 				layout: 'auto'
 			} );
 
-			this.transferPipelines[ format ] = pipeline;
+			this.transferPipelines[ key ] = pipeline;
 
 		}
 
