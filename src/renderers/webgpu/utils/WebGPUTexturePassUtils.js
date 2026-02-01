@@ -49,7 +49,7 @@ fn mainVS(
 
 	let p = pos[ vertexIndex ];
 	let mult = select( vec2f( 0.5, -0.5 ), vec2f( 0.5, 0.5 ), flipY != 0 );
-	Varys.vTex = p * vec2f( 0.5, -0.5 ) + vec2f( 0.5 );
+	Varys.vTex = p * mult + vec2f( 0.5 );
 	Varys.Position = vec4f( p, 0, 1 );
 	Varys.vBaseArrayLayer = instanceIndex;
 
@@ -182,7 +182,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 				layout: 'auto'
 			} );
 
-			this.transferPipelines[ format ] = pipeline;
+			this.transferPipelines[ key ] = pipeline;
 
 		}
 
