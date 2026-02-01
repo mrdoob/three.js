@@ -1,5 +1,3 @@
-import NodeError from './NodeError.js';
-
 // Pre-compiled RegExp patterns for ignored files
 const IGNORED_FILES = [
 	/^StackTrace\.js$/,
@@ -100,11 +98,9 @@ class StackTrace {
 
 	getError( message ) {
 
-		const error = new NodeError( message, this );
-
 		if ( this.stack.length === 0 ) {
 
-			return error;
+			return message;
 
 		}
 
@@ -123,9 +119,7 @@ class StackTrace {
 
 		} ).join( '\n' );
 
-		error.stack = `Error: ${ message }\n${ stackString }`;
-
-		return error;
+		return `${ message }\n${ stackString }`;
 
 	}
 
