@@ -90,9 +90,9 @@ class StackTrace {
 		const mainStack = this.stack[ 0 ];
 
 		const fn = mainStack.fn;
-		const fnName = fn ? `${ fn }() at ` : '';
+		const fnName = fn ? `"${ fn }()" at ` : '';
 
-		return `${fnName}${mainStack.file}:${mainStack.line}`; // :${mainStack.column}
+		return `${fnName}"${mainStack.file}:${mainStack.line}"`; // :${mainStack.column}
 
 	}
 
