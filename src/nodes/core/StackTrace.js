@@ -79,7 +79,12 @@ class StackTrace {
 
 	}
 
-	getMessage() {
+	/**
+	 * Returns a formatted location string of the top stack frame.
+	 *
+	 * @returns {string} The formatted stack trace message.
+	 */
+	getLocation() {
 
 		if ( this.stack.length === 0 ) {
 
@@ -96,7 +101,13 @@ class StackTrace {
 
 	}
 
-	getErrorMessage( message ) {
+	/**
+	 * Returns the full error message including the stack trace.
+	 *
+	 * @param {string} message - The error message.
+	 * @returns {string} The full error message with stack trace.
+	 */
+	getError( message ) {
 
 		if ( this.stack.length === 0 ) {
 

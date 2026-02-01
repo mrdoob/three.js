@@ -128,7 +128,7 @@ class Inspector extends RendererInspector {
 
 				if ( stackTrace && stackTrace.isStackTrace ) {
 
-					console.warn( stackTrace.getErrorMessage( message ) );
+					console.warn( stackTrace.getError( message ) );
 
 				} else {
 
@@ -144,7 +144,7 @@ class Inspector extends RendererInspector {
 
 				if ( stackTrace && stackTrace.isStackTrace ) {
 
-					console.error( stackTrace.getErrorMessage( message ) );
+					console.error( stackTrace.getError( message ) );
 
 				} else {
 

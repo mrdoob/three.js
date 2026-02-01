@@ -234,7 +234,7 @@ function enhanceLogMessage( params ) {
 
 		if ( stackTrace && stackTrace.isStackTrace ) {
 
-			params[ 0 ] += ' ' + stackTrace.getMessage();
+			params[ 0 ] += ' ' + stackTrace.getLocation();
 
 		} else {
 
@@ -274,7 +274,7 @@ function warn( ...params ) {
 
 		if ( stackTrace && stackTrace.isStackTrace ) {
 
-			console.warn( stackTrace.getErrorMessage( message ) );
+			console.warn( stackTrace.getError( message ) );
 
 		} else {
 
@@ -312,7 +312,7 @@ function error( ...params ) {
 
 		if ( stackTrace && stackTrace.isStackTrace ) {
 
-			console.error( stackTrace.getErrorMessage( message ) );
+			console.error( stackTrace.getError( message ) );
 
 		} else {
 
