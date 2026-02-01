@@ -28,12 +28,12 @@ class PointLightHelper extends Mesh {
 	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
 	 * the color of the light.
 	 */
-	constructor(light, sphereSize, color) {
+	constructor( light, sphereSize, color ) {
 
-		const geometry = new SphereGeometry(sphereSize, 4, 2);
-		const material = new MeshBasicMaterial({ wireframe: true, fog: false, toneMapped: false });
+		const geometry = new SphereGeometry( sphereSize, 4, 2 );
+		const material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
-		super(geometry, material);
+		super( geometry, material );
 
 		/**
 		 * The light being visualized.
@@ -79,15 +79,15 @@ class PointLightHelper extends Mesh {
 	 */
 	update() {
 
-		this.light.updateWorldMatrix(true, false);
+		this.light.updateWorldMatrix( true, false );
 
-		if (this.color !== undefined) {
+		if ( this.color !== undefined ) {
 
-			this.material.color.set(this.color);
+			this.material.color.set( this.color );
 
 		} else {
 
-			this.material.color.copy(this.light.color);
+			this.material.color.copy( this.light.color );
 
 		}
 
