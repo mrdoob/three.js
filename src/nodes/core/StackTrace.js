@@ -108,7 +108,6 @@ class StackTrace {
 
 		}
 
-		// Format compatible with Chrome, Firefox and Safari
 		// Output: "Error: message\n    at functionName (file.js:line:column)"
 		const stackString = this.stack.map( frame => {
 
