@@ -96,7 +96,7 @@ class StackTrace {
 
 	}
 
-	getError( message ) {
+	getErrorMessage( message ) {
 
 		if ( this.stack.length === 0 ) {
 

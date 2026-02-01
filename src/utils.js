@@ -274,7 +274,7 @@ function warn( ...params ) {
 
 		if ( stackTrace && stackTrace.isStackTrace ) {
 
-			console.warn( stackTrace.getError( message ) );
+			console.warn( stackTrace.getErrorMessage( message ) );
 
 		} else {
 
@@ -312,7 +312,7 @@ function error( ...params ) {
 
 		if ( stackTrace && stackTrace.isStackTrace ) {
 
-			console.error( stackTrace.getError( message ) );
+			console.error( stackTrace.getErrorMessage( message ) );
 
 		} else {
 
