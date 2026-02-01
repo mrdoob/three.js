@@ -219,6 +219,36 @@ function log( ...params ) {
 }
 
 /**
+ * Enhances log/warn/error messages related to TSL.
+ *
+ * @param {Array<any>} params - The original message parameters.
+ * @returns {Array<any>} The filtered and enhanced message parameters.
+ */
+function enhanceLogMessage( params ) {
+
+	const message = params[ 0 ];
+
+	if ( typeof message === 'string' && message.startsWith( 'TSL:' ) ) {
+
+		const stackTrace = params[ 1 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			params[ 0 ] += ' ' + stackTrace.getMessage();
+
+		} else {
+
+			params[ 1 ] = 'Stack trace not available. Enable "THREE.Node.captureStackTrace" to capture stack traces.';
+
+		}
+
+	}
+
+	return params;
+
+}
+
+/**
  * Logs a warning message with the 'THREE.' prefix.
  *
  * If a custom console function is set via setConsoleFunction(), it will be used
@@ -230,6 +260,8 @@ function log( ...params ) {
  */
 function warn( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -238,7 +270,17 @@ function warn( ...params ) {
 
 	} else {
 
-		console.warn( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.warn( stackTrace.getError( message ) );
+
+		} else {
+
+			console.warn( message, ...params );
+
+		}
 
 	}
 
@@ -256,6 +298,8 @@ function warn( ...params ) {
  */
 function error( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -264,7 +308,17 @@ function error( ...params ) {
 
 	} else {
 
-		console.error( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.error( stackTrace.getError( message ) );
+
+		} else {
+
+			console.error( message, ...params );
+
+		}
 
 	}
 
