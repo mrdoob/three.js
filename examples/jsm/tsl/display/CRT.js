@@ -1,4 +1,4 @@
-import { Fn, float, vec2, vec3, sin, screenUV, mix, clamp, dot, rtt, time, uv, select } from 'three/tsl';
+import { Fn, float, vec2, vec3, sin, screenUV, mix, clamp, dot, convertToTexture, time, uv, select } from 'three/tsl';
 import { circle } from './Shape.js';
 
 /**
@@ -66,7 +66,7 @@ export const barrelMask = Fn( ( [ coord ] ) => {
  */
 export const colorBleeding = Fn( ( [ color, amount = float( 0.002 ) ] ) => {
 
-	const inputTexture = rtt( color );
+	const inputTexture = convertToTexture( color );
 
 	// Get the original color
 	const original = inputTexture.sample( screenUV ).rgb;
