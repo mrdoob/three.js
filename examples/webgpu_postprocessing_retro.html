@@ -241,6 +241,7 @@
 				const vignetteIntensity = uniform( 0.3 ); // subtle vignette
 				const bleeding = uniform( 0.001 ); // minimal bleeding
 				const curvature = uniform( 0.02 ); // subtle curve
+				const affineDistortion = uniform( 0 ); // no affine distortion
 
 				// render pipeline
 
@@ -251,7 +252,7 @@
 				const distortedUV = barrelUV( curvature );
 				const distortedDelta = circle( curvature.add( .1 ).mul( 10 ), 1 ).mul( curvature ).mul( .05 );
 
-				let retroPipeline = retroPass( scene, camera );
+				let retroPipeline = retroPass( scene, camera, { affineDistortion } );
 				retroPipeline = replaceDefaultUV( distortedUV, retroPipeline );
 				retroPipeline = colorBleeding( retroPipeline, bleeding.add( distortedDelta ) );
 				retroPipeline = bayerDither( retroPipeline, colorDepthSteps );
@@ -291,6 +292,7 @@
 				gui.add( scanlineSpeed, 'value', 0, .1, 0.01 ).name( 'Scanline Speed' );
 				gui.add( vignetteIntensity, 'value', 0, 1, 0.01 ).name( 'Vignette' );
 				gui.add( bleeding, 'value', 0, 0.005, 0.001 ).name( 'Color Bleeding' );
+				gui.add( affineDistortion, 'value', 0, 1 ).name( 'Affine Distortion' );
 
 				window.addEventListener( 'resize', onWindowResize );
 

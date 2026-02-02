@@ -1,5 +1,5 @@
 import { MeshBasicNodeMaterial, PassNode, UnsignedByteType, NearestFilter } from 'three/webgpu';
-import { float, vec2, vec4, Fn, varying, attribute, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize } from 'three/tsl';
+import { float, vec2, vec4, Fn, uv, varying, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize, materialColor, replaceDefaultUV } from 'three/tsl';
 
 const _affineUv = varying( vec2() );
 const _w = varying( float() );
@@ -17,7 +17,7 @@ const _clipSpaceRetro = Fn( () => {
 		.div( screenSize.xy )
 		.mul( defaultPosition.w.mul( 2 ) );
 
-	_affineUv.assign( attribute( 'uv' ).mul( defaultPosition.w ) );
+	_affineUv.assign( uv().mul( defaultPosition.w ) );
 	_w.assign( defaultPosition.w );
 
 	return vec4( roundedPosition.xy, defaultPosition.zw );
@@ -29,6 +29,7 @@ const _clipSpaceRetro = Fn( () => {
  *
  * This node renders the scene with classic PlayStation 1 visual characteristics:
  * - **Vertex snapping**: Vertices are snapped to screen pixels, creating the iconic "wobbly" geometry
+ * - **Affine texture mapping**: Textures are sampled without perspective correction, resulting in distortion effects
  * - **Low resolution**: Default 0.25 scale (typical 320x240 equivalent)
  * - **Nearest-neighbor filtering**: Sharp pixelated textures without smoothing
  *
@@ -41,16 +42,24 @@ class RetroPassNode extends PassNode {
 	 *
 	 * @param {Scene} scene - The scene to render.
 	 * @param {Camera} camera - The camera to render from.
+	 * @param {Object} [options={}] - Additional options for the retro pass.
+	 * @param {Node} [options.affineDistortion=null] - An optional node to apply affine distortion to UVs.
 	 */
-	constructor( scene, camera ) {
+	constructor( scene, camera, options = {} ) {
 
 		super( PassNode.COLOR, scene, camera );
+
+		const {
+			affineDistortion = null
+		} = options;
 
 		this.setResolutionScale( .25 );
 
 		this.renderTarget.texture.type = UnsignedByteType;
 		this.renderTarget.texture.magFilter = NearestFilter;
 		this.renderTarget.texture.minFilter = NearestFilter;
+
+		this.affineDistortionNode = affineDistortion;
 
 		this._materialCache = new Map();
 
@@ -81,6 +90,16 @@ class RetroPassNode extends PassNode {
 				retroMaterial.opacityNode = material.opacityNode || null;
 				retroMaterial.positionNode = material.positionNode || null;
 				retroMaterial.vertexNode = material.vertexNode || _clipSpaceRetro;
+
+				if ( this.affineDistortionNode ) {
+
+					retroMaterial.colorNode = replaceDefaultUV( () => {
+
+						return this.affineDistortionNode.mix( uv(), _affineUv.div( _w ) );
+
+					}, retroMaterial.colorNode || materialColor );
+
+				}
 
 				this._materialCache.set( material, retroMaterial );
 
@@ -140,6 +159,8 @@ export default RetroPassNode;
  * @function
  * @param {Scene} scene - The scene to render.
  * @param {Camera} camera - The camera to render from.
+ * @param {Object} [options={}] - Additional options for the retro pass.
+ * @param {Node} [options.affineDistortion=null] - An optional node to apply affine distortion to UVs.
  * @return {RetroPassNode} A new RetroPassNode instance.
  */
-export const retroPass = ( scene, camera ) => new RetroPassNode( scene, camera );
+export const retroPass = ( scene, camera, options = {} ) => new RetroPassNode( scene, camera, options );
