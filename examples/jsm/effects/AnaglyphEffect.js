@@ -1,5 +1,6 @@
 import {
 	LinearFilter,
+	MathUtils,
 	Matrix3,
 	NearestFilter,
 	PerspectiveCamera,
@@ -17,6 +18,7 @@ const _cameraR = /*@__PURE__*/ new PerspectiveCamera();
 // Reusable vectors for screen corner calculations
 const _eyeL = /*@__PURE__*/ new Vector3();
 const _eyeR = /*@__PURE__*/ new Vector3();
+const _screenCenter = /*@__PURE__*/ new Vector3();
 const _screenBottomLeft = /*@__PURE__*/ new Vector3();
 const _screenBottomRight = /*@__PURE__*/ new Vector3();
 const _screenTopLeft = /*@__PURE__*/ new Vector3();
@@ -78,19 +80,13 @@ class AnaglyphEffect {
 		 * Objects closer appear in front of the screen (negative parallax).
 		 * Objects further appear behind the screen (positive parallax).
 		 *
-		 * @type {number}
-		 * @default 0.5
-		 */
-		this.screenDistance = 0.5;
-
-		/**
-		 * The physical width of the virtual screen in world units.
-		 * This affects the field of view and depth perception.
+		 * The screen dimensions are derived from the camera's FOV and aspect ratio
+		 * at this distance, ensuring the stereo view matches the camera's field of view.
 		 *
 		 * @type {number}
 		 * @default 0.5
 		 */
-		this.screenWidth = 0.5;
+		this.screenDistance = 0.5;
 
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
 
@@ -204,23 +200,22 @@ class AnaglyphEffect {
 			_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
 
 			// Calculate screen center (at screenDistance in front of the camera center)
-			const screenCenter = _forward.clone().multiplyScalar( this.screenDistance ).add( camera.position );
+			_screenCenter.copy( _forward ).multiplyScalar( this.screenDistance ).add( camera.position );
 
-			// Calculate screen dimensions based on render target aspect ratio
-			const aspect = _renderTargetL.width / _renderTargetL.height;
-			const halfWidth = this.screenWidth / 2;
-			const halfHeight = halfWidth / aspect;
+			// Calculate screen dimensions from camera FOV and aspect ratio
+			const halfHeight = this.screenDistance * Math.tan( MathUtils.DEG2RAD * camera.fov / 2 );
+			const halfWidth = halfHeight * camera.aspect;
 
 			// Calculate screen corners
-			_screenBottomLeft.copy( screenCenter )
+			_screenBottomLeft.copy( _screenCenter )
 				.addScaledVector( _right, - halfWidth )
 				.addScaledVector( _up, - halfHeight );
 
-			_screenBottomRight.copy( screenCenter )
+			_screenBottomRight.copy( _screenCenter )
 				.addScaledVector( _right, halfWidth )
 				.addScaledVector( _up, - halfHeight );
 
-			_screenTopLeft.copy( screenCenter )
+			_screenTopLeft.copy( _screenCenter )
 				.addScaledVector( _right, - halfWidth )
 				.addScaledVector( _up, halfHeight );
 
