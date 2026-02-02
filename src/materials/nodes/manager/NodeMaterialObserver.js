@@ -108,14 +108,6 @@ class NodeMaterialObserver {
 		 */
 		this.refreshUniforms = refreshUniforms;
 
-		/**
-		 * Holds the current render ID from the node frame.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.renderId = 0;
-
 	}
 
 	/**
@@ -169,6 +161,7 @@ class NodeMaterialObserver {
 			const { geometry, material, object } = renderObject;
 
 			data = {
+				renderId: 0,
 				material: this.getMaterialData( material ),
 				geometry: {
 					id: geometry.id,
@@ -586,17 +579,18 @@ class NodeMaterialObserver {
 			return true;
 
 		const { renderId } = nodeFrame;
+		const renderObjectData = this.getRenderObjectData( renderObject );
 
-		if ( this.renderId !== renderId ) {
+		if ( renderObjectData.renderId !== renderId ) {
 
-			this.renderId = renderId;
+			renderObjectData.renderId = renderId;
 
 			return true;
 
 		}
 
 		const isStatic = renderObject.object.static === true;
-		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
+		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && renderObjectData.version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
 			return false;
