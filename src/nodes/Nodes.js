@@ -83,7 +83,6 @@ export { default as ColorSpaceNode } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode } from './display/FrontFacingNode.js';
 export { default as NormalMapNode } from './display/NormalMapNode.js';
 export { default as PassNode } from './display/PassNode.js';
-export { default as PosterizeNode } from './display/PosterizeNode.js';
 export { default as RenderOutputNode } from './display/RenderOutputNode.js';
 export { default as ScreenNode } from './display/ScreenNode.js';
 export { default as ToneMappingNode } from './display/ToneMappingNode.js';
