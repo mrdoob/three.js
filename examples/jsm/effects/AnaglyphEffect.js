@@ -189,10 +189,10 @@ class AnaglyphEffect {
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			// Get the camera's local coordinate axes from its world matrix
-			const e = camera.matrixWorld.elements;
-			_right.set( e[ 0 ], e[ 1 ], e[ 2 ] ).normalize();
-			_up.set( e[ 4 ], e[ 5 ], e[ 6 ] ).normalize();
-			_forward.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
+			camera.matrixWorld.extractBasis( _right, _up, _forward );
+			_right.normalize();
+			_up.normalize();
+			_forward.normalize();
 
 			// Calculate eye positions
 			const halfSep = this.eyeSep / 2;
@@ -200,7 +200,7 @@ class AnaglyphEffect {
 			_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
 
 			// Calculate screen center (at screenDistance in front of the camera center)
-			_screenCenter.copy( _forward ).multiplyScalar( this.screenDistance ).add( camera.position );
+			_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.screenDistance );
 
 			// Calculate screen dimensions from camera FOV and aspect ratio
 			const halfHeight = this.screenDistance * Math.tan( MathUtils.DEG2RAD * camera.fov / 2 );
