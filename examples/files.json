@@ -424,6 +424,7 @@
 		"webgpu_postprocessing_outline",
 		"webgpu_postprocessing_pixel",
 		"webgpu_postprocessing_radial_blur",
+		"webgpu_postprocessing_retro",
 		"webgpu_postprocessing_smaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
