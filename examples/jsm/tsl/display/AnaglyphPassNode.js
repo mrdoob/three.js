@@ -1,6 +1,17 @@
-import { Matrix3, NodeMaterial } from 'three/webgpu';
+import { Matrix3, NodeMaterial, Vector3 } from 'three/webgpu';
 import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
+import { frameCorners } from '../../utils/CameraUtils.js';
+
+const _eyeL = /*@__PURE__*/ new Vector3();
+const _eyeR = /*@__PURE__*/ new Vector3();
+const _screenBottomLeft = /*@__PURE__*/ new Vector3();
+const _screenBottomRight = /*@__PURE__*/ new Vector3();
+const _screenTopLeft = /*@__PURE__*/ new Vector3();
+const _right = /*@__PURE__*/ new Vector3();
+const _up = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ new Vector3();
+const _screenCenter = /*@__PURE__*/ new Vector3();
 
 /**
  * Anaglyph algorithm types.
@@ -259,7 +270,12 @@ const ANAGLYPH_MATRICES = {
 };
 
 /**
- * A render pass node that creates an anaglyph effect.
+ * A render pass node that creates an anaglyph effect using physically-correct
+ * off-axis stereo projection.
+ *
+ * This implementation uses CameraUtils.frameCorners() to align stereo
+ * camera frustums to a virtual screen plane, providing accurate depth
+ * perception with zero parallax at the screen distance.
  *
  * @augments StereoCompositePassNode
  * @three_import import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
@@ -290,6 +306,30 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @default true
 		 */
 		this.isAnaglyphPassNode = true;
+
+		/**
+		 * The interpupillary distance (eye separation) in world units.
+		 * Typical human IPD is 0.064 meters (64mm).
+		 *
+		 * @type {number}
+		 * @default 0.064
+		 */
+		this.eyeSep = 0.064;
+
+		/**
+		 * The distance from the viewer to the virtual screen plane
+		 * where zero parallax (screen depth) occurs.
+		 * Objects at this distance appear at the screen surface.
+		 * Objects closer appear in front of the screen (negative parallax).
+		 * Objects further appear behind the screen (positive parallax).
+		 *
+		 * The screen dimensions are derived from the camera's FOV and aspect ratio
+		 * at this distance, ensuring the stereo view matches the camera's field of view.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this.screenDistance = 0.5;
 
 		/**
 		 * The current anaglyph algorithm.
@@ -395,6 +435,69 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		this._colorMatrixLeft.value.fromArray( matrices.left );
 		this._colorMatrixRight.value.fromArray( matrices.right );
+
+	}
+
+	/**
+	 * Updates the internal stereo camera using frameCorners for
+	 * physically-correct off-axis projection.
+	 *
+	 * @param {number} coordinateSystem - The current coordinate system.
+	 */
+	updateStereoCamera( coordinateSystem ) {
+
+		const { stereo, camera } = this;
+
+		stereo.cameraL.coordinateSystem = coordinateSystem;
+		stereo.cameraR.coordinateSystem = coordinateSystem;
+
+		// Get the camera's local coordinate axes from its world matrix
+		camera.matrixWorld.extractBasis( _right, _up, _forward );
+		_right.normalize();
+		_up.normalize();
+		_forward.normalize();
+
+		// Calculate eye positions
+		const halfSep = this.eyeSep / 2;
+		_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
+		_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
+
+		// Calculate screen center (at screenDistance in front of the camera center)
+		_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.screenDistance );
+
+		// Calculate screen dimensions from camera FOV and aspect ratio
+		const DEG2RAD = Math.PI / 180;
+		const halfHeight = this.screenDistance * Math.tan( DEG2RAD * camera.fov / 2 );
+		const halfWidth = halfHeight * camera.aspect;
+
+		// Calculate screen corners
+		_screenBottomLeft.copy( _screenCenter )
+			.addScaledVector( _right, - halfWidth )
+			.addScaledVector( _up, - halfHeight );
+
+		_screenBottomRight.copy( _screenCenter )
+			.addScaledVector( _right, halfWidth )
+			.addScaledVector( _up, - halfHeight );
+
+		_screenTopLeft.copy( _screenCenter )
+			.addScaledVector( _right, - halfWidth )
+			.addScaledVector( _up, halfHeight );
+
+		// Set up left eye camera
+		stereo.cameraL.position.copy( _eyeL );
+		stereo.cameraL.near = camera.near;
+		stereo.cameraL.far = camera.far;
+		frameCorners( stereo.cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+		stereo.cameraL.matrixWorld.compose( stereo.cameraL.position, stereo.cameraL.quaternion, stereo.cameraL.scale );
+		stereo.cameraL.matrixWorldInverse.copy( stereo.cameraL.matrixWorld ).invert();
+
+		// Set up right eye camera
+		stereo.cameraR.position.copy( _eyeR );
+		stereo.cameraR.near = camera.near;
+		stereo.cameraR.far = camera.far;
+		frameCorners( stereo.cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+		stereo.cameraR.matrixWorld.compose( stereo.cameraR.position, stereo.cameraR.quaternion, stereo.cameraR.scale );
+		stereo.cameraR.matrixWorldInverse.copy( stereo.cameraR.matrixWorld ).invert();
 
 	}
 

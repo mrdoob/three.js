@@ -54,6 +54,7 @@
 			const params = {
 				effect: 'stereo',
 				eyeSep: 0.064,
+				screenDistance: 3,
 				anaglyphAlgorithm: 'dubois',
 				anaglyphColorMode: 'redCyan'
 			};
@@ -101,7 +102,7 @@
 
 				mesh = new THREE.InstancedMesh( geometry, material, 500 );
 				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
-			
+
 				dummy = new THREE.Mesh();
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -110,7 +111,7 @@
 					dummy.position.y = Math.random() * 10 - 5;
 					dummy.position.z = Math.random() * 10 - 5;
 					dummy.scale.x = dummy.scale.y = dummy.scale.z = Math.random() * 3 + 1;
-			
+
 					dummy.updateMatrix();
 
 					mesh.setMatrixAt( i, dummy.matrix );
@@ -133,6 +134,10 @@
 				anaglyph = anaglyphPass( scene, camera );
 				parallaxBarrier = parallaxBarrierPass( scene, camera );
 
+				// Configure anaglyph for physically-correct stereo with zero parallax at scene center
+				anaglyph.eyeSep = params.eyeSep;
+				anaglyph.screenDistance = params.screenDistance;
+
 				renderPipeline.outputNode = stereo;
 
 				const gui = renderer.inspector.createParameters( 'Stereo Settings' );
@@ -140,8 +145,7 @@
 				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
 
 					stereo.stereo.eyeSep = value;
-
-					anaglyph.stereo.eyeSep = value;
+					anaglyph.eyeSep = value; // Anaglyph has direct eyeSep property
 					parallaxBarrier.stereo.eyeSep = value;
 
 				} );
@@ -156,6 +160,11 @@
 				anaglyphFolder.add( params, 'anaglyphColorMode', anaglyphColorModes ).name( 'Color Mode' ).onChange( function ( value ) {
 
 					anaglyph.colorMode = value;
+
+				} );
+				anaglyphFolder.add( params, 'screenDistance', 0.5, 10, 0.1 ).name( 'Screen Distance' ).onChange( function ( value ) {
+
+					anaglyph.screenDistance = value;
 
 				} );
 				anaglyphFolder.paramList.domElement.style.display = 'none';
