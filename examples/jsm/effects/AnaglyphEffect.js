@@ -2,15 +2,35 @@ import {
 	LinearFilter,
 	Matrix3,
 	NearestFilter,
+	PerspectiveCamera,
 	RGBAFormat,
 	ShaderMaterial,
-	StereoCamera,
+	Vector3,
 	WebGLRenderTarget
 } from 'three';
 import { FullScreenQuad } from '../postprocessing/Pass.js';
+import { frameCorners } from '../utils/CameraUtils.js';
+
+const _cameraL = /*@__PURE__*/ new PerspectiveCamera();
+const _cameraR = /*@__PURE__*/ new PerspectiveCamera();
+
+// Reusable vectors for screen corner calculations
+const _eyeL = /*@__PURE__*/ new Vector3();
+const _eyeR = /*@__PURE__*/ new Vector3();
+const _screenBottomLeft = /*@__PURE__*/ new Vector3();
+const _screenBottomRight = /*@__PURE__*/ new Vector3();
+const _screenTopLeft = /*@__PURE__*/ new Vector3();
+const _right = /*@__PURE__*/ new Vector3();
+const _up = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ new Vector3();
 
 /**
- * A class that creates an anaglyph effect.
+ * A class that creates an anaglyph effect using physically-correct
+ * off-axis stereo projection.
+ *
+ * This implementation uses CameraUtils.frameCorners() to align stereo
+ * camera frustums to a virtual screen plane, providing accurate depth
+ * perception with zero parallax at the screen distance.
  *
  * Note that this class can only be used with {@link WebGLRenderer}.
  * When using {@link WebGPURenderer}, use {@link AnaglyphPassNode}.
@@ -42,12 +62,43 @@ class AnaglyphEffect {
 			- 0.00155529, - 0.0184503, 1.2264
 		] );
 
-		const _stereo = new StereoCamera();
+		/**
+		 * The interpupillary distance (eye separation) in world units.
+		 * Typical human IPD is 0.064 meters (64mm).
+		 *
+		 * @type {number}
+		 * @default 0.064
+		 */
+		this.eyeSep = 0.064;
+
+		/**
+		 * The distance from the viewer to the virtual screen plane
+		 * where zero parallax (screen depth) occurs.
+		 * Objects at this distance appear at the screen surface.
+		 * Objects closer appear in front of the screen (negative parallax).
+		 * Objects further appear behind the screen (positive parallax).
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this.screenDistance = 0.5;
+
+		/**
+		 * The physical width of the virtual screen in world units.
+		 * This affects the field of view and depth perception.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this.screenWidth = 0.5;
 
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 		const _renderTargetL = new WebGLRenderTarget( width, height, _params );
 		const _renderTargetR = new WebGLRenderTarget( width, height, _params );
+
+		_cameraL.layers.enable( 1 );
+		_cameraR.layers.enable( 2 );
 
 		const _material = new ShaderMaterial( {
 
@@ -141,16 +192,67 @@ class AnaglyphEffect {
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			_stereo.update( camera );
+			// Get the camera's local coordinate axes from its world matrix
+			const e = camera.matrixWorld.elements;
+			_right.set( e[ 0 ], e[ 1 ], e[ 2 ] ).normalize();
+			_up.set( e[ 4 ], e[ 5 ], e[ 6 ] ).normalize();
+			_forward.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
+			// Calculate eye positions
+			const halfSep = this.eyeSep / 2;
+			_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
+			_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
+
+			// Calculate screen center (at screenDistance in front of the camera center)
+			const screenCenter = _forward.clone().multiplyScalar( this.screenDistance ).add( camera.position );
+
+			// Calculate screen dimensions based on render target aspect ratio
+			const aspect = _renderTargetL.width / _renderTargetL.height;
+			const halfWidth = this.screenWidth / 2;
+			const halfHeight = halfWidth / aspect;
+
+			// Calculate screen corners
+			_screenBottomLeft.copy( screenCenter )
+				.addScaledVector( _right, - halfWidth )
+				.addScaledVector( _up, - halfHeight );
+
+			_screenBottomRight.copy( screenCenter )
+				.addScaledVector( _right, halfWidth )
+				.addScaledVector( _up, - halfHeight );
+
+			_screenTopLeft.copy( screenCenter )
+				.addScaledVector( _right, - halfWidth )
+				.addScaledVector( _up, halfHeight );
+
+			// Set up left eye camera
+			_cameraL.position.copy( _eyeL );
+			_cameraL.near = camera.near;
+			_cameraL.far = camera.far;
+			frameCorners( _cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+			_cameraL.matrixWorld.copy( camera.matrixWorld );
+			_cameraL.matrixWorld.setPosition( _eyeL );
+			_cameraL.matrixWorldInverse.copy( _cameraL.matrixWorld ).invert();
+
+			// Set up right eye camera
+			_cameraR.position.copy( _eyeR );
+			_cameraR.near = camera.near;
+			_cameraR.far = camera.far;
+			frameCorners( _cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+			_cameraR.matrixWorld.copy( camera.matrixWorld );
+			_cameraR.matrixWorld.setPosition( _eyeR );
+			_cameraR.matrixWorldInverse.copy( _cameraR.matrixWorld ).invert();
+
+			// Render left eye
 			renderer.setRenderTarget( _renderTargetL );
 			renderer.clear();
-			renderer.render( scene, _stereo.cameraL );
+			renderer.render( scene, _cameraL );
 
+			// Render right eye
 			renderer.setRenderTarget( _renderTargetR );
 			renderer.clear();
-			renderer.render( scene, _stereo.cameraR );
+			renderer.render( scene, _cameraR );
 
+			// Composite anaglyph
 			renderer.setRenderTarget( null );
 			_quad.render( renderer );
 
