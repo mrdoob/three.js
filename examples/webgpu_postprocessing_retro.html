@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - retro</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Retro</span>
+			</div>
+
+			<small>
+				Retro post-processing effects, with scene based on <a href="https://threejs-journey.com/lessons/coffee-smoke-shader" target="_blank" rel="noopener">Three.js Journey</a> lesson.<br />
+				Perlin noise texture from <a href="http://kitfox.com/projects/perlinNoiseMaker/" target="_blank" rel="noopener">Perlin Noise Maker</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mix, mul, oneMinus, positionLocal, smoothstep, texture, time, rotateUV, Fn, uv, vec2, vec3, vec4, uniform, posterize, floor, float, sin, fract, dot, step, color, normalWorld, length, atan, replaceDefaultUV } from 'three/tsl';
+			import { retroPass } from 'three/addons/tsl/display/RetroPassNode.js';
+			import { bayerDither } from 'three/addons/tsl/math/Bayer.js';
+			import { scanlines, vignette, colorBleeding, barrelUV } from 'three/addons/tsl/display/CRT.js';
+			import { circle } from 'three/addons/tsl/display/Shape.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline, controls;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 8, 5, 20 );
+
+				scene = new THREE.Scene();
+
+				// PS1-style background: gradient sky with simple stars
+
+				const ps1Background = Fn( () => {
+
+					// Flip Y coordinate for correct orientation
+					const flippedY = normalWorld.y.negate();
+					const skyUV = flippedY.mul( 0.5 ).add( 0.5 );
+
+					// Simple gradient sky (dark blue at top to purple/orange at horizon)
+					const topColor = color( 0x000033 ); // dark blue night sky
+					const midColor = color( 0x330066 ); // purple
+					const horizonColor = color( 0x663322 ); // warm orange/brown horizon
+
+					// Two-step gradient (inverted - top is dark, horizon is warm)
+					const skyGradient = mix(
+						horizonColor,
+						mix( midColor, topColor, skyUV.smoothstep( 0.4, 0.9 ) ),
+						skyUV.smoothstep( 0.0, 0.4 )
+					);
+
+					// PS1-style "stars" using spherical coordinates
+					const longitude = atan( normalWorld.x, normalWorld.z );
+					const latitude = flippedY.asin(); // Use flipped Y for latitude too
+
+					// More stars with smaller scale
+					const starScale = float( 50.0 );
+					const starUV = vec2( longitude.mul( starScale ), latitude.mul( starScale ) );
+					const starCell = floor( starUV );
+
+					// Hash for randomness
+					const cellHash = fract( sin( dot( starCell, vec2( 12.9898, 78.233 ) ) ).mul( 43758.5453 ) );
+
+					// Position within cell (0-1)
+					const cellUV = fract( starUV );
+					const toCenter = cellUV.sub( 0.5 );
+
+					// Gemini-style star: bright center with soft glow + cross flare
+					const distToCenter = length( toCenter );
+
+					// Core (small bright center)
+					const core = smoothstep( float( 0.08 ), float( 0.0 ), distToCenter );
+
+					// Soft glow around
+					const glow = smoothstep( float( 0.25 ), float( 0.0 ), distToCenter ).mul( 0.4 );
+
+					// Cross/diamond flare effect
+					const crossX = smoothstep( float( 0.15 ), float( 0.0 ), toCenter.x.abs() ).mul( smoothstep( float( 0.4 ), float( 0.0 ), toCenter.y.abs() ) );
+					const crossY = smoothstep( float( 0.15 ), float( 0.0 ), toCenter.y.abs() ).mul( smoothstep( float( 0.4 ), float( 0.0 ), toCenter.x.abs() ) );
+					const cross = crossX.add( crossY ).mul( 0.3 );
+
+					// Combine star shape
+					const starShape = core.add( glow ).add( cross );
+
+					// More stars (lower threshold = more stars)
+					const isStar = step( 0.85, cellHash );
+
+					// Show stars from horizon up
+					const aboveHorizon = smoothstep( float( - 0.2 ), float( 0.1 ), flippedY );
+
+					// Star brightness varies + twinkle color
+					const starIntensity = isStar.mul( aboveHorizon ).mul( starShape ).mul( cellHash.mul( 0.6 ).add( 0.4 ) );
+
+					// Slight color variation (white to light blue)
+					const starColor = mix( vec3( 1.0, 1.0, 0.95 ), vec3( 0.8, 0.9, 1.0 ), cellHash );
+
+					// Combine sky and stars
+					const finalColor = mix( skyGradient, starColor, starIntensity.clamp( 0.0, 1.0 ) );
+
+					return finalColor;
+
+				} )();
+
+				scene.backgroundNode = ps1Background;
+
+				// Loaders
+
+				const gltfLoader = new GLTFLoader();
+				const textureLoader = new THREE.TextureLoader();
+
+				// baked model
+
+				gltfLoader.load(
+					'./models/gltf/coffeeMug.glb',
+					( gltf ) => {
+
+        				gltf.scene.getObjectByName( 'baked' ).material.map.anisotropy = 8;
+						scene.add( gltf.scene );
+
+					}
+				);
+
+				// geometry
+
+				const smokeGeometry = new THREE.PlaneGeometry( 1, 1, 16, 64 );
+				smokeGeometry.translate( 0, 0.5, 0 );
+				smokeGeometry.scale( 1.5, 6, 1.5 );
+
+				// texture
+
+				const noiseTexture = textureLoader.load( './textures/noises/perlin/128x128.png' );
+				noiseTexture.wrapS = THREE.RepeatWrapping;
+				noiseTexture.wrapT = THREE.RepeatWrapping;
+
+				// material
+
+				const smokeMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide, depthWrite: false } );
+
+				// position
+
+				smokeMaterial.positionNode = Fn( () => {
+
+					// twist
+
+					const twistNoiseUv = vec2( 0.5, uv().y.mul( 0.2 ).sub( time.mul( 0.005 ) ).mod( 1 ) );
+					const twist = texture( noiseTexture, twistNoiseUv ).r.mul( 10 );
+					positionLocal.xz.assign( rotateUV( positionLocal.xz, twist, vec2( 0 ) ) );
+
+					// wind
+
+					const windOffset = vec2(
+						texture( noiseTexture, vec2( 0.25, time.mul( 0.01 ) ).mod( 1 ) ).r.sub( 0.5 ),
+						texture( noiseTexture, vec2( 0.75, time.mul( 0.01 ) ).mod( 1 ) ).r.sub( 0.5 ),
+					).mul( uv().y.pow( 2 ).mul( 10 ) );
+					positionLocal.addAssign( windOffset );
+
+					return positionLocal;
+
+				} )();
+
+				// color
+
+				smokeMaterial.colorNode = Fn( () => {
+
+					// alpha
+
+					const alphaNoiseUv = uv().mul( vec2( 0.5, 0.3 ) ).add( vec2( 0, time.mul( 0.03 ).negate() ) );
+					const alpha = mul(
+
+						// pattern
+						texture( noiseTexture, alphaNoiseUv ).r.smoothstep( 0.4, 1 ),
+
+						// edges fade
+						smoothstep( 0, 0.1, uv().x ),
+						smoothstep( 0, 0.1, oneMinus( uv().x ) ),
+						smoothstep( 0, 0.1, uv().y ),
+						smoothstep( 0, 0.1, oneMinus( uv().y ) )
+
+					);
+
+					// color
+
+					const finalColor = mix( vec3( 0.6, 0.3, 0.2 ), vec3( 1, 1, 1 ), alpha.pow( 3 ) );
+
+					return vec4( finalColor, alpha );
+
+				} )();
+
+				// mesh
+
+				const smoke = new THREE.Mesh( smokeGeometry, smokeMaterial );
+				smoke.position.y = 1.83;
+				scene.add( smoke );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// uniforms
+
+				// PS1-style: 15-bit color (32 levels per channel)
+				const colorDepthSteps = uniform( 32 );
+
+				// CRT effect parameters (subtle for PS1 look)
+				const scanlineIntensity = uniform( 0.08 ); // subtle scanlines
+				const scanlineCount = uniform( 60 ); // match vertical resolution
+				const scanlineSpeed = uniform( 0.05 ); // slow scroll
+				const vignetteIntensity = uniform( 0.3 ); // subtle vignette
+				const bleeding = uniform( 0.001 ); // minimal bleeding
+				const curvature = uniform( 0.02 ); // subtle curve
+
+				// render pipeline
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// retro pipeline
+
+				const distortedUV = barrelUV( curvature );
+				const distortedDelta = circle( curvature.add( .1 ).mul( 10 ), 1 ).mul( curvature ).mul( .05 );
+
+				let retroPipeline = retroPass( scene, camera );
+				retroPipeline = replaceDefaultUV( distortedUV, retroPipeline );
+				retroPipeline = colorBleeding( retroPipeline, bleeding.add( distortedDelta ) );
+				retroPipeline = bayerDither( retroPipeline, colorDepthSteps );
+				retroPipeline = posterize( retroPipeline, colorDepthSteps );
+				retroPipeline = vignette( retroPipeline, vignetteIntensity, 0.6 );
+				retroPipeline = scanlines( retroPipeline, scanlineIntensity, scanlineCount, scanlineSpeed );
+
+				renderPipeline.outputNode = retroPipeline;
+
+				// default pass (no post-processing)
+
+				const defaultPass = pass( scene, camera );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 0.1;
+				controls.maxDistance = 50;
+				controls.target.y = 1;
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( { enabled: true }, 'enabled' ).onChange( v => {
+
+					renderPipeline.outputNode = v ? retroPipeline : defaultPass;
+					renderPipeline.needsUpdate = true;
+
+				} ).name( 'Retro Pipeline' );
+
+				gui.add( curvature, 'value', 0, 0.2, 0.01 ).name( 'Curvature' );
+				gui.add( colorDepthSteps, 'value', 4, 32, 1 ).name( 'Color Depth' );
+				gui.add( scanlineIntensity, 'value', 0, 1, 0.01 ).name( 'Scanlines' );
+				gui.add( scanlineCount, 'value', 20, 480, 1 ).name( 'Scanline Count' );
+				gui.add( scanlineSpeed, 'value', 0, .1, 0.01 ).name( 'Scanline Speed' );
+				gui.add( vignetteIntensity, 'value', 0, 1, 0.01 ).name( 'Vignette' );
+				gui.add( bleeding, 'value', 0, 0.005, 0.001 ).name( 'Color Bleeding' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			async function animate() {
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
