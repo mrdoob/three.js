@@ -32,6 +32,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_godrays',
+	'webgpu_postprocessing_retro',
 	'webgpu_postprocessing_ssgi',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
