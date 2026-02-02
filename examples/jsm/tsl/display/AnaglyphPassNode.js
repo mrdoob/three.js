@@ -488,8 +488,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		stereo.cameraL.near = camera.near;
 		stereo.cameraL.far = camera.far;
 		frameCorners( stereo.cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-		stereo.cameraL.matrixWorld.copy( camera.matrixWorld );
-		stereo.cameraL.matrixWorld.setPosition( _eyeL );
+		stereo.cameraL.matrixWorld.compose( stereo.cameraL.position, stereo.cameraL.quaternion, stereo.cameraL.scale );
 		stereo.cameraL.matrixWorldInverse.copy( stereo.cameraL.matrixWorld ).invert();
 
 		// Set up right eye camera
@@ -497,8 +496,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		stereo.cameraR.near = camera.near;
 		stereo.cameraR.far = camera.far;
 		frameCorners( stereo.cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-		stereo.cameraR.matrixWorld.copy( camera.matrixWorld );
-		stereo.cameraR.matrixWorld.setPosition( _eyeR );
+		stereo.cameraR.matrixWorld.compose( stereo.cameraR.position, stereo.cameraR.quaternion, stereo.cameraR.scale );
 		stereo.cameraR.matrixWorldInverse.copy( stereo.cameraR.matrixWorld ).invert();
 
 	}

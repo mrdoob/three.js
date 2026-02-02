@@ -224,8 +224,7 @@ class AnaglyphEffect {
 			_cameraL.near = camera.near;
 			_cameraL.far = camera.far;
 			frameCorners( _cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-			_cameraL.matrixWorld.copy( camera.matrixWorld );
-			_cameraL.matrixWorld.setPosition( _eyeL );
+			_cameraL.matrixWorld.compose( _cameraL.position, _cameraL.quaternion, _cameraL.scale );
 			_cameraL.matrixWorldInverse.copy( _cameraL.matrixWorld ).invert();
 
 			// Set up right eye camera
@@ -233,8 +232,7 @@ class AnaglyphEffect {
 			_cameraR.near = camera.near;
 			_cameraR.far = camera.far;
 			frameCorners( _cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-			_cameraR.matrixWorld.copy( camera.matrixWorld );
-			_cameraR.matrixWorld.setPosition( _eyeR );
+			_cameraR.matrixWorld.compose( _cameraR.position, _cameraR.quaternion, _cameraR.scale );
 			_cameraR.matrixWorldInverse.copy( _cameraR.matrixWorld ).invert();
 
 			// Render left eye
