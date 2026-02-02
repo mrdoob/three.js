@@ -135,6 +135,7 @@
 				parallaxBarrier = parallaxBarrierPass( scene, camera );
 
 				// Configure anaglyph for physically-correct stereo with zero parallax at scene center
+				anaglyph.eyeSep = params.eyeSep;
 				anaglyph.screenDistance = params.screenDistance;
 
 				renderPipeline.outputNode = stereo;
