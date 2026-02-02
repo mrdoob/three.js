@@ -2690,6 +2690,37 @@ class Renderer {
 	}
 
 	/**
+	 * Initializes the given render target.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to intialize.
+	 */
+	initRenderTarget( renderTarget ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
+		}
+
+		this._textures.updateRenderTarget( renderTarget );
+
+		const renderTargetData = this._textures.get( renderTarget );
+
+		const renderContext = this._renderContexts.get( renderTarget );
+
+		renderContext.textures = renderTargetData.textures;
+		renderContext.depthTexture = renderTargetData.depthTexture;
+		renderContext.width = renderTargetData.width;
+		renderContext.height = renderTargetData.height;
+		renderContext.renderTarget = renderTarget;
+		renderContext.depth = renderTarget.depthBuffer;
+		renderContext.stencil = renderTarget.stencilBuffer;
+
+		this.backend.initRenderTarget( renderContext );
+
+	}
+
+	/**
 	 * Copies the current bound framebuffer into the given texture.
 	 *
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
@@ -3164,9 +3195,9 @@ class Renderer {
 			materialOverride = true;
 
 			// store original nodes
-			materialColorNode = scene.overrideMaterial.colorNode;
-			materialDepthNode = scene.overrideMaterial.depthNode;
-			materialPositionNode = scene.overrideMaterial.positionNode;
+			materialColorNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.colorNode : null;
+			materialDepthNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.depthNode : null;
+			materialPositionNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.positionNode : null;
 			materialSide = scene.overrideMaterial.side;
 
 			if ( material.positionNode && material.positionNode.isNode ) {
@@ -3273,6 +3304,16 @@ class Renderer {
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
+		if ( this._currentRenderBundle !== null ) {
+
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
+
+			renderBundleData.renderObjects.push( renderObject );
+
+			renderObject.bundle = this._currentRenderBundle.bundleGroup;
+
+		}
+
 		//
 
 		const needsRefresh = this._nodes.needsRefresh( renderObject );
@@ -3291,16 +3332,6 @@ class Renderer {
 		this._pipelines.updateForRender( renderObject );
 
 		//
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderBundleData = this.backend.get( this._currentRenderBundle );
-
-			renderBundleData.renderObjects.push( renderObject );
-
-			renderObject.bundle = this._currentRenderBundle.bundleGroup;
-
-		}
 
 		this.backend.draw( renderObject, this.info );
 

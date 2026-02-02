@@ -210,6 +210,7 @@ class RenderImageDialog {
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
+			renderer.setClearColor( editor.viewportColor );
 
 			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
@@ -411,9 +412,10 @@ class RenderVideoDialog {
 		renderButton.onClick( async () => {
 
 			const player = new APP.Player();
-			player.load( editor.toJSON() );
+			await player.load( editor.toJSON() );
 			player.setPixelRatio( 1 );
 			player.setSize( videoWidth.getValue(), videoHeight.getValue() );
+			player.setClearColor( editor.viewportColor );
 
 			//
 
@@ -497,7 +499,7 @@ class RenderVideoDialog {
 
 			const qualityToBitrate = {
 				'low': 2e6,
-				'medium': 5e6, 
+				'medium': 5e6,
 				'high': 10e6,
 				'ultra': 20e6
 			};
@@ -526,7 +528,7 @@ class RenderVideoDialog {
 				player.render( currentTime );
 
 				const bitmap = await createImageBitmap( canvas );
-				const frame = new VideoFrame( bitmap, { timestamp: i * ( 1_000_000 / fps ) } );
+				const frame = new VideoFrame( bitmap, { timestamp: i * ( 1e6 / fps ) } );
 
 				videoEncoder.encode( frame, { keyFrame: i % fps === 0 } );
 				frame.close();

@@ -468,6 +468,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Whether the material is using flat shading or not.
+	 *
+	 * @returns {boolean} Whether the material is using flat shading or not.
+	 */
+	isFlatShading() {
+
+		return this.material.flatShading === true || this.geometry.hasAttribute( 'normal' ) === false;
+
+	}
+
+	/**
 	 * Whether the material is opaque or not.
 	 *
 	 * @return {boolean} Whether the material is opaque or not.
@@ -573,7 +584,7 @@ class NodeBuilder {
 
 			bindingsArray.push( binding );
 
-			sharedGroup = sharedGroup && binding.groupNode.shared !== true;
+			sharedGroup = sharedGroup && binding.groupNode.shared;
 
 		}
 
@@ -587,7 +598,7 @@ class NodeBuilder {
 
 			if ( bindGroup === undefined ) {
 
-				bindGroup = new BindGroup( groupName, bindingsArray, this.bindingsIndexes[ groupName ].group, bindingsArray );
+				bindGroup = new BindGroup( groupName, bindingsArray, this.bindingsIndexes[ groupName ].group );
 
 				bindGroupsCache.set( bindingsArray, bindGroup );
 
@@ -595,7 +606,7 @@ class NodeBuilder {
 
 		} else {
 
-			bindGroup = new BindGroup( groupName, bindingsArray, this.bindingsIndexes[ groupName ].group, bindingsArray );
+			bindGroup = new BindGroup( groupName, bindingsArray, this.bindingsIndexes[ groupName ].group );
 
 		}
 

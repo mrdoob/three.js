@@ -65,7 +65,7 @@
 
 				// cube camera for environment map
 
-				const renderTarget = new THREE.WebGLCubeRenderTarget( 512 );
+				const renderTarget = new THREE.CubeRenderTarget( 512 );
 				renderTarget.texture.type = THREE.HalfFloatType;
 				renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				renderTarget.texture.magFilter = THREE.LinearFilter;

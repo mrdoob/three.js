@@ -36,7 +36,7 @@
 			import * as THREE from 'three/webgpu';
 
 			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
-			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
+			import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
 			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -47,6 +47,8 @@
 
 			let mesh, dummy, timer;
 
+			let anaglyphFolder;
+
 			const position = new THREE.Vector3();
 
 			const params = {
@@ -54,9 +56,27 @@
 				eyeSep: 0.064,
 				screenDistance: 3,
 				screenWidth: 2,
+				anaglyphAlgorithm: 'dubois',
+				anaglyphColorMode: 'redCyan'
 			};
 
 			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
+
+			const anaglyphAlgorithms = {
+				'True': AnaglyphAlgorithm.TRUE,
+				'Grey': AnaglyphAlgorithm.GREY,
+				'Colour': AnaglyphAlgorithm.COLOUR,
+				'Half-Colour': AnaglyphAlgorithm.HALF_COLOUR,
+				'Dubois': AnaglyphAlgorithm.DUBOIS,
+				'Optimised': AnaglyphAlgorithm.OPTIMISED,
+				'Compromise': AnaglyphAlgorithm.COMPROMISE
+			};
+
+			const anaglyphColorModes = {
+				'Red / Cyan': AnaglyphColorMode.RED_CYAN,
+				'Magenta / Cyan': AnaglyphColorMode.MAGENTA_CYAN,
+				'Magenta / Green': AnaglyphColorMode.MAGENTA_GREEN
+			};
 
 			init();
 
@@ -83,7 +103,7 @@
 
 				mesh = new THREE.InstancedMesh( geometry, material, 500 );
 				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
-			
+
 				dummy = new THREE.Mesh();
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -92,7 +112,7 @@
 					dummy.position.y = Math.random() * 10 - 5;
 					dummy.position.z = Math.random() * 10 - 5;
 					dummy.scale.x = dummy.scale.y = dummy.scale.z = Math.random() * 3 + 1;
-			
+
 					dummy.updateMatrix();
 
 					mesh.setMatrixAt( i, dummy.matrix );
@@ -131,17 +151,29 @@
 
 				} );
 
-				// Anaglyph-specific parameters for physically-correct stereo
-				gui.add( params, 'screenDistance', 0.5, 10, 0.1 ).name( 'screenDistance (anaglyph)' ).onChange( function ( value ) {
+				// Anaglyph-specific settings folder
+				anaglyphFolder = gui.addFolder( 'Anaglyph Options' );
+				anaglyphFolder.add( params, 'anaglyphAlgorithm', anaglyphAlgorithms ).name( 'Algorithm' ).onChange( function ( value ) {
+
+					anaglyph.algorithm = value;
+
+				} );
+				anaglyphFolder.add( params, 'anaglyphColorMode', anaglyphColorModes ).name( 'Color Mode' ).onChange( function ( value ) {
+
+					anaglyph.colorMode = value;
+
+				} );
+				anaglyphFolder.add( params, 'screenDistance', 0.5, 10, 0.1 ).name( 'Screen Distance' ).onChange( function ( value ) {
 
 					anaglyph.screenDistance = value;
 
 				} );
-				gui.add( params, 'screenWidth', 0.5, 5, 0.1 ).name( 'screenWidth (anaglyph)' ).onChange( function ( value ) {
+				anaglyphFolder.add( params, 'screenWidth', 0.5, 5, 0.1 ).name( 'Screen Width' ).onChange( function ( value ) {
 
 					anaglyph.screenWidth = value;
 
 				} );
+				anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -156,14 +188,17 @@
 				if ( value === 'stereo' ) {
 
 					renderPipeline.outputNode = stereo;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				} else if ( value === 'anaglyph' ) {
 
 					renderPipeline.outputNode = anaglyph;
+					anaglyphFolder.paramList.domElement.style.display = '';
 
 				} else if ( value === 'parallaxBarrier' ) {
 
 					renderPipeline.outputNode = parallaxBarrier;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				}
 

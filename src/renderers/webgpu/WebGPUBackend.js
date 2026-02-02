@@ -218,6 +218,12 @@ class WebGPUBackend extends Backend {
 
 		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
+		if ( this.compatibilityMode ) {
+
+			renderer._samples = 0;
+
+		}
+
 		device.lost.then( ( info ) => {
 
 			if ( info.reason === 'destroyed' ) return;

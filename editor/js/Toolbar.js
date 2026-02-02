@@ -1,4 +1,4 @@
-import { UIPanel, UIButton, UICheckbox } from './libs/ui.js';
+import { UIPanel, UIButton } from './libs/ui.js';
 
 function Toolbar( editor ) {
 
@@ -49,15 +49,6 @@ function Toolbar( editor ) {
 
 	} );
 	container.add( scale );
-
-	const local = new UICheckbox( false );
-	local.dom.title = strings.getKey( 'toolbar/local' );
-	local.onChange( function () {
-
-		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
-
-	} );
-	container.add( local );
 
 	//
 

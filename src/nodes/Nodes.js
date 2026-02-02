@@ -19,6 +19,7 @@ export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
 export { default as NodeCache } from './core/NodeCache.js';
 export { default as NodeCode } from './core/NodeCode.js';
+export { default as NodeError } from './core/NodeError.js';
 export { default as NodeFrame } from './core/NodeFrame.js';
 export { default as NodeFunctionInput } from './core/NodeFunctionInput.js';
 export { default as NodeUniform } from './core/NodeUniform.js';
@@ -28,6 +29,7 @@ export { default as OutputStructNode } from './core/OutputStructNode.js';
 export { default as ParameterNode } from './core/ParameterNode.js';
 export { default as PropertyNode } from './core/PropertyNode.js';
 export { default as StackNode } from './core/StackNode.js';
+export { default as StackTrace } from './core/StackTrace.js';
 export { default as StructNode } from './core/StructNode.js';
 export { default as StructTypeNode } from './core/StructTypeNode.js';
 export { default as SubBuildNode } from './core/SubBuildNode.js';
@@ -74,8 +76,6 @@ export { default as CodeNode } from './code/CodeNode.js';
 export { default as ExpressionNode } from './code/ExpressionNode.js';
 export { default as FunctionCallNode } from './code/FunctionCallNode.js';
 export { default as FunctionNode } from './code/FunctionNode.js';
-export { default as ScriptableNode } from './code/ScriptableNode.js';
-export { default as ScriptableValueNode } from './code/ScriptableValueNode.js';
 
 // display
 export { default as BumpMapNode } from './display/BumpMapNode.js';

@@ -18,13 +18,7 @@
 		</style>
 	</head>
 	<body ontouchstart="">
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./js/three.module.js"
-				}
-			}
-		</script>
+		<script type="importmap"><!-- importmap --></script>
 		<script type="module">
 
 			import * as THREE from 'three';
@@ -33,10 +27,10 @@
 			window.THREE = THREE; // Used by APP Scripts.
 
 			var loader = new THREE.FileLoader();
-			loader.load( 'app.json', function ( text ) {
+			loader.load( 'app.json', async function ( text ) {
 
 				var player = new APP.Player();
-				player.load( JSON.parse( text ) );
+				await player.load( JSON.parse( text ) );
 				player.setSize( window.innerWidth, window.innerHeight );
 				player.play();
 

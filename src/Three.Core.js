@@ -3,7 +3,6 @@ import { warn } from './utils.js';
 
 export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget.js';
 export { WebGL3DRenderTarget } from './renderers/WebGL3DRenderTarget.js';
-export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebXRController } from './renderers/webxr/WebXRController.js';
 export { FogExp2 } from './scenes/FogExp2.js';

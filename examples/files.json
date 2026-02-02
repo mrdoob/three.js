@@ -416,6 +416,7 @@
 		"webgpu_postprocessing_dof",
 		"webgpu_postprocessing_dof_basic",
 		"webgpu_postprocessing_fxaa",
+		"webgpu_postprocessing_godrays",
 		"webgpu_postprocessing_lensflare",
 		"webgpu_postprocessing_masking",
 		"webgpu_postprocessing_ca",

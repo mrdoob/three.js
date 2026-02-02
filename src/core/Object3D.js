@@ -242,7 +242,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the local matrix from position,
-		 * rotation and scale every frame.
+		 * rotation and scale every frame. If set to `false`, the app is responsible for recomputing
+		 * the local matrix by calling `updateMatrix()`.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_AUTO_UPDATE`.
 		 *
@@ -253,7 +254,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the world matrix from the current local
-		 * matrix and the object's transformation hierarchy.
+		 * matrix and the object's transformation hierarchy. If set to `false`, the app is responsible for
+		 * recomputing the world matrix by directly updating the `matrixWorld` property.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE`.
 		 *
@@ -1158,7 +1160,7 @@ class Object3D extends EventDispatcher {
 	 * `true` by default.  Set these flags to `false` if you need more control over the update matrix process.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
 	updateMatrixWorld( force ) {
 
@@ -1313,6 +1315,9 @@ class Object3D extends EventDispatcher {
 		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
+		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
 
 		// object specific properties
 
