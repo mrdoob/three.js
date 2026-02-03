@@ -29,7 +29,6 @@ export const HALF_PI = TSL.HALF_PI;
 export const PointShadowFilter = TSL.PointShadowFilter;
 export const Return = TSL.Return;
 export const Schlick_to_F0 = TSL.Schlick_to_F0;
-export const ScriptableNodeResources = TSL.ScriptableNodeResources;
 export const ShaderNode = TSL.ShaderNode;
 export const Stack = TSL.Stack;
 export const Switch = TSL.Switch;
