@@ -32,7 +32,7 @@ const _forward = /*@__PURE__*/ new Vector3();
  *
  * This implementation uses CameraUtils.frameCorners() to align stereo
  * camera frustums to a virtual screen plane, providing accurate depth
- * perception with zero parallax at the screen distance.
+ * perception with zero parallax at the plane distance.
  *
  * Note that this class can only be used with {@link WebGLRenderer}.
  * When using {@link WebGPURenderer}, use {@link AnaglyphPassNode}.
@@ -74,8 +74,8 @@ class AnaglyphEffect {
 		this.eyeSep = 0.064;
 
 		/**
-		 * The distance from the viewer to the virtual screen plane
-		 * where zero parallax (screen depth) occurs.
+		 * The distance in world units from the viewer to the virtual
+		 * screen plane where zero parallax (screen depth) occurs.
 		 * Objects at this distance appear at the screen surface.
 		 * Objects closer appear in front of the screen (negative parallax).
 		 * Objects further appear behind the screen (positive parallax).
@@ -86,7 +86,7 @@ class AnaglyphEffect {
 		 * @type {number}
 		 * @default 0.5
 		 */
-		this.screenDistance = 0.5;
+		this.planeDistance = 0.5;
 
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
 
@@ -199,11 +199,11 @@ class AnaglyphEffect {
 			_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
 			_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
 
-			// Calculate screen center (at screenDistance in front of the camera center)
-			_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.screenDistance );
+			// Calculate screen center (at planeDistance in front of the camera center)
+			_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.planeDistance );
 
 			// Calculate screen dimensions from camera FOV and aspect ratio
-			const halfHeight = this.screenDistance * Math.tan( MathUtils.DEG2RAD * camera.fov / 2 );
+			const halfHeight = this.planeDistance * Math.tan( MathUtils.DEG2RAD * camera.fov / 2 );
 			const halfWidth = halfHeight * camera.aspect;
 
 			// Calculate screen corners

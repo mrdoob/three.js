@@ -54,7 +54,7 @@
 			const params = {
 				effect: 'stereo',
 				eyeSep: 0.064,
-				screenDistance: 3,
+				planeDistance: 3,
 				anaglyphAlgorithm: 'dubois',
 				anaglyphColorMode: 'redCyan'
 			};
@@ -136,7 +136,7 @@
 
 				// Configure anaglyph for physically-correct stereo with zero parallax at scene center
 				anaglyph.eyeSep = params.eyeSep;
-				anaglyph.screenDistance = params.screenDistance;
+				anaglyph.planeDistance = params.planeDistance;
 
 				renderPipeline.outputNode = stereo;
 
@@ -162,9 +162,9 @@
 					anaglyph.colorMode = value;
 
 				} );
-				anaglyphFolder.add( params, 'screenDistance', 0.5, 10, 0.1 ).name( 'Screen Distance' ).onChange( function ( value ) {
+				anaglyphFolder.add( params, 'planeDistance', 0.5, 10, 0.1 ).name( 'Plane Distance' ).onChange( function ( value ) {
 
-					anaglyph.screenDistance = value;
+					anaglyph.planeDistance = value;
 
 				} );
 				anaglyphFolder.paramList.domElement.style.display = 'none';
