@@ -1,5 +1,4 @@
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
-import { arrayNeedsUint32 } from '../../utils.js';
 
 function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
