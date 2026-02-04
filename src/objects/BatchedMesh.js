@@ -1539,6 +1539,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		// the "wireframe" attribute implicitly creates a line attribute in the renderer, which is double
+		// the vertices to draw (3 lines per triangle) so we multiply the draw counts here.
 		let multiDrawCount = 0;
 		const multiDrawMultiplier = material.wireframe ? 2 : 1;
 		if ( this.sortObjects ) {
