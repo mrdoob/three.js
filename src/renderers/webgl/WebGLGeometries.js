@@ -85,6 +85,12 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		const geometryPosition = geometry.attributes.position;
 		let version = 0;
 
+		if ( geometryPosition === undefined ) {
+
+			return;
+
+		}
+
 		if ( geometryIndex !== null ) {
 
 			const array = geometryIndex.array;
@@ -100,7 +106,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else if ( geometryPosition !== undefined ) {
+		} else {
 
 			const array = geometryPosition.array;
 			version = geometryPosition.version;
@@ -115,13 +121,11 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else {
-
-			return;
-
 		}
 
-		const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		// check whether a 32 bit or 16 bit buffer is required to store the indices
+		// account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
+		const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 		attribute.version = version;
 
 		// Updating index buffer in VAO now. See WebGLBindingStates
