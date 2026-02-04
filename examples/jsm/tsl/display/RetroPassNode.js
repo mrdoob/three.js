@@ -1,5 +1,5 @@
 import { MeshBasicNodeMaterial, PassNode, UnsignedByteType, NearestFilter } from 'three/webgpu';
-import { float, vec2, vec4, Fn, uv, varying, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize, materialColor, replaceDefaultUV } from 'three/tsl';
+import { float, vec2, vec4, Fn, uv, varying, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize, materialColor, uint } from 'three/tsl';
 
 const _affineUv = varying( vec2() );
 const _w = varying( float() );
@@ -50,7 +50,8 @@ class RetroPassNode extends PassNode {
 		super( PassNode.COLOR, scene, camera );
 
 		const {
-			affineDistortion = null
+			affineDistortion = null,
+			filterTextures = false
 		} = options;
 
 		this.setResolutionScale( .25 );
@@ -60,6 +61,8 @@ class RetroPassNode extends PassNode {
 		this.renderTarget.texture.minFilter = NearestFilter;
 
 		this.affineDistortionNode = affineDistortion;
+
+		this.filterTextures = filterTextures;
 
 		this._materialCache = new Map();
 
@@ -80,9 +83,17 @@ class RetroPassNode extends PassNode {
 
 		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, ...params ) => {
 
-			let retroMaterial = this._materialCache.get( material );
+			const retroMaterialData = this._materialCache.get( material );
 
-			if ( retroMaterial === undefined ) {
+			let retroMaterial;
+
+			if ( retroMaterialData === undefined || retroMaterialData.version !== material.version ) {
+
+				if ( retroMaterialData !== undefined ) {
+
+					retroMaterialData.material.dispose();
+
+				}
 
 				retroMaterial = new MeshBasicNodeMaterial();
 
@@ -91,17 +102,38 @@ class RetroPassNode extends PassNode {
 				retroMaterial.positionNode = material.positionNode || null;
 				retroMaterial.vertexNode = material.vertexNode || _clipSpaceRetro;
 
+				let colorNode = material.colorNode || materialColor;
+
 				if ( this.affineDistortionNode ) {
 
-					retroMaterial.colorNode = replaceDefaultUV( () => {
+					colorNode = colorNode.context( {
 
-						return this.affineDistortionNode.mix( uv(), _affineUv.div( _w ) );
+						getUV: () => this.affineDistortionNode.mix( uv(), _affineUv.div( _w ) ),
 
-					}, retroMaterial.colorNode || materialColor );
+					} );
 
 				}
 
-				this._materialCache.set( material, retroMaterial );
+				if ( this.filterTextures !== true ) {
+
+					colorNode = colorNode.context( {
+
+						getTextureLevel: () => uint( 0 )
+
+					} );
+
+				}
+
+				retroMaterial.colorNode = colorNode;
+
+				this._materialCache.set( material, {
+					material: retroMaterial,
+					version: material.version
+				} );
+
+			} else {
+
+				retroMaterial = retroMaterialData.material;
 
 			}
 
@@ -131,7 +163,12 @@ class RetroPassNode extends PassNode {
 
 		super.dispose();
 
-		this._materialCache.forEach( material => material.dispose() );
+		this._materialCache.forEach( ( data ) => {
+
+			data.material.dispose();
+
+		} );
+
 		this._materialCache.clear();
 
 	}

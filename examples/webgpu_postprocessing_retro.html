@@ -252,7 +252,9 @@
 				const distortedUV = barrelUV( curvature );
 				const distortedDelta = circle( curvature.add( .1 ).mul( 10 ), 1 ).mul( curvature ).mul( .05 );
 
-				let retroPipeline = retroPass( scene, camera, { affineDistortion } );
+				const retro = retroPass( scene, camera, { affineDistortion } );
+
+				let retroPipeline = retro;
 				retroPipeline = replaceDefaultUV( distortedUV, retroPipeline );
 				retroPipeline = colorBleeding( retroPipeline, bleeding.add( distortedDelta ) );
 				retroPipeline = bayerDither( retroPipeline, colorDepthSteps );
@@ -293,6 +295,11 @@
 				gui.add( vignetteIntensity, 'value', 0, 1, 0.01 ).name( 'Vignette' );
 				gui.add( bleeding, 'value', 0, 0.005, 0.001 ).name( 'Color Bleeding' );
 				gui.add( affineDistortion, 'value', 0, 1 ).name( 'Affine Distortion' );
+				gui.add( retro, 'filterTextures' ).name( 'Filter Textures' ).onChange( () => {
+
+					retro.dispose();
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
