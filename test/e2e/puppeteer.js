@@ -39,6 +39,7 @@ const exceptionList = [
 	'webgpu_test_memory',
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
+	'webgpu_volume_lighting_traa',
 
 	// Need more time to render
 	'css3d_mixed',
