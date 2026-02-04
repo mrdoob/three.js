@@ -49,9 +49,27 @@ class FontLoader extends Loader {
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			const font = scope.parse( JSON.parse( text ) );
+			try {
 
-			if ( onLoad ) onLoad( font );
+				const font = scope.parse( JSON.parse( text ) );
+
+				if ( onLoad ) onLoad( font );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

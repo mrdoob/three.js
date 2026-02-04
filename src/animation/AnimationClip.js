@@ -107,7 +107,16 @@ class AnimationClip {
 		const clip = new this( json.name, json.duration, tracks, json.blendMode );
 		clip.uuid = json.uuid;
 
-		clip.userData = JSON.parse( json.userData || '{}' );
+		try {
+
+			clip.userData = JSON.parse( json.userData || '{}' );
+
+		} catch ( e ) {
+
+			warn( 'AnimationClip: Unable to parse userData.' );
+			clip.userData = {};
+
+		}
 
 		return clip;
 

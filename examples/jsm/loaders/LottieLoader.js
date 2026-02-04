@@ -83,39 +83,55 @@ class LottieLoader extends Loader {
 
 		loader.load( url, function ( text ) {
 
-			const data = JSON.parse( text );
+			try {
 
-			// lottie uses container.offsetWidth and offsetHeight
-			// to define width/height
+				const data = JSON.parse( text );
 
-			const container = document.createElement( 'div' );
-			container.style.width = data.w + 'px';
-			container.style.height = data.h + 'px';
-			document.body.appendChild( container );
+				// lottie uses container.offsetWidth and offsetHeight
+				// to define width/height
 
-			const animation = lottie.loadAnimation( {
-				container: container,
-				animType: 'canvas',
-				loop: true,
-				autoplay: true,
-				animationData: data,
-				rendererSettings: { dpr: quality }
-			} );
+				const container = document.createElement( 'div' );
+				container.style.width = data.w + 'px';
+				container.style.height = data.h + 'px';
+				document.body.appendChild( container );
 
-			texture.animation = animation;
-			texture.image = animation.container;
+				const animation = lottie.loadAnimation( {
+					container: container,
+					animType: 'canvas',
+					loop: true,
+					autoplay: true,
+					animationData: data,
+					rendererSettings: { dpr: quality }
+				} );
 
-			animation.addEventListener( 'enterFrame', function () {
+				texture.animation = animation;
+				texture.image = animation.container;
 
-				texture.needsUpdate = true;
+				animation.addEventListener( 'enterFrame', function () {
 
-			} );
+					texture.needsUpdate = true;
 
-			container.style.display = 'none';
+				} );
 
-			if ( onLoad !== undefined ) {
+				container.style.display = 'none';
 
-				onLoad( texture );
+				if ( onLoad !== undefined ) {
+
+					onLoad( texture );
+
+				}
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
 
 			}
 

@@ -18,7 +18,7 @@ function cyrb53( value, seed = 0 ) {
 
 	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
 
-	if ( value instanceof Array ) {
+	if ( Array.isArray( value ) ) {
 
 		for ( let i = 0, val; i < value.length; i ++ ) {
 

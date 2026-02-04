@@ -429,38 +429,37 @@ class GLTFLoader extends Loader {
 		const plugins = {};
 		const textDecoder = new TextDecoder();
 
-		if ( typeof data === 'string' ) {
+		try {
 
-			json = JSON.parse( data );
+			if ( typeof data === 'string' ) {
 
-		} else if ( data instanceof ArrayBuffer ) {
+				json = JSON.parse( data );
 
-			const magic = textDecoder.decode( new Uint8Array( data, 0, 4 ) );
+			} else if ( data instanceof ArrayBuffer ) {
 
-			if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
+				const magic = textDecoder.decode( new Uint8Array( data, 0, 4 ) );
 
-				try {
+				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
 					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+					json = JSON.parse( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
 
-				} catch ( error ) {
+				} else {
 
-					if ( onError ) onError( error );
-					return;
+					json = JSON.parse( textDecoder.decode( data ) );
 
 				}
 
-				json = JSON.parse( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
-
 			} else {
 
-				json = JSON.parse( textDecoder.decode( data ) );
+				json = data;
 
 			}
 
-		} else {
+		} catch ( error ) {
 
-			json = data;
+			if ( onError ) onError( error );
+			return;
 
 		}
 
