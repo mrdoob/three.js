@@ -1513,7 +1513,19 @@ class BatchedMesh extends Mesh {
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
-		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+		let bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
+
+		// the "wireframe" attribute implicitly creates a line attribute in the renderer, which is double
+		// the vertices to draw (3 lines per triangle) so we multiply the draw counts / starts and make
+		// assumptions about the index buffer byte size.
+		let multiDrawMultiplier = 1;
+		if ( material.wireframe ) {
+
+			multiDrawMultiplier = 2;
+			bytesPerElement = geometry.attributes.position.count > 65535 ? 4 : 2;
+
+		}
 
 		const instanceInfo = this._instanceInfo;
 		const multiDrawStarts = this._multiDrawStarts;
@@ -1539,10 +1551,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// the "wireframe" attribute implicitly creates a line attribute in the renderer, which is double
-		// the vertices to draw (3 lines per triangle) so we multiply the draw counts here.
 		let multiDrawCount = 0;
-		const multiDrawMultiplier = material.wireframe ? 2 : 1;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
