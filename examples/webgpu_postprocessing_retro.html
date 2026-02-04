@@ -43,7 +43,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -152,7 +152,7 @@
 
 						if ( environment ) return;
 
-						environment = new RGBELoader()
+						environment = new HDRLoader()
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', ( texture ) => {
 
