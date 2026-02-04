@@ -405,13 +405,17 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				if ( this.value.compareFunction !== null && this.value.compareFunction !== LessCompare ) {
+				if ( this.value.compareFunction === null || this.value.compareFunction === LessCompare ) {
+
+					compareStepNode = this.compareNode;
+
+				} else {
+
+					compareNode = this.compareNode;
 
 					warnOnce( 'TSL: Only "LessCompare" is supported for depth texture comparison fallback.' );
 
 				}
-
-				compareStepNode = this.compareNode;
 
 			}
 
