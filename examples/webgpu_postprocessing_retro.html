@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mix, mul, oneMinus, positionLocal, smoothstep, texture, time, rotateUV, Fn, uv, vec2, vec3, vec4, uniform, posterize, floor, float, sin, fract, dot, step, color, normalWorld, length, atan, replaceDefaultUV } from 'three/tsl';
+			import { pass, mix, mul, oneMinus, positionLocal, smoothstep, texture, time, rotateUV, Fn, uv, vec2, vec3, vec4, uniform, posterize, floor, float, sin, fract, dot, step, color, normalWorld, length, atan, replaceDefaultUV, screenSize } from 'three/tsl';
 			import { retroPass } from 'three/addons/tsl/display/RetroPassNode.js';
 			import { bayerDither } from 'three/addons/tsl/math/Bayer.js';
 			import { scanlines, vignette, colorBleeding, barrelUV } from 'three/addons/tsl/display/CRT.js';
@@ -235,9 +235,9 @@
 				const colorDepthSteps = uniform( 32 );
 
 				// CRT effect parameters (subtle for PS1 look)
-				const scanlineIntensity = uniform( 0.08 ); // subtle scanlines
-				const scanlineCount = uniform( 60 ); // match vertical resolution
-				const scanlineSpeed = uniform( 0.05 ); // slow scroll
+				const scanlineIntensity = uniform( 0.3 ); // subtle scanlines
+				const scanlineDensity = uniform( 1 ); // 0.1-1: normalized scanline density (1 = full screen resolution)
+				const scanlineSpeed = uniform( 0.0 ); // no scanline movement
 				const vignetteIntensity = uniform( 0.3 ); // subtle vignette
 				const bleeding = uniform( 0.001 ); // minimal bleeding
 				const curvature = uniform( 0.02 ); // subtle curve
@@ -258,7 +258,7 @@
 				retroPipeline = bayerDither( retroPipeline, colorDepthSteps );
 				retroPipeline = posterize( retroPipeline, colorDepthSteps );
 				retroPipeline = vignette( retroPipeline, vignetteIntensity, 0.6 );
-				retroPipeline = scanlines( retroPipeline, scanlineIntensity, scanlineCount, scanlineSpeed );
+				retroPipeline = scanlines( retroPipeline, scanlineIntensity, screenSize.y.mul( scanlineDensity ), scanlineSpeed );
 
 				renderPipeline.outputNode = retroPipeline;
 
@@ -288,7 +288,7 @@
 				gui.add( curvature, 'value', 0, 0.2, 0.01 ).name( 'Curvature' );
 				gui.add( colorDepthSteps, 'value', 4, 32, 1 ).name( 'Color Depth' );
 				gui.add( scanlineIntensity, 'value', 0, 1, 0.01 ).name( 'Scanlines' );
-				gui.add( scanlineCount, 'value', 20, 480, 1 ).name( 'Scanline Count' );
+				gui.add( scanlineDensity, 'value', 0.1, 1, 0.01 ).name( 'Scanline Density' );
 				gui.add( scanlineSpeed, 'value', 0, .1, 0.01 ).name( 'Scanline Speed' );
 				gui.add( vignetteIntensity, 'value', 0, 1, 0.01 ).name( 'Vignette' );
 				gui.add( bleeding, 'value', 0, 0.005, 0.001 ).name( 'Color Bleeding' );
