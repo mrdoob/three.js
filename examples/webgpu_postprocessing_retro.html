@@ -43,10 +43,13 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, renderPipeline, controls;
+			let environment;
+			let currentModel;
 
 			init();
 
@@ -136,17 +139,90 @@
 				const gltfLoader = new GLTFLoader();
 				const textureLoader = new THREE.TextureLoader();
 
-				// baked model
+				// Model
 
-				gltfLoader.load(
-					'./models/gltf/coffeeMug.glb',
-					( gltf ) => {
+				const models = {
+					'Coffee Mug': 'models/gltf/coffeeMug.glb',
+					'Damaged Helmet': 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
+				};
 
-        				gltf.scene.getObjectByName( 'baked' ).material.map.anisotropy = 8;
-						scene.add( gltf.scene );
+				function loadModel( name ) {
+
+					function loadEnvironment() {
+
+						if ( environment ) return;
+
+						environment = new RGBELoader()
+							.setPath( 'textures/equirectangular/' )
+							.load( 'venice_sunset_1k.hdr', ( texture ) => {
+
+								texture.mapping = THREE.EquirectangularReflectionMapping;
+								scene.environment = texture;
+
+								// re-invalidate retro pass textures
+
+								retro.dispose();
+
+							} );
 
 					}
-				);
+
+					if ( currentModel ) {
+
+						scene.remove( currentModel );
+						currentModel.traverse( ( child ) => {
+
+							if ( child.isMesh ) {
+
+								child.geometry.dispose();
+								child.material.dispose();
+
+							}
+
+						} );
+
+					}
+
+					gltfLoader.load( models[ name ], ( gltf ) => {
+
+						currentModel = gltf.scene;
+						currentModel.position.set( 0, 0, 0 );
+
+						smoke.visible = false;
+
+						if ( name === 'Damaged Helmet' ) {
+
+							loadEnvironment();
+
+							currentModel.scale.setScalar( 3 );
+							currentModel.position.y = 1;
+
+						} else if ( name === 'Coffee Mug' ) {
+
+							smoke.visible = true;
+
+						}
+
+						scene.add( currentModel );
+
+					} );
+
+				}
+
+				loadModel( 'Coffee Mug' );
+
+				// lighting
+
+				const ambientLight = new THREE.AmbientLight( 0x404040, 2 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 5, 10, 5 );
+				scene.add( directionalLight );
+
+				const pointLight = new THREE.PointLight( 0xff6600, 5, 20 );
+				pointLight.position.set( - 3, 3, 2 );
+				scene.add( pointLight );
 
 				// geometry
 
@@ -279,6 +355,8 @@
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( { model: 'Coffee Mug' }, 'model', Object.keys( models ) ).name( 'Model' ).onChange( loadModel );
 
 				gui.add( { enabled: true }, 'enabled' ).onChange( v => {
 

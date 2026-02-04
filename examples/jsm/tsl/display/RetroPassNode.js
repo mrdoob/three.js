@@ -1,5 +1,5 @@
-import { MeshBasicNodeMaterial, PassNode, UnsignedByteType, NearestFilter } from 'three/webgpu';
-import { float, vec2, vec4, Fn, uv, varying, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize, materialColor, uint } from 'three/tsl';
+import { MeshBasicNodeMaterial, PassNode, UnsignedByteType, NearestFilter, CubeMapNode, MeshPhongNodeMaterial } from 'three/webgpu';
+import { float, vec2, vec4, Fn, uv, varying, cameraProjectionMatrix, cameraViewMatrix, positionWorld, screenSize, materialColor, uint, texture, uniform, context, reflectVector } from 'three/tsl';
 
 const _affineUv = varying( vec2() );
 const _w = varying( float() );
@@ -95,7 +95,15 @@ class RetroPassNode extends PassNode {
 
 				}
 
-				retroMaterial = new MeshBasicNodeMaterial();
+				if ( material.isMeshBasicMaterial || material.isMeshBasicNodeMaterial ) {
+
+					retroMaterial = new MeshBasicNodeMaterial();
+
+				} else {
+
+					retroMaterial = new MeshPhongNodeMaterial();
+
+				}
 
 				retroMaterial.colorNode = material.colorNode || null;
 				retroMaterial.opacityNode = material.opacityNode || null;
@@ -104,27 +112,77 @@ class RetroPassNode extends PassNode {
 
 				let colorNode = material.colorNode || materialColor;
 
+				if ( material.isMeshStandardNodeMaterial || material.isMeshStandardMaterial ) {
+
+					const envMap = material.envMap || scene.environment;
+
+					if ( envMap ) {
+
+						const reflection = new CubeMapNode( texture( envMap ) );
+
+						let metalness;
+
+						if ( material.metalnessNode ) {
+
+							metalness = material.metalnessNode;
+
+						} else {
+
+							metalness = uniform( material.metalness ).onRenderUpdate( ( { material } ) => material.metalness );
+
+							if ( material.metalnessMap ) {
+
+								const textureUniform = texture( material.metalnessMap ).onRenderUpdate( ( { material } ) => material.metalnessMap );
+
+								metalness = metalness.mul( textureUniform.b );
+
+							}
+
+						}
+
+						colorNode = metalness.mix( colorNode, reflection );
+
+					}
+
+				}
+
+				retroMaterial.colorNode = colorNode;
+
+				//
+
+				const contextData = {};
+
 				if ( this.affineDistortionNode ) {
 
-					colorNode = colorNode.context( {
+					contextData.getUV = ( texture ) => {
 
-						getUV: () => this.affineDistortionNode.mix( uv(), _affineUv.div( _w ) ),
+						let finalUV;
 
-					} );
+						if ( texture.isCubeTextureNode ) {
+
+							finalUV = reflectVector;
+
+						} else {
+
+							finalUV = this.affineDistortionNode.mix( uv(), _affineUv.div( _w ) );
+
+						}
+
+						return finalUV;
+
+					};
 
 				}
 
 				if ( this.filterTextures !== true ) {
 
-					colorNode = colorNode.context( {
-
-						getTextureLevel: () => uint( 0 )
-
-					} );
+					contextData.getTextureLevel = () => uint( 0 );
 
 				}
 
-				retroMaterial.colorNode = colorNode;
+				retroMaterial.contextNode = context( contextData );
+
+				//
 
 				this._materialCache.set( material, {
 					material: retroMaterial,
@@ -137,11 +195,13 @@ class RetroPassNode extends PassNode {
 
 			}
 
-			retroMaterial.map = material.map;
-			retroMaterial.color = material.color;
-			retroMaterial.opacity = material.opacity;
-			retroMaterial.transparent = material.transparent;
-			retroMaterial.side = material.side;
+			for ( const property in material ) {
+
+				if ( retroMaterial[ property ] === undefined ) continue;
+
+				retroMaterial[ property ] = material[ property ];
+
+			}
 
 			renderer.renderObject( object, scene, camera, geometry, retroMaterial, ...params );
 
