@@ -1,6 +1,17 @@
-import { Matrix3, NodeMaterial } from 'three/webgpu';
+import { Matrix3, NodeMaterial, Vector3 } from 'three/webgpu';
 import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
+import { frameCorners } from '../../utils/CameraUtils.js';
+
+const _eyeL = /*@__PURE__*/ new Vector3();
+const _eyeR = /*@__PURE__*/ new Vector3();
+const _screenBottomLeft = /*@__PURE__*/ new Vector3();
+const _screenBottomRight = /*@__PURE__*/ new Vector3();
+const _screenTopLeft = /*@__PURE__*/ new Vector3();
+const _right = /*@__PURE__*/ new Vector3();
+const _up = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ new Vector3();
+const _screenCenter = /*@__PURE__*/ new Vector3();
 
 /**
  * Anaglyph algorithm types.
@@ -70,7 +81,7 @@ function createMatrixPair( leftSpec, rightSpec ) {
 		return [
 			r[ 0 ], g[ 0 ], b[ 0 ], // Column 0: coefficients for input R
 			r[ 1 ], g[ 1 ], b[ 1 ], // Column 1: coefficients for input G
-			r[ 2 ], g[ 2 ], b[ 2 ]  // Column 2: coefficients for input B
+			r[ 2 ], g[ 2 ], b[ 2 ] // Column 2: coefficients for input B
 		];
 
 	}
@@ -106,16 +117,16 @@ const ANAGLYPH_MATRICES = {
 	// Paper: Left=[R,0,0], Right=[0,0,Lum]
 	[ AnaglyphAlgorithm.TRUE ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ] },                    // Left: R -> outR
-			{ g: LUM, b: LUM }                     // Right: Lum -> outG, Lum -> outB
+			{ r: [ 1, 0, 0 ] }, // Left: R -> outR
+			{ g: LUM, b: LUM } // Right: Lum -> outG, Lum -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] },  // Left: R -> outR, partial B -> outB
-			{ g: LUM, b: [ 0, 0, 0.5 ] }           // Right: Lum -> outG, partial B
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] }, // Left: R -> outR, partial B -> outB
+			{ g: LUM, b: [ 0, 0, 0.5 ] } // Right: Lum -> outG, partial B
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ], b: LUM },            // Left: R -> outR, Lum -> outB
-			{ g: LUM }                              // Right: Lum -> outG
+			{ r: [ 1, 0, 0 ], b: LUM }, // Left: R -> outR, Lum -> outB
+			{ g: LUM } // Right: Lum -> outG
 		)
 	},
 
@@ -123,16 +134,16 @@ const ANAGLYPH_MATRICES = {
 	// Paper: Left=[Lum,0,0], Right=[0,0,Lum]
 	[ AnaglyphAlgorithm.GREY ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: LUM },                            // Left: Lum -> outR
-			{ g: LUM, b: LUM }                     // Right: Lum -> outG, Lum -> outB
+			{ r: LUM }, // Left: Lum -> outR
+			{ g: LUM, b: LUM } // Right: Lum -> outG, Lum -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
-			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] },   // Left: Lum -> outR, half-Lum -> outB
-			{ g: LUM, b: [ 0.15, 0.29, 0.06 ] }    // Right: Lum -> outG, half-Lum -> outB
+			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] }, // Left: Lum -> outR, half-Lum -> outB
+			{ g: LUM, b: [ 0.15, 0.29, 0.06 ] } // Right: Lum -> outG, half-Lum -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
-			{ r: LUM, b: LUM },                    // Left: Lum -> outR, Lum -> outB
-			{ g: LUM }                              // Right: Lum -> outG
+			{ r: LUM, b: LUM }, // Left: Lum -> outR, Lum -> outB
+			{ g: LUM } // Right: Lum -> outG
 		)
 	},
 
@@ -140,16 +151,16 @@ const ANAGLYPH_MATRICES = {
 	// Paper: Left=[R,0,0], Right=[0,G,B]
 	[ AnaglyphAlgorithm.COLOUR ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ] },                    // Left: R -> outR
-			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+			{ r: [ 1, 0, 0 ] }, // Left: R -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] } // Right: G -> outG, B -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] },  // Left: R -> outR, partial B -> outB
-			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] }   // Right: G -> outG, partial B -> outB
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 0.5 ] }, // Left: R -> outR, partial B -> outB
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] } // Right: G -> outG, partial B -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
-			{ r: [ 1, 0, 0 ], b: [ 0, 0, 1 ] },    // Left: R -> outR, B -> outB
-			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+			{ r: [ 1, 0, 0 ], b: [ 0, 0, 1 ] }, // Left: R -> outR, B -> outB
+			{ g: [ 0, 1, 0 ] } // Right: G -> outG
 		)
 	},
 
@@ -157,16 +168,16 @@ const ANAGLYPH_MATRICES = {
 	// Paper: Left=[Lum,0,0], Right=[0,G,B]
 	[ AnaglyphAlgorithm.HALF_COLOUR ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: LUM },                            // Left: Lum -> outR
-			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+			{ r: LUM }, // Left: Lum -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] } // Right: G -> outG, B -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
-			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] },   // Left: Lum -> outR, half-Lum -> outB
+			{ r: LUM, b: [ 0.15, 0.29, 0.06 ] }, // Left: Lum -> outR, half-Lum -> outB
 			{ g: [ 0, 1, 0 ], b: [ 0.15, 0.29, 0.06 ] } // Right: G -> outG, half-Lum -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
-			{ r: LUM, b: LUM },                    // Left: Lum -> outR, Lum -> outB
-			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+			{ r: LUM, b: LUM }, // Left: Lum -> outR, Lum -> outB
+			{ g: [ 0, 1, 0 ] } // Right: G -> outG
 		)
 	},
 
@@ -212,16 +223,16 @@ const ANAGLYPH_MATRICES = {
 	// Paper: Left=[0,0.7G+0.3B,0,0], Right=[0,G,B]
 	[ AnaglyphAlgorithm.OPTIMISED ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: [ 0, 0.7, 0.3 ] },                // Left: 0.7G+0.3B -> outR
-			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] }     // Right: G -> outG, B -> outB
+			{ r: [ 0, 0.7, 0.3 ] }, // Left: 0.7G+0.3B -> outR
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 1 ] } // Right: G -> outG, B -> outB
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
 			{ r: [ 0, 0.7, 0.3 ], b: [ 0, 0, 0.5 ] }, // Left: 0.7G+0.3B -> outR, partial B
-			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] }   // Right: G -> outG, partial B
+			{ g: [ 0, 1, 0 ], b: [ 0, 0, 0.5 ] } // Right: G -> outG, partial B
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
 			{ r: [ 0, 0.7, 0.3 ], b: [ 0, 0, 1 ] }, // Left: 0.7G+0.3B -> outR, B -> outB
-			{ g: [ 0, 1, 0 ] }                      // Right: G -> outG
+			{ g: [ 0, 1, 0 ] } // Right: G -> outG
 		)
 	},
 
@@ -230,20 +241,20 @@ const ANAGLYPH_MATRICES = {
 	// Paper matrix [8]: Left=[0.439R+0.447G+0.148B, 0, 0], Right=[0, 0.095R+0.934G+0.005B, 0.018R+0.028G+1.057B]
 	[ AnaglyphAlgorithm.COMPROMISE ]: {
 		[ AnaglyphColorMode.RED_CYAN ]: createMatrixPair(
-			{ r: [ 0.439, 0.447, 0.148 ] },        // Left: weighted RGB -> outR
+			{ r: [ 0.439, 0.447, 0.148 ] }, // Left: weighted RGB -> outR
 			{
-				g: [ 0.095, 0.934, 0.005 ],        // Right: weighted RGB -> outG
-				b: [ 0.018, 0.028, 1.057 ]         // Right: weighted RGB -> outB
+				g: [ 0.095, 0.934, 0.005 ], // Right: weighted RGB -> outG
+				b: [ 0.018, 0.028, 1.057 ] // Right: weighted RGB -> outB
 			}
 		),
 		[ AnaglyphColorMode.MAGENTA_CYAN ]: createMatrixPair(
 			{
 				r: [ 0.439, 0.447, 0.148 ],
-				b: [ 0.009, 0.014, 0.074 ]         // Partial blue from left
+				b: [ 0.009, 0.014, 0.074 ] // Partial blue from left
 			},
 			{
 				g: [ 0.095, 0.934, 0.005 ],
-				b: [ 0.009, 0.014, 0.528 ]         // Partial blue from right
+				b: [ 0.009, 0.014, 0.528 ] // Partial blue from right
 			}
 		),
 		[ AnaglyphColorMode.MAGENTA_GREEN ]: createMatrixPair(
@@ -259,7 +270,12 @@ const ANAGLYPH_MATRICES = {
 };
 
 /**
- * A render pass node that creates an anaglyph effect.
+ * A render pass node that creates an anaglyph effect using physically-correct
+ * off-axis stereo projection.
+ *
+ * This implementation uses CameraUtils.frameCorners() to align stereo
+ * camera frustums to a virtual screen plane, providing accurate depth
+ * perception with zero parallax at the plane distance.
  *
  * @augments StereoCompositePassNode
  * @three_import import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
@@ -290,6 +306,30 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @default true
 		 */
 		this.isAnaglyphPassNode = true;
+
+		/**
+		 * The interpupillary distance (eye separation) in world units.
+		 * Typical human IPD is 0.064 meters (64mm).
+		 *
+		 * @type {number}
+		 * @default 0.064
+		 */
+		this.eyeSep = 0.064;
+
+		/**
+		 * The distance in world units from the viewer to the virtual
+		 * screen plane where zero parallax (screen depth) occurs.
+		 * Objects at this distance appear at the screen surface.
+		 * Objects closer appear in front of the screen (negative parallax).
+		 * Objects further appear behind the screen (positive parallax).
+		 *
+		 * The screen dimensions are derived from the camera's FOV and aspect ratio
+		 * at this distance, ensuring the stereo view matches the camera's field of view.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this.planeDistance = 0.5;
 
 		/**
 		 * The current anaglyph algorithm.
@@ -395,6 +435,69 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		this._colorMatrixLeft.value.fromArray( matrices.left );
 		this._colorMatrixRight.value.fromArray( matrices.right );
+
+	}
+
+	/**
+	 * Updates the internal stereo camera using frameCorners for
+	 * physically-correct off-axis projection.
+	 *
+	 * @param {number} coordinateSystem - The current coordinate system.
+	 */
+	updateStereoCamera( coordinateSystem ) {
+
+		const { stereo, camera } = this;
+
+		stereo.cameraL.coordinateSystem = coordinateSystem;
+		stereo.cameraR.coordinateSystem = coordinateSystem;
+
+		// Get the camera's local coordinate axes from its world matrix
+		camera.matrixWorld.extractBasis( _right, _up, _forward );
+		_right.normalize();
+		_up.normalize();
+		_forward.normalize();
+
+		// Calculate eye positions
+		const halfSep = this.eyeSep / 2;
+		_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
+		_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
+
+		// Calculate screen center (at planeDistance in front of the camera center)
+		_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.planeDistance );
+
+		// Calculate screen dimensions from camera FOV and aspect ratio
+		const DEG2RAD = Math.PI / 180;
+		const halfHeight = this.planeDistance * Math.tan( DEG2RAD * camera.fov / 2 );
+		const halfWidth = halfHeight * camera.aspect;
+
+		// Calculate screen corners
+		_screenBottomLeft.copy( _screenCenter )
+			.addScaledVector( _right, - halfWidth )
+			.addScaledVector( _up, - halfHeight );
+
+		_screenBottomRight.copy( _screenCenter )
+			.addScaledVector( _right, halfWidth )
+			.addScaledVector( _up, - halfHeight );
+
+		_screenTopLeft.copy( _screenCenter )
+			.addScaledVector( _right, - halfWidth )
+			.addScaledVector( _up, halfHeight );
+
+		// Set up left eye camera
+		stereo.cameraL.position.copy( _eyeL );
+		stereo.cameraL.near = camera.near;
+		stereo.cameraL.far = camera.far;
+		frameCorners( stereo.cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+		stereo.cameraL.matrixWorld.compose( stereo.cameraL.position, stereo.cameraL.quaternion, stereo.cameraL.scale );
+		stereo.cameraL.matrixWorldInverse.copy( stereo.cameraL.matrixWorld ).invert();
+
+		// Set up right eye camera
+		stereo.cameraR.position.copy( _eyeR );
+		stereo.cameraR.near = camera.near;
+		stereo.cameraR.far = camera.far;
+		frameCorners( stereo.cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
+		stereo.cameraR.matrixWorld.compose( stereo.cameraR.position, stereo.cameraR.quaternion, stereo.cameraR.scale );
+		stereo.cameraR.matrixWorldInverse.copy( stereo.cameraR.matrixWorld ).invert();
 
 	}
 

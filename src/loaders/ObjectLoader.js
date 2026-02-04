@@ -170,7 +170,17 @@ class ObjectLoader extends Loader {
 
 		const text = await loader.loadAsync( url, onProgress );
 
-		const json = JSON.parse( text );
+		let json;
+
+		try {
+
+			json = JSON.parse( text );
+
+		} catch ( e ) {
+
+			throw new Error( 'ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
+
+		}
 
 		const metadata = json.metadata;
 

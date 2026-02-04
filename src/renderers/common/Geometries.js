@@ -1,6 +1,5 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-import { arrayNeedsUint32 } from '../../utils.js';
 
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
 
@@ -77,7 +76,7 @@ function getWireframeIndex( geometry ) {
 
 	}
 
-	const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+	const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 	attribute.version = getWireframeVersion( geometry );
 	attribute.__id = getWireframeId( geometry );
 

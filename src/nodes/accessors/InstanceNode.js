@@ -301,11 +301,9 @@ class InstanceNode extends Node {
 
 		} else {
 
-			// WebGPU has a 64kb UBO limit, WebGL 2 ensures only 16KB; fallback to attributes if a certain count is exceeded
+			const uniformBufferSize = count * 16 * 4; // count * 16 components * 4 bytes (float)
 
-			const limit = ( builder.renderer.backend.isWebGPUBackend === true ) ? 1000 : 250;
-
-			if ( count <= limit ) {
+			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 

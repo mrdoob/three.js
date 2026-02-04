@@ -864,6 +864,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the maximum number of bytes available for uniform buffers.
+	 *
+	 * @return {number} The maximum number of bytes available for uniform buffers.
+	 */
+	getUniformBufferLimit() {
+
+		return 16384;
+
+	}
+
+	/**
 	 * Adds the given node to the internal node chain.
 	 * This is used to check recursive calls in node-graph.
 	 *

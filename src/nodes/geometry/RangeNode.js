@@ -168,8 +168,9 @@ class RangeNode extends Node {
 			}
 
 			const nodeType = this.getNodeType( builder );
+			const uniformBufferSize = object.count * 4 * 4; // count * 4 components * 4 bytes (float)
 
-			if ( object.count <= 4096 ) {
+			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 				output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
 
