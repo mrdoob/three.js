@@ -59,7 +59,8 @@
 				camera,
 				controls,
 				textureLoader,
-				cloth;
+				cloth,
+				cloth2;
 
 			const timer = new THREE.Timer();
 			timer.connect( document );
@@ -141,7 +142,7 @@
 				scene.add( floorMesh );
 
 				const light = new THREE.DirectionalLight( 0xffffff, 3 );
-				const shadowSize = 1;
+				const shadowSize = 3;
 				light.castShadow = true;
 				light.shadow.camera.far = 10;
 				light.shadow.bias = - 0.002;
@@ -153,6 +154,7 @@
 				scene.add( light );
 
 				setupCloth();
+				setupCloth2();
 				loadDudeHead();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -190,6 +192,28 @@
 			
 					},
 				);
+
+			}
+
+			function setupCloth2() {
+
+				cloth2 = new ClothSimulator( renderer, {
+					segmentsX: 30,
+					segmentsY: 30,
+					width: 1,
+					height: 1.5,
+					numSphereColliders: 0, //<-- how many "sphere colliders" will interact with the cloth
+					sphereRadius: 0,
+					stiffness: 0.3,
+					wind: 0.7,
+					color: 0xff0000,
+					fixedVertexPattern: ( _x, y ) => y == 0
+				} );
+				scene.add( cloth2.mesh );
+
+				cloth2.mesh.castShadow = true;
+				cloth2.mesh.receiveShadow = true;
+				cloth2.mesh.frustumCulled = false;
 
 			}
 
@@ -240,7 +264,7 @@
 					cloth.setSphereEnabled( 0, value );
 					cloth.setSphereEnabled( 1, value );
 			
-	} ).name( 'Enable Colliders' );
+				} ).name( 'Enable Colliders' );
 
 				gui.add( { seeColliders: false }, 'seeColliders' ).onChange( ( value ) => {
 			
@@ -248,9 +272,9 @@
 
 						sphere.visible = value;
 			
-		} );
+					} );
 			
-	} ).name( 'See Colliders' );
+				} ).name( 'See Colliders' );
 
 			}
 
@@ -273,6 +297,11 @@
 				cloth.mesh.position.z = Math.cos( timer.getElapsed() * 1.2 );
 				cloth.mesh.rotateY( deltaTime );
 				cloth.update( deltaTime );
+
+				cloth2.mesh.position.z = Math.cos( timer.getElapsed() ) * 1;
+				cloth2.mesh.position.x = - 2;
+				cloth2.mesh.rotateY( deltaTime * 5 );
+				cloth2.update( deltaTime );
 
 				renderer.render( scene, camera );
 			
