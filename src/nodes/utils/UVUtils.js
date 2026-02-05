@@ -16,14 +16,16 @@ import { context } from '../core/ContextNode.js';
  *
  * @tsl
  * @function
- * @param {function(Node):Node<vec2>} callback - A callback that receives the texture node
+ * @param {function(Node):Node<vec2>|Node<vec2>} callback - A callback that receives the texture node
  * and must return the new uv coordinates.
  * @param {Node} [node=null] - An optional node to which the context will be applied.
  * @return {ContextNode} A context node that replaces the default UV coordinates.
  */
 export function replaceDefaultUV( callback, node = null ) {
 
-	return context( node, { getUV: callback } );
+	const getUV = typeof callback === 'function' ? callback : () => callback;
+
+	return context( node, { getUV } );
 
 }
 

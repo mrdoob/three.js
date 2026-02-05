@@ -2143,7 +2143,6 @@ ${ flowData.code }
 
 	}
 
-
 	/**
 	 * Returns the WGSL type of the given node data type.
 	 *
@@ -2183,6 +2182,17 @@ ${ flowData.code }
 		}
 
 		return result;
+
+	}
+
+	/**
+	 * Returns the maximum uniform buffer size limit.
+	 *
+	 * @return {number} The maximum uniform buffer size in bytes.
+	 */
+	getUniformBufferLimit() {
+
+		return this.renderer.backend.device.limits.maxUniformBufferBindingSize;
 
 	}
 

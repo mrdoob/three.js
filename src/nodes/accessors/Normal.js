@@ -108,9 +108,9 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+		// Use custom context to avoid side effects from nodes overwriting getUV, getTextureLevel in the context (e.g. EnvironmentNode)
 
-		node = builder.context.setupNormal().context( { getUV: null } );
+		node = builder.context.setupNormal().context( { getUV: null, getTextureLevel: null } );
 
 	}
 
@@ -142,9 +142,9 @@ export const clearcoatNormalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, context }
 
 	} else {
 
-		// Use getUV context to avoid side effects from nodes overwriting getUV in the context (e.g. EnvironmentNode)
+		// Use custom context to avoid side effects from nodes overwriting getUV, getTextureLevel in the context (e.g. EnvironmentNode)
 
-		node = context.setupClearcoatNormal().context( { getUV: null } );
+		node = context.setupClearcoatNormal().context( { getUV: null, getTextureLevel: null } );
 
 	}
 

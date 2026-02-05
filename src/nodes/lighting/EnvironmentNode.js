@@ -9,7 +9,7 @@ import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
 
-const _envNodeCache = new WeakMap();
+const _rendererCache = new WeakMap();
 
 /**
  * Represents a physical model for Image-based lighting (IBL). The environment
@@ -55,13 +55,15 @@ class EnvironmentNode extends LightingNode {
 
 			const value = ( envNode.isTextureNode ) ? envNode.value : material[ envNode.property ];
 
-			let cacheEnvNode = _envNodeCache.get( value );
+			const cache = this._getPMREMNodeCache( builder.renderer );
+
+			let cacheEnvNode = cache.get( value );
 
 			if ( cacheEnvNode === undefined ) {
 
 				cacheEnvNode = pmremTexture( value );
 
-				_envNodeCache.set( value, cacheEnvNode );
+				cache.set( value, cacheEnvNode );
 
 			}
 
@@ -98,6 +100,29 @@ class EnvironmentNode extends LightingNode {
 			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
 		}
+
+	}
+
+	/**
+	 * Returns the PMREM node cache of the current renderer.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The current renderer.
+	 * @return {WeakMap} The node cache.
+	 */
+	_getPMREMNodeCache( renderer ) {
+
+		let pmremCache = _rendererCache.get( renderer );
+
+		if ( pmremCache === undefined ) {
+
+			pmremCache = new WeakMap();
+
+			_rendererCache.set( renderer, pmremCache );
+
+		}
+
+		return pmremCache;
 
 	}
 

@@ -254,7 +254,7 @@ class VarNode extends Node {
 
 			if ( this.isIntent( builder ) !== true ) {
 
-				error( 'TSL: ".toVar()" can not be used with void type.' );
+				error( 'TSL: ".toVar()" can not be used with void type.', this.stackTrace );
 
 			}
 
