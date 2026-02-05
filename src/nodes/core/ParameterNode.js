@@ -1,4 +1,5 @@
 import { error } from '../../utils.js';
+import StackTrace from '../core/StackTrace.js';
 import PropertyNode from './PropertyNode.js';
 
 /**
@@ -55,7 +56,7 @@ class ParameterNode extends PropertyNode {
 
 		} else {
 
-			error( `TSL: Member "${ name }" not found in struct "${ type }".` );
+			error( `TSL: Member "${ name }" not found in struct "${ type }".`, new StackTrace() );
 
 			memberType = 'float';
 

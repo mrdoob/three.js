@@ -3,7 +3,7 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
-import { NodeFrame } from '../../../nodes/Nodes.js';
+import { NodeFrame, StackTrace } from '../../../nodes/Nodes.js';
 import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, texture3D, vec3, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
@@ -228,7 +228,17 @@ class NodeManager extends DataMap {
 					nodeBuilder = createNodeBuilder( new NodeMaterial() );
 					nodeBuilder.build();
 
-					error( 'TSL: ' + e );
+					let stackTrace = e.stackTrace;
+
+					if ( ! stackTrace && e.stack ) {
+
+						// Capture stack trace for JavaScript errors
+
+						stackTrace = new StackTrace( e.stack );
+
+					}
+
+					error( 'TSL: ' + e, stackTrace );
 
 				}
 

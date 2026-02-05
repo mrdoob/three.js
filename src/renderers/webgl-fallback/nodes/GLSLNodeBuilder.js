@@ -1308,6 +1308,18 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the maximum number of bytes available for uniform buffers.
+	 *
+	 * @return {number} The maximum number of bytes available for uniform buffers.
+	 */
+	getUniformBufferLimit() {
+
+		const gl = this.renderer.backend.gl;
+		return gl.getParameter( gl.MAX_UNIFORM_BLOCK_SIZE );
+
+	}
+
+	/**
 	 * Enables hardware clipping.
 	 *
 	 * @param {string} planeCount - The clipping plane count.

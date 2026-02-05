@@ -80,7 +80,7 @@ const APP = {
 
 			const scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
-			for ( let uuid in json.scripts ) {
+			for ( const uuid in json.scripts ) {
 
 				const object = scene.getObjectByProperty( 'uuid', uuid, true );
 
@@ -99,7 +99,7 @@ const APP = {
 
 					const functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
-					for ( let name in functions ) {
+					for ( const name in functions ) {
 
 						if ( functions[ name ] === undefined ) continue;
 

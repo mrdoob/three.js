@@ -218,6 +218,12 @@ class WebGPUBackend extends Backend {
 
 		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
+		if ( this.compatibilityMode ) {
+
+			renderer._samples = 0;
+
+		}
+
 		device.lost.then( ( info ) => {
 
 			if ( info.reason === 'destroyed' ) return;
@@ -1590,6 +1596,14 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
+
+				if ( material.wireframe ) {
+
+					bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
+				}
+
 				for ( let i = 0; i < drawCount; i ++ ) {
 
 					const count = drawInstances ? drawInstances[ i ] : 1;
@@ -1597,7 +1611,7 @@ class WebGPUBackend extends Backend {
 
 					if ( hasIndex === true ) {
 
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
 
 					} else {
 

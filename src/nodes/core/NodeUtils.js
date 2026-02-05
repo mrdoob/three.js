@@ -5,7 +5,9 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
+
 import { error } from '../../utils.js';
+import StackTrace from '../core/StackTrace.js';
 
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
@@ -154,7 +156,7 @@ export function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
@@ -176,7 +178,7 @@ export function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
@@ -198,7 +200,7 @@ export function getAlignmentFromType( type ) {
 	if ( /mat3/.test( type ) ) return 16;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 

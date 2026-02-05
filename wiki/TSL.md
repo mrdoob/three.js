@@ -44,9 +44,11 @@ An Approach to Productive and Maintainable Shader Creation.
 - [Oscillator](#oscillator)
 - [Timer](#timer)
 - [Packing](#packing)
-- [Post-Processing](#post-processing)
-- [Render Pass](#render-pass)
-- [Compute](#compute)
+- [Render Pipeline](#render-pipeline)
+  - [Multiple Render Targets](#multiple-render-targets-mrt)
+  - [Post-Processing](#post-processing)
+  - [Render Pass](#render-pass)
+  - [Compute](#compute)
 - [Storage](#storage)
 - [Struct](#struct)
 - [Flow Control](#flow-control)
@@ -1134,7 +1136,102 @@ const matcap = texture( matcapMap, matcapUV );
 | `directionToColor( value )` | Converts direction vector to color. | `color` |
 | `colorToDirection( value )` | Converts color to direction vector. | `vec3` |
 
-## Post-Processing
+## Render Pipeline
+
+The `RenderPipeline` provides full control over the rendering process. It enables developers to build complex multi-pass rendering pipelines entirely in JavaScript, combining scene rendering, post-processing, and compute operations in a unified, composable workflow.
+
+#### Basic Usage
+
+```js
+import * as THREE from 'three/webgpu';
+import { pass } from 'three/tsl';
+
+// Create the render pipeline
+const renderPipeline = new THREE.RenderPipeline( renderer );
+
+// Create a scene pass
+const scenePass = pass( scene, camera );
+
+// Set the output
+renderPipeline.outputNode = scenePass;
+
+// In the animation loop
+function animate() {
+
+	renderPipeline.render();
+
+}
+```
+
+### Multiple Render Targets (MRT)
+
+MRT allows capturing multiple outputs from a single render pass. Instead of rendering the scene multiple times to get different data (color, normals, depth, velocity), MRT captures all of them in one draw call—significantly improving performance.
+
+#### Setting up MRT
+
+Use `setMRT()` with the `mrt()` function to define which outputs to capture:
+
+```js
+import { pass, mrt, output, normalView, velocity, directionToColor } from 'three/tsl';
+
+const scenePass = pass( scene, camera );
+
+scenePass.setMRT( mrt( {
+	output: output,                          // Final color output
+	normal: directionToColor( normalView ),  // View-space normals encoded as colors
+	velocity: velocity                       // Motion vectors for temporal effects
+} ) );
+```
+
+Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `directionToColor( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
+
+Within a TSL function `Fn( ( { material, object } ) => { ... } )`, you have complete access to the current material and object being rendered, enabling full customization of outputs.
+
+#### Accessing MRT Buffers
+
+Each MRT output becomes available as a texture node via `getTextureNode()`:
+
+```js
+// Access individual buffers as texture nodes
+const colorTexture = scenePass.getTextureNode( 'output' );
+const normalTexture = scenePass.getTextureNode( 'normal' );
+const velocityTexture = scenePass.getTextureNode( 'velocity' );
+
+// Depth is always available, even without MRT
+const depthTexture = scenePass.getTextureNode( 'depth' );
+```
+
+These texture nodes can be sampled, transformed, and passed to post-processing effects or other passes.
+
+#### Optimizing MRT Textures
+
+You can access the textures to optimize memory usage and bandwidth. Using smaller data types reduces GPU memory transfers, which is critical for performance on bandwidth-limited devices:
+
+```js
+// Use 8-bit format for encoded normals, default is 16-bit
+const normalTexture = scenePass.getTexture( 'normal' );
+normalTexture.type = THREE.UnsignedByteType;
+```
+
+#### Dynamic Pipeline Updates
+
+The pipeline can be updated at runtime:
+
+```js
+if ( showNormals ) {
+
+	renderPipeline.outputNode = prePass;
+
+} else {
+
+	renderPipeline.outputNode = traaPass;
+
+}
+
+renderPipeline.needsUpdate = true;
+```
+
+### Post-Processing
 
 TSL utilities for post-processing effects. They can be used in materials or post-processing passes.
 
@@ -1165,30 +1262,29 @@ TSL utilities for post-processing effects. They can be used in materials or post
 | `ao( depthNode, normalNode, camera )` | Creates a Ground Truth Ambient Occlusion (GTAO) effect. |
 | `transition( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture )` | Creates a transition effect between two scenes. |
 | `traa( beautyNode, depthNode, velocityNode, camera )` | Creates a TRAA temporal anti-aliasing effect. |
+| `renderOutput( node, targetColorSpace, targetToneMapping )` | Apply the renderer output settings in the node. |
 
 Example:
 
 ```js
-import { gaussianBlur, grayscale, pass } from 'three/tsl';
+import { grayscale, pass } from 'three/tsl';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 // Post-processing
 const scenePass = pass( scene, camera );
-const beauty = scenePass.getTextureNode();
+const output = scenePass.getTextureNode(); // default parameter is 'output'
 
-postProcessing.outputNode = grayscale( gaussianBlur( beauty, 4 ) );
+renderPipeline.outputNode = grayscale( gaussianBlur( output, 4 ) );
 ```
 
-## Render Pass
+### Render Pass
 
 Functions for creating and managing render passes.
 
 | Name | Description |
 | -- | -- |
 | `pass( scene, camera, options = {} )` | Creates a pass node for rendering a scene. |
-| `passTexture( pass, texture )` | Creates a pass texture node. |
-| `depthPass( scene, camera, options = {} )` | Creates a depth pass node. |
 | `mrt( outputNodes )` | Creates a Multiple Render Targets (MRT) node. |
-| `renderOutput( node, targetColorSpace, targetToneMapping )` | Creates a render output node. |
 
 Example:
 
@@ -1207,7 +1303,7 @@ const outputNode = scenePass.getTextureNode( 'output' );
 const emissiveNode = scenePass.getTextureNode( 'emissive' );
 ```
 
-## Compute
+### Compute
 
 Compute shaders allow general-purpose GPU computations. TSL provides functions for creating and managing compute operations.
 
