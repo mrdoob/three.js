@@ -1,0 +1,25 @@
+{
+    "opts": {
+        "destination": "editor/js/libs/tern-threejs",
+        "encoding": "utf8",
+        "recurse": true,
+        "template": "utils/editor/template"
+    },
+    "plugins": [],
+    "source": {
+        "include": [
+            "src"
+        ],
+        "exclude": [
+            "src/nodes",
+            "src/renderers",
+            "src/extras/lib",
+            "src/Three.js",
+            "src/Three.Core.js",
+            "src/Three.TSL.js",
+            "src/Three.WebGPU.js",
+            "src/Three.WebGPU.Nodes.js",
+            "src/Three.Legacy.js"
+        ]
+    }
+}
