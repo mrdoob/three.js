@@ -37,13 +37,19 @@
 import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4 } from 'three';
 import { MeshPhysicalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu';
 import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, uv, frontFacing, color as colorNode, } from 'three/tsl';
-// ================================
-// ClothSimulator Class
-// ================================
+
+/**
+ * Generates a plane that can be used as a cloth simulator.
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * @three_import import { ClothSimulator } from 'three/addons/objects/ClothSimulator.js';
+ */
 class ClothSimulator {
 
-	/** The mesh to add to your scene */
-	constructor( renderer, options ) {
+	/**
+	 * @param {WebGPURenderer} renderer - The renderer to use for the simulation.
+	 * @param {ClothSimulator~Options} [options] - The options for the simulation.
+	 */
+	constructor( renderer, options  = {} ) {
 
 		this.renderer = renderer;
 		this.sphereMeshes = [];
@@ -58,8 +64,8 @@ class ClothSimulator {
 		// Set defaults
 
 		this.options = {
-			segmentsX: options.segmentsX,
-			segmentsY: options.segmentsY,
+			segmentsX: options.segmentsX !== undefined ? options.segmentsX : 20,
+			segmentsY: options.segmentsY !== undefined ? options.segmentsY : 20,
 			width: options.width !== undefined ? options.width : 1,
 			height: options.height !== undefined ? options.height : 1,
 			numSphereColliders: options.numSphereColliders !== undefined ? options.numSphereColliders : 1,
@@ -69,16 +75,15 @@ class ClothSimulator {
 			wind: options.wind !== undefined ? options.wind : 1.0,
 			gravity: options.gravity !== undefined ? options.gravity : 0.00005,
 			fixedVertexPattern: options.fixedVertexPattern !== undefined ? options.fixedVertexPattern : ( ( x, y ) => y === 0 && ( x === 0 || x === options.segmentsX - 1 ) ),
-			color: options.color !== undefined ? options.color : 0x204080,
-			opacity: options.opacity !== undefined ? options.opacity : 0.85,
+			color: options.color !== undefined ? options.color : 0x204080, 
 		};
-		this.setupVerletGeometry();
-		this.setupVerletVertexBuffers();
-		this.setupVerletSpringBuffers();
-		this.setupUniforms();
-		this.setupSphereColliders();
-		this.setupComputeShaders();
-		this.mesh = this.setupClothMesh();
+		this._setupVerletGeometry();
+		this._setupVerletVertexBuffers();
+		this._setupVerletSpringBuffers();
+		this._setupUniforms();
+		this._setupSphereColliders();
+		this._setupComputeShaders();
+		this.mesh = this._setupClothMesh();
 
 	}
 	// ================================
@@ -239,7 +244,7 @@ class ClothSimulator {
 	// ================================
 	// Private Setup Methods
 	// ================================
-	setupVerletGeometry() {
+	_setupVerletGeometry() {
 
 		const { segmentsX, segmentsY, width, height, fixedVertexPattern } = this.options;
 		const addVerletVertex = ( x, y, z, isFixed ) => {
@@ -309,7 +314,7 @@ class ClothSimulator {
 		}
 
 	}
-	setupVerletVertexBuffers() {
+	_setupVerletVertexBuffers() {
 
 		const vertexCount = this.verletVertices.length;
 		const springListArray = [];
@@ -339,7 +344,7 @@ class ClothSimulator {
 		this.springListBuffer = instancedArray( new Uint32Array( springListArray ), 'uint' ).setPBO( true );
 
 	}
-	setupVerletSpringBuffers() {
+	_setupVerletSpringBuffers() {
 
 		const springCount = this.verletSprings.length;
 		const springVertexIdArray = new Uint32Array( springCount * 2 );
@@ -358,7 +363,7 @@ class ClothSimulator {
 		this.springForceBuffer = instancedArray( springCount * 3, 'vec3' ).setPBO( true );
 
 	}
-	setupUniforms() {
+	_setupUniforms() {
 
 		this.dampeningUniform = uniform( this.options.dampening );
 		this.stiffnessUniform = uniform( this.options.stiffness );
@@ -368,7 +373,7 @@ class ClothSimulator {
 		this.worldMatrixInverseUniform = uniform( new Matrix4() );
 
 	}
-	setupSphereColliders() {
+	_setupSphereColliders() {
 
 		for ( let i = 0; i < this.options.numSphereColliders; i ++ ) {
 
@@ -381,7 +386,7 @@ class ClothSimulator {
 		}
 
 	}
-	setupComputeShaders() {
+	_setupComputeShaders() {
 
 		const vertexCount = this.verletVertices.length;
 		const springCount = this.verletSprings.length;
@@ -487,7 +492,7 @@ class ClothSimulator {
 		} )().compute( vertexCount );
 
 	}
-	setupClothMesh() {
+	_setupClothMesh() {
 
 		const { segmentsX, segmentsY } = this.options;
 		const vertexCount = segmentsX * segmentsY;
@@ -576,5 +581,23 @@ class ClothSimulator {
 	}
 
 }
+
+
+/**
+ * Constructor options of `ClothSimulator`.
+ *
+ * @typedef {Object} ClothSimulator~Options
+ * @property {number} [segmentsX=20] - The number of segments in the X direction.
+ * @property {number} [segmentsY=20] - The number of segments in the Y direction.
+ * @property {number} [width=1] - The width of the cloth.
+ * @property {number} [height=2] - The height of the cloth.
+ * @property {number} [numSphereColliders=1] - The number of sphere colliders.
+ * @property {number} [sphereRadius=0.2] - The radius of the sphere colliders.
+ * @property {number} [stiffness=0.3] - The stiffness of the cloth.
+ * @property {number} [wind=0.1] - The wind strength.
+ * @property {number} [gravity=0.00005] - The gravity strength.
+ * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - The fixed vertex pattern. 
+ * @property {number} [color=0x204080] - The color of the cloth.
+ **/
 
 export { ClothSimulator };
