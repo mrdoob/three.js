@@ -78,7 +78,7 @@ class ClothSimulator {
 			wind: options.wind !== undefined ? options.wind : 1.0,
 			gravity: options.gravity !== undefined ? options.gravity : 0.00005,
 			fixedVertexPattern: options.fixedVertexPattern !== undefined ? options.fixedVertexPattern : ( ( x, y ) => y === 0 && ( x === 0 || x === options.segmentsX - 1 ) ),
-			color: options.color !== undefined ? options.color : 0x204080,
+			color: options.color !== undefined ? options.color : 0,
 			material: options.material !== undefined ? options.material : null,
 		};
 		this._setupVerletGeometry();
@@ -535,9 +535,14 @@ class ClothSimulator {
 		const vertexPositionBuffer = this.vertexPositionBuffer;
 		const worldMatrixInverseUniform = this.worldMatrixInverseUniform;
 		const clothMaterial = this.options.material ? this.options.material : new MeshPhysicalNodeMaterial( {
-			colorNode: colorNode( this.options.color ),
 			side: DoubleSide,
 		} );
+		if ( this.options.color && ( ! this.options.material || ! this.options.material.colorNode ) ) {
+
+			clothMaterial.colorNode = colorNode( this.options.color );
+
+		}
+
 		const calculateNormal = Fn( () => {
 
 			const vertexIds = attribute( 'vertexIds' );
@@ -591,8 +596,8 @@ class ClothSimulator {
  * @property {number} [wind=0.1] - The wind strength.
  * @property {number} [gravity=0.00005] - The gravity strength.
  * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves).
- * @property {number} [color=0x204080] - The color of the cloth's material
- * @property {NodeMaterial} [material] - Optional: cloth's material. It must be a NodeMaterial and it's positionNode and normalNode will be set/overriten!
+ * @property {number} [color=0x204080] - Optional: Onli used if no material is passed in the options. The color of the cloth's material.
+ * @property {NodeMaterial} [material] - Optional: ( by default it is a MeshPhysicalNodeMaterial ) cloth's material. It must be a NodeMaterial and it's positionNode and normalNode will be set/overriten!
  **/
 
 export { ClothSimulator };
