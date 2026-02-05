@@ -194,11 +194,10 @@ function cleanDescription( text ) {
 
 /**
  * Get documentation URL category for a class.
- * @param {string} className - The class name.
  * @param {string} filePath - The file path.
  * @return {string} The category path.
  */
-function getCategory( className, filePath ) {
+function getCategory( filePath ) {
 
 	if ( ! filePath ) return 'core';
 
@@ -318,7 +317,7 @@ exports.publish = ( taffyData/*, opts */ ) => {
 		const classInfo = classMap[ className ];
 		const cls = classInfo.doclet;
 
-		const category = getCategory( className, cls.meta ? cls.meta.path : null );
+		const category = getCategory( cls.meta ? cls.meta.path : null );
 
 		const classDef = {
 			'!url': `https://threejs.org/docs/#api/en/${category}/${cls.name}`,
