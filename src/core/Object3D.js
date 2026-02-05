@@ -1172,8 +1172,8 @@ class Object3D extends EventDispatcher {
 	 * control over the update process.
 	 * @param {boolean?} force - (optional) Forces an update of this object's world matrix, even if
 	 * {@link Object3D#matrixWorldNeedsUpdate} is `false`.
-	 * @param {boolean?} updateParents - (optional) Whether ancestor nodes should be updated.
-	 * @param {boolean?} updateChildren - (optional) Whether descendant nodes should be updated.
+	 * @param {boolean?} [updateParents=false] - (optional) Whether ancestor nodes should be updated.
+	 * @param {boolean?} [updateChildren=true] - (optional) Whether descendant nodes should be updated.
 	 * @param {boolean?} updateLocal - (optional) Whether local matrices should be updated.
 	 * @param {boolean?} updateWorld - (optional) Whether world matrices should be updated.
 	 * @param {boolean?} respectAutoUpdateFlags - (optional) Whether {@link Object3D#matrixAutoUpdate}
