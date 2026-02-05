@@ -1,12 +1,12 @@
 import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4 } from 'three';
-import { MeshPhysicalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu';
-import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, uv, frontFacing, color as colorNode, } from 'three/tsl';
+import { MeshBasicMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
+import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, frontFacing, color as colorNode, } from 'three/tsl';
 
 /**
  * Generates a plane that can be used as a cloth simulator.
  * Note that this class can only be used with {@link WebGPURenderer}.
  * @three_import import { ClothSimulator } from 'three/addons/objects/ClothSimulator.js';
- * @example 
+ * @example
  *
  * // Create cloth simulation with 2 sphere colliders
  * const cloth = new ClothSimulator(renderer, {
@@ -47,7 +47,7 @@ class ClothSimulator {
 	 * @param {WebGPURenderer} renderer - The renderer to use for the simulation.
 	 * @param {ClothSimulator~Options} [options] - The options for the simulation.
 	 */
-	constructor( renderer, options  = {} ) {
+	constructor( renderer, options = {} ) {
 
 		this.renderer = renderer;
 		this.sphereMeshes = [];
@@ -73,7 +73,7 @@ class ClothSimulator {
 			wind: options.wind !== undefined ? options.wind : 1.0,
 			gravity: options.gravity !== undefined ? options.gravity : 0.00005,
 			fixedVertexPattern: options.fixedVertexPattern !== undefined ? options.fixedVertexPattern : ( ( x, y ) => y === 0 && ( x === 0 || x === options.segmentsX - 1 ) ),
-			color: options.color !== undefined ? options.color : 0x204080, 
+			color: options.color !== undefined ? options.color : 0x204080,
 		};
 		this._setupVerletGeometry();
 		this._setupVerletVertexBuffers();
@@ -204,12 +204,10 @@ class ClothSimulator {
 
 			const collider = this.sphereColliders[ i ];
 			const geometry = new IcosahedronGeometry( collider.radiusUniform.value * 0.95, 4 );
-			const material = new MeshStandardNodeMaterial();
+			const material = new MeshBasicMaterial( { wireframe: true } );
 			const sphere = new Mesh( geometry, material );
 			sphere.position.copy( collider.positionUniform.value );
 			this.sphereMeshes.push( sphere );
-			sphere.castShadow = true;
-			sphere.receiveShadow = true;
 
 		}
 
@@ -231,7 +229,7 @@ class ClothSimulator {
 		for ( const sphere of this.sphereMeshes ) {
 
 			sphere.geometry.dispose();
-			if ( sphere.material.isMeshPhysicalNodeMaterial) {
+			if ( sphere.material.isMeshPhysicalNodeMaterial ) {
 
 				sphere.material.dispose();
 
@@ -531,7 +529,7 @@ class ClothSimulator {
 		const vertexPositionBuffer = this.vertexPositionBuffer;
 		const worldMatrixInverseUniform = this.worldMatrixInverseUniform;
 		const clothMaterial = new MeshPhysicalNodeMaterial( {
-			colorNode: uv(),
+			colorNode: colorNode( this.options.color ),
 			side: DoubleSide,
 		} );
 		const calculateNormal = Fn( () => {
@@ -564,12 +562,7 @@ class ClothSimulator {
 		} )();
 		const vNormal = calculateNormal().toVarying();
 		clothMaterial.normalNode = select( frontFacing, vNormal, vNormal.negate() );
-		const mesh = new Mesh( geometry, new MeshPhysicalNodeMaterial( {
-			colorNode: colorNode( this.options.color ),
-			positionNode: clothMaterial.positionNode,
-			normalNode: clothMaterial.normalNode,
-			side: DoubleSide,
-		} ) );
+		const mesh = new Mesh( geometry, clothMaterial );
 		mesh.frustumCulled = false;
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
@@ -593,7 +586,7 @@ class ClothSimulator {
  * @property {number} [stiffness=0.3] - The stiffness of the cloth.
  * @property {number} [wind=0.1] - The wind strength.
  * @property {number} [gravity=0.00005] - The gravity strength.
- * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves). 
+ * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves).
  * @property {number} [color=0x204080] - The color of the cloth's material
  **/
 

@@ -49,7 +49,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
-			import { ClothSimulator } from 'three/addons/objects/ClothSimulator.js';
+			import { ClothSimulator } from 'three/addons/misc/ClothSimulator.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -218,6 +218,35 @@
 				material.colorNode = texture(
 					textureLoader.load( 'textures/roughness_map.jpg' ),
 				);
+
+				const spheres = cloth.createSphereVisualizers();
+				spheres.forEach( sphere => {
+
+					scene.add( sphere );
+					sphere.visible = false;
+			
+	} );
+
+				const gui = renderer.inspector.createParameters( 'Cloth Simulator' );
+				gui.add( cloth.options, 'wind', 0, 10, 0.1 ).onChange( value=>cloth.setWind( value ) );
+				gui.add( cloth.options, 'stiffness', 0, 1, 0.01 ).onChange( value=>cloth.setStiffness( value ) );
+				gui.add( cloth.options, 'dampening', 0, 1, 0.01 ).onChange( value=>cloth.setDampening( value ) );
+				gui.add( { helpers: true }, 'helpers' ).onChange( ( value ) => {
+			
+					cloth.setSphereEnabled( 0, value );
+					cloth.setSphereEnabled( 1, value );
+			
+	} ).name( 'Enable Colliders' );
+
+				gui.add( { seeColliders: false }, 'seeColliders' ).onChange( ( value ) => {
+			
+					spheres.forEach( sphere => {
+
+						sphere.visible = value;
+			
+		} );
+			
+	} ).name( 'See Colliders' );
 
 			}
 
