@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4, Sphere } from 'three';
+import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4 } from 'three';
 import { MeshBasicMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
 import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, frontFacing, color as colorNode, } from 'three/tsl';
 
