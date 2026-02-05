@@ -1,39 +1,3 @@
-/**
- * ---- EXAMPLE USE ----
- *
- * 		// Create cloth simulation with 2 sphere colliders
-        const cloth = new ClothSimulation(renderer, {
-            segmentsX: 20,
-            segmentsY: 20,
-            width: 1,
-            height: 2,
-            numSphereColliders: 2, //<-- how many "sphere colliders" will interact with the cloth
-            sphereRadius: 0.2,
-            stiffness: 0.3,
-            wind: 0.1,
-        });
-
-        // Add cloth mesh to scene
-        scene.add(cloth.mesh);
-
-        // To modify the material access it via:
-        cloth.mesh.material; // it is a MeshPhysicalNodeMaterial
-
-        // OPTIONAL!! : Create and add sphere visualizers ( for debug )
-        const spheres = cloth.createSphereVisualizers();
-        spheres.forEach(sphere => scene.add(sphere));
-
-        // IN YOUR MAIN LOOP:
-        cloth.setSphereCollider(0, colPos); // set the position of the first sphere collider
-        cloth.setSphereCollider(1, colPos2); // set the position of the second sphere collider
-
-        // **** You can move the cloth object itself ****
-        cloth.mesh.position.x = .5 + Math.sin(elapsedTime * 1.1)*.3
-        cloth.mesh.rotateY( Math.sin(elapsedTime)*.01)
-
-        // update the cloth simulation
-        cloth.update(delta);
- */
 import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4 } from 'three';
 import { MeshPhysicalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu';
 import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, uv, frontFacing, color as colorNode, } from 'three/tsl';
@@ -42,6 +6,40 @@ import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribu
  * Generates a plane that can be used as a cloth simulator.
  * Note that this class can only be used with {@link WebGPURenderer}.
  * @three_import import { ClothSimulator } from 'three/addons/objects/ClothSimulator.js';
+ * @example 
+ *
+ * // Create cloth simulation with 2 sphere colliders
+ * const cloth = new ClothSimulator(renderer, {
+ *     segmentsX: 20,
+ *     segmentsY: 20,
+ *     width: 1,
+ *     height: 2,
+ *     numSphereColliders: 2, //<-- how many "sphere colliders" will interact with the cloth
+ *     sphereRadius: 0.2,
+ *     stiffness: 0.3,
+ *     wind: 0.1,
+ * });
+
+ * // Add cloth mesh to scene
+ * scene.add(cloth.mesh);
+
+ * // To modify the material access it via:
+ * cloth.mesh.material; // it is a MeshPhysicalNodeMaterial
+
+ * // OPTIONAL!! : Create and add sphere visualizers ( for debug )
+ * const spheres = cloth.createSphereVisualizers();
+ * spheres.forEach(sphere => scene.add(sphere));
+
+ * // IN YOUR MAIN LOOP:
+ * cloth.setSphereCollider(0, colPos); // set the position of the first sphere collider
+ * cloth.setSphereCollider(1, colPos2); // set the position of the second sphere collider
+
+ * // **** You can move the cloth object itself ****
+ * cloth.mesh.position.x = .5 + Math.sin(elapsedTime * 1.1)*.3
+ * cloth.mesh.rotateY( Math.sin(elapsedTime)*.01)
+
+ * // update the cloth simulation
+ * cloth.update(delta);
  */
 class ClothSimulator {
 
@@ -86,9 +84,7 @@ class ClothSimulator {
 		this.mesh = this._setupClothMesh();
 
 	}
-	// ================================
-	// Public API
-	// ================================
+
 	/**
      * Update the cloth simulation. Call this every frame.
      * @param {number} delta Time since last frame in seconds
@@ -172,6 +168,7 @@ class ClothSimulator {
 	}
 	/**
      * Set wind strength
+	 * @param {number} value New wind strength
      */
 	setWind( value ) {
 
@@ -180,6 +177,7 @@ class ClothSimulator {
 	}
 	/**
      * Set spring stiffness
+	 * @param {number} value New stiffness value
      */
 	setStiffness( value ) {
 
@@ -188,6 +186,7 @@ class ClothSimulator {
 	}
 	/**
      * Set velocity dampening
+	 * @param {number} value New dampening value
      */
 	setDampening( value ) {
 
@@ -223,7 +222,7 @@ class ClothSimulator {
 	dispose() {
 
 		this.mesh.geometry.dispose();
-		if ( this.mesh.material instanceof MeshPhysicalNodeMaterial ) {
+		if ( this.mesh.material.isMeshPhysicalNodeMaterial ) {
 
 			this.mesh.material.dispose();
 
@@ -232,7 +231,7 @@ class ClothSimulator {
 		for ( const sphere of this.sphereMeshes ) {
 
 			sphere.geometry.dispose();
-			if ( sphere.material instanceof MeshStandardNodeMaterial ) {
+			if ( sphere.material.isMeshPhysicalNodeMaterial) {
 
 				sphere.material.dispose();
 
@@ -241,9 +240,7 @@ class ClothSimulator {
 		}
 
 	}
-	// ================================
-	// Private Setup Methods
-	// ================================
+
 	_setupVerletGeometry() {
 
 		const { segmentsX, segmentsY, width, height, fixedVertexPattern } = this.options;
@@ -596,8 +593,8 @@ class ClothSimulator {
  * @property {number} [stiffness=0.3] - The stiffness of the cloth.
  * @property {number} [wind=0.1] - The wind strength.
  * @property {number} [gravity=0.00005] - The gravity strength.
- * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - The fixed vertex pattern. 
- * @property {number} [color=0x204080] - The color of the cloth.
+ * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves). 
+ * @property {number} [color=0x204080] - The color of the cloth's material
  **/
 
 export { ClothSimulator };
