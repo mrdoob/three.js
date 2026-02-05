@@ -344,7 +344,7 @@ sphere points. How this works is explained in <a href="optimize-lots-of-objects.
   function getPoint(lat, long) {
     latHelper.rotation.x = lat;
     longHelper.rotation.y = long;
-    longHelper.updateMatrixWorld(true);
+    longHelper.ensureMatrices(true);
     return pointHelper.getWorldPosition(temp).toArray();
   }
 

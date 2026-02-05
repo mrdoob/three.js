@@ -233,7 +233,7 @@ class SkinnedMesh extends Mesh {
 
 		if ( bindMatrix === undefined ) {
 
-			this.updateMatrixWorld( true );
+			this.ensureMatrices( true );
 
 			this.skeleton.calculateInverses();
 
@@ -287,9 +287,9 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 		if ( this.bindMode === AttachedBindMode ) {
 

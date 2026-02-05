@@ -38,7 +38,7 @@ class SetPositionCommand extends Command {
 	execute() {
 
 		this.object.position.copy( this.newPosition );
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	}
@@ -46,7 +46,7 @@ class SetPositionCommand extends Command {
 	undo() {
 
 		this.object.position.copy( this.oldPosition );
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	}

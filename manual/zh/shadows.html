@@ -286,7 +286,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 这个方法将更新光源，光源的帮助类以及光源的阴影相机和像是光的阴影相机的帮助类。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // update the light target's matrixWorld because it's needed by the helper
-  light.target.updateMatrixWorld();
+  light.target.ensureMatrices();
   helper.update();
   // update the light's shadow camera's projection matrix
   light.shadow.camera.updateProjectionMatrix();

@@ -1380,35 +1380,117 @@ Descendants of invisible 3D objects are not traversed.</p>
 position, rotation and scale values.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="updateMatrixWorld" translate="no">.<a href="#updateMatrixWorld">updateMatrixWorld</a><span class="signature">( force : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="updateMatrixWorld" translate="no">.<a href="#updateMatrixWorld">updateMatrixWorld</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Updates the transformation matrix in world space of this 3D objects and its descendants.</p>
-<p>To ensure correct results, this method also recomputes the 3D object's transformation matrix in
-local space. The computation of the local and world matrix can be controlled with the
-<a href="Object3D.html#matrixAutoUpdate">Object3D#matrixAutoUpdate</a> and <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> flags which are both
-<code>true</code> by default.  Set these flags to <code>false</code> if you need more control over the update matrix process.</p>
+							<p>Updates the transformation matrix in world space of this 3D object.</p>
+<p>If you also want to recompute descendant world matrices, consider using <a href="Object3D.html#ensureMatrices">Object3D#ensureMatrices</a>
+or <a href="Object3D.html#updateWorldMatrix">Object3D#updateWorldMatrix</a> instead.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="ensureMatrices" translate="no">.<a href="#ensureMatrices">ensureMatrices</a>
+						<span class="signature">
+								(
+								force : <span class="param-type">boolean</span>,
+								updateParents : <span class="param-type">boolean</span>,
+								updateChildren : <span class="param-type">boolean</span> ,
+								updateLocal : <span class="param-type">boolean</span> ,
+								updateWorld : <span class="param-type">boolean</span> ,
+								respectAutoUpdateFlags : <span class="param-type">boolean</span>
+								)
+							</span>
+					</h3>
+					<div class="method">
+						<div class="description">
+							<p>
+								Ensures that the local and world matrices of the current object and all of
+								its descendants are updated. A variety of arguments are provided for more
+								control over the update process.
+							</p>
 						</div>
 						<table class="params">
 							<tbody>
-								<tr>
-									<td class="name">
-										<strong>force</strong>
-									</td>
-									<td class="description last">
-										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
-when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
-										<p>Default is <code>false</code>.</p>
-									</td>
-								</tr>
+							<tr>
+								<td class="name">
+									<strong>force</strong>
+								</td>
+								<td class="description last">
+									<p>
+										Forces an update of this object's world matrix, even if
+										<a href="#matrixWorldNeedsUpdate">matrixWorldNeedsUpdate</a> is `false`.
+									</p>
+									<p>Default is <code>false</code>.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>updateParents</strong>
+								</td>
+								<td class="description last">
+									<p>Whether ancestor nodes should be updated.</p>
+									<p>Default is <code>false</code>.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>updateChildren</strong>
+								</td>
+								<td class="description last">
+									<p>Whether descendant nodes should be updated.</p>
+									<p>Default is <code>true</code>.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>updateLocal</strong>
+								</td>
+								<td class="description last">
+									<p>Whether local matrices should be updated.</p>
+									<p>Default is <code>true</code>.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>updateWorld</strong>
+								</td>
+								<td class="description last">
+									<p>Whether world matrices should be updated.</p>
+									<p>Default is <code>true</code>.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>respectAutoUpdateFlags</strong>
+								</td>
+								<td class="description last">
+									<p>
+										Whether <a href="Object3D.html#matrixAutoUpdate">Object3D#matrixAutoUpdate</a>
+										<a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> should be respected.
+									</p>
+									<p>Default is <code>true</code>.</p>
+								</td>
+							</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="updateWorldMatrix" translate="no">.<a href="#updateWorldMatrix">updateWorldMatrix</a><span class="signature">( updateParents : <span class="param-type">boolean</span>, updateChildren : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="updateWorldMatrix" translate="no">.<a href="#updateWorldMatrix">updateWorldMatrix</a>
+						<span class="signature">
+							(
+							updateParents : <span class="param-type">boolean</span>,
+							updateChildren : <span class="param-type">boolean</span> ,
+							updateLocal : <span class="param-type">boolean</span> ,
+							updateWorld : <span class="param-type">boolean</span> ,
+							respectAutoUpdateFlags : <span class="param-type">boolean</span>
+							)
+						</span>
+					</h3>
 					<div class="method">
 						<div class="description">
-							<p>An alternative version of <a href="Object3D.html#updateMatrixWorld">Object3D#updateMatrixWorld</a> with more control over the
-update of ancestor and descendant nodes.</p>
+							<p>
+								An alternative version of <a href="Object3D.html#ensureMatrices">Object3D#ensureMatrices</a> that always
+								ignores the <a href="Object3D.html#matrixWorldNeedsUpdate">Object3D#matrixWorldNeedsUpdate</a> flag, and does
+								not update children by default.
+							</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -1417,7 +1499,7 @@ update of ancestor and descendant nodes.</p>
 										<strong>updateParents</strong>
 									</td>
 									<td class="description last">
-										<p>Whether ancestor nodes should be updated or not.</p>
+										<p>Whether ancestor nodes should be updated.</p>
 										<p>Default is <code>false</code>.</p>
 									</td>
 								</tr>
@@ -1426,8 +1508,38 @@ update of ancestor and descendant nodes.</p>
 										<strong>updateChildren</strong>
 									</td>
 									<td class="description last">
-										<p>Whether descendant nodes should be updated or not.</p>
+										<p>Whether descendant nodes should be updated.</p>
 										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>updateLocal</strong>
+									</td>
+									<td class="description last">
+										<p>Whether local matrices should be updated.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>updateWorld</strong>
+									</td>
+									<td class="description last">
+										<p>Whether world matrices should be updated.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>respectAutoUpdateFlags</strong>
+									</td>
+									<td class="description last">
+										<p>
+											Whether <a href="Object3D.html#matrixAutoUpdate">Object3D#matrixAutoUpdate</a>
+											<a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> should be respected.
+										</p>
+										<p>Default is <code>true</code>.</p>
 									</td>
 								</tr>
 							</tbody>

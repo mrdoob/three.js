@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head>
+﻿<!DOCTYPE html><html lang="ko"><head>
     <meta charset="utf-8">
     <title>에서 .OBJ 파일 불러오기</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -492,7 +492,7 @@ illum 2
 +    const objLoader = new OBJLoader();
 +    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
-      root.updateMatrixWorld();
+      root.ensureMatrices();
       scene.add(root);
       // 모든 요소를 포함하는 육면체를 계산합니다
       const box = new THREE.Box3().setFromObject(root);

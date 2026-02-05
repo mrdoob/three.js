@@ -46,7 +46,7 @@
 						subcamera.position.z = 1.5;
 						subcamera.position.multiplyScalar( 2 );
 						subcamera.lookAt( 0, 0, 0 );
-						subcamera.updateMatrixWorld();
+						subcamera.ensureMatrices();
 						cameras.push( subcamera );
 
 					}

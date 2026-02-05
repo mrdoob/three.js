@@ -186,7 +186,7 @@
 				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
-				camera.updateMatrixWorld();
+				camera.ensureMatrices();
 
 				// find intersections
 
