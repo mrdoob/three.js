@@ -60,6 +60,11 @@ class ClothSimulator {
 		this.stepsPerSecond = 360;
 
 		// Set defaults
+		if ( options.material && ! options.material.isNodeMaterial ) {
+
+			throw new Error( 'The material used must be a node material since it\'s position and normal nodes will be set/overriten' );
+
+		}
 
 		this.options = {
 			segmentsX: options.segmentsX !== undefined ? options.segmentsX : 20,
@@ -74,6 +79,7 @@ class ClothSimulator {
 			gravity: options.gravity !== undefined ? options.gravity : 0.00005,
 			fixedVertexPattern: options.fixedVertexPattern !== undefined ? options.fixedVertexPattern : ( ( x, y ) => y === 0 && ( x === 0 || x === options.segmentsX - 1 ) ),
 			color: options.color !== undefined ? options.color : 0x204080,
+			material: options.material !== undefined ? options.material : null,
 		};
 		this._setupVerletGeometry();
 		this._setupVerletVertexBuffers();
@@ -528,7 +534,7 @@ class ClothSimulator {
 		// Capture for closure
 		const vertexPositionBuffer = this.vertexPositionBuffer;
 		const worldMatrixInverseUniform = this.worldMatrixInverseUniform;
-		const clothMaterial = new MeshPhysicalNodeMaterial( {
+		const clothMaterial = this.options.material ? this.options.material : new MeshPhysicalNodeMaterial( {
 			colorNode: colorNode( this.options.color ),
 			side: DoubleSide,
 		} );
@@ -560,13 +566,11 @@ class ClothSimulator {
 			return localPos;
 
 		} )();
+
 		const vNormal = calculateNormal().toVarying();
 		clothMaterial.normalNode = select( frontFacing, vNormal, vNormal.negate() );
-		const mesh = new Mesh( geometry, clothMaterial );
-		mesh.frustumCulled = false;
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;
-		return mesh;
+
+		return new Mesh( geometry, clothMaterial );
 
 	}
 
@@ -588,6 +592,7 @@ class ClothSimulator {
  * @property {number} [gravity=0.00005] - The gravity strength.
  * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves).
  * @property {number} [color=0x204080] - The color of the cloth's material
+ * @property {NodeMaterial} [material] - Optional: cloth's material. It must be a NodeMaterial and it's positionNode and normalNode will be set/overriten!
  **/
 
 export { ClothSimulator };

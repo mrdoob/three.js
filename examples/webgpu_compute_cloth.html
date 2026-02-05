@@ -204,9 +204,13 @@
 					sphereRadius: 0.23,
 					stiffness: 0.3,
 					wind: 0.7,
-					color: 0xff0000,
+					color: 0xff0000, 
 				} );
 				scene.add( cloth.mesh );
+
+				cloth.mesh.castShadow = true;
+				cloth.mesh.receiveShadow = true;
+				cloth.mesh.frustumCulled = false;
 
 				//
 				// positionthe colliders in such a way that contain the mesh.
