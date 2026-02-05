@@ -32,23 +32,25 @@ class Gyroscope extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-			if ( this.parent !== null ) {
+		if ( this.parent !== null ) {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
-				this.matrixWorld.decompose( _translationWorld, _quaternionWorld, _scaleWorld );
-				this.matrix.decompose( _translationObject, _quaternionObject, _scaleObject );
+			this.matrixWorld.decompose( _translationWorld, _quaternionWorld, _scaleWorld );
+			this.matrix.decompose( _translationObject, _quaternionObject, _scaleObject );
 
-				this.matrixWorld.compose( _translationWorld, _quaternionObject, _scaleWorld );
+			this.matrixWorld.compose( _translationWorld, _quaternionObject, _scaleWorld );
 
 
-			} else {
+		} else {
 
-				this.matrixWorld.copy( this.matrix );
+			this.matrixWorld.copy( this.matrix );
 
-			}
+		}
+
+	}
 
 }
 
