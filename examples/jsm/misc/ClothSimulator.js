@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4 } from 'three';
+import { BufferAttribute, BufferGeometry, DoubleSide, IcosahedronGeometry, Mesh, Vector3, Matrix4, Sphere } from 'three';
 import { MeshBasicMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
 import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time, frontFacing, color as colorNode, } from 'three/tsl';
 
@@ -116,12 +116,12 @@ class ClothSimulator {
 
 	}
 	/**
-     * Set the position and optionally radius of a sphere collider
-     * @param {number} index Index of the sphere collider (0-based)
-     * @param {Vector3} position Position of the sphere
-     * @param {number} [radius] Optional new radius
-     */
-	setSphereCollider( index, position, radius ) {
+	 * Set the position and optionally radius of a sphere collider using either a THREE.Sphere or position and radius.
+	 * @param {number} index Index of the sphere collider (0-based)
+	 * @param {Vector3|Sphere} positionOrSphere Position of the sphere OR a THREE.Sphere object
+	 * @param {number} [radius] Optional new radius (ignored if a THREE.Sphere is passed)
+	 */
+	setSphereCollider( index, positionOrSphere, radius ) {
 
 		if ( index < 0 || index >= this.sphereColliders.length ) {
 
@@ -130,11 +130,26 @@ class ClothSimulator {
 
 		}
 
+		let position, r;
+
+		if ( positionOrSphere.isSphere ) {
+
+			position = positionOrSphere.center;
+			r = positionOrSphere.radius;
+
+		} else {
+
+			position = positionOrSphere;
+			r = radius;
+
+		}
+
 		const collider = this.sphereColliders[ index ];
 		collider.positionUniform.value.copy( position );
-		if ( radius !== undefined ) {
 
-			collider.radiusUniform.value = radius;
+		if ( r !== undefined ) {
+
+			collider.radiusUniform.value = r;
 
 		}
 
@@ -142,9 +157,10 @@ class ClothSimulator {
 		if ( this.sphereMeshes[ index ] ) {
 
 			this.sphereMeshes[ index ].position.copy( position );
-			if ( radius !== undefined ) {
 
-				this.sphereMeshes[ index ].scale.setScalar( radius / this.options.sphereRadius );
+			if ( r !== undefined ) {
+
+				this.sphereMeshes[ index ].scale.setScalar( r / this.options.sphereRadius );
 
 			}
 
