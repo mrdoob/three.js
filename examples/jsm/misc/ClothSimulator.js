@@ -57,7 +57,6 @@ class ClothSimulator {
 		this.sphereColliders = [];
 		this.timeSinceLastStep = 0;
 		this.timestamp = 0;
-		this.stepsPerSecond = 360;
 
 		// Set defaults
 		if ( options.material && ! options.material.isNodeMaterial ) {
@@ -73,14 +72,17 @@ class ClothSimulator {
 			height: options.height !== undefined ? options.height : 1,
 			numSphereColliders: options.numSphereColliders !== undefined ? options.numSphereColliders : 1,
 			sphereRadius: options.sphereRadius !== undefined ? options.sphereRadius : 0.15,
-			stiffness: options.stiffness !== undefined ? options.stiffness : 0.2,
+			stiffness: options.stiffness !== undefined ? options.stiffness : 0.3,
 			dampening: options.dampening !== undefined ? options.dampening : 0.99,
 			wind: options.wind !== undefined ? options.wind : 1.0,
 			gravity: options.gravity !== undefined ? options.gravity : 0.00005,
+			stepsPerSecond: options.stepsPerSecond !== undefined ? options.stepsPerSecond : 360,
 			fixedVertexPattern: options.fixedVertexPattern !== undefined ? options.fixedVertexPattern : ( ( x, y ) => y === 0 && ( x === 0 || x === options.segmentsX - 1 ) ),
 			color: options.color !== undefined ? options.color : 0,
 			material: options.material !== undefined ? options.material : null,
 		};
+
+		this.timeStep = 1 / this.options.stepsPerSecond;
 		this._setupVerletGeometry();
 		this._setupVerletVertexBuffers();
 		this._setupVerletSpringBuffers();
@@ -99,12 +101,11 @@ class ClothSimulator {
 
 		// Clamp delta to prevent large jumps
 		const clampedDelta = Math.min( delta, 1 / 60 );
-		const timePerStep = 1 / this.stepsPerSecond;
 		this.timeSinceLastStep += clampedDelta;
-		while ( this.timeSinceLastStep >= timePerStep ) {
+		while ( this.timeSinceLastStep >= this.timeStep ) {
 
-			this.timestamp += timePerStep;
-			this.timeSinceLastStep -= timePerStep;
+			this.timestamp += this.timeStep;
+			this.timeSinceLastStep -= this.timeStep;
 			this.mesh.updateMatrixWorld();
 			this.worldMatrixUniform.value.copy( this.mesh.matrixWorld );
 			this.worldMatrixInverseUniform.value.copy( this.mesh.matrixWorld ).invert();
@@ -593,10 +594,12 @@ class ClothSimulator {
  * @property {number} [numSphereColliders=1] - The number of sphere colliders.
  * @property {number} [sphereRadius=0.2] - The radius of the sphere colliders.
  * @property {number} [stiffness=0.3] - The stiffness of the cloth.
- * @property {number} [wind=0.1] - The wind strength.
+ * @property {number} [dampening=0.99] - The velocity dampening.
+ * @property {number} [wind=1.0] - The wind strength.
  * @property {number} [gravity=0.00005] - The gravity strength.
+ * @property {number} [stepsPerSecond=360] - The number of simulation sub-steps performed per second.
  * @property {(x:number, y:number) => boolean} [fixedVertexPattern] - Given the X and Y coordinates of a vertex, returns whether it should be fixed or dynamic (moves).
- * @property {number} [color=0x204080] - Optional: Onli used if no material is passed in the options. The color of the cloth's material.
+ * @property {number} [color=0] - Optional: Only used if no material is passed in the options or if the material doesn't have a colorNode. The color of the cloth's material.
  * @property {NodeMaterial} [material] - Optional: ( by default it is a MeshPhysicalNodeMaterial ) cloth's material. It must be a NodeMaterial and it's positionNode and normalNode will be set/overriten!
  **/
 
