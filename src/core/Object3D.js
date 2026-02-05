@@ -1152,92 +1152,73 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Updates the transformation matrix in world space of this 3D objects and its descendants.
-	 *
-	 * To ensure correct results, this method also recomputes the 3D object's transformation matrix in
-	 * local space. The computation of the local and world matrix can be controlled with the
-	 * {@link Object3D#matrixAutoUpdate} and {@link Object3D#matrixWorldAutoUpdate} flags which are both
-	 * `true` by default.  Set these flags to `false` if you need more control over the update matrix process.
-	 *
-	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * Updates the transformation matrix in world space.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
+		if ( this.parent === null ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+			this.matrixWorld.copy( this.matrix );
 
-			if ( this.matrixWorldAutoUpdate === true ) {
+		} else {
 
-				if ( this.parent === null ) {
-
-					this.matrixWorld.copy( this.matrix );
-
-				} else {
-
-					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-				}
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// make sure descendants are updated if required
-
-		const children = this.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			const child = children[ i ];
-
-			child.updateMatrixWorld( force );
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 		}
 
 	}
 
 	/**
-	 * An alternative version of {@link Object3D#updateMatrixWorld} with more control over the
-	 * update of ancestor and descendant nodes.
-	 *
-	 * @param {boolean} [updateParents=false] Whether ancestor nodes should be updated or not.
-	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
+	 * @desc Ensures that the local and world matrices of the current object and all of
+	 * its descendants are updated. A variety of arguments are provided for more
+	 * control over the update process.
+	 * @param {boolean?} force - (optional) Forces an update of this object's world matrix, even if
+	 * {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @param {boolean?} [updateParents=false] - (optional) Whether ancestor nodes should be updated.
+	 * @param {boolean?} [updateChildren=true] - (optional) Whether descendant nodes should be updated.
+	 * @param {boolean?} updateLocal - (optional) Whether local matrices should be updated.
+	 * @param {boolean?} updateWorld - (optional) Whether world matrices should be updated.
+	 * @param {boolean?} respectAutoUpdateFlags - (optional) Whether {@link Object3D#matrixAutoUpdate}
+	 * and {@link Object3D#matrixWorldAutoUpdate} should be respected.
 	 */
-	updateWorldMatrix( updateParents, updateChildren ) {
+	ensureMatrices(
+		force = false,
+		updateParents = false,
+		updateChildren = true,
+		updateLocal = true,
+		updateWorld = true,
+		respectAutoUpdateFlags = true
+	) {
 
 		const parent = this.parent;
 
-		if ( updateParents === true && parent !== null ) {
+		if ( updateParents && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			parent.ensureMatrices( force, true, false, updateLocal, updateWorld, respectAutoUpdateFlags );
 
 		}
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
+		if ( updateLocal && ( ! respectAutoUpdateFlags || this.matrixAutoUpdate ) ) {
 
-		if ( this.matrixWorldAutoUpdate === true ) {
+			this.updateMatrix();
 
-			if ( this.parent === null ) {
+		}
 
-				this.matrixWorld.copy( this.matrix );
+		if ( updateWorld && ( ! respectAutoUpdateFlags || this.matrixWorldAutoUpdate ) ) {
 
-			} else {
+			if ( force || this.matrixWorldNeedsUpdate ) {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				this.updateMatrixWorld();
+
+				this.matrixWorldNeedsUpdate = false;
+
+				force = true;
 
 			}
 
 		}
 
-		// make sure descendants are updated
-
-		if ( updateChildren === true ) {
+		if ( updateChildren ) {
 
 			const children = this.children;
 
@@ -1245,11 +1226,35 @@ class Object3D extends EventDispatcher {
 
 				const child = children[ i ];
 
-				child.updateWorldMatrix( false, true );
+				child.ensureMatrices( force, false, true, updateLocal, updateWorld, respectAutoUpdateFlags );
 
 			}
 
 		}
+
+	}
+
+	/**
+	 * An alternative version of {@link Object3D#ensureMatrices} that always
+	 * ignores the {@link Object3D#matrixWorldNeedsUpdate} flag, and does
+	 * not update children by default.
+	 *
+	 * @param {boolean?} [updateParents=false] - (optional) Whether ancestor nodes should be updated.
+	 * @param {boolean?} [updateChildren=false] - (optional) Whether descendant nodes should be updated.
+	 * @param {boolean?} updateLocal - (optional) Whether local matrices should be updated.
+	 * @param {boolean?} updateWorld - (optional) Whether world matrices should be updated.
+	 * @param {boolean?} respectAutoUpdateFlags - (optional) Whether {@link Object3D#matrixAutoUpdate}
+	 * and {@link Object3D#matrixWorldAutoUpdate} should be respected.
+	 */
+	updateWorldMatrix(
+		updateParents = false,
+		updateChildren = false,
+		updateLocal = true,
+		updateWorld = true,
+		respectAutoUpdateFlags = true
+	) {
+
+		this.ensureMatrices( true, updateParents, updateChildren, updateLocal, updateWorld, respectAutoUpdateFlags );
 
 	}
 

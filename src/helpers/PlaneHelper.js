@@ -64,7 +64,7 @@ class PlaneHelper extends Line {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		this.position.set( 0, 0, 0 );
 
@@ -74,7 +74,7 @@ class PlaneHelper extends Line {
 
 		this.translateZ( - this.plane.constant );
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 

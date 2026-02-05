@@ -153,7 +153,7 @@ class Reflector extends Mesh {
 
 			virtualCamera.far = camera.far; // Used in WebGLBackground
 
-			virtualCamera.updateMatrixWorld();
+			virtualCamera.ensureMatrices();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 			// Update the texture matrix

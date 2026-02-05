@@ -178,7 +178,7 @@ class SceneOptimizer {
 		const singleGroups = new Map();
 		const uniqueGeometries = new Set();
 
-		this.scene.updateMatrixWorld( true );
+		this.scene.ensureMatrices( true );
 		this.scene.traverse( ( node ) => {
 
 			if ( ! node.isMesh ) return;

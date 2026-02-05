@@ -785,7 +785,7 @@ class OrbitControls extends Controls {
 
 				const radiusDelta = prevRadius - newRadius;
 				this.object.position.addScaledVector( this._dollyDirection, radiusDelta );
-				this.object.updateMatrixWorld();
+				this.object.ensureMatrices();
 
 				zoomChanged = !! radiusDelta;
 
@@ -805,7 +805,7 @@ class OrbitControls extends Controls {
 				mouseAfter.unproject( this.object );
 
 				this.object.position.sub( mouseAfter ).add( mouseBefore );
-				this.object.updateMatrixWorld();
+				this.object.ensureMatrices();
 
 				newRadius = _v.length();
 

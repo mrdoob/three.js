@@ -184,9 +184,9 @@ class AnaglyphEffect {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.ensureMatrices();
 
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.ensureMatrices();
 
 			// Get the camera's local coordinate axes from its world matrix
 			camera.matrixWorld.extractBasis( _right, _up, _forward );

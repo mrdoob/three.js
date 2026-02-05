@@ -34,12 +34,6 @@ class Gyroscope extends Object3D {
 
 	updateMatrixWorld( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
-
-		// update matrixWorld
-
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
 			if ( this.parent !== null ) {
 
 				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
@@ -55,23 +49,6 @@ class Gyroscope extends Object3D {
 				this.matrixWorld.copy( this.matrix );
 
 			}
-
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateMatrixWorld( force );
-
-		}
-
-	}
 
 }
 

@@ -214,9 +214,9 @@ class PositionalAudio extends Audio {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 

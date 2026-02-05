@@ -164,7 +164,7 @@ class ViewHelper extends Object3D {
 		this.render = function ( renderer ) {
 
 			this.quaternion.copy( camera.quaternion ).invert();
-			this.updateMatrixWorld();
+			this.ensureMatrices();
 
 			point.set( 0, 0, 1 );
 			point.applyQuaternion( camera.quaternion );

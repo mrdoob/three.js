@@ -300,7 +300,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 камеры тени источника света и помощника, отображающего камеру тени источника света.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // update the light target's matrixWorld because it's needed by the helper
-  light.target.updateMatrixWorld();
+  light.target.ensureMatrices();
   helper.update();
   // update the light's shadow camera's projection matrix
   light.shadow.camera.updateProjectionMatrix();
