@@ -1198,15 +1198,15 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		if ( updateLocal && ( ! respectAutoUpdateFlags || this.matrixAutoUpdate ) ) {
+		if ( updateLocal && ( this.matrixAutoUpdate || ! respectAutoUpdateFlags ) ) {
 
 			this.updateMatrix();
 
 		}
 
-		if ( updateWorld && ( ! respectAutoUpdateFlags || this.matrixWorldAutoUpdate ) ) {
+		if ( updateWorld && ( this.matrixWorldAutoUpdate || ! respectAutoUpdateFlags ) ) {
 
-			if ( force || this.matrixWorldNeedsUpdate ) {
+			if ( this.matrixWorldNeedsUpdate || force ) {
 
 				this.updateMatrixWorld();
 
