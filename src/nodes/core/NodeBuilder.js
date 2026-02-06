@@ -580,31 +580,15 @@ class NodeBuilder {
 
 				if ( binding.isNodeUniformsGroup ) {
 
-					// Sort uniforms alphabetically by name and type
-					binding.uniforms.sort( ( a, b ) => {
-
-						const nameA = `${ a.name }:${ a.getType() }`;
-						const nameB = `${ b.name }:${ b.getType() }`;
-
-						if ( nameA < nameB ) return - 1;
-						if ( nameA > nameB ) return 1;
-
-						return 0;
-
-					} );
+					binding.uniforms.sort( ( a, b ) => a.nodeUniform.node.id - b.nodeUniform.node.id );
 
 					for ( const uniform of binding.uniforms ) {
 
-						const name = uniform.name;
-						const type = uniform.getType();
-
-						cacheKeyString += `${ name }:${ type };`;
+						cacheKeyString += uniform.nodeUniform.node.id;
 
 					}
 
 				} else {
-
-					// TODO: Check a possible hash
 
 					cacheKeyString += binding.nodeUniform.id;
 
@@ -614,13 +598,15 @@ class NodeBuilder {
 
 			// TODO: Remove this hack ._currentRenderContext
 
-			let bindingGroupsCache = _bindingGroupsCache.get( this.renderer._currentRenderContext );
+			const currentContext = this.renderer._currentRenderContext || this.renderer;
+
+			let bindingGroupsCache = _bindingGroupsCache.get( currentContext );
 
 			if ( bindingGroupsCache === undefined ) {
 
 				bindingGroupsCache = new Map();
 
-				_bindingGroupsCache.set( this.renderer._currentRenderContext, bindingGroupsCache );
+				_bindingGroupsCache.set( currentContext, bindingGroupsCache );
 
 			}
 
@@ -635,6 +621,14 @@ class NodeBuilder {
 				bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
 
 				bindingGroupsCache.set( cacheKey, bindGroup );
+
+			} else {
+
+				for ( let i = 0; i < bindings.length; i ++ ) {
+
+					bindGroup.bindings[ i ].visibility |= bindings[ i ].visibility;
+
+				}
 
 			}
 
