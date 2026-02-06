@@ -88,18 +88,39 @@ class WebGPUBindingUtils {
 
 		const bindingsData = backend.get( bindGroup );
 
-		// check if the the bind group already has a layout
+		const entries = this._createLayoutEntries( bindGroup );
+		const bindGroupLayoutKey = JSON.stringify( entries );
+
+		let layoutChanged = false;
+
+		// check if the bind group already has a layout and if it's still valid
 
 		if ( bindingsData.layout ) {
 
-			return bindingsData.layout.layoutGPU;
+			// if the layout key changed (e.g. visibility was updated), invalidate the old layout
+
+			if ( bindingsData.layoutKey !== bindGroupLayoutKey ) {
+
+				bindingsData.layout.usedTimes --;
+
+				if ( bindingsData.layout.usedTimes === 0 ) {
+
+					this._bindGroupLayoutCache.delete( bindingsData.layoutKey );
+
+				}
+
+				bindingsData.layout = undefined;
+				bindingsData.layoutKey = undefined;
+
+				layoutChanged = true;
+
+			} else {
+
+				return bindingsData.layout.layoutGPU;
+
+			}
 
 		}
-
-		// if not, assing one
-
-		const entries = this._createLayoutEntries( bindGroup );
-		const bindGroupLayoutKey = JSON.stringify( entries );
 
 		// try to find an existing layout in the cache
 
@@ -118,6 +139,14 @@ class WebGPUBindingUtils {
 
 		bindingsData.layout = bindGroupLayout;
 		bindingsData.layoutKey = bindGroupLayoutKey;
+
+		// if layout changed, recreate the GPU bind group with the new layout
+
+		if ( layoutChanged ) {
+
+			bindingsData.group = this.createBindGroup( bindGroup, bindGroupLayout.layoutGPU );
+
+		}
 
 		return bindGroupLayout.layoutGPU;
 

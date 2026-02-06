@@ -105,8 +105,8 @@ class WebGPUPipelineUtils {
 
 		for ( const bindGroup of renderObject.getBindings() ) {
 
-			const bindingsData = backend.get( bindGroup );
-			const { layoutGPU } = bindingsData.layout;
+			// ensure layout is up to date (visibility may have changed due to shared bind groups)
+			const layoutGPU = backend.bindingUtils.createBindingsLayout( bindGroup );
 
 			bindGroupLayouts.push( layoutGPU );
 
@@ -356,8 +356,8 @@ class WebGPUPipelineUtils {
 
 		for ( const bindingsGroup of bindings ) {
 
-			const bindingsData = backend.get( bindingsGroup );
-			const { layoutGPU } = bindingsData.layout;
+			// ensure layout is up to date (visibility may have changed due to shared bind groups)
+			const layoutGPU = backend.bindingUtils.createBindingsLayout( bindingsGroup );
 
 			bindGroupLayouts.push( layoutGPU );
 
