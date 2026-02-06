@@ -1059,23 +1059,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
-					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
+				}
+
+				// Update visibility to include this shader stage (bitwise OR)
+				uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
+
+				// Add to bindings for this stage if not already present
+				if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
+
 					bindings.push( uniformsGroup );
-
-				} else {
-
-					// Update visibility to include this shader stage (bitwise OR)
-					uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
-
-					// Add to bindings for this stage if not already present
-					if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
-
-						bindings.push( uniformsGroup );
-
-					}
 
 				}
 
