@@ -9,8 +9,17 @@ class RenderContexts {
 
 	/**
 	 * Constructs a new render context management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
 	 */
-	constructor() {
+	constructor( renderer ) {
+
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
+		this.renderer = renderer;
 
 		/**
 		 * A dictionary that manages render contexts.
@@ -69,6 +78,9 @@ class RenderContexts {
 		}
 
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+
+		renderState.clearDepthValue = this.renderer.getClearDepth();
+		renderState.clearStencilValue = this.renderer.getClearStencil();
 
 		return renderState;
 

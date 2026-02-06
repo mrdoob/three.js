@@ -440,6 +440,7 @@
 		"webgpu_reflection_roughness",
 		"webgpu_refraction",
 		"webgpu_rendertarget_2d-array_3d",
+		"webgpu_reversed_depth_buffer",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",

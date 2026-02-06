@@ -17,6 +17,18 @@ import {
 
 import { error } from '../../../utils.js';
 
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
 /**
  * A WebGPU backend utility module for managing pipelines.
  *
@@ -780,11 +792,11 @@ class WebGPUPipelineUtils {
 
 		if ( material.depthTest === false ) {
 
-			depthCompare = GPUCompareFunction.Always;
+			depthCompare = ( this.backend.parameters.reversedDepthBuffer ) ? GPUCompareFunction.Never : GPUCompareFunction.Always;
 
 		} else {
 
-			const depthFunc = material.depthFunc;
+			const depthFunc = ( this.backend.parameters.reversedDepthBuffer ) ? reversedFuncs[ material.depthFunc ] : material.depthFunc;
 
 			switch ( depthFunc ) {
 

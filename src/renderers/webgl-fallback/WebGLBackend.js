@@ -28,6 +28,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @typedef {Object} WebGLBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
@@ -184,7 +185,6 @@ class WebGLBackend extends Backend {
 		 */
 		this._knownBindings = new WeakSet();
 
-
 		/**
 		 * Whether the device supports framebuffers invalidation or not.
 		 *
@@ -265,10 +265,17 @@ class WebGLBackend extends Backend {
 		this.extensions.get( 'WEBGL_render_shared_exponent' );
 		this.extensions.get( 'WEBGL_multi_draw' );
 		this.extensions.get( 'OVR_multiview2' );
+		this.extensions.get( 'EXT_clip_control' );
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
+
+		if ( parameters.reversedDepthBuffer === true && this.extensions.has( 'EXT_clip_control' ) ) {
+
+			this.state.setReversedDepth( true );
+
+		}
 
 	}
 
