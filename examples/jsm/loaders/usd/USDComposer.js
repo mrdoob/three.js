@@ -2524,6 +2524,18 @@ class USDComposer {
 			}
 		);
 
+		// Apply UsdUVTexture scale to diffuse color (output = texture * scale + bias)
+		if ( material.map && material.map.userData.scale ) {
+
+			const scale = material.map.userData.scale;
+			if ( Array.isArray( scale ) && scale.length >= 3 ) {
+
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+
+			}
+
+		}
+
 		// Emissive
 		applyTexture(
 			'inputs:emissiveColor',
@@ -2542,7 +2554,20 @@ class USDComposer {
 
 		if ( material.emissiveMap ) {
 
-			material.emissive.set( 0xffffff );
+			if ( material.emissiveMap.userData.scale ) {
+
+				const scale = material.emissiveMap.userData.scale;
+				if ( Array.isArray( scale ) && scale.length >= 3 ) {
+
+					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+
+				}
+
+			} else {
+
+				material.emissive.set( 0xffffff );
+
+			}
 
 		}
 
@@ -2619,6 +2644,18 @@ class USDComposer {
 
 			}
 		);
+
+		// Apply UsdUVTexture scale to specular color
+		if ( material.specularColorMap && material.specularColorMap.userData.scale ) {
+
+			const scale = material.specularColorMap.userData.scale;
+			if ( Array.isArray( scale ) && scale.length >= 3 ) {
+
+				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+
+			}
+
+		}
 
 		// Clearcoat
 		if ( fields[ 'inputs:clearcoat' ] !== undefined ) {
@@ -2701,6 +2738,18 @@ class USDComposer {
 
 			}
 		);
+
+		// Apply UsdUVTexture scale to base color
+		if ( material.map && material.map.userData.scale ) {
+
+			const scale = material.map.userData.scale;
+			if ( Array.isArray( scale ) && scale.length >= 3 ) {
+
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+
+			}
+
+		}
 
 		// Base metalness
 		applyTexture(
