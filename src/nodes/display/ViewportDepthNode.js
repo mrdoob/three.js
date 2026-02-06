@@ -181,8 +181,6 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 /**
  * TSL function for converting a viewZ value to a reversed perspective depth value.
  *
- * Note: {link https://twitter.com/gonnavis/status/1377183786949959682}.
- *
  * @tsl
  * @function
  * @param {Node<float>} viewZ - The viewZ node.
