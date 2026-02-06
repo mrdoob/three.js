@@ -598,7 +598,7 @@ class NodeBuilder {
 
 			// TODO: Remove this hack ._currentRenderContext
 
-			const currentContext = this.renderer._currentRenderContext || this.renderer;
+			const currentContext = this.renderer._currentRenderContext || this.renderer; // use renderer as fallback until we have a compute context
 
 			let bindingGroupsCache = _bindingGroupsCache.get( currentContext );
 
