@@ -619,7 +619,7 @@ class WebGLState {
 	/**
 	 * Configures the WebGL state to use a reversed depth buffer.
 	 *
-	 * @param {boolean} depthTest - Whether the depth test is enabled or not.
+	 * @param {boolean} reversed - Whether the depth buffer is reversed or not.
 	 */
 	setReversedDepth( reversed ) {
 
