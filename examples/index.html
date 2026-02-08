@@ -103,6 +103,7 @@
 				if ( validRedirects.has( file ) === true ) {
 
 					selectFile( file );
+					links[ file ].scrollIntoView( { block: 'center' } );
 					viewer.src = validRedirects.get( file );
 					viewer.style.display = 'unset';
 
