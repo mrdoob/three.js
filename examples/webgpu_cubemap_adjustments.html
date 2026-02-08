@@ -70,7 +70,7 @@
 				cube1Texture.generateMipmaps = true;
 				cube1Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-				const cube2Urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
+				const cube2Urls = [ 'posx.png', 'negx.png', 'posy.png', 'negy.png', 'posz.png', 'negz.png' ];
 				const cube2Texture = await new THREE.CubeTextureLoader()
 					.setPath( './textures/cube/Park2/' )
 					.loadAsync( cube2Urls );
