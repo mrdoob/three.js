@@ -270,7 +270,7 @@
 		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+			v = v.replace( /[\s_]+/gi, ' ' ); // replace multiple whitespaces or underscores with a single one
 
 			if ( v !== '' ) {
 
