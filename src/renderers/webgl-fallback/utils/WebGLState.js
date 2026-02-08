@@ -8,7 +8,7 @@ import {
 	MaterialBlending
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
-import { error } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -276,7 +276,13 @@ class WebGLState {
 		const gl = this.gl;
 		const drawBuffersIndexedExt = this.backend.drawBuffersIndexedExt;
 
-		if ( ! drawBuffersIndexedExt ) return;
+		if ( ! drawBuffersIndexedExt ) {
+
+			warnOnce( 'WebGPURenderer: Multiple Render Targets (MRT) blending configuration is not fully supported in compatibility mode. The material blending will be used for all render targets.' );
+
+			return;
+
+		}
 
 		for ( let i = 0; i < textures.length; i ++ ) {
 
