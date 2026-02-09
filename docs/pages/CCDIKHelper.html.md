@@ -54,7 +54,7 @@ The material for the link spheres.
 
 The skinned mesh this helper refers to.
 
-### .sphereGeometry : SkinnedMesh
+### .sphereGeometry : SphereGeometry
 
 The helpers sphere geometry.
 

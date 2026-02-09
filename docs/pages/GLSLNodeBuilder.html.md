@@ -486,6 +486,14 @@ The buffer attribute.
 
 **Returns:** The type.
 
+### .getUniformBufferLimit() : number
+
+Returns the maximum number of bytes available for uniform buffers.
+
+**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
+
+**Returns:** The maximum number of bytes available for uniform buffers.
+
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.

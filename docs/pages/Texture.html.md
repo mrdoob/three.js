@@ -198,7 +198,7 @@ An array holding user-defined mipmaps.
 
 ### .name : string
 
-The name of the material.
+The name of the texture.
 
 ### .needsPMREMUpdate : boolean
 
@@ -282,7 +282,7 @@ An object that can be used to store custom data about the texture. It should not
 
 ### .uuid : string (readonly)
 
-The UUID of the material.
+The UUID of the texture.
 
 ### .version : number (readonly)
 

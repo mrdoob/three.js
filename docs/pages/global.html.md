@@ -42,6 +42,44 @@ Always pass.
 
 Will always return true.
 
+### .AnaglyphAlgorithm : string (constant)
+
+Anaglyph algorithm types.
+
+**TRUE**  
+string
+
+**GREY**  
+string
+
+**COLOUR**  
+string
+
+**HALF\_COLOUR**  
+string
+
+**DUBOIS**  
+string
+
+**OPTIMISED**  
+string
+
+**COMPROMISE**  
+string
+
+### .AnaglyphColorMode : string (constant)
+
+Anaglyph color modes.
+
+**RED\_CYAN**  
+string
+
+**MAGENTA\_CYAN**  
+string
+
+**MAGENTA\_GREEN**  
+string
+
 ### .AttachedBindMode : string (constant)
 
 The skinned mesh shares the same world space as the skeleton.
@@ -248,6 +286,12 @@ Increments the current stencil buffer value. Wraps stencil buffer value to zero 
 
 An int data type for textures.
 
+### .InterpolateBezier : number (constant)
+
+Bezier interpolation mode for keyframe tracks.
+
+Uses cubic Bezier curves with explicit 2D control points. Requires tangent data to be set on the track.
+
 ### .InterpolateDiscrete : number (constant)
 
 Discrete interpolation mode for keyframe tracks.
@@ -347,6 +391,10 @@ Animations are played with a chosen number of repetitions, each time jumping fro
 ### .MOUSE : ConstantsMouse (constant)
 
 Represents mouse buttons and interaction types in context of controls.
+
+### .MaterialBlending : number (constant)
+
+Represents material blending.
 
 ### .MaxEquation : number (constant)
 
@@ -834,13 +882,12 @@ UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-f
 
 Short format brief:
 
-\[JPEG headers\] \[XMP metadata describing the MPF container and _both_ SDR and gainmap images\] \[Optional metadata\] \[EXIF\] \[ICC Profile\] \[SDR image\] \[XMP metadata describing only the gainmap image\] \[Gainmap image\]
+\[JPEG headers\] \[Metadata describing the MPF container and both SDR and gainmap images\]
+
+*   XMP metadata (legacy format)
+*   ISO 21496-1 metadata (current standard) \[Optional metadata\] \[EXIF\] \[ICC Profile\] \[SDR image\] \[Gainmap image with metadata\]
 
 Each section is separated by a 0xFFXX byte followed by a descriptor byte (0xFFE0, 0xFFE1, 0xFFE2.) Binary image storages are prefixed with a unique 0xFFD8 16-bit descriptor.
-
-### .ScriptableNodeResources : Resources (constant)
-
-Defines the resources (e.g. namespaces) of scriptable nodes.
 
 ### .ShortType : number (constant)
 
@@ -989,6 +1036,10 @@ Zero slope ending for animations.
 ### .ZeroStencilOp : number (constant)
 
 Sets the stencil buffer value to `0`.
+
+### .depthAwareBlend (constant)
+
+Performs a depth-aware blend between a base scene and a secondary effect (like godrays). This function uses a Poisson disk sampling pattern to detect depth discontinuities in the neighborhood of the current pixel. If an edge is detected, it shifts the sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.
 
 ### .disposeShadowMaterial (constant)
 
@@ -1146,7 +1197,7 @@ Returns the smallest power of two that is greater than or equal to the given num
 
 **value**
 
-The value to find a POT for.
+The value to find a POT for. Must be greater than `0`.
 
 **Returns:** The smallest power of two that is greater than or equal to the given number.
 
@@ -1210,6 +1261,14 @@ The texture's aspect ratio.
 
 **Returns:** The updated texture.
 
+### .createCanvasElement() : HTMLCanvasElement
+
+Creates a canvas element configured for block display.
+
+This is a convenience function that creates a canvas element with display style set to 'block', which is commonly used in three.js rendering contexts to avoid inline element spacing issues.
+
+**Returns:** A canvas element with display set to 'block'.
+
 ### .createEvent( type : string, callback : function ) : EventNode
 
 Helper to create an EventNode and add it to the stack.
@@ -1268,6 +1327,26 @@ The typed array that defines the data type of the value.
 
 **Returns:** The denormalize (float) value in the range `[0,1]`.
 
+### .enhanceLogMessage( params : Array.<any> ) : Array.<any>
+
+Enhances log/warn/error messages related to TSL.
+
+**params**
+
+The original message parameters.
+
+**Returns:** The filtered and enhanced message parameters.
+
+### .error( …params : any )
+
+Logs an error message with the 'THREE.' prefix.
+
+If a custom console function is set via setConsoleFunction(), it will be used instead of the native console.error. The first parameter is treated as the method name and is automatically prefixed with 'THREE.'.
+
+**params**
+
+The message components. The first param is used as the method name and prefixed with 'THREE.'.
+
 ### .euclideanModulo( n : number, m : number ) : number
 
 Computes the Euclidean modulo of the given parameters that is `( ( n % m ) + m ) % m`.
@@ -1318,7 +1397,7 @@ Returns the largest power of two that is less than or equal to the given number.
 
 **value**
 
-The value to find a POT for.
+The value to find a POT for. Must be greater than `0`.
 
 **Returns:** The largest power of two that is less than or equal to the given number.
 
@@ -1392,6 +1471,12 @@ The render context.
 
 **Returns:** The cache key.
 
+### .getConsoleFunction() : function | null
+
+Gets the currently set custom console function.
+
+**Returns:** The custom console function, or null if not set.
+
 ### .getDistanceAttenuation( inputs : Object ) : Node.<float>
 
 Represents a `discard` shader operation in TSL.
@@ -1413,6 +1498,14 @@ The light's cutoff distance.
 The light's decay exponent.
 
 **Returns:** The distance falloff.
+
+### .getElementsByTagName()
+
+Utility functions for parsing
+
+### .getFilteredStack()
+
+Parses the stack trace and filters out ignored files. Returns an array with function name, file, line, and column.
 
 ### .getFloatLength( floatLength : number ) : number
 
@@ -1578,6 +1671,16 @@ The interpolation factor in the closed interval `[0, 1]`.
 
 **Returns:** The interpolated value.
 
+### .log( …params : any )
+
+Logs an informational message with the 'THREE.' prefix.
+
+If a custom console function is set via setConsoleFunction(), it will be used instead of the native console.log. The first parameter is treated as the method name and is automatically prefixed with 'THREE.'.
+
+**params**
+
+The message components. The first param is used as the method name and prefixed with 'THREE.'.
+
 ### .makeClipAdditive( targetClip : AnimationClip, referenceFrame : number, referenceClip : AnimationClip, fps : number ) : AnimationClip
 
 Converts the keyframes of the given animation clip to an additive format.
@@ -1608,7 +1711,7 @@ Default is `30`.
 
 ### .mapLinear( x : number, a1 : number, a2 : number, b1 : number, b2 : number ) : number
 
-Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>` for the given value.
+Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>` for the given value. `a2` must be greater than `a1`.
 
 **x**
 
@@ -1736,6 +1839,16 @@ The integer seed.
 
 **Returns:** A random float.
 
+### .setConsoleFunction( fn : function )
+
+Sets a custom function to handle console output.
+
+This allows external code to intercept and handle console.log, console.warn, and console.error calls made by three.js, which is useful for custom logging, testing, or debugging workflows.
+
+**fn**
+
+The function to handle console output. Should accept (type, message, ...params) where type is 'log', 'warn', or 'error'.
+
 ### .setProjectionFromUnion( camera : ArrayCamera, cameraL : PerspectiveCamera, cameraR : PerspectiveCamera )
 
 Assumes 2 cameras that are parallel and share an X-axis, and that the cameras' projection and world matrices have already been set. And that near and far planes are identical for both cameras. Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
@@ -1812,19 +1925,19 @@ Additional parameters for rendering.
 
 ### .smootherstep( x : number, min : number, max : number ) : number
 
-A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations) that has zero 1st and 2nd order derivatives at x=0 and x=1.
+A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations) that has zero 1st and 2nd order derivatives at `x=0` and `x=1`.
 
 **x**
 
-The value to evaluate based on its position between min and max.
+The value to evaluate based on its position between `min` and `max`.
 
 **min**
 
-The min value. Any x value below min will be `0`.
+The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
 
 **max**
 
-The max value. Any x value above max will be `1`.
+The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
 
 **Returns:** The alternated value.
 
@@ -1836,15 +1949,15 @@ See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
 
 **x**
 
-The value to evaluate based on its position between min and max.
+The value to evaluate based on its position between `min` and `max`.
 
 **min**
 
-The min value. Any x value below min will be `0`.
+The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
 
 **max**
 
-The max value. Any x value above max will be `1`.
+The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
 
 **Returns:** The alternated value.
 
@@ -1931,6 +2044,26 @@ The XR camera.
 **parent**
 
 The parent 3D object.
+
+### .warn( …params : any )
+
+Logs a warning message with the 'THREE.' prefix.
+
+If a custom console function is set via setConsoleFunction(), it will be used instead of the native console.warn. The first parameter is treated as the method name and is automatically prefixed with 'THREE.'.
+
+**params**
+
+The message components. The first param is used as the method name and prefixed with 'THREE.'.
+
+### .warnOnce( …params : any )
+
+Logs a warning message only once, preventing duplicate warnings.
+
+This function maintains an internal cache of warning messages and will only output each unique warning message once. Useful for warnings that may be triggered repeatedly but should only be shown to the user once.
+
+**params**
+
+The warning message components.
 
 ## Type Definitions
 

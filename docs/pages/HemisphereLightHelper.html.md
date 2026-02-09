@@ -4,6 +4,8 @@
 
 Creates a visual aid consisting of a spherical mesh for a given [HemisphereLight](HemisphereLight.html).
 
+When the hemisphere light is transformed or its light properties are changed, it's necessary to call the `update()` method of the respective helper.
+
 ## Code Example
 
 ```js

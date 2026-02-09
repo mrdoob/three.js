@@ -108,6 +108,12 @@ The environment map.
 
 Default is `null`.
 
+### .envMapIntensity : number
+
+Scales the effect of the environment map by multiplying its color.
+
+Default is `1`.
+
 ### .envMapRotation : Euler
 
 The rotation of the environment map in radians.

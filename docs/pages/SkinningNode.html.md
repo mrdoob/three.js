@@ -88,9 +88,9 @@ The current node builder.
 
 **Returns:** The skinned position from the previous frame.
 
-### .getSkinnedNormal( boneMatrices : Node, normal : Node.<vec3> ) : Node.<vec3>
+### .getSkinnedNormalAndTangent( boneMatrices : Node, normal : Node.<vec3>, tangent : Node.<vec3> ) : Object
 
-Transforms the given vertex normal via skinning.
+Transforms the given vertex normal and tangent via skinning.
 
 **boneMatrices**
 
@@ -104,7 +104,13 @@ The vertex normal in local space.
 
 Default is `normalLocal`.
 
-**Returns:** The transformed vertex normal.
+**tangent**
+
+The vertex tangent in local space.
+
+Default is `tangentLocal`.
+
+**Returns:** The transformed vertex normal and tangent.
 
 ### .getSkinnedPosition( boneMatrices : Node, position : Node.<vec3> ) : Node.<vec3>
 

@@ -50,9 +50,9 @@ Default is `true`.
 
 ### .updateBeforeType : string
 
-The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the scene once per frame in its [ViewportTextureNode#updateBefore](ViewportTextureNode.html#updateBefore) method.
+The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node should extract the current contents of the bound framebuffer for each render call.
 
-Default is `'frame'`.
+Default is `'render'`.
 
 **Overrides:** [TextureNode#updateBeforeType](TextureNode.html#updateBeforeType)
 

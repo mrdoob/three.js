@@ -4,6 +4,8 @@
 
 This displays a cone shaped helper object for a [SpotLight](SpotLight.html).
 
+When the spot light or its target are transformed or light properties are changed, it's necessary to call the `update()` method of the respective helper.
+
 ## Code Example
 
 ```js

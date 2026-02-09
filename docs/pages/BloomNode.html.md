@@ -7,7 +7,7 @@ Post processing node for creating a bloom effect.
 By default, the node affects the entire image. For a selective bloom, use the `emissive` material property to control which objects should contribute to bloom or not. This can be achieved via MRT.
 
 ```js
-const postProcessing = new THREE.PostProcessing( renderer );
+const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 scenePass.setMRT( mrt( {
 	output,
@@ -16,17 +16,17 @@ scenePass.setMRT( mrt( {
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const emissivePass = scenePass.getTextureNode( 'emissive' );
 const bloomPass = bloom( emissivePass );
-postProcessing.outputNode = scenePassColor.add( bloomPass );
+renderPipeline.outputNode = scenePassColor.add( bloomPass );
 ```
 
 ## Code Example
 
 ```js
-const postProcessing = new THREE.PostProcessing( renderer );
+const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const bloomPass = bloom( scenePassColor );
-postProcessing.outputNode = scenePassColor.add( bloomPass );
+renderPipeline.outputNode = scenePassColor.add( bloomPass );
 ```
 
 ## Import

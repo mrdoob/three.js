@@ -68,7 +68,7 @@ Represents the object's transformation matrix in local space.
 
 ### .matrixAutoUpdate : boolean
 
-When set to `true`, the engine automatically computes the local matrix from position, rotation and scale every frame.
+When set to `true`, the engine automatically computes the local matrix from position, rotation and scale every frame. If set to `false`, the app is responsible for recomputing the local matrix by calling `updateMatrix()`.
 
 The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_AUTO_UPDATE`.
 
@@ -80,7 +80,7 @@ Represents the object's transformation matrix in world space. If the 3D object h
 
 ### .matrixWorldAutoUpdate : boolean
 
-When set to `true`, the engine automatically computes the world matrix from the current local matrix and the object's transformation hierarchy.
+When set to `true`, the engine automatically computes the world matrix from the current local matrix and the object's transformation hierarchy. If set to `false`, the app is responsible for recomputing the world matrix by directly updating the `matrixWorld` property.
 
 The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE`.
 
@@ -107,6 +107,12 @@ Represents the object's normal matrix.
 ### .parent : Object3D
 
 A reference to the parent object.
+
+Default is `null`.
+
+### .pivot : Vector3
+
+The pivot point for rotation and scale transformations. When set, rotation and scale are applied around this point instead of the object's origin.
 
 Default is `null`.
 
@@ -143,6 +149,14 @@ Default is `(0,0,0)`.
 Represents the object's local scale.
 
 Default is `(1,1,1)`.
+
+### .static : boolean
+
+Whether the 3D object is supposed to be static or not. If set to `true`, it means the 3D object is not going to be changed after the initial renderer. This includes geometry and material settings. A static 3D object can be processed by the renderer slightly faster since certain state checks can be bypassed.
+
+Only relevant in context of [WebGPURenderer](WebGPURenderer.html).
+
+Default is `false`.
 
 ### .type : string (readonly)
 
@@ -747,7 +761,7 @@ To ensure correct results, this method also recomputes the 3D object's transform
 
 **force**
 
-When set to `true`, a recomputation of world matrices is forced even when [Object3D#matrixWorldAutoUpdate](Object3D.html#matrixWorldAutoUpdate) is set to `false`.
+When set to `true`, a recomputation of world matrices is forced even when [Object3D#matrixWorldNeedsUpdate](Object3D.html#matrixWorldNeedsUpdate) is `false`.
 
 Default is `false`.
 
@@ -769,7 +783,7 @@ Default is `false`.
 
 ### .worldToLocal( vector : Vector3 ) : Vector3
 
-Converts the given vector from this 3D object's word space to local space.
+Converts the given vector from this 3D object's world space to local space.
 
 **vector**
 

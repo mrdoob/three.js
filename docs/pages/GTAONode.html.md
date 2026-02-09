@@ -9,7 +9,7 @@ Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](http
 ## Code Example
 
 ```js
-const postProcessing = new THREE.PostProcessing( renderer );
+const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 scenePass.setMRT( mrt( {
 	output: output,
@@ -19,7 +19,7 @@ const scenePassColor = scenePass.getTextureNode( 'output' );
 const scenePassNormal = scenePass.getTextureNode( 'normal' );
 const scenePassDepth = scenePass.getTextureNode( 'depth' );
 const aoPass = ao( scenePassDepth, scenePassNormal, camera );
-postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
+renderPipeline.outputNode = aoPass.getTextureNode().mul( scenePassColor );
 ```
 
 ## Import

@@ -15,7 +15,7 @@ scene.add( torus );
 
 ## Constructor
 
-### new TorusGeometry( radius : number, tube : number, radialSegments : number, tubularSegments : number, arc : number )
+### new TorusGeometry( radius : number, tube : number, radialSegments : number, tubularSegments : number, arc : number, thetaStart : number, thetaLength : number )
 
 Constructs a new torus geometry.
 
@@ -46,6 +46,18 @@ Default is `48`.
 **arc**
 
 Central angle in radians.
+
+Default is `Math.PI*2`.
+
+**thetaStart**
+
+Start of the tubular sweep in radians.
+
+Default is `0`.
+
+**thetaLength**
+
+Length of the tubular sweep in radians.
 
 Default is `Math.PI*2`.
 

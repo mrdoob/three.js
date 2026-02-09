@@ -1,6 +1,8 @@
 # AnaglyphEffect
 
-A class that creates an anaglyph effect.
+A class that creates an anaglyph effect using physically-correct off-axis stereo projection.
+
+This implementation uses CameraUtils.frameCorners() to align stereo camera frustums to a virtual screen plane, providing accurate depth perception with zero parallax at the plane distance.
 
 Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). When using [WebGPURenderer](WebGPURenderer.html), use [AnaglyphPassNode](AnaglyphPassNode.html).
 
@@ -33,6 +35,22 @@ Default is `512`.
 The height of the effect in physical pixels.
 
 Default is `512`.
+
+## Properties
+
+### .eyeSep : number
+
+The interpupillary distance (eye separation) in world units. Typical human IPD is 0.064 meters (64mm).
+
+Default is `0.064`.
+
+### .planeDistance : number
+
+The distance in world units from the viewer to the virtual screen plane where zero parallax (screen depth) occurs. Objects at this distance appear at the screen surface. Objects closer appear in front of the screen (negative parallax). Objects further appear behind the screen (positive parallax).
+
+The screen dimensions are derived from the camera's FOV and aspect ratio at this distance, ensuring the stereo view matches the camera's field of view.
+
+Default is `0.5`.
 
 ## Methods
 

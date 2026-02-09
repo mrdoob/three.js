@@ -34,7 +34,7 @@ Default is `false`.
 
 ### .lastValue : number
 
-TODO
+The total frame duration until the next update.
 
 Default is `0`.
 
@@ -44,9 +44,9 @@ Maximum number of queries this pool can hold.
 
 Default is `256`.
 
-### .pendingResolve : boolean
+### .pendingResolve : boolean | Promise.<number>
 
-TODO
+This property is used to avoid multiple concurrent resolve operations. The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds the promise of the current resolve operation.
 
 Default is `false`.
 

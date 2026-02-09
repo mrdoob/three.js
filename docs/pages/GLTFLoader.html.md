@@ -4,7 +4,7 @@
 
 A loader for the glTF 2.0 format.
 
-\[glTF\](https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification](https://github.com/KhronosGroup/glTF/tree/main/specification/2.0\)) whenever possible. Be advised that image bitmaps are not automatically GC-collected when they are no longer referenced, and they require special handling during the disposal process.
+[glTF](https://www.khronos.org/gltf/) (GL Transmission Format) is an [open format specification](https://github.com/KhronosGroup/glTF/tree/main/specification/2.0\)) whenever possible. Be advised that image bitmaps are not automatically GC-collected when they are no longer referenced, and they require special handling during the disposal process.
 
 `GLTFLoader` supports the following glTF 2.0 extensions:
 
@@ -18,6 +18,7 @@ A loader for the glTF 2.0 format.
 *   KHR\_materials\_unlit
 *   KHR\_materials\_volume
 *   KHR\_mesh\_quantization
+*   KHR\_meshopt\_compression
 *   KHR\_lights\_punctual
 *   KHR\_texture\_basisu
 *   KHR\_texture\_transform
@@ -88,7 +89,7 @@ Executed when errors occur.
 
 ### .parse( data : string | ArrayBuffer, path : string, onLoad : function, onError : onErrorCallback )
 
-Parses the given FBX data and returns the resulting group.
+Parses the given glTF data and returns the resulting group.
 
 **data**
 

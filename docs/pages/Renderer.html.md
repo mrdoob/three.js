@@ -629,6 +629,14 @@ Initializes the renderer so it is ready for usage.
 
 **Returns:** A Promise that resolves when the renderer has been initialized.
 
+### .initRenderTarget( renderTarget : RenderTarget )
+
+Initializes the given render target.
+
+**renderTarget**
+
+The render target to intialize.
+
 ### .initTexture( texture : Texture )
 
 Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).

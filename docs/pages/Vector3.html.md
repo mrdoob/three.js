@@ -749,7 +749,7 @@ The value to set for all vector components.
 
 ### .setX( x : number ) : Vector3
 
-Sets the vector's x component to the given value
+Sets the vector's x component to the given value.
 
 **x**
 
@@ -759,7 +759,7 @@ The value to set.
 
 ### .setY( y : number ) : Vector3
 
-Sets the vector's y component to the given value
+Sets the vector's y component to the given value.
 
 **y**
 
@@ -769,7 +769,7 @@ The value to set.
 
 ### .setZ( z : number ) : Vector3
 
-Sets the vector's z component to the given value
+Sets the vector's z component to the given value.
 
 **z**
 

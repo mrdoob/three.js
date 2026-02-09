@@ -28,7 +28,7 @@ Default is `[]`.
 
 ## Properties
 
-### .iks : SkinnedMesh
+### .iks : Array.<CCDIKSolver~IK>
 
 The IK objects.
 

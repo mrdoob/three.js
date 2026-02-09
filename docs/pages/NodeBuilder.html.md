@@ -1226,6 +1226,12 @@ The data type.
 
 **Returns:** The length.
 
+### .getUniformBufferLimit() : number
+
+Returns the maximum number of bytes available for uniform buffers.
+
+**Returns:** The maximum number of bytes available for uniform buffers.
+
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : 'vertex' | 'fragment' | 'compute' | 'any', name : string ) : NodeUniform
 
 Returns an instance of [NodeUniform](NodeUniform.html) for the given uniform node.
@@ -1455,6 +1461,12 @@ Whether the given texture is filtered or not.
 The texture to check.
 
 **Returns:** Whether the given texture is filtered or not.
+
+### .isFlatShading() : boolean
+
+Whether the material is using flat shading or not.
+
+**Returns:** Whether the material is using flat shading or not.
 
 ### .isFlipY() : boolean (abstract)
 

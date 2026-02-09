@@ -7,7 +7,7 @@ Post processing node for rendering outlines around selected objects. The node gi
 ## Code Example
 
 ```js
-const postProcessing = new THREE.PostProcessing( renderer );
+const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 // outline parameter
 const edgeStrength = uniform( 3.0 );
@@ -23,7 +23,7 @@ outlinePass = outline( scene, camera, {
 // compose custom outline
 const { visibleEdge, hiddenEdge } = outlinePass;
 const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
-postProcessing.outputNode = outlineColor.add( scenePass );
+renderPipeline.outputNode = outlineColor.add( scenePass );
 ```
 
 ## Import

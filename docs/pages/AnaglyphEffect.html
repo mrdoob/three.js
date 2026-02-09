@@ -12,7 +12,11 @@
 	<h1 translate="no">AnaglyphEffect</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>A class that creates an anaglyph effect.</p>
+				<div class="class-description"><p>A class that creates an anaglyph effect using physically-correct
+off-axis stereo projection.</p>
+<p>This implementation uses CameraUtils.frameCorners() to align stereo
+camera frustums to a virtual screen plane, providing accurate depth
+perception with zero parallax at the plane distance.</p>
 <p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
 When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="AnaglyphPassNode.html">AnaglyphPassNode</a>.</p></div>
 			</header>
@@ -31,7 +35,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Anagly
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -39,7 +43,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Anagly
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect in physical pixels.</p>
@@ -48,7 +52,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Anagly
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect in physical pixels.</p>
@@ -57,6 +61,28 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Anagly
 								</tr>
 							</tbody>
 						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="eyeSep" translate="no">.<a href="#eyeSep">eyeSep</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The interpupillary distance (eye separation) in world units.
+Typical human IPD is 0.064 meters (64mm).</p>
+						<p>Default is <code>0.064</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="planeDistance" translate="no">.<a href="#planeDistance">planeDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The distance in world units from the viewer to the virtual
+screen plane where zero parallax (screen depth) occurs.
+Objects at this distance appear at the screen surface.
+Objects closer appear in front of the screen (negative parallax).
+Objects further appear behind the screen (positive parallax).</p>
+<p>The screen dimensions are derived from the camera's FOV and aspect ratio
+at this distance, ensuring the stereo view matches the camera's field of view.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -77,7 +103,7 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene to render.</p>
@@ -85,7 +111,7 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera.</p>
@@ -103,7 +129,7 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect in logical pixels.</p>
@@ -111,7 +137,7 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect in logical pixels.</p>

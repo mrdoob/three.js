@@ -766,6 +766,14 @@ The node data type.
 
 **Returns:** The WGSL type.
 
+### .getUniformBufferLimit() : number
+
+Returns the maximum uniform buffer size limit.
+
+**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
+
+**Returns:** The maximum uniform buffer size in bytes.
+
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.

@@ -28,25 +28,25 @@ The property binding.
 
 ### .cumulativeWeight : number
 
-TODO
+Accumulated weight of the property binding.
 
 Default is `0`.
 
 ### .cumulativeWeightAdditive : number
 
-TODO
+Accumulated additive weight of the property binding.
 
 Default is `0`.
 
 ### .referenceCount : number
 
-TODO
+Number of keyframe tracks referencing this property binding.
 
 Default is `0`.
 
 ### .useCount : number
 
-TODO
+Number of active keyframe tracks currently using this property binding.
 
 Default is `0`.
 

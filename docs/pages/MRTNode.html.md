@@ -27,6 +27,10 @@ The MRT outputs.
 
 ## Properties
 
+### .blendModes : Object.<string, BlendMode>
+
+A dictionary storing the blend modes for each output.
+
 ### .isMRTNode : boolean (readonly)
 
 This flag can be used for type testing.
@@ -49,6 +53,16 @@ The name of the output.
 
 **Returns:** The output node.
 
+### .getBlendMode( name : string ) : BlendMode
+
+Returns the blend mode for the given output name.
+
+**name**
+
+The name of the output.
+
+**Returns:** The blend mode.
+
 ### .has( name : string ) : NodeBuilder
 
 Returns `true` if the MRT node has an output with the given name.
@@ -68,6 +82,20 @@ Merges the outputs of the given MRT node with the outputs of this node.
 The MRT to merge.
 
 **Returns:** A new MRT node with merged outputs..
+
+### .setBlendMode( name : string, blend : BlendMode ) : MRTNode
+
+Sets the blend mode for the given output name.
+
+**name**
+
+The name of the output.
+
+**blend**
+
+The blending mode.
+
+**Returns:** The current MRT node.
 
 ## Source
 

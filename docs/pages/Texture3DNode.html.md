@@ -90,13 +90,13 @@ The current node builder.
 
 ### .normal( uvNode : Node.<vec3> ) : Node.<vec3>
 
-TODO.
+Computes the normal for the given uv. These texture coordiantes represent a position inside the 3D texture. Unlike geometric normals, this normal represents a slope or gradient of scalar data inside the 3D texture.
 
 **uvNode**
 
-The uv node .
+The uv node that defines a position in the 3D texture.
 
-**Returns:** TODO.
+**Returns:** The normal representing the slope/gradient in the data.
 
 ### .setUpdateMatrix( value : boolean )
 
@@ -107,22 +107,6 @@ Overwritten with an empty implementation since the `updateMatrix` flag is ignore
 The update toggle.
 
 **Overrides:** [TextureNode#setUpdateMatrix](TextureNode.html#setUpdateMatrix)
-
-### .setupUV( builder : NodeBuilder, uvNode : Node ) : Node
-
-Overwrites the default implementation to return the unmodified uv node.
-
-**builder**
-
-The current node builder.
-
-**uvNode**
-
-The uv node to setup.
-
-**Overrides:** [TextureNode#setupUV](TextureNode.html#setupUV)
-
-**Returns:** The unmodified uv node.
 
 ## Source
 

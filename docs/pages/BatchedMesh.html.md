@@ -199,7 +199,7 @@ The target object that is used to store the method's result.
 
 **Returns:** The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
 
-### .getColorAt( instanceId : number, color : Color ) : Color
+### .getColorAt( instanceId : number, color : Color | Vector4 ) : Color | Vector4
 
 Returns the color of the defined instance.
 
@@ -211,7 +211,7 @@ The ID of an instance to get the color of.
 
 The target object that is used to store the method's result.
 
-**Returns:** The instance's color.
+**Returns:** The instance's color. Use a `Vector4` to also retrieve alpha.
 
 ### .getGeometryIdAt( instanceId : number ) : number
 
@@ -267,7 +267,7 @@ Repacks the sub geometries in BatchedMesh to remove any unused space remaining f
 
 **Returns:** A reference to this batched mesh.
 
-### .setColorAt( instanceId : number, color : Color ) : BatchedMesh
+### .setColorAt( instanceId : number, color : Color | Vector4 ) : BatchedMesh
 
 Sets the given color to the defined instance.
 
@@ -277,7 +277,7 @@ The ID of an instance to set the color of.
 
 **color**
 
-The color to set the instance to.
+The color to set the instance to. Use a `Vector4` to also define alpha.
 
 **Returns:** A reference to this batched mesh.
 

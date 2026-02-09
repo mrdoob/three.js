@@ -266,6 +266,22 @@ Default is `false`.
 
 ## Methods
 
+### .dollyIn( dollyScale : number )
+
+Programmatically dolly in (zoom in for perspective camera).
+
+**dollyScale**
+
+The dolly scale factor.
+
+### .dollyOut( dollyScale : number )
+
+Programmatically dolly out (zoom out for perspective camera).
+
+**dollyScale**
+
+The dolly scale factor.
+
 ### .getAzimuthalAngle() : number
 
 Get the current horizontal rotation, in radians.
@@ -292,9 +308,37 @@ Adds key event listeners to the given DOM element. `window` is a recommended arg
 
 The DOM element
 
+### .pan( deltaX : number, deltaY : number )
+
+Programmatically pan the camera.
+
+**deltaX**
+
+The horizontal pan amount in pixels.
+
+**deltaY**
+
+The vertical pan amount in pixels.
+
 ### .reset()
 
 Reset the controls to their state from either the last time the `saveState()` was called, or the initial state.
+
+### .rotateLeft( angle : number )
+
+Programmatically rotate the camera left (around the vertical axis).
+
+**angle**
+
+The rotation angle in radians.
+
+### .rotateUp( angle : number )
+
+Programmatically rotate the camera up (around the horizontal axis).
+
+**angle**
+
+The rotation angle in radians.
 
 ### .saveState()
 

@@ -82,11 +82,13 @@ Defines the offset.
 
 Default is `null`.
 
-### .useColor : boolean
+### .vertexColors : boolean
 
 Whether vertex colors should be used or not.
 
 Default is `false`.
+
+**Overrides:** [NodeMaterial#vertexColors](NodeMaterial.html#vertexColors)
 
 ### .worldUnits : boolean
 

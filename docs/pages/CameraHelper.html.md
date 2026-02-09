@@ -8,6 +8,8 @@ Based on frustum visualization in [lightgl.js shadowmap example](https://github.
 
 `CameraHelper` must be a child of the scene.
 
+When the camera is transformed or its projection matrix is changed, it's necessary to call the `update()` method of the respective helper.
+
 ## Code Example
 
 ```js

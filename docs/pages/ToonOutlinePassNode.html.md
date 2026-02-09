@@ -7,7 +7,7 @@ Represents a render pass for producing a toon outline effect on compatible objec
 ## Code Example
 
 ```js
-const postProcessing = new PostProcessing( renderer );
+const postProcessing = new RenderPipeline( renderer );
 const scenePass = toonOutlinePass( scene, camera );
 postProcessing.outputNode = scenePass;
 ```

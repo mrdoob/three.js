@@ -27,7 +27,7 @@ The loading manager.
 
 ### .mimeType : string
 
-The expected mime type. Valid values can be found [here](hhttps://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
+The expected mime type. Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
 
 ### .responseType : 'arraybuffer' | 'blob' | 'document' | 'json' | ''
 

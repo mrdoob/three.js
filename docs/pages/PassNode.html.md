@@ -7,7 +7,7 @@ Represents a render pass (sometimes called beauty pass) in context of post proce
 ## Code Example
 
 ```js
-const postProcessing = new PostProcessing( renderer );
+const postProcessing = new RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 postProcessing.outputNode = scenePass;
 ```

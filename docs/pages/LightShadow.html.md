@@ -28,6 +28,14 @@ The default is `0`. Very tiny adjustments here (in the order of `0.0001`) may he
 
 Default is `0`.
 
+### .biasNode : Node.<float>
+
+A node version of `bias`. Only supported with `WebGPURenderer`.
+
+If a bias node is defined, `bias` has no effect.
+
+Default is `null`.
+
 ### .blurSamples : number
 
 The amount of samples to use when blurring a VSM shadow map.

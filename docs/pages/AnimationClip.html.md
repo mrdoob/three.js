@@ -166,7 +166,7 @@ The serialized animation clip.
 
 **Returns:** The new animation clip.
 
-### .parseAnimation( animation : Object, bones : Array.<Bones> ) : AnimationClip
+### .parseAnimation( animation : Object, bones : Array.<Bone> ) : AnimationClip
 
 Parses the `animation.hierarchy` format and returns a new animation clip.
 

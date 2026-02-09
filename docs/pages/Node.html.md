@@ -54,6 +54,12 @@ Create a list of parents for this node during the build process.
 
 Default is `false`.
 
+### .stackTrace : string
+
+The stack trace of the node for debugging purposes.
+
+Default is `null`.
+
 ### .type : string (readonly)
 
 The type of the class. The value is usually the constructor name.
@@ -85,6 +91,12 @@ The UUID of the node.
 The version of the node. The version automatically is increased when [Node#needsUpdate](Node.html#needsUpdate) is set to `true`.
 
 Default is `0`.
+
+### .captureStackTrace : boolean
+
+Enables or disables the automatic capturing of stack traces for nodes.
+
+Default is `false`.
 
 ## Methods
 

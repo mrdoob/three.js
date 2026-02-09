@@ -1,10 +1,10 @@
 # KeyframeTrack
 
-Represents s a timed sequence of keyframes, which are composed of lists of times and related values, and which are used to animate a specific property of an object.
+Represents a timed sequence of keyframes, which are composed of lists of times and related values, and which are used to animate a specific property of an object.
 
 ## Constructor
 
-### new KeyframeTrack( name : string, times : Array.<number>, values : Array.<(number|string|boolean)>, interpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth )
+### new KeyframeTrack( name : string, times : Array.<number>, values : Array.<(number|string|boolean)>, interpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth | InterpolateBezier )
 
 Constructs a new keyframe track.
 
@@ -26,7 +26,7 @@ The interpolation type.
 
 ## Properties
 
-### .DefaultInterpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth
+### .DefaultInterpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth | InterpolateBezier
 
 The default interpolation type of this keyframe track.
 
@@ -64,6 +64,21 @@ The keyframe values.
 
 ## Methods
 
+### .InterpolantFactoryMethodBezier( result : TypedArray ) : BezierInterpolant
+
+Factory method for creating a new Bezier interpolant.
+
+The Bezier interpolant requires tangent data to be set via the `settings` property on the track before creating the interpolant. The settings should contain:
+
+*   `inTangents`: Float32Array with \[time, value\] pairs per keyframe per component
+*   `outTangents`: Float32Array with \[time, value\] pairs per keyframe per component
+
+**result**
+
+The result buffer.
+
+**Returns:** The new interpolant.
+
 ### .InterpolantFactoryMethodDiscrete( result : TypedArray ) : DiscreteInterpolant
 
 Factory method for creating a new discrete interpolant.
@@ -100,7 +115,7 @@ Returns a new keyframe track with copied values from this instance.
 
 **Returns:** A clone of this instance.
 
-### .getInterpolation() : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth
+### .getInterpolation() : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth | InterpolateBezier
 
 Returns the current interpolation type.
 
@@ -112,11 +127,11 @@ Returns the value size.
 
 **Returns:** The value size.
 
-### .optimize() : AnimationClip
+### .optimize() : KeyframeTrack
 
 Optimizes this keyframe track by removing equivalent sequential keys (which are common in morph target sequences).
 
-**Returns:** A reference to this animation clip.
+**Returns:** A reference to this keyframe track.
 
 ### .scale( timeScale : number ) : KeyframeTrack
 
@@ -128,7 +143,7 @@ The time scale.
 
 **Returns:** A reference to this keyframe track.
 
-### .setInterpolation( interpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth ) : KeyframeTrack
+### .setInterpolation( interpolation : InterpolateLinear | InterpolateDiscrete | InterpolateSmooth | InterpolateBezier ) : KeyframeTrack
 
 Defines the interpolation factor method for this keyframe track.
 

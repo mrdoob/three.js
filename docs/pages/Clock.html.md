@@ -14,6 +14,8 @@ Whether to automatically start the clock when `getDelta()` is called for the fir
 
 Default is `true`.
 
+**Deprecated:** since r183.
+
 ## Properties
 
 ### .autoStart : boolean

@@ -2,15 +2,15 @@
 
 # USDLoader
 
-A loader for the USDZ format.
+A loader for the USD format (USD, USDA, USDC, USDZ).
 
-USDZ files that use USDC internally are not yet supported, only USDA.
+Supports both ASCII (USDA) and binary (USDC) USD files, as well as USDZ archives containing either format.
 
 ## Code Example
 
 ```js
-const loader = new USDZLoader();
-const model = await loader.loadAsync( 'saeukkang.usdz' );
+const loader = new USDLoader();
+const model = await loader.loadAsync( 'model.usdz' );
 scene.add( model );
 ```
 

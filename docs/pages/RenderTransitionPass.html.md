@@ -122,7 +122,7 @@ The effect texture.
 
 ### .setTextureThreshold( value : boolean | number )
 
-Sets the texture threshold. This value defined how strong the texture effects the transition. Must be in the range `[0,1]` (0 means full effect, 1 means no effect).
+Sets the texture threshold. This value defines how strong the texture effects the transition. Must be in the range `[0,1]` (0 means full effect, 1 means no effect).
 
 **value**
 

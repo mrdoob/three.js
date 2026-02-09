@@ -4,7 +4,7 @@
 
 Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality. Cursor/finger positions and movements are mapped over a virtual trackball surface represented by a gizmo and mapped in intuitive and consistent camera movements. Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative way (returning to the starting point will make the camera return to its starting orientation).
 
-In addition to supporting pan, zoom and pinch gestures, Arcball controls provide focus< functionality with a double click/tap for intuitively moving the object's point of interest in the center of the virtual trackball. Focus allows a much better inspection and navigation in complex environment. Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation. Saving and restoring of Camera State is supported also through clipboard (use ctrl+c and ctrl+v shortcuts for copy and paste the state).
+In addition to supporting pan, zoom and pinch gestures, double clicking/tapping focuses on a point, intuitively moving the object's point of interest to the center of the virtual trackball. Focus allows a much better inspection and navigation in complex environment. Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation. Saving and restoring of Camera State is supported also through clipboard (use ctrl+c and ctrl+v shortcuts for copy and paste the state).
 
 Unlike [OrbitControls](OrbitControls.html) and [TrackballControls](TrackballControls.html), `ArcballControls` doesn't require `update()` to be called externally in an animation loop when animations are on.
 

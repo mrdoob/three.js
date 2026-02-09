@@ -28,11 +28,13 @@ Default is `false`.
 
 ### .static : boolean
 
-Whether the bundle is static or not. When set to `true`, the structure is assumed to be static and does not change. E.g. no new objects are added to the group
+Whether the bundle is static or not. When set to `true`, the structure is assumed to be static and does not change. E.g. no new objects are added to the group.
 
 If a change is required, an update can still be forced by setting the `needsUpdate` flag to `true`.
 
 Default is `true`.
+
+**Overrides:** [Group#static](Group.html#static)
 
 ### .type : string (readonly)
 

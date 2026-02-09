@@ -46,6 +46,10 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+### .location : Object
+
+Controls the position of the helper in the viewport. Use `top`/`bottom` for vertical positioning and `left`/`right` for horizontal. If `left` is `null`, `right` is used. If `top` is `null`, `bottom` is used.
+
 ## Methods
 
 ### .dispose()
@@ -64,7 +68,7 @@ The event to process.
 
 ### .render( renderer : WebGLRenderer | WebGPURenderer )
 
-Renders the helper in a separate view in the bottom-right corner of the viewport.
+Renders the helper in a separate view in the viewport. Position is controlled by the `location` property.
 
 **renderer**
 

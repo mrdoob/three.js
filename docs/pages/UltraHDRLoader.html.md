@@ -9,7 +9,8 @@ Existing HDR or EXR textures can be converted to Ultra HDR with this [tool](http
 Current feature set:
 
 *   JPEG headers (required)
-*   XMP metadata (required)
+*   XMP metadata (legacy format, supported)
+*   ISO 21496-1 metadata (current standard, supported)
 *   XMP validation (not implemented)
 *   EXIF profile (not implemented)
 *   ICC profile (not implemented)

@@ -111,7 +111,7 @@ The precision to set.
 
 ### .setQuality( quality : 'low' | 'high' )
 
-Sets the render quality. Setting to `high` means This value indicates that the browser tries to improve the SVG quality over rendering speed and geometric precision.
+Sets the render quality. Setting to `high` makes the browser improve SVG quality over rendering speed and geometric precision.
 
 **quality**
 

@@ -35,6 +35,26 @@ Constructs a new skydome.
 
 ## Properties
 
+### .cloudCoverage : UniformNode.<float>
+
+The cloud coverage uniform.
+
+### .cloudDensity : UniformNode.<float>
+
+The cloud density uniform.
+
+### .cloudElevation : UniformNode.<float>
+
+The cloud elevation uniform.
+
+### .cloudScale : UniformNode.<float>
+
+The cloud scale uniform.
+
+### .cloudSpeed : UniformNode.<float>
+
+The cloud speed uniform.
+
 ### .isSky : boolean (readonly)
 
 This flag can be used for type testing.

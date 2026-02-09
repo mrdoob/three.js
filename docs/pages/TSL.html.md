@@ -56,15 +56,15 @@ TSL object that represents the shader variable `AttenuationColor`.
 
 TSL object that represents the shader variable `AttenuationDistance`.
 
-### .backgroundBlurriness : SceneNode (constant)
+### .backgroundBlurriness : Node.<float> (constant)
 
 TSL object that represents the scene's background blurriness.
 
-### .backgroundIntensity : SceneNode (constant)
+### .backgroundIntensity : Node.<float> (constant)
 
 TSL object that represents the scene's background intensity.
 
-### .backgroundRotation : SceneNode (constant)
+### .backgroundRotation : Node.<mat4> (constant)
 
 TSL object that represents the scene's background rotation.
 
@@ -1203,6 +1203,34 @@ The data type.
 
 Default is `'float'`.
 
+### .barrelMask( coord : Node.<vec2> ) : Node.<float>
+
+Checks if UV coordinates are inside the valid 0-1 range. Useful for masking areas inside the distorted screen.
+
+**coord**
+
+The UV coordinates to check.
+
+**Returns:** 1.0 if inside bounds, 0.0 if outside.
+
+### .barrelUV( curvature : Node.<float>, coord : Node.<vec2> ) : Node.<vec2>
+
+Creates barrel-distorted UV coordinates. The center of the screen appears to bulge outward (convex distortion).
+
+**curvature**
+
+The amount of curvature (0 = flat, 0.5 = very curved).
+
+Default is `0.1`.
+
+**coord**
+
+The input UV coordinates.
+
+Default is `uv()`.
+
+**Returns:** The distorted UV coordinates.
+
 ### .barrier( scope : string ) : BarrierNode
 
 TSL function for creating a barrier node.
@@ -1224,6 +1252,28 @@ A reference to batched mesh.
 TSL function for computing bent normals.
 
 **Returns:** Bent normals.
+
+### .bilateralBlur( node : Node.<vec4>, directionNode : Node.<(vec2|float)>, sigma : number, sigmaColor : number ) : BilateralBlurNode
+
+TSL function for creating a bilateral blur node for post processing.
+
+Bilateral blur smooths an image while preserving sharp edges by considering both spatial distance and color/intensity differences between pixels.
+
+**node**
+
+The node that represents the input of the effect.
+
+**directionNode**
+
+Defines the direction and radius of the blur.
+
+**sigma**
+
+Controls the spatial kernel of the blur filter. Higher values mean a wider blur radius.
+
+**sigmaColor**
+
+Controls the intensity kernel. Higher values allow more color difference to be blurred together.
 
 ### .billboarding( config : Object ) : Node.<vec3>
 
@@ -1711,6 +1761,30 @@ The exposure.
 
 **Returns:** The tone mapped color.
 
+### .circle( scale : Node.<float>, softness : Node.<float>, coord : Node.<vec2> ) : Node.<float>
+
+Returns a radial gradient from center (white) to edges (black). Useful for masking effects based on distance from center.
+
+**scale**
+
+Controls the size of the gradient (0 = all black, 1 = full circle).
+
+Default is `1.0`.
+
+**softness**
+
+Controls the edge softness (0 = hard edge, 1 = soft gradient).
+
+Default is `0.5`.
+
+**coord**
+
+The input UV coordinates.
+
+Default is `uv()`.
+
+**Returns:** 1.0 at center, 0.0 at edges.
+
 ### .circleIntersectsAABB( circleCenter : Node.<vec2>, radius : Node.<float>, minBounds : Node.<vec2>, maxBounds : Node.<vec2> ) : Node.<bool>
 
 TSL function that checks if a circle intersects with an axis-aligned bounding box (AABB).
@@ -1780,6 +1854,22 @@ Default is `[]`.
 The used language.
 
 Default is `''`.
+
+### .colorBleeding( color : Node, amount : Node.<float> ) : Node.<vec3>
+
+Applies color bleeding effect to simulate horizontal color smearing. Simulates the analog signal bleeding in CRT displays where colors "leak" into adjacent pixels horizontally.
+
+**color**
+
+The input texture node.
+
+**amount**
+
+The amount of color bleeding (0-0.01).
+
+Default is `0.002`.
+
+**Returns:** The color with bleeding effect applied.
 
 ### .colorSpaceToWorking( node : Node, sourceColorSpace : string ) : ColorSpaceNode
 
@@ -2329,6 +2419,18 @@ Returns 2 raised to the power of the parameter.
 
 The parameter.
 
+### .exponentialHeightFogFactor( density : Node, height : Node )
+
+Constructs a new height fog factor node. This fog factor requires a Y-up coordinate system.
+
+**density**
+
+Defines the fog density.
+
+**height**
+
+The height threshold in world space. Everything below this y-coordinate is affected by fog.
+
 ### .expression( snippet : string, nodeType : string ) : ExpressionNode
 
 TSL function for creating an expression node.
@@ -2607,6 +2709,22 @@ The native code.
 **includes**
 
 An array of includes.
+
+### .godrays( depthNode : TextureNode, camera : Camera, light : DirectionalLight | PointLight ) : GodraysNode
+
+TSL function for creating a Godrays effect.
+
+**depthNode**
+
+A texture node that represents the scene's depth.
+
+**camera**
+
+The camera the scene is rendered with.
+
+**light**
+
+The light the godrays are rendered for.
 
 ### .grayscale( color : Node.<vec3> ) : Node.<vec3>
 
@@ -3769,9 +3887,9 @@ Default is `null`.
 
 **Returns:** The created point shadow node.
 
-### .posterize( sourceNode : Node, stepsNode : Node ) : PosterizeNode
+### .posterize( sourceNode : Node, stepsNode : Node ) : Node
 
-TSL function for creating a posterize node.
+TSL function for creating a posterize effect which reduces the number of colors in an image, resulting in a more blocky and stylized appearance.
 
 **sourceNode**
 
@@ -3780,6 +3898,8 @@ The input color.
 **stepsNode**
 
 Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.
+
+**Returns:** The posterized color.
 
 ### .pow( x : Node | number, y : Node | number ) : Node
 
@@ -4286,6 +4406,42 @@ Default is `null`.
 
 **Returns:** A context node that replaces the default UV coordinates.
 
+### .retroPass( scene : Scene, camera : Camera, options : Object ) : RetroPassNode
+
+Creates a new RetroPassNode instance for PS1-style rendering.
+
+The retro pass applies vertex snapping, affine texture mapping, and low-resolution rendering to achieve an authentic PlayStation 1 aesthetic. Combine with other post-processing effects like dithering, posterization, and scanlines for full retro look.
+
+```js
+// Combined with other effects
+let pipeline = retroPass( scene, camera );
+pipeline = bayerDither( pipeline, 32 );
+pipeline = posterize( pipeline, 32 );
+renderPipeline.outputNode = pipeline;
+```
+
+**scene**
+
+The scene to render.
+
+**camera**
+
+The camera to render from.
+
+**options**
+
+Additional options for the retro pass.
+
+Default is `{}`.
+
+**affineDistortion**
+
+An optional node to apply affine distortion to UVs.
+
+Default is `null`.
+
+**Returns:** A new RetroPassNode instance.
+
 ### .rgbShift( node : Node.<vec4>, amount : number, angle : number ) : RGBShiftNode
 
 TSL function for creating a RGB shift or split effect for post processing.
@@ -4430,27 +4586,39 @@ Default is `1`.
 
 **Returns:** The saturated color.
 
-### .scriptable( codeNode : CodeNode, parameters : Object ) : ScriptableNode
+### .scanlines( color : Node.<vec3>, intensity : Node.<float>, count : Node.<float>, speed : Node.<float>, coord : Node.<vec2> ) : Node.<vec3>
 
-TSL function for creating a scriptable node.
+Applies scanline effect to simulate CRT monitor horizontal lines with animation.
 
-**codeNode**
+**color**
 
-The code node.
+The input color.
 
-**parameters**
+**intensity**
 
-The parameters definition.
+The intensity of the scanlines (0-1).
 
-Default is `{}`.
+Default is `0.3`.
 
-### .scriptableValue( value : any ) : ScriptableValueNode
+**count**
 
-TSL function for creating a scriptable value node.
+The number of scanlines (typically matches vertical resolution).
 
-**value**
+Default is `240`.
 
-The value.
+**speed**
+
+The scroll speed of scanlines (0 = static, 1 = normal CRT roll).
+
+Default is `0.0`.
+
+**coord**
+
+The UV coordinates to use for scanlines.
+
+Default is `uv()`.
+
+**Returns:** The color with scanlines applied.
 
 ### .select( condNode : Node, ifNode : Node, elseNode : Node ) : ConditionalNode
 
@@ -4658,9 +4826,14 @@ The center point
 
 **Returns:** The updated uv coordinates.
 
-### .spritesheetUV( countNode : Node.<vec2>, uvNode : Node.<vec2>, frameNode : Node.<float> ) : SpriteSheetUVNode
+### .spritesheetUV( countNode : Node.<vec2>, uvNode : Node.<vec2>, frameNode : Node.<float> ) : Node.<vec2>
 
-TSL function for creating a sprite sheet uv node.
+TSL function for computing texture coordinates for animated sprite sheets.
+
+```js
+const uvNode = spritesheetUV( vec2( 6, 6 ), uv(), time.mul( animationSpeed ) );
+material.colorNode = texture( spriteSheet, uvNode );
+```
 
 **countNode**
 
@@ -4676,7 +4849,7 @@ Default is `uv()`.
 
 The node that defines the current frame/sprite.
 
-Default is `float()`.
+Default is `float(0)`.
 
 ### .sqrt( x : Node | number ) : Node
 
@@ -5922,6 +6095,24 @@ A framebuffer texture holding the viewport data. If not provided, a framebuffer 
 
 Default is `null`.
 
+### .viewportOpaqueMipTexture( uv : Node, level : Node ) : ViewportTextureNode
+
+TSL function for creating a viewport texture node with enabled mipmap generation. The texture should only contain the opaque rendering objects.
+
+This should be used just in transparent or transmissive materials.
+
+**uv**
+
+The uv node.
+
+Default is `screenUV`.
+
+**level**
+
+The level node.
+
+Default is `null`.
+
 ### .viewportSafeUV( uv : Node.<vec2> ) : Node.<vec2>
 
 A special version of a screen uv function that involves a depth comparison when computing the final uvs. The function mitigates visual errors when using viewport texture nodes for refraction purposes. Without this function objects in front of a refractive surface might appear on the refractive surface which is incorrect.
@@ -5969,6 +6160,34 @@ Default is `null`.
 A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
 
 Default is `null`.
+
+### .vignette( color : Node.<vec3>, intensity : Node.<float>, smoothness : Node.<float>, coord : Node.<vec2> ) : Node.<vec3>
+
+Applies vignette effect to darken the edges of the screen.
+
+**color**
+
+The input color.
+
+**intensity**
+
+The intensity of the vignette (0-1).
+
+Default is `0.4`.
+
+**smoothness**
+
+The smoothness of the vignette falloff.
+
+Default is `0.5`.
+
+**coord**
+
+The UV coordinates to use for vignette calculation.
+
+Default is `uv()`.
+
+**Returns:** The color with vignette applied.
 
 ### .vogelDiskSample( sampleIndex : Node.<int>, samplesCount : Node.<int>, phi : Node.<float> ) : Node.<vec2>
 

@@ -558,16 +558,14 @@
 						tube: 3,
 						radialSegments: 16,
 						tubularSegments: 100,
-						arc: twoPi,
-						thetaStart: 0,
-						thetaLength: twoPi
+						arc: twoPi
 					};
 
 					function generateGeometry() {
 
 						updateGroupGeometry( mesh,
 							new TorusGeometry(
-								data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc, data.thetaStart, data.thetaLength
+								data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc
 							)
 						);
 
@@ -580,8 +578,6 @@
 					folder.add( data, 'radialSegments', 2, 30 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'tubularSegments', 3, 200 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'arc', 0.1, twoPi ).onChange( generateGeometry );
-					folder.add( data, 'thetaStart', 0.1, twoPi ).onChange( generateGeometry );
-					folder.add( data, 'thetaLength', 0.1, twoPi ).onChange( generateGeometry );
 
 					generateGeometry();
 

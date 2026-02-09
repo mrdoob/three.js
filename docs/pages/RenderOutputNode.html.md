@@ -4,12 +4,12 @@
 
 Normally, tone mapping and color conversion happens automatically before outputting pixel too the default (screen) framebuffer. In certain post processing setups this happens to late because certain effects require e.g. sRGB input. For such scenarios, `RenderOutputNode` can be used to apply tone mapping and color space conversion at an arbitrary point in the effect chain.
 
-When applying tone mapping and color space conversion manually with this node, you have to set [PostProcessing#outputColorTransform](PostProcessing.html#outputColorTransform) to `false`.
+When applying tone mapping and color space conversion manually with this node, you have to set [RenderPipeline#outputColorTransform](RenderPipeline.html#outputColorTransform) to `false`.
 
 ## Code Example
 
 ```js
-const postProcessing = new PostProcessing( renderer );
+const postProcessing = new RenderPipeline( renderer );
 postProcessing.outputColorTransform = false;
 const scenePass = pass( scene, camera );
 const outputPass = renderOutput( scenePass );
