@@ -93,8 +93,10 @@ function Editor() {
 
 		pathTracerUpdated: new Signal(),
 
-		morphTargetsUpdated: new Signal()
+		animationPanelChanged: new Signal(),
+		animationPanelResized: new Signal(),
 
+		morphTargetsUpdated: new Signal()
 
 	};
 
