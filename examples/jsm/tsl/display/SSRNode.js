@@ -375,7 +375,7 @@ class SSRNode extends TempNode {
 
 		const uvNode = uv();
 
-		const pointToLineDistance = Fn( ( [ point, linePointA, linePointB ] )=> {
+		const pointToLineDistance = Fn( ( [ point, linePointA, linePointB ] ) => {
 
 			// https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
@@ -383,7 +383,7 @@ class SSRNode extends TempNode {
 
 		} );
 
-		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] )=> {
+		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] ) => {
 
 			// https://mathworld.wolfram.com/Point-PlaneDistance.html
 			// https://en.wikipedia.org/wiki/Plane_(geometry)
@@ -622,7 +622,8 @@ class SSRNode extends TempNode {
 				const reflectionDistance = reflectionBuffer.sample( uvNode ).a;
 				const r = float( this.roughnessNode );
 				// squared roughness for more physically accurate falloff (GGX-like)
-				const lod = r.mul( r ).mul( reflectionDistance ).mul( mips ).clamp( 0, mips );
+				// use (1 - distance) so close reflections show proper roughness blur, far ones need less blur
+				const lod = r.mul( r ).mul( reflectionDistance.oneMinus() ).mul( mips ).clamp( 0, mips );
 				const blurred = blurBuffer.sample( uvNode ).level( lod );
 
 				// output: RGB is premultiplied color, keep alpha as distance for potential further use
