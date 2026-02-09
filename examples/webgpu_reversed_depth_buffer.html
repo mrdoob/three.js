@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - reverse depth buffer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#container {
+				display: flex;
+			}
+
+			#container_normal,
+			#container_logarithmic,
+			#container_reverse {
+				width: 33%;
+				display: inline-block;
+				position: relative;
+			}
+
+			.container_label {
+				position: absolute;
+				bottom: 1em;
+				width: 100%;
+				color: white;
+				z-index: 10;
+				display: block;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div id="container_normal"><h2 class="container_label">normal z-buffer</h2></div>
+			<div id="container_logarithmic"><h2 class="container_label">logarithmic z-buffer</h2></div>
+			<div id="container_reverse"><h2 class="container_label">reverse z-buffer</h2></div>
+		</div>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Reverse Depth Buffer</span>
+			</div>
+
+			<small>
+				Note: For best results, a floating-point depth buffer should be used with post-processing. See <a href="https://developer.nvidia.com/blog/visualizing-depth-precision" target="_blank" rel="noopener">Visualizing Depth Precision</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass } from 'three/tsl';
+
+			let camera, reversedCamera, scene;
+			let normalRenderer, logarithmicRenderer, reverseRenderer;
+			let normalRenderPipeline, logarithmicRenderPipeline, reverseRenderPipeline;
+			const meshes = [];
+
+			init().then( animate );
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 72, 0.33 * window.innerWidth / window.innerHeight, 5, 9999 );
+				camera.position.z = 12;
+
+				reversedCamera = camera.clone();
+
+				scene = new THREE.Scene();
+
+				const xCount = 1;
+				const yCount = 5;
+				const numInstances = xCount * yCount;
+
+				const d = 0.0001; // half distance between two planes
+				const o = 0.5; // half x offset to shift planes so they are only partially overlapping
+
+				const positions = new Float32Array( [
+					- 1 - o, - 1, d,
+					1 - o, - 1, d,
+					- 1 - o, 1, d,
+					1 - o, - 1, d,
+					1 - o, 1, d,
+					- 1 - o, 1, d,
+
+					- 1 + o, - 1, - d,
+					1 + o, - 1, - d,
+					- 1 + o, 1, - d,
+					1 + o, - 1, - d,
+					1 + o, 1, - d,
+					- 1 + o, 1, - d,
+				] );
+
+				const colors = new Float32Array( [
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+					1, 0, 0,
+
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+					0, 1, 0,
+				] );
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+				for ( let i = 0; i < numInstances; i ++ ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					meshes.push( mesh );
+					scene.add( mesh );
+
+				}
+
+				let i = 0;
+				for ( let x = 0; x < xCount; x ++ ) {
+
+					for ( let y = 0; y < yCount; y ++ ) {
+
+						const z = - 800 * i;
+						const s = 1 + 50 * i;
+
+						const mesh = meshes[ i ];
+						mesh.position.set(
+							x - xCount / 2 + 0.5,
+							( 4.0 - 0.2 * z ) * ( y - yCount / 2 + 1.0 ),
+							z
+						);
+						mesh.scale.setScalar( s );
+
+						i ++;
+
+					}
+
+				}
+
+				const normalContainer = document.getElementById( 'container_normal' );
+				normalRenderer = new THREE.WebGPURenderer();
+				normalRenderer.setPixelRatio( window.devicePixelRatio );
+				normalRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				normalRenderer.domElement.style.position = 'relative';
+				normalContainer.appendChild( normalRenderer.domElement );
+
+				const logarithmicContainer = document.getElementById( 'container_logarithmic' );
+				logarithmicRenderer = new THREE.WebGPURenderer( { logarithmicDepthBuffer: true } );
+				logarithmicRenderer.setPixelRatio( window.devicePixelRatio );
+				logarithmicRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				logarithmicRenderer.domElement.style.position = 'relative';
+				logarithmicContainer.appendChild( logarithmicRenderer.domElement );
+
+				const reverseContainer = document.getElementById( 'container_reverse' );
+				reverseRenderer = new THREE.WebGPURenderer( { reversedDepthBuffer: true } );
+				reverseRenderer.setPixelRatio( window.devicePixelRatio );
+				reverseRenderer.setSize( 0.33 * window.innerWidth, window.innerHeight );
+				reverseRenderer.domElement.style.position = 'relative';
+				reverseContainer.appendChild( reverseRenderer.domElement );
+
+				//
+
+				normalRenderPipeline = new THREE.RenderPipeline( normalRenderer );
+				normalRenderPipeline.outputNode = pass( scene, camera );
+
+				logarithmicRenderPipeline = new THREE.RenderPipeline( logarithmicRenderer );
+				logarithmicRenderPipeline.outputNode = pass( scene, camera );
+
+				reverseRenderPipeline = new THREE.RenderPipeline( reverseRenderer );
+				reverseRenderPipeline.outputNode = pass( scene, reversedCamera );
+
+				await Promise.all( [ normalRenderer.init(), logarithmicRenderer.init(), reverseRenderer.init() ] );
+
+				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const now = performance.now() / 1000;
+
+				for ( let i = 0; i < meshes.length; i ++ ) {
+
+					const angle = THREE.MathUtils.degToRad( 30 );
+					const axis = new THREE.Vector3( Math.sin( now ), Math.cos( now ), 0 );
+					meshes[ i ].quaternion.setFromAxisAngle( axis, angle );
+
+				}
+
+				render();
+
+			}
+
+			function render() {
+
+				normalRenderPipeline.render();
+				logarithmicRenderPipeline.render();
+				reverseRenderPipeline.render();
+
+			}
+
+			function onWindowResize() {
+
+				const width = 0.33 * window.innerWidth;
+				const height = window.innerHeight;
+
+				normalRenderer.setSize( width, height );
+				logarithmicRenderer.setSize( width, height );
+				reverseRenderer.setSize( width, height );
+
+				camera.aspect = 0.33 * window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				reversedCamera.aspect = 0.33 * window.innerWidth / window.innerHeight;
+				reversedCamera.updateProjectionMatrix();
+
+			}
+		</script>
+
+	</body>
+</html>

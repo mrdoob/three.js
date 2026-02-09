@@ -12,7 +12,14 @@ export default [
 		ignores: [
 			'**/node_modules/**',
 			'**/build/**',
-			'**/libs/**',
+			'examples/jsm/libs/**',
+			'editor/js/libs/acorn/**',
+			'editor/js/libs/codemirror/**',
+			'editor/js/libs/tern-threejs/**',
+			'editor/js/libs/ternjs/**',
+			'editor/js/libs/esprima.js',
+			'editor/js/libs/jsonlint.js',
+			'editor/js/libs/signals.min.js',
 			'**/ifc/**',
 			'**/prettify.js',
 			'**/prettify/**',
@@ -99,6 +106,7 @@ export default [
 			'no-irregular-whitespace': 'error',
 			'no-duplicate-imports': 'error',
 			'prefer-spread': 'error',
+			// 'eqeqeq': 'error',
 
 			'no-useless-escape': 'off',
 			'no-case-declarations': 'off',
@@ -118,6 +126,16 @@ export default [
 			'jsdoc/require-param-description': 'off',
 			'jsdoc/require-returns-description': 'off',
 			'jsdoc/require-param-type': 'error'
+		}
+	},
+
+	// editor rules
+	{
+		name: 'editor rules',
+		files: [ 'editor/**/*.js' ],
+		languageOptions: {
+			ecmaVersion: 2020,
+			sourceType: 'module'
 		}
 	}
 ];

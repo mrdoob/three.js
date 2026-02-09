@@ -30,8 +30,8 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @typedef {Object} WebGPUBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @property {boolean} [compatibilityMode=false] - Whether the backend should be in compatibility mode or not.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
@@ -64,16 +64,18 @@ class WebGPUBackend extends Backend {
 
 		// some parameters require default values other than "undefined"
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
-		this.parameters.compatibilityMode = ( parameters.compatibilityMode === undefined ) ? false : parameters.compatibilityMode;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		/**
-		 * Indicates whether the backend is in compatibility mode or not.
-		 * @type {boolean}
-		 * @default false
+		 * Indicates whether the backend is in WebGPU compatibility mode or not.
+		 * The backend must be initialized before the property can be evaluated.
+		 *
+		 * @type {?boolean}
+		 * @readonly
+		 * @default null
 		 */
-		this.compatibilityMode = this.parameters.compatibilityMode;
+		this.compatibilityMode = null;
 
 		/**
 		 * A reference to the device.
@@ -175,7 +177,7 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: parameters.compatibilityMode ? 'compatibility' : undefined
+				featureLevel: 'compatibility'
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -212,6 +214,14 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			device = parameters.device;
+
+		}
+
+		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
+
+		if ( this.compatibilityMode ) {
+
+			renderer._samples = 0;
 
 		}
 
@@ -1589,6 +1599,14 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
+
+				if ( material.wireframe ) {
+
+					bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
+				}
+
 				for ( let i = 0; i < drawCount; i ++ ) {
 
 					const count = drawInstances ? drawInstances[ i ] : 1;
@@ -1596,7 +1614,7 @@ class WebGPUBackend extends Backend {
 
 					if ( hasIndex === true ) {
 
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
 
 					} else {
 

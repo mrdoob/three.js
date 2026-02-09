@@ -30,7 +30,7 @@
 
 			import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
 
-			let camera, scene, renderer, controls, mesh, material, postProcessing;
+			let camera, scene, renderer, controls, mesh, material, renderPipeline;
 
 			const amount = parseInt( window.location.search.slice( 1 ) ) || 3;
 			const count = Math.pow( amount, 3 );
@@ -111,11 +111,11 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 				const scenePass = ssaaPass( scene, camera );
 				scenePass.sampleLevel = 3;
 
-				postProcessing.outputNode = scenePass;
+				renderPipeline.outputNode = scenePass;
 
 				//
 
@@ -161,7 +161,7 @@
 
 			function animate() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

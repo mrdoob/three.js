@@ -41,7 +41,7 @@
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 			let camera, scene, renderer, controls;
-			let postProcessing, outlinePass;
+			let renderPipeline, outlinePass;
 
 			let selectedObjects = [];
 
@@ -196,8 +196,8 @@
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outlinePulse.add( scenePass );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = outlinePulse.add( scenePass );
 
 				// gui
 
@@ -280,7 +280,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

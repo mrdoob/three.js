@@ -38,7 +38,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x88ccee );
@@ -467,7 +468,9 @@
 
 			function animate() {
 
-				const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
+				timer.update();
+
+				const deltaTime = Math.min( 0.05, timer.getDelta() ) / STEPS_PER_FRAME;
 
 				// we look for collisions in substeps to mitigate the risk of
 				// an object traversing another too quickly for detection.

@@ -173,7 +173,7 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
  * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
  * @return {Node<float>} The filtering result.
  */
-export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
+export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer }, builder ) => {
 
 	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
 
@@ -188,25 +188,25 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 	const mean = distribution.x;
 	const variance = max( 0.0000001, distribution.y.mul( distribution.y ) );
 
-	const hardShadow = step( shadowCoord.z, mean );
+	const hardShadow = ( builder.renderer.reversedDepthBuffer ) ? step( mean, shadowCoord.z ) : step( shadowCoord.z, mean );
 
-	// Early return if fully lit
-	If( hardShadow.equal( 1.0 ), () => {
+	const output = float( 1 ).toVar(); // default, fully lit
 
-		return float( 1.0 );
+	If( hardShadow.notEqual( 1.0 ), () => {
+
+		// Distance from mean
+		const d = shadowCoord.z.sub( mean );
+
+		// Chebyshev's inequality for upper bound on probability
+		let p_max = variance.div( variance.add( d.mul( d ) ) );
+
+		// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+		p_max = clamp( sub( p_max, 0.3 ).div( 0.65 ) );
+
+		output.assign( max( hardShadow, p_max ) );
 
 	} );
-
-	// Distance from mean
-	const d = shadowCoord.z.sub( mean );
-
-	// Chebyshev's inequality for upper bound on probability
-	let p_max = variance.div( variance.add( d.mul( d ) ) );
-
-	// Reduce light bleeding by remapping [amount, 1] to [0, 1]
-	p_max = clamp( sub( p_max, 0.3 ).div( 0.65 ) );
-
-	return max( hardShadow, p_max );
+	return output;
 
 } );
 

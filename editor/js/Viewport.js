@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { PMREMGenerator } from 'three/webgpu';
 
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
@@ -16,6 +17,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
+import { ColorEnvironment } from 'three/addons/environments/ColorEnvironment.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
@@ -290,10 +292,11 @@ function Viewport( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
-		pathtracer.reset();
+		if ( pathtracer ) pathtracer.reset();
 
 		initPT();
-		render();
+
+		signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 	} );
 
@@ -340,8 +343,18 @@ function Viewport( editor ) {
 		if ( renderer !== null ) {
 
 			renderer.setAnimationLoop( null );
+
+			try {
+
+				pmremGenerator.dispose();
+
+			} catch ( e ) {
+
+				console.warn( 'PMREMGenerator dispose error:', e );
+
+			}
+
 			renderer.dispose();
-			pmremGenerator.dispose();
 
 			container.dom.removeChild( renderer.domElement );
 
@@ -372,15 +385,29 @@ function Viewport( editor ) {
 
 		}
 
+		renderer.getClearColor( editor.viewportColor );
+
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
-		pmremGenerator = new THREE.PMREMGenerator( renderer );
-		pmremGenerator.compileEquirectangularShader();
+		if ( renderer.isWebGLRenderer ) {
 
-		pathtracer = new ViewportPathtracer( renderer );
+			pmremGenerator = new THREE.PMREMGenerator( renderer );
+			pmremGenerator.compileEquirectangularShader();
+
+			pathtracer = new ViewportPathtracer( renderer );
+
+		} else {
+
+			pmremGenerator = new PMREMGenerator( renderer );
+
+			pathtracer = null;
+
+		}
 
 		container.dom.appendChild( renderer.domElement );
+
+		signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 		render();
 
@@ -401,7 +428,7 @@ function Viewport( editor ) {
 
 	signals.cameraChanged.add( function () {
 
-		pathtracer.reset();
+		if ( pathtracer ) pathtracer.reset();
 
 		render();
 
@@ -499,6 +526,8 @@ function Viewport( editor ) {
 
 	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundColorSpace, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
 
+		editor.backgroundType = backgroundType;
+
 		scene.background = null;
 
 		switch ( backgroundType ) {
@@ -535,17 +564,15 @@ function Viewport( editor ) {
 					scene.backgroundIntensity = backgroundIntensity;
 					scene.backgroundRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
 
-					if ( useBackgroundAsEnvironment ) {
-
-						scene.environment = scene.background;
-						scene.environmentRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
-
-					}
-
-
 				}
 
 				break;
+
+		}
+
+		if ( useBackgroundAsEnvironment ) {
+
+			signals.sceneEnvironmentChanged.dispatch( editor.environmentType );
 
 		}
 
@@ -560,26 +587,13 @@ function Viewport( editor ) {
 
 	signals.sceneEnvironmentChanged.add( function ( environmentType, environmentEquirectangularTexture ) {
 
+		editor.environmentType = environmentType;
+
 		scene.environment = null;
 
 		useBackgroundAsEnvironment = false;
 
 		switch ( environmentType ) {
-
-
-			case 'Background':
-
-				useBackgroundAsEnvironment = true;
-
-				if ( scene.background !== null && scene.background.isTexture ) {
-
-					scene.environment = scene.background;
-					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-					scene.environmentRotation.y = scene.backgroundRotation.y;
-
-				}
-
-				break;
 
 			case 'Equirectangular':
 
@@ -592,9 +606,29 @@ function Viewport( editor ) {
 
 				break;
 
-			case 'Room':
+			case 'Default':
 
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+				useBackgroundAsEnvironment = true;
+
+				if ( scene.background !== null ) {
+
+					if ( scene.background.isColor ) {
+
+						scene.environment = pmremGenerator.fromScene( new ColorEnvironment( scene.background ), 0.04 ).texture;
+
+					} else if ( scene.background.isTexture ) {
+
+						scene.environment = scene.background;
+						scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+						scene.environmentRotation.y = scene.backgroundRotation.y;
+
+					}
+
+				} else {
+
+					scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				}
 
 				break;
 
@@ -673,7 +707,7 @@ function Viewport( editor ) {
 		switch ( viewportShading ) {
 
 			case 'realistic':
-				pathtracer.init( scene, editor.viewportCamera );
+				if ( pathtracer ) pathtracer.init( scene, editor.viewportCamera );
 				break;
 
 			case 'solid':
@@ -700,8 +734,10 @@ function Viewport( editor ) {
 
 		updateAspectRatio();
 
+		if ( renderer === null ) return;
+
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-		pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		if ( pathtracer ) pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		render();
 
@@ -768,12 +804,14 @@ function Viewport( editor ) {
 
 	let prevActionsInUse = 0;
 
-	const clock = new THREE.Clock(); // only used for animations
+	const timer = new THREE.Timer(); // only used for animations
 
 	function animate() {
 
+		timer.update();
+
 		const mixer = editor.mixer;
-		const delta = clock.getDelta();
+		const delta = timer.getDelta();
 
 		let needsUpdate = false;
 
@@ -794,6 +832,8 @@ function Viewport( editor ) {
 				selectionBox.box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
 
 			}
+
+			signals.morphTargetsUpdated.dispatch();
 
 		}
 
@@ -820,7 +860,7 @@ function Viewport( editor ) {
 
 	function initPT() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.init( scene, editor.viewportCamera );
 
@@ -830,7 +870,7 @@ function Viewport( editor ) {
 
 	function updatePTBackground() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.setBackground( scene.background, scene.backgroundBlurriness );
 
@@ -840,7 +880,7 @@ function Viewport( editor ) {
 
 	function updatePTEnvironment() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.setEnvironment( scene.environment );
 
@@ -850,7 +890,7 @@ function Viewport( editor ) {
 
 	function updatePTMaterials() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.updateMaterials();
 
@@ -860,7 +900,7 @@ function Viewport( editor ) {
 
 	function updatePT() {
 
-		if ( editor.viewportShading === 'realistic' ) {
+		if ( pathtracer && editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
 			editor.signals.pathTracerUpdated.dispatch( pathtracer.getSamples() );
@@ -875,6 +915,8 @@ function Viewport( editor ) {
 	let endTime = 0;
 
 	function render() {
+
+		if ( renderer === null ) return;
 
 		startTime = performance.now();
 

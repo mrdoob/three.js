@@ -1,11 +1,13 @@
 import {
 	InterpolateLinear,
 	InterpolateSmooth,
-	InterpolateDiscrete
+	InterpolateDiscrete,
+	InterpolateBezier
 } from '../constants.js';
 import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
+import { BezierInterpolant } from '../math/interpolants/BezierInterpolant.js';
 import * as AnimationUtils from './AnimationUtils.js';
 import { warn, error } from '../utils.js';
 
@@ -22,7 +24,7 @@ class KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number|string|boolean>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -141,9 +143,36 @@ class KeyframeTrack {
 	}
 
 	/**
+	 * Factory method for creating a new Bezier interpolant.
+	 *
+	 * The Bezier interpolant requires tangent data to be set via the `settings` property
+	 * on the track before creating the interpolant. The settings should contain:
+	 * - `inTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 * - `outTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 *
+	 * @static
+	 * @param {TypedArray} [result] - The result buffer.
+	 * @return {BezierInterpolant} The new interpolant.
+	 */
+	InterpolantFactoryMethodBezier( result ) {
+
+		const interpolant = new BezierInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		// Pass tangent data from track settings to interpolant
+		if ( this.settings ) {
+
+			interpolant.settings = this.settings;
+
+		}
+
+		return interpolant;
+
+	}
+
+	/**
 	 * Defines the interpolation factor method for this keyframe track.
 	 *
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} interpolation - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} interpolation - The interpolation type.
 	 * @return {KeyframeTrack} A reference to this keyframe track.
 	 */
 	setInterpolation( interpolation ) {
@@ -167,6 +196,12 @@ class KeyframeTrack {
 			case InterpolateSmooth:
 
 				factoryMethod = this.InterpolantFactoryMethodSmooth;
+
+				break;
+
+			case InterpolateBezier:
+
+				factoryMethod = this.InterpolantFactoryMethodBezier;
 
 				break;
 
@@ -206,7 +241,7 @@ class KeyframeTrack {
 	/**
 	 * Returns the current interpolation type.
 	 *
-	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} The interpolation type.
+	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} The interpolation type.
 	 */
 	getInterpolation() {
 
@@ -223,6 +258,10 @@ class KeyframeTrack {
 			case this.InterpolantFactoryMethodSmooth:
 
 				return InterpolateSmooth;
+
+			case this.InterpolantFactoryMethodBezier:
+
+				return InterpolateBezier;
 
 		}
 
@@ -589,7 +628,7 @@ KeyframeTrack.prototype.ValueBufferType = Float32Array;
 /**
  * The default interpolation type of this keyframe track.
  *
- * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)}
+ * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)}
  * @default InterpolateLinear
  */
 KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;

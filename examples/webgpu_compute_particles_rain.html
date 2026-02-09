@@ -46,7 +46,7 @@
 			let controls;
 			let computeParticles;
 			let monkey;
-			let clock;
+			let timer;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
 			let collisionBoxPos, collisionBoxPosUI;
@@ -267,7 +267,8 @@
 
 				//
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -322,7 +323,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( monkey ) {
 

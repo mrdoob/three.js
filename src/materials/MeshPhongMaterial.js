@@ -285,6 +285,14 @@ class MeshPhongMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
+		 * Scales the effect of the environment map by multiplying its color.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.envMapIntensity = 1.0;
+
+		/**
 		 * The index of refraction (IOR) of air (approximately 1) divided by the
 		 * index of refraction of the material. It is used with environment mapping
 		 * modes {@link CubeRefractionMapping} and {@link EquirectangularRefractionMapping}.
@@ -392,6 +400,7 @@ class MeshPhongMaterial extends Material {
 		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
+		this.envMapIntensity = source.envMapIntensity;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;

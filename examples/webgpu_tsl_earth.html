@@ -42,13 +42,14 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, controls, globe, clock;
+			let camera, scene, renderer, controls, globe, timer;
 
 			init();
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 4.5, 2, 3 );
@@ -200,7 +201,9 @@
 
 			async function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 				globe.rotation.y += delta * 0.025;
 			
 				controls.update();

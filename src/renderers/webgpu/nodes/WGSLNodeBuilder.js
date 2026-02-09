@@ -518,6 +518,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
 		const vecType = texture.is3DTexture || texture.isData3DTexture ? 'vec3' : 'vec2';
+		const textureDimensionMargin = ( vecType === 'vec3' ) ? 'vec3<u32>( 1, 1, 1 )' : 'vec2<u32>( 1, 1 )';
 
 		if ( offsetSnippet ) {
 
@@ -525,7 +526,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		}
 
-		uvSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
+		const clampMin = `${ vecType }<f32>( 0 )`;
+		const clampMax = `${ vecType }<f32>( ${ textureDimension } - ${ textureDimensionMargin } )`;
+
+		uvSnippet = `${ vecType }<u32>( clamp( floor( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) ), ${ clampMin }, ${ clampMax } ) )`;
 
 		return this.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, null );
 
@@ -544,7 +548,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		if ( levelSnippet === null ) levelSnippet = '0u';
+		const isStorageTexture = texture.isStorageTexture === true;
+
+		if ( levelSnippet === null && ! isStorageTexture ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
@@ -556,15 +562,33 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( depthSnippet ) {
 
-			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+			// Storage textures don't take a level parameter in WGSL
+			if ( isStorageTexture ) {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet } )`;
+
+			} else {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
+
+			}
 
 		} else {
 
-			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+			// Storage textures don't take a level parameter in WGSL
+			if ( isStorageTexture ) {
 
-			if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
-				snippet += '.x';
+			} else {
+
+				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
+
+				if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
+
+					snippet += '.x';
+
+				}
 
 			}
 
@@ -1698,7 +1722,7 @@ ${ flowData.code }
 
 					} else if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
 
-						attributesSnippet += ` @interpolate( ${ this.renderer.backend.compatibilityMode ? 'flat, either' : 'flat' } )`;
+						attributesSnippet += ' @interpolate(flat, either)';
 
 					}
 
@@ -2119,7 +2143,6 @@ ${ flowData.code }
 
 	}
 
-
 	/**
 	 * Returns the WGSL type of the given node data type.
 	 *
@@ -2159,6 +2182,17 @@ ${ flowData.code }
 		}
 
 		return result;
+
+	}
+
+	/**
+	 * Returns the maximum uniform buffer size limit.
+	 *
+	 * @return {number} The maximum uniform buffer size in bytes.
+	 */
+	getUniformBufferLimit() {
+
+		return this.renderer.backend.device.limits.maxUniformBufferBindingSize;
 
 	}
 

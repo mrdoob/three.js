@@ -1,0 +1,2716 @@
+# Three.js
+
+> Three.js is a cross-browser JavaScript library for creating 3D graphics using WebGL and WebGPU.
+
+## Instructions for Large Language Models
+
+When generating Three.js code, follow these guidelines:
+
+### 1. Use Import Maps (Not Old CDN Patterns)
+
+WRONG - outdated pattern:
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+```
+
+CORRECT - modern pattern (always use latest version):
+```html
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+</script>
+```
+
+### 2. Choosing Between WebGLRenderer and WebGPURenderer
+
+Three.js maintains both renderers:
+
+**Use WebGLRenderer** (default, mature):
+- Maximum browser compatibility
+- Well-established, many years of development
+- Most examples and tutorials use this
+
+```js
+import * as THREE from 'three';
+const renderer = new THREE.WebGLRenderer();
+```
+
+**Use WebGPURenderer** when you need:
+- Custom shaders/materials using TSL (Three.js Shading Language)
+- Compute shaders
+- Advanced node-based materials
+
+```js
+import * as THREE from 'three/webgpu';
+const renderer = new THREE.WebGPURenderer();
+await renderer.init();
+```
+
+### 3. TSL (Three.js Shading Language)
+
+When using WebGPURenderer, use TSL instead of raw GLSL for custom materials:
+
+```js
+import { texture, uv, color } from 'three/tsl';
+
+const material = new THREE.MeshStandardNodeMaterial();
+material.colorNode = texture( myTexture ).mul( color( 0xff0000 ) );
+```
+
+TSL benefits:
+- Works with both WebGL and WebGPU backends
+- No string manipulation or onBeforeCompile hacks
+- Type-safe, composable shader nodes
+- Automatic optimization
+
+### 4. NodeMaterial Classes (for WebGPU/TSL)
+
+When using TSL, use node-based materials:
+- MeshBasicNodeMaterial
+- MeshStandardNodeMaterial
+- MeshPhysicalNodeMaterial
+- LineBasicNodeMaterial
+- SpriteNodeMaterial
+
+---
+
+## Complete Code Examples
+
+### Basic Scene with WebGLRenderer
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Three.js Basic Scene</title>
+  <style>
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Scene
+const scene = new THREE.Scene();
+
+// Camera
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+// Renderer
+const renderer = new THREE.WebGLRenderer( { antialias: true } );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setPixelRatio( window.devicePixelRatio );
+document.body.appendChild( renderer.domElement );
+
+// Controls
+const controls = new OrbitControls( camera, renderer.domElement );
+
+// Lighting
+const ambientLight = new THREE.AmbientLight( 0x404040 );
+scene.add( ambientLight );
+
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+directionalLight.position.set( 5, 5, 5 );
+scene.add( directionalLight );
+
+// Mesh
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+// Handle resize
+window.addEventListener( 'resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+} );
+
+// Animation loop
+function animate() {
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+  controls.update();
+  renderer.render( scene, camera );
+}
+renderer.setAnimationLoop( animate );
+</script>
+</body>
+</html>
+```
+
+### Basic Scene with WebGPURenderer and TSL
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Three.js WebGPU Scene</title>
+  <style>
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { color, positionLocal, sin, time } from 'three/tsl';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Scene
+const scene = new THREE.Scene();
+
+// Camera
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+// Renderer
+const renderer = new THREE.WebGPURenderer( { antialias: true } );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setPixelRatio( window.devicePixelRatio );
+document.body.appendChild( renderer.domElement );
+
+await renderer.init();
+
+// Controls
+const controls = new OrbitControls( camera, renderer.domElement );
+
+// Lighting
+const ambientLight = new THREE.AmbientLight( 0x404040 );
+scene.add( ambientLight );
+
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+directionalLight.position.set( 5, 5, 5 );
+scene.add( directionalLight );
+
+// Custom TSL material
+const material = new THREE.MeshStandardNodeMaterial();
+material.colorNode = color( 0x00ff00 ).mul( sin( time ).mul( 0.5 ).add( 0.5 ) );
+material.positionNode = positionLocal.add( sin( time.add( positionLocal.y ) ).mul( 0.1 ) );
+
+// Mesh
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+// Handle resize
+window.addEventListener( 'resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+} );
+
+// Animation loop
+function animate() {
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+  controls.update();
+  renderer.render( scene, camera );
+}
+renderer.setAnimationLoop( animate );
+</script>
+</body>
+</html>
+```
+
+### Loading a GLTF Model
+
+```js
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const loader = new GLTFLoader();
+
+loader.load(
+  'model.glb',
+  ( gltf ) => {
+    scene.add( gltf.scene );
+  },
+  ( progress ) => {
+    console.log( ( progress.loaded / progress.total * 100 ) + '% loaded' );
+  },
+  ( error ) => {
+    console.error( 'Error loading model:', error );
+  }
+);
+```
+
+---
+
+# TSL (Three.js Shading Language) - Complete Reference
+
+## TSL Specification
+
+An Approach to Productive and Maintainable Shader Creation.
+
+- [Introduction](#introduction)
+  - [Why TSL?](#why-tsl)
+  - [Example](#example)
+  - [Architecture](#architecture)
+- [Learning TSL](#learning-tsl)
+- [Constants and explicit conversions](#constants-and-explicit-conversions)
+- [Conversions](#conversions)
+- [Uniform](#uniform)
+  - [onUpdate](#uniformonupdate)
+- [Swizzle](#swizzle)
+- [Operators](#operators)
+- [Function](#function)
+- [Variables](#variables)
+- [Array](#array)
+  - [Uniform](#array-uniform)
+- [Varying](#varying)
+- [Conditional](#conditional)
+  - [If-else](#if-else)
+  - [Switch-case](#switch-case)
+  - [Ternary](#ternary)
+- [Loop](#loop)
+- [Math](#math)
+- [Method chaining](#method-chaining)
+- [Texture](#texture)
+- [Attributes](#attributes)
+- [Position](#position)
+- [Normal](#normal)
+- [Tangent](#tangent)
+- [Bitangent](#bitangent)
+- [Camera](#camera)
+- [Model](#model)
+- [Screen](#screen)
+- [Viewport](#viewport)
+- [Blend Modes](#blend-modes)
+- [Reflect](#reflect)
+- [UV Utils](#uv-utils)
+- [Interpolation](#interpolation)
+- [Random](#random)
+- [Rotate](#rotate)
+- [Oscillator](#oscillator)
+- [Timer](#timer)
+- [Packing](#packing)
+- [Render Pipeline](#render-pipeline)
+  - [Multiple Render Targets](#multiple-render-targets-mrt)
+  - [Post-Processing](#post-processing)
+  - [Render Pass](#render-pass)
+  - [Compute](#compute)
+- [Storage](#storage)
+- [Struct](#struct)
+- [Flow Control](#flow-control)
+- [Fog](#fog)
+- [Color Adjustments](#color-adjustments)
+- [Utilities](#utilities)
+- [NodeMaterial](#nodematerial)
+  - [LineDashedNodeMaterial](#linedashednodematerial)
+  - [MeshPhongNodeMaterial](#meshphongnodematerial)
+  - [MeshStandardNodeMaterial](#meshstandardnodematerial)
+    - [MeshPhysicalNodeMaterial](#meshphysicalnodematerial)
+  - [SpriteNodeMaterial](#spritenodematerial)
+- [Transitioning common GLSL properties to TSL](#transitioning-common-glsl-properties-to-tsl)
+
+## Introduction
+
+### Why TSL?
+
+Creating shaders has always been an advanced step for most developers; many game developers have never created GLSL code from scratch. The shader graph solution adopted today by the industry has allowed developers more focused on dynamics to create the necessary graphic effects to meet the demands of their projects.
+
+The aim of the project is to create an easy-to-use environment for shader creation. Even if for this we need to create complexity behind it, this happened initially with `Renderer` and now with the `TSL`.
+
+Other benefits that TSL brings besides simplifying shading creation are keeping the `renderer agnostic`, while all the complexity of a material can be imported into different modules and use `tree shaking` without breaking during the process.
+
+### Example
+
+A `detail map` makes things look more real in games. It adds tiny details like cracks or bumps to surfaces. In this example we will scale uv to improve details when seen up close and multiply with a base texture.
+
+#### Old
+
+This is how we would achieve that using `.onBeforeCompile()`:
+
+```js
+const material = new THREE.MeshStandardMaterial();
+material.map = colorMap;
+material.onBeforeCompile = ( shader ) => {
+
+	shader.uniforms.detailMap = { value: detailMap };
+
+	let token = '#define STANDARD';
+
+	let insert = /* glsl */`
+		uniform sampler2D detailMap;
+	`;
+
+	shader.fragmentShader = shader.fragmentShader.replace( token, token + insert );
+
+	token = '#include <map_fragment>';
+
+	insert = /* glsl */`
+		diffuseColor *= texture2D( detailMap, vMapUv * 10.0 );
+	`;
+
+	shader.fragmentShader = shader.fragmentShader.replace( token, token + insert );
+
+};
+```
+
+Any simple change from this makes the code increasingly complicated using `.onBeforeCompile`, the result we have today in the community are countless types of parametric materials that do not communicate with each other, and that need to be updated periodically to be operating, limiting the creativity to create unique materials reusing modules in a simple way.
+
+#### New
+
+With `TSL` the code would look like this:
+
+```js
+import { texture, uv } from 'three/tsl';
+
+const detail = texture( detailMap, uv().mul( 10 ) );
+
+const material = new THREE.MeshStandardNodeMaterial();
+material.colorNode = texture( colorMap ).mul( detail );
+```
+
+`TSL` is also capable of encoding code into different outputs such as `WGSL`/`GLSL` - `WebGPU`/`WebGL`, in addition to optimizing the shader graph automatically and through codes that can be inserted within each `Node`. This allows the developer to focus on productivity and leave the graphical management part to the `Node System`.
+
+Another important feature of a graph shader is that we will no longer need to care about the sequence in which components are created, because the `Node System` will only declare and include it once.
+
+Let's say that you import `positionWorld` into your code, even if another component uses it, the calculations performed to obtain `position world` will only be performed once, as is the case with any other node such as: `normalWorld`, `modelPosition`, etc.
+
+### Architecture
+
+All `TSL` components are extended from `Node` class. The `Node` allows it to communicate with any other, value conversions can be automatic or manual, a `Node` can receive the output value expected by the parent `Node` and modify its own output snippet. It's possible to modulate them using `tree shaking` in the shader construction process, the `Node` will have important information such as `geometry`, `material`, `renderer` as well as the `backend`, which can influence the type and value of output.
+
+The main class responsible for creating the code is `NodeBuilder`. This class can be extended to any output programming language, so you can use TSL for a third language if you wish. Currently `NodeBuilder` has two extended classes, the `WGSLNodeBuilder` aimed at WebGPU and `GLSLNodeBuilder` aimed at WebGL2.
+
+The build process is based on three pillars: `setup`, `analyze` and `generate`.
+
+| | |
+| -- | -- |
+| `setup` | Use `TSL` to create a completely customized code for the `Node` output. The `Node` can use many others within itself, have countless inputs, but there will always be a single output. |
+| `analyze` | This proccess will check the `nodes` that were created in order to create useful information for `generate` the snippet, such as the need to create or not a cache/variable for optimizing a node. |
+| `generate` | An output of `string` will be returned from each `node`. Any node will also be able to create code in the flow of shader, supporting multiple lines. |
+
+`Node` also have a native update process invoked by the `update()` function, these events be called by `frame`, `render call` and `object draw`.
+
+It is also possible to serialize or deserialize a `Node` using `serialize()` and `deserialize()` functions.
+
+## Learning TSL
+
+TSL is a Node-based shader abstraction, written in JavaScript. TSL's functions are inspired by GLSL, but follow a very different concept. WGSL and GLSL are focused on creating GPU programs, in TSL this is one of the features.
+
+### Seamless Integration with JavaScript/TypeScript
+
+- Unified Code
+  - Write shader logic directly in JS/TS, eliminating the need to manipulate strings.
+  - Create and manipulate render objects just like any other JavaScript logic inside a TSL function.
+  - Advanced events to control a Node before and after the object is rendered.
+- JS Ecosystem
+  - Use native **import/export**, **NPM**, and integrate **JS/TS** components directly into your shader logic.
+- Typing
+  - Benefit from better type checking (especially with **TypeScript** and **[@three-types](https://github.com/three-types/three-ts-types)**), increasing code robustness.
+
+### Shader-Graph Inspired Structure
+
+- Focus on Intent
+  - Build materials by connecting nodes through: [positionWorld](#position), [normalWorld](#normal), [screenUV](#screen), [attribute()](#attributes), etc. 
+More declarative("what") vs. imperative("how").
+- Composition & High-Level Concepts
+  - Work with high-level concepts for Node Material like [colorNode](#basic), [roughnessNode](#standard), [metalnessNode](#standard), [positionNode](#basic), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
+- Keeping an eye on software exchange
+  - Modern 3D authoring software uses Shader-Graph based material composition to exchange between other software. TSL already has its own MaterialX integration.
+- Easier Migration
+  - Many functions are directly inspired by GLSL to smooth the learning curve for those with prior experience.
+
+### Rendering Manipulation
+
+- Control rendering steps and create new render-passes per individual TSL functions.
+  - Implement complex effects is easily with nodes using a single function call either in post-processing and in materials allowing the node itself to manage the rendering process as it needs.
+    - `gaussianBlur()`: Double render-pass gaussian blur node. It can be used in the material or in post-processing through a single function.
+  - Easy access to renderer buffers using TSL functions like: 
+    - `viewportSharedTexture()`: Accesses the beauty what has already been rendered, preserving the render-order.
+    - `viewportLinearDepth()`: Accesses the depth what has already been rendered, preserving the render-order.
+  - Integrated Compute Shaders
+    - Perform calculations on buffers using compute stage directly during an object's rendering.
+  - TSL allows dynamic manipulation of renderer functions, which makes it more customizable than intermediate languages ​​that would have to use flags in fixed pipelines for this.
+  - You just need to use the events of a Node for the renderer manipulations, without needing to modify the core.
+
+### Automatic Optimization and Workarounds
+
+- Your TSL code automatically benefits from optimizations and workarounds implemented in the Three.js compiler with each new version.
+  - Simplifications
+    - Automatic type conversions.
+    - Execute a block of code in vertex-stage and get it in fragment-stage just using `vertexStage( node )`.
+    - Automatically choose interpolation method for varyings depending on type.
+    - Don't worry about collisions of global variables internally when using Nodes.
+  - Polyfills
+    - e.g: `textureSample()` function in the vertex shader (not natively supported in WGSL) is correctly transpiled to work.
+    - e.g: Automatic correction for the `pow()` function, which didn't accept negative bases on Windows/DirectX using WGSL.
+  - Optimizations
+    - Repeated expressions: TSL can automatically create temporary variables to avoid redundant calculations.
+    - Automatic reuse of uniforms and attributes.
+    - Creating varying only if necessary. Otherwise they are replaced by simple variables.
+
+### Target audience
+  - Beginners users
+    - You only need one line to create your first custom shader.
+  - Advanced users
+    - Makes creating shaders simple but not limited. Example: https://www.youtube.com/watch?v=C2gDL9Qk_vo
+    - If you don't like fixed pipelines and low level, you'll love this.
+
+### Share everything
+
+#### TSL is based on Nodes, so don’t worry about sharing your **functions** and **uniforms** across materials and post-processing.
+
+```js
+// Shared the same uniform with various materials
+
+const sharedColor = uniform( new THREE.Color() );
+
+materialA.colorNode = sharedColor.div( 2 );
+materialB.colorNode = sharedColor.mul( .5 );
+materialC.colorNode = sharedColor.add( .5 );
+```
+
+#### Deferred Function: High level of customization, goodby **#defines**
+
+Access **material**, **geometry**, **object**, **camera**, **scene**, **renderer** and more directly from a TSL function. Function calls are only performed at the time of building the shader allowing you to customize the function according to the object's setup.
+
+```js
+// Returns an uniform of the material's custom color if it exists 
+
+const customColor = Fn( ( { material, geometry, object } ) => {
+
+	if ( material.userData.customColor !== undefined ) {
+
+		return uniform( material.userData.customColor );
+
+	}
+
+	return vec3( 0 );
+
+} );
+
+//
+
+material.colorNode = customColor();
+
+```
+
+#### Load a texture-based matrix inside a TSL function
+
+This can be used for any other JS and Three.js ecosystem needs. You can manipulate your assets according to the needs of a function. This can work for creating buffers, attributes, uniforms and any other JavaScript operation.
+
+```js
+let bayer16Texture = null;
+
+export const bayer16 = Fn( ( [ uv ] ) => {
+
+	if ( bayer16Texture === null ) {
+
+		const bayer16Base64 = 'data:image/png;base64,...==';
+
+		bayer16Texture = new TextureLoader().load( bayer16Base64 );
+
+	}
+
+	return textureLoad( bayer16Texture, ivec2( uv ).mod( int( 16 ) ) );
+
+} );
+
+//
+
+material.colorNode = bayer16( screenCoordinate );
+
+```
+
+#### The node architecture allows the creation of instances of custom attributes and buffers through simple functions.
+
+```js
+// Range values node example
+
+const randomColor = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
+
+material.colorNode = randomColor;
+
+//...
+
+const mesh = new THREE.InstancedMesh( geometry, material, count );
+```
+
+#### TSL loves JavaScript
+
+TSL syntax follows JavaScript style because they are the same thing, so if you come from GLSL you can explore new possibilities.
+
+```js
+// A simple example of Function closure
+
+const mainTask = Fn( () => {
+
+	const task2 = Fn( ( [ a, b ] ) => {
+
+		return a.add( b ).mul( 0.5 );
+
+	} );
+
+
+	return task2( color( 0x00ff00 ), color( 0x0000ff ) );
+
+} );
+
+//
+
+material.colorNode = mainTask();
+```
+
+#### Simplification
+
+Double render-pass `gaussianBlur()` node. It can be used in the material or in post-processing through a single function. 
+
+```js
+// Applies a double render-pass gaussianBlur and then a grayscale filter before the object with the material is rendered.
+
+const myTexture = texture( map );
+
+material.colorNode = grayscale( gaussianBlur( myTexture, 4 ) );
+```
+
+Accesses what has already been rendered, preserving the render-order for easy refraction effects, avoiding multiple render-pass and manual sorts.
+
+```js
+// Leaving the back in grayscale.
+
+material.colorNode = grayscale( viewportSharedTexture( screenUV ) );
+material.transparent = true;
+```
+
+#### Extend the TSL
+
+You no longer need to create a Material for each desired effect, instead create Nodes. A Node can have access to the Material and can be used in many ways. Extend the TSL from Nodes and let the user use it in creative ways.
+
+A great example of this is [TSL-Textures](https://boytchev.github.io/tsl-textures/).
+
+```js
+import * as THREE from 'three';
+import { simplexNoise } from 'tsl-textures';
+
+material.colorNode = simplexNoise ( {
+	scale: 2,
+	balance: 0,
+	contrast: 0,
+	color: new THREE.Color(16777215),
+	background: new THREE.Color(0),
+	seed: 0
+} );
+
+```
+
+## Constants and explicit conversions
+
+Input functions can be used to create contants and do explicit conversions.
+> Conversions are also performed automatically if the output and input are of different types.
+
+| Name | Returns a constant or convertion of type: |
+| -- | -- |
+| `float( node\|number )` | `float` |
+| `int( node\|number )` | `int` |
+| `uint( node\|number )` | `uint` |
+| `bool( node\|value )` | `boolean` |
+| `color( node\|hex\|r,g,b )` | `color` |
+| `vec2( node\|Vector2\|x,y )` | `vec2` |
+| `vec3( node\|Vector3\|x,y,z )` | `vec3` |
+| `vec4( node\|Vector4\|x,y,z,w )` | `vec4` |
+| `mat2( node\|Matrix2\|a,b,c,d )` | `mat2` |
+| `mat3( node\|Matrix3\|a,b,c,d,e,f,g,h,i )` | `mat3` |
+| `mat4( node\|Matrix4\|a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p )` | `mat4` |
+| `ivec2( node\|x,y )` | `ivec2` |
+| `ivec3( node\|x,y,z )` | `ivec3` |
+| `ivec4( node\|x,y,z,w )` | `ivec4` |
+| `uvec2( node\|x,y )` | `uvec2` |
+| `uvec3( node\|x,y,z )` | `uvec3` |
+| `uvec4( node\|x,y,z,w )` | `uvec4` |
+| `bvec2( node\|x,y )` | `bvec2` |
+| `bvec3( node\|x,y,z )` | `bvec3` |
+| `bvec4( node\|x,y,z,w )` | `bvec4` |
+
+Example:
+
+```js
+import { color, vec2, positionWorld } from 'three/tsl';
+
+// constant
+material.colorNode = color( 0x0066ff );
+
+// conversion
+material.colorNode = vec2( positionWorld ); // result positionWorld.xy
+```
+
+## Conversions
+
+It is also possible to perform conversions using the `method chaining`:
+
+| Name | Returns a constant or conversion of type: |
+| -- | -- |
+| `.toFloat()` | `float` |
+| `.toInt()` | `int` |
+| `.toUint()` | `uint` |
+| `.toBool()` | `boolean` |
+| `.toColor()` | `color` |
+| `.toVec2()` | `vec2` |
+| `.toVec3()` | `vec3` |
+| `.toVec4()` | `vec4` |
+| `.toMat2()` | `mat2` |
+| `.toMat3()` | `mat3` |
+| `.toMat4()` | `mat4` |
+| | |
+| `.toIVec2()` | `ivec2` |
+| `.toIVec3()` | `ivec3` |
+| `.toIVec4()` | `ivec4` |
+| `.toUVec2()` | `uvec2` |
+| `.toUVec3()` | `uvec3` |
+| `.toUVec4()` | `uvec4` |
+| `.toBVec2()` | `bvec2` |
+| `.toBVec3()` | `bvec3` |
+| `.toBVec4()` | `bvec4` |
+
+Example:
+
+```js
+import { positionWorld } from 'three/tsl';
+
+// conversion
+material.colorNode = positionWorld.toVec2(); // result positionWorld.xy
+```
+
+## Uniform
+
+Uniforms are useful to update values of variables like colors, lighting, or transformations without having to recreate the shader program. They are the true variables from a GPU's point of view.
+
+| Name | Description |
+| -- | -- |
+| `uniform( boolean \| number \| Color \| Vector2 \| Vector3 \| Vector4 \| Matrix3 \| Matrix4, type = null )` | Dynamic values. |
+
+Example:
+
+```js
+const myColor = uniform( new THREE.Color( 0x0066FF ) );
+
+material.colorNode = myColor;
+```
+
+### `uniform.on*Update()`
+
+It is also possible to create update events on `uniforms`, which can be defined by the user:
+
+| Name | Description |
+| -- | -- |
+| `.onObjectUpdate( function )` | It will be updated every time an object like `Mesh` is rendered with this `node` in `Material`. |
+| `.onRenderUpdate( function )` | It will be updated once per render, common and shared materials, fog, tone mapping, etc. |
+| `.onFrameUpdate( function )` | It will be updated only once per frame, recommended for values ​​that will be updated only once per frame, regardless of when `render-pass` the frame has, cases like `time` for example. |
+
+Example:
+
+```js
+const posY = uniform( 0 ); // it's possible use uniform( 'float' )
+
+// or using event to be done automatically
+// { object } will be the current rendering object
+posY.onObjectUpdate( ( { object } ) => object.position.y );
+
+// you can also update manually using the .value property
+posY.value = object.position.y;
+
+material.colorNode = posY;
+```
+
+## Swizzle
+
+Swizzling is the technique that allows you to access, reorder, or duplicate the components of a vector using a specific notation within TSL. This is done by combining the identifiers:
+
+```js
+const original = vec3( 1.0, 2.0, 3.0 ); // (x, y, z)
+const swizzled = original.zyx; // swizzled = (3.0, 2.0, 1.0)
+```
+
+It's possible use `xyzw`, `rgba` or `stpq`.
+
+## Operators
+
+| Name | Description |
+| -- | -- |
+| `.add( node \| value, ... )` | Return the addition of two or more value. |
+| `.sub( node \| value )` | Return the subraction of two or more value. |
+| `.mul( node \| value )` | Return the multiplication of two or more value. |
+| `.div( node \| value )` | Return the division of two or more value. |
+| `.mod( node \| value )` | Computes the remainder of dividing the first node by the second. |
+| `.equal( node \| value )` | Checks if two nodes are equal. |
+| `.notEqual( node \| value )` | Checks if two nodes are not equal. |
+| `.lessThan( node \| value )` | Checks if the first node is less than the second. |
+| `.greaterThan( node \| value )` | Checks if the first node is greater than the second. |
+| `.lessThanEqual( node \| value )` | Checks if the first node is less than or equal to the second. |
+| `.greaterThanEqual( node \| value )` | Checks if the first node is greater than or equal to the second. |
+| `.and( node \| value )` | Performs logical AND on two nodes. |
+| `.or( node \| value )` | Performs logical OR on two nodes. |
+| `.not( node \| value )` | Performs logical NOT on a node. |
+| `.xor( node \| value )` | Performs logical XOR on two nodes. |
+| `.bitAnd( node \| value )` | Performs bitwise AND on two nodes. |
+| `.bitNot( node \| value )` | Performs bitwise NOT on a node. |
+| `.bitOr( node \| value )` | Performs bitwise OR on two nodes. |
+| `.bitXor( node \| value )` | Performs bitwise XOR on two nodes. |
+| `.shiftLeft( node \| value )` | Shifts a node to the left. |
+| `.shiftRight( node \| value )` | Shifts a node to the right. |
+| | |
+| `.assign( node \| value )` | Assign one or more value to a and return the same. |
+| `.addAssign( node \| value )` | Adds a value and assigns the result. |
+| `.subAssign( node \| value )` | Subtracts a value and assigns the result. |
+| `.mulAssign( node \| value )` | Multiplies a value and assigns the result. |
+| `.divAssign( node \| value )` | Divides a value and assigns the result. |
+
+```js
+const a = float( 1 );
+const b = float( 2 );
+
+const result = a.add( b ); // output: 3
+```
+
+## Function
+
+### `Fn( function, layout = null )`
+
+It is possible to use classic JS functions or a `Fn()` interface. The main difference is that `Fn()` creates a controllable environment, allowing the use of `stack` where you can use `assign` and `conditional`, while the classic function only allows inline approaches.
+
+Example:
+
+```js
+// tsl function
+const oscSine = Fn( ( [ t = time ] ) => {
+
+	return t.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
+
+} );
+
+// inline function
+export const oscSine = ( t = time ) => t.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
+```
+> Both above can be called with `oscSin( value )`.
+
+TSL allows the entry of parameters as object, this is useful in functions that have many optional arguments.
+
+Example:
+
+```js
+const oscSine = Fn( ( { timer = time } ) => {
+
+	return timer.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
+
+} );
+
+const value = oscSine( { timer: value } );
+```
+
+Parameters as object also allows traditional calls as an array, enabling different types of usage.
+
+```js
+const col = Fn( ( { r, g, b } ) => {
+
+	return vec3( r, g, b );
+
+} );
+
+
+// Any of the options below will return a green color.
+
+material.colorNode = col( 0, 1, 0 ); // option 1
+material.colorNode = col( { r: 0, g: 1, b: 0 } ); // option 2
+```
+
+If you want to use an export function compatible with `tree shaking`, remember to use `/*@__PURE__*/`
+
+```js
+export const oscSawtooth = /*@__PURE__*/ Fn( ( [ timer = time ] ) => timer.fract() );
+```
+
+The second parameter of the function, if there are any parameters, will always be the first if there are none, and is dedicated to `NodeBuilder`. In `NodeBuilder` you can find out details about the current construction process and also obtain objects related to the shader construction, such as `material`, `geometry`, `object`, `camera`, etc.
+
+[See an example](#deferred-function-high-level-of-customization-goodby-defines)
+
+## Variables
+
+Functions used to declare variables.
+
+| Name | Description |
+| -- | -- |
+| `.toVar( node, name = null )` or `Var( node, name = null )` | Converts a node into a reusable variable in the shader. |
+| `.toConst( node, name = null )` or `Const( node, name = null )` | Converts a node into an inline constant. |
+| `property( type, name = null )` | Declares an property but does not assign an initial value. |
+
+The name is optional; if set to `null`, the node system will generate one automatically.  
+Creating a variable, constant, or property can help optimize the shader graph manually or assist in debugging.
+
+```js
+const uvScaled = uv().mul( 10 ).toVar();
+
+material.colorNode = texture( map, uvScaled );
+```
+
+***
+
+## Array
+
+The array() function in TSL allows creating constant or dynamic value arrays; there are many ways to create arrays in TSL.
+
+#### The standard way
+
+```js
+const colors = array( [
+	vec3( 1, 0, 0 ),
+	vec3( 0, 1, 0 ),
+	vec3( 0, 0, 1 )
+] );
+
+const greenColor = colors.element( 1 );
+
+// greenColor: vec3( 0, 1, 0 )
+```
+
+#### Fixed size
+
+```js
+const a = array( 'vec3', 2 );
+
+// a: [ vec3( 0, 0, 0 ), vec3( 0, 0, 0 ) ]
+```
+
+#### Fill with a default value
+
+```js
+const a = vec3( 0, 0, 1 ).toArray( 2 ); 
+
+// a: [ vec3( 0, 0, 1 ), vec3( 0, 0, 1 ) ]
+```
+
+#### Define a type explicitly
+
+```js
+const a = array( [ 0, 1, 2 ], 'uint' );
+const value = a.element( 1 );
+
+// value: 1u
+```
+
+### Array Uniform
+
+It is possible to use the same array logic for uniforms using Three.js native components or primitive values.
+
+```js
+const tintColors = uniformArray( [
+	new Color( 1, 0, 0 ),
+	new Color( 0, 1, 0 ),
+	new Color( 0, 0, 1 )
+], 'color' );
+
+const redColor = tintColors.element( 0 );
+```
+
+#### Accessing values
+
+To access the values you can use `a[ 1 ]` or `a.element( 1 )`. The difference is that `a[ 1 ]` only allows constant values, while `a.element( 1 )` allows the use of dynamic values such as `a.element( index )` where index is a node.
+
+### Array Storage
+
+It is possible to create arrays that can be used in compute shaders and storage operations.
+
+| Name | Description |
+| -- | -- |
+| `instancedArray( array, type )` | Creates an instanced buffer attribute array. |
+| `attributeArray( array, type )` | Creates a buffer attribute array. |
+
+## Varying
+
+Functions used to declare varying.
+
+| Name | Description |
+| -- | -- |
+| `vertexStage( node )` | Computes the node in the vertex stage. |
+| `varying( node, name = null )` | Computes the node in the vertex stage and passes interpolated values to the fragment shader. |
+| `varyingProperty( type, name = null )` | Declares an varying property but does not assign an initial value. |
+
+Let's suppose you want to optimize some calculation in the `vertex stage` but are using it in a slot like `material.colorNode`.
+
+For example:
+
+```js
+// multiplication will be executed in vertex stage
+const normalView = vertexStage( modelNormalMatrix.mul( normalLocal ) );
+
+// normalize will be computed in fragment stage while `normalView` is computed on vertex stage
+material.colorNode = normalView.normalize();
+```
+
+The first parameter of `vertexStage()` `modelNormalMatrix.mul( normalLocal )` will be computed in `vertex stage`, and the return from `vertexStage()` will be a `varying` as we are used in WGSL/GLSL, this can optimize extra calculations in the `fragment stage`. The second parameter of `varying()` allows you to add a custom name in code generation.
+
+If `varying()` is added only to `material.positionNode`, it will only return a simple variable and varying will not be created because `material.positionNode` is one of the only node material input that are computed at the vertex stage.
+
+## Conditional
+
+### If-else
+
+`If-else` conditionals can be used within `Fn()`. Conditionals in `TSL` are built using the `If` function:
+
+```js
+If( conditional, function )
+.ElseIf( conditional, function )
+.Else( function )
+```
+> Notice here the `i` in `If` is capitalized.
+
+Example:
+
+In this example below, we will limit the y position of the geometry to 10.
+
+```js
+const limitPosition = Fn( ( { position } ) => {
+
+	const limit = 10;
+
+	const result = vec3( position );
+
+	If( result.y.greaterThan( limit ), () => {
+
+		result.y = limit;
+
+	} );
+
+	return result;
+
+} );
+
+material.positionNode = limitPosition( { position: positionLocal } );
+```
+
+Example using `elseif`:
+
+```js
+const limitPosition = Fn( ( { position } ) => {
+
+	const limit = 10;
+
+	const result = vec3( position );
+
+	If( result.y.greaterThan( limit ), () => {
+
+		result.y = limit;
+
+	} ).ElseIf( result.y.lessThan( limit ), () => {
+
+		result.y = limit;
+
+	} );
+
+	return result;
+
+} );
+
+material.positionNode = limitPosition( { position: positionLocal } );
+```
+### Switch-Case
+
+A Switch-Case statement is an alternative way to express conditional logic compared to If-Else.
+
+```js
+const col = color();
+
+Switch( 0 )
+	.Case( 0, () => {
+
+		col.assign( color( 1, 0, 0 ) );
+
+	} ).Case( 1, () => {
+
+		col.assign( color( 0, 1, 0 ) );
+
+	} ).Case( 2, 3, () => {
+
+		col.assign( color( 0, 0, 1 ) );
+
+	} ).Default( () => {
+
+		col.assign( color( 1, 1, 1 ) );
+
+	} );
+```
+Notice that there are some rules when using this syntax which differentiate TSL from JavaScript:
+
+- There is no fallthrough support. So each `Case()` statement has an implicit break.
+- A `Case()` statement can hold multiple values (selectors) for testing. 
+
+### Ternary
+
+Different from `if-else`, a ternary conditional will return a value and can be used outside of `Fn()`.
+
+```js
+const result = select( value.greaterThan( 1 ), 1.0, value );
+```
+> Equivalent in JavaScript should be: `value > 1 ? 1.0 : value`
+
+## Loop
+
+This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
+```js
+Loop( count, ( { i } ) => {
+
+} );
+```
+However, it is also possible to define a start and end ranges, data types and loop conditions:
+```js
+Loop( { start: int( 0 ), end: int( 10 ), type: 'int', condition: '<', name: 'i' }, ( { i } ) => {
+
+} );
+```
+Nested loops can be defined in a compacted form:
+```js
+Loop( 10, 5, ( { i, j } ) => {
+
+} );
+```
+Loops that should run backwards can be defined like so:
+```js
+Loop( { start: 10 }, () => {} );
+```
+It is possible to execute with boolean values, similar to the `while` syntax.
+```js
+const value = float( 0 );
+
+Loop( value.lessThan( 10 ), () => {
+
+	value.addAssign( 1 );
+
+} );
+```
+The module also provides `Break()` and `Continue()` TSL expression for loop control.
+
+## Math
+
+| Name | Description |
+| -- | -- |
+| `EPSILON` | A small value used to handle floating-point precision errors. |
+| `INFINITY` | Represent infinity. |
+| `PI` | The mathematical constant π (pi). |
+| `TWO_PI` | Two times π (2π). |
+| `HALF_PI` | Half of π (π/2). |
+| | |
+| `abs( x )` | Return the absolute value of the parameter. |
+| `acos( x )` | Return the arccosine of the parameter. |
+| `all( x )` | Return true if all components of x are true. |
+| `any( x )` | Return true if any component of x is true. |
+| `asin( x )` | Return the arcsine of the parameter. |
+| `atan( y, x )` | Return the arc-tangent of the parameters. |
+| `bitcast( x, y )` | Reinterpret the bits of a value as a different type. |
+| `cbrt( x )` | Return the cube root of the parameter. |
+| `ceil( x )` | Find the nearest integer that is greater than or equal to the parameter. |
+| `clamp( x, min, max )` | Constrain a value to lie between two further values. |
+| `cos( x )` | Return the cosine of the parameter. |
+| `cross( x, y )` | Calculate the cross product of two vectors. |
+| `dFdx( p )` | Return the partial derivative of an argument with respect to x. |
+| `dFdy( p )` | Return the partial derivative of an argument with respect to y. |
+| `degrees( radians )` | Convert a quantity in radians to degrees. |
+| `difference( x, y )` | Calculate the absolute difference between two values. |
+| `distance( x, y )` | Calculate the distance between two points. |
+| `dot( x, y )` | Calculate the dot product of two vectors. |
+| `equals( x, y )` | Return true if x equals y. |
+| `exp( x )` | Return the natural exponentiation of the parameter. |
+| `exp2( x )` | Return 2 raised to the power of the parameter. |
+| `faceforward( N, I, Nref )` | Return a vector pointing in the same direction as another. |
+| `floor( x )` | Find the nearest integer less than or equal to the parameter. |
+| `fract( x )` | Compute the fractional part of the argument. |
+| `fwidth( x )` | Return the sum of the absolute derivatives in x and y. |
+| `inverseSqrt( x )` | Return the inverse of the square root of the parameter. |
+| `length( x )` | Calculate the length of a vector. |
+| `lengthSq( x )` | Calculate the squared length of a vector. |
+| `log( x )` | Return the natural logarithm of the parameter. |
+| `log2( x )` | Return the base 2 logarithm of the parameter. |
+| `max( x, y )` | Return the greater of two values. |
+| `min( x, y )` | Return the lesser of two values. |
+| `mix( x, y, a )` | Linearly interpolate between two values. |
+| `negate( x )` | Negate the value of the parameter ( -x ). |
+| `normalize( x )` | Calculate the unit vector in the same direction as the original vector. |
+| `oneMinus( x )` | Return 1 minus the parameter. |
+| `pow( x, y )` | Return the value of the first parameter raised to the power of the second. |
+| `pow2( x )` | Return the square of the parameter. |
+| `pow3( x )` | Return the cube of the parameter. |
+| `pow4( x )` | Return the fourth power of the parameter. |
+| `radians( degrees )` | Convert a quantity in degrees to radians. |
+| `reciprocal( x )` | Return the reciprocal of the parameter (1/x). |
+| `reflect( I, N )` | Calculate the reflection direction for an incident vector. |
+| `refract( I, N, eta )` | Calculate the refraction direction for an incident vector. |
+| `round( x )` | Round the parameter to the nearest integer. |
+| `saturate( x )` | Constrain a value between 0 and 1. |
+| `sign( x )` | Extract the sign of the parameter. |
+| `sin( x )` | Return the sine of the parameter. |
+| `smoothstep( e0, e1, x )` | Perform Hermite interpolation between two values. |
+| `sqrt( x )` | Return the square root of the parameter. |
+| `step( edge, x )` | Generate a step function by comparing two values. |
+| `tan( x )` | Return the tangent of the parameter. |
+| `transformDirection( dir, matrix )` | Transform the direction of a vector by a matrix and then normalize the result. |
+| `trunc( x )` | Truncate the parameter, removing the fractional part. |
+
+```js
+const value = float( -1 );
+
+// It's possible use `value.abs()` too.
+const positiveValue = abs( value ); // output: 1
+```
+
+## Method chaining
+
+`Method chaining` will only be including operators, converters, math and some core functions. These functions, however, can be used on any `node`.
+
+Example:
+
+`oneMinus()` is a mathematical function like `abs()`, `sin()`. This example uses `.oneMinus()` as a built-in function in the class that returns a new node instead of classic C function like `oneMinus( texture( map ).rgb )`.
+
+```js
+// it will invert the texture color
+material.colorNode = texture( map ).rgb.oneMinus();
+```
+
+You can use mathematical operators on any node, e.g:
+
+```js
+const contrast = .5;
+const brightness = .5;
+
+material.colorNode = texture( map ).mul( contrast ).add( brightness );
+```
+
+## Texture
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `texture( texture, uv = uv(), level = null )` | Retrieves texels from a texture. | `vec4` |
+| `textureLoad( texture, uv, level = null )` | Fetches/loads texels without interpolation. | `vec4` |
+| `textureStore( texture, uv, value )` | Stores a value into a storage texture. | `void` |
+| `textureSize( texture, level = null )` | Returns the size of a texture. | `ivec2` |
+| `textureBicubic( textureNode, strength = null )` | Applies mipped bicubic texture filtering. | `vec4` |
+| `cubeTexture( texture, uvw = reflectVector, level = null )` | Retrieves texels from a cube texture. | `vec4` |
+| `texture3D( texture, uvw = null, level = null )` | Retrieves texels from a 3D texture. | `vec4` |
+| `triplanarTexture( textureX, textureY = null, textureZ = null, scale = float( 1 ), position = positionLocal, normal = normalLocal )` | Computes texture using triplanar mapping based on provided parameters. | `vec4` |
+
+## Attributes
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `attribute( name, type = null )` | Getting geometry attribute using name and type. | `any` |
+| `uv( index = 0 )` | UV attribute named `uv + index`. | `vec2` |
+| `vertexColor( index = 0 )` | Vertex color node for the specified index. | `color` |
+| `instanceIndex` | The index of the current instance. | `uint` |
+| `vertexIndex` | The index of a vertex within a mesh. | `uint` |
+| `drawIndex` | The draw index when using multi-draw. | `uint` |
+| `batch( batchMesh )` | Creates a batch node for BatchedMesh. | `BatchNode` |
+| `instance( instancedMesh )` | Creates an instance node for InstancedMesh. | `InstanceNode` |
+
+## Position
+
+The transformed term reflects the modifications applied by processes such as `skinning`, `morphing`, and similar techniques.
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `positionGeometry` | Position attribute of geometry. | `vec3` |
+| `positionLocal` | Transformed local position. | `vec3` |
+| `positionWorld` | Transformed world position. | `vec3` |
+| `positionWorldDirection` | Normalized world direction. | `vec3` |
+| `positionView` | View position. | `vec3` |
+| `positionViewDirection` | Normalized view direction. | `vec3` |
+
+## Normal
+
+The term transformed here also includes following the correct orientation of the face, so that the normals are inverted inside the geometry.
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `normalGeometry` | Normal attribute of geometry. | `vec3` |
+| `normalLocal` | Local variable for normal. | `vec3` |
+| `normalView` | Normalized transformed view normal. | `vec3` |
+| `normalViewGeometry` | Normalized view normal. | `vec3` |
+| `normalWorld` | Normalized transformed world normal. | `vec3` |
+| `normalWorldGeometry` | Normalized world normal. | `vec3` |
+
+## Tangent
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `tangentGeometry` | Tangent attribute of geometry. | `vec4` |
+| `tangentLocal` | Local variable for tangent. | `vec3` |
+| `tangentView` | Normalized transformed view tangent. | `vec3` |
+| `tangentWorld` | Normalized transformed world tangent. | `vec3` |
+
+### Bitangent
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `bitangentGeometry` | Normalized bitangent in geometry space. | `vec3` |
+| `bitangentLocal` | Normalized bitangent in local space. | `vec3` |
+| `bitangentView` | Normalized transformed bitangent in view space. | `vec3` |
+| `bitangentWorld` | Normalized transformed bitangent in world space. | `vec3` |
+
+## Camera
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `cameraNear` | Near plane distance of the camera. | `float` |
+| `cameraFar` | Far plane distance of the camera. | `float` |
+| `cameraProjectionMatrix` | Projection matrix of the camera. | `mat4` |
+| `cameraProjectionMatrixInverse` | Inverse projection matrix of the camera. | `mat4` |
+| `cameraViewMatrix` | View matrix of the camera. | `mat4` |
+| `cameraWorldMatrix` | World matrix of the camera. | `mat4` |
+| `cameraNormalMatrix` | Normal matrix of the camera. | `mat3` |
+| `cameraPosition` | World position of the camera. | `vec3` |
+
+## Model
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `modelDirection` | Direction of the model. | `vec3` |
+| `modelViewMatrix` | View-space matrix of the model. | `mat4` |
+| `modelNormalMatrix` | View-space matrix of the model. | `mat3` |
+| `modelWorldMatrix` | World-space matrix of the model. | `mat4` |
+| `modelPosition` | Position of the model. | `vec3` |
+| `modelScale` | Scale of the model. | `vec3` |
+| `modelViewPosition` | View-space position of the model. | `vec3` |
+| `modelWorldMatrixInverse` | Inverse world matrix of the model. | `mat4` |
+| | |
+| `highpModelViewMatrix` | View-space matrix of the model computed on CPU using 64-bit. | `mat4` |
+| `highpModelNormalViewMatrix` | View-space normal matrix of the model computed on CPU using 64-bit. | `mat3` |
+
+## Screen
+
+Screen nodes will return the values related to the current `frame buffer`, either normalized or in `physical pixel units` considering the current `Pixel Ratio`.
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `screenUV` | Returns the normalized frame buffer coordinate. | `vec2` |
+| `screenCoordinate` | Returns the frame buffer coordinate in physical pixel units. | `vec2` |
+| `screenSize` | Returns the frame buffer size in physical pixel units. | `vec2` |
+| `screenDPR` | Returns the device pixel ratio (DPR). | `float` |
+
+## Viewport
+
+`viewport` is influenced by the area defined in `renderer.setViewport()`, different of the values ​​defined in the renderer that are `logical pixel units`, it use `physical pixel units` considering the current `Pixel Ratio`.
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `viewportUV` | Returns the normalized viewport coordinate. | `vec2` |
+| `viewport` | Returns the viewport dimension in physical pixel units. | `vec4` |
+| `viewportCoordinate` | Returns the viewport coordinate in physical pixel units. | `vec2` |
+| `viewportSize` | Returns the viewport size in physical pixel units. | `vec2` |
+| `viewportSharedTexture( uvNode = screenUV, levelNode = null )` | Accesses what has already been rendered, preserving render-order. | `vec4` |
+| `viewportDepthTexture( uvNode = screenUV, levelNode = null )` | Returns the depth texture of the viewport. | `float` |
+| `viewportLinearDepth` | Returns the linear (orthographic) depth value of the current fragment. | `float` |
+| `viewportMipTexture( uvNode = screenUV, levelNode = null, framebufferTexture = null )` | Returns a viewport texture with mipmap generation enabled. | `vec4` |
+| `viewportSafeUV( uv = screenUV )` | Returns safe UV coordinates for refraction purposes. | `vec2` |
+
+## Blend Modes
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `blendBurn( a, b )` | Returns the burn blend mode. | `color` |
+| `blendDodge( a, b )` | Returns the dodge blend mode. | `color` |
+| `blendOverlay( a, b )` | Returns the overlay blend mode. | `color` |
+| `blendScreen( a, b )` | Returns the screen blend mode. | `color` |
+| `blendColor( a, b )` | Returns the (normal) color blend mode. | `color` |
+
+## Reflect
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `reflectView` | Computes reflection direction in view space. | `vec3` |
+| `reflectVector` | Transforms the reflection direction to world space. | `vec3` |
+
+## UV Utils
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `matcapUV` | UV coordinates for matcap texture. | `vec2` |
+| `rotateUV( uv, rotation, centerNode = vec2( 0.5 ) )` | Rotates UV coordinates around a center point. | `vec2` |
+| `spherizeUV( uv, strength, centerNode = vec2( 0.5 ) )` | Distorts UV coordinates with a spherical effect around a center point. | `vec2` |
+| `spritesheetUV( count, uv = uv(), frame = float( 0 ) )` | Computes UV coordinates for a sprite sheet based on the number of frames, UV coordinates, and frame index. | `vec2` |
+| `equirectUV( direction = positionWorldDirection )` | Computes UV coordinates for equirectangular mapping based on the direction vector. | `vec2` |
+
+```js
+import { texture, matcapUV } from 'three/tsl';
+
+const matcap = texture( matcapMap, matcapUV );
+```
+
+## Interpolation
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `remap( node, inLow, inHigh, outLow = float( 0 ), outHigh = float( 1 ) )` | Remaps a value from one range to another. | `any` |
+| `remapClamp( node, inLow, inHigh, outLow = float( 0 ), outHigh = float( 1 ) )` | Remaps a value from one range to another, with clamping. | `any` |
+
+## Random
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `hash( seed )` | Generates a hash value in the range [ 0, 1 ] from the given seed. | `float` |
+| `range( min, max )` | Generates a range `attribute` of values between min and max. Attribute randomization is useful when you want to randomize values ​​between instances and not between pixels. | `any` |
+
+## Rotate
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `rotate( position, rotation )` | Applies a rotation to the given position node. Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value. | `vec2`, `vec3`
+
+## Oscillator
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `oscSine( timer = time )` | Generates a sine wave oscillation based on a timer. | `float` |
+| `oscSquare( timer = time )` | Generates a square wave oscillation based on a timer. | `float` |
+| `oscTriangle( timer = time )` | Generates a triangle wave oscillation based on a timer. | `float` |
+| `oscSawtooth( timer = time )` | Generates a sawtooth wave oscillation based on a timer. | `float` |
+
+## Timer
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `time` | Represents the elapsed time in seconds. | `float` |
+| `deltaTime` | Represents the delta time in seconds. | `float` |
+
+## Packing
+
+| Variable | Description | Type |
+| -- | -- | -- |
+| `directionToColor( value )` | Converts direction vector to color. | `color` |
+| `colorToDirection( value )` | Converts color to direction vector. | `vec3` |
+
+## Render Pipeline
+
+The `RenderPipeline` provides full control over the rendering process. It enables developers to build complex multi-pass rendering pipelines entirely in JavaScript, combining scene rendering, post-processing, and compute operations in a unified, composable workflow.
+
+#### Basic Usage
+
+```js
+import * as THREE from 'three/webgpu';
+import { pass } from 'three/tsl';
+
+// Create the render pipeline
+const renderPipeline = new THREE.RenderPipeline( renderer );
+
+// Create a scene pass
+const scenePass = pass( scene, camera );
+
+// Set the output
+renderPipeline.outputNode = scenePass;
+
+// In the animation loop
+function animate() {
+
+	renderPipeline.render();
+
+}
+```
+
+### Multiple Render Targets (MRT)
+
+MRT allows capturing multiple outputs from a single render pass. Instead of rendering the scene multiple times to get different data (color, normals, depth, velocity), MRT captures all of them in one draw call—significantly improving performance.
+
+#### Setting up MRT
+
+Use `setMRT()` with the `mrt()` function to define which outputs to capture:
+
+```js
+import { pass, mrt, output, normalView, velocity, directionToColor } from 'three/tsl';
+
+const scenePass = pass( scene, camera );
+
+scenePass.setMRT( mrt( {
+	output: output,                          // Final color output
+	normal: directionToColor( normalView ),  // View-space normals encoded as colors
+	velocity: velocity                       // Motion vectors for temporal effects
+} ) );
+```
+
+Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `directionToColor( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
+
+Within a TSL function `Fn( ( { material, object } ) => { ... } )`, you have complete access to the current material and object being rendered, enabling full customization of outputs.
+
+#### Accessing MRT Buffers
+
+Each MRT output becomes available as a texture node via `getTextureNode()`:
+
+```js
+// Access individual buffers as texture nodes
+const colorTexture = scenePass.getTextureNode( 'output' );
+const normalTexture = scenePass.getTextureNode( 'normal' );
+const velocityTexture = scenePass.getTextureNode( 'velocity' );
+
+// Depth is always available, even without MRT
+const depthTexture = scenePass.getTextureNode( 'depth' );
+```
+
+These texture nodes can be sampled, transformed, and passed to post-processing effects or other passes.
+
+#### Optimizing MRT Textures
+
+You can access the textures to optimize memory usage and bandwidth. Using smaller data types reduces GPU memory transfers, which is critical for performance on bandwidth-limited devices:
+
+```js
+// Use 8-bit format for encoded normals, default is 16-bit
+const normalTexture = scenePass.getTexture( 'normal' );
+normalTexture.type = THREE.UnsignedByteType;
+```
+
+#### Dynamic Pipeline Updates
+
+The pipeline can be updated at runtime:
+
+```js
+if ( showNormals ) {
+
+	renderPipeline.outputNode = prePass;
+
+} else {
+
+	renderPipeline.outputNode = traaPass;
+
+}
+
+renderPipeline.needsUpdate = true;
+```
+
+### Post-Processing
+
+TSL utilities for post-processing effects. They can be used in materials or post-processing passes.
+
+| Name | Description |
+| -- | -- |
+| `afterImage( node, damp = 0.96 )` | Creates an after image effect. |
+| `anamorphic( node, threshold = 0.9, scale = 3, samples = 32 )` | Creates an anamorphic flare effect. |
+| `bloom( node, strength = 1, radius = 0, threshold = 0 )` | Creates a bloom effect. |
+| `boxBlur( textureNode, options = {} )` | Applies a box blur effect. |
+| `chromaticAberration( node, strength = 1.0, center = null, scale = 1.1 )` | Creates a chromatic aberration effect. |
+| `denoise( node, depthNode, normalNode, camera )` | Creates a denoise effect. |
+| `dof( node, viewZNode, focusDistance, focalLength, bokehScale )` | Creates a depth-of-field effect. |
+| `dotScreen( node, angle = 1.57, scale = 1 )` | Creates a dot-screen effect. |
+| `film( inputNode, intensityNode = null, uvNode = null )` | Creates a film grain effect. |
+| `fxaa( node )` | Creates a FXAA anti-aliasing effect. |
+| `gaussianBlur( node, directionNode, sigma, options = {} )` | Creates a gaussian blur effect. |
+| `grayscale( color )` | Converts color to grayscale. |
+| `hashBlur( textureNode, bluramount = float( 0.1 ), options = {} )` | Applies a hash blur effect. |
+| `lut3D( node, lut, size, intensity )` | Creates a LUT color grading effect. |
+| `motionBlur( inputNode, velocity, numSamples = int( 16 ) )` | Creates a motion blur effect. |
+| `outline( scene, camera, params )` | Creates an outline effect around selected objects. |
+| `rgbShift( node, amount = 0.005, angle = 0 )` | Creates an RGB shift effect. |
+| `sepia( color )` | Applies a sepia effect. |
+| `smaa( node )` | Creates a SMAA anti-aliasing effect. |
+| `sobel( node )` | Creates a sobel edge detection effect. |
+| `ssr( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null )` | Creates screen space reflections. |
+| `ssgi( beautyNode, depthNode, normalNode, camera )` | Creates a SSGI effect. |
+| `ao( depthNode, normalNode, camera )` | Creates a Ground Truth Ambient Occlusion (GTAO) effect. |
+| `transition( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture )` | Creates a transition effect between two scenes. |
+| `traa( beautyNode, depthNode, velocityNode, camera )` | Creates a TRAA temporal anti-aliasing effect. |
+| `renderOutput( node, targetColorSpace, targetToneMapping )` | Apply the renderer output settings in the node. |
+
+Example:
+
+```js
+import { grayscale, pass } from 'three/tsl';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+
+// Post-processing
+const scenePass = pass( scene, camera );
+const output = scenePass.getTextureNode(); // default parameter is 'output'
+
+renderPipeline.outputNode = grayscale( gaussianBlur( output, 4 ) );
+```
+
+### Render Pass
+
+Functions for creating and managing render passes.
+
+| Name | Description |
+| -- | -- |
+| `pass( scene, camera, options = {} )` | Creates a pass node for rendering a scene. |
+| `mrt( outputNodes )` | Creates a Multiple Render Targets (MRT) node. |
+
+Example:
+
+```js
+import { pass, mrt, output, emissive } from 'three/tsl';
+
+const scenePass = pass( scene, camera );
+
+// Setup MRT
+scenePass.setMRT( mrt( {
+	output: output,
+	emissive: emissive
+} ) );
+
+const outputNode = scenePass.getTextureNode( 'output' );
+const emissiveNode = scenePass.getTextureNode( 'emissive' );
+```
+
+### Compute
+
+Compute shaders allow general-purpose GPU computations. TSL provides functions for creating and managing compute operations.
+
+| Name | Description |
+| -- | -- |
+| `compute( node, count = null, workgroupSize = [ 64 ] )` | Creates a compute node. |
+| `atomicAdd( node, value )` | Performs an atomic addition. |
+| `atomicSub( node, value )` | Performs an atomic subtraction. |
+| `atomicMax( node, value )` | Performs an atomic max operation. |
+| `atomicMin( node, value )` | Performs an atomic min operation. |
+| `atomicAnd( node, value )` | Performs an atomic AND operation. |
+| `atomicOr( node, value )` | Performs an atomic OR operation. |
+| `atomicXor( node, value )` | Performs an atomic XOR operation. |
+| `atomicStore( node, value )` | Stores a value atomically. |
+| `atomicLoad( node )` | Loads a value atomically. |
+| `workgroupBarrier()` | Creates a workgroup barrier. |
+| `storageBarrier()` | Creates a storage barrier. |
+| `textureBarrier()` | Creates a texture barrier. |
+| `barrier()` | Creates a memory barrier. |
+| `workgroupId` | The workgroup ID. |
+| `localId` | The local invocation ID within the workgroup. |
+| `globalId` | The global invocation ID. |
+| `numWorkgroups` | The number of workgroups. |
+| `subgroupSize` | The size of the subgroup. |
+
+Example:
+
+```js
+import { Fn, instancedArray, instanceIndex, deltaTime } from 'three/tsl';
+
+const count = 1000;
+const positionArray = instancedArray( count, 'vec3' );
+
+// create a compute function
+
+const computeShader = Fn( () => {
+
+	const position = positionArray.element( instanceIndex );
+
+	position.x.addAssign( deltaTime );
+
+} )().compute( count );
+
+//
+
+renderer.compute( computeShader );
+```
+
+## Storage
+
+Storage functions allow reading and writing to GPU buffers.
+
+| Name | Description |
+| -- | -- |
+| `storage( attribute, type, count )` | Creates a storage buffer. |
+| `storageTexture( texture )` | Creates a storage texture for read/write operations. |
+
+## Struct
+
+Structs allow you to create custom data types with multiple members. They can be used to organize related data in shaders, define structures for attributes and uniforms.
+
+| Name | Description |
+| -- | -- |
+| `struct( membersLayout, name = null )` | Creates a struct type with the specified member layout. |
+| `outputStruct( ...members )` | Creates an output struct node for returning multiple values. |
+
+Example:
+
+```js
+import { struct, vec3 } from 'three/tsl';
+
+// Define a custom struct
+const BoundingBox = struct( { min: 'vec3', max: 'vec3' } );
+
+// Create a new instance of the struct
+const bb = BoundingBox( vec3( 0 ), vec3( 1 ) ); // style 1
+const bb2 = BoundingBox( { min: vec3( 0 ), max: vec3( 1 ) } ); // style 2
+
+// Access the struct members
+const min = bb.get( 'min' );
+
+// Assign a new value to a member
+min.assign( vec3( -1, -1, -1 ) );
+```
+
+## Flow Control
+
+Functions for controlling shader flow.
+
+| Name | Description |
+| -- | -- |
+| `Discard()` | Discards the current fragment. |
+| `Return()` | Returns from the current function. |
+| `Break()` | Breaks out of a loop. |
+| `Continue()` | Continues to the next iteration of a loop. |
+
+Example:
+
+```js
+import { Fn, If, Discard, uv } from 'three/tsl';
+
+const customFragment = Fn( () => {
+
+	If( uv().x.lessThan( 0.5 ), () => {
+
+		Discard();
+
+	} );
+
+	return vec4( 1, 0, 0, 1 );
+
+} );
+
+material.colorNode = customFragment();
+```
+
+## Fog
+
+Functions for creating fog effects in the scene. Assign the fog node to `scene.fogNode`.
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `fog( color, factor )` | Creates a fog node with specified color and fog factor. | `FogNode` |
+| `rangeFogFactor( near, far )` | Creates a linear fog factor based on distance from camera. | `float` |
+| `densityFogFactor( density )` | Creates an exponential squared fog factor for denser fog. | `float` |
+
+Example:
+
+```js
+import { fog, rangeFogFactor, densityFogFactor, color } from 'three/tsl';
+
+// Linear fog (starts at 10 units, fully opaque at 100 units)
+scene.fogNode = fog( color( 0x000000 ), rangeFogFactor( 10, 100 ) );
+
+// Exponential fog (density-based)
+scene.fogNode = fog( color( 0xcccccc ), densityFogFactor( 0.02 ) );
+```
+
+## Color Adjustments
+
+Functions for adjusting and manipulating colors.
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `luminance( node )` | Calculates the luminance (perceived brightness) of a color. | `float` |
+| `saturation( node, adjustment = 1 )` | Adjusts the saturation of a color. Values > 1 increase saturation, < 1 decrease. | `color` |
+| `vibrance( node, adjustment = 1 )` | Selectively enhances less saturated colors while preserving already saturated ones. | `color` |
+| `hue( node, adjustment = 0 )` | Rotates the hue of a color. Value is in radians. | `color` |
+| `posterize( node, steps )` | Reduces the number of color levels, creating a poster-like effect. | `color` |
+
+Example:
+
+```js
+import { texture, saturation, hue, posterize } from 'three/tsl';
+
+// Increase saturation
+material.colorNode = saturation( texture( map ), 1.5 );
+
+// Rotate hue by 90 degrees
+material.colorNode = hue( texture( map ), Math.PI / 2 );
+
+// Posterize to 4 color levels
+material.colorNode = posterize( texture( map ), 4 );
+```
+
+## Utilities
+
+Utility functions for common shader tasks.
+
+| Name | Description | Type |
+| -- | -- | -- |
+| `billboarding( { position, horizontal, vertical } )` | Orients flat meshes always towards the camera. `position`: vertex positions in world space (default: `null`). `horizontal`: follow camera horizontally (default: `true`). `vertical`: follow camera vertically (default: `false`). | `vec3` |
+| `checker( coord )` | Creates a 2x2 checkerboard pattern. | `float` |
+
+Example:
+
+```js
+import { billboarding } from 'three/tsl';
+
+// Full billboarding (like particles) - faces camera in all directions
+material.vertexNode = billboarding();
+
+// Horizontal only (like trees) - rotates around Y axis only
+material.vertexNode = billboarding( { horizontal: true, vertical: false } );
+```
+
+## NodeMaterial
+
+Check below for more details about `NodeMaterial` inputs.
+
+#### Core
+
+| Name | Description | Type |
+|--|--|--|
+| `.fragmentNode` | Replaces the built-in material logic used in the fragment stage. | `vec4` |
+| `.vertexNode` | Replaces the built-in material logic used in the vertex stage. | `vec4` |
+| `.geometryNode` | Allows you to execute a TSL function to deal with Geometry. | `Fn()` |
+
+#### Basic
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.colorNode` | Replace the logic of `material.color * material.map`. | `materialColor` | `vec4` |
+| `.depthNode` | Customize the `depth` output. | `depth` | `float` |
+| `.opacityNode` | Replace the logic of `material.opacity * material.alphaMap`. | `materialOpacity` | `float` |
+| `.alphaTestNode` | Sets a threshold to discard pixels with low opacity. | `materialAlphaTest` | `float` |
+| `.positionNode` | Represents the vertex positions in local-space. Replace the logic of `material.displacementMap * material.displacementScale + material.displacementBias`. | `positionLocal` | `vec3` |
+
+#### Lighting
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.emissiveNode` | Replace the logic of `material.emissive * material.emissiveIntensity * material.emissiveMap`. | `materialEmissive` | `color` |
+| `.normalNode` | Represents the normals direction in view-space. Replace the logic of `material.normalMap * material.normalScale` and `material.bumpMap * material.bumpScale`. | `materialNormal` | `vec3` |
+| `.lightsNode` | Defines the lights and lighting model that will be used by the material. |  | `lights()` |
+| `.envNode` | Replace the logic of `material.envMap * material.envMapRotation * material.envMapIntensity`. |  | `color` |
+
+#### Backdrop
+
+| Name | Description | Type |
+|--|--|--|
+| `.backdropNode` | Set the current render color to be used before applying `Specular`, useful for `transmission` and `refraction` effects. | `color` |
+| `.backdropAlphaNode` | Define the alpha of `backdropNode`. | `float` |
+
+#### Shadows
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.castShadowNode` | Control the `color` and `opacity` of the shadow that will be projected by the material. |  | `vec4` |
+| `.maskShadowNode` | Define a custom mask for the shadow. |  | `bool` |
+| `.receivedShadowNode` | Handle the shadow cast on the material. |  | `Fn()` |
+| `.receivedShadowPositionNode` | Define the shadow projection position in world-space. | `shadowPositionWorld` | `vec3` |
+| `.aoNode` | Replace the logic of `material.aoMap * aoMapIntensity`. | `materialAO` | `float` |
+
+#### Output
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.maskNode` | Define the material's mask. Unlike opacity, it is discarded at the beginning of rendering, optimizing the process. |  | `bool` |
+| `.mrtNode` | Define a different MRT than the one defined in `pass()`. |  | `mrt()` |
+| `.outputNode` | Defines the material's final output. | `output` | `vec4` |
+
+## LineDashedNodeMaterial
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.dashScaleNode` | Replace the logic of `material.scale`. | `materialLineScale` | `float` |
+| `.dashSizeNode` | Replace the logic of `material.dashSize`. | `materialLineDashSize` | `float` |
+| `.gapSizeNode` | Replace the logic of `material.gapSize`. | `materialLineGapSize` | `float` |
+| `.offsetNode` | Replace the logic of `material.dashOffset`. | `materialLineDashOffset` | `float` |
+
+## MeshPhongNodeMaterial
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.shininessNode` | Replace the logic of `material.shininess`. | `materialShininess` | `float` |
+| `.specularNode` | Replace the logic of `material.specular`. | `materialSpecular` | `color` |
+
+## MeshStandardNodeMaterial
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.metalnessNode` | Replace the logic of `material.metalness * material.metalnessMap`. | `materialMetalness` | `float` |
+| `.roughnessNode` | Replace the logic of `material.roughness * material.roughnessMap`. | `materialRoughness` | `float` |
+
+## MeshPhysicalNodeMaterial
+
+| Name | Description | Reference | Type |
+|--|--|--|--|
+| `.clearcoatNode` | Replace the logic of `material.clearcoat * material.clearcoatMap`. | `materialClearcoat` | `float` |
+| `.clearcoatRoughnessNode` | Replace the logic of `material.clearcoatRoughness * material.clearcoatRoughnessMap`. | `materialClearcoatRoughness` | `float` |
+| `.clearcoatNormalNode` | Replace the logic of `material.clearcoatNormalMap * material.clearcoatNormalMapScale`. | `materialClearcoatNormal` | `vec3` |
+| `.sheenNode` | Replace the logic of `material.sheenColor * material.sheenColorMap`. | `materialSheen` | `color` |
+| `.iridescenceNode` | Replace the logic of `material.iridescence`. | `materialIridescence` | `float` |
+| `.iridescenceIORNode` | Replace the logic of `material.iridescenceIOR`. | `materialIridescenceIOR` | `float` |
+| `.iridescenceThicknessNode` | Replace the logic of `material.iridescenceThicknessRange * material.iridescenceThicknessMap`. | `materialIridescenceThickness` | `float` |
+| `.specularIntensityNode` | Replace the logic of `material.specularIntensity * material.specularIntensityMap`. | `materialSpecularIntensity` | `float` |
+| `.specularColorNode` | Replace the logic of `material.specularColor * material.specularColorMap`. | `materialSpecularColor` | `color` |
+| `.iorNode` | Replace the logic of `material.ior`. | `materialIOR` | `float` |
+| `.transmissionNode` | Replace the logic of `material.transmission * material.transmissionMap`. | `materialTransmission` | `color` |
+| `.thicknessNode` | Replace the logic of `material.thickness * material.thicknessMap`. | `materialTransmission` | `float` |
+| `.attenuationDistanceNode` | Replace the logic of `material.attenuationDistance`. | `materialAttenuationDistance` | `float` |
+| `.attenuationColorNode` | Replace the logic of `material.attenuationColor`. | `materialAttenuationColor` | `color` |
+| `.dispersionNode` | Replace the logic of `material.dispersion`. | `materialDispersion` | `float` |
+| `.anisotropyNode` | Replace the logic of `material.anisotropy * material.anisotropyMap`. | `materialAnisotropy` | `vec2` |
+
+## SpriteNodeMaterial
+
+| Name | Description | Type |
+|--|--|--|
+| `.positionNode` | Defines the position. | `vec3` |
+| `.rotationNode` | Defines the rotation. | `float` |
+| `.scaleNode` | Defines the scale. | `vec2` |
+
+## Transitioning common GLSL properties to TSL
+
+| GLSL | TSL | Type |
+| -- | -- | -- |
+| `position` | `positionGeometry` | `vec3` |
+| `transformed` | `positionLocal` | `vec3` |
+| `transformedNormal` | `normalLocal` | `vec3` |
+| `vWorldPosition` | `positionWorld` | `vec3` |
+| `vColor` | `vertexColor()` | `vec3` |
+| `vUv` \| `uv` | `uv()` | `vec2` |
+| `vNormal` | `normalView` | `vec3` |
+| `viewMatrix` | `cameraViewMatrix` | `mat4` |
+| `modelMatrix` | `modelWorldMatrix` | `mat4` |
+| `modelViewMatrix` | `modelViewMatrix` | `mat4` |
+| `projectionMatrix` | `cameraProjectionMatrix` | `mat4` |
+| `diffuseColor` | `material.colorNode` | `vec4` |
+| `gl_FragColor` | `material.fragmentNode` | `vec4` |
+
+
+
+---
+
+## Available Documentation
+
+The following documentation pages are available in markdown format at `https://threejs.org/docs/pages/{Name}.html.md`:
+
+### Core
+
+- [ARButton](https://threejs.org/docs/pages/ARButton.html.md)
+- [AmmoPhysics](https://threejs.org/docs/pages/AmmoPhysics.html.md)
+- [BasicLightingModel](https://threejs.org/docs/pages/BasicLightingModel.html.md)
+- [BatchedMesh](https://threejs.org/docs/pages/BatchedMesh.html.md)
+- [BezierInterpolant](https://threejs.org/docs/pages/BezierInterpolant.html.md)
+- [BitonicSort_BitonicSort](https://threejs.org/docs/pages/BitonicSort_BitonicSort.html.md)
+- [BlendMode](https://threejs.org/docs/pages/BlendMode.html.md)
+- [Bone](https://threejs.org/docs/pages/Bone.html.md)
+- [BooleanKeyframeTrack](https://threejs.org/docs/pages/BooleanKeyframeTrack.html.md)
+- [BufferAttribute](https://threejs.org/docs/pages/BufferAttribute.html.md)
+- [BundleGroup](https://threejs.org/docs/pages/BundleGroup.html.md)
+- [CCDIKSolver](https://threejs.org/docs/pages/CCDIKSolver.html.md)
+- [CSM](https://threejs.org/docs/pages/CSM.html.md)
+- [CSMFrustum](https://threejs.org/docs/pages/CSMFrustum.html.md)
+- [CSS2DObject](https://threejs.org/docs/pages/CSS2DObject.html.md)
+- [CSS2DRenderer](https://threejs.org/docs/pages/CSS2DRenderer.html.md)
+- [CSS3DObject](https://threejs.org/docs/pages/CSS3DObject.html.md)
+- [CSS3DRenderer](https://threejs.org/docs/pages/CSS3DRenderer.html.md)
+- [CSS3DSprite](https://threejs.org/docs/pages/CSS3DSprite.html.md)
+- [Cache](https://threejs.org/docs/pages/Cache.html.md)
+- [CanvasTarget](https://threejs.org/docs/pages/CanvasTarget.html.md)
+- [Capsule](https://threejs.org/docs/pages/Capsule.html.md)
+- [CinquefoilKnot](https://threejs.org/docs/pages/CinquefoilKnot.html.md)
+- [ClippingGroup](https://threejs.org/docs/pages/ClippingGroup.html.md)
+- [Clock](https://threejs.org/docs/pages/Clock.html.md)
+- [ColladaComposer](https://threejs.org/docs/pages/ColladaComposer.html.md)
+- [ColladaParser](https://threejs.org/docs/pages/ColladaParser.html.md)
+- [ColorConverter](https://threejs.org/docs/pages/ColorConverter.html.md)
+- [ColorEnvironment](https://threejs.org/docs/pages/ColorEnvironment.html.md)
+- [ColorKeyframeTrack](https://threejs.org/docs/pages/ColorKeyframeTrack.html.md)
+- [ConvexHull](https://threejs.org/docs/pages/ConvexHull.html.md)
+- [ConvexObjectBreaker](https://threejs.org/docs/pages/ConvexObjectBreaker.html.md)
+- [CubeRenderTarget](https://threejs.org/docs/pages/CubeRenderTarget.html.md)
+- [CubicInterpolant](https://threejs.org/docs/pages/CubicInterpolant.html.md)
+- [Cylindrical](https://threejs.org/docs/pages/Cylindrical.html.md)
+- [DRACOExporter](https://threejs.org/docs/pages/DRACOExporter.html.md)
+- [DataUtils](https://threejs.org/docs/pages/DataUtils.html.md)
+- [DebugEnvironment](https://threejs.org/docs/pages/DebugEnvironment.html.md)
+- [DecoratedTorusKnot4a](https://threejs.org/docs/pages/DecoratedTorusKnot4a.html.md)
+- [DecoratedTorusKnot4b](https://threejs.org/docs/pages/DecoratedTorusKnot4b.html.md)
+- [DecoratedTorusKnot5a](https://threejs.org/docs/pages/DecoratedTorusKnot5a.html.md)
+- [DecoratedTorusKnot5c](https://threejs.org/docs/pages/DecoratedTorusKnot5c.html.md)
+- [DirectionalLightShadow](https://threejs.org/docs/pages/DirectionalLightShadow.html.md)
+- [DiscreteInterpolant](https://threejs.org/docs/pages/DiscreteInterpolant.html.md)
+- [Earcut](https://threejs.org/docs/pages/Earcut.html.md)
+- [EdgeSplitModifier](https://threejs.org/docs/pages/EdgeSplitModifier.html.md)
+- [EffectComposer](https://threejs.org/docs/pages/EffectComposer.html.md)
+- [EventDispatcher](https://threejs.org/docs/pages/EventDispatcher.html.md)
+- [FigureEightPolynomialKnot](https://threejs.org/docs/pages/FigureEightPolynomialKnot.html.md)
+- [Float16BufferAttribute](https://threejs.org/docs/pages/Float16BufferAttribute.html.md)
+- [Float32BufferAttribute](https://threejs.org/docs/pages/Float32BufferAttribute.html.md)
+- [Flow](https://threejs.org/docs/pages/Flow.html.md)
+- [Fog](https://threejs.org/docs/pages/Fog.html.md)
+- [FogExp2](https://threejs.org/docs/pages/FogExp2.html.md)
+- [Font](https://threejs.org/docs/pages/Font.html.md)
+- [FullScreenQuad](https://threejs.org/docs/pages/FullScreenQuad.html.md)
+- [GLBufferAttribute](https://threejs.org/docs/pages/GLBufferAttribute.html.md)
+- [GLSLNodeBuilder](https://threejs.org/docs/pages/GLSLNodeBuilder.html.md)
+- [GLSLNodeFunction](https://threejs.org/docs/pages/GLSLNodeFunction.html.md)
+- [GLSLNodeParser](https://threejs.org/docs/pages/GLSLNodeParser.html.md)
+- [GLTFExporter](https://threejs.org/docs/pages/GLTFExporter.html.md)
+- [GPUComputationRenderer](https://threejs.org/docs/pages/GPUComputationRenderer.html.md)
+- [GrannyKnot](https://threejs.org/docs/pages/GrannyKnot.html.md)
+- [GroundedSkybox](https://threejs.org/docs/pages/GroundedSkybox.html.md)
+- [Group](https://threejs.org/docs/pages/Group.html.md)
+- [Gyroscope](https://threejs.org/docs/pages/Gyroscope.html.md)
+- [HTMLMesh](https://threejs.org/docs/pages/HTMLMesh.html.md)
+- [ImageUtils](https://threejs.org/docs/pages/ImageUtils.html.md)
+- [ImprovedNoise](https://threejs.org/docs/pages/ImprovedNoise.html.md)
+- [IndirectStorageBufferAttribute](https://threejs.org/docs/pages/IndirectStorageBufferAttribute.html.md)
+- [Info](https://threejs.org/docs/pages/Info.html.md)
+- [InspectorBase](https://threejs.org/docs/pages/InspectorBase.html.md)
+- [InstancedBufferAttribute](https://threejs.org/docs/pages/InstancedBufferAttribute.html.md)
+- [InstancedFlow](https://threejs.org/docs/pages/InstancedFlow.html.md)
+- [InstancedInterleavedBuffer](https://threejs.org/docs/pages/InstancedInterleavedBuffer.html.md)
+- [InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html.md)
+- [Int16BufferAttribute](https://threejs.org/docs/pages/Int16BufferAttribute.html.md)
+- [Int32BufferAttribute](https://threejs.org/docs/pages/Int32BufferAttribute.html.md)
+- [Int8BufferAttribute](https://threejs.org/docs/pages/Int8BufferAttribute.html.md)
+- [InteractiveGroup](https://threejs.org/docs/pages/InteractiveGroup.html.md)
+- [InterleavedBuffer](https://threejs.org/docs/pages/InterleavedBuffer.html.md)
+- [InterleavedBufferAttribute](https://threejs.org/docs/pages/InterleavedBufferAttribute.html.md)
+- [Interpolant](https://threejs.org/docs/pages/Interpolant.html.md)
+- [JoltPhysics](https://threejs.org/docs/pages/JoltPhysics.html.md)
+- [KTX2Exporter](https://threejs.org/docs/pages/KTX2Exporter.html.md)
+- [KeyframeTrack](https://threejs.org/docs/pages/KeyframeTrack.html.md)
+- [LDrawUtils](https://threejs.org/docs/pages/LDrawUtils.html.md)
+- [LOD](https://threejs.org/docs/pages/LOD.html.md)
+- [Layers](https://threejs.org/docs/pages/Layers.html.md)
+- [Lensflare](https://threejs.org/docs/pages/Lensflare.html.md)
+- [LensflareElement](https://threejs.org/docs/pages/LensflareElement.html.md)
+- [LensflareMesh](https://threejs.org/docs/pages/LensflareMesh.html.md)
+- [LightProbe](https://threejs.org/docs/pages/LightProbe.html.md)
+- [LightProbeGenerator](https://threejs.org/docs/pages/LightProbeGenerator.html.md)
+- [LightShadow](https://threejs.org/docs/pages/LightShadow.html.md)
+- [LightingModel](https://threejs.org/docs/pages/LightingModel.html.md)
+- [Line](https://threejs.org/docs/pages/Line.html.md)
+- [Line2](https://threejs.org/docs/pages/Line2.html.md)
+- [Line3](https://threejs.org/docs/pages/Line3.html.md)
+- [LineLoop](https://threejs.org/docs/pages/LineLoop.html.md)
+- [LineSegments](https://threejs.org/docs/pages/LineSegments.html.md)
+- [LineSegments2](https://threejs.org/docs/pages/LineSegments2.html.md)
+- [LinearInterpolant](https://threejs.org/docs/pages/LinearInterpolant.html.md)
+- [LoaderUtils](https://threejs.org/docs/pages/LoaderUtils.html.md)
+- [LoadingManager](https://threejs.org/docs/pages/LoadingManager.html.md)
+- [Lut](https://threejs.org/docs/pages/Lut.html.md)
+- [MD2Character](https://threejs.org/docs/pages/MD2Character.html.md)
+- [MD2CharacterComplex](https://threejs.org/docs/pages/MD2CharacterComplex.html.md)
+- [MarchingCubes](https://threejs.org/docs/pages/MarchingCubes.html.md)
+- [MathUtils](https://threejs.org/docs/pages/MathUtils.html.md)
+- [Mesh](https://threejs.org/docs/pages/Mesh.html.md)
+- [MeshSurfaceSampler](https://threejs.org/docs/pages/MeshSurfaceSampler.html.md)
+- [MorphAnimMesh](https://threejs.org/docs/pages/MorphAnimMesh.html.md)
+- [MorphBlendMesh](https://threejs.org/docs/pages/MorphBlendMesh.html.md)
+- [NURBSSurface](https://threejs.org/docs/pages/NURBSSurface.html.md)
+- [NURBSVolume](https://threejs.org/docs/pages/NURBSVolume.html.md)
+- [NodeAttribute](https://threejs.org/docs/pages/NodeAttribute.html.md)
+- [NodeBuilder](https://threejs.org/docs/pages/NodeBuilder.html.md)
+- [NodeCache](https://threejs.org/docs/pages/NodeCache.html.md)
+- [NodeCode](https://threejs.org/docs/pages/NodeCode.html.md)
+- [NodeError](https://threejs.org/docs/pages/NodeError.html.md)
+- [NodeFrame](https://threejs.org/docs/pages/NodeFrame.html.md)
+- [NodeFunction](https://threejs.org/docs/pages/NodeFunction.html.md)
+- [NodeFunctionInput](https://threejs.org/docs/pages/NodeFunctionInput.html.md)
+- [NodeMaterialObserver](https://threejs.org/docs/pages/NodeMaterialObserver.html.md)
+- [NodeParser](https://threejs.org/docs/pages/NodeParser.html.md)
+- [NodeUniform](https://threejs.org/docs/pages/NodeUniform.html.md)
+- [NodeVar](https://threejs.org/docs/pages/NodeVar.html.md)
+- [NodeVarying](https://threejs.org/docs/pages/NodeVarying.html.md)
+- [NumberKeyframeTrack](https://threejs.org/docs/pages/NumberKeyframeTrack.html.md)
+- [OBB](https://threejs.org/docs/pages/OBB.html.md)
+- [OBJExporter](https://threejs.org/docs/pages/OBJExporter.html.md)
+- [Object3D](https://threejs.org/docs/pages/Object3D.html.md)
+- [Octree](https://threejs.org/docs/pages/Octree.html.md)
+- [OculusHandModel](https://threejs.org/docs/pages/OculusHandModel.html.md)
+- [OculusHandPointerModel](https://threejs.org/docs/pages/OculusHandPointerModel.html.md)
+- [PLYExporter](https://threejs.org/docs/pages/PLYExporter.html.md)
+- [PMREMGenerator](https://threejs.org/docs/pages/PMREMGenerator.html.md)
+- [Path](https://threejs.org/docs/pages/Path.html.md)
+- [PhongLightingModel](https://threejs.org/docs/pages/PhongLightingModel.html.md)
+- [PhysicalLightingModel](https://threejs.org/docs/pages/PhysicalLightingModel.html.md)
+- [PointLightShadow](https://threejs.org/docs/pages/PointLightShadow.html.md)
+- [Points](https://threejs.org/docs/pages/Points.html.md)
+- [PostProcessing](https://threejs.org/docs/pages/PostProcessing.html.md)
+- [ProgressiveLightMap](https://threejs.org/docs/pages/ProgressiveLightMap.html.md)
+- [Projector](https://threejs.org/docs/pages/Projector.html.md)
+- [PropertyBinding](https://threejs.org/docs/pages/PropertyBinding.html.md)
+- [PropertyMixer](https://threejs.org/docs/pages/PropertyMixer.html.md)
+- [QuadMesh](https://threejs.org/docs/pages/QuadMesh.html.md)
+- [RapierPhysics](https://threejs.org/docs/pages/RapierPhysics.html.md)
+- [RectAreaLightTexturesLib](https://threejs.org/docs/pages/RectAreaLightTexturesLib.html.md)
+- [RectAreaLightUniformsLib](https://threejs.org/docs/pages/RectAreaLightUniformsLib.html.md)
+- [Reflector](https://threejs.org/docs/pages/Reflector.html.md)
+- [Refractor](https://threejs.org/docs/pages/Refractor.html.md)
+- [RenderPipeline](https://threejs.org/docs/pages/RenderPipeline.html.md)
+- [RenderTarget](https://threejs.org/docs/pages/RenderTarget.html.md)
+- [RenderTarget3D](https://threejs.org/docs/pages/RenderTarget3D.html.md)
+- [Renderer](https://threejs.org/docs/pages/Renderer.html.md)
+- [RoomEnvironment](https://threejs.org/docs/pages/RoomEnvironment.html.md)
+- [SSSLightingModel](https://threejs.org/docs/pages/SSSLightingModel.html.md)
+- [STLExporter](https://threejs.org/docs/pages/STLExporter.html.md)
+- [SVGObject](https://threejs.org/docs/pages/SVGObject.html.md)
+- [SVGRenderer](https://threejs.org/docs/pages/SVGRenderer.html.md)
+- [Scene](https://threejs.org/docs/pages/Scene.html.md)
+- [SceneOptimizer](https://threejs.org/docs/pages/SceneOptimizer.html.md)
+- [SelectionBox](https://threejs.org/docs/pages/SelectionBox.html.md)
+- [ShadowMapViewer](https://threejs.org/docs/pages/ShadowMapViewer.html.md)
+- [ShadowMaskModel](https://threejs.org/docs/pages/ShadowMaskModel.html.md)
+- [ShadowMesh](https://threejs.org/docs/pages/ShadowMesh.html.md)
+- [Shape](https://threejs.org/docs/pages/Shape.html.md)
+- [ShapePath](https://threejs.org/docs/pages/ShapePath.html.md)
+- [ShapeUtils](https://threejs.org/docs/pages/ShapeUtils.html.md)
+- [SimplexNoise](https://threejs.org/docs/pages/SimplexNoise.html.md)
+- [SimplifyModifier](https://threejs.org/docs/pages/SimplifyModifier.html.md)
+- [Skeleton](https://threejs.org/docs/pages/Skeleton.html.md)
+- [SkinnedMesh](https://threejs.org/docs/pages/SkinnedMesh.html.md)
+- [Sky](https://threejs.org/docs/pages/Sky.html.md)
+- [SkyMesh](https://threejs.org/docs/pages/SkyMesh.html.md)
+- [Source](https://threejs.org/docs/pages/Source.html.md)
+- [Spherical](https://threejs.org/docs/pages/Spherical.html.md)
+- [SphericalHarmonics3](https://threejs.org/docs/pages/SphericalHarmonics3.html.md)
+- [SpotLightShadow](https://threejs.org/docs/pages/SpotLightShadow.html.md)
+- [Sprite](https://threejs.org/docs/pages/Sprite.html.md)
+- [StackTrace](https://threejs.org/docs/pages/StackTrace.html.md)
+- [StorageBufferAttribute](https://threejs.org/docs/pages/StorageBufferAttribute.html.md)
+- [StorageInstancedBufferAttribute](https://threejs.org/docs/pages/StorageInstancedBufferAttribute.html.md)
+- [StringKeyframeTrack](https://threejs.org/docs/pages/StringKeyframeTrack.html.md)
+- [TSL](https://threejs.org/docs/pages/TSL.html.md)
+- [Tab](https://threejs.org/docs/pages/Tab.html.md)
+- [TessellateModifier](https://threejs.org/docs/pages/TessellateModifier.html.md)
+- [TextureUtils](https://threejs.org/docs/pages/TextureUtils.html.md)
+- [TiledLighting](https://threejs.org/docs/pages/TiledLighting.html.md)
+- [Timer](https://threejs.org/docs/pages/Timer.html.md)
+- [TimestampQueryPool](https://threejs.org/docs/pages/TimestampQueryPool.html.md)
+- [ToonLightingModel](https://threejs.org/docs/pages/ToonLightingModel.html.md)
+- [TorusKnot](https://threejs.org/docs/pages/TorusKnot.html.md)
+- [Transpiler](https://threejs.org/docs/pages/Transpiler.html.md)
+- [TrefoilKnot](https://threejs.org/docs/pages/TrefoilKnot.html.md)
+- [TrefoilPolynomialKnot](https://threejs.org/docs/pages/TrefoilPolynomialKnot.html.md)
+- [TubePainter](https://threejs.org/docs/pages/TubePainter.html.md)
+- [USDComposer](https://threejs.org/docs/pages/USDComposer.html.md)
+- [USDZExporter](https://threejs.org/docs/pages/USDZExporter.html.md)
+- [Uint16BufferAttribute](https://threejs.org/docs/pages/Uint16BufferAttribute.html.md)
+- [Uint32BufferAttribute](https://threejs.org/docs/pages/Uint32BufferAttribute.html.md)
+- [Uint8BufferAttribute](https://threejs.org/docs/pages/Uint8BufferAttribute.html.md)
+- [Uint8ClampedBufferAttribute](https://threejs.org/docs/pages/Uint8ClampedBufferAttribute.html.md)
+- [Uniform](https://threejs.org/docs/pages/Uniform.html.md)
+- [UniformsGroup](https://threejs.org/docs/pages/UniformsGroup.html.md)
+- [VRButton](https://threejs.org/docs/pages/VRButton.html.md)
+- [Volume](https://threejs.org/docs/pages/Volume.html.md)
+- [VolumeSlice](https://threejs.org/docs/pages/VolumeSlice.html.md)
+- [VolumetricLightingModel](https://threejs.org/docs/pages/VolumetricLightingModel.html.md)
+- [WGSLNodeBuilder](https://threejs.org/docs/pages/WGSLNodeBuilder.html.md)
+- [WGSLNodeFunction](https://threejs.org/docs/pages/WGSLNodeFunction.html.md)
+- [WGSLNodeParser](https://threejs.org/docs/pages/WGSLNodeParser.html.md)
+- [Water](https://threejs.org/docs/pages/Water.html.md)
+- [WaterMesh](https://threejs.org/docs/pages/WaterMesh.html.md)
+- [WebGL](https://threejs.org/docs/pages/WebGL.html.md)
+- [WebGL3DRenderTarget](https://threejs.org/docs/pages/WebGL3DRenderTarget.html.md)
+- [WebGLArrayRenderTarget](https://threejs.org/docs/pages/WebGLArrayRenderTarget.html.md)
+- [WebGLCubeRenderTarget](https://threejs.org/docs/pages/WebGLCubeRenderTarget.html.md)
+- [WebGLRenderTarget](https://threejs.org/docs/pages/WebGLRenderTarget.html.md)
+- [WebGLRenderer](https://threejs.org/docs/pages/WebGLRenderer.html.md)
+- [WebGLTimestampQueryPool](https://threejs.org/docs/pages/WebGLTimestampQueryPool.html.md)
+- [WebGPU](https://threejs.org/docs/pages/WebGPU.html.md)
+- [WebGPURenderer](https://threejs.org/docs/pages/WebGPURenderer.html.md)
+- [WebGPUTimestampQueryPool](https://threejs.org/docs/pages/WebGPUTimestampQueryPool.html.md)
+- [Wireframe](https://threejs.org/docs/pages/Wireframe.html.md)
+- [WireframeGeometry2](https://threejs.org/docs/pages/WireframeGeometry2.html.md)
+- [WorkerPool](https://threejs.org/docs/pages/WorkerPool.html.md)
+
+### Cameras
+
+- [ArrayCamera](https://threejs.org/docs/pages/ArrayCamera.html.md)
+- [Camera](https://threejs.org/docs/pages/Camera.html.md)
+- [CubeCamera](https://threejs.org/docs/pages/CubeCamera.html.md)
+- [OrthographicCamera](https://threejs.org/docs/pages/OrthographicCamera.html.md)
+- [PerspectiveCamera](https://threejs.org/docs/pages/PerspectiveCamera.html.md)
+- [StereoCamera](https://threejs.org/docs/pages/StereoCamera.html.md)
+
+### Lights
+
+- [AmbientLight](https://threejs.org/docs/pages/AmbientLight.html.md)
+- [DirectionalLight](https://threejs.org/docs/pages/DirectionalLight.html.md)
+- [HemisphereLight](https://threejs.org/docs/pages/HemisphereLight.html.md)
+- [IESSpotLight](https://threejs.org/docs/pages/IESSpotLight.html.md)
+- [Light](https://threejs.org/docs/pages/Light.html.md)
+- [PointLight](https://threejs.org/docs/pages/PointLight.html.md)
+- [ProjectorLight](https://threejs.org/docs/pages/ProjectorLight.html.md)
+- [RectAreaLight](https://threejs.org/docs/pages/RectAreaLight.html.md)
+- [SpotLight](https://threejs.org/docs/pages/SpotLight.html.md)
+- [XREstimatedLight](https://threejs.org/docs/pages/XREstimatedLight.html.md)
+
+### Materials
+
+- [LDrawConditionalLineMaterial](https://threejs.org/docs/pages/LDrawConditionalLineMaterial.html.md)
+- [Line2NodeMaterial](https://threejs.org/docs/pages/Line2NodeMaterial.html.md)
+- [LineBasicMaterial](https://threejs.org/docs/pages/LineBasicMaterial.html.md)
+- [LineBasicNodeMaterial](https://threejs.org/docs/pages/LineBasicNodeMaterial.html.md)
+- [LineDashedMaterial](https://threejs.org/docs/pages/LineDashedMaterial.html.md)
+- [LineDashedNodeMaterial](https://threejs.org/docs/pages/LineDashedNodeMaterial.html.md)
+- [LineMaterial](https://threejs.org/docs/pages/LineMaterial.html.md)
+- [Material](https://threejs.org/docs/pages/Material.html.md)
+- [MeshBasicMaterial](https://threejs.org/docs/pages/MeshBasicMaterial.html.md)
+- [MeshBasicNodeMaterial](https://threejs.org/docs/pages/MeshBasicNodeMaterial.html.md)
+- [MeshDepthMaterial](https://threejs.org/docs/pages/MeshDepthMaterial.html.md)
+- [MeshDistanceMaterial](https://threejs.org/docs/pages/MeshDistanceMaterial.html.md)
+- [MeshLambertMaterial](https://threejs.org/docs/pages/MeshLambertMaterial.html.md)
+- [MeshLambertNodeMaterial](https://threejs.org/docs/pages/MeshLambertNodeMaterial.html.md)
+- [MeshMatcapMaterial](https://threejs.org/docs/pages/MeshMatcapMaterial.html.md)
+- [MeshMatcapNodeMaterial](https://threejs.org/docs/pages/MeshMatcapNodeMaterial.html.md)
+- [MeshNormalMaterial](https://threejs.org/docs/pages/MeshNormalMaterial.html.md)
+- [MeshNormalNodeMaterial](https://threejs.org/docs/pages/MeshNormalNodeMaterial.html.md)
+- [MeshPhongMaterial](https://threejs.org/docs/pages/MeshPhongMaterial.html.md)
+- [MeshPhongNodeMaterial](https://threejs.org/docs/pages/MeshPhongNodeMaterial.html.md)
+- [MeshPhysicalMaterial](https://threejs.org/docs/pages/MeshPhysicalMaterial.html.md)
+- [MeshPhysicalNodeMaterial](https://threejs.org/docs/pages/MeshPhysicalNodeMaterial.html.md)
+- [MeshSSSNodeMaterial](https://threejs.org/docs/pages/MeshSSSNodeMaterial.html.md)
+- [MeshStandardMaterial](https://threejs.org/docs/pages/MeshStandardMaterial.html.md)
+- [MeshStandardNodeMaterial](https://threejs.org/docs/pages/MeshStandardNodeMaterial.html.md)
+- [MeshToonMaterial](https://threejs.org/docs/pages/MeshToonMaterial.html.md)
+- [MeshToonNodeMaterial](https://threejs.org/docs/pages/MeshToonNodeMaterial.html.md)
+- [NodeMaterial](https://threejs.org/docs/pages/NodeMaterial.html.md)
+- [PointsMaterial](https://threejs.org/docs/pages/PointsMaterial.html.md)
+- [PointsNodeMaterial](https://threejs.org/docs/pages/PointsNodeMaterial.html.md)
+- [RawShaderMaterial](https://threejs.org/docs/pages/RawShaderMaterial.html.md)
+- [ShaderMaterial](https://threejs.org/docs/pages/ShaderMaterial.html.md)
+- [ShadowMaterial](https://threejs.org/docs/pages/ShadowMaterial.html.md)
+- [ShadowNodeMaterial](https://threejs.org/docs/pages/ShadowNodeMaterial.html.md)
+- [SpriteMaterial](https://threejs.org/docs/pages/SpriteMaterial.html.md)
+- [SpriteNodeMaterial](https://threejs.org/docs/pages/SpriteNodeMaterial.html.md)
+- [VolumeNodeMaterial](https://threejs.org/docs/pages/VolumeNodeMaterial.html.md)
+- [WoodNodeMaterial](https://threejs.org/docs/pages/WoodNodeMaterial.html.md)
+
+### Geometries
+
+- [BoxGeometry](https://threejs.org/docs/pages/BoxGeometry.html.md)
+- [BoxLineGeometry](https://threejs.org/docs/pages/BoxLineGeometry.html.md)
+- [BufferGeometry](https://threejs.org/docs/pages/BufferGeometry.html.md)
+- [CapsuleGeometry](https://threejs.org/docs/pages/CapsuleGeometry.html.md)
+- [CircleGeometry](https://threejs.org/docs/pages/CircleGeometry.html.md)
+- [ConeGeometry](https://threejs.org/docs/pages/ConeGeometry.html.md)
+- [ConvexGeometry](https://threejs.org/docs/pages/ConvexGeometry.html.md)
+- [CylinderGeometry](https://threejs.org/docs/pages/CylinderGeometry.html.md)
+- [DecalGeometry](https://threejs.org/docs/pages/DecalGeometry.html.md)
+- [DodecahedronGeometry](https://threejs.org/docs/pages/DodecahedronGeometry.html.md)
+- [EdgesGeometry](https://threejs.org/docs/pages/EdgesGeometry.html.md)
+- [ExtrudeGeometry](https://threejs.org/docs/pages/ExtrudeGeometry.html.md)
+- [IcosahedronGeometry](https://threejs.org/docs/pages/IcosahedronGeometry.html.md)
+- [InstancedBufferGeometry](https://threejs.org/docs/pages/InstancedBufferGeometry.html.md)
+- [LatheGeometry](https://threejs.org/docs/pages/LatheGeometry.html.md)
+- [LineGeometry](https://threejs.org/docs/pages/LineGeometry.html.md)
+- [LineSegmentsGeometry](https://threejs.org/docs/pages/LineSegmentsGeometry.html.md)
+- [OctahedronGeometry](https://threejs.org/docs/pages/OctahedronGeometry.html.md)
+- [ParametricGeometry](https://threejs.org/docs/pages/ParametricGeometry.html.md)
+- [PlaneGeometry](https://threejs.org/docs/pages/PlaneGeometry.html.md)
+- [PolyhedronGeometry](https://threejs.org/docs/pages/PolyhedronGeometry.html.md)
+- [RingGeometry](https://threejs.org/docs/pages/RingGeometry.html.md)
+- [RollerCoasterGeometry](https://threejs.org/docs/pages/RollerCoasterGeometry.html.md)
+- [RollerCoasterLiftersGeometry](https://threejs.org/docs/pages/RollerCoasterLiftersGeometry.html.md)
+- [RollerCoasterShadowGeometry](https://threejs.org/docs/pages/RollerCoasterShadowGeometry.html.md)
+- [RoundedBoxGeometry](https://threejs.org/docs/pages/RoundedBoxGeometry.html.md)
+- [ShapeGeometry](https://threejs.org/docs/pages/ShapeGeometry.html.md)
+- [SkyGeometry](https://threejs.org/docs/pages/SkyGeometry.html.md)
+- [SphereGeometry](https://threejs.org/docs/pages/SphereGeometry.html.md)
+- [TeapotGeometry](https://threejs.org/docs/pages/TeapotGeometry.html.md)
+- [TetrahedronGeometry](https://threejs.org/docs/pages/TetrahedronGeometry.html.md)
+- [TextGeometry](https://threejs.org/docs/pages/TextGeometry.html.md)
+- [TorusGeometry](https://threejs.org/docs/pages/TorusGeometry.html.md)
+- [TorusKnotGeometry](https://threejs.org/docs/pages/TorusKnotGeometry.html.md)
+- [TreesGeometry](https://threejs.org/docs/pages/TreesGeometry.html.md)
+- [TubeGeometry](https://threejs.org/docs/pages/TubeGeometry.html.md)
+- [WireframeGeometry](https://threejs.org/docs/pages/WireframeGeometry.html.md)
+
+### Textures
+
+- [CanvasTexture](https://threejs.org/docs/pages/CanvasTexture.html.md)
+- [CompressedArrayTexture](https://threejs.org/docs/pages/CompressedArrayTexture.html.md)
+- [CompressedCubeTexture](https://threejs.org/docs/pages/CompressedCubeTexture.html.md)
+- [CompressedTexture](https://threejs.org/docs/pages/CompressedTexture.html.md)
+- [CubeDepthTexture](https://threejs.org/docs/pages/CubeDepthTexture.html.md)
+- [CubeTexture](https://threejs.org/docs/pages/CubeTexture.html.md)
+- [Data3DTexture](https://threejs.org/docs/pages/Data3DTexture.html.md)
+- [DataArrayTexture](https://threejs.org/docs/pages/DataArrayTexture.html.md)
+- [DataTexture](https://threejs.org/docs/pages/DataTexture.html.md)
+- [DepthTexture](https://threejs.org/docs/pages/DepthTexture.html.md)
+- [ExternalTexture](https://threejs.org/docs/pages/ExternalTexture.html.md)
+- [FlakesTexture](https://threejs.org/docs/pages/FlakesTexture.html.md)
+- [FramebufferTexture](https://threejs.org/docs/pages/FramebufferTexture.html.md)
+- [Storage3DTexture](https://threejs.org/docs/pages/Storage3DTexture.html.md)
+- [StorageArrayTexture](https://threejs.org/docs/pages/StorageArrayTexture.html.md)
+- [StorageTexture](https://threejs.org/docs/pages/StorageTexture.html.md)
+- [Texture](https://threejs.org/docs/pages/Texture.html.md)
+- [VideoFrameTexture](https://threejs.org/docs/pages/VideoFrameTexture.html.md)
+- [VideoTexture](https://threejs.org/docs/pages/VideoTexture.html.md)
+
+### Loaders
+
+- [AMFLoader](https://threejs.org/docs/pages/AMFLoader.html.md)
+- [AnimationLoader](https://threejs.org/docs/pages/AnimationLoader.html.md)
+- [AudioLoader](https://threejs.org/docs/pages/AudioLoader.html.md)
+- [BVHLoader](https://threejs.org/docs/pages/BVHLoader.html.md)
+- [BufferGeometryLoader](https://threejs.org/docs/pages/BufferGeometryLoader.html.md)
+- [ColladaLoader](https://threejs.org/docs/pages/ColladaLoader.html.md)
+- [CompressedTextureLoader](https://threejs.org/docs/pages/CompressedTextureLoader.html.md)
+- [CubeTextureLoader](https://threejs.org/docs/pages/CubeTextureLoader.html.md)
+- [DDSLoader](https://threejs.org/docs/pages/DDSLoader.html.md)
+- [DRACOLoader](https://threejs.org/docs/pages/DRACOLoader.html.md)
+- [DataTextureLoader](https://threejs.org/docs/pages/DataTextureLoader.html.md)
+- [EXRLoader](https://threejs.org/docs/pages/EXRLoader.html.md)
+- [FBXLoader](https://threejs.org/docs/pages/FBXLoader.html.md)
+- [FileLoader](https://threejs.org/docs/pages/FileLoader.html.md)
+- [FontLoader](https://threejs.org/docs/pages/FontLoader.html.md)
+- [GCodeLoader](https://threejs.org/docs/pages/GCodeLoader.html.md)
+- [GLTFLoader](https://threejs.org/docs/pages/GLTFLoader.html.md)
+- [HDRCubeTextureLoader](https://threejs.org/docs/pages/HDRCubeTextureLoader.html.md)
+- [HDRLoader](https://threejs.org/docs/pages/HDRLoader.html.md)
+- [IESLoader](https://threejs.org/docs/pages/IESLoader.html.md)
+- [ImageBitmapLoader](https://threejs.org/docs/pages/ImageBitmapLoader.html.md)
+- [ImageLoader](https://threejs.org/docs/pages/ImageLoader.html.md)
+- [KMZLoader](https://threejs.org/docs/pages/KMZLoader.html.md)
+- [KTX2Loader](https://threejs.org/docs/pages/KTX2Loader.html.md)
+- [KTXLoader](https://threejs.org/docs/pages/KTXLoader.html.md)
+- [LDrawLoader](https://threejs.org/docs/pages/LDrawLoader.html.md)
+- [LUT3dlLoader](https://threejs.org/docs/pages/LUT3dlLoader.html.md)
+- [LUTCubeLoader](https://threejs.org/docs/pages/LUTCubeLoader.html.md)
+- [LUTImageLoader](https://threejs.org/docs/pages/LUTImageLoader.html.md)
+- [LWOLoader](https://threejs.org/docs/pages/LWOLoader.html.md)
+- [Loader](https://threejs.org/docs/pages/Loader.html.md)
+- [LottieLoader](https://threejs.org/docs/pages/LottieLoader.html.md)
+- [MD2Loader](https://threejs.org/docs/pages/MD2Loader.html.md)
+- [MDDLoader](https://threejs.org/docs/pages/MDDLoader.html.md)
+- [MTLLoader](https://threejs.org/docs/pages/MTLLoader.html.md)
+- [MaterialLoader](https://threejs.org/docs/pages/MaterialLoader.html.md)
+- [MaterialXLoader](https://threejs.org/docs/pages/MaterialXLoader.html.md)
+- [NRRDLoader](https://threejs.org/docs/pages/NRRDLoader.html.md)
+- [NodeLoader](https://threejs.org/docs/pages/NodeLoader.html.md)
+- [NodeMaterialLoader](https://threejs.org/docs/pages/NodeMaterialLoader.html.md)
+- [NodeObjectLoader](https://threejs.org/docs/pages/NodeObjectLoader.html.md)
+- [OBJLoader](https://threejs.org/docs/pages/OBJLoader.html.md)
+- [ObjectLoader](https://threejs.org/docs/pages/ObjectLoader.html.md)
+- [PCDLoader](https://threejs.org/docs/pages/PCDLoader.html.md)
+- [PDBLoader](https://threejs.org/docs/pages/PDBLoader.html.md)
+- [PLYLoader](https://threejs.org/docs/pages/PLYLoader.html.md)
+- [PVRLoader](https://threejs.org/docs/pages/PVRLoader.html.md)
+- [Rhino3dmLoader](https://threejs.org/docs/pages/Rhino3dmLoader.html.md)
+- [STLLoader](https://threejs.org/docs/pages/STLLoader.html.md)
+- [SVGLoader](https://threejs.org/docs/pages/SVGLoader.html.md)
+- [TDSLoader](https://threejs.org/docs/pages/TDSLoader.html.md)
+- [TGALoader](https://threejs.org/docs/pages/TGALoader.html.md)
+- [TIFFLoader](https://threejs.org/docs/pages/TIFFLoader.html.md)
+- [TTFLoader](https://threejs.org/docs/pages/TTFLoader.html.md)
+- [TextureLoader](https://threejs.org/docs/pages/TextureLoader.html.md)
+- [ThreeMFLoader](https://threejs.org/docs/pages/ThreeMFLoader.html.md)
+- [USDLoader](https://threejs.org/docs/pages/USDLoader.html.md)
+- [UltraHDRLoader](https://threejs.org/docs/pages/UltraHDRLoader.html.md)
+- [VOXLoader](https://threejs.org/docs/pages/VOXLoader.html.md)
+- [VRMLLoader](https://threejs.org/docs/pages/VRMLLoader.html.md)
+- [VTKLoader](https://threejs.org/docs/pages/VTKLoader.html.md)
+- [XYZLoader](https://threejs.org/docs/pages/XYZLoader.html.md)
+
+### Controls
+
+- [ArcballControls](https://threejs.org/docs/pages/ArcballControls.html.md)
+- [Controls](https://threejs.org/docs/pages/Controls.html.md)
+- [DragControls](https://threejs.org/docs/pages/DragControls.html.md)
+- [FirstPersonControls](https://threejs.org/docs/pages/FirstPersonControls.html.md)
+- [FlyControls](https://threejs.org/docs/pages/FlyControls.html.md)
+- [MapControls](https://threejs.org/docs/pages/MapControls.html.md)
+- [OrbitControls](https://threejs.org/docs/pages/OrbitControls.html.md)
+- [PointerLockControls](https://threejs.org/docs/pages/PointerLockControls.html.md)
+- [TrackballControls](https://threejs.org/docs/pages/TrackballControls.html.md)
+- [TransformControls](https://threejs.org/docs/pages/TransformControls.html.md)
+
+### Helpers
+
+- [AnimationPathHelper](https://threejs.org/docs/pages/AnimationPathHelper.html.md)
+- [ArrowHelper](https://threejs.org/docs/pages/ArrowHelper.html.md)
+- [AxesHelper](https://threejs.org/docs/pages/AxesHelper.html.md)
+- [Box3Helper](https://threejs.org/docs/pages/Box3Helper.html.md)
+- [BoxHelper](https://threejs.org/docs/pages/BoxHelper.html.md)
+- [CCDIKHelper](https://threejs.org/docs/pages/CCDIKHelper.html.md)
+- [CSMHelper](https://threejs.org/docs/pages/CSMHelper.html.md)
+- [CameraHelper](https://threejs.org/docs/pages/CameraHelper.html.md)
+- [DirectionalLightHelper](https://threejs.org/docs/pages/DirectionalLightHelper.html.md)
+- [GridHelper](https://threejs.org/docs/pages/GridHelper.html.md)
+- [HemisphereLightHelper](https://threejs.org/docs/pages/HemisphereLightHelper.html.md)
+- [LightProbeHelper](https://threejs.org/docs/pages/LightProbeHelper.html.md)
+- [OctreeHelper](https://threejs.org/docs/pages/OctreeHelper.html.md)
+- [PlaneHelper](https://threejs.org/docs/pages/PlaneHelper.html.md)
+- [PointLightHelper](https://threejs.org/docs/pages/PointLightHelper.html.md)
+- [PolarGridHelper](https://threejs.org/docs/pages/PolarGridHelper.html.md)
+- [PositionalAudioHelper](https://threejs.org/docs/pages/PositionalAudioHelper.html.md)
+- [RapierHelper](https://threejs.org/docs/pages/RapierHelper.html.md)
+- [RectAreaLightHelper](https://threejs.org/docs/pages/RectAreaLightHelper.html.md)
+- [SelectionHelper](https://threejs.org/docs/pages/SelectionHelper.html.md)
+- [SkeletonHelper](https://threejs.org/docs/pages/SkeletonHelper.html.md)
+- [SpotLightHelper](https://threejs.org/docs/pages/SpotLightHelper.html.md)
+- [TextureHelper](https://threejs.org/docs/pages/TextureHelper.html.md)
+- [TileShadowNodeHelper](https://threejs.org/docs/pages/TileShadowNodeHelper.html.md)
+- [VertexNormalsHelper](https://threejs.org/docs/pages/VertexNormalsHelper.html.md)
+- [VertexTangentsHelper](https://threejs.org/docs/pages/VertexTangentsHelper.html.md)
+- [ViewHelper](https://threejs.org/docs/pages/ViewHelper.html.md)
+
+### Animation
+
+- [AnimationAction](https://threejs.org/docs/pages/AnimationAction.html.md)
+- [AnimationClip](https://threejs.org/docs/pages/AnimationClip.html.md)
+- [AnimationClipCreator](https://threejs.org/docs/pages/AnimationClipCreator.html.md)
+- [AnimationMixer](https://threejs.org/docs/pages/AnimationMixer.html.md)
+- [AnimationObjectGroup](https://threejs.org/docs/pages/AnimationObjectGroup.html.md)
+- [AnimationUtils](https://threejs.org/docs/pages/AnimationUtils.html.md)
+
+### Audio
+
+- [Audio](https://threejs.org/docs/pages/Audio.html.md)
+- [AudioAnalyser](https://threejs.org/docs/pages/AudioAnalyser.html.md)
+- [AudioContext](https://threejs.org/docs/pages/AudioContext.html.md)
+- [AudioListener](https://threejs.org/docs/pages/AudioListener.html.md)
+- [PositionalAudio](https://threejs.org/docs/pages/PositionalAudio.html.md)
+
+### Math
+
+- [Box2](https://threejs.org/docs/pages/Box2.html.md)
+- [Box3](https://threejs.org/docs/pages/Box3.html.md)
+- [Color](https://threejs.org/docs/pages/Color.html.md)
+- [Euler](https://threejs.org/docs/pages/Euler.html.md)
+- [Frustum](https://threejs.org/docs/pages/Frustum.html.md)
+- [FrustumArray](https://threejs.org/docs/pages/FrustumArray.html.md)
+- [Matrix2](https://threejs.org/docs/pages/Matrix2.html.md)
+- [Matrix3](https://threejs.org/docs/pages/Matrix3.html.md)
+- [Matrix4](https://threejs.org/docs/pages/Matrix4.html.md)
+- [Plane](https://threejs.org/docs/pages/Plane.html.md)
+- [Quaternion](https://threejs.org/docs/pages/Quaternion.html.md)
+- [QuaternionKeyframeTrack](https://threejs.org/docs/pages/QuaternionKeyframeTrack.html.md)
+- [QuaternionLinearInterpolant](https://threejs.org/docs/pages/QuaternionLinearInterpolant.html.md)
+- [Ray](https://threejs.org/docs/pages/Ray.html.md)
+- [Raycaster](https://threejs.org/docs/pages/Raycaster.html.md)
+- [Sphere](https://threejs.org/docs/pages/Sphere.html.md)
+- [Triangle](https://threejs.org/docs/pages/Triangle.html.md)
+- [Vector2](https://threejs.org/docs/pages/Vector2.html.md)
+- [Vector3](https://threejs.org/docs/pages/Vector3.html.md)
+- [Vector4](https://threejs.org/docs/pages/Vector4.html.md)
+- [VectorKeyframeTrack](https://threejs.org/docs/pages/VectorKeyframeTrack.html.md)
+
+### Curves
+
+- [ArcCurve](https://threejs.org/docs/pages/ArcCurve.html.md)
+- [CatmullRomCurve3](https://threejs.org/docs/pages/CatmullRomCurve3.html.md)
+- [CubicBezierCurve](https://threejs.org/docs/pages/CubicBezierCurve.html.md)
+- [CubicBezierCurve3](https://threejs.org/docs/pages/CubicBezierCurve3.html.md)
+- [Curve](https://threejs.org/docs/pages/Curve.html.md)
+- [CurvePath](https://threejs.org/docs/pages/CurvePath.html.md)
+- [EllipseCurve](https://threejs.org/docs/pages/EllipseCurve.html.md)
+- [HeartCurve](https://threejs.org/docs/pages/HeartCurve.html.md)
+- [HelixCurve](https://threejs.org/docs/pages/HelixCurve.html.md)
+- [KnotCurve](https://threejs.org/docs/pages/KnotCurve.html.md)
+- [LineCurve](https://threejs.org/docs/pages/LineCurve.html.md)
+- [LineCurve3](https://threejs.org/docs/pages/LineCurve3.html.md)
+- [NURBSCurve](https://threejs.org/docs/pages/NURBSCurve.html.md)
+- [QuadraticBezierCurve](https://threejs.org/docs/pages/QuadraticBezierCurve.html.md)
+- [QuadraticBezierCurve3](https://threejs.org/docs/pages/QuadraticBezierCurve3.html.md)
+- [SplineCurve](https://threejs.org/docs/pages/SplineCurve.html.md)
+- [VivianiCurve](https://threejs.org/docs/pages/VivianiCurve.html.md)
+
+### Effects
+
+- [AnaglyphEffect](https://threejs.org/docs/pages/AnaglyphEffect.html.md)
+- [AsciiEffect](https://threejs.org/docs/pages/AsciiEffect.html.md)
+- [OutlineEffect](https://threejs.org/docs/pages/OutlineEffect.html.md)
+- [ParallaxBarrierEffect](https://threejs.org/docs/pages/ParallaxBarrierEffect.html.md)
+- [StereoEffect](https://threejs.org/docs/pages/StereoEffect.html.md)
+
+### Post-Processing
+
+- [AfterimagePass](https://threejs.org/docs/pages/AfterimagePass.html.md)
+- [AnaglyphPassNode](https://threejs.org/docs/pages/AnaglyphPassNode.html.md)
+- [BloomPass](https://threejs.org/docs/pages/BloomPass.html.md)
+- [BokehPass](https://threejs.org/docs/pages/BokehPass.html.md)
+- [ClearMaskPass](https://threejs.org/docs/pages/ClearMaskPass.html.md)
+- [ClearPass](https://threejs.org/docs/pages/ClearPass.html.md)
+- [CubeTexturePass](https://threejs.org/docs/pages/CubeTexturePass.html.md)
+- [DotScreenPass](https://threejs.org/docs/pages/DotScreenPass.html.md)
+- [FXAAPass](https://threejs.org/docs/pages/FXAAPass.html.md)
+- [FilmPass](https://threejs.org/docs/pages/FilmPass.html.md)
+- [GTAOPass](https://threejs.org/docs/pages/GTAOPass.html.md)
+- [GlitchPass](https://threejs.org/docs/pages/GlitchPass.html.md)
+- [HalftonePass](https://threejs.org/docs/pages/HalftonePass.html.md)
+- [LUTPass](https://threejs.org/docs/pages/LUTPass.html.md)
+- [MaskPass](https://threejs.org/docs/pages/MaskPass.html.md)
+- [OutlinePass](https://threejs.org/docs/pages/OutlinePass.html.md)
+- [OutputPass](https://threejs.org/docs/pages/OutputPass.html.md)
+- [ParallaxBarrierPassNode](https://threejs.org/docs/pages/ParallaxBarrierPassNode.html.md)
+- [Pass](https://threejs.org/docs/pages/Pass.html.md)
+- [PassNode](https://threejs.org/docs/pages/PassNode.html.md)
+- [PixelationPassNode](https://threejs.org/docs/pages/PixelationPassNode.html.md)
+- [ReflectorForSSRPass](https://threejs.org/docs/pages/ReflectorForSSRPass.html.md)
+- [RenderPass](https://threejs.org/docs/pages/RenderPass.html.md)
+- [RenderPixelatedPass](https://threejs.org/docs/pages/RenderPixelatedPass.html.md)
+- [RenderTransitionPass](https://threejs.org/docs/pages/RenderTransitionPass.html.md)
+- [RetroPassNode](https://threejs.org/docs/pages/RetroPassNode.html.md)
+- [SAOPass](https://threejs.org/docs/pages/SAOPass.html.md)
+- [SMAAPass](https://threejs.org/docs/pages/SMAAPass.html.md)
+- [SSAAPassNode](https://threejs.org/docs/pages/SSAAPassNode.html.md)
+- [SSAARenderPass](https://threejs.org/docs/pages/SSAARenderPass.html.md)
+- [SSAOPass](https://threejs.org/docs/pages/SSAOPass.html.md)
+- [SSRPass](https://threejs.org/docs/pages/SSRPass.html.md)
+- [SavePass](https://threejs.org/docs/pages/SavePass.html.md)
+- [ShaderPass](https://threejs.org/docs/pages/ShaderPass.html.md)
+- [StereoCompositePassNode](https://threejs.org/docs/pages/StereoCompositePassNode.html.md)
+- [StereoPassNode](https://threejs.org/docs/pages/StereoPassNode.html.md)
+- [TAARenderPass](https://threejs.org/docs/pages/TAARenderPass.html.md)
+- [TexturePass](https://threejs.org/docs/pages/TexturePass.html.md)
+- [ToonOutlinePassNode](https://threejs.org/docs/pages/ToonOutlinePassNode.html.md)
+- [UnrealBloomPass](https://threejs.org/docs/pages/UnrealBloomPass.html.md)
+
+### Nodes (TSL)
+
+- [AONode](https://threejs.org/docs/pages/AONode.html.md)
+- [AfterImageNode](https://threejs.org/docs/pages/AfterImageNode.html.md)
+- [AmbientLightNode](https://threejs.org/docs/pages/AmbientLightNode.html.md)
+- [AnalyticLightNode](https://threejs.org/docs/pages/AnalyticLightNode.html.md)
+- [AnamorphicNode](https://threejs.org/docs/pages/AnamorphicNode.html.md)
+- [ArrayElementNode](https://threejs.org/docs/pages/ArrayElementNode.html.md)
+- [ArrayNode](https://threejs.org/docs/pages/ArrayNode.html.md)
+- [AssignNode](https://threejs.org/docs/pages/AssignNode.html.md)
+- [AtomicFunctionNode](https://threejs.org/docs/pages/AtomicFunctionNode.html.md)
+- [AttributeNode](https://threejs.org/docs/pages/AttributeNode.html.md)
+- [BarrierNode](https://threejs.org/docs/pages/BarrierNode.html.md)
+- [BasicEnvironmentNode](https://threejs.org/docs/pages/BasicEnvironmentNode.html.md)
+- [BasicLightMapNode](https://threejs.org/docs/pages/BasicLightMapNode.html.md)
+- [BatchNode](https://threejs.org/docs/pages/BatchNode.html.md)
+- [BilateralBlurNode](https://threejs.org/docs/pages/BilateralBlurNode.html.md)
+- [BitcastNode](https://threejs.org/docs/pages/BitcastNode.html.md)
+- [BitcountNode](https://threejs.org/docs/pages/BitcountNode.html.md)
+- [BloomNode](https://threejs.org/docs/pages/BloomNode.html.md)
+- [BufferAttributeNode](https://threejs.org/docs/pages/BufferAttributeNode.html.md)
+- [BufferNode](https://threejs.org/docs/pages/BufferNode.html.md)
+- [BuiltinNode](https://threejs.org/docs/pages/BuiltinNode.html.md)
+- [BumpMapNode](https://threejs.org/docs/pages/BumpMapNode.html.md)
+- [BypassNode](https://threejs.org/docs/pages/BypassNode.html.md)
+- [CSMShadowNode](https://threejs.org/docs/pages/CSMShadowNode.html.md)
+- [ChromaticAberrationNode](https://threejs.org/docs/pages/ChromaticAberrationNode.html.md)
+- [ClippingNode](https://threejs.org/docs/pages/ClippingNode.html.md)
+- [CodeNode](https://threejs.org/docs/pages/CodeNode.html.md)
+- [ColorSpaceNode](https://threejs.org/docs/pages/ColorSpaceNode.html.md)
+- [ComputeBuiltinNode](https://threejs.org/docs/pages/ComputeBuiltinNode.html.md)
+- [ComputeNode](https://threejs.org/docs/pages/ComputeNode.html.md)
+- [ConditionalNode](https://threejs.org/docs/pages/ConditionalNode.html.md)
+- [ConstNode](https://threejs.org/docs/pages/ConstNode.html.md)
+- [ContextNode](https://threejs.org/docs/pages/ContextNode.html.md)
+- [ConvertNode](https://threejs.org/docs/pages/ConvertNode.html.md)
+- [CubeMapNode](https://threejs.org/docs/pages/CubeMapNode.html.md)
+- [CubeTextureNode](https://threejs.org/docs/pages/CubeTextureNode.html.md)
+- [DenoiseNode](https://threejs.org/docs/pages/DenoiseNode.html.md)
+- [DepthOfFieldNode](https://threejs.org/docs/pages/DepthOfFieldNode.html.md)
+- [DirectionalLightNode](https://threejs.org/docs/pages/DirectionalLightNode.html.md)
+- [DotScreenNode](https://threejs.org/docs/pages/DotScreenNode.html.md)
+- [EnvironmentNode](https://threejs.org/docs/pages/EnvironmentNode.html.md)
+- [EventNode](https://threejs.org/docs/pages/EventNode.html.md)
+- [ExpressionNode](https://threejs.org/docs/pages/ExpressionNode.html.md)
+- [FXAANode](https://threejs.org/docs/pages/FXAANode.html.md)
+- [FilmNode](https://threejs.org/docs/pages/FilmNode.html.md)
+- [FlipNode](https://threejs.org/docs/pages/FlipNode.html.md)
+- [FrontFacingNode](https://threejs.org/docs/pages/FrontFacingNode.html.md)
+- [FunctionCallNode](https://threejs.org/docs/pages/FunctionCallNode.html.md)
+- [FunctionNode](https://threejs.org/docs/pages/FunctionNode.html.md)
+- [FunctionOverloadingNode](https://threejs.org/docs/pages/FunctionOverloadingNode.html.md)
+- [GTAONode](https://threejs.org/docs/pages/GTAONode.html.md)
+- [GaussianBlurNode](https://threejs.org/docs/pages/GaussianBlurNode.html.md)
+- [GodraysNode](https://threejs.org/docs/pages/GodraysNode.html.md)
+- [HemisphereLightNode](https://threejs.org/docs/pages/HemisphereLightNode.html.md)
+- [IESSpotLightNode](https://threejs.org/docs/pages/IESSpotLightNode.html.md)
+- [IndexNode](https://threejs.org/docs/pages/IndexNode.html.md)
+- [InputNode](https://threejs.org/docs/pages/InputNode.html.md)
+- [InspectorNode](https://threejs.org/docs/pages/InspectorNode.html.md)
+- [InstanceNode](https://threejs.org/docs/pages/InstanceNode.html.md)
+- [InstancedMeshNode](https://threejs.org/docs/pages/InstancedMeshNode.html.md)
+- [IrradianceNode](https://threejs.org/docs/pages/IrradianceNode.html.md)
+- [IsolateNode](https://threejs.org/docs/pages/IsolateNode.html.md)
+- [JoinNode](https://threejs.org/docs/pages/JoinNode.html.md)
+- [LensflareNode](https://threejs.org/docs/pages/LensflareNode.html.md)
+- [LightProbeNode](https://threejs.org/docs/pages/LightProbeNode.html.md)
+- [LightingContextNode](https://threejs.org/docs/pages/LightingContextNode.html.md)
+- [LightingNode](https://threejs.org/docs/pages/LightingNode.html.md)
+- [LightsNode](https://threejs.org/docs/pages/LightsNode.html.md)
+- [LoopNode](https://threejs.org/docs/pages/LoopNode.html.md)
+- [Lut3DNode](https://threejs.org/docs/pages/Lut3DNode.html.md)
+- [MRTNode](https://threejs.org/docs/pages/MRTNode.html.md)
+- [MaterialNode](https://threejs.org/docs/pages/MaterialNode.html.md)
+- [MaterialReferenceNode](https://threejs.org/docs/pages/MaterialReferenceNode.html.md)
+- [MathNode](https://threejs.org/docs/pages/MathNode.html.md)
+- [MaxMipLevelNode](https://threejs.org/docs/pages/MaxMipLevelNode.html.md)
+- [MemberNode](https://threejs.org/docs/pages/MemberNode.html.md)
+- [ModelNode](https://threejs.org/docs/pages/ModelNode.html.md)
+- [MorphNode](https://threejs.org/docs/pages/MorphNode.html.md)
+- [Node](https://threejs.org/docs/pages/Node.html.md)
+- [NormalMapNode](https://threejs.org/docs/pages/NormalMapNode.html.md)
+- [Object3DNode](https://threejs.org/docs/pages/Object3DNode.html.md)
+- [OperatorNode](https://threejs.org/docs/pages/OperatorNode.html.md)
+- [OutlineNode](https://threejs.org/docs/pages/OutlineNode.html.md)
+- [OutputStructNode](https://threejs.org/docs/pages/OutputStructNode.html.md)
+- [PMREMNode](https://threejs.org/docs/pages/PMREMNode.html.md)
+- [PackFloatNode](https://threejs.org/docs/pages/PackFloatNode.html.md)
+- [ParameterNode](https://threejs.org/docs/pages/ParameterNode.html.md)
+- [PassMultipleTextureNode](https://threejs.org/docs/pages/PassMultipleTextureNode.html.md)
+- [PassTextureNode](https://threejs.org/docs/pages/PassTextureNode.html.md)
+- [PixelationNode](https://threejs.org/docs/pages/PixelationNode.html.md)
+- [PointLightNode](https://threejs.org/docs/pages/PointLightNode.html.md)
+- [PointShadowNode](https://threejs.org/docs/pages/PointShadowNode.html.md)
+- [PointUVNode](https://threejs.org/docs/pages/PointUVNode.html.md)
+- [ProjectorLightNode](https://threejs.org/docs/pages/ProjectorLightNode.html.md)
+- [PropertyNode](https://threejs.org/docs/pages/PropertyNode.html.md)
+- [RGBShiftNode](https://threejs.org/docs/pages/RGBShiftNode.html.md)
+- [RTTNode](https://threejs.org/docs/pages/RTTNode.html.md)
+- [RangeNode](https://threejs.org/docs/pages/RangeNode.html.md)
+- [RectAreaLightNode](https://threejs.org/docs/pages/RectAreaLightNode.html.md)
+- [ReferenceBaseNode](https://threejs.org/docs/pages/ReferenceBaseNode.html.md)
+- [ReferenceElementNode](https://threejs.org/docs/pages/ReferenceElementNode.html.md)
+- [ReferenceNode](https://threejs.org/docs/pages/ReferenceNode.html.md)
+- [ReflectorNode](https://threejs.org/docs/pages/ReflectorNode.html.md)
+- [RemapNode](https://threejs.org/docs/pages/RemapNode.html.md)
+- [RenderOutputNode](https://threejs.org/docs/pages/RenderOutputNode.html.md)
+- [RendererReferenceNode](https://threejs.org/docs/pages/RendererReferenceNode.html.md)
+- [RotateNode](https://threejs.org/docs/pages/RotateNode.html.md)
+- [SMAANode](https://threejs.org/docs/pages/SMAANode.html.md)
+- [SSGINode](https://threejs.org/docs/pages/SSGINode.html.md)
+- [SSRNode](https://threejs.org/docs/pages/SSRNode.html.md)
+- [SSSNode](https://threejs.org/docs/pages/SSSNode.html.md)
+- [SampleNode](https://threejs.org/docs/pages/SampleNode.html.md)
+- [ScreenNode](https://threejs.org/docs/pages/ScreenNode.html.md)
+- [SetNode](https://threejs.org/docs/pages/SetNode.html.md)
+- [ShadowBaseNode](https://threejs.org/docs/pages/ShadowBaseNode.html.md)
+- [ShadowNode](https://threejs.org/docs/pages/ShadowNode.html.md)
+- [SkinningNode](https://threejs.org/docs/pages/SkinningNode.html.md)
+- [SobelOperatorNode](https://threejs.org/docs/pages/SobelOperatorNode.html.md)
+- [SplitNode](https://threejs.org/docs/pages/SplitNode.html.md)
+- [SpotLightNode](https://threejs.org/docs/pages/SpotLightNode.html.md)
+- [StackNode](https://threejs.org/docs/pages/StackNode.html.md)
+- [StorageArrayElementNode](https://threejs.org/docs/pages/StorageArrayElementNode.html.md)
+- [StorageBufferNode](https://threejs.org/docs/pages/StorageBufferNode.html.md)
+- [StorageTextureNode](https://threejs.org/docs/pages/StorageTextureNode.html.md)
+- [StructNode](https://threejs.org/docs/pages/StructNode.html.md)
+- [StructTypeNode](https://threejs.org/docs/pages/StructTypeNode.html.md)
+- [SubBuildNode](https://threejs.org/docs/pages/SubBuildNode.html.md)
+- [SubgroupFunctionNode](https://threejs.org/docs/pages/SubgroupFunctionNode.html.md)
+- [TRAANode](https://threejs.org/docs/pages/TRAANode.html.md)
+- [TempNode](https://threejs.org/docs/pages/TempNode.html.md)
+- [Texture3DNode](https://threejs.org/docs/pages/Texture3DNode.html.md)
+- [TextureNode](https://threejs.org/docs/pages/TextureNode.html.md)
+- [TextureSizeNode](https://threejs.org/docs/pages/TextureSizeNode.html.md)
+- [TileShadowNode](https://threejs.org/docs/pages/TileShadowNode.html.md)
+- [TiledLightsNode](https://threejs.org/docs/pages/TiledLightsNode.html.md)
+- [ToneMappingNode](https://threejs.org/docs/pages/ToneMappingNode.html.md)
+- [TransitionNode](https://threejs.org/docs/pages/TransitionNode.html.md)
+- [UniformArrayElementNode](https://threejs.org/docs/pages/UniformArrayElementNode.html.md)
+- [UniformArrayNode](https://threejs.org/docs/pages/UniformArrayNode.html.md)
+- [UniformGroupNode](https://threejs.org/docs/pages/UniformGroupNode.html.md)
+- [UniformNode](https://threejs.org/docs/pages/UniformNode.html.md)
+- [UnpackFloatNode](https://threejs.org/docs/pages/UnpackFloatNode.html.md)
+- [UserDataNode](https://threejs.org/docs/pages/UserDataNode.html.md)
+- [VarNode](https://threejs.org/docs/pages/VarNode.html.md)
+- [VaryingNode](https://threejs.org/docs/pages/VaryingNode.html.md)
+- [VelocityNode](https://threejs.org/docs/pages/VelocityNode.html.md)
+- [VertexColorNode](https://threejs.org/docs/pages/VertexColorNode.html.md)
+- [ViewportDepthNode](https://threejs.org/docs/pages/ViewportDepthNode.html.md)
+- [ViewportDepthTextureNode](https://threejs.org/docs/pages/ViewportDepthTextureNode.html.md)
+- [ViewportSharedTextureNode](https://threejs.org/docs/pages/ViewportSharedTextureNode.html.md)
+- [ViewportTextureNode](https://threejs.org/docs/pages/ViewportTextureNode.html.md)
+- [WorkgroupInfoElementNode](https://threejs.org/docs/pages/WorkgroupInfoElementNode.html.md)
+- [WorkgroupInfoNode](https://threejs.org/docs/pages/WorkgroupInfoNode.html.md)
+
+### WebXR
+
+- [EXRExporter](https://threejs.org/docs/pages/EXRExporter.html.md)
+- [WebXRDepthSensing](https://threejs.org/docs/pages/WebXRDepthSensing.html.md)
+- [WebXRManager](https://threejs.org/docs/pages/WebXRManager.html.md)
+- [XRButton](https://threejs.org/docs/pages/XRButton.html.md)
+- [XRControllerModel](https://threejs.org/docs/pages/XRControllerModel.html.md)
+- [XRControllerModelFactory](https://threejs.org/docs/pages/XRControllerModelFactory.html.md)
+- [XRHandMeshModel](https://threejs.org/docs/pages/XRHandMeshModel.html.md)
+- [XRHandModel](https://threejs.org/docs/pages/XRHandModel.html.md)
+- [XRHandModelFactory](https://threejs.org/docs/pages/XRHandModelFactory.html.md)
+- [XRHandPrimitiveModel](https://threejs.org/docs/pages/XRHandPrimitiveModel.html.md)
+- [XRManager](https://threejs.org/docs/pages/XRManager.html.md)
+- [XRPlanes](https://threejs.org/docs/pages/XRPlanes.html.md)
+
+### Shader Modules
+
+- [module-ACESFilmicToneMappingShader](https://threejs.org/docs/pages/module-ACESFilmicToneMappingShader.html.md)
+- [module-AfterimageShader](https://threejs.org/docs/pages/module-AfterimageShader.html.md)
+- [module-BasicShader](https://threejs.org/docs/pages/module-BasicShader.html.md)
+- [module-Bayer](https://threejs.org/docs/pages/module-Bayer.html.md)
+- [module-BleachBypassShader](https://threejs.org/docs/pages/module-BleachBypassShader.html.md)
+- [module-BlendShader](https://threejs.org/docs/pages/module-BlendShader.html.md)
+- [module-BokehShader](https://threejs.org/docs/pages/module-BokehShader.html.md)
+- [module-BokehShader2](https://threejs.org/docs/pages/module-BokehShader2.html.md)
+- [module-BrightnessContrastShader](https://threejs.org/docs/pages/module-BrightnessContrastShader.html.md)
+- [module-BufferGeometryUtils](https://threejs.org/docs/pages/module-BufferGeometryUtils.html.md)
+- [module-CSMShader](https://threejs.org/docs/pages/module-CSMShader.html.md)
+- [module-CameraUtils](https://threejs.org/docs/pages/module-CameraUtils.html.md)
+- [module-ColorCorrectionShader](https://threejs.org/docs/pages/module-ColorCorrectionShader.html.md)
+- [module-ColorSpaces](https://threejs.org/docs/pages/module-ColorSpaces.html.md)
+- [module-ColorifyShader](https://threejs.org/docs/pages/module-ColorifyShader.html.md)
+- [module-ConvolutionShader](https://threejs.org/docs/pages/module-ConvolutionShader.html.md)
+- [module-CopyShader](https://threejs.org/docs/pages/module-CopyShader.html.md)
+- [module-DOFMipMapShader](https://threejs.org/docs/pages/module-DOFMipMapShader.html.md)
+- [module-DepthLimitedBlurShader](https://threejs.org/docs/pages/module-DepthLimitedBlurShader.html.md)
+- [module-DigitalGlitch](https://threejs.org/docs/pages/module-DigitalGlitch.html.md)
+- [module-DotScreenShader](https://threejs.org/docs/pages/module-DotScreenShader.html.md)
+- [module-ExposureShader](https://threejs.org/docs/pages/module-ExposureShader.html.md)
+- [module-FXAAShader](https://threejs.org/docs/pages/module-FXAAShader.html.md)
+- [module-FilmShader](https://threejs.org/docs/pages/module-FilmShader.html.md)
+- [module-FocusShader](https://threejs.org/docs/pages/module-FocusShader.html.md)
+- [module-FreiChenShader](https://threejs.org/docs/pages/module-FreiChenShader.html.md)
+- [module-GTAOShader](https://threejs.org/docs/pages/module-GTAOShader.html.md)
+- [module-GammaCorrectionShader](https://threejs.org/docs/pages/module-GammaCorrectionShader.html.md)
+- [module-GeometryCompressionUtils](https://threejs.org/docs/pages/module-GeometryCompressionUtils.html.md)
+- [module-GeometryUtils](https://threejs.org/docs/pages/module-GeometryUtils.html.md)
+- [module-HalftoneShader](https://threejs.org/docs/pages/module-HalftoneShader.html.md)
+- [module-HorizontalBlurShader](https://threejs.org/docs/pages/module-HorizontalBlurShader.html.md)
+- [module-HorizontalTiltShiftShader](https://threejs.org/docs/pages/module-HorizontalTiltShiftShader.html.md)
+- [module-HueSaturationShader](https://threejs.org/docs/pages/module-HueSaturationShader.html.md)
+- [module-Interpolations](https://threejs.org/docs/pages/module-Interpolations.html.md)
+- [module-KaleidoShader](https://threejs.org/docs/pages/module-KaleidoShader.html.md)
+- [module-LuminosityHighPassShader](https://threejs.org/docs/pages/module-LuminosityHighPassShader.html.md)
+- [module-LuminosityShader](https://threejs.org/docs/pages/module-LuminosityShader.html.md)
+- [module-MirrorShader](https://threejs.org/docs/pages/module-MirrorShader.html.md)
+- [module-NURBSUtils](https://threejs.org/docs/pages/module-NURBSUtils.html.md)
+- [module-NormalMapShader](https://threejs.org/docs/pages/module-NormalMapShader.html.md)
+- [module-OutputShader](https://threejs.org/docs/pages/module-OutputShader.html.md)
+- [module-ParametricFunctions](https://threejs.org/docs/pages/module-ParametricFunctions.html.md)
+- [module-PoissonDenoiseShader](https://threejs.org/docs/pages/module-PoissonDenoiseShader.html.md)
+- [module-RGBShiftShader](https://threejs.org/docs/pages/module-RGBShiftShader.html.md)
+- [module-Raymarching](https://threejs.org/docs/pages/module-Raymarching.html.md)
+- [module-SAOShader](https://threejs.org/docs/pages/module-SAOShader.html.md)
+- [module-SMAAShader](https://threejs.org/docs/pages/module-SMAAShader.html.md)
+- [module-SSAOShader](https://threejs.org/docs/pages/module-SSAOShader.html.md)
+- [module-SSRShader](https://threejs.org/docs/pages/module-SSRShader.html.md)
+- [module-SceneUtils](https://threejs.org/docs/pages/module-SceneUtils.html.md)
+- [module-SepiaShader](https://threejs.org/docs/pages/module-SepiaShader.html.md)
+- [module-SkeletonUtils](https://threejs.org/docs/pages/module-SkeletonUtils.html.md)
+- [module-SobelOperatorShader](https://threejs.org/docs/pages/module-SobelOperatorShader.html.md)
+- [module-SortUtils](https://threejs.org/docs/pages/module-SortUtils.html.md)
+- [module-SubsurfaceScatteringShader](https://threejs.org/docs/pages/module-SubsurfaceScatteringShader.html.md)
+- [module-Text2D](https://threejs.org/docs/pages/module-Text2D.html.md)
+- [module-TriangleBlurShader](https://threejs.org/docs/pages/module-TriangleBlurShader.html.md)
+- [module-UVsDebug](https://threejs.org/docs/pages/module-UVsDebug.html.md)
+- [module-UniformsUtils](https://threejs.org/docs/pages/module-UniformsUtils.html.md)
+- [module-UnpackDepthRGBAShader](https://threejs.org/docs/pages/module-UnpackDepthRGBAShader.html.md)
+- [module-VelocityShader](https://threejs.org/docs/pages/module-VelocityShader.html.md)
+- [module-VerticalBlurShader](https://threejs.org/docs/pages/module-VerticalBlurShader.html.md)
+- [module-VerticalTiltShiftShader](https://threejs.org/docs/pages/module-VerticalTiltShiftShader.html.md)
+- [module-VignetteShader](https://threejs.org/docs/pages/module-VignetteShader.html.md)
+- [module-VolumeShader](https://threejs.org/docs/pages/module-VolumeShader.html.md)
+- [module-WaterRefractionShader](https://threejs.org/docs/pages/module-WaterRefractionShader.html.md)
+- [module-WebGLTextureUtils](https://threejs.org/docs/pages/module-WebGLTextureUtils.html.md)
+- [module-WebGPUTextureUtils](https://threejs.org/docs/pages/module-WebGPUTextureUtils.html.md)

@@ -1,5 +1,5 @@
 import DataMap from './DataMap.js';
-import RenderPipeline from './RenderPipeline.js';
+import RenderObjectPipeline from './RenderObjectPipeline.js';
 import ComputePipeline from './ComputePipeline.js';
 import ProgrammableStage from './ProgrammableStage.js';
 
@@ -146,7 +146,7 @@ class Pipelines extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
-	 * @return {RenderPipeline} The render pipeline.
+	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
 	getForRender( renderObject, promises = null ) {
 
@@ -364,7 +364,7 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
-	 * @return {RenderPipeline} The render pipeline.
+	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
 	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
 
@@ -376,7 +376,7 @@ class Pipelines extends DataMap {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new RenderPipeline( cacheKey, stageVertex, stageFragment );
+			pipeline = new RenderObjectPipeline( cacheKey, stageVertex, stageFragment );
 
 			this.caches.set( cacheKey, pipeline );
 

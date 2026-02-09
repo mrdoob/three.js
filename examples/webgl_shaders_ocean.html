@@ -54,7 +54,7 @@
 				renderer.toneMappingExposure = 0.1;
 				container.appendChild( renderer.domElement );
 
-				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ) );
+				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 				bloomPass.threshold = 0;
 				bloomPass.strength = 0.1;
 				bloomPass.radius = 0;

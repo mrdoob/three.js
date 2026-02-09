@@ -49,7 +49,7 @@
 			let camera, scene, renderer;
 			let controls;
 			let computeParticles;
-			let postProcessing;
+			let renderPipeline;
 
 			let collisionCamera, collisionPosRT, collisionPosMaterial;
 
@@ -309,8 +309,8 @@
 				totalPass = totalPass.mul( vignette );
 				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ).toInspector( 'Teapot Blur' ) );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = totalPass;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = totalPass;
 
 				//
 
@@ -354,7 +354,7 @@
 				scene.overrideMaterial = null;
 				renderer.setRenderTarget( null );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

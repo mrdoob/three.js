@@ -752,7 +752,17 @@ ${ flowData.code }
 
 			} else if ( uniform.type === 'cubeDepthTexture' ) {
 
-				snippet = `samplerCubeShadow ${ uniform.name };`;
+				const texture = uniform.node.value;
+
+				if ( texture.compareFunction ) {
+
+					snippet = `samplerCubeShadow ${ uniform.name };`;
+
+				} else {
+
+					snippet = `samplerCube ${ uniform.name };`;
+
+				}
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -1294,6 +1304,18 @@ ${ flowData.code }
 	isFlipY() {
 
 		return true;
+
+	}
+
+	/**
+	 * Returns the maximum number of bytes available for uniform buffers.
+	 *
+	 * @return {number} The maximum number of bytes available for uniform buffers.
+	 */
+	getUniformBufferLimit() {
+
+		const gl = this.renderer.backend.gl;
+		return gl.getParameter( gl.MAX_UNIFORM_BLOCK_SIZE );
 
 	}
 

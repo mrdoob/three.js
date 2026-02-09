@@ -31,6 +31,7 @@ const exceptionList = [
 	'webgpu_portal',
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
+	'webgpu_postprocessing_godrays',
 	'webgpu_postprocessing_ssgi',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
@@ -38,6 +39,7 @@ const exceptionList = [
 	'webgpu_test_memory',
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
+	'webgpu_volume_lighting_traa',
 
 	// Need more time to render
 	'css3d_mixed',

@@ -957,12 +957,10 @@ class BatchedMesh extends Mesh {
 			nextVertexStart += geometryInfo.reservedVertexCount;
 			geometryInfo.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
 
-			// step the next geometry points to the shifted position
-			this._nextIndexStart = geometry.index ? geometryInfo.indexStart + geometryInfo.reservedIndexCount : 0;
-			this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
-
 		}
 
+		this._nextIndexStart = nextIndexStart;
+		this._nextVertexStart = nextVertexStart;
 		this._visibilityChanged = true;
 
 		return this;
@@ -1105,7 +1103,7 @@ class BatchedMesh extends Mesh {
 	 * Sets the given color to the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to set the color of.
-	 * @param {Color} color - The color to set the instance to.
+	 * @param {Color|Vector4} color - The color to set the instance to. Use a `Vector4` to also define alpha.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	setColorAt( instanceId, color ) {
@@ -1129,8 +1127,8 @@ class BatchedMesh extends Mesh {
 	 * Returns the color of the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to get the color of.
-	 * @param {Color} color - The target object that is used to store the method's result.
-	 * @return {Color} The instance's color.
+	 * @param {Color|Vector4} color - The target object that is used to store the method's result.
+	 * @return {Color|Vector4} The instance's color.  Use a `Vector4` to also retrieve alpha.
 	 */
 	getColorAt( instanceId, color ) {
 
@@ -1515,7 +1513,19 @@ class BatchedMesh extends Mesh {
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
-		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+		let bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
+
+		// the "wireframe" attribute implicitly creates a line attribute in the renderer, which is double
+		// the vertices to draw (3 lines per triangle) so we multiply the draw counts / starts and make
+		// assumptions about the index buffer byte size.
+		let multiDrawMultiplier = 1;
+		if ( material.wireframe ) {
+
+			multiDrawMultiplier = 2;
+			bytesPerElement = geometry.attributes.position.count > 65535 ? 4 : 2;
+
+		}
 
 		const instanceInfo = this._instanceInfo;
 		const multiDrawStarts = this._multiDrawStarts;
@@ -1596,8 +1606,8 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement;
-				multiDrawCounts[ multiDrawCount ] = item.count;
+				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement * multiDrawMultiplier;
+				multiDrawCounts[ multiDrawCount ] = item.count * multiDrawMultiplier;
 				indirectArray[ multiDrawCount ] = item.index;
 				multiDrawCount ++;
 
@@ -1627,8 +1637,8 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement;
-						multiDrawCounts[ multiDrawCount ] = geometryInfo.count;
+						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
+						multiDrawCounts[ multiDrawCount ] = geometryInfo.count * multiDrawMultiplier;
 						indirectArray[ multiDrawCount ] = i;
 						multiDrawCount ++;
 

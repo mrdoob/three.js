@@ -1,5 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
+import StackTrace from '../core/StackTrace.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
 
@@ -743,7 +744,7 @@ addMethodChaining( 'decrement', decrement );
  */
 export const modInt = ( a, b ) => { // @deprecated, r175
 
-	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.', new StackTrace() );
 	return mod( int( a ), int( b ) );
 
 };

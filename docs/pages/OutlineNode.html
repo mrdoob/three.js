@@ -17,7 +17,7 @@
 gives you great flexibility in composing the final outline look depending on
 your requirements.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 // outline parameter
 const edgeStrength = uniform( 3.0 );
@@ -33,7 +33,7 @@ outlinePass = outline( scene, camera, {
 // compose custom outline
 const { visibleEdge, hiddenEdge } = outlinePass;
 const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
-postProcessing.outputNode = outlineColor.add( scenePass );
+renderPipeline.outputNode = outlineColor.add( scenePass );
 </code></pre></div>
 			</header>
 			<article>
@@ -51,7 +51,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the scene.</p>
@@ -59,7 +59,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera the scene is rendered with.</p>
@@ -67,7 +67,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>params</strong>
+										<strong translate="no">params</strong>
 									</td>
 									<td class="description last">
 										<p>The configuration parameters.</p>
@@ -75,7 +75,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>selectedObjects</strong>
+										<strong translate="no">selectedObjects</strong>
 									</td>
 									<td class="description last">
 										<p>An array of selected objects.</p>
@@ -83,7 +83,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>edgeThickness</strong>
+										<strong translate="no">edgeThickness</strong>
 									</td>
 									<td class="description last">
 										<p>The thickness of the edges.</p>
@@ -92,7 +92,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>edgeGlow</strong>
+										<strong translate="no">edgeGlow</strong>
 									</td>
 									<td class="description last">
 										<p>Can be used for an animated glow/pulse effects.</p>
@@ -101,7 +101,7 @@ postProcessing.outputNode = outlineColor.add( scenePass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>downSampleRatio</strong>
+										<strong translate="no">downSampleRatio</strong>
 									</td>
 									<td class="description last">
 										<p>The downsample ratio.</p>
@@ -206,7 +206,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect.</p>
@@ -214,7 +214,7 @@ when the effect is no longer required.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect.</p>
@@ -232,7 +232,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -253,7 +253,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>The current node frame.</p>

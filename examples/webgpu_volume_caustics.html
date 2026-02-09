@@ -46,7 +46,7 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			let camera, scene, renderer, controls;
-			let postProcessing;
+			let renderPipeline;
 			let gltf;
 
 			init();
@@ -179,7 +179,7 @@
 
 				// Post-Processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// Layers
 
@@ -294,7 +294,7 @@
 
 				const scenePassColor = scenePass.add( bloomPass.mul( volumetricLightingIntensity ) );
 
-				postProcessing.outputNode = scenePassColor;
+				renderPipeline.outputNode = scenePassColor;
 
 				// Controls
 
@@ -326,7 +326,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 
