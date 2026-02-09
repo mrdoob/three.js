@@ -36,7 +36,7 @@ import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { context } from '../../nodes/core/ContextNode.js';
-import { error, warn, warnOnce } from '../../utils.js';
+import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -865,9 +865,11 @@ class Renderer {
 
 		//
 
-		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
-
 		if ( targetScene === null ) targetScene = scene;
+
+		// Use the actual scene for caching when compiling individual objects
+		// This ensures cache keys match between compileAsync and render
+		const sceneRef = ( scene.isScene === true ) ? scene : ( targetScene.isScene === true ) ? targetScene : _scene;
 
 		const renderTarget = this._renderTarget;
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
@@ -902,7 +904,8 @@ class Renderer {
 
 		//
 
-		const renderList = this._renderLists.get( scene, camera );
+		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
+		const renderList = this._renderLists.get( sceneRef, camera );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -954,7 +957,7 @@ class Renderer {
 
 		}
 
-		// process render lists
+		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -973,9 +976,39 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
-		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
+		// Process compilation work items sequentially to avoid freezing
+		// Yields between objects to keep animation smooth
 
-		await Promise.all( compilationPromises );
+		for ( const item of compilationPromises ) {
+
+			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+			renderObject.drawRange = item.object.geometry.drawRange;
+			renderObject.group = item.group;
+
+			this._geometries.updateForRender( renderObject );
+
+			// Use async node building to yield to main thread
+			await this._nodes.getForRenderAsync( renderObject );
+
+			this._nodes.updateBefore( renderObject );
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateForRender( renderObject );
+
+			// Wait for pipeline creation
+			const pipelinePromises = [];
+			this._pipelines.getForRender( renderObject, pipelinePromises );
+			if ( pipelinePromises.length > 0 ) {
+
+				await Promise.all( pipelinePromises );
+
+			}
+
+			this._nodes.updateAfter( renderObject );
+
+			// Yield between objects to allow animation frames
+			await yieldToMain();
+
+		}
 
 	}
 
@@ -1509,7 +1542,7 @@ class Renderer {
 
 		}
 
-		const renderList = this._renderLists.get( scene, camera );
+		const renderList = this._renderLists.get( sceneRef, camera );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -3275,6 +3308,20 @@ class Renderer {
 
 		//
 
+		// Try to get nodeBuilderState - returns null if async build pending
+		// This prevents blocking the main thread when a new material is encountered
+		const nodeBuilderState = this._nodes.getForRenderDeferred( renderObject );
+
+		if ( nodeBuilderState === null ) {
+
+			// Node building in progress - skip this frame, will render when ready
+			return;
+
+		}
+
+		// Store for getNodeBuilderState() calls (prevents re-triggering sync build)
+		renderObject._nodeBuilderState = nodeBuilderState;
+
 		const needsRefresh = this._nodes.needsRefresh( renderObject );
 
 		if ( needsRefresh ) {
@@ -3288,7 +3335,17 @@ class Renderer {
 
 		}
 
-		this._pipelines.updateForRender( renderObject );
+		// Pass empty array to enable async pipeline compilation (promises unused but triggers async path)
+		this._pipelines.getForRender( renderObject, [] );
+
+		// Skip drawing if pipeline is still compiling asynchronously
+		// The object will be drawn on the next frame when the pipeline is ready
+		if ( ! this._pipelines.isReady( renderObject ) ) {
+
+			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+			return;
+
+		}
 
 		//
 
@@ -3324,6 +3381,27 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
+		// If in async compilation mode, queue the work for sequential execution
+		if ( this._compilationPromises !== null ) {
+
+			// Store work items instead of promises - will be processed sequentially
+			this._compilationPromises.push( {
+				object,
+				material,
+				scene,
+				camera,
+				lightsNode,
+				group,
+				clippingContext,
+				passId,
+				renderContext: this._currentRenderContext
+			} );
+
+			return;
+
+		}
+
+		// Sync path
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;

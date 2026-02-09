@@ -164,6 +164,28 @@ function warnOnce( ...params ) {
 
 }
 
+/**
+ * Yields execution to the main thread to allow rendering and other tasks.
+ * Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimationFrame.
+ *
+ * @return {Promise<void>}
+ */
+function yieldToMain() {
+
+	if ( typeof self !== 'undefined' && typeof self.scheduler !== 'undefined' && typeof self.scheduler.yield !== 'undefined' ) {
+
+		return self.scheduler.yield();
+
+	}
+
+	return new Promise( resolve => {
+
+		requestAnimationFrame( resolve );
+
+	} );
+
+}
+
 function probeAsync( gl, sync, interval ) {
 
 	return new Promise( function ( resolve, reject ) {
@@ -225,4 +247,4 @@ function toReversedProjectionMatrix( projectionMatrix ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, yieldToMain, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray };

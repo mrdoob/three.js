@@ -235,6 +235,26 @@ class Pipelines extends DataMap {
 	}
 
 	/**
+	 * Checks if the render pipeline for the given render object is ready for drawing.
+	 * Returns false if the GPU pipeline is still being compiled asynchronously.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {boolean} True if the pipeline is ready for drawing.
+	 */
+	isReady( renderObject ) {
+
+		const data = this.get( renderObject );
+		const pipeline = data.pipeline;
+
+		if ( pipeline === undefined ) return false;
+
+		const pipelineData = this.backend.get( pipeline );
+
+		return pipelineData.pipeline !== undefined && pipelineData.pipeline !== null;
+
+	}
+
+	/**
 	 * Deletes the pipeline for the given render object.
 	 *
 	 * @param {RenderObject} object - The render object.
