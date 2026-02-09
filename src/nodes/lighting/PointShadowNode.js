@@ -7,12 +7,12 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Color } from '../../math/Color.js';
-import { BasicShadowMap, LessEqualCompare, WebGPUCoordinateSystem } from '../../constants.js';
+import { BasicShadowMap, GreaterEqualCompare, LessEqualCompare, WebGPUCoordinateSystem } from '../../constants.js';
 import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 import { abs, normalize, cross } from '../math/MathNode.js';
-import { viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from '../display/ViewportDepthNode.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
@@ -94,7 +94,7 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 
 } );
 
-const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow } ) => {
+const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow }, builder ) => {
 
 	// for point lights, the uniform @vShadowCoord is re-purposed to hold
 	// the vector from the light to the world-space position of the fragment.
@@ -110,8 +110,19 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 
 	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
 
-		const dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-		dp.addAssign( bias );
+		let dp;
+
+		if ( builder.renderer.reversedDepthBuffer ) {
+
+			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.subAssign( bias );
+
+		} else {
+
+			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
+
+		}
 
 		// bd3D = base direction 3D (direction from light to fragment)
 		const bd3D = shadowPosition.normalize();
@@ -206,7 +217,7 @@ class PointShadowNode extends ShadowNode {
 
 		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
 		depthTexture.name = 'PointShadowDepthTexture';
-		depthTexture.compareFunction = LessEqualCompare;
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
 		shadowMap.texture.name = 'PointShadowMap';

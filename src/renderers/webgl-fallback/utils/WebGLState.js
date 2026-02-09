@@ -12,6 +12,18 @@ import { error, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
 /**
  * A WebGL 2 backend utility module for managing the WebGL state.
  *
@@ -63,6 +75,7 @@ class WebGLState {
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;
 		this.currentColorMask = null;
+		this.currentDepthReversed = false;
 		this.currentDepthFunc = null;
 		this.currentDepthMask = null;
 		this.currentStencilFunc = null;
@@ -608,6 +621,34 @@ class WebGLState {
 
 	}
 
+
+	/**
+	 * Configures the WebGL state to use a reversed depth buffer.
+	 *
+	 * @param {boolean} reversed - Whether the depth buffer is reversed or not.
+	 */
+	setReversedDepth( reversed ) {
+
+		if ( this.currentDepthReversed !== reversed ) {
+
+			const ext = this.backend.extensions.get( 'EXT_clip_control' );
+
+			if ( reversed ) {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+			} else {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+			}
+
+			this.currentDepthReversed = reversed;
+
+		}
+
+	}
+
 	/**
 	 * Specifies whether depth values can be written when rendering
 	 * into a framebuffer or not.
@@ -637,6 +678,8 @@ class WebGLState {
 	 * @param {number} depthFunc - The depth compare function.
 	 */
 	setDepthFunc( depthFunc ) {
+
+		if ( this.currentDepthReversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 		if ( this.currentDepthFunc !== depthFunc ) {
 

@@ -203,8 +203,8 @@ class Background extends DataMap {
 
 			//
 
-			renderContext.depthClearValue = renderer._clearDepth;
-			renderContext.stencilClearValue = renderer._clearStencil;
+			renderContext.depthClearValue = renderer.getClearDepth();
+			renderContext.stencilClearValue = renderer.getClearStencil();
 
 			renderContext.clearColor = renderer.autoClearColor === true;
 			renderContext.clearDepth = renderer.autoClearDepth === true;

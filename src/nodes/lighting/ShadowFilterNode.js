@@ -173,7 +173,7 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
  * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
  * @return {Node<float>} The filtering result.
  */
-export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
+export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer }, builder ) => {
 
 	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
 
@@ -188,7 +188,7 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 	const mean = distribution.x;
 	const variance = max( 0.0000001, distribution.y.mul( distribution.y ) );
 
-	const hardShadow = step( shadowCoord.z, mean );
+	const hardShadow = ( builder.renderer.reversedDepthBuffer ) ? step( mean, shadowCoord.z ) : step( shadowCoord.z, mean );
 
 	const output = float( 1 ).toVar(); // default, fully lit
 
