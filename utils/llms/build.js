@@ -522,6 +522,16 @@ ${tslSpec}
 
 // Generate .md versions of all HTML doc pages
 const docsDir = 'docs/pages';
+
+// Remove stale .md files from previous builds
+const existingMdFiles = fs.readdirSync( docsDir ).filter( f => f.endsWith( '.html.md' ) );
+
+for ( const file of existingMdFiles ) {
+
+	fs.unlinkSync( path.join( docsDir, file ) );
+
+}
+
 const htmlFiles = fs.readdirSync( docsDir ).filter( f => f.endsWith( '.html' ) );
 
 const mdFiles = [];
