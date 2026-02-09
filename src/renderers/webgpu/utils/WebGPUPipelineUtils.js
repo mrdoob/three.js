@@ -15,19 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error, warnOnce } from '../../../utils.js';
-
-const reversedFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
-	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
-	[ LessEqualDepth ]: GreaterEqualDepth,
-
-	[ AlwaysDepth ]: NeverDepth,
-	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
-	[ GreaterEqualDepth ]: LessEqualDepth,
-};
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -806,7 +794,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const depthFunc = ( this.backend.parameters.reversedDepthBuffer ) ? reversedFuncs[ material.depthFunc ] : material.depthFunc;
+			const depthFunc = ( this.backend.parameters.reversedDepthBuffer ) ? ReversedDepthFuncs[ material.depthFunc ] : material.depthFunc;
 
 			switch ( depthFunc ) {
 

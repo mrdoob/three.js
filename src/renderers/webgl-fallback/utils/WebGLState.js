@@ -8,21 +8,9 @@ import {
 	MaterialBlending
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
-import { error, warnOnce } from '../../../utils.js';
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
-
-const reversedFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
-	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
-	[ LessEqualDepth ]: GreaterEqualDepth,
-
-	[ AlwaysDepth ]: NeverDepth,
-	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
-	[ GreaterEqualDepth ]: LessEqualDepth,
-};
 
 /**
  * A WebGL 2 backend utility module for managing the WebGL state.
@@ -679,7 +667,7 @@ class WebGLState {
 	 */
 	setDepthFunc( depthFunc ) {
 
-		if ( this.currentDepthReversed ) depthFunc = reversedFuncs[ depthFunc ];
+		if ( this.currentDepthReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 		if ( this.currentDepthFunc !== depthFunc ) {
 
