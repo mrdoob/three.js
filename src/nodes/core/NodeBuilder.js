@@ -140,6 +140,16 @@ class NodeBuilder {
 		this.nodes = [];
 
 		/**
+		 * A list of all nodes the builder is processing in sequential order.
+		 *
+		 * This is used to determine the update order of nodes, which is important for
+		 * nodes with update types {@link NodeUpdateType#UPDATE}, {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
+		 *
+		 * @type {Array<Node>}
+		 */
+		this.sequentialNodes = [];
+
+		/**
 		 * A list of all nodes which {@link Node#update} method should be executed.
 		 *
 		 * @type {Array<Node>}
@@ -740,6 +750,16 @@ class NodeBuilder {
 
 		}
 
+		const index = this.sequentialNodes.indexOf( node );
+
+		if ( index !== - 1 ) {
+
+			this.sequentialNodes.splice( index, 1 );
+
+		}
+
+		this.sequentialNodes.push( node );
+
 	}
 
 	/**
@@ -747,10 +767,10 @@ class NodeBuilder {
 	 */
 	buildUpdateNodes() {
 
-		for ( let i = 0; i < this.nodes.length; i ++ ) {
+		for ( let i = 0; i < this.sequentialNodes.length; i ++ ) {
 
-			const forwardNode = this.nodes[ i ];
-			const backwardNode = this.nodes[ this.nodes.length - 1 - i ];
+			const forwardNode = this.sequentialNodes[ i ];
+			const backwardNode = this.sequentialNodes[ this.sequentialNodes.length - 1 - i ];
 
 			const updateType = forwardNode.getUpdateType();
 			const updateBeforeType = backwardNode.getUpdateBeforeType();

@@ -786,7 +786,12 @@ class Node extends EventDispatcher {
 
 		//
 
-		builder.addNode( this );
+		if ( builder.buildStage === 'setup' ) {
+
+			builder.addNode( this );
+
+		}
+
 		builder.addChain( this );
 
 		/* Build stages expected results:
