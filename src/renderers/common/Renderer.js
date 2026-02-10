@@ -883,7 +883,9 @@ class Renderer {
 		// This ensures cache keys match between compileAsync and render
 		const sceneRef = ( scene.isScene === true ) ? scene : ( targetScene.isScene === true ) ? targetScene : _scene;
 
-		const renderTarget = this._renderTarget;
+		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
+		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
