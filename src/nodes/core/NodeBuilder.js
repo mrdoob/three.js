@@ -140,13 +140,6 @@ class NodeBuilder {
 		this.nodes = [];
 
 		/**
-		 * A list of all sequential nodes.
-		 *
-		 * @type {Array<Node>}
-		 */
-		this.sequentialNodes = [];
-
-		/**
 		 * A list of all nodes which {@link Node#update} method should be executed.
 		 *
 		 * @type {Array<Node>}
@@ -750,53 +743,34 @@ class NodeBuilder {
 	}
 
 	/**
-	 * It is used to add Nodes that will be used as FRAME and RENDER events,
-	 * and need to follow a certain sequence in the calls to work correctly.
-	 * This function should be called after 'setup()' in the 'build()' process to ensure that the child nodes are processed first.
-	 *
-	 * @param {Node} node - The node to add.
-	 */
-	addSequentialNode( node ) {
-
-		if ( this.sequentialNodes.includes( node ) === false ) {
-
-			this.sequentialNodes.push( node );
-
-		}
-
-	}
-
-	/**
 	 * Checks the update types of nodes
 	 */
 	buildUpdateNodes() {
 
-		for ( const node of this.nodes ) {
+		for ( let i = 0; i < this.nodes.length; i ++ ) {
 
-			const updateType = node.getUpdateType();
+			const forwardNode = this.nodes[ i ];
+			const backwardNode = this.nodes[ this.nodes.length - 1 - i ];
+
+			const updateType = forwardNode.getUpdateType();
+			const updateBeforeType = backwardNode.getUpdateBeforeType();
+			const updateAfterType = backwardNode.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node );
+				this.updateNodes.push( forwardNode );
 
 			}
 
-		}
-
-		for ( const node of this.sequentialNodes ) {
-
-			const updateBeforeType = node.getUpdateBeforeType();
-			const updateAfterType = node.getUpdateAfterType();
-
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( node );
+				this.updateBeforeNodes.push( backwardNode );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( node );
+				this.updateAfterNodes.push( backwardNode );
 
 			}
 

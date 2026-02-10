@@ -905,7 +905,6 @@ class Node extends EventDispatcher {
 		}
 
 		builder.removeChain( this );
-		builder.addSequentialNode( this );
 
 		return result;
 
