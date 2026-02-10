@@ -98,7 +98,7 @@ function isBlobURL( key ) {
 
 	try {
 
-		const urlString = key.slice( key.indexOf( ':' ) + 1 ); // remove key identifier
+		const urlString = key.slice( key.indexOf( ':' ) + 1 ); // remove type identifier
 
 		const url = new URL( urlString );
 		return url.protocol === 'blob:';
