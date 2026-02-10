@@ -180,15 +180,13 @@ class NodeManager extends DataMap {
 
 	/**
 	 * Returns the cache key for the given render object.
-	 * Uses a stable cache key that excludes context.id to ensure cache hits
-	 * between compileAsync and render even when renderContext differs.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {number} The cache key.
 	 */
 	getForRenderCacheKey( renderObject ) {
 
-		return renderObject.getNodeBuilderCacheKey();
+		return renderObject.initialCacheKey;
 
 	}
 

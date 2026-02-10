@@ -1602,7 +1602,7 @@ class Renderer {
 
 		}
 
-		const renderList = this._renderLists.get( sceneRef, camera );
+		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -3411,20 +3411,6 @@ class Renderer {
 
 		//
 
-		// Try to get nodeBuilderState - returns null if async build pending
-		// This prevents blocking the main thread when a new material is encountered
-		const nodeBuilderState = this._nodes.getForRenderDeferred( renderObject );
-
-		if ( nodeBuilderState === null ) {
-
-			// Node building in progress - skip this frame, will render when ready
-			return;
-
-		}
-
-		// Store for getNodeBuilderState() calls (prevents re-triggering sync build)
-		renderObject._nodeBuilderState = nodeBuilderState;
-
 		const needsRefresh = this._nodes.needsRefresh( renderObject );
 
 		if ( needsRefresh ) {
@@ -3438,17 +3424,7 @@ class Renderer {
 
 		}
 
-		// Pass empty array to enable async pipeline compilation (promises unused but triggers async path)
-		this._pipelines.getForRender( renderObject, [] );
-
-		// Skip drawing if pipeline is still compiling asynchronously
-		// The object will be drawn on the next frame when the pipeline is ready
-		if ( ! this._pipelines.isReady( renderObject ) ) {
-
-			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
-			return;
-
-		}
+		this._pipelines.updateForRender( renderObject );
 
 		//
 
