@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
-import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 import { boxBlur } from './boxBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -262,7 +262,6 @@ class SSRNode extends TempNode {
 		this._copyMaterial = new NodeMaterial();
 		this._copyMaterial.name = 'SSRNode.Copy';
 
-
 		/**
 		 * The result of the effect is represented as a separate texture node.
 		 *
@@ -271,13 +270,25 @@ class SSRNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
 
+		let blurredTextureNode = null;
+
+		if ( this.roughnessNode !== null ) {
+
+			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
+			const r = float( this.roughnessNode );
+			const lod = r.mul( r ).mul( mips ).clamp( 0, mips );
+
+			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
+
+		}
+
 		/**
 		 * Holds the blurred SSR reflections.
 		 *
 		 * @private
-		 * @type {?Node}
+		 * @type {?PassTextureNode}
 		 */
-		this._blurredTextureNode = null;
+		this._blurredTextureNode = blurredTextureNode;
 
 	}
 
@@ -389,6 +400,7 @@ class SSRNode extends TempNode {
 			// https://en.wikipedia.org/wiki/Plane_(geometry)
 			// http://paulbourke.net/geometry/pointlineplane/
 
+			// planeNormal is already normalized, so denominator is 1
 			const d = mul( planeNormal.x, planePoint.x ).add( mul( planeNormal.y, planePoint.y ) ).add( mul( planeNormal.z, planePoint.z ) ).negate().toVar();
 			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
 			return distance;
@@ -469,6 +481,9 @@ class SSRNode extends TempNode {
 
 			// below variables are used to control the raymarching process
 
+			// total length of the ray
+			const totalLen = d1.sub( d0 ).length().toVar();
+
 			// offset in x and y direction
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
@@ -476,9 +491,7 @@ class SSRNode extends TempNode {
 			// determine the larger delta
 			// The larger difference will help to determine how much to travel in the X and Y direction each iteration and
 			// how many iterations are needed to travel the entire ray
-			// scale step count by distance - distant surfaces need less precision (0.5 to 1.0 multiplier)
-			const distanceFactor = float( 1 ).sub( depth.mul( 0.5 ) ).clamp( 0.5, 1 );
-			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ).mul( distanceFactor ) ).toConst();
+			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
 
 			// step sizes in the x and y directions
 			const xSpan = xLen.div( totalStep ).toVar();
@@ -486,14 +499,10 @@ class SSRNode extends TempNode {
 
 			const output = vec4( 0 ).toVar();
 
-			// incremental interpolation factor
-			const sStep = float( 1 ).div( float( totalStep ) );
-			const s = sStep.toVar(); // start at sStep since loop starts at i=1
-
 			// the actual ray marching loop
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
-			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
+			Loop( totalStep, ( { i } ) => {
 
 				// advance on the ray by computing a new position in screen coordinates
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
@@ -511,6 +520,9 @@ class SSRNode extends TempNode {
 				const vZ = getViewZ( d ).toVar();
 
 				const viewReflectRayZ = float( 0 ).toVar();
+
+				// normalized distance between the current position xy and the starting point d0
+				const s = xy.sub( d0 ).length().div( totalLen );
 
 				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
 				If( this._isPerspectiveCamera, () => {
@@ -547,9 +559,9 @@ class SSRNode extends TempNode {
 
 						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
 
-							// the reflected ray is hitting a backface (normal pointing away from ray),
-							// treat as opaque surface that blocks the ray
-							Break();
+							// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
+							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
+							Continue();
 
 						} );
 
@@ -575,18 +587,14 @@ class SSRNode extends TempNode {
 						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 );
 						op.mulAssign( fresnelCoe );
 
-						// output: RGB = color * opacity (premultiplied), A = normalized distance
+						// output
 						const reflectColor = this.colorNode.sample( uvNode );
-						const normalizedDistance = distance.div( this.maxDistance ).clamp( 0, 1 );
-						output.assign( vec4( reflectColor.rgb.mul( op ), normalizedDistance ) );
+						output.assign( vec4( reflectColor.rgb.mul( op ), 1 ) );
 						Break();
 
 					} );
 
 				} );
-
-				// advance interpolation factor
-				s.addAssign( sStep );
 
 			} );
 
@@ -606,33 +614,6 @@ class SSRNode extends TempNode {
 
 		this._copyMaterial.fragmentNode = reflectionBuffer;
 		this._copyMaterial.needsUpdate = true;
-
-		// distance-aware blur sampling
-
-		if ( this.roughnessNode !== null ) {
-
-			const blurBuffer = texture( this._blurRenderTarget.texture );
-			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-
-			// sample distance from unblurred SSR alpha and use roughness² * distance for LOD
-			// roughness² matches GGX microfacet distribution behavior
-			const distanceAwareSample = Fn( () => {
-
-				// get distance from the unblurred SSR texture's alpha channel
-				const reflectionDistance = reflectionBuffer.sample( uvNode ).a;
-				const r = float( this.roughnessNode );
-				// squared roughness for more physically accurate falloff (GGX-like)
-				const lod = r.mul( r ).mul( reflectionDistance ).mul( mips ).clamp( 0, mips );
-				const blurred = blurBuffer.sample( uvNode ).level( lod );
-
-				// output: RGB is premultiplied color, keep alpha as distance for potential further use
-				return blurred;
-
-			} );
-
-			this._blurredTextureNode = distanceAwareSample();
-
-		}
 
 		//
 
