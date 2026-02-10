@@ -33,7 +33,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Async Node Compilation</span>
 			</div>
 
-			<small>NodeMaterial shaders compile asynchronously without blocking the render loop. Animation stays smooth while 256 unique TSL materials build in the background.</small>
+			<small id="description">NodeMaterial shaders compile asynchronously without blocking the render loop. Animation stays smooth while <span id="materialCount">256</span> unique TSL materials build in the background.</small>
 		</div>
 
 		<div id="stats">
@@ -61,8 +61,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const MESH_COUNT = 256;
-			const GRID_SIZE = 16;
+			let MESH_COUNT = 256;
+			let GRID_SIZE = 16;
 			const ADD_DELAY = 1000;
 
 			let camera, scene, renderer;
@@ -140,6 +140,16 @@
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
+
+				// Reduce mesh count for WebGL (slower compilation)
+				if ( renderer.backend.isWebGLBackend ) {
+
+					MESH_COUNT = 64;
+					GRID_SIZE = 8;
+					document.getElementById( 'materialCount' ).textContent = '64';
+					meshCountEl.textContent = '0 / 64';
+
+				}
 
 				// Get mode from URL
 				const urlParams = new URLSearchParams( window.location.search );
