@@ -3278,6 +3278,22 @@ class GLTFParser {
 
 	}
 
+	toBase64(array) {
+		return new Promise((resolve) => {
+			const blob = new Blob([array]);
+			const reader = new FileReader();
+			
+			reader.onload = (event) => {
+				const dataUrl = event.target.result;
+				const [_, base64] = dataUrl.split(',');
+				
+				resolve(base64);
+			};
+			
+			reader.readAsDataURL(blob);
+			} );
+	}
+
 	loadImageSource( sourceIndex, loader ) {
 
 		const parser = this;
@@ -3295,19 +3311,15 @@ class GLTFParser {
 		const URL = self.URL || self.webkitURL;
 
 		let sourceURI = sourceDef.uri || '';
-		let isObjectURL = false;
 
 		if ( sourceDef.bufferView !== undefined ) {
 
 			// Load binary image data from bufferView, if provided.
 
-			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
-
-				isObjectURL = true;
-				const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
-				sourceURI = URL.createObjectURL( blob );
+			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView).then( async (bufferView) => {
+				const base64 = await parser.toBase64(bufferView);
+				const sourceURI = `data:${sourceDef.mimeType};base64,${base64}`;
 				return sourceURI;
-
 			} );
 
 		} else if ( sourceDef.uri === undefined ) {
@@ -3341,13 +3353,7 @@ class GLTFParser {
 
 		} ).then( function ( texture ) {
 
-			// Clean up resources and configure Texture.
-
-			if ( isObjectURL === true ) {
-
-				URL.revokeObjectURL( sourceURI );
-
-			}
+			// Configure Texture.
 
 			assignExtrasToUserData( texture, sourceDef );
 
