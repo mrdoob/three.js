@@ -3308,8 +3308,6 @@ class GLTFParser {
 
 		const sourceDef = json.images[ sourceIndex ];
 
-		const URL = self.URL || self.webkitURL;
-
 		let sourceURI = sourceDef.uri || '';
 
 		if ( sourceDef.bufferView !== undefined ) {
