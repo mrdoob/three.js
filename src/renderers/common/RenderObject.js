@@ -688,10 +688,9 @@ class RenderObject {
 	 *
 	 * The material cache key is part of the render object cache key.
 	 *
-	 * @param {boolean} [includeContextId=true] - Whether to include context.id in the key.
 	 * @return {number} The material cache key.
 	 */
-	getMaterialCacheKey( includeContextId = true ) {
+	getMaterialCacheKey() {
 
 		const { object, material, renderer } = this;
 
@@ -789,29 +788,11 @@ class RenderObject {
 
 		}
 
-		// context.id is excluded when includeContextId=false to ensure cache stability
-		// between compileAsync() and render() which may use different renderContexts
-		if ( includeContextId ) {
-
-			cacheKey += this.context.id + ',';
-
-		}
+		cacheKey += this.context.id + ',';
 
 		cacheKey += object.receiveShadow + ',';
 
 		return hashString( cacheKey );
-
-	}
-
-	/**
-	 * Returns a cache key suitable for the nodeBuilderCache.
-	 * Excludes context.id to ensure cache hits between compileAsync and render.
-	 *
-	 * @return {number} The node builder cache key.
-	 */
-	getNodeBuilderCacheKey() {
-
-		return this.getMaterialCacheKey( false );
 
 	}
 
