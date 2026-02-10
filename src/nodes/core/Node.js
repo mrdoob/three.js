@@ -786,12 +786,6 @@ class Node extends EventDispatcher {
 
 		//
 
-		if ( builder.buildStage === 'setup' ) {
-
-			builder.addNode( this );
-
-		}
-
 		builder.addChain( this );
 
 		/* Build stages expected results:
@@ -804,6 +798,8 @@ class Node extends EventDispatcher {
 		const buildStage = builder.getBuildStage();
 
 		if ( buildStage === 'setup' ) {
+
+			builder.addNode( this );
 
 			this.updateReference( builder );
 
@@ -844,6 +840,8 @@ class Node extends EventDispatcher {
 			}
 
 			result = properties.outputNode;
+
+			builder.addSequentialNode( this );
 
 		} else if ( buildStage === 'analyze' ) {
 
