@@ -6057,6 +6057,22 @@ The camera's near value.
 
 The camera's far value.
 
+### .viewZToReversedPerspectiveDepth( viewZ : Node.<float>, near : Node.<float>, far : Node.<float> ) : Node.<float>
+
+TSL function for converting a viewZ value to a reversed perspective depth value.
+
+**viewZ**
+
+The viewZ node.
+
+**near**
+
+The camera's near value.
+
+**far**
+
+The camera's far value.
+
 ### .viewportDepthTexture( uvNode : Node, levelNode : Node ) : ViewportDepthTextureNode
 
 TSL function for a viewport depth texture node.
