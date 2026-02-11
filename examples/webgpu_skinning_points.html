@@ -85,6 +85,7 @@
 							materialPoints.opacityNode = shapeCircle();
 							materialPoints.sizeNode = pointSpeedAttribute.length().exp().min( 5 ).mul( 5 ).add( 1 );
 							materialPoints.sizeAttenuation = false;
+							materialPoints.alphaTest = 0.5;
 
 							const updateSkinningPoints = Fn( () => {
 
