@@ -356,7 +356,7 @@ function warnOnce( ...params ) {
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
  * @private
- * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
  * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
