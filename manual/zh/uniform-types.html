@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="zh"><head>
     <meta charset="utf-8">
-    <title>Uniform Types</title>
+    <title>Uniform 类型</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Uniform Types">
+    <meta name="twitter:title" content="Three.js – Uniform 类型">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,29 +22,20 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Uniform Types</h1>
+        <h1>Uniform 类型</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          
+
           <p>
-            Each uniform must have a `value` property. The type of the value must
-            correspond to the type of the uniform variable in the GLSL code as
-            specified for the primitive GLSL types in the table below. Uniform
-            structures and arrays are also supported. GLSL arrays of primitive type
-            must either be specified as an array of the corresponding THREE objects or
-            as a flat array containing the data of all the objects. In other words;
-            GLSL primitives in arrays must not be represented by arrays. This rule
-            does not apply transitively. An array of `vec2` arrays, each with a length
-            of five vectors, must be an array of arrays, of either five `Vector2`
-            objects or ten `number`s.
+            每个 uniform 都必须有一个 `value` 属性。其值的类型必须与 GLSL 代码中 uniform 变量的类型相对应，具体的 GLSL 基本类型对应关系见下表。Uniform 结构体和数组同样受支持。基本类型的 GLSL 数组必须指定为对应 THREE 对象的数组，或者包含所有对象数据的扁平数组。换言之，GLSL 基本类型本身不应再嵌套一层数组。此规则不具有传递性。例如，一个由 `vec2` 数组组成的数组，每个子数组包含五个向量，则必须是一个数组的数组，其中每个元素可以是五个 `Vector2` 对象或十个 `number`。
           </p>
-      
+
           <table>
             <thead>
               <tr>
-                <th>GLSL type</th>
-                <th>JavaScript type</th>
+                <th>GLSL 类型</th>
+                <th>JavaScript 类型</th>
               </tr>
             </thead>
             <tbody>
@@ -178,43 +169,39 @@
               </tr>
             </tbody>
           </table>
-      
+
           <p>
-            (*) Same for an (innermost) array (dimension) of the same GLSL type,
-            containing the components of all vectors or matrices in the array.
+            (*) 对于相同 GLSL 类型的（最内层）数组（维度）同样适用，其中包含数组中所有向量或矩阵的分量。
           </p>
-      
-          <h2>Structured Uniforms</h2>
-      
+
+          <h2>结构化 Uniform</h2>
+
           <p>
-            Sometimes you want to organize uniforms as `structs` in your shader code.
-            The following style must be used so `three.js` is able to process
-            structured uniform data.
+            有时你可能希望在着色器代码中将 uniform 组织为 `struct`（结构体）。必须使用以下方式，`three.js` 才能正确处理结构化的 uniform 数据。
           </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 uniforms = {
-  data: { 
+  data: {
     value: {
-      position: new Vector3(), 
-      direction: new Vector3( 0, 0, 1 ) 
-    } 
-  } 
+      position: new Vector3(),
+      direction: new Vector3( 0, 0, 1 )
+    }
+  }
 };
 </pre>
-          This definition can be mapped on the following GLSL code:
+          此定义可以映射到以下 GLSL 代码：
 <pre class="prettyprint notranslate lang-js" translate="no">
-struct Data { 
+struct Data {
   vec3 position;
   vec3 direction;
 };
 uniform Data data;
 </pre>
-      
-          <h2>Structured Uniforms with Arrays</h2>
-      
+
+          <h2>带数组的结构化 Uniform</h2>
+
           <p>
-            It's also possible to manage `structs` in arrays. The syntax for this use
-            case looks like so:
+            也可以在数组中管理 `structs`。此用法的语法如下：
           </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const entry1 = {
@@ -232,11 +219,11 @@ uniforms = {
   }
 };
 </pre>
-          This definition can be mapped on the following GLSL code:
+          此定义可以映射到以下 GLSL 代码：
 <pre class="prettyprint notranslate lang-js" translate="no">
-struct Data { 
-  vec3 position; 
-  vec3 direction; 
+struct Data {
+  vec3 position;
+  vec3 direction;
 };
 uniform Data data[ 2 ];
 </pre>
