@@ -6,6 +6,7 @@ import {
 import { FloatType, IntType, UnsignedIntType, Compatibility } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
+import { hashString } from '../../../nodes/core/NodeUtils.js';
 
 /**
  * Class representing a WebGPU bind group layout.
@@ -88,36 +89,63 @@ class WebGPUBindingUtils {
 
 		const bindingsData = backend.get( bindGroup );
 
-		// check if the the bind group already has a layout
+		const entries = this._createLayoutEntries( bindGroup );
+		const bindGroupLayoutHash = hashString( JSON.stringify( entries ) );
+
+		let layoutChanged = false;
+
+		// check if the bind group already has a layout and if it's still valid
 
 		if ( bindingsData.layout ) {
 
-			return bindingsData.layout.layoutGPU;
+			// if the layout hash changed (e.g. visibility was updated), invalidate the old layout
+
+			if ( bindingsData.layoutHash !== bindGroupLayoutHash ) {
+
+				bindingsData.layout.usedTimes --;
+
+				if ( bindingsData.layout.usedTimes === 0 ) {
+
+					this._bindGroupLayoutCache.delete( bindingsData.layoutHash );
+
+				}
+
+				bindingsData.layout = undefined;
+				bindingsData.layoutHash = undefined;
+
+				layoutChanged = true;
+
+			} else {
+
+				return bindingsData.layout.layoutGPU;
+
+			}
 
 		}
 
-		// if not, assing one
+		// create or reuse a bind group layout from the cache
 
-		const entries = this._createLayoutEntries( bindGroup );
-		const bindGroupLayoutKey = JSON.stringify( entries );
-
-		// try to find an existing layout in the cache
-
-		let bindGroupLayout = this._bindGroupLayoutCache.get( bindGroupLayoutKey );
-
-		// if not create a new one
+		let bindGroupLayout = this._bindGroupLayoutCache.get( bindGroupLayoutHash );
 
 		if ( bindGroupLayout === undefined ) {
 
 			bindGroupLayout = new BindGroupLayout( device.createBindGroupLayout( { entries } ) );
-			this._bindGroupLayoutCache.set( bindGroupLayoutKey, bindGroupLayout );
+			this._bindGroupLayoutCache.set( bindGroupLayoutHash, bindGroupLayout );
 
 		}
 
 		bindGroupLayout.usedTimes ++;
 
 		bindingsData.layout = bindGroupLayout;
-		bindingsData.layoutKey = bindGroupLayoutKey;
+		bindingsData.layoutHash = bindGroupLayoutHash;
+
+		// if layout changed, recreate the GPU bind group with the new layout
+
+		if ( layoutChanged ) {
+
+			bindingsData.group = this.createBindGroup( bindGroup, bindGroupLayout.layoutGPU );
+
+		}
 
 		return bindGroupLayout.layoutGPU;
 
@@ -616,12 +644,12 @@ class WebGPUBindingUtils {
 
 			if ( bindingsData.layout.usedTimes === 0 ) {
 
-				this._bindGroupLayoutCache.delete( bindingsData.layoutKey );
+				this._bindGroupLayoutCache.delete( bindingsData.layoutHash );
 
 			}
 
 			bindingsData.layout = undefined;
-			bindingsData.layoutKey = undefined;
+			bindingsData.layoutHash = undefined;
 
 		}
 
