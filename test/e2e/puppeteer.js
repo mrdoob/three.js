@@ -8,8 +8,6 @@ const server = createServer();
 const exceptionList = [
 
 	// Take too long
-	'webgpu_parallax_uv', 				// 11 min
-	'webgpu_cubemap_adjustments', 		// 9 min
 	'webgl_loader_lwo', 				// 8 min
 	'webgpu_cubemap_mix', 				// 2 min
 	'webgl_loader_texture_ultrahdr', 	// 1 min
