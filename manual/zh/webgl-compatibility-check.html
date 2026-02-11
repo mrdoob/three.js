@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="zh"><head>
     <meta charset="utf-8">
-    <title>WebGL Compatibility Check</title>
+    <title>WebGL 兼容性检查</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – WebGL Compatibility Check">
+    <meta name="twitter:title" content="Three.js – WebGL 兼容性检查">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,23 +22,21 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>WebGL Compatibility Check</h1>
+        <h1>WebGL 兼容性检查</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          
+
           <p>
-            Even though this is becoming less and less of a problem, some devices or browsers may still not support WebGL 2.
-            The following method allows you to check if it is supported and display a message to the user if it is not.
-            Import the WebGL support detection module, and run the following before attempting to render anything.
+            尽管这个问题越来越少见，但某些设备或浏览器可能仍然不支持 WebGL 2。以下方法可以检测是否支持 WebGL 2，并在不支持时向用户显示提示信息。请导入 WebGL 支持检测模块，并在渲染任何内容之前运行以下代码。
           </p>
-      
+
 <pre class="prettyprint notranslate lang-js" translate="no">
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 if ( WebGL.isWebGL2Available() ) {
 
-  // Initiate function or other initializations here
+  // 在此处调用初始化函数或执行其他初始化操作
   animate();
 
 } else {
@@ -48,7 +46,7 @@ if ( WebGL.isWebGL2Available() ) {
 
 }
 </pre>
-          
+
         </div>
       </div>
     </div>
