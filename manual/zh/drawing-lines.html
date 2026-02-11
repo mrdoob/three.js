@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="zh"><head>
     <meta charset="utf-8">
-    <title>Drawing Lines</title>
+    <title>绘制线条</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Drawing Lines">
+    <meta name="twitter:title" content="Three.js – 绘制线条">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,17 +22,17 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Drawing Lines</h1>
+        <h1>绘制线条</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          
+
           <p>
-            Let's say you want to draw a line or a circle, not a wireframe `Mesh`.
-            First we need to set up the renderer, scene and camera (see the Creating a scene page).
+            假设你想绘制一条线或一个圆，而不是线框 `Mesh`。
+            首先我们需要设置渲染器、场景和相机（参见"创建场景"页面）。
           </p>
-    
-          <p>Here is the code that we will use:</p>
+
+          <p>以下是我们将使用的代码：</p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -44,16 +44,16 @@ camera.lookAt( 0, 0, 0 );
 
 const scene = new THREE.Scene();
 </pre>
-          <p>Next thing we will do is define a material. For lines we have to use `LineBasicMaterial` or `LineDashedMaterial`.</p>
+          <p>接下来我们需要定义一个材质。对于线条，需要使用 `LineBasicMaterial` 或 `LineDashedMaterial`。</p>
 <pre class="prettyprint notranslate lang-js" translate="no">
-//create a blue LineBasicMaterial
+// 创建一个蓝色的 LineBasicMaterial
 const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 </pre>
-    
+
           <p>
-            After material we will need a geometry with some vertices:
+            有了材质之后，我们还需要一个带有顶点的几何体：
           </p>
-    
+
 <pre class="prettyprint notranslate lang-js" translate="no">
 const points = [];
 points.push( new THREE.Vector3( - 10, 0, 0 ) );
@@ -62,21 +62,21 @@ points.push( new THREE.Vector3( 10, 0, 0 ) );
 
 const geometry = new THREE.BufferGeometry().setFromPoints( points );
 </pre>
-    
-          <p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
-    
-          <p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
+
+          <p>注意，线条是在每对相邻顶点之间绘制的，而不会连接首尾两个顶点（即线条不是闭合的）。</p>
+
+          <p>现在我们有了两条线段的顶点和一个材质，可以将它们组合成一条线：</p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 const line = new THREE.Line( geometry, material );
 </pre>
-          <p>All that's left is to add it to the scene and call `renderer.render()`.</p>
-    
+          <p>剩下的就是将其添加到场景中并调用 `renderer.render()`。</p>
+
 <pre class="prettyprint notranslate lang-js" translate="no">
 scene.add( line );
 renderer.render( scene, camera );
 </pre>
-    
-          <p>You should now be seeing an arrow pointing upwards, made from two blue lines.</p>
+
+          <p>现在你应该能看到一个由两条蓝色线段组成的向上箭头。</p>
 
         </div>
       </div>
