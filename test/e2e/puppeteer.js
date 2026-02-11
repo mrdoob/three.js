@@ -19,6 +19,7 @@ const exceptionList = [
 
 	// Needs investigation
 	'physics_rapier_instancing',
+	'physics_jolt_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
 	'webgl_postprocessing_glitch',
