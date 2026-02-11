@@ -80,13 +80,13 @@ class PixelationNode extends TempNode {
 		this._resolution = uniform( new Vector4() );
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * The `updateType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
@@ -95,7 +95,7 @@ class PixelationNode extends TempNode {
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
-	updateBefore() {
+	update() {
 
 		const map = this.textureNode.value;
 
