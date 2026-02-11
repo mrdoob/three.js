@@ -837,11 +837,11 @@ class Node extends EventDispatcher {
 
 				}
 
+				builder.addSequentialNode( this );
+
 			}
 
 			result = properties.outputNode;
-
-			builder.addSequentialNode( this );
 
 		} else if ( buildStage === 'analyze' ) {
 

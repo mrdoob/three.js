@@ -143,7 +143,7 @@ class NodeBuilder {
 		 * A list of all nodes the builder is processing in sequential order.
 		 *
 		 * This is used to determine the update order of nodes, which is important for
-		 * nodes with update types {@link NodeUpdateType#UPDATE}, {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
+		 * {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
 		 *
 		 * @type {Array<Node>}
 		 */
@@ -761,15 +761,18 @@ class NodeBuilder {
 	 */
 	addSequentialNode( node ) {
 
-		const index = this.sequentialNodes.indexOf( node );
+		const updateBeforeType = node.getUpdateBeforeType();
+		const updateAfterType = node.getUpdateAfterType();
 
-		if ( index !== - 1 ) {
+		if ( updateBeforeType !== NodeUpdateType.NONE || updateAfterType !== NodeUpdateType.NONE ) {
 
-			this.sequentialNodes.splice( index, 1 );
+			if ( this.sequentialNodes.includes( node ) === false ) {
+
+				this.sequentialNodes.push( node );
+
+			}
 
 		}
-
-		this.sequentialNodes.push( node );
 
 	}
 
@@ -778,30 +781,32 @@ class NodeBuilder {
 	 */
 	buildUpdateNodes() {
 
-		for ( let i = 0; i < this.sequentialNodes.length; i ++ ) {
+		for ( const node of this.nodes ) {
 
-			const forwardNode = this.sequentialNodes[ this.sequentialNodes.length - 1 - i ];
-			const backwardNode = this.sequentialNodes[ i ];
-
-			const updateType = forwardNode.getUpdateType();
-			const updateBeforeType = backwardNode.getUpdateBeforeType();
-			const updateAfterType = backwardNode.getUpdateAfterType();
+			const updateType = node.getUpdateType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( forwardNode );
+				this.updateNodes.push( node );
 
 			}
 
+		}
+
+		for ( const node of this.sequentialNodes ) {
+
+			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
+
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( backwardNode );
+				this.updateBeforeNodes.push( node );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( backwardNode );
+				this.updateAfterNodes.push( node );
 
 			}
 
