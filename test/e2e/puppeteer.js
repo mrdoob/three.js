@@ -19,28 +19,6 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
-	// Needs investigation
-	'physics_rapier_instancing',
-	'webgl_shadowmap',
-	'webgl_postprocessing_dof2',
-	'webgl_postprocessing_glitch',
-	'webgl_video_kinect',
-	'webgl_worker_offscreencanvas',
-	'webgpu_backdrop_water',
-	'webgpu_lightprobe_cubecamera',
-	'webgpu_portal',
-	'webgpu_postprocessing_ao',
-	'webgpu_postprocessing_dof',
-	'webgpu_postprocessing_godrays',
-	'webgpu_postprocessing_ssgi',
-	'webgpu_postprocessing_sss',
-	'webgpu_postprocessing_traa',
-	'webgpu_reflection',
-	'webgpu_test_memory',
-	'webgpu_texturegrad',
-	'webgpu_tsl_vfx_flames',
-	'webgpu_volume_lighting_traa',
-
 	// Need more time to render
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
