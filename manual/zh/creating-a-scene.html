@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="zh"><head>
     <meta charset="utf-8">
-    <title>Creating a scene</title>
+    <title>创建场景</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Creating a scene">
+    <meta name="twitter:title" content="Three.js – 创建场景">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,22 +22,22 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Creating a scene</h1>
+        <h1>创建场景</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-            
-          <p>The goal of this section is to give a brief introduction to three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page in case you get stuck and need help.</p>
 
-		<h2>Before we start</h2>
+          <p>本节的目标是简要介绍 three.js。我们将从搭建一个包含旋转立方体的场景开始。页面底部提供了可运行的示例，如果你遇到困难可以参考。</p>
+
+		<h2>开始之前</h2>
 
 		<p>
-			If you haven't yet, go through the `Installation` guide. We'll assume you've already set up the same project structure (including <i>index.html</i> and <i>main.js</i>), have installed three.js, and are either running a build tool, or using a local server with a CDN and import maps.
+			如果你还没有阅读过<a href="installation.html">安装</a>指南，请先阅读它。我们假设你已经搭建好了相同的项目结构（包括 <i>index.html</i> 和 <i>main.js</i>），安装了 three.js，并且正在使用构建工具，或使用本地服务器并配合 CDN 与 import maps。
 		</p>
 
-		<h2>Creating the scene</h2>
+		<h2>创建场景</h2>
 
-		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
+		<p>要使用 three.js 显示任何内容，我们需要三样东西：场景（scene）、相机（camera）和渲染器（renderer），这样我们才能通过相机来渲染场景。</p>
 
 		<p><i>main.js —</i></p>
 
@@ -52,23 +52,23 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 </pre>
 
-		<p>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer.</p>
+		<p>让我们花点时间解释一下这里发生了什么。我们现在已经设置好了场景、相机和渲染器。</p>
 
-		<p>There are a few different cameras in three.js. For now, let's use a `PerspectiveCamera`.</p>
+		<p>three.js 中有几种不同的相机。目前，我们先使用 `PerspectiveCamera`（透视相机）。</p>
 
-		<p>The first attribute is the `field of view`. FOV is the extent of the scene that is seen on the display at any given moment. The value is in degrees.</p>
+		<p>第一个参数是`视野范围`（field of view）。FOV 是指在任意时刻显示器上能看到的场景范围，值以角度为单位。</p>
 
-		<p>The second one is the `aspect ratio`. You almost always want to use the width of the element divided by the height, or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.</p>
+		<p>第二个参数是`宽高比`（aspect ratio）。几乎总是应该使用元素的宽度除以高度，否则会出现类似在宽屏电视上播放老电影的效果——画面看起来会被压扁。</p>
 
-		<p>The next two attributes are the `near` and `far` clipping plane. What that means, is that objects further away from the camera than the value of `far` or closer than `near` won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</p>
+		<p>接下来的两个参数是近裁剪面（`near`）和远裁剪面（`far`）。也就是说，距离相机比 `far` 更远或比 `near` 更近的物体将不会被渲染。你现在不必担心这个，但在实际应用中可能需要调整这些值以获得更好的性能。</p>
 
-		<p>Next up is the renderer. In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
+		<p>接下来是渲染器。除了创建渲染器实例之外，我们还需要设置渲染尺寸。通常建议用应用需要填满的区域宽高——在这里就是浏览器窗口的宽度和高度。对于性能要求较高的应用，你也可以给 `setSize` 传入较小的值，例如 `window.innerWidth/2` 和 `window.innerHeight/2`，这会使应用以四分之一的尺寸进行渲染。</p>
 
-		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling `setSize` with false as `updateStyle` (the third argument). For example, `setSize(window.innerWidth/2, window.innerHeight/2, false)` will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
+		<p>如果你希望保持应用的显示尺寸不变，但以较低的分辨率渲染，可以在调用 `setSize` 时将第三个参数 `updateStyle` 设为 false。例如，假设你的 &lt;canvas&gt; 宽高均为 100%，调用 `setSize(window.innerWidth/2, window.innerHeight/2, false)` 将以一半的分辨率渲染应用。</p>
 
-		<p>Last but not least, we add the `renderer` element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
+		<p>最后，我们将 `renderer` 元素添加到 HTML 文档中。这是一个 &lt;canvas&gt; 元素，渲染器用它来向我们展示场景。</p>
 
-		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
+		<p><em>"听起来不错，但你说好的立方体呢？"</em> 现在就来添加它。</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 const geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -79,17 +79,17 @@ scene.add( cube );
 camera.position.z = 5;
 </pre>
 
-		<p>To create a cube, we need a `BoxGeometry`. This is an object that contains all the points (`vertices`) and fill (`faces`) of the cube. We'll explore this more in the future.</p>
+		<p>要创建一个立方体，我们需要一个 `BoxGeometry`（立方体几何体）。这个对象包含了立方体的所有顶点（`vertices`）和面（`faces`）。我们以后会进一步探索这些内容。</p>
 
-		<p>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the `MeshBasicMaterial` for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of `0x00ff00`, which is green. This works the same way that colors work in CSS or Photoshop (`hex colors`).</p>
+		<p>除了几何体，我们还需要一个材质来为它着色。Three.js 提供了多种材质，这里我们先使用 `MeshBasicMaterial`。所有材质都接受一个属性对象。为了简单起见，我们只提供一个颜色属性 `0x00ff00`，即绿色。颜色的工作方式与 CSS 或 Photoshop 中的十六进制颜色（`hex colors`）相同。</p>
 
-		<p>The third thing we need is a `Mesh`. A mesh is an object that takes a geometry, and applies a material to it, which we then can insert to our scene, and move freely around.</p>
+		<p>我们需要的第三样东西是 `Mesh`（网格）。网格是一个接受几何体并将材质应用于其上的对象，然后我们可以将它插入场景中并自由移动。</p>
 
-		<p>By default, when we call `scene.add()`, the thing we add will be added to the coordinates `(0,0,0)`. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
+		<p>默认情况下，当我们调用 `scene.add()` 时，添加的对象会被放置在坐标 `(0,0,0)` 处。这会导致相机和立方体重叠在一起。为了避免这种情况，我们只需将相机稍微向外移动一些。</p>
 
-		<h2>Rendering the scene</h2>
+		<h2>渲染场景</h2>
 
-		<p>If you copied the code from above into the main.js file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a render or animation loop.</p>
+		<p>如果你将上面的代码复制到之前创建的 main.js 文件中，你会发现什么都看不到。这是因为我们还没有真正进行渲染。为此，我们需要一个所谓的渲染循环或动画循环。</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 function animate( time ) {
@@ -98,25 +98,25 @@ function animate( time ) {
 renderer.setAnimationLoop( animate );
 </pre>
 
-		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but `requestAnimationFrame` which is internally used in `WebGLRenderer` has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
+		<p>这会创建一个循环，让渲染器在每次屏幕刷新时绘制场景（在普通屏幕上这意味着每秒 60 次）。如果你是浏览器游戏开发的新手，可能会问<em>"为什么不直接用 setInterval？"</em>当然可以，但 `WebGLRenderer` 内部使用的 `requestAnimationFrame` 有很多优势。其中最重要的一点是，当用户切换到其他浏览器标签页时它会自动暂停，从而不会浪费宝贵的处理资源和电池寿命。</p>
 
-		<h2>Animating the cube</h2>
+		<h2>让立方体动起来</h2>
 
-		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
+		<p>如果你将上面所有的代码都插入到文件中，你应该能看到一个绿色的立方体。让我们给它添加旋转，使它更有趣一些。</p>
 
-		<p>Add the following code right above the `renderer.render` call in your `animate` function:</p>
+		<p>在 `animate` 函数中的 `renderer.render` 调用之前添加以下代码：</p>
 
 <pre class="prettyprint notranslate lang-js" translate="no">
 cube.rotation.x = time / 2000;
 cube.rotation.y = time / 1000;
 </pre>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animation loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
+		<p>这段代码会在每一帧执行（通常每秒 60 次），让立方体产生流畅的旋转动画。基本上，在应用运行期间你想要移动或改变的任何东西都需要通过动画循环来实现。当然，你可以在其中调用其他函数，这样就不会让 `animate` 函数变得过于冗长。</p>
 
-		<h2>The result</h2>
-		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
+		<h2>最终效果</h2>
+		<p>恭喜！你已经完成了你的第一个 three.js 应用。虽然很简单，但万事总要有个开始。</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/zycqb61k/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>完整代码如下，也可以作为可编辑的 [link:https://jsfiddle.net/zycqb61k/ 在线示例] 查看。试着修改代码来加深理解。</p>
 
 		<p><i>index.html —</i></p>
 
