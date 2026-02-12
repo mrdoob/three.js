@@ -1151,8 +1151,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				// Update visibility to include this shader stage (bitwise OR)
-				uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
+				// TODO: Verifier caches
+				uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
 
 				// Add to bindings for this stage if not already present
 				if ( bindings.indexOf( uniformsGroup ) === - 1 ) {

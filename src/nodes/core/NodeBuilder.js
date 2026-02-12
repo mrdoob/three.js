@@ -625,14 +625,6 @@ class NodeBuilder {
 
 				bindingGroupsCache.set( cacheKey, bindGroup );
 
-			} else {
-
-				for ( let i = 0; i < bindings.length; i ++ ) {
-
-					bindGroup.bindings[ i ].visibility |= bindings[ i ].visibility;
-
-				}
-
 			}
 
 		} else {
