@@ -790,7 +790,7 @@ class WebGPUPipelineUtils {
 
 		if ( material.depthTest === false ) {
 
-			depthCompare = ( this.backend.parameters.reversedDepthBuffer ) ? GPUCompareFunction.Never : GPUCompareFunction.Always;
+			depthCompare = GPUCompareFunction.Always;
 
 		} else {
 
