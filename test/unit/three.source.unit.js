@@ -281,6 +281,7 @@ import './src/scenes/Scene.tests.js';
 //src/textures
 import './src/textures/CanvasTexture.tests.js';
 import './src/textures/CompressedArrayTexture.tests.js';
+import './src/textures/CompressedCubeTexture.tests.js';
 import './src/textures/CompressedTexture.tests.js';
 import './src/textures/CubeTexture.tests.js';
 import './src/textures/Data3DTexture.tests.js';
@@ -291,3 +292,4 @@ import './src/textures/FramebufferTexture.tests.js';
 import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
 import './src/textures/VideoTexture.tests.js';
+import './src/textures/VideoFrameTexture.tests.js';
