@@ -1146,13 +1146,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
+					uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
 				}
-
-				// TODO: Verifier caches
-				uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
 
 				// Add to bindings for this stage if not already present
 				if ( bindings.indexOf( uniformsGroup ) === - 1 ) {

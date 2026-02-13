@@ -6,6 +6,7 @@ import {
 import { FloatType, IntType, UnsignedIntType, Compatibility } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
+import { hashString } from '../../../nodes/core/NodeUtils.js';
 
 /**
  * Class representing a WebGPU bind group layout.
@@ -99,7 +100,7 @@ class WebGPUBindingUtils {
 		// if not, assing one
 
 		const entries = this._createLayoutEntries( bindGroup );
-		const bindGroupLayoutKey = JSON.stringify( entries );
+		const bindGroupLayoutKey = hashString( JSON.stringify( entries ) );
 
 		// try to find an existing layout in the cache
 
