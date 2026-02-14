@@ -19554,7 +19554,7 @@ class ViewportDepthNode extends Node {
 
 			if ( value !== null ) {
 
- 				node = depthBase().assign( value );
+				node = depthBase().assign( value );
 
 			}
 
@@ -19619,6 +19619,18 @@ ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
 const viewZToOrthographicDepth = ( viewZ, near, far ) => viewZ.add( near ).div( near.sub( far ) );
 
 /**
+ * TSL function for converting a viewZ value to a reversed orthographic depth value.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} viewZ - The viewZ node.
+ * @param {Node<float>} near - The camera's near value.
+ * @param {Node<float>} far - The camera's far value.
+ * @returns {Node<float>}
+ */
+const viewZToReversedOrthographicDepth = ( viewZ, near, far ) => viewZ.add( far ).div( far.sub( near ) );
+
+/**
  * TSL function for converting an orthographic depth value to a viewZ value.
  *
  * @tsl
@@ -19628,7 +19640,19 @@ const viewZToOrthographicDepth = ( viewZ, near, far ) => viewZ.add( near ).div( 
  * @param {Node<float>} far - The camera's far value.
  * @returns {Node<float>}
  */
-const orthographicDepthToViewZ = ( depth, near, far ) => near.sub( far ).mul( depth ).sub( near );
+const orthographicDepthToViewZ = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
+
+	if ( builder.renderer.reversedDepthBuffer === true ) {
+
+		return far.sub( near ).mul( depth ).sub( far );
+
+	} else {
+
+		return near.sub( far ).mul( depth ).sub( near );
+
+	}
+
+} );
 
 /**
  * TSL function for converting a viewZ value to a perspective depth value.
@@ -19666,7 +19690,19 @@ const viewZToReversedPerspectiveDepth = ( viewZ, near, far ) => near.mul( viewZ.
  * @param {Node<float>} far - The camera's far value.
  * @returns {Node<float>}
  */
-const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
+const perspectiveDepthToViewZ = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
+
+	if ( builder.renderer.reversedDepthBuffer === true ) {
+
+		return near.mul( far ).div( near.sub( far ).mul( depth ).sub( near ) );
+
+	} else {
+
+		return near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
+
+	}
+
+} );
 
 /**
  * TSL function for converting a viewZ value to a logarithmic depth value.
@@ -47173,6 +47209,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	viewZToLogarithmicDepth: viewZToLogarithmicDepth,
 	viewZToOrthographicDepth: viewZToOrthographicDepth,
 	viewZToPerspectiveDepth: viewZToPerspectiveDepth,
+	viewZToReversedOrthographicDepth: viewZToReversedOrthographicDepth,
 	viewZToReversedPerspectiveDepth: viewZToReversedPerspectiveDepth,
 	viewport: viewport,
 	viewportCoordinate: viewportCoordinate,
@@ -49366,14 +49403,6 @@ class NodeBuilder {
 				bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
 
 				bindingGroupsCache.set( cacheKey, bindGroup );
-
-			} else {
-
-				for ( let i = 0; i < bindings.length; i ++ ) {
-
-					bindGroup.bindings[ i ].visibility |= bindings[ i ].visibility;
-
-				}
 
 			}
 
@@ -74455,13 +74484,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
+					uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
 				}
-
-				// Update visibility to include this shader stage (bitwise OR)
-				uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
 
 				// Add to bindings for this stage if not already present
 				if ( bindings.indexOf( uniformsGroup ) === -1 ) {
@@ -76554,63 +76581,36 @@ class WebGPUBindingUtils {
 
 		const bindingsData = backend.get( bindGroup );
 
-		const entries = this._createLayoutEntries( bindGroup );
-		const bindGroupLayoutHash = hashString( JSON.stringify( entries ) );
-
-		let layoutChanged = false;
-
-		// check if the bind group already has a layout and if it's still valid
+		// check if the the bind group already has a layout
 
 		if ( bindingsData.layout ) {
 
-			// if the layout hash changed (e.g. visibility was updated), invalidate the old layout
-
-			if ( bindingsData.layoutHash !== bindGroupLayoutHash ) {
-
-				bindingsData.layout.usedTimes --;
-
-				if ( bindingsData.layout.usedTimes === 0 ) {
-
-					this._bindGroupLayoutCache.delete( bindingsData.layoutHash );
-
-				}
-
-				bindingsData.layout = undefined;
-				bindingsData.layoutHash = undefined;
-
-				layoutChanged = true;
-
-			} else {
-
-				return bindingsData.layout.layoutGPU;
-
-			}
+			return bindingsData.layout.layoutGPU;
 
 		}
 
-		// create or reuse a bind group layout from the cache
+		// if not, assing one
 
-		let bindGroupLayout = this._bindGroupLayoutCache.get( bindGroupLayoutHash );
+		const entries = this._createLayoutEntries( bindGroup );
+		const bindGroupLayoutKey = hashString( JSON.stringify( entries ) );
+
+		// try to find an existing layout in the cache
+
+		let bindGroupLayout = this._bindGroupLayoutCache.get( bindGroupLayoutKey );
+
+		// if not create a new one
 
 		if ( bindGroupLayout === undefined ) {
 
 			bindGroupLayout = new BindGroupLayout( device.createBindGroupLayout( { entries } ) );
-			this._bindGroupLayoutCache.set( bindGroupLayoutHash, bindGroupLayout );
+			this._bindGroupLayoutCache.set( bindGroupLayoutKey, bindGroupLayout );
 
 		}
 
 		bindGroupLayout.usedTimes ++;
 
 		bindingsData.layout = bindGroupLayout;
-		bindingsData.layoutHash = bindGroupLayoutHash;
-
-		// if layout changed, recreate the GPU bind group with the new layout
-
-		if ( layoutChanged ) {
-
-			bindingsData.group = this.createBindGroup( bindGroup, bindGroupLayout.layoutGPU );
-
-		}
+		bindingsData.layoutKey = bindGroupLayoutKey;
 
 		return bindGroupLayout.layoutGPU;
 
@@ -77109,12 +77109,12 @@ class WebGPUBindingUtils {
 
 			if ( bindingsData.layout.usedTimes === 0 ) {
 
-				this._bindGroupLayoutCache.delete( bindingsData.layoutHash );
+				this._bindGroupLayoutCache.delete( bindingsData.layoutKey );
 
 			}
 
 			bindingsData.layout = undefined;
-			bindingsData.layoutHash = undefined;
+			bindingsData.layoutKey = undefined;
 
 		}
 
@@ -77219,8 +77219,8 @@ class WebGPUPipelineUtils {
 
 		for ( const bindGroup of renderObject.getBindings() ) {
 
-			// ensure layout is up to date (visibility may have changed due to shared bind groups)
-			const layoutGPU = backend.bindingUtils.createBindingsLayout( bindGroup );
+			const bindingsData = backend.get( bindGroup );
+			const { layoutGPU } = bindingsData.layout;
 
 			bindGroupLayouts.push( layoutGPU );
 
@@ -77364,7 +77364,7 @@ class WebGPUPipelineUtils {
 			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = {}; // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
+				depthStencil.stencilBack = stencilFront; // apply the same stencil ops to both faces, matching gl.stencilOp() which is not face-separated
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
@@ -77480,8 +77480,8 @@ class WebGPUPipelineUtils {
 
 		for ( const bindingsGroup of bindings ) {
 
-			// ensure layout is up to date (visibility may have changed due to shared bind groups)
-			const layoutGPU = backend.bindingUtils.createBindingsLayout( bindingsGroup );
+			const bindingsData = backend.get( bindingsGroup );
+			const { layoutGPU } = bindingsData.layout;
 
 			bindGroupLayouts.push( layoutGPU );
 
@@ -77904,7 +77904,7 @@ class WebGPUPipelineUtils {
 
 		if ( material.depthTest === false ) {
 
-			depthCompare = ( this.backend.parameters.reversedDepthBuffer ) ? GPUCompareFunction.Never : GPUCompareFunction.Always;
+			depthCompare = GPUCompareFunction.Always;
 
 		} else {
 

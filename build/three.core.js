@@ -2074,7 +2074,7 @@ function warnOnce( ...params ) {
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
  * @private
- * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
  * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
@@ -43182,6 +43182,8 @@ const Cache = {
 
 		if ( this.enabled === false ) return;
 
+		if ( isBlobURL( key ) ) return;
+
 		// log( 'Cache', 'Adding key:', key );
 
 		this.files[ key ] = file;
@@ -43198,6 +43200,8 @@ const Cache = {
 	get: function ( key ) {
 
 		if ( this.enabled === false ) return;
+
+		if ( isBlobURL( key ) ) return;
 
 		// log( 'Cache', 'Checking key:', key );
 
@@ -43229,6 +43233,31 @@ const Cache = {
 	}
 
 };
+
+/**
+ * Returns true if the given cache key contains the blob: scheme.
+ *
+ * @private
+ * @param {string} key - The cache key.
+ * @return {boolean} Whether the given cache key contains the blob: scheme or not.
+ */
+function isBlobURL( key ) {
+
+	try {
+
+		const urlString = key.slice( key.indexOf( ':' ) + 1 ); // remove type identifier
+
+		const url = new URL( urlString );
+		return url.protocol === 'blob:';
+
+	} catch ( e ) {
+
+		// If the string is not a valid URL, it throws an error
+		return false;
+
+	}
+
+}
 
 /**
  * Handles and keeps track of loaded and pending data. A default global
@@ -49910,7 +49939,18 @@ class CubeCamera extends Object3D {
 		renderTarget.texture.generateMipmaps = false;
 
 		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
-		const reversedDepthBuffer = !! ( renderer.isWebGLRenderer && renderer.state.buffers.depth.getReversed() );
+
+		let reversedDepthBuffer = false;
+
+		if ( renderer.isWebGLRenderer === true ) {
+
+			reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		} else {
+
+			reversedDepthBuffer = renderer.reversedDepthBuffer;
+
+		}
 
 		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
 		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
