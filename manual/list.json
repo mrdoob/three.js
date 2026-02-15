@@ -38,7 +38,8 @@
 			"Shadows": "en/shadows",
 			"Fog": "en/fog",
 			"Render Targets": "en/rendertargets",
-			"Custom BufferGeometry": "en/custom-buffergeometry"
+			"Custom BufferGeometry": "en/custom-buffergeometry",
+			"Physics": "en/physics"
 		},
 		"Tips": {
 			"Rendering On Demand": "en/rendering-on-demand",
