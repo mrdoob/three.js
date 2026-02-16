@@ -1008,7 +1008,11 @@ class WebGLRenderer {
 
 			}
 
-			_gl.clear( bits );
+			if ( bits !== 0 ) {
+
+				_gl.clear( bits );
+
+			}
 
 		};
 
