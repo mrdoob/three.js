@@ -318,6 +318,7 @@ class Textures extends DataMap {
 
 			textureData.initialized = true;
 			textureData.generation = texture.version;
+			textureData.bindGroups = new Set();
 
 			//
 
@@ -530,6 +531,21 @@ class Textures extends DataMap {
 
 			const isDefaultTexture = textureData.isDefaultTexture;
 			this.backend.destroyTexture( texture, isDefaultTexture );
+
+			// delete cached bind groups so they don't point to destroyed textures
+
+			if ( textureData.bindGroups ) {
+
+				for ( const bindGroup of textureData.bindGroups ) {
+
+					const bindingsData = this.backend.get( bindGroup );
+
+					bindingsData.groups = undefined;
+					bindingsData.versions = undefined;
+
+				}
+
+			}
 
 			this.delete( texture );
 
