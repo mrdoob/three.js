@@ -306,7 +306,7 @@ class Bindings extends DataMap {
 
 					this.textures.updateTexture( texture );
 
-					// generation: update the bindings if a new texture has been created
+					// generation: update the bindings if the binding refers to a different texture object
 
 					if ( binding.generation !== texturesTextureData.generation ) {
 
@@ -314,9 +314,11 @@ class Bindings extends DataMap {
 
 						needsBindingsUpdate = true;
 
-						cacheBindings = false;
-
 					}
+
+					// keep track which bind groups refer to the current texture (this is needed for dispose)
+
+					texturesTextureData.bindGroups.add( bindGroup );
 
 				}
 
@@ -364,8 +366,6 @@ class Bindings extends DataMap {
 						binding.samplerKey = samplerKey;
 
 						needsBindingsUpdate = true;
-
-						cacheBindings = false;
 
 					}
 
