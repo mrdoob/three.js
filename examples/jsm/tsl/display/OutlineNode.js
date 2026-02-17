@@ -759,4 +759,4 @@ export default OutlineNode;
  * @param {number} [params.downSampleRatio=2] - The downsample ratio.
  * @returns {OutlineNode}
  */
-export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );
+export const outline = ( scene, camera, params ) => new OutlineNode( scene, camera, params );

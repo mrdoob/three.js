@@ -1201,8 +1201,8 @@ addMethodChaining( 'toMat4', mat4 );
 // basic nodes
 
 export const element = /*@__PURE__*/ nodeProxy( ArrayElementNode ).setParameterLength( 2 );
-export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
-export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
+export const convert = ( node, types ) => new ConvertNode( nodeObject( node ), types );
+export const split = ( node, channels ) => new SplitNode( nodeObject( node ), channels );
 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );

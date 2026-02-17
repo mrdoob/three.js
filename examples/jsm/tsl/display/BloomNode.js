@@ -529,6 +529,6 @@ class BloomNode extends TempNode {
  * @param {number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
  * @returns {BloomNode}
  */
-export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );
+export const bloom = ( node, strength, radius, threshold ) => new BloomNode( nodeObject( node ), strength, radius, threshold );
 
 export default BloomNode;

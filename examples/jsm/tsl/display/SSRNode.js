@@ -653,4 +653,4 @@ export default SSRNode;
  * @param {?Camera} [camera=null] - The camera the scene is rendered with.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera ) );
+export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera );

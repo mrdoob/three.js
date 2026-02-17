@@ -1,5 +1,4 @@
 import { StereoCamera, Vector2, PassNode, RendererUtils } from 'three/webgpu';
-import { nodeObject } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -117,4 +116,4 @@ export default StereoPassNode;
  * @param {Camera} camera - The camera to render the scene with.
  * @returns {StereoPassNode}
  */
-export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );
+export const stereoPass = ( scene, camera ) => new StereoPassNode( scene, camera );
