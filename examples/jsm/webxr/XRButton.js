@@ -23,19 +23,19 @@ class XRButton {
 	 * @param {XRSessionInit} [sessionInit] - The a configuration object for the AR session.
 	 * @return {HTMLElement} The button or an error message if WebXR isn't supported.
 	 */
-	static createButton( renderer, sessionInit = {} ) {
+	static createButton(renderer, sessionInit = {}) {
 
-		const button = document.createElement( 'button' );
+		const button = document.createElement('button');
 
-		function showStartXR( mode ) {
+		function showStartXR(mode) {
 
 			let currentSession = null;
 
-			async function onSessionStarted( session ) {
+			async function onSessionStarted(session) {
 
-				session.addEventListener( 'end', onSessionEnded );
+				session.addEventListener('end', onSessionEnded);
 
-				await renderer.xr.setSession( session );
+				await renderer.xr.setSession(session);
 
 				button.textContent = 'STOP XR';
 
@@ -43,9 +43,9 @@ class XRButton {
 
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			function onSessionEnded( /*event*/) {
 
-				currentSession.removeEventListener( 'end', onSessionEnded );
+				currentSession.removeEventListener('end', onSessionEnded);
 
 				button.textContent = 'START XR';
 
@@ -69,7 +69,7 @@ class XRButton {
 					'local-floor',
 					'bounded-floor',
 					'layers',
-					...( sessionInit.optionalFeatures || [] )
+					...(sessionInit.optionalFeatures || [])
 				],
 			};
 
@@ -87,24 +87,24 @@ class XRButton {
 
 			button.onclick = function () {
 
-				if ( currentSession === null ) {
+				if (currentSession === null) {
 
-					navigator.xr.requestSession( mode, sessionOptions )
-						.then( onSessionStarted );
+					navigator.xr.requestSession(mode, sessionOptions)
+						.then(onSessionStarted);
 
 				} else {
 
 					currentSession.end();
 
-					if ( navigator.xr.offerSession !== undefined ) {
+					if (navigator.xr.offerSession !== undefined) {
 
-						navigator.xr.offerSession( mode, sessionOptions )
-							.then( onSessionStarted )
-							.catch( ( err ) => {
+						navigator.xr.offerSession(mode, sessionOptions)
+							.then(onSessionStarted)
+							.catch((err) => {
 
-								console.warn( err );
+								console.warn(err);
 
-							} );
+							});
 
 					}
 
@@ -112,15 +112,15 @@ class XRButton {
 
 			};
 
-			if ( navigator.xr.offerSession !== undefined ) {
+			if (navigator.xr.offerSession !== undefined) {
 
-				navigator.xr.offerSession( mode, sessionOptions )
-					.then( onSessionStarted )
-					.catch( ( err ) => {
+				navigator.xr.offerSession(mode, sessionOptions)
+					.then(onSessionStarted)
+					.catch((err) => {
 
-						console.warn( err );
+						console.warn(err);
 
-					} );
+					});
 
 			}
 
@@ -149,17 +149,17 @@ class XRButton {
 
 		}
 
-		function showXRNotAllowed( exception ) {
+		function showXRNotAllowed(exception) {
 
 			disableButton();
 
-			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+			console.warn('Exception when trying to call xr.isSessionSupported', exception);
 
 			button.textContent = 'XR NOT ALLOWED';
 
 		}
 
-		function stylizeElement( element ) {
+		function stylizeElement(element) {
 
 			element.style.position = 'absolute';
 			element.style.bottom = '20px';
@@ -176,28 +176,28 @@ class XRButton {
 
 		}
 
-		if ( 'xr' in navigator ) {
+		if ('xr' in navigator) {
 
 			button.id = 'XRButton';
 			button.style.display = 'none';
 
-			stylizeElement( button );
+			stylizeElement(button);
 
-			navigator.xr.isSessionSupported( 'immersive-ar' )
-				.then( function ( supported ) {
+			navigator.xr.isSessionSupported('immersive-ar')
+				.then(function (supported) {
 
-					if ( supported ) {
+					if (supported) {
 
-						showStartXR( 'immersive-ar' );
+						showStartXR('immersive-ar');
 
 					} else {
 
-						navigator.xr.isSessionSupported( 'immersive-vr' )
-							.then( function ( supported ) {
+						navigator.xr.isSessionSupported('immersive-vr')
+							.then(function (supported) {
 
-								if ( supported ) {
+								if (supported) {
 
-									showStartXR( 'immersive-vr' );
+									showStartXR('immersive-vr');
 
 								} else {
 
@@ -205,22 +205,22 @@ class XRButton {
 
 								}
 
-							} ).catch( showXRNotAllowed );
+							}).catch(showXRNotAllowed);
 
 					}
 
-				} ).catch( showXRNotAllowed );
+				}).catch(showXRNotAllowed);
 
 			return button;
 
 		} else {
 
-			const message = document.createElement( 'a' );
+			const message = document.createElement('a');
 
-			if ( window.isSecureContext === false ) {
+			if (window.isSecureContext === false) {
 
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
+				message.href = document.location.href.replace(/^http:/, 'https:');
+				message.innerHTML = 'HTTPS REQUIRED'; // TODO Improve message
 
 			} else {
 
@@ -233,7 +233,7 @@ class XRButton {
 			message.style.width = '180px';
 			message.style.textDecoration = 'none';
 
-			stylizeElement( message );
+			stylizeElement(message);
 
 			return message;
 

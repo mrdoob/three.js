@@ -19,44 +19,44 @@ class ARButton {
 	 * @param {XRSessionInit} [sessionInit] - The a configuration object for the AR session.
 	 * @return {HTMLElement} The button or an error message if `immersive-ar` isn't supported.
 	 */
-	static createButton( renderer, sessionInit = {} ) {
+	static createButton(renderer, sessionInit = {}) {
 
-		const button = document.createElement( 'button' );
+		const button = document.createElement('button');
 
-		function showStartAR( /*device*/ ) {
+		function showStartAR( /*device*/) {
 
-			if ( sessionInit.domOverlay === undefined ) {
+			if (sessionInit.domOverlay === undefined) {
 
-				const overlay = document.createElement( 'div' );
+				const overlay = document.createElement('div');
 				overlay.style.display = 'none';
-				document.body.appendChild( overlay );
+				document.body.appendChild(overlay);
 
-				const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
-				svg.setAttribute( 'width', 38 );
-				svg.setAttribute( 'height', 38 );
+				const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+				svg.setAttribute('width', 38);
+				svg.setAttribute('height', 38);
 				svg.style.position = 'absolute';
 				svg.style.right = '20px';
 				svg.style.top = '20px';
-				svg.addEventListener( 'click', function () {
+				svg.addEventListener('click', function () {
 
 					currentSession.end();
 
-				} );
-				overlay.appendChild( svg );
+				});
+				overlay.appendChild(svg);
 
-				const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-				path.setAttribute( 'd', 'M 12,12 L 28,28 M 28,12 12,28' );
-				path.setAttribute( 'stroke', '#fff' );
-				path.setAttribute( 'stroke-width', 2 );
-				svg.appendChild( path );
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+				path.setAttribute('d', 'M 12,12 L 28,28 M 28,12 12,28');
+				path.setAttribute('stroke', '#fff');
+				path.setAttribute('stroke-width', 2);
+				svg.appendChild(path);
 
-				if ( sessionInit.optionalFeatures === undefined ) {
+				if (sessionInit.optionalFeatures === undefined) {
 
 					sessionInit.optionalFeatures = [];
 
 				}
 
-				sessionInit.optionalFeatures.push( 'dom-overlay' );
+				sessionInit.optionalFeatures.push('dom-overlay');
 				sessionInit.domOverlay = { root: overlay };
 
 			}
@@ -65,13 +65,13 @@ class ARButton {
 
 			let currentSession = null;
 
-			async function onSessionStarted( session ) {
+			async function onSessionStarted(session) {
 
-				session.addEventListener( 'end', onSessionEnded );
+				session.addEventListener('end', onSessionEnded);
 
-				renderer.xr.setReferenceSpaceType( 'local' );
+				renderer.xr.setReferenceSpaceType('local');
 
-				await renderer.xr.setSession( session );
+				await renderer.xr.setSession(session);
 
 				button.textContent = 'STOP AR';
 				sessionInit.domOverlay.root.style.display = '';
@@ -80,9 +80,9 @@ class ARButton {
 
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			function onSessionEnded( /*event*/) {
 
-				currentSession.removeEventListener( 'end', onSessionEnded );
+				currentSession.removeEventListener('end', onSessionEnded);
 
 				button.textContent = 'START AR';
 				sessionInit.domOverlay.root.style.display = 'none';
@@ -115,23 +115,23 @@ class ARButton {
 
 			button.onclick = function () {
 
-				if ( currentSession === null ) {
+				if (currentSession === null) {
 
-					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
+					navigator.xr.requestSession('immersive-ar', sessionInit).then(onSessionStarted);
 
 				} else {
 
 					currentSession.end();
 
-					if ( navigator.xr.offerSession !== undefined ) {
+					if (navigator.xr.offerSession !== undefined) {
 
-						navigator.xr.offerSession( 'immersive-ar', sessionInit )
-							.then( onSessionStarted )
-							.catch( ( err ) => {
+						navigator.xr.offerSession('immersive-ar', sessionInit)
+							.then(onSessionStarted)
+							.catch((err) => {
 
-								console.warn( err );
+								console.warn(err);
 
-							} );
+							});
 
 					}
 
@@ -139,15 +139,15 @@ class ARButton {
 
 			};
 
-			if ( navigator.xr.offerSession !== undefined ) {
+			if (navigator.xr.offerSession !== undefined) {
 
-				navigator.xr.offerSession( 'immersive-ar', sessionInit )
-					.then( onSessionStarted )
-					.catch( ( err ) => {
+				navigator.xr.offerSession('immersive-ar', sessionInit)
+					.then(onSessionStarted)
+					.catch((err) => {
 
-						console.warn( err );
+						console.warn(err);
 
-					} );
+					});
 
 			}
 
@@ -176,17 +176,17 @@ class ARButton {
 
 		}
 
-		function showARNotAllowed( exception ) {
+		function showARNotAllowed(exception) {
 
 			disableButton();
 
-			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+			console.warn('Exception when trying to call xr.isSessionSupported', exception);
 
 			button.textContent = 'AR NOT ALLOWED';
 
 		}
 
-		function stylizeElement( element ) {
+		function stylizeElement(element) {
 
 			element.style.position = 'absolute';
 			element.style.bottom = '20px';
@@ -203,29 +203,29 @@ class ARButton {
 
 		}
 
-		if ( 'xr' in navigator ) {
+		if ('xr' in navigator) {
 
 			button.id = 'ARButton';
 			button.style.display = 'none';
 
-			stylizeElement( button );
+			stylizeElement(button);
 
-			navigator.xr.isSessionSupported( 'immersive-ar' ).then( function ( supported ) {
+			navigator.xr.isSessionSupported('immersive-ar').then(function (supported) {
 
 				supported ? showStartAR() : showARNotSupported();
 
-			} ).catch( showARNotAllowed );
+			}).catch(showARNotAllowed);
 
 			return button;
 
 		} else {
 
-			const message = document.createElement( 'a' );
+			const message = document.createElement('a');
 
-			if ( window.isSecureContext === false ) {
+			if (window.isSecureContext === false) {
 
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
+				message.href = document.location.href.replace(/^http:/, 'https:');
+				message.innerHTML = 'HTTPS REQUIRED'; // TODO Improve message
 
 			} else {
 
@@ -238,7 +238,7 @@ class ARButton {
 			message.style.width = '180px';
 			message.style.textDecoration = 'none';
 
-			stylizeElement( message );
+			stylizeElement(message);
 
 			return message;
 

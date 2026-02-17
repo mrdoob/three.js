@@ -19,28 +19,28 @@ class VRButton {
 	 * @param {XRSessionInit} [sessionInit] - The a configuration object for the AR session.
 	 * @return {HTMLElement} The button or an error message if `immersive-ar` isn't supported.
 	 */
-	static createButton( renderer, sessionInit = {} ) {
+	static createButton(renderer, sessionInit = {}) {
 
-		const button = document.createElement( 'button' );
+		const button = document.createElement('button');
 
-		function showEnterVR( /*device*/ ) {
+		function showEnterVR( /*device*/) {
 
 			let currentSession = null;
 
-			async function onSessionStarted( session ) {
+			async function onSessionStarted(session) {
 
-				session.addEventListener( 'end', onSessionEnded );
+				session.addEventListener('end', onSessionEnded);
 
-				await renderer.xr.setSession( session );
+				await renderer.xr.setSession(session);
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;
 
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			function onSessionEnded( /*event*/) {
 
-				currentSession.removeEventListener( 'end', onSessionEnded );
+				currentSession.removeEventListener('end', onSessionEnded);
 
 				button.textContent = 'ENTER VR';
 
@@ -71,7 +71,7 @@ class VRButton {
 					'local-floor',
 					'bounded-floor',
 					'layers',
-					...( sessionInit.optionalFeatures || [] )
+					...(sessionInit.optionalFeatures || [])
 				],
 			};
 
@@ -89,23 +89,23 @@ class VRButton {
 
 			button.onclick = function () {
 
-				if ( currentSession === null ) {
+				if (currentSession === null) {
 
-					navigator.xr.requestSession( 'immersive-vr', sessionOptions ).then( onSessionStarted );
+					navigator.xr.requestSession('immersive-vr', sessionOptions).then(onSessionStarted);
 
 				} else {
 
 					currentSession.end();
 
-					if ( navigator.xr.offerSession !== undefined ) {
+					if (navigator.xr.offerSession !== undefined) {
 
-						navigator.xr.offerSession( 'immersive-vr', sessionOptions )
-							.then( onSessionStarted )
-							.catch( ( err ) => {
+						navigator.xr.offerSession('immersive-vr', sessionOptions)
+							.then(onSessionStarted)
+							.catch((err) => {
 
-								console.warn( err );
+								console.warn(err);
 
-							} );
+							});
 
 					}
 
@@ -113,15 +113,15 @@ class VRButton {
 
 			};
 
-			if ( navigator.xr.offerSession !== undefined ) {
+			if (navigator.xr.offerSession !== undefined) {
 
-				navigator.xr.offerSession( 'immersive-vr', sessionOptions )
-					.then( onSessionStarted )
-					.catch( ( err ) => {
+				navigator.xr.offerSession('immersive-vr', sessionOptions)
+					.then(onSessionStarted)
+					.catch((err) => {
 
-						console.warn( err );
+						console.warn(err);
 
-					} );
+					});
 
 			}
 
@@ -150,17 +150,17 @@ class VRButton {
 
 		}
 
-		function showVRNotAllowed( exception ) {
+		function showVRNotAllowed(exception) {
 
 			disableButton();
 
-			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+			console.warn('Exception when trying to call xr.isSessionSupported', exception);
 
 			button.textContent = 'VR NOT ALLOWED';
 
 		}
 
-		function stylizeElement( element ) {
+		function stylizeElement(element) {
 
 			element.style.position = 'absolute';
 			element.style.bottom = '20px';
@@ -177,35 +177,35 @@ class VRButton {
 
 		}
 
-		if ( 'xr' in navigator ) {
+		if ('xr' in navigator) {
 
 			button.id = 'VRButton';
 			button.style.display = 'none';
 
-			stylizeElement( button );
+			stylizeElement(button);
 
-			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
+			navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
 
 				supported ? showEnterVR() : showWebXRNotFound();
 
-				if ( supported && VRButton.xrSessionIsGranted ) {
+				if (supported && VRButton.xrSessionIsGranted) {
 
 					button.click();
 
 				}
 
-			} ).catch( showVRNotAllowed );
+			}).catch(showVRNotAllowed);
 
 			return button;
 
 		} else {
 
-			const message = document.createElement( 'a' );
+			const message = document.createElement('a');
 
-			if ( window.isSecureContext === false ) {
+			if (window.isSecureContext === false) {
 
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
+				message.href = document.location.href.replace(/^http:/, 'https:');
+				message.innerHTML = 'HTTPS REQUIRED'; // TODO Improve message
 
 			} else {
 
@@ -218,7 +218,7 @@ class VRButton {
 			message.style.width = '180px';
 			message.style.textDecoration = 'none';
 
-			stylizeElement( message );
+			stylizeElement(message);
 
 			return message;
 
@@ -233,17 +233,17 @@ class VRButton {
 	 */
 	static registerSessionGrantedListener() {
 
-		if ( typeof navigator !== 'undefined' && 'xr' in navigator ) {
+		if (typeof navigator !== 'undefined' && 'xr' in navigator) {
 
 			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.
-			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+			if (/WebXRViewer\//i.test(navigator.userAgent)) return;
 
-			navigator.xr.addEventListener( 'sessiongranted', () => {
+			navigator.xr.addEventListener('sessiongranted', () => {
 
 				VRButton.xrSessionIsGranted = true;
 
-			} );
+			});
 
 		}
 
