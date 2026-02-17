@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { screenUV } from '../display/ScreenNode.js';
 
