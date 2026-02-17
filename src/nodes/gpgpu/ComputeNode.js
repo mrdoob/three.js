@@ -265,7 +265,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	//
 
-	return nodeObject( new ComputeNode( nodeObject( node ), workgroupSize ) );
+	return new ComputeNode( nodeObject( node ), workgroupSize );
 
 };
 

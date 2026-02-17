@@ -1,5 +1,5 @@
 import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane, WebGPUCoordinateSystem } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, nodeObject, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix } from 'three/tsl';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -621,4 +621,4 @@ export default GodraysNode;
  * @param {(DirectionalLight|PointLight)} light - The light the godrays are rendered for.
  * @returns {GodraysNode}
  */
-export const godrays = ( depthNode, camera, light ) => nodeObject( new GodraysNode( depthNode, camera, light ) );
+export const godrays = ( depthNode, camera, light ) => new GodraysNode( depthNode, camera, light );

@@ -134,10 +134,10 @@ class ReflectorNode extends TextureNode {
 
 			}
 
-			this._depthNode = nodeObject( new ReflectorNode( {
+			this._depthNode = new ReflectorNode( {
 				defaultTexture: _defaultRT.depthTexture,
 				reflector: this._reflectorBaseNode
-			} ) );
+			} );
 
 		}
 

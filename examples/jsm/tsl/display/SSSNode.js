@@ -487,4 +487,4 @@ export default SSSNode;
  * @param {DirectionalLight} mainLight - The main directional light of the scene.
  * @returns {SSSNode}
  */
-export const sss = ( depthNode, camera, mainLight ) => nodeObject( new SSSNode( depthNode, camera, mainLight ) );
+export const sss = ( depthNode, camera, mainLight ) => new SSSNode( depthNode, camera, mainLight );

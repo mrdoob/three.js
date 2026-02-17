@@ -551,4 +551,4 @@ export default DepthOfFieldNode;
  * @param {Node<float> | number} bokehScale - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
-export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) ) );
+export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );
