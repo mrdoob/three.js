@@ -1498,9 +1498,8 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
-		// Skip if pipeline has error or is still compiling asynchronously
+		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
-		if ( pipelineGPU === undefined || pipelineGPU === null ) return;
 
 		const index = renderObject.getIndex();
 		const hasIndex = ( index !== null );
