@@ -8,6 +8,7 @@ import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
+import { BRDF_Lambert } from '../../Three.TSL.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 
@@ -171,7 +172,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// DIFFUSE COLOR OVER PI
 
-		diffuseContributionOverPi.assign( diffuseContribution.mul( 1 / Math.PI ) );
+		diffuseContributionOverPi.assign( BRDF_Lambert( { diffuseColor: diffuseContribution.rgb } ) );
 
 	}
 

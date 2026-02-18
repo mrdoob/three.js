@@ -26,6 +26,7 @@ import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
 import { error } from '../../utils.js';
+import { BRDF_Lambert } from '../../Three.TSL.js';
 
 /**
  * Base class for all node materials.
@@ -901,7 +902,7 @@ class NodeMaterial extends Material {
 
 		// DIFFUSE COLOR OVER PI
 
-		diffuseColorOverPi.assign( diffuseColor.rgb.mul( 1 / Math.PI ) );
+		diffuseColorOverPi.assign( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) );
 
 		// OPACITY
 

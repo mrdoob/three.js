@@ -1,4 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
+import { BRDF_Lambert } from '../../Three.TSL.js';
 import { diffuseColor, diffuseColorOverPi } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
@@ -60,7 +61,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		diffuseColor.assign( colorSpaceToWorking( vec4( directionToColor( normalView ), opacityNode ), SRGBColorSpace ) );
 
-		diffuseColorOverPi.assign( diffuseColor.mul( 1 / Math.PI ) );
+		diffuseColorOverPi.assign( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) );
 
 	}
 
