@@ -133,7 +133,7 @@ The node library defines how certain library objects like materials, lights or t
 
 A map-like data structure for managing lights.
 
-### .logarithmicDepthBuffer : boolean
+### .logarithmicDepthBuffer : boolean (readonly)
 
 Whether logarithmic depth buffer is enabled or not.
 
@@ -158,6 +158,12 @@ Default is `true`.
 Defines the output color space of the renderer.
 
 Default is `SRGBColorSpace`.
+
+### .reversedDepthBuffer : boolean (readonly)
+
+Whether reversed depth buffer is enabled or not.
+
+Default is `false`.
 
 ### .samples : number
 
@@ -1030,6 +1036,13 @@ Renderer options.
 boolean
 
 Whether logarithmic depth buffer is enabled or not.
+
+Default is `false`.
+
+**reversedDepthBuffer**  
+boolean
+
+Whether reversed depth buffer is enabled or not.
 
 Default is `false`.
 

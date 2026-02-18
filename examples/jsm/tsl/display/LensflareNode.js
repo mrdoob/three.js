@@ -276,4 +276,4 @@ export default LensflareNode;
  * @param {number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
  * @returns {LensflareNode}
  */
-export const lensflare = ( node, params ) => nodeObject( new LensflareNode( convertToTexture( node ), params ) );
+export const lensflare = ( node, params ) => new LensflareNode( convertToTexture( node ), params );

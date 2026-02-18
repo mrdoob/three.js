@@ -78,6 +78,6 @@ export default DebugNode;
  * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
  * @returns {DebugNode}
  */
-export const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) ).toStack();
+export const debug = ( node, callback = null ) => new DebugNode( nodeObject( node ), callback ).toStack();
 
 addMethodChaining( 'debug', debug );

@@ -113,6 +113,29 @@ fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, iRes : vec2u, l
 	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
 
 }
+` ),
+	biquadraticTextureArray: new CodeNode( /* wgsl */`
+fn tsl_biquadraticTexture_array( map : texture_2d_array<f32>, coord : vec2f, iRes : vec2u, layer : u32, level : u32 ) -> vec4f {
+
+	let res = vec2f( iRes );
+
+	let uvScaled = coord * res;
+	let uvWrapping = ( ( uvScaled % res ) + res ) % res;
+
+	// https://www.shadertoy.com/view/WtyXRy
+
+	let uv = uvWrapping - 0.5;
+	let iuv = floor( uv );
+	let f = fract( uv );
+
+	let rg1 = textureLoad( map, vec2u( iuv + vec2( 0.5, 0.5 ) ) % iRes, layer, level );
+	let rg2 = textureLoad( map, vec2u( iuv + vec2( 1.5, 0.5 ) ) % iRes, layer, level );
+	let rg3 = textureLoad( map, vec2u( iuv + vec2( 0.5, 1.5 ) ) % iRes, layer, level );
+	let rg4 = textureLoad( map, vec2u( iuv + vec2( 1.5, 1.5 ) ) % iRes, layer, level );
+
+	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
+
+}
 ` )
 };
 
@@ -271,17 +294,31 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( this.isUnfilterable( texture ) === false ) {
 
-			if ( offsetSnippet ) {
+			if ( depthSnippet ) {
 
-				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+				if ( offsetSnippet ) {
+
+					return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ levelSnippet } )`;
+
+			} else {
+
+				if ( offsetSnippet ) {
+
+					return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
 			}
 
-			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
-
 		} else if ( this.isFilteredTexture( texture ) ) {
 
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet );
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet, depthSnippet );
 
 		} else {
 
@@ -465,11 +502,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet = '0u' ) {
-
-		this._include( 'biquadraticTexture' );
+	generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet = '0u', depthSnippet ) {
 
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
@@ -479,6 +515,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 			uvSnippet = `${ uvSnippet } + vec2<f32>(${ offsetSnippet }) / ${ textureDimension }`;
 
 		}
+
+		if ( depthSnippet ) {
+
+			this._include( 'biquadraticTextureArray' );
+
+			return `tsl_biquadraticTexture_array( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, u32( ${ depthSnippet } ), u32( ${ levelSnippet } ) )`;
+
+		}
+
+		this._include( 'biquadraticTexture' );
 
 		return `tsl_biquadraticTexture( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, u32( ${ levelSnippet } ) )`;
 
@@ -698,14 +744,27 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'fragment' ) {
 
-			// TODO handle i32 or u32 --> uvSnippet, array_index: A, ddx, ddy
-			if ( offsetSnippet ) {
+			if ( depthSnippet ) {
 
-				return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+				if ( offsetSnippet ) {
+
+					return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
+
+			} else {
+
+				if ( offsetSnippet ) {
+
+					return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
 			}
-
-			return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
 		} else {
 
@@ -776,17 +835,31 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( this.isUnfilterable( texture ) === false ) {
 
-			if ( offsetSnippet ) {
+			if ( depthSnippet ) {
 
-				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+				if ( offsetSnippet ) {
+
+					return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ levelSnippet } )`;
+
+			} else {
+
+				if ( offsetSnippet ) {
+
+					return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
 			}
 
-			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
-
 		} else if ( this.isFilteredTexture( texture ) ) {
 
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet );
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet, depthSnippet );
 
 		} else {
 
@@ -812,13 +885,27 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'fragment' ) {
 
-			if ( offsetSnippet ) {
+			if ( depthSnippet ) {
 
-				return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet }, ${ offsetSnippet } )`;
+				if ( offsetSnippet ) {
+
+					return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ biasSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ biasSnippet } )`;
+
+			} else {
+
+				if ( offsetSnippet ) {
+
+					return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet } )`;
 
 			}
-
-			return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet } )`;
 
 		} else {
 
@@ -1059,23 +1146,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
-					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
+					uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
+				}
+
+				// Add to bindings for this stage if not already present
+				if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
+
 					bindings.push( uniformsGroup );
-
-				} else {
-
-					// Update visibility to include this shader stage (bitwise OR)
-					uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
-
-					// Add to bindings for this stage if not already present
-					if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
-
-						bindings.push( uniformsGroup );
-
-					}
 
 				}
 

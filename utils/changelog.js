@@ -40,16 +40,6 @@ const skipPatterns = [
 // Categories that map to sections
 const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Scripts', 'Build' ];
 
-// Author name to GitHub username mapping (for commits without PR numbers)
-const authorMap = {
-	'Mr.doob': 'mrdoob',
-	'Michael Herzog': 'Mugen87',
-	'Claude': 'claude',
-	'Claude Opus 4.5': 'claude',
-	'Copilot': 'copilot',
-	'copilot-swe-agent[bot]': 'copilot'
-};
-
 function exec( command ) {
 
 	try {
@@ -296,7 +286,13 @@ function cleanSubject( subject, category ) {
 
 function normalizeAuthor( author ) {
 
-	return authorMap[ author ] || author;
+	const lower = author.toLowerCase();
+	if ( lower === 'mr.doob' ) return 'mrdoob';
+	if ( lower === 'michael herzog' ) return 'Mugen87';
+	if ( lower.startsWith( 'claude' ) ) return 'claude';
+	if ( lower.startsWith( 'copilot' ) ) return 'copilot';
+
+	return author;
 
 }
 
@@ -562,8 +558,17 @@ function generateChangelog() {
 	};
 
 	let skipped = 0;
+	const total = commits.length;
+	const barWidth = 40;
 
-	for ( const commit of commits ) {
+	for ( let i = 0; i < total; i ++ ) {
+
+		const commit = commits[ i ];
+		const done = i + 1;
+		const filled = Math.round( barWidth * done / total );
+		const bar = '█'.repeat( filled ) + '░'.repeat( barWidth - filled );
+		const pct = Math.round( 100 * done / total );
+		process.stderr.write( `\r  ${bar} ${pct}% (${done}/${total})` );
 
 		const result = processCommit( commit, revertedTitles );
 
@@ -591,6 +596,8 @@ function generateChangelog() {
 		}
 
 	}
+
+	process.stderr.write( '\n\n' );
 
 	if ( skipped > 0 ) {
 

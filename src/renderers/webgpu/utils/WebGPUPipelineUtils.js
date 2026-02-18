@@ -250,7 +250,7 @@ class WebGPUPipelineUtils {
 			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = {}; // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
+				depthStencil.stencilBack = stencilFront; // apply the same stencil ops to both faces, matching gl.stencilOp() which is not face-separated
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
@@ -790,7 +790,7 @@ class WebGPUPipelineUtils {
 
 		if ( material.depthTest === false ) {
 
-			depthCompare = ( this.backend.parameters.reversedDepthBuffer ) ? GPUCompareFunction.Never : GPUCompareFunction.Always;
+			depthCompare = GPUCompareFunction.Always;
 
 		} else {
 

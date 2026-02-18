@@ -227,7 +227,7 @@ further processing.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Whether logarithmic depth buffer is enabled or not.</p>
 						<p>Default is <code>false</code>.</p>
@@ -258,6 +258,13 @@ If this is the case, the renderer allocates an internal render target for that p
 					<div class="description">
 						<p>Defines the output color space of the renderer.</p>
 						<p>Default is <code>SRGBColorSpace</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="reversedDepthBuffer" translate="no">.<a href="#reversedDepthBuffer">reversedDepthBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether reversed depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1878,6 +1885,17 @@ the CPU waits for the GPU to complete its operation (e.g. a compute task).</p>
 				</td>
 			<td class="description last">
 				<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>reversedDepthBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether reversed depth buffer is enabled or not.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>

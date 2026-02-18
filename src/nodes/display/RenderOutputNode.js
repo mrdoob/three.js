@@ -145,6 +145,6 @@ export default RenderOutputNode;
  * @param {?string} [outputColorSpace=null] - The output color space.
  * @returns {RenderOutputNode}
  */
-export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
+export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace );
 
 addMethodChaining( 'renderOutput', renderOutput );

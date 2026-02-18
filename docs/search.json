@@ -11257,6 +11257,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Renderer#reversedDepthBuffer",
+			"kind": "member"
+		},
+		{
 			"title": "Renderer#samples",
 			"kind": "member"
 		},
@@ -19643,6 +19647,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "OrbitControls#cursorStyle",
+			"kind": "member"
+		},
+		{
 			"title": "OrbitControls#dampingFactor",
 			"kind": "member"
 		},
@@ -27744,6 +27752,10 @@
 		},
 		{
 			"title": "viewZToPerspectiveDepth",
+			"kind": "function"
+		},
+		{
+			"title": "viewZToReversedPerspectiveDepth",
 			"kind": "function"
 		},
 		{

@@ -41,6 +41,13 @@ Whether logarithmic depth buffer is enabled or not.
 
 Default is `false`.
 
+**reversedDepthBuffer**  
+boolean
+
+Whether reversed depth buffer is enabled or not.
+
+Default is `false`.
+
 **alpha**  
 boolean
 

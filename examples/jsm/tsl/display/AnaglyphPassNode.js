@@ -1,5 +1,5 @@
 import { Matrix3, NodeMaterial, Vector3 } from 'three/webgpu';
-import { clamp, nodeObject, Fn, vec4, uv, uniform, max } from 'three/tsl';
+import { clamp, Fn, vec4, uv, uniform, max } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 import { frameCorners } from '../../utils/CameraUtils.js';
 
@@ -546,4 +546,4 @@ export { AnaglyphAlgorithm, AnaglyphColorMode };
  * @param {Camera} camera - The camera to render the scene with.
  * @returns {AnaglyphPassNode}
  */
-export const anaglyphPass = ( scene, camera ) => nodeObject( new AnaglyphPassNode( scene, camera ) );
+export const anaglyphPass = ( scene, camera ) => new AnaglyphPassNode( scene, camera );

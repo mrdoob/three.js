@@ -1767,14 +1767,6 @@ const Compatibility = {
  */
 
 /**
- * Finds the minimum value in an array.
- *
- * @private
- * @param {Array<number>} array - The array to search for the minimum value.
- * @return {number} The minimum value in the array, or Infinity if the array is empty.
- */
-
-/**
  * Checks if an array contains values that require Uint32 representation.
  *
  * This function determines whether the array contains any values >= 65535,
@@ -2084,7 +2076,7 @@ function warnOnce( ...params ) {
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
  * @private
- * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
  * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
@@ -2117,6 +2109,25 @@ function probeAsync( gl, sync, interval ) {
 	} );
 
 }
+
+/**
+ * Used to select the correct depth functions
+ * when reversed depth buffer is used.
+ *
+ * @private
+ * @type {Object}
+ */
+const ReversedDepthFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
 
 /**
  * This modules allows to dispatch event objects on custom JavaScript objects.
@@ -9144,10 +9155,6 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		const image = { width: width, height: height, depth: options.depth };
-
-		const texture = new Texture( image );
-
 		/**
 		 * An array of textures. Each color attachment is represented as a separate texture.
 		 * Has at least a single entry for the default color attachment.
@@ -9155,6 +9162,9 @@ class RenderTarget extends EventDispatcher {
 		 * @type {Array<Texture>}
 		 */
 		this.textures = [];
+
+		const image = { width: width, height: height, depth: options.depth };
+		const texture = new Texture( image );
 
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
@@ -43174,6 +43184,8 @@ const Cache = {
 
 		if ( this.enabled === false ) return;
 
+		if ( isBlobURL( key ) ) return;
+
 		// log( 'Cache', 'Adding key:', key );
 
 		this.files[ key ] = file;
@@ -43190,6 +43202,8 @@ const Cache = {
 	get: function ( key ) {
 
 		if ( this.enabled === false ) return;
+
+		if ( isBlobURL( key ) ) return;
 
 		// log( 'Cache', 'Checking key:', key );
 
@@ -43221,6 +43235,31 @@ const Cache = {
 	}
 
 };
+
+/**
+ * Returns true if the given cache key contains the blob: scheme.
+ *
+ * @private
+ * @param {string} key - The cache key.
+ * @return {boolean} Whether the given cache key contains the blob: scheme or not.
+ */
+function isBlobURL( key ) {
+
+	try {
+
+		const urlString = key.slice( key.indexOf( ':' ) + 1 ); // remove type identifier
+
+		const url = new URL( urlString );
+		return url.protocol === 'blob:';
+
+	} catch ( e ) {
+
+		// If the string is not a valid URL, it throws an error
+		return false;
+
+	}
+
+}
 
 /**
  * Handles and keeps track of loaded and pending data. A default global
@@ -45201,12 +45240,12 @@ class LightShadow {
 		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
-		if ( shadowCamera.reversedDepth ) {
+		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
 			shadowMatrix.set(
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
-				0.0, 0.0, 1.0, 0.0,
+				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
 				0.0, 0.0, 0.0, 1.0
 			);
 
@@ -49902,7 +49941,18 @@ class CubeCamera extends Object3D {
 		renderTarget.texture.generateMipmaps = false;
 
 		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
-		const reversedDepthBuffer = !! ( renderer.isWebGLRenderer && renderer.state.buffers.depth.getReversed() );
+
+		let reversedDepthBuffer = false;
+
+		if ( renderer.isWebGLRenderer === true ) {
+
+			reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		} else {
+
+			reversedDepthBuffer = renderer.reversedDepthBuffer;
+
+		}
 
 		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
 		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
@@ -69061,18 +69111,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 }
 
-const reversedFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
-	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
-	[ LessEqualDepth ]: GreaterEqualDepth,
-
-	[ AlwaysDepth ]: NeverDepth,
-	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
-	[ GreaterEqualDepth ]: LessEqualDepth,
-};
-
 function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
@@ -69204,7 +69242,7 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( depthFunc ) {
 
-				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
+				if ( currentReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
