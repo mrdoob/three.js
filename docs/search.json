@@ -7665,10 +7665,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "NodeBuilder#getBindGroupsCache",
-			"kind": "function"
-		},
-		{
 			"title": "NodeBuilder#getBindings",
 			"kind": "function"
 		},
@@ -20151,11 +20147,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "PixelationNode#updateBefore",
+			"title": "PixelationNode#update",
 			"kind": "function"
 		},
 		{
-			"title": "PixelationNode#updateBeforeType",
+			"title": "PixelationNode#updateType",
 			"kind": "member"
 		},
 		{
@@ -27752,6 +27748,10 @@
 		},
 		{
 			"title": "viewZToPerspectiveDepth",
+			"kind": "function"
+		},
+		{
+			"title": "viewZToReversedOrthographicDepth",
 			"kind": "function"
 		},
 		{

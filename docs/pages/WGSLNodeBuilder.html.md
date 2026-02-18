@@ -120,7 +120,7 @@ The count.
 
 **Returns:** The generated value as a shader string.
 
-### .generateFilteredTexture( texture : Texture, textureProperty : string, uvSnippet : string, offsetSnippet : string, levelSnippet : string ) : string
+### .generateFilteredTexture( texture : Texture, textureProperty : string, uvSnippet : string, offsetSnippet : string, levelSnippet : string, depthSnippet : string ) : string
 
 Generates the WGSL snippet for a manual filtered texture.
 
@@ -145,6 +145,10 @@ A WGSL snippet that represents the offset that will be applied to the unnormaliz
 A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 
 Default is `'0u'`.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
 
 **Returns:** The WGSL snippet.
 

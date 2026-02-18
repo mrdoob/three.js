@@ -126,7 +126,7 @@ A GLSL snippet that represents the offset that will be applied to the unnormaliz
 
 **Returns:** The GLSL snippet.
 
-### .generateTextureBias( texture : Texture, textureProperty : string, uvSnippet : string, biasSnippet : string, offsetSnippet : string ) : string
+### .generateTextureBias( texture : Texture, textureProperty : string, uvSnippet : string, biasSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the GLSL snippet when sampling textures with a bias to the mip level.
 
@@ -145,6 +145,10 @@ A GLSL snippet that represents texture coordinates used for sampling.
 **biasSnippet**
 
 A GLSL snippet that represents the bias to apply to the mip level before sampling.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
 
 **offsetSnippet**
 
@@ -188,7 +192,7 @@ Default is `this.shaderStage`.
 
 **Returns:** The GLSL snippet.
 
-### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, offsetSnippet : string ) : string
+### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.
 
@@ -208,13 +212,17 @@ A GLSL snippet that represents texture coordinates used for sampling.
 
 An array holding both gradient GLSL snippets.
 
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
+
 **offsetSnippet**
 
 A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 
 **Returns:** The GLSL snippet.
 
-### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, offsetSnippet : string ) : string
+### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the GLSL snippet when sampling textures with explicit mip level.
 
@@ -233,6 +241,10 @@ A GLSL snippet that represents texture coordinates used for sampling.
 **levelSnippet**
 
 A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
 
 **offsetSnippet**
 

@@ -182,7 +182,9 @@ Default is `null`.
 
 ### .sequentialNodes : Array.<Node>
 
-A list of all sequential nodes.
+A list of all nodes the builder is processing in sequential order.
+
+This is used to determine the update order of nodes, which is important for NodeUpdateType#UPDATE\_BEFORE and NodeUpdateType#UPDATE\_AFTER.
 
 ### .shaderStage : 'vertex' | 'fragment' | 'compute' | 'any'
 
@@ -751,12 +753,6 @@ The group name.
 The shader stage.
 
 **Returns:** The array of node uniform groups.
-
-### .getBindGroupsCache() : ChainMap
-
-Returns the bind groups of the current renderer.
-
-**Returns:** The cache.
 
 ### .getBindings() : Array.<BindGroup>
 

@@ -247,7 +247,7 @@ buffer node.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureBias" translate="no">.<a href="#generateTextureBias">generateTextureBias</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureBias" translate="no">.<a href="#generateTextureBias">generateTextureBias</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet when sampling textures with a bias to the mip level.</p>
@@ -284,6 +284,14 @@ buffer node.</p>
 									</td>
 									<td class="description last">
 										<p>A GLSL snippet that represents the bias to apply to the mip level before sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents 0-based texture array index to sample.</p>
 									</td>
 								</tr>
 								<tr>
@@ -371,7 +379,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureGrad" translate="no">.<a href="#generateTextureGrad">generateTextureGrad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureGrad" translate="no">.<a href="#generateTextureGrad">generateTextureGrad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.</p>
@@ -412,6 +420,14 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
 										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
@@ -424,7 +440,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet when sampling textures with explicit mip level.</p>
@@ -461,6 +477,14 @@ against a reference value.</p>
 									</td>
 									<td class="description last">
 										<p>A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents 0-based texture array index to sample.</p>
 									</td>
 								</tr>
 								<tr>

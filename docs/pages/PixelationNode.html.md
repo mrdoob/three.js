@@ -60,13 +60,13 @@ The pixel size.
 
 The texture node that represents the beauty pass.
 
-### .updateBeforeType : string
+### .updateType : string
 
-The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates its internal uniforms once per frame in `updateBefore()`.
+The `updateType` is set to `NodeUpdateType.FRAME` since the node updates its internal uniforms once per frame in `updateBefore()`.
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [TempNode#updateType](TempNode.html#updateType)
 
 ## Methods
 
@@ -80,7 +80,7 @@ The current node builder.
 
 **Overrides:** [TempNode#setup](TempNode.html#setup)
 
-### .updateBefore( frame : NodeFrame )
+### .update( frame : NodeFrame )
 
 This method is used to update uniforms once per frame.
 
@@ -88,7 +88,7 @@ This method is used to update uniforms once per frame.
 
 The current node frame.
 
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
+**Overrides:** [TempNode#update](TempNode.html#update)
 
 ## Source
 

@@ -20,6 +20,12 @@ The output texture.
 
 ## Properties
 
+### .isPassTextureNode : boolean (readonly)
+
+This flag can be used for type testing.
+
+Default is `true`.
+
 ### .passNode : PassNode
 
 A reference to the pass node.

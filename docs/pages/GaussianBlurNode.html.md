@@ -58,6 +58,12 @@ Default is `1`.
 
 Defines the direction and radius of the blur.
 
+### .isGaussianBlurNode : boolean (readonly)
+
+This flag can be used for type testing.
+
+Default is `true`.
+
 ### .premultipliedAlpha : boolean
 
 Whether the effect should use premultiplied alpha or not. Set this to `true` if you are going to blur texture input with transparency.

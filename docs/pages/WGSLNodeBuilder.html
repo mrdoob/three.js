@@ -224,7 +224,7 @@ This ensures the same binding index is used across all shader stages.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated value as a shader string.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the WGSL snippet for a manual filtered texture.</p>
@@ -270,6 +270,14 @@ This ensures the same binding index is used across all shader stages.</p>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
 										<p>Default is <code>'0u'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
 									</td>
 								</tr>
 							</tbody>

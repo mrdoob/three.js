@@ -26,6 +26,12 @@ Default is `false`.
 
 ## Properties
 
+### .isPassMultipleTextureNode : boolean (readonly)
+
+This flag can be used for type testing.
+
+Default is `true`.
+
 ### .previousTexture : boolean
 
 Whether previous frame data should be used or not.
