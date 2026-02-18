@@ -899,7 +899,7 @@ class NodeMaterial extends Material {
 
 		diffuseColor.assign( colorNode );
 
-		// DIFFUSE RGB OVER PI
+		// DIFFUSE COLOR OVER PI
 
 		diffuseColorOverPi.assign( diffuseColor.rgb.mul( 1 / Math.PI ) );
 

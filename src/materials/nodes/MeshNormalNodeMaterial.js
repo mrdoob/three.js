@@ -1,5 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
-import { diffuseColor } from '../../nodes/core/PropertyNode.js';
+import { diffuseColor, diffuseColorOverPi } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
 import { normalView } from '../../nodes/accessors/Normal.js';
@@ -59,6 +59,8 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 		// By convention, a normal packed to RGB is in sRGB color space. Convert it to working color space.
 
 		diffuseColor.assign( colorSpaceToWorking( vec4( directionToColor( normalView ), opacityNode ), SRGBColorSpace ) );
+
+		diffuseColorOverPi.assign( diffuseColor.mul( 1 / Math.PI ) );
 
 	}
 

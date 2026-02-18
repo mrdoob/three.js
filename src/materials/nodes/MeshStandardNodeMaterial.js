@@ -1,5 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
-import { diffuseColor, diffuseContribution, metalness, roughness, specularColor, specularColorBlended, specularF90 } from '../../nodes/core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, diffuseContributionOverPi, metalness, roughness, specularColor, specularColorBlended, specularF90 } from '../../nodes/core/PropertyNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../../nodes/accessors/MaterialNode.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
@@ -168,6 +168,10 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		// DIFFUSE COLOR
 
 		diffuseContribution.assign( diffuseColor.rgb.mul( metalnessNode.oneMinus() ) );
+
+		// DIFFUSE COLOR OVER PI
+
+		diffuseContributionOverPi.assign( diffuseContribution.mul( 1 / Math.PI ) );
 
 	}
 
