@@ -40,7 +40,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			init();
 
@@ -71,7 +71,7 @@
 
 				//
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
@@ -123,7 +123,7 @@
 				// traa
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
-				postProcessing.outputNode = traaPass;
+				renderPipeline.outputNode = traaPass;
 
 				// Cornell Box inspired scene
 
@@ -205,7 +205,6 @@
 				pointLight.castShadow = true;
 				pointLight.shadow.mapSize.width = 1024;
 				pointLight.shadow.mapSize.height = 1024;
-				pointLight.shadow.bias = - 0.0025;
 				scene.add( pointLight );
 
 				// Ambient light
@@ -240,23 +239,23 @@
 
 					if ( value === 1 ) {
 
-						postProcessing.outputNode = vec4( vec3( ao ), 1 );
+						renderPipeline.outputNode = vec4( vec3( ao ), 1 );
 
 					} else if ( value === 2 ) {
 
-						postProcessing.outputNode = vec4( gi, 1 );
+						renderPipeline.outputNode = vec4( gi, 1 );
 
 					} else if ( value === 3 ) {
 
-						postProcessing.outputNode = scenePassColor;
+						renderPipeline.outputNode = scenePassColor;
 
 					} else {
 
-						postProcessing.outputNode = giPass.useTemporalFiltering ? traaPass : compositePass;
+						renderPipeline.outputNode = giPass.useTemporalFiltering ? traaPass : compositePass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 
 				}
@@ -280,7 +279,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

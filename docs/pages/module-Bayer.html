@@ -32,7 +32,7 @@ fewer steps without affecting the visuals as much.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>uv</strong>
+										<strong translate="no">uv</strong>
 									</td>
 									<td class="description last">
 										<p>The uv to sample the bayer16 texture.</p>
@@ -42,6 +42,38 @@ fewer steps without affecting the visuals as much.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The sampled bayer value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".bayerDither" translate="no">.<a href="#.bayerDither">bayerDither</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, steps : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This TSL function applies Bayer dithering to a color input. It uses a 4x4 Bayer matrix
+pattern to add structured noise before color quantization, which helps reduce visible
+color banding when limiting color depth.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The input color to apply dithering to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">steps</strong>
+									</td>
+									<td class="description last">
+										<p>The number of color steps per channel.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The dithered color ready for quantization.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

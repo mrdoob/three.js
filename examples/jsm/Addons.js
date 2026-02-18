@@ -123,9 +123,7 @@ export * from './loaders/VRMLLoader.js';
 export * from './loaders/VTKLoader.js';
 export * from './loaders/XYZLoader.js';
 
-export * from './materials/MeshGouraudMaterial.js';
 export * from './materials/LDrawConditionalLineMaterial.js';
-export * from './materials/MeshPostProcessingMaterial.js';
 
 export * from './math/Capsule.js';
 export * from './math/ColorConverter.js';
@@ -225,7 +223,6 @@ export * from './shaders/FilmShader.js';
 export * from './shaders/FocusShader.js';
 export * from './shaders/FreiChenShader.js';
 export * from './shaders/GammaCorrectionShader.js';
-export * from './shaders/GodRaysShader.js';
 export * from './shaders/GTAOShader.js';
 export * from './shaders/HalftoneShader.js';
 export * from './shaders/HorizontalBlurShader.js';

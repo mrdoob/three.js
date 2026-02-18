@@ -27,7 +27,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D texture.</p>
@@ -35,7 +35,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvNode</strong>
+										<strong translate="no">uvNode</strong>
 									</td>
 									<td class="description last">
 										<p>The uv node.</p>
@@ -44,7 +44,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelNode</strong>
+										<strong translate="no">levelNode</strong>
 									</td>
 									<td class="description last">
 										<p>The level node.</p>
@@ -73,7 +73,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -81,7 +81,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetNode</strong>
+										<strong translate="no">offsetNode</strong>
 									</td>
 									<td class="description last">
 										<p>The offset node to generate code for.</p>
@@ -105,7 +105,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -113,7 +113,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvNode</strong>
+										<strong translate="no">uvNode</strong>
 									</td>
 									<td class="description last">
 										<p>The uv node to generate code for.</p>
@@ -150,7 +150,7 @@ uv node.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -168,22 +168,24 @@ uv node.</p>
 					<h3 class="name name-method" id="normal" translate="no">.<a href="#normal">normal</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TODO.</p>
+							<p>Computes the normal for the given uv. These texture coordiantes represent a
+position inside the 3D texture. Unlike geometric normals, this normal
+represents a slope or gradient of scalar data inside the 3D texture.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>uvNode</strong>
+										<strong translate="no">uvNode</strong>
 									</td>
 									<td class="description last">
-										<p>The uv node .</p>
+										<p>The uv node that defines a position in the 3D texture.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> TODO.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The normal representing the slope/gradient in the data.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="setUpdateMatrix" translate="no">.<a href="#setUpdateMatrix">setUpdateMatrix</a><span class="signature">( value : <span class="param-type">boolean</span> )</span> </h3>
@@ -196,7 +198,7 @@ for 3D textures. The uv transformation matrix is not applied to 3D textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The update toggle.</p>
@@ -206,38 +208,6 @@ for 3D textures. The uv transformation matrix is not applied to 3D textures.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#setUpdateMatrix">TextureNode#setUpdateMatrix</a></dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="setupUV" translate="no">.<a href="#setupUV">setupUV</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Overwrites the default implementation to return the unmodified uv node.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>builder</strong>
-									</td>
-									<td class="description last">
-										<p>The current node builder.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>uvNode</strong>
-									</td>
-									<td class="description last">
-										<p>The uv node to setup.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#setupUV">TextureNode#setupUV</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The unmodified uv node.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

@@ -1057,7 +1057,7 @@ export class Style {
 	justify-content: space-between;
 }
 
-.console-filters-group {
+.console-buttons-group {
 	display: flex;
 	gap: 20px;
 }
@@ -1074,6 +1074,28 @@ export class Style {
 	border-radius: 15px;
 }
 
+.console-copy-button {
+	background: transparent;
+	border: none;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: color 0.2s, background-color 0.2s;
+}
+
+.console-copy-button:hover {
+	color: var(--text-primary);
+	background-color: var(--profiler-hover);
+}
+
+.console-copy-button.copied {
+	color: var(--color-green);
+}
+
 #console-log {
 	display: flex;
 	flex-direction: column;
@@ -1081,6 +1103,8 @@ export class Style {
 	padding: 10px;
 	overflow-y: auto;
 	flex-grow: 1;
+	user-select: text;
+	-webkit-user-select: text;
 }
 
 .log-message {

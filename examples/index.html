@@ -111,6 +111,7 @@
 				if ( validRedirects.has( file ) === true ) {
 
 					selectFile( file );
+					links[ file ].scrollIntoView( { block: 'center' } );
 					viewer.src = validRedirects.get( file );
 					viewer.style.display = 'unset';
 
@@ -277,7 +278,7 @@
 		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+			v = v.replace( /[\s_]+/gi, ' ' ); // replace multiple whitespaces or underscores with a single one
 
 			if ( v !== '' ) {
 

@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2010-2025 Three.js Authors
+ * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 'use strict';
 
-const REVISION = '182';
+const REVISION = '183';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -161,6 +161,14 @@ const MultiplyBlending = 4;
  * @constant
  */
 const CustomBlending = 5;
+
+/**
+ * Represents material blending.
+ *
+ * @type {number}
+ * @constant
+ */
+const MaterialBlending = 6;
 
 /**
  * A `source + destination` blending equation.
@@ -1165,6 +1173,17 @@ const InterpolateLinear = 2301;
 const InterpolateSmooth = 2302;
 
 /**
+ * Bezier interpolation mode for keyframe tracks.
+ *
+ * Uses cubic Bezier curves with explicit 2D control points.
+ * Requires tangent data to be set on the track.
+ *
+ * @type {number}
+ * @constant
+ */
+const InterpolateBezier = 2303;
+
+/**
  * Zero curvature ending for animations.
  *
  * @type {number}
@@ -1688,6 +1707,16 @@ const InterpolationSamplingMode = {
 };
 
 /**
+ * Compatibility flags for features that may not be supported across all platforms.
+ *
+ * @type {Object}
+ * @constant
+ */
+const Compatibility = {
+	TEXTURE_COMPARE: 'depthTextureCompare'
+};
+
+/**
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
@@ -1737,6 +1766,18 @@ const InterpolationSamplingMode = {
  * @property {string} EITHER - Flat interpolation using either vertex.
  */
 
+/**
+ * Checks if an array contains values that require Uint32 representation.
+ *
+ * This function determines whether the array contains any values >= 65535,
+ * which would require a Uint32Array rather than a Uint16Array for proper storage.
+ * The function iterates from the end of the array, assuming larger values are
+ * typically located at the end.
+ *
+ * @private
+ * @param {Array<number>} array - The array to check.
+ * @return {boolean} True if the array contains values >= 65535, false otherwise.
+ */
 function arrayNeedsUint32( array ) {
 
 	// assumes larger values usually on last
@@ -1751,6 +1792,14 @@ function arrayNeedsUint32( array ) {
 
 }
 
+/**
+ * Map of typed array constructor names to their constructors.
+ * This mapping enables dynamic creation of typed arrays based on string type names.
+ *
+ * @private
+ * @constant
+ * @type {Object<string, TypedArrayConstructor>}
+ */
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -1763,6 +1812,14 @@ const TYPED_ARRAYS = {
 	Float64Array: Float64Array
 };
 
+/**
+ * Creates a typed array of the specified type from the given buffer.
+ *
+ * @private
+ * @param {string} type - The name of the typed array type (e.g., 'Float32Array', 'Uint16Array').
+ * @param {ArrayBuffer} buffer - The buffer to create the typed array from.
+ * @return {TypedArray} A new typed array of the specified type.
+ */
 function getTypedArray( type, buffer ) {
 
 	return new TYPED_ARRAYS[ type ]( buffer );
@@ -1781,12 +1838,31 @@ function isTypedArray( array ) {
 
 }
 
+/**
+ * Creates an XHTML element with the specified tag name.
+ *
+ * This function uses the XHTML namespace to create DOM elements,
+ * ensuring proper element creation in XML-based contexts.
+ *
+ * @private
+ * @param {string} name - The tag name of the element to create (e.g., 'canvas', 'div').
+ * @return {HTMLElement} The created XHTML element.
+ */
 function createElementNS( name ) {
 
 	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
 
 }
 
+/**
+ * Creates a canvas element configured for block display.
+ *
+ * This is a convenience function that creates a canvas element with
+ * display style set to 'block', which is commonly used in three.js
+ * rendering contexts to avoid inline element spacing issues.
+ *
+ * @return {HTMLCanvasElement} A canvas element with display set to 'block'.
+ */
 function createCanvasElement() {
 
 	const canvas = createElementNS( 'canvas' );
@@ -1795,22 +1871,59 @@ function createCanvasElement() {
 
 }
 
+/**
+ * Internal cache for tracking warning messages to prevent duplicate warnings.
+ *
+ * @private
+ * @type {Object<string, boolean>}
+ */
 const _cache = {};
 
+/**
+ * Custom console function handler for intercepting log, warn, and error calls.
+ *
+ * @private
+ * @type {Function|null}
+ */
 let _setConsoleFunction = null;
 
+/**
+ * Sets a custom function to handle console output.
+ *
+ * This allows external code to intercept and handle console.log, console.warn,
+ * and console.error calls made by three.js, which is useful for custom logging,
+ * testing, or debugging workflows.
+ *
+ * @param {Function} fn - The function to handle console output. Should accept
+ *                        (type, message, ...params) where type is 'log', 'warn', or 'error'.
+ */
 function setConsoleFunction( fn ) {
 
 	_setConsoleFunction = fn;
 
 }
 
+/**
+ * Gets the currently set custom console function.
+ *
+ * @return {Function|null} The custom console function, or null if not set.
+ */
 function getConsoleFunction() {
 
 	return _setConsoleFunction;
 
 }
 
+/**
+ * Logs an informational message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.log. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function log( ...params ) {
 
 	const message = 'THREE.' + params.shift();
@@ -1827,7 +1940,49 @@ function log( ...params ) {
 
 }
 
+/**
+ * Enhances log/warn/error messages related to TSL.
+ *
+ * @param {Array<any>} params - The original message parameters.
+ * @returns {Array<any>} The filtered and enhanced message parameters.
+ */
+function enhanceLogMessage( params ) {
+
+	const message = params[ 0 ];
+
+	if ( typeof message === 'string' && message.startsWith( 'TSL:' ) ) {
+
+		const stackTrace = params[ 1 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			params[ 0 ] += ' ' + stackTrace.getLocation();
+
+		} else {
+
+			params[ 1 ] = 'Stack trace not available. Enable "THREE.Node.captureStackTrace" to capture stack traces.';
+
+		}
+
+	}
+
+	return params;
+
+}
+
+/**
+ * Logs a warning message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.warn. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function warn( ...params ) {
+
+	params = enhanceLogMessage( params );
 
 	const message = 'THREE.' + params.shift();
 
@@ -1837,13 +1992,35 @@ function warn( ...params ) {
 
 	} else {
 
-		console.warn( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.warn( stackTrace.getError( message ) );
+
+		} else {
+
+			console.warn( message, ...params );
+
+		}
 
 	}
 
 }
 
+/**
+ * Logs an error message with the 'THREE.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.error. The first parameter is treated as the
+ * method name and is automatically prefixed with 'THREE.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with 'THREE.'.
+ */
 function error( ...params ) {
+
+	params = enhanceLogMessage( params );
 
 	const message = 'THREE.' + params.shift();
 
@@ -1853,12 +2030,31 @@ function error( ...params ) {
 
 	} else {
 
-		console.error( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.error( stackTrace.getError( message ) );
+
+		} else {
+
+			console.error( message, ...params );
+
+		}
 
 	}
 
 }
 
+/**
+ * Logs a warning message only once, preventing duplicate warnings.
+ *
+ * This function maintains an internal cache of warning messages and will only
+ * output each unique warning message once. Useful for warnings that may be
+ * triggered repeatedly but should only be shown to the user once.
+ *
+ * @param {...any} params - The warning message components.
+ */
 function warnOnce( ...params ) {
 
 	const message = params.join( ' ' );
@@ -1871,6 +2067,20 @@ function warnOnce( ...params ) {
 
 }
 
+/**
+ * Asynchronously probes for WebGL sync object completion.
+ *
+ * This function creates a promise that resolves when the WebGL sync object
+ * signals completion or rejects if the sync operation fails. It uses polling
+ * at the specified interval to check the sync status without blocking the
+ * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
+ *
+ * @private
+ * @param {WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGLSync} sync - The WebGL sync object to wait for.
+ * @param {number} interval - The polling interval in milliseconds.
+ * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
+ */
 function probeAsync( gl, sync, interval ) {
 
 	return new Promise( function ( resolve, reject ) {
@@ -1899,6 +2109,25 @@ function probeAsync( gl, sync, interval ) {
 	} );
 
 }
+
+/**
+ * Used to select the correct depth functions
+ * when reversed depth buffer is used.
+ *
+ * @private
+ * @type {Object}
+ */
+const ReversedDepthFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
 
 /**
  * This modules allows to dispatch event objects on custom JavaScript objects.
@@ -2093,7 +2322,7 @@ function euclideanModulo( n, m ) {
 
 /**
  * Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>`
- * for the given value.
+ * for the given value. `a2` must be greater than `a1`.
  *
  * @param {number} x - The value to be mapped.
  * @param {number} a1 - Minimum value for range A.
@@ -2188,9 +2417,9 @@ function pingpong( x, length = 1 ) {
  *
  * See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
  *
- * @param {number} x - The value to evaluate based on its position between min and max.
- * @param {number} min - The min value. Any x value below min will be `0`.
- * @param {number} max - The max value. Any x value above max will be `1`.
+ * @param {number} x - The value to evaluate based on its position between `min` and `max`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
  * @return {number} The alternated value.
  */
 function smoothstep( x, min, max ) {
@@ -2206,11 +2435,11 @@ function smoothstep( x, min, max ) {
 
 /**
  * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
- * that has zero 1st and 2nd order derivatives at x=0 and x=1.
+ * that has zero 1st and 2nd order derivatives at `x=0` and `x=1`.
  *
- * @param {number} x - The value to evaluate based on its position between min and max.
- * @param {number} min - The min value. Any x value below min will be `0`.
- * @param {number} max - The max value. Any x value above max will be `1`.
+ * @param {number} x - The value to evaluate based on its position between `min` and `max`.
+ * @param {number} min - The min value. Any `x` value below `min` will be `0`. `min` must be lower than `max`.
+ * @param {number} max - The max value. Any `x` value above `max` will be `1`. `max` must be greater than `min`.
  * @return {number} The alternated value.
  */
 function smootherstep( x, min, max ) {
@@ -2323,7 +2552,7 @@ function isPowerOfTwo( value ) {
 /**
  * Returns the smallest power of two that is greater than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for.
+ * @param {number} value - The value to find a POT for. Must be greater than `0`.
  * @return {number} The smallest power of two that is greater than or equal to the given number.
  */
 function ceilPowerOfTwo( value ) {
@@ -2335,7 +2564,7 @@ function ceilPowerOfTwo( value ) {
 /**
  * Returns the largest power of two that is less than or equal to the given number.
  *
- * @param {number} value - The value to find a POT for.
+ * @param {number} value - The value to find a POT for. Must be greater than `0`.
  * @return {number} The largest power of two that is less than or equal to the given number.
  */
 function floorPowerOfTwo( value ) {
@@ -3667,7 +3896,7 @@ class Quaternion {
 	 * @param {number} srcOffset0 - An offset into the first source array.
 	 * @param {Array<number>} src1 -  The source array of the second quaternion.
 	 * @param {number} srcOffset1 - An offset into the second source array.
-	 * @param {number} t - The interpolation factor in the range `[0,1]`.
+	 * @param {number} t - The interpolation factor. A value in the range `[0,1]` will interpolate. A value outside the range `[0,1]` will extrapolate.
 	 * @see {@link Quaternion#slerp}
 	 */
 	static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
@@ -3681,28 +3910,6 @@ class Quaternion {
 			y1 = src1[ srcOffset1 + 1 ],
 			z1 = src1[ srcOffset1 + 2 ],
 			w1 = src1[ srcOffset1 + 3 ];
-
-		if ( t <= 0 ) {
-
-			dst[ dstOffset + 0 ] = x0;
-			dst[ dstOffset + 1 ] = y0;
-			dst[ dstOffset + 2 ] = z0;
-			dst[ dstOffset + 3 ] = w0;
-
-			return;
-
-		}
-
-		if ( t >= 1 ) {
-
-			dst[ dstOffset + 0 ] = x1;
-			dst[ dstOffset + 1 ] = y1;
-			dst[ dstOffset + 2 ] = z1;
-			dst[ dstOffset + 3 ] = w1;
-
-			return;
-
-		}
 
 		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
@@ -4345,17 +4552,13 @@ class Quaternion {
 	}
 
 	/**
-	 * Performs a spherical linear interpolation between quaternions.
+	 * Performs a spherical linear interpolation between this quaternion and the target quaternion.
 	 *
 	 * @param {Quaternion} qb - The target quaternion.
-	 * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
+	 * @param {number} t - The interpolation factor. A value in the range `[0,1]` will interpolate. A value outside the range `[0,1]` will extrapolate.
 	 * @return {Quaternion} A reference to this quaternion.
 	 */
 	slerp( qb, t ) {
-
-		if ( t <= 0 ) return this;
-
-		if ( t >= 1 ) return this.copy( qb ); // copy calls _onChangeCallback()
 
 		let x = qb._x, y = qb._y, z = qb._z, w = qb._w;
 
@@ -4659,7 +4862,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's x component to the given value
+	 * Sets the vector's x component to the given value.
 	 *
 	 * @param {number} x - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -4673,7 +4876,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's y component to the given value
+	 * Sets the vector's y component to the given value.
 	 *
 	 * @param {number} y - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -4687,7 +4890,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's z component to the given value
+	 * Sets the vector's z component to the given value.
 	 *
 	 * @param {number} z - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -4940,7 +5143,7 @@ class Vector3 {
 	 */
 	applyEuler( euler ) {
 
-		return this.applyQuaternion( _quaternion$4.setFromEuler( euler ) );
+		return this.applyQuaternion( _quaternion$5.setFromEuler( euler ) );
 
 	}
 
@@ -4953,7 +5156,7 @@ class Vector3 {
 	 */
 	applyAxisAngle( axis, angle ) {
 
-		return this.applyQuaternion( _quaternion$4.setFromAxisAngle( axis, angle ) );
+		return this.applyQuaternion( _quaternion$5.setFromAxisAngle( axis, angle ) );
 
 	}
 
@@ -5807,7 +6010,7 @@ class Vector3 {
 }
 
 const _vector$c = /*@__PURE__*/ new Vector3();
-const _quaternion$4 = /*@__PURE__*/ new Quaternion();
+const _quaternion$5 = /*@__PURE__*/ new Quaternion();
 
 /**
  * Represents a 3x3 matrix.
@@ -7042,7 +7245,7 @@ class Texture extends EventDispatcher {
 		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 		/**
-		 * The UUID of the material.
+		 * The UUID of the texture.
 		 *
 		 * @type {string}
 		 * @readonly
@@ -7050,7 +7253,7 @@ class Texture extends EventDispatcher {
 		this.uuid = generateUUID();
 
 		/**
-		 * The name of the material.
+		 * The name of the texture.
 		 *
 		 * @type {string}
 		 */
@@ -8952,10 +9155,6 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		const image = { width: width, height: height, depth: options.depth };
-
-		const texture = new Texture( image );
-
 		/**
 		 * An array of textures. Each color attachment is represented as a separate texture.
 		 * Has at least a single entry for the default color attachment.
@@ -8963,6 +9162,9 @@ class RenderTarget extends EventDispatcher {
 		 * @type {Array<Texture>}
 		 */
 		this.textures = [];
+
+		const image = { width: width, height: height, depth: options.depth };
+		const texture = new Texture( image );
 
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
@@ -9575,1876 +9777,6 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 }
 
 /**
- * Represents an axis-aligned bounding box (AABB) in 3D space.
- */
-class Box3 {
-
-	/**
-	 * Constructs a new bounding box.
-	 *
-	 * @param {Vector3} [min=(Infinity,Infinity,Infinity)] - A vector representing the lower boundary of the box.
-	 * @param {Vector3} [max=(-Infinity,-Infinity,-Infinity)] - A vector representing the upper boundary of the box.
-	 */
-	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isBox3 = true;
-
-		/**
-		 * The lower boundary of the box.
-		 *
-		 * @type {Vector3}
-		 */
-		this.min = min;
-
-		/**
-		 * The upper boundary of the box.
-		 *
-		 * @type {Vector3}
-		 */
-		this.max = max;
-
-	}
-
-	/**
-	 * Sets the lower and upper boundaries of this box.
-	 * Please note that this method only copies the values from the given objects.
-	 *
-	 * @param {Vector3} min - The lower boundary of the box.
-	 * @param {Vector3} max - The upper boundary of the box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	set( min, max ) {
-
-		this.min.copy( min );
-		this.max.copy( max );
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the upper and lower bounds of this box so it encloses the position data
-	 * in the given array.
-	 *
-	 * @param {Array<number>} array - An array holding 3D position data.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	setFromArray( array ) {
-
-		this.makeEmpty();
-
-		for ( let i = 0, il = array.length; i < il; i += 3 ) {
-
-			this.expandByPoint( _vector$b.fromArray( array, i ) );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the upper and lower bounds of this box so it encloses the position data
-	 * in the given buffer attribute.
-	 *
-	 * @param {BufferAttribute} attribute - A buffer attribute holding 3D position data.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	setFromBufferAttribute( attribute ) {
-
-		this.makeEmpty();
-
-		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
-
-			this.expandByPoint( _vector$b.fromBufferAttribute( attribute, i ) );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the upper and lower bounds of this box so it encloses the position data
-	 * in the given array.
-	 *
-	 * @param {Array<Vector3>} points - An array holding 3D position data as instances of {@link Vector3}.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	setFromPoints( points ) {
-
-		this.makeEmpty();
-
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
-
-			this.expandByPoint( points[ i ] );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Centers this box on the given center vector and sets this box's width, height and
-	 * depth to the given size values.
-	 *
-	 * @param {Vector3} center - The center of the box.
-	 * @param {Vector3} size - The x, y and z dimensions of the box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	setFromCenterAndSize( center, size ) {
-
-		const halfSize = _vector$b.copy( size ).multiplyScalar( 0.5 );
-
-		this.min.copy( center ).sub( halfSize );
-		this.max.copy( center ).add( halfSize );
-
-		return this;
-
-	}
-
-	/**
-	 * Computes the world-axis-aligned bounding box for the given 3D object
-	 * (including its children), accounting for the object's, and children's,
-	 * world transforms. The function may result in a larger box than strictly necessary.
-	 *
-	 * @param {Object3D} object - The 3D object to compute the bounding box for.
-	 * @param {boolean} [precise=false] - If set to `true`, the method computes the smallest
-	 * world-axis-aligned bounding box at the expense of more computation.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	setFromObject( object, precise = false ) {
-
-		this.makeEmpty();
-
-		return this.expandByObject( object, precise );
-
-	}
-
-	/**
-	 * Returns a new box with copied values from this instance.
-	 *
-	 * @return {Box3} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
-	/**
-	 * Copies the values of the given box to this instance.
-	 *
-	 * @param {Box3} box - The box to copy.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	copy( box ) {
-
-		this.min.copy( box.min );
-		this.max.copy( box.max );
-
-		return this;
-
-	}
-
-	/**
-	 * Makes this box empty which means in encloses a zero space in 3D.
-	 *
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	makeEmpty() {
-
-		this.min.x = this.min.y = this.min.z = + Infinity;
-		this.max.x = this.max.y = this.max.z = - Infinity;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns true if this box includes zero points within its bounds.
-	 * Note that a box with equal lower and upper bounds still includes one
-	 * point, the one both bounds share.
-	 *
-	 * @return {boolean} Whether this box is empty or not.
-	 */
-	isEmpty() {
-
-		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
-
-		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
-
-	}
-
-	/**
-	 * Returns the center point of this box.
-	 *
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The center point.
-	 */
-	getCenter( target ) {
-
-		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
-
-	}
-
-	/**
-	 * Returns the dimensions of this box.
-	 *
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The size.
-	 */
-	getSize( target ) {
-
-		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
-
-	}
-
-	/**
-	 * Expands the boundaries of this box to include the given point.
-	 *
-	 * @param {Vector3} point - The point that should be included by the bounding box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	expandByPoint( point ) {
-
-		this.min.min( point );
-		this.max.max( point );
-
-		return this;
-
-	}
-
-	/**
-	 * Expands this box equilaterally by the given vector. The width of this
-	 * box will be expanded by the x component of the vector in both
-	 * directions. The height of this box will be expanded by the y component of
-	 * the vector in both directions. The depth of this box will be
-	 * expanded by the z component of the vector in both directions.
-	 *
-	 * @param {Vector3} vector - The vector that should expand the bounding box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	expandByVector( vector ) {
-
-		this.min.sub( vector );
-		this.max.add( vector );
-
-		return this;
-
-	}
-
-	/**
-	 * Expands each dimension of the box by the given scalar. If negative, the
-	 * dimensions of the box will be contracted.
-	 *
-	 * @param {number} scalar - The scalar value that should expand the bounding box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	expandByScalar( scalar ) {
-
-		this.min.addScalar( - scalar );
-		this.max.addScalar( scalar );
-
-		return this;
-
-	}
-
-	/**
-	 * Expands the boundaries of this box to include the given 3D object and
-	 * its children, accounting for the object's, and children's, world
-	 * transforms. The function may result in a larger box than strictly
-	 * necessary (unless the precise parameter is set to true).
-	 *
-	 * @param {Object3D} object - The 3D object that should expand the bounding box.
-	 * @param {boolean} precise - If set to `true`, the method expands the bounding box
-	 * as little as necessary at the expense of more computation.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	expandByObject( object, precise = false ) {
-
-		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
-
-		object.updateWorldMatrix( false, false );
-
-		const geometry = object.geometry;
-
-		if ( geometry !== undefined ) {
-
-			const positionAttribute = geometry.getAttribute( 'position' );
-
-			// precise AABB computation based on vertex data requires at least a position attribute.
-			// instancing isn't supported so far and uses the normal (conservative) code path.
-
-			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
-
-				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
-
-					if ( object.isMesh === true ) {
-
-						object.getVertexPosition( i, _vector$b );
-
-					} else {
-
-						_vector$b.fromBufferAttribute( positionAttribute, i );
-
-					}
-
-					_vector$b.applyMatrix4( object.matrixWorld );
-					this.expandByPoint( _vector$b );
-
-				}
-
-			} else {
-
-				if ( object.boundingBox !== undefined ) {
-
-					// object-level bounding box
-
-					if ( object.boundingBox === null ) {
-
-						object.computeBoundingBox();
-
-					}
-
-					_box$4.copy( object.boundingBox );
-
-
-				} else {
-
-					// geometry-level bounding box
-
-					if ( geometry.boundingBox === null ) {
-
-						geometry.computeBoundingBox();
-
-					}
-
-					_box$4.copy( geometry.boundingBox );
-
-				}
-
-				_box$4.applyMatrix4( object.matrixWorld );
-
-				this.union( _box$4 );
-
-			}
-
-		}
-
-		const children = object.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			this.expandByObject( children[ i ], precise );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if the given point lies within or on the boundaries of this box.
-	 *
-	 * @param {Vector3} point - The point to test.
-	 * @return {boolean} Whether the bounding box contains the given point or not.
-	 */
-	containsPoint( point ) {
-
-		return point.x >= this.min.x && point.x <= this.max.x &&
-			point.y >= this.min.y && point.y <= this.max.y &&
-			point.z >= this.min.z && point.z <= this.max.z;
-
-	}
-
-	/**
-	 * Returns `true` if this bounding box includes the entirety of the given bounding box.
-	 * If this box and the given one are identical, this function also returns `true`.
-	 *
-	 * @param {Box3} box - The bounding box to test.
-	 * @return {boolean} Whether the bounding box contains the given bounding box or not.
-	 */
-	containsBox( box ) {
-
-		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
-			this.min.y <= box.min.y && box.max.y <= this.max.y &&
-			this.min.z <= box.min.z && box.max.z <= this.max.z;
-
-	}
-
-	/**
-	 * Returns a point as a proportion of this box's width, height and depth.
-	 *
-	 * @param {Vector3} point - A point in 3D space.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} A point as a proportion of this box's width, height and depth.
-	 */
-	getParameter( point, target ) {
-
-		// This can potentially have a divide by zero if the box
-		// has a size dimension of 0.
-
-		return target.set(
-			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
-			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
-			( point.z - this.min.z ) / ( this.max.z - this.min.z )
-		);
-
-	}
-
-	/**
-	 * Returns `true` if the given bounding box intersects with this bounding box.
-	 *
-	 * @param {Box3} box - The bounding box to test.
-	 * @return {boolean} Whether the given bounding box intersects with this bounding box.
-	 */
-	intersectsBox( box ) {
-
-		// using 6 splitting planes to rule out intersections.
-		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
-			box.max.y >= this.min.y && box.min.y <= this.max.y &&
-			box.max.z >= this.min.z && box.min.z <= this.max.z;
-
-	}
-
-	/**
-	 * Returns `true` if the given bounding sphere intersects with this bounding box.
-	 *
-	 * @param {Sphere} sphere - The bounding sphere to test.
-	 * @return {boolean} Whether the given bounding sphere intersects with this bounding box.
-	 */
-	intersectsSphere( sphere ) {
-
-		// Find the point on the AABB closest to the sphere center.
-		this.clampPoint( sphere.center, _vector$b );
-
-		// If that point is inside the sphere, the AABB and sphere intersect.
-		return _vector$b.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-	}
-
-	/**
-	 * Returns `true` if the given plane intersects with this bounding box.
-	 *
-	 * @param {Plane} plane - The plane to test.
-	 * @return {boolean} Whether the given plane intersects with this bounding box.
-	 */
-	intersectsPlane( plane ) {
-
-		// We compute the minimum and maximum dot product values. If those values
-		// are on the same side (back or front) of the plane, then there is no intersection.
-
-		let min, max;
-
-		if ( plane.normal.x > 0 ) {
-
-			min = plane.normal.x * this.min.x;
-			max = plane.normal.x * this.max.x;
-
-		} else {
-
-			min = plane.normal.x * this.max.x;
-			max = plane.normal.x * this.min.x;
-
-		}
-
-		if ( plane.normal.y > 0 ) {
-
-			min += plane.normal.y * this.min.y;
-			max += plane.normal.y * this.max.y;
-
-		} else {
-
-			min += plane.normal.y * this.max.y;
-			max += plane.normal.y * this.min.y;
-
-		}
-
-		if ( plane.normal.z > 0 ) {
-
-			min += plane.normal.z * this.min.z;
-			max += plane.normal.z * this.max.z;
-
-		} else {
-
-			min += plane.normal.z * this.max.z;
-			max += plane.normal.z * this.min.z;
-
-		}
-
-		return ( min <= - plane.constant && max >= - plane.constant );
-
-	}
-
-	/**
-	 * Returns `true` if the given triangle intersects with this bounding box.
-	 *
-	 * @param {Triangle} triangle - The triangle to test.
-	 * @return {boolean} Whether the given triangle intersects with this bounding box.
-	 */
-	intersectsTriangle( triangle ) {
-
-		if ( this.isEmpty() ) {
-
-			return false;
-
-		}
-
-		// compute box center and extents
-		this.getCenter( _center );
-		_extents.subVectors( this.max, _center );
-
-		// translate triangle to aabb origin
-		_v0$3.subVectors( triangle.a, _center );
-		_v1$7.subVectors( triangle.b, _center );
-		_v2$4.subVectors( triangle.c, _center );
-
-		// compute edge vectors for triangle
-		_f0.subVectors( _v1$7, _v0$3 );
-		_f1.subVectors( _v2$4, _v1$7 );
-		_f2.subVectors( _v0$3, _v2$4 );
-
-		// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
-		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
-		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
-		let axes = [
-			0, - _f0.z, _f0.y, 0, - _f1.z, _f1.y, 0, - _f2.z, _f2.y,
-			_f0.z, 0, - _f0.x, _f1.z, 0, - _f1.x, _f2.z, 0, - _f2.x,
-			- _f0.y, _f0.x, 0, - _f1.y, _f1.x, 0, - _f2.y, _f2.x, 0
-		];
-		if ( ! satForAxes( axes, _v0$3, _v1$7, _v2$4, _extents ) ) {
-
-			return false;
-
-		}
-
-		// test 3 face normals from the aabb
-		axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
-		if ( ! satForAxes( axes, _v0$3, _v1$7, _v2$4, _extents ) ) {
-
-			return false;
-
-		}
-
-		// finally testing the face normal of the triangle
-		// use already existing triangle edge vectors here
-		_triangleNormal.crossVectors( _f0, _f1 );
-		axes = [ _triangleNormal.x, _triangleNormal.y, _triangleNormal.z ];
-
-		return satForAxes( axes, _v0$3, _v1$7, _v2$4, _extents );
-
-	}
-
-	/**
-	 * Clamps the given point within the bounds of this box.
-	 *
-	 * @param {Vector3} point - The point to clamp.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The clamped point.
-	 */
-	clampPoint( point, target ) {
-
-		return target.copy( point ).clamp( this.min, this.max );
-
-	}
-
-	/**
-	 * Returns the euclidean distance from any edge of this box to the specified point. If
-	 * the given point lies inside of this box, the distance will be `0`.
-	 *
-	 * @param {Vector3} point - The point to compute the distance to.
-	 * @return {number} The euclidean distance.
-	 */
-	distanceToPoint( point ) {
-
-		return this.clampPoint( point, _vector$b ).distanceTo( point );
-
-	}
-
-	/**
-	 * Returns a bounding sphere that encloses this bounding box.
-	 *
-	 * @param {Sphere} target - The target sphere that is used to store the method's result.
-	 * @return {Sphere} The bounding sphere that encloses this bounding box.
-	 */
-	getBoundingSphere( target ) {
-
-		if ( this.isEmpty() ) {
-
-			target.makeEmpty();
-
-		} else {
-
-			this.getCenter( target.center );
-
-			target.radius = this.getSize( _vector$b ).length() * 0.5;
-
-		}
-
-		return target;
-
-	}
-
-	/**
-	 * Computes the intersection of this bounding box and the given one, setting the upper
-	 * bound of this box to the lesser of the two boxes' upper bounds and the
-	 * lower bound of this box to the greater of the two boxes' lower bounds. If
-	 * there's no overlap, makes this box empty.
-	 *
-	 * @param {Box3} box - The bounding box to intersect with.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	intersect( box ) {
-
-		this.min.max( box.min );
-		this.max.min( box.max );
-
-		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
-		if ( this.isEmpty() ) this.makeEmpty();
-
-		return this;
-
-	}
-
-	/**
-	 * Computes the union of this box and another and the given one, setting the upper
-	 * bound of this box to the greater of the two boxes' upper bounds and the
-	 * lower bound of this box to the lesser of the two boxes' lower bounds.
-	 *
-	 * @param {Box3} box - The bounding box that will be unioned with this instance.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	union( box ) {
-
-		this.min.min( box.min );
-		this.max.max( box.max );
-
-		return this;
-
-	}
-
-	/**
-	 * Transforms this bounding box by the given 4x4 transformation matrix.
-	 *
-	 * @param {Matrix4} matrix - The transformation matrix.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	applyMatrix4( matrix ) {
-
-		// transform of empty box is an empty box.
-		if ( this.isEmpty() ) return this;
-
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
-
-		this.setFromPoints( _points );
-
-		return this;
-
-	}
-
-	/**
-	 * Adds the given offset to both the upper and lower bounds of this bounding box,
-	 * effectively moving it in 3D space.
-	 *
-	 * @param {Vector3} offset - The offset that should be used to translate the bounding box.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	translate( offset ) {
-
-		this.min.add( offset );
-		this.max.add( offset );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this bounding box is equal with the given one.
-	 *
-	 * @param {Box3} box - The box to test for equality.
-	 * @return {boolean} Whether this bounding box is equal with the given one.
-	 */
-	equals( box ) {
-
-		return box.min.equals( this.min ) && box.max.equals( this.max );
-
-	}
-
-	/**
-	 * Returns a serialized structure of the bounding box.
-	 *
-	 * @return {Object} Serialized structure with fields representing the object state.
-	 */
-	toJSON() {
-
-		return {
-			min: this.min.toArray(),
-			max: this.max.toArray()
-		};
-
-	}
-
-	/**
-	 * Returns a serialized structure of the bounding box.
-	 *
-	 * @param {Object} json - The serialized json to set the box from.
-	 * @return {Box3} A reference to this bounding box.
-	 */
-	fromJSON( json ) {
-
-		this.min.fromArray( json.min );
-		this.max.fromArray( json.max );
-		return this;
-
-	}
-
-}
-
-const _points = [
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3()
-];
-
-const _vector$b = /*@__PURE__*/ new Vector3();
-
-const _box$4 = /*@__PURE__*/ new Box3();
-
-// triangle centered vertices
-
-const _v0$3 = /*@__PURE__*/ new Vector3();
-const _v1$7 = /*@__PURE__*/ new Vector3();
-const _v2$4 = /*@__PURE__*/ new Vector3();
-
-// triangle edge vectors
-
-const _f0 = /*@__PURE__*/ new Vector3();
-const _f1 = /*@__PURE__*/ new Vector3();
-const _f2 = /*@__PURE__*/ new Vector3();
-
-const _center = /*@__PURE__*/ new Vector3();
-const _extents = /*@__PURE__*/ new Vector3();
-const _triangleNormal = /*@__PURE__*/ new Vector3();
-const _testAxis = /*@__PURE__*/ new Vector3();
-
-function satForAxes( axes, v0, v1, v2, extents ) {
-
-	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
-
-		_testAxis.fromArray( axes, i );
-		// project the aabb onto the separating axis
-		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the separating axis
-		const p0 = v0.dot( _testAxis );
-		const p1 = v1.dot( _testAxis );
-		const p2 = v2.dot( _testAxis );
-		// actual test, basically see if either of the most extreme of the triangle points intersects r
-		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
-
-			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is separating and we can exit
-			return false;
-
-		}
-
-	}
-
-	return true;
-
-}
-
-const _box$3 = /*@__PURE__*/ new Box3();
-const _v1$6 = /*@__PURE__*/ new Vector3();
-const _v2$3 = /*@__PURE__*/ new Vector3();
-
-/**
- * An analytical 3D sphere defined by a center and radius. This class is mainly
- * used as a Bounding Sphere for 3D objects.
- */
-class Sphere {
-
-	/**
-	 * Constructs a new sphere.
-	 *
-	 * @param {Vector3} [center=(0,0,0)] - The center of the sphere
-	 * @param {number} [radius=-1] - The radius of the sphere.
-	 */
-	constructor( center = new Vector3(), radius = -1 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSphere = true;
-
-		/**
-		 * The center of the sphere
-		 *
-		 * @type {Vector3}
-		 */
-		this.center = center;
-
-		/**
-		 * The radius of the sphere.
-		 *
-		 * @type {number}
-		 */
-		this.radius = radius;
-
-	}
-
-	/**
-	 * Sets the sphere's components by copying the given values.
-	 *
-	 * @param {Vector3} center - The center.
-	 * @param {number} radius - The radius.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	set( center, radius ) {
-
-		this.center.copy( center );
-		this.radius = radius;
-
-		return this;
-
-	}
-
-	/**
-	 * Computes the minimum bounding sphere for list of points.
-	 * If the optional center point is given, it is used as the sphere's
-	 * center. Otherwise, the center of the axis-aligned bounding box
-	 * encompassing the points is calculated.
-	 *
-	 * @param {Array<Vector3>} points - A list of points in 3D space.
-	 * @param {Vector3} [optionalCenter] - The center of the sphere.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	setFromPoints( points, optionalCenter ) {
-
-		const center = this.center;
-
-		if ( optionalCenter !== undefined ) {
-
-			center.copy( optionalCenter );
-
-		} else {
-
-			_box$3.setFromPoints( points ).getCenter( center );
-
-		}
-
-		let maxRadiusSq = 0;
-
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
-
-			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
-
-		}
-
-		this.radius = Math.sqrt( maxRadiusSq );
-
-		return this;
-
-	}
-
-	/**
-	 * Copies the values of the given sphere to this instance.
-	 *
-	 * @param {Sphere} sphere - The sphere to copy.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	copy( sphere ) {
-
-		this.center.copy( sphere.center );
-		this.radius = sphere.radius;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if the sphere is empty (the radius set to a negative number).
-	 *
-	 * Spheres with a radius of `0` contain only their center point and are not
-	 * considered to be empty.
-	 *
-	 * @return {boolean} Whether this sphere is empty or not.
-	 */
-	isEmpty() {
-
-		return ( this.radius < 0 );
-
-	}
-
-	/**
-	 * Makes this sphere empty which means in encloses a zero space in 3D.
-	 *
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	makeEmpty() {
-
-		this.center.set( 0, 0, 0 );
-		this.radius = -1;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this sphere contains the given point inclusive of
-	 * the surface of the sphere.
-	 *
-	 * @param {Vector3} point - The point to check.
-	 * @return {boolean} Whether this sphere contains the given point or not.
-	 */
-	containsPoint( point ) {
-
-		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
-
-	}
-
-	/**
-	 * Returns the closest distance from the boundary of the sphere to the
-	 * given point. If the sphere contains the point, the distance will
-	 * be negative.
-	 *
-	 * @param {Vector3} point - The point to compute the distance to.
-	 * @return {number} The distance to the point.
-	 */
-	distanceToPoint( point ) {
-
-		return ( point.distanceTo( this.center ) - this.radius );
-
-	}
-
-	/**
-	 * Returns `true` if this sphere intersects with the given one.
-	 *
-	 * @param {Sphere} sphere - The sphere to test.
-	 * @return {boolean} Whether this sphere intersects with the given one or not.
-	 */
-	intersectsSphere( sphere ) {
-
-		const radiusSum = this.radius + sphere.radius;
-
-		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
-
-	}
-
-	/**
-	 * Returns `true` if this sphere intersects with the given box.
-	 *
-	 * @param {Box3} box - The box to test.
-	 * @return {boolean} Whether this sphere intersects with the given box or not.
-	 */
-	intersectsBox( box ) {
-
-		return box.intersectsSphere( this );
-
-	}
-
-	/**
-	 * Returns `true` if this sphere intersects with the given plane.
-	 *
-	 * @param {Plane} plane - The plane to test.
-	 * @return {boolean} Whether this sphere intersects with the given plane or not.
-	 */
-	intersectsPlane( plane ) {
-
-		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
-
-	}
-
-	/**
-	 * Clamps a point within the sphere. If the point is outside the sphere, it
-	 * will clamp it to the closest point on the edge of the sphere. Points
-	 * already inside the sphere will not be affected.
-	 *
-	 * @param {Vector3} point - The plane to clamp.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The clamped point.
-	 */
-	clampPoint( point, target ) {
-
-		const deltaLengthSq = this.center.distanceToSquared( point );
-
-		target.copy( point );
-
-		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
-
-			target.sub( this.center ).normalize();
-			target.multiplyScalar( this.radius ).add( this.center );
-
-		}
-
-		return target;
-
-	}
-
-	/**
-	 * Returns a bounding box that encloses this sphere.
-	 *
-	 * @param {Box3} target - The target box that is used to store the method's result.
-	 * @return {Box3} The bounding box that encloses this sphere.
-	 */
-	getBoundingBox( target ) {
-
-		if ( this.isEmpty() ) {
-
-			// Empty sphere produces empty bounding box
-			target.makeEmpty();
-			return target;
-
-		}
-
-		target.set( this.center, this.center );
-		target.expandByScalar( this.radius );
-
-		return target;
-
-	}
-
-	/**
-	 * Transforms this sphere with the given 4x4 transformation matrix.
-	 *
-	 * @param {Matrix4} matrix - The transformation matrix.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	applyMatrix4( matrix ) {
-
-		this.center.applyMatrix4( matrix );
-		this.radius = this.radius * matrix.getMaxScaleOnAxis();
-
-		return this;
-
-	}
-
-	/**
-	 * Translates the sphere's center by the given offset.
-	 *
-	 * @param {Vector3} offset - The offset.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	translate( offset ) {
-
-		this.center.add( offset );
-
-		return this;
-
-	}
-
-	/**
-	 * Expands the boundaries of this sphere to include the given point.
-	 *
-	 * @param {Vector3} point - The point to include.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	expandByPoint( point ) {
-
-		if ( this.isEmpty() ) {
-
-			this.center.copy( point );
-
-			this.radius = 0;
-
-			return this;
-
-		}
-
-		_v1$6.subVectors( point, this.center );
-
-		const lengthSq = _v1$6.lengthSq();
-
-		if ( lengthSq > ( this.radius * this.radius ) ) {
-
-			// calculate the minimal sphere
-
-			const length = Math.sqrt( lengthSq );
-
-			const delta = ( length - this.radius ) * 0.5;
-
-			this.center.addScaledVector( _v1$6, delta / length );
-
-			this.radius += delta;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Expands this sphere to enclose both the original sphere and the given sphere.
-	 *
-	 * @param {Sphere} sphere - The sphere to include.
-	 * @return {Sphere} A reference to this sphere.
-	 */
-	union( sphere ) {
-
-		if ( sphere.isEmpty() ) {
-
-			return this;
-
-		}
-
-		if ( this.isEmpty() ) {
-
-			this.copy( sphere );
-
-			return this;
-
-		}
-
-		if ( this.center.equals( sphere.center ) === true ) {
-
-			 this.radius = Math.max( this.radius, sphere.radius );
-
-		} else {
-
-			_v2$3.subVectors( sphere.center, this.center ).setLength( sphere.radius );
-
-			this.expandByPoint( _v1$6.copy( sphere.center ).add( _v2$3 ) );
-
-			this.expandByPoint( _v1$6.copy( sphere.center ).sub( _v2$3 ) );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this sphere is equal with the given one.
-	 *
-	 * @param {Sphere} sphere - The sphere to test for equality.
-	 * @return {boolean} Whether this bounding sphere is equal with the given one.
-	 */
-	equals( sphere ) {
-
-		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
-
-	}
-
-	/**
-	 * Returns a new sphere with copied values from this instance.
-	 *
-	 * @return {Sphere} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
-	/**
-	 * Returns a serialized structure of the bounding sphere.
-	 *
-	 * @return {Object} Serialized structure with fields representing the object state.
-	 */
-	toJSON() {
-
-		return {
-			radius: this.radius,
-			center: this.center.toArray()
-		};
-
-	}
-
-	/**
-	 * Returns a serialized structure of the bounding sphere.
-	 *
-	 * @param {Object} json - The serialized json to set the sphere from.
-	 * @return {Sphere} A reference to this bounding sphere.
-	 */
-	fromJSON( json ) {
-
-		this.radius = json.radius;
-		this.center.fromArray( json.center );
-		return this;
-
-	}
-
-}
-
-const _vector$a = /*@__PURE__*/ new Vector3();
-const _segCenter = /*@__PURE__*/ new Vector3();
-const _segDir = /*@__PURE__*/ new Vector3();
-const _diff = /*@__PURE__*/ new Vector3();
-
-const _edge1 = /*@__PURE__*/ new Vector3();
-const _edge2 = /*@__PURE__*/ new Vector3();
-const _normal$1 = /*@__PURE__*/ new Vector3();
-
-/**
- * A ray that emits from an origin in a certain direction. The class is used by
- * {@link Raycaster} to assist with raycasting. Raycasting is used for
- * mouse picking (working out what objects in the 3D space the mouse is over)
- * amongst other things.
- */
-class Ray {
-
-	/**
-	 * Constructs a new ray.
-	 *
-	 * @param {Vector3} [origin=(0,0,0)] - The origin of the ray.
-	 * @param {Vector3} [direction=(0,0,-1)] - The (normalized) direction of the ray.
-	 */
-	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, -1 ) ) {
-
-		/**
-		 * The origin of the ray.
-		 *
-		 * @type {Vector3}
-		 */
-		this.origin = origin;
-
-		/**
-		 * The (normalized) direction of the ray.
-		 *
-		 * @type {Vector3}
-		 */
-		this.direction = direction;
-
-	}
-
-	/**
-	 * Sets the ray's components by copying the given values.
-	 *
-	 * @param {Vector3} origin - The origin.
-	 * @param {Vector3} direction - The direction.
-	 * @return {Ray} A reference to this ray.
-	 */
-	set( origin, direction ) {
-
-		this.origin.copy( origin );
-		this.direction.copy( direction );
-
-		return this;
-
-	}
-
-	/**
-	 * Copies the values of the given ray to this instance.
-	 *
-	 * @param {Ray} ray - The ray to copy.
-	 * @return {Ray} A reference to this ray.
-	 */
-	copy( ray ) {
-
-		this.origin.copy( ray.origin );
-		this.direction.copy( ray.direction );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a vector that is located at a given distance along this ray.
-	 *
-	 * @param {number} t - The distance along the ray to retrieve a position for.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} A position on the ray.
-	 */
-	at( t, target ) {
-
-		return target.copy( this.origin ).addScaledVector( this.direction, t );
-
-	}
-
-	/**
-	 * Adjusts the direction of the ray to point at the given vector in world space.
-	 *
-	 * @param {Vector3} v - The target position.
-	 * @return {Ray} A reference to this ray.
-	 */
-	lookAt( v ) {
-
-		this.direction.copy( v ).sub( this.origin ).normalize();
-
-		return this;
-
-	}
-
-	/**
-	 * Shift the origin of this ray along its direction by the given distance.
-	 *
-	 * @param {number} t - The distance along the ray to interpolate.
-	 * @return {Ray} A reference to this ray.
-	 */
-	recast( t ) {
-
-		this.origin.copy( this.at( t, _vector$a ) );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the point along this ray that is closest to the given point.
-	 *
-	 * @param {Vector3} point - A point in 3D space to get the closet location on the ray for.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The closest point on this ray.
-	 */
-	closestPointToPoint( point, target ) {
-
-		target.subVectors( point, this.origin );
-
-		const directionDistance = target.dot( this.direction );
-
-		if ( directionDistance < 0 ) {
-
-			return target.copy( this.origin );
-
-		}
-
-		return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
-
-	}
-
-	/**
-	 * Returns the distance of the closest approach between this ray and the given point.
-	 *
-	 * @param {Vector3} point - A point in 3D space to compute the distance to.
-	 * @return {number} The distance.
-	 */
-	distanceToPoint( point ) {
-
-		return Math.sqrt( this.distanceSqToPoint( point ) );
-
-	}
-
-	/**
-	 * Returns the squared distance of the closest approach between this ray and the given point.
-	 *
-	 * @param {Vector3} point - A point in 3D space to compute the distance to.
-	 * @return {number} The squared distance.
-	 */
-	distanceSqToPoint( point ) {
-
-		const directionDistance = _vector$a.subVectors( point, this.origin ).dot( this.direction );
-
-		// point behind the ray
-
-		if ( directionDistance < 0 ) {
-
-			return this.origin.distanceToSquared( point );
-
-		}
-
-		_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
-
-		return _vector$a.distanceToSquared( point );
-
-	}
-
-	/**
-	 * Returns the squared distance between this ray and the given line segment.
-	 *
-	 * @param {Vector3} v0 - The start point of the line segment.
-	 * @param {Vector3} v1 - The end point of the line segment.
-	 * @param {Vector3} [optionalPointOnRay] - When provided, it receives the point on this ray that is closest to the segment.
-	 * @param {Vector3} [optionalPointOnSegment] - When provided, it receives the point on the line segment that is closest to this ray.
-	 * @return {number} The squared distance.
-	 */
-	distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
-
-		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteDistRaySegment.h
-		// It returns the min distance between the ray and the segment
-		// defined by v0 and v1
-		// It can also set two optional targets :
-		// - The closest point on the ray
-		// - The closest point on the segment
-
-		_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
-		_segDir.copy( v1 ).sub( v0 ).normalize();
-		_diff.copy( this.origin ).sub( _segCenter );
-
-		const segExtent = v0.distanceTo( v1 ) * 0.5;
-		const a01 = - this.direction.dot( _segDir );
-		const b0 = _diff.dot( this.direction );
-		const b1 = - _diff.dot( _segDir );
-		const c = _diff.lengthSq();
-		const det = Math.abs( 1 - a01 * a01 );
-		let s0, s1, sqrDist, extDet;
-
-		if ( det > 0 ) {
-
-			// The ray and segment are not parallel.
-
-			s0 = a01 * b1 - b0;
-			s1 = a01 * b0 - b1;
-			extDet = segExtent * det;
-
-			if ( s0 >= 0 ) {
-
-				if ( s1 >= - extDet ) {
-
-					if ( s1 <= extDet ) {
-
-						// region 0
-						// Minimum at interior points of ray and segment.
-
-						const invDet = 1 / det;
-						s0 *= invDet;
-						s1 *= invDet;
-						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-
-					} else {
-
-						// region 1
-
-						s1 = segExtent;
-						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-					}
-
-				} else {
-
-					// region 5
-
-					s1 = - segExtent;
-					s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-				}
-
-			} else {
-
-				if ( s1 <= - extDet ) {
-
-					// region 4
-
-					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
-					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-				} else if ( s1 <= extDet ) {
-
-					// region 3
-
-					s0 = 0;
-					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
-					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
-
-				} else {
-
-					// region 2
-
-					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
-					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-				}
-
-			}
-
-		} else {
-
-			// Ray and segment are parallel.
-
-			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-		}
-
-		if ( optionalPointOnRay ) {
-
-			optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
-
-		}
-
-		if ( optionalPointOnSegment ) {
-
-			optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
-
-		}
-
-		return sqrDist;
-
-	}
-
-	/**
-	 * Intersects this ray with the given sphere, returning the intersection
-	 * point or `null` if there is no intersection.
-	 *
-	 * @param {Sphere} sphere - The sphere to intersect.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
-	 */
-	intersectSphere( sphere, target ) {
-
-		_vector$a.subVectors( sphere.center, this.origin );
-		const tca = _vector$a.dot( this.direction );
-		const d2 = _vector$a.dot( _vector$a ) - tca * tca;
-		const radius2 = sphere.radius * sphere.radius;
-
-		if ( d2 > radius2 ) return null;
-
-		const thc = Math.sqrt( radius2 - d2 );
-
-		// t0 = first intersect point - entrance on front of sphere
-		const t0 = tca - thc;
-
-		// t1 = second intersect point - exit point on back of sphere
-		const t1 = tca + thc;
-
-		// test to see if t1 is behind the ray - if so, return null
-		if ( t1 < 0 ) return null;
-
-		// test to see if t0 is behind the ray:
-		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
-		// in order to always return an intersect point that is in front of the ray.
-		if ( t0 < 0 ) return this.at( t1, target );
-
-		// else t0 is in front of the ray, so return the first collision point scaled by t0
-		return this.at( t0, target );
-
-	}
-
-	/**
-	 * Returns `true` if this ray intersects with the given sphere.
-	 *
-	 * @param {Sphere} sphere - The sphere to intersect.
-	 * @return {boolean} Whether this ray intersects with the given sphere or not.
-	 */
-	intersectsSphere( sphere ) {
-
-		if ( sphere.radius < 0 ) return false; // handle empty spheres, see #31187
-
-		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-	}
-
-	/**
-	 * Computes the distance from the ray's origin to the given plane. Returns `null` if the ray
-	 * does not intersect with the plane.
-	 *
-	 * @param {Plane} plane - The plane to compute the distance to.
-	 * @return {?number} Whether this ray intersects with the given sphere or not.
-	 */
-	distanceToPlane( plane ) {
-
-		const denominator = plane.normal.dot( this.direction );
-
-		if ( denominator === 0 ) {
-
-			// line is coplanar, return origin
-			if ( plane.distanceToPoint( this.origin ) === 0 ) {
-
-				return 0;
-
-			}
-
-			// Null is preferable to undefined since undefined means.... it is undefined
-
-			return null;
-
-		}
-
-		const t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
-
-		// Return if the ray never intersects the plane
-
-		return t >= 0 ? t : null;
-
-	}
-
-	/**
-	 * Intersects this ray with the given plane, returning the intersection
-	 * point or `null` if there is no intersection.
-	 *
-	 * @param {Plane} plane - The plane to intersect.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
-	 */
-	intersectPlane( plane, target ) {
-
-		const t = this.distanceToPlane( plane );
-
-		if ( t === null ) {
-
-			return null;
-
-		}
-
-		return this.at( t, target );
-
-	}
-
-	/**
-	 * Returns `true` if this ray intersects with the given plane.
-	 *
-	 * @param {Plane} plane - The plane to intersect.
-	 * @return {boolean} Whether this ray intersects with the given plane or not.
-	 */
-	intersectsPlane( plane ) {
-
-		// check if the ray lies on the plane first
-
-		const distToPoint = plane.distanceToPoint( this.origin );
-
-		if ( distToPoint === 0 ) {
-
-			return true;
-
-		}
-
-		const denominator = plane.normal.dot( this.direction );
-
-		if ( denominator * distToPoint < 0 ) {
-
-			return true;
-
-		}
-
-		// ray origin is behind the plane (and is pointing behind it)
-
-		return false;
-
-	}
-
-	/**
-	 * Intersects this ray with the given bounding box, returning the intersection
-	 * point or `null` if there is no intersection.
-	 *
-	 * @param {Box3} box - The box to intersect.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
-	 */
-	intersectBox( box, target ) {
-
-		let tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-		const invdirx = 1 / this.direction.x,
-			invdiry = 1 / this.direction.y,
-			invdirz = 1 / this.direction.z;
-
-		const origin = this.origin;
-
-		if ( invdirx >= 0 ) {
-
-			tmin = ( box.min.x - origin.x ) * invdirx;
-			tmax = ( box.max.x - origin.x ) * invdirx;
-
-		} else {
-
-			tmin = ( box.max.x - origin.x ) * invdirx;
-			tmax = ( box.min.x - origin.x ) * invdirx;
-
-		}
-
-		if ( invdiry >= 0 ) {
-
-			tymin = ( box.min.y - origin.y ) * invdiry;
-			tymax = ( box.max.y - origin.y ) * invdiry;
-
-		} else {
-
-			tymin = ( box.max.y - origin.y ) * invdiry;
-			tymax = ( box.min.y - origin.y ) * invdiry;
-
-		}
-
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
-
-		if ( tymin > tmin || isNaN( tmin ) ) tmin = tymin;
-
-		if ( tymax < tmax || isNaN( tmax ) ) tmax = tymax;
-
-		if ( invdirz >= 0 ) {
-
-			tzmin = ( box.min.z - origin.z ) * invdirz;
-			tzmax = ( box.max.z - origin.z ) * invdirz;
-
-		} else {
-
-			tzmin = ( box.max.z - origin.z ) * invdirz;
-			tzmax = ( box.min.z - origin.z ) * invdirz;
-
-		}
-
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
-
-		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
-
-		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
-
-		//return point closest to the ray (positive side)
-
-		if ( tmax < 0 ) return null;
-
-		return this.at( tmin >= 0 ? tmin : tmax, target );
-
-	}
-
-	/**
-	 * Returns `true` if this ray intersects with the given box.
-	 *
-	 * @param {Box3} box - The box to intersect.
-	 * @return {boolean} Whether this ray intersects with the given box or not.
-	 */
-	intersectsBox( box ) {
-
-		return this.intersectBox( box, _vector$a ) !== null;
-
-	}
-
-	/**
-	 * Intersects this ray with the given triangle, returning the intersection
-	 * point or `null` if there is no intersection.
-	 *
-	 * @param {Vector3} a - The first vertex of the triangle.
-	 * @param {Vector3} b - The second vertex of the triangle.
-	 * @param {Vector3} c - The third vertex of the triangle.
-	 * @param {boolean} backfaceCulling - Whether to use backface culling or not.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
-	 */
-	intersectTriangle( a, b, c, backfaceCulling, target ) {
-
-		// Compute the offset origin, edges, and normal.
-
-		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
-
-		_edge1.subVectors( b, a );
-		_edge2.subVectors( c, a );
-		_normal$1.crossVectors( _edge1, _edge2 );
-
-		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
-		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
-		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-		let DdN = this.direction.dot( _normal$1 );
-		let sign;
-
-		if ( DdN > 0 ) {
-
-			if ( backfaceCulling ) return null;
-			sign = 1;
-
-		} else if ( DdN < 0 ) {
-
-			sign = -1;
-			DdN = - DdN;
-
-		} else {
-
-			return null;
-
-		}
-
-		_diff.subVectors( this.origin, a );
-		const DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
-
-		// b1 < 0, no intersection
-		if ( DdQxE2 < 0 ) {
-
-			return null;
-
-		}
-
-		const DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
-
-		// b2 < 0, no intersection
-		if ( DdE1xQ < 0 ) {
-
-			return null;
-
-		}
-
-		// b1+b2 > 1, no intersection
-		if ( DdQxE2 + DdE1xQ > DdN ) {
-
-			return null;
-
-		}
-
-		// Line intersects triangle, check if ray does.
-		const QdN = - sign * _diff.dot( _normal$1 );
-
-		// t < 0, no intersection
-		if ( QdN < 0 ) {
-
-			return null;
-
-		}
-
-		// Ray intersects triangle.
-		return this.at( QdN / DdN, target );
-
-	}
-
-	/**
-	 * Transforms this ray with the given 4x4 transformation matrix.
-	 *
-	 * @param {Matrix4} matrix4 - The transformation matrix.
-	 * @return {Ray} A reference to this ray.
-	 */
-	applyMatrix4( matrix4 ) {
-
-		this.origin.applyMatrix4( matrix4 );
-		this.direction.transformDirection( matrix4 );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this ray is equal with the given one.
-	 *
-	 * @param {Ray} ray - The ray to test for equality.
-	 * @return {boolean} Whether this ray is equal with the given one.
-	 */
-	equals( ray ) {
-
-		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
-
-	}
-
-	/**
-	 * Returns a new ray with copied values from this instance.
-	 *
-	 * @return {Ray} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
-}
-
-/**
  * Represents a 4x4 matrix.
  *
  * The most common use of a 4x4 matrix in 3D computer graphics is as a transformation matrix.
@@ -11736,9 +10068,9 @@ class Matrix4 {
 		const te = this.elements;
 		const me = m.elements;
 
-		const scaleX = 1 / _v1$5.setFromMatrixColumn( m, 0 ).length();
-		const scaleY = 1 / _v1$5.setFromMatrixColumn( m, 1 ).length();
-		const scaleZ = 1 / _v1$5.setFromMatrixColumn( m, 2 ).length();
+		const scaleX = 1 / _v1$7.setFromMatrixColumn( m, 0 ).length();
+		const scaleY = 1 / _v1$7.setFromMatrixColumn( m, 1 ).length();
+		const scaleZ = 1 / _v1$7.setFromMatrixColumn( m, 2 ).length();
 
 		te[ 0 ] = me[ 0 ] * scaleX;
 		te[ 1 ] = me[ 1 ] * scaleX;
@@ -12150,7 +10482,7 @@ class Matrix4 {
 	 */
 	invert() {
 
-		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+		// based on https://github.com/toji/gl-matrix
 		const te = this.elements,
 
 			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ], n41 = te[ 3 ],
@@ -12158,36 +10490,44 @@ class Matrix4 {
 			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
 			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
 
-			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
-			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
-			t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
-			t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+			t1 = n11 * n22 - n21 * n12,
+			t2 = n11 * n32 - n31 * n12,
+			t3 = n11 * n42 - n41 * n12,
+			t4 = n21 * n32 - n31 * n22,
+			t5 = n21 * n42 - n41 * n22,
+			t6 = n31 * n42 - n41 * n32,
+			t7 = n13 * n24 - n23 * n14,
+			t8 = n13 * n34 - n33 * n14,
+			t9 = n13 * n44 - n43 * n14,
+			t10 = n23 * n34 - n33 * n24,
+			t11 = n23 * n44 - n43 * n24,
+			t12 = n33 * n44 - n43 * n34;
 
-		const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+		const det = t1 * t12 - t2 * t11 + t3 * t10 + t4 * t9 - t5 * t8 + t6 * t7;
 
 		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		const detInv = 1 / det;
 
-		te[ 0 ] = t11 * detInv;
-		te[ 1 ] = ( n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44 ) * detInv;
-		te[ 2 ] = ( n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44 ) * detInv;
-		te[ 3 ] = ( n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43 ) * detInv;
+		te[ 0 ] = ( n22 * t12 - n32 * t11 + n42 * t10 ) * detInv;
+		te[ 1 ] = ( n31 * t11 - n21 * t12 - n41 * t10 ) * detInv;
+		te[ 2 ] = ( n24 * t6 - n34 * t5 + n44 * t4 ) * detInv;
+		te[ 3 ] = ( n33 * t5 - n23 * t6 - n43 * t4 ) * detInv;
 
-		te[ 4 ] = t12 * detInv;
-		te[ 5 ] = ( n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44 ) * detInv;
-		te[ 6 ] = ( n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44 ) * detInv;
-		te[ 7 ] = ( n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43 ) * detInv;
+		te[ 4 ] = ( n32 * t9 - n12 * t12 - n42 * t8 ) * detInv;
+		te[ 5 ] = ( n11 * t12 - n31 * t9 + n41 * t8 ) * detInv;
+		te[ 6 ] = ( n34 * t3 - n14 * t6 - n44 * t2 ) * detInv;
+		te[ 7 ] = ( n13 * t6 - n33 * t3 + n43 * t2 ) * detInv;
 
-		te[ 8 ] = t13 * detInv;
-		te[ 9 ] = ( n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44 ) * detInv;
-		te[ 10 ] = ( n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44 ) * detInv;
-		te[ 11 ] = ( n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43 ) * detInv;
+		te[ 8 ] = ( n12 * t11 - n22 * t9 + n42 * t7 ) * detInv;
+		te[ 9 ] = ( n21 * t9 - n11 * t11 - n41 * t7 ) * detInv;
+		te[ 10 ] = ( n14 * t5 - n24 * t3 + n44 * t1 ) * detInv;
+		te[ 11 ] = ( n23 * t3 - n13 * t5 - n43 * t1 ) * detInv;
 
-		te[ 12 ] = t14 * detInv;
-		te[ 13 ] = ( n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34 ) * detInv;
-		te[ 14 ] = ( n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34 ) * detInv;
-		te[ 15 ] = ( n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33 ) * detInv;
+		te[ 12 ] = ( n22 * t8 - n12 * t10 - n32 * t7 ) * detInv;
+		te[ 13 ] = ( n11 * t10 - n21 * t8 + n31 * t7 ) * detInv;
+		te[ 14 ] = ( n24 * t2 - n14 * t4 - n34 * t1 ) * detInv;
+		te[ 15 ] = ( n13 * t4 - n23 * t2 + n33 * t1 ) * detInv;
 
 		return this;
 
@@ -12489,7 +10829,9 @@ class Matrix4 {
 		position.y = te[ 13 ];
 		position.z = te[ 14 ];
 
-		if ( this.determinant() === 0 ) {
+		const det = this.determinant();
+
+		if ( det === 0 ) {
 
 			scale.set( 1, 1, 1 );
 			quaternion.identity();
@@ -12498,12 +10840,11 @@ class Matrix4 {
 
 		}
 
-		let sx = _v1$5.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		const sy = _v1$5.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		const sz = _v1$5.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		let sx = _v1$7.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
+		const sy = _v1$7.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		const sz = _v1$7.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
-		// if determine is negative, we need to invert one scale
-		const det = this.determinant();
+		// if determinant is negative, we need to invert one scale
 		if ( det < 0 ) sx = - sx;
 
 		// scale the rotation part
@@ -12733,7 +11074,7 @@ class Matrix4 {
 
 }
 
-const _v1$5 = /*@__PURE__*/ new Vector3();
+const _v1$7 = /*@__PURE__*/ new Vector3();
 const _m1$4 = /*@__PURE__*/ new Matrix4();
 const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
 const _one = /*@__PURE__*/ new Vector3( 1, 1, 1 );
@@ -12742,7 +11083,7 @@ const _y = /*@__PURE__*/ new Vector3();
 const _z = /*@__PURE__*/ new Vector3();
 
 const _matrix$2 = /*@__PURE__*/ new Matrix4();
-const _quaternion$3 = /*@__PURE__*/ new Quaternion();
+const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
 /**
  * A class representing Euler angles.
@@ -13096,9 +11437,9 @@ class Euler {
 	 */
 	reorder( newOrder ) {
 
-		_quaternion$3.setFromEuler( this );
+		_quaternion$4.setFromEuler( this );
 
-		return this.setFromQuaternion( _quaternion$3, newOrder );
+		return this.setFromQuaternion( _quaternion$4, newOrder );
 
 	}
 
@@ -13305,14 +11646,14 @@ class Layers {
 
 let _object3DId = 0;
 
-const _v1$4 = /*@__PURE__*/ new Vector3();
+const _v1$6 = /*@__PURE__*/ new Vector3();
 const _q1 = /*@__PURE__*/ new Quaternion();
 const _m1$3 = /*@__PURE__*/ new Matrix4();
 const _target = /*@__PURE__*/ new Vector3();
 
-const _position$3 = /*@__PURE__*/ new Vector3();
-const _scale$2 = /*@__PURE__*/ new Vector3();
-const _quaternion$2 = /*@__PURE__*/ new Quaternion();
+const _position$4 = /*@__PURE__*/ new Vector3();
+const _scale$3 = /*@__PURE__*/ new Vector3();
+const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 
 const _xAxis = /*@__PURE__*/ new Vector3( 1, 0, 0 );
 const _yAxis = /*@__PURE__*/ new Vector3( 0, 1, 0 );
@@ -13537,7 +11878,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the local matrix from position,
-		 * rotation and scale every frame.
+		 * rotation and scale every frame. If set to `false`, the app is responsible for recomputing
+		 * the local matrix by calling `updateMatrix()`.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_AUTO_UPDATE`.
 		 *
@@ -13548,7 +11890,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the world matrix from the current local
-		 * matrix and the object's transformation hierarchy.
+		 * matrix and the object's transformation hierarchy. If set to `false`, the app is responsible for
+		 * recomputing the world matrix by directly updating the `matrixWorld` property.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE`.
 		 *
@@ -13650,12 +11993,35 @@ class Object3D extends EventDispatcher {
 		this.customDistanceMaterial = undefined;
 
 		/**
+		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
+		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * geometry and material settings. A static 3D object can be processed by the renderer
+		 * slightly faster since certain state checks can be bypassed.
+		 *
+		 * Only relevant in context of {@link WebGPURenderer}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.static = false;
+
+		/**
 		 * An object that can be used to store custom data about the 3D object. It
 		 * should not hold references to functions as these will not be cloned.
 		 *
 		 * @type {Object}
 		 */
 		this.userData = {};
+
+		/**
+		 * The pivot point for rotation and scale transformations.
+		 * When set, rotation and scale are applied around this point
+		 * instead of the object's origin.
+		 *
+		 * @type {?Vector3}
+		 * @default null
+		 */
+		this.pivot = null;
 
 	}
 
@@ -13880,9 +12246,9 @@ class Object3D extends EventDispatcher {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		_v1$4.copy( axis ).applyQuaternion( this.quaternion );
+		_v1$6.copy( axis ).applyQuaternion( this.quaternion );
 
-		this.position.add( _v1$4.multiplyScalar( distance ) );
+		this.position.add( _v1$6.multiplyScalar( distance ) );
 
 		return this;
 
@@ -13939,7 +12305,7 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Converts the given vector from this 3D object's word space to local space.
+	 * Converts the given vector from this 3D object's world space to local space.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -13979,15 +12345,15 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		_position$3.setFromMatrixPosition( this.matrixWorld );
+		_position$4.setFromMatrixPosition( this.matrixWorld );
 
 		if ( this.isCamera || this.isLight ) {
 
-			_m1$3.lookAt( _position$3, _target, this.up );
+			_m1$3.lookAt( _position$4, _target, this.up );
 
 		} else {
 
-			_m1$3.lookAt( _target, _position$3, this.up );
+			_m1$3.lookAt( _target, _position$4, this.up );
 
 		}
 
@@ -14281,7 +12647,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		this.matrixWorld.decompose( _position$3, target, _scale$2 );
+		this.matrixWorld.decompose( _position$4, target, _scale$3 );
 
 		return target;
 
@@ -14297,7 +12663,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		this.matrixWorld.decompose( _position$3, _quaternion$2, target );
+		this.matrixWorld.decompose( _position$4, _quaternion$3, target );
 
 		return target;
 
@@ -14404,6 +12770,19 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
+		const pivot = this.pivot;
+
+		if ( pivot !== null ) {
+
+			const px = pivot.x, py = pivot.y, pz = pivot.z;
+			const te = this.matrix.elements;
+
+			te[ 12 ] += px - te[ 0 ] * px - te[ 4 ] * py - te[ 8 ] * pz;
+			te[ 13 ] += py - te[ 1 ] * px - te[ 5 ] * py - te[ 9 ] * pz;
+			te[ 14 ] += pz - te[ 2 ] * px - te[ 6 ] * py - te[ 10 ] * pz;
+
+		}
+
 		this.matrixWorldNeedsUpdate = true;
 
 	}
@@ -14417,7 +12796,7 @@ class Object3D extends EventDispatcher {
 	 * `true` by default.  Set these flags to `false` if you need more control over the update matrix process.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
 	updateMatrixWorld( force ) {
 
@@ -14562,13 +12941,19 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
+		if ( this.static !== false ) object.static = this.static;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
 		object.up = this.up.toArray();
 
+		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
+
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
+		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
 
 		// object specific properties
 
@@ -14843,6 +13228,12 @@ class Object3D extends EventDispatcher {
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
 
+		if ( source.pivot !== null ) {
+
+			this.pivot = source.pivot.clone();
+
+		}
+
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );
 
@@ -14859,6 +13250,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.static = source.static;
 
 		this.animations = source.animations.slice();
 
@@ -14911,536 +13304,462 @@ Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true;
  */
 Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 
-const _v0$2 = /*@__PURE__*/ new Vector3();
-const _v1$3 = /*@__PURE__*/ new Vector3();
-const _v2$2 = /*@__PURE__*/ new Vector3();
-const _v3$2 = /*@__PURE__*/ new Vector3();
+/**
+ * This is almost identical to an {@link Object3D}. Its purpose is to
+ * make working with groups of objects syntactically clearer.
+ *
+ * ```js
+ * // Create a group and add the two cubes.
+ * // These cubes can now be rotated / scaled etc as a group.
+ * const group = new THREE.Group();
+ *
+ * group.add( meshA );
+ * group.add( meshB );
+ *
+ * scene.add( group );
+ * ```
+ *
+ * @augments Object3D
+ */
+class Group extends Object3D {
 
-const _vab = /*@__PURE__*/ new Vector3();
-const _vac = /*@__PURE__*/ new Vector3();
-const _vbc = /*@__PURE__*/ new Vector3();
-const _vap = /*@__PURE__*/ new Vector3();
-const _vbp = /*@__PURE__*/ new Vector3();
-const _vcp = /*@__PURE__*/ new Vector3();
+	constructor() {
 
-const _v40 = /*@__PURE__*/ new Vector4();
-const _v41 = /*@__PURE__*/ new Vector4();
-const _v42 = /*@__PURE__*/ new Vector4();
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isGroup = true;
+
+		this.type = 'Group';
+
+	}
+
+}
+
+const _moveEvent = { type: 'move' };
 
 /**
- * A geometric triangle as defined by three vectors representing its three corners.
+ * Class for representing a XR controller with its
+ * different coordinate systems.
+ *
+ * @private
  */
-class Triangle {
+class WebXRController {
 
 	/**
-	 * Constructs a new triangle.
-	 *
-	 * @param {Vector3} [a=(0,0,0)] - The first corner of the triangle.
-	 * @param {Vector3} [b=(0,0,0)] - The second corner of the triangle.
-	 * @param {Vector3} [c=(0,0,0)] - The third corner of the triangle.
+	 * Constructs a new XR controller.
 	 */
-	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
+	constructor() {
 
 		/**
-		 * The first corner of the triangle.
+		 * A group representing the target ray space
+		 * of the XR controller.
 		 *
-		 * @type {Vector3}
+		 * @private
+		 * @type {?Group}
+		 * @default null
 		 */
-		this.a = a;
+		this._targetRay = null;
 
 		/**
-		 * The second corner of the triangle.
+		 * A group representing the grip space
+		 * of the XR controller.
 		 *
-		 * @type {Vector3}
+		 * @private
+		 * @type {?Group}
+		 * @default null
 		 */
-		this.b = b;
+		this._grip = null;
 
 		/**
-		 * The third corner of the triangle.
+		 * A group representing the hand space
+		 * of the XR controller.
 		 *
-		 * @type {Vector3}
+		 * @private
+		 * @type {?Group}
+		 * @default null
 		 */
-		this.c = c;
+		this._hand = null;
 
 	}
 
 	/**
-	 * Computes the normal vector of a triangle.
+	 * Returns a group representing the hand space of the XR controller.
 	 *
-	 * @param {Vector3} a - The first corner of the triangle.
-	 * @param {Vector3} b - The second corner of the triangle.
-	 * @param {Vector3} c - The third corner of the triangle.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The triangle's normal.
+	 * @return {Group} A group representing the hand space of the XR controller.
 	 */
-	static getNormal( a, b, c, target ) {
+	getHandSpace() {
 
-		target.subVectors( c, b );
-		_v0$2.subVectors( a, b );
-		target.cross( _v0$2 );
+		if ( this._hand === null ) {
 
-		const targetLengthSq = target.lengthSq();
-		if ( targetLengthSq > 0 ) {
+			this._hand = new Group();
+			this._hand.matrixAutoUpdate = false;
+			this._hand.visible = false;
 
-			return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
+			this._hand.joints = {};
+			this._hand.inputState = { pinching: false };
 
 		}
 
-		return target.set( 0, 0, 0 );
+		return this._hand;
 
 	}
 
 	/**
-	 * Computes a barycentric coordinates from the given vector.
-	 * Returns `null` if the triangle is degenerate.
+	 * Returns a group representing the target ray space of the XR controller.
 	 *
-	 * @param {Vector3} point - A point in 3D space.
-	 * @param {Vector3} a - The first corner of the triangle.
-	 * @param {Vector3} b - The second corner of the triangle.
-	 * @param {Vector3} c - The third corner of the triangle.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The barycentric coordinates for the given point
+	 * @return {Group} A group representing the target ray space of the XR controller.
 	 */
-	static getBarycoord( point, a, b, c, target ) {
+	getTargetRaySpace() {
 
-		// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+		if ( this._targetRay === null ) {
 
-		_v0$2.subVectors( c, a );
-		_v1$3.subVectors( b, a );
-		_v2$2.subVectors( point, a );
-
-		const dot00 = _v0$2.dot( _v0$2 );
-		const dot01 = _v0$2.dot( _v1$3 );
-		const dot02 = _v0$2.dot( _v2$2 );
-		const dot11 = _v1$3.dot( _v1$3 );
-		const dot12 = _v1$3.dot( _v2$2 );
-
-		const denom = ( dot00 * dot11 - dot01 * dot01 );
-
-		// collinear or singular triangle
-		if ( denom === 0 ) {
-
-			target.set( 0, 0, 0 );
-			return null;
+			this._targetRay = new Group();
+			this._targetRay.matrixAutoUpdate = false;
+			this._targetRay.visible = false;
+			this._targetRay.hasLinearVelocity = false;
+			this._targetRay.linearVelocity = new Vector3();
+			this._targetRay.hasAngularVelocity = false;
+			this._targetRay.angularVelocity = new Vector3();
 
 		}
 
-		const invDenom = 1 / denom;
-		const u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		const v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		// barycentric coordinates must always sum to 1
-		return target.set( 1 - u - v, v, u );
+		return this._targetRay;
 
 	}
 
 	/**
-	 * Returns `true` if the given point, when projected onto the plane of the
-	 * triangle, lies within the triangle.
+	 * Returns a group representing the grip space of the XR controller.
 	 *
-	 * @param {Vector3} point - The point in 3D space to test.
-	 * @param {Vector3} a - The first corner of the triangle.
-	 * @param {Vector3} b - The second corner of the triangle.
-	 * @param {Vector3} c - The third corner of the triangle.
-	 * @return {boolean} Whether the given point, when projected onto the plane of the
-	 * triangle, lies within the triangle or not.
+	 * @return {Group} A group representing the grip space of the XR controller.
 	 */
-	static containsPoint( point, a, b, c ) {
+	getGripSpace() {
 
-		// if the triangle is degenerate then we can't contain a point
-		if ( this.getBarycoord( point, a, b, c, _v3$2 ) === null ) {
+		if ( this._grip === null ) {
 
-			return false;
+			this._grip = new Group();
+			this._grip.matrixAutoUpdate = false;
+			this._grip.visible = false;
+			this._grip.hasLinearVelocity = false;
+			this._grip.linearVelocity = new Vector3();
+			this._grip.hasAngularVelocity = false;
+			this._grip.angularVelocity = new Vector3();
 
 		}
 
-		return ( _v3$2.x >= 0 ) && ( _v3$2.y >= 0 ) && ( ( _v3$2.x + _v3$2.y ) <= 1 );
+		return this._grip;
 
 	}
 
 	/**
-	 * Computes the value barycentrically interpolated for the given point on the
-	 * triangle. Returns `null` if the triangle is degenerate.
+	 * Dispatches the given event to the groups representing
+	 * the different coordinate spaces of the XR controller.
 	 *
-	 * @param {Vector3} point - Position of interpolated point.
-	 * @param {Vector3} p1 - The first corner of the triangle.
-	 * @param {Vector3} p2 - The second corner of the triangle.
-	 * @param {Vector3} p3 - The third corner of the triangle.
-	 * @param {Vector3} v1 - Value to interpolate of first vertex.
-	 * @param {Vector3} v2 - Value to interpolate of second vertex.
-	 * @param {Vector3} v3 - Value to interpolate of third vertex.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The interpolated value.
+	 * @param {Object} event - The event to dispatch.
+	 * @return {WebXRController} A reference to this instance.
 	 */
-	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
+	dispatchEvent( event ) {
 
-		if ( this.getBarycoord( point, p1, p2, p3, _v3$2 ) === null ) {
+		if ( this._targetRay !== null ) {
 
-			target.x = 0;
-			target.y = 0;
-			if ( 'z' in target ) target.z = 0;
-			if ( 'w' in target ) target.w = 0;
-			return null;
+			this._targetRay.dispatchEvent( event );
 
 		}
 
-		target.setScalar( 0 );
-		target.addScaledVector( v1, _v3$2.x );
-		target.addScaledVector( v2, _v3$2.y );
-		target.addScaledVector( v3, _v3$2.z );
+		if ( this._grip !== null ) {
 
-		return target;
+			this._grip.dispatchEvent( event );
 
-	}
+		}
 
-	/**
-	 * Computes the value barycentrically interpolated for the given attribute and indices.
-	 *
-	 * @param {BufferAttribute} attr - The attribute to interpolate.
-	 * @param {number} i1 - Index of first vertex.
-	 * @param {number} i2 - Index of second vertex.
-	 * @param {number} i3 - Index of third vertex.
-	 * @param {Vector3} barycoord - The barycoordinate value to use to interpolate.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The interpolated attribute value.
-	 */
-	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
+		if ( this._hand !== null ) {
 
-		_v40.setScalar( 0 );
-		_v41.setScalar( 0 );
-		_v42.setScalar( 0 );
+			this._hand.dispatchEvent( event );
 
-		_v40.fromBufferAttribute( attr, i1 );
-		_v41.fromBufferAttribute( attr, i2 );
-		_v42.fromBufferAttribute( attr, i3 );
-
-		target.setScalar( 0 );
-		target.addScaledVector( _v40, barycoord.x );
-		target.addScaledVector( _v41, barycoord.y );
-		target.addScaledVector( _v42, barycoord.z );
-
-		return target;
-
-	}
-
-	/**
-	 * Returns `true` if the triangle is oriented towards the given direction.
-	 *
-	 * @param {Vector3} a - The first corner of the triangle.
-	 * @param {Vector3} b - The second corner of the triangle.
-	 * @param {Vector3} c - The third corner of the triangle.
-	 * @param {Vector3} direction - The (normalized) direction vector.
-	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
-	 */
-	static isFrontFacing( a, b, c, direction ) {
-
-		_v0$2.subVectors( c, b );
-		_v1$3.subVectors( a, b );
-
-		// strictly front facing
-		return ( _v0$2.cross( _v1$3 ).dot( direction ) < 0 ) ? true : false;
-
-	}
-
-	/**
-	 * Sets the triangle's vertices by copying the given values.
-	 *
-	 * @param {Vector3} a - The first corner of the triangle.
-	 * @param {Vector3} b - The second corner of the triangle.
-	 * @param {Vector3} c - The third corner of the triangle.
-	 * @return {Triangle} A reference to this triangle.
-	 */
-	set( a, b, c ) {
-
-		this.a.copy( a );
-		this.b.copy( b );
-		this.c.copy( c );
+		}
 
 		return this;
 
 	}
 
 	/**
-	 * Sets the triangle's vertices by copying the given array values.
+	 * Connects the controller with the given XR input source.
 	 *
-	 * @param {Array<Vector3>} points - An array with 3D points.
-	 * @param {number} i0 - The array index representing the first corner of the triangle.
-	 * @param {number} i1 - The array index representing the second corner of the triangle.
-	 * @param {number} i2 - The array index representing the third corner of the triangle.
-	 * @return {Triangle} A reference to this triangle.
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @return {WebXRController} A reference to this instance.
 	 */
-	setFromPointsAndIndices( points, i0, i1, i2 ) {
+	connect( inputSource ) {
 
-		this.a.copy( points[ i0 ] );
-		this.b.copy( points[ i1 ] );
-		this.c.copy( points[ i2 ] );
+		if ( inputSource && inputSource.hand ) {
+
+			const hand = this._hand;
+
+			if ( hand ) {
+
+				for ( const inputjoint of inputSource.hand.values() ) {
+
+					// Initialize hand with joints when connected
+					this._getHandJoint( hand, inputjoint );
+
+				}
+
+			}
+
+		}
+
+		this.dispatchEvent( { type: 'connected', data: inputSource } );
 
 		return this;
 
 	}
 
 	/**
-	 * Sets the triangle's vertices by copying the given attribute values.
+	 * Disconnects the controller from the given XR input source.
 	 *
-	 * @param {BufferAttribute} attribute - A buffer attribute with 3D points data.
-	 * @param {number} i0 - The attribute index representing the first corner of the triangle.
-	 * @param {number} i1 - The attribute index representing the second corner of the triangle.
-	 * @param {number} i2 - The attribute index representing the third corner of the triangle.
-	 * @return {Triangle} A reference to this triangle.
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @return {WebXRController} A reference to this instance.
 	 */
-	setFromAttributeAndIndices( attribute, i0, i1, i2 ) {
+	disconnect( inputSource ) {
 
-		this.a.fromBufferAttribute( attribute, i0 );
-		this.b.fromBufferAttribute( attribute, i1 );
-		this.c.fromBufferAttribute( attribute, i2 );
+		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
+
+		if ( this._targetRay !== null ) {
+
+			this._targetRay.visible = false;
+
+		}
+
+		if ( this._grip !== null ) {
+
+			this._grip.visible = false;
+
+		}
+
+		if ( this._hand !== null ) {
+
+			this._hand.visible = false;
+
+		}
 
 		return this;
 
 	}
 
 	/**
-	 * Returns a new triangle with copied values from this instance.
+	 * Updates the controller with the given input source, XR frame and reference space.
+	 * This updates the transformations of the groups that represent the different
+	 * coordinate systems of the controller.
 	 *
-	 * @return {Triangle} A clone of this instance.
+	 * @param {XRInputSource} inputSource - The input source.
+	 * @param {XRFrame} frame - The XR frame.
+	 * @param {XRReferenceSpace} referenceSpace - The reference space.
+	 * @return {WebXRController} A reference to this instance.
 	 */
-	clone() {
+	update( inputSource, frame, referenceSpace ) {
 
-		return new this.constructor().copy( this );
+		let inputPose = null;
+		let gripPose = null;
+		let handPose = null;
 
-	}
+		const targetRay = this._targetRay;
+		const grip = this._grip;
+		const hand = this._hand;
 
-	/**
-	 * Copies the values of the given triangle to this instance.
-	 *
-	 * @param {Triangle} triangle - The triangle to copy.
-	 * @return {Triangle} A reference to this triangle.
-	 */
-	copy( triangle ) {
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
-		this.a.copy( triangle.a );
-		this.b.copy( triangle.b );
-		this.c.copy( triangle.c );
+			if ( hand && inputSource.hand ) {
+
+				handPose = true;
+
+				for ( const inputjoint of inputSource.hand.values() ) {
+
+					// Update the joints groups with the XRJoint poses
+					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
+
+					// The transform of this joint will be updated with the joint pose on each frame
+					const joint = this._getHandJoint( hand, inputjoint );
+
+					if ( jointPose !== null ) {
+
+						joint.matrix.fromArray( jointPose.transform.matrix );
+						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+						joint.matrixWorldNeedsUpdate = true;
+						joint.jointRadius = jointPose.radius;
+
+					}
+
+					joint.visible = jointPose !== null;
+
+				}
+
+				// Custom events
+
+				// Check pinchz
+				const indexTip = hand.joints[ 'index-finger-tip' ];
+				const thumbTip = hand.joints[ 'thumb-tip' ];
+				const distance = indexTip.position.distanceTo( thumbTip.position );
+
+				const distanceToPinch = 0.02;
+				const threshold = 0.005;
+
+				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
+
+					hand.inputState.pinching = false;
+					this.dispatchEvent( {
+						type: 'pinchend',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+
+					hand.inputState.pinching = true;
+					this.dispatchEvent( {
+						type: 'pinchstart',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				}
+
+			} else {
+
+				if ( grip !== null && inputSource.gripSpace ) {
+
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+
+					if ( gripPose !== null ) {
+
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+						grip.matrixWorldNeedsUpdate = true;
+
+						if ( gripPose.linearVelocity ) {
+
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.copy( gripPose.linearVelocity );
+
+						} else {
+
+							grip.hasLinearVelocity = false;
+
+						}
+
+						if ( gripPose.angularVelocity ) {
+
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.copy( gripPose.angularVelocity );
+
+						} else {
+
+							grip.hasAngularVelocity = false;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				// Some runtimes (namely Vive Cosmos with Vive OpenXR Runtime) have only grip space and ray space is equal to it
+				if ( inputPose === null && gripPose !== null ) {
+
+					inputPose = gripPose;
+
+				}
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+					targetRay.matrixWorldNeedsUpdate = true;
+
+					if ( inputPose.linearVelocity ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+					this.dispatchEvent( _moveEvent );
+
+				}
+
+			}
+
+
+		}
+
+		if ( targetRay !== null ) {
+
+			targetRay.visible = ( inputPose !== null );
+
+		}
+
+		if ( grip !== null ) {
+
+			grip.visible = ( gripPose !== null );
+
+		}
+
+		if ( hand !== null ) {
+
+			hand.visible = ( handPose !== null );
+
+		}
 
 		return this;
 
 	}
 
 	/**
-	 * Computes the area of the triangle.
+	 * Returns a group representing the hand joint for the given input joint.
 	 *
-	 * @return {number} The triangle's area.
+	 * @private
+	 * @param {Group} hand - The group representing the hand space.
+	 * @param {XRJointSpace} inputjoint - The hand joint data.
+	 * @return {Group} A group representing the hand joint for the given input joint.
 	 */
-	getArea() {
+	_getHandJoint( hand, inputjoint ) {
 
-		_v0$2.subVectors( this.c, this.b );
-		_v1$3.subVectors( this.a, this.b );
+		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
 
-		return _v0$2.cross( _v1$3 ).length() * 0.5;
+			const joint = new Group();
+			joint.matrixAutoUpdate = false;
+			joint.visible = false;
+			hand.joints[ inputjoint.jointName ] = joint;
 
-	}
-
-	/**
-	 * Computes the midpoint of the triangle.
-	 *
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The triangle's midpoint.
-	 */
-	getMidpoint( target ) {
-
-		return target.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
-
-	}
-
-	/**
-	 * Computes the normal of the triangle.
-	 *
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The triangle's normal.
-	 */
-	getNormal( target ) {
-
-		return Triangle.getNormal( this.a, this.b, this.c, target );
-
-	}
-
-	/**
-	 * Computes a plane the triangle lies within.
-	 *
-	 * @param {Plane} target - The target vector that is used to store the method's result.
-	 * @return {Plane} The plane the triangle lies within.
-	 */
-	getPlane( target ) {
-
-		return target.setFromCoplanarPoints( this.a, this.b, this.c );
-
-	}
-
-	/**
-	 * Computes a barycentric coordinates from the given vector.
-	 * Returns `null` if the triangle is degenerate.
-	 *
-	 * @param {Vector3} point - A point in 3D space.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The barycentric coordinates for the given point
-	 */
-	getBarycoord( point, target ) {
-
-		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
-
-	}
-
-	/**
-	 * Computes the value barycentrically interpolated for the given point on the
-	 * triangle. Returns `null` if the triangle is degenerate.
-	 *
-	 * @param {Vector3} point - Position of interpolated point.
-	 * @param {Vector3} v1 - Value to interpolate of first vertex.
-	 * @param {Vector3} v2 - Value to interpolate of second vertex.
-	 * @param {Vector3} v3 - Value to interpolate of third vertex.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The interpolated value.
-	 */
-	getInterpolation( point, v1, v2, v3, target ) {
-
-		return Triangle.getInterpolation( point, this.a, this.b, this.c, v1, v2, v3, target );
-
-	}
-
-	/**
-	 * Returns `true` if the given point, when projected onto the plane of the
-	 * triangle, lies within the triangle.
-	 *
-	 * @param {Vector3} point - The point in 3D space to test.
-	 * @return {boolean} Whether the given point, when projected onto the plane of the
-	 * triangle, lies within the triangle or not.
-	 */
-	containsPoint( point ) {
-
-		return Triangle.containsPoint( point, this.a, this.b, this.c );
-
-	}
-
-	/**
-	 * Returns `true` if the triangle is oriented towards the given direction.
-	 *
-	 * @param {Vector3} direction - The (normalized) direction vector.
-	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
-	 */
-	isFrontFacing( direction ) {
-
-		return Triangle.isFrontFacing( this.a, this.b, this.c, direction );
-
-	}
-
-	/**
-	 * Returns `true` if this triangle intersects with the given box.
-	 *
-	 * @param {Box3} box - The box to intersect.
-	 * @return {boolean} Whether this triangle intersects with the given box or not.
-	 */
-	intersectsBox( box ) {
-
-		return box.intersectsTriangle( this );
-
-	}
-
-	/**
-	 * Returns the closest point on the triangle to the given point.
-	 *
-	 * @param {Vector3} p - The point to compute the closest point for.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The closest point on the triangle.
-	 */
-	closestPointToPoint( p, target ) {
-
-		const a = this.a, b = this.b, c = this.c;
-		let v, w;
-
-		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
-		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
-		// under the accompanying license; see chapter 5.1.5 for detailed explanation.
-		// basically, we're distinguishing which of the voronoi regions of the triangle
-		// the point lies in with the minimum amount of redundant computation.
-
-		_vab.subVectors( b, a );
-		_vac.subVectors( c, a );
-		_vap.subVectors( p, a );
-		const d1 = _vab.dot( _vap );
-		const d2 = _vac.dot( _vap );
-		if ( d1 <= 0 && d2 <= 0 ) {
-
-			// vertex region of A; barycentric coords (1, 0, 0)
-			return target.copy( a );
+			hand.add( joint );
 
 		}
 
-		_vbp.subVectors( p, b );
-		const d3 = _vab.dot( _vbp );
-		const d4 = _vac.dot( _vbp );
-		if ( d3 >= 0 && d4 <= d3 ) {
-
-			// vertex region of B; barycentric coords (0, 1, 0)
-			return target.copy( b );
-
-		}
-
-		const vc = d1 * d4 - d3 * d2;
-		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
-
-			v = d1 / ( d1 - d3 );
-			// edge region of AB; barycentric coords (1-v, v, 0)
-			return target.copy( a ).addScaledVector( _vab, v );
-
-		}
-
-		_vcp.subVectors( p, c );
-		const d5 = _vab.dot( _vcp );
-		const d6 = _vac.dot( _vcp );
-		if ( d6 >= 0 && d5 <= d6 ) {
-
-			// vertex region of C; barycentric coords (0, 0, 1)
-			return target.copy( c );
-
-		}
-
-		const vb = d5 * d2 - d1 * d6;
-		if ( vb <= 0 && d2 >= 0 && d6 <= 0 ) {
-
-			w = d2 / ( d2 - d6 );
-			// edge region of AC; barycentric coords (1-w, 0, w)
-			return target.copy( a ).addScaledVector( _vac, w );
-
-		}
-
-		const va = d3 * d6 - d5 * d4;
-		if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
-
-			_vbc.subVectors( c, b );
-			w = ( d4 - d3 ) / ( ( d4 - d3 ) + ( d5 - d6 ) );
-			// edge region of BC; barycentric coords (0, 1-w, w)
-			return target.copy( b ).addScaledVector( _vbc, w ); // edge region of BC
-
-		}
-
-		// face region
-		const denom = 1 / ( va + vb + vc );
-		// u = va * denom
-		v = vb * denom;
-		w = vc * denom;
-
-		return target.copy( a ).addScaledVector( _vab, v ).addScaledVector( _vac, w );
-
-	}
-
-	/**
-	 * Returns `true` if this triangle is equal with the given one.
-	 *
-	 * @param {Triangle} triangle - The triangle to test for equality.
-	 * @return {boolean} Whether this triangle is equal with the given one.
-	 */
-	equals( triangle ) {
-
-		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
+		return hand.joints[ inputjoint.jointName ];
 
 	}
 
@@ -16406,6 +14725,5605 @@ const _color = /*@__PURE__*/ new Color();
  * @type {Object}
  */
 Color.NAMES = _colorKeywords;
+
+/**
+ * This class can be used to define an exponential squared fog,
+ * which gives a clear view near the camera and a faster than exponentially
+ * densening fog farther from the camera.
+ *
+ * ```js
+ * const scene = new THREE.Scene();
+ * scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+ * ```
+ */
+class FogExp2 {
+
+	/**
+	 * Constructs a new fog.
+	 *
+	 * @param {number|Color} color - The fog's color.
+	 * @param {number} [density=0.00025] - Defines how fast the fog will grow dense.
+	 */
+	constructor( color, density = 0.00025 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isFogExp2 = true;
+
+		/**
+		 * The name of the fog.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+
+		/**
+		 * The fog's color.
+		 *
+		 * @type {Color}
+		 */
+		this.color = new Color( color );
+
+		/**
+		 *  Defines how fast the fog will grow dense.
+		 *
+		 * @type {number}
+		 * @default 0.00025
+		 */
+		this.density = density;
+
+	}
+
+	/**
+	 * Returns a new fog with copied values from this instance.
+	 *
+	 * @return {FogExp2} A clone of this instance.
+	 */
+	clone() {
+
+		return new FogExp2( this.color, this.density );
+
+	}
+
+	/**
+	 * Serializes the fog into JSON.
+	 *
+	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
+	 * @return {Object} A JSON object representing the serialized fog
+	 */
+	toJSON( /* meta */ ) {
+
+		return {
+			type: 'FogExp2',
+			name: this.name,
+			color: this.color.getHex(),
+			density: this.density
+		};
+
+	}
+
+}
+
+/**
+ * This class can be used to define a linear fog that grows linearly denser
+ * with the distance.
+ *
+ * ```js
+ * const scene = new THREE.Scene();
+ * scene.fog = new THREE.Fog( 0xcccccc, 10, 15 );
+ * ```
+ */
+class Fog {
+
+	/**
+	 * Constructs a new fog.
+	 *
+	 * @param {number|Color} color - The fog's color.
+	 * @param {number} [near=1] - The minimum distance to start applying fog.
+	 * @param {number} [far=1000] - The maximum distance at which fog stops being calculated and applied.
+	 */
+	constructor( color, near = 1, far = 1000 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isFog = true;
+
+		/**
+		 * The name of the fog.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+
+		/**
+		 * The fog's color.
+		 *
+		 * @type {Color}
+		 */
+		this.color = new Color( color );
+
+		/**
+		 * The minimum distance to start applying fog. Objects that are less than
+		 * `near` units from the active camera won't be affected by fog.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.near = near;
+
+		/**
+		 * The maximum distance at which fog stops being calculated and applied.
+		 * Objects that are more than `far` units away from the active camera won't
+		 * be affected by fog.
+		 *
+		 * @type {number}
+		 * @default 1000
+		 */
+		this.far = far;
+
+	}
+
+	/**
+	 * Returns a new fog with copied values from this instance.
+	 *
+	 * @return {Fog} A clone of this instance.
+	 */
+	clone() {
+
+		return new Fog( this.color, this.near, this.far );
+
+	}
+
+	/**
+	 * Serializes the fog into JSON.
+	 *
+	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
+	 * @return {Object} A JSON object representing the serialized fog
+	 */
+	toJSON( /* meta */ ) {
+
+		return {
+			type: 'Fog',
+			name: this.name,
+			color: this.color.getHex(),
+			near: this.near,
+			far: this.far
+		};
+
+	}
+
+}
+
+/**
+ * Scenes allow you to set up what is to be rendered and where by three.js.
+ * This is where you place 3D objects like meshes, lines or lights.
+ *
+ * @augments Object3D
+ */
+class Scene extends Object3D {
+
+	/**
+	 * Constructs a new scene.
+	 */
+	constructor() {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isScene = true;
+
+		this.type = 'Scene';
+
+		/**
+		 * Defines the background of the scene. Valid inputs are:
+		 *
+		 * - A color for defining a uniform colored background.
+		 * - A texture for defining a (flat) textured background.
+		 * - Cube textures or equirectangular textures for defining a skybox.
+		 *
+		 * @type {?(Color|Texture)}
+		 * @default null
+		 */
+		this.background = null;
+
+		/**
+		 * Sets the environment map for all physical materials in the scene. However,
+		 * it's not possible to overwrite an existing texture assigned to the `envMap`
+		 * material property.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.environment = null;
+
+		/**
+		 * A fog instance defining the type of fog that affects everything
+		 * rendered in the scene.
+		 *
+		 * @type {?(Fog|FogExp2)}
+		 * @default null
+		 */
+		this.fog = null;
+
+		/**
+		 * Sets the blurriness of the background. Only influences environment maps
+		 * assigned to {@link Scene#background}. Valid input is a float between `0`
+		 * and `1`.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.backgroundBlurriness = 0;
+
+		/**
+		 * Attenuates the color of the background. Only applies to background textures.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.backgroundIntensity = 1;
+
+		/**
+		 * The rotation of the background in radians. Only influences environment maps
+		 * assigned to {@link Scene#background}.
+		 *
+		 * @type {Euler}
+		 * @default (0,0,0)
+		 */
+		this.backgroundRotation = new Euler();
+
+		/**
+		 * Attenuates the color of the environment. Only influences environment maps
+		 * assigned to {@link Scene#environment}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.environmentIntensity = 1;
+
+		/**
+		 * The rotation of the environment map in radians. Only influences physical materials
+		 * in the scene when {@link Scene#environment} is used.
+		 *
+		 * @type {Euler}
+		 * @default (0,0,0)
+		 */
+		this.environmentRotation = new Euler();
+
+		/**
+		 * Forces everything in the scene to be rendered with the defined material. It is possible
+		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
+		 *
+		 * @type {?Material}
+		 * @default null
+		 */
+		this.overrideMaterial = null;
+
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		}
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		if ( source.background !== null ) this.background = source.background.clone();
+		if ( source.environment !== null ) this.environment = source.environment.clone();
+		if ( source.fog !== null ) this.fog = source.fog.clone();
+
+		this.backgroundBlurriness = source.backgroundBlurriness;
+		this.backgroundIntensity = source.backgroundIntensity;
+		this.backgroundRotation.copy( source.backgroundRotation );
+
+		this.environmentIntensity = source.environmentIntensity;
+		this.environmentRotation.copy( source.environmentRotation );
+
+		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+
+		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
+		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
+		data.object.backgroundRotation = this.backgroundRotation.toArray();
+
+		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
+		data.object.environmentRotation = this.environmentRotation.toArray();
+
+		return data;
+
+	}
+
+}
+
+const _v0$3 = /*@__PURE__*/ new Vector3();
+const _v1$5 = /*@__PURE__*/ new Vector3();
+const _v2$4 = /*@__PURE__*/ new Vector3();
+const _v3$2 = /*@__PURE__*/ new Vector3();
+
+const _vab = /*@__PURE__*/ new Vector3();
+const _vac = /*@__PURE__*/ new Vector3();
+const _vbc = /*@__PURE__*/ new Vector3();
+const _vap = /*@__PURE__*/ new Vector3();
+const _vbp = /*@__PURE__*/ new Vector3();
+const _vcp = /*@__PURE__*/ new Vector3();
+
+const _v40 = /*@__PURE__*/ new Vector4();
+const _v41 = /*@__PURE__*/ new Vector4();
+const _v42 = /*@__PURE__*/ new Vector4();
+
+/**
+ * A geometric triangle as defined by three vectors representing its three corners.
+ */
+class Triangle {
+
+	/**
+	 * Constructs a new triangle.
+	 *
+	 * @param {Vector3} [a=(0,0,0)] - The first corner of the triangle.
+	 * @param {Vector3} [b=(0,0,0)] - The second corner of the triangle.
+	 * @param {Vector3} [c=(0,0,0)] - The third corner of the triangle.
+	 */
+	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
+
+		/**
+		 * The first corner of the triangle.
+		 *
+		 * @type {Vector3}
+		 */
+		this.a = a;
+
+		/**
+		 * The second corner of the triangle.
+		 *
+		 * @type {Vector3}
+		 */
+		this.b = b;
+
+		/**
+		 * The third corner of the triangle.
+		 *
+		 * @type {Vector3}
+		 */
+		this.c = c;
+
+	}
+
+	/**
+	 * Computes the normal vector of a triangle.
+	 *
+	 * @param {Vector3} a - The first corner of the triangle.
+	 * @param {Vector3} b - The second corner of the triangle.
+	 * @param {Vector3} c - The third corner of the triangle.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The triangle's normal.
+	 */
+	static getNormal( a, b, c, target ) {
+
+		target.subVectors( c, b );
+		_v0$3.subVectors( a, b );
+		target.cross( _v0$3 );
+
+		const targetLengthSq = target.lengthSq();
+		if ( targetLengthSq > 0 ) {
+
+			return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
+
+		}
+
+		return target.set( 0, 0, 0 );
+
+	}
+
+	/**
+	 * Computes a barycentric coordinates from the given vector.
+	 * Returns `null` if the triangle is degenerate.
+	 *
+	 * @param {Vector3} point - A point in 3D space.
+	 * @param {Vector3} a - The first corner of the triangle.
+	 * @param {Vector3} b - The second corner of the triangle.
+	 * @param {Vector3} c - The third corner of the triangle.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The barycentric coordinates for the given point
+	 */
+	static getBarycoord( point, a, b, c, target ) {
+
+		// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+
+		_v0$3.subVectors( c, a );
+		_v1$5.subVectors( b, a );
+		_v2$4.subVectors( point, a );
+
+		const dot00 = _v0$3.dot( _v0$3 );
+		const dot01 = _v0$3.dot( _v1$5 );
+		const dot02 = _v0$3.dot( _v2$4 );
+		const dot11 = _v1$5.dot( _v1$5 );
+		const dot12 = _v1$5.dot( _v2$4 );
+
+		const denom = ( dot00 * dot11 - dot01 * dot01 );
+
+		// collinear or singular triangle
+		if ( denom === 0 ) {
+
+			target.set( 0, 0, 0 );
+			return null;
+
+		}
+
+		const invDenom = 1 / denom;
+		const u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		const v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+		// barycentric coordinates must always sum to 1
+		return target.set( 1 - u - v, v, u );
+
+	}
+
+	/**
+	 * Returns `true` if the given point, when projected onto the plane of the
+	 * triangle, lies within the triangle.
+	 *
+	 * @param {Vector3} point - The point in 3D space to test.
+	 * @param {Vector3} a - The first corner of the triangle.
+	 * @param {Vector3} b - The second corner of the triangle.
+	 * @param {Vector3} c - The third corner of the triangle.
+	 * @return {boolean} Whether the given point, when projected onto the plane of the
+	 * triangle, lies within the triangle or not.
+	 */
+	static containsPoint( point, a, b, c ) {
+
+		// if the triangle is degenerate then we can't contain a point
+		if ( this.getBarycoord( point, a, b, c, _v3$2 ) === null ) {
+
+			return false;
+
+		}
+
+		return ( _v3$2.x >= 0 ) && ( _v3$2.y >= 0 ) && ( ( _v3$2.x + _v3$2.y ) <= 1 );
+
+	}
+
+	/**
+	 * Computes the value barycentrically interpolated for the given point on the
+	 * triangle. Returns `null` if the triangle is degenerate.
+	 *
+	 * @param {Vector3} point - Position of interpolated point.
+	 * @param {Vector3} p1 - The first corner of the triangle.
+	 * @param {Vector3} p2 - The second corner of the triangle.
+	 * @param {Vector3} p3 - The third corner of the triangle.
+	 * @param {Vector3} v1 - Value to interpolate of first vertex.
+	 * @param {Vector3} v2 - Value to interpolate of second vertex.
+	 * @param {Vector3} v3 - Value to interpolate of third vertex.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The interpolated value.
+	 */
+	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
+
+		if ( this.getBarycoord( point, p1, p2, p3, _v3$2 ) === null ) {
+
+			target.x = 0;
+			target.y = 0;
+			if ( 'z' in target ) target.z = 0;
+			if ( 'w' in target ) target.w = 0;
+			return null;
+
+		}
+
+		target.setScalar( 0 );
+		target.addScaledVector( v1, _v3$2.x );
+		target.addScaledVector( v2, _v3$2.y );
+		target.addScaledVector( v3, _v3$2.z );
+
+		return target;
+
+	}
+
+	/**
+	 * Computes the value barycentrically interpolated for the given attribute and indices.
+	 *
+	 * @param {BufferAttribute} attr - The attribute to interpolate.
+	 * @param {number} i1 - Index of first vertex.
+	 * @param {number} i2 - Index of second vertex.
+	 * @param {number} i3 - Index of third vertex.
+	 * @param {Vector3} barycoord - The barycoordinate value to use to interpolate.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The interpolated attribute value.
+	 */
+	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
+
+		_v40.setScalar( 0 );
+		_v41.setScalar( 0 );
+		_v42.setScalar( 0 );
+
+		_v40.fromBufferAttribute( attr, i1 );
+		_v41.fromBufferAttribute( attr, i2 );
+		_v42.fromBufferAttribute( attr, i3 );
+
+		target.setScalar( 0 );
+		target.addScaledVector( _v40, barycoord.x );
+		target.addScaledVector( _v41, barycoord.y );
+		target.addScaledVector( _v42, barycoord.z );
+
+		return target;
+
+	}
+
+	/**
+	 * Returns `true` if the triangle is oriented towards the given direction.
+	 *
+	 * @param {Vector3} a - The first corner of the triangle.
+	 * @param {Vector3} b - The second corner of the triangle.
+	 * @param {Vector3} c - The third corner of the triangle.
+	 * @param {Vector3} direction - The (normalized) direction vector.
+	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
+	 */
+	static isFrontFacing( a, b, c, direction ) {
+
+		_v0$3.subVectors( c, b );
+		_v1$5.subVectors( a, b );
+
+		// strictly front facing
+		return ( _v0$3.cross( _v1$5 ).dot( direction ) < 0 ) ? true : false;
+
+	}
+
+	/**
+	 * Sets the triangle's vertices by copying the given values.
+	 *
+	 * @param {Vector3} a - The first corner of the triangle.
+	 * @param {Vector3} b - The second corner of the triangle.
+	 * @param {Vector3} c - The third corner of the triangle.
+	 * @return {Triangle} A reference to this triangle.
+	 */
+	set( a, b, c ) {
+
+		this.a.copy( a );
+		this.b.copy( b );
+		this.c.copy( c );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the triangle's vertices by copying the given array values.
+	 *
+	 * @param {Array<Vector3>} points - An array with 3D points.
+	 * @param {number} i0 - The array index representing the first corner of the triangle.
+	 * @param {number} i1 - The array index representing the second corner of the triangle.
+	 * @param {number} i2 - The array index representing the third corner of the triangle.
+	 * @return {Triangle} A reference to this triangle.
+	 */
+	setFromPointsAndIndices( points, i0, i1, i2 ) {
+
+		this.a.copy( points[ i0 ] );
+		this.b.copy( points[ i1 ] );
+		this.c.copy( points[ i2 ] );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the triangle's vertices by copying the given attribute values.
+	 *
+	 * @param {BufferAttribute} attribute - A buffer attribute with 3D points data.
+	 * @param {number} i0 - The attribute index representing the first corner of the triangle.
+	 * @param {number} i1 - The attribute index representing the second corner of the triangle.
+	 * @param {number} i2 - The attribute index representing the third corner of the triangle.
+	 * @return {Triangle} A reference to this triangle.
+	 */
+	setFromAttributeAndIndices( attribute, i0, i1, i2 ) {
+
+		this.a.fromBufferAttribute( attribute, i0 );
+		this.b.fromBufferAttribute( attribute, i1 );
+		this.c.fromBufferAttribute( attribute, i2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new triangle with copied values from this instance.
+	 *
+	 * @return {Triangle} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Copies the values of the given triangle to this instance.
+	 *
+	 * @param {Triangle} triangle - The triangle to copy.
+	 * @return {Triangle} A reference to this triangle.
+	 */
+	copy( triangle ) {
+
+		this.a.copy( triangle.a );
+		this.b.copy( triangle.b );
+		this.c.copy( triangle.c );
+
+		return this;
+
+	}
+
+	/**
+	 * Computes the area of the triangle.
+	 *
+	 * @return {number} The triangle's area.
+	 */
+	getArea() {
+
+		_v0$3.subVectors( this.c, this.b );
+		_v1$5.subVectors( this.a, this.b );
+
+		return _v0$3.cross( _v1$5 ).length() * 0.5;
+
+	}
+
+	/**
+	 * Computes the midpoint of the triangle.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The triangle's midpoint.
+	 */
+	getMidpoint( target ) {
+
+		return target.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
+
+	}
+
+	/**
+	 * Computes the normal of the triangle.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The triangle's normal.
+	 */
+	getNormal( target ) {
+
+		return Triangle.getNormal( this.a, this.b, this.c, target );
+
+	}
+
+	/**
+	 * Computes a plane the triangle lies within.
+	 *
+	 * @param {Plane} target - The target vector that is used to store the method's result.
+	 * @return {Plane} The plane the triangle lies within.
+	 */
+	getPlane( target ) {
+
+		return target.setFromCoplanarPoints( this.a, this.b, this.c );
+
+	}
+
+	/**
+	 * Computes a barycentric coordinates from the given vector.
+	 * Returns `null` if the triangle is degenerate.
+	 *
+	 * @param {Vector3} point - A point in 3D space.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The barycentric coordinates for the given point
+	 */
+	getBarycoord( point, target ) {
+
+		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
+
+	}
+
+	/**
+	 * Computes the value barycentrically interpolated for the given point on the
+	 * triangle. Returns `null` if the triangle is degenerate.
+	 *
+	 * @param {Vector3} point - Position of interpolated point.
+	 * @param {Vector3} v1 - Value to interpolate of first vertex.
+	 * @param {Vector3} v2 - Value to interpolate of second vertex.
+	 * @param {Vector3} v3 - Value to interpolate of third vertex.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The interpolated value.
+	 */
+	getInterpolation( point, v1, v2, v3, target ) {
+
+		return Triangle.getInterpolation( point, this.a, this.b, this.c, v1, v2, v3, target );
+
+	}
+
+	/**
+	 * Returns `true` if the given point, when projected onto the plane of the
+	 * triangle, lies within the triangle.
+	 *
+	 * @param {Vector3} point - The point in 3D space to test.
+	 * @return {boolean} Whether the given point, when projected onto the plane of the
+	 * triangle, lies within the triangle or not.
+	 */
+	containsPoint( point ) {
+
+		return Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	}
+
+	/**
+	 * Returns `true` if the triangle is oriented towards the given direction.
+	 *
+	 * @param {Vector3} direction - The (normalized) direction vector.
+	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
+	 */
+	isFrontFacing( direction ) {
+
+		return Triangle.isFrontFacing( this.a, this.b, this.c, direction );
+
+	}
+
+	/**
+	 * Returns `true` if this triangle intersects with the given box.
+	 *
+	 * @param {Box3} box - The box to intersect.
+	 * @return {boolean} Whether this triangle intersects with the given box or not.
+	 */
+	intersectsBox( box ) {
+
+		return box.intersectsTriangle( this );
+
+	}
+
+	/**
+	 * Returns the closest point on the triangle to the given point.
+	 *
+	 * @param {Vector3} p - The point to compute the closest point for.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The closest point on the triangle.
+	 */
+	closestPointToPoint( p, target ) {
+
+		const a = this.a, b = this.b, c = this.c;
+		let v, w;
+
+		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
+		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
+		// under the accompanying license; see chapter 5.1.5 for detailed explanation.
+		// basically, we're distinguishing which of the voronoi regions of the triangle
+		// the point lies in with the minimum amount of redundant computation.
+
+		_vab.subVectors( b, a );
+		_vac.subVectors( c, a );
+		_vap.subVectors( p, a );
+		const d1 = _vab.dot( _vap );
+		const d2 = _vac.dot( _vap );
+		if ( d1 <= 0 && d2 <= 0 ) {
+
+			// vertex region of A; barycentric coords (1, 0, 0)
+			return target.copy( a );
+
+		}
+
+		_vbp.subVectors( p, b );
+		const d3 = _vab.dot( _vbp );
+		const d4 = _vac.dot( _vbp );
+		if ( d3 >= 0 && d4 <= d3 ) {
+
+			// vertex region of B; barycentric coords (0, 1, 0)
+			return target.copy( b );
+
+		}
+
+		const vc = d1 * d4 - d3 * d2;
+		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
+
+			v = d1 / ( d1 - d3 );
+			// edge region of AB; barycentric coords (1-v, v, 0)
+			return target.copy( a ).addScaledVector( _vab, v );
+
+		}
+
+		_vcp.subVectors( p, c );
+		const d5 = _vab.dot( _vcp );
+		const d6 = _vac.dot( _vcp );
+		if ( d6 >= 0 && d5 <= d6 ) {
+
+			// vertex region of C; barycentric coords (0, 0, 1)
+			return target.copy( c );
+
+		}
+
+		const vb = d5 * d2 - d1 * d6;
+		if ( vb <= 0 && d2 >= 0 && d6 <= 0 ) {
+
+			w = d2 / ( d2 - d6 );
+			// edge region of AC; barycentric coords (1-w, 0, w)
+			return target.copy( a ).addScaledVector( _vac, w );
+
+		}
+
+		const va = d3 * d6 - d5 * d4;
+		if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
+
+			_vbc.subVectors( c, b );
+			w = ( d4 - d3 ) / ( ( d4 - d3 ) + ( d5 - d6 ) );
+			// edge region of BC; barycentric coords (0, 1-w, w)
+			return target.copy( b ).addScaledVector( _vbc, w ); // edge region of BC
+
+		}
+
+		// face region
+		const denom = 1 / ( va + vb + vc );
+		// u = va * denom
+		v = vb * denom;
+		w = vc * denom;
+
+		return target.copy( a ).addScaledVector( _vab, v ).addScaledVector( _vac, w );
+
+	}
+
+	/**
+	 * Returns `true` if this triangle is equal with the given one.
+	 *
+	 * @param {Triangle} triangle - The triangle to test for equality.
+	 * @return {boolean} Whether this triangle is equal with the given one.
+	 */
+	equals( triangle ) {
+
+		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
+
+	}
+
+}
+
+/**
+ * Represents an axis-aligned bounding box (AABB) in 3D space.
+ */
+class Box3 {
+
+	/**
+	 * Constructs a new bounding box.
+	 *
+	 * @param {Vector3} [min=(Infinity,Infinity,Infinity)] - A vector representing the lower boundary of the box.
+	 * @param {Vector3} [max=(-Infinity,-Infinity,-Infinity)] - A vector representing the upper boundary of the box.
+	 */
+	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBox3 = true;
+
+		/**
+		 * The lower boundary of the box.
+		 *
+		 * @type {Vector3}
+		 */
+		this.min = min;
+
+		/**
+		 * The upper boundary of the box.
+		 *
+		 * @type {Vector3}
+		 */
+		this.max = max;
+
+	}
+
+	/**
+	 * Sets the lower and upper boundaries of this box.
+	 * Please note that this method only copies the values from the given objects.
+	 *
+	 * @param {Vector3} min - The lower boundary of the box.
+	 * @param {Vector3} max - The upper boundary of the box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	set( min, max ) {
+
+		this.min.copy( min );
+		this.max.copy( max );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given array.
+	 *
+	 * @param {Array<number>} array - An array holding 3D position data.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromArray( array ) {
+
+		this.makeEmpty();
+
+		for ( let i = 0, il = array.length; i < il; i += 3 ) {
+
+			this.expandByPoint( _vector$b.fromArray( array, i ) );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - A buffer attribute holding 3D position data.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromBufferAttribute( attribute ) {
+
+		this.makeEmpty();
+
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
+
+			this.expandByPoint( _vector$b.fromBufferAttribute( attribute, i ) );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given array.
+	 *
+	 * @param {Array<Vector3>} points - An array holding 3D position data as instances of {@link Vector3}.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromPoints( points ) {
+
+		this.makeEmpty();
+
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
+
+			this.expandByPoint( points[ i ] );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Centers this box on the given center vector and sets this box's width, height and
+	 * depth to the given size values.
+	 *
+	 * @param {Vector3} center - The center of the box.
+	 * @param {Vector3} size - The x, y and z dimensions of the box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromCenterAndSize( center, size ) {
+
+		const halfSize = _vector$b.copy( size ).multiplyScalar( 0.5 );
+
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
+
+		return this;
+
+	}
+
+	/**
+	 * Computes the world-axis-aligned bounding box for the given 3D object
+	 * (including its children), accounting for the object's, and children's,
+	 * world transforms. The function may result in a larger box than strictly necessary.
+	 *
+	 * @param {Object3D} object - The 3D object to compute the bounding box for.
+	 * @param {boolean} [precise=false] - If set to `true`, the method computes the smallest
+	 * world-axis-aligned bounding box at the expense of more computation.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromObject( object, precise = false ) {
+
+		this.makeEmpty();
+
+		return this.expandByObject( object, precise );
+
+	}
+
+	/**
+	 * Returns a new box with copied values from this instance.
+	 *
+	 * @return {Box3} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Copies the values of the given box to this instance.
+	 *
+	 * @param {Box3} box - The box to copy.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	copy( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	}
+
+	/**
+	 * Makes this box empty which means in encloses a zero space in 3D.
+	 *
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	makeEmpty() {
+
+		this.min.x = this.min.y = this.min.z = + Infinity;
+		this.max.x = this.max.y = this.max.z = - Infinity;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns true if this box includes zero points within its bounds.
+	 * Note that a box with equal lower and upper bounds still includes one
+	 * point, the one both bounds share.
+	 *
+	 * @return {boolean} Whether this box is empty or not.
+	 */
+	isEmpty() {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+
+	}
+
+	/**
+	 * Returns the center point of this box.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The center point.
+	 */
+	getCenter( target ) {
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+
+	}
+
+	/**
+	 * Returns the dimensions of this box.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The size.
+	 */
+	getSize( target ) {
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
+
+	}
+
+	/**
+	 * Expands the boundaries of this box to include the given point.
+	 *
+	 * @param {Vector3} point - The point that should be included by the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	expandByPoint( point ) {
+
+		this.min.min( point );
+		this.max.max( point );
+
+		return this;
+
+	}
+
+	/**
+	 * Expands this box equilaterally by the given vector. The width of this
+	 * box will be expanded by the x component of the vector in both
+	 * directions. The height of this box will be expanded by the y component of
+	 * the vector in both directions. The depth of this box will be
+	 * expanded by the z component of the vector in both directions.
+	 *
+	 * @param {Vector3} vector - The vector that should expand the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	expandByVector( vector ) {
+
+		this.min.sub( vector );
+		this.max.add( vector );
+
+		return this;
+
+	}
+
+	/**
+	 * Expands each dimension of the box by the given scalar. If negative, the
+	 * dimensions of the box will be contracted.
+	 *
+	 * @param {number} scalar - The scalar value that should expand the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	expandByScalar( scalar ) {
+
+		this.min.addScalar( - scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+
+	}
+
+	/**
+	 * Expands the boundaries of this box to include the given 3D object and
+	 * its children, accounting for the object's, and children's, world
+	 * transforms. The function may result in a larger box than strictly
+	 * necessary (unless the precise parameter is set to true).
+	 *
+	 * @param {Object3D} object - The 3D object that should expand the bounding box.
+	 * @param {boolean} precise - If set to `true`, the method expands the bounding box
+	 * as little as necessary at the expense of more computation.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	expandByObject( object, precise = false ) {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and children's, world transforms
+
+		object.updateWorldMatrix( false, false );
+
+		const geometry = object.geometry;
+
+		if ( geometry !== undefined ) {
+
+			const positionAttribute = geometry.getAttribute( 'position' );
+
+			// precise AABB computation based on vertex data requires at least a position attribute.
+			// instancing isn't supported so far and uses the normal (conservative) code path.
+
+			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
+
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+					if ( object.isMesh === true ) {
+
+						object.getVertexPosition( i, _vector$b );
+
+					} else {
+
+						_vector$b.fromBufferAttribute( positionAttribute, i );
+
+					}
+
+					_vector$b.applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector$b );
+
+				}
+
+			} else {
+
+				if ( object.boundingBox !== undefined ) {
+
+					// object-level bounding box
+
+					if ( object.boundingBox === null ) {
+
+						object.computeBoundingBox();
+
+					}
+
+					_box$4.copy( object.boundingBox );
+
+
+				} else {
+
+					// geometry-level bounding box
+
+					if ( geometry.boundingBox === null ) {
+
+						geometry.computeBoundingBox();
+
+					}
+
+					_box$4.copy( geometry.boundingBox );
+
+				}
+
+				_box$4.applyMatrix4( object.matrixWorld );
+
+				this.union( _box$4 );
+
+			}
+
+		}
+
+		const children = object.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			this.expandByObject( children[ i ], precise );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if the given point lies within or on the boundaries of this box.
+	 *
+	 * @param {Vector3} point - The point to test.
+	 * @return {boolean} Whether the bounding box contains the given point or not.
+	 */
+	containsPoint( point ) {
+
+		return point.x >= this.min.x && point.x <= this.max.x &&
+			point.y >= this.min.y && point.y <= this.max.y &&
+			point.z >= this.min.z && point.z <= this.max.z;
+
+	}
+
+	/**
+	 * Returns `true` if this bounding box includes the entirety of the given bounding box.
+	 * If this box and the given one are identical, this function also returns `true`.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the bounding box contains the given bounding box or not.
+	 */
+	containsBox( box ) {
+
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y &&
+			this.min.z <= box.min.z && box.max.z <= this.max.z;
+
+	}
+
+	/**
+	 * Returns a point as a proportion of this box's width, height and depth.
+	 *
+	 * @param {Vector3} point - A point in 3D space.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} A point as a proportion of this box's width, height and depth.
+	 */
+	getParameter( point, target ) {
+
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+
+		return target.set(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
+			( point.z - this.min.z ) / ( this.max.z - this.min.z )
+		);
+
+	}
+
+	/**
+	 * Returns `true` if the given bounding box intersects with this bounding box.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the given bounding box intersects with this bounding box.
+	 */
+	intersectsBox( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
+			box.max.y >= this.min.y && box.min.y <= this.max.y &&
+			box.max.z >= this.min.z && box.min.z <= this.max.z;
+
+	}
+
+	/**
+	 * Returns `true` if the given bounding sphere intersects with this bounding box.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @return {boolean} Whether the given bounding sphere intersects with this bounding box.
+	 */
+	intersectsSphere( sphere ) {
+
+		// Find the point on the AABB closest to the sphere center.
+		this.clampPoint( sphere.center, _vector$b );
+
+		// If that point is inside the sphere, the AABB and sphere intersect.
+		return _vector$b.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+	}
+
+	/**
+	 * Returns `true` if the given plane intersects with this bounding box.
+	 *
+	 * @param {Plane} plane - The plane to test.
+	 * @return {boolean} Whether the given plane intersects with this bounding box.
+	 */
+	intersectsPlane( plane ) {
+
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
+
+		let min, max;
+
+		if ( plane.normal.x > 0 ) {
+
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+
+		} else {
+
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+
+		}
+
+		if ( plane.normal.y > 0 ) {
+
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+
+		} else {
+
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+
+		}
+
+		if ( plane.normal.z > 0 ) {
+
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+
+		} else {
+
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+
+		}
+
+		return ( min <= - plane.constant && max >= - plane.constant );
+
+	}
+
+	/**
+	 * Returns `true` if the given triangle intersects with this bounding box.
+	 *
+	 * @param {Triangle} triangle - The triangle to test.
+	 * @return {boolean} Whether the given triangle intersects with this bounding box.
+	 */
+	intersectsTriangle( triangle ) {
+
+		if ( this.isEmpty() ) {
+
+			return false;
+
+		}
+
+		// compute box center and extents
+		this.getCenter( _center );
+		_extents.subVectors( this.max, _center );
+
+		// translate triangle to aabb origin
+		_v0$2.subVectors( triangle.a, _center );
+		_v1$4.subVectors( triangle.b, _center );
+		_v2$3.subVectors( triangle.c, _center );
+
+		// compute edge vectors for triangle
+		_f0.subVectors( _v1$4, _v0$2 );
+		_f1.subVectors( _v2$3, _v1$4 );
+		_f2.subVectors( _v0$2, _v2$3 );
+
+		// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
+		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+		let axes = [
+			0, - _f0.z, _f0.y, 0, - _f1.z, _f1.y, 0, - _f2.z, _f2.y,
+			_f0.z, 0, - _f0.x, _f1.z, 0, - _f1.x, _f2.z, 0, - _f2.x,
+			- _f0.y, _f0.x, 0, - _f1.y, _f1.x, 0, - _f2.y, _f2.x, 0
+		];
+		if ( ! satForAxes( axes, _v0$2, _v1$4, _v2$3, _extents ) ) {
+
+			return false;
+
+		}
+
+		// test 3 face normals from the aabb
+		axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+		if ( ! satForAxes( axes, _v0$2, _v1$4, _v2$3, _extents ) ) {
+
+			return false;
+
+		}
+
+		// finally testing the face normal of the triangle
+		// use already existing triangle edge vectors here
+		_triangleNormal.crossVectors( _f0, _f1 );
+		axes = [ _triangleNormal.x, _triangleNormal.y, _triangleNormal.z ];
+
+		return satForAxes( axes, _v0$2, _v1$4, _v2$3, _extents );
+
+	}
+
+	/**
+	 * Clamps the given point within the bounds of this box.
+	 *
+	 * @param {Vector3} point - The point to clamp.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The clamped point.
+	 */
+	clampPoint( point, target ) {
+
+		return target.copy( point ).clamp( this.min, this.max );
+
+	}
+
+	/**
+	 * Returns the euclidean distance from any edge of this box to the specified point. If
+	 * the given point lies inside of this box, the distance will be `0`.
+	 *
+	 * @param {Vector3} point - The point to compute the distance to.
+	 * @return {number} The euclidean distance.
+	 */
+	distanceToPoint( point ) {
+
+		return this.clampPoint( point, _vector$b ).distanceTo( point );
+
+	}
+
+	/**
+	 * Returns a bounding sphere that encloses this bounding box.
+	 *
+	 * @param {Sphere} target - The target sphere that is used to store the method's result.
+	 * @return {Sphere} The bounding sphere that encloses this bounding box.
+	 */
+	getBoundingSphere( target ) {
+
+		if ( this.isEmpty() ) {
+
+			target.makeEmpty();
+
+		} else {
+
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( _vector$b ).length() * 0.5;
+
+		}
+
+		return target;
+
+	}
+
+	/**
+	 * Computes the intersection of this bounding box and the given one, setting the upper
+	 * bound of this box to the lesser of the two boxes' upper bounds and the
+	 * lower bound of this box to the greater of the two boxes' lower bounds. If
+	 * there's no overlap, makes this box empty.
+	 *
+	 * @param {Box3} box - The bounding box to intersect with.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	intersect( box ) {
+
+		this.min.max( box.min );
+		this.max.min( box.max );
+
+		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
+		if ( this.isEmpty() ) this.makeEmpty();
+
+		return this;
+
+	}
+
+	/**
+	 * Computes the union of this box and another and the given one, setting the upper
+	 * bound of this box to the greater of the two boxes' upper bounds and the
+	 * lower bound of this box to the lesser of the two boxes' lower bounds.
+	 *
+	 * @param {Box3} box - The bounding box that will be unioned with this instance.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	union( box ) {
+
+		this.min.min( box.min );
+		this.max.max( box.max );
+
+		return this;
+
+	}
+
+	/**
+	 * Transforms this bounding box by the given 4x4 transformation matrix.
+	 *
+	 * @param {Matrix4} matrix - The transformation matrix.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	applyMatrix4( matrix ) {
+
+		// transform of empty box is an empty box.
+		if ( this.isEmpty() ) return this;
+
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+
+		this.setFromPoints( _points );
+
+		return this;
+
+	}
+
+	/**
+	 * Adds the given offset to both the upper and lower bounds of this bounding box,
+	 * effectively moving it in 3D space.
+	 *
+	 * @param {Vector3} offset - The offset that should be used to translate the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	translate( offset ) {
+
+		this.min.add( offset );
+		this.max.add( offset );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this bounding box is equal with the given one.
+	 *
+	 * @param {Box3} box - The box to test for equality.
+	 * @return {boolean} Whether this bounding box is equal with the given one.
+	 */
+	equals( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			min: this.min.toArray(),
+			max: this.max.toArray()
+		};
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @param {Object} json - The serialized json to set the box from.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	fromJSON( json ) {
+
+		this.min.fromArray( json.min );
+		this.max.fromArray( json.max );
+		return this;
+
+	}
+
+}
+
+const _points = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+const _vector$b = /*@__PURE__*/ new Vector3();
+
+const _box$4 = /*@__PURE__*/ new Box3();
+
+// triangle centered vertices
+
+const _v0$2 = /*@__PURE__*/ new Vector3();
+const _v1$4 = /*@__PURE__*/ new Vector3();
+const _v2$3 = /*@__PURE__*/ new Vector3();
+
+// triangle edge vectors
+
+const _f0 = /*@__PURE__*/ new Vector3();
+const _f1 = /*@__PURE__*/ new Vector3();
+const _f2 = /*@__PURE__*/ new Vector3();
+
+const _center = /*@__PURE__*/ new Vector3();
+const _extents = /*@__PURE__*/ new Vector3();
+const _triangleNormal = /*@__PURE__*/ new Vector3();
+const _testAxis = /*@__PURE__*/ new Vector3();
+
+function satForAxes( axes, v0, v1, v2, extents ) {
+
+	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+		_testAxis.fromArray( axes, i );
+		// project the aabb onto the separating axis
+		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
+		// project all 3 vertices of the triangle onto the separating axis
+		const p0 = v0.dot( _testAxis );
+		const p1 = v1.dot( _testAxis );
+		const p2 = v2.dot( _testAxis );
+		// actual test, basically see if either of the most extreme of the triangle points intersects r
+		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+			// points of the projected triangle are outside the projected half-length of the aabb
+			// the axis is separating and we can exit
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
+
+// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
+
+const _tables = /*@__PURE__*/ _generateTables();
+
+function _generateTables() {
+
+	// float32 to float16 helpers
+
+	const buffer = new ArrayBuffer( 4 );
+	const floatView = new Float32Array( buffer );
+	const uint32View = new Uint32Array( buffer );
+
+	const baseTable = new Uint32Array( 512 );
+	const shiftTable = new Uint32Array( 512 );
+
+	for ( let i = 0; i < 256; ++ i ) {
+
+		const e = i - 127;
+
+		// very small number (0, -0)
+
+		if ( e < -27 ) {
+
+			baseTable[ i ] = 0x0000;
+			baseTable[ i | 0x100 ] = 0x8000;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// small number (denorm)
+
+		} else if ( e < -14 ) {
+
+			baseTable[ i ] = 0x0400 >> ( - e - 14 );
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+			shiftTable[ i ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
+
+			// normal number
+
+		} else if ( e <= 15 ) {
+
+			baseTable[ i ] = ( e + 15 ) << 10;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+			// large number (Infinity, -Infinity)
+
+		} else if ( e < 128 ) {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// stay (NaN, Infinity, -Infinity)
+
+		} else {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+		}
+
+	}
+
+	// float16 to float32 helpers
+
+	const mantissaTable = new Uint32Array( 2048 );
+	const exponentTable = new Uint32Array( 64 );
+	const offsetTable = new Uint32Array( 64 );
+
+	for ( let i = 1; i < 1024; ++ i ) {
+
+		let m = i << 13; // zero pad mantissa bits
+		let e = 0; // zero exponent
+
+		// normalized
+		while ( ( m & 0x00800000 ) === 0 ) {
+
+			m <<= 1;
+			e -= 0x00800000; // decrement exponent
+
+		}
+
+		m &= -8388609; // clear leading 1 bit
+		e += 0x38800000; // adjust bias
+
+		mantissaTable[ i ] = m | e;
+
+	}
+
+	for ( let i = 1024; i < 2048; ++ i ) {
+
+		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+	}
+
+	for ( let i = 1; i < 31; ++ i ) {
+
+		exponentTable[ i ] = i << 23;
+
+	}
+
+	exponentTable[ 31 ] = 0x47800000;
+	exponentTable[ 32 ] = 0x80000000;
+
+	for ( let i = 33; i < 63; ++ i ) {
+
+		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+	}
+
+	exponentTable[ 63 ] = 0xc7800000;
+
+	for ( let i = 1; i < 64; ++ i ) {
+
+		if ( i !== 32 ) {
+
+			offsetTable[ i ] = 1024;
+
+		}
+
+	}
+
+	return {
+		floatView: floatView,
+		uint32View: uint32View,
+		baseTable: baseTable,
+		shiftTable: shiftTable,
+		mantissaTable: mantissaTable,
+		exponentTable: exponentTable,
+		offsetTable: offsetTable
+	};
+
+}
+
+/**
+ * Returns a half precision floating point value (FP16) from the given single
+ * precision floating point value (FP32).
+ *
+ * @param {number} val - A single precision floating point value.
+ * @return {number} The FP16 value.
+ */
+function toHalfFloat( val ) {
+
+	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
+
+	val = clamp( val, -65504, 65504 );
+
+	_tables.floatView[ 0 ] = val;
+	const f = _tables.uint32View[ 0 ];
+	const e = ( f >> 23 ) & 0x1ff;
+	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
+
+}
+
+/**
+ * Returns a single precision floating point value (FP32) from the given half
+ * precision floating point value (FP16).
+ *
+ * @param {number} val - A half precision floating point value.
+ * @return {number} The FP32 value.
+ */
+function fromHalfFloat( val ) {
+
+	const m = val >> 10;
+	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+	return _tables.floatView[ 0 ];
+
+}
+
+/**
+ * A class containing utility functions for data.
+ *
+ * @hideconstructor
+ */
+class DataUtils {
+
+	/**
+	 * Returns a half precision floating point value (FP16) from the given single
+	 * precision floating point value (FP32).
+	 *
+	 * @param {number} val - A single precision floating point value.
+	 * @return {number} The FP16 value.
+	 */
+	static toHalfFloat( val ) {
+
+		return toHalfFloat( val );
+
+	}
+
+	/**
+	 * Returns a single precision floating point value (FP32) from the given half
+	 * precision floating point value (FP16).
+	 *
+	 * @param {number} val - A half precision floating point value.
+	 * @return {number} The FP32 value.
+	 */
+	static fromHalfFloat( val ) {
+
+		return fromHalfFloat( val );
+
+	}
+
+}
+
+const _vector$a = /*@__PURE__*/ new Vector3();
+const _vector2$1 = /*@__PURE__*/ new Vector2();
+
+let _id$3 = 0;
+
+/**
+ * This class stores data for an attribute (such as vertex positions, face
+ * indices, normals, colors, UVs, and any custom attributes ) associated with
+ * a geometry, which allows for more efficient passing of data to the GPU.
+ *
+ * When working with vector-like data, the `fromBufferAttribute( attribute, index )`
+ * helper methods on vector and color class might be helpful. E.g. {@link Vector3#fromBufferAttribute}.
+ */
+class BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {TypedArray} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized = false ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBufferAttribute = true;
+
+		/**
+		 * The ID of the buffer attribute.
+		 *
+		 * @name BufferAttribute#id
+		 * @type {number}
+		 * @readonly
+		 */
+		Object.defineProperty( this, 'id', { value: _id$3 ++ } );
+
+		/**
+		 * The name of the buffer attribute.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+
+		/**
+		 * The array holding the attribute data. It should have `itemSize * numVertices`
+		 * elements, where `numVertices` is the number of vertices in the associated geometry.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.array = array;
+
+		/**
+		 * The number of values of the array that should be associated with a particular vertex.
+		 * For instance, if this attribute is storing a 3-component vector (such as a position,
+		 * normal, or color), then the value should be `3`.
+		 *
+		 * @type {number}
+		 */
+		this.itemSize = itemSize;
+
+		/**
+		 * Represents the number of items this buffer attribute stores. It is internally computed
+		 * by dividing the `array` length by the `itemSize`.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.count = array !== undefined ? array.length / itemSize : 0;
+
+		/**
+		 * Applies to integer data only. Indicates how the underlying data in the buffer maps to
+		 * the values in the GLSL code. For instance, if `array` is an instance of `UInt16Array`,
+		 * and `normalized` is `true`, the values `0 - +65535` in the array data will be mapped to
+		 * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
+		 * to floats unmodified, i.e. `65535` becomes `65535.0f`.
+		 *
+		 * @type {boolean}
+		 */
+		this.normalized = normalized;
+
+		/**
+		 * Defines the intended usage pattern of the data store for optimization purposes.
+		 *
+		 * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+		 * instantiate a new one and set the desired usage before the next render.
+		 *
+		 * @type {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)}
+		 * @default StaticDrawUsage
+		 */
+		this.usage = StaticDrawUsage;
+
+		/**
+		 * This can be used to only update some components of stored vectors (for example, just the
+		 * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.updateRanges = [];
+
+		/**
+		 * Configures the bound GPU type for use in shaders.
+		 *
+		 * Note: this only has an effect for integer arrays and is not configurable for float arrays.
+		 * For lower precision float types, use `Float16BufferAttribute`.
+		 *
+		 * @type {(FloatType|IntType)}
+		 * @default FloatType
+		 */
+		this.gpuType = FloatType;
+
+		/**
+		 * A version number, incremented every time the `needsUpdate` is set to `true`.
+		 *
+		 * @type {number}
+		 */
+		this.version = 0;
+
+	}
+
+	/**
+	 * A callback function that is executed after the renderer has transferred the attribute
+	 * array data to the GPU.
+	 */
+	onUploadCallback() {}
+
+	/**
+	 * Flag to indicate that this attribute has changed and should be re-sent to
+	 * the GPU. Set this to `true` when you modify the value of the array.
+	 *
+	 * @type {number}
+	 * @default false
+	 * @param {boolean} value
+	 */
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+	/**
+	 * Sets the usage of this buffer attribute.
+	 *
+	 * @param {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)} value - The usage to set.
+	 * @return {BufferAttribute} A reference to this buffer attribute.
+	 */
+	setUsage( value ) {
+
+		this.usage = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Adds a range of data in the data array to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
+	}
+
+	/**
+	 * Copies the values of the given buffer attribute to this instance.
+	 *
+	 * @param {BufferAttribute} source - The buffer attribute to copy.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	copy( source ) {
+
+		this.name = source.name;
+		this.array = new source.array.constructor( source.array );
+		this.itemSize = source.itemSize;
+		this.count = source.count;
+		this.normalized = source.normalized;
+
+		this.usage = source.usage;
+		this.gpuType = source.gpuType;
+
+		return this;
+
+	}
+
+	/**
+	 * Copies a vector from the given buffer attribute to this one. The start
+	 * and destination position in the attribute buffers are represented by the
+	 * given indices.
+	 *
+	 * @param {number} index1 - The destination index into this buffer attribute.
+	 * @param {BufferAttribute} attribute - The buffer attribute to copy from.
+	 * @param {number} index2 - The source index into the given buffer attribute.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	copyAt( index1, attribute, index2 ) {
+
+		index1 *= this.itemSize;
+		index2 *= attribute.itemSize;
+
+		for ( let i = 0, l = this.itemSize; i < l; i ++ ) {
+
+			this.array[ index1 + i ] = attribute.array[ index2 + i ];
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Copies the given array data into this buffer attribute.
+	 *
+	 * @param {(TypedArray|Array)} array - The array to copy.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	copyArray( array ) {
+
+		this.array.set( array );
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 3x3 matrix to the given attribute. Works with
+	 * item size `2` and `3`.
+	 *
+	 * @param {Matrix3} m - The matrix to apply.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	applyMatrix3( m ) {
+
+		if ( this.itemSize === 2 ) {
+
+			for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector2$1.fromBufferAttribute( this, i );
+				_vector2$1.applyMatrix3( m );
+
+				this.setXY( i, _vector2$1.x, _vector2$1.y );
+
+			}
+
+		} else if ( this.itemSize === 3 ) {
+
+			for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector$a.fromBufferAttribute( this, i );
+				_vector$a.applyMatrix3( m );
+
+				this.setXYZ( i, _vector$a.x, _vector$a.y, _vector$a.z );
+
+			}
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 4x4 matrix to the given attribute. Only works with
+	 * item size `3`.
+	 *
+	 * @param {Matrix4} m - The matrix to apply.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	applyMatrix4( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector$a.fromBufferAttribute( this, i );
+
+			_vector$a.applyMatrix4( m );
+
+			this.setXYZ( i, _vector$a.x, _vector$a.y, _vector$a.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 3x3 normal matrix to the given attribute. Only works with
+	 * item size `3`.
+	 *
+	 * @param {Matrix3} m - The normal matrix to apply.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	applyNormalMatrix( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector$a.fromBufferAttribute( this, i );
+
+			_vector$a.applyNormalMatrix( m );
+
+			this.setXYZ( i, _vector$a.x, _vector$a.y, _vector$a.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 4x4 matrix to the given attribute. Only works with
+	 * item size `3` and with direction vectors.
+	 *
+	 * @param {Matrix4} m - The matrix to apply.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	transformDirection( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector$a.fromBufferAttribute( this, i );
+
+			_vector$a.transformDirection( m );
+
+			this.setXYZ( i, _vector$a.x, _vector$a.y, _vector$a.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the given array data in the buffer attribute.
+	 *
+	 * @param {(TypedArray|Array)} value - The array data to set.
+	 * @param {number} [offset=0] - The offset in this buffer attribute's array.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	set( value, offset = 0 ) {
+
+		// Matching BufferAttribute constructor, do not normalize the array.
+		this.array.set( value, offset );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the given component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} component - The component index.
+	 * @return {number} The returned value.
+	 */
+	getComponent( index, component ) {
+
+		let value = this.array[ index * this.itemSize + component ];
+
+		if ( this.normalized ) value = denormalize( value, this.array );
+
+		return value;
+
+	}
+
+	/**
+	 * Sets the given value to the given component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} component - The component index.
+	 * @param {number} value - The value to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setComponent( index, component, value ) {
+
+		if ( this.normalized ) value = normalize( value, this.array );
+
+		this.array[ index * this.itemSize + component ] = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the x component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The x component.
+	 */
+	getX( index ) {
+
+		let x = this.array[ index * this.itemSize ];
+
+		if ( this.normalized ) x = denormalize( x, this.array );
+
+		return x;
+
+	}
+
+	/**
+	 * Sets the x component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setX( index, x ) {
+
+		if ( this.normalized ) x = normalize( x, this.array );
+
+		this.array[ index * this.itemSize ] = x;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The y component.
+	 */
+	getY( index ) {
+
+		let y = this.array[ index * this.itemSize + 1 ];
+
+		if ( this.normalized ) y = denormalize( y, this.array );
+
+		return y;
+
+	}
+
+	/**
+	 * Sets the y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} y - The value to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setY( index, y ) {
+
+		if ( this.normalized ) y = normalize( y, this.array );
+
+		this.array[ index * this.itemSize + 1 ] = y;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The z component.
+	 */
+	getZ( index ) {
+
+		let z = this.array[ index * this.itemSize + 2 ];
+
+		if ( this.normalized ) z = denormalize( z, this.array );
+
+		return z;
+
+	}
+
+	/**
+	 * Sets the z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} z - The value to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setZ( index, z ) {
+
+		if ( this.normalized ) z = normalize( z, this.array );
+
+		this.array[ index * this.itemSize + 2 ] = z;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The w component.
+	 */
+	getW( index ) {
+
+		let w = this.array[ index * this.itemSize + 3 ];
+
+		if ( this.normalized ) w = denormalize( w, this.array );
+
+		return w;
+
+	}
+
+	/**
+	 * Sets the w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} w - The value to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setW( index, w ) {
+
+		if ( this.normalized ) w = normalize( w, this.array );
+
+		this.array[ index * this.itemSize + 3 ] = w;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x and y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setXY( index, x, y ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+
+		}
+
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x, y and z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @param {number} z - The value for the z component to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setXYZ( index, x, y, z ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+
+		}
+
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x, y, z and w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @param {number} z - The value for the z component to set.
+	 * @param {number} w - The value for the w component to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setXYZW( index, x, y, z, w ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+			w = normalize( w, this.array );
+
+		}
+
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
+		this.array[ index + 3 ] = w;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the given callback function that is executed after the Renderer has transferred
+	 * the attribute array data to the GPU. Can be used to perform clean-up operations after
+	 * the upload when attribute data are not needed anymore on the CPU side.
+	 *
+	 * @param {Function} callback - The `onUpload()` callback.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	onUpload( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new buffer attribute with copied values from this instance.
+	 *
+	 * @return {BufferAttribute} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor( this.array, this.itemSize ).copy( this );
+
+	}
+
+	/**
+	 * Serializes the buffer attribute into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized buffer attribute.
+	 */
+	toJSON() {
+
+		const data = {
+			itemSize: this.itemSize,
+			type: this.array.constructor.name,
+			array: Array.from( this.array ),
+			normalized: this.normalized
+		};
+
+		if ( this.name !== '' ) data.name = this.name;
+		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
+
+		return data;
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `Int8` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Int8BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Int8Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Int8Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `UInt8` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Uint8BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Uint8Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint8Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `UInt8Clamped` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Uint8ClampedBufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Uint8ClampedArray)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint8ClampedArray( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `Int16` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Int16BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Int16Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Int16Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `UInt16` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Uint16BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint16Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `Int32` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Int32BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Int32Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Int32Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `UInt32` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Uint32BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Uint32Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint32Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `Float16` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
+ * browser support is still problematic.
+ *
+ * @augments BufferAttribute
+ */
+class Float16BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint16Array( array ), itemSize, normalized );
+
+		this.isFloat16BufferAttribute = true;
+
+	}
+
+	getX( index ) {
+
+		let x = fromHalfFloat( this.array[ index * this.itemSize ] );
+
+		if ( this.normalized ) x = denormalize( x, this.array );
+
+		return x;
+
+	}
+
+	setX( index, x ) {
+
+		if ( this.normalized ) x = normalize( x, this.array );
+
+		this.array[ index * this.itemSize ] = toHalfFloat( x );
+
+		return this;
+
+	}
+
+	getY( index ) {
+
+		let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
+
+		if ( this.normalized ) y = denormalize( y, this.array );
+
+		return y;
+
+	}
+
+	setY( index, y ) {
+
+		if ( this.normalized ) y = normalize( y, this.array );
+
+		this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
+
+		return this;
+
+	}
+
+	getZ( index ) {
+
+		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
+
+		if ( this.normalized ) z = denormalize( z, this.array );
+
+		return z;
+
+	}
+
+	setZ( index, z ) {
+
+		if ( this.normalized ) z = normalize( z, this.array );
+
+		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
+
+		return this;
+
+	}
+
+	getW( index ) {
+
+		let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
+
+		if ( this.normalized ) w = denormalize( w, this.array );
+
+		return w;
+
+	}
+
+	setW( index, w ) {
+
+		if ( this.normalized ) w = normalize( w, this.array );
+
+		this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
+
+		return this;
+
+	}
+
+	setXY( index, x, y ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+
+		}
+
+		this.array[ index + 0 ] = toHalfFloat( x );
+		this.array[ index + 1 ] = toHalfFloat( y );
+
+		return this;
+
+	}
+
+	setXYZ( index, x, y, z ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+
+		}
+
+		this.array[ index + 0 ] = toHalfFloat( x );
+		this.array[ index + 1 ] = toHalfFloat( y );
+		this.array[ index + 2 ] = toHalfFloat( z );
+
+		return this;
+
+	}
+
+	setXYZW( index, x, y, z, w ) {
+
+		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+			w = normalize( w, this.array );
+
+		}
+
+		this.array[ index + 0 ] = toHalfFloat( x );
+		this.array[ index + 1 ] = toHalfFloat( y );
+		this.array[ index + 2 ] = toHalfFloat( z );
+		this.array[ index + 3 ] = toHalfFloat( w );
+
+		return this;
+
+	}
+
+}
+
+/**
+ * Convenient class that can be used when creating a `Float32` buffer attribute with
+ * a plain `Array` instance.
+ *
+ * @augments BufferAttribute
+ */
+class Float32BufferAttribute extends BufferAttribute {
+
+	/**
+	 * Constructs a new buffer attribute.
+	 *
+	 * @param {(Array<number>|Float32Array)} array - The array holding the attribute data.
+	 * @param {number} itemSize - The item size.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( array, itemSize, normalized ) {
+
+		super( new Float32Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+const _box$3 = /*@__PURE__*/ new Box3();
+const _v1$3 = /*@__PURE__*/ new Vector3();
+const _v2$2 = /*@__PURE__*/ new Vector3();
+
+/**
+ * An analytical 3D sphere defined by a center and radius. This class is mainly
+ * used as a Bounding Sphere for 3D objects.
+ */
+class Sphere {
+
+	/**
+	 * Constructs a new sphere.
+	 *
+	 * @param {Vector3} [center=(0,0,0)] - The center of the sphere
+	 * @param {number} [radius=-1] - The radius of the sphere.
+	 */
+	constructor( center = new Vector3(), radius = -1 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSphere = true;
+
+		/**
+		 * The center of the sphere
+		 *
+		 * @type {Vector3}
+		 */
+		this.center = center;
+
+		/**
+		 * The radius of the sphere.
+		 *
+		 * @type {number}
+		 */
+		this.radius = radius;
+
+	}
+
+	/**
+	 * Sets the sphere's components by copying the given values.
+	 *
+	 * @param {Vector3} center - The center.
+	 * @param {number} radius - The radius.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	set( center, radius ) {
+
+		this.center.copy( center );
+		this.radius = radius;
+
+		return this;
+
+	}
+
+	/**
+	 * Computes the minimum bounding sphere for list of points.
+	 * If the optional center point is given, it is used as the sphere's
+	 * center. Otherwise, the center of the axis-aligned bounding box
+	 * encompassing the points is calculated.
+	 *
+	 * @param {Array<Vector3>} points - A list of points in 3D space.
+	 * @param {Vector3} [optionalCenter] - The center of the sphere.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	setFromPoints( points, optionalCenter ) {
+
+		const center = this.center;
+
+		if ( optionalCenter !== undefined ) {
+
+			center.copy( optionalCenter );
+
+		} else {
+
+			_box$3.setFromPoints( points ).getCenter( center );
+
+		}
+
+		let maxRadiusSq = 0;
+
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
+
+			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+
+		}
+
+		this.radius = Math.sqrt( maxRadiusSq );
+
+		return this;
+
+	}
+
+	/**
+	 * Copies the values of the given sphere to this instance.
+	 *
+	 * @param {Sphere} sphere - The sphere to copy.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	copy( sphere ) {
+
+		this.center.copy( sphere.center );
+		this.radius = sphere.radius;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if the sphere is empty (the radius set to a negative number).
+	 *
+	 * Spheres with a radius of `0` contain only their center point and are not
+	 * considered to be empty.
+	 *
+	 * @return {boolean} Whether this sphere is empty or not.
+	 */
+	isEmpty() {
+
+		return ( this.radius < 0 );
+
+	}
+
+	/**
+	 * Makes this sphere empty which means in encloses a zero space in 3D.
+	 *
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	makeEmpty() {
+
+		this.center.set( 0, 0, 0 );
+		this.radius = -1;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this sphere contains the given point inclusive of
+	 * the surface of the sphere.
+	 *
+	 * @param {Vector3} point - The point to check.
+	 * @return {boolean} Whether this sphere contains the given point or not.
+	 */
+	containsPoint( point ) {
+
+		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+
+	}
+
+	/**
+	 * Returns the closest distance from the boundary of the sphere to the
+	 * given point. If the sphere contains the point, the distance will
+	 * be negative.
+	 *
+	 * @param {Vector3} point - The point to compute the distance to.
+	 * @return {number} The distance to the point.
+	 */
+	distanceToPoint( point ) {
+
+		return ( point.distanceTo( this.center ) - this.radius );
+
+	}
+
+	/**
+	 * Returns `true` if this sphere intersects with the given one.
+	 *
+	 * @param {Sphere} sphere - The sphere to test.
+	 * @return {boolean} Whether this sphere intersects with the given one or not.
+	 */
+	intersectsSphere( sphere ) {
+
+		const radiusSum = this.radius + sphere.radius;
+
+		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	}
+
+	/**
+	 * Returns `true` if this sphere intersects with the given box.
+	 *
+	 * @param {Box3} box - The box to test.
+	 * @return {boolean} Whether this sphere intersects with the given box or not.
+	 */
+	intersectsBox( box ) {
+
+		return box.intersectsSphere( this );
+
+	}
+
+	/**
+	 * Returns `true` if this sphere intersects with the given plane.
+	 *
+	 * @param {Plane} plane - The plane to test.
+	 * @return {boolean} Whether this sphere intersects with the given plane or not.
+	 */
+	intersectsPlane( plane ) {
+
+		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
+
+	}
+
+	/**
+	 * Clamps a point within the sphere. If the point is outside the sphere, it
+	 * will clamp it to the closest point on the edge of the sphere. Points
+	 * already inside the sphere will not be affected.
+	 *
+	 * @param {Vector3} point - The plane to clamp.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The clamped point.
+	 */
+	clampPoint( point, target ) {
+
+		const deltaLengthSq = this.center.distanceToSquared( point );
+
+		target.copy( point );
+
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
+
+			target.sub( this.center ).normalize();
+			target.multiplyScalar( this.radius ).add( this.center );
+
+		}
+
+		return target;
+
+	}
+
+	/**
+	 * Returns a bounding box that encloses this sphere.
+	 *
+	 * @param {Box3} target - The target box that is used to store the method's result.
+	 * @return {Box3} The bounding box that encloses this sphere.
+	 */
+	getBoundingBox( target ) {
+
+		if ( this.isEmpty() ) {
+
+			// Empty sphere produces empty bounding box
+			target.makeEmpty();
+			return target;
+
+		}
+
+		target.set( this.center, this.center );
+		target.expandByScalar( this.radius );
+
+		return target;
+
+	}
+
+	/**
+	 * Transforms this sphere with the given 4x4 transformation matrix.
+	 *
+	 * @param {Matrix4} matrix - The transformation matrix.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	applyMatrix4( matrix ) {
+
+		this.center.applyMatrix4( matrix );
+		this.radius = this.radius * matrix.getMaxScaleOnAxis();
+
+		return this;
+
+	}
+
+	/**
+	 * Translates the sphere's center by the given offset.
+	 *
+	 * @param {Vector3} offset - The offset.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	translate( offset ) {
+
+		this.center.add( offset );
+
+		return this;
+
+	}
+
+	/**
+	 * Expands the boundaries of this sphere to include the given point.
+	 *
+	 * @param {Vector3} point - The point to include.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	expandByPoint( point ) {
+
+		if ( this.isEmpty() ) {
+
+			this.center.copy( point );
+
+			this.radius = 0;
+
+			return this;
+
+		}
+
+		_v1$3.subVectors( point, this.center );
+
+		const lengthSq = _v1$3.lengthSq();
+
+		if ( lengthSq > ( this.radius * this.radius ) ) {
+
+			// calculate the minimal sphere
+
+			const length = Math.sqrt( lengthSq );
+
+			const delta = ( length - this.radius ) * 0.5;
+
+			this.center.addScaledVector( _v1$3, delta / length );
+
+			this.radius += delta;
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Expands this sphere to enclose both the original sphere and the given sphere.
+	 *
+	 * @param {Sphere} sphere - The sphere to include.
+	 * @return {Sphere} A reference to this sphere.
+	 */
+	union( sphere ) {
+
+		if ( sphere.isEmpty() ) {
+
+			return this;
+
+		}
+
+		if ( this.isEmpty() ) {
+
+			this.copy( sphere );
+
+			return this;
+
+		}
+
+		if ( this.center.equals( sphere.center ) === true ) {
+
+			 this.radius = Math.max( this.radius, sphere.radius );
+
+		} else {
+
+			_v2$2.subVectors( sphere.center, this.center ).setLength( sphere.radius );
+
+			this.expandByPoint( _v1$3.copy( sphere.center ).add( _v2$2 ) );
+
+			this.expandByPoint( _v1$3.copy( sphere.center ).sub( _v2$2 ) );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this sphere is equal with the given one.
+	 *
+	 * @param {Sphere} sphere - The sphere to test for equality.
+	 * @return {boolean} Whether this bounding sphere is equal with the given one.
+	 */
+	equals( sphere ) {
+
+		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
+
+	}
+
+	/**
+	 * Returns a new sphere with copied values from this instance.
+	 *
+	 * @return {Sphere} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding sphere.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			radius: this.radius,
+			center: this.center.toArray()
+		};
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding sphere.
+	 *
+	 * @param {Object} json - The serialized json to set the sphere from.
+	 * @return {Sphere} A reference to this bounding sphere.
+	 */
+	fromJSON( json ) {
+
+		this.radius = json.radius;
+		this.center.fromArray( json.center );
+		return this;
+
+	}
+
+}
+
+let _id$2 = 0;
+
+const _m1$2 = /*@__PURE__*/ new Matrix4();
+const _obj = /*@__PURE__*/ new Object3D();
+const _offset = /*@__PURE__*/ new Vector3();
+const _box$2 = /*@__PURE__*/ new Box3();
+const _boxMorphTargets = /*@__PURE__*/ new Box3();
+const _vector$9 = /*@__PURE__*/ new Vector3();
+
+/**
+ * A representation of mesh, line, or point geometry. Includes vertex
+ * positions, face indices, normals, colors, UVs, and custom attributes
+ * within buffers, reducing the cost of passing all this data to the GPU.
+ *
+ * ```js
+ * const geometry = new THREE.BufferGeometry();
+ * // create a simple square shape. We duplicate the top left and bottom right
+ * // vertices because each vertex needs to appear once per triangle.
+ * const vertices = new Float32Array( [
+ * 	-1.0, -1.0,  1.0, // v0
+ * 	 1.0, -1.0,  1.0, // v1
+ * 	 1.0,  1.0,  1.0, // v2
+ *
+ * 	 1.0,  1.0,  1.0, // v3
+ * 	-1.0,  1.0,  1.0, // v4
+ * 	-1.0, -1.0,  1.0  // v5
+ * ] );
+ * // itemSize = 3 because there are 3 values (components) per vertex
+ * geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * ```
+ *
+ * @augments EventDispatcher
+ */
+class BufferGeometry extends EventDispatcher {
+
+	/**
+	 * Constructs a new geometry.
+	 */
+	constructor() {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBufferGeometry = true;
+
+		/**
+		 * The ID of the geometry.
+		 *
+		 * @name BufferGeometry#id
+		 * @type {number}
+		 * @readonly
+		 */
+		Object.defineProperty( this, 'id', { value: _id$2 ++ } );
+
+		/**
+		 * The UUID of the geometry.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
+		this.uuid = generateUUID();
+
+		/**
+		 * The name of the geometry.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+		this.type = 'BufferGeometry';
+
+		/**
+		 * Allows for vertices to be re-used across multiple triangles; this is
+		 * called using "indexed triangles". Each triangle is associated with the
+		 * indices of three vertices. This attribute therefore stores the index of
+		 * each vertex for each triangular face. If this attribute is not set, the
+		 * renderer assumes that each three contiguous positions represent a single triangle.
+		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.index = null;
+
+		/**
+		 * A (storage) buffer attribute which was generated with a compute shader and
+		 * now defines indirect draw calls.
+		 *
+		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.indirect = null;
+
+		/**
+		 * The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
+		 *
+		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+		 *
+		 * @type {number|Array<number>}
+		 * @default 0
+		 */
+		this.indirectOffset = 0;
+
+		/**
+		 * This dictionary has as id the name of the attribute to be set and as value
+		 * the buffer attribute to set it to. Rather than accessing this property directly,
+		 * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
+		 *
+		 * @type {Object<string,(BufferAttribute|InterleavedBufferAttribute)>}
+		 */
+		this.attributes = {};
+
+		/**
+		 * This dictionary holds the morph targets of the geometry.
+		 *
+		 * Note: Once the geometry has been rendered, the morph attribute data cannot
+		 * be changed. You will have to call `dispose()`, and create a new geometry instance.
+		 *
+		 * @type {Object}
+		 */
+		this.morphAttributes = {};
+
+		/**
+		 * Used to control the morph target behavior; when set to `true`, the morph
+		 * target data is treated as relative offsets, rather than as absolute
+		 * positions/normals.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.morphTargetsRelative = false;
+
+		/**
+		 * Split the geometry into groups, each of which will be rendered in a
+		 * separate draw call. This allows an array of materials to be used with the geometry.
+		 *
+		 * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
+		 *
+		 * Every vertex and index must belong to exactly one group — groups must not share vertices or
+		 * indices, and must not leave vertices or indices unused.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.groups = [];
+
+		/**
+		 * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
+		this.boundingBox = null;
+
+		/**
+		 * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
+		this.boundingSphere = null;
+
+		/**
+		 * Determines the part of the geometry to render. This should not be set directly,
+		 * instead use `setDrawRange()`.
+		 *
+		 * @type {{start:number,count:number}}
+		 */
+		this.drawRange = { start: 0, count: Infinity };
+
+		/**
+		 * An object that can be used to store custom data about the geometry.
+		 * It should not hold references to functions as these will not be cloned.
+		 *
+		 * @type {Object}
+		 */
+		this.userData = {};
+
+	}
+
+	/**
+	 * Returns the index of this geometry.
+	 *
+	 * @return {?BufferAttribute} The index. Returns `null` if no index is defined.
+	 */
+	getIndex() {
+
+		return this.index;
+
+	}
+
+	/**
+	 * Sets the given index to this geometry.
+	 *
+	 * @param {Array<number>|BufferAttribute} index - The index to set.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setIndex( index ) {
+
+		if ( Array.isArray( index ) ) {
+
+			this.index = new ( arrayNeedsUint32( index ) ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+
+		} else {
+
+			this.index = index;
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the given indirect attribute to this geometry.
+	 *
+	 * @param {BufferAttribute} indirect - The attribute holding indirect draw calls.
+	 * @param {number|Array<number>} [indirectOffset=0] - The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setIndirect( indirect, indirectOffset = 0 ) {
+
+		this.indirect = indirect;
+		this.indirectOffset = indirectOffset;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the indirect attribute of this geometry.
+	 *
+	 * @return {?BufferAttribute} The indirect attribute. Returns `null` if no indirect attribute is defined.
+	 */
+	getIndirect() {
+
+		return this.indirect;
+
+	}
+
+	/**
+	 * Returns the buffer attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @return {BufferAttribute|InterleavedBufferAttribute|undefined} The buffer attribute.
+	 * Returns `undefined` if not attribute has been found.
+	 */
+	getAttribute( name ) {
+
+		return this.attributes[ name ];
+
+	}
+
+	/**
+	 * Sets the given attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute to set.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setAttribute( name, attribute ) {
+
+		this.attributes[ name ] = attribute;
+
+		return this;
+
+	}
+
+	/**
+	 * Deletes the attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name to delete.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	deleteAttribute( name ) {
+
+		delete this.attributes[ name ];
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this geometry has an attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @return {boolean} Whether this geometry has an attribute for the given name or not.
+	 */
+	hasAttribute( name ) {
+
+		return this.attributes[ name ] !== undefined;
+
+	}
+
+	/**
+	 * Adds a group to this geometry.
+	 *
+	 * @param {number} start - The first element in this draw call. That is the first
+	 * vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} count - Specifies how many vertices (or indices) are part of this group.
+	 * @param {number} [materialIndex=0] - The material array index to use.
+	 */
+	addGroup( start, count, materialIndex = 0 ) {
+
+		this.groups.push( {
+
+			start: start,
+			count: count,
+			materialIndex: materialIndex
+
+		} );
+
+	}
+
+	/**
+	 * Clears all groups.
+	 */
+	clearGroups() {
+
+		this.groups = [];
+
+	}
+
+	/**
+	 * Sets the draw range for this geometry.
+	 *
+	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} count - For non-indexed BufferGeometry, `count` is the number of vertices to render.
+	 * For indexed BufferGeometry, `count` is the number of indices to render.
+	 */
+	setDrawRange( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
+
+	}
+
+	/**
+	 * Applies the given 4x4 transformation matrix to the geometry.
+	 *
+	 * @param {Matrix4} matrix - The matrix to apply.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	applyMatrix4( matrix ) {
+
+		const position = this.attributes.position;
+
+		if ( position !== undefined ) {
+
+			position.applyMatrix4( matrix );
+
+			position.needsUpdate = true;
+
+		}
+
+		const normal = this.attributes.normal;
+
+		if ( normal !== undefined ) {
+
+			const normalMatrix = new Matrix3().getNormalMatrix( matrix );
+
+			normal.applyNormalMatrix( normalMatrix );
+
+			normal.needsUpdate = true;
+
+		}
+
+		const tangent = this.attributes.tangent;
+
+		if ( tangent !== undefined ) {
+
+			tangent.transformDirection( matrix );
+
+			tangent.needsUpdate = true;
+
+		}
+
+		if ( this.boundingBox !== null ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere !== null ) {
+
+			this.computeBoundingSphere();
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the rotation represented by the Quaternion to the geometry.
+	 *
+	 * @param {Quaternion} q - The Quaternion to apply.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	applyQuaternion( q ) {
+
+		_m1$2.makeRotationFromQuaternion( q );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the geometry about the X axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateX( angle ) {
+
+		// rotate geometry around world x-axis
+
+		_m1$2.makeRotationX( angle );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the geometry about the Y axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateY( angle ) {
+
+		// rotate geometry around world y-axis
+
+		_m1$2.makeRotationY( angle );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the geometry about the Z axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateZ( angle ) {
+
+		// rotate geometry around world z-axis
+
+		_m1$2.makeRotationZ( angle );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Translates the geometry. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#position} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} x - The x offset.
+	 * @param {number} y - The y offset.
+	 * @param {number} z - The z offset.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	translate( x, y, z ) {
+
+		// translate geometry
+
+		_m1$2.makeTranslation( x, y, z );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Scales the geometry. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#scale} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} x - The x scale.
+	 * @param {number} y - The y scale.
+	 * @param {number} z - The z scale.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	scale( x, y, z ) {
+
+		// scale geometry
+
+		_m1$2.makeScale( x, y, z );
+
+		this.applyMatrix4( _m1$2 );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the geometry to face a point in 3D space. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#lookAt} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {Vector3} vector - The target point.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	lookAt( vector ) {
+
+		_obj.lookAt( vector );
+
+		_obj.updateMatrix();
+
+		this.applyMatrix4( _obj.matrix );
+
+		return this;
+
+	}
+
+	/**
+	 * Center the geometry based on its bounding box.
+	 *
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	center() {
+
+		this.computeBoundingBox();
+
+		this.boundingBox.getCenter( _offset ).negate();
+
+		this.translate( _offset.x, _offset.y, _offset.z );
+
+		return this;
+
+	}
+
+	/**
+	 * Defines a geometry by creating a `position` attribute based on the given array of points. The array
+	 * can hold 2D or 3D vectors. When using two-dimensional data, the `z` coordinate for all vertices is
+	 * set to `0`.
+	 *
+	 * If the method is used with an existing `position` attribute, the vertex data are overwritten with the
+	 * data from the array. The length of the array must match the vertex count.
+	 *
+	 * @param {Array<Vector2>|Array<Vector3>} points - The points.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setFromPoints( points ) {
+
+		const positionAttribute = this.getAttribute( 'position' );
+
+		if ( positionAttribute === undefined ) {
+
+			const position = [];
+
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
+
+				const point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+
+		} else {
+
+			const l = Math.min( points.length, positionAttribute.count ); // make sure data do not exceed buffer size
+
+			for ( let i = 0; i < l; i ++ ) {
+
+				const point = points[ i ];
+				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
+
+			}
+
+			if ( points.length > positionAttribute.count ) {
+
+				warn( 'BufferGeometry: Buffer size too small for points data. Use .dispose() and create a new geometry.' );
+
+			}
+
+			positionAttribute.needsUpdate = true;
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Computes the bounding box of the geometry, and updates the `boundingBox` member.
+	 * The bounding box is not computed by the engine; it must be computed by your app.
+	 * You may need to recompute the bounding box if the geometry vertices are modified.
+	 */
+	computeBoundingBox() {
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		const position = this.attributes.position;
+		const morphAttributesPosition = this.morphAttributes.position;
+
+		if ( position && position.isGLBufferAttribute ) {
+
+			error( 'BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.', this );
+
+			this.boundingBox.set(
+				new Vector3( - Infinity, - Infinity, - Infinity ),
+				new Vector3( + Infinity, + Infinity, + Infinity )
+			);
+
+			return;
+
+		}
+
+		if ( position !== undefined ) {
+
+			this.boundingBox.setFromBufferAttribute( position );
+
+			// process morph attributes if present
+
+			if ( morphAttributesPosition ) {
+
+				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+					const morphAttribute = morphAttributesPosition[ i ];
+					_box$2.setFromBufferAttribute( morphAttribute );
+
+					if ( this.morphTargetsRelative ) {
+
+						_vector$9.addVectors( this.boundingBox.min, _box$2.min );
+						this.boundingBox.expandByPoint( _vector$9 );
+
+						_vector$9.addVectors( this.boundingBox.max, _box$2.max );
+						this.boundingBox.expandByPoint( _vector$9 );
+
+					} else {
+
+						this.boundingBox.expandByPoint( _box$2.min );
+						this.boundingBox.expandByPoint( _box$2.max );
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			this.boundingBox.makeEmpty();
+
+		}
+
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+
+			error( 'BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+
+		}
+
+	}
+
+	/**
+	 * Computes the bounding sphere of the geometry, and updates the `boundingSphere` member.
+	 * The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+	 * You may need to recompute the bounding sphere if the geometry vertices are modified.
+	 */
+	computeBoundingSphere() {
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		const position = this.attributes.position;
+		const morphAttributesPosition = this.morphAttributes.position;
+
+		if ( position && position.isGLBufferAttribute ) {
+
+			error( 'BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.', this );
+
+			this.boundingSphere.set( new Vector3(), Infinity );
+
+			return;
+
+		}
+
+		if ( position ) {
+
+			// first, find the center of the bounding sphere
+
+			const center = this.boundingSphere.center;
+
+			_box$2.setFromBufferAttribute( position );
+
+			// process morph attributes if present
+
+			if ( morphAttributesPosition ) {
+
+				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+					const morphAttribute = morphAttributesPosition[ i ];
+					_boxMorphTargets.setFromBufferAttribute( morphAttribute );
+
+					if ( this.morphTargetsRelative ) {
+
+						_vector$9.addVectors( _box$2.min, _boxMorphTargets.min );
+						_box$2.expandByPoint( _vector$9 );
+
+						_vector$9.addVectors( _box$2.max, _boxMorphTargets.max );
+						_box$2.expandByPoint( _vector$9 );
+
+					} else {
+
+						_box$2.expandByPoint( _boxMorphTargets.min );
+						_box$2.expandByPoint( _boxMorphTargets.max );
+
+					}
+
+				}
+
+			}
+
+			_box$2.getCenter( center );
+
+			// second, try to find a boundingSphere with a radius smaller than the
+			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
+
+			let maxRadiusSq = 0;
+
+			for ( let i = 0, il = position.count; i < il; i ++ ) {
+
+				_vector$9.fromBufferAttribute( position, i );
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$9 ) );
+
+			}
+
+			// process morph attributes if present
+
+			if ( morphAttributesPosition ) {
+
+				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+					const morphAttribute = morphAttributesPosition[ i ];
+					const morphTargetsRelative = this.morphTargetsRelative;
+
+					for ( let j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
+
+						_vector$9.fromBufferAttribute( morphAttribute, j );
+
+						if ( morphTargetsRelative ) {
+
+							_offset.fromBufferAttribute( position, j );
+							_vector$9.add( _offset );
+
+						}
+
+						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$9 ) );
+
+					}
+
+				}
+
+			}
+
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			if ( isNaN( this.boundingSphere.radius ) ) {
+
+				error( 'BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Calculates and adds a tangent attribute to this geometry.
+	 *
+	 * The computation is only supported for indexed geometries and if position, normal, and uv attributes
+	 * are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+	 * {@link BufferGeometryUtils#computeMikkTSpaceTangents} instead.
+	 */
+	computeTangents() {
+
+		const index = this.index;
+		const attributes = this.attributes;
+
+		// based on http://www.terathon.com/code/tangent.html
+		// (per vertex tangents)
+
+		if ( index === null ||
+			 attributes.position === undefined ||
+			 attributes.normal === undefined ||
+			 attributes.uv === undefined ) {
+
+			error( 'BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
+			return;
+
+		}
+
+		const positionAttribute = attributes.position;
+		const normalAttribute = attributes.normal;
+		const uvAttribute = attributes.uv;
+
+		if ( this.hasAttribute( 'tangent' ) === false ) {
+
+			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
+
+		}
+
+		const tangentAttribute = this.getAttribute( 'tangent' );
+
+		const tan1 = [], tan2 = [];
+
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+			tan1[ i ] = new Vector3();
+			tan2[ i ] = new Vector3();
+
+		}
+
+		const vA = new Vector3(),
+			vB = new Vector3(),
+			vC = new Vector3(),
+
+			uvA = new Vector2(),
+			uvB = new Vector2(),
+			uvC = new Vector2(),
+
+			sdir = new Vector3(),
+			tdir = new Vector3();
+
+		function handleTriangle( a, b, c ) {
+
+			vA.fromBufferAttribute( positionAttribute, a );
+			vB.fromBufferAttribute( positionAttribute, b );
+			vC.fromBufferAttribute( positionAttribute, c );
+
+			uvA.fromBufferAttribute( uvAttribute, a );
+			uvB.fromBufferAttribute( uvAttribute, b );
+			uvC.fromBufferAttribute( uvAttribute, c );
+
+			vB.sub( vA );
+			vC.sub( vA );
+
+			uvB.sub( uvA );
+			uvC.sub( uvA );
+
+			const r = 1.0 / ( uvB.x * uvC.y - uvC.x * uvB.y );
+
+			// silently ignore degenerate uv triangles having coincident or colinear vertices
+
+			if ( ! isFinite( r ) ) return;
+
+			sdir.copy( vB ).multiplyScalar( uvC.y ).addScaledVector( vC, - uvB.y ).multiplyScalar( r );
+			tdir.copy( vC ).multiplyScalar( uvB.x ).addScaledVector( vB, - uvC.x ).multiplyScalar( r );
+
+			tan1[ a ].add( sdir );
+			tan1[ b ].add( sdir );
+			tan1[ c ].add( sdir );
+
+			tan2[ a ].add( tdir );
+			tan2[ b ].add( tdir );
+			tan2[ c ].add( tdir );
+
+		}
+
+		let groups = this.groups;
+
+		if ( groups.length === 0 ) {
+
+			groups = [ {
+				start: 0,
+				count: index.count
+			} ];
+
+		}
+
+		for ( let i = 0, il = groups.length; i < il; ++ i ) {
+
+			const group = groups[ i ];
+
+			const start = group.start;
+			const count = group.count;
+
+			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
+
+				handleTriangle(
+					index.getX( j + 0 ),
+					index.getX( j + 1 ),
+					index.getX( j + 2 )
+				);
+
+			}
+
+		}
+
+		const tmp = new Vector3(), tmp2 = new Vector3();
+		const n = new Vector3(), n2 = new Vector3();
+
+		function handleVertex( v ) {
+
+			n.fromBufferAttribute( normalAttribute, v );
+			n2.copy( n );
+
+			const t = tan1[ v ];
+
+			// Gram-Schmidt orthogonalize
+
+			tmp.copy( t );
+			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+			// Calculate handedness
+
+			tmp2.crossVectors( n2, t );
+			const test = tmp2.dot( tan2[ v ] );
+			const w = ( test < 0.0 ) ? -1 : 1.0;
+
+			tangentAttribute.setXYZW( v, tmp.x, tmp.y, tmp.z, w );
+
+		}
+
+		for ( let i = 0, il = groups.length; i < il; ++ i ) {
+
+			const group = groups[ i ];
+
+			const start = group.start;
+			const count = group.count;
+
+			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
+
+				handleVertex( index.getX( j + 0 ) );
+				handleVertex( index.getX( j + 1 ) );
+				handleVertex( index.getX( j + 2 ) );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Computes vertex normals for the given vertex data. For indexed geometries, the method sets
+	 * each vertex normal to be the average of the face normals of the faces that share that vertex.
+	 * For non-indexed geometries, vertices are not shared, and the method sets each vertex normal
+	 * to be the same as the face normal.
+	 */
+	computeVertexNormals() {
+
+		const index = this.index;
+		const positionAttribute = this.getAttribute( 'position' );
+
+		if ( positionAttribute !== undefined ) {
+
+			let normalAttribute = this.getAttribute( 'normal' );
+
+			if ( normalAttribute === undefined ) {
+
+				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
+				this.setAttribute( 'normal', normalAttribute );
+
+			} else {
+
+				// reset existing normals to zero
+
+				for ( let i = 0, il = normalAttribute.count; i < il; i ++ ) {
+
+					normalAttribute.setXYZ( i, 0, 0, 0 );
+
+				}
+
+			}
+
+			const pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
+			const nA = new Vector3(), nB = new Vector3(), nC = new Vector3();
+			const cb = new Vector3(), ab = new Vector3();
+
+			// indexed elements
+
+			if ( index ) {
+
+				for ( let i = 0, il = index.count; i < il; i += 3 ) {
+
+					const vA = index.getX( i + 0 );
+					const vB = index.getX( i + 1 );
+					const vC = index.getX( i + 2 );
+
+					pA.fromBufferAttribute( positionAttribute, vA );
+					pB.fromBufferAttribute( positionAttribute, vB );
+					pC.fromBufferAttribute( positionAttribute, vC );
+
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
+
+					nA.fromBufferAttribute( normalAttribute, vA );
+					nB.fromBufferAttribute( normalAttribute, vB );
+					nC.fromBufferAttribute( normalAttribute, vC );
+
+					nA.add( cb );
+					nB.add( cb );
+					nC.add( cb );
+
+					normalAttribute.setXYZ( vA, nA.x, nA.y, nA.z );
+					normalAttribute.setXYZ( vB, nB.x, nB.y, nB.z );
+					normalAttribute.setXYZ( vC, nC.x, nC.y, nC.z );
+
+				}
+
+			} else {
+
+				// non-indexed elements (unconnected triangle soup)
+
+				for ( let i = 0, il = positionAttribute.count; i < il; i += 3 ) {
+
+					pA.fromBufferAttribute( positionAttribute, i + 0 );
+					pB.fromBufferAttribute( positionAttribute, i + 1 );
+					pC.fromBufferAttribute( positionAttribute, i + 2 );
+
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
+
+					normalAttribute.setXYZ( i + 0, cb.x, cb.y, cb.z );
+					normalAttribute.setXYZ( i + 1, cb.x, cb.y, cb.z );
+					normalAttribute.setXYZ( i + 2, cb.x, cb.y, cb.z );
+
+				}
+
+			}
+
+			this.normalizeNormals();
+
+			normalAttribute.needsUpdate = true;
+
+		}
+
+	}
+
+	/**
+	 * Ensures every normal vector in a geometry will have a magnitude of `1`. This will
+	 * correct lighting on the geometry surfaces.
+	 */
+	normalizeNormals() {
+
+		const normals = this.attributes.normal;
+
+		for ( let i = 0, il = normals.count; i < il; i ++ ) {
+
+			_vector$9.fromBufferAttribute( normals, i );
+
+			_vector$9.normalize();
+
+			normals.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
+
+		}
+
+	}
+
+	/**
+	 * Return a new non-index version of this indexed geometry. If the geometry
+	 * is already non-indexed, the method is a NOOP.
+	 *
+	 * @return {BufferGeometry} The non-indexed version of this indexed geometry.
+	 */
+	toNonIndexed() {
+
+		function convertBufferAttribute( attribute, indices ) {
+
+			const array = attribute.array;
+			const itemSize = attribute.itemSize;
+			const normalized = attribute.normalized;
+
+			const array2 = new array.constructor( indices.length * itemSize );
+
+			let index = 0, index2 = 0;
+
+			for ( let i = 0, l = indices.length; i < l; i ++ ) {
+
+				if ( attribute.isInterleavedBufferAttribute ) {
+
+					index = indices[ i ] * attribute.data.stride + attribute.offset;
+
+				} else {
+
+					index = indices[ i ] * itemSize;
+
+				}
+
+				for ( let j = 0; j < itemSize; j ++ ) {
+
+					array2[ index2 ++ ] = array[ index ++ ];
+
+				}
+
+			}
+
+			return new BufferAttribute( array2, itemSize, normalized );
+
+		}
+
+		//
+
+		if ( this.index === null ) {
+
+			warn( 'BufferGeometry.toNonIndexed(): BufferGeometry is already non-indexed.' );
+			return this;
+
+		}
+
+		const geometry2 = new BufferGeometry();
+
+		const indices = this.index.array;
+		const attributes = this.attributes;
+
+		// attributes
+
+		for ( const name in attributes ) {
+
+			const attribute = attributes[ name ];
+
+			const newAttribute = convertBufferAttribute( attribute, indices );
+
+			geometry2.setAttribute( name, newAttribute );
+
+		}
+
+		// morph attributes
+
+		const morphAttributes = this.morphAttributes;
+
+		for ( const name in morphAttributes ) {
+
+			const morphArray = [];
+			const morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+
+			for ( let i = 0, il = morphAttribute.length; i < il; i ++ ) {
+
+				const attribute = morphAttribute[ i ];
+
+				const newAttribute = convertBufferAttribute( attribute, indices );
+
+				morphArray.push( newAttribute );
+
+			}
+
+			geometry2.morphAttributes[ name ] = morphArray;
+
+		}
+
+		geometry2.morphTargetsRelative = this.morphTargetsRelative;
+
+		// groups
+
+		const groups = this.groups;
+
+		for ( let i = 0, l = groups.length; i < l; i ++ ) {
+
+			const group = groups[ i ];
+			geometry2.addGroup( group.start, group.count, group.materialIndex );
+
+		}
+
+		return geometry2;
+
+	}
+
+	/**
+	 * Serializes the geometry into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized geometry.
+	 */
+	toJSON() {
+
+		const data = {
+			metadata: {
+				version: 4.7,
+				type: 'BufferGeometry',
+				generator: 'BufferGeometry.toJSON'
+			}
+		};
+
+		// standard BufferGeometry serialization
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
+		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
+
+		if ( this.parameters !== undefined ) {
+
+			const parameters = this.parameters;
+
+			for ( const key in parameters ) {
+
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+
+			}
+
+			return data;
+
+		}
+
+		// for simplicity the code assumes attributes are not shared across geometries, see #15811
+
+		data.data = { attributes: {} };
+
+		const index = this.index;
+
+		if ( index !== null ) {
+
+			data.data.index = {
+				type: index.array.constructor.name,
+				array: Array.prototype.slice.call( index.array )
+			};
+
+		}
+
+		const attributes = this.attributes;
+
+		for ( const key in attributes ) {
+
+			const attribute = attributes[ key ];
+
+			data.data.attributes[ key ] = attribute.toJSON( data.data );
+
+		}
+
+		const morphAttributes = {};
+		let hasMorphAttributes = false;
+
+		for ( const key in this.morphAttributes ) {
+
+			const attributeArray = this.morphAttributes[ key ];
+
+			const array = [];
+
+			for ( let i = 0, il = attributeArray.length; i < il; i ++ ) {
+
+				const attribute = attributeArray[ i ];
+
+				array.push( attribute.toJSON( data.data ) );
+
+			}
+
+			if ( array.length > 0 ) {
+
+				morphAttributes[ key ] = array;
+
+				hasMorphAttributes = true;
+
+			}
+
+		}
+
+		if ( hasMorphAttributes ) {
+
+			data.data.morphAttributes = morphAttributes;
+			data.data.morphTargetsRelative = this.morphTargetsRelative;
+
+		}
+
+		const groups = this.groups;
+
+		if ( groups.length > 0 ) {
+
+			data.data.groups = JSON.parse( JSON.stringify( groups ) );
+
+		}
+
+		const boundingSphere = this.boundingSphere;
+
+		if ( boundingSphere !== null ) {
+
+			data.data.boundingSphere = boundingSphere.toJSON();
+
+		}
+
+		return data;
+
+	}
+
+	/**
+	 * Returns a new geometry with copied values from this instance.
+	 *
+	 * @return {BufferGeometry} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Copies the values of the given geometry to this instance.
+	 *
+	 * @param {BufferGeometry} source - The geometry to copy.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	copy( source ) {
+
+		// reset
+
+		this.index = null;
+		this.attributes = {};
+		this.morphAttributes = {};
+		this.groups = [];
+		this.boundingBox = null;
+		this.boundingSphere = null;
+
+		// used for storing cloned, shared data
+
+		const data = {};
+
+		// name
+
+		this.name = source.name;
+
+		// index
+
+		const index = source.index;
+
+		if ( index !== null ) {
+
+			this.setIndex( index.clone() );
+
+		}
+
+		// attributes
+
+		const attributes = source.attributes;
+
+		for ( const name in attributes ) {
+
+			const attribute = attributes[ name ];
+			this.setAttribute( name, attribute.clone( data ) );
+
+		}
+
+		// morph attributes
+
+		const morphAttributes = source.morphAttributes;
+
+		for ( const name in morphAttributes ) {
+
+			const array = [];
+			const morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+
+			for ( let i = 0, l = morphAttribute.length; i < l; i ++ ) {
+
+				array.push( morphAttribute[ i ].clone( data ) );
+
+			}
+
+			this.morphAttributes[ name ] = array;
+
+		}
+
+		this.morphTargetsRelative = source.morphTargetsRelative;
+
+		// groups
+
+		const groups = source.groups;
+
+		for ( let i = 0, l = groups.length; i < l; i ++ ) {
+
+			const group = groups[ i ];
+			this.addGroup( group.start, group.count, group.materialIndex );
+
+		}
+
+		// bounding box
+
+		const boundingBox = source.boundingBox;
+
+		if ( boundingBox !== null ) {
+
+			this.boundingBox = boundingBox.clone();
+
+		}
+
+		// bounding sphere
+
+		const boundingSphere = source.boundingSphere;
+
+		if ( boundingSphere !== null ) {
+
+			this.boundingSphere = boundingSphere.clone();
+
+		}
+
+		// draw range
+
+		this.drawRange.start = source.drawRange.start;
+		this.drawRange.count = source.drawRange.count;
+
+		// user data
+
+		this.userData = source.userData;
+
+		return this;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 *
+	 * @fires BufferGeometry#dispose
+	 */
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+}
+
+/**
+ * "Interleaved" means that multiple attributes, possibly of different types,
+ * (e.g., position, normal, uv, color) are packed into a single array buffer.
+ *
+ * An introduction into interleaved arrays can be found here: [Interleaved array basics](https://blog.tojicode.com/2011/05/interleaved-array-basics.html)
+ */
+class InterleavedBuffer {
+
+	/**
+	 * Constructs a new interleaved buffer.
+	 *
+	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
+	 * @param {number} stride - The number of typed-array elements per vertex.
+	 */
+	constructor( array, stride ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInterleavedBuffer = true;
+
+		/**
+		 * A typed array with a shared buffer storing attribute data.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.array = array;
+
+		/**
+		 * The number of typed-array elements per vertex.
+		 *
+		 * @type {number}
+		 */
+		this.stride = stride;
+
+		/**
+		 * The total number of elements in the array
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.count = array !== undefined ? array.length / stride : 0;
+
+		/**
+		 * Defines the intended usage pattern of the data store for optimization purposes.
+		 *
+		 * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+		 * instantiate a new one and set the desired usage before the next render.
+		 *
+		 * @type {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)}
+		 * @default StaticDrawUsage
+		 */
+		this.usage = StaticDrawUsage;
+
+		/**
+		 * This can be used to only update some components of stored vectors (for example, just the
+		 * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.updateRanges = [];
+
+		/**
+		 * A version number, incremented every time the `needsUpdate` is set to `true`.
+		 *
+		 * @type {number}
+		 */
+		this.version = 0;
+
+		/**
+		 * The UUID of the interleaved buffer.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
+		this.uuid = generateUUID();
+
+	}
+
+	/**
+	 * A callback function that is executed after the renderer has transferred the attribute array
+	 * data to the GPU.
+	 */
+	onUploadCallback() {}
+
+	/**
+	 * Flag to indicate that this attribute has changed and should be re-sent to
+	 * the GPU. Set this to `true` when you modify the value of the array.
+	 *
+	 * @type {number}
+	 * @default false
+	 * @param {boolean} value
+	 */
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+	/**
+	 * Sets the usage of this interleaved buffer.
+	 *
+	 * @param {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)} value - The usage to set.
+	 * @return {InterleavedBuffer} A reference to this interleaved buffer.
+	 */
+	setUsage( value ) {
+
+		this.usage = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Adds a range of data in the data array to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
+	}
+
+	/**
+	 * Copies the values of the given interleaved buffer to this instance.
+	 *
+	 * @param {InterleavedBuffer} source - The interleaved buffer to copy.
+	 * @return {InterleavedBuffer} A reference to this instance.
+	 */
+	copy( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.count = source.count;
+		this.stride = source.stride;
+		this.usage = source.usage;
+
+		return this;
+
+	}
+
+	/**
+	 * Copies a vector from the given interleaved buffer to this one. The start
+	 * and destination position in the attribute buffers are represented by the
+	 * given indices.
+	 *
+	 * @param {number} index1 - The destination index into this interleaved buffer.
+	 * @param {InterleavedBuffer} interleavedBuffer - The interleaved buffer to copy from.
+	 * @param {number} index2 - The source index into the given interleaved buffer.
+	 * @return {InterleavedBuffer} A reference to this instance.
+	 */
+	copyAt( index1, interleavedBuffer, index2 ) {
+
+		index1 *= this.stride;
+		index2 *= interleavedBuffer.stride;
+
+		for ( let i = 0, l = this.stride; i < l; i ++ ) {
+
+			this.array[ index1 + i ] = interleavedBuffer.array[ index2 + i ];
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the given array data in the interleaved buffer.
+	 *
+	 * @param {(TypedArray|Array)} value - The array data to set.
+	 * @param {number} [offset=0] - The offset in this interleaved buffer's array.
+	 * @return {InterleavedBuffer} A reference to this instance.
+	 */
+	set( value, offset = 0 ) {
+
+		this.array.set( value, offset );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new interleaved buffer with copied values from this instance.
+	 *
+	 * @param {Object} [data] - An object with shared array buffers that allows to retain shared structures.
+	 * @return {InterleavedBuffer} A clone of this instance.
+	 */
+	clone( data ) {
+
+		if ( data.arrayBuffers === undefined ) {
+
+			data.arrayBuffers = {};
+
+		}
+
+		if ( this.array.buffer._uuid === undefined ) {
+
+			this.array.buffer._uuid = generateUUID();
+
+		}
+
+		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+
+			data.arrayBuffers[ this.array.buffer._uuid ] = this.array.slice( 0 ).buffer;
+
+		}
+
+		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
+
+		const ib = new this.constructor( array, this.stride );
+		ib.setUsage( this.usage );
+
+		return ib;
+
+	}
+
+	/**
+	 * Sets the given callback function that is executed after the Renderer has transferred
+	 * the array data to the GPU. Can be used to perform clean-up operations after
+	 * the upload when data are not needed anymore on the CPU side.
+	 *
+	 * @param {Function} callback - The `onUpload()` callback.
+	 * @return {InterleavedBuffer} A reference to this instance.
+	 */
+	onUpload( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
+
+	}
+
+	/**
+	 * Serializes the interleaved buffer into JSON.
+	 *
+	 * @param {Object} [data] - An optional value holding meta information about the serialization.
+	 * @return {Object} A JSON object representing the serialized interleaved buffer.
+	 */
+	toJSON( data ) {
+
+		if ( data.arrayBuffers === undefined ) {
+
+			data.arrayBuffers = {};
+
+		}
+
+		// generate UUID for array buffer if necessary
+
+		if ( this.array.buffer._uuid === undefined ) {
+
+			this.array.buffer._uuid = generateUUID();
+
+		}
+
+		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+
+			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
+
+		}
+
+		//
+
+		return {
+			uuid: this.uuid,
+			buffer: this.array.buffer._uuid,
+			type: this.array.constructor.name,
+			stride: this.stride
+		};
+
+	}
+
+}
+
+const _vector$8 = /*@__PURE__*/ new Vector3();
+
+/**
+ * An alternative version of a buffer attribute with interleaved data. Interleaved
+ * attributes share a common interleaved data storage ({@link InterleavedBuffer}) and refer with
+ * different offsets into the buffer.
+ */
+class InterleavedBufferAttribute {
+
+	/**
+	 * Constructs a new interleaved buffer attribute.
+	 *
+	 * @param {InterleavedBuffer} interleavedBuffer - The buffer holding the interleaved data.
+	 * @param {number} itemSize - The item size.
+	 * @param {number} offset - The attribute offset into the buffer.
+	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
+	 */
+	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInterleavedBufferAttribute = true;
+
+		/**
+		 * The name of the buffer attribute.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+
+		/**
+		 * The buffer holding the interleaved data.
+		 *
+		 * @type {InterleavedBuffer}
+		 */
+		this.data = interleavedBuffer;
+
+		/**
+		 * The item size, see {@link BufferAttribute#itemSize}.
+		 *
+		 * @type {number}
+		 */
+		this.itemSize = itemSize;
+
+		/**
+		 * The attribute offset into the buffer.
+		 *
+		 * @type {number}
+		 */
+		this.offset = offset;
+
+		/**
+		 * Whether the data are normalized or not, see {@link BufferAttribute#normalized}
+		 *
+		 * @type {InterleavedBuffer}
+		 */
+		this.normalized = normalized;
+
+	}
+
+	/**
+	 * The item count of this buffer attribute.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get count() {
+
+		return this.data.count;
+
+	}
+
+	/**
+	 * The array holding the interleaved buffer attribute data.
+	 *
+	 * @type {TypedArray}
+	 */
+	get array() {
+
+		return this.data.array;
+
+	}
+
+	/**
+	 * Flag to indicate that this attribute has changed and should be re-sent to
+	 * the GPU. Set this to `true` when you modify the value of the array.
+	 *
+	 * @type {number}
+	 * @default false
+	 * @param {boolean} value
+	 */
+	set needsUpdate( value ) {
+
+		this.data.needsUpdate = value;
+
+	}
+
+	/**
+	 * Applies the given 4x4 matrix to the given attribute. Only works with
+	 * item size `3`.
+	 *
+	 * @param {Matrix4} m - The matrix to apply.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	applyMatrix4( m ) {
+
+		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
+
+			_vector$8.fromBufferAttribute( this, i );
+
+			_vector$8.applyMatrix4( m );
+
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 3x3 normal matrix to the given attribute. Only works with
+	 * item size `3`.
+	 *
+	 * @param {Matrix3} m - The normal matrix to apply.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	applyNormalMatrix( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector$8.fromBufferAttribute( this, i );
+
+			_vector$8.applyNormalMatrix( m );
+
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Applies the given 4x4 matrix to the given attribute. Only works with
+	 * item size `3` and with direction vectors.
+	 *
+	 * @param {Matrix4} m - The matrix to apply.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	transformDirection( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector$8.fromBufferAttribute( this, i );
+
+			_vector$8.transformDirection( m );
+
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the given component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} component - The component index.
+	 * @return {number} The returned value.
+	 */
+	getComponent( index, component ) {
+
+		let value = this.array[ index * this.data.stride + this.offset + component ];
+
+		if ( this.normalized ) value = denormalize( value, this.array );
+
+		return value;
+
+	}
+
+	/**
+	 * Sets the given value to the given component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} component - The component index.
+	 * @param {number} value - The value to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setComponent( index, component, value ) {
+
+		if ( this.normalized ) value = normalize( value, this.array );
+
+		this.data.array[ index * this.data.stride + this.offset + component ] = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setX( index, x ) {
+
+		if ( this.normalized ) x = normalize( x, this.array );
+
+		this.data.array[ index * this.data.stride + this.offset ] = x;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} y - The value to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setY( index, y ) {
+
+		if ( this.normalized ) y = normalize( y, this.array );
+
+		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} z - The value to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setZ( index, z ) {
+
+		if ( this.normalized ) z = normalize( z, this.array );
+
+		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} w - The value to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setW( index, w ) {
+
+		if ( this.normalized ) w = normalize( w, this.array );
+
+		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the x component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The x component.
+	 */
+	getX( index ) {
+
+		let x = this.data.array[ index * this.data.stride + this.offset ];
+
+		if ( this.normalized ) x = denormalize( x, this.array );
+
+		return x;
+
+	}
+
+	/**
+	 * Returns the y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The y component.
+	 */
+	getY( index ) {
+
+		let y = this.data.array[ index * this.data.stride + this.offset + 1 ];
+
+		if ( this.normalized ) y = denormalize( y, this.array );
+
+		return y;
+
+	}
+
+	/**
+	 * Returns the z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The z component.
+	 */
+	getZ( index ) {
+
+		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
+
+		if ( this.normalized ) z = denormalize( z, this.array );
+
+		return z;
+
+	}
+
+	/**
+	 * Returns the w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @return {number} The w component.
+	 */
+	getW( index ) {
+
+		let w = this.data.array[ index * this.data.stride + this.offset + 3 ];
+
+		if ( this.normalized ) w = denormalize( w, this.array );
+
+		return w;
+
+	}
+
+	/**
+	 * Sets the x and y component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setXY( index, x, y ) {
+
+		index = index * this.data.stride + this.offset;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+
+		}
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x, y and z component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @param {number} z - The value for the z component to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setXYZ( index, x, y, z ) {
+
+		index = index * this.data.stride + this.offset;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+
+		}
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the x, y, z and w component of the vector at the given index.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {number} x - The value for the x component to set.
+	 * @param {number} y - The value for the y component to set.
+	 * @param {number} z - The value for the z component to set.
+	 * @param {number} w - The value for the w component to set.
+	 * @return {InterleavedBufferAttribute} A reference to this instance.
+	 */
+	setXYZW( index, x, y, z, w ) {
+
+		index = index * this.data.stride + this.offset;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+			w = normalize( w, this.array );
+
+		}
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+		this.data.array[ index + 3 ] = w;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new buffer attribute with copied values from this instance.
+	 *
+	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
+	 *
+	 * @param {Object} [data] - An object with interleaved buffers that allows to retain the interleaved property.
+	 * @return {BufferAttribute|InterleavedBufferAttribute} A clone of this instance.
+	 */
+	clone( data ) {
+
+		if ( data === undefined ) {
+
+			log( 'InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
+
+			const array = [];
+
+			for ( let i = 0; i < this.count; i ++ ) {
+
+				const index = i * this.data.stride + this.offset;
+
+				for ( let j = 0; j < this.itemSize; j ++ ) {
+
+					array.push( this.data.array[ index + j ] );
+
+				}
+
+			}
+
+			return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
+
+		} else {
+
+			if ( data.interleavedBuffers === undefined ) {
+
+				data.interleavedBuffers = {};
+
+			}
+
+			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
+
+				data.interleavedBuffers[ this.data.uuid ] = this.data.clone( data );
+
+			}
+
+			return new InterleavedBufferAttribute( data.interleavedBuffers[ this.data.uuid ], this.itemSize, this.offset, this.normalized );
+
+		}
+
+	}
+
+	/**
+	 * Serializes the buffer attribute into JSON.
+	 *
+	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
+	 *
+	 * @param {Object} [data] - An optional value holding meta information about the serialization.
+	 * @return {Object} A JSON object representing the serialized buffer attribute.
+	 */
+	toJSON( data ) {
+
+		if ( data === undefined ) {
+
+			log( 'InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
+
+			const array = [];
+
+			for ( let i = 0; i < this.count; i ++ ) {
+
+				const index = i * this.data.stride + this.offset;
+
+				for ( let j = 0; j < this.itemSize; j ++ ) {
+
+					array.push( this.data.array[ index + j ] );
+
+				}
+
+			}
+
+			// de-interleave data and save it as an ordinary buffer attribute for now
+
+			return {
+				itemSize: this.itemSize,
+				type: this.array.constructor.name,
+				array: array,
+				normalized: this.normalized
+			};
+
+		} else {
+
+			// save as true interleaved attribute
+
+			if ( data.interleavedBuffers === undefined ) {
+
+				data.interleavedBuffers = {};
+
+			}
+
+			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
+
+				data.interleavedBuffers[ this.data.uuid ] = this.data.toJSON( data );
+
+			}
+
+			return {
+				isInterleavedBufferAttribute: true,
+				itemSize: this.itemSize,
+				data: this.data.uuid,
+				offset: this.offset,
+				normalized: this.normalized
+			};
+
+		}
+
+	}
+
+}
 
 let _materialId = 0;
 
@@ -17418,6 +21336,1347 @@ class Material extends EventDispatcher {
 }
 
 /**
+ * A material for rendering instances of {@link Sprite}.
+ *
+ * ```js
+ * const map = new THREE.TextureLoader().load( 'textures/sprite.png' );
+ * const material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
+ *
+ * const sprite = new THREE.Sprite( material );
+ * sprite.scale.set(200, 200, 1)
+ * scene.add( sprite );
+ * ```
+ *
+ * @augments Material
+ */
+class SpriteMaterial extends Material {
+
+	/**
+	 * Constructs a new sprite material.
+	 *
+	 * @param {Object} [parameters] - An object with one or more properties
+	 * defining the material's appearance. Any property of the material
+	 * (including any property from inherited materials) can be passed
+	 * in here. Color values can be passed any type of value accepted
+	 * by {@link Color#set}.
+	 */
+	constructor( parameters ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSpriteMaterial = true;
+
+		this.type = 'SpriteMaterial';
+
+		/**
+		 * Color of the material.
+		 *
+		 * @type {Color}
+		 * @default (1,1,1)
+		 */
+		this.color = new Color( 0xffffff );
+
+		/**
+		 * The color map. May optionally include an alpha channel, typically combined
+		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
+		 * color is modulated by the diffuse `color`.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.map = null;
+
+		/**
+		 * The alpha map is a grayscale texture that controls the opacity across the
+		 * surface (black: fully transparent; white: fully opaque).
+		 *
+		 * Only the color of the texture is used, ignoring the alpha channel if one
+		 * exists. For RGB and RGBA textures, the renderer will use the green channel
+		 * when sampling this texture due to the extra bit of precision provided for
+		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.alphaMap = null;
+
+		/**
+		 * The rotation of the sprite in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.rotation = 0;
+
+		/**
+		 * Specifies whether size of the sprite is attenuated by the camera depth (perspective camera only).
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.sizeAttenuation = true;
+
+		/**
+		 * Overwritten since sprite materials are transparent
+		 * by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the material is affected by fog or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.fog = true;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+
+		this.map = source.map;
+
+		this.alphaMap = source.alphaMap;
+
+		this.rotation = source.rotation;
+
+		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fog = source.fog;
+
+		return this;
+
+	}
+
+}
+
+let _geometry;
+
+const _intersectPoint = /*@__PURE__*/ new Vector3();
+const _worldScale = /*@__PURE__*/ new Vector3();
+const _mvPosition = /*@__PURE__*/ new Vector3();
+
+const _alignedPosition = /*@__PURE__*/ new Vector2();
+const _rotatedPosition = /*@__PURE__*/ new Vector2();
+const _viewWorldMatrix = /*@__PURE__*/ new Matrix4();
+
+const _vA$1 = /*@__PURE__*/ new Vector3();
+const _vB$1 = /*@__PURE__*/ new Vector3();
+const _vC$1 = /*@__PURE__*/ new Vector3();
+
+const _uvA = /*@__PURE__*/ new Vector2();
+const _uvB = /*@__PURE__*/ new Vector2();
+const _uvC = /*@__PURE__*/ new Vector2();
+
+/**
+ * A sprite is a plane that always faces towards the camera, generally with a
+ * partially transparent texture applied.
+ *
+ * Sprites do not cast shadows, setting {@link Object3D#castShadow} to `true` will
+ * have no effect.
+ *
+ * ```js
+ * const map = new THREE.TextureLoader().load( 'sprite.png' );
+ * const material = new THREE.SpriteMaterial( { map: map } );
+ *
+ * const sprite = new THREE.Sprite( material );
+ * scene.add( sprite );
+ * ```
+ *
+ * @augments Object3D
+ */
+class Sprite extends Object3D {
+
+	/**
+	 * Constructs a new sprite.
+	 *
+	 * @param {(SpriteMaterial|SpriteNodeMaterial)} [material] - The sprite material.
+	 */
+	constructor( material = new SpriteMaterial() ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSprite = true;
+
+		this.type = 'Sprite';
+
+		if ( _geometry === undefined ) {
+
+			_geometry = new BufferGeometry();
+
+			const float32Array = new Float32Array( [
+				-0.5, -0.5, 0, 0, 0,
+				0.5, -0.5, 0, 1, 0,
+				0.5, 0.5, 0, 1, 1,
+				-0.5, 0.5, 0, 0, 1
+			] );
+
+			const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+			_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+			_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+			_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+		}
+
+		/**
+		 * The sprite geometry.
+		 *
+		 * @type {BufferGeometry}
+		 */
+		this.geometry = _geometry;
+
+		/**
+		 * The sprite material.
+		 *
+		 * @type {(SpriteMaterial|SpriteNodeMaterial)}
+		 */
+		this.material = material;
+
+		/**
+		 * The sprite's anchor point, and the point around which the sprite rotates.
+		 * A value of `(0.5, 0.5)` corresponds to the midpoint of the sprite. A value
+		 * of `(0, 0)` corresponds to the lower left corner of the sprite.
+		 *
+		 * @type {Vector2}
+		 * @default (0.5,0.5)
+		 */
+		this.center = new Vector2( 0.5, 0.5 );
+
+		/**
+		 * The number of instances of this sprite.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
+	}
+
+	/**
+	 * Computes intersection points between a casted ray and this sprite.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
+	raycast( raycaster, intersects ) {
+
+		if ( raycaster.camera === null ) {
+
+			error( 'Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
+
+		}
+
+		_worldScale.setFromMatrixScale( this.matrixWorld );
+
+		_viewWorldMatrix.copy( raycaster.camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld );
+
+		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
+
+		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
+
+			_worldScale.multiplyScalar( - _mvPosition.z );
+
+		}
+
+		const rotation = this.material.rotation;
+		let sin, cos;
+
+		if ( rotation !== 0 ) {
+
+			cos = Math.cos( rotation );
+			sin = Math.sin( rotation );
+
+		}
+
+		const center = this.center;
+
+		transformVertex( _vA$1.set( -0.5, -0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vB$1.set( 0.5, -0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vC$1.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+
+		_uvA.set( 0, 0 );
+		_uvB.set( 1, 0 );
+		_uvC.set( 1, 1 );
+
+		// check first triangle
+		let intersect = raycaster.ray.intersectTriangle( _vA$1, _vB$1, _vC$1, false, _intersectPoint );
+
+		if ( intersect === null ) {
+
+			// check second triangle
+			transformVertex( _vB$1.set( -0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+			_uvB.set( 0, 1 );
+
+			intersect = raycaster.ray.intersectTriangle( _vA$1, _vC$1, _vB$1, false, _intersectPoint );
+			if ( intersect === null ) {
+
+				return;
+
+			}
+
+		}
+
+		const distance = raycaster.ray.origin.distanceTo( _intersectPoint );
+
+		if ( distance < raycaster.near || distance > raycaster.far ) return;
+
+		intersects.push( {
+
+			distance: distance,
+			point: _intersectPoint.clone(),
+			uv: Triangle.getInterpolation( _intersectPoint, _vA$1, _vB$1, _vC$1, _uvA, _uvB, _uvC, new Vector2() ),
+			face: null,
+			object: this
+
+		} );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		if ( source.center !== undefined ) this.center.copy( source.center );
+
+		this.material = source.material;
+
+		return this;
+
+	}
+
+}
+
+function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
+
+	// compute position in camera space
+	_alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
+
+	// to check if rotation is not zero
+	if ( sin !== undefined ) {
+
+		_rotatedPosition.x = ( cos * _alignedPosition.x ) - ( sin * _alignedPosition.y );
+		_rotatedPosition.y = ( sin * _alignedPosition.x ) + ( cos * _alignedPosition.y );
+
+	} else {
+
+		_rotatedPosition.copy( _alignedPosition );
+
+	}
+
+
+	vertexPosition.copy( mvPosition );
+	vertexPosition.x += _rotatedPosition.x;
+	vertexPosition.y += _rotatedPosition.y;
+
+	// transform to world space
+	vertexPosition.applyMatrix4( _viewWorldMatrix );
+
+}
+
+const _v1$2 = /*@__PURE__*/ new Vector3();
+const _v2$1 = /*@__PURE__*/ new Vector3();
+
+/**
+ * A component for providing a basic Level of Detail (LOD) mechanism.
+ *
+ * Every LOD level is associated with an object, and rendering can be switched
+ * between them at the distances specified. Typically you would create, say,
+ * three meshes, one for far away (low detail), one for mid range (medium
+ * detail) and one for close up (high detail).
+ *
+ * ```js
+ * const lod = new THREE.LOD();
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+ *
+ * //Create spheres with 3 levels of detail and create new LOD levels for them
+ * for( let i = 0; i < 3; i++ ) {
+ *
+ * 	const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
+ * 	const mesh = new THREE.Mesh( geometry, material );
+ * 	lod.addLevel( mesh, i * 75 );
+ *
+ * }
+ *
+ * scene.add( lod );
+ * ```
+ *
+ * @augments Object3D
+ */
+class LOD extends Object3D {
+
+	/**
+	 * Constructs a new LOD.
+	 */
+	constructor() {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLOD = true;
+
+		/**
+		 * The current LOD index.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._currentLevel = 0;
+
+		this.type = 'LOD';
+
+		Object.defineProperties( this, {
+			/**
+			 * This array holds the LOD levels.
+			 *
+			 * @name LOD#levels
+			 * @type {Array<{object:Object3D,distance:number,hysteresis:number}>}
+			 */
+			levels: {
+				enumerable: true,
+				value: []
+			}
+		} );
+
+		/**
+		 * Whether the LOD object is updated automatically by the renderer per frame
+		 * or not. If set to `false`, you have to call {@link LOD#update} in the
+		 * render loop by yourself.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoUpdate = true;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source, false );
+
+		const levels = source.levels;
+
+		for ( let i = 0, l = levels.length; i < l; i ++ ) {
+
+			const level = levels[ i ];
+
+			this.addLevel( level.object.clone(), level.distance, level.hysteresis );
+
+		}
+
+		this.autoUpdate = source.autoUpdate;
+
+		return this;
+
+	}
+
+	/**
+	 * Adds a mesh that will display at a certain distance and greater. Typically
+	 * the further away the distance, the lower the detail on the mesh.
+	 *
+	 * @param {Object3D} object - The 3D object to display at this level.
+	 * @param {number} [distance=0] - The distance at which to display this level of detail.
+	 * @param {number} [hysteresis=0] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
+	 * @return {LOD} A reference to this instance.
+	 */
+	addLevel( object, distance = 0, hysteresis = 0 ) {
+
+		distance = Math.abs( distance );
+
+		const levels = this.levels;
+
+		let l;
+
+		for ( l = 0; l < levels.length; l ++ ) {
+
+			if ( distance < levels[ l ].distance ) {
+
+				break;
+
+			}
+
+		}
+
+		levels.splice( l, 0, { distance: distance, hysteresis: hysteresis, object: object } );
+
+		this.add( object );
+
+		return this;
+
+	}
+
+	/**
+	 * Removes an existing level, based on the distance from the camera.
+	 * Returns `true` when the level has been removed. Otherwise `false`.
+	 *
+	 * @param {number} distance - Distance of the level to remove.
+	 * @return {boolean} Whether the level has been removed or not.
+	 */
+	removeLevel( distance ) {
+
+		const levels = this.levels;
+
+		for ( let i = 0; i < levels.length; i ++ ) {
+
+			if ( levels[ i ].distance === distance ) {
+
+				const removedElements = levels.splice( i, 1 );
+				this.remove( removedElements[ 0 ].object );
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Returns the currently active LOD level index.
+	 *
+	 * @return {number} The current active LOD level index.
+	 */
+	getCurrentLevel() {
+
+		return this._currentLevel;
+
+	}
+
+	/**
+	 * Returns a reference to the first 3D object that is greater than
+	 * the given distance.
+	 *
+	 * @param {number} distance - The LOD distance.
+	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
+	 */
+	getObjectForDistance( distance ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 0 ) {
+
+			let i, l;
+
+			for ( i = 1, l = levels.length; i < l; i ++ ) {
+
+				let levelDistance = levels[ i ].distance;
+
+				if ( levels[ i ].object.visible ) {
+
+					levelDistance -= levelDistance * levels[ i ].hysteresis;
+
+				}
+
+				if ( distance < levelDistance ) {
+
+					break;
+
+				}
+
+			}
+
+			return levels[ i - 1 ].object;
+
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * Computes intersection points between a casted ray and this LOD.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
+	raycast( raycaster, intersects ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 0 ) {
+
+			_v1$2.setFromMatrixPosition( this.matrixWorld );
+
+			const distance = raycaster.ray.origin.distanceTo( _v1$2 );
+
+			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+		}
+
+	}
+
+	/**
+	 * Updates the LOD by computing which LOD level should be visible according
+	 * to the current distance of the given camera.
+	 *
+	 * @param {Camera} camera - The camera the scene is rendered with.
+	 */
+	update( camera ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 1 ) {
+
+			_v1$2.setFromMatrixPosition( camera.matrixWorld );
+			_v2$1.setFromMatrixPosition( this.matrixWorld );
+
+			const distance = _v1$2.distanceTo( _v2$1 ) / camera.zoom;
+
+			levels[ 0 ].object.visible = true;
+
+			let i, l;
+
+			for ( i = 1, l = levels.length; i < l; i ++ ) {
+
+				let levelDistance = levels[ i ].distance;
+
+				if ( levels[ i ].object.visible ) {
+
+					levelDistance -= levelDistance * levels[ i ].hysteresis;
+
+				}
+
+				if ( distance >= levelDistance ) {
+
+					levels[ i - 1 ].object.visible = false;
+					levels[ i ].object.visible = true;
+
+				} else {
+
+					break;
+
+				}
+
+			}
+
+			this._currentLevel = i - 1;
+
+			for ( ; i < l; i ++ ) {
+
+				levels[ i ].object.visible = false;
+
+			}
+
+		}
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
+
+		data.object.levels = [];
+
+		const levels = this.levels;
+
+		for ( let i = 0, l = levels.length; i < l; i ++ ) {
+
+			const level = levels[ i ];
+
+			data.object.levels.push( {
+				object: level.object.uuid,
+				distance: level.distance,
+				hysteresis: level.hysteresis
+			} );
+
+		}
+
+		return data;
+
+	}
+
+}
+
+const _vector$7 = /*@__PURE__*/ new Vector3();
+const _segCenter = /*@__PURE__*/ new Vector3();
+const _segDir = /*@__PURE__*/ new Vector3();
+const _diff = /*@__PURE__*/ new Vector3();
+
+const _edge1 = /*@__PURE__*/ new Vector3();
+const _edge2 = /*@__PURE__*/ new Vector3();
+const _normal$1 = /*@__PURE__*/ new Vector3();
+
+/**
+ * A ray that emits from an origin in a certain direction. The class is used by
+ * {@link Raycaster} to assist with raycasting. Raycasting is used for
+ * mouse picking (working out what objects in the 3D space the mouse is over)
+ * amongst other things.
+ */
+class Ray {
+
+	/**
+	 * Constructs a new ray.
+	 *
+	 * @param {Vector3} [origin=(0,0,0)] - The origin of the ray.
+	 * @param {Vector3} [direction=(0,0,-1)] - The (normalized) direction of the ray.
+	 */
+	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, -1 ) ) {
+
+		/**
+		 * The origin of the ray.
+		 *
+		 * @type {Vector3}
+		 */
+		this.origin = origin;
+
+		/**
+		 * The (normalized) direction of the ray.
+		 *
+		 * @type {Vector3}
+		 */
+		this.direction = direction;
+
+	}
+
+	/**
+	 * Sets the ray's components by copying the given values.
+	 *
+	 * @param {Vector3} origin - The origin.
+	 * @param {Vector3} direction - The direction.
+	 * @return {Ray} A reference to this ray.
+	 */
+	set( origin, direction ) {
+
+		this.origin.copy( origin );
+		this.direction.copy( direction );
+
+		return this;
+
+	}
+
+	/**
+	 * Copies the values of the given ray to this instance.
+	 *
+	 * @param {Ray} ray - The ray to copy.
+	 * @return {Ray} A reference to this ray.
+	 */
+	copy( ray ) {
+
+		this.origin.copy( ray.origin );
+		this.direction.copy( ray.direction );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a vector that is located at a given distance along this ray.
+	 *
+	 * @param {number} t - The distance along the ray to retrieve a position for.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} A position on the ray.
+	 */
+	at( t, target ) {
+
+		return target.copy( this.origin ).addScaledVector( this.direction, t );
+
+	}
+
+	/**
+	 * Adjusts the direction of the ray to point at the given vector in world space.
+	 *
+	 * @param {Vector3} v - The target position.
+	 * @return {Ray} A reference to this ray.
+	 */
+	lookAt( v ) {
+
+		this.direction.copy( v ).sub( this.origin ).normalize();
+
+		return this;
+
+	}
+
+	/**
+	 * Shift the origin of this ray along its direction by the given distance.
+	 *
+	 * @param {number} t - The distance along the ray to interpolate.
+	 * @return {Ray} A reference to this ray.
+	 */
+	recast( t ) {
+
+		this.origin.copy( this.at( t, _vector$7 ) );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the point along this ray that is closest to the given point.
+	 *
+	 * @param {Vector3} point - A point in 3D space to get the closet location on the ray for.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The closest point on this ray.
+	 */
+	closestPointToPoint( point, target ) {
+
+		target.subVectors( point, this.origin );
+
+		const directionDistance = target.dot( this.direction );
+
+		if ( directionDistance < 0 ) {
+
+			return target.copy( this.origin );
+
+		}
+
+		return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+
+	}
+
+	/**
+	 * Returns the distance of the closest approach between this ray and the given point.
+	 *
+	 * @param {Vector3} point - A point in 3D space to compute the distance to.
+	 * @return {number} The distance.
+	 */
+	distanceToPoint( point ) {
+
+		return Math.sqrt( this.distanceSqToPoint( point ) );
+
+	}
+
+	/**
+	 * Returns the squared distance of the closest approach between this ray and the given point.
+	 *
+	 * @param {Vector3} point - A point in 3D space to compute the distance to.
+	 * @return {number} The squared distance.
+	 */
+	distanceSqToPoint( point ) {
+
+		const directionDistance = _vector$7.subVectors( point, this.origin ).dot( this.direction );
+
+		// point behind the ray
+
+		if ( directionDistance < 0 ) {
+
+			return this.origin.distanceToSquared( point );
+
+		}
+
+		_vector$7.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+
+		return _vector$7.distanceToSquared( point );
+
+	}
+
+	/**
+	 * Returns the squared distance between this ray and the given line segment.
+	 *
+	 * @param {Vector3} v0 - The start point of the line segment.
+	 * @param {Vector3} v1 - The end point of the line segment.
+	 * @param {Vector3} [optionalPointOnRay] - When provided, it receives the point on this ray that is closest to the segment.
+	 * @param {Vector3} [optionalPointOnSegment] - When provided, it receives the point on the line segment that is closest to this ray.
+	 * @return {number} The squared distance.
+	 */
+	distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteDistRaySegment.h
+		// It returns the min distance between the ray and the segment
+		// defined by v0 and v1
+		// It can also set two optional targets :
+		// - The closest point on the ray
+		// - The closest point on the segment
+
+		_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
+		_segDir.copy( v1 ).sub( v0 ).normalize();
+		_diff.copy( this.origin ).sub( _segCenter );
+
+		const segExtent = v0.distanceTo( v1 ) * 0.5;
+		const a01 = - this.direction.dot( _segDir );
+		const b0 = _diff.dot( this.direction );
+		const b1 = - _diff.dot( _segDir );
+		const c = _diff.lengthSq();
+		const det = Math.abs( 1 - a01 * a01 );
+		let s0, s1, sqrDist, extDet;
+
+		if ( det > 0 ) {
+
+			// The ray and segment are not parallel.
+
+			s0 = a01 * b1 - b0;
+			s1 = a01 * b0 - b1;
+			extDet = segExtent * det;
+
+			if ( s0 >= 0 ) {
+
+				if ( s1 >= - extDet ) {
+
+					if ( s1 <= extDet ) {
+
+						// region 0
+						// Minimum at interior points of ray and segment.
+
+						const invDet = 1 / det;
+						s0 *= invDet;
+						s1 *= invDet;
+						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
+
+					} else {
+
+						// region 1
+
+						s1 = segExtent;
+						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+					}
+
+				} else {
+
+					// region 5
+
+					s1 = - segExtent;
+					s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
+
+			} else {
+
+				if ( s1 <= - extDet ) {
+
+					// region 4
+
+					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				} else if ( s1 <= extDet ) {
+
+					// region 3
+
+					s0 = 0;
+					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
+
+				} else {
+
+					// region 2
+
+					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
+
+			}
+
+		} else {
+
+			// Ray and segment are parallel.
+
+			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+		}
+
+		if ( optionalPointOnRay ) {
+
+			optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
+
+		}
+
+		if ( optionalPointOnSegment ) {
+
+			optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
+
+		}
+
+		return sqrDist;
+
+	}
+
+	/**
+	 * Intersects this ray with the given sphere, returning the intersection
+	 * point or `null` if there is no intersection.
+	 *
+	 * @param {Sphere} sphere - The sphere to intersect.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The intersection point.
+	 */
+	intersectSphere( sphere, target ) {
+
+		_vector$7.subVectors( sphere.center, this.origin );
+		const tca = _vector$7.dot( this.direction );
+		const d2 = _vector$7.dot( _vector$7 ) - tca * tca;
+		const radius2 = sphere.radius * sphere.radius;
+
+		if ( d2 > radius2 ) return null;
+
+		const thc = Math.sqrt( radius2 - d2 );
+
+		// t0 = first intersect point - entrance on front of sphere
+		const t0 = tca - thc;
+
+		// t1 = second intersect point - exit point on back of sphere
+		const t1 = tca + thc;
+
+		// test to see if t1 is behind the ray - if so, return null
+		if ( t1 < 0 ) return null;
+
+		// test to see if t0 is behind the ray:
+		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+		// in order to always return an intersect point that is in front of the ray.
+		if ( t0 < 0 ) return this.at( t1, target );
+
+		// else t0 is in front of the ray, so return the first collision point scaled by t0
+		return this.at( t0, target );
+
+	}
+
+	/**
+	 * Returns `true` if this ray intersects with the given sphere.
+	 *
+	 * @param {Sphere} sphere - The sphere to intersect.
+	 * @return {boolean} Whether this ray intersects with the given sphere or not.
+	 */
+	intersectsSphere( sphere ) {
+
+		if ( sphere.radius < 0 ) return false; // handle empty spheres, see #31187
+
+		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+	}
+
+	/**
+	 * Computes the distance from the ray's origin to the given plane. Returns `null` if the ray
+	 * does not intersect with the plane.
+	 *
+	 * @param {Plane} plane - The plane to compute the distance to.
+	 * @return {?number} Whether this ray intersects with the given sphere or not.
+	 */
+	distanceToPlane( plane ) {
+
+		const denominator = plane.normal.dot( this.direction );
+
+		if ( denominator === 0 ) {
+
+			// line is coplanar, return origin
+			if ( plane.distanceToPoint( this.origin ) === 0 ) {
+
+				return 0;
+
+			}
+
+			// Null is preferable to undefined since undefined means.... it is undefined
+
+			return null;
+
+		}
+
+		const t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+
+		// Return if the ray never intersects the plane
+
+		return t >= 0 ? t : null;
+
+	}
+
+	/**
+	 * Intersects this ray with the given plane, returning the intersection
+	 * point or `null` if there is no intersection.
+	 *
+	 * @param {Plane} plane - The plane to intersect.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The intersection point.
+	 */
+	intersectPlane( plane, target ) {
+
+		const t = this.distanceToPlane( plane );
+
+		if ( t === null ) {
+
+			return null;
+
+		}
+
+		return this.at( t, target );
+
+	}
+
+	/**
+	 * Returns `true` if this ray intersects with the given plane.
+	 *
+	 * @param {Plane} plane - The plane to intersect.
+	 * @return {boolean} Whether this ray intersects with the given plane or not.
+	 */
+	intersectsPlane( plane ) {
+
+		// check if the ray lies on the plane first
+
+		const distToPoint = plane.distanceToPoint( this.origin );
+
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		const denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	}
+
+	/**
+	 * Intersects this ray with the given bounding box, returning the intersection
+	 * point or `null` if there is no intersection.
+	 *
+	 * @param {Box3} box - The box to intersect.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The intersection point.
+	 */
+	intersectBox( box, target ) {
+
+		let tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+		const invdirx = 1 / this.direction.x,
+			invdiry = 1 / this.direction.y,
+			invdirz = 1 / this.direction.z;
+
+		const origin = this.origin;
+
+		if ( invdirx >= 0 ) {
+
+			tmin = ( box.min.x - origin.x ) * invdirx;
+			tmax = ( box.max.x - origin.x ) * invdirx;
+
+		} else {
+
+			tmin = ( box.max.x - origin.x ) * invdirx;
+			tmax = ( box.min.x - origin.x ) * invdirx;
+
+		}
+
+		if ( invdiry >= 0 ) {
+
+			tymin = ( box.min.y - origin.y ) * invdiry;
+			tymax = ( box.max.y - origin.y ) * invdiry;
+
+		} else {
+
+			tymin = ( box.max.y - origin.y ) * invdiry;
+			tymax = ( box.min.y - origin.y ) * invdiry;
+
+		}
+
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+
+		if ( tymin > tmin || isNaN( tmin ) ) tmin = tymin;
+
+		if ( tymax < tmax || isNaN( tmax ) ) tmax = tymax;
+
+		if ( invdirz >= 0 ) {
+
+			tzmin = ( box.min.z - origin.z ) * invdirz;
+			tzmax = ( box.max.z - origin.z ) * invdirz;
+
+		} else {
+
+			tzmin = ( box.max.z - origin.z ) * invdirz;
+			tzmax = ( box.min.z - origin.z ) * invdirz;
+
+		}
+
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+
+		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+
+		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+
+		//return point closest to the ray (positive side)
+
+		if ( tmax < 0 ) return null;
+
+		return this.at( tmin >= 0 ? tmin : tmax, target );
+
+	}
+
+	/**
+	 * Returns `true` if this ray intersects with the given box.
+	 *
+	 * @param {Box3} box - The box to intersect.
+	 * @return {boolean} Whether this ray intersects with the given box or not.
+	 */
+	intersectsBox( box ) {
+
+		return this.intersectBox( box, _vector$7 ) !== null;
+
+	}
+
+	/**
+	 * Intersects this ray with the given triangle, returning the intersection
+	 * point or `null` if there is no intersection.
+	 *
+	 * @param {Vector3} a - The first vertex of the triangle.
+	 * @param {Vector3} b - The second vertex of the triangle.
+	 * @param {Vector3} c - The third vertex of the triangle.
+	 * @param {boolean} backfaceCulling - Whether to use backface culling or not.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {?Vector3} The intersection point.
+	 */
+	intersectTriangle( a, b, c, backfaceCulling, target ) {
+
+		// Compute the offset origin, edges, and normal.
+
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+
+		_edge1.subVectors( b, a );
+		_edge2.subVectors( c, a );
+		_normal$1.crossVectors( _edge1, _edge2 );
+
+		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+		let DdN = this.direction.dot( _normal$1 );
+		let sign;
+
+		if ( DdN > 0 ) {
+
+			if ( backfaceCulling ) return null;
+			sign = 1;
+
+		} else if ( DdN < 0 ) {
+
+			sign = -1;
+			DdN = - DdN;
+
+		} else {
+
+			return null;
+
+		}
+
+		_diff.subVectors( this.origin, a );
+		const DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
+
+		// b1 < 0, no intersection
+		if ( DdQxE2 < 0 ) {
+
+			return null;
+
+		}
+
+		const DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
+
+		// b2 < 0, no intersection
+		if ( DdE1xQ < 0 ) {
+
+			return null;
+
+		}
+
+		// b1+b2 > 1, no intersection
+		if ( DdQxE2 + DdE1xQ > DdN ) {
+
+			return null;
+
+		}
+
+		// Line intersects triangle, check if ray does.
+		const QdN = - sign * _diff.dot( _normal$1 );
+
+		// t < 0, no intersection
+		if ( QdN < 0 ) {
+
+			return null;
+
+		}
+
+		// Ray intersects triangle.
+		return this.at( QdN / DdN, target );
+
+	}
+
+	/**
+	 * Transforms this ray with the given 4x4 transformation matrix.
+	 *
+	 * @param {Matrix4} matrix4 - The transformation matrix.
+	 * @return {Ray} A reference to this ray.
+	 */
+	applyMatrix4( matrix4 ) {
+
+		this.origin.applyMatrix4( matrix4 );
+		this.direction.transformDirection( matrix4 );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this ray is equal with the given one.
+	 *
+	 * @param {Ray} ray - The ray to test for equality.
+	 * @return {boolean} Whether this ray is equal with the given one.
+	 */
+	equals( ray ) {
+
+		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
+
+	}
+
+	/**
+	 * Returns a new ray with copied values from this instance.
+	 *
+	 * @return {Ray} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+}
+
+/**
  * A material for drawing geometries in a simple shaded (flat or wireframe) way.
  *
  * This material is not affected by lights.
@@ -17661,2692 +22920,14 @@ class MeshBasicMaterial extends Material {
 
 }
 
-// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
-
-const _tables = /*@__PURE__*/ _generateTables();
-
-function _generateTables() {
-
-	// float32 to float16 helpers
-
-	const buffer = new ArrayBuffer( 4 );
-	const floatView = new Float32Array( buffer );
-	const uint32View = new Uint32Array( buffer );
-
-	const baseTable = new Uint32Array( 512 );
-	const shiftTable = new Uint32Array( 512 );
-
-	for ( let i = 0; i < 256; ++ i ) {
-
-		const e = i - 127;
-
-		// very small number (0, -0)
-
-		if ( e < -27 ) {
-
-			baseTable[ i ] = 0x0000;
-			baseTable[ i | 0x100 ] = 0x8000;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// small number (denorm)
-
-		} else if ( e < -14 ) {
-
-			baseTable[ i ] = 0x0400 >> ( - e - 14 );
-			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-			shiftTable[ i ] = - e - 1;
-			shiftTable[ i | 0x100 ] = - e - 1;
-
-			// normal number
-
-		} else if ( e <= 15 ) {
-
-			baseTable[ i ] = ( e + 15 ) << 10;
-			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-			// large number (Infinity, -Infinity)
-
-		} else if ( e < 128 ) {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// stay (NaN, Infinity, -Infinity)
-
-		} else {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-		}
-
-	}
-
-	// float16 to float32 helpers
-
-	const mantissaTable = new Uint32Array( 2048 );
-	const exponentTable = new Uint32Array( 64 );
-	const offsetTable = new Uint32Array( 64 );
-
-	for ( let i = 1; i < 1024; ++ i ) {
-
-		let m = i << 13; // zero pad mantissa bits
-		let e = 0; // zero exponent
-
-		// normalized
-		while ( ( m & 0x00800000 ) === 0 ) {
-
-			m <<= 1;
-			e -= 0x00800000; // decrement exponent
-
-		}
-
-		m &= -8388609; // clear leading 1 bit
-		e += 0x38800000; // adjust bias
-
-		mantissaTable[ i ] = m | e;
-
-	}
-
-	for ( let i = 1024; i < 2048; ++ i ) {
-
-		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-	}
-
-	for ( let i = 1; i < 31; ++ i ) {
-
-		exponentTable[ i ] = i << 23;
-
-	}
-
-	exponentTable[ 31 ] = 0x47800000;
-	exponentTable[ 32 ] = 0x80000000;
-
-	for ( let i = 33; i < 63; ++ i ) {
-
-		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-	}
-
-	exponentTable[ 63 ] = 0xc7800000;
-
-	for ( let i = 1; i < 64; ++ i ) {
-
-		if ( i !== 32 ) {
-
-			offsetTable[ i ] = 1024;
-
-		}
-
-	}
-
-	return {
-		floatView: floatView,
-		uint32View: uint32View,
-		baseTable: baseTable,
-		shiftTable: shiftTable,
-		mantissaTable: mantissaTable,
-		exponentTable: exponentTable,
-		offsetTable: offsetTable
-	};
-
-}
-
-/**
- * Returns a half precision floating point value (FP16) from the given single
- * precision floating point value (FP32).
- *
- * @param {number} val - A single precision floating point value.
- * @return {number} The FP16 value.
- */
-function toHalfFloat( val ) {
-
-	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
-
-	val = clamp( val, -65504, 65504 );
-
-	_tables.floatView[ 0 ] = val;
-	const f = _tables.uint32View[ 0 ];
-	const e = ( f >> 23 ) & 0x1ff;
-	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
-
-}
-
-/**
- * Returns a single precision floating point value (FP32) from the given half
- * precision floating point value (FP16).
- *
- * @param {number} val - A half precision floating point value.
- * @return {number} The FP32 value.
- */
-function fromHalfFloat( val ) {
-
-	const m = val >> 10;
-	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
-	return _tables.floatView[ 0 ];
-
-}
-
-/**
- * A class containing utility functions for data.
- *
- * @hideconstructor
- */
-class DataUtils {
-
-	/**
-	 * Returns a half precision floating point value (FP16) from the given single
-	 * precision floating point value (FP32).
-	 *
-	 * @param {number} val - A single precision floating point value.
-	 * @return {number} The FP16 value.
-	 */
-	static toHalfFloat( val ) {
-
-		return toHalfFloat( val );
-
-	}
-
-	/**
-	 * Returns a single precision floating point value (FP32) from the given half
-	 * precision floating point value (FP16).
-	 *
-	 * @param {number} val - A half precision floating point value.
-	 * @return {number} The FP32 value.
-	 */
-	static fromHalfFloat( val ) {
-
-		return fromHalfFloat( val );
-
-	}
-
-}
-
-const _vector$9 = /*@__PURE__*/ new Vector3();
-const _vector2$1 = /*@__PURE__*/ new Vector2();
-
-let _id$3 = 0;
-
-/**
- * This class stores data for an attribute (such as vertex positions, face
- * indices, normals, colors, UVs, and any custom attributes ) associated with
- * a geometry, which allows for more efficient passing of data to the GPU.
- *
- * When working with vector-like data, the `fromBufferAttribute( attribute, index )`
- * helper methods on vector and color class might be helpful. E.g. {@link Vector3#fromBufferAttribute}.
- */
-class BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {TypedArray} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized = false ) {
-
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isBufferAttribute = true;
-
-		/**
-		 * The ID of the buffer attribute.
-		 *
-		 * @name BufferAttribute#id
-		 * @type {number}
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'id', { value: _id$3 ++ } );
-
-		/**
-		 * The name of the buffer attribute.
-		 *
-		 * @type {string}
-		 */
-		this.name = '';
-
-		/**
-		 * The array holding the attribute data. It should have `itemSize * numVertices`
-		 * elements, where `numVertices` is the number of vertices in the associated geometry.
-		 *
-		 * @type {TypedArray}
-		 */
-		this.array = array;
-
-		/**
-		 * The number of values of the array that should be associated with a particular vertex.
-		 * For instance, if this attribute is storing a 3-component vector (such as a position,
-		 * normal, or color), then the value should be `3`.
-		 *
-		 * @type {number}
-		 */
-		this.itemSize = itemSize;
-
-		/**
-		 * Represents the number of items this buffer attribute stores. It is internally computed
-		 * by dividing the `array` length by the `itemSize`.
-		 *
-		 * @type {number}
-		 * @readonly
-		 */
-		this.count = array !== undefined ? array.length / itemSize : 0;
-
-		/**
-		 * Applies to integer data only. Indicates how the underlying data in the buffer maps to
-		 * the values in the GLSL code. For instance, if `array` is an instance of `UInt16Array`,
-		 * and `normalized` is `true`, the values `0 - +65535` in the array data will be mapped to
-		 * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
-		 * to floats unmodified, i.e. `65535` becomes `65535.0f`.
-		 *
-		 * @type {boolean}
-		 */
-		this.normalized = normalized;
-
-		/**
-		 * Defines the intended usage pattern of the data store for optimization purposes.
-		 *
-		 * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
-		 * instantiate a new one and set the desired usage before the next render.
-		 *
-		 * @type {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)}
-		 * @default StaticDrawUsage
-		 */
-		this.usage = StaticDrawUsage;
-
-		/**
-		 * This can be used to only update some components of stored vectors (for example, just the
-		 * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
-		 *
-		 * @type {Array<Object>}
-		 */
-		this.updateRanges = [];
-
-		/**
-		 * Configures the bound GPU type for use in shaders.
-		 *
-		 * Note: this only has an effect for integer arrays and is not configurable for float arrays.
-		 * For lower precision float types, use `Float16BufferAttribute`.
-		 *
-		 * @type {(FloatType|IntType)}
-		 * @default FloatType
-		 */
-		this.gpuType = FloatType;
-
-		/**
-		 * A version number, incremented every time the `needsUpdate` is set to `true`.
-		 *
-		 * @type {number}
-		 */
-		this.version = 0;
-
-	}
-
-	/**
-	 * A callback function that is executed after the renderer has transferred the attribute
-	 * array data to the GPU.
-	 */
-	onUploadCallback() {}
-
-	/**
-	 * Flag to indicate that this attribute has changed and should be re-sent to
-	 * the GPU. Set this to `true` when you modify the value of the array.
-	 *
-	 * @type {number}
-	 * @default false
-	 * @param {boolean} value
-	 */
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-	/**
-	 * Sets the usage of this buffer attribute.
-	 *
-	 * @param {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)} value - The usage to set.
-	 * @return {BufferAttribute} A reference to this buffer attribute.
-	 */
-	setUsage( value ) {
-
-		this.usage = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Adds a range of data in the data array to be updated on the GPU.
-	 *
-	 * @param {number} start - Position at which to start update.
-	 * @param {number} count - The number of components to update.
-	 */
-	addUpdateRange( start, count ) {
-
-		this.updateRanges.push( { start, count } );
-
-	}
-
-	/**
-	 * Clears the update ranges.
-	 */
-	clearUpdateRanges() {
-
-		this.updateRanges.length = 0;
-
-	}
-
-	/**
-	 * Copies the values of the given buffer attribute to this instance.
-	 *
-	 * @param {BufferAttribute} source - The buffer attribute to copy.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	copy( source ) {
-
-		this.name = source.name;
-		this.array = new source.array.constructor( source.array );
-		this.itemSize = source.itemSize;
-		this.count = source.count;
-		this.normalized = source.normalized;
-
-		this.usage = source.usage;
-		this.gpuType = source.gpuType;
-
-		return this;
-
-	}
-
-	/**
-	 * Copies a vector from the given buffer attribute to this one. The start
-	 * and destination position in the attribute buffers are represented by the
-	 * given indices.
-	 *
-	 * @param {number} index1 - The destination index into this buffer attribute.
-	 * @param {BufferAttribute} attribute - The buffer attribute to copy from.
-	 * @param {number} index2 - The source index into the given buffer attribute.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	copyAt( index1, attribute, index2 ) {
-
-		index1 *= this.itemSize;
-		index2 *= attribute.itemSize;
-
-		for ( let i = 0, l = this.itemSize; i < l; i ++ ) {
-
-			this.array[ index1 + i ] = attribute.array[ index2 + i ];
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Copies the given array data into this buffer attribute.
-	 *
-	 * @param {(TypedArray|Array)} array - The array to copy.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	copyArray( array ) {
-
-		this.array.set( array );
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 3x3 matrix to the given attribute. Works with
-	 * item size `2` and `3`.
-	 *
-	 * @param {Matrix3} m - The matrix to apply.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	applyMatrix3( m ) {
-
-		if ( this.itemSize === 2 ) {
-
-			for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-				_vector2$1.fromBufferAttribute( this, i );
-				_vector2$1.applyMatrix3( m );
-
-				this.setXY( i, _vector2$1.x, _vector2$1.y );
-
-			}
-
-		} else if ( this.itemSize === 3 ) {
-
-			for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-				_vector$9.fromBufferAttribute( this, i );
-				_vector$9.applyMatrix3( m );
-
-				this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
-
-			}
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 4x4 matrix to the given attribute. Only works with
-	 * item size `3`.
-	 *
-	 * @param {Matrix4} m - The matrix to apply.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	applyMatrix4( m ) {
-
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-			_vector$9.fromBufferAttribute( this, i );
-
-			_vector$9.applyMatrix4( m );
-
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 3x3 normal matrix to the given attribute. Only works with
-	 * item size `3`.
-	 *
-	 * @param {Matrix3} m - The normal matrix to apply.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	applyNormalMatrix( m ) {
-
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-			_vector$9.fromBufferAttribute( this, i );
-
-			_vector$9.applyNormalMatrix( m );
-
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 4x4 matrix to the given attribute. Only works with
-	 * item size `3` and with direction vectors.
-	 *
-	 * @param {Matrix4} m - The matrix to apply.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	transformDirection( m ) {
-
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-			_vector$9.fromBufferAttribute( this, i );
-
-			_vector$9.transformDirection( m );
-
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the given array data in the buffer attribute.
-	 *
-	 * @param {(TypedArray|Array)} value - The array data to set.
-	 * @param {number} [offset=0] - The offset in this buffer attribute's array.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	set( value, offset = 0 ) {
-
-		// Matching BufferAttribute constructor, do not normalize the array.
-		this.array.set( value, offset );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the given component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} component - The component index.
-	 * @return {number} The returned value.
-	 */
-	getComponent( index, component ) {
-
-		let value = this.array[ index * this.itemSize + component ];
-
-		if ( this.normalized ) value = denormalize( value, this.array );
-
-		return value;
-
-	}
-
-	/**
-	 * Sets the given value to the given component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} component - The component index.
-	 * @param {number} value - The value to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setComponent( index, component, value ) {
-
-		if ( this.normalized ) value = normalize( value, this.array );
-
-		this.array[ index * this.itemSize + component ] = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the x component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The x component.
-	 */
-	getX( index ) {
-
-		let x = this.array[ index * this.itemSize ];
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	/**
-	 * Sets the x component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = x;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The y component.
-	 */
-	getY( index ) {
-
-		let y = this.array[ index * this.itemSize + 1 ];
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	/**
-	 * Sets the y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} y - The value to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = y;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The z component.
-	 */
-	getZ( index ) {
-
-		let z = this.array[ index * this.itemSize + 2 ];
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	/**
-	 * Sets the z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} z - The value to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = z;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The w component.
-	 */
-	getW( index ) {
-
-		let w = this.array[ index * this.itemSize + 3 ];
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	/**
-	 * Sets the w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} w - The value to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = w;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x and y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setXY( index, x, y ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x, y and z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @param {number} z - The value for the z component to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setXYZ( index, x, y, z ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x, y, z and w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @param {number} z - The value for the z component to set.
-	 * @param {number} w - The value for the w component to set.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	setXYZW( index, x, y, z, w ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
-		this.array[ index + 3 ] = w;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the given callback function that is executed after the Renderer has transferred
-	 * the attribute array data to the GPU. Can be used to perform clean-up operations after
-	 * the upload when attribute data are not needed anymore on the CPU side.
-	 *
-	 * @param {Function} callback - The `onUpload()` callback.
-	 * @return {BufferAttribute} A reference to this instance.
-	 */
-	onUpload( callback ) {
-
-		this.onUploadCallback = callback;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a new buffer attribute with copied values from this instance.
-	 *
-	 * @return {BufferAttribute} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor( this.array, this.itemSize ).copy( this );
-
-	}
-
-	/**
-	 * Serializes the buffer attribute into JSON.
-	 *
-	 * @return {Object} A JSON object representing the serialized buffer attribute.
-	 */
-	toJSON() {
-
-		const data = {
-			itemSize: this.itemSize,
-			type: this.array.constructor.name,
-			array: Array.from( this.array ),
-			normalized: this.normalized
-		};
-
-		if ( this.name !== '' ) data.name = this.name;
-		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
-
-		return data;
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `Int8` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Int8BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Int8Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Int8Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `UInt8` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Uint8BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Uint8Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Uint8Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `UInt8Clamped` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Uint8ClampedBufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Uint8ClampedArray)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Uint8ClampedArray( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `Int16` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Int16BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Int16Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Int16Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `UInt16` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Uint16BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Uint16Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `Int32` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Int32BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Int32Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Int32Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `UInt32` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Uint32BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Uint32Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Uint32Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `Float16` buffer attribute with
- * a plain `Array` instance.
- *
- * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
- * browser support is still problematic.
- *
- * @augments BufferAttribute
- */
-class Float16BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Uint16Array( array ), itemSize, normalized );
-
-		this.isFloat16BufferAttribute = true;
-
-	}
-
-	getX( index ) {
-
-		let x = fromHalfFloat( this.array[ index * this.itemSize ] );
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = toHalfFloat( x );
-
-		return this;
-
-	}
-
-	getY( index ) {
-
-		let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	getZ( index ) {
-
-		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	getW( index ) {
-
-		let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
-
-		return this;
-
-	}
-
-	setXY( index, x, y ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	setXYZ( index, x, y, z ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	setXYZW( index, x, y, z, w ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-		this.array[ index + 3 ] = toHalfFloat( w );
-
-		return this;
-
-	}
-
-}
-
-/**
- * Convenient class that can be used when creating a `Float32` buffer attribute with
- * a plain `Array` instance.
- *
- * @augments BufferAttribute
- */
-class Float32BufferAttribute extends BufferAttribute {
-
-	/**
-	 * Constructs a new buffer attribute.
-	 *
-	 * @param {(Array<number>|Float32Array)} array - The array holding the attribute data.
-	 * @param {number} itemSize - The item size.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( array, itemSize, normalized ) {
-
-		super( new Float32Array( array ), itemSize, normalized );
-
-	}
-
-}
-
-let _id$2 = 0;
-
-const _m1$2 = /*@__PURE__*/ new Matrix4();
-const _obj = /*@__PURE__*/ new Object3D();
-const _offset = /*@__PURE__*/ new Vector3();
-const _box$2 = /*@__PURE__*/ new Box3();
-const _boxMorphTargets = /*@__PURE__*/ new Box3();
-const _vector$8 = /*@__PURE__*/ new Vector3();
-
-/**
- * A representation of mesh, line, or point geometry. Includes vertex
- * positions, face indices, normals, colors, UVs, and custom attributes
- * within buffers, reducing the cost of passing all this data to the GPU.
- *
- * ```js
- * const geometry = new THREE.BufferGeometry();
- * // create a simple square shape. We duplicate the top left and bottom right
- * // vertices because each vertex needs to appear once per triangle.
- * const vertices = new Float32Array( [
- * 	-1.0, -1.0,  1.0, // v0
- * 	 1.0, -1.0,  1.0, // v1
- * 	 1.0,  1.0,  1.0, // v2
- *
- * 	 1.0,  1.0,  1.0, // v3
- * 	-1.0,  1.0,  1.0, // v4
- * 	-1.0, -1.0,  1.0  // v5
- * ] );
- * // itemSize = 3 because there are 3 values (components) per vertex
- * geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
- * const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
- * const mesh = new THREE.Mesh( geometry, material );
- * ```
- *
- * @augments EventDispatcher
- */
-class BufferGeometry extends EventDispatcher {
-
-	/**
-	 * Constructs a new geometry.
-	 */
-	constructor() {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isBufferGeometry = true;
-
-		/**
-		 * The ID of the geometry.
-		 *
-		 * @name BufferGeometry#id
-		 * @type {number}
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'id', { value: _id$2 ++ } );
-
-		/**
-		 * The UUID of the geometry.
-		 *
-		 * @type {string}
-		 * @readonly
-		 */
-		this.uuid = generateUUID();
-
-		/**
-		 * The name of the geometry.
-		 *
-		 * @type {string}
-		 */
-		this.name = '';
-		this.type = 'BufferGeometry';
-
-		/**
-		 * Allows for vertices to be re-used across multiple triangles; this is
-		 * called using "indexed triangles". Each triangle is associated with the
-		 * indices of three vertices. This attribute therefore stores the index of
-		 * each vertex for each triangular face. If this attribute is not set, the
-		 * renderer assumes that each three contiguous positions represent a single triangle.
-		 *
-		 * @type {?BufferAttribute}
-		 * @default null
-		 */
-		this.index = null;
-
-		/**
-		 * A (storage) buffer attribute which was generated with a compute shader and
-		 * now defines indirect draw calls.
-		 *
-		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
-		 *
-		 * @type {?BufferAttribute}
-		 * @default null
-		 */
-		this.indirect = null;
-
-		/**
-		 * The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
-		 *
-		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
-		 *
-		 * @type {number|Array<number>}
-		 * @default 0
-		 */
-		this.indirectOffset = 0;
-
-		/**
-		 * This dictionary has as id the name of the attribute to be set and as value
-		 * the buffer attribute to set it to. Rather than accessing this property directly,
-		 * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
-		 *
-		 * @type {Object<string,(BufferAttribute|InterleavedBufferAttribute)>}
-		 */
-		this.attributes = {};
-
-		/**
-		 * This dictionary holds the morph targets of the geometry.
-		 *
-		 * Note: Once the geometry has been rendered, the morph attribute data cannot
-		 * be changed. You will have to call `dispose()`, and create a new geometry instance.
-		 *
-		 * @type {Object}
-		 */
-		this.morphAttributes = {};
-
-		/**
-		 * Used to control the morph target behavior; when set to `true`, the morph
-		 * target data is treated as relative offsets, rather than as absolute
-		 * positions/normals.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.morphTargetsRelative = false;
-
-		/**
-		 * Split the geometry into groups, each of which will be rendered in a
-		 * separate draw call. This allows an array of materials to be used with the geometry.
-		 *
-		 * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
-		 *
-		 * Every vertex and index must belong to exactly one group — groups must not share vertices or
-		 * indices, and must not leave vertices or indices unused.
-		 *
-		 * @type {Array<Object>}
-		 */
-		this.groups = [];
-
-		/**
-		 * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
-		 *
-		 * @type {?Box3}
-		 * @default null
-		 */
-		this.boundingBox = null;
-
-		/**
-		 * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
-		 *
-		 * @type {?Sphere}
-		 * @default null
-		 */
-		this.boundingSphere = null;
-
-		/**
-		 * Determines the part of the geometry to render. This should not be set directly,
-		 * instead use `setDrawRange()`.
-		 *
-		 * @type {{start:number,count:number}}
-		 */
-		this.drawRange = { start: 0, count: Infinity };
-
-		/**
-		 * An object that can be used to store custom data about the geometry.
-		 * It should not hold references to functions as these will not be cloned.
-		 *
-		 * @type {Object}
-		 */
-		this.userData = {};
-
-	}
-
-	/**
-	 * Returns the index of this geometry.
-	 *
-	 * @return {?BufferAttribute} The index. Returns `null` if no index is defined.
-	 */
-	getIndex() {
-
-		return this.index;
-
-	}
-
-	/**
-	 * Sets the given index to this geometry.
-	 *
-	 * @param {Array<number>|BufferAttribute} index - The index to set.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	setIndex( index ) {
-
-		if ( Array.isArray( index ) ) {
-
-			this.index = new ( arrayNeedsUint32( index ) ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
-
-		} else {
-
-			this.index = index;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the given indirect attribute to this geometry.
-	 *
-	 * @param {BufferAttribute} indirect - The attribute holding indirect draw calls.
-	 * @param {number|Array<number>} [indirectOffset=0] - The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	setIndirect( indirect, indirectOffset = 0 ) {
-
-		this.indirect = indirect;
-		this.indirectOffset = indirectOffset;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the indirect attribute of this geometry.
-	 *
-	 * @return {?BufferAttribute} The indirect attribute. Returns `null` if no indirect attribute is defined.
-	 */
-	getIndirect() {
-
-		return this.indirect;
-
-	}
-
-	/**
-	 * Returns the buffer attribute for the given name.
-	 *
-	 * @param {string} name - The attribute name.
-	 * @return {BufferAttribute|InterleavedBufferAttribute|undefined} The buffer attribute.
-	 * Returns `undefined` if not attribute has been found.
-	 */
-	getAttribute( name ) {
-
-		return this.attributes[ name ];
-
-	}
-
-	/**
-	 * Sets the given attribute for the given name.
-	 *
-	 * @param {string} name - The attribute name.
-	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute to set.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	setAttribute( name, attribute ) {
-
-		this.attributes[ name ] = attribute;
-
-		return this;
-
-	}
-
-	/**
-	 * Deletes the attribute for the given name.
-	 *
-	 * @param {string} name - The attribute name to delete.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	deleteAttribute( name ) {
-
-		delete this.attributes[ name ];
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this geometry has an attribute for the given name.
-	 *
-	 * @param {string} name - The attribute name.
-	 * @return {boolean} Whether this geometry has an attribute for the given name or not.
-	 */
-	hasAttribute( name ) {
-
-		return this.attributes[ name ] !== undefined;
-
-	}
-
-	/**
-	 * Adds a group to this geometry.
-	 *
-	 * @param {number} start - The first element in this draw call. That is the first
-	 * vertex for non-indexed geometry, otherwise the first triangle index.
-	 * @param {number} count - Specifies how many vertices (or indices) are part of this group.
-	 * @param {number} [materialIndex=0] - The material array index to use.
-	 */
-	addGroup( start, count, materialIndex = 0 ) {
-
-		this.groups.push( {
-
-			start: start,
-			count: count,
-			materialIndex: materialIndex
-
-		} );
-
-	}
-
-	/**
-	 * Clears all groups.
-	 */
-	clearGroups() {
-
-		this.groups = [];
-
-	}
-
-	/**
-	 * Sets the draw range for this geometry.
-	 *
-	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the first triangle index.
-	 * @param {number} count - For non-indexed BufferGeometry, `count` is the number of vertices to render.
-	 * For indexed BufferGeometry, `count` is the number of indices to render.
-	 */
-	setDrawRange( start, count ) {
-
-		this.drawRange.start = start;
-		this.drawRange.count = count;
-
-	}
-
-	/**
-	 * Applies the given 4x4 transformation matrix to the geometry.
-	 *
-	 * @param {Matrix4} matrix - The matrix to apply.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	applyMatrix4( matrix ) {
-
-		const position = this.attributes.position;
-
-		if ( position !== undefined ) {
-
-			position.applyMatrix4( matrix );
-
-			position.needsUpdate = true;
-
-		}
-
-		const normal = this.attributes.normal;
-
-		if ( normal !== undefined ) {
-
-			const normalMatrix = new Matrix3().getNormalMatrix( matrix );
-
-			normal.applyNormalMatrix( normalMatrix );
-
-			normal.needsUpdate = true;
-
-		}
-
-		const tangent = this.attributes.tangent;
-
-		if ( tangent !== undefined ) {
-
-			tangent.transformDirection( matrix );
-
-			tangent.needsUpdate = true;
-
-		}
-
-		if ( this.boundingBox !== null ) {
-
-			this.computeBoundingBox();
-
-		}
-
-		if ( this.boundingSphere !== null ) {
-
-			this.computeBoundingSphere();
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the rotation represented by the Quaternion to the geometry.
-	 *
-	 * @param {Quaternion} q - The Quaternion to apply.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	applyQuaternion( q ) {
-
-		_m1$2.makeRotationFromQuaternion( q );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Rotates the geometry about the X axis. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {number} angle - The angle in radians.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	rotateX( angle ) {
-
-		// rotate geometry around world x-axis
-
-		_m1$2.makeRotationX( angle );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Rotates the geometry about the Y axis. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {number} angle - The angle in radians.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	rotateY( angle ) {
-
-		// rotate geometry around world y-axis
-
-		_m1$2.makeRotationY( angle );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Rotates the geometry about the Z axis. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {number} angle - The angle in radians.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	rotateZ( angle ) {
-
-		// rotate geometry around world z-axis
-
-		_m1$2.makeRotationZ( angle );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Translates the geometry. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#position} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {number} x - The x offset.
-	 * @param {number} y - The y offset.
-	 * @param {number} z - The z offset.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	translate( x, y, z ) {
-
-		// translate geometry
-
-		_m1$2.makeTranslation( x, y, z );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Scales the geometry. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#scale} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {number} x - The x scale.
-	 * @param {number} y - The y scale.
-	 * @param {number} z - The z scale.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	scale( x, y, z ) {
-
-		// scale geometry
-
-		_m1$2.makeScale( x, y, z );
-
-		this.applyMatrix4( _m1$2 );
-
-		return this;
-
-	}
-
-	/**
-	 * Rotates the geometry to face a point in 3D space. This is typically done as a one time
-	 * operation, and not during a loop. Use {@link Object3D#lookAt} for typical
-	 * real-time mesh rotation.
-	 *
-	 * @param {Vector3} vector - The target point.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	lookAt( vector ) {
-
-		_obj.lookAt( vector );
-
-		_obj.updateMatrix();
-
-		this.applyMatrix4( _obj.matrix );
-
-		return this;
-
-	}
-
-	/**
-	 * Center the geometry based on its bounding box.
-	 *
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	center() {
-
-		this.computeBoundingBox();
-
-		this.boundingBox.getCenter( _offset ).negate();
-
-		this.translate( _offset.x, _offset.y, _offset.z );
-
-		return this;
-
-	}
-
-	/**
-	 * Defines a geometry by creating a `position` attribute based on the given array of points. The array
-	 * can hold 2D or 3D vectors. When using two-dimensional data, the `z` coordinate for all vertices is
-	 * set to `0`.
-	 *
-	 * If the method is used with an existing `position` attribute, the vertex data are overwritten with the
-	 * data from the array. The length of the array must match the vertex count.
-	 *
-	 * @param {Array<Vector2>|Array<Vector3>} points - The points.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	setFromPoints( points ) {
-
-		const positionAttribute = this.getAttribute( 'position' );
-
-		if ( positionAttribute === undefined ) {
-
-			const position = [];
-
-			for ( let i = 0, l = points.length; i < l; i ++ ) {
-
-				const point = points[ i ];
-				position.push( point.x, point.y, point.z || 0 );
-
-			}
-
-			this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
-
-		} else {
-
-			const l = Math.min( points.length, positionAttribute.count ); // make sure data do not exceed buffer size
-
-			for ( let i = 0; i < l; i ++ ) {
-
-				const point = points[ i ];
-				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
-
-			}
-
-			if ( points.length > positionAttribute.count ) {
-
-				warn( 'BufferGeometry: Buffer size too small for points data. Use .dispose() and create a new geometry.' );
-
-			}
-
-			positionAttribute.needsUpdate = true;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Computes the bounding box of the geometry, and updates the `boundingBox` member.
-	 * The bounding box is not computed by the engine; it must be computed by your app.
-	 * You may need to recompute the bounding box if the geometry vertices are modified.
-	 */
-	computeBoundingBox() {
-
-		if ( this.boundingBox === null ) {
-
-			this.boundingBox = new Box3();
-
-		}
-
-		const position = this.attributes.position;
-		const morphAttributesPosition = this.morphAttributes.position;
-
-		if ( position && position.isGLBufferAttribute ) {
-
-			error( 'BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.', this );
-
-			this.boundingBox.set(
-				new Vector3( - Infinity, - Infinity, - Infinity ),
-				new Vector3( + Infinity, + Infinity, + Infinity )
-			);
-
-			return;
-
-		}
-
-		if ( position !== undefined ) {
-
-			this.boundingBox.setFromBufferAttribute( position );
-
-			// process morph attributes if present
-
-			if ( morphAttributesPosition ) {
-
-				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-					const morphAttribute = morphAttributesPosition[ i ];
-					_box$2.setFromBufferAttribute( morphAttribute );
-
-					if ( this.morphTargetsRelative ) {
-
-						_vector$8.addVectors( this.boundingBox.min, _box$2.min );
-						this.boundingBox.expandByPoint( _vector$8 );
-
-						_vector$8.addVectors( this.boundingBox.max, _box$2.max );
-						this.boundingBox.expandByPoint( _vector$8 );
-
-					} else {
-
-						this.boundingBox.expandByPoint( _box$2.min );
-						this.boundingBox.expandByPoint( _box$2.max );
-
-					}
-
-				}
-
-			}
-
-		} else {
-
-			this.boundingBox.makeEmpty();
-
-		}
-
-		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
-
-			error( 'BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
-
-		}
-
-	}
-
-	/**
-	 * Computes the bounding sphere of the geometry, and updates the `boundingSphere` member.
-	 * The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
-	 * You may need to recompute the bounding sphere if the geometry vertices are modified.
-	 */
-	computeBoundingSphere() {
-
-		if ( this.boundingSphere === null ) {
-
-			this.boundingSphere = new Sphere();
-
-		}
-
-		const position = this.attributes.position;
-		const morphAttributesPosition = this.morphAttributes.position;
-
-		if ( position && position.isGLBufferAttribute ) {
-
-			error( 'BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.', this );
-
-			this.boundingSphere.set( new Vector3(), Infinity );
-
-			return;
-
-		}
-
-		if ( position ) {
-
-			// first, find the center of the bounding sphere
-
-			const center = this.boundingSphere.center;
-
-			_box$2.setFromBufferAttribute( position );
-
-			// process morph attributes if present
-
-			if ( morphAttributesPosition ) {
-
-				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-					const morphAttribute = morphAttributesPosition[ i ];
-					_boxMorphTargets.setFromBufferAttribute( morphAttribute );
-
-					if ( this.morphTargetsRelative ) {
-
-						_vector$8.addVectors( _box$2.min, _boxMorphTargets.min );
-						_box$2.expandByPoint( _vector$8 );
-
-						_vector$8.addVectors( _box$2.max, _boxMorphTargets.max );
-						_box$2.expandByPoint( _vector$8 );
-
-					} else {
-
-						_box$2.expandByPoint( _boxMorphTargets.min );
-						_box$2.expandByPoint( _boxMorphTargets.max );
-
-					}
-
-				}
-
-			}
-
-			_box$2.getCenter( center );
-
-			// second, try to find a boundingSphere with a radius smaller than the
-			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
-
-			let maxRadiusSq = 0;
-
-			for ( let i = 0, il = position.count; i < il; i ++ ) {
-
-				_vector$8.fromBufferAttribute( position, i );
-
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
-
-			}
-
-			// process morph attributes if present
-
-			if ( morphAttributesPosition ) {
-
-				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-					const morphAttribute = morphAttributesPosition[ i ];
-					const morphTargetsRelative = this.morphTargetsRelative;
-
-					for ( let j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
-
-						_vector$8.fromBufferAttribute( morphAttribute, j );
-
-						if ( morphTargetsRelative ) {
-
-							_offset.fromBufferAttribute( position, j );
-							_vector$8.add( _offset );
-
-						}
-
-						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
-
-					}
-
-				}
-
-			}
-
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-			if ( isNaN( this.boundingSphere.radius ) ) {
-
-				error( 'BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Calculates and adds a tangent attribute to this geometry.
-	 *
-	 * The computation is only supported for indexed geometries and if position, normal, and uv attributes
-	 * are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
-	 * {@link BufferGeometryUtils#computeMikkTSpaceTangents} instead.
-	 */
-	computeTangents() {
-
-		const index = this.index;
-		const attributes = this.attributes;
-
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( index === null ||
-			 attributes.position === undefined ||
-			 attributes.normal === undefined ||
-			 attributes.uv === undefined ) {
-
-			error( 'BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
-			return;
-
-		}
-
-		const positionAttribute = attributes.position;
-		const normalAttribute = attributes.normal;
-		const uvAttribute = attributes.uv;
-
-		if ( this.hasAttribute( 'tangent' ) === false ) {
-
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
-
-		}
-
-		const tangentAttribute = this.getAttribute( 'tangent' );
-
-		const tan1 = [], tan2 = [];
-
-		for ( let i = 0; i < positionAttribute.count; i ++ ) {
-
-			tan1[ i ] = new Vector3();
-			tan2[ i ] = new Vector3();
-
-		}
-
-		const vA = new Vector3(),
-			vB = new Vector3(),
-			vC = new Vector3(),
-
-			uvA = new Vector2(),
-			uvB = new Vector2(),
-			uvC = new Vector2(),
-
-			sdir = new Vector3(),
-			tdir = new Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			vA.fromBufferAttribute( positionAttribute, a );
-			vB.fromBufferAttribute( positionAttribute, b );
-			vC.fromBufferAttribute( positionAttribute, c );
-
-			uvA.fromBufferAttribute( uvAttribute, a );
-			uvB.fromBufferAttribute( uvAttribute, b );
-			uvC.fromBufferAttribute( uvAttribute, c );
-
-			vB.sub( vA );
-			vC.sub( vA );
-
-			uvB.sub( uvA );
-			uvC.sub( uvA );
-
-			const r = 1.0 / ( uvB.x * uvC.y - uvC.x * uvB.y );
-
-			// silently ignore degenerate uv triangles having coincident or colinear vertices
-
-			if ( ! isFinite( r ) ) return;
-
-			sdir.copy( vB ).multiplyScalar( uvC.y ).addScaledVector( vC, - uvB.y ).multiplyScalar( r );
-			tdir.copy( vC ).multiplyScalar( uvB.x ).addScaledVector( vB, - uvC.x ).multiplyScalar( r );
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		let groups = this.groups;
-
-		if ( groups.length === 0 ) {
-
-			groups = [ {
-				start: 0,
-				count: index.count
-			} ];
-
-		}
-
-		for ( let i = 0, il = groups.length; i < il; ++ i ) {
-
-			const group = groups[ i ];
-
-			const start = group.start;
-			const count = group.count;
-
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
-
-				handleTriangle(
-					index.getX( j + 0 ),
-					index.getX( j + 1 ),
-					index.getX( j + 2 )
-				);
-
-			}
-
-		}
-
-		const tmp = new Vector3(), tmp2 = new Vector3();
-		const n = new Vector3(), n2 = new Vector3();
-
-		function handleVertex( v ) {
-
-			n.fromBufferAttribute( normalAttribute, v );
-			n2.copy( n );
-
-			const t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.crossVectors( n2, t );
-			const test = tmp2.dot( tan2[ v ] );
-			const w = ( test < 0.0 ) ? -1 : 1.0;
-
-			tangentAttribute.setXYZW( v, tmp.x, tmp.y, tmp.z, w );
-
-		}
-
-		for ( let i = 0, il = groups.length; i < il; ++ i ) {
-
-			const group = groups[ i ];
-
-			const start = group.start;
-			const count = group.count;
-
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
-
-				handleVertex( index.getX( j + 0 ) );
-				handleVertex( index.getX( j + 1 ) );
-				handleVertex( index.getX( j + 2 ) );
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Computes vertex normals for the given vertex data. For indexed geometries, the method sets
-	 * each vertex normal to be the average of the face normals of the faces that share that vertex.
-	 * For non-indexed geometries, vertices are not shared, and the method sets each vertex normal
-	 * to be the same as the face normal.
-	 */
-	computeVertexNormals() {
-
-		const index = this.index;
-		const positionAttribute = this.getAttribute( 'position' );
-
-		if ( positionAttribute !== undefined ) {
-
-			let normalAttribute = this.getAttribute( 'normal' );
-
-			if ( normalAttribute === undefined ) {
-
-				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
-				this.setAttribute( 'normal', normalAttribute );
-
-			} else {
-
-				// reset existing normals to zero
-
-				for ( let i = 0, il = normalAttribute.count; i < il; i ++ ) {
-
-					normalAttribute.setXYZ( i, 0, 0, 0 );
-
-				}
-
-			}
-
-			const pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
-			const nA = new Vector3(), nB = new Vector3(), nC = new Vector3();
-			const cb = new Vector3(), ab = new Vector3();
-
-			// indexed elements
-
-			if ( index ) {
-
-				for ( let i = 0, il = index.count; i < il; i += 3 ) {
-
-					const vA = index.getX( i + 0 );
-					const vB = index.getX( i + 1 );
-					const vC = index.getX( i + 2 );
-
-					pA.fromBufferAttribute( positionAttribute, vA );
-					pB.fromBufferAttribute( positionAttribute, vB );
-					pC.fromBufferAttribute( positionAttribute, vC );
-
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
-
-					nA.fromBufferAttribute( normalAttribute, vA );
-					nB.fromBufferAttribute( normalAttribute, vB );
-					nC.fromBufferAttribute( normalAttribute, vC );
-
-					nA.add( cb );
-					nB.add( cb );
-					nC.add( cb );
-
-					normalAttribute.setXYZ( vA, nA.x, nA.y, nA.z );
-					normalAttribute.setXYZ( vB, nB.x, nB.y, nB.z );
-					normalAttribute.setXYZ( vC, nC.x, nC.y, nC.z );
-
-				}
-
-			} else {
-
-				// non-indexed elements (unconnected triangle soup)
-
-				for ( let i = 0, il = positionAttribute.count; i < il; i += 3 ) {
-
-					pA.fromBufferAttribute( positionAttribute, i + 0 );
-					pB.fromBufferAttribute( positionAttribute, i + 1 );
-					pC.fromBufferAttribute( positionAttribute, i + 2 );
-
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
-
-					normalAttribute.setXYZ( i + 0, cb.x, cb.y, cb.z );
-					normalAttribute.setXYZ( i + 1, cb.x, cb.y, cb.z );
-					normalAttribute.setXYZ( i + 2, cb.x, cb.y, cb.z );
-
-				}
-
-			}
-
-			this.normalizeNormals();
-
-			normalAttribute.needsUpdate = true;
-
-		}
-
-	}
-
-	/**
-	 * Ensures every normal vector in a geometry will have a magnitude of `1`. This will
-	 * correct lighting on the geometry surfaces.
-	 */
-	normalizeNormals() {
-
-		const normals = this.attributes.normal;
-
-		for ( let i = 0, il = normals.count; i < il; i ++ ) {
-
-			_vector$8.fromBufferAttribute( normals, i );
-
-			_vector$8.normalize();
-
-			normals.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
-
-		}
-
-	}
-
-	/**
-	 * Return a new non-index version of this indexed geometry. If the geometry
-	 * is already non-indexed, the method is a NOOP.
-	 *
-	 * @return {BufferGeometry} The non-indexed version of this indexed geometry.
-	 */
-	toNonIndexed() {
-
-		function convertBufferAttribute( attribute, indices ) {
-
-			const array = attribute.array;
-			const itemSize = attribute.itemSize;
-			const normalized = attribute.normalized;
-
-			const array2 = new array.constructor( indices.length * itemSize );
-
-			let index = 0, index2 = 0;
-
-			for ( let i = 0, l = indices.length; i < l; i ++ ) {
-
-				if ( attribute.isInterleavedBufferAttribute ) {
-
-					index = indices[ i ] * attribute.data.stride + attribute.offset;
-
-				} else {
-
-					index = indices[ i ] * itemSize;
-
-				}
-
-				for ( let j = 0; j < itemSize; j ++ ) {
-
-					array2[ index2 ++ ] = array[ index ++ ];
-
-				}
-
-			}
-
-			return new BufferAttribute( array2, itemSize, normalized );
-
-		}
-
-		//
-
-		if ( this.index === null ) {
-
-			warn( 'BufferGeometry.toNonIndexed(): BufferGeometry is already non-indexed.' );
-			return this;
-
-		}
-
-		const geometry2 = new BufferGeometry();
-
-		const indices = this.index.array;
-		const attributes = this.attributes;
-
-		// attributes
-
-		for ( const name in attributes ) {
-
-			const attribute = attributes[ name ];
-
-			const newAttribute = convertBufferAttribute( attribute, indices );
-
-			geometry2.setAttribute( name, newAttribute );
-
-		}
-
-		// morph attributes
-
-		const morphAttributes = this.morphAttributes;
-
-		for ( const name in morphAttributes ) {
-
-			const morphArray = [];
-			const morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
-
-			for ( let i = 0, il = morphAttribute.length; i < il; i ++ ) {
-
-				const attribute = morphAttribute[ i ];
-
-				const newAttribute = convertBufferAttribute( attribute, indices );
-
-				morphArray.push( newAttribute );
-
-			}
-
-			geometry2.morphAttributes[ name ] = morphArray;
-
-		}
-
-		geometry2.morphTargetsRelative = this.morphTargetsRelative;
-
-		// groups
-
-		const groups = this.groups;
-
-		for ( let i = 0, l = groups.length; i < l; i ++ ) {
-
-			const group = groups[ i ];
-			geometry2.addGroup( group.start, group.count, group.materialIndex );
-
-		}
-
-		return geometry2;
-
-	}
-
-	/**
-	 * Serializes the geometry into JSON.
-	 *
-	 * @return {Object} A JSON object representing the serialized geometry.
-	 */
-	toJSON() {
-
-		const data = {
-			metadata: {
-				version: 4.7,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometry.toJSON'
-			}
-		};
-
-		// standard BufferGeometry serialization
-
-		data.uuid = this.uuid;
-		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
-		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
-
-		if ( this.parameters !== undefined ) {
-
-			const parameters = this.parameters;
-
-			for ( const key in parameters ) {
-
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
-
-			}
-
-			return data;
-
-		}
-
-		// for simplicity the code assumes attributes are not shared across geometries, see #15811
-
-		data.data = { attributes: {} };
-
-		const index = this.index;
-
-		if ( index !== null ) {
-
-			data.data.index = {
-				type: index.array.constructor.name,
-				array: Array.prototype.slice.call( index.array )
-			};
-
-		}
-
-		const attributes = this.attributes;
-
-		for ( const key in attributes ) {
-
-			const attribute = attributes[ key ];
-
-			data.data.attributes[ key ] = attribute.toJSON( data.data );
-
-		}
-
-		const morphAttributes = {};
-		let hasMorphAttributes = false;
-
-		for ( const key in this.morphAttributes ) {
-
-			const attributeArray = this.morphAttributes[ key ];
-
-			const array = [];
-
-			for ( let i = 0, il = attributeArray.length; i < il; i ++ ) {
-
-				const attribute = attributeArray[ i ];
-
-				array.push( attribute.toJSON( data.data ) );
-
-			}
-
-			if ( array.length > 0 ) {
-
-				morphAttributes[ key ] = array;
-
-				hasMorphAttributes = true;
-
-			}
-
-		}
-
-		if ( hasMorphAttributes ) {
-
-			data.data.morphAttributes = morphAttributes;
-			data.data.morphTargetsRelative = this.morphTargetsRelative;
-
-		}
-
-		const groups = this.groups;
-
-		if ( groups.length > 0 ) {
-
-			data.data.groups = JSON.parse( JSON.stringify( groups ) );
-
-		}
-
-		const boundingSphere = this.boundingSphere;
-
-		if ( boundingSphere !== null ) {
-
-			data.data.boundingSphere = boundingSphere.toJSON();
-
-		}
-
-		return data;
-
-	}
-
-	/**
-	 * Returns a new geometry with copied values from this instance.
-	 *
-	 * @return {BufferGeometry} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
-	/**
-	 * Copies the values of the given geometry to this instance.
-	 *
-	 * @param {BufferGeometry} source - The geometry to copy.
-	 * @return {BufferGeometry} A reference to this instance.
-	 */
-	copy( source ) {
-
-		// reset
-
-		this.index = null;
-		this.attributes = {};
-		this.morphAttributes = {};
-		this.groups = [];
-		this.boundingBox = null;
-		this.boundingSphere = null;
-
-		// used for storing cloned, shared data
-
-		const data = {};
-
-		// name
-
-		this.name = source.name;
-
-		// index
-
-		const index = source.index;
-
-		if ( index !== null ) {
-
-			this.setIndex( index.clone() );
-
-		}
-
-		// attributes
-
-		const attributes = source.attributes;
-
-		for ( const name in attributes ) {
-
-			const attribute = attributes[ name ];
-			this.setAttribute( name, attribute.clone( data ) );
-
-		}
-
-		// morph attributes
-
-		const morphAttributes = source.morphAttributes;
-
-		for ( const name in morphAttributes ) {
-
-			const array = [];
-			const morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
-
-			for ( let i = 0, l = morphAttribute.length; i < l; i ++ ) {
-
-				array.push( morphAttribute[ i ].clone( data ) );
-
-			}
-
-			this.morphAttributes[ name ] = array;
-
-		}
-
-		this.morphTargetsRelative = source.morphTargetsRelative;
-
-		// groups
-
-		const groups = source.groups;
-
-		for ( let i = 0, l = groups.length; i < l; i ++ ) {
-
-			const group = groups[ i ];
-			this.addGroup( group.start, group.count, group.materialIndex );
-
-		}
-
-		// bounding box
-
-		const boundingBox = source.boundingBox;
-
-		if ( boundingBox !== null ) {
-
-			this.boundingBox = boundingBox.clone();
-
-		}
-
-		// bounding sphere
-
-		const boundingSphere = source.boundingSphere;
-
-		if ( boundingSphere !== null ) {
-
-			this.boundingSphere = boundingSphere.clone();
-
-		}
-
-		// draw range
-
-		this.drawRange.start = source.drawRange.start;
-		this.drawRange.count = source.drawRange.count;
-
-		// user data
-
-		this.userData = source.userData;
-
-		return this;
-
-	}
-
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever this instance is no longer used in your app.
-	 *
-	 * @fires BufferGeometry#dispose
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
-	}
-
-}
-
 const _inverseMatrix$3 = /*@__PURE__*/ new Matrix4();
 const _ray$3 = /*@__PURE__*/ new Ray();
 const _sphere$6 = /*@__PURE__*/ new Sphere();
 const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
-const _vA$1 = /*@__PURE__*/ new Vector3();
-const _vB$1 = /*@__PURE__*/ new Vector3();
-const _vC$1 = /*@__PURE__*/ new Vector3();
+const _vA = /*@__PURE__*/ new Vector3();
+const _vB = /*@__PURE__*/ new Vector3();
+const _vC = /*@__PURE__*/ new Vector3();
 
 const _tempA = /*@__PURE__*/ new Vector3();
 const _morphA = /*@__PURE__*/ new Vector3();
@@ -20769,16 +23350,16 @@ function checkIntersection$1( object, material, raycaster, ray, pA, pB, pC, poin
 
 function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, normal, a, b, c ) {
 
-	object.getVertexPosition( a, _vA$1 );
-	object.getVertexPosition( b, _vB$1 );
-	object.getVertexPosition( c, _vC$1 );
+	object.getVertexPosition( a, _vA );
+	object.getVertexPosition( b, _vB );
+	object.getVertexPosition( c, _vC );
 
-	const intersection = checkIntersection$1( object, material, raycaster, ray, _vA$1, _vB$1, _vC$1, _intersectionPoint );
+	const intersection = checkIntersection$1( object, material, raycaster, ray, _vA, _vB, _vC, _intersectionPoint );
 
 	if ( intersection ) {
 
 		const barycoord = new Vector3();
-		Triangle.getBarycoord( _intersectionPoint, _vA$1, _vB$1, _vC$1, barycoord );
+		Triangle.getBarycoord( _intersectionPoint, _vA, _vB, _vC, barycoord );
 
 		if ( uv ) {
 
@@ -20812,7 +23393,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 			materialIndex: 0
 		};
 
-		Triangle.getNormal( _vA$1, _vB$1, _vC$1, face.normal );
+		Triangle.getNormal( _vA, _vB, _vC, face.normal );
 
 		intersection.face = face;
 		intersection.barycoord = barycoord;
@@ -20820,4074 +23401,6 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 	}
 
 	return intersection;
-
-}
-
-/**
- * A geometry class for a rectangular cuboid with a given width, height, and depth.
- * On creation, the cuboid is centred on the origin, with each edge parallel to one
- * of the axes.
- *
- * ```js
- * const geometry = new THREE.BoxGeometry( 1, 1, 1 );
- * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
- * const cube = new THREE.Mesh( geometry, material );
- * scene.add( cube );
- * ```
- *
- * @augments BufferGeometry
- * @demo scenes/geometry-browser.html#BoxGeometry
- */
-class BoxGeometry extends BufferGeometry {
-
-	/**
-	 * Constructs a new box geometry.
-	 *
-	 * @param {number} [width=1] - The width. That is, the length of the edges parallel to the X axis.
-	 * @param {number} [height=1] - The height. That is, the length of the edges parallel to the Y axis.
-	 * @param {number} [depth=1] - The depth. That is, the length of the edges parallel to the Z axis.
-	 * @param {number} [widthSegments=1] - Number of segmented rectangular faces along the width of the sides.
-	 * @param {number} [heightSegments=1] - Number of segmented rectangular faces along the height of the sides.
-	 * @param {number} [depthSegments=1] - Number of segmented rectangular faces along the depth of the sides.
-	 */
-	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
-
-		super();
-
-		this.type = 'BoxGeometry';
-
-		/**
-		 * Holds the constructor parameters that have been
-		 * used to generate the geometry. Any modification
-		 * after instantiation does not change the geometry.
-		 *
-		 * @type {Object}
-		 */
-		this.parameters = {
-			width: width,
-			height: height,
-			depth: depth,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			depthSegments: depthSegments
-		};
-
-		const scope = this;
-
-		// segments
-
-		widthSegments = Math.floor( widthSegments );
-		heightSegments = Math.floor( heightSegments );
-		depthSegments = Math.floor( depthSegments );
-
-		// buffers
-
-		const indices = [];
-		const vertices = [];
-		const normals = [];
-		const uvs = [];
-
-		// helper variables
-
-		let numberOfVertices = 0;
-		let groupStart = 0;
-
-		// build each side of the box geometry
-
-		buildPlane( 'z', 'y', 'x', -1, -1, depth, height, width, depthSegments, heightSegments, 0 ); // px
-		buildPlane( 'z', 'y', 'x', 1, -1, depth, height, - width, depthSegments, heightSegments, 1 ); // nx
-		buildPlane( 'x', 'z', 'y', 1, 1, width, depth, height, widthSegments, depthSegments, 2 ); // py
-		buildPlane( 'x', 'z', 'y', 1, -1, width, depth, - height, widthSegments, depthSegments, 3 ); // ny
-		buildPlane( 'x', 'y', 'z', 1, -1, width, height, depth, widthSegments, heightSegments, 4 ); // pz
-		buildPlane( 'x', 'y', 'z', -1, -1, width, height, - depth, widthSegments, heightSegments, 5 ); // nz
-
-		// build geometry
-
-		this.setIndex( indices );
-		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
-
-			const segmentWidth = width / gridX;
-			const segmentHeight = height / gridY;
-
-			const widthHalf = width / 2;
-			const heightHalf = height / 2;
-			const depthHalf = depth / 2;
-
-			const gridX1 = gridX + 1;
-			const gridY1 = gridY + 1;
-
-			let vertexCounter = 0;
-			let groupCount = 0;
-
-			const vector = new Vector3();
-
-			// generate vertices, normals and uvs
-
-			for ( let iy = 0; iy < gridY1; iy ++ ) {
-
-				const y = iy * segmentHeight - heightHalf;
-
-				for ( let ix = 0; ix < gridX1; ix ++ ) {
-
-					const x = ix * segmentWidth - widthHalf;
-
-					// set values to correct vector component
-
-					vector[ u ] = x * udir;
-					vector[ v ] = y * vdir;
-					vector[ w ] = depthHalf;
-
-					// now apply vector to vertex buffer
-
-					vertices.push( vector.x, vector.y, vector.z );
-
-					// set values to correct vector component
-
-					vector[ u ] = 0;
-					vector[ v ] = 0;
-					vector[ w ] = depth > 0 ? 1 : -1;
-
-					// now apply vector to normal buffer
-
-					normals.push( vector.x, vector.y, vector.z );
-
-					// uvs
-
-					uvs.push( ix / gridX );
-					uvs.push( 1 - ( iy / gridY ) );
-
-					// counters
-
-					vertexCounter += 1;
-
-				}
-
-			}
-
-			// indices
-
-			// 1. you need three indices to draw a single face
-			// 2. a single segment consists of two faces
-			// 3. so we need to generate six (2*3) indices per segment
-
-			for ( let iy = 0; iy < gridY; iy ++ ) {
-
-				for ( let ix = 0; ix < gridX; ix ++ ) {
-
-					const a = numberOfVertices + ix + gridX1 * iy;
-					const b = numberOfVertices + ix + gridX1 * ( iy + 1 );
-					const c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-					const d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
-
-					// faces
-
-					indices.push( a, b, d );
-					indices.push( b, c, d );
-
-					// increase counter
-
-					groupCount += 6;
-
-				}
-
-			}
-
-			// add a group to the geometry. this will ensure multi material support
-
-			scope.addGroup( groupStart, groupCount, materialIndex );
-
-			// calculate new start value for groups
-
-			groupStart += groupCount;
-
-			// update total number of vertices
-
-			numberOfVertices += vertexCounter;
-
-		}
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.parameters = Object.assign( {}, source.parameters );
-
-		return this;
-
-	}
-
-	/**
-	 * Factory method for creating an instance of this class from the given
-	 * JSON object.
-	 *
-	 * @param {Object} data - A JSON object representing the serialized geometry.
-	 * @return {BoxGeometry} A new instance.
-	 */
-	static fromJSON( data ) {
-
-		return new BoxGeometry( data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments );
-
-	}
-
-}
-
-/**
- * Provides utility functions for managing uniforms.
- *
- * @module UniformsUtils
- */
-
-/**
- * Clones the given uniform definitions by performing a deep-copy. That means
- * if the value of a uniform refers to an object like a Vector3 or Texture,
- * the cloned uniform will refer to a new object reference.
- *
- * @param {Object} src - An object representing uniform definitions.
- * @return {Object} The cloned uniforms.
- */
-function cloneUniforms( src ) {
-
-	const dst = {};
-
-	for ( const u in src ) {
-
-		dst[ u ] = {};
-
-		for ( const p in src[ u ] ) {
-
-			const property = src[ u ][ p ];
-
-			if ( property && ( property.isColor ||
-				property.isMatrix3 || property.isMatrix4 ||
-				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture || property.isQuaternion ) ) {
-
-				if ( property.isRenderTargetTexture ) {
-
-					warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
-					dst[ u ][ p ] = null;
-
-				} else {
-
-					dst[ u ][ p ] = property.clone();
-
-				}
-
-			} else if ( Array.isArray( property ) ) {
-
-				dst[ u ][ p ] = property.slice();
-
-			} else {
-
-				dst[ u ][ p ] = property;
-
-			}
-
-		}
-
-	}
-
-	return dst;
-
-}
-
-/**
- * Merges the given uniform definitions into a single object. Since the
- * method internally uses cloneUniforms(), it performs a deep-copy when
- * producing the merged uniform definitions.
- *
- * @param {Array} uniforms - An array of objects containing uniform definitions.
- * @return {Object} The merged uniforms.
- */
-function mergeUniforms( uniforms ) {
-
-	const merged = {};
-
-	for ( let u = 0; u < uniforms.length; u ++ ) {
-
-		const tmp = cloneUniforms( uniforms[ u ] );
-
-		for ( const p in tmp ) {
-
-			merged[ p ] = tmp[ p ];
-
-		}
-
-	}
-
-	return merged;
-
-}
-
-function cloneUniformsGroups( src ) {
-
-	const dst = [];
-
-	for ( let u = 0; u < src.length; u ++ ) {
-
-		dst.push( src[ u ].clone() );
-
-	}
-
-	return dst;
-
-}
-
-function getUnlitUniformColorSpace( renderer ) {
-
-	const currentRenderTarget = renderer.getRenderTarget();
-
-	if ( currentRenderTarget === null ) {
-
-		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
-		return renderer.outputColorSpace;
-
-	}
-
-	// https://github.com/mrdoob/three.js/issues/27868
-	if ( currentRenderTarget.isXRRenderTarget === true ) {
-
-		return currentRenderTarget.texture.colorSpace;
-
-	}
-
-	return ColorManagement.workingColorSpace;
-
-}
-
-// Legacy
-
-const UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
-
-var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}";
-
-var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
-
-/**
- * A material rendered with custom shaders. A shader is a small program written in GLSL.
- * that runs on the GPU. You may want to use a custom shader if you need to implement an
- * effect not included with any of the built-in materials.
- *
- * There are the following notes to bear in mind when using a `ShaderMaterial`:
- *
- * - `ShaderMaterial` can only be used with {@link WebGLRenderer}.
- * - Built in attributes and uniforms are passed to the shaders along with your code. If
- * you don't want that, use {@link RawShaderMaterial} instead.
- * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end`
- * in order to unroll a `for` loop in GLSL by the shader preprocessor. The directive has
- * to be placed right above the loop. The loop formatting has to correspond to a defined standard.
- *   - The loop has to be [normalized](https://en.wikipedia.org/wiki/Normalized_loop).
- *   - The loop variable has to be *i*.
- *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly
- * value of *i* for the given iteration and can be used in preprocessor
- * statements.
- *
- * ```js
- * const material = new THREE.ShaderMaterial( {
- * 	uniforms: {
- * 		time: { value: 1.0 },
- * 		resolution: { value: new THREE.Vector2() }
- * 	},
- * 	vertexShader: document.getElementById( 'vertexShader' ).textContent,
- * 	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
- * } );
- * ```
- *
- * @augments Material
- */
-class ShaderMaterial extends Material {
-
-	/**
-	 * Constructs a new shader material.
-	 *
-	 * @param {Object} [parameters] - An object with one or more properties
-	 * defining the material's appearance. Any property of the material
-	 * (including any property from inherited materials) can be passed
-	 * in here. Color values can be passed any type of value accepted
-	 * by {@link Color#set}.
-	 */
-	constructor( parameters ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isShaderMaterial = true;
-
-		this.type = 'ShaderMaterial';
-
-		/**
-		 * Defines custom constants using `#define` directives within the GLSL code
-		 * for both the vertex shader and the fragment shader; each key/value pair
-		 * yields another directive.
-		 * ```js
-		 * defines: {
-		 * 	FOO: 15,
-		 * 	BAR: true
-		 * }
-		 * ```
-		 * Yields the lines:
-		 * ```
-		 * #define FOO 15
-		 * #define BAR true
-		 * ```
-		 *
-		 * @type {Object}
-		 */
-		this.defines = {};
-
-		/**
-		 * An object of the form:
-		 * ```js
-		 * {
-		 * 	"uniform1": { value: 1.0 },
-		 * 	"uniform2": { value: 2 }
-		 * }
-		 * ```
-		 * specifying the uniforms to be passed to the shader code; keys are uniform
-		 * names, values are definitions of the form
-		 * ```
-		 * {
-		 * 	value: 1.0
-		 * }
-		 * ```
-		 * where `value` is the value of the uniform. Names must match the name of
-		 * the uniform, as defined in the GLSL code. Note that uniforms are refreshed
-		 * on every frame, so updating the value of the uniform will immediately
-		 * update the value available to the GLSL code.
-		 *
-		 * @type {Object}
-		 */
-		this.uniforms = {};
-
-		/**
-		 * An array holding uniforms groups for configuring UBOs.
-		 *
-		 * @type {Array<UniformsGroup>}
-		 */
-		this.uniformsGroups = [];
-
-		/**
-		 * Vertex shader GLSL code. This is the actual code for the shader.
-		 *
-		 * @type {string}
-		 */
-		this.vertexShader = default_vertex;
-
-		/**
-		 * Fragment shader GLSL code. This is the actual code for the shader.
-		 *
-		 * @type {string}
-		 */
-		this.fragmentShader = default_fragment;
-
-		/**
-		 * Controls line thickness or lines.
-		 *
-		 * WebGL and WebGPU ignore this setting and always render line primitives with a
-		 * width of one pixel.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.linewidth = 1;
-
-		/**
-		 * Renders the geometry as a wireframe.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.wireframe = false;
-
-		/**
-		 * Controls the thickness of the wireframe.
-		 *
-		 * WebGL and WebGPU ignore this property and always render
-		 * 1 pixel wide lines.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.wireframeLinewidth = 1;
-
-		/**
-		 * Defines whether the material color is affected by global fog settings; `true`
-		 * to pass fog uniforms to the shader.
-		 *
-		 * Setting this property to `true` requires the definition of fog uniforms. It is
-		 * recommended to use `UniformsUtils.merge()` to combine the custom shader uniforms
-		 * with predefined fog uniforms.
-		 *
-		 * ```js
-		 * const material = new ShaderMaterial( {
-		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
-		 *     vertexShader: vertexShader,
-		 *     fragmentShader: fragmentShader,
-		 *     fog: true
-		 * } );
-		 * ```
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.fog = false;
-
-		/**
-		 * Defines whether this material uses lighting; `true` to pass uniform data
-		 * related to lighting to this shader.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.lights = false;
-
-		/**
-		 * Defines whether this material supports clipping; `true` to let the renderer
-		 * pass the clippingPlanes uniform.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.clipping = false;
-
-		/**
-		 * Overwritten and set to `true` by default.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.forceSinglePass = true;
-
-		/**
-		 * This object allows to enable certain WebGL 2 extensions.
-		 *
-		 * - clipCullDistance: set to `true` to use vertex shader clipping
-		 * - multiDraw: set to `true` to use vertex shader multi_draw / enable gl_DrawID
-		 *
-		 * @type {{clipCullDistance:false,multiDraw:false}}
-		 */
-		this.extensions = {
-			clipCullDistance: false, // set to use vertex shader clipping
-			multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
-		};
-
-		/**
-		 * When the rendered geometry doesn't include these attributes but the
-		 * material does, these default values will be passed to the shaders. This
-		 * avoids errors when buffer data is missing.
-		 *
-		 * - color: [ 1, 1, 1 ]
-		 * - uv: [ 0, 0 ]
-		 * - uv1: [ 0, 0 ]
-		 *
-		 * @type {Object}
-		 */
-		this.defaultAttributeValues = {
-			'color': [ 1, 1, 1 ],
-			'uv': [ 0, 0 ],
-			'uv1': [ 0, 0 ]
-		};
-
-		/**
-		 * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
-		 * to bind a generic vertex index to an attribute variable.
-		 *
-		 * @type {string|undefined}
-		 * @default undefined
-		 */
-		this.index0AttributeName = undefined;
-
-		/**
-		 * Can be used to force a uniform update while changing uniforms in
-		 * {@link Object3D#onBeforeRender}.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.uniformsNeedUpdate = false;
-
-		/**
-		 * Defines the GLSL version of custom shader code.
-		 *
-		 * @type {?(GLSL1|GLSL3)}
-		 * @default null
-		 */
-		this.glslVersion = null;
-
-		if ( parameters !== undefined ) {
-
-			this.setValues( parameters );
-
-		}
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.fragmentShader = source.fragmentShader;
-		this.vertexShader = source.vertexShader;
-
-		this.uniforms = cloneUniforms( source.uniforms );
-		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
-
-		this.defines = Object.assign( {}, source.defines );
-
-		this.wireframe = source.wireframe;
-		this.wireframeLinewidth = source.wireframeLinewidth;
-
-		this.fog = source.fog;
-		this.lights = source.lights;
-		this.clipping = source.clipping;
-
-		this.extensions = Object.assign( {}, source.extensions );
-
-		this.glslVersion = source.glslVersion;
-
-		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
-
-		this.index0AttributeName = source.index0AttributeName;
-
-		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.glslVersion = this.glslVersion;
-		data.uniforms = {};
-
-		for ( const name in this.uniforms ) {
-
-			const uniform = this.uniforms[ name ];
-			const value = uniform.value;
-
-			if ( value && value.isTexture ) {
-
-				data.uniforms[ name ] = {
-					type: 't',
-					value: value.toJSON( meta ).uuid
-				};
-
-			} else if ( value && value.isColor ) {
-
-				data.uniforms[ name ] = {
-					type: 'c',
-					value: value.getHex()
-				};
-
-			} else if ( value && value.isVector2 ) {
-
-				data.uniforms[ name ] = {
-					type: 'v2',
-					value: value.toArray()
-				};
-
-			} else if ( value && value.isVector3 ) {
-
-				data.uniforms[ name ] = {
-					type: 'v3',
-					value: value.toArray()
-				};
-
-			} else if ( value && value.isVector4 ) {
-
-				data.uniforms[ name ] = {
-					type: 'v4',
-					value: value.toArray()
-				};
-
-			} else if ( value && value.isMatrix3 ) {
-
-				data.uniforms[ name ] = {
-					type: 'm3',
-					value: value.toArray()
-				};
-
-			} else if ( value && value.isMatrix4 ) {
-
-				data.uniforms[ name ] = {
-					type: 'm4',
-					value: value.toArray()
-				};
-
-			} else {
-
-				data.uniforms[ name ] = {
-					value: value
-				};
-
-				// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
-
-			}
-
-		}
-
-		if ( Object.keys( this.defines ).length > 0 ) data.defines = this.defines;
-
-		data.vertexShader = this.vertexShader;
-		data.fragmentShader = this.fragmentShader;
-
-		data.lights = this.lights;
-		data.clipping = this.clipping;
-
-		const extensions = {};
-
-		for ( const key in this.extensions ) {
-
-			if ( this.extensions[ key ] === true ) extensions[ key ] = true;
-
-		}
-
-		if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
-
-		return data;
-
-	}
-
-}
-
-/**
- * Abstract base class for cameras. This class should always be inherited
- * when you build a new camera.
- *
- * @abstract
- * @augments Object3D
- */
-class Camera extends Object3D {
-
-	/**
-	 * Constructs a new camera.
-	 */
-	constructor() {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isCamera = true;
-
-		this.type = 'Camera';
-
-		/**
-		 * The inverse of the camera's world matrix.
-		 *
-		 * @type {Matrix4}
-		 */
-		this.matrixWorldInverse = new Matrix4();
-
-		/**
-		 * The camera's projection matrix.
-		 *
-		 * @type {Matrix4}
-		 */
-		this.projectionMatrix = new Matrix4();
-
-		/**
-		 * The inverse of the camera's projection matrix.
-		 *
-		 * @type {Matrix4}
-		 */
-		this.projectionMatrixInverse = new Matrix4();
-
-		/**
-		 * The coordinate system in which the camera is used.
-		 *
-		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
-		 */
-		this.coordinateSystem = WebGLCoordinateSystem;
-
-		this._reversedDepth = false;
-
-	}
-
-	/**
-	 * The flag that indicates whether the camera uses a reversed depth buffer.
-	 *
-	 * @type {boolean}
-	 * @default false
-	 */
-	get reversedDepth() {
-
-		return this._reversedDepth;
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.matrixWorldInverse.copy( source.matrixWorldInverse );
-
-		this.projectionMatrix.copy( source.projectionMatrix );
-		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
-
-		this.coordinateSystem = source.coordinateSystem;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a vector representing the ("look") direction of the 3D object in world space.
-	 *
-	 * This method is overwritten since cameras have a different forward vector compared to other
-	 * 3D objects. A camera looks down its local, negative z-axis by default.
-	 *
-	 * @param {Vector3} target - The target vector the result is stored to.
-	 * @return {Vector3} The 3D object's direction in world space.
-	 */
-	getWorldDirection( target ) {
-
-		return super.getWorldDirection( target ).negate();
-
-	}
-
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
-
-		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
-
-	}
-
-	updateWorldMatrix( updateParents, updateChildren ) {
-
-		super.updateWorldMatrix( updateParents, updateChildren );
-
-		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
-}
-
-const _v3$1 = /*@__PURE__*/ new Vector3();
-const _minTarget = /*@__PURE__*/ new Vector2();
-const _maxTarget = /*@__PURE__*/ new Vector2();
-
-/**
- * Camera that uses [perspective projection](https://en.wikipedia.org/wiki/Perspective_(graphical)).
- *
- * This projection mode is designed to mimic the way the human eye sees. It
- * is the most common projection mode used for rendering a 3D scene.
- *
- * ```js
- * const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
- * scene.add( camera );
- * ```
- *
- * @augments Camera
- */
-class PerspectiveCamera extends Camera {
-
-	/**
-	 * Constructs a new perspective camera.
-	 *
-	 * @param {number} [fov=50] - The vertical field of view.
-	 * @param {number} [aspect=1] - The aspect ratio.
-	 * @param {number} [near=0.1] - The camera's near plane.
-	 * @param {number} [far=2000] - The camera's far plane.
-	 */
-	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isPerspectiveCamera = true;
-
-		this.type = 'PerspectiveCamera';
-
-		/**
-		 * The vertical field of view, from bottom to top of view,
-		 * in degrees.
-		 *
-		 * @type {number}
-		 * @default 50
-		 */
-		this.fov = fov;
-
-		/**
-		 * The zoom factor of the camera.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.zoom = 1;
-
-		/**
-		 * The camera's near plane. The valid range is greater than `0`
-		 * and less than the current value of {@link PerspectiveCamera#far}.
-		 *
-		 * Note that, unlike for the {@link OrthographicCamera}, `0` is <em>not</em> a
-		 * valid value for a perspective camera's near plane.
-		 *
-		 * @type {number}
-		 * @default 0.1
-		 */
-		this.near = near;
-
-		/**
-		 * The camera's far plane. Must be greater than the
-		 * current value of {@link PerspectiveCamera#near}.
-		 *
-		 * @type {number}
-		 * @default 2000
-		 */
-		this.far = far;
-
-		/**
-		 * Object distance used for stereoscopy and depth-of-field effects. This
-		 * parameter does not influence the projection matrix unless a
-		 * {@link StereoCamera} is being used.
-		 *
-		 * @type {number}
-		 * @default 10
-		 */
-		this.focus = 10;
-
-		/**
-		 * The aspect ratio, usually the canvas width / canvas height.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.aspect = aspect;
-
-		/**
-		 * Represents the frustum window specification. This property should not be edited
-		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
-		 *
-		 * @type {?Object}
-		 * @default null
-		 */
-		this.view = null;
-
-		/**
-		 * Film size used for the larger axis. Default is `35` (millimeters). This
-		 * parameter does not influence the projection matrix unless {@link PerspectiveCamera#filmOffset}
-		 * is set to a nonzero value.
-		 *
-		 * @type {number}
-		 * @default 35
-		 */
-		this.filmGauge = 35;
-
-		/**
-		 * Horizontal off-center offset in the same unit as {@link PerspectiveCamera#filmGauge}.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.filmOffset = 0;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.fov = source.fov;
-		this.zoom = source.zoom;
-
-		this.near = source.near;
-		this.far = source.far;
-		this.focus = source.focus;
-
-		this.aspect = source.aspect;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
-
-		this.filmGauge = source.filmGauge;
-		this.filmOffset = source.filmOffset;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the FOV by focal length in respect to the current {@link PerspectiveCamera#filmGauge}.
-	 *
-	 * The default film gauge is 35, so that the focal length can be specified for
-	 * a 35mm (full frame) camera.
-	 *
-	 * @param {number} focalLength - Values for focal length and film gauge must have the same unit.
-	 */
-	setFocalLength( focalLength ) {
-
-		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
-		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
-
-		this.fov = RAD2DEG * 2 * Math.atan( vExtentSlope );
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Returns the focal length from the current {@link PerspectiveCamera#fov} and
-	 * {@link PerspectiveCamera#filmGauge}.
-	 *
-	 * @return {number} The computed focal length.
-	 */
-	getFocalLength() {
-
-		const vExtentSlope = Math.tan( DEG2RAD * 0.5 * this.fov );
-
-		return 0.5 * this.getFilmHeight() / vExtentSlope;
-
-	}
-
-	/**
-	 * Returns the current vertical field of view angle in degrees considering {@link PerspectiveCamera#zoom}.
-	 *
-	 * @return {number} The effective FOV.
-	 */
-	getEffectiveFOV() {
-
-		return RAD2DEG * 2 * Math.atan(
-			Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom );
-
-	}
-
-	/**
-	 * Returns the width of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
-	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
-	 *
-	 * @return {number} The film width.
-	 */
-	getFilmWidth() {
-
-		// film not completely covered in portrait format (aspect < 1)
-		return this.filmGauge * Math.min( this.aspect, 1 );
-
-	}
-
-	/**
-	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
-	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
-	 *
-	 * @return {number} The film width.
-	 */
-	getFilmHeight() {
-
-		// film not completely covered in landscape format (aspect > 1)
-		return this.filmGauge / Math.max( this.aspect, 1 );
-
-	}
-
-	/**
-	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
-	 * Sets `minTarget` and `maxTarget` to the coordinates of the lower-left and upper-right corners of the view rectangle.
-	 *
-	 * @param {number} distance - The viewing distance.
-	 * @param {Vector2} minTarget - The lower-left corner of the view rectangle is written into this vector.
-	 * @param {Vector2} maxTarget - The upper-right corner of the view rectangle is written into this vector.
-	 */
-	getViewBounds( distance, minTarget, maxTarget ) {
-
-		_v3$1.set( -1, -1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-
-		minTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
-
-		_v3$1.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-
-		maxTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
-
-	}
-
-	/**
-	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
-	 *
-	 * @param {number} distance - The viewing distance.
-	 * @param {Vector2} target - The target vector that is used to store result where x is width and y is height.
-	 * @returns {Vector2} The view size.
-	 */
-	getViewSize( distance, target ) {
-
-		this.getViewBounds( distance, _minTarget, _maxTarget );
-
-		return target.subVectors( _maxTarget, _minTarget );
-
-	}
-
-	/**
-	 * Sets an offset in a larger frustum. This is useful for multi-window or
-	 * multi-monitor/multi-machine setups.
-	 *
-	 * For example, if you have 3x2 monitors and each monitor is 1920x1080 and
-	 * the monitors are in grid like this
-	 *```
-	 *   +---+---+---+
-	 *   | A | B | C |
-	 *   +---+---+---+
-	 *   | D | E | F |
-	 *   +---+---+---+
-	 *```
-	 * then for each monitor you would call it like this:
-	 *```js
-	 * const w = 1920;
-	 * const h = 1080;
-	 * const fullWidth = w * 3;
-	 * const fullHeight = h * 2;
-	 *
-	 * // --A--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
-	 * // --B--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
-	 * // --C--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
-	 * // --D--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
-	 * // --E--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
-	 * // --F--
-	 * camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
-	 * ```
-	 *
-	 * Note there is no reason monitors have to be the same size or in a grid.
-	 *
-	 * @param {number} fullWidth - The full width of multiview setup.
-	 * @param {number} fullHeight - The full height of multiview setup.
-	 * @param {number} x - The horizontal offset of the subcamera.
-	 * @param {number} y - The vertical offset of the subcamera.
-	 * @param {number} width - The width of subcamera.
-	 * @param {number} height - The height of subcamera.
-	 */
-	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
-
-		this.aspect = fullWidth / fullHeight;
-
-		if ( this.view === null ) {
-
-			this.view = {
-				enabled: true,
-				fullWidth: 1,
-				fullHeight: 1,
-				offsetX: 0,
-				offsetY: 0,
-				width: 1,
-				height: 1
-			};
-
-		}
-
-		this.view.enabled = true;
-		this.view.fullWidth = fullWidth;
-		this.view.fullHeight = fullHeight;
-		this.view.offsetX = x;
-		this.view.offsetY = y;
-		this.view.width = width;
-		this.view.height = height;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Removes the view offset from the projection matrix.
-	 */
-	clearViewOffset() {
-
-		if ( this.view !== null ) {
-
-			this.view.enabled = false;
-
-		}
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Updates the camera's projection matrix. Must be called after any change of
-	 * camera properties.
-	 */
-	updateProjectionMatrix() {
-
-		const near = this.near;
-		let top = near * Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom;
-		let height = 2 * top;
-		let width = this.aspect * height;
-		let left = -0.5 * width;
-		const view = this.view;
-
-		if ( this.view !== null && this.view.enabled ) {
-
-			const fullWidth = view.fullWidth,
-				fullHeight = view.fullHeight;
-
-			left += view.offsetX * width / fullWidth;
-			top -= view.offsetY * height / fullHeight;
-			width *= view.width / fullWidth;
-			height *= view.height / fullHeight;
-
-		}
-
-		const skew = this.filmOffset;
-		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
-
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth );
-
-		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.fov = this.fov;
-		data.object.zoom = this.zoom;
-
-		data.object.near = this.near;
-		data.object.far = this.far;
-		data.object.focus = this.focus;
-
-		data.object.aspect = this.aspect;
-
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
-
-		data.object.filmGauge = this.filmGauge;
-		data.object.filmOffset = this.filmOffset;
-
-		return data;
-
-	}
-
-}
-
-const fov = -90; // negative fov is not an error
-const aspect = 1;
-
-/**
- * A special type of camera that is positioned in 3D space to render its surroundings into a
- * cube render target. The render target can then be used as an environment map for rendering
- * realtime reflections in your scene.
- *
- * ```js
- * // Create cube render target
- * const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
- *
- * // Create cube camera
- * const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
- * scene.add( cubeCamera );
- *
- * // Create car
- * const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
- * const car = new THREE.Mesh( carGeometry, chromeMaterial );
- * scene.add( car );
- *
- * // Update the render target cube
- * car.visible = false;
- * cubeCamera.position.copy( car.position );
- * cubeCamera.update( renderer, scene );
- *
- * // Render the scene
- * car.visible = true;
- * renderer.render( scene, camera );
- * ```
- *
- * @augments Object3D
- */
-class CubeCamera extends Object3D {
-
-	/**
-	 * Constructs a new cube camera.
-	 *
-	 * @param {number} near - The camera's near plane.
-	 * @param {number} far - The camera's far plane.
-	 * @param {WebGLCubeRenderTarget} renderTarget - The cube render target.
-	 */
-	constructor( near, far, renderTarget ) {
-
-		super();
-
-		this.type = 'CubeCamera';
-
-		/**
-		 * A reference to the cube render target.
-		 *
-		 * @type {WebGLCubeRenderTarget}
-		 */
-		this.renderTarget = renderTarget;
-
-		/**
-		 * The current active coordinate system.
-		 *
-		 * @type {?(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
-		 * @default null
-		 */
-		this.coordinateSystem = null;
-
-		/**
-		 * The current active mipmap level
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.activeMipmapLevel = 0;
-
-		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
-		cameraPX.layers = this.layers;
-		this.add( cameraPX );
-
-		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
-		cameraNX.layers = this.layers;
-		this.add( cameraNX );
-
-		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
-		cameraPY.layers = this.layers;
-		this.add( cameraPY );
-
-		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
-		cameraNY.layers = this.layers;
-		this.add( cameraNY );
-
-		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
-		cameraPZ.layers = this.layers;
-		this.add( cameraPZ );
-
-		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
-		cameraNZ.layers = this.layers;
-		this.add( cameraNZ );
-
-	}
-
-	/**
-	 * Must be called when the coordinate system of the cube camera is changed.
-	 */
-	updateCoordinateSystem() {
-
-		const coordinateSystem = this.coordinateSystem;
-
-		const cameras = this.children.concat();
-
-		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = cameras;
-
-		for ( const camera of cameras ) this.remove( camera );
-
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
-
-			cameraPX.up.set( 0, 1, 0 );
-			cameraPX.lookAt( 1, 0, 0 );
-
-			cameraNX.up.set( 0, 1, 0 );
-			cameraNX.lookAt( -1, 0, 0 );
-
-			cameraPY.up.set( 0, 0, -1 );
-			cameraPY.lookAt( 0, 1, 0 );
-
-			cameraNY.up.set( 0, 0, 1 );
-			cameraNY.lookAt( 0, -1, 0 );
-
-			cameraPZ.up.set( 0, 1, 0 );
-			cameraPZ.lookAt( 0, 0, 1 );
-
-			cameraNZ.up.set( 0, 1, 0 );
-			cameraNZ.lookAt( 0, 0, -1 );
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			cameraPX.up.set( 0, -1, 0 );
-			cameraPX.lookAt( -1, 0, 0 );
-
-			cameraNX.up.set( 0, -1, 0 );
-			cameraNX.lookAt( 1, 0, 0 );
-
-			cameraPY.up.set( 0, 0, 1 );
-			cameraPY.lookAt( 0, 1, 0 );
-
-			cameraNY.up.set( 0, 0, -1 );
-			cameraNY.lookAt( 0, -1, 0 );
-
-			cameraPZ.up.set( 0, -1, 0 );
-			cameraPZ.lookAt( 0, 0, 1 );
-
-			cameraNZ.up.set( 0, -1, 0 );
-			cameraNZ.lookAt( 0, 0, -1 );
-
-		} else {
-
-			throw new Error( 'THREE.CubeCamera.updateCoordinateSystem(): Invalid coordinate system: ' + coordinateSystem );
-
-		}
-
-		for ( const camera of cameras ) {
-
-			this.add( camera );
-
-			camera.updateMatrixWorld();
-
-		}
-
-	}
-
-	/**
-	 * Calling this method will render the given scene with the given renderer
-	 * into the cube render target of the camera.
-	 *
-	 * @param {(Renderer|WebGLRenderer)} renderer - The renderer.
-	 * @param {Scene} scene - The scene to render.
-	 */
-	update( renderer, scene ) {
-
-		if ( this.parent === null ) this.updateMatrixWorld();
-
-		const { renderTarget, activeMipmapLevel } = this;
-
-		if ( this.coordinateSystem !== renderer.coordinateSystem ) {
-
-			this.coordinateSystem = renderer.coordinateSystem;
-
-			this.updateCoordinateSystem();
-
-		}
-
-		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentActiveCubeFace = renderer.getActiveCubeFace();
-		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
-
-		const currentXrEnabled = renderer.xr.enabled;
-
-		renderer.xr.enabled = false;
-
-		const generateMipmaps = renderTarget.texture.generateMipmaps;
-
-		renderTarget.texture.generateMipmaps = false;
-
-		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
-		renderer.render( scene, cameraPX );
-
-		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
-		renderer.render( scene, cameraNX );
-
-		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
-		renderer.render( scene, cameraPY );
-
-		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
-		renderer.render( scene, cameraNY );
-
-		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
-		renderer.render( scene, cameraPZ );
-
-		// mipmaps are generated during the last call of render()
-		// at this point, all sides of the cube render target are defined
-
-		renderTarget.texture.generateMipmaps = generateMipmaps;
-
-		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
-		renderer.render( scene, cameraNZ );
-
-		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
-
-		renderer.xr.enabled = currentXrEnabled;
-
-		renderTarget.texture.needsPMREMUpdate = true;
-
-	}
-
-}
-
-/**
- * Creates a cube texture made up of six images.
- *
- * ```js
- * const loader = new THREE.CubeTextureLoader();
- * loader.setPath( 'textures/cube/pisa/' );
- *
- * const textureCube = loader.load( [
- * 	'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'
- * ] );
- *
- * const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
- * ```
- *
- * @augments Texture
- */
-class CubeTexture extends Texture {
-
-	/**
-	 * Constructs a new cube texture.
-	 *
-	 * @param {Array<Image>} [images=[]] - An array holding a image for each side of a cube.
-	 * @param {number} [mapping=CubeReflectionMapping] - The texture mapping.
-	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
-	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
-	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
-	 * @param {number} [minFilter=LinearMipmapLinearFilter] - The min filter value.
-	 * @param {number} [format=RGBAFormat] - The texture format.
-	 * @param {number} [type=UnsignedByteType] - The texture type.
-	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
-	 * @param {string} [colorSpace=NoColorSpace] - The color space value.
-	 */
-	constructor( images = [], mapping = CubeReflectionMapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
-
-		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isCubeTexture = true;
-
-		/**
-		 * If set to `true`, the texture is flipped along the vertical axis when
-		 * uploaded to the GPU.
-		 *
-		 * Overwritten and set to `false` by default.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.flipY = false;
-
-	}
-
-	/**
-	 * Alias for {@link CubeTexture#image}.
-	 *
-	 * @type {Array<Image>}
-	 */
-	get images() {
-
-		return this.image;
-
-	}
-
-	set images( value ) {
-
-		this.image = value;
-
-	}
-
-}
-
-/**
- * A cube render target used in context of {@link WebGLRenderer}.
- *
- * @augments WebGLRenderTarget
- */
-class WebGLCubeRenderTarget extends WebGLRenderTarget {
-
-	/**
-	 * Constructs a new cube render target.
-	 *
-	 * @param {number} [size=1] - The size of the render target.
-	 * @param {RenderTarget~Options} [options] - The configuration object.
-	 */
-	constructor( size = 1, options = {} ) {
-
-		super( size, size, options );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isWebGLCubeRenderTarget = true;
-
-		const image = { width: size, height: size, depth: 1 };
-		const images = [ image, image, image, image, image, image ];
-
-		/**
-		 * Overwritten with a different texture type.
-		 *
-		 * @type {DataArrayTexture}
-		 */
-		this.texture = new CubeTexture( images );
-		this._setTextureOptions( options );
-
-		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
-		// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
-		// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
-
-		// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
-		// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
-		// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
-
-		this.texture.isRenderTargetTexture = true;
-
-	}
-
-	/**
-	 * Converts the given equirectangular texture to a cube map.
-	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
-	 * @param {Texture} texture - The equirectangular texture.
-	 * @return {WebGLCubeRenderTarget} A reference to this cube render target.
-	 */
-	fromEquirectangularTexture( renderer, texture ) {
-
-		this.texture.type = texture.type;
-		this.texture.colorSpace = texture.colorSpace;
-
-		this.texture.generateMipmaps = texture.generateMipmaps;
-		this.texture.minFilter = texture.minFilter;
-		this.texture.magFilter = texture.magFilter;
-
-		const shader = {
-
-			uniforms: {
-				tEquirect: { value: null },
-			},
-
-			vertexShader: /* glsl */`
-
-				varying vec3 vWorldDirection;
-
-				vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
-
-					return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
-
-				}
-
-				void main() {
-
-					vWorldDirection = transformDirection( position, modelMatrix );
-
-					#include <begin_vertex>
-					#include <project_vertex>
-
-				}
-			`,
-
-			fragmentShader: /* glsl */`
-
-				uniform sampler2D tEquirect;
-
-				varying vec3 vWorldDirection;
-
-				#include <common>
-
-				void main() {
-
-					vec3 direction = normalize( vWorldDirection );
-
-					vec2 sampleUV = equirectUv( direction );
-
-					gl_FragColor = texture2D( tEquirect, sampleUV );
-
-				}
-			`
-		};
-
-		const geometry = new BoxGeometry( 5, 5, 5 );
-
-		const material = new ShaderMaterial( {
-
-			name: 'CubemapFromEquirect',
-
-			uniforms: cloneUniforms( shader.uniforms ),
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader,
-			side: BackSide,
-			blending: NoBlending
-
-		} );
-
-		material.uniforms.tEquirect.value = texture;
-
-		const mesh = new Mesh( geometry, material );
-
-		const currentMinFilter = texture.minFilter;
-
-		// Avoid blurred poles
-		if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
-
-		const camera = new CubeCamera( 1, 10, this );
-		camera.update( renderer, mesh );
-
-		texture.minFilter = currentMinFilter;
-
-		mesh.geometry.dispose();
-		mesh.material.dispose();
-
-		return this;
-
-	}
-
-	/**
-	 * Clears this cube render target.
-	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
-	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
-	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
-	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
-	 */
-	clear( renderer, color = true, depth = true, stencil = true ) {
-
-		const currentRenderTarget = renderer.getRenderTarget();
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			renderer.setRenderTarget( this, i );
-
-			renderer.clear( color, depth, stencil );
-
-		}
-
-		renderer.setRenderTarget( currentRenderTarget );
-
-	}
-
-}
-
-/**
- * This is almost identical to an {@link Object3D}. Its purpose is to
- * make working with groups of objects syntactically clearer.
- *
- * ```js
- * // Create a group and add the two cubes.
- * // These cubes can now be rotated / scaled etc as a group.
- * const group = new THREE.Group();
- *
- * group.add( meshA );
- * group.add( meshB );
- *
- * scene.add( group );
- * ```
- *
- * @augments Object3D
- */
-class Group extends Object3D {
-
-	constructor() {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isGroup = true;
-
-		this.type = 'Group';
-
-	}
-
-}
-
-const _moveEvent = { type: 'move' };
-
-/**
- * Class for representing a XR controller with its
- * different coordinate systems.
- *
- * @private
- */
-class WebXRController {
-
-	/**
-	 * Constructs a new XR controller.
-	 */
-	constructor() {
-
-		/**
-		 * A group representing the target ray space
-		 * of the XR controller.
-		 *
-		 * @private
-		 * @type {?Group}
-		 * @default null
-		 */
-		this._targetRay = null;
-
-		/**
-		 * A group representing the grip space
-		 * of the XR controller.
-		 *
-		 * @private
-		 * @type {?Group}
-		 * @default null
-		 */
-		this._grip = null;
-
-		/**
-		 * A group representing the hand space
-		 * of the XR controller.
-		 *
-		 * @private
-		 * @type {?Group}
-		 * @default null
-		 */
-		this._hand = null;
-
-	}
-
-	/**
-	 * Returns a group representing the hand space of the XR controller.
-	 *
-	 * @return {Group} A group representing the hand space of the XR controller.
-	 */
-	getHandSpace() {
-
-		if ( this._hand === null ) {
-
-			this._hand = new Group();
-			this._hand.matrixAutoUpdate = false;
-			this._hand.visible = false;
-
-			this._hand.joints = {};
-			this._hand.inputState = { pinching: false };
-
-		}
-
-		return this._hand;
-
-	}
-
-	/**
-	 * Returns a group representing the target ray space of the XR controller.
-	 *
-	 * @return {Group} A group representing the target ray space of the XR controller.
-	 */
-	getTargetRaySpace() {
-
-		if ( this._targetRay === null ) {
-
-			this._targetRay = new Group();
-			this._targetRay.matrixAutoUpdate = false;
-			this._targetRay.visible = false;
-			this._targetRay.hasLinearVelocity = false;
-			this._targetRay.linearVelocity = new Vector3();
-			this._targetRay.hasAngularVelocity = false;
-			this._targetRay.angularVelocity = new Vector3();
-
-		}
-
-		return this._targetRay;
-
-	}
-
-	/**
-	 * Returns a group representing the grip space of the XR controller.
-	 *
-	 * @return {Group} A group representing the grip space of the XR controller.
-	 */
-	getGripSpace() {
-
-		if ( this._grip === null ) {
-
-			this._grip = new Group();
-			this._grip.matrixAutoUpdate = false;
-			this._grip.visible = false;
-			this._grip.hasLinearVelocity = false;
-			this._grip.linearVelocity = new Vector3();
-			this._grip.hasAngularVelocity = false;
-			this._grip.angularVelocity = new Vector3();
-
-		}
-
-		return this._grip;
-
-	}
-
-	/**
-	 * Dispatches the given event to the groups representing
-	 * the different coordinate spaces of the XR controller.
-	 *
-	 * @param {Object} event - The event to dispatch.
-	 * @return {WebXRController} A reference to this instance.
-	 */
-	dispatchEvent( event ) {
-
-		if ( this._targetRay !== null ) {
-
-			this._targetRay.dispatchEvent( event );
-
-		}
-
-		if ( this._grip !== null ) {
-
-			this._grip.dispatchEvent( event );
-
-		}
-
-		if ( this._hand !== null ) {
-
-			this._hand.dispatchEvent( event );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Connects the controller with the given XR input source.
-	 *
-	 * @param {XRInputSource} inputSource - The input source.
-	 * @return {WebXRController} A reference to this instance.
-	 */
-	connect( inputSource ) {
-
-		if ( inputSource && inputSource.hand ) {
-
-			const hand = this._hand;
-
-			if ( hand ) {
-
-				for ( const inputjoint of inputSource.hand.values() ) {
-
-					// Initialize hand with joints when connected
-					this._getHandJoint( hand, inputjoint );
-
-				}
-
-			}
-
-		}
-
-		this.dispatchEvent( { type: 'connected', data: inputSource } );
-
-		return this;
-
-	}
-
-	/**
-	 * Disconnects the controller from the given XR input source.
-	 *
-	 * @param {XRInputSource} inputSource - The input source.
-	 * @return {WebXRController} A reference to this instance.
-	 */
-	disconnect( inputSource ) {
-
-		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-		if ( this._targetRay !== null ) {
-
-			this._targetRay.visible = false;
-
-		}
-
-		if ( this._grip !== null ) {
-
-			this._grip.visible = false;
-
-		}
-
-		if ( this._hand !== null ) {
-
-			this._hand.visible = false;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Updates the controller with the given input source, XR frame and reference space.
-	 * This updates the transformations of the groups that represent the different
-	 * coordinate systems of the controller.
-	 *
-	 * @param {XRInputSource} inputSource - The input source.
-	 * @param {XRFrame} frame - The XR frame.
-	 * @param {XRReferenceSpace} referenceSpace - The reference space.
-	 * @return {WebXRController} A reference to this instance.
-	 */
-	update( inputSource, frame, referenceSpace ) {
-
-		let inputPose = null;
-		let gripPose = null;
-		let handPose = null;
-
-		const targetRay = this._targetRay;
-		const grip = this._grip;
-		const hand = this._hand;
-
-		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
-
-			if ( hand && inputSource.hand ) {
-
-				handPose = true;
-
-				for ( const inputjoint of inputSource.hand.values() ) {
-
-					// Update the joints groups with the XRJoint poses
-					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
-
-					// The transform of this joint will be updated with the joint pose on each frame
-					const joint = this._getHandJoint( hand, inputjoint );
-
-					if ( jointPose !== null ) {
-
-						joint.matrix.fromArray( jointPose.transform.matrix );
-						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
-						joint.matrixWorldNeedsUpdate = true;
-						joint.jointRadius = jointPose.radius;
-
-					}
-
-					joint.visible = jointPose !== null;
-
-				}
-
-				// Custom events
-
-				// Check pinchz
-				const indexTip = hand.joints[ 'index-finger-tip' ];
-				const thumbTip = hand.joints[ 'thumb-tip' ];
-				const distance = indexTip.position.distanceTo( thumbTip.position );
-
-				const distanceToPinch = 0.02;
-				const threshold = 0.005;
-
-				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
-
-					hand.inputState.pinching = false;
-					this.dispatchEvent( {
-						type: 'pinchend',
-						handedness: inputSource.handedness,
-						target: this
-					} );
-
-				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
-
-					hand.inputState.pinching = true;
-					this.dispatchEvent( {
-						type: 'pinchstart',
-						handedness: inputSource.handedness,
-						target: this
-					} );
-
-				}
-
-			} else {
-
-				if ( grip !== null && inputSource.gripSpace ) {
-
-					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
-
-					if ( gripPose !== null ) {
-
-						grip.matrix.fromArray( gripPose.transform.matrix );
-						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
-						grip.matrixWorldNeedsUpdate = true;
-
-						if ( gripPose.linearVelocity ) {
-
-							grip.hasLinearVelocity = true;
-							grip.linearVelocity.copy( gripPose.linearVelocity );
-
-						} else {
-
-							grip.hasLinearVelocity = false;
-
-						}
-
-						if ( gripPose.angularVelocity ) {
-
-							grip.hasAngularVelocity = true;
-							grip.angularVelocity.copy( gripPose.angularVelocity );
-
-						} else {
-
-							grip.hasAngularVelocity = false;
-
-						}
-
-					}
-
-				}
-
-			}
-
-			if ( targetRay !== null ) {
-
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-				// Some runtimes (namely Vive Cosmos with Vive OpenXR Runtime) have only grip space and ray space is equal to it
-				if ( inputPose === null && gripPose !== null ) {
-
-					inputPose = gripPose;
-
-				}
-
-				if ( inputPose !== null ) {
-
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-					targetRay.matrixWorldNeedsUpdate = true;
-
-					if ( inputPose.linearVelocity ) {
-
-						targetRay.hasLinearVelocity = true;
-						targetRay.linearVelocity.copy( inputPose.linearVelocity );
-
-					} else {
-
-						targetRay.hasLinearVelocity = false;
-
-					}
-
-					if ( inputPose.angularVelocity ) {
-
-						targetRay.hasAngularVelocity = true;
-						targetRay.angularVelocity.copy( inputPose.angularVelocity );
-
-					} else {
-
-						targetRay.hasAngularVelocity = false;
-
-					}
-
-					this.dispatchEvent( _moveEvent );
-
-				}
-
-			}
-
-
-		}
-
-		if ( targetRay !== null ) {
-
-			targetRay.visible = ( inputPose !== null );
-
-		}
-
-		if ( grip !== null ) {
-
-			grip.visible = ( gripPose !== null );
-
-		}
-
-		if ( hand !== null ) {
-
-			hand.visible = ( handPose !== null );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a group representing the hand joint for the given input joint.
-	 *
-	 * @private
-	 * @param {Group} hand - The group representing the hand space.
-	 * @param {XRJointSpace} inputjoint - The hand joint data.
-	 * @return {Group} A group representing the hand joint for the given input joint.
-	 */
-	_getHandJoint( hand, inputjoint ) {
-
-		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
-
-			const joint = new Group();
-			joint.matrixAutoUpdate = false;
-			joint.visible = false;
-			hand.joints[ inputjoint.jointName ] = joint;
-
-			hand.add( joint );
-
-		}
-
-		return hand.joints[ inputjoint.jointName ];
-
-	}
-
-}
-
-/**
- * This class can be used to define an exponential squared fog,
- * which gives a clear view near the camera and a faster than exponentially
- * densening fog farther from the camera.
- *
- * ```js
- * const scene = new THREE.Scene();
- * scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
- * ```
- */
-class FogExp2 {
-
-	/**
-	 * Constructs a new fog.
-	 *
-	 * @param {number|Color} color - The fog's color.
-	 * @param {number} [density=0.00025] - Defines how fast the fog will grow dense.
-	 */
-	constructor( color, density = 0.00025 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isFogExp2 = true;
-
-		/**
-		 * The name of the fog.
-		 *
-		 * @type {string}
-		 */
-		this.name = '';
-
-		/**
-		 * The fog's color.
-		 *
-		 * @type {Color}
-		 */
-		this.color = new Color( color );
-
-		/**
-		 *  Defines how fast the fog will grow dense.
-		 *
-		 * @type {number}
-		 * @default 0.00025
-		 */
-		this.density = density;
-
-	}
-
-	/**
-	 * Returns a new fog with copied values from this instance.
-	 *
-	 * @return {FogExp2} A clone of this instance.
-	 */
-	clone() {
-
-		return new FogExp2( this.color, this.density );
-
-	}
-
-	/**
-	 * Serializes the fog into JSON.
-	 *
-	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized fog
-	 */
-	toJSON( /* meta */ ) {
-
-		return {
-			type: 'FogExp2',
-			name: this.name,
-			color: this.color.getHex(),
-			density: this.density
-		};
-
-	}
-
-}
-
-/**
- * This class can be used to define a linear fog that grows linearly denser
- * with the distance.
- *
- * ```js
- * const scene = new THREE.Scene();
- * scene.fog = new THREE.Fog( 0xcccccc, 10, 15 );
- * ```
- */
-class Fog {
-
-	/**
-	 * Constructs a new fog.
-	 *
-	 * @param {number|Color} color - The fog's color.
-	 * @param {number} [near=1] - The minimum distance to start applying fog.
-	 * @param {number} [far=1000] - The maximum distance at which fog stops being calculated and applied.
-	 */
-	constructor( color, near = 1, far = 1000 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isFog = true;
-
-		/**
-		 * The name of the fog.
-		 *
-		 * @type {string}
-		 */
-		this.name = '';
-
-		/**
-		 * The fog's color.
-		 *
-		 * @type {Color}
-		 */
-		this.color = new Color( color );
-
-		/**
-		 * The minimum distance to start applying fog. Objects that are less than
-		 * `near` units from the active camera won't be affected by fog.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.near = near;
-
-		/**
-		 * The maximum distance at which fog stops being calculated and applied.
-		 * Objects that are more than `far` units away from the active camera won't
-		 * be affected by fog.
-		 *
-		 * @type {number}
-		 * @default 1000
-		 */
-		this.far = far;
-
-	}
-
-	/**
-	 * Returns a new fog with copied values from this instance.
-	 *
-	 * @return {Fog} A clone of this instance.
-	 */
-	clone() {
-
-		return new Fog( this.color, this.near, this.far );
-
-	}
-
-	/**
-	 * Serializes the fog into JSON.
-	 *
-	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized fog
-	 */
-	toJSON( /* meta */ ) {
-
-		return {
-			type: 'Fog',
-			name: this.name,
-			color: this.color.getHex(),
-			near: this.near,
-			far: this.far
-		};
-
-	}
-
-}
-
-/**
- * Scenes allow you to set up what is to be rendered and where by three.js.
- * This is where you place 3D objects like meshes, lines or lights.
- *
- * @augments Object3D
- */
-class Scene extends Object3D {
-
-	/**
-	 * Constructs a new scene.
-	 */
-	constructor() {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isScene = true;
-
-		this.type = 'Scene';
-
-		/**
-		 * Defines the background of the scene. Valid inputs are:
-		 *
-		 * - A color for defining a uniform colored background.
-		 * - A texture for defining a (flat) textured background.
-		 * - Cube textures or equirectangular textures for defining a skybox.
-		 *
-		 * @type {?(Color|Texture)}
-		 * @default null
-		 */
-		this.background = null;
-
-		/**
-		 * Sets the environment map for all physical materials in the scene. However,
-		 * it's not possible to overwrite an existing texture assigned to the `envMap`
-		 * material property.
-		 *
-		 * @type {?Texture}
-		 * @default null
-		 */
-		this.environment = null;
-
-		/**
-		 * A fog instance defining the type of fog that affects everything
-		 * rendered in the scene.
-		 *
-		 * @type {?(Fog|FogExp2)}
-		 * @default null
-		 */
-		this.fog = null;
-
-		/**
-		 * Sets the blurriness of the background. Only influences environment maps
-		 * assigned to {@link Scene#background}. Valid input is a float between `0`
-		 * and `1`.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.backgroundBlurriness = 0;
-
-		/**
-		 * Attenuates the color of the background. Only applies to background textures.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.backgroundIntensity = 1;
-
-		/**
-		 * The rotation of the background in radians. Only influences environment maps
-		 * assigned to {@link Scene#background}.
-		 *
-		 * @type {Euler}
-		 * @default (0,0,0)
-		 */
-		this.backgroundRotation = new Euler();
-
-		/**
-		 * Attenuates the color of the environment. Only influences environment maps
-		 * assigned to {@link Scene#environment}.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.environmentIntensity = 1;
-
-		/**
-		 * The rotation of the environment map in radians. Only influences physical materials
-		 * in the scene when {@link Scene#environment} is used.
-		 *
-		 * @type {Euler}
-		 * @default (0,0,0)
-		 */
-		this.environmentRotation = new Euler();
-
-		/**
-		 * Forces everything in the scene to be rendered with the defined material. It is possible
-		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
-		 *
-		 * @type {?Material}
-		 * @default null
-		 */
-		this.overrideMaterial = null;
-
-		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
-
-			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
-
-		}
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		if ( source.background !== null ) this.background = source.background.clone();
-		if ( source.environment !== null ) this.environment = source.environment.clone();
-		if ( source.fog !== null ) this.fog = source.fog.clone();
-
-		this.backgroundBlurriness = source.backgroundBlurriness;
-		this.backgroundIntensity = source.backgroundIntensity;
-		this.backgroundRotation.copy( source.backgroundRotation );
-
-		this.environmentIntensity = source.environmentIntensity;
-		this.environmentRotation.copy( source.environmentRotation );
-
-		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
-
-		this.matrixAutoUpdate = source.matrixAutoUpdate;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
-
-		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
-		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
-		data.object.backgroundRotation = this.backgroundRotation.toArray();
-
-		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
-		data.object.environmentRotation = this.environmentRotation.toArray();
-
-		return data;
-
-	}
-
-}
-
-/**
- * "Interleaved" means that multiple attributes, possibly of different types,
- * (e.g., position, normal, uv, color) are packed into a single array buffer.
- *
- * An introduction into interleaved arrays can be found here: [Interleaved array basics](https://blog.tojicode.com/2011/05/interleaved-array-basics.html)
- */
-class InterleavedBuffer {
-
-	/**
-	 * Constructs a new interleaved buffer.
-	 *
-	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
-	 * @param {number} stride - The number of typed-array elements per vertex.
-	 */
-	constructor( array, stride ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isInterleavedBuffer = true;
-
-		/**
-		 * A typed array with a shared buffer storing attribute data.
-		 *
-		 * @type {TypedArray}
-		 */
-		this.array = array;
-
-		/**
-		 * The number of typed-array elements per vertex.
-		 *
-		 * @type {number}
-		 */
-		this.stride = stride;
-
-		/**
-		 * The total number of elements in the array
-		 *
-		 * @type {number}
-		 * @readonly
-		 */
-		this.count = array !== undefined ? array.length / stride : 0;
-
-		/**
-		 * Defines the intended usage pattern of the data store for optimization purposes.
-		 *
-		 * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
-		 * instantiate a new one and set the desired usage before the next render.
-		 *
-		 * @type {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)}
-		 * @default StaticDrawUsage
-		 */
-		this.usage = StaticDrawUsage;
-
-		/**
-		 * This can be used to only update some components of stored vectors (for example, just the
-		 * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
-		 *
-		 * @type {Array<Object>}
-		 */
-		this.updateRanges = [];
-
-		/**
-		 * A version number, incremented every time the `needsUpdate` is set to `true`.
-		 *
-		 * @type {number}
-		 */
-		this.version = 0;
-
-		/**
-		 * The UUID of the interleaved buffer.
-		 *
-		 * @type {string}
-		 * @readonly
-		 */
-		this.uuid = generateUUID();
-
-	}
-
-	/**
-	 * A callback function that is executed after the renderer has transferred the attribute array
-	 * data to the GPU.
-	 */
-	onUploadCallback() {}
-
-	/**
-	 * Flag to indicate that this attribute has changed and should be re-sent to
-	 * the GPU. Set this to `true` when you modify the value of the array.
-	 *
-	 * @type {number}
-	 * @default false
-	 * @param {boolean} value
-	 */
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-	/**
-	 * Sets the usage of this interleaved buffer.
-	 *
-	 * @param {(StaticDrawUsage|DynamicDrawUsage|StreamDrawUsage|StaticReadUsage|DynamicReadUsage|StreamReadUsage|StaticCopyUsage|DynamicCopyUsage|StreamCopyUsage)} value - The usage to set.
-	 * @return {InterleavedBuffer} A reference to this interleaved buffer.
-	 */
-	setUsage( value ) {
-
-		this.usage = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Adds a range of data in the data array to be updated on the GPU.
-	 *
-	 * @param {number} start - Position at which to start update.
-	 * @param {number} count - The number of components to update.
-	 */
-	addUpdateRange( start, count ) {
-
-		this.updateRanges.push( { start, count } );
-
-	}
-
-	/**
-	 * Clears the update ranges.
-	 */
-	clearUpdateRanges() {
-
-		this.updateRanges.length = 0;
-
-	}
-
-	/**
-	 * Copies the values of the given interleaved buffer to this instance.
-	 *
-	 * @param {InterleavedBuffer} source - The interleaved buffer to copy.
-	 * @return {InterleavedBuffer} A reference to this instance.
-	 */
-	copy( source ) {
-
-		this.array = new source.array.constructor( source.array );
-		this.count = source.count;
-		this.stride = source.stride;
-		this.usage = source.usage;
-
-		return this;
-
-	}
-
-	/**
-	 * Copies a vector from the given interleaved buffer to this one. The start
-	 * and destination position in the attribute buffers are represented by the
-	 * given indices.
-	 *
-	 * @param {number} index1 - The destination index into this interleaved buffer.
-	 * @param {InterleavedBuffer} interleavedBuffer - The interleaved buffer to copy from.
-	 * @param {number} index2 - The source index into the given interleaved buffer.
-	 * @return {InterleavedBuffer} A reference to this instance.
-	 */
-	copyAt( index1, interleavedBuffer, index2 ) {
-
-		index1 *= this.stride;
-		index2 *= interleavedBuffer.stride;
-
-		for ( let i = 0, l = this.stride; i < l; i ++ ) {
-
-			this.array[ index1 + i ] = interleavedBuffer.array[ index2 + i ];
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the given array data in the interleaved buffer.
-	 *
-	 * @param {(TypedArray|Array)} value - The array data to set.
-	 * @param {number} [offset=0] - The offset in this interleaved buffer's array.
-	 * @return {InterleavedBuffer} A reference to this instance.
-	 */
-	set( value, offset = 0 ) {
-
-		this.array.set( value, offset );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a new interleaved buffer with copied values from this instance.
-	 *
-	 * @param {Object} [data] - An object with shared array buffers that allows to retain shared structures.
-	 * @return {InterleavedBuffer} A clone of this instance.
-	 */
-	clone( data ) {
-
-		if ( data.arrayBuffers === undefined ) {
-
-			data.arrayBuffers = {};
-
-		}
-
-		if ( this.array.buffer._uuid === undefined ) {
-
-			this.array.buffer._uuid = generateUUID();
-
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = this.array.slice( 0 ).buffer;
-
-		}
-
-		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
-
-		const ib = new this.constructor( array, this.stride );
-		ib.setUsage( this.usage );
-
-		return ib;
-
-	}
-
-	/**
-	 * Sets the given callback function that is executed after the Renderer has transferred
-	 * the array data to the GPU. Can be used to perform clean-up operations after
-	 * the upload when data are not needed anymore on the CPU side.
-	 *
-	 * @param {Function} callback - The `onUpload()` callback.
-	 * @return {InterleavedBuffer} A reference to this instance.
-	 */
-	onUpload( callback ) {
-
-		this.onUploadCallback = callback;
-
-		return this;
-
-	}
-
-	/**
-	 * Serializes the interleaved buffer into JSON.
-	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized interleaved buffer.
-	 */
-	toJSON( data ) {
-
-		if ( data.arrayBuffers === undefined ) {
-
-			data.arrayBuffers = {};
-
-		}
-
-		// generate UUID for array buffer if necessary
-
-		if ( this.array.buffer._uuid === undefined ) {
-
-			this.array.buffer._uuid = generateUUID();
-
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
-
-		}
-
-		//
-
-		return {
-			uuid: this.uuid,
-			buffer: this.array.buffer._uuid,
-			type: this.array.constructor.name,
-			stride: this.stride
-		};
-
-	}
-
-}
-
-const _vector$7 = /*@__PURE__*/ new Vector3();
-
-/**
- * An alternative version of a buffer attribute with interleaved data. Interleaved
- * attributes share a common interleaved data storage ({@link InterleavedBuffer}) and refer with
- * different offsets into the buffer.
- */
-class InterleavedBufferAttribute {
-
-	/**
-	 * Constructs a new interleaved buffer attribute.
-	 *
-	 * @param {InterleavedBuffer} interleavedBuffer - The buffer holding the interleaved data.
-	 * @param {number} itemSize - The item size.
-	 * @param {number} offset - The attribute offset into the buffer.
-	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
-	 */
-	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isInterleavedBufferAttribute = true;
-
-		/**
-		 * The name of the buffer attribute.
-		 *
-		 * @type {string}
-		 */
-		this.name = '';
-
-		/**
-		 * The buffer holding the interleaved data.
-		 *
-		 * @type {InterleavedBuffer}
-		 */
-		this.data = interleavedBuffer;
-
-		/**
-		 * The item size, see {@link BufferAttribute#itemSize}.
-		 *
-		 * @type {number}
-		 */
-		this.itemSize = itemSize;
-
-		/**
-		 * The attribute offset into the buffer.
-		 *
-		 * @type {number}
-		 */
-		this.offset = offset;
-
-		/**
-		 * Whether the data are normalized or not, see {@link BufferAttribute#normalized}
-		 *
-		 * @type {InterleavedBuffer}
-		 */
-		this.normalized = normalized;
-
-	}
-
-	/**
-	 * The item count of this buffer attribute.
-	 *
-	 * @type {number}
-	 * @readonly
-	 */
-	get count() {
-
-		return this.data.count;
-
-	}
-
-	/**
-	 * The array holding the interleaved buffer attribute data.
-	 *
-	 * @type {TypedArray}
-	 */
-	get array() {
-
-		return this.data.array;
-
-	}
-
-	/**
-	 * Flag to indicate that this attribute has changed and should be re-sent to
-	 * the GPU. Set this to `true` when you modify the value of the array.
-	 *
-	 * @type {number}
-	 * @default false
-	 * @param {boolean} value
-	 */
-	set needsUpdate( value ) {
-
-		this.data.needsUpdate = value;
-
-	}
-
-	/**
-	 * Applies the given 4x4 matrix to the given attribute. Only works with
-	 * item size `3`.
-	 *
-	 * @param {Matrix4} m - The matrix to apply.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	applyMatrix4( m ) {
-
-		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
-
-			_vector$7.fromBufferAttribute( this, i );
-
-			_vector$7.applyMatrix4( m );
-
-			this.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 3x3 normal matrix to the given attribute. Only works with
-	 * item size `3`.
-	 *
-	 * @param {Matrix3} m - The normal matrix to apply.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	applyNormalMatrix( m ) {
-
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-			_vector$7.fromBufferAttribute( this, i );
-
-			_vector$7.applyNormalMatrix( m );
-
-			this.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Applies the given 4x4 matrix to the given attribute. Only works with
-	 * item size `3` and with direction vectors.
-	 *
-	 * @param {Matrix4} m - The matrix to apply.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	transformDirection( m ) {
-
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
-
-			_vector$7.fromBufferAttribute( this, i );
-
-			_vector$7.transformDirection( m );
-
-			this.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the given component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} component - The component index.
-	 * @return {number} The returned value.
-	 */
-	getComponent( index, component ) {
-
-		let value = this.array[ index * this.data.stride + this.offset + component ];
-
-		if ( this.normalized ) value = denormalize( value, this.array );
-
-		return value;
-
-	}
-
-	/**
-	 * Sets the given value to the given component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} component - The component index.
-	 * @param {number} value - The value to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setComponent( index, component, value ) {
-
-		if ( this.normalized ) value = normalize( value, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + component ] = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset ] = x;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} y - The value to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} z - The value to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} w - The value to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the x component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The x component.
-	 */
-	getX( index ) {
-
-		let x = this.data.array[ index * this.data.stride + this.offset ];
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	/**
-	 * Returns the y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The y component.
-	 */
-	getY( index ) {
-
-		let y = this.data.array[ index * this.data.stride + this.offset + 1 ];
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	/**
-	 * Returns the z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The z component.
-	 */
-	getZ( index ) {
-
-		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	/**
-	 * Returns the w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @return {number} The w component.
-	 */
-	getW( index ) {
-
-		let w = this.data.array[ index * this.data.stride + this.offset + 3 ];
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	/**
-	 * Sets the x and y component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setXY( index, x, y ) {
-
-		index = index * this.data.stride + this.offset;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x, y and z component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @param {number} z - The value for the z component to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setXYZ( index, x, y, z ) {
-
-		index = index * this.data.stride + this.offset;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the x, y, z and w component of the vector at the given index.
-	 *
-	 * @param {number} index - The index into the buffer attribute.
-	 * @param {number} x - The value for the x component to set.
-	 * @param {number} y - The value for the y component to set.
-	 * @param {number} z - The value for the z component to set.
-	 * @param {number} w - The value for the w component to set.
-	 * @return {InterleavedBufferAttribute} A reference to this instance.
-	 */
-	setXYZW( index, x, y, z, w ) {
-
-		index = index * this.data.stride + this.offset;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-		this.data.array[ index + 3 ] = w;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns a new buffer attribute with copied values from this instance.
-	 *
-	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
-	 *
-	 * @param {Object} [data] - An object with interleaved buffers that allows to retain the interleaved property.
-	 * @return {BufferAttribute|InterleavedBufferAttribute} A clone of this instance.
-	 */
-	clone( data ) {
-
-		if ( data === undefined ) {
-
-			log( 'InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
-
-			const array = [];
-
-			for ( let i = 0; i < this.count; i ++ ) {
-
-				const index = i * this.data.stride + this.offset;
-
-				for ( let j = 0; j < this.itemSize; j ++ ) {
-
-					array.push( this.data.array[ index + j ] );
-
-				}
-
-			}
-
-			return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
-
-		} else {
-
-			if ( data.interleavedBuffers === undefined ) {
-
-				data.interleavedBuffers = {};
-
-			}
-
-			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
-
-				data.interleavedBuffers[ this.data.uuid ] = this.data.clone( data );
-
-			}
-
-			return new InterleavedBufferAttribute( data.interleavedBuffers[ this.data.uuid ], this.itemSize, this.offset, this.normalized );
-
-		}
-
-	}
-
-	/**
-	 * Serializes the buffer attribute into JSON.
-	 *
-	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
-	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized buffer attribute.
-	 */
-	toJSON( data ) {
-
-		if ( data === undefined ) {
-
-			log( 'InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
-
-			const array = [];
-
-			for ( let i = 0; i < this.count; i ++ ) {
-
-				const index = i * this.data.stride + this.offset;
-
-				for ( let j = 0; j < this.itemSize; j ++ ) {
-
-					array.push( this.data.array[ index + j ] );
-
-				}
-
-			}
-
-			// de-interleave data and save it as an ordinary buffer attribute for now
-
-			return {
-				itemSize: this.itemSize,
-				type: this.array.constructor.name,
-				array: array,
-				normalized: this.normalized
-			};
-
-		} else {
-
-			// save as true interleaved attribute
-
-			if ( data.interleavedBuffers === undefined ) {
-
-				data.interleavedBuffers = {};
-
-			}
-
-			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
-
-				data.interleavedBuffers[ this.data.uuid ] = this.data.toJSON( data );
-
-			}
-
-			return {
-				isInterleavedBufferAttribute: true,
-				itemSize: this.itemSize,
-				data: this.data.uuid,
-				offset: this.offset,
-				normalized: this.normalized
-			};
-
-		}
-
-	}
-
-}
-
-/**
- * A material for rendering instances of {@link Sprite}.
- *
- * ```js
- * const map = new THREE.TextureLoader().load( 'textures/sprite.png' );
- * const material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
- *
- * const sprite = new THREE.Sprite( material );
- * sprite.scale.set(200, 200, 1)
- * scene.add( sprite );
- * ```
- *
- * @augments Material
- */
-class SpriteMaterial extends Material {
-
-	/**
-	 * Constructs a new sprite material.
-	 *
-	 * @param {Object} [parameters] - An object with one or more properties
-	 * defining the material's appearance. Any property of the material
-	 * (including any property from inherited materials) can be passed
-	 * in here. Color values can be passed any type of value accepted
-	 * by {@link Color#set}.
-	 */
-	constructor( parameters ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSpriteMaterial = true;
-
-		this.type = 'SpriteMaterial';
-
-		/**
-		 * Color of the material.
-		 *
-		 * @type {Color}
-		 * @default (1,1,1)
-		 */
-		this.color = new Color( 0xffffff );
-
-		/**
-		 * The color map. May optionally include an alpha channel, typically combined
-		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
-		 * color is modulated by the diffuse `color`.
-		 *
-		 * @type {?Texture}
-		 * @default null
-		 */
-		this.map = null;
-
-		/**
-		 * The alpha map is a grayscale texture that controls the opacity across the
-		 * surface (black: fully transparent; white: fully opaque).
-		 *
-		 * Only the color of the texture is used, ignoring the alpha channel if one
-		 * exists. For RGB and RGBA textures, the renderer will use the green channel
-		 * when sampling this texture due to the extra bit of precision provided for
-		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-		 * luminance/alpha textures will also still work as expected.
-		 *
-		 * @type {?Texture}
-		 * @default null
-		 */
-		this.alphaMap = null;
-
-		/**
-		 * The rotation of the sprite in radians.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.rotation = 0;
-
-		/**
-		 * Specifies whether size of the sprite is attenuated by the camera depth (perspective camera only).
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.sizeAttenuation = true;
-
-		/**
-		 * Overwritten since sprite materials are transparent
-		 * by default.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.transparent = true;
-
-		/**
-		 * Whether the material is affected by fog or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.fog = true;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.color.copy( source.color );
-
-		this.map = source.map;
-
-		this.alphaMap = source.alphaMap;
-
-		this.rotation = source.rotation;
-
-		this.sizeAttenuation = source.sizeAttenuation;
-
-		this.fog = source.fog;
-
-		return this;
-
-	}
-
-}
-
-let _geometry;
-
-const _intersectPoint = /*@__PURE__*/ new Vector3();
-const _worldScale = /*@__PURE__*/ new Vector3();
-const _mvPosition = /*@__PURE__*/ new Vector3();
-
-const _alignedPosition = /*@__PURE__*/ new Vector2();
-const _rotatedPosition = /*@__PURE__*/ new Vector2();
-const _viewWorldMatrix = /*@__PURE__*/ new Matrix4();
-
-const _vA = /*@__PURE__*/ new Vector3();
-const _vB = /*@__PURE__*/ new Vector3();
-const _vC = /*@__PURE__*/ new Vector3();
-
-const _uvA = /*@__PURE__*/ new Vector2();
-const _uvB = /*@__PURE__*/ new Vector2();
-const _uvC = /*@__PURE__*/ new Vector2();
-
-/**
- * A sprite is a plane that always faces towards the camera, generally with a
- * partially transparent texture applied.
- *
- * Sprites do not cast shadows, setting {@link Object3D#castShadow} to `true` will
- * have no effect.
- *
- * ```js
- * const map = new THREE.TextureLoader().load( 'sprite.png' );
- * const material = new THREE.SpriteMaterial( { map: map } );
- *
- * const sprite = new THREE.Sprite( material );
- * scene.add( sprite );
- * ```
- *
- * @augments Object3D
- */
-class Sprite extends Object3D {
-
-	/**
-	 * Constructs a new sprite.
-	 *
-	 * @param {(SpriteMaterial|SpriteNodeMaterial)} [material] - The sprite material.
-	 */
-	constructor( material = new SpriteMaterial() ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSprite = true;
-
-		this.type = 'Sprite';
-
-		if ( _geometry === undefined ) {
-
-			_geometry = new BufferGeometry();
-
-			const float32Array = new Float32Array( [
-				-0.5, -0.5, 0, 0, 0,
-				0.5, -0.5, 0, 1, 0,
-				0.5, 0.5, 0, 1, 1,
-				-0.5, 0.5, 0, 0, 1
-			] );
-
-			const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
-
-			_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-			_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-			_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
-
-		}
-
-		/**
-		 * The sprite geometry.
-		 *
-		 * @type {BufferGeometry}
-		 */
-		this.geometry = _geometry;
-
-		/**
-		 * The sprite material.
-		 *
-		 * @type {(SpriteMaterial|SpriteNodeMaterial)}
-		 */
-		this.material = material;
-
-		/**
-		 * The sprite's anchor point, and the point around which the sprite rotates.
-		 * A value of `(0.5, 0.5)` corresponds to the midpoint of the sprite. A value
-		 * of `(0, 0)` corresponds to the lower left corner of the sprite.
-		 *
-		 * @type {Vector2}
-		 * @default (0.5,0.5)
-		 */
-		this.center = new Vector2( 0.5, 0.5 );
-
-		/**
-		 * The number of instances of this sprite.
-		 * Can only be used with {@link WebGPURenderer}.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.count = 1;
-
-	}
-
-	/**
-	 * Computes intersection points between a casted ray and this sprite.
-	 *
-	 * @param {Raycaster} raycaster - The raycaster.
-	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
-	 */
-	raycast( raycaster, intersects ) {
-
-		if ( raycaster.camera === null ) {
-
-			error( 'Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
-
-		}
-
-		_worldScale.setFromMatrixScale( this.matrixWorld );
-
-		_viewWorldMatrix.copy( raycaster.camera.matrixWorld );
-		this.modelViewMatrix.multiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld );
-
-		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
-
-		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
-
-			_worldScale.multiplyScalar( - _mvPosition.z );
-
-		}
-
-		const rotation = this.material.rotation;
-		let sin, cos;
-
-		if ( rotation !== 0 ) {
-
-			cos = Math.cos( rotation );
-			sin = Math.sin( rotation );
-
-		}
-
-		const center = this.center;
-
-		transformVertex( _vA.set( -0.5, -0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( _vB.set( 0.5, -0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( _vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-
-		_uvA.set( 0, 0 );
-		_uvB.set( 1, 0 );
-		_uvC.set( 1, 1 );
-
-		// check first triangle
-		let intersect = raycaster.ray.intersectTriangle( _vA, _vB, _vC, false, _intersectPoint );
-
-		if ( intersect === null ) {
-
-			// check second triangle
-			transformVertex( _vB.set( -0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-			_uvB.set( 0, 1 );
-
-			intersect = raycaster.ray.intersectTriangle( _vA, _vC, _vB, false, _intersectPoint );
-			if ( intersect === null ) {
-
-				return;
-
-			}
-
-		}
-
-		const distance = raycaster.ray.origin.distanceTo( _intersectPoint );
-
-		if ( distance < raycaster.near || distance > raycaster.far ) return;
-
-		intersects.push( {
-
-			distance: distance,
-			point: _intersectPoint.clone(),
-			uv: Triangle.getInterpolation( _intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() ),
-			face: null,
-			object: this
-
-		} );
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		if ( source.center !== undefined ) this.center.copy( source.center );
-
-		this.material = source.material;
-
-		return this;
-
-	}
-
-}
-
-function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
-
-	// compute position in camera space
-	_alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
-
-	// to check if rotation is not zero
-	if ( sin !== undefined ) {
-
-		_rotatedPosition.x = ( cos * _alignedPosition.x ) - ( sin * _alignedPosition.y );
-		_rotatedPosition.y = ( sin * _alignedPosition.x ) + ( cos * _alignedPosition.y );
-
-	} else {
-
-		_rotatedPosition.copy( _alignedPosition );
-
-	}
-
-
-	vertexPosition.copy( mvPosition );
-	vertexPosition.x += _rotatedPosition.x;
-	vertexPosition.y += _rotatedPosition.y;
-
-	// transform to world space
-	vertexPosition.applyMatrix4( _viewWorldMatrix );
-
-}
-
-const _v1$2 = /*@__PURE__*/ new Vector3();
-const _v2$1 = /*@__PURE__*/ new Vector3();
-
-/**
- * A component for providing a basic Level of Detail (LOD) mechanism.
- *
- * Every LOD level is associated with an object, and rendering can be switched
- * between them at the distances specified. Typically you would create, say,
- * three meshes, one for far away (low detail), one for mid range (medium
- * detail) and one for close up (high detail).
- *
- * ```js
- * const lod = new THREE.LOD();
- * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
- *
- * //Create spheres with 3 levels of detail and create new LOD levels for them
- * for( let i = 0; i < 3; i++ ) {
- *
- * 	const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
- * 	const mesh = new THREE.Mesh( geometry, material );
- * 	lod.addLevel( mesh, i * 75 );
- *
- * }
- *
- * scene.add( lod );
- * ```
- *
- * @augments Object3D
- */
-class LOD extends Object3D {
-
-	/**
-	 * Constructs a new LOD.
-	 */
-	constructor() {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isLOD = true;
-
-		/**
-		 * The current LOD index.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._currentLevel = 0;
-
-		this.type = 'LOD';
-
-		Object.defineProperties( this, {
-			/**
-			 * This array holds the LOD levels.
-			 *
-			 * @name LOD#levels
-			 * @type {Array<{object:Object3D,distance:number,hysteresis:number}>}
-			 */
-			levels: {
-				enumerable: true,
-				value: []
-			}
-		} );
-
-		/**
-		 * Whether the LOD object is updated automatically by the renderer per frame
-		 * or not. If set to `false`, you have to call {@link LOD#update} in the
-		 * render loop by yourself.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.autoUpdate = true;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source, false );
-
-		const levels = source.levels;
-
-		for ( let i = 0, l = levels.length; i < l; i ++ ) {
-
-			const level = levels[ i ];
-
-			this.addLevel( level.object.clone(), level.distance, level.hysteresis );
-
-		}
-
-		this.autoUpdate = source.autoUpdate;
-
-		return this;
-
-	}
-
-	/**
-	 * Adds a mesh that will display at a certain distance and greater. Typically
-	 * the further away the distance, the lower the detail on the mesh.
-	 *
-	 * @param {Object3D} object - The 3D object to display at this level.
-	 * @param {number} [distance=0] - The distance at which to display this level of detail.
-	 * @param {number} [hysteresis=0] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
-	 * @return {LOD} A reference to this instance.
-	 */
-	addLevel( object, distance = 0, hysteresis = 0 ) {
-
-		distance = Math.abs( distance );
-
-		const levels = this.levels;
-
-		let l;
-
-		for ( l = 0; l < levels.length; l ++ ) {
-
-			if ( distance < levels[ l ].distance ) {
-
-				break;
-
-			}
-
-		}
-
-		levels.splice( l, 0, { distance: distance, hysteresis: hysteresis, object: object } );
-
-		this.add( object );
-
-		return this;
-
-	}
-
-	/**
-	 * Removes an existing level, based on the distance from the camera.
-	 * Returns `true` when the level has been removed. Otherwise `false`.
-	 *
-	 * @param {number} distance - Distance of the level to remove.
-	 * @return {boolean} Whether the level has been removed or not.
-	 */
-	removeLevel( distance ) {
-
-		const levels = this.levels;
-
-		for ( let i = 0; i < levels.length; i ++ ) {
-
-			if ( levels[ i ].distance === distance ) {
-
-				const removedElements = levels.splice( i, 1 );
-				this.remove( removedElements[ 0 ].object );
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-	/**
-	 * Returns the currently active LOD level index.
-	 *
-	 * @return {number} The current active LOD level index.
-	 */
-	getCurrentLevel() {
-
-		return this._currentLevel;
-
-	}
-
-	/**
-	 * Returns a reference to the first 3D object that is greater than
-	 * the given distance.
-	 *
-	 * @param {number} distance - The LOD distance.
-	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
-	 */
-	getObjectForDistance( distance ) {
-
-		const levels = this.levels;
-
-		if ( levels.length > 0 ) {
-
-			let i, l;
-
-			for ( i = 1, l = levels.length; i < l; i ++ ) {
-
-				let levelDistance = levels[ i ].distance;
-
-				if ( levels[ i ].object.visible ) {
-
-					levelDistance -= levelDistance * levels[ i ].hysteresis;
-
-				}
-
-				if ( distance < levelDistance ) {
-
-					break;
-
-				}
-
-			}
-
-			return levels[ i - 1 ].object;
-
-		}
-
-		return null;
-
-	}
-
-	/**
-	 * Computes intersection points between a casted ray and this LOD.
-	 *
-	 * @param {Raycaster} raycaster - The raycaster.
-	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
-	 */
-	raycast( raycaster, intersects ) {
-
-		const levels = this.levels;
-
-		if ( levels.length > 0 ) {
-
-			_v1$2.setFromMatrixPosition( this.matrixWorld );
-
-			const distance = raycaster.ray.origin.distanceTo( _v1$2 );
-
-			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
-
-		}
-
-	}
-
-	/**
-	 * Updates the LOD by computing which LOD level should be visible according
-	 * to the current distance of the given camera.
-	 *
-	 * @param {Camera} camera - The camera the scene is rendered with.
-	 */
-	update( camera ) {
-
-		const levels = this.levels;
-
-		if ( levels.length > 1 ) {
-
-			_v1$2.setFromMatrixPosition( camera.matrixWorld );
-			_v2$1.setFromMatrixPosition( this.matrixWorld );
-
-			const distance = _v1$2.distanceTo( _v2$1 ) / camera.zoom;
-
-			levels[ 0 ].object.visible = true;
-
-			let i, l;
-
-			for ( i = 1, l = levels.length; i < l; i ++ ) {
-
-				let levelDistance = levels[ i ].distance;
-
-				if ( levels[ i ].object.visible ) {
-
-					levelDistance -= levelDistance * levels[ i ].hysteresis;
-
-				}
-
-				if ( distance >= levelDistance ) {
-
-					levels[ i - 1 ].object.visible = false;
-					levels[ i ].object.visible = true;
-
-				} else {
-
-					break;
-
-				}
-
-			}
-
-			this._currentLevel = i - 1;
-
-			for ( ; i < l; i ++ ) {
-
-				levels[ i ].object.visible = false;
-
-			}
-
-		}
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
-
-		data.object.levels = [];
-
-		const levels = this.levels;
-
-		for ( let i = 0, l = levels.length; i < l; i ++ ) {
-
-			const level = levels[ i ];
-
-			data.object.levels.push( {
-				object: level.object.uuid,
-				distance: level.distance,
-				hysteresis: level.hysteresis
-			} );
-
-		}
-
-		return data;
-
-	}
 
 }
 
@@ -25851,6 +24364,15 @@ class InstancedMesh extends Mesh {
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 
 		/**
+		 * Represents the local transformation of all instances of the previous frame.
+		 * Required for computing velocity. Maintained in {@link InstanceNode}.
+		 *
+		 * @type {?InstancedBufferAttribute}
+		 * @default null
+		 */
+		this.previousInstanceMatrix = null;
+
+		/**
 		 * Represents the color of all instances. You have to set its
 		 * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
 		 * via {@link InstancedMesh#setColorAt}.
@@ -25978,6 +24500,8 @@ class InstancedMesh extends Mesh {
 		super.copy( source, recursive );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
+
+		if ( source.previousInstanceMatrix !== null ) this.previousInstanceMatrix = source.previousInstanceMatrix.clone();
 
 		if ( source.morphTexture !== null ) this.morphTexture = source.morphTexture.clone();
 		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
@@ -28024,12 +26548,10 @@ class BatchedMesh extends Mesh {
 			nextVertexStart += geometryInfo.reservedVertexCount;
 			geometryInfo.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
 
-			// step the next geometry points to the shifted position
-			this._nextIndexStart = geometry.index ? geometryInfo.indexStart + geometryInfo.reservedIndexCount : 0;
-			this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
-
 		}
 
+		this._nextIndexStart = nextIndexStart;
+		this._nextVertexStart = nextVertexStart;
 		this._visibilityChanged = true;
 
 		return this;
@@ -28172,7 +26694,7 @@ class BatchedMesh extends Mesh {
 	 * Sets the given color to the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to set the color of.
-	 * @param {Color} color - The color to set the instance to.
+	 * @param {Color|Vector4} color - The color to set the instance to. Use a `Vector4` to also define alpha.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	setColorAt( instanceId, color ) {
@@ -28196,8 +26718,8 @@ class BatchedMesh extends Mesh {
 	 * Returns the color of the defined instance.
 	 *
 	 * @param {number} instanceId - The ID of an instance to get the color of.
-	 * @param {Color} color - The target object that is used to store the method's result.
-	 * @return {Color} The instance's color.
+	 * @param {Color|Vector4} color - The target object that is used to store the method's result.
+	 * @return {Color|Vector4} The instance's color.  Use a `Vector4` to also retrieve alpha.
 	 */
 	getColorAt( instanceId, color ) {
 
@@ -28582,7 +27104,19 @@ class BatchedMesh extends Mesh {
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
-		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+		let bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
+
+		// the "wireframe" attribute implicitly creates a line attribute in the renderer, which is double
+		// the vertices to draw (3 lines per triangle) so we multiply the draw counts / starts and make
+		// assumptions about the index buffer byte size.
+		let multiDrawMultiplier = 1;
+		if ( material.wireframe ) {
+
+			multiDrawMultiplier = 2;
+			bytesPerElement = geometry.attributes.position.count > 65535 ? 4 : 2;
+
+		}
 
 		const instanceInfo = this._instanceInfo;
 		const multiDrawStarts = this._multiDrawStarts;
@@ -28663,8 +27197,8 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement;
-				multiDrawCounts[ multiDrawCount ] = item.count;
+				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement * multiDrawMultiplier;
+				multiDrawCounts[ multiDrawCount ] = item.count * multiDrawMultiplier;
 				indirectArray[ multiDrawCount ] = item.index;
 				multiDrawCount ++;
 
@@ -28694,8 +27228,8 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement;
-						multiDrawCounts[ multiDrawCount ] = geometryInfo.count;
+						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
+						multiDrawCounts[ multiDrawCount ] = geometryInfo.count * multiDrawMultiplier;
 						indirectArray[ multiDrawCount ] = i;
 						multiDrawCount ++;
 
@@ -29397,7 +27931,7 @@ class PointsMaterial extends Material {
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
-const _position$2 = /*@__PURE__*/ new Vector3();
+const _position$3 = /*@__PURE__*/ new Vector3();
 
 /**
  * A class for displaying points or point clouds.
@@ -29521,9 +28055,9 @@ class Points extends Object3D {
 
 				const a = index.getX( i );
 
-				_position$2.fromBufferAttribute( positionAttribute, a );
+				_position$3.fromBufferAttribute( positionAttribute, a );
 
-				testPoint( _position$2, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
+				testPoint( _position$3, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 			}
 
@@ -29534,9 +28068,9 @@ class Points extends Object3D {
 
 			for ( let i = start, l = end; i < l; i ++ ) {
 
-				_position$2.fromBufferAttribute( positionAttribute, i );
+				_position$3.fromBufferAttribute( positionAttribute, i );
 
-				testPoint( _position$2, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
+				testPoint( _position$3, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 			}
 
@@ -30099,6 +28633,83 @@ class CompressedCubeTexture extends CompressedTexture {
 }
 
 /**
+ * Creates a cube texture made up of six images.
+ *
+ * ```js
+ * const loader = new THREE.CubeTextureLoader();
+ * loader.setPath( 'textures/cube/pisa/' );
+ *
+ * const textureCube = loader.load( [
+ * 	'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'
+ * ] );
+ *
+ * const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+ * ```
+ *
+ * @augments Texture
+ */
+class CubeTexture extends Texture {
+
+	/**
+	 * Constructs a new cube texture.
+	 *
+	 * @param {Array<Image>} [images=[]] - An array holding a image for each side of a cube.
+	 * @param {number} [mapping=CubeReflectionMapping] - The texture mapping.
+	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
+	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
+	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
+	 * @param {number} [minFilter=LinearMipmapLinearFilter] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The texture format.
+	 * @param {number} [type=UnsignedByteType] - The texture type.
+	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
+	 * @param {string} [colorSpace=NoColorSpace] - The color space value.
+	 */
+	constructor( images = [], mapping = CubeReflectionMapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
+
+		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isCubeTexture = true;
+
+		/**
+		 * If set to `true`, the texture is flipped along the vertical axis when
+		 * uploaded to the GPU.
+		 *
+		 * Overwritten and set to `false` by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.flipY = false;
+
+	}
+
+	/**
+	 * Alias for {@link CubeTexture#image}.
+	 *
+	 * @type {Array<Image>}
+	 */
+	get images() {
+
+		return this.image;
+
+	}
+
+	set images( value ) {
+
+		this.image = value;
+
+	}
+
+}
+
+/**
  * Creates a texture from a canvas element.
  *
  * This is almost the same as the base texture class, except that it sets {@link Texture#needsUpdate}
@@ -30359,6 +28970,220 @@ class ExternalTexture extends Texture {
 		this.sourceTexture = source.sourceTexture;
 
 		return this;
+
+	}
+
+}
+
+/**
+ * A geometry class for a rectangular cuboid with a given width, height, and depth.
+ * On creation, the cuboid is centred on the origin, with each edge parallel to one
+ * of the axes.
+ *
+ * ```js
+ * const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+ * const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+ * const cube = new THREE.Mesh( geometry, material );
+ * scene.add( cube );
+ * ```
+ *
+ * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#BoxGeometry
+ */
+class BoxGeometry extends BufferGeometry {
+
+	/**
+	 * Constructs a new box geometry.
+	 *
+	 * @param {number} [width=1] - The width. That is, the length of the edges parallel to the X axis.
+	 * @param {number} [height=1] - The height. That is, the length of the edges parallel to the Y axis.
+	 * @param {number} [depth=1] - The depth. That is, the length of the edges parallel to the Z axis.
+	 * @param {number} [widthSegments=1] - Number of segmented rectangular faces along the width of the sides.
+	 * @param {number} [heightSegments=1] - Number of segmented rectangular faces along the height of the sides.
+	 * @param {number} [depthSegments=1] - Number of segmented rectangular faces along the depth of the sides.
+	 */
+	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
+
+		super();
+
+		this.type = 'BoxGeometry';
+
+		/**
+		 * Holds the constructor parameters that have been
+		 * used to generate the geometry. Any modification
+		 * after instantiation does not change the geometry.
+		 *
+		 * @type {Object}
+		 */
+		this.parameters = {
+			width: width,
+			height: height,
+			depth: depth,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments,
+			depthSegments: depthSegments
+		};
+
+		const scope = this;
+
+		// segments
+
+		widthSegments = Math.floor( widthSegments );
+		heightSegments = Math.floor( heightSegments );
+		depthSegments = Math.floor( depthSegments );
+
+		// buffers
+
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
+
+		// helper variables
+
+		let numberOfVertices = 0;
+		let groupStart = 0;
+
+		// build each side of the box geometry
+
+		buildPlane( 'z', 'y', 'x', -1, -1, depth, height, width, depthSegments, heightSegments, 0 ); // px
+		buildPlane( 'z', 'y', 'x', 1, -1, depth, height, - width, depthSegments, heightSegments, 1 ); // nx
+		buildPlane( 'x', 'z', 'y', 1, 1, width, depth, height, widthSegments, depthSegments, 2 ); // py
+		buildPlane( 'x', 'z', 'y', 1, -1, width, depth, - height, widthSegments, depthSegments, 3 ); // ny
+		buildPlane( 'x', 'y', 'z', 1, -1, width, height, depth, widthSegments, heightSegments, 4 ); // pz
+		buildPlane( 'x', 'y', 'z', -1, -1, width, height, - depth, widthSegments, heightSegments, 5 ); // nz
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+
+			const segmentWidth = width / gridX;
+			const segmentHeight = height / gridY;
+
+			const widthHalf = width / 2;
+			const heightHalf = height / 2;
+			const depthHalf = depth / 2;
+
+			const gridX1 = gridX + 1;
+			const gridY1 = gridY + 1;
+
+			let vertexCounter = 0;
+			let groupCount = 0;
+
+			const vector = new Vector3();
+
+			// generate vertices, normals and uvs
+
+			for ( let iy = 0; iy < gridY1; iy ++ ) {
+
+				const y = iy * segmentHeight - heightHalf;
+
+				for ( let ix = 0; ix < gridX1; ix ++ ) {
+
+					const x = ix * segmentWidth - widthHalf;
+
+					// set values to correct vector component
+
+					vector[ u ] = x * udir;
+					vector[ v ] = y * vdir;
+					vector[ w ] = depthHalf;
+
+					// now apply vector to vertex buffer
+
+					vertices.push( vector.x, vector.y, vector.z );
+
+					// set values to correct vector component
+
+					vector[ u ] = 0;
+					vector[ v ] = 0;
+					vector[ w ] = depth > 0 ? 1 : -1;
+
+					// now apply vector to normal buffer
+
+					normals.push( vector.x, vector.y, vector.z );
+
+					// uvs
+
+					uvs.push( ix / gridX );
+					uvs.push( 1 - ( iy / gridY ) );
+
+					// counters
+
+					vertexCounter += 1;
+
+				}
+
+			}
+
+			// indices
+
+			// 1. you need three indices to draw a single face
+			// 2. a single segment consists of two faces
+			// 3. so we need to generate six (2*3) indices per segment
+
+			for ( let iy = 0; iy < gridY; iy ++ ) {
+
+				for ( let ix = 0; ix < gridX; ix ++ ) {
+
+					const a = numberOfVertices + ix + gridX1 * iy;
+					const b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+					const c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+					const d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+
+					// faces
+
+					indices.push( a, b, d );
+					indices.push( b, c, d );
+
+					// increase counter
+
+					groupCount += 6;
+
+				}
+
+			}
+
+			// add a group to the geometry. this will ensure multi material support
+
+			scope.addGroup( groupStart, groupCount, materialIndex );
+
+			// calculate new start value for groups
+
+			groupStart += groupCount;
+
+			// update total number of vertices
+
+			numberOfVertices += vertexCounter;
+
+		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
+	/**
+	 * Factory method for creating an instance of this class from the given
+	 * JSON object.
+	 *
+	 * @param {Object} data - A JSON object representing the serialized geometry.
+	 * @return {BoxGeometry} A new instance.
+	 */
+	static fromJSON( data ) {
+
+		return new BoxGeometry( data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments );
 
 	}
 
@@ -37409,8 +36234,10 @@ class TorusGeometry extends BufferGeometry {
 	 * @param {number} [radialSegments=12] - The number of radial segments.
 	 * @param {number} [tubularSegments=48] - The number of tubular segments.
 	 * @param {number} [arc=Math.PI*2] - Central angle in radians.
+	 * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
 	 */
-	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -37428,7 +36255,9 @@ class TorusGeometry extends BufferGeometry {
 			tube: tube,
 			radialSegments: radialSegments,
 			tubularSegments: tubularSegments,
-			arc: arc
+			arc: arc,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength,
 		};
 
 		radialSegments = Math.floor( radialSegments );
@@ -37451,10 +36280,11 @@ class TorusGeometry extends BufferGeometry {
 
 		for ( let j = 0; j <= radialSegments; j ++ ) {
 
+			const v = thetaStart + ( j / radialSegments ) * thetaLength;
+
 			for ( let i = 0; i <= tubularSegments; i ++ ) {
 
 				const u = i / tubularSegments * arc;
-				const v = j / radialSegments * Math.PI * 2;
 
 				// vertex
 
@@ -38263,6 +37093,533 @@ class ShadowMaterial extends Material {
 		this.fog = source.fog;
 
 		return this;
+
+	}
+
+}
+
+/**
+ * Provides utility functions for managing uniforms.
+ *
+ * @module UniformsUtils
+ */
+
+/**
+ * Clones the given uniform definitions by performing a deep-copy. That means
+ * if the value of a uniform refers to an object like a Vector3 or Texture,
+ * the cloned uniform will refer to a new object reference.
+ *
+ * @param {Object} src - An object representing uniform definitions.
+ * @return {Object} The cloned uniforms.
+ */
+function cloneUniforms( src ) {
+
+	const dst = {};
+
+	for ( const u in src ) {
+
+		dst[ u ] = {};
+
+		for ( const p in src[ u ] ) {
+
+			const property = src[ u ][ p ];
+
+			if ( property && ( property.isColor ||
+				property.isMatrix3 || property.isMatrix4 ||
+				property.isVector2 || property.isVector3 || property.isVector4 ||
+				property.isTexture || property.isQuaternion ) ) {
+
+				if ( property.isRenderTargetTexture ) {
+
+					warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
+					dst[ u ][ p ] = null;
+
+				} else {
+
+					dst[ u ][ p ] = property.clone();
+
+				}
+
+			} else if ( Array.isArray( property ) ) {
+
+				dst[ u ][ p ] = property.slice();
+
+			} else {
+
+				dst[ u ][ p ] = property;
+
+			}
+
+		}
+
+	}
+
+	return dst;
+
+}
+
+/**
+ * Merges the given uniform definitions into a single object. Since the
+ * method internally uses cloneUniforms(), it performs a deep-copy when
+ * producing the merged uniform definitions.
+ *
+ * @param {Array} uniforms - An array of objects containing uniform definitions.
+ * @return {Object} The merged uniforms.
+ */
+function mergeUniforms( uniforms ) {
+
+	const merged = {};
+
+	for ( let u = 0; u < uniforms.length; u ++ ) {
+
+		const tmp = cloneUniforms( uniforms[ u ] );
+
+		for ( const p in tmp ) {
+
+			merged[ p ] = tmp[ p ];
+
+		}
+
+	}
+
+	return merged;
+
+}
+
+function cloneUniformsGroups( src ) {
+
+	const dst = [];
+
+	for ( let u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
+
+}
+
+function getUnlitUniformColorSpace( renderer ) {
+
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	if ( currentRenderTarget === null ) {
+
+		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
+		return renderer.outputColorSpace;
+
+	}
+
+	// https://github.com/mrdoob/three.js/issues/27868
+	if ( currentRenderTarget.isXRRenderTarget === true ) {
+
+		return currentRenderTarget.texture.colorSpace;
+
+	}
+
+	return ColorManagement.workingColorSpace;
+
+}
+
+// Legacy
+
+const UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
+
+var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}";
+
+var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
+
+/**
+ * A material rendered with custom shaders. A shader is a small program written in GLSL.
+ * that runs on the GPU. You may want to use a custom shader if you need to implement an
+ * effect not included with any of the built-in materials.
+ *
+ * There are the following notes to bear in mind when using a `ShaderMaterial`:
+ *
+ * - `ShaderMaterial` can only be used with {@link WebGLRenderer}.
+ * - Built in attributes and uniforms are passed to the shaders along with your code. If
+ * you don't want that, use {@link RawShaderMaterial} instead.
+ * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end`
+ * in order to unroll a `for` loop in GLSL by the shader preprocessor. The directive has
+ * to be placed right above the loop. The loop formatting has to correspond to a defined standard.
+ *   - The loop has to be [normalized](https://en.wikipedia.org/wiki/Normalized_loop).
+ *   - The loop variable has to be *i*.
+ *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly
+ * value of *i* for the given iteration and can be used in preprocessor
+ * statements.
+ *
+ * ```js
+ * const material = new THREE.ShaderMaterial( {
+ * 	uniforms: {
+ * 		time: { value: 1.0 },
+ * 		resolution: { value: new THREE.Vector2() }
+ * 	},
+ * 	vertexShader: document.getElementById( 'vertexShader' ).textContent,
+ * 	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+ * } );
+ * ```
+ *
+ * @augments Material
+ */
+class ShaderMaterial extends Material {
+
+	/**
+	 * Constructs a new shader material.
+	 *
+	 * @param {Object} [parameters] - An object with one or more properties
+	 * defining the material's appearance. Any property of the material
+	 * (including any property from inherited materials) can be passed
+	 * in here. Color values can be passed any type of value accepted
+	 * by {@link Color#set}.
+	 */
+	constructor( parameters ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isShaderMaterial = true;
+
+		this.type = 'ShaderMaterial';
+
+		/**
+		 * Defines custom constants using `#define` directives within the GLSL code
+		 * for both the vertex shader and the fragment shader; each key/value pair
+		 * yields another directive.
+		 * ```js
+		 * defines: {
+		 * 	FOO: 15,
+		 * 	BAR: true
+		 * }
+		 * ```
+		 * Yields the lines:
+		 * ```
+		 * #define FOO 15
+		 * #define BAR true
+		 * ```
+		 *
+		 * @type {Object}
+		 */
+		this.defines = {};
+
+		/**
+		 * An object of the form:
+		 * ```js
+		 * {
+		 * 	"uniform1": { value: 1.0 },
+		 * 	"uniform2": { value: 2 }
+		 * }
+		 * ```
+		 * specifying the uniforms to be passed to the shader code; keys are uniform
+		 * names, values are definitions of the form
+		 * ```
+		 * {
+		 * 	value: 1.0
+		 * }
+		 * ```
+		 * where `value` is the value of the uniform. Names must match the name of
+		 * the uniform, as defined in the GLSL code. Note that uniforms are refreshed
+		 * on every frame, so updating the value of the uniform will immediately
+		 * update the value available to the GLSL code.
+		 *
+		 * @type {Object}
+		 */
+		this.uniforms = {};
+
+		/**
+		 * An array holding uniforms groups for configuring UBOs.
+		 *
+		 * @type {Array<UniformsGroup>}
+		 */
+		this.uniformsGroups = [];
+
+		/**
+		 * Vertex shader GLSL code. This is the actual code for the shader.
+		 *
+		 * @type {string}
+		 */
+		this.vertexShader = default_vertex;
+
+		/**
+		 * Fragment shader GLSL code. This is the actual code for the shader.
+		 *
+		 * @type {string}
+		 */
+		this.fragmentShader = default_fragment;
+
+		/**
+		 * Controls line thickness or lines.
+		 *
+		 * WebGL and WebGPU ignore this setting and always render line primitives with a
+		 * width of one pixel.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.linewidth = 1;
+
+		/**
+		 * Renders the geometry as a wireframe.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.wireframe = false;
+
+		/**
+		 * Controls the thickness of the wireframe.
+		 *
+		 * WebGL and WebGPU ignore this property and always render
+		 * 1 pixel wide lines.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.wireframeLinewidth = 1;
+
+		/**
+		 * Defines whether the material color is affected by global fog settings; `true`
+		 * to pass fog uniforms to the shader.
+		 *
+		 * Setting this property to `true` requires the definition of fog uniforms. It is
+		 * recommended to use `UniformsUtils.merge()` to combine the custom shader uniforms
+		 * with predefined fog uniforms.
+		 *
+		 * ```js
+		 * const material = new ShaderMaterial( {
+		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+		 *     vertexShader: vertexShader,
+		 *     fragmentShader: fragmentShader,
+		 *     fog: true
+		 * } );
+		 * ```
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.fog = false;
+
+		/**
+		 * Defines whether this material uses lighting; `true` to pass uniform data
+		 * related to lighting to this shader.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.lights = false;
+
+		/**
+		 * Defines whether this material supports clipping; `true` to let the renderer
+		 * pass the clippingPlanes uniform.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.clipping = false;
+
+		/**
+		 * Overwritten and set to `true` by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.forceSinglePass = true;
+
+		/**
+		 * This object allows to enable certain WebGL 2 extensions.
+		 *
+		 * - clipCullDistance: set to `true` to use vertex shader clipping
+		 * - multiDraw: set to `true` to use vertex shader multi_draw / enable gl_DrawID
+		 *
+		 * @type {{clipCullDistance:false,multiDraw:false}}
+		 */
+		this.extensions = {
+			clipCullDistance: false, // set to use vertex shader clipping
+			multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
+		};
+
+		/**
+		 * When the rendered geometry doesn't include these attributes but the
+		 * material does, these default values will be passed to the shaders. This
+		 * avoids errors when buffer data is missing.
+		 *
+		 * - color: [ 1, 1, 1 ]
+		 * - uv: [ 0, 0 ]
+		 * - uv1: [ 0, 0 ]
+		 *
+		 * @type {Object}
+		 */
+		this.defaultAttributeValues = {
+			'color': [ 1, 1, 1 ],
+			'uv': [ 0, 0 ],
+			'uv1': [ 0, 0 ]
+		};
+
+		/**
+		 * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
+		 * to bind a generic vertex index to an attribute variable.
+		 *
+		 * @type {string|undefined}
+		 * @default undefined
+		 */
+		this.index0AttributeName = undefined;
+
+		/**
+		 * Can be used to force a uniform update while changing uniforms in
+		 * {@link Object3D#onBeforeRender}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.uniformsNeedUpdate = false;
+
+		/**
+		 * Defines the GLSL version of custom shader code.
+		 *
+		 * @type {?(GLSL1|GLSL3)}
+		 * @default null
+		 */
+		this.glslVersion = null;
+
+		if ( parameters !== undefined ) {
+
+			this.setValues( parameters );
+
+		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.fragmentShader = source.fragmentShader;
+		this.vertexShader = source.vertexShader;
+
+		this.uniforms = cloneUniforms( source.uniforms );
+		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
+
+		this.defines = Object.assign( {}, source.defines );
+
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+
+		this.fog = source.fog;
+		this.lights = source.lights;
+		this.clipping = source.clipping;
+
+		this.extensions = Object.assign( {}, source.extensions );
+
+		this.glslVersion = source.glslVersion;
+
+		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
+
+		this.index0AttributeName = source.index0AttributeName;
+
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.glslVersion = this.glslVersion;
+		data.uniforms = {};
+
+		for ( const name in this.uniforms ) {
+
+			const uniform = this.uniforms[ name ];
+			const value = uniform.value;
+
+			if ( value && value.isTexture ) {
+
+				data.uniforms[ name ] = {
+					type: 't',
+					value: value.toJSON( meta ).uuid
+				};
+
+			} else if ( value && value.isColor ) {
+
+				data.uniforms[ name ] = {
+					type: 'c',
+					value: value.getHex()
+				};
+
+			} else if ( value && value.isVector2 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v2',
+					value: value.toArray()
+				};
+
+			} else if ( value && value.isVector3 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v3',
+					value: value.toArray()
+				};
+
+			} else if ( value && value.isVector4 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v4',
+					value: value.toArray()
+				};
+
+			} else if ( value && value.isMatrix3 ) {
+
+				data.uniforms[ name ] = {
+					type: 'm3',
+					value: value.toArray()
+				};
+
+			} else if ( value && value.isMatrix4 ) {
+
+				data.uniforms[ name ] = {
+					type: 'm4',
+					value: value.toArray()
+				};
+
+			} else {
+
+				data.uniforms[ name ] = {
+					value: value
+				};
+
+				// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
+
+			}
+
+		}
+
+		if ( Object.keys( this.defines ).length > 0 ) data.defines = this.defines;
+
+		data.vertexShader = this.vertexShader;
+		data.fragmentShader = this.fragmentShader;
+
+		data.lights = this.lights;
+		data.clipping = this.clipping;
+
+		const extensions = {};
+
+		for ( const key in this.extensions ) {
+
+			if ( this.extensions[ key ] === true ) extensions[ key ] = true;
+
+		}
+
+		if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
+
+		return data;
 
 	}
 
@@ -39536,6 +38893,14 @@ class MeshPhongMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
+		 * Scales the effect of the environment map by multiplying its color.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.envMapIntensity = 1.0;
+
+		/**
 		 * The index of refraction (IOR) of air (approximately 1) divided by the
 		 * index of refraction of the material. It is used with environment mapping
 		 * modes {@link CubeRefractionMapping} and {@link EquirectangularRefractionMapping}.
@@ -39643,6 +39008,7 @@ class MeshPhongMaterial extends Material {
 		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
+		this.envMapIntensity = source.envMapIntensity;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;
@@ -40409,6 +39775,14 @@ class MeshLambertMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
+		 * Scales the effect of the environment map by multiplying its color.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.envMapIntensity = 1.0;
+
+		/**
 		 * The index of refraction (IOR) of air (approximately 1) divided by the
 		 * index of refraction of the material. It is used with environment mapping
 		 * modes {@link CubeRefractionMapping} and {@link EquirectangularRefractionMapping}.
@@ -40514,6 +39888,7 @@ class MeshLambertMaterial extends Material {
 		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
+		this.envMapIntensity = source.envMapIntensity;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;
@@ -42146,7 +41521,112 @@ class DiscreteInterpolant extends Interpolant {
 }
 
 /**
- * Represents s a timed sequence of keyframes, which are composed of lists of
+ * A Bezier interpolant using cubic Bezier curves with 2D control points.
+ *
+ * This interpolant supports the COLLADA/Maya style of Bezier animation where
+ * each keyframe has explicit in/out tangent control points specified as
+ * 2D coordinates (time, value).
+ *
+ * The tangent data must be provided via the `settings` object:
+ * - `settings.inTangents`: Float32Array with [time, value] pairs per keyframe per component
+ * - `settings.outTangents`: Float32Array with [time, value] pairs per keyframe per component
+ *
+ * For a track with N keyframes and stride S:
+ * - Each tangent array has N * S * 2 values
+ * - Layout: [k0_c0_time, k0_c0_value, k0_c1_time, k0_c1_value, ..., k0_cS_time, k0_cS_value,
+ *            k1_c0_time, k1_c0_value, ...]
+ *
+ * @augments Interpolant
+ */
+class BezierInterpolant extends Interpolant {
+
+	interpolate_( i1, t0, t, t1 ) {
+
+		const result = this.resultBuffer;
+		const values = this.sampleValues;
+		const stride = this.valueSize;
+
+		const offset1 = i1 * stride;
+		const offset0 = offset1 - stride;
+
+		const settings = this.settings || this.DefaultSettings_;
+		const inTangents = settings.inTangents;
+		const outTangents = settings.outTangents;
+
+		// If no tangent data, fall back to linear interpolation
+		if ( ! inTangents || ! outTangents ) {
+
+			const weight1 = ( t - t0 ) / ( t1 - t0 );
+			const weight0 = 1 - weight1;
+
+			for ( let i = 0; i !== stride; ++ i ) {
+
+				result[ i ] = values[ offset0 + i ] * weight0 + values[ offset1 + i ] * weight1;
+
+			}
+
+			return result;
+
+		}
+
+		const tangentStride = stride * 2;
+		const i0 = i1 - 1;
+
+		for ( let i = 0; i !== stride; ++ i ) {
+
+			const v0 = values[ offset0 + i ];
+			const v1 = values[ offset1 + i ];
+
+			// outTangent of previous keyframe (C0)
+			const outTangentOffset = i0 * tangentStride + i * 2;
+			const c0x = outTangents[ outTangentOffset ];
+			const c0y = outTangents[ outTangentOffset + 1 ];
+
+			// inTangent of current keyframe (C1)
+			const inTangentOffset = i1 * tangentStride + i * 2;
+			const c1x = inTangents[ inTangentOffset ];
+			const c1y = inTangents[ inTangentOffset + 1 ];
+
+			// Solve for Bezier parameter s where Bx(s) = t using Newton-Raphson
+			let s = ( t - t0 ) / ( t1 - t0 );
+			let s2, s3, oneMinusS, oneMinusS2, oneMinusS3;
+
+			for ( let iter = 0; iter < 8; iter ++ ) {
+
+				s2 = s * s;
+				s3 = s2 * s;
+				oneMinusS = 1 - s;
+				oneMinusS2 = oneMinusS * oneMinusS;
+				oneMinusS3 = oneMinusS2 * oneMinusS;
+
+				// Bezier X(s) = (1-s)³·t0 + 3(1-s)²s·c0x + 3(1-s)s²·c1x + s³·t1
+				const bx = oneMinusS3 * t0 + 3 * oneMinusS2 * s * c0x + 3 * oneMinusS * s2 * c1x + s3 * t1;
+
+				const error = bx - t;
+				if ( Math.abs( error ) < 1e-10 ) break;
+
+				// Derivative dX/ds
+				const dbx = 3 * oneMinusS2 * ( c0x - t0 ) + 6 * oneMinusS * s * ( c1x - c0x ) + 3 * s2 * ( t1 - c1x );
+				if ( Math.abs( dbx ) < 1e-10 ) break;
+
+				s = s - error / dbx;
+				s = Math.max( 0, Math.min( 1, s ) );
+
+			}
+
+			// Evaluate Bezier Y(s)
+			result[ i ] = oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
+
+		}
+
+		return result;
+
+	}
+
+}
+
+/**
+ * Represents a timed sequence of keyframes, which are composed of lists of
  * times and related values, and which are used to animate a specific property
  * of an object.
  */
@@ -42158,7 +41638,7 @@ class KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number|string|boolean>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -42277,9 +41757,36 @@ class KeyframeTrack {
 	}
 
 	/**
+	 * Factory method for creating a new Bezier interpolant.
+	 *
+	 * The Bezier interpolant requires tangent data to be set via the `settings` property
+	 * on the track before creating the interpolant. The settings should contain:
+	 * - `inTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 * - `outTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 *
+	 * @static
+	 * @param {TypedArray} [result] - The result buffer.
+	 * @return {BezierInterpolant} The new interpolant.
+	 */
+	InterpolantFactoryMethodBezier( result ) {
+
+		const interpolant = new BezierInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		// Pass tangent data from track settings to interpolant
+		if ( this.settings ) {
+
+			interpolant.settings = this.settings;
+
+		}
+
+		return interpolant;
+
+	}
+
+	/**
 	 * Defines the interpolation factor method for this keyframe track.
 	 *
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} interpolation - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} interpolation - The interpolation type.
 	 * @return {KeyframeTrack} A reference to this keyframe track.
 	 */
 	setInterpolation( interpolation ) {
@@ -42303,6 +41810,12 @@ class KeyframeTrack {
 			case InterpolateSmooth:
 
 				factoryMethod = this.InterpolantFactoryMethodSmooth;
+
+				break;
+
+			case InterpolateBezier:
+
+				factoryMethod = this.InterpolantFactoryMethodBezier;
 
 				break;
 
@@ -42342,7 +41855,7 @@ class KeyframeTrack {
 	/**
 	 * Returns the current interpolation type.
 	 *
-	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} The interpolation type.
+	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} The interpolation type.
 	 */
 	getInterpolation() {
 
@@ -42359,6 +41872,10 @@ class KeyframeTrack {
 			case this.InterpolantFactoryMethodSmooth:
 
 				return InterpolateSmooth;
+
+			case this.InterpolantFactoryMethodBezier:
+
+				return InterpolateBezier;
 
 		}
 
@@ -42561,7 +42078,7 @@ class KeyframeTrack {
 	 * Optimizes this keyframe track by removing equivalent sequential keys (which are
 	 * common in morph target sequences).
 	 *
-	 * @return {AnimationClip} A reference to this animation clip.
+	 * @return {KeyframeTrack} A reference to this keyframe track.
 	 */
 	optimize() {
 
@@ -42725,7 +42242,7 @@ KeyframeTrack.prototype.ValueBufferType = Float32Array;
 /**
  * The default interpolation type of this keyframe track.
  *
- * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)}
+ * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)}
  * @default InterpolateLinear
  */
 KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
@@ -43306,7 +42823,7 @@ class AnimationClip {
 	 * @static
 	 * @deprecated since r175.
 	 * @param {Object} animation - A serialized animation clip as JSON.
-	 * @param {Array<Bones>} bones - An array of bones.
+	 * @param {Array<Bone>} bones - An array of bones.
 	 * @return {?AnimationClip} The new animation clip.
 	 */
 	static parseAnimation( animation, bones ) {
@@ -43667,6 +43184,8 @@ const Cache = {
 
 		if ( this.enabled === false ) return;
 
+		if ( isBlobURL( key ) ) return;
+
 		// log( 'Cache', 'Adding key:', key );
 
 		this.files[ key ] = file;
@@ -43683,6 +43202,8 @@ const Cache = {
 	get: function ( key ) {
 
 		if ( this.enabled === false ) return;
+
+		if ( isBlobURL( key ) ) return;
 
 		// log( 'Cache', 'Checking key:', key );
 
@@ -43714,6 +43235,31 @@ const Cache = {
 	}
 
 };
+
+/**
+ * Returns true if the given cache key contains the blob: scheme.
+ *
+ * @private
+ * @param {string} key - The cache key.
+ * @return {boolean} Whether the given cache key contains the blob: scheme or not.
+ */
+function isBlobURL( key ) {
+
+	try {
+
+		const urlString = key.slice( key.indexOf( ':' ) + 1 ); // remove type identifier
+
+		const url = new URL( urlString );
+		return url.protocol === 'blob:';
+
+	} catch ( e ) {
+
+		// If the string is not a valid URL, it throws an error
+		return false;
+
+	}
+
+}
 
 /**
  * Handles and keeps track of loaded and pending data. A default global
@@ -44104,6 +43650,12 @@ class Loader {
 		 */
 		this.requestHeader = {};
 
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		}
+
 	}
 
 	/**
@@ -44297,7 +43849,7 @@ class FileLoader extends Loader {
 
 		/**
 		 * The expected mime type. Valid values can be found
-		 * [here](hhttps://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
+		 * [here](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
 		 *
 		 * @type {string}
 		 */
@@ -45528,6 +45080,16 @@ class LightShadow {
 		this.bias = 0;
 
 		/**
+		 * A node version of `bias`. Only supported with `WebGPURenderer`.
+		 *
+		 * If a bias node is defined, `bias` has no effect.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.biasNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -45678,12 +45240,12 @@ class LightShadow {
 		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
-		if ( shadowCamera.reversedDepth ) {
+		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
 			shadowMatrix.set(
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
-				0.0, 0.0, 1.0, 0.0,
+				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
 				0.0, 0.0, 0.0, 1.0
 			);
 
@@ -45767,6 +45329,8 @@ class LightShadow {
 
 		this.mapSize.copy( source.mapSize );
 
+		this.biasNode = source.biasNode;
+
 		return this;
 
 	}
@@ -45802,6 +45366,560 @@ class LightShadow {
 		delete object.camera.matrix;
 
 		return object;
+
+	}
+
+}
+
+const _position$2 = /*@__PURE__*/ new Vector3();
+const _quaternion$2 = /*@__PURE__*/ new Quaternion();
+const _scale$2 = /*@__PURE__*/ new Vector3();
+
+/**
+ * Abstract base class for cameras. This class should always be inherited
+ * when you build a new camera.
+ *
+ * @abstract
+ * @augments Object3D
+ */
+class Camera extends Object3D {
+
+	/**
+	 * Constructs a new camera.
+	 */
+	constructor() {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isCamera = true;
+
+		this.type = 'Camera';
+
+		/**
+		 * The inverse of the camera's world matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.matrixWorldInverse = new Matrix4();
+
+		/**
+		 * The camera's projection matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.projectionMatrix = new Matrix4();
+
+		/**
+		 * The inverse of the camera's projection matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.projectionMatrixInverse = new Matrix4();
+
+		/**
+		 * The coordinate system in which the camera is used.
+		 *
+		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
+		 */
+		this.coordinateSystem = WebGLCoordinateSystem;
+
+		this._reversedDepth = false;
+
+	}
+
+	/**
+	 * The flag that indicates whether the camera uses a reversed depth buffer.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get reversedDepth() {
+
+		return this._reversedDepth;
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
+		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
+
+		this.coordinateSystem = source.coordinateSystem;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a vector representing the ("look") direction of the 3D object in world space.
+	 *
+	 * This method is overwritten since cameras have a different forward vector compared to other
+	 * 3D objects. A camera looks down its local, negative z-axis by default.
+	 *
+	 * @param {Vector3} target - The target vector the result is stored to.
+	 * @return {Vector3} The 3D object's direction in world space.
+	 */
+	getWorldDirection( target ) {
+
+		return super.getWorldDirection( target ).negate();
+
+	}
+
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
+
+		// exclude scale from view matrix to be glTF conform
+
+		this.matrixWorld.decompose( _position$2, _quaternion$2, _scale$2 );
+
+		if ( _scale$2.x === 1 && _scale$2.y === 1 && _scale$2.z === 1 ) {
+
+			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+
+		} else {
+
+			this.matrixWorldInverse.compose( _position$2, _quaternion$2, _scale$2.set( 1, 1, 1 ) ).invert();
+
+		}
+
+	}
+
+	updateWorldMatrix( updateParents, updateChildren ) {
+
+		super.updateWorldMatrix( updateParents, updateChildren );
+
+		// exclude scale from view matrix to be glTF conform
+
+		this.matrixWorld.decompose( _position$2, _quaternion$2, _scale$2 );
+
+		if ( _scale$2.x === 1 && _scale$2.y === 1 && _scale$2.z === 1 ) {
+
+			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+
+		} else {
+
+			this.matrixWorldInverse.compose( _position$2, _quaternion$2, _scale$2.set( 1, 1, 1 ) ).invert();
+
+		}
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+}
+
+const _v3$1 = /*@__PURE__*/ new Vector3();
+const _minTarget = /*@__PURE__*/ new Vector2();
+const _maxTarget = /*@__PURE__*/ new Vector2();
+
+/**
+ * Camera that uses [perspective projection](https://en.wikipedia.org/wiki/Perspective_(graphical)).
+ *
+ * This projection mode is designed to mimic the way the human eye sees. It
+ * is the most common projection mode used for rendering a 3D scene.
+ *
+ * ```js
+ * const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+ * scene.add( camera );
+ * ```
+ *
+ * @augments Camera
+ */
+class PerspectiveCamera extends Camera {
+
+	/**
+	 * Constructs a new perspective camera.
+	 *
+	 * @param {number} [fov=50] - The vertical field of view.
+	 * @param {number} [aspect=1] - The aspect ratio.
+	 * @param {number} [near=0.1] - The camera's near plane.
+	 * @param {number} [far=2000] - The camera's far plane.
+	 */
+	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isPerspectiveCamera = true;
+
+		this.type = 'PerspectiveCamera';
+
+		/**
+		 * The vertical field of view, from bottom to top of view,
+		 * in degrees.
+		 *
+		 * @type {number}
+		 * @default 50
+		 */
+		this.fov = fov;
+
+		/**
+		 * The zoom factor of the camera.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.zoom = 1;
+
+		/**
+		 * The camera's near plane. The valid range is greater than `0`
+		 * and less than the current value of {@link PerspectiveCamera#far}.
+		 *
+		 * Note that, unlike for the {@link OrthographicCamera}, `0` is <em>not</em> a
+		 * valid value for a perspective camera's near plane.
+		 *
+		 * @type {number}
+		 * @default 0.1
+		 */
+		this.near = near;
+
+		/**
+		 * The camera's far plane. Must be greater than the
+		 * current value of {@link PerspectiveCamera#near}.
+		 *
+		 * @type {number}
+		 * @default 2000
+		 */
+		this.far = far;
+
+		/**
+		 * Object distance used for stereoscopy and depth-of-field effects. This
+		 * parameter does not influence the projection matrix unless a
+		 * {@link StereoCamera} is being used.
+		 *
+		 * @type {number}
+		 * @default 10
+		 */
+		this.focus = 10;
+
+		/**
+		 * The aspect ratio, usually the canvas width / canvas height.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.aspect = aspect;
+
+		/**
+		 * Represents the frustum window specification. This property should not be edited
+		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.view = null;
+
+		/**
+		 * Film size used for the larger axis. Default is `35` (millimeters). This
+		 * parameter does not influence the projection matrix unless {@link PerspectiveCamera#filmOffset}
+		 * is set to a nonzero value.
+		 *
+		 * @type {number}
+		 * @default 35
+		 */
+		this.filmGauge = 35;
+
+		/**
+		 * Horizontal off-center offset in the same unit as {@link PerspectiveCamera#filmGauge}.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.filmOffset = 0;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.fov = source.fov;
+		this.zoom = source.zoom;
+
+		this.near = source.near;
+		this.far = source.far;
+		this.focus = source.focus;
+
+		this.aspect = source.aspect;
+		this.view = source.view === null ? null : Object.assign( {}, source.view );
+
+		this.filmGauge = source.filmGauge;
+		this.filmOffset = source.filmOffset;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the FOV by focal length in respect to the current {@link PerspectiveCamera#filmGauge}.
+	 *
+	 * The default film gauge is 35, so that the focal length can be specified for
+	 * a 35mm (full frame) camera.
+	 *
+	 * @param {number} focalLength - Values for focal length and film gauge must have the same unit.
+	 */
+	setFocalLength( focalLength ) {
+
+		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
+		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
+
+		this.fov = RAD2DEG * 2 * Math.atan( vExtentSlope );
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Returns the focal length from the current {@link PerspectiveCamera#fov} and
+	 * {@link PerspectiveCamera#filmGauge}.
+	 *
+	 * @return {number} The computed focal length.
+	 */
+	getFocalLength() {
+
+		const vExtentSlope = Math.tan( DEG2RAD * 0.5 * this.fov );
+
+		return 0.5 * this.getFilmHeight() / vExtentSlope;
+
+	}
+
+	/**
+	 * Returns the current vertical field of view angle in degrees considering {@link PerspectiveCamera#zoom}.
+	 *
+	 * @return {number} The effective FOV.
+	 */
+	getEffectiveFOV() {
+
+		return RAD2DEG * 2 * Math.atan(
+			Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom );
+
+	}
+
+	/**
+	 * Returns the width of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
+	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
+	 *
+	 * @return {number} The film width.
+	 */
+	getFilmWidth() {
+
+		// film not completely covered in portrait format (aspect < 1)
+		return this.filmGauge * Math.min( this.aspect, 1 );
+
+	}
+
+	/**
+	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
+	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
+	 *
+	 * @return {number} The film width.
+	 */
+	getFilmHeight() {
+
+		// film not completely covered in landscape format (aspect > 1)
+		return this.filmGauge / Math.max( this.aspect, 1 );
+
+	}
+
+	/**
+	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
+	 * Sets `minTarget` and `maxTarget` to the coordinates of the lower-left and upper-right corners of the view rectangle.
+	 *
+	 * @param {number} distance - The viewing distance.
+	 * @param {Vector2} minTarget - The lower-left corner of the view rectangle is written into this vector.
+	 * @param {Vector2} maxTarget - The upper-right corner of the view rectangle is written into this vector.
+	 */
+	getViewBounds( distance, minTarget, maxTarget ) {
+
+		_v3$1.set( -1, -1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+
+		minTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
+
+		_v3$1.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+
+		maxTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
+
+	}
+
+	/**
+	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
+	 *
+	 * @param {number} distance - The viewing distance.
+	 * @param {Vector2} target - The target vector that is used to store result where x is width and y is height.
+	 * @returns {Vector2} The view size.
+	 */
+	getViewSize( distance, target ) {
+
+		this.getViewBounds( distance, _minTarget, _maxTarget );
+
+		return target.subVectors( _maxTarget, _minTarget );
+
+	}
+
+	/**
+	 * Sets an offset in a larger frustum. This is useful for multi-window or
+	 * multi-monitor/multi-machine setups.
+	 *
+	 * For example, if you have 3x2 monitors and each monitor is 1920x1080 and
+	 * the monitors are in grid like this
+	 *```
+	 *   +---+---+---+
+	 *   | A | B | C |
+	 *   +---+---+---+
+	 *   | D | E | F |
+	 *   +---+---+---+
+	 *```
+	 * then for each monitor you would call it like this:
+	 *```js
+	 * const w = 1920;
+	 * const h = 1080;
+	 * const fullWidth = w * 3;
+	 * const fullHeight = h * 2;
+	 *
+	 * // --A--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+	 * // --B--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+	 * // --C--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+	 * // --D--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+	 * // --E--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+	 * // --F--
+	 * camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+	 * ```
+	 *
+	 * Note there is no reason monitors have to be the same size or in a grid.
+	 *
+	 * @param {number} fullWidth - The full width of multiview setup.
+	 * @param {number} fullHeight - The full height of multiview setup.
+	 * @param {number} x - The horizontal offset of the subcamera.
+	 * @param {number} y - The vertical offset of the subcamera.
+	 * @param {number} width - The width of subcamera.
+	 * @param {number} height - The height of subcamera.
+	 */
+	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
+
+		this.aspect = fullWidth / fullHeight;
+
+		if ( this.view === null ) {
+
+			this.view = {
+				enabled: true,
+				fullWidth: 1,
+				fullHeight: 1,
+				offsetX: 0,
+				offsetY: 0,
+				width: 1,
+				height: 1
+			};
+
+		}
+
+		this.view.enabled = true;
+		this.view.fullWidth = fullWidth;
+		this.view.fullHeight = fullHeight;
+		this.view.offsetX = x;
+		this.view.offsetY = y;
+		this.view.width = width;
+		this.view.height = height;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Removes the view offset from the projection matrix.
+	 */
+	clearViewOffset() {
+
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Updates the camera's projection matrix. Must be called after any change of
+	 * camera properties.
+	 */
+	updateProjectionMatrix() {
+
+		const near = this.near;
+		let top = near * Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom;
+		let height = 2 * top;
+		let width = this.aspect * height;
+		let left = -0.5 * width;
+		const view = this.view;
+
+		if ( this.view !== null && this.view.enabled ) {
+
+			const fullWidth = view.fullWidth,
+				fullHeight = view.fullHeight;
+
+			left += view.offsetX * width / fullWidth;
+			top -= view.offsetY * height / fullHeight;
+			width *= view.width / fullWidth;
+			height *= view.height / fullHeight;
+
+		}
+
+		const skew = this.filmOffset;
+		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
+
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth );
+
+		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.fov = this.fov;
+		data.object.zoom = this.zoom;
+
+		data.object.near = this.near;
+		data.object.far = this.far;
+		data.object.focus = this.focus;
+
+		data.object.aspect = this.aspect;
+
+		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+
+		data.object.filmGauge = this.filmGauge;
+		data.object.filmOffset = this.filmOffset;
+
+		return data;
 
 	}
 
@@ -48020,7 +48138,17 @@ class ObjectLoader extends Loader {
 
 		const text = await loader.loadAsync( url, onProgress );
 
-		const json = JSON.parse( text );
+		let json;
+
+		try {
+
+			json = JSON.parse( text );
+
+		} catch ( e ) {
+
+			throw new Error( 'ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
+
+		}
 
 		const metadata = json.metadata;
 
@@ -48965,6 +49093,11 @@ class ObjectLoader extends Loader {
 
 		if ( data.up !== undefined ) object.up.fromArray( data.up );
 
+		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
+
+		if ( data.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, data.morphTargetDictionary );
+		if ( data.morphTargetInfluences !== undefined ) object.morphTargetInfluences = data.morphTargetInfluences.slice();
+
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
@@ -48982,6 +49115,7 @@ class ObjectLoader extends Loader {
 		if ( data.visible !== undefined ) object.visible = data.visible;
 		if ( data.frustumCulled !== undefined ) object.frustumCulled = data.frustumCulled;
 		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
+		if ( data.static !== undefined ) object.static = data.static;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
 
@@ -49122,11 +49256,16 @@ const _errorMap = new WeakMap();
  * textures for rendering.
  *
  * Note that {@link Texture#flipY} and {@link Texture#premultiplyAlpha} are ignored with image bitmaps.
- * They needs these configuration on bitmap creation unlike regular images need them on uploading to GPU.
+ * These options need to be configured via {@link ImageBitmapLoader#setOptions} prior to loading,
+ * unlike regular images which can be configured on the Texture to set these options on GPU upload instead.
  *
- * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
+ * To match the default behaviour of {@link Texture}, the following options are needed:
  *
- * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
+ * ```js
+ * { imageOrientation: 'flipY', premultiplyAlpha: 'none' }
+ * ```
+ *
+ * Also note that unlike {@link FileLoader}, this loader will only avoid multiple concurrent requests to the same URL if {@link Cache} is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -49600,6 +49739,260 @@ class StereoCamera {
 
 }
 
+const fov = -90; // negative fov is not an error
+const aspect = 1;
+
+/**
+ * A special type of camera that is positioned in 3D space to render its surroundings into a
+ * cube render target. The render target can then be used as an environment map for rendering
+ * realtime reflections in your scene.
+ *
+ * ```js
+ * // Create cube render target
+ * const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+ *
+ * // Create cube camera
+ * const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+ * scene.add( cubeCamera );
+ *
+ * // Create car
+ * const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+ * const car = new THREE.Mesh( carGeometry, chromeMaterial );
+ * scene.add( car );
+ *
+ * // Update the render target cube
+ * car.visible = false;
+ * cubeCamera.position.copy( car.position );
+ * cubeCamera.update( renderer, scene );
+ *
+ * // Render the scene
+ * car.visible = true;
+ * renderer.render( scene, camera );
+ * ```
+ *
+ * @augments Object3D
+ */
+class CubeCamera extends Object3D {
+
+	/**
+	 * Constructs a new cube camera.
+	 *
+	 * @param {number} near - The camera's near plane.
+	 * @param {number} far - The camera's far plane.
+	 * @param {WebGLCubeRenderTarget} renderTarget - The cube render target.
+	 */
+	constructor( near, far, renderTarget ) {
+
+		super();
+
+		this.type = 'CubeCamera';
+
+		/**
+		 * A reference to the cube render target.
+		 *
+		 * @type {WebGLCubeRenderTarget}
+		 */
+		this.renderTarget = renderTarget;
+
+		/**
+		 * The current active coordinate system.
+		 *
+		 * @type {?(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
+		 * @default null
+		 */
+		this.coordinateSystem = null;
+
+		/**
+		 * The current active mipmap level
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.activeMipmapLevel = 0;
+
+		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPX.layers = this.layers;
+		this.add( cameraPX );
+
+		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNX.layers = this.layers;
+		this.add( cameraNX );
+
+		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPY.layers = this.layers;
+		this.add( cameraPY );
+
+		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNY.layers = this.layers;
+		this.add( cameraNY );
+
+		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPZ.layers = this.layers;
+		this.add( cameraPZ );
+
+		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNZ.layers = this.layers;
+		this.add( cameraNZ );
+
+	}
+
+	/**
+	 * Must be called when the coordinate system of the cube camera is changed.
+	 */
+	updateCoordinateSystem() {
+
+		const coordinateSystem = this.coordinateSystem;
+
+		const cameras = this.children.concat();
+
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = cameras;
+
+		for ( const camera of cameras ) this.remove( camera );
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			cameraPX.up.set( 0, 1, 0 );
+			cameraPX.lookAt( 1, 0, 0 );
+
+			cameraNX.up.set( 0, 1, 0 );
+			cameraNX.lookAt( -1, 0, 0 );
+
+			cameraPY.up.set( 0, 0, -1 );
+			cameraPY.lookAt( 0, 1, 0 );
+
+			cameraNY.up.set( 0, 0, 1 );
+			cameraNY.lookAt( 0, -1, 0 );
+
+			cameraPZ.up.set( 0, 1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
+
+			cameraNZ.up.set( 0, 1, 0 );
+			cameraNZ.lookAt( 0, 0, -1 );
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			cameraPX.up.set( 0, -1, 0 );
+			cameraPX.lookAt( -1, 0, 0 );
+
+			cameraNX.up.set( 0, -1, 0 );
+			cameraNX.lookAt( 1, 0, 0 );
+
+			cameraPY.up.set( 0, 0, 1 );
+			cameraPY.lookAt( 0, 1, 0 );
+
+			cameraNY.up.set( 0, 0, -1 );
+			cameraNY.lookAt( 0, -1, 0 );
+
+			cameraPZ.up.set( 0, -1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
+
+			cameraNZ.up.set( 0, -1, 0 );
+			cameraNZ.lookAt( 0, 0, -1 );
+
+		} else {
+
+			throw new Error( 'THREE.CubeCamera.updateCoordinateSystem(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
+
+		for ( const camera of cameras ) {
+
+			this.add( camera );
+
+			camera.updateMatrixWorld();
+
+		}
+
+	}
+
+	/**
+	 * Calling this method will render the given scene with the given renderer
+	 * into the cube render target of the camera.
+	 *
+	 * @param {(Renderer|WebGLRenderer)} renderer - The renderer.
+	 * @param {Scene} scene - The scene to render.
+	 */
+	update( renderer, scene ) {
+
+		if ( this.parent === null ) this.updateMatrixWorld();
+
+		const { renderTarget, activeMipmapLevel } = this;
+
+		if ( this.coordinateSystem !== renderer.coordinateSystem ) {
+
+			this.coordinateSystem = renderer.coordinateSystem;
+
+			this.updateCoordinateSystem();
+
+		}
+
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentActiveCubeFace = renderer.getActiveCubeFace();
+		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
+
+		const currentXrEnabled = renderer.xr.enabled;
+
+		renderer.xr.enabled = false;
+
+		const generateMipmaps = renderTarget.texture.generateMipmaps;
+
+		renderTarget.texture.generateMipmaps = false;
+
+		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
+
+		let reversedDepthBuffer = false;
+
+		if ( renderer.isWebGLRenderer === true ) {
+
+			reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		} else {
+
+			reversedDepthBuffer = renderer.reversedDepthBuffer;
+
+		}
+
+		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraPX );
+
+		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraNX );
+
+		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraPY );
+
+		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraNY );
+
+		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraPZ );
+
+		// mipmaps are generated during the last call of render()
+		// at this point, all sides of the cube render target are defined
+
+		renderTarget.texture.generateMipmaps = generateMipmaps;
+
+		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
+		renderer.render( scene, cameraNZ );
+
+		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
+
+		renderer.xr.enabled = currentXrEnabled;
+
+		renderTarget.texture.needsPMREMUpdate = true;
+
+	}
+
+}
+
 /**
  * This type of camera can be used in order to efficiently render a scene with a
  * predefined set of cameras. This is an important performance aspect for
@@ -49653,12 +50046,15 @@ class ArrayCamera extends PerspectiveCamera {
 
 /**
  * Class for keeping track of time.
+ *
+ * @deprecated since r183.
  */
 class Clock {
 
 	/**
 	 * Constructs a new clock.
 	 *
+	 * @deprecated since 183.
 	 * @param {boolean} [autoStart=true] - Whether to automatically start the clock when
 	 * `getDelta()` is called for the first time.
 	 */
@@ -49705,6 +50101,8 @@ class Clock {
 		 * @default true
 		 */
 		this.running = false;
+
+		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
 
 	}
 
@@ -50177,7 +50575,7 @@ class Audio extends Object3D {
 		/**
 		 * Defines the source type.
 		 *
-		 * The property is automatically by one of the `set*()` methods.
+		 * The property is automatically set by one of the `set*()` methods.
 		 *
 		 * @type {('empty'|'audioNode'|'mediaNode'|'mediaStreamNode'|'buffer')}
 		 * @readonly
@@ -51193,7 +51591,7 @@ class PropertyMixer {
 		this._addIndex = 4;
 
 		/**
-		 * TODO
+		 * Accumulated weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51201,7 +51599,7 @@ class PropertyMixer {
 		this.cumulativeWeight = 0;
 
 		/**
-		 * TODO
+		 * Accumulated additive weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51209,7 +51607,7 @@ class PropertyMixer {
 		this.cumulativeWeightAdditive = 0;
 
 		/**
-		 * TODO
+		 * Number of active keyframe tracks currently using this property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -51217,7 +51615,7 @@ class PropertyMixer {
 		this.useCount = 0;
 
 		/**
-		 * TODO
+		 * Number of keyframe tracks referencing this property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -53231,7 +53629,7 @@ class AnimationAction {
 
 	}
 
-	// Interna
+	// Internal
 
 	_update( time, deltaTime, timeDirection, accuIndex ) {
 
@@ -53652,6 +54050,12 @@ class AnimationMixer extends EventDispatcher {
 		 * @default 1
 		 */
 		this.timeScale = 1.0;
+
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		}
 
 	}
 
@@ -56450,12 +56854,10 @@ class Line3 {
 
 		}
 
-		c1.copy( p1 ).add( _d1.multiplyScalar( s ) );
-		c2.copy( p2 ).add( _d2.multiplyScalar( t ) );
+		c1.copy( p1 ).addScaledVector( _d1, s );
+		c2.copy( p2 ).addScaledVector( _d2, t );
 
-		c1.sub( c2 );
-
-		return c1.dot( c1 );
+		return c1.distanceToSquared( c2 );
 
 	}
 
@@ -56503,6 +56905,9 @@ const _vector$3 = /*@__PURE__*/ new Vector3();
 
 /**
  * This displays a cone shaped helper object for a {@link SpotLight}.
+ *
+ * When the spot light or its target are transformed or light properties are
+ * changed, it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
  * const spotLight = new THREE.SpotLight( 0xffffff );
@@ -56880,30 +57285,6 @@ class PointLightHelper extends Mesh {
 
 		this.update();
 
-
-		/*
-	// TODO: delete this comment?
-	const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-
-	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
-	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-
-	const d = light.distance;
-
-	if ( d === 0.0 ) {
-
-		this.lightDistance.visible = false;
-
-	} else {
-
-		this.lightDistance.scale.set( d, d, d );
-
-	}
-
-	this.add( this.lightDistance );
-	*/
-
 	}
 
 	/**
@@ -56961,6 +57342,9 @@ const _color2 = /*@__PURE__*/ new Color();
 /**
  * Creates a visual aid consisting of a spherical mesh for a
  * given {@link HemisphereLight}.
+ *
+ * When the hemisphere light is transformed or its light properties are changed,
+ * it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
  * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
@@ -57269,8 +57653,11 @@ const _v3 = /*@__PURE__*/ new Vector3();
 
 /**
  * Helper object to assist with visualizing a {@link DirectionalLight}'s
- * effect on the scene. This consists of plane and a line representing the
+ * effect on the scene. This consists of a plane and a line representing the
  * light's position and direction.
+ *
+ * When the directional light or its target are transformed or light properties
+ * are changed, it's necessary to call the `update()` method of the respective helper.
  *
  * ```js
  * const light = new THREE.DirectionalLight( 0xFFFFFF );
@@ -57409,6 +57796,9 @@ const _camera = /*@__PURE__*/ new Camera();
  * Based on frustum visualization in [lightgl.js shadowmap example](https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html).
  *
  * `CameraHelper` must be a child of the scene.
+ *
+ * When the camera is transformed or its projection matrix is changed, it's necessary
+ * to call the `update()` method of the respective helper.
  *
  * ```js
  * const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -59380,7 +59770,7 @@ var aomap_fragment = "#ifdef USE_AOMAP\n\tfloat ambientOcclusion = ( texture2D( 
 
 var aomap_pars_fragment = "#ifdef USE_AOMAP\n\tuniform sampler2D aoMap;\n\tuniform float aoMapIntensity;\n#endif";
 
-var batching_pars_vertex = "#ifdef USE_BATCHING\n\t#if ! defined( GL_ANGLE_multi_draw )\n\t#define gl_DrawID _gl_DrawID\n\tuniform int _gl_DrawID;\n\t#endif\n\tuniform highp sampler2D batchingTexture;\n\tuniform highp usampler2D batchingIdTexture;\n\tmat4 getBatchingMatrix( const in float i ) {\n\t\tint size = textureSize( batchingTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n\tfloat getIndirectIndex( const in int i ) {\n\t\tint size = textureSize( batchingIdTexture, 0 ).x;\n\t\tint x = i % size;\n\t\tint y = i / size;\n\t\treturn float( texelFetch( batchingIdTexture, ivec2( x, y ), 0 ).r );\n\t}\n#endif\n#ifdef USE_BATCHING_COLOR\n\tuniform sampler2D batchingColorTexture;\n\tvec3 getBatchingColor( const in float i ) {\n\t\tint size = textureSize( batchingColorTexture, 0 ).x;\n\t\tint j = int( i );\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\treturn texelFetch( batchingColorTexture, ivec2( x, y ), 0 ).rgb;\n\t}\n#endif";
+var batching_pars_vertex = "#ifdef USE_BATCHING\n\t#if ! defined( GL_ANGLE_multi_draw )\n\t#define gl_DrawID _gl_DrawID\n\tuniform int _gl_DrawID;\n\t#endif\n\tuniform highp sampler2D batchingTexture;\n\tuniform highp usampler2D batchingIdTexture;\n\tmat4 getBatchingMatrix( const in float i ) {\n\t\tint size = textureSize( batchingTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n\tfloat getIndirectIndex( const in int i ) {\n\t\tint size = textureSize( batchingIdTexture, 0 ).x;\n\t\tint x = i % size;\n\t\tint y = i / size;\n\t\treturn float( texelFetch( batchingIdTexture, ivec2( x, y ), 0 ).r );\n\t}\n#endif\n#ifdef USE_BATCHING_COLOR\n\tuniform sampler2D batchingColorTexture;\n\tvec4 getBatchingColor( const in float i ) {\n\t\tint size = textureSize( batchingColorTexture, 0 ).x;\n\t\tint j = int( i );\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\treturn texelFetch( batchingColorTexture, ivec2( x, y ), 0 );\n\t}\n#endif";
 
 var batching_vertex = "#ifdef USE_BATCHING\n\tmat4 batchingMatrix = getBatchingMatrix( getIndirectIndex( gl_DrawID ) );\n#endif";
 
@@ -59402,13 +59792,13 @@ var clipping_planes_pars_vertex = "#if NUM_CLIPPING_PLANES > 0\n\tvarying vec3 v
 
 var clipping_planes_vertex = "#if NUM_CLIPPING_PLANES > 0\n\tvClipPosition = - mvPosition.xyz;\n#endif";
 
-var color_fragment = "#if defined( USE_COLOR_ALPHA )\n\tdiffuseColor *= vColor;\n#elif defined( USE_COLOR )\n\tdiffuseColor.rgb *= vColor;\n#endif";
+var color_fragment = "#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )\n\tdiffuseColor *= vColor;\n#endif";
 
-var color_pars_fragment = "#if defined( USE_COLOR_ALPHA )\n\tvarying vec4 vColor;\n#elif defined( USE_COLOR )\n\tvarying vec3 vColor;\n#endif";
+var color_pars_fragment = "#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )\n\tvarying vec4 vColor;\n#endif";
 
-var color_pars_vertex = "#if defined( USE_COLOR_ALPHA )\n\tvarying vec4 vColor;\n#elif defined( USE_COLOR ) || defined( USE_INSTANCING_COLOR ) || defined( USE_BATCHING_COLOR )\n\tvarying vec3 vColor;\n#endif";
+var color_pars_vertex = "#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA ) || defined( USE_INSTANCING_COLOR ) || defined( USE_BATCHING_COLOR )\n\tvarying vec4 vColor;\n#endif";
 
-var color_vertex = "#if defined( USE_COLOR_ALPHA )\n\tvColor = vec4( 1.0 );\n#elif defined( USE_COLOR ) || defined( USE_INSTANCING_COLOR ) || defined( USE_BATCHING_COLOR )\n\tvColor = vec3( 1.0 );\n#endif\n#ifdef USE_COLOR\n\tvColor *= color;\n#endif\n#ifdef USE_INSTANCING_COLOR\n\tvColor.xyz *= instanceColor.xyz;\n#endif\n#ifdef USE_BATCHING_COLOR\n\tvec3 batchingColor = getBatchingColor( getIndirectIndex( gl_DrawID ) );\n\tvColor.xyz *= batchingColor.xyz;\n#endif";
+var color_vertex = "#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA ) || defined( USE_INSTANCING_COLOR ) || defined( USE_BATCHING_COLOR )\n\tvColor = vec4( 1.0 );\n#endif\n#ifdef USE_COLOR_ALPHA\n\tvColor *= color;\n#elif defined( USE_COLOR )\n\tvColor.rgb *= color;\n#endif\n#ifdef USE_INSTANCING_COLOR\n\tvColor.rgb *= instanceColor.rgb;\n#endif\n#ifdef USE_BATCHING_COLOR\n\tvColor *= getBatchingColor( getIndirectIndex( gl_DrawID ) );\n#endif";
 
 var common = "#define PI 3.141592653589793\n#define PI2 6.283185307179586\n#define PI_HALF 1.5707963267948966\n#define RECIPROCAL_PI 0.3183098861837907\n#define RECIPROCAL_PI2 0.15915494309189535\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate( a ) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement( a ) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nvec3 pow2( const in vec3 x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat max3( const in vec3 v ) { return max( max( v.x, v.y ), v.z ); }\nfloat average( const in vec3 v ) { return dot( v, vec3( 0.3333333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract( sin( sn ) * c );\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\n#ifdef USE_ALPHAHASH\n\tvarying vec3 vPosition;\n#endif\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n\treturn m[ 2 ][ 3 ] == - 1.0;\n}\nvec2 equirectUv( in vec3 dir ) {\n\tfloat u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;\n\tfloat v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\treturn vec2( u, v );\n}\nvec3 BRDF_Lambert( const in vec3 diffuseColor ) {\n\treturn RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 f0, const in float f90, const in float dotVH ) {\n\tfloat fresnel = exp2( ( - 5.55473 * dotVH - 6.98316 ) * dotVH );\n\treturn f0 * ( 1.0 - fresnel ) + ( f90 * fresnel );\n}\nfloat F_Schlick( const in float f0, const in float f90, const in float dotVH ) {\n\tfloat fresnel = exp2( ( - 5.55473 * dotVH - 6.98316 ) * dotVH );\n\treturn f0 * ( 1.0 - fresnel ) + ( f90 * fresnel );\n} // validated";
 
@@ -59428,7 +59818,7 @@ var colorspace_fragment = "gl_FragColor = linearToOutputTexel( gl_FragColor );";
 
 var colorspace_pars_fragment = "vec4 LinearTransferOETF( in vec4 value ) {\n\treturn value;\n}\nvec4 sRGBTransferEOTF( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );\n}\nvec4 sRGBTransferOETF( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}";
 
-var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif";
+var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t\t#endif\n\t#endif\n#endif";
 
 var envmap_common_pars_fragment = "#ifdef USE_ENVMAP\n\tuniform float envMapIntensity;\n\tuniform float flipEnvMap;\n\tuniform mat3 envMapRotation;\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tuniform samplerCube envMap;\n\t#else\n\t\tuniform sampler2D envMap;\n\t#endif\n#endif";
 
@@ -59468,13 +59858,13 @@ var lights_phong_pars_fragment = "varying vec3 vViewPosition;\nstruct BlinnPhong
 
 var lights_physical_fragment = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb;\nmaterial.diffuseContribution = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nmaterial.metalness = metalnessFactor;\nvec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );\nfloat geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );\nmaterial.roughness = max( roughnessFactor, 0.0525 );material.roughness += geometryRoughness;\nmaterial.roughness = min( material.roughness, 1.0 );\n#ifdef IOR\n\tmaterial.ior = ior;\n\t#ifdef USE_SPECULAR\n\t\tfloat specularIntensityFactor = specularIntensity;\n\t\tvec3 specularColorFactor = specularColor;\n\t\t#ifdef USE_SPECULAR_COLORMAP\n\t\t\tspecularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;\n\t\t#endif\n\t\t#ifdef USE_SPECULAR_INTENSITYMAP\n\t\t\tspecularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;\n\t\t#endif\n\t\tmaterial.specularF90 = mix( specularIntensityFactor, 1.0, metalnessFactor );\n\t#else\n\t\tfloat specularIntensityFactor = 1.0;\n\t\tvec3 specularColorFactor = vec3( 1.0 );\n\t\tmaterial.specularF90 = 1.0;\n\t#endif\n\tmaterial.specularColor = min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor;\n\tmaterial.specularColorBlended = mix( material.specularColor, diffuseColor.rgb, metalnessFactor );\n#else\n\tmaterial.specularColor = vec3( 0.04 );\n\tmaterial.specularColorBlended = mix( material.specularColor, diffuseColor.rgb, metalnessFactor );\n\tmaterial.specularF90 = 1.0;\n#endif\n#ifdef USE_CLEARCOAT\n\tmaterial.clearcoat = clearcoat;\n\tmaterial.clearcoatRoughness = clearcoatRoughness;\n\tmaterial.clearcoatF0 = vec3( 0.04 );\n\tmaterial.clearcoatF90 = 1.0;\n\t#ifdef USE_CLEARCOATMAP\n\t\tmaterial.clearcoat *= texture2D( clearcoatMap, vClearcoatMapUv ).x;\n\t#endif\n\t#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\t\tmaterial.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vClearcoatRoughnessMapUv ).y;\n\t#endif\n\tmaterial.clearcoat = saturate( material.clearcoat );\tmaterial.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );\n\tmaterial.clearcoatRoughness += geometryRoughness;\n\tmaterial.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );\n#endif\n#ifdef USE_DISPERSION\n\tmaterial.dispersion = dispersion;\n#endif\n#ifdef USE_IRIDESCENCE\n\tmaterial.iridescence = iridescence;\n\tmaterial.iridescenceIOR = iridescenceIOR;\n\t#ifdef USE_IRIDESCENCEMAP\n\t\tmaterial.iridescence *= texture2D( iridescenceMap, vIridescenceMapUv ).r;\n\t#endif\n\t#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\t\tmaterial.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vIridescenceThicknessMapUv ).g + iridescenceThicknessMinimum;\n\t#else\n\t\tmaterial.iridescenceThickness = iridescenceThicknessMaximum;\n\t#endif\n#endif\n#ifdef USE_SHEEN\n\tmaterial.sheenColor = sheenColor;\n\t#ifdef USE_SHEEN_COLORMAP\n\t\tmaterial.sheenColor *= texture2D( sheenColorMap, vSheenColorMapUv ).rgb;\n\t#endif\n\tmaterial.sheenRoughness = clamp( sheenRoughness, 0.0001, 1.0 );\n\t#ifdef USE_SHEEN_ROUGHNESSMAP\n\t\tmaterial.sheenRoughness *= texture2D( sheenRoughnessMap, vSheenRoughnessMapUv ).a;\n\t#endif\n#endif\n#ifdef USE_ANISOTROPY\n\t#ifdef USE_ANISOTROPYMAP\n\t\tmat2 anisotropyMat = mat2( anisotropyVector.x, anisotropyVector.y, - anisotropyVector.y, anisotropyVector.x );\n\t\tvec3 anisotropyPolar = texture2D( anisotropyMap, vAnisotropyMapUv ).rgb;\n\t\tvec2 anisotropyV = anisotropyMat * normalize( 2.0 * anisotropyPolar.rg - vec2( 1.0 ) ) * anisotropyPolar.b;\n\t#else\n\t\tvec2 anisotropyV = anisotropyVector;\n\t#endif\n\tmaterial.anisotropy = length( anisotropyV );\n\tif( material.anisotropy == 0.0 ) {\n\t\tanisotropyV = vec2( 1.0, 0.0 );\n\t} else {\n\t\tanisotropyV /= material.anisotropy;\n\t\tmaterial.anisotropy = saturate( material.anisotropy );\n\t}\n\tmaterial.alphaT = mix( pow2( material.roughness ), 1.0, pow2( material.anisotropy ) );\n\tmaterial.anisotropyT = tbn[ 0 ] * anisotropyV.x + tbn[ 1 ] * anisotropyV.y;\n\tmaterial.anisotropyB = tbn[ 1 ] * anisotropyV.x - tbn[ 0 ] * anisotropyV.y;\n#endif";
 
-var lights_physical_pars_fragment = "uniform sampler2D dfgLUT;\nstruct PhysicalMaterial {\n\tvec3 diffuseColor;\n\tvec3 diffuseContribution;\n\tvec3 specularColor;\n\tvec3 specularColorBlended;\n\tfloat roughness;\n\tfloat metalness;\n\tfloat specularF90;\n\tfloat dispersion;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0;\n\t\tvec3 iridescenceFresnelDielectric;\n\t\tvec3 iridescenceFresnelMetallic;\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n};\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\n#ifdef USE_ANISOTROPY\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\tfloat v = 0.5 / ( gv + gl );\n\t\treturn v;\n\t}\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\t}\n#endif\n#ifdef USE_CLEARCOAT\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = material.clearcoatRoughness;\n\t\tfloat alpha = pow2( roughness );\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t\treturn F * ( V * D );\n\t}\n#endif\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 f0 = material.specularColorBlended;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = material.roughness;\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t#ifdef USE_IRIDESCENCE\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( material.alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\t\tfloat D = D_GGX_Anisotropic( material.alphaT, alpha, dotNH, dotTH, dotBH );\n\t#else\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t#endif\n\treturn F * ( V * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transpose( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\n#if defined( USE_SHEEN )\nfloat D_Charlie( float roughness, float dotNH ) {\n\tfloat alpha = pow2( roughness );\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 );\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n}\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n}\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\treturn sheenColor * ( D * V );\n}\n#endif\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat r2 = roughness * roughness;\n\tfloat rInv = 1.0 / ( roughness + 0.1 );\n\tfloat a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;\n\tfloat b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;\n\tfloat DG = exp( a * dotNV + b );\n\treturn saturate( DG );\n}\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\treturn specularColor * fab.x + specularF90 * fab.y;\n}\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\t#ifdef USE_IRIDESCENCE\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\t#else\n\t\tvec3 Fr = specularColor;\n\t#endif\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619;\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n}\nvec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;\n\tvec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;\n\tvec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;\n\tvec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;\n\tfloat Ess_V = dfgV.x + dfgV.y;\n\tfloat Ess_L = dfgL.x + dfgL.y;\n\tfloat Ems_V = 1.0 - Ess_V;\n\tfloat Ems_L = 1.0 - Ess_L;\n\tvec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619;\n\tvec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );\n\tfloat compensationFactor = Ems_V * Ems_L;\n\tvec3 multiScatter = Fms * compensationFactor;\n\treturn singleScatter + multiScatter;\n}\n#if NUM_RECT_AREA_LIGHTS > 0\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight;\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\t\tvec3 fresnel = ( material.specularColorBlended * t2.x + ( vec3( 1.0 ) - material.specularColorBlended ) * t2.y );\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\t}\n#endif\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\t#endif\n\t#ifdef USE_SHEEN\n \n \t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n \n \t\tfloat sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n \t\tfloat sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );\n \n \t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );\n \n \t\tirradiance *= sheenEnergyComp;\n \n \t#endif\n\treflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );\n\treflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );\n}\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tvec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tdiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectDiffuse += diffuse;\n}\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;\n \t#endif\n\tvec3 singleScatteringDielectric = vec3( 0.0 );\n\tvec3 multiScatteringDielectric = vec3( 0.0 );\n\tvec3 singleScatteringMetallic = vec3( 0.0 );\n\tvec3 multiScatteringMetallic = vec3( 0.0 );\n\t#ifdef USE_IRIDESCENCE\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnelDielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnelMetallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#else\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#endif\n\tvec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );\n\tvec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );\n\tvec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;\n\tvec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\tvec3 indirectSpecular = radiance * singleScattering;\n\tindirectSpecular += multiScattering * cosineWeightedIrradiance;\n\tvec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tindirectSpecular *= sheenEnergyComp;\n\t\tindirectDiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectSpecular += indirectSpecular;\n\treflectedLight.indirectDiffuse += indirectDiffuse;\n}\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}";
+var lights_physical_pars_fragment = "uniform sampler2D dfgLUT;\nstruct PhysicalMaterial {\n\tvec3 diffuseColor;\n\tvec3 diffuseContribution;\n\tvec3 specularColor;\n\tvec3 specularColorBlended;\n\tfloat roughness;\n\tfloat metalness;\n\tfloat specularF90;\n\tfloat dispersion;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0;\n\t\tvec3 iridescenceFresnelDielectric;\n\t\tvec3 iridescenceFresnelMetallic;\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n};\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\n#ifdef USE_ANISOTROPY\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\tfloat v = 0.5 / ( gv + gl );\n\t\treturn v;\n\t}\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\t}\n#endif\n#ifdef USE_CLEARCOAT\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = material.clearcoatRoughness;\n\t\tfloat alpha = pow2( roughness );\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t\treturn F * ( V * D );\n\t}\n#endif\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 f0 = material.specularColorBlended;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = material.roughness;\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t#ifdef USE_IRIDESCENCE\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( material.alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\t\tfloat D = D_GGX_Anisotropic( material.alphaT, alpha, dotNH, dotTH, dotBH );\n\t#else\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t#endif\n\treturn F * ( V * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transpose( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\n#if defined( USE_SHEEN )\nfloat D_Charlie( float roughness, float dotNH ) {\n\tfloat alpha = pow2( roughness );\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 );\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n}\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n}\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\treturn sheenColor * ( D * V );\n}\n#endif\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat r2 = roughness * roughness;\n\tfloat rInv = 1.0 / ( roughness + 0.1 );\n\tfloat a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;\n\tfloat b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;\n\tfloat DG = exp( a * dotNV + b );\n\treturn saturate( DG );\n}\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\treturn specularColor * fab.x + specularF90 * fab.y;\n}\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\t#ifdef USE_IRIDESCENCE\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\t#else\n\t\tvec3 Fr = specularColor;\n\t#endif\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619;\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n}\nvec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;\n\tvec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;\n\tvec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;\n\tvec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;\n\tfloat Ess_V = dfgV.x + dfgV.y;\n\tfloat Ess_L = dfgL.x + dfgL.y;\n\tfloat Ems_V = 1.0 - Ess_V;\n\tfloat Ems_L = 1.0 - Ess_L;\n\tvec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619;\n\tvec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );\n\tfloat compensationFactor = Ems_V * Ems_L;\n\tvec3 multiScatter = Fms * compensationFactor;\n\treturn singleScatter + multiScatter;\n}\n#if NUM_RECT_AREA_LIGHTS > 0\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight;\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\t\tvec3 fresnel = ( material.specularColorBlended * t2.x + ( material.specularF90 - material.specularColorBlended ) * t2.y );\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\t\t#ifdef USE_CLEARCOAT\n\t\t\tvec3 Ncc = geometryClearcoatNormal;\n\t\t\tvec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );\n\t\t\tvec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );\n\t\t\tvec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );\n\t\t\tmat3 mInvClearcoat = mat3(\n\t\t\t\tvec3( t1Clearcoat.x, 0, t1Clearcoat.y ),\n\t\t\t\tvec3(             0, 1,             0 ),\n\t\t\t\tvec3( t1Clearcoat.z, 0, t1Clearcoat.w )\n\t\t\t);\n\t\t\tvec3 fresnelClearcoat = material.clearcoatF0 * t2Clearcoat.x + ( material.clearcoatF90 - material.clearcoatF0 ) * t2Clearcoat.y;\n\t\t\tclearcoatSpecularDirect += lightColor * fresnelClearcoat * LTC_Evaluate( Ncc, viewDir, position, mInvClearcoat, rectCoords );\n\t\t#endif\n\t}\n#endif\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\t#endif\n\t#ifdef USE_SHEEN\n \n \t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n \n \t\tfloat sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n \t\tfloat sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );\n \n \t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );\n \n \t\tirradiance *= sheenEnergyComp;\n \n \t#endif\n\treflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );\n\treflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );\n}\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tvec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tdiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectDiffuse += diffuse;\n}\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;\n \t#endif\n\tvec3 singleScatteringDielectric = vec3( 0.0 );\n\tvec3 multiScatteringDielectric = vec3( 0.0 );\n\tvec3 singleScatteringMetallic = vec3( 0.0 );\n\tvec3 multiScatteringMetallic = vec3( 0.0 );\n\t#ifdef USE_IRIDESCENCE\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnelDielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnelMetallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#else\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#endif\n\tvec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );\n\tvec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );\n\tvec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;\n\tvec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\tvec3 indirectSpecular = radiance * singleScattering;\n\tindirectSpecular += multiScattering * cosineWeightedIrradiance;\n\tvec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tindirectSpecular *= sheenEnergyComp;\n\t\tindirectDiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectSpecular += indirectSpecular;\n\treflectedLight.indirectDiffuse += indirectDiffuse;\n}\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}";
 
 var lights_fragment_begin = "\nvec3 geometryPosition = - vViewPosition;\nvec3 geometryNormal = normal;\nvec3 geometryViewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );\nvec3 geometryClearcoatNormal = vec3( 0.0 );\n#ifdef USE_CLEARCOAT\n\tgeometryClearcoatNormal = clearcoatNormal;\n#endif\n#ifdef USE_IRIDESCENCE\n\tfloat dotNVi = saturate( dot( normal, geometryViewDir ) );\n\tif ( material.iridescenceThickness == 0.0 ) {\n\t\tmaterial.iridescence = 0.0;\n\t} else {\n\t\tmaterial.iridescence = saturate( material.iridescence );\n\t}\n\tif ( material.iridescence > 0.0 ) {\n\t\tmaterial.iridescenceFresnelDielectric = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );\n\t\tmaterial.iridescenceFresnelMetallic = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.diffuseColor );\n\t\tmaterial.iridescenceFresnel = mix( material.iridescenceFresnelDielectric, material.iridescenceFresnelMetallic, material.metalness );\n\t\tmaterial.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );\n\t}\n#endif\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n\tPointLight pointLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n\tPointLightShadow pointLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tgetPointLightInfo( pointLight, geometryPosition, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS ) && ( defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_BASIC ) )\n\t\tpointLightShadow = pointLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getPointShadow( pointShadowMap[ i ], pointLightShadow.shadowMapSize, pointLightShadow.shadowIntensity, pointLightShadow.shadowBias, pointLightShadow.shadowRadius, vPointShadowCoord[ i ], pointLightShadow.shadowCameraNear, pointLightShadow.shadowCameraFar ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n\tSpotLight spotLight;\n\tvec4 spotColor;\n\tvec3 spotLightCoord;\n\tbool inSpotLightMap;\n\t#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0\n\tSpotLightShadow spotLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tgetSpotLightInfo( spotLight, geometryPosition, directLight );\n\t\t#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#define SPOT_LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX\n\t\t#elif ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\t#define SPOT_LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS\n\t\t#else\n\t\t#define SPOT_LIGHT_MAP_INDEX ( UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#endif\n\t\t#if ( SPOT_LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )\n\t\t\tspotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;\n\t\t\tinSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );\n\t\t\tspotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );\n\t\t\tdirectLight.color = inSpotLightMap ? directLight.color * spotColor.rgb : directLight.color;\n\t\t#endif\n\t\t#undef SPOT_LIGHT_MAP_INDEX\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\tspotLightShadow = spotLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowIntensity, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotLightCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n\tDirectionalLight directionalLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0\n\tDirectionalLightShadow directionalLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tgetDirectionalLightInfo( directionalLight, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )\n\t\tdirectionalLightShadow = directionalLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )\n\tRectAreaLight rectAreaLight;\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {\n\t\trectAreaLight = rectAreaLights[ i ];\n\t\tRE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if defined( RE_IndirectDiffuse )\n\tvec3 iblIrradiance = vec3( 0.0 );\n\tvec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n\t#if defined( USE_LIGHT_PROBES )\n\t\tirradiance += getLightProbeIrradiance( lightProbe, geometryNormal );\n\t#endif\n\t#if ( NUM_HEMI_LIGHTS > 0 )\n\t\t#pragma unroll_loop_start\n\t\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\t\tirradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometryNormal );\n\t\t}\n\t\t#pragma unroll_loop_end\n\t#endif\n#endif\n#if defined( RE_IndirectSpecular )\n\tvec3 radiance = vec3( 0.0 );\n\tvec3 clearcoatRadiance = vec3( 0.0 );\n#endif";
 
-var lights_fragment_maps = "#if defined( RE_IndirectDiffuse )\n\t#ifdef USE_LIGHTMAP\n\t\tvec4 lightMapTexel = texture2D( lightMap, vLightMapUv );\n\t\tvec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;\n\t\tirradiance += lightMapIrradiance;\n\t#endif\n\t#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )\n\t\tiblIrradiance += getIBLIrradiance( geometryNormal );\n\t#endif\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n\t#ifdef USE_ANISOTROPY\n\t\tradiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );\n\t#else\n\t\tradiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );\n\t#endif\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );\n\t#endif\n#endif";
+var lights_fragment_maps = "#if defined( RE_IndirectDiffuse )\n\t#ifdef USE_LIGHTMAP\n\t\tvec4 lightMapTexel = texture2D( lightMap, vLightMapUv );\n\t\tvec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;\n\t\tirradiance += lightMapIrradiance;\n\t#endif\n\t#if defined( USE_ENVMAP ) && defined( ENVMAP_TYPE_CUBE_UV )\n\t\t#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )\n\t\t\tiblIrradiance += getIBLIrradiance( geometryNormal );\n\t\t#endif\n\t#endif\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n\t#ifdef USE_ANISOTROPY\n\t\tradiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );\n\t#else\n\t\tradiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );\n\t#endif\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );\n\t#endif\n#endif";
 
-var lights_fragment_end = "#if defined( RE_IndirectDiffuse )\n\tRE_IndirectDiffuse( irradiance, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n#endif\n#if defined( RE_IndirectSpecular )\n\tRE_IndirectSpecular( radiance, iblIrradiance, clearcoatRadiance, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n#endif";
+var lights_fragment_end = "#if defined( RE_IndirectDiffuse )\n\t#if defined( LAMBERT ) || defined( PHONG )\n\t\tirradiance += iblIrradiance;\n\t#endif\n\tRE_IndirectDiffuse( irradiance, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n#endif\n#if defined( RE_IndirectSpecular )\n\tRE_IndirectSpecular( radiance, iblIrradiance, clearcoatRadiance, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n#endif";
 
 var logdepthbuf_fragment = "#if defined( USE_LOGARITHMIC_DEPTH_BUFFER )\n\tgl_FragDepth = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;\n#endif";
 
@@ -59528,7 +59918,7 @@ var iridescence_pars_fragment = "#ifdef USE_IRIDESCENCEMAP\n\tuniform sampler2D 
 
 var opaque_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha;\n#endif\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
 
-var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;const float ShiftRight8 = 1. / 256.;\nconst float Inv255 = 1. / 255.;\nconst vec4 PackFactors = vec4( 1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0 );\nconst vec2 UnpackFactors2 = vec2( UnpackDownscale, 1.0 / PackFactors.g );\nconst vec3 UnpackFactors3 = vec3( UnpackDownscale / PackFactors.rg, 1.0 / PackFactors.b );\nconst vec4 UnpackFactors4 = vec4( UnpackDownscale / PackFactors.rgb, 1.0 / PackFactors.a );\nvec4 packDepthToRGBA( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec4( 0., 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec4( 1., 1., 1., 1. );\n\tfloat vuf;\n\tfloat af = modf( v * PackFactors.a, vuf );\n\tfloat bf = modf( vuf * ShiftRight8, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec4( vuf * Inv255, gf * PackUpscale, bf * PackUpscale, af );\n}\nvec3 packDepthToRGB( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec3( 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec3( 1., 1., 1. );\n\tfloat vuf;\n\tfloat bf = modf( v * PackFactors.b, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec3( vuf * Inv255, gf * PackUpscale, bf );\n}\nvec2 packDepthToRG( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec2( 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec2( 1., 1. );\n\tfloat vuf;\n\tfloat gf = modf( v * 256., vuf );\n\treturn vec2( vuf * Inv255, gf );\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors4 );\n}\nfloat unpackRGBToDepth( const in vec3 v ) {\n\treturn dot( v, UnpackFactors3 );\n}\nfloat unpackRGToDepth( const in vec2 v ) {\n\treturn v.r * UnpackFactors2.r + v.g * UnpackFactors2.g;\n}\nvec4 pack2HalfToRGBA( const in vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( const in vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn depth * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn ( near * far ) / ( ( far - near ) * depth - far );\n}";
+var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;const float ShiftRight8 = 1. / 256.;\nconst float Inv255 = 1. / 255.;\nconst vec4 PackFactors = vec4( 1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0 );\nconst vec2 UnpackFactors2 = vec2( UnpackDownscale, 1.0 / PackFactors.g );\nconst vec3 UnpackFactors3 = vec3( UnpackDownscale / PackFactors.rg, 1.0 / PackFactors.b );\nconst vec4 UnpackFactors4 = vec4( UnpackDownscale / PackFactors.rgb, 1.0 / PackFactors.a );\nvec4 packDepthToRGBA( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec4( 0., 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec4( 1., 1., 1., 1. );\n\tfloat vuf;\n\tfloat af = modf( v * PackFactors.a, vuf );\n\tfloat bf = modf( vuf * ShiftRight8, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec4( vuf * Inv255, gf * PackUpscale, bf * PackUpscale, af );\n}\nvec3 packDepthToRGB( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec3( 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec3( 1., 1., 1. );\n\tfloat vuf;\n\tfloat bf = modf( v * PackFactors.b, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec3( vuf * Inv255, gf * PackUpscale, bf );\n}\nvec2 packDepthToRG( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec2( 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec2( 1., 1. );\n\tfloat vuf;\n\tfloat gf = modf( v * 256., vuf );\n\treturn vec2( vuf * Inv255, gf );\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors4 );\n}\nfloat unpackRGBToDepth( const in vec3 v ) {\n\treturn dot( v, UnpackFactors3 );\n}\nfloat unpackRGToDepth( const in vec2 v ) {\n\treturn v.r * UnpackFactors2.r + v.g * UnpackFactors2.g;\n}\nvec4 pack2HalfToRGBA( const in vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( const in vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\n\t\treturn depth * ( far - near ) - far;\n\t#else\n\t\treturn depth * ( near - far ) - near;\n\t#endif\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\t\n\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\treturn ( near * far ) / ( ( near - far ) * depth - near );\n\t#else\n\t\treturn ( near * far ) / ( ( far - near ) * depth - far );\n\t#endif\n}";
 
 var premultiplied_alpha_fragment = "#ifdef PREMULTIPLIED_ALPHA\n\tgl_FragColor.rgb *= gl_FragColor.a;\n#endif";
 
@@ -59542,7 +59932,7 @@ var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUG
 
 var roughnessmap_pars_fragment = "#ifdef USE_ROUGHNESSMAP\n\tuniform sampler2D roughnessMap;\n#endif";
 
-var shadowmap_pars_fragment = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#if NUM_SPOT_LIGHT_MAPS > 0\n\tuniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform sampler2DShadow directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\t#else\n\t\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform sampler2DShadow spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\t#else\n\t\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform samplerCubeShadow pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\t#elif defined( SHADOWMAP_TYPE_BASIC )\n\t\t\tuniform samplerCube pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\tfloat interleavedGradientNoise( vec2 position ) {\n\t\t\treturn fract( 52.9829189 * fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) );\n\t\t}\n\t\tvec2 vogelDiskSample( int sampleIndex, int samplesCount, float phi ) {\n\t\t\tconst float goldenAngle = 2.399963229728653;\n\t\t\tfloat r = sqrt( ( float( sampleIndex ) + 0.5 ) / float( samplesCount ) );\n\t\t\tfloat theta = float( sampleIndex ) * goldenAngle + phi;\n\t\t\treturn vec2( cos( theta ), sin( theta ) ) * r;\n\t\t}\n\t#endif\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\tfloat getShadow( sampler2DShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\tshadowCoord.z += shadowBias;\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\t\tfloat radius = shadowRadius * texelSize.x;\n\t\t\t\tfloat phi = interleavedGradientNoise( gl_FragCoord.xy ) * 6.28318530718;\n\t\t\t\tshadow = (\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 0, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 1, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 2, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 3, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 4, 5, phi ) * radius, shadowCoord.z ) )\n\t\t\t\t) * 0.2;\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#elif defined( SHADOWMAP_TYPE_VSM )\n\t\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\tshadowCoord.z += shadowBias;\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tvec2 distribution = texture2D( shadowMap, shadowCoord.xy ).rg;\n\t\t\t\tfloat mean = distribution.x;\n\t\t\t\tfloat variance = distribution.y * distribution.y;\n\t\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\t\tfloat hard_shadow = step( mean, shadowCoord.z );\n\t\t\t\t#else\n\t\t\t\t\tfloat hard_shadow = step( shadowCoord.z, mean );\n\t\t\t\t#endif\n\t\t\t\tif ( hard_shadow == 1.0 ) {\n\t\t\t\t\tshadow = 1.0;\n\t\t\t\t} else {\n\t\t\t\t\tvariance = max( variance, 0.0000001 );\n\t\t\t\t\tfloat d = shadowCoord.z - mean;\n\t\t\t\t\tfloat p_max = variance / ( variance + d * d );\n\t\t\t\t\tp_max = clamp( ( p_max - 0.3 ) / 0.65, 0.0, 1.0 );\n\t\t\t\t\tshadow = max( hard_shadow, p_max );\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#else\n\t\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\tshadowCoord.z += shadowBias;\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;\n\t\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\t\tshadow = step( depth, shadowCoord.z );\n\t\t\t\t#else\n\t\t\t\t\tshadow = step( shadowCoord.z, depth );\n\t\t\t\t#endif\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\tfloat getPointShadow( samplerCubeShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tvec3 bd3D = normalize( lightToPosition );\n\t\tvec3 absVec = abs( lightToPosition );\n\t\tfloat viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );\n\t\tif ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {\n\t\t\tfloat dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );\n\t\t\tdp += shadowBias;\n\t\t\tfloat texelSize = shadowRadius / shadowMapSize.x;\n\t\t\tvec3 absDir = abs( bd3D );\n\t\t\tvec3 tangent = absDir.x > absDir.z ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 );\n\t\t\ttangent = normalize( cross( bd3D, tangent ) );\n\t\t\tvec3 bitangent = cross( bd3D, tangent );\n\t\t\tfloat phi = interleavedGradientNoise( gl_FragCoord.xy ) * 6.28318530718;\n\t\t\tshadow = (\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 0, 5, phi ).x + bitangent * vogelDiskSample( 0, 5, phi ).y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 1, 5, phi ).x + bitangent * vogelDiskSample( 1, 5, phi ).y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 2, 5, phi ).x + bitangent * vogelDiskSample( 2, 5, phi ).y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 3, 5, phi ).x + bitangent * vogelDiskSample( 3, 5, phi ).y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * vogelDiskSample( 4, 5, phi ).x + bitangent * vogelDiskSample( 4, 5, phi ).y ) * texelSize, dp ) )\n\t\t\t) * 0.2;\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\t#elif defined( SHADOWMAP_TYPE_BASIC )\n\tfloat getPointShadow( samplerCube shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tvec3 bd3D = normalize( lightToPosition );\n\t\tvec3 absVec = abs( lightToPosition );\n\t\tfloat viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );\n\t\tif ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {\n\t\t\tfloat dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );\n\t\t\tdp += shadowBias;\n\t\t\tfloat depth = textureCube( shadowMap, bd3D ).r;\n\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\tshadow = step( depth, dp );\n\t\t\t#else\n\t\t\t\tshadow = step( dp, depth );\n\t\t\t#endif\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\t#endif\n\t#endif\n#endif";
+var shadowmap_pars_fragment = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#if NUM_SPOT_LIGHT_MAPS > 0\n\tuniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform sampler2DShadow directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\t#else\n\t\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform sampler2DShadow spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\t#else\n\t\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tuniform samplerCubeShadow pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\t#elif defined( SHADOWMAP_TYPE_BASIC )\n\t\t\tuniform samplerCube pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\t#endif\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\tfloat interleavedGradientNoise( vec2 position ) {\n\t\t\treturn fract( 52.9829189 * fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) );\n\t\t}\n\t\tvec2 vogelDiskSample( int sampleIndex, int samplesCount, float phi ) {\n\t\t\tconst float goldenAngle = 2.399963229728653;\n\t\t\tfloat r = sqrt( ( float( sampleIndex ) + 0.5 ) / float( samplesCount ) );\n\t\t\tfloat theta = float( sampleIndex ) * goldenAngle + phi;\n\t\t\treturn vec2( cos( theta ), sin( theta ) ) * r;\n\t\t}\n\t#endif\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\tfloat getShadow( sampler2DShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\tshadowCoord.z += shadowBias;\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\t\tfloat radius = shadowRadius * texelSize.x;\n\t\t\t\tfloat phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;\n\t\t\t\tshadow = (\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 0, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 1, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 2, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 3, 5, phi ) * radius, shadowCoord.z ) ) +\n\t\t\t\t\ttexture( shadowMap, vec3( shadowCoord.xy + vogelDiskSample( 4, 5, phi ) * radius, shadowCoord.z ) )\n\t\t\t\t) * 0.2;\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#elif defined( SHADOWMAP_TYPE_VSM )\n\t\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\tshadowCoord.z -= shadowBias;\n\t\t\t#else\n\t\t\t\tshadowCoord.z += shadowBias;\n\t\t\t#endif\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tvec2 distribution = texture2D( shadowMap, shadowCoord.xy ).rg;\n\t\t\t\tfloat mean = distribution.x;\n\t\t\t\tfloat variance = distribution.y * distribution.y;\n\t\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\t\tfloat hard_shadow = step( mean, shadowCoord.z );\n\t\t\t\t#else\n\t\t\t\t\tfloat hard_shadow = step( shadowCoord.z, mean );\n\t\t\t\t#endif\n\t\t\t\t\n\t\t\t\tif ( hard_shadow == 1.0 ) {\n\t\t\t\t\tshadow = 1.0;\n\t\t\t\t} else {\n\t\t\t\t\tvariance = max( variance, 0.0000001 );\n\t\t\t\t\tfloat d = shadowCoord.z - mean;\n\t\t\t\t\tfloat p_max = variance / ( variance + d * d );\n\t\t\t\t\tp_max = clamp( ( p_max - 0.3 ) / 0.65, 0.0, 1.0 );\n\t\t\t\t\tshadow = max( hard_shadow, p_max );\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#else\n\t\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\t\tfloat shadow = 1.0;\n\t\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\tshadowCoord.z -= shadowBias;\n\t\t\t#else\n\t\t\t\tshadowCoord.z += shadowBias;\n\t\t\t#endif\n\t\t\tbool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;\n\t\t\tbool frustumTest = inFrustum && shadowCoord.z <= 1.0;\n\t\t\tif ( frustumTest ) {\n\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;\n\t\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\t\tshadow = step( depth, shadowCoord.z );\n\t\t\t\t#else\n\t\t\t\t\tshadow = step( shadowCoord.z, depth );\n\t\t\t\t#endif\n\t\t\t}\n\t\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t\t}\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t#if defined( SHADOWMAP_TYPE_PCF )\n\tfloat getPointShadow( samplerCubeShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tvec3 bd3D = normalize( lightToPosition );\n\t\tvec3 absVec = abs( lightToPosition );\n\t\tfloat viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );\n\t\tif ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {\n\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\tfloat dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );\n\t\t\t\tdp -= shadowBias;\n\t\t\t#else\n\t\t\t\tfloat dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );\n\t\t\t\tdp += shadowBias;\n\t\t\t#endif\n\t\t\tfloat texelSize = shadowRadius / shadowMapSize.x;\n\t\t\tvec3 absDir = abs( bd3D );\n\t\t\tvec3 tangent = absDir.x > absDir.z ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 );\n\t\t\ttangent = normalize( cross( bd3D, tangent ) );\n\t\t\tvec3 bitangent = cross( bd3D, tangent );\n\t\t\tfloat phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;\n\t\t\tvec2 sample0 = vogelDiskSample( 0, 5, phi );\n\t\t\tvec2 sample1 = vogelDiskSample( 1, 5, phi );\n\t\t\tvec2 sample2 = vogelDiskSample( 2, 5, phi );\n\t\t\tvec2 sample3 = vogelDiskSample( 3, 5, phi );\n\t\t\tvec2 sample4 = vogelDiskSample( 4, 5, phi );\n\t\t\tshadow = (\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * sample0.x + bitangent * sample0.y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * sample1.x + bitangent * sample1.y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * sample2.x + bitangent * sample2.y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * sample3.x + bitangent * sample3.y ) * texelSize, dp ) ) +\n\t\t\t\ttexture( shadowMap, vec4( bd3D + ( tangent * sample4.x + bitangent * sample4.y ) * texelSize, dp ) )\n\t\t\t) * 0.2;\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\t#elif defined( SHADOWMAP_TYPE_BASIC )\n\tfloat getPointShadow( samplerCube shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tfloat shadow = 1.0;\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tvec3 absVec = abs( lightToPosition );\n\t\tfloat viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );\n\t\tif ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {\n\t\t\tfloat dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );\n\t\t\tdp += shadowBias;\n\t\t\tvec3 bd3D = normalize( lightToPosition );\n\t\t\tfloat depth = textureCube( shadowMap, bd3D ).r;\n\t\t\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\t\t\tdepth = 1.0 - depth;\n\t\t\t#endif\n\t\t\tshadow = step( dp, depth );\n\t\t}\n\t\treturn mix( 1.0, shadow, shadowIntensity );\n\t}\n\t#endif\n\t#endif\n#endif";
 
 var shadowmap_pars_vertex = "#if NUM_SPOT_LIGHT_COORDS > 0\n\tuniform mat4 spotLightMatrix[ NUM_SPOT_LIGHT_COORDS ];\n\tvarying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];\n#endif\n#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform mat4 pointShadowMatrix[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowIntensity;\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowNormalBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n#endif";
 
@@ -59612,7 +60002,7 @@ const fragment$a = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_
 
 const vertex$9 = "#define LAMBERT\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-const fragment$9 = "#define LAMBERT\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_lambert_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_lambert_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
+const fragment$9 = "#define LAMBERT\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <cube_uv_reflection_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <envmap_physical_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_lambert_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_lambert_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
 const vertex$8 = "#define MATCAP\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <color_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n\tvViewPosition = - mvPosition.xyz;\n}";
 
@@ -59624,7 +60014,7 @@ const fragment$7 = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SH
 
 const vertex$6 = "#define PHONG\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-const fragment$6 = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
+const fragment$6 = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <cube_uv_reflection_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <envmap_physical_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
 const vertex$5 = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifdef USE_TRANSMISSION\n\tvarying vec3 vWorldPosition;\n#endif\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n#ifdef USE_TRANSMISSION\n\tvWorldPosition = worldPosition.xyz;\n#endif\n}";
 
@@ -59640,7 +60030,7 @@ const fragment$3 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <com
 
 const vertex$2 = "#include <common>\n#include <batching_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
+const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n}";
 
 const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix[ 3 ];\n\tvec2 scale = vec2( length( modelMatrix[ 0 ].xyz ), length( modelMatrix[ 1 ].xyz ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
@@ -59924,7 +60314,6 @@ const UniformsLib = {
 			shadowMapSize: {}
 		} },
 
-		directionalShadowMap: { value: [] },
 		directionalShadowMatrix: { value: [] },
 
 		spotLights: { value: [], properties: {
@@ -59946,7 +60335,6 @@ const UniformsLib = {
 		} },
 
 		spotLightMap: { value: [] },
-		spotShadowMap: { value: [] },
 		spotLightMatrix: { value: [] },
 
 		pointLights: { value: [], properties: {
@@ -59966,7 +60354,6 @@ const UniformsLib = {
 			shadowCameraFar: {}
 		} },
 
-		pointShadowMap: { value: [] },
 		pointShadowMatrix: { value: [] },
 
 		hemisphereLights: { value: [], properties: {
@@ -60051,7 +60438,8 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+				envMapIntensity: { value: 1 }
 			}
 		] ),
 
@@ -60077,7 +60465,8 @@ const ShaderLib = {
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
-				shininess: { value: 30 }
+				shininess: { value: 30 },
+				envMapIntensity: { value: 1 }
 			}
 		] ),
 
@@ -60373,7 +60762,7 @@ const _rgb = { r: 0, b: 0, g: 0 };
 const _e1$1 = /*@__PURE__*/ new Euler();
 const _m1$1 = /*@__PURE__*/ new Matrix4();
 
-function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha ) {
+function WebGLBackground( renderer, environments, state, objects, alpha, premultipliedAlpha ) {
 
 	const clearColor = new Color( 0x000000 );
 	let clearAlpha = alpha === true ? 0 : 1;
@@ -60392,7 +60781,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 		if ( background && background.isTexture ) {
 
 			const usePMREM = scene.backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
-			background = ( usePMREM ? cubeuvmaps : cubemaps ).get( background );
+			background = environments.get( background, usePMREM );
 
 		}
 
@@ -60672,7 +61061,7 @@ function WebGLBindingStates( gl, attributes ) {
 
 		let updateBuffers = false;
 
-		const state = getBindingState( geometry, program, material );
+		const state = getBindingState( object, geometry, program, material );
 
 		if ( currentState !== state ) {
 
@@ -60725,16 +61114,28 @@ function WebGLBindingStates( gl, attributes ) {
 
 	}
 
-	function getBindingState( geometry, program, material ) {
+	function getBindingState( object, geometry, program, material ) {
 
 		const wireframe = ( material.wireframe === true );
 
-		let programMap = bindingStates[ geometry.id ];
+		let objectMap = bindingStates[ geometry.id ];
+
+		if ( objectMap === undefined ) {
+
+			objectMap = {};
+			bindingStates[ geometry.id ] = objectMap;
+
+		}
+
+		// Each InstancedMesh requires unique binding states because it contains instanced attributes.
+		const objectId = ( object.isInstancedMesh === true ) ? object.id : 0;
+
+		let programMap = objectMap[ objectId ];
 
 		if ( programMap === undefined ) {
 
 			programMap = {};
-			bindingStates[ geometry.id ] = programMap;
+			objectMap[ objectId ] = programMap;
 
 		}
 
@@ -61135,7 +61536,45 @@ function WebGLBindingStates( gl, attributes ) {
 
 		for ( const geometryId in bindingStates ) {
 
-			const programMap = bindingStates[ geometryId ];
+			const objectMap = bindingStates[ geometryId ];
+
+			for ( const objectId in objectMap ) {
+
+				const programMap = objectMap[ objectId ];
+
+				for ( const programId in programMap ) {
+
+					const stateMap = programMap[ programId ];
+
+					for ( const wireframe in stateMap ) {
+
+						deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+						delete stateMap[ wireframe ];
+
+					}
+
+					delete programMap[ programId ];
+
+				}
+
+			}
+
+			delete bindingStates[ geometryId ];
+
+		}
+
+	}
+
+	function releaseStatesOfGeometry( geometry ) {
+
+		if ( bindingStates[ geometry.id ] === undefined ) return;
+
+		const objectMap = bindingStates[ geometry.id ];
+
+		for ( const objectId in objectMap ) {
+
+			const programMap = objectMap[ objectId ];
 
 			for ( const programId in programMap ) {
 
@@ -61153,32 +61592,6 @@ function WebGLBindingStates( gl, attributes ) {
 
 			}
 
-			delete bindingStates[ geometryId ];
-
-		}
-
-	}
-
-	function releaseStatesOfGeometry( geometry ) {
-
-		if ( bindingStates[ geometry.id ] === undefined ) return;
-
-		const programMap = bindingStates[ geometry.id ];
-
-		for ( const programId in programMap ) {
-
-			const stateMap = programMap[ programId ];
-
-			for ( const wireframe in stateMap ) {
-
-				deleteVertexArrayObject( stateMap[ wireframe ].object );
-
-				delete stateMap[ wireframe ];
-
-			}
-
-			delete programMap[ programId ];
-
 		}
 
 		delete bindingStates[ geometry.id ];
@@ -61189,25 +61602,72 @@ function WebGLBindingStates( gl, attributes ) {
 
 		for ( const geometryId in bindingStates ) {
 
-			const programMap = bindingStates[ geometryId ];
+			const objectMap = bindingStates[ geometryId ];
 
-			if ( programMap[ program.id ] === undefined ) continue;
+			for ( const objectId in objectMap ) {
 
-			const stateMap = programMap[ program.id ];
+				const programMap = objectMap[ objectId ];
 
-			for ( const wireframe in stateMap ) {
+				if ( programMap[ program.id ] === undefined ) continue;
 
-				deleteVertexArrayObject( stateMap[ wireframe ].object );
+				const stateMap = programMap[ program.id ];
 
-				delete stateMap[ wireframe ];
+				for ( const wireframe in stateMap ) {
+
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+					delete stateMap[ wireframe ];
+
+				}
+
+				delete programMap[ program.id ];
 
 			}
-
-			delete programMap[ program.id ];
 
 		}
 
 	}
+
+	function releaseStatesOfObject( object ) {
+
+		for ( const geometryId in bindingStates ) {
+
+			const objectMap = bindingStates[ geometryId ];
+
+			const objectId = ( object.isInstancedMesh === true ) ? object.id : 0;
+
+			const programMap = objectMap[ objectId ];
+
+			if ( programMap === undefined ) continue;
+
+			for ( const programId in programMap ) {
+
+				const stateMap = programMap[ programId ];
+
+				for ( const wireframe in stateMap ) {
+
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+					delete stateMap[ wireframe ];
+
+				}
+
+				delete programMap[ programId ];
+
+			}
+
+			delete objectMap[ objectId ];
+
+			if ( Object.keys( objectMap ).length === 0 ) {
+
+				delete bindingStates[ geometryId ];
+
+			}
+
+		}
+
+	}
+
 
 	function reset() {
 
@@ -61238,6 +61698,7 @@ function WebGLBindingStates( gl, attributes ) {
 		resetDefaultState: resetDefaultState,
 		dispose: dispose,
 		releaseStatesOfGeometry: releaseStatesOfGeometry,
+		releaseStatesOfObject: releaseStatesOfObject,
 		releaseStatesOfProgram: releaseStatesOfProgram,
 
 		initAttributes: initAttributes,
@@ -61637,101 +62098,6 @@ function WebGLClipping( properties ) {
 		return dstArray;
 
 	}
-
-}
-
-function WebGLCubeMaps( renderer ) {
-
-	let cubemaps = new WeakMap();
-
-	function mapTextureMapping( texture, mapping ) {
-
-		if ( mapping === EquirectangularReflectionMapping ) {
-
-			texture.mapping = CubeReflectionMapping;
-
-		} else if ( mapping === EquirectangularRefractionMapping ) {
-
-			texture.mapping = CubeRefractionMapping;
-
-		}
-
-		return texture;
-
-	}
-
-	function get( texture ) {
-
-		if ( texture && texture.isTexture ) {
-
-			const mapping = texture.mapping;
-
-			if ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) {
-
-				if ( cubemaps.has( texture ) ) {
-
-					const cubemap = cubemaps.get( texture ).texture;
-					return mapTextureMapping( cubemap, texture.mapping );
-
-				} else {
-
-					const image = texture.image;
-
-					if ( image && image.height > 0 ) {
-
-						const renderTarget = new WebGLCubeRenderTarget( image.height );
-						renderTarget.fromEquirectangularTexture( renderer, texture );
-						cubemaps.set( texture, renderTarget );
-
-						texture.addEventListener( 'dispose', onTextureDispose );
-
-						return mapTextureMapping( renderTarget.texture, texture.mapping );
-
-					} else {
-
-						// image not yet ready. try the conversion next frame
-
-						return null;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return texture;
-
-	}
-
-	function onTextureDispose( event ) {
-
-		const texture = event.target;
-
-		texture.removeEventListener( 'dispose', onTextureDispose );
-
-		const cubemap = cubemaps.get( texture );
-
-		if ( cubemap !== undefined ) {
-
-			cubemaps.delete( texture );
-			cubemap.dispose();
-
-		}
-
-	}
-
-	function dispose() {
-
-		cubemaps = new WeakMap();
-
-	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }
 
@@ -62556,24 +62922,20 @@ function _getGGXShader( lodMax, width, height ) {
 			vec3 importanceSampleGGX_VNDF(vec2 Xi, vec3 V, float roughness) {
 				float alpha = roughness * roughness;
 
-				// Section 3.2: Transform view direction to hemisphere configuration
-				vec3 Vh = normalize(vec3(alpha * V.x, alpha * V.y, V.z));
-
 				// Section 4.1: Orthonormal basis
-				float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
-				vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) / sqrt(lensq) : vec3(1.0, 0.0, 0.0);
-				vec3 T2 = cross(Vh, T1);
+				vec3 T1 = vec3(1.0, 0.0, 0.0);
+				vec3 T2 = cross(V, T1);
 
 				// Section 4.2: Parameterization of projected area
 				float r = sqrt(Xi.x);
 				float phi = 2.0 * PI * Xi.y;
 				float t1 = r * cos(phi);
 				float t2 = r * sin(phi);
-				float s = 0.5 * (1.0 + Vh.z);
+				float s = 0.5 * (1.0 + V.z);
 				t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
 
 				// Section 4.3: Reprojection onto hemisphere
-				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * V;
 
 				// Section 3.4: Transform back to ellipsoid configuration
 				return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(0.0, Nh.z)));
@@ -62879,13 +63241,245 @@ function _getCommonVertexShader() {
 
 }
 
-function WebGLCubeUVMaps( renderer ) {
+/**
+ * A cube render target used in context of {@link WebGLRenderer}.
+ *
+ * @augments WebGLRenderTarget
+ */
+class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	let cubeUVmaps = new WeakMap();
+	/**
+	 * Constructs a new cube render target.
+	 *
+	 * @param {number} [size=1] - The size of the render target.
+	 * @param {RenderTarget~Options} [options] - The configuration object.
+	 */
+	constructor( size = 1, options = {} ) {
+
+		super( size, size, options );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isWebGLCubeRenderTarget = true;
+
+		const image = { width: size, height: size, depth: 1 };
+		const images = [ image, image, image, image, image, image ];
+
+		/**
+		 * Overwritten with a different texture type.
+		 *
+		 * @type {DataArrayTexture}
+		 */
+		this.texture = new CubeTexture( images );
+		this._setTextureOptions( options );
+
+		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
+		// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
+		// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
+
+		// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
+		// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
+		// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
+
+		this.texture.isRenderTargetTexture = true;
+
+	}
+
+	/**
+	 * Converts the given equirectangular texture to a cube map.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {Texture} texture - The equirectangular texture.
+	 * @return {WebGLCubeRenderTarget} A reference to this cube render target.
+	 */
+	fromEquirectangularTexture( renderer, texture ) {
+
+		this.texture.type = texture.type;
+		this.texture.colorSpace = texture.colorSpace;
+
+		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.minFilter = texture.minFilter;
+		this.texture.magFilter = texture.magFilter;
+
+		const shader = {
+
+			uniforms: {
+				tEquirect: { value: null },
+			},
+
+			vertexShader: /* glsl */`
+
+				varying vec3 vWorldDirection;
+
+				vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
+
+					return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
+
+				}
+
+				void main() {
+
+					vWorldDirection = transformDirection( position, modelMatrix );
+
+					#include <begin_vertex>
+					#include <project_vertex>
+
+				}
+			`,
+
+			fragmentShader: /* glsl */`
+
+				uniform sampler2D tEquirect;
+
+				varying vec3 vWorldDirection;
+
+				#include <common>
+
+				void main() {
+
+					vec3 direction = normalize( vWorldDirection );
+
+					vec2 sampleUV = equirectUv( direction );
+
+					gl_FragColor = texture2D( tEquirect, sampleUV );
+
+				}
+			`
+		};
+
+		const geometry = new BoxGeometry( 5, 5, 5 );
+
+		const material = new ShaderMaterial( {
+
+			name: 'CubemapFromEquirect',
+
+			uniforms: cloneUniforms( shader.uniforms ),
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
+			side: BackSide,
+			blending: NoBlending
+
+		} );
+
+		material.uniforms.tEquirect.value = texture;
+
+		const mesh = new Mesh( geometry, material );
+
+		const currentMinFilter = texture.minFilter;
+
+		// Avoid blurred poles
+		if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
+
+		const camera = new CubeCamera( 1, 10, this );
+		camera.update( renderer, mesh );
+
+		texture.minFilter = currentMinFilter;
+
+		mesh.geometry.dispose();
+		mesh.material.dispose();
+
+		return this;
+
+	}
+
+	/**
+	 * Clears this cube render target.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
+	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
+	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
+	 */
+	clear( renderer, color = true, depth = true, stencil = true ) {
+
+		const currentRenderTarget = renderer.getRenderTarget();
+
+		for ( let i = 0; i < 6; i ++ ) {
+
+			renderer.setRenderTarget( this, i );
+
+			renderer.clear( color, depth, stencil );
+
+		}
+
+		renderer.setRenderTarget( currentRenderTarget );
+
+	}
+
+}
+
+function WebGLEnvironments( renderer ) {
+
+	let cubeMaps = new WeakMap();
+	let pmremMaps = new WeakMap();
 
 	let pmremGenerator = null;
 
-	function get( texture ) {
+	function get( texture, usePMREM = false ) {
+
+		if ( texture === null || texture === undefined ) return null;
+
+		if ( usePMREM ) {
+
+			return getPMREM( texture );
+
+		}
+
+		return getCube( texture );
+
+	}
+
+	function getCube( texture ) {
+
+		if ( texture && texture.isTexture ) {
+
+			const mapping = texture.mapping;
+
+			if ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) {
+
+				if ( cubeMaps.has( texture ) ) {
+
+					const cubemap = cubeMaps.get( texture ).texture;
+					return mapTextureMapping( cubemap, texture.mapping );
+
+				} else {
+
+					const image = texture.image;
+
+					if ( image && image.height > 0 ) {
+
+						const renderTarget = new WebGLCubeRenderTarget( image.height );
+						renderTarget.fromEquirectangularTexture( renderer, texture );
+						cubeMaps.set( texture, renderTarget );
+
+						texture.addEventListener( 'dispose', onCubemapDispose );
+
+						return mapTextureMapping( renderTarget.texture, texture.mapping );
+
+					} else {
+
+						// image not yet ready. try the conversion next frame
+
+						return null;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return texture;
+
+	}
+
+	function getPMREM( texture ) {
 
 		if ( texture && texture.isTexture ) {
 
@@ -62898,7 +63492,7 @@ function WebGLCubeUVMaps( renderer ) {
 
 			if ( isEquirectMap || isCubeMap ) {
 
-				let renderTarget = cubeUVmaps.get( texture );
+				let renderTarget = pmremMaps.get( texture );
 
 				const currentPMREMVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : 0;
 
@@ -62909,7 +63503,7 @@ function WebGLCubeUVMaps( renderer ) {
 					renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture, renderTarget ) : pmremGenerator.fromCubemap( texture, renderTarget );
 					renderTarget.texture.pmremVersion = texture.pmremVersion;
 
-					cubeUVmaps.set( texture, renderTarget );
+					pmremMaps.set( texture, renderTarget );
 
 					return renderTarget.texture;
 
@@ -62930,9 +63524,9 @@ function WebGLCubeUVMaps( renderer ) {
 							renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture ) : pmremGenerator.fromCubemap( texture );
 							renderTarget.texture.pmremVersion = texture.pmremVersion;
 
-							cubeUVmaps.set( texture, renderTarget );
+							pmremMaps.set( texture, renderTarget );
 
-							texture.addEventListener( 'dispose', onTextureDispose );
+							texture.addEventListener( 'dispose', onPMREMDispose );
 
 							return renderTarget.texture;
 
@@ -62956,6 +63550,22 @@ function WebGLCubeUVMaps( renderer ) {
 
 	}
 
+	function mapTextureMapping( texture, mapping ) {
+
+		if ( mapping === EquirectangularReflectionMapping ) {
+
+			texture.mapping = CubeReflectionMapping;
+
+		} else if ( mapping === EquirectangularRefractionMapping ) {
+
+			texture.mapping = CubeRefractionMapping;
+
+		}
+
+		return texture;
+
+	}
+
 	function isCubeTextureComplete( image ) {
 
 		let count = 0;
@@ -62969,21 +63579,37 @@ function WebGLCubeUVMaps( renderer ) {
 
 		return count === length;
 
-
 	}
 
-	function onTextureDispose( event ) {
+	function onCubemapDispose( event ) {
 
 		const texture = event.target;
 
-		texture.removeEventListener( 'dispose', onTextureDispose );
+		texture.removeEventListener( 'dispose', onCubemapDispose );
 
-		const cubemapUV = cubeUVmaps.get( texture );
+		const cubemap = cubeMaps.get( texture );
 
-		if ( cubemapUV !== undefined ) {
+		if ( cubemap !== undefined ) {
 
-			cubeUVmaps.delete( texture );
-			cubemapUV.dispose();
+			cubeMaps.delete( texture );
+			cubemap.dispose();
+
+		}
+
+	}
+
+	function onPMREMDispose( event ) {
+
+		const texture = event.target;
+
+		texture.removeEventListener( 'dispose', onPMREMDispose );
+
+		const pmrem = pmremMaps.get( texture );
+
+		if ( pmrem !== undefined ) {
+
+			pmremMaps.delete( texture );
+			pmrem.dispose();
 
 		}
 
@@ -62991,7 +63617,8 @@ function WebGLCubeUVMaps( renderer ) {
 
 	function dispose() {
 
-		cubeUVmaps = new WeakMap();
+		cubeMaps = new WeakMap();
+		pmremMaps = new WeakMap();
 
 		if ( pmremGenerator !== null ) {
 
@@ -63150,6 +63777,12 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		const geometryPosition = geometry.attributes.position;
 		let version = 0;
 
+		if ( geometryPosition === undefined ) {
+
+			return;
+
+		}
+
 		if ( geometryIndex !== null ) {
 
 			const array = geometryIndex.array;
@@ -63165,7 +63798,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else if ( geometryPosition !== undefined ) {
+		} else {
 
 			const array = geometryPosition.array;
 			version = geometryPosition.version;
@@ -63180,13 +63813,11 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else {
-
-			return;
-
 		}
 
-		const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		// check whether a 32 bit or 16 bit buffer is required to store the indices
+		// account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
+		const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 		attribute.version = version;
 
 		// Updating index buffer in VAO now. See WebGLBindingStates
@@ -63572,7 +64203,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 }
 
-function WebGLObjects( gl, geometries, attributes, info ) {
+function WebGLObjects( gl, geometries, attributes, bindingStates, info ) {
 
 	let updateMap = new WeakMap();
 
@@ -63646,6 +64277,8 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 		const instancedMesh = event.target;
 
 		instancedMesh.removeEventListener( 'dispose', onInstancedMeshDispose );
+
+		bindingStates.releaseStatesOfObject( instancedMesh );
 
 		attributes.remove( instancedMesh.instanceMatrix );
 
@@ -65840,8 +66473,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
 			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
-			parameters.vertexColors || parameters.instancingColor || parameters.batchingColor ? '#define USE_COLOR' : '',
-			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
+			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
+			parameters.vertexAlphas || parameters.batchingColor ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUv1s ? '#define USE_UV1' : '',
 			parameters.vertexUv2s ? '#define USE_UV2' : '',
 			parameters.vertexUv3s ? '#define USE_UV3' : '',
@@ -66255,7 +66888,7 @@ class WebGLShaderStage {
 
 }
 
-function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
+function WebGLPrograms( renderer, environments, extensions, capabilities, bindingStates, clipping ) {
 
 	const _programLayers = new Layers();
 	const _customShaders = new WebGLShaderCache();
@@ -66299,9 +66932,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const fog = scene.fog;
 		const geometry = object.geometry;
-		const environment = material.isMeshStandardMaterial ? scene.environment : null;
+		const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 
-		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
+		const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
+		const envMap = environments.get( material.envMap || environment, usePMREM );
 		const envMapCubeUVHeight = ( !! envMap ) && ( envMap.mapping === CubeUVReflectionMapping ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
@@ -66550,7 +67184,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			useFog: material.fog === true,
 			fogExp2: ( !! fog && fog.isFogExp2 ),
 
-			flatShading: ( material.flatShading === true && material.wireframe === false ),
+			flatShading: material.wireframe === false && (
+				material.flatShading === true ||
+				( geometry.attributes.normal === undefined && HAS_NORMALMAP === false &&
+					( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial || material.isMeshPhysicalMaterial )
+				)
+			),
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
@@ -66969,6 +67608,10 @@ function painterSortStable( a, b ) {
 
 		return a.material.id - b.material.id;
 
+	} else if ( a.materialVariant !== b.materialVariant ) {
+
+		return a.materialVariant - b.materialVariant;
+
 	} else if ( a.z !== b.z ) {
 
 		return a.z - b.z;
@@ -67023,6 +67666,15 @@ function WebGLRenderList() {
 
 	}
 
+	function materialVariant( object ) {
+
+		let variant = 0;
+		if ( object.isInstancedMesh ) variant += 2;
+		if ( object.isSkinnedMesh ) variant += 1;
+		return variant;
+
+	}
+
 	function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
 
 		let renderItem = renderItems[ renderItemsIndex ];
@@ -67034,6 +67686,7 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
+				materialVariant: materialVariant( object ),
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
@@ -67048,6 +67701,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
+			renderItem.materialVariant = materialVariant( object );
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
@@ -67957,10 +68611,10 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		if ( lights.length === 0 ) return;
 
-		if ( lights.type === PCFSoftShadowMap ) {
+		if ( this.type === PCFSoftShadowMap ) {
 
 			warn( 'WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.' );
-			lights.type = PCFShadowMap;
+			this.type = PCFShadowMap;
 
 		}
 
@@ -68058,6 +68712,9 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			}
 
+			const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+			shadow.camera._reversedDepth = reversedDepthBuffer;
+
 			if ( shadow.map === null || typeChanged === true ) {
 
 				if ( shadow.map !== null ) {
@@ -68115,8 +68772,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 					shadow.map.depthTexture.name = light.name + '.shadowMap';
 					shadow.map.depthTexture.format = DepthFormat;
-
-					const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
 
 					if ( this.type === PCFShadowMap ) {
 
@@ -68456,18 +69111,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 }
 
-const reversedFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
-	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
-	[ LessEqualDepth ]: GreaterEqualDepth,
-
-	[ AlwaysDepth ]: NeverDepth,
-	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
-	[ GreaterEqualDepth ]: LessEqualDepth,
-};
-
 function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
@@ -68599,7 +69242,7 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( depthFunc ) {
 
-				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
+				if ( currentReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -68667,6 +69310,8 @@ function WebGLState( gl, extensions ) {
 
 				if ( currentDepthClear !== depth ) {
 
+					currentDepthClear = depth;
+
 					if ( currentReversed ) {
 
 						depth = 1 - depth;
@@ -68674,7 +69319,6 @@ function WebGLState( gl, extensions ) {
 					}
 
 					gl.clearDepth( depth );
-					currentDepthClear = depth;
 
 				}
 
@@ -69328,10 +69972,16 @@ function WebGLState( gl, extensions ) {
 
 			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				currentPolygonOffsetFactor = factor;
 				currentPolygonOffsetUnits = units;
+
+				if ( depthBuffer.getReversed() ) {
+
+					factor = - factor;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 
@@ -73274,8 +73924,8 @@ class WebXRManager extends EventDispatcher {
 
 			// inherit camera layers and enable eye layers (1 = left, 2 = right)
 			cameraXR.layers.mask = camera.layers.mask | 0b110;
-			cameraL.layers.mask = cameraXR.layers.mask & 0b011;
-			cameraR.layers.mask = cameraXR.layers.mask & 0b101;
+			cameraL.layers.mask = cameraXR.layers.mask & -5;
+			cameraR.layers.mask = cameraXR.layers.mask & -3;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
@@ -73669,6 +74319,12 @@ function WebGLMaterials( renderer, properties ) {
 
 			refreshUniformsCommon( uniforms, material );
 
+			if ( material.envMap ) {
+
+				uniforms.envMapIntensity.value = material.envMapIntensity;
+
+			}
+
 		} else if ( material.isMeshToonMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
@@ -73678,6 +74334,12 @@ function WebGLMaterials( renderer, properties ) {
 
 			refreshUniformsCommon( uniforms, material );
 			refreshUniformsPhong( uniforms, material );
+
+			if ( material.envMap ) {
+
+				uniforms.envMapIntensity.value = material.envMapIntensity;
+
+			}
 
 		} else if ( material.isMeshStandardMaterial ) {
 
@@ -74740,7 +75402,7 @@ class WebGLRenderer {
 		// public properties
 
 		/**
-		 * A canvas where the renderer draws its output.This is automatically created by the renderer
+		 * A canvas where the renderer draws its output. This is automatically created by the renderer
 		 * in the constructor (if not provided already); you just need to add it to your page like so:
 		 * ```js
 		 * document.body.appendChild( renderer.domElement );
@@ -74756,7 +75418,7 @@ class WebGLRenderer {
 		 * - `checkShaderErrors`: If it is `true`, defines whether material shader programs are
 		 * checked for errors during compilation and linkage process. It may be useful to disable
 		 * this check in production for performance gain. It is strongly recommended to keep these
-		 * checks enabled during development. If the shader does not compile and link - it will not
+		 * checks enabled during development. If the shader does not compile and link, it will not
 		 * work and associated material will not render.
 		 * - `onShaderError(gl, program, glVertexShader,glFragmentShader)`: A callback function that
 		 * can be used for custom error reporting. The callback receives the WebGL context, an instance
@@ -75005,7 +75667,7 @@ class WebGLRenderer {
 		}
 
 		let extensions, capabilities, state, info;
-		let properties, textures, cubemaps, cubeuvmaps, attributes, geometries, objects;
+		let properties, textures, environments, attributes, geometries, objects;
 		let programCache, materials, renderLists, renderStates, clipping, shadowMap;
 
 		let background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -75032,19 +75694,18 @@ class WebGLRenderer {
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
-			cubemaps = new WebGLCubeMaps( _this );
-			cubeuvmaps = new WebGLCubeUVMaps( _this );
+			environments = new WebGLEnvironments( _this );
 			attributes = new WebGLAttributes( _gl );
 			bindingStates = new WebGLBindingStates( _gl, attributes );
 			geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
-			objects = new WebGLObjects( _gl, geometries, attributes, info );
+			objects = new WebGLObjects( _gl, geometries, attributes, bindingStates, info );
 			morphtargets = new WebGLMorphtargets( _gl, capabilities, textures );
 			clipping = new WebGLClipping( properties );
-			programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
+			programCache = new WebGLPrograms( _this, environments, extensions, capabilities, bindingStates, clipping );
 			materials = new WebGLMaterials( _this, properties );
 			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates( extensions );
-			background = new WebGLBackground( _this, cubemaps, cubeuvmaps, state, objects, _alpha, premultipliedAlpha );
+			background = new WebGLBackground( _this, environments, state, objects, _alpha, premultipliedAlpha );
 			shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 			uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 
@@ -75601,7 +76262,11 @@ class WebGLRenderer {
 
 			}
 
-			_gl.clear( bits );
+			if ( bits !== 0 ) {
+
+				_gl.clear( bits );
+
+			}
 
 		};
 
@@ -75646,8 +76311,7 @@ class WebGLRenderer {
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
-			cubemaps.dispose();
-			cubeuvmaps.dispose();
+			environments.dispose();
 			objects.dispose();
 			bindingStates.dispose();
 			uniformsGroups.dispose();
@@ -76726,9 +77390,11 @@ class WebGLRenderer {
 
 			// always update environment and fog - changing these trigger an getProgram call, but it's possible that the program doesn't change
 
-			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
+			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
-			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
+
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
+			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
 			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 			if ( programs === undefined ) {
@@ -76801,12 +77467,9 @@ class WebGLRenderer {
 				uniforms.pointLightShadows.value = lights.state.pointShadow;
 				uniforms.hemisphereLights.value = lights.state.hemi;
 
-				uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
 				uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
-				uniforms.spotShadowMap.value = lights.state.spotShadowMap;
 				uniforms.spotLightMatrix.value = lights.state.spotLightMatrix;
 				uniforms.spotLightMap.value = lights.state.spotLightMap;
-				uniforms.pointShadowMap.value = lights.state.pointShadowMap;
 				uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
 				// TODO (abelnation): add area lights shadow info to uniforms
 
@@ -76862,9 +77525,10 @@ class WebGLRenderer {
 			textures.resetTextureUnits();
 
 			const fog = scene.fog;
-			const environment = material.isMeshStandardMaterial ? scene.environment : null;
+			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
-			const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
+			const envMap = environments.get( material.envMap || environment, usePMREM );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !! geometry.attributes.tangent && ( !! material.normalMap || material.anisotropy > 0 );
 			const morphTargets = !! geometry.morphAttributes.position;
@@ -77189,17 +77853,7 @@ class WebGLRenderer {
 
 			}
 
-			// https://github.com/mrdoob/three.js/pull/24467#issuecomment-1209031512
-
-			if ( material.isMeshGouraudMaterial && material.envMap !== null ) {
-
-				m_uniforms.envMap.value = envMap;
-
-				m_uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? -1 : 1;
-
-			}
-
-			if ( material.isMeshStandardMaterial && material.envMap === null && scene.environment !== null ) {
+			if ( ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) && material.envMap === null && scene.environment !== null ) {
 
 				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
 
@@ -77592,6 +78246,10 @@ class WebGLRenderer {
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
+					// when using MRT, select the correct color buffer for the subsequent read command
+
+					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
+
 					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
@@ -77609,10 +78267,6 @@ class WebGLRenderer {
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
 					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-						// when using MRT, select the correct color buffer for the subsequent read command
-
-						if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
 						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), buffer );
 
@@ -77674,6 +78328,11 @@ class WebGLRenderer {
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
+					// when using MRT, select the correct color buffer for the subsequent read command
+
+					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
+
+
 					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
@@ -77689,10 +78348,6 @@ class WebGLRenderer {
 					const glBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
-
-					// when using MRT, select the correct color buffer for the subsequent read command
-
-					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
 
@@ -77763,27 +78418,9 @@ class WebGLRenderer {
 		 * @param {?(Box2|Box3)} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
 		 * @param {?(Vector2|Vector3)} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
 		 * @param {number} [srcLevel=0] - The source mipmap level to copy.
-		 * @param {?number} [dstLevel=null] - The destination mipmap level.
+		 * @param {?number} [dstLevel=0] - The destination mipmap level.
 		 */
-		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
-
-			// support the previous signature with just a single dst mipmap level
-			if ( dstLevel === null ) {
-
-				if ( srcLevel !== 0 ) {
-
-					// @deprecated, r171
-					warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.' );
-					dstLevel = srcLevel;
-					srcLevel = 0;
-
-				} else {
-
-					dstLevel = 0;
-
-				}
-
-			}
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
@@ -78158,6 +78795,7 @@ exports.BackSide = BackSide;
 exports.BasicDepthPacking = BasicDepthPacking;
 exports.BasicShadowMap = BasicShadowMap;
 exports.BatchedMesh = BatchedMesh;
+exports.BezierInterpolant = BezierInterpolant;
 exports.Bone = Bone;
 exports.BooleanKeyframeTrack = BooleanKeyframeTrack;
 exports.Box2 = Box2;
@@ -78182,6 +78820,7 @@ exports.Clock = Clock;
 exports.Color = Color;
 exports.ColorKeyframeTrack = ColorKeyframeTrack;
 exports.ColorManagement = ColorManagement;
+exports.Compatibility = Compatibility;
 exports.CompressedArrayTexture = CompressedArrayTexture;
 exports.CompressedCubeTexture = CompressedCubeTexture;
 exports.CompressedTexture = CompressedTexture;
@@ -78284,6 +78923,7 @@ exports.IntType = IntType;
 exports.InterleavedBuffer = InterleavedBuffer;
 exports.InterleavedBufferAttribute = InterleavedBufferAttribute;
 exports.Interpolant = Interpolant;
+exports.InterpolateBezier = InterpolateBezier;
 exports.InterpolateDiscrete = InterpolateDiscrete;
 exports.InterpolateLinear = InterpolateLinear;
 exports.InterpolateSmooth = InterpolateSmooth;
@@ -78328,6 +78968,7 @@ exports.LoopPingPong = LoopPingPong;
 exports.LoopRepeat = LoopRepeat;
 exports.MOUSE = MOUSE;
 exports.Material = Material;
+exports.MaterialBlending = MaterialBlending;
 exports.MaterialLoader = MaterialLoader;
 exports.MathUtils = MathUtils;
 exports.Matrix2 = Matrix2;

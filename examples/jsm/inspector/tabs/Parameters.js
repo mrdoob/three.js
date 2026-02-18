@@ -13,6 +13,8 @@ class ParametersGroup {
 
 		this.paramList = new Item( name );
 
+		this.objects = [];
+
 	}
 
 	close() {
@@ -92,6 +94,15 @@ class ParametersGroup {
 			return editor;
 
 		};
+
+
+		this._registerParameter( object, property, editor, subItem );
+
+	}
+
+	_registerParameter( object, property, editor, subItem ) {
+
+		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
 
 	}
 
@@ -291,6 +302,8 @@ class ParametersGroup {
 
 		};
 
+		this._registerParameter( object, property, editor, subItem );
+
 		return editor;
 
 	}
@@ -315,6 +328,8 @@ class Parameters extends Tab {
 
 		this.paramList = paramList;
 
+		this.groups = [];
+
 	}
 
 	createGroup( name ) {
@@ -322,6 +337,7 @@ class Parameters extends Tab {
 		const group = new ParametersGroup( this, name );
 
 		this.paramList.add( group.paramList );
+		this.groups.push( group );
 
 		return group;
 

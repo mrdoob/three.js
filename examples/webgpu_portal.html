@@ -43,7 +43,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, sceneMain, scenePortal, renderer;
-			let clock;
+			let timer;
 
 			const mixers = [];
 
@@ -68,7 +68,8 @@
 				camera.position.multiplyScalar( .8 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -182,7 +183,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				for ( const mixer of mixers ) {
 

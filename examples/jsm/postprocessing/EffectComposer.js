@@ -1,7 +1,7 @@
 import {
-	Clock,
 	HalfFloatType,
 	NoBlending,
+	Timer,
 	Vector2,
 	WebGLRenderTarget
 } from 'three';
@@ -121,12 +121,12 @@ class EffectComposer {
 		this.copyPass.material.blending = NoBlending;
 
 		/**
-		 * The internal clock for managing time data.
+		 * The internal timer for managing time data.
 		 *
 		 * @private
-		 * @type {Clock}
+		 * @type {Timer}
 		 */
-		this.clock = new Clock();
+		this.timer = new Timer();
 
 	}
 
@@ -215,9 +215,11 @@ class EffectComposer {
 
 		// deltaTime value is in seconds
 
+		this.timer.update();
+
 		if ( deltaTime === undefined ) {
 
-			deltaTime = this.clock.getDelta();
+			deltaTime = this.timer.getDelta();
 
 		}
 

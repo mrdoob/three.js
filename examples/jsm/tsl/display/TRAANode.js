@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Fn, max, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
+import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -376,13 +376,10 @@ class TRAANode extends TempNode {
 
 		if ( needsRestart === true ) {
 
-			// bind and clear render target to make sure they are initialized after the resize which triggers a dispose()
+			// make sure render targets are initialized after the resize which triggers a dispose()
 
-			renderer.setRenderTarget( this._historyRenderTarget );
-			renderer.clear();
-
-			renderer.setRenderTarget( this._resolveRenderTarget );
-			renderer.clear();
+			renderer.initRenderTarget( this._historyRenderTarget );
+			renderer.initRenderTarget( this._resolveRenderTarget );
 
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
@@ -434,20 +431,20 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const postProcessing = builder.context.postProcessing;
+		const renderPipeline = builder.context.renderPipeline;
 
-		if ( postProcessing ) {
+		if ( renderPipeline ) {
 
 			this._needsPostProcessingSync = true;
 
-			postProcessing.context.onBeforePostProcessing = () => {
+			renderPipeline.context.onBeforeRenderPipeline = () => {
 
 				const size = builder.renderer.getDrawingBufferSize( _size );
 				this.setViewOffset( size.width, size.height );
 
 			};
 
-			postProcessing.context.onAfterPostProcessing = () => {
+			renderPipeline.context.onAfterRenderPipeline = () => {
 
 				this.clearViewOffset();
 
@@ -726,4 +723,4 @@ const _haltonOffsets = /*@__PURE__*/ Array.from(
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {TRAANode}
  */
-export const traa = ( beautyNode, depthNode, velocityNode, camera ) => nodeObject( new TRAANode( convertToTexture( beautyNode ), depthNode, velocityNode, camera ) );
+export const traa = ( beautyNode, depthNode, velocityNode, camera ) => new TRAANode( convertToTexture( beautyNode ), depthNode, velocityNode, camera );

@@ -1,4 +1,4 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.17.3';
 
@@ -97,7 +97,7 @@ async function RapierPhysics() {
 
 	if ( RAPIER === null ) {
 
-		RAPIER = await import( `${RAPIER_PATH}` );
+		RAPIER = await import( RAPIER_PATH /* @vite-ignore */ );
 		await RAPIER.init();
 
 	}
@@ -301,11 +301,13 @@ async function RapierPhysics() {
 
 	//
 
-	const clock = new Clock();
+	const timer = new Timer();
 
 	function step() {
 
-		world.timestep = clock.getDelta();
+		timer.update();
+
+		world.timestep = timer.getDelta();
 		world.step();
 
 		//

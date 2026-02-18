@@ -48,7 +48,7 @@
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, stats;
-			let composer, renderer, mixer, clock;
+			let composer, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -63,7 +63,8 @@
 
 				const container = document.getElementById( 'container' );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -174,7 +175,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

@@ -26,7 +26,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>backend</strong>
+										<strong translate="no">backend</strong>
 									</td>
 									<td class="description last">
 										<p>The backend the renderer is targeting (e.g. WebGPU or WebGL 2).</p>
@@ -34,7 +34,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>parameters</strong>
+										<strong translate="no">parameters</strong>
 									</td>
 									<td class="description last">
 										<p>The configuration parameter.</p>
@@ -227,7 +227,7 @@ further processing.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Whether logarithmic depth buffer is enabled or not.</p>
 						<p>Default is <code>false</code>.</p>
@@ -258,6 +258,13 @@ If this is the case, the renderer allocates an internal render target for that p
 					<div class="description">
 						<p>Defines the output color space of the renderer.</p>
 						<p>Default is <code>SRGBColorSpace</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="reversedDepthBuffer" translate="no">.<a href="#reversedDepthBuffer">reversedDepthBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether reversed depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -328,7 +335,7 @@ e.g. manually determining each object's rendering order.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the color buffer should be cleared or not.</p>
@@ -337,7 +344,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depth</strong>
+										<strong translate="no">depth</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the depth buffer should be cleared or not.</p>
@@ -346,7 +353,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>stencil</strong>
+										<strong translate="no">stencil</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the stencil buffer should be cleared or not.</p>
@@ -365,7 +372,7 @@ e.g. manually determining each object's rendering order.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the color buffer should be cleared or not.</p>
@@ -374,7 +381,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depth</strong>
+										<strong translate="no">depth</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the depth buffer should be cleared or not.</p>
@@ -383,7 +390,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>stencil</strong>
+										<strong translate="no">stencil</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the stencil buffer should be cleared or not.</p>
@@ -462,7 +469,7 @@ e.g. manually determining each object's rendering order.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or 3D object to precompile.</p>
@@ -470,7 +477,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -478,7 +485,7 @@ e.g. manually determining each object's rendering order.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>targetScene</strong>
+										<strong translate="no">targetScene</strong>
 									</td>
 									<td class="description last">
 										<p>If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.</p>
@@ -504,7 +511,7 @@ and environment must be configured before calling this method.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or 3D object to precompile.</p>
@@ -512,7 +519,7 @@ and environment must be configured before calling this method.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -520,7 +527,7 @@ and environment must be configured before calling this method.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>targetScene</strong>
+										<strong translate="no">targetScene</strong>
 									</td>
 									<td class="description last">
 										<p>If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.</p>
@@ -543,7 +550,7 @@ if the renderer has been initialized.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>computeNodes</strong>
+										<strong translate="no">computeNodes</strong>
 									</td>
 									<td class="description last">
 										<p>The compute node(s).</p>
@@ -551,7 +558,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dispatchSize</strong>
+										<strong translate="no">dispatchSize</strong>
 									</td>
 									<td class="description last">
 										<ul>
@@ -577,7 +584,7 @@ if the renderer has been initialized.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>computeNodes</strong>
+										<strong translate="no">computeNodes</strong>
 									</td>
 									<td class="description last">
 										<p>The compute node(s).</p>
@@ -585,7 +592,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dispatchSize</strong>
+										<strong translate="no">dispatchSize</strong>
 									</td>
 									<td class="description last">
 										<ul>
@@ -611,7 +618,7 @@ if the renderer has been initialized.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>framebufferTexture</strong>
+										<strong translate="no">framebufferTexture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -619,7 +626,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>rectangle</strong>
+										<strong translate="no">rectangle</strong>
 									</td>
 									<td class="description last">
 										<p>A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.</p>
@@ -638,7 +645,7 @@ if the renderer has been initialized.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>srcTexture</strong>
+										<strong translate="no">srcTexture</strong>
 									</td>
 									<td class="description last">
 										<p>The source texture.</p>
@@ -646,7 +653,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstTexture</strong>
+										<strong translate="no">dstTexture</strong>
 									</td>
 									<td class="description last">
 										<p>The destination texture.</p>
@@ -654,7 +661,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>srcRegion</strong>
+										<strong translate="no">srcRegion</strong>
 									</td>
 									<td class="description last">
 										<p>A bounding box which describes the source region. Can be two or three-dimensional.</p>
@@ -663,7 +670,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstPosition</strong>
+										<strong translate="no">dstPosition</strong>
 									</td>
 									<td class="description last">
 										<p>A vector that represents the origin of the destination region. Can be two or three-dimensional.</p>
@@ -672,7 +679,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>srcLevel</strong>
+										<strong translate="no">srcLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The source mip level to copy from.</p>
@@ -681,7 +688,7 @@ if the renderer has been initialized.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstLevel</strong>
+										<strong translate="no">dstLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The destination mip level to copy to.</p>
@@ -735,7 +742,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>attribute</strong>
+										<strong translate="no">attribute</strong>
 									</td>
 									<td class="description last">
 										<p>The storage buffer attribute.</p>
@@ -774,7 +781,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -834,7 +841,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -918,7 +925,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -948,7 +955,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -969,7 +976,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -979,6 +986,28 @@ from the GPU to the CPU in context of compute shaders.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The viewport definition.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasCompatibility" translate="no">.<a href="#hasCompatibility">hasCompatibility</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given compatibility is supported by the selected backend. If the
+renderer has not been initialized, this method always returns <code>false</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The compatibility's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the compatibility is supported or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="hasFeature" translate="no">.<a href="#hasFeature">hasFeature</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
@@ -991,7 +1020,7 @@ renderer has not been initialized, this method always returns <code>false</code>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The feature's name.</p>
@@ -1012,7 +1041,7 @@ renderer has not been initialized, this method always returns <code>false</code>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The feature's name.</p>
@@ -1045,6 +1074,24 @@ renderer has not been initialized, this method always returns <code>false</code>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the renderer has been initialized.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="initRenderTarget" translate="no">.<a href="#initRenderTarget">initRenderTarget</a><span class="signature">( renderTarget : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the given render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to intialize.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="initTexture" translate="no">.<a href="#initTexture">initTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1056,7 +1103,7 @@ renderer has not been initialized, this method always returns <code>false</code>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -1075,7 +1122,7 @@ renderer has not been initialized, this method always returns <code>false</code>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -1101,7 +1148,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to test.</p>
@@ -1122,7 +1169,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to read from.</p>
@@ -1130,7 +1177,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>x</code> coordinate of the copy region's origin.</p>
@@ -1138,7 +1185,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>y</code> coordinate of the copy region's origin.</p>
@@ -1146,7 +1193,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the copy region.</p>
@@ -1154,7 +1201,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the copy region.</p>
@@ -1162,7 +1209,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureIndex</strong>
+										<strong translate="no">textureIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The texture index of a MRT render target.</p>
@@ -1171,7 +1218,7 @@ It returns <code>true</code> if the given 3D object is fully occluded by other
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>faceIndex</strong>
+										<strong translate="no">faceIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The active cube face index.</p>
@@ -1200,7 +1247,7 @@ or alternatively a render target when specified via <code>setRenderTarget()</cod
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or 3D object to render.</p>
@@ -1208,7 +1255,7 @@ or alternatively a render target when specified via <code>setRenderTarget()</cod
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to render the scene with.</p>
@@ -1226,7 +1273,7 @@ or alternatively a render target when specified via <code>setRenderTarget()</cod
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or 3D object to render.</p>
@@ -1234,7 +1281,7 @@ or alternatively a render target when specified via <code>setRenderTarget()</cod
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera.</p>
@@ -1259,7 +1306,7 @@ of the object.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -1267,7 +1314,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene the 3D object belongs to.</p>
@@ -1275,7 +1322,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera the object should be rendered with.</p>
@@ -1283,7 +1330,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The object's geometry.</p>
@@ -1291,7 +1338,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The object's material.</p>
@@ -1299,7 +1346,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>Only relevant for objects using multiple materials. This represents a group entry from the respective <code>BufferGeometry</code>.</p>
@@ -1307,7 +1354,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>lightsNode</strong>
+										<strong translate="no">lightsNode</strong>
 									</td>
 									<td class="description last">
 										<p>The current lights node.</p>
@@ -1315,7 +1362,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>clippingContext</strong>
+										<strong translate="no">clippingContext</strong>
 									</td>
 									<td class="description last">
 										<p>The clipping context.</p>
@@ -1324,7 +1371,7 @@ of the object.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>passId</strong>
+										<strong translate="no">passId</strong>
 									</td>
 									<td class="description last">
 										<p>An optional ID for identifying the pass.</p>
@@ -1345,7 +1392,7 @@ for best compatibility.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The application's animation loop.</p>
@@ -1367,7 +1414,7 @@ or the offscreen canvas the renderer draws into.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>canvasTarget</strong>
+										<strong translate="no">canvasTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The canvas target.</p>
@@ -1385,7 +1432,7 @@ or the offscreen canvas the renderer draws into.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>alpha</strong>
+										<strong translate="no">alpha</strong>
 									</td>
 									<td class="description last">
 										<p>The clear alpha.</p>
@@ -1403,7 +1450,7 @@ or the offscreen canvas the renderer draws into.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The clear color.</p>
@@ -1411,7 +1458,7 @@ or the offscreen canvas the renderer draws into.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>alpha</strong>
+										<strong translate="no">alpha</strong>
 									</td>
 									<td class="description last">
 										<p>The clear alpha.</p>
@@ -1430,7 +1477,7 @@ or the offscreen canvas the renderer draws into.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depth</strong>
+										<strong translate="no">depth</strong>
 									</td>
 									<td class="description last">
 										<p>The clear depth.</p>
@@ -1448,7 +1495,7 @@ or the offscreen canvas the renderer draws into.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>stencil</strong>
+										<strong translate="no">stencil</strong>
 									</td>
 									<td class="description last">
 										<p>The clear stencil.</p>
@@ -1471,7 +1518,7 @@ size.y = height * pixelRatio;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width in logical pixels.</p>
@@ -1479,7 +1526,7 @@ size.y = height * pixelRatio;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height in logical pixels.</p>
@@ -1487,7 +1534,7 @@ size.y = height * pixelRatio;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>pixelRatio</strong>
+										<strong translate="no">pixelRatio</strong>
 									</td>
 									<td class="description last">
 										<p>The pixel ratio.</p>
@@ -1505,7 +1552,7 @@ size.y = height * pixelRatio;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>mrt</strong>
+										<strong translate="no">mrt</strong>
 									</td>
 									<td class="description last">
 										<p>The MRT node to set.</p>
@@ -1527,7 +1574,7 @@ Pass <code>null</code> to use the default sort.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>method</strong>
+										<strong translate="no">method</strong>
 									</td>
 									<td class="description last">
 										<p>The sort function.</p>
@@ -1545,7 +1592,7 @@ Pass <code>null</code> to use the default sort.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to set as the output target.</p>
@@ -1563,7 +1610,7 @@ Pass <code>null</code> to use the default sort.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The pixel ratio.</p>
@@ -1587,7 +1634,7 @@ The custom function must always call <code>renderObject()</code> in its implemen
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderObjectFunction</strong>
+										<strong translate="no">renderObjectFunction</strong>
 									</td>
 									<td class="description last">
 										<p>The render object function.</p>
@@ -1607,7 +1654,7 @@ Use <code>null</code> as the first argument to reset the state.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to set.</p>
@@ -1615,7 +1662,7 @@ Use <code>null</code> as the first argument to reset the state.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeCubeFace</strong>
+										<strong translate="no">activeCubeFace</strong>
 									</td>
 									<td class="description last">
 										<p>The active cube face.</p>
@@ -1624,7 +1671,7 @@ Use <code>null</code> as the first argument to reset the state.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeMipmapLevel</strong>
+										<strong translate="no">activeMipmapLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The active mipmap level.</p>
@@ -1643,7 +1690,7 @@ Use <code>null</code> as the first argument to reset the state.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the upper left corner of the box in logical pixel unit.
@@ -1652,7 +1699,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the upper left corner of the box in logical pixel unit.</p>
@@ -1660,7 +1707,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the scissor box in logical pixel unit.</p>
@@ -1668,7 +1715,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the scissor box in logical pixel unit.</p>
@@ -1686,7 +1733,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>boolean</strong>
+										<strong translate="no">boolean</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the scissor test should be enabled or not.</p>
@@ -1704,7 +1751,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width in logical pixels.</p>
@@ -1712,7 +1759,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height in logical pixels.</p>
@@ -1720,7 +1767,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>updateStyle</strong>
+										<strong translate="no">updateStyle</strong>
 									</td>
 									<td class="description last">
 										<p>Whether to update the <code>style</code> attribute of the canvas or not.</p>
@@ -1740,7 +1787,7 @@ Pass <code>null</code> to use the default sort.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>method</strong>
+										<strong translate="no">method</strong>
 									</td>
 									<td class="description last">
 										<p>The sort function.</p>
@@ -1758,7 +1805,7 @@ Pass <code>null</code> to use the default sort.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.</p>
@@ -1766,7 +1813,7 @@ Pass <code>null</code> to use the default sort.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the upper left corner of the viewport origin  in logical pixel unit.</p>
@@ -1774,7 +1821,7 @@ Pass <code>null</code> to use the default sort.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the viewport in logical pixel unit.</p>
@@ -1782,7 +1829,7 @@ Pass <code>null</code> to use the default sort.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the viewport in logical pixel unit.</p>
@@ -1790,7 +1837,7 @@ Pass <code>null</code> to use the default sort.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>minDepth</strong>
+										<strong translate="no">minDepth</strong>
 									</td>
 									<td class="description last">
 										<p>The minimum depth value of the viewport. WebGPU only.</p>
@@ -1799,7 +1846,7 @@ Pass <code>null</code> to use the default sort.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>maxDepth</strong>
+										<strong translate="no">maxDepth</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum depth value of the viewport. WebGPU only.</p>
@@ -1838,6 +1885,17 @@ the CPU waits for the GPU to complete its operation (e.g. a compute task).</p>
 				</td>
 			<td class="description last">
 				<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>reversedDepthBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether reversed depth buffer is enabled or not.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>

@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+import { Fn, float, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, fract, floor, sin, time, Loop, If } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -83,6 +83,41 @@ class SkyMesh extends Mesh {
 		this.upUniform = uniform( new Vector3( 0, 1, 0 ) );
 
 		/**
+		 * The cloud scale uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cloudScale = uniform( 0.0002 );
+
+		/**
+		 * The cloud speed uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cloudSpeed = uniform( 0.0001 );
+
+		/**
+		 * The cloud coverage uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cloudCoverage = uniform( 0.4 );
+
+		/**
+		 * The cloud density uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cloudDensity = uniform( 0.4 );
+
+		/**
+		 * The cloud elevation uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cloudElevation = uniform( 0.5 );
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -105,7 +140,6 @@ class SkyMesh extends Mesh {
 
 		const vSunDirection = varyingProperty( 'vec3' );
 		const vSunE = varyingProperty( 'float' );
-		const vSunfade = varyingProperty( 'float' );
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
@@ -146,10 +180,9 @@ class SkyMesh extends Mesh {
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
 			vSunE.assign( sunIntensity );
 
-			// varying sun fade
+			// sun fade
 
 			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
-			vSunfade.assign( sunfade );
 
 			// varying vBetaR
 
@@ -232,11 +265,85 @@ class SkyMesh extends Mesh {
 			const sundisk = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos.add( 0.00002 ), cosTheta );
 			L0.addAssign( vSunE.mul( 19000.0 ).mul( Fex ).mul( sundisk ) );
 
-			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
+			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
-			const retColor = pow( texColor, vec3( float( 1.0 ).div( float( 1.2 ).add( vSunfade.mul( 1.2 ) ) ) ) );
+			// Cloud noise functions
+			const hash = Fn( ( [ p ] ) => {
 
-			return vec4( retColor, 1.0 );
+				return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ).mul( 43758.5453123 ) );
+
+			} );
+
+			const noise = Fn( ( [ p_immutable ] ) => {
+
+				const p = vec2( p_immutable ).toVar();
+				const i = floor( p );
+				const f = fract( p );
+				const ff = f.mul( f ).mul( sub( 3.0, f.mul( 2.0 ) ) );
+
+				const a = hash( i );
+				const b = hash( add( i, vec2( 1.0, 0.0 ) ) );
+				const c = hash( add( i, vec2( 0.0, 1.0 ) ) );
+				const d = hash( add( i, vec2( 1.0, 1.0 ) ) );
+
+				return mix( mix( a, b, ff.x ), mix( c, d, ff.x ), ff.y );
+
+			} );
+
+			const fbm = Fn( ( [ p_immutable ] ) => {
+
+				const p = vec2( p_immutable ).toVar();
+				const value = float( 0.0 ).toVar();
+				const amplitude = float( 0.5 ).toVar();
+
+				Loop( 5, () => {
+
+					value.addAssign( amplitude.mul( noise( p ) ) );
+					p.mulAssign( 2.0 );
+					amplitude.mulAssign( 0.5 );
+
+				} );
+
+				return value;
+
+			} );
+
+			// Clouds
+			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {
+
+				// Project to cloud plane (higher elevation = clouds appear lower/closer)
+				const elevation = mix( 1.0, 0.1, this.cloudElevation );
+				const cloudUV = direction.xz.div( direction.y.mul( elevation ) ).toVar();
+				cloudUV.mulAssign( this.cloudScale );
+				cloudUV.addAssign( time.mul( this.cloudSpeed ) );
+
+				// Multi-octave noise for fluffy clouds
+				const cloudNoise = fbm( cloudUV.mul( 1000.0 ) ).add( fbm( cloudUV.mul( 2000.0 ).add( 3.7 ) ).mul( 0.5 ) ).toVar();
+				cloudNoise.assign( cloudNoise.mul( 0.5 ).add( 0.5 ) );
+
+				// Apply coverage threshold
+				const cloudMask = smoothstep( sub( 1.0, this.cloudCoverage ), sub( 1.0, this.cloudCoverage ).add( 0.3 ), cloudNoise ).toVar();
+
+				// Fade clouds near horizon (adjusted by elevation)
+				const horizonFade = smoothstep( 0.0, add( 0.1, mul( 0.2, this.cloudElevation ) ), direction.y );
+				cloudMask.mulAssign( horizonFade );
+
+				// Cloud lighting based on sun position
+				const sunInfluence = dot( direction, vSunDirection ).mul( 0.5 ).add( 0.5 );
+				const daylight = max( 0.0, vSunDirection.y.mul( 2.0 ) );
+
+				// Base cloud color affected by atmosphere
+				const atmosphereColor = Lin.mul( 0.04 );
+				const cloudColor = mix( vec3( 0.3 ), vec3( 1.0 ), daylight ).toVar();
+				cloudColor.assign( mix( cloudColor, atmosphereColor.add( vec3( 1.0 ) ), sunInfluence.mul( 0.5 ) ) );
+				cloudColor.mulAssign( vSunE.mul( 0.00002 ) );
+
+				// Blend clouds with sky
+				texColor.assign( mix( texColor, cloudColor, cloudMask.mul( this.cloudDensity ) ) );
+
+			} );
+
+			return vec4( texColor, 1.0 );
 
 		} )();
 

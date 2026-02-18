@@ -391,6 +391,8 @@ class OrbitControls extends Controls {
 		 */
 		this.zoom0 = this.object.zoom;
 
+		this._cursorStyle = 'auto';
+
 		// the target DOM element for key events
 		this._domElementKeyEvents = null;
 
@@ -459,6 +461,34 @@ class OrbitControls extends Controls {
 		}
 
 		this.update();
+
+	}
+
+	/**
+	 * Defines the visual representation of the cursor.
+	 *
+	 * @type {('auto'|'grab')}
+	 * @default 'auto'
+	 */
+	set cursorStyle( type ) {
+
+		this._cursorStyle = type;
+
+		if ( type === 'grab' ) {
+
+			this.domElement.style.cursor = 'grab';
+
+		} else {
+
+			this.domElement.style.cursor = 'auto';
+
+		}
+
+	}
+
+	get cursorStyle() {
+
+		return this._cursorStyle;
 
 	}
 
@@ -591,6 +621,67 @@ class OrbitControls extends Controls {
 		this.update();
 
 		this.state = _STATE.NONE;
+
+	}
+
+	/**
+	 * Programmatically pan the camera.
+	 *
+	 * @param {number} deltaX - The horizontal pan amount in pixels.
+	 * @param {number} deltaY - The vertical pan amount in pixels.
+	 */
+	pan( deltaX, deltaY ) {
+
+		this._pan( deltaX, deltaY );
+		this.update();
+
+	}
+
+	/**
+	 * Programmatically dolly in (zoom in for perspective camera).
+	 *
+	 * @param {number} dollyScale - The dolly scale factor.
+	 */
+	dollyIn( dollyScale ) {
+
+		this._dollyIn( dollyScale );
+		this.update();
+
+	}
+
+	/**
+	 * Programmatically dolly out (zoom out for perspective camera).
+	 *
+	 * @param {number} dollyScale - The dolly scale factor.
+	 */
+	dollyOut( dollyScale ) {
+
+		this._dollyOut( dollyScale );
+		this.update();
+
+	}
+
+	/**
+	 * Programmatically rotate the camera left (around the vertical axis).
+	 *
+	 * @param {number} angle - The rotation angle in radians.
+	 */
+	rotateLeft( angle ) {
+
+		this._rotateLeft( angle );
+		this.update();
+
+	}
+
+	/**
+	 * Programmatically rotate the camera up (around the horizontal axis).
+	 *
+	 * @param {number} angle - The rotation angle in radians.
+	 */
+	rotateUp( angle ) {
+
+		this._rotateUp( angle );
+		this.update();
 
 	}
 
@@ -1481,6 +1572,12 @@ function onPointerDown( event ) {
 
 	}
 
+	if ( this._cursorStyle === 'grab' ) {
+
+		this.domElement.style.cursor = 'grabbing';
+
+	}
+
 }
 
 function onPointerMove( event ) {
@@ -1515,6 +1612,12 @@ function onPointerUp( event ) {
 			this.dispatchEvent( _endEvent );
 
 			this.state = _STATE.NONE;
+
+			if ( this._cursorStyle === 'grab' ) {
+
+				this.domElement.style.cursor = 'grab';
+
+			}
 
 			break;
 

@@ -39,7 +39,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let mixer, clock;
+			let mixer, timer;
 
 			init();
 
@@ -54,7 +54,8 @@
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 10 ) );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
@@ -84,6 +85,7 @@
 							materialPoints.opacityNode = shapeCircle();
 							materialPoints.sizeNode = pointSpeedAttribute.length().exp().min( 5 ).mul( 5 ).add( 1 );
 							materialPoints.sizeAttenuation = false;
+							materialPoints.alphaTest = 0.5;
 
 							const updateSkinningPoints = Fn( () => {
 
@@ -151,7 +153,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

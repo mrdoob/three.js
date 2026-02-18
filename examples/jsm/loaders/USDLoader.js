@@ -3,18 +3,20 @@ import {
 	Loader
 } from 'three';
 
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 import { USDAParser } from './usd/USDAParser.js';
 import { USDCParser } from './usd/USDCParser.js';
+import { USDComposer } from './usd/USDComposer.js';
 
 /**
- * A loader for the USDZ format.
+ * A loader for the USD format (USD, USDA, USDC, USDZ).
  *
- * USDZ files that use USDC internally are not yet supported, only USDA.
+ * Supports both ASCII (USDA) and binary (USDC) USD files, as well as
+ * USDZ archives containing either format.
  *
  * ```js
- * const loader = new USDZLoader();
- * const model = await loader.loadAsync( 'saeukkang.usdz' );
+ * const loader = new USDLoader();
+ * const model = await loader.loadAsync( 'model.usdz' );
  * scene.add( model );
  * ```
  *
@@ -97,23 +99,35 @@ class USDLoader extends Loader {
 
 			for ( const filename in zip ) {
 
-				if ( filename.endsWith( 'png' ) ) {
+				if ( filename.endsWith( 'png' ) || filename.endsWith( 'jpg' ) || filename.endsWith( 'jpeg' ) ) {
 
-					const blob = new Blob( [ zip[ filename ] ], { type: 'image/png' } );
+					const type = filename.endsWith( 'png' ) ? 'image/png' : 'image/jpeg';
+					const blob = new Blob( [ zip[ filename ] ], { type } );
 					data[ filename ] = URL.createObjectURL( blob );
 
 				}
+
+			}
+
+			for ( const filename in zip ) {
 
 				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) || filename.endsWith( 'usdc' ) ) {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
 
-						data[ filename ] = usdc.parse( zip[ filename ].buffer, data );
+						// Store parsed data (specsByPath) for on-demand composition
+						const parsedData = usdc.parseData( zip[ filename ].buffer );
+						data[ filename ] = parsedData;
+						// Store raw buffer for re-parsing with variant selections
+						data[ filename + ':buffer' ] = zip[ filename ].buffer;
 
 					} else {
 
-						const text = fflate.strFromU8( zip[ filename ] );
-						data[ filename ] = usda.parseText( text );
+						const text = new TextDecoder().decode( zip[ filename ] );
+						// Store parsed data (specsByPath) for on-demand composition
+						data[ filename ] = usda.parseData( text );
+						// Store raw text for re-parsing with variant selections
+						data[ filename + ':text' ] = text;
 
 					}
 
@@ -145,15 +159,18 @@ class USDLoader extends Loader {
 
 		function findUSD( zip ) {
 
-			if ( zip.length < 1 ) return undefined;
+			if ( zip.length < 1 ) return { file: undefined, basePath: '' };
 
 			const firstFileName = Object.keys( zip )[ 0 ];
 			let isCrate = false;
 
+			const lastSlash = firstFileName.lastIndexOf( '/' );
+			const basePath = lastSlash >= 0 ? firstFileName.slice( 0, lastSlash ) : '';
+
 			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
 			// ASCII files can end in either .usda or .usd.
 			// See https://openusd.org/release/spec_usdz.html#layout
-			if ( firstFileName.endsWith( 'usda' ) ) return zip[ firstFileName ];
+			if ( firstFileName.endsWith( 'usda' ) ) return { file: zip[ firstFileName ], basePath };
 
 			if ( firstFileName.endsWith( 'usdc' ) ) {
 
@@ -164,7 +181,7 @@ class USDLoader extends Loader {
 				// If this is not a crate file, we assume it is a plain USDA file.
 				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
 
-					return zip[ firstFileName ];
+					return { file: zip[ firstFileName ], basePath };
 
 				} else {
 
@@ -176,41 +193,72 @@ class USDLoader extends Loader {
 
 			if ( isCrate ) {
 
-				return zip[ firstFileName ];
+				return { file: zip[ firstFileName ], basePath };
 
 			}
 
+			return { file: undefined, basePath: '' };
+
 		}
 
-		// USDA
+		const scope = this;
+
+		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
-			return usda.parse( buffer, {} );
+			const composer = new USDComposer( scope.manager );
+			const data = usda.parseData( buffer );
+			return composer.compose( data, {} );
 
 		}
 
-		// USDC
+		// USDC (standalone)
 
 		if ( isCrateFile( buffer ) ) {
 
-			return usdc.parse( buffer );
+			const composer = new USDComposer( scope.manager );
+			const data = usdc.parseData( buffer );
+			return composer.compose( data, {} );
 
 		}
 
+		const bytes = new Uint8Array( buffer );
+
 		// USDZ
 
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
+		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
 
-		const assets = parseAssets( zip );
+			const zip = unzipSync( bytes );
 
-		// console.log( assets );
+			const assets = parseAssets( zip );
 
-		const file = findUSD( zip );
+			const { file, basePath } = findUSD( zip );
 
-		const text = fflate.strFromU8( file );
+			const composer = new USDComposer( scope.manager );
+			let data;
 
-		return usda.parse( text, assets );
+			if ( isCrateFile( file ) ) {
+
+				data = usdc.parseData( file.buffer );
+
+			} else {
+
+				const text = new TextDecoder().decode( file );
+				data = usda.parseData( text );
+
+			}
+
+			return composer.compose( data, assets, {}, basePath );
+
+		}
+
+		// USDA (standalone, as ArrayBuffer)
+
+		const composer = new USDComposer( scope.manager );
+		const text = new TextDecoder().decode( bytes );
+		const data = usda.parseData( text );
+		return composer.compose( data, {} );
 
 	}
 

@@ -12,20 +12,20 @@ let _rendererState;
 /**
  * Post processing node for creating a bloom effect.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  * const scenePassColor = scenePass.getTextureNode( 'output' );
  *
  * const bloomPass = bloom( scenePassColor );
  *
- * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * renderPipeline.outputNode = scenePassColor.add( bloomPass );
  * ```
  * By default, the node affects the entire image. For a selective bloom,
  * use the `emissive` material property to control which objects should
  * contribute to bloom or not. This can be achieved via MRT.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  * scenePass.setMRT( mrt( {
@@ -37,7 +37,7 @@ let _rendererState;
  * const emissivePass = scenePass.getTextureNode( 'emissive' );
  *
  * const bloomPass = bloom( emissivePass );
- * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * renderPipeline.outputNode = scenePassColor.add( bloomPass );
  * ```
  * @augments TempNode
  * @three_import import { bloom } from 'three/addons/tsl/display/BloomNode.js';
@@ -529,6 +529,6 @@ class BloomNode extends TempNode {
  * @param {number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
  * @returns {BloomNode}
  */
-export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );
+export const bloom = ( node, strength, radius, threshold ) => new BloomNode( nodeObject( node ), strength, radius, threshold );
 
 export default BloomNode;

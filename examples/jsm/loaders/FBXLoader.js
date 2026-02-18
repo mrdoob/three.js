@@ -44,7 +44,7 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-import * as fflate from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
 let fbxTree;
@@ -3797,7 +3797,7 @@ class BinaryParser {
 
 				}
 
-				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+				const data = unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
 				const reader2 = new BinaryReader( data.buffer );
 
 				switch ( type ) {

@@ -13,7 +13,7 @@ let _rendererState;
  * gives you great flexibility in composing the final outline look depending on
  * your requirements.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
@@ -36,7 +36,7 @@ let _rendererState;
  * const { visibleEdge, hiddenEdge } = outlinePass;
  * const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
  *
- * postProcessing.outputNode = outlineColor.add( scenePass );
+ * renderPipeline.outputNode = outlineColor.add( scenePass );
  * ```
  *
  * @augments TempNode
@@ -759,4 +759,4 @@ export default OutlineNode;
  * @param {number} [params.downSampleRatio=2] - The downsample ratio.
  * @returns {OutlineNode}
  */
-export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );
+export const outline = ( scene, camera, params ) => new OutlineNode( scene, camera, params );

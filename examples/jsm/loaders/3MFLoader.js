@@ -19,7 +19,7 @@ import {
 	TextureLoader,
 	SRGBColorSpace
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 
 const COLOR_SPACE_3MF = SRGBColorSpace;
 
@@ -143,7 +143,7 @@ class ThreeMFLoader extends Loader {
 
 			try {
 
-				zip = fflate.unzipSync( new Uint8Array( data ) );
+				zip = unzipSync( new Uint8Array( data ) );
 
 			} catch ( e ) {
 

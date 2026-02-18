@@ -38,7 +38,8 @@
 			"Shadows": "en/shadows",
 			"Fog": "en/fog",
 			"Render Targets": "en/rendertargets",
-			"Custom BufferGeometry": "en/custom-buffergeometry"
+			"Custom BufferGeometry": "en/custom-buffergeometry",
+			"Physics": "en/physics"
 		},
 		"Tips": {
 			"Rendering On Demand": "en/rendering-on-demand",
@@ -326,6 +327,19 @@
 		}
 	},
 	"zh": {
+		"入门": {
+			"安装": "zh/installation",
+			"创建场景": "zh/creating-a-scene",
+			"创建文本": "zh/creating-text",
+			"绘制线条": "zh/drawing-lines",
+			"常见问题": "zh/faq",
+			"库和插件": "zh/libraries-and-plugins",
+			"加载3D模型": "zh/loading-3d-models",
+			"Uniform类型": "zh/uniform-types",
+			"相关资源": "zh/useful-links",
+			"WebGL兼容性检查": "zh/webgl-compatibility-check"
+		},
+		"---": {},
 		"基本": {
 			"基础": "zh/fundamentals",
 			"响应式设计": "zh/responsive",

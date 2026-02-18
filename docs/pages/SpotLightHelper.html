@@ -13,7 +13,9 @@
 	<h1 translate="no">SpotLightHelper</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>This displays a cone shaped helper object for a <a href="SpotLight.html">SpotLight</a>.</p></div>
+				<div class="class-description"><p>This displays a cone shaped helper object for a <a href="SpotLight.html">SpotLight</a>.</p>
+<p>When the spot light or its target are transformed or light properties are
+changed, it's necessary to call the <code>update()</code> method of the respective helper.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const spotLight = new THREE.SpotLight( 0xffffff );
 spotLight.position.set( 10, 10, 10 );
@@ -34,7 +36,7 @@ scene.add( spotLightHelper );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>light</strong>
+										<strong translate="no">light</strong>
 									</td>
 									<td class="description last">
 										<p>The light to be visualized.</p>
@@ -42,7 +44,7 @@ scene.add( spotLightHelper );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The helper's color. If not set, the helper will take

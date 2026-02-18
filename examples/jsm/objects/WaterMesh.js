@@ -2,10 +2,10 @@ import {
 	Color,
 	Mesh,
 	Vector3,
-	MeshLambertNodeMaterial
+	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, diffuseColor } from 'three/tsl';
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -32,7 +32,7 @@ class WaterMesh extends Mesh {
 	 */
 	constructor( geometry, options ) {
 
-		const material = new MeshLambertNodeMaterial();
+		const material = new NodeMaterial();
 
 		super( geometry, material );
 
@@ -155,8 +155,6 @@ class WaterMesh extends Mesh {
 
 		material.receivedShadowPositionNode = positionWorld.add( distortion );
 
-		material.setupOutgoingLight = () => diffuseColor.rgb; // backwards compatibility
-
 		material.colorNode = Fn( () => {
 
 			const mirrorSampler = reflector();
@@ -166,10 +164,10 @@ class WaterMesh extends Mesh {
 			this.add( mirrorSampler.target );
 
 			const theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-			const rf0 = float( 0.3 );
+			const rf0 = float( 0.02 );
 			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
 			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
-			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.mul( specularLight ).add( mirrorSampler.rgb.mul( 0.9 ) ).add( vec3( 0.1 ) ), reflectance );
+			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
 
 			return albedo;
 
