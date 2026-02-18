@@ -26,7 +26,7 @@ import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
 import { error } from '../../utils.js';
-import { BRDF_Lambert } from '../../Three.TSL.js';
+import BRDF_Lambert from './../../nodes/functions/BSDF/BRDF_Lambert.js';
 
 /**
  * Base class for all node materials.

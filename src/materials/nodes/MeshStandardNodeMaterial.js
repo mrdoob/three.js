@@ -8,7 +8,7 @@ import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
-import { BRDF_Lambert } from '../../Three.TSL.js';
+import BRDF_Lambert from './../../nodes/functions/BSDF/BRDF_Lambert.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 

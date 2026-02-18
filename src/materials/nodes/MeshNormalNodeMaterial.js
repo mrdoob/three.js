@@ -1,5 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
-import { BRDF_Lambert } from '../../Three.TSL.js';
+import BRDF_Lambert from './../../nodes/functions/BSDF/BRDF_Lambert.js';
 import { diffuseColor, diffuseColorOverPi } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
