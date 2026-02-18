@@ -14,7 +14,7 @@ const categoryPaths = [
 	[ 'editor', 'Editor' ],
 	[ 'test', 'Tests' ],
 	[ 'playground', 'Playground' ],
-	[ 'utils', 'Scripts' ],
+	[ 'utils', 'Utils' ],
 	[ 'build', 'Build' ],
 	[ 'examples/jsm', 'Addons' ],
 	[ 'examples', 'Examples' ],
@@ -38,7 +38,7 @@ const skipPatterns = [
 ];
 
 // Categories that map to sections
-const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Scripts', 'Build' ];
+const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Utils', 'Build' ];
 
 function exec( command ) {
 
@@ -275,7 +275,7 @@ function cleanSubject( subject, category ) {
 	cleaned = cleaned.replace( prefixPattern, '' );
 
 	// Also remove common prefixes
-	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer):\s*/i, '' );
+	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
 
 	// Remove trailing period if present, we'll add it back
 	cleaned = cleaned.replace( /\.\s*$/, '' );
@@ -289,8 +289,10 @@ function normalizeAuthor( author ) {
 	const lower = author.toLowerCase();
 	if ( lower === 'mr.doob' ) return 'mrdoob';
 	if ( lower === 'michael herzog' ) return 'Mugen87';
+	if ( lower === 'garrett johnson' ) return 'gkjohnson';
 	if ( lower.startsWith( 'claude' ) ) return 'claude';
-	if ( lower.startsWith( 'copilot' ) ) return 'copilot';
+	if ( lower.startsWith( 'copilot' ) ) return 'microsoftcopilot';
+	if ( lower.includes( 'dependabot' ) ) return 'dependabot';
 
 	return author;
 
@@ -306,13 +308,13 @@ function formatEntry( subject, prNumber, hash, author, coAuthors, category ) {
 
 	} else if ( hash ) {
 
-		entry += ` ${hash.slice( 0, 7 )}`;
+		entry += ` ${hash}`;
 
 	}
 
 	if ( author ) {
 
-		const authors = [ author, ...( coAuthors || [] ) ].map( normalizeAuthor );
+		const authors = [ ...new Set( [ author, ...( coAuthors || [] ) ].map( normalizeAuthor ) ) ];
 		entry += ` (@${authors.join( ', @' )})`;
 
 	}
@@ -414,6 +416,7 @@ function processCommit( commit, revertedTitles ) {
 
 		category = titleCategory;
 		if ( category === 'Puppeteer' ) category = 'Tests';
+		if ( category === 'Scripts' ) category = 'Utils';
 		section = sectionCategories.includes( category ) ? category : null;
 
 	}
@@ -474,7 +477,7 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 	}
 
 	// Output sections in order
-	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Scripts', 'Build' ];
+	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Utils', 'Build' ];
 
 	for ( const sectionName of sectionOrder ) {
 
@@ -553,7 +556,7 @@ function generateChangelog() {
 		Examples: [],
 		Editor: [],
 		Tests: [],
-		Scripts: [],
+		Utils: [],
 		Build: []
 	};
 
