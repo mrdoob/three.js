@@ -1,6 +1,5 @@
 import LightingModel from '../core/LightingModel.js';
-import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
-import { diffuseColor } from '../core/PropertyNode.js';
+import { diffuseColorOverPi } from '../core/PropertyNode.js';
 import { normalGeometry } from '../accessors/Normal.js';
 import { Fn, float, vec2, vec3 } from '../tsl/TSLBase.js';
 import { mix, smoothstep } from '../math/MathNode.js';
@@ -46,7 +45,7 @@ class ToonLightingModel extends LightingModel {
 
 		const irradiance = getGradientIrradiance( { normal: normalGeometry, lightDirection, builder } ).mul( lightColor );
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( diffuseColorOverPi ) );
 
 	}
 
@@ -59,7 +58,7 @@ class ToonLightingModel extends LightingModel {
 
 		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
-		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( diffuseColorOverPi ) );
 
 		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
 

@@ -1,7 +1,6 @@
 import BasicLightingModel from './BasicLightingModel.js';
 import F_Schlick from './BSDF/F_Schlick.js';
-import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
-import { diffuseColor, shininess, specularColor } from '../core/PropertyNode.js';
+import { diffuseColorOverPi, shininess, specularColor } from '../core/PropertyNode.js';
 import { normalView } from '../accessors/Normal.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { positionViewDirection } from '../accessors/Position.js';
@@ -69,7 +68,7 @@ class PhongLightingModel extends BasicLightingModel {
 		const dotNL = normalView.dot( lightDirection ).clamp();
 		const irradiance = dotNL.mul( lightColor );
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( diffuseColorOverPi ) );
 
 		if ( this.specular === true ) {
 
@@ -88,7 +87,7 @@ class PhongLightingModel extends BasicLightingModel {
 
 		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
 
-		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( diffuseColorOverPi ) );
 
 		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
 

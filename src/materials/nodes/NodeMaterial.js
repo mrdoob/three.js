@@ -1,7 +1,7 @@
 import { Material } from '../Material.js';
 
 import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
-import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { output, diffuseColor, diffuseColorOverPi, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
 import { normalLocal } from '../../nodes/accessors/Normal.js';
@@ -898,6 +898,10 @@ class NodeMaterial extends Material {
 		// DIFFUSE COLOR
 
 		diffuseColor.assign( colorNode );
+
+		// DIFFUSE RGB OVER PI
+
+		diffuseColorOverPi.assign( diffuseColor.rgb.mul( 1 / Math.PI ) );
 
 		// OPACITY
 

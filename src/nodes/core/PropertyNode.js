@@ -135,12 +135,28 @@ export const varyingProperty = ( type, name ) => new PropertyNode( type, name, t
 export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
 
 /**
+ * TSL object that represents the shader variable `DiffuseColorOverPi`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const diffuseColorOverPi = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseColorOverPi' );
+
+/**
  * TSL object that represents the shader variable `DiffuseContribution`.
  *
  * @tsl
  * @type {PropertyNode<vec3>}
  */
 export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
+
+/**
+ * TSL object that represents the shader variable `DiffuseContributionOverPi`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const diffuseContributionOverPi = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContributionOverPi' );
 
 /**
  * TSL object that represents the shader variable `EmissiveColor`.
