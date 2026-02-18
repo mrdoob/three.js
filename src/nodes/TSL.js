@@ -158,6 +158,7 @@ export * from './materialx/MaterialXNodes.js';
 
 // functions
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
+export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
