@@ -103,7 +103,7 @@
 				if ( validRedirects.has( file ) === true ) {
 
 					selectFile( file );
-					links[ file ].scrollIntoView( { block: 'center' } );
+					updateLinkScroll();
 					viewer.src = validRedirects.get( file );
 					viewer.style.display = 'unset';
 
@@ -171,6 +171,7 @@
 
 				event.preventDefault();
 				panel.classList.toggle( 'open' );
+				updateLinkScroll();
 
 			} );
 
@@ -382,6 +383,17 @@
 			const div = document.createElement( 'div' );
 			div.innerHTML = htmlString.trim();
 			return div.firstChild;
+
+		}
+
+		function updateLinkScroll() {
+
+			if ( selected !== null ) {
+
+				const link = links[ selected ];
+				content.scrollTop = link.offsetTop - content.offsetTop - ( content.clientHeight - link.offsetHeight ) / 2;
+
+			}
 
 		}
 
