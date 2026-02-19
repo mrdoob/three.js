@@ -438,14 +438,14 @@ class NodeMaterialObserver {
 		// check index
 
 		const index = geometry.index;
-		const storedIndexId = storedGeometryData.id;
+		const storedIndexId = storedGeometryData.indexId;
 		const storedIndexVersion = storedGeometryData.indexVersion;
 		const currentIndexId = index ? index.id : null;
 		const currentIndexVersion = index ? index.version : null;
 
 		if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
 
-			storedGeometryData.id = currentIndexId;
+			storedGeometryData.indexId = currentIndexId;
 			storedGeometryData.indexVersion = currentIndexVersion;
 			return false;
 
