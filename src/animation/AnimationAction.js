@@ -41,6 +41,14 @@ class AnimationAction {
 
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
+
+			// Preserve tangent data before overwriting
+			if ( interpolant.settings ) {
+
+				Object.assign( interpolantSettings, interpolant.settings );
+
+			}
+
 			interpolant.settings = interpolantSettings;
 
 		}
@@ -894,7 +902,7 @@ class AnimationAction {
 
 			} else {
 
-				settings.endingEnd 	 = WrapAroundEnding;
+				settings.endingEnd = WrapAroundEnding;
 
 			}
 
