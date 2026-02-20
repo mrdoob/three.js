@@ -91,17 +91,28 @@ class USDLoader extends Loader {
 		const usda = new USDAParser();
 		const usdc = new USDCParser();
 
+		function getLowercaseExtension( filename ) {
+
+			const lastDot = filename.lastIndexOf( '.' );
+			if ( lastDot < 0 ) return '';
+
+			const lastSlash = filename.lastIndexOf( '/' );
+			if ( lastSlash > lastDot ) return '';
+
+			return filename.slice( lastDot + 1 ).toLowerCase();
+
+		}
+
 		function parseAssets( zip ) {
 
 			const data = {};
-			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
 
 			for ( const filename in zip ) {
 
-				if ( filename.endsWith( 'png' ) || filename.endsWith( 'jpg' ) || filename.endsWith( 'jpeg' ) ) {
+				const ext = getLowercaseExtension( filename );
+				if ( ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'avif' ) {
 
-					const type = filename.endsWith( 'png' ) ? 'image/png' : 'image/jpeg';
+					const type = ext === 'png' ? 'image/png' : ext === 'avif' ? 'image/avif' : 'image/jpeg';
 					const blob = new Blob( [ zip[ filename ] ], { type } );
 					data[ filename ] = URL.createObjectURL( blob );
 
@@ -111,7 +122,8 @@ class USDLoader extends Loader {
 
 			for ( const filename in zip ) {
 
-				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) || filename.endsWith( 'usdc' ) ) {
+				const ext = getLowercaseExtension( filename );
+				if ( ext === 'usd' || ext === 'usda' || ext === 'usdc' ) {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
 
@@ -159,24 +171,25 @@ class USDLoader extends Loader {
 
 		function findUSD( zip ) {
 
-			if ( zip.length < 1 ) return { file: undefined, basePath: '' };
+			const fileNames = Object.keys( zip );
+			if ( fileNames.length < 1 ) return { file: undefined, basePath: '' };
 
-			const firstFileName = Object.keys( zip )[ 0 ];
+			const firstFileName = fileNames[ 0 ];
+			const ext = getLowercaseExtension( firstFileName );
 			let isCrate = false;
 
 			const lastSlash = firstFileName.lastIndexOf( '/' );
 			const basePath = lastSlash >= 0 ? firstFileName.slice( 0, lastSlash ) : '';
 
-			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
+			// Per AOUSD core spec v1.0.1 section 16.4.1.2, the first ZIP entry is the root layer.
 			// ASCII files can end in either .usda or .usd.
-			// See https://openusd.org/release/spec_usdz.html#layout
-			if ( firstFileName.endsWith( 'usda' ) ) return { file: zip[ firstFileName ], basePath };
+			if ( ext === 'usda' ) return { file: zip[ firstFileName ], basePath };
 
-			if ( firstFileName.endsWith( 'usdc' ) ) {
+			if ( ext === 'usdc' ) {
 
 				isCrate = true;
 
-			} else if ( firstFileName.endsWith( 'usd' ) ) {
+			} else if ( ext === 'usd' ) {
 
 				// If this is not a crate file, we assume it is a plain USDA file.
 				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
@@ -230,10 +243,14 @@ class USDLoader extends Loader {
 		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
 
 			const zip = unzipSync( bytes );
-
 			const assets = parseAssets( zip );
-
 			const { file, basePath } = findUSD( zip );
+
+			if ( ! file ) {
+
+				throw new Error( 'USDLoader: Invalid USDZ package. The first ZIP entry must be a USD layer (.usd/.usda/.usdc).' );
+
+			}
 
 			const composer = new USDComposer( scope.manager );
 			let data;
