@@ -1,5 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { cameraViewMatrix } from './Camera.js';
+import { cameraViewMatrix, worldToViewRotation } from './Camera.js';
 import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 import { mat3, vec3, Fn } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
@@ -194,7 +194,7 @@ export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) =
 
 	const transformedNormal = modelNormalMatrix.mul( normal );
 
-	return cameraViewMatrix.transformDirection( transformedNormal );
+	return worldToViewRotation.mul( transformedNormal );
 
 } );
 
