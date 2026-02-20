@@ -12705,6 +12705,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "StorageTextureNode#generateSnippet",
+			"kind": "function"
+		},
+		{
 			"title": "StorageTextureNode#generateStore",
 			"kind": "function"
 		},
@@ -14822,6 +14826,10 @@
 		},
 		{
 			"title": "WGSLNodeBuilder#generateFilteredTexture",
+			"kind": "function"
+		},
+		{
+			"title": "WGSLNodeBuilder#generateStorageTextureLoad",
 			"kind": "function"
 		},
 		{
