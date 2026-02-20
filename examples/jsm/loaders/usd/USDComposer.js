@@ -3559,7 +3559,9 @@ class USDComposer {
 
 			}
 
-			// Use geomBindTransform if available, otherwise compute from mesh/skeleton alignment
+			// Use geomBindTransform if available, otherwise fall back to identity.
+			// Estimating bind transforms from vertex/joint samples is not robust and can
+			// produce severe skinning distortion for valid assets.
 			let bindMatrix = new Matrix4();
 
 			if ( geomBindTransform && geomBindTransform.length === 16 ) {
@@ -3573,83 +3575,11 @@ class USDComposer {
 					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 				);
 
-			} else {
-
-				// Compute geomBindTransform by comparing mesh vertices with skeleton bind positions
-				bindMatrix = this._computeGeomBindTransform( mesh, skeleton );
-
 			}
 
 			mesh.bind( skeleton, bindMatrix );
 
 		}
-
-	}
-
-	_computeGeomBindTransform( mesh, skeleton ) {
-
-		const bindMatrix = new Matrix4();
-		const geometry = mesh.geometry;
-		const position = geometry.attributes.position;
-		const skinIndex = geometry.attributes.skinIndex;
-
-		if ( ! position || ! skinIndex || position.count === 0 ) {
-
-			return bindMatrix;
-
-		}
-
-		// Sample vertices and their influencing joints to compute average scale
-		const boneInverses = skeleton.boneInverses;
-		const sampleCount = Math.min( 50, position.count );
-		let sumRatioX = 0, sumRatioY = 0, sumRatioZ = 0;
-		let validSamples = 0;
-
-		for ( let i = 0; i < sampleCount; i ++ ) {
-
-			const vi = Math.floor( i * position.count / sampleCount );
-			const vx = position.getX( vi );
-			const vy = position.getY( vi );
-			const vz = position.getZ( vi );
-
-			// Get primary joint for this vertex
-			const jointIdx = skinIndex.getX( vi );
-			if ( jointIdx >= boneInverses.length ) continue;
-
-			// Get joint bind position from inverse bind matrix
-			const inverseBindMatrix = boneInverses[ jointIdx ];
-			const bindTransform = inverseBindMatrix.clone().invert();
-			const jx = bindTransform.elements[ 12 ];
-			const jy = bindTransform.elements[ 13 ];
-			const jz = bindTransform.elements[ 14 ];
-
-			// Compute ratio if both values are non-zero
-			if ( Math.abs( vx ) > 0.001 && Math.abs( jx ) > 0.001 ) {
-
-				sumRatioX += jx / vx;
-				sumRatioY += jy / vy;
-				sumRatioZ += jz / vz;
-				validSamples ++;
-
-			}
-
-		}
-
-		if ( validSamples > 0 ) {
-
-			// Use average scale to create geomBindTransform
-			const avgScale = ( sumRatioX + sumRatioY + sumRatioZ ) / ( validSamples * 3 );
-
-			// Only apply if scale is significantly different from 1
-			if ( Math.abs( avgScale - 1 ) > 0.1 ) {
-
-				bindMatrix.makeScale( avgScale, avgScale, avgScale );
-
-			}
-
-		}
-
-		return bindMatrix;
 
 	}
 
