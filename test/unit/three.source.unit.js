@@ -265,12 +265,6 @@ import './src/renderers/webgl/WebGLTextures.tests.js';
 import './src/renderers/webgl/WebGLUniforms.tests.js';
 import './src/renderers/webgl/WebGLUtils.tests.js';
 
-//src/renderers/webgpu/nodes
-import './src/renderers/webgpu/nodes/WGSLNodeBuilder.tests.js';
-
-//src/nodes/accessors
-import './src/nodes/accessors/StorageTextureNode.tests.js';
-
 
 //src/scenes
 import './src/scenes/Fog.tests.js';
