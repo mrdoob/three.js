@@ -163,8 +163,8 @@ class SkyMesh extends Mesh {
 		const vertexNode = /*@__PURE__*/ Fn( () => {
 
 			// constants for atmospheric scattering
-			const e = float( 2.71828182845904523536028747135266249775724709369995957 );
-			// const pi = float( 3.141592653589793238462643383279502884197169 );
+			const e = float( 2.718281828459045 );
+			// const pi = float( 3.141592653589793 );
 
 			// wavelength of used primaries, according to preetham
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
@@ -228,13 +228,13 @@ class SkyMesh extends Mesh {
 		const colorNode = /*@__PURE__*/ Fn( () => {
 
 			// constants for atmospheric scattering
-			const pi = float( 3.141592653589793238462643383279502884197169 );
+			const pi = float( 3.141592653589793 );
 
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
 			const mieZenithLength = float( 1.25E3 );
 			// 66 arc seconds -> degrees, and the cosine of that
-			const sunAngularDiameterCos = float( 0.999956676946448443553574619906976478926848692873900859324 );
+			const sunAngularDiameterCos = float( 0.9999566769464484 );
 
 			// 3.0 / ( 16.0 * pi )
 			const THREE_OVER_SIXTEENPI = float( 0.05968310365946075 );
