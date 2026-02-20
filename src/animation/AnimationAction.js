@@ -42,7 +42,8 @@ class AnimationAction {
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
 
-			// Preserve tangent data before overwriting
+			// preserve interpolant settings (like tangent data from BezierInterpolant)
+
 			if ( interpolant.settings ) {
 
 				Object.assign( interpolantSettings, interpolant.settings );
