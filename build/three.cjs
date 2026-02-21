@@ -50045,134 +50045,185 @@ class ArrayCamera extends PerspectiveCamera {
 }
 
 /**
- * Class for keeping track of time.
+ * This class is an alternative to {@link Clock} with a different API design and behavior.
+ * The goal is to avoid the conceptual flaws that became apparent in `Clock` over time.
  *
- * @deprecated since r183.
+ * - `Timer` has an `update()` method that updates its internal state. That makes it possible to
+ * call `getDelta()` and `getElapsed()` multiple times per simulation step without getting different values.
+ * - The class can make use of the Page Visibility API to avoid large time delta values when the app
+ * is inactive (e.g. tab switched or browser hidden).
+ *
+ * ```js
+ * const timer = new Timer();
+ * timer.connect( document ); // use Page Visibility API
+ * ```
  */
-class Clock {
+class Timer {
 
 	/**
-	 * Constructs a new clock.
+	 * Constructs a new timer.
+	 */
+	constructor() {
+
+		this._previousTime = 0;
+		this._currentTime = 0;
+		this._startTime = performance.now();
+
+		this._delta = 0;
+		this._elapsed = 0;
+
+		this._timescale = 1;
+
+		this._document = null;
+		this._pageVisibilityHandler = null;
+
+	}
+
+	/**
+	 * Connect the timer to the given document.Calling this method is not mandatory to
+	 * use the timer but enables the usage of the Page Visibility API to avoid large time
+	 * delta values.
 	 *
-	 * @deprecated since 183.
-	 * @param {boolean} [autoStart=true] - Whether to automatically start the clock when
-	 * `getDelta()` is called for the first time.
+	 * @param {Document} document - The document.
 	 */
-	constructor( autoStart = true ) {
+	connect( document ) {
 
-		/**
-		 * If set to `true`, the clock starts automatically when `getDelta()` is called
-		 * for the first time.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.autoStart = autoStart;
+		this._document = document;
 
-		/**
-		 * Holds the time at which the clock's `start()` method was last called.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.startTime = 0;
+		// use Page Visibility API to avoid large time delta values
 
-		/**
-		 * Holds the time at which the clock's `start()`, `getElapsedTime()` or
-		 * `getDelta()` methods were last called.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.oldTime = 0;
+		if ( document.hidden !== undefined ) {
 
-		/**
-		 * Keeps track of the total time that the clock has been running.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.elapsedTime = 0;
+			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
 
-		/**
-		 * Whether the clock is running or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.running = false;
+			document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
 
-		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
+		}
 
 	}
 
 	/**
-	 * Starts the clock. When `autoStart` is set to `true`, the method is automatically
-	 * called by the class.
+	 * Disconnects the timer from the DOM and also disables the usage of the Page Visibility API.
 	 */
-	start() {
+	disconnect() {
 
-		this.startTime = performance.now();
+		if ( this._pageVisibilityHandler !== null ) {
 
-		this.oldTime = this.startTime;
-		this.elapsedTime = 0;
-		this.running = true;
+			this._document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
+			this._pageVisibilityHandler = null;
+
+		}
+
+		this._document = null;
 
 	}
 
 	/**
-	 * Stops the clock.
+	 * Returns the time delta in seconds.
+	 *
+	 * @return {number} The time delta in second.
 	 */
-	stop() {
+	getDelta() {
 
-		this.getElapsedTime();
-		this.running = false;
-		this.autoStart = false;
+		return this._delta / 1000;
 
 	}
 
 	/**
 	 * Returns the elapsed time in seconds.
 	 *
-	 * @return {number} The elapsed time.
+	 * @return {number} The elapsed time in second.
 	 */
-	getElapsedTime() {
+	getElapsed() {
 
-		this.getDelta();
-		return this.elapsedTime;
+		return this._elapsed / 1000;
 
 	}
 
 	/**
-	 * Returns the delta time in seconds.
+	 * Returns the timescale.
 	 *
-	 * @return {number} The delta time.
+	 * @return {number} The timescale.
 	 */
-	getDelta() {
+	getTimescale() {
 
-		let diff = 0;
-
-		if ( this.autoStart && ! this.running ) {
-
-			this.start();
-			return 0;
-
-		}
-
-		if ( this.running ) {
-
-			const newTime = performance.now();
-
-			diff = ( newTime - this.oldTime ) / 1000;
-			this.oldTime = newTime;
-
-			this.elapsedTime += diff;
-
-		}
-
-		return diff;
+		return this._timescale;
 
 	}
+
+	/**
+	 * Sets the given timescale which scale the time delta computation
+	 * in `update()`.
+	 *
+	 * @param {number} timescale - The timescale to set.
+	 * @return {Timer} A reference to this timer.
+	 */
+	setTimescale( timescale ) {
+
+		this._timescale = timescale;
+
+		return this;
+
+	}
+
+	/**
+	 * Resets the time computation for the current simulation step.
+	 *
+	 * @return {Timer} A reference to this timer.
+	 */
+	reset() {
+
+		this._currentTime = performance.now() - this._startTime;
+
+		return this;
+
+	}
+
+	/**
+	 * Can be used to free all internal resources. Usually called when
+	 * the timer instance isn't required anymore.
+	 */
+	dispose() {
+
+		this.disconnect();
+
+	}
+
+	/**
+	 * Updates the internal state of the timer. This method should be called
+	 * once per simulation step and before you perform queries against the timer
+	 * (e.g. via `getDelta()`).
+	 *
+	 * @param {number} timestamp - The current time in milliseconds. Can be obtained
+	 * from the `requestAnimationFrame` callback argument. If not provided, the current
+	 * time will be determined with `performance.now`.
+	 * @return {Timer} A reference to this timer.
+	 */
+	update( timestamp ) {
+
+		if ( this._pageVisibilityHandler !== null && this._document.hidden === true ) {
+
+			this._delta = 0;
+
+		} else {
+
+			this._previousTime = this._currentTime;
+			this._currentTime = ( timestamp !== undefined ? timestamp : performance.now() ) - this._startTime;
+
+			this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
+			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+
+		}
+
+		return this;
+
+	}
+
+}
+
+function handleVisibilityChange() {
+
+	if ( this._document.hidden === false ) this.reset();
 
 }
 
@@ -50243,7 +50294,7 @@ class AudioListener extends Object3D {
 
 		// private
 
-		this._clock = new Clock();
+		this._timer = new Timer();
 
 	}
 
@@ -50348,9 +50399,11 @@ class AudioListener extends Object3D {
 
 		super.updateMatrixWorld( force );
 
+		this._timer.update();
+
 		const listener = this.context.listener;
 
-		this.timeDelta = this._clock.getDelta();
+		this.timeDelta = this._timer.getDelta();
 
 		this.matrixWorld.decompose( _position$1, _quaternion$1, _scale$1 );
 
@@ -55623,185 +55676,134 @@ function intersect( object, raycaster, intersects, recursive ) {
 }
 
 /**
- * This class is an alternative to {@link Clock} with a different API design and behavior.
- * The goal is to avoid the conceptual flaws that became apparent in `Clock` over time.
+ * Class for keeping track of time.
  *
- * - `Timer` has an `update()` method that updates its internal state. That makes it possible to
- * call `getDelta()` and `getElapsed()` multiple times per simulation step without getting different values.
- * - The class can make use of the Page Visibility API to avoid large time delta values when the app
- * is inactive (e.g. tab switched or browser hidden).
- *
- * ```js
- * const timer = new Timer();
- * timer.connect( document ); // use Page Visibility API
- * ```
+ * @deprecated since r183.
  */
-class Timer {
+class Clock {
 
 	/**
-	 * Constructs a new timer.
-	 */
-	constructor() {
-
-		this._previousTime = 0;
-		this._currentTime = 0;
-		this._startTime = performance.now();
-
-		this._delta = 0;
-		this._elapsed = 0;
-
-		this._timescale = 1;
-
-		this._document = null;
-		this._pageVisibilityHandler = null;
-
-	}
-
-	/**
-	 * Connect the timer to the given document.Calling this method is not mandatory to
-	 * use the timer but enables the usage of the Page Visibility API to avoid large time
-	 * delta values.
+	 * Constructs a new clock.
 	 *
-	 * @param {Document} document - The document.
+	 * @deprecated since 183.
+	 * @param {boolean} [autoStart=true] - Whether to automatically start the clock when
+	 * `getDelta()` is called for the first time.
 	 */
-	connect( document ) {
+	constructor( autoStart = true ) {
 
-		this._document = document;
+		/**
+		 * If set to `true`, the clock starts automatically when `getDelta()` is called
+		 * for the first time.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoStart = autoStart;
 
-		// use Page Visibility API to avoid large time delta values
+		/**
+		 * Holds the time at which the clock's `start()` method was last called.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.startTime = 0;
 
-		if ( document.hidden !== undefined ) {
+		/**
+		 * Holds the time at which the clock's `start()`, `getElapsedTime()` or
+		 * `getDelta()` methods were last called.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.oldTime = 0;
 
-			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
+		/**
+		 * Keeps track of the total time that the clock has been running.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.elapsedTime = 0;
 
-			document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
+		/**
+		 * Whether the clock is running or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.running = false;
 
-		}
+		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
 
 	}
 
 	/**
-	 * Disconnects the timer from the DOM and also disables the usage of the Page Visibility API.
+	 * Starts the clock. When `autoStart` is set to `true`, the method is automatically
+	 * called by the class.
 	 */
-	disconnect() {
+	start() {
 
-		if ( this._pageVisibilityHandler !== null ) {
+		this.startTime = performance.now();
 
-			this._document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
-			this._pageVisibilityHandler = null;
-
-		}
-
-		this._document = null;
+		this.oldTime = this.startTime;
+		this.elapsedTime = 0;
+		this.running = true;
 
 	}
 
 	/**
-	 * Returns the time delta in seconds.
-	 *
-	 * @return {number} The time delta in second.
+	 * Stops the clock.
 	 */
-	getDelta() {
+	stop() {
 
-		return this._delta / 1000;
+		this.getElapsedTime();
+		this.running = false;
+		this.autoStart = false;
 
 	}
 
 	/**
 	 * Returns the elapsed time in seconds.
 	 *
-	 * @return {number} The elapsed time in second.
+	 * @return {number} The elapsed time.
 	 */
-	getElapsed() {
+	getElapsedTime() {
 
-		return this._elapsed / 1000;
+		this.getDelta();
+		return this.elapsedTime;
 
 	}
 
 	/**
-	 * Returns the timescale.
+	 * Returns the delta time in seconds.
 	 *
-	 * @return {number} The timescale.
+	 * @return {number} The delta time.
 	 */
-	getTimescale() {
+	getDelta() {
 
-		return this._timescale;
+		let diff = 0;
 
-	}
+		if ( this.autoStart && ! this.running ) {
 
-	/**
-	 * Sets the given timescale which scale the time delta computation
-	 * in `update()`.
-	 *
-	 * @param {number} timescale - The timescale to set.
-	 * @return {Timer} A reference to this timer.
-	 */
-	setTimescale( timescale ) {
-
-		this._timescale = timescale;
-
-		return this;
-
-	}
-
-	/**
-	 * Resets the time computation for the current simulation step.
-	 *
-	 * @return {Timer} A reference to this timer.
-	 */
-	reset() {
-
-		this._currentTime = performance.now() - this._startTime;
-
-		return this;
-
-	}
-
-	/**
-	 * Can be used to free all internal resources. Usually called when
-	 * the timer instance isn't required anymore.
-	 */
-	dispose() {
-
-		this.disconnect();
-
-	}
-
-	/**
-	 * Updates the internal state of the timer. This method should be called
-	 * once per simulation step and before you perform queries against the timer
-	 * (e.g. via `getDelta()`).
-	 *
-	 * @param {number} timestamp - The current time in milliseconds. Can be obtained
-	 * from the `requestAnimationFrame` callback argument. If not provided, the current
-	 * time will be determined with `performance.now`.
-	 * @return {Timer} A reference to this timer.
-	 */
-	update( timestamp ) {
-
-		if ( this._pageVisibilityHandler !== null && this._document.hidden === true ) {
-
-			this._delta = 0;
-
-		} else {
-
-			this._previousTime = this._currentTime;
-			this._currentTime = ( timestamp !== undefined ? timestamp : performance.now() ) - this._startTime;
-
-			this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
-			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+			this.start();
+			return 0;
 
 		}
 
-		return this;
+		if ( this.running ) {
+
+			const newTime = performance.now();
+
+			diff = ( newTime - this.oldTime ) / 1000;
+			this.oldTime = newTime;
+
+			this.elapsedTime += diff;
+
+		}
+
+		return diff;
 
 	}
-
-}
-
-function handleVisibilityChange() {
-
-	if ( this._document.hidden === false ) this.reset();
 
 }
 

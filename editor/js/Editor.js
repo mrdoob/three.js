@@ -553,7 +553,7 @@ Editor.prototype = {
 
 	setViewportCamera: function ( uuid ) {
 
-		this.viewportCamera = this.cameras[ uuid ];
+		this.viewportCamera = this.cameras[ uuid ] || this.camera;
 		this.signals.viewportCameraChanged.dispatch();
 
 	},

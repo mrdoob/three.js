@@ -1618,7 +1618,8 @@ class WebGLBackend extends Backend {
 		//
 
 		this.set( pipeline, {
-			programGPU
+			programGPU,
+			pipeline: programGPU
 		} );
 
 	}

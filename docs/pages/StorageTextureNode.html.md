@@ -88,6 +88,50 @@ The current output.
 
 **Returns:** The generated code snippet.
 
+### .generateSnippet( builder : NodeBuilder, textureProperty : string, uvSnippet : string, levelSnippet : string, biasSnippet : string, depthSnippet : string, compareSnippet : string, gradSnippet : Array.<string>, offsetSnippet : string ) : string
+
+Generates the snippet for the storage texture.
+
+**builder**
+
+The current node builder.
+
+**textureProperty**
+
+The texture property.
+
+**uvSnippet**
+
+The uv snippet.
+
+**levelSnippet**
+
+The level snippet.
+
+**biasSnippet**
+
+The bias snippet.
+
+**depthSnippet**
+
+The depth snippet.
+
+**compareSnippet**
+
+The compare snippet.
+
+**gradSnippet**
+
+The grad snippet.
+
+**offsetSnippet**
+
+The offset snippet.
+
+**Overrides:** [TextureNode#generateSnippet](TextureNode.html#generateSnippet)
+
+**Returns:** The generated code snippet.
+
 ### .generateStore( builder : NodeBuilder )
 
 Generates the code snippet of the storage texture node.

@@ -152,6 +152,36 @@ A WGSL snippet that represents 0-based texture array index to sample.
 
 **Returns:** The WGSL snippet.
 
+### .generateStorageTextureLoad( texture : Texture, textureProperty : string, uvIndexSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
+
+Generates the WGSL snippet that reads a single texel from a storage texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvIndexSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**levelSnippet**
+
+A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**Returns:** The WGSL snippet.
+
 ### .generateTexture( texture : Texture, textureProperty : string, uvSnippet : string, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
 
 Generates the WGSL snippet for sampling/loading the given texture.

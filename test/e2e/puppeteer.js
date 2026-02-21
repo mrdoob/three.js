@@ -63,6 +63,7 @@ const exceptionList = [
 	'webgpu_shadowmap',
 
 	// WebGPU needed
+	'webgpu_compile_async',
 	'webgpu_compute_audio',
 	'webgpu_compute_birds',
 	'webgpu_compute_cloth',

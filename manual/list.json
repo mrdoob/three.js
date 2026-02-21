@@ -339,6 +339,15 @@
 			"相关资源": "zh/useful-links",
 			"WebGL兼容性检查": "zh/webgl-compatibility-check"
 		},
+		"进阶": {
+			"动画系统": "zh/animation-system",
+			"颜色管理": "zh/color-management",
+			"如何创建VR内容": "zh/how-to-create-vr-content",
+			"如何释放对象": "zh/how-to-dispose-of-objects",
+			"如何更新对象": "zh/how-to-update-things",
+			"如何使用后处理": "zh/how-to-use-post-processing",
+			"矩阵变换": "zh/matrix-transformations"
+		},
 		"---": {},
 		"基本": {
 			"基础": "zh/fundamentals",
@@ -356,7 +365,8 @@
 			"阴影": "zh/shadows",
 			"雾": "zh/fog",
 			"渲染目标": "zh/rendertargets",
-			"自定义缓冲几何体": "zh/custom-buffergeometry"
+			"自定义缓冲几何体": "zh/custom-buffergeometry",
+			"物理": "zh/physics"
 		},
 		"技巧": {
 			"按需渲染": "zh/rendering-on-demand",
@@ -389,6 +399,10 @@
 			"释放资源": "zh/cleanup",
 			"体素几何体 (Minecraft)": "zh/voxel-geometry",
 			"来试试做一个游戏吧": "zh/game"
+		},
+		"WebGPU": {
+			"WebGPU渲染器": "zh/webgpurenderer",
+			"后处理": "zh/webgpu-postprocessing"
 		},
 		"WebXR": {
 			"VR - 基础": "zh/webxr-basics",

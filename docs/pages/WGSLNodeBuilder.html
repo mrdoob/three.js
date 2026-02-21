@@ -286,6 +286,67 @@ This ensures the same binding index is used across all shader stages.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="generateStorageTextureLoad" translate="no">.<a href="#generateStorageTextureLoad">generateStorageTextureLoad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet that reads a single texel from a storage texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvIndexSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="generateTexture" translate="no">.<a href="#generateTexture">generateTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">

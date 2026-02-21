@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>如何使用后处理</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 如何使用后处理">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>如何使用后处理</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            许多 three.js 应用会把 3D 对象直接渲染到屏幕上。但在一些场景中，
+            你会希望叠加景深（DOF）、Bloom、胶片颗粒、抗锯齿等视觉效果。后处理（Post Processing）
+            是实现这些效果的常见方案：先把场景渲染到一个渲染目标（显存中的图像缓冲区），
+            再通过一个或多个后处理 pass 对该缓冲区应用滤镜与效果，最后输出到屏幕。
+          </p>
+          <p>
+            three.js 通过 `EffectComposer` 提供了完整的后处理工作流支持。
+          </p>
+      
+          <h2>工作流程</h2>
+      
+          <p>
+            第一步是从 examples 目录导入所需模块。本文默认你使用 three.js 官方
+            [link:https://www.npmjs.com/package/three npm 包]。在本教程的基础示例中，我们需要以下文件。
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+</pre>
+      
+          <p>
+            导入完成后，把 `WebGLRenderer` 实例传入，创建 composer。
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+const composer = new EffectComposer( renderer );
+</pre>
+      
+          <p>
+            使用 composer 后，需要调整动画循环：不再调用 `WebGLRenderer.render()`，
+            而改为调用 `EffectComposer.render()`。
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+function animate() {
+
+  requestAnimationFrame( animate );
+
+  composer.render();
+
+}
+</pre>
+      
+          <p>
+            到这里 composer 已准备就绪，可以配置后处理 pass 链。各 pass 按添加顺序依次执行，
+            共同决定最终输出结果。在本例中先执行 `RenderPass`，再执行 `GlitchPass`，
+            最后执行 `OutputPass`。链路中最后一个启用的 pass 会自动渲染到屏幕。
+            配置如下：
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+
+const glitchPass = new GlitchPass();
+composer.addPass( glitchPass );
+
+const outputPass = new OutputPass();
+composer.addPass( outputPass );
+</pre>
+      
+          <p>
+            `RenderPass` 通常放在链路开头，用于提供场景渲染结果给后续步骤。
+            本例中 `GlitchPass` 会基于图像数据施加故障效果。
+            `OutputPass` 一般放在最后，负责 sRGB 色彩空间转换与色调映射（tone mapping）。
+            可参考这个 [link:https://threejs.org/examples/webgl_postprocessing_glitch 在线示例]。
+          </p>
+      
+          <h2>内置 Pass</h2>
+      
+          <p>
+            引擎提供了大量预置后处理 pass，可在
+            [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing]
+            目录中找到。
+          </p>
+      
+          <h2>自定义 Pass</h2>
+      
+          <p>
+            如果你要编写自定义后处理着色器并接入 pass 链，可以使用 `ShaderPass`。
+            在导入相关模块和自定义 shader 后，按下述方式添加 pass：
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
+
+// 稍后在你的初始化流程中
+
+const luminosityPass = new ShaderPass( LuminosityShader );
+composer.addPass( luminosityPass );
+</pre>
+      
+          <p>
+            仓库中提供的
+            [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader]
+            是编写自定义 shader 的良好起点。`CopyShader` 仅将 `EffectComposer` 的读缓冲内容
+            复制到写缓冲，不附加任何效果。
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+
+

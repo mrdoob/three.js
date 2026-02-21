@@ -11,6 +11,8 @@ import {
 	MirroredRepeatWrapping,
 	NoColorSpace,
 	Object3D,
+	OrthographicCamera,
+	PerspectiveCamera,
 	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
@@ -42,6 +44,19 @@ const SpecType = {
 	RelationshipTarget: 9,
 	Variant: 10,
 	VariantSet: 11
+};
+
+// UsdGeomCamera fallback values (OpenUSD schema)
+const USD_CAMERA_DEFAULTS = {
+	projection: 'perspective',
+	clippingRange: [ 1, 1000000 ],
+	horizontalAperture: 20.955,
+	verticalAperture: 15.2908,
+	horizontalApertureOffset: 0,
+	verticalApertureOffset: 0,
+	focalLength: 50,
+	focusDistance: 0,
+	fStop: 0
 };
 
 /**
@@ -653,12 +668,22 @@ class USDComposer {
 				if ( obj ) {
 
 					parent.add( obj );
+					this._buildHierarchy( obj, path );
 
 				}
 
-			} else if ( typeName === 'Material' || typeName === 'Shader' ) {
+			} else if ( typeName === 'Camera' ) {
 
-				// Skip materials/shaders, they're referenced by meshes
+				const obj = this._buildCamera( path );
+				obj.name = name;
+				const attrs = this._getAttributes( path );
+				this.applyTransform( obj, spec.fields, attrs );
+				parent.add( obj );
+				this._buildHierarchy( obj, path );
+
+			} else if ( typeName === 'Material' || typeName === 'Shader' || typeName === 'GeomSubset' ) {
+
+				// Skip materials/shaders/subsets, they're referenced by meshes
 
 			} else {
 
@@ -1112,13 +1137,13 @@ class USDComposer {
 		}
 
 		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
-		if ( displayOpacity && displayOpacity.length >= 1 ) {
+		if ( displayOpacity && displayOpacity.length === 1 && geomSubsets.length === 0 ) {
 
 			const opacity = displayOpacity[ 0 ];
 
 			const applyDisplayOpacity = ( mat ) => {
 
-				if ( opacity < 1 ) {
+				if ( opacity < 1 && mat.opacity === 1 && mat.transparent === false ) {
 
 					mat.opacity = opacity;
 					mat.transparent = true;
@@ -1187,6 +1212,99 @@ class USDComposer {
 		this.applyTransform( mesh, spec.fields, attrs );
 
 		return mesh;
+
+	}
+
+	/**
+	 * Build a camera from a Camera spec.
+	 */
+	_buildCamera( path ) {
+
+		const attrs = this._getAttributes( path );
+		const projectionToken = attrs[ 'projection' ];
+		const projection = typeof projectionToken === 'string'
+			? projectionToken.toLowerCase()
+			: USD_CAMERA_DEFAULTS.projection;
+		const clippingRange = attrs[ 'clippingRange' ] || USD_CAMERA_DEFAULTS.clippingRange;
+		const near = Math.max(
+			Number.EPSILON,
+			this._parseNumber( clippingRange[ 0 ], USD_CAMERA_DEFAULTS.clippingRange[ 0 ] )
+		);
+		const far = Math.max(
+			near + Number.EPSILON,
+			this._parseNumber( clippingRange[ 1 ], USD_CAMERA_DEFAULTS.clippingRange[ 1 ] )
+		);
+		const horizontalAperture = this._parseNumber(
+			attrs[ 'horizontalAperture' ],
+			USD_CAMERA_DEFAULTS.horizontalAperture
+		);
+		const verticalAperture = this._parseNumber(
+			attrs[ 'verticalAperture' ],
+			USD_CAMERA_DEFAULTS.verticalAperture
+		);
+		const horizontalApertureOffset = this._parseNumber(
+			attrs[ 'horizontalApertureOffset' ],
+			USD_CAMERA_DEFAULTS.horizontalApertureOffset
+		);
+		const verticalApertureOffset = this._parseNumber(
+			attrs[ 'verticalApertureOffset' ],
+			USD_CAMERA_DEFAULTS.verticalApertureOffset
+		);
+		const focalLength = this._parseNumber( attrs[ 'focalLength' ], USD_CAMERA_DEFAULTS.focalLength );
+		const focusDistance = this._parseNumber( attrs[ 'focusDistance' ], USD_CAMERA_DEFAULTS.focusDistance );
+		const fStop = this._parseNumber( attrs[ 'fStop' ], USD_CAMERA_DEFAULTS.fStop );
+
+		let camera;
+
+		if ( projection === 'orthographic' ) {
+
+			// USD orthographic apertures are in tenths of a world unit.
+			const width = horizontalAperture / 10;
+			const height = verticalAperture / 10;
+			const offsetX = horizontalApertureOffset / 10;
+			const offsetY = verticalApertureOffset / 10;
+
+			camera = new OrthographicCamera(
+				offsetX - width * 0.5,
+				offsetX + width * 0.5,
+				offsetY + height * 0.5,
+				offsetY - height * 0.5,
+				near,
+				far
+			);
+
+		} else {
+
+			const safeVerticalAperture = Math.max( Number.EPSILON, verticalAperture );
+			const safeFocalLength = Math.max( Number.EPSILON, focalLength );
+			const aspect = horizontalAperture / safeVerticalAperture;
+			const fov = 2 * Math.atan( safeVerticalAperture / ( 2 * safeFocalLength ) ) * 180 / Math.PI;
+
+			camera = new PerspectiveCamera( fov, aspect, near, far );
+			camera.filmGauge = Math.max( horizontalAperture, verticalAperture );
+			camera.filmOffset = horizontalApertureOffset;
+			camera.focus = focusDistance;
+			camera.setFocalLength( safeFocalLength );
+
+			if ( verticalApertureOffset !== 0 ) {
+
+				// Three.js supports only horizontal film offset directly.
+				camera.userData.verticalApertureOffset = verticalApertureOffset;
+
+			}
+
+		}
+
+		camera.userData.fStop = fStop;
+		camera.userData.usdProjection = projection;
+		return camera;
+
+	}
+
+	_parseNumber( value, fallback ) {
+
+		const n = Number( value );
+		return Number.isFinite( n ) ? n : fallback;
 
 	}
 
@@ -3559,7 +3677,9 @@ class USDComposer {
 
 			}
 
-			// Use geomBindTransform if available, otherwise compute from mesh/skeleton alignment
+			// Use geomBindTransform if available, otherwise fall back to identity.
+			// Estimating bind transforms from vertex/joint samples is not robust and can
+			// produce severe skinning distortion for valid assets.
 			let bindMatrix = new Matrix4();
 
 			if ( geomBindTransform && geomBindTransform.length === 16 ) {
@@ -3573,83 +3693,11 @@ class USDComposer {
 					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 				);
 
-			} else {
-
-				// Compute geomBindTransform by comparing mesh vertices with skeleton bind positions
-				bindMatrix = this._computeGeomBindTransform( mesh, skeleton );
-
 			}
 
 			mesh.bind( skeleton, bindMatrix );
 
 		}
-
-	}
-
-	_computeGeomBindTransform( mesh, skeleton ) {
-
-		const bindMatrix = new Matrix4();
-		const geometry = mesh.geometry;
-		const position = geometry.attributes.position;
-		const skinIndex = geometry.attributes.skinIndex;
-
-		if ( ! position || ! skinIndex || position.count === 0 ) {
-
-			return bindMatrix;
-
-		}
-
-		// Sample vertices and their influencing joints to compute average scale
-		const boneInverses = skeleton.boneInverses;
-		const sampleCount = Math.min( 50, position.count );
-		let sumRatioX = 0, sumRatioY = 0, sumRatioZ = 0;
-		let validSamples = 0;
-
-		for ( let i = 0; i < sampleCount; i ++ ) {
-
-			const vi = Math.floor( i * position.count / sampleCount );
-			const vx = position.getX( vi );
-			const vy = position.getY( vi );
-			const vz = position.getZ( vi );
-
-			// Get primary joint for this vertex
-			const jointIdx = skinIndex.getX( vi );
-			if ( jointIdx >= boneInverses.length ) continue;
-
-			// Get joint bind position from inverse bind matrix
-			const inverseBindMatrix = boneInverses[ jointIdx ];
-			const bindTransform = inverseBindMatrix.clone().invert();
-			const jx = bindTransform.elements[ 12 ];
-			const jy = bindTransform.elements[ 13 ];
-			const jz = bindTransform.elements[ 14 ];
-
-			// Compute ratio if both values are non-zero
-			if ( Math.abs( vx ) > 0.001 && Math.abs( jx ) > 0.001 ) {
-
-				sumRatioX += jx / vx;
-				sumRatioY += jy / vy;
-				sumRatioZ += jz / vz;
-				validSamples ++;
-
-			}
-
-		}
-
-		if ( validSamples > 0 ) {
-
-			// Use average scale to create geomBindTransform
-			const avgScale = ( sumRatioX + sumRatioY + sumRatioZ ) / ( validSamples * 3 );
-
-			// Only apply if scale is significantly different from 1
-			if ( Math.abs( avgScale - 1 ) > 0.1 ) {
-
-				bindMatrix.makeScale( avgScale, avgScale, avgScale );
-
-			}
-
-		}
-
-		return bindMatrix;
 
 	}
 

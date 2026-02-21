@@ -582,6 +582,41 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet that reads a single texel from a storage texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateStorageTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			uvIndexSnippet = `${ uvIndexSnippet } + ${ offsetSnippet }`;
+
+		}
+
+		let snippet;
+
+		if ( depthSnippet ) {
+
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet } )`;
+
+		} else {
+
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+
+		}
+
+		return snippet;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet that reads a single texel from a texture without sampling or filtering.
 	 *
 	 * @param {Texture} texture - The texture.
@@ -594,9 +629,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		const isStorageTexture = texture.isStorageTexture === true;
-
-		if ( levelSnippet === null && ! isStorageTexture ) levelSnippet = '0u';
+		if ( levelSnippet === null ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
@@ -608,33 +641,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( depthSnippet ) {
 
-			// Storage textures don't take a level parameter in WGSL
-			if ( isStorageTexture ) {
-
-				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet } )`;
-
-			} else {
-
-				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
-
-			}
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, u32( ${ levelSnippet } ) )`;
 
 		} else {
 
-			// Storage textures don't take a level parameter in WGSL
-			if ( isStorageTexture ) {
+			snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
 
-				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
+			if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
 
-			} else {
-
-				snippet = `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, u32( ${ levelSnippet } ) )`;
-
-				if ( this.renderer.backend.compatibilityMode && texture.isDepthTexture ) {
-
-					snippet += '.x';
-
-				}
+				snippet += '.x';
 
 			}
 

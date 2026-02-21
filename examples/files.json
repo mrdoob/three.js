@@ -308,6 +308,7 @@
 		"webgpu_centroid_sampling",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
+		"webgpu_compile_async",
 		"webgpu_compute_audio",
 		"webgpu_compute_birds",
 		"webgpu_compute_cloth",
