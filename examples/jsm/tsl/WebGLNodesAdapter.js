@@ -313,8 +313,6 @@ export class WebGLNodesAdapter {
 			const { nodeFrame } = self;
 			nodeFrame.material = this;
 			nodeFrame.object = object;
-			renderer.info.render.frame ++;
-			nodeFrame.renderId ++;
 
 			// update the uniform groups and nodes for the program if they're available before rendering
 			if ( renderer.properties.has( this ) ) {
@@ -583,6 +581,7 @@ export class WebGLNodesAdapter {
 
 		// update nodes for render
 		const { nodeFrame } = this;
+		nodeFrame.renderId ++;
 		for ( const node of updateNodes ) {
 
 			nodeFrame.updateNode( node );
