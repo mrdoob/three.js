@@ -171,6 +171,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'محاسبه مماس ها',
 			'sidebar/geometry/center': 'وسط',
 			'sidebar/geometry/export': 'اکسپورت جیسون',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'عرض',
 			'sidebar/geometry/box_geometry/height': 'ارتفاع',
@@ -587,6 +588,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Export JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -1004,6 +1006,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Exporter JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -1421,6 +1424,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '计算切线',
 			'sidebar/geometry/center': '居中',
 			'sidebar/geometry/export': '导出JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -1838,6 +1842,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '接線を計算',
 			'sidebar/geometry/center': '中央',
 			'sidebar/geometry/export': 'JSONをエクスポート',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '幅',
 			'sidebar/geometry/box_geometry/height': '高さ',
@@ -2254,6 +2259,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '접선 계산',
 			'sidebar/geometry/center': '중앙',
 			'sidebar/geometry/export': 'JSON으로 내보내기',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '너비',
 			'sidebar/geometry/box_geometry/height': '높이',

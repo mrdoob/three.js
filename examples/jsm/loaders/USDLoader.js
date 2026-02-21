@@ -90,46 +90,60 @@ class USDLoader extends Loader {
 
 		const usda = new USDAParser();
 		const usdc = new USDCParser();
+		const textDecoder = new TextDecoder();
+
+		function toArrayBuffer( data ) {
+
+			if ( data instanceof ArrayBuffer ) return data;
+
+			if ( data.byteOffset === 0 && data.byteLength === data.buffer.byteLength ) {
+
+				return data.buffer;
+
+			}
+
+			return data.buffer.slice( data.byteOffset, data.byteOffset + data.byteLength );
+
+		}
+
+		function getLowercaseExtension( filename ) {
+
+			const lastDot = filename.lastIndexOf( '.' );
+			if ( lastDot < 0 ) return '';
+
+			const lastSlash = filename.lastIndexOf( '/' );
+			if ( lastSlash > lastDot ) return '';
+
+			return filename.slice( lastDot + 1 ).toLowerCase();
+
+		}
 
 		function parseAssets( zip ) {
 
 			const data = {};
-			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
 
 			for ( const filename in zip ) {
 
-				if ( filename.endsWith( 'png' ) || filename.endsWith( 'jpg' ) || filename.endsWith( 'jpeg' ) ) {
+				const fileBytes = zip[ filename ];
+				const ext = getLowercaseExtension( filename );
 
-					const type = filename.endsWith( 'png' ) ? 'image/png' : 'image/jpeg';
-					const blob = new Blob( [ zip[ filename ] ], { type } );
-					data[ filename ] = URL.createObjectURL( blob );
+				if ( ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'avif' ) {
+
+					// Keep raw image bytes and create object URLs lazily in USDComposer.
+					data[ filename ] = fileBytes;
+					continue;
 
 				}
 
-			}
+				if ( ext !== 'usd' && ext !== 'usda' && ext !== 'usdc' ) continue;
 
-			for ( const filename in zip ) {
+				if ( isCrateFile( fileBytes ) ) {
 
-				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) || filename.endsWith( 'usdc' ) ) {
+					data[ filename ] = usdc.parseData( toArrayBuffer( fileBytes ) );
 
-					if ( isCrateFile( zip[ filename ] ) ) {
+				} else {
 
-						// Store parsed data (specsByPath) for on-demand composition
-						const parsedData = usdc.parseData( zip[ filename ].buffer );
-						data[ filename ] = parsedData;
-						// Store raw buffer for re-parsing with variant selections
-						data[ filename + ':buffer' ] = zip[ filename ].buffer;
-
-					} else {
-
-						const text = new TextDecoder().decode( zip[ filename ] );
-						// Store parsed data (specsByPath) for on-demand composition
-						data[ filename ] = usda.parseData( text );
-						// Store raw text for re-parsing with variant selections
-						data[ filename + ':text' ] = text;
-
-					}
+					data[ filename ] = usda.parseData( textDecoder.decode( fileBytes ) );
 
 				}
 
@@ -142,10 +156,9 @@ class USDLoader extends Loader {
 		function isCrateFile( buffer ) {
 
 			const crateHeader = new Uint8Array( [ 0x50, 0x58, 0x52, 0x2D, 0x55, 0x53, 0x44, 0x43 ] ); // PXR-USDC
+			const view = buffer instanceof Uint8Array ? buffer : new Uint8Array( buffer );
 
-			if ( buffer.byteLength < crateHeader.length ) return false;
-
-			const view = new Uint8Array( buffer, 0, crateHeader.length );
+			if ( view.byteLength < crateHeader.length ) return false;
 
 			for ( let i = 0; i < crateHeader.length; i ++ ) {
 
@@ -159,29 +172,30 @@ class USDLoader extends Loader {
 
 		function findUSD( zip ) {
 
-			if ( zip.length < 1 ) return { file: undefined, basePath: '' };
+			const fileNames = Object.keys( zip );
+			if ( fileNames.length < 1 ) return { file: undefined, filename: '', basePath: '' };
 
-			const firstFileName = Object.keys( zip )[ 0 ];
+			const firstFileName = fileNames[ 0 ];
+			const ext = getLowercaseExtension( firstFileName );
 			let isCrate = false;
 
 			const lastSlash = firstFileName.lastIndexOf( '/' );
 			const basePath = lastSlash >= 0 ? firstFileName.slice( 0, lastSlash ) : '';
 
-			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
+			// Per AOUSD core spec v1.0.1 section 16.4.1.2, the first ZIP entry is the root layer.
 			// ASCII files can end in either .usda or .usd.
-			// See https://openusd.org/release/spec_usdz.html#layout
-			if ( firstFileName.endsWith( 'usda' ) ) return { file: zip[ firstFileName ], basePath };
+			if ( ext === 'usda' ) return { file: zip[ firstFileName ], filename: firstFileName, basePath };
 
-			if ( firstFileName.endsWith( 'usdc' ) ) {
+			if ( ext === 'usdc' ) {
 
 				isCrate = true;
 
-			} else if ( firstFileName.endsWith( 'usd' ) ) {
+			} else if ( ext === 'usd' ) {
 
 				// If this is not a crate file, we assume it is a plain USDA file.
 				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
 
-					return { file: zip[ firstFileName ], basePath };
+					return { file: zip[ firstFileName ], filename: firstFileName, basePath };
 
 				} else {
 
@@ -193,11 +207,11 @@ class USDLoader extends Loader {
 
 			if ( isCrate ) {
 
-				return { file: zip[ firstFileName ], basePath };
+				return { file: zip[ firstFileName ], filename: firstFileName, basePath };
 
 			}
 
-			return { file: undefined, basePath: '' };
+			return { file: undefined, filename: '', basePath: '' };
 
 		}
 
@@ -218,7 +232,7 @@ class USDLoader extends Loader {
 		if ( isCrateFile( buffer ) ) {
 
 			const composer = new USDComposer( scope.manager );
-			const data = usdc.parseData( buffer );
+			const data = usdc.parseData( toArrayBuffer( buffer ) );
 			return composer.compose( data, {} );
 
 		}
@@ -230,22 +244,20 @@ class USDLoader extends Loader {
 		if ( bytes[ 0 ] === 0x50 && bytes[ 1 ] === 0x4B ) {
 
 			const zip = unzipSync( bytes );
-
 			const assets = parseAssets( zip );
+			const { file, filename, basePath } = findUSD( zip );
 
-			const { file, basePath } = findUSD( zip );
+			if ( ! file ) {
+
+				throw new Error( 'USDLoader: Invalid USDZ package. The first ZIP entry must be a USD layer (.usd/.usda/.usdc).' );
+
+			}
 
 			const composer = new USDComposer( scope.manager );
-			let data;
+			const data = assets[ filename ];
+			if ( ! data ) {
 
-			if ( isCrateFile( file ) ) {
-
-				data = usdc.parseData( file.buffer );
-
-			} else {
-
-				const text = new TextDecoder().decode( file );
-				data = usda.parseData( text );
+				throw new Error( 'USDLoader: Failed to parse root layer "' + filename + '".' );
 
 			}
 
@@ -256,7 +268,7 @@ class USDLoader extends Loader {
 		// USDA (standalone, as ArrayBuffer)
 
 		const composer = new USDComposer( scope.manager );
-		const text = new TextDecoder().decode( bytes );
+		const text = textDecoder.decode( bytes );
 		const data = usda.parseData( text );
 		return composer.compose( data, {} );
 

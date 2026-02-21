@@ -110,7 +110,7 @@ class Inspector extends RendererInspector {
 
 	}
 
-	resolveConsole( type, message ) {
+	resolveConsole( type, message, stackTrace = null ) {
 
 		switch ( type ) {
 
@@ -126,7 +126,15 @@ class Inspector extends RendererInspector {
 
 				this.console.addMessage( 'warn', message );
 
-				console.warn( message );
+				if ( stackTrace && stackTrace.isStackTrace ) {
+
+					console.warn( stackTrace.getError( message ) );
+
+				} else {
+
+					console.warn( message );
+
+				}
 
 				break;
 
@@ -134,7 +142,15 @@ class Inspector extends RendererInspector {
 
 				this.console.addMessage( 'error', message );
 
-				console.error( message );
+				if ( stackTrace && stackTrace.isStackTrace ) {
+
+					console.error( stackTrace.getError( message ) );
+
+				} else {
+
+					console.error( message );
+
+				}
 
 				break;
 
@@ -182,9 +198,9 @@ class Inspector extends RendererInspector {
 
 			if ( this.isAvailable ) {
 
-				renderer.backend.trackTimestamp = true;
-
 				renderer.init().then( () => {
+
+					renderer.backend.trackTimestamp = true;
 
 					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 

@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { screenUV } from '../display/ScreenNode.js';
 
@@ -134,10 +133,10 @@ class ReflectorNode extends TextureNode {
 
 			}
 
-			this._depthNode = nodeObject( new ReflectorNode( {
+			this._depthNode = new ReflectorNode( {
 				defaultTexture: _defaultRT.depthTexture,
 				reflector: this._reflectorBaseNode
-			} ) );
+			} );
 
 		}
 

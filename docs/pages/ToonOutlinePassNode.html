@@ -17,7 +17,7 @@
 Only 3D objects with materials of type <code>MeshToonMaterial</code> and <code>MeshToonNodeMaterial</code>
 will receive the outline.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const postProcessing = new PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const postProcessing = new RenderPipeline( renderer );
 const scenePass = toonOutlinePass( scene, camera );
 postProcessing.outputNode = scenePass;
 </code></pre></div>
@@ -34,7 +34,7 @@ postProcessing.outputNode = scenePass;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the scene.</p>
@@ -42,7 +42,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the camera.</p>
@@ -50,7 +50,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>colorNode</strong>
+										<strong translate="no">colorNode</strong>
 									</td>
 									<td class="description last">
 										<p>Defines the outline's color.</p>
@@ -58,7 +58,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>thicknessNode</strong>
+										<strong translate="no">thicknessNode</strong>
 									</td>
 									<td class="description last">
 										<p>Defines the outline's thickness.</p>
@@ -66,7 +66,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>alphaNode</strong>
+										<strong translate="no">alphaNode</strong>
 									</td>
 									<td class="description last">
 										<p>Defines the outline's alpha.</p>

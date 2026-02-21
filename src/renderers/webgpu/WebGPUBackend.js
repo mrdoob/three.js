@@ -30,6 +30,7 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @typedef {Object} WebGPUBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
@@ -217,6 +218,12 @@ class WebGPUBackend extends Backend {
 		}
 
 		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
+
+		if ( this.compatibilityMode ) {
+
+			renderer._samples = 0;
+
+		}
 
 		device.lost.then( ( info ) => {
 
@@ -1491,6 +1498,7 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
+		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
 
 		const index = renderObject.getIndex();
@@ -1590,6 +1598,14 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
+
+				if ( material.wireframe ) {
+
+					bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
+				}
+
 				for ( let i = 0; i < drawCount; i ++ ) {
 
 					const count = drawInstances ? drawInstances[ i ] : 1;
@@ -1597,7 +1613,7 @@ class WebGPUBackend extends Backend {
 
 					if ( hasIndex === true ) {
 
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
+						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
 
 					} else {
 

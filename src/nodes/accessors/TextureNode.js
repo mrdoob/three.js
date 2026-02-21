@@ -13,6 +13,8 @@ import { Compatibility, IntType, LessCompare, NearestFilter, UnsignedIntType } f
 import { Texture } from '../../textures/Texture.js';
 import { warn, warnOnce } from '../../utils.js';
 
+import NodeError from '../core/NodeError.js';
+
 const EmptyTexture = /*@__PURE__*/ new Texture();
 
 /**
@@ -344,7 +346,7 @@ class TextureNode extends UniformNode {
 
 		if ( ! texture || texture.isTexture !== true ) {
 
-			throw new Error( 'THREE.TSL: `texture( value )` function expects a valid instance of THREE.Texture().' );
+			throw new NodeError( 'THREE.TSL: `texture( value )` function expects a valid instance of THREE.Texture().', this.stackTrace );
 
 		}
 
@@ -403,13 +405,17 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				if ( this.value.compareFunction !== null && this.value.compareFunction !== LessCompare ) {
+				if ( this.value.compareFunction === null || this.value.compareFunction === LessCompare ) {
+
+					compareStepNode = this.compareNode;
+
+				} else {
+
+					compareNode = this.compareNode;
 
 					warnOnce( 'TSL: Only "LessCompare" is supported for depth texture comparison fallback.' );
 
 				}
-
-				compareStepNode = this.compareNode;
 
 			}
 

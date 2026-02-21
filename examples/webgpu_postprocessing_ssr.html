@@ -40,7 +40,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection, vec2, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, directionToColor, colorToDirection, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -52,10 +52,10 @@
 
 		const params = {
 			quality: 0.5,
-			blurQuality: 2,
-			maxDistance: 0.5,
+			blurQuality: 1,
+			maxDistance: 1,
 			opacity: 1,
-			thickness: 0.015,
+			thickness: 0.03,
 			roughness: 1,
 			enabled: true
 		};
@@ -104,6 +104,19 @@
 				scene.add( model );
 
 			} );
+
+			// Add a reflective plane under the camera
+
+			const floorGeometry = new THREE.CircleGeometry( 2, 64 );
+			const floorMaterial = new THREE.MeshStandardMaterial( {
+				color: 0xffffff,
+				metalness: 1,
+				roughness: 0.5
+			} );
+			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floor.rotation.x = - Math.PI / 2;
+			floor.position.y = - 0.8;
+			scene.add( floor );
 
 			//
 
@@ -166,9 +179,9 @@
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, scenePassMetalRough.r, scenePassMetalRough.g ).toInspector( 'SSR' );
 
-			// blend SSR over beauty
+			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
+			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
 
 			renderPipeline.outputNode = outputNode;
 

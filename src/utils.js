@@ -1,3 +1,5 @@
+import { AlwaysDepth, EqualDepth, GreaterDepth, GreaterEqualDepth, LessDepth, LessEqualDepth, NeverDepth, NotEqualDepth } from './constants.js';
+
 /**
  * Finds the minimum value in an array.
  *
@@ -219,6 +221,36 @@ function log( ...params ) {
 }
 
 /**
+ * Enhances log/warn/error messages related to TSL.
+ *
+ * @param {Array<any>} params - The original message parameters.
+ * @returns {Array<any>} The filtered and enhanced message parameters.
+ */
+function enhanceLogMessage( params ) {
+
+	const message = params[ 0 ];
+
+	if ( typeof message === 'string' && message.startsWith( 'TSL:' ) ) {
+
+		const stackTrace = params[ 1 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			params[ 0 ] += ' ' + stackTrace.getLocation();
+
+		} else {
+
+			params[ 1 ] = 'Stack trace not available. Enable "THREE.Node.captureStackTrace" to capture stack traces.';
+
+		}
+
+	}
+
+	return params;
+
+}
+
+/**
  * Logs a warning message with the 'THREE.' prefix.
  *
  * If a custom console function is set via setConsoleFunction(), it will be used
@@ -230,6 +262,8 @@ function log( ...params ) {
  */
 function warn( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -238,7 +272,17 @@ function warn( ...params ) {
 
 	} else {
 
-		console.warn( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.warn( stackTrace.getError( message ) );
+
+		} else {
+
+			console.warn( message, ...params );
+
+		}
 
 	}
 
@@ -256,6 +300,8 @@ function warn( ...params ) {
  */
 function error( ...params ) {
 
+	params = enhanceLogMessage( params );
+
 	const message = 'THREE.' + params.shift();
 
 	if ( _setConsoleFunction ) {
@@ -264,7 +310,17 @@ function error( ...params ) {
 
 	} else {
 
-		console.error( message, ...params );
+		const stackTrace = params[ 0 ];
+
+		if ( stackTrace && stackTrace.isStackTrace ) {
+
+			console.error( stackTrace.getError( message ) );
+
+		} else {
+
+			console.error( message, ...params );
+
+		}
 
 	}
 
@@ -292,6 +348,28 @@ function warnOnce( ...params ) {
 }
 
 /**
+ * Yields execution to the main thread to allow rendering and other tasks.
+ * Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimationFrame.
+ *
+ * @return {Promise<void>}
+ */
+function yieldToMain() {
+
+	if ( typeof self !== 'undefined' && typeof self.scheduler !== 'undefined' && typeof self.scheduler.yield !== 'undefined' ) {
+
+		return self.scheduler.yield();
+
+	}
+
+	return new Promise( resolve => {
+
+		requestAnimationFrame( resolve );
+
+	} );
+
+}
+
+/**
  * Asynchronously probes for WebGL sync object completion.
  *
  * This function creates a promise that resolves when the WebGL sync object
@@ -300,7 +378,7 @@ function warnOnce( ...params ) {
  * main thread. This is useful for GPU-CPU synchronization in WebGL contexts.
  *
  * @private
- * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL rendering context.
+ * @param {WebGL2RenderingContext} gl - The WebGL rendering context.
  * @param {WebGLSync} sync - The WebGL sync object to wait for.
  * @param {number} interval - The polling interval in milliseconds.
  * @return {Promise<void>} A promise that resolves when the sync completes or rejects if it fails.
@@ -393,4 +471,23 @@ function toReversedProjectionMatrix( projectionMatrix ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray };
+/**
+ * Used to select the correct depth functions
+ * when reversed depth buffer is used.
+ *
+ * @private
+ * @type {Object}
+ */
+const ReversedDepthFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, yieldToMain, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray, ReversedDepthFuncs };

@@ -291,7 +291,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.`, this.stackTrace );
 
 					method = '/*' + method + '*/';
 
@@ -964,7 +964,7 @@ export const mix = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIX ).setPa
  * @param {Node | number} [high=1] - The upper bound.
  * @returns {Node}
  */
-export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
+export const clamp = ( value, low = 0, high = 1 ) => new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) );
 
 /**
  * Constrains a value between `0` and `1`.

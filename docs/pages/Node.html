@@ -27,7 +27,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>nodeType</strong>
+										<strong translate="no">nodeType</strong>
 									</td>
 									<td class="description last">
 										<p>The node type.</p>
@@ -84,6 +84,13 @@ set this flag to <code>true</code> (a typical example is <a href="AttributeNode.
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="stackTrace" translate="no">.<a href="#stackTrace">stackTrace</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The stack trace of the node for debugging purposes.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>The type of the class. The value is usually the constructor name.</p>
@@ -123,6 +130,13 @@ set this flag to <code>true</code> (a typical example is <a href="AttributeNode.
 						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
+				<div class="member">
+					<h3 class="name" id=".captureStackTrace" translate="no">.<a href="#.captureStackTrace">captureStackTrace</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables or disables the automatic capturing of stack traces for nodes.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
 					<h3 class="name name-method" id="analyze" translate="no">.<a href="#analyze">analyze</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
@@ -134,7 +148,7 @@ This stage analyzes the node hierarchy and ensures descendent nodes are built.</
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -142,7 +156,7 @@ This stage analyzes the node hierarchy and ensures descendent nodes are built.</
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>output</strong>
+										<strong translate="no">output</strong>
 									</td>
 									<td class="description last">
 										<p>The target output node.</p>
@@ -166,7 +180,7 @@ This stage analyzes the node hierarchy and ensures descendent nodes are built.</
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -174,7 +188,7 @@ This stage analyzes the node hierarchy and ensures descendent nodes are built.</
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>output</strong>
+										<strong translate="no">output</strong>
 									</td>
 									<td class="description last">
 										<p>Can be used to define the output type.</p>
@@ -205,7 +219,7 @@ This stage analyzes the node hierarchy and ensures descendent nodes are built.</
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>json</strong>
+										<strong translate="no">json</strong>
 									</td>
 									<td class="description last">
 										<p>The JSON object.</p>
@@ -231,7 +245,7 @@ This state builds the output node and returns the resulting shader string.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -239,7 +253,7 @@ This state builds the output node and returns the resulting shader string.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>output</strong>
+										<strong translate="no">output</strong>
 									</td>
 									<td class="description last">
 										<p>Can be used to define the output type.</p>
@@ -260,7 +274,7 @@ This state builds the output node and returns the resulting shader string.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -281,7 +295,7 @@ This state builds the output node and returns the resulting shader string.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>force</strong>
+										<strong translate="no">force</strong>
 									</td>
 									<td class="description last">
 										<p>When set to <code>true</code>, a recomputation of the cache key is forced.</p>
@@ -290,7 +304,7 @@ This state builds the output node and returns the resulting shader string.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>ignores</strong>
+										<strong translate="no">ignores</strong>
 									</td>
 									<td class="description last">
 										<p>A set of nodes to ignore during the computation of the cache key.</p>
@@ -322,7 +336,7 @@ these elements.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -345,7 +359,7 @@ depending on their implementation.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -366,7 +380,7 @@ depending on their implementation.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -374,7 +388,7 @@ depending on their implementation.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the member.</p>
@@ -395,7 +409,7 @@ depending on their implementation.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -437,7 +451,7 @@ process makes sure to process just the first node.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -487,7 +501,7 @@ global cache referring to the current shader-stage.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -509,7 +523,7 @@ this method automatically sets the update type to <code>FRAME</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The update method.</p>
@@ -531,7 +545,7 @@ this method automatically sets the update type to <code>OBJECT</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The update method.</p>
@@ -552,7 +566,7 @@ this method automatically sets the update type to <code>OBJECT</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The update method.</p>
@@ -574,7 +588,7 @@ this method automatically sets the update type to <code>RENDER</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The update method.</p>
@@ -595,7 +609,7 @@ this method automatically sets the update type to <code>RENDER</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The update method.</p>
@@ -603,7 +617,7 @@ this method automatically sets the update type to <code>RENDER</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>updateType</strong>
+										<strong translate="no">updateType</strong>
 									</td>
 									<td class="description last">
 										<p>The update type.</p>
@@ -624,7 +638,7 @@ this method automatically sets the update type to <code>RENDER</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>json</strong>
+										<strong translate="no">json</strong>
 									</td>
 									<td class="description last">
 										<p>The output JSON object.</p>
@@ -644,7 +658,7 @@ If an output node is prepared, then it must be returned in the <code>return</cod
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -665,7 +679,7 @@ If an output node is prepared, then it must be returned in the <code>return</cod
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>meta</strong>
+										<strong translate="no">meta</strong>
 									</td>
 									<td class="description last">
 										<p>An optional JSON object that already holds serialized data from other scene objects.</p>
@@ -686,7 +700,7 @@ If an output node is prepared, then it must be returned in the <code>return</cod
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>A callback that is executed per node.</p>
@@ -705,7 +719,7 @@ The <a href="Node.html#updateType">Node#updateType</a> property defines how ofte
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current node frame.</p>
@@ -727,7 +741,7 @@ The <a href="Node.html#updateAfterType">Node#updateAfterType</a> property define
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current node frame.</p>
@@ -749,7 +763,7 @@ The <a href="Node.html#updateBeforeType">Node#updateBeforeType</a> property defi
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current node frame.</p>
@@ -771,7 +785,7 @@ to such objects based on a given state (e.g. the current node frame or builder).
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>state</strong>
+										<strong translate="no">state</strong>
 									</td>
 									<td class="description last">
 										<p>This method can be invocated in different contexts so <code>state</code> can refer to any object type.</p>

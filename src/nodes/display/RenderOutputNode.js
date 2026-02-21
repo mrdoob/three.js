@@ -5,9 +5,9 @@ import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
- * Normally, tone mapping and color conversion happens automatically
- * before outputting pixel too the default (screen) framebuffer. In certain
- * post processing setups this happens to late because certain effects
+ * Normally, tone mapping and color conversion happens automatically just
+ * before outputting a pixel to the default (screen) framebuffer. In certain
+ * post processing setups this is too late because some effects such as FXAA
  * require e.g. sRGB input. For such scenarios, `RenderOutputNode` can be used
  * to apply tone mapping and color space conversion at an arbitrary point
  * in the effect chain.
@@ -136,7 +136,7 @@ class RenderOutputNode extends TempNode {
 export default RenderOutputNode;
 
 /**
- * TSL function for creating a posterize node.
+ * TSL function for creating a render output node.
  *
  * @tsl
  * @function
@@ -145,6 +145,6 @@ export default RenderOutputNode;
  * @param {?string} [outputColorSpace=null] - The output color space.
  * @returns {RenderOutputNode}
  */
-export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
+export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace );
 
 addMethodChaining( 'renderOutput', renderOutput );

@@ -93,6 +93,11 @@ function Editor() {
 
 		pathTracerUpdated: new Signal(),
 
+		animationPanelChanged: new Signal(),
+		animationPanelResized: new Signal(),
+
+		morphTargetsUpdated: new Signal()
+
 	};
 
 	this.config = new Config();
@@ -131,6 +136,7 @@ function Editor() {
 
 	this.viewportCamera = this.camera;
 	this.viewportShading = 'default';
+	this.viewportColor = new THREE.Color();
 
 	this.addCamera( this.camera );
 
@@ -547,7 +553,7 @@ Editor.prototype = {
 
 	setViewportCamera: function ( uuid ) {
 
-		this.viewportCamera = this.cameras[ uuid ];
+		this.viewportCamera = this.cameras[ uuid ] || this.camera;
 		this.signals.viewportCameraChanged.dispatch();
 
 	},

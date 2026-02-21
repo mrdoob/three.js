@@ -61,7 +61,7 @@ export const instancedArray = ( count, type = 'float' ) => {
 	}
 
 	const buffer = new StorageInstancedBufferAttribute( count, itemSize, typedArray );
-	const node = storage( buffer, type, count );
+	const node = storage( buffer, type, buffer.count );
 
 	return node;
 

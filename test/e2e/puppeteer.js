@@ -8,8 +8,6 @@ const server = createServer();
 const exceptionList = [
 
 	// Take too long
-	'webgpu_parallax_uv', 				// 11 min
-	'webgpu_cubemap_adjustments', 		// 9 min
 	'webgl_loader_lwo', 				// 8 min
 	'webgpu_cubemap_mix', 				// 2 min
 	'webgl_loader_texture_ultrahdr', 	// 1 min
@@ -21,6 +19,7 @@ const exceptionList = [
 
 	// Needs investigation
 	'physics_rapier_instancing',
+	'physics_jolt_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
 	'webgl_postprocessing_glitch',
@@ -34,10 +33,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
-	'webgpu_reflection',
-	'webgpu_test_memory',
-	'webgpu_texturegrad',
-	'webgpu_tsl_vfx_flames',
+	'webgpu_volume_lighting_traa',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -67,6 +63,7 @@ const exceptionList = [
 	'webgpu_shadowmap',
 
 	// WebGPU needed
+	'webgpu_compile_async',
 	'webgpu_compute_audio',
 	'webgpu_compute_birds',
 	'webgpu_compute_cloth',

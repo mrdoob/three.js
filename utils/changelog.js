@@ -14,7 +14,7 @@ const categoryPaths = [
 	[ 'editor', 'Editor' ],
 	[ 'test', 'Tests' ],
 	[ 'playground', 'Playground' ],
-	[ 'utils', 'Scripts' ],
+	[ 'utils', 'Utils' ],
 	[ 'build', 'Build' ],
 	[ 'examples/jsm', 'Addons' ],
 	[ 'examples', 'Examples' ],
@@ -38,17 +38,7 @@ const skipPatterns = [
 ];
 
 // Categories that map to sections
-const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Scripts', 'Build' ];
-
-// Author name to GitHub username mapping (for commits without PR numbers)
-const authorMap = {
-	'Mr.doob': 'mrdoob',
-	'Michael Herzog': 'Mugen87',
-	'Claude': 'claude',
-	'Claude Opus 4.5': 'claude',
-	'Copilot': 'copilot',
-	'copilot-swe-agent[bot]': 'copilot'
-};
+const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Utils', 'Build' ];
 
 function exec( command ) {
 
@@ -285,7 +275,7 @@ function cleanSubject( subject, category ) {
 	cleaned = cleaned.replace( prefixPattern, '' );
 
 	// Also remove common prefixes
-	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer):\s*/i, '' );
+	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
 
 	// Remove trailing period if present, we'll add it back
 	cleaned = cleaned.replace( /\.\s*$/, '' );
@@ -296,7 +286,15 @@ function cleanSubject( subject, category ) {
 
 function normalizeAuthor( author ) {
 
-	return authorMap[ author ] || author;
+	const lower = author.toLowerCase();
+	if ( lower === 'mr.doob' ) return 'mrdoob';
+	if ( lower === 'michael herzog' ) return 'Mugen87';
+	if ( lower === 'garrett johnson' ) return 'gkjohnson';
+	if ( lower.startsWith( 'claude' ) ) return 'claude';
+	if ( lower.startsWith( 'copilot' ) ) return 'microsoftcopilot';
+	if ( lower.includes( 'dependabot' ) ) return 'dependabot';
+
+	return author;
 
 }
 
@@ -310,13 +308,13 @@ function formatEntry( subject, prNumber, hash, author, coAuthors, category ) {
 
 	} else if ( hash ) {
 
-		entry += ` ${hash.slice( 0, 7 )}`;
+		entry += ` ${hash}`;
 
 	}
 
 	if ( author ) {
 
-		const authors = [ author, ...( coAuthors || [] ) ].map( normalizeAuthor );
+		const authors = [ ...new Set( [ author, ...( coAuthors || [] ) ].map( normalizeAuthor ) ) ];
 		entry += ` (@${authors.join( ', @' )})`;
 
 	}
@@ -418,6 +416,7 @@ function processCommit( commit, revertedTitles ) {
 
 		category = titleCategory;
 		if ( category === 'Puppeteer' ) category = 'Tests';
+		if ( category === 'Scripts' ) category = 'Utils';
 		section = sectionCategories.includes( category ) ? category : null;
 
 	}
@@ -478,7 +477,7 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 	}
 
 	// Output sections in order
-	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Scripts', 'Build' ];
+	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Utils', 'Build' ];
 
 	for ( const sectionName of sectionOrder ) {
 
@@ -557,13 +556,22 @@ function generateChangelog() {
 		Examples: [],
 		Editor: [],
 		Tests: [],
-		Scripts: [],
+		Utils: [],
 		Build: []
 	};
 
 	let skipped = 0;
+	const total = commits.length;
+	const barWidth = 40;
 
-	for ( const commit of commits ) {
+	for ( let i = 0; i < total; i ++ ) {
+
+		const commit = commits[ i ];
+		const done = i + 1;
+		const filled = Math.round( barWidth * done / total );
+		const bar = '█'.repeat( filled ) + '░'.repeat( barWidth - filled );
+		const pct = Math.round( 100 * done / total );
+		process.stderr.write( `\r  ${bar} ${pct}% (${done}/${total})` );
 
 		const result = processCommit( commit, revertedTitles );
 
@@ -591,6 +599,8 @@ function generateChangelog() {
 		}
 
 	}
+
+	process.stderr.write( '\n\n' );
 
 	if ( skipped > 0 ) {
 

@@ -12,6 +12,7 @@ const APP = {
 		const dom = document.createElement( 'div' );
 
 		this.dom = dom;
+		this.canvas = null;
 
 		this.width = 500;
 		this.height = 500;
@@ -26,6 +27,7 @@ const APP = {
 
 				renderer.dispose();
 				dom.removeChild( renderer.domElement );
+				this.canvas = null;
 
 			}
 
@@ -49,6 +51,7 @@ const APP = {
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
 
 			dom.appendChild( renderer.domElement );
+			this.canvas = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -77,7 +80,7 @@ const APP = {
 
 			const scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
-			for ( let uuid in json.scripts ) {
+			for ( const uuid in json.scripts ) {
 
 				const object = scene.getObjectByProperty( 'uuid', uuid, true );
 
@@ -96,7 +99,7 @@ const APP = {
 
 					const functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
-					for ( let name in functions ) {
+					for ( const name in functions ) {
 
 						if ( functions[ name ] === undefined ) continue;
 
@@ -136,6 +139,12 @@ const APP = {
 		this.setPixelRatio = function ( pixelRatio ) {
 
 			renderer.setPixelRatio( pixelRatio );
+
+		};
+
+		this.setClearColor = function ( color ) {
+
+			renderer.setClearColor( color );
 
 		};
 

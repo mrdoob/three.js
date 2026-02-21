@@ -44,13 +44,23 @@ class PassTextureNode extends TextureNode {
 		 */
 		this.passNode = passNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 * @readonly
+		 */
+		this.isPassTextureNode = true;
+
 		this.setUpdateMatrix( false );
 
 	}
 
 	setup( builder ) {
 
-		this.passNode.build( builder );
+		const properties = builder.getNodeProperties( this );
+		properties.passNode = this.passNode;
 
 		return super.setup( builder );
 
@@ -106,6 +116,15 @@ class PassMultipleTextureNode extends PassTextureNode {
 		 * @type {boolean}
 		 */
 		this.previousTexture = previousTexture;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 * @readonly
+		 */
+		this.isPassMultipleTextureNode = true;
 
 	}
 

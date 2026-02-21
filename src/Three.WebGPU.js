@@ -10,6 +10,7 @@ export { default as RenderPipeline } from './renderers/common/RenderPipeline.js'
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
 import * as RendererUtils from './renderers/common/RendererUtils.js';
 export { RendererUtils };
+export { default as CubeRenderTarget } from './renderers/common/CubeRenderTarget.js';
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';
 export { default as Storage3DTexture } from './renderers/common/Storage3DTexture.js';
 export { default as StorageArrayTexture } from './renderers/common/StorageArrayTexture.js';

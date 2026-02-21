@@ -99,7 +99,6 @@ export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
 export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
-export * from './display/PosterizeNode.js';
 export * from './display/ToneMappingNode.js';
 export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';
@@ -119,8 +118,6 @@ export * from './code/ExpressionNode.js';
 export * from './code/CodeNode.js';
 export * from './code/FunctionCallNode.js';
 export * from './code/FunctionNode.js';
-export * from './code/ScriptableNode.js';
-export * from './code/ScriptableValueNode.js';
 
 // fog
 export * from './fog/Fog.js';

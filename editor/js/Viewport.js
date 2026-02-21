@@ -385,6 +385,8 @@ function Viewport( editor ) {
 
 		}
 
+		renderer.getClearColor( editor.viewportColor );
+
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -830,6 +832,8 @@ function Viewport( editor ) {
 				selectionBox.box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
 
 			}
+
+			signals.morphTargetsUpdated.dispatch();
 
 		}
 
