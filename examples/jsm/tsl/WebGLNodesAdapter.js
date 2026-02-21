@@ -314,6 +314,10 @@ export class WebGLNodesAdapter {
 			nodeFrame.material = this;
 			nodeFrame.object = object;
 
+			// increment "frame" here to force uniform buffers to update for the material, which otherwise only get
+			// updated once per frame.
+			renderer.info.render.frame ++;
+
 			// update the uniform groups and nodes for the program if they're available before rendering
 			if ( renderer.properties.has( this ) ) {
 
