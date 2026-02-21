@@ -495,6 +495,7 @@ export class WebGLNodesAdapter {
 		// set up callbacks for uniforms and node updates
 		material._latestBuilder = builder;
 		material.addEventListener( 'dispose', onDisposeMaterialCallback );
+		this.updateNodes( builder.updateNodes );
 
 	}
 
