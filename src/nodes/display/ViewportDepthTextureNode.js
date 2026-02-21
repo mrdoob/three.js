@@ -4,8 +4,6 @@ import { screenUV } from './ScreenNode.js';
 
 import { DepthTexture } from '../../textures/DepthTexture.js';
 
-let _sharedDepthbuffer = null;
-
 /**
  * Represents the depth of the current viewport as a texture. This module
  * can be used in combination with viewport texture to achieve effects
@@ -29,25 +27,7 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 	 */
 	constructor( uvNode = screenUV, levelNode = null ) {
 
-		if ( _sharedDepthbuffer === null ) {
-
-			_sharedDepthbuffer = new DepthTexture();
-
-		}
-
-		super( uvNode, levelNode, _sharedDepthbuffer );
-
-	}
-
-	/**
-	 * Overwritten so the method always returns the unique shared
-	 * depth texture.
-	 *
-	 * @return {DepthTexture} The shared depth texture.
-	 */
-	getTextureForReference() {
-
-		return _sharedDepthbuffer;
+		super( uvNode, levelNode, new DepthTexture() );
 
 	}
 

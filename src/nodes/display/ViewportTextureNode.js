@@ -144,9 +144,10 @@ class ViewportTextureNode extends TextureNode {
 
 	updateReference( frame ) {
 
-		const renderTarget = frame.renderer.getRenderTarget();
+		const renderer = frame.renderer;
+		const renderTarget = renderer.getRenderTarget();
 
-		this.value = this.getTextureForReference( renderTarget );
+		this.value = this.getTextureForReference( renderTarget !== null ? renderTarget : renderer.getCanvasTarget() );
 
 		return this.value;
 
@@ -169,7 +170,7 @@ class ViewportTextureNode extends TextureNode {
 
 		//
 
-		const framebufferTexture = this.getTextureForReference( renderTarget );
+		const framebufferTexture = this.getTextureForReference( renderTarget !== null ? renderTarget : renderer.getCanvasTarget() );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
