@@ -1272,6 +1272,13 @@ class Renderer {
 
 					this._nodes.updateAfter( renderObject );
 
+				} else if ( renderObject.version !== renderObject.material.version ) {
+
+					renderObject.version = renderObject.material.version;
+
+					this._nodes.updateForRender( renderObject );
+					this._bindings.updateForRender( renderObject );
+
 				}
 
 			}
