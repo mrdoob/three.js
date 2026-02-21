@@ -33,18 +33,104 @@ function Loader( editor ) {
 
 			filesMap = filesMap || LoaderUtils.createFilesMap( files );
 
+			const normalizeLookupPath = function ( path ) {
+
+				let normalized = String( path || '' ).replace( /\\/g, '/' );
+				const queryIndex = normalized.indexOf( '?' );
+				if ( queryIndex !== - 1 ) normalized = normalized.slice( 0, queryIndex );
+				const hashIndex = normalized.indexOf( '#' );
+				if ( hashIndex !== - 1 ) normalized = normalized.slice( 0, hashIndex );
+
+				while ( normalized.startsWith( './' ) ) normalized = normalized.slice( 2 );
+				while ( normalized.startsWith( '../' ) ) normalized = normalized.slice( 3 );
+				while ( normalized.startsWith( '/' ) ) normalized = normalized.slice( 1 );
+
+				return normalized;
+
+			};
+
+			const createFileFinder = function ( map ) {
+
+				const suffixMap = {};
+				const warnedAmbiguous = new Set();
+
+				const addCandidate = function ( suffix, candidate ) {
+
+					if ( ! suffixMap[ suffix ] ) suffixMap[ suffix ] = [];
+					suffixMap[ suffix ].push( candidate );
+
+				};
+
+				for ( const rawKey in map ) {
+
+					const key = normalizeLookupPath( rawKey );
+					const file = map[ rawKey ];
+					if ( key === '' || ! file ) continue;
+
+					const parts = key.split( '/' );
+
+					for ( let i = 0; i < parts.length; i ++ ) {
+
+						const suffix = parts.slice( i ).join( '/' );
+						if ( suffix !== '' ) addCandidate( suffix, { key, file } );
+
+					}
+
+				}
+
+				for ( const suffix in suffixMap ) {
+
+					suffixMap[ suffix ].sort( function ( a, b ) {
+
+						if ( a.key.length !== b.key.length ) return a.key.length - b.key.length;
+						if ( a.key < b.key ) return - 1;
+						if ( a.key > b.key ) return 1;
+						return 0;
+
+					} );
+
+				}
+
+				return function findFile( url ) {
+
+					const lookup = normalizeLookupPath( url );
+					if ( lookup === '' ) return null;
+
+					const candidates = suffixMap[ lookup ];
+					if ( ! candidates || candidates.length === 0 ) return null;
+					if ( candidates.length === 1 ) return candidates[ 0 ];
+
+					for ( let i = 0; i < candidates.length; i ++ ) {
+
+						if ( candidates[ i ].key === lookup ) return candidates[ i ];
+
+					}
+
+					if ( ! warnedAmbiguous.has( lookup ) ) {
+
+						console.warn( 'Loader: Ambiguous file reference "' + lookup + '". Using "' + candidates[ 0 ].key + '".' );
+						warnedAmbiguous.add( lookup );
+
+					}
+
+					return candidates[ 0 ];
+
+				};
+
+			};
+
+			const findFile = createFileFinder( filesMap );
+
 			const manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
-				url = url.replace( /^(\.?\/)/, '' ); // remove './'
+				const resolved = findFile( url );
 
-				const file = filesMap[ url ];
-
-				if ( file ) {
+				if ( resolved ) {
 
 					console.log( 'Loading', url );
 
-					return URL.createObjectURL( file );
+					return URL.createObjectURL( resolved.file );
 
 				}
 
