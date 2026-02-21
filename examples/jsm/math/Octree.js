@@ -328,7 +328,7 @@ class Octree {
 		const d1 = _plane.distanceToPoint( capsule.start ) - capsule.radius;
 		const d2 = _plane.distanceToPoint( capsule.end ) - capsule.radius;
 
-		if ( ( d1 > 0 && d2 > 0 ) || ( d1 < - capsule.radius && d2 < - capsule.radius ) ) {
+		if ( ( d1 > 0 && d2 > 0 ) || ( d1 < - capsule.radius * 2 && d2 < - capsule.radius * 2 ) ) {
 
 			return false;
 
