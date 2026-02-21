@@ -653,12 +653,13 @@ class USDComposer {
 				if ( obj ) {
 
 					parent.add( obj );
+					this._buildHierarchy( obj, path );
 
 				}
 
-			} else if ( typeName === 'Material' || typeName === 'Shader' ) {
+			} else if ( typeName === 'Material' || typeName === 'Shader' || typeName === 'GeomSubset' ) {
 
-				// Skip materials/shaders, they're referenced by meshes
+				// Skip materials/shaders/subsets, they're referenced by meshes
 
 			} else {
 
