@@ -70,7 +70,6 @@
 			let gui;
 
 			// Frame timing
-			let testStartTime = 0;
 			let lastFrameTime = 0;
 			let longestFrameTime = 0;
 			let isTracking = false;
@@ -296,7 +295,6 @@
 
 					shouldStartTracking = false;
 					isTracking = true;
-					testStartTime = now;
 					lastFrameTime = now;
 					longestFrameTime = 0;
 					framesAfterComplete = 0;
