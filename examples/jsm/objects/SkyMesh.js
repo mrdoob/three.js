@@ -26,13 +26,13 @@ import { Fn, float, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, 
  * scene.add( sky );
  * ```
  *
- * It can be useful to hide the sun disc when generating an environment map to avoid
- * high-luminance overflow artifacts
+ * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
  * 
- * ```
- * // disable before rendering to CubeCamera/CubeRenderTarget or PMREMGenerator
+ * ```js
+ * // disable before rendering environment map
  * sky.showSunDisc.value = false;
- * // re-enable before final scene rendering
+ * // ...
+ * // re-enable before scene sky box rendering
  * sky.showSunDisc.value = true;
  * ```
  *
@@ -279,8 +279,8 @@ class SkyMesh extends Mesh {
 			const L0 = vec3( 0.1 ).mul( Fex );
 
 			// composition + solar disc
-			const sundisk = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos.add( 0.00002 ), cosTheta );
-			L0.addAssign( vSunE.mul( 19000.0 ).mul( Fex ).mul( sundisk ).mul( this.showSunDisc ) );
+			const sundisc = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos.add( 0.00002 ), cosTheta ).mul( this.showSunDisc );
+			L0.addAssign( vSunE.mul( 19000.0 ).mul( Fex ).mul( sundisc ) );
 
 			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
