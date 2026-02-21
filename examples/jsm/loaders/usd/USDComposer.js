@@ -1113,13 +1113,13 @@ class USDComposer {
 		}
 
 		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
-		if ( displayOpacity && displayOpacity.length >= 1 ) {
+		if ( displayOpacity && displayOpacity.length === 1 && geomSubsets.length === 0 ) {
 
 			const opacity = displayOpacity[ 0 ];
 
 			const applyDisplayOpacity = ( mat ) => {
 
-				if ( opacity < 1 ) {
+				if ( opacity < 1 && mat.opacity === 1 && mat.transparent === false ) {
 
 					mat.opacity = opacity;
 					mat.transparent = true;
