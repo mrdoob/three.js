@@ -205,6 +205,7 @@ class RendererProxy {
 		this.backend = {
 			isWebGPUBackend: false,
 			extensions: renderer.extensions,
+			gl: renderer.getContext(),
 		};
 
 		const self = this;
