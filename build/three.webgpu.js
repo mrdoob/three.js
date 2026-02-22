@@ -56790,16 +56790,13 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
-const _shadowSide = {
-	[FrontSide]: BackSide,
-	[BackSide]: FrontSide,
-	[DoubleSide]: DoubleSide,
-};
+const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
 /**
  * Base class for renderers.
  */
 class Renderer {
+
 	/**
 	 * Renderer options.
 	 *
@@ -56825,7 +56822,8 @@ class Renderer {
 	 * @param {Renderer~Options} [parameters] - The configuration parameter.
 
 	 */
-	constructor(backend, parameters = {}) {
+	constructor( backend, parameters = {} ) {
+
 		/**
 		 * This flag can be used for type testing.
 		 *
@@ -56847,7 +56845,7 @@ class Renderer {
 			samples = 0,
 			getFallback = null,
 			outputBufferType = HalfFloatType,
-			multiview = false,
+			multiview = false
 		} = parameters;
 
 		/**
@@ -57017,7 +57015,7 @@ class Renderer {
 		 * @type {number}
 		 * @default 0
 		 */
-		this._samples = samples || antialias === true ? 4 : 0;
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
 
 		/**
 		 * OnCanvasTargetResize callback function.
@@ -57025,7 +57023,7 @@ class Renderer {
 		 * @private
 		 * @type {Function}
 		 */
-		this._onCanvasTargetResize = this._onCanvasTargetResize.bind(this);
+		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
 		 * The canvas target for rendering.
@@ -57033,8 +57031,8 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget(backend.getDomElement());
-		this._canvasTarget.addEventListener("resize", this._onCanvasTargetResize);
+		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -57044,7 +57042,7 @@ class Renderer {
 		 * @type {InspectorBase}
 		 */
 		this._inspector = new InspectorBase();
-		this._inspector.setRenderer(this);
+		this._inspector.setRenderer( this );
 
 		/**
 		 * This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
@@ -57169,9 +57167,9 @@ class Renderer {
 		 * @private
 		 * @type {QuadMesh}
 		 */
-		this._quad = new QuadMesh(new NodeMaterial());
-		this._quad.name = "Output Color Transform";
-		this._quad.material.name = "outputColorTransform";
+		this._quad = new QuadMesh( new NodeMaterial() );
+		this._quad.name = 'Output Color Transform';
+		this._quad.material.name = 'outputColorTransform';
 
 		/**
 		 * A reference to the current render context.
@@ -57217,7 +57215,7 @@ class Renderer {
 		 * @private
 		 * @type {Color4}
 		 */
-		this._clearColor = new Color4(0, 0, 0, alphaClear);
+		this._clearColor = new Color4( 0, 0, 0, alphaClear );
 
 		/**
 		 * The clear depth value.
@@ -57429,7 +57427,7 @@ class Renderer {
 		this.shadowMap = {
 			enabled: false,
 			transmitted: false,
-			type: PCFShadowMap,
+			type: PCFShadowMap
 		};
 
 		/**
@@ -57443,7 +57441,7 @@ class Renderer {
 		 *
 		 * @type {XRManager}
 		 */
-		this.xr = new XRManager(this, multiview);
+		this.xr = new XRManager( this, multiview );
 
 		/**
 		 * Debug configuration.
@@ -57461,33 +57459,24 @@ class Renderer {
 		this.debug = {
 			checkShaderErrors: true,
 			onShaderError: null,
-			getShaderAsync: async (scene, camera, object) => {
-				await this.compileAsync(scene, camera);
+			getShaderAsync: async ( scene, camera, object ) => {
 
-				const renderList = this._renderLists.get(scene, camera);
-				const renderContext = this._renderContexts.get(
-					this._renderTarget,
-					this._mrt,
-				);
+				await this.compileAsync( scene, camera );
+
+				const renderList = this._renderLists.get( scene, camera );
+				const renderContext = this._renderContexts.get( this._renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
 
-				const renderObject = this._objects.get(
-					object,
-					material,
-					scene,
-					camera,
-					renderList.lightsNode,
-					renderContext,
-					renderContext.clippingContext,
-				);
+				const renderObject = this._objects.get( object, material, scene, camera, renderList.lightsNode, renderContext, renderContext.clippingContext );
 
-				const { fragmentShader, vertexShader } =
-					renderObject.getNodeBuilderState();
+				const { fragmentShader, vertexShader } = renderObject.getNodeBuilderState();
 
 				return { fragmentShader, vertexShader };
-			},
+
+			}
 		};
+
 	}
 
 	/**
@@ -57497,58 +57486,60 @@ class Renderer {
 	 * @return {Promise<this>} A Promise that resolves when the renderer has been initialized.
 	 */
 	async init() {
-		if (this._initPromise !== null) {
+
+		if ( this._initPromise !== null ) {
+
 			return this._initPromise;
+
 		}
 
-		this._initPromise = new Promise(async (resolve, reject) => {
+		this._initPromise = new Promise( async ( resolve, reject ) => {
+
 			let backend = this.backend;
 
 			try {
-				await backend.init(this);
-			} catch (error) {
-				if (this._getFallback !== null) {
+
+				await backend.init( this );
+
+			} catch ( error ) {
+
+				if ( this._getFallback !== null ) {
+
 					// try the fallback
 
 					try {
-						this.backend = backend = this._getFallback(error);
-						await backend.init(this);
-					} catch (error) {
-						reject(error);
+
+						this.backend = backend = this._getFallback( error );
+						await backend.init( this );
+
+					} catch ( error ) {
+
+						reject( error );
 						return;
+
 					}
+
 				} else {
-					reject(error);
+
+					reject( error );
 					return;
+
 				}
+
 			}
 
-			this._nodes = new NodeManager(this, backend);
-			this._animation = new Animation(this, this._nodes, this.info);
-			this._attributes = new Attributes(backend);
-			this._background = new Background(this, this._nodes);
-			this._geometries = new Geometries(this._attributes, this.info);
-			this._textures = new Textures(this, backend, this.info);
-			this._pipelines = new Pipelines(backend, this._nodes);
-			this._bindings = new Bindings(
-				backend,
-				this._nodes,
-				this._textures,
-				this._attributes,
-				this._pipelines,
-				this.info,
-			);
-			this._objects = new RenderObjects(
-				this,
-				this._nodes,
-				this._geometries,
-				this._pipelines,
-				this._bindings,
-				this.info,
-			);
-			this._renderLists = new RenderLists(this.lighting);
+			this._nodes = new NodeManager( this, backend );
+			this._animation = new Animation( this, this._nodes, this.info );
+			this._attributes = new Attributes( backend );
+			this._background = new Background( this, this._nodes );
+			this._geometries = new Geometries( this._attributes, this.info );
+			this._textures = new Textures( this, backend, this.info );
+			this._pipelines = new Pipelines( backend, this._nodes );
+			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
+			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
+			this._renderLists = new RenderLists( this.lighting );
 			this._bundles = new RenderBundles();
-			this._renderContexts = new RenderContexts(this);
+			this._renderContexts = new RenderContexts( this );
 
 			//
 
@@ -57561,10 +57552,12 @@ class Renderer {
 
 			//
 
-			resolve(this);
-		});
+			resolve( this );
+
+		} );
 
 		return this._initPromise;
+
 	}
 
 	/**
@@ -57575,7 +57568,9 @@ class Renderer {
 	 * @type {HTMLCanvasElement|OffscreenCanvas}
 	 */
 	get domElement() {
+
 		return this._canvasTarget.domElement;
+
 	}
 
 	/**
@@ -57587,7 +57582,9 @@ class Renderer {
 	 * @type {number}
 	 */
 	get coordinateSystem() {
+
 		return this.backend.coordinateSystem;
+
 	}
 
 	/**
@@ -57605,10 +57602,11 @@ class Renderer {
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
-	async compileAsync(scene, camera, targetScene = null) {
-		if (this._isDeviceLost === true) return;
+	async compileAsync( scene, camera, targetScene = null ) {
 
-		if (this._initialized === false) await this.init();
+		if ( this._isDeviceLost === true ) return;
+
+		if ( this._initialized === false ) await this.init();
 
 		// preserve render tree
 
@@ -57622,12 +57620,12 @@ class Renderer {
 
 		//
 
-		const sceneRef = scene.isScene === true ? scene : _scene;
+		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
-		if (targetScene === null) targetScene = scene;
+		if ( targetScene === null ) targetScene = scene;
 
 		const renderTarget = this._renderTarget;
-		const renderContext = this._renderContexts.get(renderTarget, this._mrt);
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		const compilationPromises = [];
@@ -57639,7 +57637,7 @@ class Renderer {
 
 		this._compilationPromises = compilationPromises;
 
-		nodeFrame.renderId++;
+		nodeFrame.renderId ++;
 
 		//
 
@@ -57650,58 +57648,65 @@ class Renderer {
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
 
-		if (!renderContext.clippingContext)
-			renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal(sceneRef, camera);
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
-		sceneRef.onBeforeRender(this, scene, camera, renderTarget);
+		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
 		//
 
-		const renderList = this._renderLists.get(scene, camera);
+		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject(
-			scene,
-			camera,
-			0,
-			renderList,
-			renderContext.clippingContext,
-		);
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
-		if (targetScene !== scene) {
-			targetScene.traverseVisible(function (object) {
-				if (object.isLight && object.layers.test(camera.layers)) {
-					renderList.pushLight(object);
+		if ( targetScene !== scene ) {
+
+			targetScene.traverseVisible( function ( object ) {
+
+				if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+					renderList.pushLight( object );
+
 				}
-			});
+
+			} );
+
 		}
 
 		renderList.finish();
 
 		//
 
-		if (renderTarget !== null) {
-			this._textures.updateRenderTarget(renderTarget, activeMipmapLevel);
+		if ( renderTarget !== null ) {
 
-			const renderTargetData = this._textures.get(renderTarget);
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+			const renderTargetData = this._textures.get( renderTarget );
 
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
+
 		} else {
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
+
 		}
 
 		//
 
-		if (targetScene !== scene) {
-			this._background.update(targetScene, renderList, renderContext);
+		if ( targetScene !== scene ) {
+
+			this._background.update( targetScene, renderList, renderContext );
+
 		} else {
-			this._background.update(sceneRef, renderList, renderContext);
+
+			this._background.update( sceneRef, renderList, renderContext );
+
 		}
 
 		// process render lists
@@ -57711,16 +57716,8 @@ class Renderer {
 		const transparentDoublePassObjects = renderList.transparentDoublePass;
 		const lightsNode = renderList.lightsNode;
 
-		if (this.opaque === true && opaqueObjects.length > 0)
-			this._renderObjects(opaqueObjects, camera, sceneRef, lightsNode);
-		if (this.transparent === true && transparentObjects.length > 0)
-			this._renderTransparents(
-				transparentObjects,
-				transparentDoublePassObjects,
-				camera,
-				sceneRef,
-				lightsNode,
-			);
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
 
@@ -57733,7 +57730,8 @@ class Renderer {
 
 		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
 
-		await Promise.all(compilationPromises);
+		await Promise.all( compilationPromises );
+
 	}
 
 	/**
@@ -57745,14 +57743,14 @@ class Renderer {
 	 * @param {Camera} camera - The camera.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
-	async renderAsync(scene, camera) {
-		warnOnce(
-			'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
+	async renderAsync( scene, camera ) {
+
+		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		await this.init();
 
-		this.render(scene, camera);
+		this.render( scene, camera );
+
 	}
 
 	/**
@@ -57764,20 +57762,24 @@ class Renderer {
 	 * @return {Promise} A Promise that resolves when synchronization has been finished.
 	 */
 	async waitForGPU() {
-		error(
-			"Renderer: waitForGPU() has been removed. Read https://github.com/mrdoob/three.js/issues/32012 for more information.",
-		);
+
+		error( 'Renderer: waitForGPU() has been removed. Read https://github.com/mrdoob/three.js/issues/32012 for more information.' );
+
 	}
 
 	//
 
-	set inspector(value) {
-		if (this._inspector !== null) {
-			this._inspector.setRenderer(null);
+	set inspector( value ) {
+
+		if ( this._inspector !== null ) {
+
+			this._inspector.setRenderer( null );
+
 		}
 
 		this._inspector = value;
-		this._inspector.setRenderer(this);
+		this._inspector.setRenderer( this );
+
 	}
 
 	/**
@@ -57786,7 +57788,9 @@ class Renderer {
 	 * @type {InspectorBase}
 	 */
 	get inspector() {
+
 		return this._inspector;
+
 	}
 
 	/**
@@ -57798,16 +57802,22 @@ class Renderer {
 	 * @param {boolean} value - Whether to enable or disable high precision.
 	 * @type {boolean}
 	 */
-	set highPrecision(value) {
+	set highPrecision( value ) {
+
 		const contextNodeData = this.contextNode.value;
 
-		if (value === true) {
+		if ( value === true ) {
+
 			contextNodeData.modelViewMatrix = highpModelViewMatrix;
 			contextNodeData.modelNormalViewMatrix = highpModelNormalViewMatrix;
-		} else if (this.highPrecision) {
+
+		} else if ( this.highPrecision ) {
+
 			delete contextNodeData.modelViewMatrix;
 			delete contextNodeData.modelNormalViewMatrix;
+
 		}
+
 	}
 
 	/**
@@ -57817,12 +57827,11 @@ class Renderer {
 	 * @type {boolean}
 	 */
 	get highPrecision() {
+
 		const contextNodeData = this.contextNode.value;
 
-		return (
-			contextNodeData.modelViewMatrix === highpModelViewMatrix &&
-			contextNodeData.modelNormalViewMatrix === highpModelNormalViewMatrix
-		);
+		return contextNodeData.modelViewMatrix === highpModelViewMatrix && contextNodeData.modelNormalViewMatrix === highpModelNormalViewMatrix;
+
 	}
 
 	/**
@@ -57831,10 +57840,12 @@ class Renderer {
 	 * @param {MRTNode} mrt - The MRT node to set.
 	 * @return {Renderer} A reference to this renderer.
 	 */
-	setMRT(mrt) {
+	setMRT( mrt ) {
+
 		this._mrt = mrt;
 
 		return this;
+
 	}
 
 	/**
@@ -57843,7 +57854,9 @@ class Renderer {
 	 * @return {MRTNode} The MRT configuration.
 	 */
 	getMRT() {
+
 		return this._mrt;
+
 	}
 
 	/**
@@ -57852,7 +57865,9 @@ class Renderer {
 	 * @return {number} The output buffer type.
 	 */
 	getOutputBufferType() {
+
 		return this._outputBufferType;
+
 	}
 
 	/**
@@ -57861,14 +57876,12 @@ class Renderer {
 	 * @deprecated since r182. Use `.getOutputBufferType()` instead.
 	 * @return {number} The output buffer type.
 	 */
-	getColorBufferType() {
-		// @deprecated, r182
+	getColorBufferType() { // @deprecated, r182
 
-		warnOnce(
-			'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".',
-		);
+		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".' );
 
 		return this.getOutputBufferType();
+
 	}
 
 	/**
@@ -57877,16 +57890,20 @@ class Renderer {
 	 * @private
 	 * @param {Object} info - Information about the context lost.
 	 */
-	_onDeviceLost(info) {
+	_onDeviceLost( info ) {
+
 		let errorMessage = `THREE.WebGPURenderer: ${info.api} Device Lost:\n\nMessage: ${info.message}`;
 
-		if (info.reason) {
+		if ( info.reason ) {
+
 			errorMessage += `\nReason: ${info.reason}`;
+
 		}
 
-		error(errorMessage);
+		error( errorMessage );
 
 		this._isDeviceLost = true;
+
 	}
 
 	/**
@@ -57897,33 +57914,34 @@ class Renderer {
 	 * @param {Scene} sceneRef - The scene the render bundle belongs to.
 	 * @param {LightsNode} lightsNode - The lights node.
 	 */
-	_renderBundle(bundle, sceneRef, lightsNode) {
+	_renderBundle( bundle, sceneRef, lightsNode ) {
+
 		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get(bundleGroup, camera);
-		const renderBundleData = this.backend.get(renderBundle);
+		const renderBundle = this._bundles.get( bundleGroup, camera );
+		const renderBundleData = this.backend.get( renderBundle );
 
-		if (renderBundleData.renderContexts === undefined)
-			renderBundleData.renderContexts = new Set();
+		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
 		const needsUpdate = bundleGroup.version !== renderBundleData.version;
-		const renderBundleNeedsUpdate =
-			renderBundleData.renderContexts.has(renderContext) === false ||
-			needsUpdate;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || needsUpdate;
 
-		renderBundleData.renderContexts.add(renderContext);
+		renderBundleData.renderContexts.add( renderContext );
 
-		if (renderBundleNeedsUpdate) {
-			this.backend.beginBundle(renderContext);
+		if ( renderBundleNeedsUpdate ) {
 
-			if (renderBundleData.renderObjects === undefined || needsUpdate) {
+			this.backend.beginBundle( renderContext );
+
+			if ( renderBundleData.renderObjects === undefined || needsUpdate ) {
+
 				renderBundleData.renderObjects = [];
+
 			}
 
 			this._currentRenderBundle = renderBundle;
@@ -57931,45 +57949,45 @@ class Renderer {
 			const {
 				transparentDoublePass: transparentDoublePassObjects,
 				transparent: transparentObjects,
-				opaque: opaqueObjects,
+				opaque: opaqueObjects
 			} = renderList;
 
-			if (this.opaque === true && opaqueObjects.length > 0)
-				this._renderObjects(opaqueObjects, camera, sceneRef, lightsNode);
-			if (this.transparent === true && transparentObjects.length > 0)
-				this._renderTransparents(
-					transparentObjects,
-					transparentDoublePassObjects,
-					camera,
-					sceneRef,
-					lightsNode,
-				);
+			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
 			//
 
-			this.backend.finishBundle(renderContext, renderBundle);
+			this.backend.finishBundle( renderContext, renderBundle );
 
 			renderBundleData.version = bundleGroup.version;
+
 		} else {
+
 			const { renderObjects } = renderBundleData;
 
-			for (let i = 0, l = renderObjects.length; i < l; i++) {
-				const renderObject = renderObjects[i];
+			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
-				if (this._nodes.needsRefresh(renderObject)) {
-					this._nodes.updateBefore(renderObject);
+				const renderObject = renderObjects[ i ];
 
-					this._nodes.updateForRender(renderObject);
-					this._bindings.updateForRender(renderObject);
+				if ( this._nodes.needsRefresh( renderObject ) ) {
 
-					this._nodes.updateAfter(renderObject);
+					this._nodes.updateBefore( renderObject );
+
+					this._nodes.updateForRender( renderObject );
+					this._bindings.updateForRender( renderObject );
+
+					this._nodes.updateAfter( renderObject );
+
 				}
+
 			}
+
 		}
 
-		this.backend.addBundle(renderContext, renderBundle);
+		this.backend.addBundle( renderContext, renderBundle );
+
 	}
 
 	/**
@@ -57987,14 +58005,16 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera to render the scene with.
 	 */
-	render(scene, camera) {
-		if (this._initialized === false) {
-			throw new Error(
-				'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.',
-			);
+	render( scene, camera ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
+
 		}
 
-		this._renderScene(scene, camera);
+		this._renderScene( scene, camera );
+
 	}
 
 	/**
@@ -58004,7 +58024,9 @@ class Renderer {
 	 * @return {boolean} Whether the renderer has been initialized or not.
 	 */
 	get initialized() {
+
 		return this._initialized;
+
 	}
 
 	/**
@@ -58016,21 +58038,22 @@ class Renderer {
 	 * @return {?RenderTarget} The render target. The method returns `null` if no output conversion should be applied.
 	 */
 	_getFrameBufferTarget() {
+
 		const { currentToneMapping, currentColorSpace } = this;
 
 		const useToneMapping = currentToneMapping !== NoToneMapping;
-		const useColorSpace =
-			currentColorSpace !== ColorManagement.workingColorSpace;
+		const useColorSpace = currentColorSpace !== ColorManagement.workingColorSpace;
 
-		if (useToneMapping === false && useColorSpace === false) return null;
+		if ( useToneMapping === false && useColorSpace === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize(_drawingBufferSize);
+		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
 		let frameBufferTarget = this._frameBufferTarget;
 
-		if (frameBufferTarget === null) {
-			frameBufferTarget = new RenderTarget(width, height, {
+		if ( frameBufferTarget === null ) {
+
+			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
 				type: this._outputBufferType,
@@ -58039,47 +58062,42 @@ class Renderer {
 				generateMipmaps: false,
 				minFilter: LinearFilter,
 				magFilter: LinearFilter,
-				samples: this.samples,
-			});
+				samples: this.samples
+			} );
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
 
 			this._frameBufferTarget = frameBufferTarget;
+
 		}
 
 		const outputRenderTarget = this.getOutputRenderTarget();
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
-		if (outputRenderTarget !== null) {
-			frameBufferTarget.setSize(
-				outputRenderTarget.width,
-				outputRenderTarget.height,
-				outputRenderTarget.depth,
-			);
+		if ( outputRenderTarget !== null ) {
+
+			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
+
 		} else {
-			frameBufferTarget.setSize(width, height, 1);
+
+			frameBufferTarget.setSize( width, height, 1 );
+
 		}
 
 		const canvasTarget = this._canvasTarget;
 
-		frameBufferTarget.viewport.copy(canvasTarget._viewport);
-		frameBufferTarget.scissor.copy(canvasTarget._scissor);
-		frameBufferTarget.viewport.multiplyScalar(canvasTarget._pixelRatio);
-		frameBufferTarget.scissor.multiplyScalar(canvasTarget._pixelRatio);
+		frameBufferTarget.viewport.copy( canvasTarget._viewport );
+		frameBufferTarget.scissor.copy( canvasTarget._scissor );
+		frameBufferTarget.viewport.multiplyScalar( canvasTarget._pixelRatio );
+		frameBufferTarget.scissor.multiplyScalar( canvasTarget._pixelRatio );
 		frameBufferTarget.scissorTest = canvasTarget._scissorTest;
-		frameBufferTarget.multiview =
-			outputRenderTarget !== null ? outputRenderTarget.multiview : false;
-		frameBufferTarget.resolveDepthBuffer =
-			outputRenderTarget !== null
-				? outputRenderTarget.resolveDepthBuffer
-				: true;
-		frameBufferTarget._autoAllocateDepthBuffer =
-			outputRenderTarget !== null
-				? outputRenderTarget._autoAllocateDepthBuffer
-				: false;
+		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
+		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
 		return frameBufferTarget;
+
 	}
 
 	/**
@@ -58091,14 +58109,13 @@ class Renderer {
 	 * @param {boolean} [useFrameBufferTarget=true] - Whether to use a framebuffer target or not.
 	 * @return {RenderContext} The current render context.
 	 */
-	_renderScene(scene, camera, useFrameBufferTarget = true) {
-		if (this._isDeviceLost === true) return;
+	_renderScene( scene, camera, useFrameBufferTarget = true ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		//
 
-		const frameBufferTarget = useFrameBufferTarget
-			? this._getFrameBufferTarget()
-			: null;
+		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
 		// preserve render tree
 
@@ -58111,9 +58128,9 @@ class Renderer {
 
 		//
 
-		this._callDepth++;
+		this._callDepth ++;
 
-		const sceneRef = scene.isScene === true ? scene : _scene;
+		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 
@@ -58124,106 +58141,122 @@ class Renderer {
 
 		let renderTarget;
 
-		if (frameBufferTarget !== null) {
+		if ( frameBufferTarget !== null ) {
+
 			renderTarget = frameBufferTarget;
 
-			this.setRenderTarget(renderTarget);
+			this.setRenderTarget( renderTarget );
+
 		} else {
+
 			renderTarget = outputRenderTarget;
+
 		}
 
 		//
 
-		const renderContext = this._renderContexts.get(
-			renderTarget,
-			this._mrt,
-			this._callDepth,
-		);
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
 		this._currentRenderContext = renderContext;
-		this._currentRenderObjectFunction =
-			this._renderObjectFunction || this.renderObject;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 		this._handleObjectFunction = this._renderObjectDirect;
 
 		//
 
-		this.info.calls++;
-		this.info.render.calls++;
-		this.info.render.frameCalls++;
+		this.info.calls ++;
+		this.info.render.calls ++;
+		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
 		//
 
-		this.backend.updateTimeStampUID(renderContext);
+		this.backend.updateTimeStampUID( renderContext );
 
-		this.inspector.beginRender(
-			this.backend.getTimestampUID(renderContext),
-			scene,
-			camera,
-			renderTarget,
-		);
+		this.inspector.beginRender( this.backend.getTimestampUID( renderContext ), scene, camera, renderTarget );
 
 		//
 
+
 		const xr = this.xr;
 
-		if (xr.isPresenting === false) {
+		if ( xr.isPresenting === false ) {
+
 			let projectionMatrixNeedsUpdate = false;
 
 			// reversed depth
 
-			if (this.reversedDepthBuffer === true && camera.reversedDepth !== true) {
+			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
+
 				camera._reversedDepth = true;
 
-				if (camera.isArrayCamera) {
-					for (const subCamera of camera.cameras) {
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
 						subCamera._reversedDepth = true;
+
 					}
+
 				}
 
 				projectionMatrixNeedsUpdate = true;
+
 			}
 
 			// WebGPU/WebGL coordinate system
 
 			const coordinateSystem = this.coordinateSystem;
 
-			if (camera.coordinateSystem !== coordinateSystem) {
+			if ( camera.coordinateSystem !== coordinateSystem ) {
+
 				camera.coordinateSystem = coordinateSystem;
 
-				if (camera.isArrayCamera) {
-					for (const subCamera of camera.cameras) {
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
 						subCamera.coordinateSystem = coordinateSystem;
+
 					}
+
 				}
 
 				projectionMatrixNeedsUpdate = true;
+
 			}
 
 			// camera update
 
-			if (projectionMatrixNeedsUpdate === true) {
+			if ( projectionMatrixNeedsUpdate === true ) {
+
 				camera.updateProjectionMatrix();
 
-				if (camera.isArrayCamera) {
-					for (const subCamera of camera.cameras) {
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
 						subCamera.updateProjectionMatrix();
+
 					}
+
 				}
+
 			}
+
 		}
 
 		//
 
-		if (scene.matrixWorldAutoUpdate === true) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if (camera.parent === null && camera.matrixWorldAutoUpdate === true)
-			camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if (xr.enabled === true && xr.isPresenting === true) {
-			if (xr.cameraAutoUpdate === true) xr.updateCamera(camera);
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
+
 		}
 
 		//
@@ -58234,84 +58267,71 @@ class Renderer {
 		let scissor = canvasTarget._scissor;
 		let pixelRatio = canvasTarget._pixelRatio;
 
-		if (renderTarget !== null) {
+		if ( renderTarget !== null ) {
+
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
 			pixelRatio = 1;
+
 		}
 
-		this.getDrawingBufferSize(_drawingBufferSize);
+		this.getDrawingBufferSize( _drawingBufferSize );
 
-		_screen.set(0, 0, _drawingBufferSize.width, _drawingBufferSize.height);
+		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
-		const minDepth = viewport.minDepth === undefined ? 0 : viewport.minDepth;
-		const maxDepth = viewport.maxDepth === undefined ? 1 : viewport.maxDepth;
+		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
+		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
-		renderContext.viewportValue
-			.copy(viewport)
-			.multiplyScalar(pixelRatio)
-			.floor();
+		renderContext.viewportValue.copy( viewport ).multiplyScalar( pixelRatio ).floor();
 		renderContext.viewportValue.width >>= activeMipmapLevel;
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport =
-			renderContext.viewportValue.equals(_screen) === false;
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
-		renderContext.scissorValue.copy(scissor).multiplyScalar(pixelRatio).floor();
-		renderContext.scissor =
-			canvasTarget._scissorTest &&
-			renderContext.scissorValue.equals(_screen) === false;
+		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
-		if (!renderContext.clippingContext)
-			renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal(sceneRef, camera);
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
-		sceneRef.onBeforeRender(this, scene, camera, renderTarget);
+		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
 		//
 
 		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 
-		if (!camera.isArrayCamera) {
-			_projScreenMatrix.multiplyMatrices(
-				camera.projectionMatrix,
-				camera.matrixWorldInverse,
-			);
-			frustum.setFromProjectionMatrix(
-				_projScreenMatrix,
-				camera.coordinateSystem,
-				camera.reversedDepth,
-			);
+		if ( ! camera.isArrayCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
 		}
 
-		const renderList = this._renderLists.get(scene, camera);
+		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject(
-			scene,
-			camera,
-			0,
-			renderList,
-			renderContext.clippingContext,
-		);
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		renderList.finish();
 
-		if (this.sortObjects === true) {
-			renderList.sort(this._opaqueSort, this._transparentSort);
+		if ( this.sortObjects === true ) {
+
+			renderList.sort( this._opaqueSort, this._transparentSort );
+
 		}
 
 		//
 
-		if (renderTarget !== null) {
-			this._textures.updateRenderTarget(renderTarget, activeMipmapLevel);
+		if ( renderTarget !== null ) {
 
-			const renderTargetData = this._textures.get(renderTarget);
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+			const renderTargetData = this._textures.get( renderTarget );
 
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
@@ -58320,13 +58340,16 @@ class Renderer {
 			renderContext.renderTarget = renderTarget;
 			renderContext.depth = renderTarget.depthBuffer;
 			renderContext.stencil = renderTarget.stencilBuffer;
+
 		} else {
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
 			renderContext.width = _drawingBufferSize.width;
 			renderContext.height = _drawingBufferSize.height;
 			renderContext.depth = this.depth;
 			renderContext.stencil = this.stencil;
+
 		}
 
 		renderContext.width >>= activeMipmapLevel;
@@ -58337,36 +58360,28 @@ class Renderer {
 
 		//
 
-		renderContext.scissorValue.max(_vector4.set(0, 0, 0, 0));
+		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
 
-		if (
-			renderContext.scissorValue.x + renderContext.scissorValue.width >
-			renderContext.width
-		) {
-			renderContext.scissorValue.width = Math.max(
-				renderContext.width - renderContext.scissorValue.x,
-				0,
-			);
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > renderContext.width ) {
+
+			renderContext.scissorValue.width = Math.max( renderContext.width - renderContext.scissorValue.x, 0 );
+
 		}
 
-		if (
-			renderContext.scissorValue.y + renderContext.scissorValue.height >
-			renderContext.height
-		) {
-			renderContext.scissorValue.height = Math.max(
-				renderContext.height - renderContext.scissorValue.y,
-				0,
-			);
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > renderContext.height ) {
+
+			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
+
 		}
 
 		//
 
-		this._background.update(sceneRef, renderList, renderContext);
+		this._background.update( sceneRef, renderList, renderContext );
 
 		//
 
 		renderContext.camera = camera;
-		this.backend.beginRender(renderContext);
+		this.backend.beginRender( renderContext );
 
 		// process render lists
 
@@ -58375,24 +58390,16 @@ class Renderer {
 			lightsNode,
 			transparentDoublePass: transparentDoublePassObjects,
 			transparent: transparentObjects,
-			opaque: opaqueObjects,
+			opaque: opaqueObjects
 		} = renderList;
 
-		if (bundles.length > 0) this._renderBundles(bundles, sceneRef, lightsNode);
-		if (this.opaque === true && opaqueObjects.length > 0)
-			this._renderObjects(opaqueObjects, camera, sceneRef, lightsNode);
-		if (this.transparent === true && transparentObjects.length > 0)
-			this._renderTransparents(
-				transparentObjects,
-				transparentDoublePassObjects,
-				camera,
-				sceneRef,
-				lightsNode,
-			);
+		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
 
-		this.backend.finishRender(renderContext);
+		this.backend.finishRender( renderContext );
 
 		// restore render tree
 
@@ -58404,38 +58411,39 @@ class Renderer {
 
 		//
 
-		this._callDepth--;
+		this._callDepth --;
 
-		if (frameBufferTarget !== null) {
-			this.setRenderTarget(
-				outputRenderTarget,
-				activeCubeFace,
-				activeMipmapLevel,
-			);
+		if ( frameBufferTarget !== null ) {
 
-			this._renderOutput(renderTarget);
+			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+			this._renderOutput( renderTarget );
+
 		}
 
 		//
 
-		sceneRef.onAfterRender(this, scene, camera, renderTarget);
+		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
 		//
 
-		this.inspector.finishRender(this.backend.getTimestampUID(renderContext));
+		this.inspector.finishRender( this.backend.getTimestampUID( renderContext ) );
 
 		//
 
 		return renderContext;
+
 	}
 
-	_setXRLayerSize(width, height) {
+	_setXRLayerSize( width, height ) {
+
 		// TODO: Find a better solution to resize the canvas when in XR.
 
 		this._canvasTarget._width = width;
 		this._canvasTarget._height = height;
 
-		this.setViewport(0, 0, width, height);
+		this.setViewport( 0, 0, width, height );
+
 	}
 
 	/**
@@ -58444,14 +58452,15 @@ class Renderer {
 	 * @private
 	 * @param {RenderTarget} renderTarget - The current render target.
 	 */
-	_renderOutput(renderTarget) {
+	_renderOutput( renderTarget ) {
+
 		const quad = this._quad;
 
-		if (this._nodes.hasOutputChange(renderTarget.texture)) {
-			quad.material.fragmentNode = this._nodes.getOutputNode(
-				renderTarget.texture,
-			);
+		if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+			quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
 			quad.material.needsUpdate = true;
+
 		}
 
 		// a clear operation clears the intermediate renderTarget texture, but should not update the screen canvas.
@@ -58462,10 +58471,12 @@ class Renderer {
 		this.autoClear = false;
 		this.xr.enabled = false;
 
-		this._renderScene(quad, quad.camera, false);
+		this._renderScene( quad, quad.camera, false );
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
+
+
 	}
 
 	/**
@@ -58474,7 +58485,9 @@ class Renderer {
 	 * @return {number} The maximum available anisotropy.
 	 */
 	getMaxAnisotropy() {
+
 		return this.backend.getMaxAnisotropy();
+
 	}
 
 	/**
@@ -58483,7 +58496,9 @@ class Renderer {
 	 * @return {number} The active cube face.
 	 */
 	getActiveCubeFace() {
+
 		return this._activeCubeFace;
+
 	}
 
 	/**
@@ -58492,7 +58507,9 @@ class Renderer {
 	 * @return {number} The active mipmap level.
 	 */
 	getActiveMipmapLevel() {
+
 		return this._activeMipmapLevel;
+
 	}
 
 	/**
@@ -58504,10 +58521,12 @@ class Renderer {
 	 * @param {?onAnimationCallback} callback - The application's animation loop.
 	 * @return {Promise} A Promise that resolves when the set has been executed.
 	 */
-	async setAnimationLoop(callback) {
-		if (this._initialized === false) await this.init();
+	async setAnimationLoop( callback ) {
 
-		this._animation.setAnimationLoop(callback);
+		if ( this._initialized === false ) await this.init();
+
+		this._animation.setAnimationLoop( callback );
+
 	}
 
 	/**
@@ -58516,7 +58535,9 @@ class Renderer {
 	 * @return {?Function} The current animation loop callback.
 	 */
 	getAnimationLoop() {
+
 		return this._animation.getAnimationLoop();
+
 	}
 
 	/**
@@ -58527,8 +58548,10 @@ class Renderer {
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync(attribute) {
-		return await this.backend.getArrayBufferAsync(attribute);
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.backend.getArrayBufferAsync( attribute );
+
 	}
 
 	/**
@@ -58537,7 +58560,9 @@ class Renderer {
 	 * @return {GPUCanvasContext|WebGL2RenderingContext} The rendering context.
 	 */
 	getContext() {
+
 		return this.backend.getContext();
+
 	}
 
 	/**
@@ -58546,7 +58571,9 @@ class Renderer {
 	 * @return {number} The pixel ratio.
 	 */
 	getPixelRatio() {
+
 		return this._canvasTarget.getPixelRatio();
+
 	}
 
 	/**
@@ -58555,8 +58582,10 @@ class Renderer {
 	 * @param {Vector2} target - The method writes the result in this target object.
 	 * @return {Vector2} The drawing buffer size.
 	 */
-	getDrawingBufferSize(target) {
-		return this._canvasTarget.getDrawingBufferSize(target);
+	getDrawingBufferSize( target ) {
+
+		return this._canvasTarget.getDrawingBufferSize( target );
+
 	}
 
 	/**
@@ -58565,8 +58594,10 @@ class Renderer {
 	 * @param {Vector2} target - The method writes the result in this target object.
 	 * @return {Vector2} The renderer's size in logical pixels.
 	 */
-	getSize(target) {
-		return this._canvasTarget.getSize(target);
+	getSize( target ) {
+
+		return this._canvasTarget.getSize( target );
+
 	}
 
 	/**
@@ -58574,8 +58605,10 @@ class Renderer {
 	 *
 	 * @param {number} [value=1] - The pixel ratio.
 	 */
-	setPixelRatio(value = 1) {
-		this._canvasTarget.setPixelRatio(value);
+	setPixelRatio( value = 1 ) {
+
+		this._canvasTarget.setPixelRatio( value );
+
 	}
 
 	/**
@@ -58591,11 +58624,13 @@ class Renderer {
 	 * @param {number} height - The height in logical pixels.
 	 * @param {number} pixelRatio - The pixel ratio.
 	 */
-	setDrawingBufferSize(width, height, pixelRatio) {
-		// Renderer can't be resized while presenting in XR.
-		if (this.xr && this.xr.isPresenting) return;
+	setDrawingBufferSize( width, height, pixelRatio ) {
 
-		this._canvasTarget.setDrawingBufferSize(width, height, pixelRatio);
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
+
+		this._canvasTarget.setDrawingBufferSize( width, height, pixelRatio );
+
 	}
 
 	/**
@@ -58605,11 +58640,13 @@ class Renderer {
 	 * @param {number} height - The height in logical pixels.
 	 * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
 	 */
-	setSize(width, height, updateStyle = true) {
-		// Renderer can't be resized while presenting in XR.
-		if (this.xr && this.xr.isPresenting) return;
+	setSize( width, height, updateStyle = true ) {
 
-		this._canvasTarget.setSize(width, height, updateStyle);
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
+
+		this._canvasTarget.setSize( width, height, updateStyle );
+
 	}
 
 	/**
@@ -58618,8 +58655,10 @@ class Renderer {
 	 *
 	 * @param {Function} method - The sort function.
 	 */
-	setOpaqueSort(method) {
+	setOpaqueSort( method ) {
+
 		this._opaqueSort = method;
+
 	}
 
 	/**
@@ -58628,8 +58667,10 @@ class Renderer {
 	 *
 	 * @param {Function} method - The sort function.
 	 */
-	setTransparentSort(method) {
+	setTransparentSort( method ) {
+
 		this._transparentSort = method;
+
 	}
 
 	/**
@@ -58638,8 +58679,10 @@ class Renderer {
 	 * @param {Vector4} target - The method writes the result in this target object.
 	 * @return {Vector4} The scissor rectangle.
 	 */
-	getScissor(target) {
-		return this._canvasTarget.getScissor(target);
+	getScissor( target ) {
+
+		return this._canvasTarget.getScissor( target );
+
 	}
 
 	/**
@@ -58651,8 +58694,10 @@ class Renderer {
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
 	 * @param {number} height - The height of the scissor box in logical pixel unit.
 	 */
-	setScissor(x, y, width, height) {
-		this._canvasTarget.setScissor(x, y, width, height);
+	setScissor( x, y, width, height ) {
+
+		this._canvasTarget.setScissor( x, y, width, height );
+
 	}
 
 	/**
@@ -58661,7 +58706,9 @@ class Renderer {
 	 * @return {boolean} Whether the scissor test should be enabled or not.
 	 */
 	getScissorTest() {
+
 		return this._canvasTarget.getScissorTest();
+
 	}
 
 	/**
@@ -58669,12 +58716,14 @@ class Renderer {
 	 *
 	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
-	setScissorTest(boolean) {
-		this._canvasTarget.setScissorTest(boolean);
+	setScissorTest( boolean ) {
+
+		this._canvasTarget.setScissorTest( boolean );
 
 		// TODO: Move it to CanvasTarget event listener.
 
-		this.backend.setScissorTest(boolean);
+		this.backend.setScissorTest( boolean );
+
 	}
 
 	/**
@@ -58683,8 +58732,10 @@ class Renderer {
 	 * @param {Vector4} target - The method writes the result in this target object.
 	 * @return {Vector4} The viewport definition.
 	 */
-	getViewport(target) {
-		return this._canvasTarget.getViewport(target);
+	getViewport( target ) {
+
+		return this._canvasTarget.getViewport( target );
+
 	}
 
 	/**
@@ -58697,8 +58748,10 @@ class Renderer {
 	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
 	 * @param {number} maxDepth - The maximum depth value of the viewport. WebGPU only.
 	 */
-	setViewport(x, y, width, height, minDepth = 0, maxDepth = 1) {
-		this._canvasTarget.setViewport(x, y, width, height, minDepth, maxDepth);
+	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
+
+		this._canvasTarget.setViewport( x, y, width, height, minDepth, maxDepth );
+
 	}
 
 	/**
@@ -58707,8 +58760,10 @@ class Renderer {
 	 * @param {Color} target - The method writes the result in this target object.
 	 * @return {Color} The clear color.
 	 */
-	getClearColor(target) {
-		return target.copy(this._clearColor);
+	getClearColor( target ) {
+
+		return target.copy( this._clearColor );
+
 	}
 
 	/**
@@ -58717,9 +58772,11 @@ class Renderer {
 	 * @param {Color} color - The clear color.
 	 * @param {number} [alpha=1] - The clear alpha.
 	 */
-	setClearColor(color, alpha = 1) {
-		this._clearColor.set(color);
+	setClearColor( color, alpha = 1 ) {
+
+		this._clearColor.set( color );
 		this._clearColor.a = alpha;
+
 	}
 
 	/**
@@ -58728,7 +58785,9 @@ class Renderer {
 	 * @return {number} The clear alpha.
 	 */
 	getClearAlpha() {
+
 		return this._clearColor.a;
+
 	}
 
 	/**
@@ -58736,8 +58795,10 @@ class Renderer {
 	 *
 	 * @param {number} alpha - The clear alpha.
 	 */
-	setClearAlpha(alpha) {
+	setClearAlpha( alpha ) {
+
 		this._clearColor.a = alpha;
+
 	}
 
 	/**
@@ -58746,9 +58807,9 @@ class Renderer {
 	 * @return {number} The clear depth.
 	 */
 	getClearDepth() {
-		return this.reversedDepthBuffer === true
-			? 1 - this._clearDepth
-			: this._clearDepth;
+
+		return ( this.reversedDepthBuffer === true ) ? 1 - this._clearDepth : this._clearDepth;
+
 	}
 
 	/**
@@ -58756,8 +58817,10 @@ class Renderer {
 	 *
 	 * @param {number} depth - The clear depth.
 	 */
-	setClearDepth(depth) {
+	setClearDepth( depth ) {
+
 		this._clearDepth = depth;
+
 	}
 
 	/**
@@ -58766,7 +58829,9 @@ class Renderer {
 	 * @return {number} The clear stencil.
 	 */
 	getClearStencil() {
+
 		return this._clearStencil;
+
 	}
 
 	/**
@@ -58774,8 +58839,10 @@ class Renderer {
 	 *
 	 * @param {number} stencil - The clear stencil.
 	 */
-	setClearStencil(stencil) {
+	setClearStencil( stencil ) {
+
 		this._clearStencil = stencil;
+
 	}
 
 	/**
@@ -58786,10 +58853,12 @@ class Renderer {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
-	isOccluded(object) {
+	isOccluded( object ) {
+
 		const renderContext = this._currentRenderContext;
 
-		return renderContext && this.backend.isOccluded(renderContext, object);
+		return renderContext && this.backend.isOccluded( renderContext, object );
+
 	}
 
 	/**
@@ -58799,23 +58868,25 @@ class Renderer {
 	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
 	 */
-	clear(color = true, depth = true, stencil = true) {
-		if (this._initialized === false) {
-			throw new Error(
-				'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.',
-			);
+	clear( color = true, depth = true, stencil = true ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
 		}
 
 		const renderTarget = this._renderTarget || this._getFrameBufferTarget();
 
 		let renderContext = null;
 
-		if (renderTarget !== null) {
-			this._textures.updateRenderTarget(renderTarget);
+		if ( renderTarget !== null ) {
 
-			const renderTargetData = this._textures.get(renderTarget);
+			this._textures.updateRenderTarget( renderTarget );
 
-			renderContext = this._renderContexts.get(renderTarget);
+			const renderTargetData = this._textures.get( renderTarget );
+
+			renderContext = this._renderContexts.get( renderTarget );
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
@@ -58833,34 +58904,44 @@ class Renderer {
 			renderContext.clearStencilValue = this.getClearStencil();
 			renderContext.activeCubeFace = this.getActiveCubeFace();
 			renderContext.activeMipmapLevel = this.getActiveMipmapLevel();
+
 		}
 
-		this.backend.clear(color, depth, stencil, renderContext);
+		this.backend.clear( color, depth, stencil, renderContext );
 
-		if (renderTarget !== null && this._renderTarget === null) {
-			this._renderOutput(renderTarget);
+		if ( renderTarget !== null && this._renderTarget === null ) {
+
+			this._renderOutput( renderTarget );
+
 		}
+
 	}
 
 	/**
 	 * Performs a manual clear operation of the color buffer. This method ignores `autoClear` properties.
 	 */
 	clearColor() {
-		this.clear(true, false, false);
+
+		this.clear( true, false, false );
+
 	}
 
 	/**
 	 * Performs a manual clear operation of the depth buffer. This method ignores `autoClear` properties.
 	 */
 	clearDepth() {
-		this.clear(false, true, false);
+
+		this.clear( false, true, false );
+
 	}
 
 	/**
 	 * Performs a manual clear operation of the stencil buffer. This method ignores `autoClear` properties.
 	 */
 	clearStencil() {
-		this.clear(false, false, true);
+
+		this.clear( false, false, true );
+
 	}
 
 	/**
@@ -58873,14 +58954,14 @@ class Renderer {
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
-	async clearAsync(color = true, depth = true, stencil = true) {
-		warnOnce(
-			'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
+	async clearAsync( color = true, depth = true, stencil = true ) {
+
+		warnOnce( 'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		await this.init();
 
-		this.clear(color, depth, stencil);
+		this.clear( color, depth, stencil );
+
 	}
 
 	/**
@@ -58891,11 +58972,11 @@ class Renderer {
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearColorAsync() {
-		warnOnce(
-			'Renderer: "clearColorAsync()" has been deprecated. Use "clearColor()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
 
-		this.clear(true, false, false);
+		warnOnce( 'Renderer: "clearColorAsync()" has been deprecated. Use "clearColor()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( true, false, false );
+
 	}
 
 	/**
@@ -58906,11 +58987,11 @@ class Renderer {
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearDepthAsync() {
-		warnOnce(
-			'Renderer: "clearDepthAsync()" has been deprecated. Use "clearDepth()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
 
-		this.clear(false, true, false);
+		warnOnce( 'Renderer: "clearDepthAsync()" has been deprecated. Use "clearDepth()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, true, false );
+
 	}
 
 	/**
@@ -58921,11 +59002,11 @@ class Renderer {
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearStencilAsync() {
-		warnOnce(
-			'Renderer: "clearStencilAsync()" has been deprecated. Use "clearStencil()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
 
-		this.clear(false, false, true);
+		warnOnce( 'Renderer: "clearStencilAsync()" has been deprecated. Use "clearStencil()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, false, true );
+
 	}
 
 	/**
@@ -58934,11 +59015,12 @@ class Renderer {
 	 *
 	 */
 	get needsFrameBufferTarget() {
+
 		const useToneMapping = this.currentToneMapping !== NoToneMapping;
-		const useColorSpace =
-			this.currentColorSpace !== ColorManagement.workingColorSpace;
+		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
 
 		return useToneMapping || useColorSpace;
+
 	}
 
 	/**
@@ -58948,7 +59030,9 @@ class Renderer {
 	 * @default 0
 	 */
 	get samples() {
+
 		return this._samples;
+
 	}
 
 	/**
@@ -58961,15 +59045,21 @@ class Renderer {
 	 * @type {number}
 	 */
 	get currentSamples() {
+
 		let samples = this._samples;
 
-		if (this._renderTarget !== null) {
+		if ( this._renderTarget !== null ) {
+
 			samples = this._renderTarget.samples;
-		} else if (this.needsFrameBufferTarget) {
+
+		} else if ( this.needsFrameBufferTarget ) {
+
 			samples = 0;
+
 		}
 
 		return samples;
+
 	}
 
 	/**
@@ -58979,7 +59069,9 @@ class Renderer {
 	 * @type {number}
 	 */
 	get currentToneMapping() {
+
 		return this.isOutputTarget ? this.toneMapping : NoToneMapping;
+
 	}
 
 	/**
@@ -58989,9 +59081,9 @@ class Renderer {
 	 * @type {string}
 	 */
 	get currentColorSpace() {
-		return this.isOutputTarget
-			? this.outputColorSpace
-			: ColorManagement.workingColorSpace;
+
+		return this.isOutputTarget ? this.outputColorSpace : ColorManagement.workingColorSpace;
+
 	}
 
 	/**
@@ -59000,10 +59092,9 @@ class Renderer {
 	 * @returns {boolean} True if the current render target is the same of output render target or `null`, otherwise false.
 	 */
 	get isOutputTarget() {
-		return (
-			this._renderTarget === this._outputRenderTarget ||
-			this._renderTarget === null
-		);
+
+		return this._renderTarget === this._outputRenderTarget || this._renderTarget === null;
+
 	}
 
 	/**
@@ -59011,7 +59102,9 @@ class Renderer {
 	 * is no longer in use by your app.
 	 */
 	dispose() {
-		if (this._initialized === true) {
+
+		if ( this._initialized === true ) {
+
 			this.info.dispose();
 			this.backend.dispose();
 
@@ -59025,15 +59118,19 @@ class Renderer {
 			this._renderContexts.dispose();
 			this._textures.dispose();
 
-			if (this._frameBufferTarget !== null) this._frameBufferTarget.dispose();
+			if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
 
-			Object.values(this.backend.timestampQueryPool).forEach((queryPool) => {
-				if (queryPool !== null) queryPool.dispose();
-			});
+			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+
+				if ( queryPool !== null ) queryPool.dispose();
+
+			} );
+
 		}
 
-		this.setRenderTarget(null);
-		this.setAnimationLoop(null);
+		this.setRenderTarget( null );
+		this.setAnimationLoop( null );
+
 	}
 
 	/**
@@ -59045,10 +59142,12 @@ class Renderer {
 	 * @param {number} [activeCubeFace=0] - The active cube face.
 	 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
 	 */
-	setRenderTarget(renderTarget, activeCubeFace = 0, activeMipmapLevel = 0) {
+	setRenderTarget( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
+
 		this._renderTarget = renderTarget;
 		this._activeCubeFace = activeCubeFace;
 		this._activeMipmapLevel = activeMipmapLevel;
+
 	}
 
 	/**
@@ -59057,7 +59156,9 @@ class Renderer {
 	 * @return {?RenderTarget} The render target. Returns `null` if no render target is set.
 	 */
 	getRenderTarget() {
+
 		return this._renderTarget;
+
 	}
 
 	/**
@@ -59065,8 +59166,10 @@ class Renderer {
 	 *
 	 * @param {Object} renderTarget - The render target to set as the output target.
 	 */
-	setOutputRenderTarget(renderTarget) {
+	setOutputRenderTarget( renderTarget ) {
+
 		this._outputRenderTarget = renderTarget;
+
 	}
 
 	/**
@@ -59075,7 +59178,9 @@ class Renderer {
 	 * @return {?RenderTarget} The current output render target. Returns `null` if no output target is set.
 	 */
 	getOutputRenderTarget() {
+
 		return this._outputRenderTarget;
+
 	}
 
 	/**
@@ -59084,14 +59189,13 @@ class Renderer {
 	 *
 	 * @param {CanvasTarget} canvasTarget - The canvas target.
 	 */
-	setCanvasTarget(canvasTarget) {
-		this._canvasTarget.removeEventListener(
-			"resize",
-			this._onCanvasTargetResize,
-		);
+	setCanvasTarget( canvasTarget ) {
+
+		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
 
 		this._canvasTarget = canvasTarget;
-		this._canvasTarget.addEventListener("resize", this._onCanvasTargetResize);
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+
 	}
 
 	/**
@@ -59100,7 +59204,9 @@ class Renderer {
 	 * @return {CanvasTarget} The current canvas target.
 	 */
 	getCanvasTarget() {
+
 		return this._canvasTarget;
+
 	}
 
 	/**
@@ -59109,12 +59215,14 @@ class Renderer {
 	 * @private
 	 */
 	_resetXRState() {
-		this.backend.setXRTarget(null);
-		this.setOutputRenderTarget(null);
-		this.setRenderTarget(null);
+
+		this.backend.setXRTarget( null );
+		this.setOutputRenderTarget( null );
+		this.setRenderTarget( null );
 
 		this._frameBufferTarget.dispose();
 		this._frameBufferTarget = null;
+
 	}
 
 	/**
@@ -59143,8 +59251,10 @@ class Renderer {
 	 *
 	 * @param {?renderObjectFunction} renderObjectFunction - The render object function.
 	 */
-	setRenderObjectFunction(renderObjectFunction) {
+	setRenderObjectFunction( renderObjectFunction ) {
+
 		this._renderObjectFunction = renderObjectFunction;
+
 	}
 
 	/**
@@ -59153,7 +59263,9 @@ class Renderer {
 	 * @return {?Function} The current render object function. Returns `null` if no function is set.
 	 */
 	getRenderObjectFunction() {
+
 		return this._renderObjectFunction;
+
 	}
 
 	/**
@@ -59167,15 +59279,16 @@ class Renderer {
 	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
-	compute(computeNodes, dispatchSize = null) {
-		if (this._isDeviceLost === true) return;
+	compute( computeNodes, dispatchSize = null ) {
 
-		if (this._initialized === false) {
-			warn(
-				"Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.",
-			);
+		if ( this._isDeviceLost === true ) return;
 
-			return this.computeAsync(computeNodes, dispatchSize);
+		if ( this._initialized === false ) {
+
+			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+
+			return this.computeAsync( computeNodes, dispatchSize );
+
 		}
 
 		//
@@ -59186,20 +59299,17 @@ class Renderer {
 
 		//
 
-		this.info.calls++;
-		this.info.compute.calls++;
-		this.info.compute.frameCalls++;
+		this.info.calls ++;
+		this.info.compute.calls ++;
+		this.info.compute.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
 		//
 
-		this.backend.updateTimeStampUID(computeNodes);
+		this.backend.updateTimeStampUID( computeNodes );
 
-		this.inspector.beginCompute(
-			this.backend.getTimestampUID(computeNodes),
-			computeNodes,
-		);
+		this.inspector.beginCompute( this.backend.getTimestampUID( computeNodes ), computeNodes );
 
 		//
 
@@ -59208,58 +59318,57 @@ class Renderer {
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 
-		const computeList = Array.isArray(computeNodes)
-			? computeNodes
-			: [computeNodes];
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
-		if (computeList[0] === undefined || computeList[0].isComputeNode !== true) {
-			throw new Error("THREE.Renderer: .compute() expects a ComputeNode.");
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
 		}
 
-		backend.beginCompute(computeNodes);
+		backend.beginCompute( computeNodes );
 
-		for (const computeNode of computeList) {
+		for ( const computeNode of computeList ) {
+
 			// onInit
 
-			if (pipelines.has(computeNode) === false) {
-				const dispose = () => {
-					computeNode.removeEventListener("dispose", dispose);
+			if ( pipelines.has( computeNode ) === false ) {
 
-					pipelines.delete(computeNode);
-					bindings.deleteForCompute(computeNode);
-					nodes.delete(computeNode);
+				const dispose = () => {
+
+					computeNode.removeEventListener( 'dispose', dispose );
+
+					pipelines.delete( computeNode );
+					bindings.deleteForCompute( computeNode );
+					nodes.delete( computeNode );
+
 				};
 
-				computeNode.addEventListener("dispose", dispose);
+				computeNode.addEventListener( 'dispose', dispose );
 
 				//
 
 				const onInitFn = computeNode.onInitFunction;
 
-				if (onInitFn !== null) {
-					onInitFn.call(computeNode, { renderer: this });
+				if ( onInitFn !== null ) {
+
+					onInitFn.call( computeNode, { renderer: this } );
+
 				}
+
 			}
 
-			nodes.updateForCompute(computeNode);
-			bindings.updateForCompute(computeNode);
+			nodes.updateForCompute( computeNode );
+			bindings.updateForCompute( computeNode );
 
-			const computeBindings = bindings.getForCompute(computeNode);
-			const computePipeline = pipelines.getForCompute(
-				computeNode,
-				computeBindings,
-			);
+			const computeBindings = bindings.getForCompute( computeNode );
+			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
-			backend.compute(
-				computeNodes,
-				computeNode,
-				computeBindings,
-				computePipeline,
-				dispatchSize,
-			);
+			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
+
 		}
 
-		backend.finishCompute(computeNodes);
+		backend.finishCompute( computeNodes );
 
 		//
 
@@ -59267,7 +59376,8 @@ class Renderer {
 
 		//
 
-		this.inspector.finishCompute(this.backend.getTimestampUID(computeNodes));
+		this.inspector.finishCompute( this.backend.getTimestampUID( computeNodes ) );
+
 	}
 
 	/**
@@ -59281,10 +59391,12 @@ class Renderer {
 	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
-	async computeAsync(computeNodes, dispatchSize = null) {
-		if (this._initialized === false) await this.init();
+	async computeAsync( computeNodes, dispatchSize = null ) {
 
-		this.compute(computeNodes, dispatchSize);
+		if ( this._initialized === false ) await this.init();
+
+		this.compute( computeNodes, dispatchSize );
+
 	}
 
 	/**
@@ -59295,20 +59407,22 @@ class Renderer {
 	 * @param {string} name - The feature's name.
 	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
-	async hasFeatureAsync(name) {
-		warnOnce(
-			'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
+	async hasFeatureAsync( name ) {
+
+		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		await this.init();
 
-		return this.hasFeature(name);
+		return this.hasFeature( name );
+
 	}
 
-	async resolveTimestampsAsync(type = "render") {
-		if (this._initialized === false) await this.init();
+	async resolveTimestampsAsync( type = 'render' ) {
 
-		return this.backend.resolveTimestampsAsync(type);
+		if ( this._initialized === false ) await this.init();
+
+		return this.backend.resolveTimestampsAsync( type );
+
 	}
 
 	/**
@@ -59318,14 +59432,16 @@ class Renderer {
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
-	hasFeature(name) {
-		if (this._initialized === false) {
-			throw new Error(
-				'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.',
-			);
+	hasFeature( name ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
 		}
 
-		return this.backend.hasFeature(name);
+		return this.backend.hasFeature( name );
+
 	}
 
 	/**
@@ -59334,7 +59450,9 @@ class Renderer {
 	 * @return {boolean} Whether the renderer has been initialized or not.
 	 */
 	hasInitialized() {
+
 		return this._initialized;
+
 	}
 
 	/**
@@ -59346,14 +59464,14 @@ class Renderer {
 	 * @param {Texture} texture - The texture.
 	 * @return {Promise} A Promise that resolves when the texture has been initialized.
 	 */
-	async initTextureAsync(texture) {
-		warnOnce(
-			'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.',
-		); // @deprecated r181
+	async initTextureAsync( texture ) {
+
+		warnOnce( 'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		await this.init();
 
-		this.initTexture(texture);
+		this.initTexture( texture );
+
 	}
 
 	/**
@@ -59364,14 +59482,16 @@ class Renderer {
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
-	initTexture(texture) {
-		if (this._initialized === false) {
-			throw new Error(
-				'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.',
-			);
+	initTexture( texture ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
 		}
 
-		this._textures.updateTexture(texture);
+		this._textures.updateTexture( texture );
+
 	}
 
 	/**
@@ -59379,18 +59499,19 @@ class Renderer {
 	 *
 	 * @param {RenderTarget} renderTarget - The render target to intialize.
 	 */
-	initRenderTarget(renderTarget) {
-		if (this._initialized === false) {
-			throw new Error(
-				'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.',
-			);
+	initRenderTarget( renderTarget ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+
 		}
 
-		this._textures.updateRenderTarget(renderTarget);
+		this._textures.updateRenderTarget( renderTarget );
 
-		const renderTargetData = this._textures.get(renderTarget);
+		const renderTargetData = this._textures.get( renderTarget );
 
-		const renderContext = this._renderContexts.get(renderTarget);
+		const renderContext = this._renderContexts.get( renderTarget );
 
 		renderContext.textures = renderTargetData.textures;
 		renderContext.depthTexture = renderTargetData.depthTexture;
@@ -59400,7 +59521,8 @@ class Renderer {
 		renderContext.depth = renderTarget.depthBuffer;
 		renderContext.stencil = renderTarget.stencilBuffer;
 
-		this.backend.initRenderTarget(renderContext);
+		this.backend.initRenderTarget( renderContext );
+
 	}
 
 	/**
@@ -59409,31 +59531,30 @@ class Renderer {
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
 	 * @param {?(Vector2|Vector4)} [rectangle=null] - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
 	 */
-	copyFramebufferToTexture(framebufferTexture, rectangle = null) {
-		if (rectangle !== null) {
-			if (rectangle.isVector2) {
-				rectangle = _vector4
-					.set(
-						rectangle.x,
-						rectangle.y,
-						framebufferTexture.image.width,
-						framebufferTexture.image.height,
-					)
-					.floor();
-			} else if (rectangle.isVector4) {
-				rectangle = _vector4.copy(rectangle).floor();
+	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
+
+		if ( rectangle !== null ) {
+
+			if ( rectangle.isVector2 ) {
+
+				rectangle = _vector4.set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height ).floor();
+
+			} else if ( rectangle.isVector4 ) {
+
+				rectangle = _vector4.copy( rectangle ).floor();
+
 			} else {
-				error("Renderer.copyFramebufferToTexture: Invalid rectangle.");
+
+				error( 'Renderer.copyFramebufferToTexture: Invalid rectangle.' );
 
 				return;
+
 			}
+
 		} else {
-			rectangle = _vector4.set(
-				0,
-				0,
-				framebufferTexture.image.width,
-				framebufferTexture.image.height,
-			);
+
+			rectangle = _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height );
+
 		}
 
 		//
@@ -59441,29 +59562,32 @@ class Renderer {
 		let renderContext = this._currentRenderContext;
 		let renderTarget;
 
-		if (renderContext !== null) {
+		if ( renderContext !== null ) {
+
 			renderTarget = renderContext.renderTarget;
+
 		} else {
+
 			renderTarget = this._renderTarget || this._getFrameBufferTarget();
 
-			if (renderTarget !== null) {
-				this._textures.updateRenderTarget(renderTarget);
+			if ( renderTarget !== null ) {
 
-				renderContext = this._textures.get(renderTarget);
+				this._textures.updateRenderTarget( renderTarget );
+
+				renderContext = this._textures.get( renderTarget );
+
 			}
+
 		}
 
 		//
 
-		this._textures.updateTexture(framebufferTexture, { renderTarget });
+		this._textures.updateTexture( framebufferTexture, { renderTarget } );
 
-		this.backend.copyFramebufferToTexture(
-			framebufferTexture,
-			renderContext,
-			rectangle,
-		);
+		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
-		this._inspector.copyFramebufferToTexture(framebufferTexture);
+		this._inspector.copyFramebufferToTexture( framebufferTexture );
+
 	}
 
 	/**
@@ -59476,27 +59600,15 @@ class Renderer {
 	 * @param {number} [srcLevel=0] - The source mip level to copy from.
 	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture(
-		srcTexture,
-		dstTexture,
-		srcRegion = null,
-		dstPosition = null,
-		srcLevel = 0,
-		dstLevel = 0,
-	) {
-		this._textures.updateTexture(srcTexture);
-		this._textures.updateTexture(dstTexture);
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
-		this.backend.copyTextureToTexture(
-			srcTexture,
-			dstTexture,
-			srcRegion,
-			dstPosition,
-			srcLevel,
-			dstLevel,
-		);
+		this._textures.updateTexture( srcTexture );
+		this._textures.updateTexture( dstTexture );
 
-		this._inspector.copyTextureToTexture(srcTexture, dstTexture);
+		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
+
+		this._inspector.copyTextureToTexture( srcTexture, dstTexture );
+
 	}
 
 	/**
@@ -59515,34 +59627,39 @@ class Renderer {
 		srcIndex = 0,
 		dstIndex = 0,
 	) {
+
 		// Layout must match for item-wise copy.
 		if (
 			srcAttribute.itemSize !== dstAttribute.itemSize ||
 			srcAttribute.array.BYTES_PER_ELEMENT !==
 				dstAttribute.array.BYTES_PER_ELEMENT
 		) {
-			error("Renderer.copyBufferToBuffer: Incompatible attribute layouts.");
+
+			error( 'Renderer.copyBufferToBuffer: Incompatible attribute layouts.' );
 			return;
+
 		}
 
 		const stride = srcAttribute.itemSize * srcAttribute.array.BYTES_PER_ELEMENT;
 
 		const maxCount = Math.max(
 			0,
-			Math.min(srcAttribute.count - srcIndex, dstAttribute.count - dstIndex),
+			Math.min( srcAttribute.count - srcIndex, dstAttribute.count - dstIndex ),
 		);
 
-		if (count === null) count = maxCount;
-		else count = Math.max(0, Math.min(count, maxCount));
+		if ( count === null ) count = maxCount;
+		else count = Math.max( 0, Math.min( count, maxCount ) );
 
-		if (count <= 0) {
+		if ( count <= 0 ) {
+
 			error(
-				`Renderer.copyBufferToBuffer: Copy would produce a zero-sized GPU buffer region.\n` +
-					`This leads to invalid WebGPU bindings.\n` +
+				'Renderer.copyBufferToBuffer: Copy would produce a zero-sized GPU buffer region.\n' +
+					'This leads to invalid WebGPU bindings.\n' +
 					`src.count=${srcAttribute.count}, dst.count=${dstAttribute.count}, ` +
 					`srcIndex=${srcIndex}, dstIndex=${dstIndex}`,
 			);
 			return;
+
 		}
 
 		const byteLength = count * stride;
@@ -59551,14 +59668,16 @@ class Renderer {
 
 		// Keep behavior consistent with WebGPU backend validation.
 		if (
-			(byteLength & 3) !== 0 ||
-			(srcOffset & 3) !== 0 ||
-			(dstOffset & 3) !== 0
+			( byteLength & 3 ) !== 0 ||
+			( srcOffset & 3 ) !== 0 ||
+			( dstOffset & 3 ) !== 0
 		) {
+
 			error(
 				`Renderer.copyBufferToBuffer: WebGPU requires 4-byte aligned copies. Got srcOffset=${srcOffset}, dstOffset=${dstOffset}, byteLength=${byteLength}.`,
 			);
 			return;
+
 		}
 
 		this.backend.copyBufferToBuffer(
@@ -59568,7 +59687,9 @@ class Renderer {
 			srcOffset,
 			dstOffset,
 		);
+
 	}
+
 
 	/**
 	 * Reads pixel data from the given render target.
@@ -59583,23 +59704,10 @@ class Renderer {
 	 * @param {number} [faceIndex=0] - The active cube face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
 	 */
-	async readRenderTargetPixelsAsync(
-		renderTarget,
-		x,
-		y,
-		width,
-		height,
-		textureIndex = 0,
-		faceIndex = 0,
-	) {
-		return this.backend.copyTextureToBuffer(
-			renderTarget.textures[textureIndex],
-			x,
-			y,
-			width,
-			height,
-			faceIndex,
-		);
+	async readRenderTargetPixelsAsync( renderTarget, x, y, width, height, textureIndex = 0, faceIndex = 0 ) {
+
+		return this.backend.copyTextureToBuffer( renderTarget.textures[ textureIndex ], x, y, width, height, faceIndex );
+
 	}
 
 	/**
@@ -59613,130 +59721,129 @@ class Renderer {
 	 * @param {RenderList} renderList - The current render list.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 */
-	_projectObject(object, camera, groupOrder, renderList, clippingContext) {
-		if (object.visible === false) return;
+	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
 
-		const visible = object.layers.test(camera.layers);
+		if ( object.visible === false ) return;
 
-		if (visible) {
-			if (object.isGroup) {
+		const visible = object.layers.test( camera.layers );
+
+		if ( visible ) {
+
+			if ( object.isGroup ) {
+
 				groupOrder = object.renderOrder;
 
-				if (object.isClippingGroup && object.enabled)
-					clippingContext = clippingContext.getGroupContext(object);
-			} else if (object.isLOD) {
-				if (object.autoUpdate === true) object.update(camera);
-			} else if (object.isLight) {
-				renderList.pushLight(object);
-			} else if (object.isSprite) {
+				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
+
+			} else if ( object.isLOD ) {
+
+				if ( object.autoUpdate === true ) object.update( camera );
+
+			} else if ( object.isLight ) {
+
+				renderList.pushLight( object );
+
+			} else if ( object.isSprite ) {
+
 				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 
-				if (!object.frustumCulled || frustum.intersectsSprite(object, camera)) {
-					if (this.sortObjects === true) {
-						_vector4
-							.setFromMatrixPosition(object.matrixWorld)
-							.applyMatrix4(_projScreenMatrix);
+				if ( ! object.frustumCulled || frustum.intersectsSprite( object, camera ) ) {
+
+					if ( this.sortObjects === true ) {
+
+						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+
 					}
 
 					const { geometry, material } = object;
 
-					if (material.visible) {
-						renderList.push(
-							object,
-							geometry,
-							material,
-							groupOrder,
-							_vector4.z,
-							null,
-							clippingContext,
-						);
+					if ( material.visible ) {
+
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
+
 					}
+
 				}
-			} else if (object.isLineLoop) {
-				error(
-					"Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.",
-				);
-			} else if (object.isMesh || object.isLine || object.isPoints) {
+
+			} else if ( object.isLineLoop ) {
+
+				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
+
+			} else if ( object.isMesh || object.isLine || object.isPoints ) {
+
 				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 
-				if (!object.frustumCulled || frustum.intersectsObject(object, camera)) {
+				if ( ! object.frustumCulled || frustum.intersectsObject( object, camera ) ) {
+
 					const { geometry, material } = object;
 
-					if (this.sortObjects === true) {
-						if (geometry.boundingSphere === null)
-							geometry.computeBoundingSphere();
+					if ( this.sortObjects === true ) {
+
+						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 						_vector4
-							.copy(geometry.boundingSphere.center)
-							.applyMatrix4(object.matrixWorld)
-							.applyMatrix4(_projScreenMatrix);
+							.copy( geometry.boundingSphere.center )
+							.applyMatrix4( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
+
 					}
 
-					if (Array.isArray(material)) {
+					if ( Array.isArray( material ) ) {
+
 						const groups = geometry.groups;
 
-						for (let i = 0, l = groups.length; i < l; i++) {
-							const group = groups[i];
-							const groupMaterial = material[group.materialIndex];
+						for ( let i = 0, l = groups.length; i < l; i ++ ) {
 
-							if (groupMaterial && groupMaterial.visible) {
-								renderList.push(
-									object,
-									geometry,
-									groupMaterial,
-									groupOrder,
-									_vector4.z,
-									group,
-									clippingContext,
-								);
+							const group = groups[ i ];
+							const groupMaterial = material[ group.materialIndex ];
+
+							if ( groupMaterial && groupMaterial.visible ) {
+
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
+
 							}
+
 						}
-					} else if (material.visible) {
-						renderList.push(
-							object,
-							geometry,
-							material,
-							groupOrder,
-							_vector4.z,
-							null,
-							clippingContext,
-						);
+
+					} else if ( material.visible ) {
+
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
+
 					}
+
 				}
+
 			}
+
 		}
 
-		if (
-			object.isBundleGroup === true &&
-			this.backend.beginBundle !== undefined
-		) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
+
 			const baseRenderList = renderList;
 
 			// replace render list
-			renderList = this._renderLists.get(object, camera);
+			renderList = this._renderLists.get( object, camera );
 
 			renderList.begin();
 
-			baseRenderList.pushBundle({
+			baseRenderList.pushBundle( {
 				bundleGroup: object,
 				camera,
 				renderList,
-			});
+			} );
 
 			renderList.finish();
+
 		}
 
 		const children = object.children;
 
-		for (let i = 0, l = children.length; i < l; i++) {
-			this._projectObject(
-				children[i],
-				camera,
-				groupOrder,
-				renderList,
-				clippingContext,
-			);
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
+
 		}
+
 	}
 
 	/**
@@ -59747,10 +59854,14 @@ class Renderer {
 	 * @param {Scene} sceneRef - The scene the render bundles belong to.
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 */
-	_renderBundles(bundles, sceneRef, lightsNode) {
-		for (const bundle of bundles) {
-			this._renderBundle(bundle, sceneRef, lightsNode);
+	_renderBundles( bundles, sceneRef, lightsNode ) {
+
+		for ( const bundle of bundles ) {
+
+			this._renderBundle( bundle, sceneRef, lightsNode );
+
 		}
+
 	}
 
 	/**
@@ -59763,38 +59874,44 @@ class Renderer {
 	 * @param {Scene} scene - The scene the render list belongs to.
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 */
-	_renderTransparents(renderList, doublePassList, camera, scene, lightsNode) {
-		if (doublePassList.length > 0) {
+	_renderTransparents( renderList, doublePassList, camera, scene, lightsNode ) {
+
+		if ( doublePassList.length > 0 ) {
+
 			// render back side
 
-			for (const { material } of doublePassList) {
+			for ( const { material } of doublePassList ) {
+
 				material.side = BackSide;
+
 			}
 
-			this._renderObjects(
-				doublePassList,
-				camera,
-				scene,
-				lightsNode,
-				"backSide",
-			);
+			this._renderObjects( doublePassList, camera, scene, lightsNode, 'backSide' );
 
 			// render front side
 
-			for (const { material } of doublePassList) {
+			for ( const { material } of doublePassList ) {
+
 				material.side = FrontSide;
+
 			}
 
-			this._renderObjects(renderList, camera, scene, lightsNode);
+			this._renderObjects( renderList, camera, scene, lightsNode );
 
 			// restore
 
-			for (const { material } of doublePassList) {
+			for ( const { material } of doublePassList ) {
+
 				material.side = DoubleSide;
+
 			}
+
 		} else {
-			this._renderObjects(renderList, camera, scene, lightsNode);
+
+			this._renderObjects( renderList, camera, scene, lightsNode );
+
 		}
+
 	}
 
 	/**
@@ -59807,23 +59924,16 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
-	_renderObjects(renderList, camera, scene, lightsNode, passId = null) {
-		for (let i = 0, il = renderList.length; i < il; i++) {
-			const { object, geometry, material, group, clippingContext } =
-				renderList[i];
+	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
-			this._currentRenderObjectFunction(
-				object,
-				scene,
-				camera,
-				geometry,
-				material,
-				group,
-				lightsNode,
-				clippingContext,
-				passId,
-			);
+		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
+
+			const { object, geometry, material, group, clippingContext } = renderList[ i ];
+
+			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
+
 		}
+
 	}
 
 	/**
@@ -59834,89 +59944,105 @@ class Renderer {
 	 * @param {Material} material
 	 * @returns {Object} - The shadow nodes for the material.
 	 */
-	_getShadowNodes(material) {
+	_getShadowNodes( material ) {
+
 		const version = material.version;
 
-		let cache = this._cacheShadowNodes.get(material);
+		let cache = this._cacheShadowNodes.get( material );
 
-		if (cache === undefined || cache.version !== version) {
+		if ( cache === undefined || cache.version !== version ) {
+
 			const hasMap = material.map !== null;
 			const hasColorNode = material.colorNode && material.colorNode.isNode;
-			const hasCastShadowNode =
-				material.castShadowNode && material.castShadowNode.isNode;
-			const hasMaskNode =
-				(material.maskShadowNode && material.maskShadowNode.isNode) ||
-				(material.maskNode && material.maskNode.isNode);
+			const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
+			const hasMaskNode = ( material.maskShadowNode && material.maskShadowNode.isNode ) || ( material.maskNode && material.maskNode.isNode );
 
 			let positionNode = null;
 			let colorNode = null;
 			let depthNode = null;
 
-			if (hasMap || hasColorNode || hasCastShadowNode || hasMaskNode) {
+			if ( hasMap || hasColorNode || hasCastShadowNode || hasMaskNode ) {
+
 				let shadowRGB;
 				let shadowAlpha;
 
-				if (hasCastShadowNode) {
+				if ( hasCastShadowNode ) {
+
 					shadowRGB = material.castShadowNode.rgb;
 					shadowAlpha = material.castShadowNode.a;
 
-					if (this.shadowMap.transmitted !== true) {
-						warnOnce(
-							"Renderer: `shadowMap.transmitted` needs to be set to `true` when using `material.castShadowNode`.",
-						);
+					if ( this.shadowMap.transmitted !== true ) {
+
+						warnOnce( 'Renderer: `shadowMap.transmitted` needs to be set to `true` when using `material.castShadowNode`.' );
+
 					}
+
 				} else {
-					shadowRGB = vec3(0);
-					shadowAlpha = float(1);
+
+					shadowRGB = vec3( 0 );
+					shadowAlpha = float( 1 );
+
 				}
 
-				if (hasMap) {
-					shadowAlpha = shadowAlpha.mul(
-						reference("map", "texture", material).a,
-					);
+				if ( hasMap ) {
+
+					shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
+
 				}
 
-				if (hasColorNode) {
-					shadowAlpha = shadowAlpha.mul(material.colorNode.a);
+				if ( hasColorNode ) {
+
+					shadowAlpha = shadowAlpha.mul( material.colorNode.a );
+
 				}
 
-				colorNode = vec4(shadowRGB, shadowAlpha);
+				colorNode = vec4( shadowRGB, shadowAlpha );
 
-				if (hasMaskNode) {
+				if ( hasMaskNode ) {
+
 					const maskNode = material.maskShadowNode || material.maskNode;
 
-					colorNode = Fn(([color]) => {
+					colorNode = Fn( ( [ color ] ) => {
+
 						maskNode.not().discard();
 
 						return color;
-					})(colorNode);
+
+					} )( colorNode );
+
 				}
+
 			}
 
-			if (material.depthNode && material.depthNode.isNode) {
+			if ( material.depthNode && material.depthNode.isNode ) {
+
 				depthNode = material.depthNode;
+
 			}
 
-			if (
-				material.castShadowPositionNode &&
-				material.castShadowPositionNode.isNode
-			) {
+			if ( material.castShadowPositionNode && material.castShadowPositionNode.isNode ) {
+
 				positionNode = material.castShadowPositionNode;
-			} else if (material.positionNode && material.positionNode.isNode) {
+
+			} else if ( material.positionNode && material.positionNode.isNode ) {
+
 				positionNode = material.positionNode;
+
 			}
 
 			cache = {
 				version,
 				colorNode,
 				depthNode,
-				positionNode,
+				positionNode
 			};
 
-			this._cacheShadowNodes.set(material, cache);
+			this._cacheShadowNodes.set( material, cache );
+
 		}
 
 		return cache;
+
 	}
 
 	/**
@@ -59933,17 +60059,8 @@ class Renderer {
 	 * @param {?ClippingContext} clippingContext - The clipping context.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
 	 */
-	renderObject(
-		object,
-		scene,
-		camera,
-		geometry,
-		material,
-		group,
-		lightsNode,
-		clippingContext = null,
-		passId = null,
-	) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
+
 		let materialOverride = false;
 		let materialColorNode;
 		let materialDepthNode;
@@ -59952,118 +60069,91 @@ class Renderer {
 
 		//
 
-		object.onBeforeRender(this, scene, camera, geometry, material, group);
+		object.onBeforeRender( this, scene, camera, geometry, material, group );
 
 		//
 
-		if (material.allowOverride === true && scene.overrideMaterial !== null) {
+		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
+
 			const overrideMaterial = scene.overrideMaterial;
 
 			materialOverride = true;
 
 			// store original nodes
-			materialColorNode = overrideMaterial.isNodeMaterial
-				? overrideMaterial.colorNode
-				: null;
-			materialDepthNode = overrideMaterial.isNodeMaterial
-				? overrideMaterial.depthNode
-				: null;
-			materialPositionNode = overrideMaterial.isNodeMaterial
-				? overrideMaterial.positionNode
-				: null;
+			materialColorNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.colorNode : null;
+			materialDepthNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.depthNode : null;
+			materialPositionNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.positionNode : null;
 			materialSide = scene.overrideMaterial.side;
 
-			if (material.positionNode && material.positionNode.isNode) {
+			if ( material.positionNode && material.positionNode.isNode ) {
+
 				overrideMaterial.positionNode = material.positionNode;
+
 			}
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
-			overrideMaterial.transparent =
-				material.transparent ||
-				material.transmission > 0 ||
-				(material.transmissionNode && material.transmissionNode.isNode) ||
-				(material.backdropNode && material.backdropNode.isNode);
+			overrideMaterial.transparent = material.transparent || material.transmission > 0 ||
+				( material.transmissionNode && material.transmissionNode.isNode ) ||
+				( material.backdropNode && material.backdropNode.isNode );
 
-			if (overrideMaterial.isShadowPassMaterial) {
-				const { colorNode, depthNode, positionNode } =
-					this._getShadowNodes(material);
+			if ( overrideMaterial.isShadowPassMaterial ) {
 
-				if (this.shadowMap.type === VSMShadowMap) {
-					overrideMaterial.side =
-						material.shadowSide !== null ? material.shadowSide : material.side;
+				const { colorNode, depthNode, positionNode } = this._getShadowNodes( material );
+
+				if ( this.shadowMap.type === VSMShadowMap ) {
+
+					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
+
 				} else {
-					overrideMaterial.side =
-						material.shadowSide !== null
-							? material.shadowSide
-							: _shadowSide[material.side];
+
+					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : _shadowSide[ material.side ];
+
 				}
 
-				if (colorNode !== null) overrideMaterial.colorNode = colorNode;
-				if (depthNode !== null) overrideMaterial.depthNode = depthNode;
-				if (positionNode !== null) overrideMaterial.positionNode = positionNode;
+				if ( colorNode !== null ) overrideMaterial.colorNode = colorNode;
+				if ( depthNode !== null ) overrideMaterial.depthNode = depthNode;
+				if ( positionNode !== null ) overrideMaterial.positionNode = positionNode;
+
 			}
 
 			material = overrideMaterial;
+
 		}
 
 		//
 
-		if (
-			material.transparent === true &&
-			material.side === DoubleSide &&
-			material.forceSinglePass === false
-		) {
+		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+
 			material.side = BackSide;
-			this._handleObjectFunction(
-				object,
-				material,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				"backSide",
-			); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._handleObjectFunction(
-				object,
-				material,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				passId,
-			); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId ); // use default pass id
 
 			material.side = DoubleSide;
+
 		} else {
-			this._handleObjectFunction(
-				object,
-				material,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				passId,
-			);
+
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId );
+
 		}
 
 		//
 
-		if (materialOverride) {
+		if ( materialOverride ) {
+
 			scene.overrideMaterial.colorNode = materialColorNode;
 			scene.overrideMaterial.depthNode = materialDepthNode;
 			scene.overrideMaterial.positionNode = materialPositionNode;
 			scene.overrideMaterial.side = materialSide;
+
 		}
 
 		//
 
-		object.onAfterRender(this, scene, camera, geometry, material, group);
+		object.onAfterRender( this, scene, camera, geometry, material, group );
+
 	}
 
 	/**
@@ -60073,8 +60163,10 @@ class Renderer {
 	 * @param {string} name - The compatibility's name.
 	 * @return {boolean} Whether the compatibility is supported or not.
 	 */
-	hasCompatibility(name) {
-		return this.backend.hasCompatibility(name);
+	hasCompatibility( name ) {
+
+		return this.backend.hasCompatibility( name );
+
 	}
 
 	/**
@@ -60091,57 +60183,45 @@ class Renderer {
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
-	_renderObjectDirect(
-		object,
-		material,
-		scene,
-		camera,
-		lightsNode,
-		group,
-		clippingContext,
-		passId,
-	) {
-		const renderObject = this._objects.get(
-			object,
-			material,
-			scene,
-			camera,
-			lightsNode,
-			this._currentRenderContext,
-			clippingContext,
-			passId,
-		);
+	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
-		if (this._currentRenderBundle !== null) {
-			const renderBundleData = this.backend.get(this._currentRenderBundle);
+		if ( this._currentRenderBundle !== null ) {
 
-			renderBundleData.renderObjects.push(renderObject);
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
+
+			renderBundleData.renderObjects.push( renderObject );
 
 			renderObject.bundle = this._currentRenderBundle.bundleGroup;
+
 		}
 
 		//
 
-		const needsRefresh = this._nodes.needsRefresh(renderObject);
+		const needsRefresh = this._nodes.needsRefresh( renderObject );
 
-		if (needsRefresh) {
-			this._nodes.updateBefore(renderObject);
+		if ( needsRefresh ) {
 
-			this._geometries.updateForRender(renderObject);
+			this._nodes.updateBefore( renderObject );
 
-			this._nodes.updateForRender(renderObject);
-			this._bindings.updateForRender(renderObject);
+			this._geometries.updateForRender( renderObject );
+
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateForRender( renderObject );
+
 		}
 
-		this._pipelines.updateForRender(renderObject);
+		this._pipelines.updateForRender( renderObject );
 
 		//
 
-		this.backend.draw(renderObject, this.info);
+		this.backend.draw( renderObject, this.info );
 
-		if (needsRefresh) this._nodes.updateAfter(renderObject);
+		if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+
 	}
 
 	/**
@@ -60158,41 +60238,25 @@ class Renderer {
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
-	_createObjectPipeline(
-		object,
-		material,
-		scene,
-		camera,
-		lightsNode,
-		group,
-		clippingContext,
-		passId,
-	) {
-		const renderObject = this._objects.get(
-			object,
-			material,
-			scene,
-			camera,
-			lightsNode,
-			this._currentRenderContext,
-			clippingContext,
-			passId,
-		);
+	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
 		//
 
-		this._nodes.updateBefore(renderObject);
+		this._nodes.updateBefore( renderObject );
 
-		this._geometries.updateForRender(renderObject);
+		this._geometries.updateForRender( renderObject );
 
-		this._nodes.updateForRender(renderObject);
-		this._bindings.updateForRender(renderObject);
+		this._nodes.updateForRender( renderObject );
+		this._bindings.updateForRender( renderObject );
 
-		this._pipelines.getForRender(renderObject, this._compilationPromises);
+		this._pipelines.getForRender( renderObject, this._compilationPromises );
 
-		this._nodes.updateAfter(renderObject);
+		this._nodes.updateAfter( renderObject );
+
 	}
 
 	/**
@@ -60201,7 +60265,9 @@ class Renderer {
 	 * @private
 	 */
 	_onCanvasTargetResize() {
-		if (this._initialized) this.backend.updateSize();
+
+		if ( this._initialized ) this.backend.updateSize();
+
 	}
 
 	/**
@@ -60214,8 +60280,11 @@ class Renderer {
 	 * @return {function(Object3D, Camera, ?Scene): Promise|undefined} A Promise that resolves when the compile has been finished.
 	 */
 	get compile() {
+
 		return this.compileAsync;
+
 	}
+
 }
 
 /**
@@ -63208,18 +63277,20 @@ let _color4 = null;
  * @private
  */
 class Backend {
+
 	/**
 	 * Constructs a new backend.
 	 *
 	 * @param {Object} parameters - An object holding parameters for the backend.
 	 */
-	constructor(parameters = {}) {
+	constructor( parameters = {} ) {
+
 		/**
 		 * The parameters of the backend.
 		 *
 		 * @type {Object}
 		 */
-		this.parameters = Object.assign({}, parameters);
+		this.parameters = Object.assign( {}, parameters );
 
 		/**
 		 * This weak map holds backend-specific data of objects
@@ -63247,12 +63318,12 @@ class Backend {
 
 		/**
 		 * A reference to the timestamp query pool.
-		 *
-		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
+   		 *
+   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
-			[TimestampQuery.RENDER]: null,
-			[TimestampQuery.COMPUTE]: null,
+			[ TimestampQuery.RENDER ]: null,
+			[ TimestampQuery.COMPUTE ]: null
 		};
 
 		/**
@@ -63261,7 +63332,8 @@ class Backend {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.trackTimestamp = parameters.trackTimestamp === true;
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
+
 	}
 
 	/**
@@ -63273,8 +63345,10 @@ class Backend {
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the backend has been initialized.
 	 */
-	async init(renderer) {
+	async init( renderer ) {
+
 		this.renderer = renderer;
+
 	}
 
 	/**
@@ -63296,7 +63370,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	beginRender(/*renderContext*/) {}
+	beginRender( /*renderContext*/ ) {}
 
 	/**
 	 * This method is executed at the end of a render call and
@@ -63306,7 +63380,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	finishRender(/*renderContext*/) {}
+	finishRender( /*renderContext*/ ) {}
 
 	/**
 	 * This method is executed at the beginning of a compute call and
@@ -63316,7 +63390,7 @@ class Backend {
 	 * @abstract
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute(/*computeGroup*/) {}
+	beginCompute( /*computeGroup*/ ) {}
 
 	/**
 	 * This method is executed at the end of a compute call and
@@ -63326,7 +63400,7 @@ class Backend {
 	 * @abstract
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute(/*computeGroup*/) {}
+	finishCompute( /*computeGroup*/ ) {}
 
 	// render object
 
@@ -63337,7 +63411,7 @@ class Backend {
 	 * @param {RenderObject} renderObject - The render object to draw.
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 */
-	draw(/*renderObject, info*/) {}
+	draw( /*renderObject, info*/ ) { }
 
 	// compute node
 
@@ -63350,7 +63424,7 @@ class Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 */
-	compute(/*computeGroup, computeNode, computeBindings, computePipeline*/) {}
+	compute( /*computeGroup, computeNode, computeBindings, computePipeline*/ ) { }
 
 	// program
 
@@ -63360,7 +63434,7 @@ class Backend {
 	 * @abstract
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	createProgram(/*program*/) {}
+	createProgram( /*program*/ ) { }
 
 	/**
 	 * Destroys the shader program of the given programmable stage.
@@ -63368,7 +63442,7 @@ class Backend {
 	 * @abstract
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	destroyProgram(/*program*/) {}
+	destroyProgram( /*program*/ ) { }
 
 	// bindings
 
@@ -63381,7 +63455,7 @@ class Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	createBindings(/*bindGroup, bindings, cacheIndex, version*/) {}
+	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
 	/**
 	 * Updates the given bind group definition.
@@ -63392,7 +63466,7 @@ class Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	updateBindings(/*bindGroup, bindings, cacheIndex, version*/) {}
+	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
 
 	/**
 	 * Updates a buffer binding.
@@ -63400,7 +63474,7 @@ class Backend {
 	 * @abstract
 	 * @param {Buffer} binding - The buffer binding to update.
 	 */
-	updateBinding(/*binding*/) {}
+	updateBinding( /*binding*/ ) { }
 
 	// pipeline
 
@@ -63411,7 +63485,7 @@ class Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
 	 */
-	createRenderPipeline(/*renderObject, promises*/) {}
+	createRenderPipeline( /*renderObject, promises*/ ) { }
 
 	/**
 	 * Creates a compute pipeline for the given compute node.
@@ -63420,7 +63494,7 @@ class Backend {
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 */
-	createComputePipeline(/*computePipeline, bindings*/) {}
+	createComputePipeline( /*computePipeline, bindings*/ ) { }
 
 	// cache key
 
@@ -63431,7 +63505,7 @@ class Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {boolean} Whether the render pipeline requires an update or not.
 	 */
-	needsRenderUpdate(/*renderObject*/) {}
+	needsRenderUpdate( /*renderObject*/ ) { }
 
 	/**
 	 * Returns a cache key that is used to identify render pipelines.
@@ -63440,7 +63514,7 @@ class Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {string} The cache key.
 	 */
-	getRenderCacheKey(/*renderObject*/) {}
+	getRenderCacheKey( /*renderObject*/ ) { }
 
 	// node builder
 
@@ -63452,7 +63526,7 @@ class Backend {
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {NodeBuilder} The node builder.
 	 */
-	createNodeBuilder(/*renderObject, renderer*/) {}
+	createNodeBuilder( /*renderObject, renderer*/ ) { }
 
 	// textures
 
@@ -63463,7 +63537,7 @@ class Backend {
 	 * @param {Texture} texture - The texture to update the sampler for.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler(/*texture*/) {}
+	updateSampler( /*texture*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -63472,7 +63546,7 @@ class Backend {
 	 * @abstract
 	 * @param {Texture} texture - The texture to create a default texture for.
 	 */
-	createDefaultTexture(/*texture*/) {}
+	createDefaultTexture( /*texture*/ ) { }
 
 	/**
 	 * Defines a texture on the GPU for the given texture object.
@@ -63481,7 +63555,7 @@ class Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	createTexture(/*texture, options={}*/) {}
+	createTexture( /*texture, options={}*/ ) { }
 
 	/**
 	 * Uploads the updated texture data to the GPU.
@@ -63490,7 +63564,7 @@ class Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	updateTexture(/*texture, options = {}*/) {}
+	updateTexture( /*texture, options = {}*/ ) { }
 
 	/**
 	 * Generates mipmaps for the given texture.
@@ -63498,7 +63572,7 @@ class Backend {
 	 * @abstract
 	 * @param {Texture} texture - The texture.
 	 */
-	generateMipmaps(/*texture*/) {}
+	generateMipmaps( /*texture*/ ) { }
 
 	/**
 	 * Destroys the GPU data for the given texture object.
@@ -63507,7 +63581,7 @@ class Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture(/*texture, isDefaultTexture*/) {}
+	destroyTexture( /*texture, isDefaultTexture*/ ) { }
 
 	/**
 	 * Returns texture data as a typed array.
@@ -63522,7 +63596,7 @@ class Backend {
 	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer(/*texture, x, y, width, height, faceIndex*/) {}
+	async copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
 
 	/**
 	 * Copies data of the given source texture to the given destination texture.
@@ -63535,17 +63609,19 @@ class Backend {
 	 * @param {number} [srcLevel=0] - The source mip level to copy from.
 	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture(/*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/) {}
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/ ) {}
 
 	/**
-	 * Copies the current bound framebuffer to the given texture.
-	 *
-	 * @abstract
-	 * @param {Texture} texture - The destination texture.
-	 * @param {RenderContext} renderContext - The render context.
-	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
-	 */
-	copyFramebufferToTexture(/*texture, renderContext, rectangle*/) {}
+	* Copies the current bound framebuffer to the given texture.
+	*
+	* @abstract
+	* @param {Texture} texture - The destination texture.
+	* @param {RenderContext} renderContext - The render context.
+	* @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
+	*/
+	copyFramebufferToTexture( /*texture, renderContext, rectangle*/ ) {}
+
+	// attributes
 
 	/**
 	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
@@ -63557,9 +63633,7 @@ class Backend {
 	 * @param {number} [srcOffset=0] - The source offset in bytes.
 	 * @param {number} [dstOffset=0] - The destination offset in bytes.
 	 */
-	copyBufferToBuffer(/*srcAttribute, dstAttribute, byteLength, srcOffset=0, dstOffset=0*/) {}
-
-	// attributes
+	copyBufferToBuffer( /*srcAttribute, dstAttribute, byteLength, srcOffset=0, dstOffset=0*/ ) {}
 
 	/**
 	 * Creates the GPU buffer of a shader attribute.
@@ -63567,7 +63641,7 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createAttribute(/*attribute*/) {}
+	createAttribute( /*attribute*/ ) { }
 
 	/**
 	 * Creates the GPU buffer of an indexed shader attribute.
@@ -63575,7 +63649,7 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
 	 */
-	createIndexAttribute(/*attribute*/) {}
+	createIndexAttribute( /*attribute*/ ) { }
 
 	/**
 	 * Creates the GPU buffer of a storage attribute.
@@ -63583,7 +63657,7 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createStorageAttribute(/*attribute*/) {}
+	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
 	 * Updates the GPU buffer of a shader attribute.
@@ -63591,7 +63665,7 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
-	updateAttribute(/*attribute*/) {}
+	updateAttribute( /*attribute*/ ) { }
 
 	/**
 	 * Destroys the GPU buffer of a shader attribute.
@@ -63599,7 +63673,7 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
-	destroyAttribute(/*attribute*/) {}
+	destroyAttribute( /*attribute*/ ) { }
 
 	// canvas
 
@@ -63609,7 +63683,7 @@ class Backend {
 	 * @abstract
 	 * @return {Object} The rendering context.
 	 */
-	getContext() {}
+	getContext() { }
 
 	/**
 	 * Backends can use this method if they have to run
@@ -63617,7 +63691,7 @@ class Backend {
 	 *
 	 * @abstract
 	 */
-	updateSize() {}
+	updateSize() { }
 
 	/**
 	 * Updates the viewport with the values from the given render context.
@@ -63625,7 +63699,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateViewport(/*renderContext*/) {}
+	updateViewport( /*renderContext*/ ) {}
 
 	// utils
 
@@ -63635,20 +63709,25 @@ class Backend {
 	 *
 	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
 	 */
-	updateTimeStampUID(abstractRenderContext) {
-		const contextData = this.get(abstractRenderContext);
+	updateTimeStampUID( abstractRenderContext ) {
+
+		const contextData = this.get( abstractRenderContext );
 		const frame = this.renderer.info.frame;
 
 		let prefix;
 
-		if (abstractRenderContext.isComputeNode === true) {
-			prefix = "c:" + this.renderer.info.compute.frameCalls;
+		if ( abstractRenderContext.isComputeNode === true ) {
+
+			prefix = 'c:' + this.renderer.info.compute.frameCalls;
+
 		} else {
-			prefix = "r:" + this.renderer.info.render.frameCalls;
+
+			prefix = 'r:' + this.renderer.info.render.frameCalls;
+
 		}
 
-		contextData.timestampUID =
-			prefix + ":" + abstractRenderContext.id + ":f" + frame;
+		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
+
 	}
 
 	/**
@@ -63658,8 +63737,10 @@ class Backend {
 	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
 	 * @return {string} The unique identifier.
 	 */
-	getTimestampUID(abstractRenderContext) {
-		return this.get(abstractRenderContext).timestampUID;
+	getTimestampUID( abstractRenderContext ) {
+
+		return this.get( abstractRenderContext ).timestampUID;
+
 	}
 
 	/**
@@ -63668,10 +63749,12 @@ class Backend {
 	 * @param {string} type - The type of the time stamp.
 	 * @return {Array<number>} The timestamp frames.
 	 */
-	getTimestampFrames(type) {
-		const queryPool = this.timestampQueryPool[type];
+	getTimestampFrames( type ) {
+
+		const queryPool = this.timestampQueryPool[ type ];
 
 		return queryPool ? queryPool.getTimestampFrames() : [];
+
 	}
 
 	/**
@@ -63680,13 +63763,13 @@ class Backend {
 	 * @param {string} uid - The unique identifier.
 	 * @return {TimestampQueryPool} The query pool.
 	 */
-	_getQueryPool(uid) {
-		const type = uid.startsWith("c:")
-			? TimestampQuery.COMPUTE
-			: TimestampQuery.RENDER;
-		const queryPool = this.timestampQueryPool[type];
+	_getQueryPool( uid ) {
+
+		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
+		const queryPool = this.timestampQueryPool[ type ];
 
 		return queryPool;
+
 	}
 
 	/**
@@ -63695,10 +63778,12 @@ class Backend {
 	 * @param {string} uid - The unique identifier.
 	 * @return {number} The timestamp.
 	 */
-	getTimestamp(uid) {
-		const queryPool = this._getQueryPool(uid);
+	getTimestamp( uid ) {
 
-		return queryPool.getTimestamp(uid);
+		const queryPool = this._getQueryPool( uid );
+
+		return queryPool.getTimestamp( uid );
+
 	}
 
 	/**
@@ -63707,10 +63792,12 @@ class Backend {
 	 * @param {string} uid - The unique identifier.
 	 * @return {boolean} Whether the timestamp is available or not.
 	 */
-	hasTimestamp(uid) {
-		const queryPool = this._getQueryPool(uid);
+	hasTimestamp( uid ) {
 
-		return queryPool.hasTimestamp(uid);
+		const queryPool = this._getQueryPool( uid );
+
+		return queryPool.hasTimestamp( uid );
+
 	}
 
 	/**
@@ -63723,7 +63810,7 @@ class Backend {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
-	isOccluded(/*renderContext, object*/) {}
+	isOccluded( /*renderContext, object*/ ) {}
 
 	/**
 	 * Resolves the time stamp for the given render context and type.
@@ -63733,23 +63820,29 @@ class Backend {
 	 * @param {string} [type='render'] - The type of the time stamp.
 	 * @return {Promise<number>} A Promise that resolves with the time stamp.
 	 */
-	async resolveTimestampsAsync(type = "render") {
-		if (!this.trackTimestamp) {
-			warnOnce("WebGPURenderer: Timestamp tracking is disabled.");
+	async resolveTimestampsAsync( type = 'render' ) {
+
+		if ( ! this.trackTimestamp ) {
+
+			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
 			return;
+
 		}
 
-		const queryPool = this.timestampQueryPool[type];
+		const queryPool = this.timestampQueryPool[ type ];
 
-		if (!queryPool) {
+		if ( ! queryPool ) {
+
 			return;
+
 		}
 
 		const duration = await queryPool.resolveQueriesAsync();
 
-		this.renderer.info[type].timestamp = duration;
+		this.renderer.info[ type ].timestamp = duration;
 
 		return duration;
+
 	}
 
 	/**
@@ -63760,7 +63853,7 @@ class Backend {
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync(/* attribute */) {}
+	async getArrayBufferAsync( /* attribute */ ) {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -63770,7 +63863,7 @@ class Backend {
 	 * @param {string} name - The feature's name.
 	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
-	async hasFeatureAsync(/*name*/) {}
+	async hasFeatureAsync( /*name*/ ) { }
 
 	/**
 	 * Checks if the given feature is supported  by the backend.
@@ -63779,7 +63872,7 @@ class Backend {
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
-	hasFeature(/*name*/) {}
+	hasFeature( /*name*/ ) {}
 
 	/**
 	 * Returns the maximum anisotropy texture filtering value.
@@ -63795,9 +63888,11 @@ class Backend {
 	 * @return {Vector2} The drawing buffer size.
 	 */
 	getDrawingBufferSize() {
+
 		_vector2 = _vector2 || new Vector2();
 
-		return this.renderer.getDrawingBufferSize(_vector2);
+		return this.renderer.getDrawingBufferSize( _vector2 );
+
 	}
 
 	/**
@@ -63806,7 +63901,7 @@ class Backend {
 	 * @abstract
 	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
-	setScissorTest(/*boolean*/) {}
+	setScissorTest( /*boolean*/ ) { }
 
 	/**
 	 * Returns the clear color and alpha into a single
@@ -63815,15 +63910,17 @@ class Backend {
 	 * @return {Color4} The clear color.
 	 */
 	getClearColor() {
+
 		const renderer = this.renderer;
 
 		_color4 = _color4 || new Color4();
 
-		renderer.getClearColor(_color4);
+		renderer.getClearColor( _color4 );
 
-		_color4.getRGB(_color4);
+		_color4.getRGB( _color4 );
 
 		return _color4;
+
 	}
 
 	/**
@@ -63833,22 +63930,22 @@ class Backend {
 	 * @return {HTMLCanvasElement} The DOM element.
 	 */
 	getDomElement() {
+
 		let domElement = this.domElement;
 
-		if (domElement === null) {
-			domElement =
-				this.parameters.canvas !== undefined
-					? this.parameters.canvas
-					: createCanvasElement();
+		if ( domElement === null ) {
+
+			domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : createCanvasElement();
 
 			// OffscreenCanvas does not have setAttribute, see #22811
-			if ("setAttribute" in domElement)
-				domElement.setAttribute("data-engine", `three.js r${REVISION} webgpu`);
+			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION} webgpu` );
 
 			this.domElement = domElement;
+
 		}
 
 		return domElement;
+
 	}
 
 	/**
@@ -63858,8 +63955,10 @@ class Backend {
 	 * @param {string} name - The compatibility.
 	 * @return {boolean} Whether the backend has the given compatibility or not.
 	 */
-	hasCompatibility(/*name*/) {
+	hasCompatibility( /*name*/ ) {
+
 		return false;
+
 	}
 
 	/**
@@ -63868,7 +63967,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	initRenderTarget(/*renderContext*/) {}
+	initRenderTarget( /*renderContext*/ ) {}
 
 	/**
 	 * Sets a dictionary for the given object into the
@@ -63877,8 +63976,10 @@ class Backend {
 	 * @param {Object} object - The object.
 	 * @param {Object} value - The dictionary to set.
 	 */
-	set(object, value) {
-		this.data.set(object, value);
+	set( object, value ) {
+
+		this.data.set( object, value );
+
 	}
 
 	/**
@@ -63887,15 +63988,19 @@ class Backend {
 	 * @param {Object} object - The object.
 	 * @return {Object} The object's dictionary.
 	 */
-	get(object) {
-		let map = this.data.get(object);
+	get( object ) {
 
-		if (map === undefined) {
+		let map = this.data.get( object );
+
+		if ( map === undefined ) {
+
 			map = {};
-			this.data.set(object, map);
+			this.data.set( object, map );
+
 		}
 
 		return map;
+
 	}
 
 	/**
@@ -63905,8 +64010,10 @@ class Backend {
 	 * @param {Object} object - The object.
 	 * @return {boolean} Whether a dictionary for the given object as been defined or not.
 	 */
-	has(object) {
-		return this.data.has(object);
+	has( object ) {
+
+		return this.data.has( object );
+
 	}
 
 	/**
@@ -63914,8 +64021,10 @@ class Backend {
 	 *
 	 * @param {Object} object - The object to delete.
 	 */
-	delete(object) {
-		this.data.delete(object);
+	delete( object ) {
+
+		this.data.delete( object );
+
 	}
 
 	/**
@@ -63924,14 +64033,15 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 */
-	deleteBindGroupData(/*bindGroup*/) {}
+	deleteBindGroupData( /*bindGroup*/ ) { }
 
 	/**
 	 * Frees internal resources.
 	 *
 	 * @abstract
 	 */
-	dispose() {}
+	dispose() { }
+
 }
 
 let _id$1 = 0;
@@ -68037,6 +68147,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
  * @augments Backend
  */
 class WebGLBackend extends Backend {
+
 	/**
 	 * WebGLBackend options.
 	 *
@@ -68057,8 +68168,9 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {WebGLBackend~Options} [parameters] - The configuration parameter.
 	 */
-	constructor(parameters = {}) {
-		super(parameters);
+	constructor( parameters = {} ) {
+
+		super( parameters );
 
 		/**
 		 * This flag can be used for type testing.
@@ -68173,12 +68285,12 @@ class WebGLBackend extends Backend {
 		this.disjoint = null;
 
 		/**
-		 * A reference to the `KHR_parallel_shader_compile` extension. `null` if the
-		 * device does not support the extension.
-		 *
-		 * @type {?KHRParallelShaderCompile}
-		 * @default null
-		 */
+		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
+		* device does not support the extension.
+		*
+		* @type {?KHRParallelShaderCompile}
+		* @default null
+		*/
 		this.parallel = null;
 
 		/**
@@ -68204,10 +68316,7 @@ class WebGLBackend extends Backend {
 		 * @private
 		 * @type {boolean}
 		 */
-		this._supportsInvalidateFramebuffer =
-			typeof navigator === "undefined"
-				? false
-				: /OculusBrowser/g.test(navigator.userAgent);
+		this._supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
 
 		/**
 		 * The target framebuffer when rendering with
@@ -68218,6 +68327,7 @@ class WebGLBackend extends Backend {
 		 * @default null
 		 */
 		this._xrFramebuffer = null;
+
 	}
 
 	/**
@@ -68225,8 +68335,9 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 */
-	init(renderer) {
-		super.init(renderer);
+	init( renderer ) {
+
+		super.init( renderer );
 
 		//
 
@@ -68236,68 +68347,61 @@ class WebGLBackend extends Backend {
 			antialias: renderer.currentSamples > 0,
 			alpha: true, // always true for performance reasons
 			depth: renderer.depth,
-			stencil: renderer.stencil,
+			stencil: renderer.stencil
 		};
 
-		const glContext =
-			parameters.context !== undefined
-				? parameters.context
-				: renderer.domElement.getContext("webgl2", contextAttributes);
+		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2', contextAttributes );
 
-		function onContextLost(event) {
+	 	function onContextLost( event ) {
+
 			event.preventDefault();
 
 			const contextLossInfo = {
-				api: "WebGL",
-				message: event.statusMessage || "Unknown reason",
+				api: 'WebGL',
+				message: event.statusMessage || 'Unknown reason',
 				reason: null,
-				originalEvent: event,
+				originalEvent: event
 			};
 
-			renderer.onDeviceLost(contextLossInfo);
+			renderer.onDeviceLost( contextLossInfo );
+
 		}
 
 		this._onContextLost = onContextLost;
 
-		renderer.domElement.addEventListener(
-			"webglcontextlost",
-			onContextLost,
-			false,
-		);
+		renderer.domElement.addEventListener( 'webglcontextlost', onContextLost, false );
 
 		this.gl = glContext;
 
-		this.extensions = new WebGLExtensions(this);
-		this.capabilities = new WebGLCapabilities(this);
-		this.attributeUtils = new WebGLAttributeUtils(this);
-		this.textureUtils = new WebGLTextureUtils(this);
-		this.bufferRenderer = new WebGLBufferRenderer(this);
+		this.extensions = new WebGLExtensions( this );
+		this.capabilities = new WebGLCapabilities( this );
+		this.attributeUtils = new WebGLAttributeUtils( this );
+		this.textureUtils = new WebGLTextureUtils( this );
+		this.bufferRenderer = new WebGLBufferRenderer( this );
 
-		this.state = new WebGLState(this);
-		this.utils = new WebGLUtils(this);
+		this.state = new WebGLState( this );
+		this.utils = new WebGLUtils( this );
 
-		this.extensions.get("EXT_color_buffer_float");
-		this.extensions.get("WEBGL_clip_cull_distance");
-		this.extensions.get("OES_texture_float_linear");
-		this.extensions.get("EXT_color_buffer_half_float");
-		this.extensions.get("WEBGL_multisampled_render_to_texture");
-		this.extensions.get("WEBGL_render_shared_exponent");
-		this.extensions.get("WEBGL_multi_draw");
-		this.extensions.get("OVR_multiview2");
-		this.extensions.get("EXT_clip_control");
+		this.extensions.get( 'EXT_color_buffer_float' );
+		this.extensions.get( 'WEBGL_clip_cull_distance' );
+		this.extensions.get( 'OES_texture_float_linear' );
+		this.extensions.get( 'EXT_color_buffer_half_float' );
+		this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+		this.extensions.get( 'WEBGL_render_shared_exponent' );
+		this.extensions.get( 'WEBGL_multi_draw' );
+		this.extensions.get( 'OVR_multiview2' );
+		this.extensions.get( 'EXT_clip_control' );
 
-		this.disjoint = this.extensions.get("EXT_disjoint_timer_query_webgl2");
-		this.parallel = this.extensions.get("KHR_parallel_shader_compile");
-		this.drawBuffersIndexedExt = this.extensions.get(
-			"OES_draw_buffers_indexed",
-		);
+		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
+		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
+		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
 
-		if (
-			parameters.reversedDepthBuffer === true &&
-			this.extensions.has("EXT_clip_control")
-		) {
-			this.state.setReversedDepth(true);
+		if ( parameters.reversedDepthBuffer === true && this.extensions.has( 'EXT_clip_control' ) ) {
+
+			this.state.setReversedDepth( true );
+
 		}
+
 	}
 
 	/**
@@ -68307,7 +68411,9 @@ class WebGLBackend extends Backend {
 	 * @readonly
 	 */
 	get coordinateSystem() {
+
 		return WebGLCoordinateSystem;
+
 	}
 
 	/**
@@ -68318,8 +68424,10 @@ class WebGLBackend extends Backend {
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync(attribute) {
-		return await this.attributeUtils.getArrayBufferAsync(attribute);
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
 	}
 
 	/**
@@ -68329,19 +68437,25 @@ class WebGLBackend extends Backend {
 	 * @return {Promise} A Promise that resolve when the renderer is XR compatible.
 	 */
 	async makeXRCompatible() {
+
 		const attributes = this.gl.getContextAttributes();
 
-		if (attributes.xrCompatible !== true) {
+		if ( attributes.xrCompatible !== true ) {
+
 			await this.gl.makeXRCompatible();
+
 		}
+
 	}
 	/**
 	 * Sets the XR rendering destination.
 	 *
 	 * @param {WebGLFramebuffer} xrFramebuffer - The XR framebuffer.
 	 */
-	setXRTarget(xrFramebuffer) {
+	setXRTarget( xrFramebuffer ) {
+
 		this._xrFramebuffer = xrFramebuffer;
+
 	}
 
 	/**
@@ -68353,38 +68467,30 @@ class WebGLBackend extends Backend {
 	 * @param {WebGLTexture} colorTexture - A native color texture.
 	 * @param {?WebGLTexture} [depthTexture=null] - A native depth texture.
 	 */
-	setXRRenderTargetTextures(renderTarget, colorTexture, depthTexture = null) {
+	setXRRenderTargetTextures( renderTarget, colorTexture, depthTexture = null ) {
+
 		const gl = this.gl;
 
-		this.set(renderTarget.texture, {
-			textureGPU: colorTexture,
-			glInternalFormat: gl.RGBA8,
-		}); // see #24698 why RGBA8 and not SRGB8_ALPHA8 is used
+		this.set( renderTarget.texture, { textureGPU: colorTexture, glInternalFormat: gl.RGBA8 } ); // see #24698 why RGBA8 and not SRGB8_ALPHA8 is used
 
-		if (depthTexture !== null) {
-			const glInternalFormat = renderTarget.stencilBuffer
-				? gl.DEPTH24_STENCIL8
-				: gl.DEPTH_COMPONENT24;
+		if ( depthTexture !== null ) {
 
-			this.set(renderTarget.depthTexture, {
-				textureGPU: depthTexture,
-				glInternalFormat: glInternalFormat,
-			});
+			const glInternalFormat = renderTarget.stencilBuffer ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+
+			this.set( renderTarget.depthTexture, { textureGPU: depthTexture, glInternalFormat: glInternalFormat } );
 
 			// The multisample_render_to_texture extension doesn't work properly if there
 			// are midframe flushes and an external depth texture.
-			if (
-				this.extensions.has("WEBGL_multisampled_render_to_texture") === true &&
-				renderTarget._autoAllocateDepthBuffer === true &&
-				renderTarget.multiview === false
-			) {
-				warn(
-					"WebGLBackend: Render-to-texture extension was disabled because an external texture was provided",
-				);
+			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget._autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
+
+				warn( 'WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
+
 			}
 
 			renderTarget._autoAllocateDepthBuffer = false;
+
 		}
+
 	}
 
 	/**
@@ -68393,25 +68499,27 @@ class WebGLBackend extends Backend {
 	 * @param {string} type - The type of the timestamp query.
 	 * @param {string} uid - A unique identifier for the timestamp query.
 	 */
-	initTimestampQuery(type, uid) {
-		if (!this.disjoint || !this.trackTimestamp) return;
+	initTimestampQuery( type, uid ) {
 
-		if (!this.timestampQueryPool[type]) {
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		if ( ! this.timestampQueryPool[ type ] ) {
+
 			// TODO: Variable maxQueries?
-			this.timestampQueryPool[type] = new WebGLTimestampQueryPool(
-				this.gl,
-				type,
-				2048,
-			);
+			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
+
 		}
 
-		const timestampQueryPool = this.timestampQueryPool[type];
+		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext(uid);
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
-		if (baseOffset !== null) {
-			timestampQueryPool.beginQuery(uid);
+		if ( baseOffset !== null ) {
+
+			timestampQueryPool.beginQuery( uid );
+
 		}
+
 	}
 
 	// timestamp utils
@@ -68422,13 +68530,16 @@ class WebGLBackend extends Backend {
 	 * @param {string} type - The type of the timestamp query.
 	 * @param {string} uid - A unique identifier for the timestamp query.
 	 */
-	prepareTimestampBuffer(type, uid) {
-		if (!this.disjoint || !this.trackTimestamp) return;
+	prepareTimestampBuffer( type, uid ) {
 
-		const timestampQueryPool = this.timestampQueryPool[type];
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
-		timestampQueryPool.endQuery(uid);
+		const timestampQueryPool = this.timestampQueryPool[ type ];
+
+		timestampQueryPool.endQuery( uid );
+
 	}
+
 
 	/**
 	 * Returns the backend's rendering context.
@@ -68436,7 +68547,9 @@ class WebGLBackend extends Backend {
 	 * @return {WebGL2RenderingContext} The rendering context.
 	 */
 	getContext() {
+
 		return this.gl;
+
 	}
 
 	/**
@@ -68445,60 +68558,61 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	beginRender(renderContext) {
+	beginRender( renderContext ) {
+
 		const { state } = this;
-		const renderContextData = this.get(renderContext);
+		const renderContextData = this.get( renderContext );
 
 		//
 
-		if (renderContext.viewport) {
-			this.updateViewport(renderContext);
+		if ( renderContext.viewport ) {
+
+			this.updateViewport( renderContext );
+
 		} else {
+
 			const { width, height } = this.getDrawingBufferSize();
-			state.viewport(0, 0, width, height);
+			state.viewport( 0, 0, width, height );
+
 		}
 
-		if (renderContext.scissor) {
-			this.updateScissor(renderContext);
+		if ( renderContext.scissor ) {
+
+			this.updateScissor( renderContext );
+
 		} else {
+
 			const { width, height } = this.getDrawingBufferSize();
-			state.scissor(0, 0, width, height);
+			state.scissor( 0, 0, width, height );
+
 		}
 
 		//
 
-		this.initTimestampQuery(
-			TimestampQuery.RENDER,
-			this.getTimestampUID(renderContext),
-		);
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
 
-		this._setFramebuffer(renderContext);
-		this.clear(
-			renderContext.clearColor,
-			renderContext.clearDepth,
-			renderContext.clearStencil,
-			renderContext,
-			false,
-		);
+		this._setFramebuffer( renderContext );
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		if (occlusionQueryCount > 0) {
+		if ( occlusionQueryCount > 0 ) {
+
 			// Get a reference to the array of objects with queries. The renderContextData property
 			// can be changed by another render pass before the async reading of all previous queries complete
-			renderContextData.currentOcclusionQueries =
-				renderContextData.occlusionQueries;
-			renderContextData.currentOcclusionQueryObjects =
-				renderContextData.occlusionQueryObjects;
+			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
+			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
 
 			renderContextData.lastOcclusionObject = null;
-			renderContextData.occlusionQueries = new Array(occlusionQueryCount);
-			renderContextData.occlusionQueryObjects = new Array(occlusionQueryCount);
+			renderContextData.occlusionQueries = new Array( occlusionQueryCount );
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 			renderContextData.occlusionQueryIndex = 0;
+
 		}
+
 	}
 
 	/**
@@ -68507,61 +68621,80 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	finishRender(renderContext) {
+	finishRender( renderContext ) {
+
 		const { gl, state } = this;
-		const renderContextData = this.get(renderContext);
+		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
 		state.resetVertexState();
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		if (occlusionQueryCount > 0) {
-			if (occlusionQueryCount > renderContextData.occlusionQueryIndex) {
-				gl.endQuery(gl.ANY_SAMPLES_PASSED);
+		if ( occlusionQueryCount > 0 ) {
+
+			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
 			}
 
-			this.resolveOccludedAsync(renderContext);
+			this.resolveOccludedAsync( renderContext );
+
 		}
 
 		const textures = renderContext.textures;
 
-		if (textures !== null) {
-			for (let i = 0; i < textures.length; i++) {
-				const texture = textures[i];
+		if ( textures !== null ) {
 
-				if (texture.generateMipmaps) {
-					this.generateMipmaps(texture);
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( texture.generateMipmaps ) {
+
+					this.generateMipmaps( texture );
+
 				}
+
 			}
+
 		}
 
 		this._currentContext = previousContext;
 
-		this._resolveRenderTarget(renderContext);
+		this._resolveRenderTarget( renderContext );
 
-		if (previousContext !== null) {
-			this._setFramebuffer(previousContext);
+		if ( previousContext !== null ) {
 
-			if (previousContext.viewport) {
-				this.updateViewport(previousContext);
+			this._setFramebuffer( previousContext );
+
+			if ( previousContext.viewport ) {
+
+				this.updateViewport( previousContext );
+
 			} else {
+
 				const { width, height } = this.getDrawingBufferSize();
-				state.viewport(0, 0, width, height);
+				state.viewport( 0, 0, width, height );
+
 			}
 
-			if (previousContext.scissor) {
-				this.updateScissor(previousContext);
+			if ( previousContext.scissor ) {
+
+				this.updateScissor( previousContext );
+
 			} else {
+
 				const { width, height } = this.getDrawingBufferSize();
-				state.scissor(0, 0, width, height);
+				state.scissor( 0, 0, width, height );
+
 			}
+
 		}
 
-		this.prepareTimestampBuffer(
-			TimestampQuery.RENDER,
-			this.getTimestampUID(renderContext),
-		);
+		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
+
 	}
 
 	/**
@@ -68571,15 +68704,16 @@ class WebGLBackend extends Backend {
 	 * @async
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	resolveOccludedAsync(renderContext) {
-		const renderContextData = this.get(renderContext);
+	resolveOccludedAsync( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
 
 		// handle occlusion query results
 
-		const { currentOcclusionQueries, currentOcclusionQueryObjects } =
-			renderContextData;
+		const { currentOcclusionQueries, currentOcclusionQueryObjects } = renderContextData;
 
-		if (currentOcclusionQueries && currentOcclusionQueryObjects) {
+		if ( currentOcclusionQueries && currentOcclusionQueryObjects ) {
+
 			const occluded = new WeakSet();
 			const { gl } = this;
 
@@ -68587,34 +68721,45 @@ class WebGLBackend extends Backend {
 			renderContextData.currentOcclusionQueries = null;
 
 			const check = () => {
+
 				let completed = 0;
 
 				// check all queries and requeue as appropriate
-				for (let i = 0; i < currentOcclusionQueries.length; i++) {
-					const query = currentOcclusionQueries[i];
+				for ( let i = 0; i < currentOcclusionQueries.length; i ++ ) {
 
-					if (query === null) continue;
+					const query = currentOcclusionQueries[ i ];
 
-					if (gl.getQueryParameter(query, gl.QUERY_RESULT_AVAILABLE)) {
-						if (gl.getQueryParameter(query, gl.QUERY_RESULT) === 0)
-							occluded.add(currentOcclusionQueryObjects[i]);
+					if ( query === null ) continue;
 
-						currentOcclusionQueries[i] = null;
-						gl.deleteQuery(query);
+					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
 
-						completed++;
+						if ( gl.getQueryParameter( query, gl.QUERY_RESULT ) === 0 ) occluded.add( currentOcclusionQueryObjects[ i ] );
+
+						currentOcclusionQueries[ i ] = null;
+						gl.deleteQuery( query );
+
+						completed ++;
+
 					}
+
 				}
 
-				if (completed < currentOcclusionQueries.length) {
-					requestAnimationFrame(check);
+				if ( completed < currentOcclusionQueries.length ) {
+
+					requestAnimationFrame( check );
+
 				} else {
+
 					renderContextData.occluded = occluded;
+
 				}
+
 			};
 
 			check();
+
 		}
+
 	}
 
 	/**
@@ -68625,10 +68770,12 @@ class WebGLBackend extends Backend {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
-	isOccluded(renderContext, object) {
-		const renderContextData = this.get(renderContext);
+	isOccluded( renderContext, object ) {
 
-		return renderContextData.occluded && renderContextData.occluded.has(object);
+		const renderContextData = this.get( renderContext );
+
+		return renderContextData.occluded && renderContextData.occluded.has( object );
+
 	}
 
 	/**
@@ -68636,11 +68783,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateViewport(renderContext) {
+	updateViewport( renderContext ) {
+
 		const { state } = this;
 		const { x, y, width, height } = renderContext.viewportValue;
 
-		state.viewport(x, renderContext.height - height - y, width, height);
+		state.viewport( x, renderContext.height - height - y, width, height );
+
 	}
 
 	/**
@@ -68648,11 +68797,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateScissor(renderContext) {
+	updateScissor( renderContext ) {
+
 		const { state } = this;
 		const { x, y, width, height } = renderContext.scissorValue;
 
-		state.scissor(x, renderContext.height - height - y, width, height);
+		state.scissor( x, renderContext.height - height - y, width, height );
+
 	}
 
 	/**
@@ -68660,10 +68811,12 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
-	setScissorTest(boolean) {
+	setScissorTest( boolean ) {
+
 		const state = this.state;
 
-		state.setScissorTest(boolean);
+		state.setScissorTest( boolean );
+
 	}
 
 	/**
@@ -68673,6 +68826,7 @@ class WebGLBackend extends Backend {
 	 * @return {Color4} The clear color.
 	 */
 	getClearColor() {
+
 		const clearColor = super.getClearColor();
 
 		// Since the canvas is always created with alpha: true,
@@ -68683,6 +68837,7 @@ class WebGLBackend extends Backend {
 		clearColor.b *= clearColor.a;
 
 		return clearColor;
+
 	}
 
 	/**
@@ -68696,80 +68851,95 @@ class WebGLBackend extends Backend {
 	 * @param {boolean} [resolveRenderTarget=true] - Controls whether an active render target should be resolved
 	 * or not. Only relevant for explicit clears.
 	 */
-	clear(
-		color,
-		depth,
-		stencil,
-		descriptor = null,
-		setFrameBuffer = true,
-		resolveRenderTarget = true,
-	) {
+	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true, resolveRenderTarget = true ) {
+
 		const { gl, renderer } = this;
 
-		if (descriptor === null) {
+		if ( descriptor === null ) {
+
 			const clearColor = this.getClearColor();
 
 			descriptor = {
 				textures: null,
-				clearColorValue: clearColor,
+				clearColorValue: clearColor
 			};
+
 		}
 
 		//
 
 		let clear = 0;
 
-		if (color) clear |= gl.COLOR_BUFFER_BIT;
-		if (depth) clear |= gl.DEPTH_BUFFER_BIT;
-		if (stencil) clear |= gl.STENCIL_BUFFER_BIT;
+		if ( color ) clear |= gl.COLOR_BUFFER_BIT;
+		if ( depth ) clear |= gl.DEPTH_BUFFER_BIT;
+		if ( stencil ) clear |= gl.STENCIL_BUFFER_BIT;
 
-		if (clear !== 0) {
+		if ( clear !== 0 ) {
+
 			let clearColor;
 
-			if (descriptor.clearColorValue) {
+			if ( descriptor.clearColorValue ) {
+
 				clearColor = descriptor.clearColorValue;
+
 			} else {
+
 				clearColor = this.getClearColor();
+
 			}
 
 			const clearDepth = renderer.getClearDepth();
 			const clearStencil = renderer.getClearStencil();
 
-			if (depth) this.state.setDepthMask(true);
+			if ( depth ) this.state.setDepthMask( true );
 
-			if (descriptor.textures === null) {
-				gl.clearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-				gl.clear(clear);
+			if ( descriptor.textures === null ) {
+
+				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				gl.clear( clear );
+
 			} else {
-				if (setFrameBuffer) this._setFramebuffer(descriptor);
 
-				if (color) {
-					for (let i = 0; i < descriptor.textures.length; i++) {
-						if (i === 0) {
-							gl.clearBufferfv(gl.COLOR, i, [
-								clearColor.r,
-								clearColor.g,
-								clearColor.b,
-								clearColor.a,
-							]);
+				if ( setFrameBuffer ) this._setFramebuffer( descriptor );
+
+				if ( color ) {
+
+					for ( let i = 0; i < descriptor.textures.length; i ++ ) {
+
+						if ( i === 0 ) {
+
+							gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
 						} else {
-							gl.clearBufferfv(gl.COLOR, i, [0, 0, 0, 1]);
+
+							gl.clearBufferfv( gl.COLOR, i, [ 0, 0, 0, 1 ] );
+
 						}
+
 					}
+
 				}
 
-				if (depth && stencil) {
-					gl.clearBufferfi(gl.DEPTH_STENCIL, 0, clearDepth, clearStencil);
-				} else if (depth) {
-					gl.clearBufferfv(gl.DEPTH, 0, [clearDepth]);
-				} else if (stencil) {
-					gl.clearBufferiv(gl.STENCIL, 0, [clearStencil]);
+				if ( depth && stencil ) {
+
+					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, clearDepth, clearStencil );
+
+				} else if ( depth ) {
+
+					gl.clearBufferfv( gl.DEPTH, 0, [ clearDepth ] );
+
+				} else if ( stencil ) {
+
+					gl.clearBufferiv( gl.STENCIL, 0, [ clearStencil ] );
+
 				}
 
-				if (setFrameBuffer && resolveRenderTarget)
-					this._resolveRenderTarget(descriptor);
+				if ( setFrameBuffer && resolveRenderTarget ) this._resolveRenderTarget( descriptor );
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -68778,16 +68948,15 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute(computeGroup) {
+	beginCompute( computeGroup ) {
+
 		const { state, gl } = this;
 
 		//
 
-		state.bindFramebuffer(gl.FRAMEBUFFER, null);
-		this.initTimestampQuery(
-			TimestampQuery.COMPUTE,
-			this.getTimestampUID(computeGroup),
-		);
+		state.bindFramebuffer( gl.FRAMEBUFFER, null );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
+
 	}
 
 	/**
@@ -68799,79 +68968,89 @@ class WebGLBackend extends Backend {
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {?number} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
 	 */
-	compute(computeGroup, computeNode, bindings, pipeline, count = null) {
+	compute( computeGroup, computeNode, bindings, pipeline, count = null ) {
+
 		const { state, gl } = this;
 
-		if (this.discard === false) {
+		if ( this.discard === false ) {
+
 			// required here to handle async behaviour of render.compute()
-			state.enable(gl.RASTERIZER_DISCARD);
+			state.enable( gl.RASTERIZER_DISCARD );
 			this.discard = true;
+
 		}
 
-		const { programGPU, transformBuffers, attributes } = this.get(pipeline);
+		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
-		const vaoKey = this._getVaoKey(attributes);
+		const vaoKey = this._getVaoKey( attributes );
 
-		const vaoGPU = this.vaoCache[vaoKey];
+		const vaoGPU = this.vaoCache[ vaoKey ];
 
-		if (vaoGPU === undefined) {
-			this.vaoCache[vaoKey] = this._createVao(attributes);
+		if ( vaoGPU === undefined ) {
+
+			this.vaoCache[ vaoKey ] = this._createVao( attributes );
+
 		} else {
-			state.setVertexState(vaoGPU);
+
+			state.setVertexState( vaoGPU );
+
 		}
 
-		state.useProgram(programGPU);
+		state.useProgram( programGPU );
 
-		this._bindUniforms(bindings);
+		this._bindUniforms( bindings );
 
-		const transformFeedbackGPU = this._getTransformFeedback(transformBuffers);
+		const transformFeedbackGPU = this._getTransformFeedback( transformBuffers );
 
-		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedbackGPU);
-		gl.beginTransformFeedback(gl.POINTS);
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+		gl.beginTransformFeedback( gl.POINTS );
 
-		count = count !== null ? count : computeNode.count;
+		count = ( count !== null ) ? count : computeNode.count;
 
-		if (Array.isArray(count)) {
-			warnOnce(
-				"WebGLBackend.compute(): The count parameter must be a single number, not an array.",
-			);
+		if ( Array.isArray( count ) ) {
 
-			count = count[0];
-		} else if (
-			count &&
-			typeof count === "object" &&
-			count.isIndirectStorageBufferAttribute
-		) {
-			warnOnce(
-				"WebGLBackend.compute(): The count parameter must be a single number, not IndirectStorageBufferAttribute",
-			);
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not an array.' );
+
+			count = count[ 0 ];
+
+		} else if ( count && typeof count === 'object' && count.isIndirectStorageBufferAttribute ) {
+
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not IndirectStorageBufferAttribute' );
 
 			count = computeNode.count;
+
 		}
 
-		if (attributes[0].isStorageInstancedBufferAttribute) {
-			gl.drawArraysInstanced(gl.POINTS, 0, 1, count);
+		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
+
+			gl.drawArraysInstanced( gl.POINTS, 0, 1, count );
+
 		} else {
-			gl.drawArrays(gl.POINTS, 0, count);
+
+			gl.drawArrays( gl.POINTS, 0, count );
+
 		}
 
 		gl.endTransformFeedback();
-		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
 
 		// switch active buffers
 
-		for (let i = 0; i < transformBuffers.length; i++) {
-			const dualAttributeData = transformBuffers[i];
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			if (dualAttributeData.pbo && this.has(dualAttributeData.pbo)) {
-				this.textureUtils.copyBufferToTexture(
-					dualAttributeData.transformBuffer,
-					dualAttributeData.pbo,
-				);
+			const dualAttributeData = transformBuffers[ i ];
+
+			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
+
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
+
 			}
 
 			dualAttributeData.switchBuffers();
+
+
 		}
+
 	}
 
 	/**
@@ -68880,21 +69059,22 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute(computeGroup) {
+	finishCompute( computeGroup ) {
+
 		const { state, gl } = this;
 
 		this.discard = false;
 
-		state.disable(gl.RASTERIZER_DISCARD);
+		state.disable( gl.RASTERIZER_DISCARD );
 
-		this.prepareTimestampBuffer(
-			TimestampQuery.COMPUTE,
-			this.getTimestampUID(computeGroup),
-		);
+		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
-		if (this._currentContext) {
-			this._setFramebuffer(this._currentContext);
+		if ( this._currentContext ) {
+
+			this._setFramebuffer( this._currentContext );
+
 		}
+
 	}
 
 	/**
@@ -68905,12 +69085,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @private
 	 */
-	_isRenderCameraDepthArray(renderContext) {
-		return (
-			renderContext.depthTexture &&
-			renderContext.depthTexture.isArrayTexture &&
-			renderContext.camera.isArrayCamera
-		);
+	_isRenderCameraDepthArray( renderContext ) {
+
+		return renderContext.depthTexture && renderContext.depthTexture.isArrayTexture && renderContext.camera.isArrayCamera;
+
 	}
 
 	/**
@@ -68919,98 +69097,113 @@ class WebGLBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object to draw.
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 */
-	draw(renderObject /*, info*/) {
-		const { object, pipeline, material, context, hardwareClippingPlanes } =
-			renderObject;
-		const { programGPU } = this.get(pipeline);
+	draw( renderObject/*, info*/ ) {
+
+		const { object, pipeline, material, context, hardwareClippingPlanes } = renderObject;
+		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
 
-		const contextData = this.get(context);
+		const contextData = this.get( context );
 
 		const drawParams = renderObject.getDrawParameters();
 
-		if (drawParams === null) return;
+		if ( drawParams === null ) return;
 
 		//
 
-		this._bindUniforms(renderObject.getBindings());
+		this._bindUniforms( renderObject.getBindings() );
 
-		const frontFaceCW = object.isMesh && object.matrixWorld.determinant() < 0;
+		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
-		state.setMaterial(material, frontFaceCW, hardwareClippingPlanes);
+		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
 
-		if (context.mrt !== null && context.textures !== null) {
-			state.setMRTBlending(context.textures, context.mrt, material);
+		if ( context.mrt !== null && context.textures !== null ) {
+
+			state.setMRTBlending( context.textures, context.mrt, material );
+
 		}
 
-		state.useProgram(programGPU);
+		state.useProgram( programGPU );
 
 		// vertex state
 
 		const attributes = renderObject.getAttributes();
-		const attributesData = this.get(attributes);
+		const attributesData = this.get( attributes );
 
 		let vaoGPU = attributesData.vaoGPU;
 
-		if (vaoGPU === undefined) {
-			const vaoKey = this._getVaoKey(attributes);
+		if ( vaoGPU === undefined ) {
 
-			vaoGPU = this.vaoCache[vaoKey];
+			const vaoKey = this._getVaoKey( attributes );
 
-			if (vaoGPU === undefined) {
-				vaoGPU = this._createVao(attributes);
+			vaoGPU = this.vaoCache[ vaoKey ];
 
-				this.vaoCache[vaoKey] = vaoGPU;
+			if ( vaoGPU === undefined ) {
+
+				vaoGPU = this._createVao( attributes );
+
+				this.vaoCache[ vaoKey ] = vaoGPU;
 				attributesData.vaoGPU = vaoGPU;
+
 			}
+
 		}
 
 		const index = renderObject.getIndex();
-		const indexGPU = index !== null ? this.get(index).bufferGPU : null;
+		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
 
-		state.setVertexState(vaoGPU, indexGPU);
+		state.setVertexState( vaoGPU, indexGPU );
 
 		//
 
 		const lastObject = contextData.lastOcclusionObject;
 
-		if (lastObject !== object && lastObject !== undefined) {
-			if (lastObject !== null && lastObject.occlusionTest === true) {
-				gl.endQuery(gl.ANY_SAMPLES_PASSED);
+		if ( lastObject !== object && lastObject !== undefined ) {
 
-				contextData.occlusionQueryIndex++;
+			if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+				contextData.occlusionQueryIndex ++;
+
 			}
 
-			if (object.occlusionTest === true) {
+			if ( object.occlusionTest === true ) {
+
 				const query = gl.createQuery();
 
-				gl.beginQuery(gl.ANY_SAMPLES_PASSED, query);
+				gl.beginQuery( gl.ANY_SAMPLES_PASSED, query );
 
-				contextData.occlusionQueries[contextData.occlusionQueryIndex] = query;
-				contextData.occlusionQueryObjects[contextData.occlusionQueryIndex] =
-					object;
+				contextData.occlusionQueries[ contextData.occlusionQueryIndex ] = query;
+				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+
 			}
 
 			contextData.lastOcclusionObject = object;
+
 		}
 
 		//
 		const renderer = this.bufferRenderer;
 
-		if (object.isPoints) renderer.mode = gl.POINTS;
-		else if (object.isLineSegments) renderer.mode = gl.LINES;
-		else if (object.isLine) renderer.mode = gl.LINE_STRIP;
-		else if (object.isLineLoop) renderer.mode = gl.LINE_LOOP;
+		if ( object.isPoints ) renderer.mode = gl.POINTS;
+		else if ( object.isLineSegments ) renderer.mode = gl.LINES;
+		else if ( object.isLine ) renderer.mode = gl.LINE_STRIP;
+		else if ( object.isLineLoop ) renderer.mode = gl.LINE_LOOP;
 		else {
-			if (material.wireframe === true) {
-				state.setLineWidth(
-					material.wireframeLinewidth * this.renderer.getPixelRatio(),
-				);
+
+			if ( material.wireframe === true ) {
+
+				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
 				renderer.mode = gl.LINES;
+
 			} else {
+
 				renderer.mode = gl.TRIANGLES;
+
 			}
+
 		}
 
 		//
@@ -69020,161 +69213,167 @@ class WebGLBackend extends Backend {
 
 		renderer.object = object;
 
-		if (index !== null) {
+		if ( index !== null ) {
+
 			firstVertex *= index.array.BYTES_PER_ELEMENT;
 
-			const indexData = this.get(index);
+			const indexData = this.get( index );
 
 			renderer.index = index.count;
 			renderer.type = indexData.type;
+
 		} else {
+
 			renderer.index = 0;
+
 		}
 
 		const draw = () => {
-			if (object.isBatchedMesh) {
-				if (object._multiDrawInstances !== null) {
+
+			if ( object.isBatchedMesh ) {
+
+				if ( object._multiDrawInstances !== null ) {
+
 					// @deprecated, r174
-					warnOnce(
-						"WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.",
-					);
-					renderer.renderMultiDrawInstances(
-						object._multiDrawStarts,
-						object._multiDrawCounts,
-						object._multiDrawCount,
-						object._multiDrawInstances,
-					);
-				} else if (!this.hasFeature("WEBGL_multi_draw")) {
-					warnOnce("WebGLBackend: WEBGL_multi_draw not supported.");
+					warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
+
+					warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
+
 				} else {
-					renderer.renderMultiDraw(
-						object._multiDrawStarts,
-						object._multiDrawCounts,
-						object._multiDrawCount,
-					);
+
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
 				}
-			} else if (instanceCount > 1) {
-				renderer.renderInstances(firstVertex, vertexCount, instanceCount);
+
+			} else if ( instanceCount > 1 ) {
+
+				renderer.renderInstances( firstVertex, vertexCount, instanceCount );
+
 			} else {
-				renderer.render(firstVertex, vertexCount);
+
+				renderer.render( firstVertex, vertexCount );
+
 			}
+
 		};
 
-		if (
-			renderObject.camera.isArrayCamera === true &&
-			renderObject.camera.cameras.length > 0 &&
-			renderObject.camera.isMultiViewCamera === false
-		) {
-			const cameraData = this.get(renderObject.camera);
-			const cameras = renderObject.camera.cameras;
-			const cameraIndex =
-				renderObject.getBindingGroup("cameraIndex").bindings[0];
+		if ( renderObject.camera.isArrayCamera === true && renderObject.camera.cameras.length > 0 && renderObject.camera.isMultiViewCamera === false ) {
 
-			if (
-				cameraData.indexesGPU === undefined ||
-				cameraData.indexesGPU.length !== cameras.length
-			) {
-				const data = new Uint32Array([0, 0, 0, 0]);
+			const cameraData = this.get( renderObject.camera );
+			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' ).bindings[ 0 ];
+
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
+
+				const data = new Uint32Array( [ 0, 0, 0, 0 ] );
 				const indexesGPU = [];
 
-				for (let i = 0, len = cameras.length; i < len; i++) {
+				for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+
 					const bufferGPU = gl.createBuffer();
 
-					data[0] = i;
+					data[ 0 ] = i;
 
-					gl.bindBuffer(gl.UNIFORM_BUFFER, bufferGPU);
-					gl.bufferData(gl.UNIFORM_BUFFER, data, gl.STATIC_DRAW);
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.STATIC_DRAW );
 
-					indexesGPU.push(bufferGPU);
+					indexesGPU.push( bufferGPU );
+
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
+
 			}
 
-			const cameraIndexData = this.get(cameraIndex);
+			const cameraIndexData = this.get( cameraIndex );
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			const renderTarget = this._currentContext.renderTarget;
-			const isRenderCameraDepthArray = this._isRenderCameraDepthArray(
-				this._currentContext,
-			);
+			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( this._currentContext );
 			const prevActiveCubeFace = this._currentContext.activeCubeFace;
 
-			if (isRenderCameraDepthArray) {
-				// Clear the depth texture
-				const textureData = this.get(renderTarget.depthTexture);
+			if ( isRenderCameraDepthArray ) {
 
-				if (
-					textureData.clearedRenderId !==
-					this.renderer._nodes.nodeFrame.renderId
-				) {
+				// Clear the depth texture
+				const textureData = this.get( renderTarget.depthTexture );
+
+				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
+
 					textureData.clearedRenderId = this.renderer._nodes.nodeFrame.renderId;
 
 					const { stencilBuffer } = renderTarget;
 
-					for (let i = 0, len = cameras.length; i < len; i++) {
+					for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+
 						this.renderer._activeCubeFace = i;
 						this._currentContext.activeCubeFace = i;
 
-						this._setFramebuffer(this._currentContext);
-						this.clear(
-							false,
-							true,
-							stencilBuffer,
-							this._currentContext,
-							false,
-							false,
-						);
+						this._setFramebuffer( this._currentContext );
+						this.clear( false, true, stencilBuffer, this._currentContext, false, false );
+
 					}
 
 					this.renderer._activeCubeFace = prevActiveCubeFace;
 					this._currentContext.activeCubeFace = prevActiveCubeFace;
+
 				}
+
 			}
 
-			for (let i = 0, len = cameras.length; i < len; i++) {
-				const subCamera = cameras[i];
+			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
-				if (object.layers.test(subCamera.layers)) {
-					if (isRenderCameraDepthArray) {
+				const subCamera = cameras[ i ];
+
+				if ( object.layers.test( subCamera.layers ) ) {
+
+					if ( isRenderCameraDepthArray ) {
+
 						// Update the active layer
 						this.renderer._activeCubeFace = i;
 						this._currentContext.activeCubeFace = i;
 
-						this._setFramebuffer(this._currentContext);
+						this._setFramebuffer( this._currentContext );
+
 					}
 
 					const vp = subCamera.viewport;
 
-					if (vp !== undefined) {
+					if ( vp !== undefined ) {
+
 						const x = vp.x * pixelRatio;
 						const y = vp.y * pixelRatio;
 						const width = vp.width * pixelRatio;
 						const height = vp.height * pixelRatio;
 
 						state.viewport(
-							Math.floor(x),
-							Math.floor(renderObject.context.height - height - y),
-							Math.floor(width),
-							Math.floor(height),
+							Math.floor( x ),
+							Math.floor( renderObject.context.height - height - y ),
+							Math.floor( width ),
+							Math.floor( height )
 						);
+
 					}
 
-					state.bindBufferBase(
-						gl.UNIFORM_BUFFER,
-						cameraIndexData.index,
-						cameraData.indexesGPU[i],
-					);
+					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
 
 					draw();
+
 				}
 
 				this._currentContext.activeCubeFace = prevActiveCubeFace;
 				this.renderer._activeCubeFace = prevActiveCubeFace;
+
 			}
+
 		} else {
+
 			draw();
+
 		}
+
 	}
 
 	/**
@@ -69183,8 +69382,10 @@ class WebGLBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {boolean} Whether the render pipeline requires an update or not.
 	 */
-	needsRenderUpdate(/*renderObject*/) {
+	needsRenderUpdate( /*renderObject*/ ) {
+
 		return false;
+
 	}
 
 	/**
@@ -69193,8 +69394,10 @@ class WebGLBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {string} The cache key.
 	 */
-	getRenderCacheKey(/*renderObject*/) {
-		return "";
+	getRenderCacheKey( /*renderObject*/ ) {
+
+		return '';
+
 	}
 
 	// textures
@@ -69205,8 +69408,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Texture} texture - The texture to create a default texture for.
 	 */
-	createDefaultTexture(texture) {
-		this.textureUtils.createDefaultTexture(texture);
+	createDefaultTexture( texture ) {
+
+		this.textureUtils.createDefaultTexture( texture );
+
 	}
 
 	/**
@@ -69215,8 +69420,10 @@ class WebGLBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	createTexture(texture, options) {
-		this.textureUtils.createTexture(texture, options);
+	createTexture( texture, options ) {
+
+		this.textureUtils.createTexture( texture, options );
+
 	}
 
 	/**
@@ -69225,8 +69432,10 @@ class WebGLBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	updateTexture(texture, options) {
-		this.textureUtils.updateTexture(texture, options);
+	updateTexture( texture, options ) {
+
+		this.textureUtils.updateTexture( texture, options );
+
 	}
 
 	/**
@@ -69234,8 +69443,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
-	generateMipmaps(texture) {
-		this.textureUtils.generateMipmaps(texture);
+	generateMipmaps( texture ) {
+
+		this.textureUtils.generateMipmaps( texture );
+
 	}
 
 	/**
@@ -69244,8 +69455,10 @@ class WebGLBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture(texture, isDefaultTexture = false) {
-		this.textureUtils.destroyTexture(texture, isDefaultTexture);
+	destroyTexture( texture, isDefaultTexture = false ) {
+
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
+
 	}
 
 	/**
@@ -69260,15 +69473,10 @@ class WebGLBackend extends Backend {
 	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer(texture, x, y, width, height, faceIndex) {
-		return this.textureUtils.copyTextureToBuffer(
-			texture,
-			x,
-			y,
-			width,
-			height,
-			faceIndex,
-		);
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
+
 	}
 
 	/**
@@ -69277,8 +69485,10 @@ class WebGLBackend extends Backend {
 	 * @param {Texture} texture - The texture to update the sampler for.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler(/*texture*/) {
-		return "";
+	updateSampler( /*texture*/ ) {
+
+		return '';
+
 	}
 
 	// node builder
@@ -69290,8 +69500,10 @@ class WebGLBackend extends Backend {
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {GLSLNodeBuilder} The node builder.
 	 */
-	createNodeBuilder(object, renderer) {
-		return new GLSLNodeBuilder(object, renderer);
+	createNodeBuilder( object, renderer ) {
+
+		return new GLSLNodeBuilder( object, renderer );
+
 	}
 
 	// program
@@ -69301,21 +69513,20 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	createProgram(program) {
+	createProgram( program ) {
+
 		const gl = this.gl;
 		const { stage, code } = program;
 
-		const shader =
-			stage === "fragment"
-				? gl.createShader(gl.FRAGMENT_SHADER)
-				: gl.createShader(gl.VERTEX_SHADER);
+		const shader = stage === 'fragment' ? gl.createShader( gl.FRAGMENT_SHADER ) : gl.createShader( gl.VERTEX_SHADER );
 
-		gl.shaderSource(shader, code);
-		gl.compileShader(shader);
+		gl.shaderSource( shader, code );
+		gl.compileShader( shader );
 
-		this.set(program, {
-			shaderGPU: shader,
-		});
+		this.set( program, {
+			shaderGPU: shader
+		} );
+
 	}
 
 	/**
@@ -69323,8 +69534,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	destroyProgram(program) {
-		this.delete(program);
+	destroyProgram( program ) {
+
+		this.delete( program );
+
 	}
 
 	/**
@@ -69333,7 +69546,8 @@ class WebGLBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
 	 */
-	createRenderPipeline(renderObject, promises) {
+	createRenderPipeline( renderObject, promises ) {
+
 		const gl = this.gl;
 		const pipeline = renderObject.pipeline;
 
@@ -69343,42 +69557,51 @@ class WebGLBackend extends Backend {
 
 		const programGPU = gl.createProgram();
 
-		const fragmentShader = this.get(fragmentProgram).shaderGPU;
-		const vertexShader = this.get(vertexProgram).shaderGPU;
+		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
+		const vertexShader = this.get( vertexProgram ).shaderGPU;
 
-		gl.attachShader(programGPU, fragmentShader);
-		gl.attachShader(programGPU, vertexShader);
-		gl.linkProgram(programGPU);
+		gl.attachShader( programGPU, fragmentShader );
+		gl.attachShader( programGPU, vertexShader );
+		gl.linkProgram( programGPU );
 
-		this.set(pipeline, {
+		this.set( pipeline, {
 			programGPU,
 			fragmentShader,
-			vertexShader,
-		});
+			vertexShader
+		} );
 
-		if (promises !== null && this.parallel) {
-			const p = new Promise((resolve /*, reject*/) => {
+		if ( promises !== null && this.parallel ) {
+
+			const p = new Promise( ( resolve /*, reject*/ ) => {
+
 				const parallel = this.parallel;
 				const checkStatus = () => {
-					if (
-						gl.getProgramParameter(programGPU, parallel.COMPLETION_STATUS_KHR)
-					) {
-						this._completeCompile(renderObject, pipeline);
+
+					if ( gl.getProgramParameter( programGPU, parallel.COMPLETION_STATUS_KHR ) ) {
+
+						this._completeCompile( renderObject, pipeline );
 						resolve();
+
 					} else {
-						requestAnimationFrame(checkStatus);
+
+						requestAnimationFrame( checkStatus );
+
 					}
+
 				};
 
 				checkStatus();
-			});
 
-			promises.push(p);
+			} );
+
+			promises.push( p );
 
 			return;
+
 		}
 
-		this._completeCompile(renderObject, pipeline);
+		this._completeCompile( renderObject, pipeline );
+
 	}
 
 	/**
@@ -69389,19 +69612,23 @@ class WebGLBackend extends Backend {
 	 * @param {number} errorLine - The error line.
 	 * @return {string} The formatted code.
 	 */
-	_handleSource(string, errorLine) {
-		const lines = string.split("\n");
+	_handleSource( string, errorLine ) {
+
+		const lines = string.split( '\n' );
 		const lines2 = [];
 
-		const from = Math.max(errorLine - 6, 0);
-		const to = Math.min(errorLine + 6, lines.length);
+		const from = Math.max( errorLine - 6, 0 );
+		const to = Math.min( errorLine + 6, lines.length );
 
-		for (let i = from; i < to; i++) {
+		for ( let i = from; i < to; i ++ ) {
+
 			const line = i + 1;
-			lines2.push(`${line === errorLine ? ">" : " "} ${line}: ${lines[i]}`);
+			lines2.push( `${line === errorLine ? '>' : ' '} ${line}: ${lines[ i ]}` );
+
 		}
 
-		return lines2.join("\n");
+		return lines2.join( '\n' );
+
 	}
 
 	/**
@@ -69413,27 +69640,27 @@ class WebGLBackend extends Backend {
 	 * @param {string} type - The shader type.
 	 * @return {string} The shader errors.
 	 */
-	_getShaderErrors(gl, shader, type) {
-		const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+	_getShaderErrors( gl, shader, type ) {
 
-		const shaderInfoLog = gl.getShaderInfoLog(shader) || "";
+		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+
+		const shaderInfoLog = gl.getShaderInfoLog( shader ) || '';
 		const errors = shaderInfoLog.trim();
 
-		if (status && errors === "") return "";
+		if ( status && errors === '' ) return '';
 
-		const errorMatches = /ERROR: 0:(\d+)/.exec(errors);
-		if (errorMatches) {
-			const errorLine = parseInt(errorMatches[1]);
-			return (
-				type.toUpperCase() +
-				"\n\n" +
-				errors +
-				"\n\n" +
-				this._handleSource(gl.getShaderSource(shader), errorLine)
-			);
+		const errorMatches = /ERROR: 0:(\d+)/.exec( errors );
+		if ( errorMatches ) {
+
+			const errorLine = parseInt( errorMatches[ 1 ] );
+			return type.toUpperCase() + '\n\n' + errors + '\n\n' + this._handleSource( gl.getShaderSource( shader ), errorLine );
+
 		} else {
+
 			return errors;
+
 		}
+
 	}
 
 	/**
@@ -69444,54 +69671,46 @@ class WebGLBackend extends Backend {
 	 * @param {WebGLShader} glFragmentShader - The fragment shader as a native WebGL shader object.
 	 * @param {WebGLShader} glVertexShader - The vertex shader as a native WebGL shader object.
 	 */
-	_logProgramError(programGPU, glFragmentShader, glVertexShader) {
-		if (this.renderer.debug.checkShaderErrors) {
+	_logProgramError( programGPU, glFragmentShader, glVertexShader ) {
+
+		if ( this.renderer.debug.checkShaderErrors ) {
+
 			const gl = this.gl;
 
-			const programInfoLog = gl.getProgramInfoLog(programGPU) || "";
+			const programInfoLog = gl.getProgramInfoLog( programGPU ) || '';
 			const programLog = programInfoLog.trim();
 
-			if (gl.getProgramParameter(programGPU, gl.LINK_STATUS) === false) {
-				if (typeof this.renderer.debug.onShaderError === "function") {
-					this.renderer.debug.onShaderError(
-						gl,
-						programGPU,
-						glVertexShader,
-						glFragmentShader,
-					);
+			if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+				if ( typeof this.renderer.debug.onShaderError === 'function' ) {
+
+					this.renderer.debug.onShaderError( gl, programGPU, glVertexShader, glFragmentShader );
+
 				} else {
+
 					// default error reporting
 
-					const vertexErrors = this._getShaderErrors(
-						gl,
-						glVertexShader,
-						"vertex",
-					);
-					const fragmentErrors = this._getShaderErrors(
-						gl,
-						glFragmentShader,
-						"fragment",
-					);
+					const vertexErrors = this._getShaderErrors( gl, glVertexShader, 'vertex' );
+					const fragmentErrors = this._getShaderErrors( gl, glFragmentShader, 'fragment' );
 
 					error(
-						"THREE.WebGLProgram: Shader Error " +
-							gl.getError() +
-							" - " +
-							"VALIDATE_STATUS " +
-							gl.getProgramParameter(programGPU, gl.VALIDATE_STATUS) +
-							"\n\n" +
-							"Program Info Log: " +
-							programLog +
-							"\n" +
-							vertexErrors +
-							"\n" +
-							fragmentErrors,
+						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'VALIDATE_STATUS ' + gl.getProgramParameter( programGPU, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Program Info Log: ' + programLog + '\n' +
+						vertexErrors + '\n' +
+						fragmentErrors
 					);
+
 				}
-			} else if (programLog !== "") {
-				warn("WebGLProgram: Program Info Log:", programLog);
+
+			} else if ( programLog !== '' ) {
+
+				warn( 'WebGLProgram: Program Info Log:', programLog );
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -69501,28 +69720,32 @@ class WebGLBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {RenderPipeline} pipeline - The render pipeline.
 	 */
-	_completeCompile(renderObject, pipeline) {
+	_completeCompile( renderObject, pipeline ) {
+
 		const { state, gl } = this;
-		const pipelineData = this.get(pipeline);
+		const pipelineData = this.get( pipeline );
 		const { programGPU, fragmentShader, vertexShader } = pipelineData;
 
-		if (gl.getProgramParameter(programGPU, gl.LINK_STATUS) === false) {
-			this._logProgramError(programGPU, fragmentShader, vertexShader);
+		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
+
 		}
 
-		state.useProgram(programGPU);
+		state.useProgram( programGPU );
 
 		// Bindings
 
 		const bindings = renderObject.getBindings();
 
-		this._setupBindings(bindings, programGPU);
+		this._setupBindings( bindings, programGPU );
 
 		//
 
-		this.set(pipeline, {
-			programGPU,
-		});
+		this.set( pipeline, {
+			programGPU
+		} );
+
 	}
 
 	/**
@@ -69531,89 +69754,98 @@ class WebGLBackend extends Backend {
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 */
-	createComputePipeline(computePipeline, bindings) {
+	createComputePipeline( computePipeline, bindings ) {
+
 		const { state, gl } = this;
 
 		// Program
 
 		const fragmentProgram = {
-			stage: "fragment",
-			code: "#version 300 es\nprecision highp float;\nvoid main() {}",
+			stage: 'fragment',
+			code: '#version 300 es\nprecision highp float;\nvoid main() {}'
 		};
 
-		this.createProgram(fragmentProgram);
+		this.createProgram( fragmentProgram );
 
 		const { computeProgram } = computePipeline;
 
 		const programGPU = gl.createProgram();
 
-		const fragmentShader = this.get(fragmentProgram).shaderGPU;
-		const vertexShader = this.get(computeProgram).shaderGPU;
+		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
+		const vertexShader = this.get( computeProgram ).shaderGPU;
 
 		const transforms = computeProgram.transforms;
 
 		const transformVaryingNames = [];
 		const transformAttributeNodes = [];
 
-		for (let i = 0; i < transforms.length; i++) {
-			const transform = transforms[i];
+		for ( let i = 0; i < transforms.length; i ++ ) {
 
-			transformVaryingNames.push(transform.varyingName);
-			transformAttributeNodes.push(transform.attributeNode);
+			const transform = transforms[ i ];
+
+			transformVaryingNames.push( transform.varyingName );
+			transformAttributeNodes.push( transform.attributeNode );
+
 		}
 
-		gl.attachShader(programGPU, fragmentShader);
-		gl.attachShader(programGPU, vertexShader);
+		gl.attachShader( programGPU, fragmentShader );
+		gl.attachShader( programGPU, vertexShader );
 
 		gl.transformFeedbackVaryings(
 			programGPU,
 			transformVaryingNames,
-			gl.SEPARATE_ATTRIBS,
+			gl.SEPARATE_ATTRIBS
 		);
 
-		gl.linkProgram(programGPU);
+		gl.linkProgram( programGPU );
 
-		if (gl.getProgramParameter(programGPU, gl.LINK_STATUS) === false) {
-			this._logProgramError(programGPU, fragmentShader, vertexShader);
+		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
+
+
 		}
 
-		state.useProgram(programGPU);
+		state.useProgram( programGPU );
 
 		// Bindings
 
-		this._setupBindings(bindings, programGPU);
+		this._setupBindings( bindings, programGPU );
 
 		const attributeNodes = computeProgram.attributes;
 		const attributes = [];
 		const transformBuffers = [];
 
-		for (let i = 0; i < attributeNodes.length; i++) {
-			const attribute = attributeNodes[i].node.attribute;
+		for ( let i = 0; i < attributeNodes.length; i ++ ) {
 
-			attributes.push(attribute);
+			const attribute = attributeNodes[ i ].node.attribute;
 
-			if (!this.has(attribute))
-				this.attributeUtils.createAttribute(attribute, gl.ARRAY_BUFFER);
+			attributes.push( attribute );
+
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
 		}
 
-		for (let i = 0; i < transformAttributeNodes.length; i++) {
-			const attribute = transformAttributeNodes[i].attribute;
+		for ( let i = 0; i < transformAttributeNodes.length; i ++ ) {
 
-			if (!this.has(attribute))
-				this.attributeUtils.createAttribute(attribute, gl.ARRAY_BUFFER);
+			const attribute = transformAttributeNodes[ i ].attribute;
 
-			const attributeData = this.get(attribute);
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
 
-			transformBuffers.push(attributeData);
+			const attributeData = this.get( attribute );
+
+			transformBuffers.push( attributeData );
+
 		}
 
 		//
 
-		this.set(computePipeline, {
+		this.set( computePipeline, {
 			programGPU,
 			transformBuffers,
-			attributes,
-		});
+			attributes
+		} );
+
 	}
 
 	/**
@@ -69624,27 +69856,35 @@ class WebGLBackend extends Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	createBindings(bindGroup, bindings /*, cacheIndex, version*/) {
-		if (this._knownBindings.has(bindings) === false) {
-			this._knownBindings.add(bindings);
+	createBindings( bindGroup, bindings /*, cacheIndex, version*/ ) {
+
+		if ( this._knownBindings.has( bindings ) === false ) {
+
+			this._knownBindings.add( bindings );
 
 			let uniformBuffers = 0;
 			let textures = 0;
 
-			for (const bindGroup of bindings) {
-				this.set(bindGroup, {
-					textures: textures,
-					uniformBuffers: uniformBuffers,
-				});
+			for ( const bindGroup of bindings ) {
 
-				for (const binding of bindGroup.bindings) {
-					if (binding.isUniformBuffer) uniformBuffers++;
-					if (binding.isSampledTexture) textures++;
+				this.set( bindGroup, {
+					textures: textures,
+					uniformBuffers: uniformBuffers
+				} );
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding.isUniformBuffer ) uniformBuffers ++;
+					if ( binding.isSampledTexture ) textures ++;
+
 				}
+
 			}
+
 		}
 
-		this.updateBindings(bindGroup, bindings);
+		this.updateBindings( bindGroup, bindings );
+
 	}
 
 	/**
@@ -69655,79 +69895,90 @@ class WebGLBackend extends Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	updateBindings(bindGroup /*, bindings, cacheIndex, version*/) {
+	updateBindings( bindGroup /*, bindings, cacheIndex, version*/ ) {
+
 		const { gl } = this;
 
-		const bindGroupData = this.get(bindGroup);
+		const bindGroupData = this.get( bindGroup );
 
 		let i = bindGroupData.uniformBuffers;
 		let t = bindGroupData.textures;
 
-		for (const binding of bindGroup.bindings) {
-			const map = this.get(binding);
+		for ( const binding of bindGroup.bindings ) {
 
-			if (binding.isUniformsGroup || binding.isUniformBuffer) {
+			const map = this.get( binding );
+
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
 				const array = binding.buffer;
-				let { bufferGPU } = this.get(array);
+				let { bufferGPU } = this.get( array );
 
-				if (bufferGPU === undefined) {
+				if ( bufferGPU === undefined ) {
+
 					// create
 
 					bufferGPU = gl.createBuffer();
 
-					gl.bindBuffer(gl.UNIFORM_BUFFER, bufferGPU);
-					gl.bufferData(gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW);
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
 
-					this.set(array, { bufferGPU });
+					this.set( array, { bufferGPU } );
+
 				} else {
-					gl.bindBuffer(gl.UNIFORM_BUFFER, bufferGPU);
+
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+
 				}
 
 				// update
 
 				const updateRanges = binding.updateRanges;
 
-				gl.bindBuffer(gl.UNIFORM_BUFFER, bufferGPU);
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
-				if (updateRanges.length === 0) {
-					gl.bufferData(gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW);
+				if ( updateRanges.length === 0 ) {
+
+					gl.bufferData( gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW );
+
 				} else {
-					const isTyped = isTypedArray(array);
+
+					const isTyped = isTypedArray( array );
 					const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
 
-					for (let i = 0, l = updateRanges.length; i < l; i++) {
-						const range = updateRanges[i];
+					for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+						const range = updateRanges[ i ];
 
 						const dataOffset = range.start * byteOffsetFactor;
 						const size = range.count * byteOffsetFactor;
 
-						const bufferOffset =
-							dataOffset * (isTyped ? array.BYTES_PER_ELEMENT : 1); // bufferOffset is always in bytes
+						const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
 
-						gl.bufferSubData(
-							gl.UNIFORM_BUFFER,
-							bufferOffset,
-							array,
-							dataOffset,
-							size,
-						);
+						gl.bufferSubData( gl.UNIFORM_BUFFER, bufferOffset, array, dataOffset, size );
+
 					}
+
 				}
 
-				map.index = i++;
+				map.index = i ++;
 				map.bufferGPU = bufferGPU;
 
-				this.set(binding, map);
-			} else if (binding.isSampledTexture) {
-				const { textureGPU, glTextureType } = this.get(binding.texture);
+				this.set( binding, map );
 
-				map.index = t++;
+			} else if ( binding.isSampledTexture ) {
+
+				const { textureGPU, glTextureType } = this.get( binding.texture );
+
+				map.index = t ++;
 				map.textureGPU = textureGPU;
 				map.glTextureType = glTextureType;
 
-				this.set(binding, map);
+				this.set( binding, map );
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -69735,43 +69986,46 @@ class WebGLBackend extends Backend {
 	 *
 	 *  @param {Buffer} binding - The buffer binding to update.
 	 */
-	updateBinding(binding) {
+	updateBinding( binding ) {
+
 		const gl = this.gl;
 
-		if (binding.isUniformsGroup || binding.isUniformBuffer) {
-			const bindingData = this.get(binding);
+		if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+			const bindingData = this.get( binding );
 			const bufferGPU = bindingData.bufferGPU;
 			const array = binding.buffer;
 
 			const updateRanges = binding.updateRanges;
 
-			gl.bindBuffer(gl.UNIFORM_BUFFER, bufferGPU);
+			gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
-			if (updateRanges.length === 0) {
-				gl.bufferData(gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW);
+			if ( updateRanges.length === 0 ) {
+
+				gl.bufferData( gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW );
+
 			} else {
-				const isTyped = isTypedArray(array);
+
+				const isTyped = isTypedArray( array );
 				const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
 
-				for (let i = 0, l = updateRanges.length; i < l; i++) {
-					const range = updateRanges[i];
+				for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+					const range = updateRanges[ i ];
 
 					const dataOffset = range.start * byteOffsetFactor;
 					const size = range.count * byteOffsetFactor;
 
-					const bufferOffset =
-						dataOffset * (isTyped ? array.BYTES_PER_ELEMENT : 1); // bufferOffset is always in bytes
+					const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
 
-					gl.bufferSubData(
-						gl.UNIFORM_BUFFER,
-						bufferOffset,
-						array,
-						dataOffset,
-						size,
-					);
+					gl.bufferSubData( gl.UNIFORM_BUFFER, bufferOffset, array, dataOffset, size );
+
 				}
+
 			}
+
 		}
+
 	}
 
 	// attributes
@@ -69781,10 +70035,12 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
 	 */
-	createIndexAttribute(attribute) {
+	createIndexAttribute( attribute ) {
+
 		const gl = this.gl;
 
-		this.attributeUtils.createAttribute(attribute, gl.ELEMENT_ARRAY_BUFFER);
+		this.attributeUtils.createAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
+
 	}
 
 	/**
@@ -69792,12 +70048,14 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createAttribute(attribute) {
-		if (this.has(attribute)) return;
+	createAttribute( attribute ) {
+
+		if ( this.has( attribute ) ) return;
 
 		const gl = this.gl;
 
-		this.attributeUtils.createAttribute(attribute, gl.ARRAY_BUFFER);
+		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
 	}
 
 	/**
@@ -69805,12 +70063,14 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createStorageAttribute(attribute) {
-		if (this.has(attribute)) return;
+	createStorageAttribute( attribute ) {
+
+		if ( this.has( attribute ) ) return;
 
 		const gl = this.gl;
 
-		this.attributeUtils.createAttribute(attribute, gl.ARRAY_BUFFER);
+		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
 	}
 
 	/**
@@ -69818,8 +70078,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
-	updateAttribute(attribute) {
-		this.attributeUtils.updateAttribute(attribute);
+	updateAttribute( attribute ) {
+
+		this.attributeUtils.updateAttribute( attribute );
+
 	}
 
 	/**
@@ -69827,8 +70089,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
-	destroyAttribute(attribute) {
-		this.attributeUtils.destroyAttribute(attribute);
+	destroyAttribute( attribute ) {
+
+		this.attributeUtils.destroyAttribute( attribute );
+
 	}
 
 	/**
@@ -69837,18 +70101,20 @@ class WebGLBackend extends Backend {
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
-	hasFeature(name) {
-		const keysMatching = Object.keys(GLFeatureName).filter(
-			(key) => GLFeatureName[key] === name,
-		);
+	hasFeature( name ) {
+
+		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
 
 		const extensions = this.extensions;
 
-		for (let i = 0; i < keysMatching.length; i++) {
-			if (extensions.has(keysMatching[i])) return true;
+		for ( let i = 0; i < keysMatching.length; i ++ ) {
+
+			if ( extensions.has( keysMatching[ i ] ) ) return true;
+
 		}
 
 		return false;
+
 	}
 
 	/**
@@ -69857,7 +70123,9 @@ class WebGLBackend extends Backend {
 	 * @return {number} The maximum anisotropy texture filtering value.
 	 */
 	getMaxAnisotropy() {
+
 		return this.capabilities.getMaxAnisotropy();
+
 	}
 
 	/**
@@ -69870,22 +70138,10 @@ class WebGLBackend extends Backend {
 	 * @param {number} [srcLevel=0] - The source mip level to copy from.
 	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture(
-		srcTexture,
-		dstTexture,
-		srcRegion = null,
-		dstPosition = null,
-		srcLevel = 0,
-		dstLevel = 0,
-	) {
-		this.textureUtils.copyTextureToTexture(
-			srcTexture,
-			dstTexture,
-			srcRegion,
-			dstPosition,
-			srcLevel,
-			dstLevel,
-		);
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
+
+		this.textureUtils.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
+
 	}
 
 	/**
@@ -69895,12 +70151,10 @@ class WebGLBackend extends Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
 	 */
-	copyFramebufferToTexture(texture, renderContext, rectangle) {
-		this.textureUtils.copyFramebufferToTexture(
-			texture,
-			renderContext,
-			rectangle,
-		);
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
+
+		this.textureUtils.copyFramebufferToTexture( texture, renderContext, rectangle );
+
 	}
 
 	/**
@@ -69921,22 +70175,23 @@ class WebGLBackend extends Backend {
 		srcOffset = 0,
 		dstOffset = 0,
 	) {
+
 		const gl = this.gl;
 
-		const srcData = this.get(srcAttribute);
-		const dstData = this.get(dstAttribute);
+		const srcData = this.get( srcAttribute );
+		const dstData = this.get( dstAttribute );
 
-		if (srcData.bufferGPU === undefined) this.createAttribute(srcAttribute);
-		if (dstData.bufferGPU === undefined) this.createAttribute(dstAttribute);
+		if ( srcData.bufferGPU === undefined ) this.createAttribute( srcAttribute );
+		if ( dstData.bufferGPU === undefined ) this.createAttribute( dstAttribute );
 
 		const srcGPU = srcData.bufferGPU;
 		const dstGPU = dstData.bufferGPU;
 
-		const prevRead = gl.getParameter(gl.COPY_READ_BUFFER_BINDING);
-		const prevWrite = gl.getParameter(gl.COPY_WRITE_BUFFER_BINDING);
+		const prevRead = gl.getParameter( gl.COPY_READ_BUFFER_BINDING );
+		const prevWrite = gl.getParameter( gl.COPY_WRITE_BUFFER_BINDING );
 
-		gl.bindBuffer(gl.COPY_READ_BUFFER, srcGPU);
-		gl.bindBuffer(gl.COPY_WRITE_BUFFER, dstGPU);
+		gl.bindBuffer( gl.COPY_READ_BUFFER, srcGPU );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, dstGPU );
 
 		gl.copyBufferSubData(
 			gl.COPY_READ_BUFFER,
@@ -69946,9 +70201,11 @@ class WebGLBackend extends Backend {
 			byteLength,
 		);
 
-		gl.bindBuffer(gl.COPY_READ_BUFFER, prevRead);
-		gl.bindBuffer(gl.COPY_WRITE_BUFFER, prevWrite);
+		gl.bindBuffer( gl.COPY_READ_BUFFER, prevRead );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, prevWrite );
+
 	}
+
 
 	/**
 	 * Checks if the given compatibility is supported by the backend.
@@ -69956,10 +70213,12 @@ class WebGLBackend extends Backend {
 	 * @param {string} name - The compatibility name.
 	 * @return {boolean} Whether the compatibility is supported or not.
 	 */
-	hasCompatibility(name) {
-		if (name === Compatibility.TEXTURE_COMPARE) return true;
+	hasCompatibility( name ) {
 
-		return super.hasCompatibility(name);
+		if ( name === Compatibility.TEXTURE_COMPARE ) return true;
+
+		return super.hasCompatibility( name );
+
 	}
 
 	/**
@@ -69967,12 +70226,14 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	initRenderTarget(renderContext) {
+	initRenderTarget( renderContext ) {
+
 		const { gl, state } = this;
 
-		this._setFramebuffer(renderContext);
+		this._setFramebuffer( renderContext );
 
-		state.bindFramebuffer(gl.FRAMEBUFFER, null);
+		state.bindFramebuffer( gl.FRAMEBUFFER, null );
+
 	}
 
 	/**
@@ -69981,403 +70242,321 @@ class WebGLBackend extends Backend {
 	 * @private
 	 * @param {RenderContext} descriptor - The render context.
 	 */
-	_setFramebuffer(descriptor) {
+	_setFramebuffer( descriptor ) {
+
 		const { gl, state } = this;
 
 		let currentFrameBuffer = null;
 
-		if (descriptor.textures !== null) {
+		if ( descriptor.textures !== null ) {
+
 			const renderTarget = descriptor.renderTarget;
-			const renderTargetContextData = this.get(renderTarget);
+			const renderTargetContextData = this.get( renderTarget );
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
 
 			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
-			const _hasExternalTextures =
-				isXRRenderTarget === true && renderTarget._hasExternalTextures === true;
+			const _hasExternalTextures = ( isXRRenderTarget === true && renderTarget._hasExternalTextures === true );
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
-			const multisampledRTTExt = this.extensions.get(
-				"WEBGL_multisampled_render_to_texture",
-			);
-			const multiviewExt = this.extensions.get("OVR_multiview2");
-			const useMultisampledRTT = this._useMultisampledExtension(renderTarget);
-			const cacheKey = getCacheKey(descriptor);
+			const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+			const multiviewExt = this.extensions.get( 'OVR_multiview2' );
+			const useMultisampledRTT = this._useMultisampledExtension( renderTarget );
+			const cacheKey = getCacheKey( descriptor );
 
 			let fb;
 
-			if (isCube) {
-				renderTargetContextData.cubeFramebuffers ||
-					(renderTargetContextData.cubeFramebuffers = {});
+			if ( isCube ) {
 
-				fb = renderTargetContextData.cubeFramebuffers[cacheKey];
-			} else if (isXRRenderTarget && _hasExternalTextures === false) {
+				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
+
+				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
+
+			} else if ( isXRRenderTarget && _hasExternalTextures === false ) {
+
 				fb = this._xrFramebuffer;
-			} else {
-				renderTargetContextData.framebuffers ||
-					(renderTargetContextData.framebuffers = {});
 
-				fb = renderTargetContextData.framebuffers[cacheKey];
+			} else {
+
+				renderTargetContextData.framebuffers || ( renderTargetContextData.framebuffers = {} );
+
+				fb = renderTargetContextData.framebuffers[ cacheKey ];
+
 			}
 
-			if (fb === undefined) {
+			if ( fb === undefined ) {
+
 				fb = gl.createFramebuffer();
 
-				state.bindFramebuffer(gl.FRAMEBUFFER, fb);
+				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = descriptor.textures;
 				const depthInvalidationArray = [];
 
-				if (isCube) {
-					renderTargetContextData.cubeFramebuffers[cacheKey] = fb;
+				if ( isCube ) {
 
-					const { textureGPU } = this.get(textures[0]);
+					renderTargetContextData.cubeFramebuffers[ cacheKey ] = fb;
+
+					const { textureGPU } = this.get( textures[ 0 ] );
 
 					const cubeFace = this.renderer._activeCubeFace;
 					const mipLevel = this.renderer._activeMipmapLevel;
 
-					gl.framebufferTexture2D(
-						gl.FRAMEBUFFER,
-						gl.COLOR_ATTACHMENT0,
-						gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace,
-						textureGPU,
-						mipLevel,
-					);
-				} else {
-					renderTargetContextData.framebuffers[cacheKey] = fb;
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, mipLevel );
 
-					for (let i = 0; i < textures.length; i++) {
-						const texture = textures[i];
-						const textureData = this.get(texture);
+				} else {
+
+					renderTargetContextData.framebuffers[ cacheKey ] = fb;
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						const texture = textures[ i ];
+						const textureData = this.get( texture );
 						textureData.renderTarget = descriptor.renderTarget;
 						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-						if (renderTarget.multiview) {
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR(
-								gl.FRAMEBUFFER,
-								attachment,
-								textureData.textureGPU,
-								0,
-								samples,
-								0,
-								2,
-							);
-						} else if (isRenderTarget3D || isRenderTargetArray) {
+						if ( renderTarget.multiview ) {
+
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
+
+						} else if ( isRenderTarget3D || isRenderTargetArray ) {
+
 							const layer = this.renderer._activeCubeFace;
 							const mipLevel = this.renderer._activeMipmapLevel;
 
-							gl.framebufferTextureLayer(
-								gl.FRAMEBUFFER,
-								attachment,
-								textureData.textureGPU,
-								mipLevel,
-								layer,
-							);
+							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, mipLevel, layer );
+
 						} else {
-							if (useMultisampledRTT) {
-								multisampledRTTExt.framebufferTexture2DMultisampleEXT(
-									gl.FRAMEBUFFER,
-									attachment,
-									gl.TEXTURE_2D,
-									textureData.textureGPU,
-									0,
-									samples,
-								);
+
+							if ( useMultisampledRTT ) {
+
+								multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
 							} else {
+
 								const mipLevel = this.renderer._activeMipmapLevel;
 
-								gl.framebufferTexture2D(
-									gl.FRAMEBUFFER,
-									attachment,
-									gl.TEXTURE_2D,
-									textureData.textureGPU,
-									mipLevel,
-								);
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, mipLevel );
+
 							}
+
 						}
+
 					}
+
 				}
 
-				const depthStyle = stencilBuffer
-					? gl.DEPTH_STENCIL_ATTACHMENT
-					: gl.DEPTH_ATTACHMENT;
+				const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-				if (renderTarget._autoAllocateDepthBuffer === true) {
+				if ( renderTarget._autoAllocateDepthBuffer === true ) {
+
 					const renderbuffer = gl.createRenderbuffer();
-					this.textureUtils.setupRenderBufferStorage(
-						renderbuffer,
-						descriptor,
-						0,
-						useMultisampledRTT,
-					);
+					this.textureUtils.setupRenderBufferStorage( renderbuffer, descriptor, 0, useMultisampledRTT );
 					renderTargetContextData.xrDepthRenderbuffer = renderbuffer;
-					depthInvalidationArray.push(
-						stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT,
-					);
+					depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
-					gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-					gl.framebufferRenderbuffer(
-						gl.FRAMEBUFFER,
-						depthStyle,
-						gl.RENDERBUFFER,
-						renderbuffer,
-					);
+					gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, depthStyle, gl.RENDERBUFFER, renderbuffer );
+
+
 				} else {
-					if (descriptor.depthTexture !== null) {
-						depthInvalidationArray.push(
-							stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT,
-						);
 
-						const textureData = this.get(descriptor.depthTexture);
+					if ( descriptor.depthTexture !== null ) {
+
+						depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
+
+						const textureData = this.get( descriptor.depthTexture );
 						textureData.renderTarget = descriptor.renderTarget;
 						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
-						if (renderTarget.multiview) {
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR(
-								gl.FRAMEBUFFER,
-								depthStyle,
-								textureData.textureGPU,
-								0,
-								samples,
-								0,
-								2,
-							);
-						} else if (_hasExternalTextures && useMultisampledRTT) {
-							multisampledRTTExt.framebufferTexture2DMultisampleEXT(
-								gl.FRAMEBUFFER,
-								depthStyle,
-								gl.TEXTURE_2D,
-								textureData.textureGPU,
-								0,
-								samples,
-							);
+						if ( renderTarget.multiview ) {
+
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
+
+						} else if ( _hasExternalTextures && useMultisampledRTT ) {
+
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
 						} else {
-							if (descriptor.depthTexture.isArrayTexture) {
+
+							if ( descriptor.depthTexture.isArrayTexture ) {
+
 								const layer = this.renderer._activeCubeFace;
 
-								gl.framebufferTextureLayer(
-									gl.FRAMEBUFFER,
-									depthStyle,
-									textureData.textureGPU,
-									0,
-									layer,
-								);
-							} else if (descriptor.depthTexture.isCubeTexture) {
+								gl.framebufferTextureLayer( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, layer );
+
+							} else if ( descriptor.depthTexture.isCubeTexture ) {
+
 								const cubeFace = this.renderer._activeCubeFace;
 
-								gl.framebufferTexture2D(
-									gl.FRAMEBUFFER,
-									depthStyle,
-									gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace,
-									textureData.textureGPU,
-									0,
-								);
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureData.textureGPU, 0 );
+
 							} else {
-								gl.framebufferTexture2D(
-									gl.FRAMEBUFFER,
-									depthStyle,
-									gl.TEXTURE_2D,
-									textureData.textureGPU,
-									0,
-								);
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
 							}
+
 						}
+
 					}
+
 				}
 
 				renderTargetContextData.depthInvalidationArray = depthInvalidationArray;
-			} else {
-				const isRenderCameraDepthArray =
-					this._isRenderCameraDepthArray(descriptor);
 
-				if (isRenderCameraDepthArray) {
-					state.bindFramebuffer(gl.FRAMEBUFFER, fb);
+
+			} else {
+
+				const isRenderCameraDepthArray = this._isRenderCameraDepthArray( descriptor );
+
+				if ( isRenderCameraDepthArray ) {
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 					const layer = this.renderer._activeCubeFace;
 
-					const depthData = this.get(descriptor.depthTexture);
-					const depthStyle = stencilBuffer
-						? gl.DEPTH_STENCIL_ATTACHMENT
-						: gl.DEPTH_ATTACHMENT;
+					const depthData = this.get( descriptor.depthTexture );
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 					gl.framebufferTextureLayer(
 						gl.FRAMEBUFFER,
 						depthStyle,
 						depthData.textureGPU,
 						0,
-						layer,
+						layer
 					);
+
 				}
 
 				// rebind external XR textures
 
-				if (
-					(isXRRenderTarget || useMultisampledRTT || renderTarget.multiview) &&
-					renderTarget._isOpaqueFramebuffer !== true
-				) {
-					state.bindFramebuffer(gl.FRAMEBUFFER, fb);
+				if ( ( isXRRenderTarget || useMultisampledRTT || renderTarget.multiview ) && ( renderTarget._isOpaqueFramebuffer !== true ) ) {
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 					// rebind color
 
-					const textureData = this.get(descriptor.textures[0]);
+					const textureData = this.get( descriptor.textures[ 0 ] );
 
-					if (renderTarget.multiview) {
-						multiviewExt.framebufferTextureMultisampleMultiviewOVR(
-							gl.FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0,
-							textureData.textureGPU,
-							0,
-							samples,
-							0,
-							2,
-						);
-					} else if (useMultisampledRTT) {
-						multisampledRTTExt.framebufferTexture2DMultisampleEXT(
-							gl.FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0,
-							gl.TEXTURE_2D,
-							textureData.textureGPU,
-							0,
-							samples,
-						);
+					if ( renderTarget.multiview ) {
+
+						multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
+
+					} else if ( useMultisampledRTT ) {
+
+						multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
 					} else {
-						gl.framebufferTexture2D(
-							gl.FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0,
-							gl.TEXTURE_2D,
-							textureData.textureGPU,
-							0,
-						);
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
 					}
 
 					// rebind depth
 
-					const depthStyle = stencilBuffer
-						? gl.DEPTH_STENCIL_ATTACHMENT
-						: gl.DEPTH_ATTACHMENT;
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-					if (renderTarget._autoAllocateDepthBuffer === true) {
+					if ( renderTarget._autoAllocateDepthBuffer === true ) {
+
 						const renderbuffer = renderTargetContextData.xrDepthRenderbuffer;
-						gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-						gl.framebufferRenderbuffer(
-							gl.FRAMEBUFFER,
-							depthStyle,
-							gl.RENDERBUFFER,
-							renderbuffer,
-						);
-					} else {
-						const textureData = this.get(descriptor.depthTexture);
+						gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, depthStyle, gl.RENDERBUFFER, renderbuffer );
 
-						if (renderTarget.multiview) {
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR(
-								gl.FRAMEBUFFER,
-								depthStyle,
-								textureData.textureGPU,
-								0,
-								samples,
-								0,
-								2,
-							);
-						} else if (useMultisampledRTT) {
-							multisampledRTTExt.framebufferTexture2DMultisampleEXT(
-								gl.FRAMEBUFFER,
-								depthStyle,
-								gl.TEXTURE_2D,
-								textureData.textureGPU,
-								0,
-								samples,
-							);
+					} else {
+
+						const textureData = this.get( descriptor.depthTexture );
+
+						if ( renderTarget.multiview ) {
+
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
+
+						} else if ( useMultisampledRTT ) {
+
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+
 						} else {
-							gl.framebufferTexture2D(
-								gl.FRAMEBUFFER,
-								depthStyle,
-								gl.TEXTURE_2D,
-								textureData.textureGPU,
-								0,
-							);
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
 						}
+
 					}
+
 				}
+
 			}
 
-			if (
-				samples > 0 &&
-				useMultisampledRTT === false &&
-				!renderTarget.multiview
-			) {
-				if (msaaFb === undefined) {
+			if ( samples > 0 && useMultisampledRTT === false && ! renderTarget.multiview ) {
+
+				if ( msaaFb === undefined ) {
+
 					const invalidationArray = [];
 
 					msaaFb = gl.createFramebuffer();
 
-					state.bindFramebuffer(gl.FRAMEBUFFER, msaaFb);
+					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
 
 					const msaaRenderbuffers = [];
 
 					const textures = descriptor.textures;
 
-					for (let i = 0; i < textures.length; i++) {
-						msaaRenderbuffers[i] = gl.createRenderbuffer();
+					for ( let i = 0; i < textures.length; i ++ ) {
 
-						gl.bindRenderbuffer(gl.RENDERBUFFER, msaaRenderbuffers[i]);
+						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
 
-						invalidationArray.push(gl.COLOR_ATTACHMENT0 + i);
+						gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
 
-						const texture = descriptor.textures[i];
-						const textureData = this.get(texture);
+						invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
 
-						gl.renderbufferStorageMultisample(
-							gl.RENDERBUFFER,
-							samples,
-							textureData.glInternalFormat,
-							descriptor.width,
-							descriptor.height,
-						);
-						gl.framebufferRenderbuffer(
-							gl.FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0 + i,
-							gl.RENDERBUFFER,
-							msaaRenderbuffers[i],
-						);
+						const texture = descriptor.textures[ i ];
+						const textureData = this.get( texture );
+
+						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, descriptor.width, descriptor.height );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+
+
 					}
 
-					gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+					gl.bindRenderbuffer( gl.RENDERBUFFER, null );
 
 					renderTargetContextData.msaaFrameBuffer = msaaFb;
 					renderTargetContextData.msaaRenderbuffers = msaaRenderbuffers;
 
-					if (depthBuffer && depthRenderbuffer === undefined) {
+					if ( depthBuffer && depthRenderbuffer === undefined ) {
+
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.textureUtils.setupRenderBufferStorage(
-							depthRenderbuffer,
-							descriptor,
-							samples,
-						);
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor, samples );
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
-						const depthStyle = stencilBuffer
-							? gl.DEPTH_STENCIL_ATTACHMENT
-							: gl.DEPTH_ATTACHMENT;
-						invalidationArray.push(depthStyle);
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+						invalidationArray.push( depthStyle );
+
 					}
 
 					renderTargetContextData.invalidationArray = invalidationArray;
+
 				}
 
 				currentFrameBuffer = renderTargetContextData.msaaFrameBuffer;
+
 			} else {
+
 				currentFrameBuffer = fb;
+
 			}
 
-			state.drawBuffers(descriptor, fb);
+			state.drawBuffers( descriptor, fb );
+
 		}
 
-		state.bindFramebuffer(gl.FRAMEBUFFER, currentFrameBuffer);
+		state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
+
 	}
 
 	/**
@@ -70387,16 +70566,20 @@ class WebGLBackend extends Backend {
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {string} The VAO key.
 	 */
-	_getVaoKey(attributes) {
-		let key = "";
+	_getVaoKey( attributes ) {
 
-		for (let i = 0; i < attributes.length; i++) {
-			const attributeData = this.get(attributes[i]);
+		let key = '';
 
-			key += ":" + attributeData.id;
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attributeData = this.get( attributes[ i ] );
+
+			key += ':' + attributeData.id;
+
 		}
 
 		return key;
+
 	}
 
 	/**
@@ -70406,65 +70589,62 @@ class WebGLBackend extends Backend {
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
 	 * @return {Object} The VAO data.
 	 */
-	_createVao(attributes) {
+	_createVao( attributes ) {
+
 		const { gl } = this;
 
 		const vaoGPU = gl.createVertexArray();
 
-		gl.bindVertexArray(vaoGPU);
+		gl.bindVertexArray( vaoGPU );
 
-		for (let i = 0; i < attributes.length; i++) {
-			const attribute = attributes[i];
-			const attributeData = this.get(attribute);
+		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			gl.bindBuffer(gl.ARRAY_BUFFER, attributeData.bufferGPU);
-			gl.enableVertexAttribArray(i);
+			const attribute = attributes[ i ];
+			const attributeData = this.get( attribute );
+
+			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+			gl.enableVertexAttribArray( i );
 
 			let stride, offset;
 
-			if (attribute.isInterleavedBufferAttribute === true) {
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
 				stride = attribute.data.stride * attributeData.bytesPerElement;
 				offset = attribute.offset * attributeData.bytesPerElement;
+
 			} else {
+
 				stride = 0;
 				offset = 0;
+
 			}
 
-			if (attributeData.isInteger) {
-				gl.vertexAttribIPointer(
-					i,
-					attribute.itemSize,
-					attributeData.type,
-					stride,
-					offset,
-				);
+			if ( attributeData.isInteger ) {
+
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+
 			} else {
-				gl.vertexAttribPointer(
-					i,
-					attribute.itemSize,
-					attributeData.type,
-					attribute.normalized,
-					stride,
-					offset,
-				);
+
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
+
 			}
 
-			if (
-				attribute.isInstancedBufferAttribute &&
-				!attribute.isInterleavedBufferAttribute
-			) {
-				gl.vertexAttribDivisor(i, attribute.meshPerAttribute);
-			} else if (
-				attribute.isInterleavedBufferAttribute &&
-				attribute.data.isInstancedInterleavedBuffer
-			) {
-				gl.vertexAttribDivisor(i, attribute.data.meshPerAttribute);
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
 			}
+
 		}
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.bindBuffer( gl.ARRAY_BUFFER, null );
 
 		return vaoGPU;
+
 	}
 
 	/**
@@ -70474,40 +70654,44 @@ class WebGLBackend extends Backend {
 	 * @param {Array<DualAttributeData>} transformBuffers - The transform buffers.
 	 * @return {WebGLTransformFeedback} The transform feedback.
 	 */
-	_getTransformFeedback(transformBuffers) {
-		let key = "";
+	_getTransformFeedback( transformBuffers ) {
 
-		for (let i = 0; i < transformBuffers.length; i++) {
-			key += ":" + transformBuffers[i].id;
+		let key = '';
+
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			key += ':' + transformBuffers[ i ].id;
+
 		}
 
-		let transformFeedbackGPU = this.transformFeedbackCache[key];
+		let transformFeedbackGPU = this.transformFeedbackCache[ key ];
 
-		if (transformFeedbackGPU !== undefined) {
+		if ( transformFeedbackGPU !== undefined ) {
+
 			return transformFeedbackGPU;
+
 		}
 
 		const { gl } = this;
 
 		transformFeedbackGPU = gl.createTransformFeedback();
 
-		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedbackGPU);
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
 
-		for (let i = 0; i < transformBuffers.length; i++) {
-			const attributeData = transformBuffers[i];
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			gl.bindBufferBase(
-				gl.TRANSFORM_FEEDBACK_BUFFER,
-				i,
-				attributeData.transformBuffer,
-			);
+			const attributeData = transformBuffers[ i ];
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
+
 		}
 
-		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
 
-		this.transformFeedbackCache[key] = transformFeedbackGPU;
+		this.transformFeedbackCache[ key ] = transformFeedbackGPU;
 
 		return transformFeedbackGPU;
+
 	}
 
 	/**
@@ -70517,23 +70701,33 @@ class WebGLBackend extends Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {WebGLProgram} programGPU - The WebGL program.
 	 */
-	_setupBindings(bindings, programGPU) {
+	_setupBindings( bindings, programGPU ) {
+
 		const gl = this.gl;
 
-		for (const bindGroup of bindings) {
-			for (const binding of bindGroup.bindings) {
-				const bindingData = this.get(binding);
+		for ( const bindGroup of bindings ) {
+
+			for ( const binding of bindGroup.bindings ) {
+
+				const bindingData = this.get( binding );
 				const index = bindingData.index;
 
-				if (binding.isUniformsGroup || binding.isUniformBuffer) {
-					const location = gl.getUniformBlockIndex(programGPU, binding.name);
-					gl.uniformBlockBinding(programGPU, location, index);
-				} else if (binding.isSampledTexture) {
-					const location = gl.getUniformLocation(programGPU, binding.name);
-					gl.uniform1i(location, index);
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+					const location = gl.getUniformBlockIndex( programGPU, binding.name );
+					gl.uniformBlockBinding( programGPU, location, index );
+
+				} else if ( binding.isSampledTexture ) {
+
+					const location = gl.getUniformLocation( programGPU, binding.name );
+					gl.uniform1i( location, index );
+
 				}
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -70542,26 +70736,32 @@ class WebGLBackend extends Backend {
 	 * @private
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 */
-	_bindUniforms(bindings) {
+	_bindUniforms( bindings ) {
+
 		const { gl, state } = this;
 
-		for (const bindGroup of bindings) {
-			for (const binding of bindGroup.bindings) {
-				const bindingData = this.get(binding);
+		for ( const bindGroup of bindings ) {
+
+			for ( const binding of bindGroup.bindings ) {
+
+				const bindingData = this.get( binding );
 				const index = bindingData.index;
 
-				if (binding.isUniformsGroup || binding.isUniformBuffer) {
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
 					// TODO USE bindBufferRange to group multiple uniform buffers
-					state.bindBufferBase(gl.UNIFORM_BUFFER, index, bindingData.bufferGPU);
-				} else if (binding.isSampledTexture) {
-					state.bindTexture(
-						bindingData.glTextureType,
-						bindingData.textureGPU,
-						gl.TEXTURE0 + index,
-					);
+					state.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+
+				} else if ( binding.isSampledTexture ) {
+
+					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+
 				}
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -70570,27 +70770,27 @@ class WebGLBackend extends Backend {
 	 * @private
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	_resolveRenderTarget(renderContext) {
+	_resolveRenderTarget( renderContext ) {
+
 		const { gl, state } = this;
 
 		const renderTarget = renderContext.renderTarget;
 
-		if (renderContext.textures !== null && renderTarget) {
-			const renderTargetContextData = this.get(renderTarget);
+		if ( renderContext.textures !== null && renderTarget ) {
 
-			if (
-				renderTarget.samples > 0 &&
-				this._useMultisampledExtension(renderTarget) === false
-			) {
-				const fb =
-					renderTargetContextData.framebuffers[renderContext.getCacheKey()];
+			const renderTargetContextData = this.get( renderTarget );
+
+			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
 				let mask = gl.COLOR_BUFFER_BIT;
 
-				if (renderTarget.resolveDepthBuffer) {
-					if (renderTarget.depthBuffer) mask |= gl.DEPTH_BUFFER_BIT;
-					if (renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer)
-						mask |= gl.STENCIL_BUFFER_BIT;
+				if ( renderTarget.resolveDepthBuffer ) {
+
+					if ( renderTarget.depthBuffer ) mask |= gl.DEPTH_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= gl.STENCIL_BUFFER_BIT;
+
 				}
 
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
@@ -70599,125 +70799,83 @@ class WebGLBackend extends Backend {
 				const textures = renderContext.textures;
 				const isMRT = textures.length > 1;
 
-				state.bindFramebuffer(gl.READ_FRAMEBUFFER, msaaFrameBuffer);
-				state.bindFramebuffer(gl.DRAW_FRAMEBUFFER, fb);
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
 
-				if (isMRT) {
+				if ( isMRT ) {
+
 					// blitFramebuffer() can only copy/resolve the first color attachment of a framebuffer. When using MRT,
 					// the engine temporarily removes all attachments and then configures each attachment for the resolve.
 
-					for (let i = 0; i < textures.length; i++) {
-						gl.framebufferRenderbuffer(
-							gl.READ_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0 + i,
-							gl.RENDERBUFFER,
-							null,
-						);
-						gl.framebufferTexture2D(
-							gl.DRAW_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0 + i,
-							gl.TEXTURE_2D,
-							null,
-							0,
-						);
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, null );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, null, 0 );
+
 					}
+
 				}
 
-				for (let i = 0; i < textures.length; i++) {
-					if (isMRT) {
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					if ( isMRT ) {
+
 						// configure attachment for resolve
 
-						const { textureGPU } = this.get(textures[i]);
+						const { textureGPU } = this.get( textures[ i ] );
 
-						gl.framebufferRenderbuffer(
-							gl.READ_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0,
-							gl.RENDERBUFFER,
-							msaaRenderbuffers[i],
-						);
-						gl.framebufferTexture2D(
-							gl.DRAW_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0,
-							gl.TEXTURE_2D,
-							textureGPU,
-							0,
-						);
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
 					}
 
-					if (renderContext.scissor) {
+					if ( renderContext.scissor ) {
+
 						const { x, y, width, height } = renderContext.scissorValue;
 
 						const viewY = renderContext.height - height - y;
 
-						gl.blitFramebuffer(
-							x,
-							viewY,
-							x + width,
-							viewY + height,
-							x,
-							viewY,
-							x + width,
-							viewY + height,
-							mask,
-							gl.NEAREST,
-						);
+						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
+
 					} else {
-						gl.blitFramebuffer(
-							0,
-							0,
-							renderContext.width,
-							renderContext.height,
-							0,
-							0,
-							renderContext.width,
-							renderContext.height,
-							mask,
-							gl.NEAREST,
-						);
+
+						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+
 					}
+
 				}
 
-				if (isMRT) {
+				if ( isMRT ) {
+
 					// restore attachments
 
-					for (let i = 0; i < textures.length; i++) {
-						const { textureGPU } = this.get(textures[i]);
+					for ( let i = 0; i < textures.length; i ++ ) {
 
-						gl.framebufferRenderbuffer(
-							gl.READ_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0 + i,
-							gl.RENDERBUFFER,
-							msaaRenderbuffers[i],
-						);
-						gl.framebufferTexture2D(
-							gl.DRAW_FRAMEBUFFER,
-							gl.COLOR_ATTACHMENT0 + i,
-							gl.TEXTURE_2D,
-							textureGPU,
-							0,
-						);
+						const { textureGPU } = this.get( textures[ i ] );
+
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+
 					}
+
 				}
 
-				if (this._supportsInvalidateFramebuffer === true) {
-					gl.invalidateFramebuffer(
-						gl.READ_FRAMEBUFFER,
-						renderTargetContextData.invalidationArray,
-					);
+				if ( this._supportsInvalidateFramebuffer === true ) {
+
+					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
 				}
-			} else if (
-				renderTarget.resolveDepthBuffer === false &&
-				renderTargetContextData.framebuffers
-			) {
-				const fb =
-					renderTargetContextData.framebuffers[renderContext.getCacheKey()];
-				state.bindFramebuffer(gl.DRAW_FRAMEBUFFER, fb);
-				gl.invalidateFramebuffer(
-					gl.DRAW_FRAMEBUFFER,
-					renderTargetContextData.depthInvalidationArray,
-				);
+
+			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, renderTargetContextData.depthInvalidationArray );
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -70728,32 +70886,32 @@ class WebGLBackend extends Backend {
 	 * @param {RenderTarget} renderTarget - The render target that should be multisampled.
 	 * @return {boolean} Whether to use the `WEBGL_multisampled_render_to_texture` extension for MSAA or not.
 	 */
-	_useMultisampledExtension(renderTarget) {
-		if (renderTarget.multiview === true) {
+	_useMultisampledExtension( renderTarget ) {
+
+		if ( renderTarget.multiview === true ) {
+
 			return true;
+
 		}
 
-		return (
-			renderTarget.samples > 0 &&
-			this.extensions.has("WEBGL_multisampled_render_to_texture") === true &&
-			renderTarget._autoAllocateDepthBuffer !== false
-		);
+		return renderTarget.samples > 0 && this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true && renderTarget._autoAllocateDepthBuffer !== false;
+
 	}
 
 	/**
 	 * Frees internal resources.
 	 */
 	dispose() {
-		if (this.textureUtils !== null) this.textureUtils.dispose();
 
-		const extension = this.extensions.get("WEBGL_lose_context");
-		if (extension) extension.loseContext();
+		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
-		this.renderer.domElement.removeEventListener(
-			"webglcontextlost",
-			this._onContextLost,
-		);
+		const extension = this.extensions.get( 'WEBGL_lose_context' );
+		if ( extension ) extension.loseContext();
+
+		this.renderer.domElement.removeEventListener( 'webglcontextlost', this._onContextLost );
+
 	}
+
 }
 
 const GPUPrimitiveTopology = {
@@ -78321,6 +78479,7 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
  * @augments Backend
  */
 class WebGPUBackend extends Backend {
+
 	/**
 	 * WebGPUBackend options.
 	 *
@@ -78345,8 +78504,9 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {WebGPUBackend~Options} [parameters] - The configuration parameter.
 	 */
-	constructor(parameters = {}) {
-		super(parameters);
+	constructor( parameters = {} ) {
+
+		super( parameters );
 
 		/**
 		 * This flag can be used for type testing.
@@ -78358,11 +78518,9 @@ class WebGPUBackend extends Backend {
 		this.isWebGPUBackend = true;
 
 		// some parameters require default values other than "undefined"
-		this.parameters.alpha =
-			parameters.alpha === undefined ? true : parameters.alpha;
+		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
 
-		this.parameters.requiredLimits =
-			parameters.requiredLimits === undefined ? {} : parameters.requiredLimits;
+		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		/**
 		 * Indicates whether the backend is in WebGPU compatibility mode or not.
@@ -78395,7 +78553,7 @@ class WebGPUBackend extends Backend {
 		 *
 		 * @type {WebGPUUtils}
 		 */
-		this.utils = new WebGPUUtils(this);
+		this.utils = new WebGPUUtils( this );
 
 		/**
 		 * A reference to a backend module holding shader attribute-related
@@ -78403,7 +78561,7 @@ class WebGPUBackend extends Backend {
 		 *
 		 * @type {WebGPUAttributeUtils}
 		 */
-		this.attributeUtils = new WebGPUAttributeUtils(this);
+		this.attributeUtils = new WebGPUAttributeUtils( this );
 
 		/**
 		 * A reference to a backend module holding shader binding-related
@@ -78411,7 +78569,7 @@ class WebGPUBackend extends Backend {
 		 *
 		 * @type {WebGPUBindingUtils}
 		 */
-		this.bindingUtils = new WebGPUBindingUtils(this);
+		this.bindingUtils = new WebGPUBindingUtils( this );
 
 		/**
 		 * A reference to a backend module holding shader pipeline-related
@@ -78419,7 +78577,7 @@ class WebGPUBackend extends Backend {
 		 *
 		 * @type {WebGPUPipelineUtils}
 		 */
-		this.pipelineUtils = new WebGPUPipelineUtils(this);
+		this.pipelineUtils = new WebGPUPipelineUtils( this );
 
 		/**
 		 * A reference to a backend module holding shader texture-related
@@ -78427,7 +78585,7 @@ class WebGPUBackend extends Backend {
 		 *
 		 * @type {WebGPUTextureUtils}
 		 */
-		this.textureUtils = new WebGPUTextureUtils(this);
+		this.textureUtils = new WebGPUTextureUtils( this );
 
 		/**
 		 * A map that manages the resolve buffers for occlusion queries.
@@ -78438,10 +78596,7 @@ class WebGPUBackend extends Backend {
 
 		// compatibility checks
 
-		const compatibilityTextureCompare =
-			typeof navigator === "undefined"
-				? true
-				: /Android/.test(navigator.userAgent) === false;
+		const compatibilityTextureCompare = typeof navigator === 'undefined' ? true : /Android/.test( navigator.userAgent ) === false;
 
 		/**
 		 * A map of compatibility checks.
@@ -78449,8 +78604,9 @@ class WebGPUBackend extends Backend {
 		 * @type {Object}
 		 */
 		this._compatibility = {
-			[Compatibility.TEXTURE_COMPARE]: compatibilityTextureCompare,
+			[ Compatibility.TEXTURE_COMPARE ]: compatibilityTextureCompare
 		};
+
 	}
 
 	/**
@@ -78460,8 +78616,9 @@ class WebGPUBackend extends Backend {
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the backend has been initialized.
 	 */
-	async init(renderer) {
-		await super.init(renderer);
+	async init( renderer ) {
+
+		await super.init( renderer );
 
 		//
 
@@ -78471,68 +78628,79 @@ class WebGPUBackend extends Backend {
 
 		let device;
 
-		if (parameters.device === undefined) {
+		if ( parameters.device === undefined ) {
+
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: "compatibility",
+				featureLevel: 'compatibility'
 			};
 
-			const adapter =
-				typeof navigator !== "undefined"
-					? await navigator.gpu.requestAdapter(adapterOptions)
-					: null;
+			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
 
-			if (adapter === null) {
-				throw new Error("WebGPUBackend: Unable to create WebGPU adapter.");
+			if ( adapter === null ) {
+
+				throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
+
 			}
 
 			// feature support
 
-			const features = Object.values(GPUFeatureName);
+			const features = Object.values( GPUFeatureName );
 
 			const supportedFeatures = [];
 
-			for (const name of features) {
-				if (adapter.features.has(name)) {
-					supportedFeatures.push(name);
+			for ( const name of features ) {
+
+				if ( adapter.features.has( name ) ) {
+
+					supportedFeatures.push( name );
+
 				}
+
 			}
 
 			const deviceDescriptor = {
 				requiredFeatures: supportedFeatures,
-				requiredLimits: parameters.requiredLimits,
+				requiredLimits: parameters.requiredLimits
 			};
 
-			device = await adapter.requestDevice(deviceDescriptor);
+			device = await adapter.requestDevice( deviceDescriptor );
+
 		} else {
+
 			device = parameters.device;
+
 		}
 
-		this.compatibilityMode = !device.features.has("core-features-and-limits");
+		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
-		if (this.compatibilityMode) {
+		if ( this.compatibilityMode ) {
+
 			renderer._samples = 0;
+
 		}
 
-		device.lost.then((info) => {
-			if (info.reason === "destroyed") return;
+		device.lost.then( ( info ) => {
+
+			if ( info.reason === 'destroyed' ) return;
 
 			const deviceLossInfo = {
-				api: "WebGPU",
-				message: info.message || "Unknown reason",
+				api: 'WebGPU',
+				message: info.message || 'Unknown reason',
 				reason: info.reason || null,
-				originalEvent: info,
+				originalEvent: info
 			};
 
-			renderer.onDeviceLost(deviceLossInfo);
-		});
+			renderer.onDeviceLost( deviceLossInfo );
+
+		} );
 
 		this.device = device;
 
-		this.trackTimestamp =
-			this.trackTimestamp && this.hasFeature(GPUFeatureName.TimestampQuery);
+		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
 	}
 
 	/**
@@ -78542,49 +78710,49 @@ class WebGPUBackend extends Backend {
 	 * @default null
 	 */
 	get context() {
+
 		const canvasTarget = this.renderer.getCanvasTarget();
-		const canvasData = this.get(canvasTarget);
+		const canvasData = this.get( canvasTarget );
 
 		let context = canvasData.context;
 
-		if (context === undefined) {
+		if ( context === undefined ) {
+
 			const parameters = this.parameters;
 
-			if (
-				canvasTarget.isDefaultCanvasTarget === true &&
-				parameters.context !== undefined
-			) {
+			if ( canvasTarget.isDefaultCanvasTarget === true && parameters.context !== undefined ) {
+
 				context = parameters.context;
+
 			} else {
-				context = canvasTarget.domElement.getContext("webgpu");
+
+				context = canvasTarget.domElement.getContext( 'webgpu' );
+
 			}
 
 			// OffscreenCanvas does not have setAttribute, see #22811
-			if ("setAttribute" in canvasTarget.domElement)
-				canvasTarget.domElement.setAttribute(
-					"data-engine",
-					`three.js r${REVISION} webgpu`,
-				);
+			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${ REVISION } webgpu` );
 
-			const alphaMode = parameters.alpha ? "premultiplied" : "opaque";
+			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
-			const toneMappingMode =
-				parameters.outputType === HalfFloatType ? "extended" : "standard";
+			const toneMappingMode = parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
-			context.configure({
+			context.configure( {
 				device: this.device,
 				format: this.utils.getPreferredCanvasFormat(),
 				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 				alphaMode: alphaMode,
 				toneMapping: {
-					mode: toneMappingMode,
-				},
-			});
+					mode: toneMappingMode
+				}
+			} );
 
 			canvasData.context = context;
+
 		}
 
 		return context;
+
 	}
 
 	/**
@@ -78594,7 +78762,9 @@ class WebGPUBackend extends Backend {
 	 * @readonly
 	 */
 	get coordinateSystem() {
+
 		return WebGPUCoordinateSystem;
+
 	}
 
 	/**
@@ -78605,8 +78775,10 @@ class WebGPUBackend extends Backend {
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync(attribute) {
-		return await this.attributeUtils.getArrayBufferAsync(attribute);
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
 	}
 
 	/**
@@ -78615,7 +78787,9 @@ class WebGPUBackend extends Backend {
 	 * @return {GPUCanvasContext} The rendering context.
 	 */
 	getContext() {
+
 		return this.context;
+
 	}
 
 	/**
@@ -78629,53 +78803,61 @@ class WebGPUBackend extends Backend {
 	 * @return {Object} The render pass descriptor.
 	 */
 	_getDefaultRenderPassDescriptor() {
+
 		const renderer = this.renderer;
 		const canvasTarget = renderer.getCanvasTarget();
-		const canvasData = this.get(canvasTarget);
+		const canvasData = this.get( canvasTarget );
 		const samples = renderer.currentSamples;
 
 		let descriptor = canvasData.descriptor;
 
-		if (descriptor === undefined || canvasData.samples !== samples) {
+		if ( descriptor === undefined || canvasData.samples !== samples ) {
+
 			descriptor = {
-				colorAttachments: [
-					{
-						view: null,
-					},
-				],
+				colorAttachments: [ {
+					view: null
+				} ]
 			};
 
-			if (renderer.depth === true || renderer.stencil === true) {
+			if ( renderer.depth === true || renderer.stencil === true ) {
+
 				descriptor.depthStencilAttachment = {
-					view: this.textureUtils
-						.getDepthBuffer(renderer.depth, renderer.stencil)
-						.createView(),
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
 				};
+
 			}
 
-			const colorAttachment = descriptor.colorAttachments[0];
+			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if (samples > 0) {
+			if ( samples > 0 ) {
+
 				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
+
 			} else {
+
 				colorAttachment.resolveTarget = undefined;
+
 			}
 
 			canvasData.descriptor = descriptor;
 			canvasData.samples = samples;
+
 		}
 
-		const colorAttachment = descriptor.colorAttachments[0];
+		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if (samples > 0) {
-			colorAttachment.resolveTarget = this.context
-				.getCurrentTexture()
-				.createView();
+		if ( samples > 0 ) {
+
+			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
+
 		} else {
+
 			colorAttachment.view = this.context.getCurrentTexture().createView();
+
 		}
 
 		return descriptor;
+
 	}
 
 	/**
@@ -78686,12 +78868,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @private
 	 */
-	_isRenderCameraDepthArray(renderContext) {
-		return (
-			renderContext.depthTexture &&
-			renderContext.depthTexture.image.depth > 1 &&
-			renderContext.camera.isArrayCamera
-		);
+	_isRenderCameraDepthArray( renderContext ) {
+
+		return renderContext.depthTexture && renderContext.depthTexture.image.depth > 1 && renderContext.camera.isArrayCamera;
+
 	}
 
 	/**
@@ -78702,155 +78882,182 @@ class WebGPUBackend extends Backend {
 	 * @param {Object} colorAttachmentsConfig - Configuration object for the color attachments.
 	 * @return {Object} The render pass descriptor.
 	 */
-	_getRenderPassDescriptor(renderContext, colorAttachmentsConfig = {}) {
+	_getRenderPassDescriptor( renderContext, colorAttachmentsConfig = {} ) {
+
 		const renderTarget = renderContext.renderTarget;
-		const renderTargetData = this.get(renderTarget);
+		const renderTargetData = this.get( renderTarget );
 
 		let descriptors = renderTargetData.descriptors;
 
-		if (
-			descriptors === undefined ||
+		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
+
 			descriptors = {};
 
 			renderTargetData.descriptors = descriptors;
+
 		}
 
 		const cacheKey = renderContext.getCacheKey();
-		let descriptorBase = descriptors[cacheKey];
+		let descriptorBase = descriptors[ cacheKey ];
 
-		if (descriptorBase === undefined) {
+		if ( descriptorBase === undefined ) {
+
 			const textures = renderContext.textures;
 			const textureViews = [];
 
 			let sliceIndex;
 
-			const isRenderCameraDepthArray =
-				this._isRenderCameraDepthArray(renderContext);
+			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( renderContext );
 
-			for (let i = 0; i < textures.length; i++) {
-				const textureData = this.get(textures[i]);
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const textureData = this.get( textures[ i ] );
 
 				const viewDescriptor = {
-					label: `colorAttachment_${i}`,
+					label: `colorAttachment_${ i }`,
 					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
 					arrayLayerCount: 1,
-					dimension: GPUTextureViewDimension.TwoD,
+					dimension: GPUTextureViewDimension.TwoD
 				};
 
-				if (renderTarget.isRenderTarget3D) {
+				if ( renderTarget.isRenderTarget3D ) {
+
 					sliceIndex = renderContext.activeCubeFace;
 
 					viewDescriptor.baseArrayLayer = 0;
 					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
-					viewDescriptor.depthOrArrayLayers = textures[i].image.depth;
-				} else if (renderTarget.isRenderTarget && textures[i].image.depth > 1) {
-					if (isRenderCameraDepthArray === true) {
+					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+				} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
+
+					if ( isRenderCameraDepthArray === true ) {
+
 						const cameras = renderContext.camera.cameras;
-						for (let layer = 0; layer < cameras.length; layer++) {
+						for ( let layer = 0; layer < cameras.length; layer ++ ) {
+
 							const layerViewDescriptor = {
 								...viewDescriptor,
 								baseArrayLayer: layer,
 								arrayLayerCount: 1,
-								dimension: GPUTextureViewDimension.TwoD,
+								dimension: GPUTextureViewDimension.TwoD
 							};
-							const textureView =
-								textureData.texture.createView(layerViewDescriptor);
-							textureViews.push({
+							const textureView = textureData.texture.createView( layerViewDescriptor );
+							textureViews.push( {
 								view: textureView,
 								resolveTarget: undefined,
-								depthSlice: undefined,
-							});
+								depthSlice: undefined
+							} );
+
 						}
+
 					} else {
+
 						viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
-						viewDescriptor.depthOrArrayLayers = textures[i].image.depth;
+						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
 					}
+
 				}
 
-				if (isRenderCameraDepthArray !== true) {
-					const textureView = textureData.texture.createView(viewDescriptor);
+				if ( isRenderCameraDepthArray !== true ) {
+
+					const textureView = textureData.texture.createView( viewDescriptor );
 
 					let view, resolveTarget;
 
-					if (textureData.msaaTexture !== undefined) {
+					if ( textureData.msaaTexture !== undefined ) {
+
 						view = textureData.msaaTexture.createView();
 						resolveTarget = textureView;
+
 					} else {
+
 						view = textureView;
 						resolveTarget = undefined;
+
 					}
 
-					textureViews.push({
+					textureViews.push( {
 						view,
 						resolveTarget,
-						depthSlice: sliceIndex,
-					});
+						depthSlice: sliceIndex
+					} );
+
 				}
+
 			}
 
 			descriptorBase = { textureViews };
 
-			if (renderContext.depth) {
-				const depthTextureData = this.get(renderContext.depthTexture);
+			if ( renderContext.depth ) {
+
+				const depthTextureData = this.get( renderContext.depthTexture );
 				const options = {};
-				if (
-					renderContext.depthTexture.isArrayTexture ||
-					renderContext.depthTexture.isCubeTexture
-				) {
+				if ( renderContext.depthTexture.isArrayTexture || renderContext.depthTexture.isCubeTexture ) {
+
 					options.dimension = GPUTextureViewDimension.TwoD;
 					options.arrayLayerCount = 1;
 					options.baseArrayLayer = renderContext.activeCubeFace;
+
 				}
 
-				descriptorBase.depthStencilView =
-					depthTextureData.texture.createView(options);
+				descriptorBase.depthStencilView = depthTextureData.texture.createView( options );
+
 			}
 
-			descriptors[cacheKey] = descriptorBase;
+			descriptors[ cacheKey ] = descriptorBase;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
 			renderTargetData.samples = renderTarget.samples;
 			renderTargetData.activeMipmapLevel = renderContext.activeMipmapLevel;
 			renderTargetData.activeCubeFace = renderContext.activeCubeFace;
+
 		}
 
 		const descriptor = {
-			colorAttachments: [],
+			colorAttachments: []
 		};
 
 		// Apply dynamic properties to cached views
-		for (let i = 0; i < descriptorBase.textureViews.length; i++) {
-			const viewInfo = descriptorBase.textureViews[i];
+		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+
+			const viewInfo = descriptorBase.textureViews[ i ];
 
 			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
-			if (i === 0 && colorAttachmentsConfig.clearValue) {
+			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+
 				clearValue = colorAttachmentsConfig.clearValue;
+
 			}
 
-			descriptor.colorAttachments.push({
+			descriptor.colorAttachments.push( {
 				view: viewInfo.view,
 				depthSlice: viewInfo.depthSlice,
 				resolveTarget: viewInfo.resolveTarget,
 				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
 				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
-				clearValue: clearValue,
-			});
+				clearValue: clearValue
+			} );
+
 		}
 
-		if (descriptorBase.depthStencilView) {
+		if ( descriptorBase.depthStencilView ) {
+
 			descriptor.depthStencilAttachment = {
-				view: descriptorBase.depthStencilView,
+				view: descriptorBase.depthStencilView
 			};
+
 		}
 
 		return descriptor;
+
 	}
 
 	/**
@@ -78859,8 +79066,9 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	beginRender(renderContext) {
-		const renderContextData = this.get(renderContext);
+	beginRender( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
 
 		//
 
@@ -78869,139 +79077,143 @@ class WebGPUBackend extends Backend {
 
 		let occlusionQuerySet;
 
-		if (occlusionQueryCount > 0) {
-			if (renderContextData.currentOcclusionQuerySet)
-				renderContextData.currentOcclusionQuerySet.destroy();
-			if (renderContextData.currentOcclusionQueryBuffer)
-				renderContextData.currentOcclusionQueryBuffer.destroy();
+		if ( occlusionQueryCount > 0 ) {
+
+			if ( renderContextData.currentOcclusionQuerySet ) renderContextData.currentOcclusionQuerySet.destroy();
+			if ( renderContextData.currentOcclusionQueryBuffer ) renderContextData.currentOcclusionQueryBuffer.destroy();
 
 			// Get a reference to the array of objects with queries. The renderContextData property
 			// can be changed by another render pass before the buffer.mapAsyc() completes.
-			renderContextData.currentOcclusionQuerySet =
-				renderContextData.occlusionQuerySet;
-			renderContextData.currentOcclusionQueryBuffer =
-				renderContextData.occlusionQueryBuffer;
-			renderContextData.currentOcclusionQueryObjects =
-				renderContextData.occlusionQueryObjects;
+			renderContextData.currentOcclusionQuerySet = renderContextData.occlusionQuerySet;
+			renderContextData.currentOcclusionQueryBuffer = renderContextData.occlusionQueryBuffer;
+			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
 
 			//
 
-			occlusionQuerySet = device.createQuerySet({
-				type: "occlusion",
-				count: occlusionQueryCount,
-				label: `occlusionQuerySet_${renderContext.id}`,
-			});
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
-			renderContextData.occlusionQueryObjects = new Array(occlusionQueryCount);
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 
 			renderContextData.lastOcclusionObject = null;
+
 		}
 
 		let descriptor;
 
-		if (renderContext.textures === null) {
+		if ( renderContext.textures === null ) {
+
 			descriptor = this._getDefaultRenderPassDescriptor();
+
 		} else {
-			descriptor = this._getRenderPassDescriptor(renderContext, {
-				loadOp: GPULoadOp.Load,
-			});
+
+			descriptor = this._getRenderPassDescriptor( renderContext, { loadOp: GPULoadOp.Load } );
+
 		}
 
-		this.initTimestampQuery(
-			TimestampQuery.RENDER,
-			this.getTimestampUID(renderContext),
-			descriptor,
-		);
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 
-		if (renderContext.textures !== null) {
+		if ( renderContext.textures !== null ) {
+
 			const colorAttachments = descriptor.colorAttachments;
 
-			for (let i = 0; i < colorAttachments.length; i++) {
-				const colorAttachment = colorAttachments[i];
+			for ( let i = 0; i < colorAttachments.length; i ++ ) {
 
-				if (renderContext.clearColor) {
-					colorAttachment.clearValue =
-						i === 0
-							? renderContext.clearColorValue
-							: { r: 0, g: 0, b: 0, a: 1 };
+				const colorAttachment = colorAttachments[ i ];
+
+				if ( renderContext.clearColor ) {
+
+					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
 					colorAttachment.loadOp = GPULoadOp.Clear;
+
 				} else {
+
 					colorAttachment.loadOp = GPULoadOp.Load;
+
 				}
 
 				colorAttachment.storeOp = GPUStoreOp.Store;
-			}
-		} else {
-			const colorAttachment = descriptor.colorAttachments[0];
 
-			if (renderContext.clearColor) {
+			}
+
+		} else {
+
+			const colorAttachment = descriptor.colorAttachments[ 0 ];
+
+			if ( renderContext.clearColor ) {
+
 				colorAttachment.clearValue = renderContext.clearColorValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
+
 			} else {
+
 				colorAttachment.loadOp = GPULoadOp.Load;
+
 			}
 
-			colorAttachment.storeOp = GPUStoreOp.Store;
+		  	colorAttachment.storeOp = GPUStoreOp.Store;
+
 		}
 
 		//
 
-		if (renderContext.depth) {
-			if (renderContext.clearDepth) {
+		if ( renderContext.depth ) {
+
+			if ( renderContext.clearDepth ) {
+
 				depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+
 			} else {
+
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+
 			}
 
-			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
 		}
 
-		if (renderContext.stencil) {
-			if (renderContext.clearStencil) {
-				depthStencilAttachment.stencilClearValue =
-					renderContext.clearStencilValue;
+		if ( renderContext.stencil ) {
+
+		  if ( renderContext.clearStencil ) {
+
+				depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+
 			} else {
+
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
 			}
 
-			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
 		}
 
 		//
 
-		const encoder = device.createCommandEncoder({
-			label: "renderContext_" + renderContext.id,
-		});
+		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
 
 		// shadow arrays - prepare bundle encoders for each camera in an array camera
 
-		if (this._isRenderCameraDepthArray(renderContext) === true) {
+		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
+
 			const cameras = renderContext.camera.cameras;
 
-			if (
-				!renderContextData.layerDescriptors ||
-				renderContextData.layerDescriptors.length !== cameras.length
-			) {
-				this._createDepthLayerDescriptors(
-					renderContext,
-					renderContextData,
-					descriptor,
-					cameras,
-				);
+			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length ) {
+
+				this._createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
+
 			} else {
-				this._updateDepthLayerDescriptors(
-					renderContext,
-					renderContextData,
-					cameras,
-				);
+
+				this._updateDepthLayerDescriptors( renderContext, renderContextData, cameras );
+
 			}
 
 			// Create bundle encoders for each layer
@@ -79009,10 +79221,11 @@ class WebGPUBackend extends Backend {
 			renderContextData.bundleSets = [];
 
 			// Create separate bundle encoders for each camera in the array
-			for (let i = 0; i < cameras.length; i++) {
+			for ( let i = 0; i < cameras.length; i ++ ) {
+
 				const bundleEncoder = this.pipelineUtils.createBundleEncoder(
 					renderContext,
-					"renderBundleArrayCamera_" + i,
+					'renderBundleArrayCamera_' + i
 				);
 
 				// Initialize state tracking for this bundle
@@ -79020,39 +79233,43 @@ class WebGPUBackend extends Backend {
 					attributes: {},
 					bindingGroups: [],
 					pipeline: null,
-					index: null,
+					index: null
 				};
 
-				renderContextData.bundleEncoders.push(bundleEncoder);
-				renderContextData.bundleSets.push(bundleSets);
+				renderContextData.bundleEncoders.push( bundleEncoder );
+				renderContextData.bundleSets.push( bundleSets );
+
 			}
 
 			// We'll complete the bundles in finishRender
 			renderContextData.currentPass = null;
+
 		} else {
-			const currentPass = encoder.beginRenderPass(descriptor);
+
+			const currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentPass = currentPass;
 
-			if (renderContext.viewport) {
-				this.updateViewport(renderContext);
+			if ( renderContext.viewport ) {
+
+				this.updateViewport( renderContext );
+
 			}
 
-			if (renderContext.scissor) {
-				this.updateScissor(renderContext);
+			if ( renderContext.scissor ) {
+
+				this.updateScissor( renderContext );
+
 			}
+
 		}
 
 		//
 
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
-		renderContextData.currentSets = {
-			attributes: {},
-			bindingGroups: [],
-			pipeline: null,
-			index: null,
-		};
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
+
 	}
 
 	/**
@@ -79066,64 +79283,67 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @private
 	 */
-	_createDepthLayerDescriptors(
-		renderContext,
-		renderContextData,
-		descriptor,
-		cameras,
-	) {
+	_createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
+
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 		renderContextData.layerDescriptors = [];
 
-		const depthTextureData = this.get(renderContext.depthTexture);
-		if (!depthTextureData.viewCache) {
+		const depthTextureData = this.get( renderContext.depthTexture );
+		if ( ! depthTextureData.viewCache ) {
+
 			depthTextureData.viewCache = [];
+
 		}
 
-		for (let i = 0; i < cameras.length; i++) {
+		for ( let i = 0; i < cameras.length; i ++ ) {
+
 			const layerDescriptor = {
 				...descriptor,
-				colorAttachments: [
-					{
-						...descriptor.colorAttachments[0],
-						view: descriptor.colorAttachments[i].view,
-					},
-				],
+				colorAttachments: [ {
+					...descriptor.colorAttachments[ 0 ],
+					view: descriptor.colorAttachments[ i ].view
+				} ]
 			};
 
-			if (descriptor.depthStencilAttachment) {
+			if ( descriptor.depthStencilAttachment ) {
+
 				const layerIndex = i;
 
-				if (!depthTextureData.viewCache[layerIndex]) {
-					depthTextureData.viewCache[layerIndex] =
-						depthTextureData.texture.createView({
-							dimension: GPUTextureViewDimension.TwoD,
-							baseArrayLayer: i,
-							arrayLayerCount: 1,
-						});
+				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
+
+					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( {
+						dimension: GPUTextureViewDimension.TwoD,
+						baseArrayLayer: i,
+						arrayLayerCount: 1
+					} );
+
 				}
 
 				layerDescriptor.depthStencilAttachment = {
-					view: depthTextureData.viewCache[layerIndex],
+					view: depthTextureData.viewCache[ layerIndex ],
 					depthLoadOp: depthStencilAttachment.depthLoadOp || GPULoadOp.Clear,
 					depthStoreOp: depthStencilAttachment.depthStoreOp || GPUStoreOp.Store,
-					depthClearValue: depthStencilAttachment.depthClearValue || 1.0,
+					depthClearValue: depthStencilAttachment.depthClearValue || 1.0
 				};
 
-				if (renderContext.stencil) {
-					layerDescriptor.depthStencilAttachment.stencilLoadOp =
-						depthStencilAttachment.stencilLoadOp;
-					layerDescriptor.depthStencilAttachment.stencilStoreOp =
-						depthStencilAttachment.stencilStoreOp;
-					layerDescriptor.depthStencilAttachment.stencilClearValue =
-						depthStencilAttachment.stencilClearValue;
+				if ( renderContext.stencil ) {
+
+					layerDescriptor.depthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+					layerDescriptor.depthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+					layerDescriptor.depthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+
 				}
+
 			} else {
+
 				layerDescriptor.depthStencilAttachment = { ...depthStencilAttachment };
+
 			}
 
-			renderContextData.layerDescriptors.push(layerDescriptor);
+			renderContextData.layerDescriptors.push( layerDescriptor );
+
 		}
+
 	}
 
 	/**
@@ -79135,32 +79355,50 @@ class WebGPUBackend extends Backend {
 	 * @param {ArrayCamera} cameras - The array camera.
 	 *
 	 */
-	_updateDepthLayerDescriptors(renderContext, renderContextData, cameras) {
-		for (let i = 0; i < cameras.length; i++) {
-			const layerDescriptor = renderContextData.layerDescriptors[i];
+	_updateDepthLayerDescriptors( renderContext, renderContextData, cameras ) {
 
-			if (layerDescriptor.depthStencilAttachment) {
+		for ( let i = 0; i < cameras.length; i ++ ) {
+
+			const layerDescriptor = renderContextData.layerDescriptors[ i ];
+
+			if ( layerDescriptor.depthStencilAttachment ) {
+
 				const depthAttachment = layerDescriptor.depthStencilAttachment;
 
-				if (renderContext.depth) {
-					if (renderContext.clearDepth) {
+				if ( renderContext.depth ) {
+
+					if ( renderContext.clearDepth ) {
+
 						depthAttachment.depthClearValue = renderContext.clearDepthValue;
 						depthAttachment.depthLoadOp = GPULoadOp.Clear;
+
 					} else {
+
 						depthAttachment.depthLoadOp = GPULoadOp.Load;
+
 					}
+
 				}
 
-				if (renderContext.stencil) {
-					if (renderContext.clearStencil) {
+				if ( renderContext.stencil ) {
+
+					if ( renderContext.clearStencil ) {
+
 						depthAttachment.stencilClearValue = renderContext.clearStencilValue;
 						depthAttachment.stencilLoadOp = GPULoadOp.Clear;
+
 					} else {
+
 						depthAttachment.stencilLoadOp = GPULoadOp.Load;
+
 					}
+
 				}
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -79169,118 +79407,138 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	finishRender(renderContext) {
-		const renderContextData = this.get(renderContext);
+	finishRender( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		if (renderContextData.renderBundles.length > 0) {
-			renderContextData.currentPass.executeBundles(
-				renderContextData.renderBundles,
-			);
+		if ( renderContextData.renderBundles.length > 0 ) {
+
+			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
+
 		}
 
-		if (occlusionQueryCount > renderContextData.occlusionQueryIndex) {
+		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
 			renderContextData.currentPass.endOcclusionQuery();
+
 		}
 
 		// shadow arrays - Execute bundles for each layer
 
 		const encoder = renderContextData.encoder;
 
-		if (this._isRenderCameraDepthArray(renderContext) === true) {
-			const bundles = [];
+		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
-			for (let i = 0; i < renderContextData.bundleEncoders.length; i++) {
-				const bundleEncoder = renderContextData.bundleEncoders[i];
-				bundles.push(bundleEncoder.finish());
+		  const bundles = [];
+
+		  for ( let i = 0; i < renderContextData.bundleEncoders.length; i ++ ) {
+
+				const bundleEncoder = renderContextData.bundleEncoders[ i ];
+				bundles.push( bundleEncoder.finish() );
+
 			}
 
-			for (let i = 0; i < renderContextData.layerDescriptors.length; i++) {
-				if (i < bundles.length) {
-					const layerDescriptor = renderContextData.layerDescriptors[i];
-					const renderPass = encoder.beginRenderPass(layerDescriptor);
+		  for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
 
-					if (renderContext.viewport) {
-						const { x, y, width, height, minDepth, maxDepth } =
-							renderContext.viewportValue;
-						renderPass.setViewport(x, y, width, height, minDepth, maxDepth);
+				if ( i < bundles.length ) {
+
+					const layerDescriptor = renderContextData.layerDescriptors[ i ];
+					const renderPass = encoder.beginRenderPass( layerDescriptor );
+
+					if ( renderContext.viewport ) {
+
+						const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+						renderPass.setViewport( x, y, width, height, minDepth, maxDepth );
+
 					}
 
-					if (renderContext.scissor) {
+					if ( renderContext.scissor ) {
+
 						const { x, y, width, height } = renderContext.scissorValue;
-						renderPass.setScissorRect(x, y, width, height);
+						renderPass.setScissorRect( x, y, width, height );
+
 					}
 
-					renderPass.executeBundles([bundles[i]]);
+					renderPass.executeBundles( [ bundles[ i ] ] );
 
 					renderPass.end();
+
 				}
+
 			}
-		} else if (renderContextData.currentPass) {
-			renderContextData.currentPass.end();
+
+		} else if ( renderContextData.currentPass ) {
+
+		  renderContextData.currentPass.end();
+
 		}
 
-		if (occlusionQueryCount > 0) {
+		if ( occlusionQueryCount > 0 ) {
+
 			const bufferSize = occlusionQueryCount * 8; // 8 byte entries for query results
 
 			//
 
-			let queryResolveBuffer = this.occludedResolveCache.get(bufferSize);
+			let queryResolveBuffer = this.occludedResolveCache.get( bufferSize );
 
-			if (queryResolveBuffer === undefined) {
-				queryResolveBuffer = this.device.createBuffer({
-					size: bufferSize,
-					usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
-				});
+			if ( queryResolveBuffer === undefined ) {
 
-				this.occludedResolveCache.set(bufferSize, queryResolveBuffer);
+				queryResolveBuffer = this.device.createBuffer(
+					{
+						size: bufferSize,
+						usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
+					}
+				);
+
+				this.occludedResolveCache.set( bufferSize, queryResolveBuffer );
+
 			}
 
 			//
 
-			const readBuffer = this.device.createBuffer({
-				size: bufferSize,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-			});
+			const readBuffer = this.device.createBuffer(
+				{
+					size: bufferSize,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+				}
+			);
 
 			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ to be combined
-			renderContextData.encoder.resolveQuerySet(
-				renderContextData.occlusionQuerySet,
-				0,
-				occlusionQueryCount,
-				queryResolveBuffer,
-				0,
-			);
-			renderContextData.encoder.copyBufferToBuffer(
-				queryResolveBuffer,
-				0,
-				readBuffer,
-				0,
-				bufferSize,
-			);
+			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
+			renderContextData.encoder.copyBufferToBuffer( queryResolveBuffer, 0, readBuffer, 0, bufferSize );
 
 			renderContextData.occlusionQueryBuffer = readBuffer;
 
 			//
 
-			this.resolveOccludedAsync(renderContext);
+			this.resolveOccludedAsync( renderContext );
+
 		}
 
-		this.device.queue.submit([renderContextData.encoder.finish()]);
+		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+
 
 		//
 
-		if (renderContext.textures !== null) {
+		if ( renderContext.textures !== null ) {
+
 			const textures = renderContext.textures;
 
-			for (let i = 0; i < textures.length; i++) {
-				const texture = textures[i];
+			for ( let i = 0; i < textures.length; i ++ ) {
 
-				if (texture.generateMipmaps === true) {
-					this.textureUtils.generateMipmaps(texture);
+				const texture = textures[ i ];
+
+				if ( texture.generateMipmaps === true ) {
+
+					this.textureUtils.generateMipmaps( texture );
+
 				}
+
 			}
+
 		}
+
 	}
 
 	/**
@@ -79291,10 +79549,12 @@ class WebGPUBackend extends Backend {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
-	isOccluded(renderContext, object) {
-		const renderContextData = this.get(renderContext);
+	isOccluded( renderContext, object ) {
 
-		return renderContextData.occluded && renderContextData.occluded.has(object);
+		const renderContextData = this.get( renderContext );
+
+		return renderContextData.occluded && renderContextData.occluded.has( object );
+
 	}
 
 	/**
@@ -79305,35 +79565,42 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @return {Promise} A Promise that resolves when the occlusion query results have been processed.
 	 */
-	async resolveOccludedAsync(renderContext) {
-		const renderContextData = this.get(renderContext);
+	async resolveOccludedAsync( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
 
 		// handle occlusion query results
 
-		const { currentOcclusionQueryBuffer, currentOcclusionQueryObjects } =
-			renderContextData;
+		const { currentOcclusionQueryBuffer, currentOcclusionQueryObjects } = renderContextData;
 
-		if (currentOcclusionQueryBuffer && currentOcclusionQueryObjects) {
+		if ( currentOcclusionQueryBuffer && currentOcclusionQueryObjects ) {
+
 			const occluded = new WeakSet();
 
 			renderContextData.currentOcclusionQueryObjects = null;
 			renderContextData.currentOcclusionQueryBuffer = null;
 
-			await currentOcclusionQueryBuffer.mapAsync(GPUMapMode.READ);
+			await currentOcclusionQueryBuffer.mapAsync( GPUMapMode.READ );
 
 			const buffer = currentOcclusionQueryBuffer.getMappedRange();
-			const results = new BigUint64Array(buffer);
+			const results = new BigUint64Array( buffer );
 
-			for (let i = 0; i < currentOcclusionQueryObjects.length; i++) {
-				if (results[i] === BigInt(0)) {
-					occluded.add(currentOcclusionQueryObjects[i]);
+			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
+
+				if ( results[ i ] === BigInt( 0 ) ) {
+
+					occluded.add( currentOcclusionQueryObjects[ i ] );
+
 				}
+
 			}
 
 			currentOcclusionQueryBuffer.destroy();
 
 			renderContextData.occluded = occluded;
+
 		}
+
 	}
 
 	/**
@@ -79341,12 +79608,13 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateViewport(renderContext) {
-		const { currentPass } = this.get(renderContext);
-		const { x, y, width, height, minDepth, maxDepth } =
-			renderContext.viewportValue;
+	updateViewport( renderContext ) {
 
-		currentPass.setViewport(x, y, width, height, minDepth, maxDepth);
+		const { currentPass } = this.get( renderContext );
+		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+
+		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
+
 	}
 
 	/**
@@ -79354,11 +79622,13 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateScissor(renderContext) {
-		const { currentPass } = this.get(renderContext);
+	updateScissor( renderContext ) {
+
+		const { currentPass } = this.get( renderContext );
 		const { x, y, width, height } = renderContext.scissorValue;
 
-		currentPass.setScissorRect(x, y, width, height);
+		currentPass.setScissorRect( x, y, width, height );
+
 	}
 
 	/**
@@ -79368,17 +79638,21 @@ class WebGPUBackend extends Backend {
 	 * @return {Color4} The clear color.
 	 */
 	getClearColor() {
+
 		const clearColor = super.getClearColor();
 
 		// only premultiply alpha when alphaMode is "premultiplied"
 
-		if (this.renderer.alpha === true) {
+		if ( this.renderer.alpha === true ) {
+
 			clearColor.r *= clearColor.a;
 			clearColor.g *= clearColor.a;
 			clearColor.b *= clearColor.a;
+
 		}
 
 		return clearColor;
+
 	}
 
 	/**
@@ -79389,7 +79663,8 @@ class WebGPUBackend extends Backend {
 	 * @param {boolean} stencil - Whether the stencil buffer should be cleared or not.
 	 * @param {?RenderContext} [renderTargetContext=null] - The render context of the current set render target.
 	 */
-	clear(color, depth, stencil, renderTargetContext = null) {
+	clear( color, depth, stencil, renderTargetContext = null ) {
+
 		const device = this.device;
 		const renderer = this.renderer;
 
@@ -79400,104 +79675,119 @@ class WebGPUBackend extends Backend {
 		let supportsDepth;
 		let supportsStencil;
 
-		if (color) {
+		if ( color ) {
+
 			const clearColor = this.getClearColor();
-			clearValue = {
-				r: clearColor.r,
-				g: clearColor.g,
-				b: clearColor.b,
-				a: clearColor.a,
-			};
+			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+
 		}
 
-		if (renderTargetContext === null) {
+		if ( renderTargetContext === null ) {
+
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
 
 			const descriptor = this._getDefaultRenderPassDescriptor();
 
-			if (color) {
+			if ( color ) {
+
 				colorAttachments = descriptor.colorAttachments;
 
-				const colorAttachment = colorAttachments[0];
+				const colorAttachment = colorAttachments[ 0 ];
 
 				colorAttachment.clearValue = clearValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
+
 			}
 
-			if (supportsDepth || supportsStencil) {
+			if ( supportsDepth || supportsStencil ) {
+
 				depthStencilAttachment = descriptor.depthStencilAttachment;
+
 			}
+
 		} else {
+
 			supportsDepth = renderTargetContext.depth;
 			supportsStencil = renderTargetContext.stencil;
 
 			const clearConfig = {
 				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
-				clearValue: color ? clearValue : undefined,
+				clearValue: color ? clearValue : undefined
 			};
 
-			if (supportsDepth) {
+			if ( supportsDepth ) {
+
 				clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
-				clearConfig.depthClearValue = depth
-					? renderer.getClearDepth()
-					: undefined;
+				clearConfig.depthClearValue = depth ? renderer.getClearDepth() : undefined;
 				clearConfig.depthStoreOp = GPUStoreOp.Store;
+
 			}
 
-			if (supportsStencil) {
+			if ( supportsStencil ) {
+
 				clearConfig.stencilLoadOp = stencil ? GPULoadOp.Clear : GPULoadOp.Load;
-				clearConfig.stencilClearValue = stencil
-					? renderer.getClearStencil()
-					: undefined;
+				clearConfig.stencilClearValue = stencil ? renderer.getClearStencil() : undefined;
 				clearConfig.stencilStoreOp = GPUStoreOp.Store;
+
 			}
 
-			const descriptor = this._getRenderPassDescriptor(
-				renderTargetContext,
-				clearConfig,
-			);
+			const descriptor = this._getRenderPassDescriptor( renderTargetContext, clearConfig );
 
 			colorAttachments = descriptor.colorAttachments;
 			depthStencilAttachment = descriptor.depthStencilAttachment;
+
 		}
 
-		if (supportsDepth && depthStencilAttachment) {
-			if (depth) {
+		if ( supportsDepth && depthStencilAttachment ) {
+
+			if ( depth ) {
+
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
 				depthStencilAttachment.depthClearValue = renderer.getClearDepth();
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
 			} else {
+
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
 			}
+
 		}
 
 		//
 
-		if (supportsStencil && depthStencilAttachment) {
-			if (stencil) {
+		if ( supportsStencil && depthStencilAttachment ) {
+
+			if ( stencil ) {
+
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
 				depthStencilAttachment.stencilClearValue = renderer.getClearStencil();
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
 			} else {
+
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
 			}
+
 		}
 
 		//
 
-		const encoder = device.createCommandEncoder({ label: "clear" });
-		const currentPass = encoder.beginRenderPass({
+		const encoder = device.createCommandEncoder( { label: 'clear' } );
+		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
-			depthStencilAttachment,
-		});
+			depthStencilAttachment
+		} );
 
 		currentPass.end();
 
-		device.queue.submit([encoder.finish()]);
+		device.queue.submit( [ encoder.finish() ] );
+
 	}
 
 	// compute
@@ -79508,27 +79798,22 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute(computeGroup) {
-		const groupGPU = this.get(computeGroup);
+	beginCompute( computeGroup ) {
+
+		const groupGPU = this.get( computeGroup );
 
 		//
 
 		const descriptor = {
-			label: "computeGroup_" + computeGroup.id,
+			label: 'computeGroup_' + computeGroup.id
 		};
 
-		this.initTimestampQuery(
-			TimestampQuery.COMPUTE,
-			this.getTimestampUID(computeGroup),
-			descriptor,
-		);
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder({
-			label: "computeGroup_" + computeGroup.id,
-		});
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
 
-		groupGPU.passEncoderGPU =
-			groupGPU.cmdEncoderGPU.beginComputePass(descriptor);
+		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+
 	}
 
 	/**
@@ -79543,95 +79828,97 @@ class WebGPUBackend extends Backend {
 	 * - An array [x, y, z] representing dispatch size, or
 	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 */
-	compute(computeGroup, computeNode, bindings, pipeline, dispatchSize = null) {
-		const computeNodeData = this.get(computeNode);
-		const { passEncoderGPU } = this.get(computeGroup);
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
+
+		const computeNodeData = this.get( computeNode );
+		const { passEncoderGPU } = this.get( computeGroup );
 
 		// pipeline
 
-		const pipelineGPU = this.get(pipeline).pipeline;
+		const pipelineGPU = this.get( pipeline ).pipeline;
 
-		this.pipelineUtils.setPipeline(passEncoderGPU, pipelineGPU);
+		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 
 		// bind groups
 
-		for (let i = 0, l = bindings.length; i < l; i++) {
-			const bindGroup = bindings[i];
-			const bindingsData = this.get(bindGroup);
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
-			passEncoderGPU.setBindGroup(i, bindingsData.group);
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
 		}
 
-		if (dispatchSize === null) {
+		if ( dispatchSize === null ) {
+
 			dispatchSize = computeNode.count;
+
 		}
 
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
-		if (
-			dispatchSize &&
-			typeof dispatchSize === "object" &&
-			dispatchSize.isIndirectStorageBufferAttribute
-		) {
-			const dispatchBuffer = this.get(dispatchSize).buffer;
+		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
 
-			passEncoderGPU.dispatchWorkgroupsIndirect(dispatchBuffer, 0);
+			const dispatchBuffer = this.get( dispatchSize ).buffer;
+
+			passEncoderGPU.dispatchWorkgroupsIndirect( dispatchBuffer, 0 );
 
 			return;
+
 		}
 
-		if (typeof dispatchSize === "number") {
+		if ( typeof dispatchSize === 'number' ) {
+
 			// If a single number is given, we calculate the dispatch size based on the workgroup size
 
 			const count = dispatchSize;
 
-			if (
-				computeNodeData.dispatchSize === undefined ||
-				computeNodeData.count !== count
-			) {
+			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
+
 				// cache dispatch size to avoid recalculating it every time
 
-				computeNodeData.dispatchSize = [0, 1, 1];
+				computeNodeData.dispatchSize = [ 0, 1, 1 ];
 				computeNodeData.count = count;
 
 				const workgroupSize = computeNode.workgroupSize;
 
-				let size = workgroupSize[0];
+				let size = workgroupSize[ 0 ];
 
-				for (let i = 1; i < workgroupSize.length; i++) size *= workgroupSize[i];
+				for ( let i = 1; i < workgroupSize.length; i ++ )
+					size *= workgroupSize[ i ];
 
-				const dispatchCount = Math.ceil(count / size);
+				const dispatchCount = Math.ceil( count / size );
 
 				//
 
-				const maxComputeWorkgroupsPerDimension =
-					this.device.limits.maxComputeWorkgroupsPerDimension;
+				const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
 
-				dispatchSize = [dispatchCount, 1, 1];
+				dispatchSize = [ dispatchCount, 1, 1 ];
 
-				if (dispatchCount > maxComputeWorkgroupsPerDimension) {
-					dispatchSize[0] = Math.min(
-						dispatchCount,
-						maxComputeWorkgroupsPerDimension,
-					);
-					dispatchSize[1] = Math.ceil(
-						dispatchCount / maxComputeWorkgroupsPerDimension,
-					);
+				if ( dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+					dispatchSize[ 0 ] = Math.min( dispatchCount, maxComputeWorkgroupsPerDimension );
+					dispatchSize[ 1 ] = Math.ceil( dispatchCount / maxComputeWorkgroupsPerDimension );
+
 				}
 
 				computeNodeData.dispatchSize = dispatchSize;
+
 			}
 
 			dispatchSize = computeNodeData.dispatchSize;
+
 		}
 
 		//
 
 		passEncoderGPU.dispatchWorkgroups(
-			dispatchSize[0],
-			dispatchSize[1] || 1,
-			dispatchSize[2] || 1,
+			dispatchSize[ 0 ],
+			dispatchSize[ 1 ] || 1,
+			dispatchSize[ 2 ] || 1
 		);
+
 	}
 
 	/**
@@ -79640,12 +79927,14 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute(computeGroup) {
-		const groupData = this.get(computeGroup);
+	finishCompute( computeGroup ) {
+
+		const groupData = this.get( computeGroup );
 
 		groupData.passEncoderGPU.end();
 
-		this.device.queue.submit([groupData.cmdEncoderGPU.finish()]);
+		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+
 	}
 
 	// render object
@@ -79656,276 +79945,317 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object to draw.
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 */
-	draw(renderObject, info) {
+	draw( renderObject, info ) {
+
 		const { object, material, context, pipeline } = renderObject;
 		const bindings = renderObject.getBindings();
-		const renderContextData = this.get(context);
-		const pipelineData = this.get(pipeline);
+		const renderContextData = this.get( context );
+		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
-		if (pipelineData.error === true) return;
+		if ( pipelineData.error === true ) return;
 
 		const index = renderObject.getIndex();
-		const hasIndex = index !== null;
+		const hasIndex = ( index !== null );
+
 
 		const drawParams = renderObject.getDrawParameters();
-		if (drawParams === null) return;
+		if ( drawParams === null ) return;
 
 		// pipeline
 
-		const setPipelineAndBindings = (passEncoderGPU, currentSets) => {
+		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
+
 			// pipeline
-			this.pipelineUtils.setPipeline(passEncoderGPU, pipelineGPU);
+			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 			currentSets.pipeline = pipelineGPU;
 
 			// bind groups
 			const currentBindingGroups = currentSets.bindingGroups;
-			for (let i = 0, l = bindings.length; i < l; i++) {
-				const bindGroup = bindings[i];
-				const bindingsData = this.get(bindGroup);
-				if (currentBindingGroups[bindGroup.index] !== bindGroup.id) {
-					passEncoderGPU.setBindGroup(bindGroup.index, bindingsData.group);
-					currentBindingGroups[bindGroup.index] = bindGroup.id;
+			for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+				const bindGroup = bindings[ i ];
+				const bindingsData = this.get( bindGroup );
+				if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+
+					passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+					currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+
 				}
+
 			}
 
 			// attributes
 
 			// index
 
-			if (hasIndex === true) {
-				if (currentSets.index !== index) {
-					const buffer = this.get(index).buffer;
-					const indexFormat =
-						index.array instanceof Uint16Array
-							? GPUIndexFormat.Uint16
-							: GPUIndexFormat.Uint32;
+			if ( hasIndex === true ) {
 
-					passEncoderGPU.setIndexBuffer(buffer, indexFormat);
+				if ( currentSets.index !== index ) {
+
+					const buffer = this.get( index ).buffer;
+					const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+					passEncoderGPU.setIndexBuffer( buffer, indexFormat );
 
 					currentSets.index = index;
+
 				}
+
 			}
 			// vertex buffers
 
 			const vertexBuffers = renderObject.getVertexBuffers();
 
-			for (let i = 0, l = vertexBuffers.length; i < l; i++) {
-				const vertexBuffer = vertexBuffers[i];
+			for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
 
-				if (currentSets.attributes[i] !== vertexBuffer) {
-					const buffer = this.get(vertexBuffer).buffer;
-					passEncoderGPU.setVertexBuffer(i, buffer);
+				const vertexBuffer = vertexBuffers[ i ];
 
-					currentSets.attributes[i] = vertexBuffer;
+				if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+
+					const buffer = this.get( vertexBuffer ).buffer;
+					passEncoderGPU.setVertexBuffer( i, buffer );
+
+					currentSets.attributes[ i ] = vertexBuffer;
+
 				}
+
 			}
 			// stencil
 
-			if (
-				context.stencil === true &&
-				material.stencilWrite === true &&
-				renderContextData.currentStencilRef !== material.stencilRef
-			) {
-				passEncoderGPU.setStencilReference(material.stencilRef);
+			if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
+
+				passEncoderGPU.setStencilReference( material.stencilRef );
 				renderContextData.currentStencilRef = material.stencilRef;
+
 			}
+
+
 		};
 
 		// Define draw function
-		const draw = (passEncoderGPU, currentSets) => {
-			setPipelineAndBindings(passEncoderGPU, currentSets);
+		const draw = ( passEncoderGPU, currentSets ) => {
 
-			if (object.isBatchedMesh === true) {
+			setPipelineAndBindings( passEncoderGPU, currentSets );
+
+			if ( object.isBatchedMesh === true ) {
+
 				const starts = object._multiDrawStarts;
 				const counts = object._multiDrawCounts;
 				const drawCount = object._multiDrawCount;
 				const drawInstances = object._multiDrawInstances;
 
-				if (drawInstances !== null) {
+				if ( drawInstances !== null ) {
+
 					// @deprecated, r174
-					warnOnce(
-						"WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.",
-					);
+					warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+
 				}
 
-				let bytesPerElement =
-					hasIndex === true ? index.array.BYTES_PER_ELEMENT : 1;
+				let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
 
-				if (material.wireframe) {
-					bytesPerElement =
-						object.geometry.attributes.position.count > 65535 ? 4 : 2;
+				if ( material.wireframe ) {
+
+					bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
 				}
 
-				for (let i = 0; i < drawCount; i++) {
-					const count = drawInstances ? drawInstances[i] : 1;
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					const count = drawInstances ? drawInstances[ i ] : 1;
 					const firstInstance = count > 1 ? 0 : i;
 
-					if (hasIndex === true) {
-						passEncoderGPU.drawIndexed(
-							counts[i],
-							count,
-							starts[i] / bytesPerElement,
-							0,
-							firstInstance,
-						);
+					if ( hasIndex === true ) {
+
+						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
+
 					} else {
-						passEncoderGPU.draw(counts[i], count, starts[i], firstInstance);
+
+						passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+
 					}
 
-					info.update(object, counts[i], count);
+					info.update( object, counts[ i ], count );
+
 				}
-			} else if (hasIndex === true) {
-				const {
-					vertexCount: indexCount,
-					instanceCount,
-					firstVertex: firstIndex,
-				} = drawParams;
+
+			} else if ( hasIndex === true ) {
+
+				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
 				const indirect = renderObject.getIndirect();
 
-				if (indirect !== null) {
-					const buffer = this.get(indirect).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray(indirectOffset)
-						? indirectOffset
-						: [indirectOffset];
+				if ( indirect !== null ) {
 
-					for (let i = 0; i < indirectOffsets.length; i++) {
-						passEncoderGPU.drawIndexedIndirect(buffer, indirectOffsets[i]);
+					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+						passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
+
 					}
+
 				} else {
-					passEncoderGPU.drawIndexed(
-						indexCount,
-						instanceCount,
-						firstIndex,
-						0,
-						0,
-					);
+
+					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
 				}
 
-				info.update(object, indexCount, instanceCount);
+				info.update( object, indexCount, instanceCount );
+
 			} else {
+
 				const { vertexCount, instanceCount, firstVertex } = drawParams;
 
 				const indirect = renderObject.getIndirect();
 
-				if (indirect !== null) {
-					const buffer = this.get(indirect).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray(indirectOffset)
-						? indirectOffset
-						: [indirectOffset];
+				if ( indirect !== null ) {
 
-					for (let i = 0; i < indirectOffsets.length; i++) {
-						passEncoderGPU.drawIndirect(buffer, indirectOffsets[i]);
+					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+						passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
+
 					}
+
+
 				} else {
-					passEncoderGPU.draw(vertexCount, instanceCount, firstVertex, 0);
+
+					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
 				}
 
-				info.update(object, vertexCount, instanceCount);
+				info.update( object, vertexCount, instanceCount );
+
 			}
+
 		};
 
-		if (
-			renderObject.camera.isArrayCamera &&
-			renderObject.camera.cameras.length > 0
-		) {
-			const cameraData = this.get(renderObject.camera);
-			const cameras = renderObject.camera.cameras;
-			const cameraIndex = renderObject.getBindingGroup("cameraIndex");
+		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
-			if (
-				cameraData.indexesGPU === undefined ||
-				cameraData.indexesGPU.length !== cameras.length
-			) {
-				const bindingsData = this.get(cameraIndex);
+			const cameraData = this.get( renderObject.camera );
+			const cameras = renderObject.camera.cameras;
+			const cameraIndex = renderObject.getBindingGroup( 'cameraIndex' );
+
+			if ( cameraData.indexesGPU === undefined || cameraData.indexesGPU.length !== cameras.length ) {
+
+				const bindingsData = this.get( cameraIndex );
 				const indexesGPU = [];
 
-				const data = new Uint32Array([0, 0, 0, 0]);
+				const data = new Uint32Array( [ 0, 0, 0, 0 ] );
 
-				for (let i = 0, len = cameras.length; i < len; i++) {
-					data[0] = i;
+				for ( let i = 0, len = cameras.length; i < len; i ++ ) {
+
+					data[ 0 ] = i;
 
 					const { layoutGPU } = bindingsData.layout;
 
-					const bindGroupIndex = this.bindingUtils.createBindGroupIndex(
-						data,
-						layoutGPU,
-					);
+					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, layoutGPU );
 
-					indexesGPU.push(bindGroupIndex);
+					indexesGPU.push( bindGroupIndex );
+
 				}
 
 				cameraData.indexesGPU = indexesGPU; // TODO: Create a global library for this
+
 			}
 
 			const pixelRatio = this.renderer.getPixelRatio();
 
-			for (let i = 0, len = cameras.length; i < len; i++) {
-				const subCamera = cameras[i];
+			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
-				if (object.layers.test(subCamera.layers)) {
+				const subCamera = cameras[ i ];
+
+				if ( object.layers.test( subCamera.layers ) ) {
+
 					const vp = subCamera.viewport;
+
+
 
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
-					if (renderContextData.bundleEncoders) {
-						const bundleEncoder = renderContextData.bundleEncoders[i];
-						const bundleSets = renderContextData.bundleSets[i];
+					if ( renderContextData.bundleEncoders ) {
+
+						const bundleEncoder = renderContextData.bundleEncoders[ i ];
+						const bundleSets = renderContextData.bundleSets[ i ];
 						pass = bundleEncoder;
 						sets = bundleSets;
+
 					}
 
-					if (vp) {
+
+
+					if ( vp ) {
+
 						pass.setViewport(
-							Math.floor(vp.x * pixelRatio),
-							Math.floor(vp.y * pixelRatio),
-							Math.floor(vp.width * pixelRatio),
-							Math.floor(vp.height * pixelRatio),
+							Math.floor( vp.x * pixelRatio ),
+							Math.floor( vp.y * pixelRatio ),
+							Math.floor( vp.width * pixelRatio ),
+							Math.floor( vp.height * pixelRatio ),
 							context.viewportValue.minDepth,
-							context.viewportValue.maxDepth,
+							context.viewportValue.maxDepth
 						);
+
 					}
+
 
 					// Set camera index binding for this layer
-					if (cameraIndex && cameraData.indexesGPU) {
-						pass.setBindGroup(cameraIndex.index, cameraData.indexesGPU[i]);
-						sets.bindingGroups[cameraIndex.index] = cameraIndex.id;
+					if ( cameraIndex && cameraData.indexesGPU ) {
+
+						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+
 					}
 
-					draw(pass, sets);
+					draw( pass, sets );
+
+
 				}
+
 			}
+
 		} else {
+
 			// Regular single camera rendering
-			if (renderContextData.currentPass) {
+			if ( renderContextData.currentPass ) {
+
 				// Handle occlusion queries
-				if (renderContextData.occlusionQuerySet !== undefined) {
+				if ( renderContextData.occlusionQuerySet !== undefined ) {
+
 					const lastObject = renderContextData.lastOcclusionObject;
-					if (lastObject !== object) {
-						if (lastObject !== null && lastObject.occlusionTest === true) {
+					if ( lastObject !== object ) {
+
+						if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
 							renderContextData.currentPass.endOcclusionQuery();
-							renderContextData.occlusionQueryIndex++;
+							renderContextData.occlusionQueryIndex ++;
+
 						}
 
-						if (object.occlusionTest === true) {
-							renderContextData.currentPass.beginOcclusionQuery(
-								renderContextData.occlusionQueryIndex,
-							);
-							renderContextData.occlusionQueryObjects[
-								renderContextData.occlusionQueryIndex
-							] = object;
+						if ( object.occlusionTest === true ) {
+
+							renderContextData.currentPass.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+							renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
+
 						}
 
 						renderContextData.lastOcclusionObject = object;
+
 					}
+
 				}
 
-				draw(renderContextData.currentPass, renderContextData.currentSets);
+				draw( renderContextData.currentPass, renderContextData.currentSets );
+
 			}
+
 		}
+
 	}
 
 	// cache key
@@ -79936,79 +80266,47 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {boolean} Whether the render pipeline requires an update or not.
 	 */
-	needsRenderUpdate(renderObject) {
-		const data = this.get(renderObject);
+	needsRenderUpdate( renderObject ) {
+
+		const data = this.get( renderObject );
 
 		const { object, material } = renderObject;
 
 		const utils = this.utils;
 
-		const sampleCount = utils.getSampleCountRenderContext(renderObject.context);
-		const colorSpace = utils.getCurrentColorSpace(renderObject.context);
-		const colorFormat = utils.getCurrentColorFormat(renderObject.context);
-		const depthStencilFormat = utils.getCurrentDepthStencilFormat(
-			renderObject.context,
-		);
-		const primitiveTopology = utils.getPrimitiveTopology(object, material);
+		const sampleCount = utils.getSampleCountRenderContext( renderObject.context );
+		const colorSpace = utils.getCurrentColorSpace( renderObject.context );
+		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
+		const primitiveTopology = utils.getPrimitiveTopology( object, material );
 
 		let needsUpdate = false;
 
-		if (
-			data.material !== material ||
-			data.materialVersion !== material.version ||
-			data.transparent !== material.transparent ||
-			data.blending !== material.blending ||
-			data.premultipliedAlpha !== material.premultipliedAlpha ||
-			data.blendSrc !== material.blendSrc ||
-			data.blendDst !== material.blendDst ||
-			data.blendEquation !== material.blendEquation ||
-			data.blendSrcAlpha !== material.blendSrcAlpha ||
-			data.blendDstAlpha !== material.blendDstAlpha ||
-			data.blendEquationAlpha !== material.blendEquationAlpha ||
-			data.colorWrite !== material.colorWrite ||
-			data.depthWrite !== material.depthWrite ||
-			data.depthTest !== material.depthTest ||
-			data.depthFunc !== material.depthFunc ||
-			data.stencilWrite !== material.stencilWrite ||
-			data.stencilFunc !== material.stencilFunc ||
-			data.stencilFail !== material.stencilFail ||
-			data.stencilZFail !== material.stencilZFail ||
-			data.stencilZPass !== material.stencilZPass ||
-			data.stencilFuncMask !== material.stencilFuncMask ||
-			data.stencilWriteMask !== material.stencilWriteMask ||
-			data.side !== material.side ||
-			data.alphaToCoverage !== material.alphaToCoverage ||
-			data.sampleCount !== sampleCount ||
-			data.colorSpace !== colorSpace ||
-			data.colorFormat !== colorFormat ||
-			data.depthStencilFormat !== depthStencilFormat ||
+		if ( data.material !== material || data.materialVersion !== material.version ||
+			data.transparent !== material.transparent || data.blending !== material.blending || data.premultipliedAlpha !== material.premultipliedAlpha ||
+			data.blendSrc !== material.blendSrc || data.blendDst !== material.blendDst || data.blendEquation !== material.blendEquation ||
+			data.blendSrcAlpha !== material.blendSrcAlpha || data.blendDstAlpha !== material.blendDstAlpha || data.blendEquationAlpha !== material.blendEquationAlpha ||
+			data.colorWrite !== material.colorWrite || data.depthWrite !== material.depthWrite || data.depthTest !== material.depthTest || data.depthFunc !== material.depthFunc ||
+			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
+			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
+			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
+			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
+			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
+			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
 			data.primitiveTopology !== primitiveTopology ||
 			data.clippingContextCacheKey !== renderObject.clippingContextCacheKey
 		) {
-			data.material = material;
-			data.materialVersion = material.version;
-			data.transparent = material.transparent;
-			data.blending = material.blending;
-			data.premultipliedAlpha = material.premultipliedAlpha;
-			data.blendSrc = material.blendSrc;
-			data.blendDst = material.blendDst;
-			data.blendEquation = material.blendEquation;
-			data.blendSrcAlpha = material.blendSrcAlpha;
-			data.blendDstAlpha = material.blendDstAlpha;
-			data.blendEquationAlpha = material.blendEquationAlpha;
+
+			data.material = material; data.materialVersion = material.version;
+			data.transparent = material.transparent; data.blending = material.blending; data.premultipliedAlpha = material.premultipliedAlpha;
+			data.blendSrc = material.blendSrc; data.blendDst = material.blendDst; data.blendEquation = material.blendEquation;
+			data.blendSrcAlpha = material.blendSrcAlpha; data.blendDstAlpha = material.blendDstAlpha; data.blendEquationAlpha = material.blendEquationAlpha;
 			data.colorWrite = material.colorWrite;
-			data.depthWrite = material.depthWrite;
-			data.depthTest = material.depthTest;
-			data.depthFunc = material.depthFunc;
-			data.stencilWrite = material.stencilWrite;
-			data.stencilFunc = material.stencilFunc;
-			data.stencilFail = material.stencilFail;
-			data.stencilZFail = material.stencilZFail;
-			data.stencilZPass = material.stencilZPass;
-			data.stencilFuncMask = material.stencilFuncMask;
-			data.stencilWriteMask = material.stencilWriteMask;
-			data.side = material.side;
-			data.alphaToCoverage = material.alphaToCoverage;
+			data.depthWrite = material.depthWrite; data.depthTest = material.depthTest; data.depthFunc = material.depthFunc;
+			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
+			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
+			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
+			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
 			data.sampleCount = sampleCount;
 			data.colorSpace = colorSpace;
 			data.colorFormat = colorFormat;
@@ -80017,9 +80315,11 @@ class WebGPUBackend extends Backend {
 			data.clippingContextCacheKey = renderObject.clippingContextCacheKey;
 
 			needsUpdate = true;
+
 		}
 
 		return needsUpdate;
+
 	}
 
 	/**
@@ -80028,7 +80328,8 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {string} The cache key.
 	 */
-	getRenderCacheKey(renderObject) {
+	getRenderCacheKey( renderObject ) {
+
 		const { object, material } = renderObject;
 
 		const utils = this.utils;
@@ -80037,39 +80338,26 @@ class WebGPUBackend extends Backend {
 		// meshes with negative scale have a different frontFace render pipeline
 		// descriptor value so the following must be honored in the cache key
 
-		const frontFaceCW = object.isMesh && object.matrixWorld.determinant() < 0;
+		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		return [
-			material.transparent,
-			material.blending,
-			material.premultipliedAlpha,
-			material.blendSrc,
-			material.blendDst,
-			material.blendEquation,
-			material.blendSrcAlpha,
-			material.blendDstAlpha,
-			material.blendEquationAlpha,
+			material.transparent, material.blending, material.premultipliedAlpha,
+			material.blendSrc, material.blendDst, material.blendEquation,
+			material.blendSrcAlpha, material.blendDstAlpha, material.blendEquationAlpha,
 			material.colorWrite,
-			material.depthWrite,
-			material.depthTest,
-			material.depthFunc,
-			material.stencilWrite,
-			material.stencilFunc,
-			material.stencilFail,
-			material.stencilZFail,
-			material.stencilZPass,
-			material.stencilFuncMask,
-			material.stencilWriteMask,
+			material.depthWrite, material.depthTest, material.depthFunc,
+			material.stencilWrite, material.stencilFunc,
+			material.stencilFail, material.stencilZFail, material.stencilZPass,
+			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
 			frontFaceCW,
-			utils.getSampleCountRenderContext(renderContext),
-			utils.getCurrentColorSpace(renderContext),
-			utils.getCurrentColorFormat(renderContext),
-			utils.getCurrentDepthStencilFormat(renderContext),
-			utils.getPrimitiveTopology(object, material),
+			utils.getSampleCountRenderContext( renderContext ),
+			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
+			utils.getPrimitiveTopology( object, material ),
 			renderObject.getGeometryCacheKey(),
-			renderObject.clippingContextCacheKey,
+			renderObject.clippingContextCacheKey
 		].join();
+
 	}
 
 	// textures
@@ -80080,8 +80368,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Texture} texture - The texture to update the sampler for.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler(texture) {
-		return this.textureUtils.updateSampler(texture);
+	updateSampler( texture ) {
+
+		return this.textureUtils.updateSampler( texture );
+
 	}
 
 	/**
@@ -80091,8 +80381,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Texture} texture - The texture to create a default texture for.
 	 * @return {boolean} Whether the sampler has been updated or not.
 	 */
-	createDefaultTexture(texture) {
-		return this.textureUtils.createDefaultTexture(texture);
+	createDefaultTexture( texture ) {
+
+		return this.textureUtils.createDefaultTexture( texture );
+
 	}
 
 	/**
@@ -80101,8 +80393,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	createTexture(texture, options) {
-		this.textureUtils.createTexture(texture, options);
+	createTexture( texture, options ) {
+
+		this.textureUtils.createTexture( texture, options );
+
 	}
 
 	/**
@@ -80111,8 +80405,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	updateTexture(texture, options) {
-		this.textureUtils.updateTexture(texture, options);
+	updateTexture( texture, options ) {
+
+		this.textureUtils.updateTexture( texture, options );
+
 	}
 
 	/**
@@ -80120,8 +80416,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {Texture} texture - The texture.
 	 */
-	generateMipmaps(texture) {
-		this.textureUtils.generateMipmaps(texture);
+	generateMipmaps( texture ) {
+
+		this.textureUtils.generateMipmaps( texture );
+
 	}
 
 	/**
@@ -80130,8 +80428,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Texture} texture - The texture.
 	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture(texture, isDefaultTexture = false) {
-		this.textureUtils.destroyTexture(texture, isDefaultTexture);
+	destroyTexture( texture, isDefaultTexture = false ) {
+
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
+
 	}
 
 	/**
@@ -80146,15 +80446,10 @@ class WebGPUBackend extends Backend {
 	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer(texture, x, y, width, height, faceIndex) {
-		return this.textureUtils.copyTextureToBuffer(
-			texture,
-			x,
-			y,
-			width,
-			height,
-			faceIndex,
-		);
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
+
 	}
 
 	/**
@@ -80164,28 +80459,29 @@ class WebGPUBackend extends Backend {
 	 * @param {number} uid - Unique id for the context (e.g. render context id).
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery(type, uid, descriptor) {
-		if (!this.trackTimestamp) return;
+	initTimestampQuery( type, uid, descriptor ) {
 
-		if (!this.timestampQueryPool[type]) {
+		if ( ! this.trackTimestamp ) return;
+
+		if ( ! this.timestampQueryPool[ type ] ) {
+
 			// TODO: Variable maxQueries?
-			this.timestampQueryPool[type] = new WebGPUTimestampQueryPool(
-				this.device,
-				type,
-				2048,
-			);
+			this.timestampQueryPool[ type ] = new WebGPUTimestampQueryPool( this.device, type, 2048 );
+
 		}
 
-		const timestampQueryPool = this.timestampQueryPool[type];
+		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext(uid);
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
 		descriptor.timestampWrites = {
 			querySet: timestampQueryPool.querySet,
 			beginningOfPassWriteIndex: baseOffset,
 			endOfPassWriteIndex: baseOffset + 1,
 		};
+
 	}
+
 
 	// node builder
 
@@ -80196,8 +80492,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {WGSLNodeBuilder} The node builder.
 	 */
-	createNodeBuilder(object, renderer) {
-		return new WGSLNodeBuilder(object, renderer);
+	createNodeBuilder( object, renderer ) {
+
+		return new WGSLNodeBuilder( object, renderer );
+
 	}
 
 	// program
@@ -80207,16 +80505,15 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	createProgram(program) {
-		const programGPU = this.get(program);
+	createProgram( program ) {
+
+		const programGPU = this.get( program );
 
 		programGPU.module = {
-			module: this.device.createShaderModule({
-				code: program.code,
-				label: program.stage + (program.name !== "" ? `_${program.name}` : ""),
-			}),
-			entryPoint: "main",
+			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${ program.name }` : '' ) } ),
+			entryPoint: 'main'
 		};
+
 	}
 
 	/**
@@ -80224,8 +80521,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {ProgrammableStage} program - The programmable stage.
 	 */
-	destroyProgram(program) {
-		this.delete(program);
+	destroyProgram( program ) {
+
+		this.delete( program );
+
 	}
 
 	// pipelines
@@ -80236,8 +80535,10 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
 	 */
-	createRenderPipeline(renderObject, promises) {
-		this.pipelineUtils.createRenderPipeline(renderObject, promises);
+	createRenderPipeline( renderObject, promises ) {
+
+		this.pipelineUtils.createRenderPipeline( renderObject, promises );
+
 	}
 
 	/**
@@ -80246,8 +80547,10 @@ class WebGPUBackend extends Backend {
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 */
-	createComputePipeline(computePipeline, bindings) {
-		this.pipelineUtils.createComputePipeline(computePipeline, bindings);
+	createComputePipeline( computePipeline, bindings ) {
+
+		this.pipelineUtils.createComputePipeline( computePipeline, bindings );
+
 	}
 
 	/**
@@ -80255,20 +80558,16 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	beginBundle(renderContext) {
-		const renderContextData = this.get(renderContext);
+	beginBundle( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
 
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = {
-			attributes: {},
-			bindingGroups: [],
-			pipeline: null,
-			index: null,
-		};
-		renderContextData.currentPass =
-			this.pipelineUtils.createBundleEncoder(renderContext);
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
+
 	}
 
 	/**
@@ -80277,18 +80576,20 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {RenderBundle} bundle - The render bundle.
 	 */
-	finishBundle(renderContext, bundle) {
-		const renderContextData = this.get(renderContext);
+	finishBundle( renderContext, bundle ) {
+
+		const renderContextData = this.get( renderContext );
 
 		const bundleEncoder = renderContextData.currentPass;
 		const bundleGPU = bundleEncoder.finish();
 
-		this.get(bundle).bundleGPU = bundleGPU;
+		this.get( bundle ).bundleGPU = bundleGPU;
 
 		// restore render pass state
 
 		renderContextData.currentSets = renderContextData._currentSets;
 		renderContextData.currentPass = renderContextData._currentPass;
+
 	}
 
 	/**
@@ -80297,10 +80598,12 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {RenderBundle} bundle - The render bundle to add.
 	 */
-	addBundle(renderContext, bundle) {
-		const renderContextData = this.get(renderContext);
+	addBundle( renderContext, bundle ) {
 
-		renderContextData.renderBundles.push(this.get(bundle).bundleGPU);
+		const renderContextData = this.get( renderContext );
+
+		renderContextData.renderBundles.push( this.get( bundle ).bundleGPU );
+
 	}
 
 	// bindings
@@ -80313,8 +80616,10 @@ class WebGPUBackend extends Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	createBindings(bindGroup, bindings, cacheIndex, version) {
-		this.bindingUtils.createBindings(bindGroup, bindings, cacheIndex, version);
+	createBindings( bindGroup, bindings, cacheIndex, version ) {
+
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
+
 	}
 
 	/**
@@ -80325,8 +80630,10 @@ class WebGPUBackend extends Backend {
 	 * @param {number} cacheIndex - The cache index.
 	 * @param {number} version - The version.
 	 */
-	updateBindings(bindGroup, bindings, cacheIndex, version) {
-		this.bindingUtils.createBindings(bindGroup, bindings, cacheIndex, version);
+	updateBindings( bindGroup, bindings, cacheIndex, version ) {
+
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
+
 	}
 
 	/**
@@ -80334,8 +80641,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 *  @param {Buffer} binding - The buffer binding to update.
 	 */
-	updateBinding(binding) {
-		this.bindingUtils.updateBinding(binding);
+	updateBinding( binding ) {
+
+		this.bindingUtils.updateBinding( binding );
+
 	}
 
 	/**
@@ -80343,8 +80652,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 */
-	deleteBindGroupData(bindGroup) {
-		this.bindingUtils.deleteBindGroupData(bindGroup);
+	deleteBindGroupData( bindGroup ) {
+
+		this.bindingUtils.deleteBindGroupData( bindGroup );
+
 	}
 
 	// attributes
@@ -80354,18 +80665,18 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The indexed buffer attribute.
 	 */
-	createIndexAttribute(attribute) {
-		let usage =
-			GPUBufferUsage.INDEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+	createIndexAttribute( attribute ) {
 
-		if (
-			attribute.isStorageBufferAttribute ||
-			attribute.isStorageInstancedBufferAttribute
-		) {
+		let usage = GPUBufferUsage.INDEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+
+		if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) {
+
 			usage |= GPUBufferUsage.STORAGE;
+
 		}
 
-		this.attributeUtils.createAttribute(attribute, usage);
+		this.attributeUtils.createAttribute( attribute, usage );
+
 	}
 
 	/**
@@ -80373,11 +80684,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createAttribute(attribute) {
-		this.attributeUtils.createAttribute(
-			attribute,
-			GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
-		);
+	createAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
 	}
 
 	/**
@@ -80385,14 +80695,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createStorageAttribute(attribute) {
-		this.attributeUtils.createAttribute(
-			attribute,
-			GPUBufferUsage.STORAGE |
-				GPUBufferUsage.VERTEX |
-				GPUBufferUsage.COPY_SRC |
-				GPUBufferUsage.COPY_DST,
-		);
+	createStorageAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
 	}
 
 	/**
@@ -80400,14 +80706,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
-	createIndirectStorageAttribute(attribute) {
-		this.attributeUtils.createAttribute(
-			attribute,
-			GPUBufferUsage.STORAGE |
-				GPUBufferUsage.INDIRECT |
-				GPUBufferUsage.COPY_SRC |
-				GPUBufferUsage.COPY_DST,
-		);
+	createIndirectStorageAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
 	}
 
 	/**
@@ -80415,8 +80717,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to update.
 	 */
-	updateAttribute(attribute) {
-		this.attributeUtils.updateAttribute(attribute);
+	updateAttribute( attribute ) {
+
+		this.attributeUtils.updateAttribute( attribute );
+
 	}
 
 	/**
@@ -80424,8 +80728,10 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
-	destroyAttribute(attribute) {
-		this.attributeUtils.destroyAttribute(attribute);
+	destroyAttribute( attribute ) {
+
+		this.attributeUtils.destroyAttribute( attribute );
+
 	}
 
 	// canvas
@@ -80434,7 +80740,9 @@ class WebGPUBackend extends Backend {
 	 * Triggers an update of the default render pass descriptor.
 	 */
 	updateSize() {
-		this.delete(this.renderer.getCanvasTarget());
+
+		this.delete( this.renderer.getCanvasTarget() );
+
 	}
 
 	// utils public
@@ -80445,7 +80753,9 @@ class WebGPUBackend extends Backend {
 	 * @return {number} The maximum anisotropy texture filtering value.
 	 */
 	getMaxAnisotropy() {
+
 		return 16;
+
 	}
 
 	/**
@@ -80454,10 +80764,12 @@ class WebGPUBackend extends Backend {
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
-	hasFeature(name) {
-		if (GPUFeatureMap[name] !== undefined) name = GPUFeatureMap[name];
+	hasFeature( name ) {
 
-		return this.device.features.has(name);
+		if ( GPUFeatureMap[ name ] !== undefined ) name = GPUFeatureMap[ name ];
+
+		return this.device.features.has( name );
+
 	}
 
 	/**
@@ -80470,14 +80782,8 @@ class WebGPUBackend extends Backend {
 	 * @param {number} [srcLevel=0] - The mipmap level to copy.
 	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture(
-		srcTexture,
-		dstTexture,
-		srcRegion = null,
-		dstPosition = null,
-		srcLevel = 0,
-		dstLevel = 0,
-	) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
+
 		let dstX = 0;
 		let dstY = 0;
 		let dstZ = 0;
@@ -80490,56 +80796,71 @@ class WebGPUBackend extends Backend {
 		let srcHeight = srcTexture.image.height;
 		let srcDepth = 1;
 
-		if (srcRegion !== null) {
-			if (srcRegion.isBox3 === true) {
+
+		if ( srcRegion !== null ) {
+
+			if ( srcRegion.isBox3 === true ) {
+
 				srcX = srcRegion.min.x;
 				srcY = srcRegion.min.y;
 				srcZ = srcRegion.min.z;
 				srcWidth = srcRegion.max.x - srcRegion.min.x;
 				srcHeight = srcRegion.max.y - srcRegion.min.y;
 				srcDepth = srcRegion.max.z - srcRegion.min.z;
+
 			} else {
+
 				// Assume it's a Box2
 				srcX = srcRegion.min.x;
 				srcY = srcRegion.min.y;
 				srcWidth = srcRegion.max.x - srcRegion.min.x;
 				srcHeight = srcRegion.max.y - srcRegion.min.y;
 				srcDepth = 1;
+
 			}
+
 		}
 
-		if (dstPosition !== null) {
+
+		if ( dstPosition !== null ) {
+
 			dstX = dstPosition.x;
 			dstY = dstPosition.y;
 			dstZ = dstPosition.z || 0;
+
 		}
 
-		const encoder = this.device.createCommandEncoder({
-			label: "copyTextureToTexture_" + srcTexture.id + "_" + dstTexture.id,
-		});
+		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
 
-		const sourceGPU = this.get(srcTexture).texture;
-		const destinationGPU = this.get(dstTexture).texture;
+		const sourceGPU = this.get( srcTexture ).texture;
+		const destinationGPU = this.get( dstTexture ).texture;
 
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
 				mipLevel: srcLevel,
-				origin: { x: srcX, y: srcY, z: srcZ },
+				origin: { x: srcX, y: srcY, z: srcZ }
 			},
 			{
 				texture: destinationGPU,
 				mipLevel: dstLevel,
-				origin: { x: dstX, y: dstY, z: dstZ },
+				origin: { x: dstX, y: dstY, z: dstZ }
 			},
-			[srcWidth, srcHeight, srcDepth],
+			[
+				srcWidth,
+				srcHeight,
+				srcDepth
+			]
 		);
 
-		this.device.queue.submit([encoder.finish()]);
+		this.device.queue.submit( [ encoder.finish() ] );
 
-		if (dstLevel === 0 && dstTexture.generateMipmaps) {
-			this.textureUtils.generateMipmaps(dstTexture);
+		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( dstTexture );
+
 		}
+
 	}
 
 	/**
@@ -80549,182 +80870,204 @@ class WebGPUBackend extends Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
 	 */
-	copyFramebufferToTexture(texture, renderContext, rectangle) {
-		const renderContextData = this.get(renderContext);
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
+
+		const renderContextData = this.get( renderContext );
 
 		let sourceGPU = null;
 
-		if (renderContext.renderTarget) {
-			if (texture.isDepthTexture) {
-				sourceGPU = this.get(renderContext.depthTexture).texture;
+		if ( renderContext.renderTarget ) {
+
+			if ( texture.isDepthTexture ) {
+
+				sourceGPU = this.get( renderContext.depthTexture ).texture;
+
 			} else {
-				sourceGPU = this.get(renderContext.textures[0]).texture;
+
+				sourceGPU = this.get( renderContext.textures[ 0 ] ).texture;
+
 			}
+
 		} else {
-			if (texture.isDepthTexture) {
-				sourceGPU = this.textureUtils.getDepthBuffer(
-					renderContext.depth,
-					renderContext.stencil,
-				);
+
+			if ( texture.isDepthTexture ) {
+
+				sourceGPU = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil );
+
 			} else {
+
 				sourceGPU = this.context.getCurrentTexture();
+
 			}
+
 		}
 
-		const destinationGPU = this.get(texture).texture;
+		const destinationGPU = this.get( texture ).texture;
 
-		if (sourceGPU.format !== destinationGPU.format) {
-			error(
-				"WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.",
-				sourceGPU.format,
-				destinationGPU.format,
-			);
+		if ( sourceGPU.format !== destinationGPU.format ) {
+
+			error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
 
 			return;
+
 		}
 
 		let encoder;
 
-		if (renderContextData.currentPass) {
+		if ( renderContextData.currentPass ) {
+
 			renderContextData.currentPass.end();
 
 			encoder = renderContextData.encoder;
+
 		} else {
-			encoder = this.device.createCommandEncoder({
-				label: "copyFramebufferToTexture_" + texture.id,
-			});
+
+			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+
 		}
 
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				origin: [rectangle.x, rectangle.y, 0],
+				origin: [ rectangle.x, rectangle.y, 0 ],
 			},
 			{
-				texture: destinationGPU,
+				texture: destinationGPU
 			},
-			[rectangle.z, rectangle.w],
+			[
+				rectangle.z,
+				rectangle.w
+			]
 		);
 
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
 
-		if (texture.generateMipmaps) {
-			this.textureUtils.generateMipmaps(texture, encoder);
+		if ( texture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( texture, encoder );
+
 		}
 
-		if (renderContextData.currentPass) {
+		if ( renderContextData.currentPass ) {
+
 			const { descriptor } = renderContextData;
 
-			for (let i = 0; i < descriptor.colorAttachments.length; i++) {
-				descriptor.colorAttachments[i].loadOp = GPULoadOp.Load;
+			for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+
+				descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+
 			}
 
-			if (renderContext.depth)
-				descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-			if (renderContext.stencil)
-				descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
-			renderContextData.currentPass = encoder.beginRenderPass(descriptor);
-			renderContextData.currentSets = {
-				attributes: {},
-				bindingGroups: [],
-				pipeline: null,
-				index: null,
-			};
+			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
+			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
-			if (renderContext.viewport) {
-				this.updateViewport(renderContext);
+			if ( renderContext.viewport ) {
+
+				this.updateViewport( renderContext );
+
 			}
 
-			if (renderContext.scissor) {
-				this.updateScissor(renderContext);
+			if ( renderContext.scissor ) {
+
+				this.updateScissor( renderContext );
+
 			}
+
 		} else {
-			this.device.queue.submit([encoder.finish()]);
+
+			this.device.queue.submit( [ encoder.finish() ] );
+
 		}
+
 	}
 
 	/**
-	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
-	 *
-	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
-	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {number} byteLength - The number of bytes to copy.
-	 * @param {number} [srcOffset=0] - The source offset in bytes.
-	 * @param {number} [dstOffset=0] - The destination offset in bytes.
-	 */
-	copyBufferToBuffer(
-		srcAttribute,
-		dstAttribute,
-		byteLength,
-		srcOffset = 0,
-		dstOffset = 0,
-	) {
-		if (
-			(srcOffset & 3) !== 0 ||
-			(dstOffset & 3) !== 0 ||
-			(byteLength & 3) !== 0
-		) {
-			error(
-				"WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.",
-			);
+ * Copies data of the given source buffer attribute to the given destination buffer attribute.
+ *
+ * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+ * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+ * @param {number} byteLength - The number of bytes to copy.
+ * @param {number} [srcOffset=0] - The source offset in bytes.
+ * @param {number} [dstOffset=0] - The destination offset in bytes.
+ */
+	copyBufferToBuffer( srcAttribute, dstAttribute, byteLength, srcOffset = 0, dstOffset = 0 ) {
+
+		if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( byteLength & 3 ) !== 0 ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.' );
 			return;
+
 		}
 
-		const srcData = this.get(srcAttribute);
-		const dstData = this.get(dstAttribute);
+		const srcData = this.get( srcAttribute );
+		const dstData = this.get( dstAttribute );
 
-		// Ensure GPU buffers exist
-		if (srcData.buffer === undefined) {
-			if (
-				srcAttribute.isStorageBufferAttribute ||
-				srcAttribute.isStorageInstancedBufferAttribute
-			)
-				this.createStorageAttribute(srcAttribute);
-			else this.createAttribute(srcAttribute);
+		// Source must exist
+		if ( srcData.buffer === undefined ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: src GPUBuffer is undefined.', { srcId: srcAttribute.id } );
+			return;
+
 		}
 
-		if (dstData.buffer === undefined) {
-			if (
-				dstAttribute.isStorageBufferAttribute ||
-				dstAttribute.isStorageInstancedBufferAttribute
-			)
-				this.createStorageAttribute(dstAttribute);
-			else this.createAttribute(dstAttribute);
+		// Destination may be created.
+		if ( dstData.buffer === undefined ) {
+
+			if ( dstAttribute.isStorageBufferAttribute || dstAttribute.isStorageInstancedBufferAttribute ) {
+
+				this.createStorageAttribute( dstAttribute );
+
+			} else {
+
+				this.createAttribute( dstAttribute );
+
+			}
+
 		}
 
-		const sourceGPU = srcData.buffer;
-		const destinationGPU = dstData.buffer;
+		// Re-fetch buffers after possible create
+		const sourceGPU = this.get( srcAttribute ).buffer;
+		const destinationGPU = this.get( dstAttribute ).buffer;
 
-		if (
-			srcOffset + byteLength > sourceGPU.size ||
-			dstOffset + byteLength > destinationGPU.size
-		) {
-			error("WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.", {
+		if ( sourceGPU === undefined || destinationGPU === undefined ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: missing GPUBuffer(s) after ensure.', {
+				srcId: srcAttribute.id,
+				dstId: dstAttribute.id,
+				srcHasBuffer: sourceGPU !== undefined,
+				dstHasBuffer: destinationGPU !== undefined,
+			} );
+
+			return;
+
+		}
+
+		if ( srcOffset + byteLength > sourceGPU.size || dstOffset + byteLength > destinationGPU.size ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.', {
 				srcSize: sourceGPU.size,
 				dstSize: destinationGPU.size,
 				srcOffset,
 				dstOffset,
 				byteLength,
-			});
+			} );
 
 			return;
+
 		}
 
-		const encoder = this.device.createCommandEncoder({
-			label: "copyBufferToBuffer_" + srcAttribute.id + "_" + dstAttribute.id,
-		});
+		const encoder = this.device.createCommandEncoder( {
+			label: 'copyBufferToBuffer_' + srcAttribute.id + '_' + dstAttribute.id,
+		} );
 
-		encoder.copyBufferToBuffer(
-			sourceGPU,
-			srcOffset,
-			destinationGPU,
-			dstOffset,
-			byteLength,
-		);
+		encoder.copyBufferToBuffer( sourceGPU, srcOffset, destinationGPU, dstOffset, byteLength );
 
-		this.device.queue.submit([encoder.finish()]);
+		this.device.queue.submit( [ encoder.finish() ] );
+
 	}
 
 	/**
@@ -80733,36 +81076,53 @@ class WebGPUBackend extends Backend {
 	 * @param {string} name - The compatibility name.
 	 * @return {boolean} Whether the compatibility is supported or not.
 	 */
-	hasCompatibility(name) {
-		if (this._compatibility[Compatibility.TEXTURE_COMPARE] !== undefined) {
-			return this._compatibility[Compatibility.TEXTURE_COMPARE];
+	hasCompatibility( name ) {
+
+		if ( this._compatibility[ Compatibility.TEXTURE_COMPARE ] !== undefined ) {
+
+			return this._compatibility[ Compatibility.TEXTURE_COMPARE ];
+
 		}
 
-		return super.hasCompatibility(name);
+		return super.hasCompatibility( name );
+
 	}
 
 	dispose() {
+
 		this.bindingUtils.dispose();
 		this.textureUtils.dispose();
 
-		if (this.occludedResolveCache) {
-			for (const buffer of this.occludedResolveCache.values()) {
+		if ( this.occludedResolveCache ) {
+
+			for ( const buffer of this.occludedResolveCache.values() ) {
+
 				buffer.destroy();
+
 			}
 
 			this.occludedResolveCache.clear();
+
 		}
 
-		if (this.timestampQueryPool) {
-			for (const queryPool of Object.values(this.timestampQueryPool)) {
-				if (queryPool !== null) queryPool.dispose();
+		if ( this.timestampQueryPool ) {
+
+			for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
+
+				if ( queryPool !== null ) queryPool.dispose();
+
 			}
+
 		}
 
-		if (this.parameters.device === undefined && this.device !== null) {
+		if ( this.parameters.device === undefined && this.device !== null ) {
+
 			this.device.destroy();
+
 		}
+
 	}
+
 }
 
 /**
