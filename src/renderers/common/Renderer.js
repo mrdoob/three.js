@@ -2904,6 +2904,86 @@ class Renderer {
 	}
 
 	/**
+	 * Copies data of the given source buffer attribute into a destination buffer attribute.
+	 *
+	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+	 * @param {?number} [count=null] - The number of items to copy. If `null`, the overlapping range is copied.
+	 * @param {number} [srcIndex=0] - The source start index (in items).
+	 * @param {number} [dstIndex=0] - The destination start index (in items).
+	 */
+	copyBufferToBuffer(
+		srcAttribute,
+		dstAttribute,
+		count = null,
+		srcIndex = 0,
+		dstIndex = 0,
+	) {
+
+		// Layout must match for item-wise copy.
+		if (
+			srcAttribute.itemSize !== dstAttribute.itemSize ||
+			srcAttribute.array.BYTES_PER_ELEMENT !==
+				dstAttribute.array.BYTES_PER_ELEMENT
+		) {
+
+			error( 'Renderer.copyBufferToBuffer: Incompatible attribute layouts.' );
+			return;
+
+		}
+
+		const stride = srcAttribute.itemSize * srcAttribute.array.BYTES_PER_ELEMENT;
+
+		const maxCount = Math.max(
+			0,
+			Math.min( srcAttribute.count - srcIndex, dstAttribute.count - dstIndex ),
+		);
+
+		if ( count === null ) count = maxCount;
+		else count = Math.max( 0, Math.min( count, maxCount ) );
+
+		if ( count <= 0 ) {
+
+			error(
+				'Renderer.copyBufferToBuffer: Copy would produce a zero-sized GPU buffer region.\n' +
+					'This leads to invalid WebGPU bindings.\n' +
+					`src.count=${srcAttribute.count}, dst.count=${dstAttribute.count}, ` +
+					`srcIndex=${srcIndex}, dstIndex=${dstIndex}`,
+			);
+			return;
+
+		}
+
+		const byteLength = count * stride;
+		const srcOffset = srcIndex * stride;
+		const dstOffset = dstIndex * stride;
+
+		// Keep behavior consistent with WebGPU backend validation.
+		if (
+			( byteLength & 3 ) !== 0 ||
+			( srcOffset & 3 ) !== 0 ||
+			( dstOffset & 3 ) !== 0
+		) {
+
+			error(
+				`Renderer.copyBufferToBuffer: WebGPU requires 4-byte aligned copies. Got srcOffset=${srcOffset}, dstOffset=${dstOffset}, byteLength=${byteLength}.`,
+			);
+			return;
+
+		}
+
+		this.backend.copyBufferToBuffer(
+			srcAttribute,
+			dstAttribute,
+			byteLength,
+			srcOffset,
+			dstOffset,
+		);
+
+	}
+
+
+	/**
 	 * Reads pixel data from the given render target.
 	 *
 	 * @async

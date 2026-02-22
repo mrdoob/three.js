@@ -2532,6 +2532,98 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
+	 *
+	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+	 * @param {number} byteLength - The number of bytes to copy.
+	 * @param {number} [srcOffset=0] - The source offset in bytes.
+	 * @param {number} [dstOffset=0] - The destination offset in bytes.
+	 */
+	copyBufferToBuffer(
+		srcAttribute,
+		dstAttribute,
+		byteLength,
+		srcOffset = 0,
+		dstOffset = 0,
+	) {
+
+		if (
+			( srcOffset & 3 ) !== 0 ||
+			( dstOffset & 3 ) !== 0 ||
+			( byteLength & 3 ) !== 0
+		) {
+
+			error(
+				'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.',
+			);
+			return;
+
+		}
+
+		const srcData = this.get( srcAttribute );
+		const dstData = this.get( dstAttribute );
+
+		// Ensure GPU buffers exist
+		if ( srcData.buffer === undefined ) {
+
+			if (
+				srcAttribute.isStorageBufferAttribute ||
+				srcAttribute.isStorageInstancedBufferAttribute
+			)
+				this.createStorageAttribute( srcAttribute );
+			else this.createAttribute( srcAttribute );
+
+		}
+
+		if ( dstData.buffer === undefined ) {
+
+			if (
+				dstAttribute.isStorageBufferAttribute ||
+				dstAttribute.isStorageInstancedBufferAttribute
+			)
+				this.createStorageAttribute( dstAttribute );
+			else this.createAttribute( dstAttribute );
+
+		}
+
+		const sourceGPU = srcData.buffer;
+		const destinationGPU = dstData.buffer;
+
+		if (
+			srcOffset + byteLength > sourceGPU.size ||
+			dstOffset + byteLength > destinationGPU.size
+		) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.', {
+				srcSize: sourceGPU.size,
+				dstSize: destinationGPU.size,
+				srcOffset,
+				dstOffset,
+				byteLength,
+			} );
+
+			return;
+
+		}
+
+		const encoder = this.device.createCommandEncoder( {
+			label: 'copyBufferToBuffer_' + srcAttribute.id + '_' + dstAttribute.id,
+		} );
+
+		encoder.copyBufferToBuffer(
+			sourceGPU,
+			srcOffset,
+			destinationGPU,
+			dstOffset,
+			byteLength,
+		);
+
+		this.device.queue.submit( [ encoder.finish() ] );
+
+	}
+
+	/**
 	 * Checks if the given compatibility is supported by the backend.
 	 *
 	 * @param {string} name - The compatibility name.

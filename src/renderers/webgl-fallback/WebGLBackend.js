@@ -2034,6 +2034,56 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
+	 *
+	 *  Uses WebGL2 `copyBufferSubData`.
+	 *
+	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+	 * @param {number} byteLength - The number of bytes to copy.
+	 * @param {number} [srcOffset=0] - The source offset in bytes.
+	 * @param {number} [dstOffset=0] - The destination offset in bytes.
+	 */
+	copyBufferToBuffer(
+		srcAttribute,
+		dstAttribute,
+		byteLength,
+		srcOffset = 0,
+		dstOffset = 0,
+	) {
+
+		const gl = this.gl;
+
+		const srcData = this.get( srcAttribute );
+		const dstData = this.get( dstAttribute );
+
+		if ( srcData.bufferGPU === undefined ) this.createAttribute( srcAttribute );
+		if ( dstData.bufferGPU === undefined ) this.createAttribute( dstAttribute );
+
+		const srcGPU = srcData.bufferGPU;
+		const dstGPU = dstData.bufferGPU;
+
+		const prevRead = gl.getParameter( gl.COPY_READ_BUFFER_BINDING );
+		const prevWrite = gl.getParameter( gl.COPY_WRITE_BUFFER_BINDING );
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, srcGPU );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, dstGPU );
+
+		gl.copyBufferSubData(
+			gl.COPY_READ_BUFFER,
+			gl.COPY_WRITE_BUFFER,
+			srcOffset,
+			dstOffset,
+			byteLength,
+		);
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, prevRead );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, prevWrite );
+
+	}
+
+
+	/**
 	 * Checks if the given compatibility is supported by the backend.
 	 *
 	 * @param {string} name - The compatibility name.
