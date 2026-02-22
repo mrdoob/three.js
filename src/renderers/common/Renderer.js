@@ -1,41 +1,41 @@
 import Animation from './Animation.js';
-import RenderObjects from './RenderObjects.js';
 import Attributes from './Attributes.js';
+import Background from './Background.js';
+import Bindings from './Bindings.js';
+import CanvasTarget from './CanvasTarget.js';
+import ClippingContext from './ClippingContext.js';
+import Color4 from './Color4.js';
 import Geometries from './Geometries.js';
 import Info from './Info.js';
+import InspectorBase from './InspectorBase.js';
+import Lighting from './Lighting.js';
 import Pipelines from './Pipelines.js';
-import Bindings from './Bindings.js';
-import RenderLists from './RenderLists.js';
-import RenderContexts from './RenderContexts.js';
-import Textures from './Textures.js';
-import Background from './Background.js';
-import NodeManager from './nodes/NodeManager.js';
-import Color4 from './Color4.js';
-import ClippingContext from './ClippingContext.js';
 import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
-import NodeLibrary from './nodes/NodeLibrary.js';
-import Lighting from './Lighting.js';
+import RenderContexts from './RenderContexts.js';
+import RenderLists from './RenderLists.js';
+import RenderObjects from './RenderObjects.js';
+import Textures from './Textures.js';
 import XRManager from './XRManager.js';
-import InspectorBase from './InspectorBase.js';
-import CanvasTarget from './CanvasTarget.js';
+import NodeLibrary from './nodes/NodeLibrary.js';
+import NodeManager from './nodes/NodeManager.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
-import { Scene } from '../../scenes/Scene.js';
+import { BackSide, DoubleSide, FrontSide, HalfFloatType, LinearFilter, NoToneMapping, PCFShadowMap, RGBAFormat, SRGBColorSpace, VSMShadowMap } from '../../constants.js';
+import { RenderTarget } from '../../core/RenderTarget.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Frustum } from '../../math/Frustum.js';
 import { FrustumArray } from '../../math/FrustumArray.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, VSMShadowMap } from '../../constants.js';
+import { Scene } from '../../scenes/Scene.js';
 
-import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
-import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { context } from '../../nodes/core/ContextNode.js';
+import { float, Fn, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
 import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
@@ -261,7 +261,7 @@ class Renderer {
 		 *
 		 * @type {Lighting}
 		 */
-		this.lighting = new Lighting();
+		this.lighting = new Lighting( this );
 
 		// internals
 
@@ -685,6 +685,30 @@ class Renderer {
 			enabled: false,
 			transmitted: false,
 			type: PCFShadowMap
+		};
+
+		/**
+		 * Lights configuration.
+		 * @typedef {Object} LightsConfig
+		 * @property {boolean} dynamic - When true, uses uniform buffers and shader loops so light count
+		 * changes don't trigger material recompilation (only light type changes do).
+		 * @property {number} maxDirectionalLights - Maximum number of directional lights in dynamic mode.
+		 * @property {number} maxPointLights - Maximum number of point lights in dynamic mode.
+		 * @property {number} maxSpotLights - Maximum number of spot lights in dynamic mode.
+		 * @property {number} maxHemisphereLights - Maximum number of hemisphere lights in dynamic mode.
+		 */
+
+		/**
+		 * The renderer's lights configuration.
+		 *
+		 * @type {LightsConfig}
+		 */
+		this.lights = {
+			dynamic: false,
+			maxDirectionalLights: 8,
+			maxPointLights: 16,
+			maxSpotLights: 16,
+			maxHemisphereLights: 4
 		};
 
 		/**
