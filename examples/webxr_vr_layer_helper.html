@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - layers</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> XRLayer helper<br/>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRLayerHelper } from './jsm/webxr/XRLayerHelper.js';
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+
+			// BASIC VR SCENE SETUP
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x505050 );
+
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.y = 1.6;
+
+			const renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.xr.enabled = true;
+			document.body.appendChild( renderer.domElement );
+			document.body.appendChild( VRButton.createButton( renderer ) );
+
+			const room = new THREE.LineSegments(
+				new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+				new THREE.LineBasicMaterial( { color: 0x808080 } )
+			);
+			scene.add( room );
+
+			// XR LAYER
+
+			const params = {
+				texture: new THREE.TextureLoader().load( "textures/snellen.png" ),
+				textureSize: 1024,
+				textureWidth: 1024,
+				textureHeight: 512,
+				mipLevels: 3,
+				layerWidth: 0.5,
+				layerHeight: 0.7,
+				textureSizePx: 512,
+				widthPx: 320,
+				heightPx: 450,
+				layout: "mono" // "stereo" for a stereoscopic image
+			}
+
+			const layer = new XRLayerHelper( renderer, params );
+			scene.add( layer );
+
+			// RENDER LOOP
+
+			renderer.setAnimationLoop( function ( time, xrFrame ) {
+
+				layer.position.set(
+					Math.sin( time * 0.001 ) * 0.5,
+					Math.cos( time * 0.001 ) * 0.5 + 1.4,
+					-2
+				);
+
+				layer.rotation.x = Math.cos( time * 0.001 ) * 0.5;
+
+				layer.update( xrFrame );
+
+				renderer.render( scene, camera );
+
+			} );
+
+			// RESIZING
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+		</script>
+	</body>
+</html>
