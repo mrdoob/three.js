@@ -2532,31 +2532,19 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
-	 *
-	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
-	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {number} byteLength - The number of bytes to copy.
-	 * @param {number} [srcOffset=0] - The source offset in bytes.
-	 * @param {number} [dstOffset=0] - The destination offset in bytes.
-	 */
-	copyBufferToBuffer(
-		srcAttribute,
-		dstAttribute,
-		byteLength,
-		srcOffset = 0,
-		dstOffset = 0,
-	) {
+ * Copies data of the given source buffer attribute to the given destination buffer attribute.
+ *
+ * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+ * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+ * @param {number} byteLength - The number of bytes to copy.
+ * @param {number} [srcOffset=0] - The source offset in bytes.
+ * @param {number} [dstOffset=0] - The destination offset in bytes.
+ */
+	copyBufferToBuffer( srcAttribute, dstAttribute, byteLength, srcOffset = 0, dstOffset = 0 ) {
 
-		if (
-			( srcOffset & 3 ) !== 0 ||
-			( dstOffset & 3 ) !== 0 ||
-			( byteLength & 3 ) !== 0
-		) {
+		if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( byteLength & 3 ) !== 0 ) {
 
-			error(
-				'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.',
-			);
+			error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.' );
 			return;
 
 		}
@@ -2564,36 +2552,47 @@ class WebGPUBackend extends Backend {
 		const srcData = this.get( srcAttribute );
 		const dstData = this.get( dstAttribute );
 
-		// Ensure GPU buffers exist
+		// Source must exist
 		if ( srcData.buffer === undefined ) {
 
-			if (
-				srcAttribute.isStorageBufferAttribute ||
-				srcAttribute.isStorageInstancedBufferAttribute
-			)
-				this.createStorageAttribute( srcAttribute );
-			else this.createAttribute( srcAttribute );
+			error( 'WebGPUBackend: copyBufferToBuffer: src GPUBuffer is undefined.', { srcId: srcAttribute.id } );
+			return;
 
 		}
 
+		// Destination may be created.
 		if ( dstData.buffer === undefined ) {
 
-			if (
-				dstAttribute.isStorageBufferAttribute ||
-				dstAttribute.isStorageInstancedBufferAttribute
-			)
+			if ( dstAttribute.isStorageBufferAttribute || dstAttribute.isStorageInstancedBufferAttribute ) {
+
 				this.createStorageAttribute( dstAttribute );
-			else this.createAttribute( dstAttribute );
+
+			} else {
+
+				this.createAttribute( dstAttribute );
+
+			}
 
 		}
 
-		const sourceGPU = srcData.buffer;
-		const destinationGPU = dstData.buffer;
+		// Re-fetch buffers after possible create
+		const sourceGPU = this.get( srcAttribute ).buffer;
+		const destinationGPU = this.get( dstAttribute ).buffer;
 
-		if (
-			srcOffset + byteLength > sourceGPU.size ||
-			dstOffset + byteLength > destinationGPU.size
-		) {
+		if ( sourceGPU === undefined || destinationGPU === undefined ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: missing GPUBuffer(s) after ensure.', {
+				srcId: srcAttribute.id,
+				dstId: dstAttribute.id,
+				srcHasBuffer: sourceGPU !== undefined,
+				dstHasBuffer: destinationGPU !== undefined,
+			} );
+
+			return;
+
+		}
+
+		if ( srcOffset + byteLength > sourceGPU.size || dstOffset + byteLength > destinationGPU.size ) {
 
 			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.', {
 				srcSize: sourceGPU.size,
@@ -2611,13 +2610,7 @@ class WebGPUBackend extends Backend {
 			label: 'copyBufferToBuffer_' + srcAttribute.id + '_' + dstAttribute.id,
 		} );
 
-		encoder.copyBufferToBuffer(
-			sourceGPU,
-			srcOffset,
-			destinationGPU,
-			dstOffset,
-			byteLength,
-		);
+		encoder.copyBufferToBuffer( sourceGPU, srcOffset, destinationGPU, dstOffset, byteLength );
 
 		this.device.queue.submit( [ encoder.finish() ] );
 
