@@ -32,7 +32,15 @@ if ( typeof hljs !== 'undefined' ) {
 
 		const element = document.getElementById( hash );
 
-		if ( element ) element.scrollIntoView();
+		if ( element ) {
+
+			requestAnimationFrame( () => {
+
+				element.scrollIntoView();
+
+			} );
+
+		}
 
 	}
 
