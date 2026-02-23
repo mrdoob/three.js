@@ -1522,10 +1522,10 @@ class WebGPUBackend extends Backend {
 
 				const bindGroup = bindings[ i ];
 				const bindingsData = this.get( bindGroup );
-				if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+				if ( currentBindingGroups[ i ] !== bindGroup.id ) {
 
-					passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-					currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+					passEncoderGPU.setBindGroup( i, bindingsData.group );
+					currentBindingGroups[ i ] = bindGroup.id;
 
 				}
 
@@ -1753,8 +1753,9 @@ class WebGPUBackend extends Backend {
 					// Set camera index binding for this layer
 					if ( cameraIndex && cameraData.indexesGPU ) {
 
-						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
-						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+						const indexPos = bindings.indexOf( cameraIndex );
+						pass.setBindGroup( indexPos, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ indexPos ] = cameraIndex.id;
 
 					}
 
