@@ -111,51 +111,6 @@ class NodeManager extends DataMap {
 	updateGroup( nodeUniformsGroup ) {
 
 		const groupNode = nodeUniformsGroup.groupNode;
-		const name = groupNode.name;
-
-		// objectGroup is always updated
-
-		if ( name === objectGroup.name ) return true;
-
-		// renderGroup is updated once per render/compute call
-
-		if ( name === renderGroup.name ) {
-
-			const uniformsGroupData = this.get( nodeUniformsGroup );
-			const renderId = this.nodeFrame.renderId;
-
-			if ( uniformsGroupData.renderId !== renderId ) {
-
-				uniformsGroupData.renderId = renderId;
-
-				return true;
-
-			}
-
-			return false;
-
-		}
-
-		// frameGroup is updated once per frame
-
-		if ( name === frameGroup.name ) {
-
-			const uniformsGroupData = this.get( nodeUniformsGroup );
-			const frameId = this.nodeFrame.frameId;
-
-			if ( uniformsGroupData.frameId !== frameId ) {
-
-				uniformsGroupData.frameId = frameId;
-
-				return true;
-
-			}
-
-			return false;
-
-		}
-
-		// other groups are updated just when groupNode.needsUpdate is true
 
 		_chainKeys[ 0 ] = groupNode;
 		_chainKeys[ 1 ] = nodeUniformsGroup;
