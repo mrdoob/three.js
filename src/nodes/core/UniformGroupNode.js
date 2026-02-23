@@ -77,12 +77,21 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Marks the uniform group node as needing an update.
+	 * This will trigger the necessary updates in the rendering process.
+	 */
 	update() {
 
 		this.needsUpdate = true;
 
 	}
 
+	/**
+	 * Serializes the uniform group node to a JSON object.
+	 *
+	 * @param {Object} data - The object to store the serialized data.
+	 */
 	serialize( data ) {
 
 		super.serialize( data );
@@ -93,6 +102,11 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Deserializes the uniform group node from a JSON object.
+	 *
+	 * @param {Object} data - The object containing the serialized data.
+	 */
 	deserialize( data ) {
 
 		super.deserialize( data );
