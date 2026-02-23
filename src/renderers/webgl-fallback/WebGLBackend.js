@@ -1163,7 +1163,20 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const cameraIndexData = this.get( cameraIndex );
+			let cameraIndexBufferIndex = 0;
+
+			bindingsSearch: for ( const bindGroup of renderObject.getBindings() ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding === cameraIndex ) break bindingsSearch;
+
+					if ( binding.isUniformsGroup || binding.isUniformBuffer ) cameraIndexBufferIndex ++;
+
+				}
+
+			}
+
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			const renderTarget = this._currentContext.renderTarget;
@@ -1232,7 +1245,7 @@ class WebGLBackend extends Backend {
 
 					}
 
-					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
 					draw();
 
@@ -1775,11 +1788,6 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 
-		const bindGroupData = this.get( bindGroup );
-
-		let i = bindGroupData.uniformBuffers;
-		let t = bindGroupData.textures;
-
 		for ( const binding of bindGroup.bindings ) {
 
 			const map = this.get( binding );
@@ -1836,7 +1844,6 @@ class WebGLBackend extends Backend {
 
 				}
 
-				map.index = i ++;
 				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
@@ -1845,7 +1852,6 @@ class WebGLBackend extends Backend {
 
 				const { textureGPU, glTextureType } = this.get( binding.texture );
 
-				map.index = t ++;
 				map.textureGPU = textureGPU;
 				map.glTextureType = glTextureType;
 
@@ -2531,20 +2537,22 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
-				const bindingData = this.get( binding );
-				const index = bindingData.index;
-
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					const location = gl.getUniformBlockIndex( programGPU, binding.name );
 					gl.uniformBlockBinding( programGPU, location, index );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					const location = gl.getUniformLocation( programGPU, binding.name );
 					gl.uniform1i( location, index );
 
@@ -2566,20 +2574,24 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
 				const bindingData = this.get( binding );
-				const index = bindingData.index;
 
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					// TODO USE bindBufferRange to group multiple uniform buffers
 					state.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 				}
