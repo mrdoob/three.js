@@ -14,7 +14,18 @@
 			<header>
 				<div class="class-description"><p>This class can be used to define an exponential squared fog,
 which gives a clear view near the camera and a faster than exponentially
-densening fog farther from the camera.</p></div>
+densening fog farther from the camera.</p>
+					<p>
+		Unlike <a href="Fog.html">Fog</a>, which uses linear interpolation between near and far values,
+		FogExp2 applies an exponential equation, resulting in a more natural atmospheric attenuation.
+		</p> <p>
+		The fog factor is computed as:
+		</p>
+
+		<pre><code class="language-js">
+fogFactor = 1.0 - exp( - density * density * distance * distance );
+		</code></pre>
+				</div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
