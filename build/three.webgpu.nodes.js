@@ -7013,6 +7013,7 @@ MathNode.FRACT = 'fract';
 MathNode.SIN = 'sin';
 MathNode.COS = 'cos';
 MathNode.TAN = 'tan';
+MathNode.TANH = 'tanh';
 MathNode.ASIN = 'asin';
 MathNode.ACOS = 'acos';
 MathNode.ATAN = 'atan';
@@ -7273,6 +7274,16 @@ const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setParameter
  * @returns {Node}
  */
 const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setParameterLength( 1 );
+
+/**
+ * Returns the hyperbolic tangent of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).setParameterLength( 1 );
 
 /**
  * Returns the arcsine of the parameter.
@@ -7753,6 +7764,7 @@ addMethodChaining( 'fract', fract );
 addMethodChaining( 'sin', sin );
 addMethodChaining( 'cos', cos );
 addMethodChaining( 'tan', tan );
+addMethodChaining( 'tanh', tanh );
 addMethodChaining( 'asin', asin );
 addMethodChaining( 'acos', acos );
 addMethodChaining( 'atan', atan );
@@ -47186,6 +47198,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	tangentLocal: tangentLocal,
 	tangentView: tangentView,
 	tangentWorld: tangentWorld,
+	tanh: tanh,
 	texture: texture,
 	texture3D: texture3D,
 	texture3DLevel: texture3DLevel,
