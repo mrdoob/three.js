@@ -542,6 +542,7 @@ export const subgroupShuffleXor = TSL.subgroupShuffleXor;
 export const subgroupSize = TSL.subgroupSize;
 export const subgroupXor = TSL.subgroupXor;
 export const tan = TSL.tan;
+export const tanh = TSL.tanh;
 export const tangentGeometry = TSL.tangentGeometry;
 export const tangentLocal = TSL.tangentLocal;
 export const tangentView = TSL.tangentView;
