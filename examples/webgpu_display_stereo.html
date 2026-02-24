@@ -4,12 +4,20 @@
 		<title>three.js webgpu - stereo effects</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - stereo effects. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Stereo Effects</span>
+			</div>
+
+			<small>
+				Collection of Stereo, Anaglyph and Parallax Barrier effects.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,25 +36,46 @@
 			import * as THREE from 'three/webgpu';
 
 			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
-			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
+			import { anaglyphPass, AnaglyphAlgorithm, AnaglyphColorMode } from 'three/addons/tsl/display/AnaglyphPassNode.js';
 			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing;
+			let camera, scene, renderer, renderPipeline;
 
 			let stereo, anaglyph, parallaxBarrier;
 
 			let mesh, dummy, timer;
+
+			let anaglyphFolder;
 
 			const position = new THREE.Vector3();
 
 			const params = {
 				effect: 'stereo',
 				eyeSep: 0.064,
+				planeDistance: 3,
+				anaglyphAlgorithm: 'dubois',
+				anaglyphColorMode: 'redCyan'
 			};
 
 			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
+
+			const anaglyphAlgorithms = {
+				'True': AnaglyphAlgorithm.TRUE,
+				'Grey': AnaglyphAlgorithm.GREY,
+				'Colour': AnaglyphAlgorithm.COLOUR,
+				'Half-Colour': AnaglyphAlgorithm.HALF_COLOUR,
+				'Dubois': AnaglyphAlgorithm.DUBOIS,
+				'Optimised': AnaglyphAlgorithm.OPTIMISED,
+				'Compromise': AnaglyphAlgorithm.COMPROMISE
+			};
+
+			const anaglyphColorModes = {
+				'Red / Cyan': AnaglyphColorMode.RED_CYAN,
+				'Magenta / Cyan': AnaglyphColorMode.MAGENTA_CYAN,
+				'Magenta / Green': AnaglyphColorMode.MAGENTA_GREEN
+			};
 
 			init();
 
@@ -73,7 +102,7 @@
 
 				mesh = new THREE.InstancedMesh( geometry, material, 500 );
 				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
-			
+
 				dummy = new THREE.Mesh();
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -82,7 +111,7 @@
 					dummy.position.y = Math.random() * 10 - 5;
 					dummy.position.z = Math.random() * 10 - 5;
 					dummy.scale.x = dummy.scale.y = dummy.scale.z = Math.random() * 3 + 1;
-			
+
 					dummy.updateMatrix();
 
 					mesh.setMatrixAt( i, dummy.matrix );
@@ -97,25 +126,48 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 				stereo = stereoPass( scene, camera );
 				anaglyph = anaglyphPass( scene, camera );
 				parallaxBarrier = parallaxBarrierPass( scene, camera );
 
-				postProcessing.outputNode = stereo;
+				// Configure anaglyph for physically-correct stereo with zero parallax at scene center
+				anaglyph.eyeSep = params.eyeSep;
+				anaglyph.planeDistance = params.planeDistance;
 
-				const gui = new GUI();
+				renderPipeline.outputNode = stereo;
+
+				const gui = renderer.inspector.createParameters( 'Stereo Settings' );
 				gui.add( params, 'effect', effects ).onChange( update );
 				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
 
 					stereo.stereo.eyeSep = value;
-
-					anaglyph.stereo.eyeSep = value;
+					anaglyph.eyeSep = value; // Anaglyph has direct eyeSep property
 					parallaxBarrier.stereo.eyeSep = value;
 
 				} );
+
+				// Anaglyph-specific settings folder
+				anaglyphFolder = gui.addFolder( 'Anaglyph Options' );
+				anaglyphFolder.add( params, 'anaglyphAlgorithm', anaglyphAlgorithms ).name( 'Algorithm' ).onChange( function ( value ) {
+
+					anaglyph.algorithm = value;
+
+				} );
+				anaglyphFolder.add( params, 'anaglyphColorMode', anaglyphColorModes ).name( 'Color Mode' ).onChange( function ( value ) {
+
+					anaglyph.colorMode = value;
+
+				} );
+				anaglyphFolder.add( params, 'planeDistance', 0.5, 10, 0.1 ).name( 'Plane Distance' ).onChange( function ( value ) {
+
+					anaglyph.planeDistance = value;
+
+				} );
+				anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -129,19 +181,22 @@
 
 				if ( value === 'stereo' ) {
 
-					postProcessing.outputNode = stereo;
+					renderPipeline.outputNode = stereo;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				} else if ( value === 'anaglyph' ) {
 
-					postProcessing.outputNode = anaglyph;
+					renderPipeline.outputNode = anaglyph;
+					anaglyphFolder.paramList.domElement.style.display = '';
 
 				} else if ( value === 'parallaxBarrier' ) {
 
-					postProcessing.outputNode = parallaxBarrier;
+					renderPipeline.outputNode = parallaxBarrier;
+					anaglyphFolder.paramList.domElement.style.display = 'none';
 
 				}
 
-				postProcessing.needsUpdate = true;
+				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -185,7 +240,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

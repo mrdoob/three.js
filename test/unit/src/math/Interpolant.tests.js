@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Interpolant } from '../../../../src/math/Interpolant.js';
 
 export default QUnit.module( 'Maths', () => {
@@ -61,44 +59,6 @@ export default QUnit.module( 'Maths', () => {
 				interpolant instanceof Interpolant, true,
 				'Mock extends from Interpolant'
 			);
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'parameterPositions', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'resultBuffer', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'sampleValues', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'valueSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'settings', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'evaluate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

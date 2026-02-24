@@ -29,7 +29,7 @@ class StringKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'string'
  */
 StringKeyframeTrack.prototype.ValueTypeName = 'string';

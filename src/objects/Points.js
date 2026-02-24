@@ -59,7 +59,7 @@ class Points extends Object3D {
 		 * morph targets name, the value its attribute index. This member is `undefined`
 		 * by default and only set when morph targets are detected in the geometry.
 		 *
-		 * @type {Object<String,number>|undefined}
+		 * @type {Object<string,number>|undefined}
 		 * @default undefined
 		 */
 		this.morphTargetDictionary = undefined;

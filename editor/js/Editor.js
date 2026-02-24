@@ -7,7 +7,7 @@ import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 import { Selector } from './Selector.js';
 
-var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.001, 1e10 );
 _DEFAULT_CAMERA.name = 'Camera';
 _DEFAULT_CAMERA.position.set( 0, 5, 10 );
 _DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
@@ -84,7 +84,6 @@ function Editor() {
 
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		refreshSidebarEnvironment: new Signal(),
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
@@ -93,6 +92,11 @@ function Editor() {
 		intersectionsDetected: new Signal(),
 
 		pathTracerUpdated: new Signal(),
+
+		animationPanelChanged: new Signal(),
+		animationPanelResized: new Signal(),
+
+		morphTargetsUpdated: new Signal()
 
 	};
 
@@ -112,6 +116,9 @@ function Editor() {
 	this.sceneHelpers = new THREE.Scene();
 	this.sceneHelpers.add( new THREE.HemisphereLight( 0xffffff, 0x888888, 2 ) );
 
+	this.backgroundType = 'Default';
+	this.environmentType = 'Default';
+
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
@@ -129,6 +136,7 @@ function Editor() {
 
 	this.viewportCamera = this.camera;
 	this.viewportShading = 'default';
+	this.viewportColor = new THREE.Color();
 
 	this.addCamera( this.camera );
 
@@ -161,6 +169,8 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = true;
 		this.signals.sceneGraphChanged.dispatch();
+
+		this.signals.sceneEnvironmentChanged.dispatch( this.environmentType, scene.environment );
 
 	},
 
@@ -396,6 +406,32 @@ Editor.prototype = {
 
 					helper = new THREE.PointLightHelper( object, 1 );
 
+					helper.matrix = new THREE.Matrix4();
+					helper.matrixAutoUpdate = true;
+
+					const light = object;
+					const editor = this;
+
+					helper.updateMatrixWorld = function () {
+
+						light.getWorldPosition( this.position );
+
+						const distance = editor.viewportCamera.position.distanceTo( this.position );
+						this.scale.setScalar( distance / 30 );
+
+						this.updateMatrix();
+						this.matrixWorld.copy( this.matrix );
+
+						const children = this.children;
+
+						for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+							children[ i ].updateMatrixWorld();
+
+						}
+
+					};
+
 				} else if ( object.isDirectionalLight ) {
 
 					helper = new THREE.DirectionalLightHelper( object, 1 );
@@ -517,7 +553,7 @@ Editor.prototype = {
 
 	setViewportCamera: function ( uuid ) {
 
-		this.viewportCamera = this.cameras[ uuid ];
+		this.viewportCamera = this.cameras[ uuid ] || this.camera;
 		this.signals.viewportCameraChanged.dispatch();
 
 	},
@@ -626,6 +662,9 @@ Editor.prototype = {
 
 		this.deselect();
 
+		this.backgroundType = 'Default';
+		this.environmentType = 'Default';
+
 		this.signals.editorCleared.dispatch();
 
 	},
@@ -647,20 +686,23 @@ Editor.prototype = {
 		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
 		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
 
+		if ( json.controls !== undefined ) {
+
+			this.controls.fromJSON( json.controls );
+
+		}
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		this.setScene( await loader.parseAsync( json.scene ) );
+		const scene = await loader.parseAsync( json.scene );
 
-		if ( json.environment === 'Room' ||
-			 json.environment === 'ModelViewer' /* DEPRECATED */ ) {
+		this.backgroundType = json.backgroundType || 'Default';
+		this.environmentType = json.environmentType || 'Default';
 
-			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
-			this.signals.refreshSidebarEnvironment.dispatch();
-
-		}
+		this.setScene( scene );
 
 	},
 
@@ -683,32 +725,23 @@ Editor.prototype = {
 
 		}
 
-		// honor neutral environment
-
-		let environment = null;
-
-		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
-
-			environment = 'Room';
-
-		}
-
-		//
-
 		return {
 
 			metadata: {},
 			project: {
+				renderer: this.config.getKey( 'project/renderer/type' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.viewportCamera.toJSON(),
+			controls: this.controls.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
-			environment: environment
+			backgroundType: this.backgroundType,
+			environmentType: this.environmentType
 
 		};
 

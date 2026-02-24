@@ -1,6 +1,5 @@
 import TextureNode from './TextureNode.js';
-import { nodeProxy, vec3, Fn, If, int } from '../tsl/TSLBase.js';
-import { textureSize } from './TextureSizeNode.js';
+import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
 
 const normal = Fn( ( { texture, uv } ) => {
 
@@ -116,35 +115,6 @@ class Texture3DNode extends TextureNode {
 	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
 
 	/**
-	 * Overwrites the default implementation to return the unmodified uv node.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Node} uvNode - The uv node to setup.
-	 * @return {Node} The unmodified uv node.
-	 */
-	setupUV( builder, uvNode ) {
-
-		const texture = this.value;
-
-		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) ) {
-
-			if ( this.sampler ) {
-
-				uvNode = uvNode.flipY();
-
-			} else {
-
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
-
-			}
-
-		}
-
-		return uvNode;
-
-	}
-
-	/**
 	 * Generates the uv code snippet.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -153,15 +123,30 @@ class Texture3DNode extends TextureNode {
 	 */
 	generateUV( builder, uvNode ) {
 
-		return uvNode.build( builder, 'vec3' );
+		return uvNode.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 
 	/**
-	 * TODO.
+	 * Generates the offset code snippet.
 	 *
-	 * @param {Node<vec3>} uvNode - The uv node .
-	 * @return {Node<vec3>} TODO.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} offsetNode - The offset node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateOffset( builder, offsetNode ) {
+
+		return offsetNode.build( builder, 'ivec3' );
+
+	}
+
+	/**
+	 * Computes the normal for the given uv. These texture coordiantes represent a
+	 * position inside the 3D texture. Unlike geometric normals, this normal
+	 * represents a slope or gradient of scalar data inside the 3D texture.
+	 *
+	 * @param {Node<vec3>} uvNode - The uv node that defines a position in the 3D texture.
+	 * @return {Node<vec3>} The normal representing the slope/gradient in the data.
 	 */
 	normal( uvNode ) {
 
@@ -179,8 +164,33 @@ export default Texture3DNode;
  * @tsl
  * @function
  * @param {Data3DTexture} value - The 3D texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @returns {Texture3DNode}
  */
 export const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode ).setParameterLength( 1, 3 );
+
+/**
+ * TSL function for creating a texture node that fetches/loads texels without interpolation.
+ *
+ * @tsl
+ * @function
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
+ * @returns {TextureNode}
+ */
+export const texture3DLoad = ( ...params ) => texture3D( ...params ).setSampler( false );
+
+/**
+ * TSL function for creating a texture node that fetches/loads texels without interpolation.
+ *
+ * @tsl
+ * @function
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @returns {TextureNode}
+ */
+export const texture3DLevel = ( value, uvNode, levelNode ) => texture3D( value, uvNode ).level( levelNode );

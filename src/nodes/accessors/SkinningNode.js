@@ -9,7 +9,6 @@ import { positionLocal, positionPrevious } from './Position.js';
 import { tangentLocal } from './Tangent.js';
 import { uniform } from '../core/UniformNode.js';
 import { buffer } from './BufferNode.js';
-import { getDataFromObject } from '../core/NodeUtils.js';
 import { storage } from './StorageBufferNode.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { instanceIndex } from '../core/IndexNode.js';
@@ -147,13 +146,14 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Transforms the given vertex normal via skinning.
+	 * Transforms the given vertex normal and tangent via skinning.
 	 *
 	 * @param {Node} [boneMatrices=this.boneMatricesNode] - The bone matrices
 	 * @param {Node<vec3>} [normal=normalLocal] - The vertex normal in local space.
-	 * @return {Node<vec3>} The transformed vertex normal.
+	 * @param {Node<vec3>} [tangent=tangentLocal] - The vertex tangent in local space.
+	 * @return {{skinNormal: Node<vec3>, skinTangent:Node<vec3>}} The transformed vertex normal and tangent.
 	 */
-	getSkinnedNormal( boneMatrices = this.boneMatricesNode, normal = normalLocal ) {
+	getSkinnedNormalAndTangent( boneMatrices = this.boneMatricesNode, normal = normalLocal, tangent = tangentLocal ) {
 
 		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode } = this;
 
@@ -162,7 +162,7 @@ class SkinningNode extends Node {
 		const boneMatZ = boneMatrices.element( skinIndexNode.z );
 		const boneMatW = boneMatrices.element( skinIndexNode.w );
 
-		// NORMAL
+		// NORMAL and TANGENT
 
 		let skinMatrix = add(
 			skinWeightNode.x.mul( boneMatX ),
@@ -173,7 +173,10 @@ class SkinningNode extends Node {
 
 		skinMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
 
-		return skinMatrix.transformDirection( normal ).xyz;
+		const skinNormal = skinMatrix.transformDirection( normal ).xyz;
+		const skinTangent = skinMatrix.transformDirection( tangent ).xyz;
+
+		return { skinNormal, skinTangent };
 
 	}
 
@@ -200,21 +203,6 @@ class SkinningNode extends Node {
 	}
 
 	/**
-	 * Returns `true` if bone matrices from the previous frame are required. Relevant
-	 * when computing motion vectors with {@link VelocityNode}.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether bone matrices from the previous frame are required or not.
-	 */
-	needsPreviousBoneMatrices( builder ) {
-
-		const mrt = builder.renderer.getMRT();
-
-		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( builder.object ).useVelocity === true;
-
-	}
-
-	/**
 	 * Setups the skinning node by assigning the transformed vertex data to predefined node variables.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -222,7 +210,7 @@ class SkinningNode extends Node {
 	 */
 	setup( builder ) {
 
-		if ( this.needsPreviousBoneMatrices( builder ) ) {
+		if ( builder.needsPreviousData() ) {
 
 			positionPrevious.assign( this.getPreviousSkinnedPosition( builder ) );
 
@@ -236,13 +224,13 @@ class SkinningNode extends Node {
 
 		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-			const skinNormal = this.getSkinnedNormal();
+			const { skinNormal, skinTangent } = this.getSkinnedNormalAndTangent();
 
 			normalLocal.assign( skinNormal );
 
 			if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-				tangentLocal.assign( skinNormal );
+				tangentLocal.assign( skinTangent );
 
 			}
 
@@ -282,7 +270,20 @@ class SkinningNode extends Node {
 
 		_frameId.set( skeleton, frame.frameId );
 
-		if ( this.previousBoneMatricesNode !== null ) skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
+		if ( this.previousBoneMatricesNode !== null ) {
+
+			if ( skeleton.previousBoneMatrices === null ) {
+
+				// cloned skeletons miss "previousBoneMatrices" in their first updated
+
+				skeleton.previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+
+			}
+
+			skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
+
+
+		}
 
 		skeleton.update();
 
@@ -300,7 +301,7 @@ export default SkinningNode;
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
  * @returns {SkinningNode}
  */
-export const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
+export const skinning = ( skinnedMesh ) => new SkinningNode( skinnedMesh );
 
 /**
  * TSL function for computing skinning.

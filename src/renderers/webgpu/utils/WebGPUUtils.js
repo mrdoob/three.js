@@ -34,17 +34,21 @@ class WebGPUUtils {
 
 		let format;
 
-		if ( renderContext.depthTexture !== null ) {
+		if ( renderContext.depth ) {
 
-			format = this.getTextureFormatGPU( renderContext.depthTexture );
+			if ( renderContext.depthTexture !== null ) {
 
-		} else if ( renderContext.depth && renderContext.stencil ) {
+				format = this.getTextureFormatGPU( renderContext.depthTexture );
 
-			format = GPUTextureFormat.Depth24PlusStencil8;
+			} else if ( renderContext.stencil ) {
 
-		} else if ( renderContext.depth ) {
+				format = GPUTextureFormat.Depth24PlusStencil8;
 
-			format = GPUTextureFormat.Depth24Plus;
+			} else {
+
+				format = GPUTextureFormat.Depth24Plus;
+
+			}
 
 		}
 
@@ -83,7 +87,7 @@ class WebGPUUtils {
 			const renderer = this.backend.renderer;
 			const renderTarget = renderer.getRenderTarget();
 
-			samples = renderTarget ? renderTarget.samples : renderer.samples;
+			samples = renderTarget ? renderTarget.samples : renderer.currentSamples;
 
 		} else if ( texture.renderTarget ) {
 
@@ -121,6 +125,26 @@ class WebGPUUtils {
 		}
 
 		return format;
+
+	}
+
+	/**
+	 * Returns the GPU formats of all color attachments of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Array<string>} The GPU texture formats of all color attachments.
+	 */
+	getCurrentColorFormats( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return renderContext.textures.map( t => this.getTextureFormatGPU( t ) );
+
+		} else {
+
+			return [ this.getPreferredCanvasFormat() ]; // default context format
+
+		}
 
 	}
 
@@ -186,7 +210,7 @@ class WebGPUUtils {
 
 		}
 
-		return this.getSampleCount( this.backend.renderer.samples );
+		return this.getSampleCount( this.backend.renderer.currentSamples );
 
 	}
 
@@ -200,23 +224,25 @@ class WebGPUUtils {
 	 */
 	getPreferredCanvasFormat() {
 
-		const outputType = this.backend.parameters.outputType;
+		const parameters = this.backend.parameters;
 
-		if ( outputType === undefined ) {
+		const bufferType = parameters.outputType;
+
+		if ( bufferType === undefined ) {
 
 			return navigator.gpu.getPreferredCanvasFormat();
 
-		} else if ( outputType === UnsignedByteType ) {
+		} else if ( bufferType === UnsignedByteType ) {
 
 			return GPUTextureFormat.BGRA8Unorm;
 
-		} else if ( outputType === HalfFloatType ) {
+		} else if ( bufferType === HalfFloatType ) {
 
 			return GPUTextureFormat.RGBA16Float;
 
 		} else {
 
-			throw new Error( 'Unsupported outputType' );
+			throw new Error( 'Unsupported output buffer type.' );
 
 		}
 

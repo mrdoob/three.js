@@ -36,7 +36,8 @@
 		let container, stats;
 		let camera, controls, scene, renderer;
 		let textureLoader;
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 
 		// Physics variables
 		const gravityConstant = - 9.8;
@@ -419,6 +420,8 @@
 
 		function animate() {
 
+			timer.update();
+
 			render();
 			stats.update();
 
@@ -426,7 +429,7 @@
 
 		function render() {
 
-			const deltaTime = clock.getDelta();
+			const deltaTime = timer.getDelta();
 
 			updatePhysics( deltaTime );
 

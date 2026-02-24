@@ -114,7 +114,7 @@ class RenderTransitionPass extends Pass {
 	}
 
 	/**
-	 * Sets the texture threshold. This value defined how strong the texture effects
+	 * Sets the texture threshold. This value defines how strong the texture effects
 	 * the transition. Must be in the range `[0,1]` (0 means full effect, 1 means no effect).
 	 *
 	 * @param {boolean|number} value - The threshold value.

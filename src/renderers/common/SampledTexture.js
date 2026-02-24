@@ -6,7 +6,7 @@ let _id = 0;
  * Represents a sampled texture binding type.
  *
  * @private
- * @augments Binding
+ * @augments Sampler
  */
 class SampledTexture extends Sampler {
 
@@ -34,6 +34,14 @@ class SampledTexture extends Sampler {
 		 * @default false
 		 */
 		this.store = false;
+
+		/**
+		 * The mip level to bind for storage textures.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
 
 		/**
 		 * This flag can be used for type testing.

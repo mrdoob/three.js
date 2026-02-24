@@ -1,5 +1,6 @@
 import Node from './Node.js';
-import { addMethodChaining, getCurrentStack, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { error } from '../../utils.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -112,6 +113,22 @@ class VarNode extends Node {
 	}
 
 	/**
+	 * Checks if this node is used for intent.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is used for intent.
+	 */
+	isIntent( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		if ( data.forceDeclaration === true ) return false;
+
+		return this.intent;
+
+	}
+
+	/**
 	 * Returns the intent flag of this node.
 	 *
 	 * @return {boolean} The intent flag.
@@ -146,14 +163,62 @@ class VarNode extends Node {
 
 	}
 
+	isAssign( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		return data.assign;
+
+	}
+
 	build( ...params ) {
 
-		if ( this.intent === true ) {
+		const builder = params[ 0 ];
 
-			const builder = params[ 0 ];
-			const properties = builder.getNodeProperties( this );
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( properties.assign !== true ) {
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+
+				let addBefore = false;
+
+				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+					if ( builder.fnCall && builder.fnCall.shaderNode ) {
+
+						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+						if ( shaderNodeData.hasLoop ) {
+
+							const data = builder.getDataFromNode( this );
+							data.forceDeclaration = true;
+
+							addBefore = true;
+
+						}
+
+					}
+
+				}
+
+				const baseStack = builder.getBaseStack();
+
+				if ( addBefore ) {
+
+					baseStack.addToStackBefore( this );
+
+				} else {
+
+					baseStack.addToStack( this );
+
+				}
+
+			}
+
+		}
+
+		if ( this.isIntent( builder ) ) {
+
+			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
 
@@ -183,7 +248,23 @@ class VarNode extends Node {
 
 		}
 
-		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const nodeType = this.getNodeType( builder );
+
+		if ( nodeType == 'void' ) {
+
+			if ( this.isIntent( builder ) !== true ) {
+
+				error( 'TSL: ".toVar()" can not be used with void type.', this.stackTrace );
+
+			}
+
+			const snippet = node.build( builder );
+
+			return snippet;
+
+		}
+
+		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
@@ -213,6 +294,14 @@ class VarNode extends Node {
 		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
 
 		return propertyName;
+
+	}
+
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
 
 	}
 
@@ -266,12 +355,6 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  * @returns {VarNode}
  */
 export const VarIntent = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
 
 	return createVar( node ).setIntent( true ).toStack();
 

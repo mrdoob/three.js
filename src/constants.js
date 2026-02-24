@@ -1,4 +1,4 @@
-export const REVISION = '180dev';
+export const REVISION = '184dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -154,6 +154,14 @@ export const MultiplyBlending = 4;
  * @constant
  */
 export const CustomBlending = 5;
+
+/**
+ * Represents material blending.
+ *
+ * @type {number}
+ * @constant
+ */
+export const MaterialBlending = 6;
 
 /**
  * A `source + destination` blending equation.
@@ -722,6 +730,14 @@ export const UnsignedInt248Type = 1020;
 export const UnsignedInt5999Type = 35902;
 
 /**
+ * An unsigned int 10_11_11 (packed) data type for textures.
+ *
+ * @type {number}
+ * @constant
+ */
+export const UnsignedInt101111Type = 35899;
+
+/**
  * Discards the red, green and blue components and reads just the alpha component.
  *
  * @type {number}
@@ -898,6 +914,38 @@ export const RGB_ETC2_Format = 37492;
  * @constant
  */
 export const RGBA_ETC2_EAC_Format = 37496;
+
+/**
+ * EAC R11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const R11_EAC_Format = 37488; // 0x9270
+
+/**
+ * EAC R11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_R11_EAC_Format = 37489; // 0x9271
+
+/**
+ * EAC RG11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const RG11_EAC_Format = 37490; // 0x9272
+
+/**
+ * EAC RG11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_RG11_EAC_Format = 37491; // 0x9273
 
 /**
  * ASTC RGBA 4x4 format.
@@ -1118,6 +1166,17 @@ export const InterpolateLinear = 2301;
 export const InterpolateSmooth = 2302;
 
 /**
+ * Bezier interpolation mode for keyframe tracks.
+ *
+ * Uses cubic Bezier curves with explicit 2D control points.
+ * Requires tangent data to be set on the track.
+ *
+ * @type {number}
+ * @constant
+ */
+export const InterpolateBezier = 2303;
+
+/**
  * Zero curvature ending for animations.
  *
  * @type {number}
@@ -1183,7 +1242,7 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 
 /**
- * Basic depth packing.
+ * The depth value is inverted (1.0 - z) for visualization purposes.
  *
  * @type {number}
  * @constant
@@ -1191,7 +1250,7 @@ export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 
 /**
- * A depth value is packed into 32 bit RGBA.
+ * The depth value is packed into 32 bit RGBA.
  *
  * @type {number}
  * @constant
@@ -1199,7 +1258,7 @@ export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 
 /**
- * A depth value is packed into 24 bit RGB.
+ * The depth value is packed into 24 bit RGB.
  *
  * @type {number}
  * @constant
@@ -1207,7 +1266,7 @@ export const RGBADepthPacking = 3201;
 export const RGBDepthPacking = 3202;
 
 /**
- * A depth value is packed into 16 bit RG.
+ * The depth value is packed into 16 bit RG.
  *
  * @type {number}
  * @constant
@@ -1271,6 +1330,30 @@ export const LinearTransfer = 'linear';
  * @constant
  */
 export const SRGBTransfer = 'srgb';
+
+/**
+ * No normal map packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NoNormalPacking = '';
+
+/**
+ * Normal RG packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalRGPacking = 'rg';
+
+/**
+ * Normal GA packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalGAPacking = 'ga';
 
 /**
  * Sets the stencil buffer value to `0`.
@@ -1617,6 +1700,16 @@ export const InterpolationSamplingMode = {
 };
 
 /**
+ * Compatibility flags for features that may not be supported across all platforms.
+ *
+ * @type {Object}
+ * @constant
+ */
+export const Compatibility = {
+	TEXTURE_COMPARE: 'depthTextureCompare'
+};
+
+/**
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
@@ -1662,6 +1755,6 @@ export const InterpolationSamplingMode = {
  * @property {string} NORMAL - Normal sampling mode.
  * @property {string} CENTROID - Centroid sampling mode.
  * @property {string} SAMPLE - Sample-specific sampling mode.
- * @property {string} FLAT_FIRST - Flat interpolation using the first vertex.
- * @property {string} FLAT_EITHER - Flat interpolation using either vertex.
+ * @property {string} FIRST - Flat interpolation using the first vertex.
+ * @property {string} EITHER - Flat interpolation using either vertex.
  */

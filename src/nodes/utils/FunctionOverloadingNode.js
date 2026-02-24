@@ -46,7 +46,7 @@ class FunctionOverloadingNode extends Node {
 		 * @private
 		 * @type {ShaderCallNodeInternal}
 		 */
-		this._candidateFnCall = null;
+		this._candidateFn = null;
 
 		/**
 		 * This node is marked as global.
@@ -65,22 +65,30 @@ class FunctionOverloadingNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	getNodeType( builder ) {
 
-		return this.functionNodes[ 0 ].shaderNode.layout.type;
+		const candidateFn = this.getCandidateFn( builder );
+
+		return candidateFn.shaderNode.layout.type;
 
 	}
 
-	setup( builder ) {
+	/**
+	 * Returns the candidate function for the current parameters.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {FunctionNode} The candidate function.
+	 */
+	getCandidateFn( builder ) {
 
 		const params = this.parametersNodes;
 
-		let candidateFnCall = this._candidateFnCall;
+		let candidateFn = this._candidateFn;
 
-		if ( candidateFnCall === null ) {
+		if ( candidateFn === null ) {
 
-			let candidateFn = null;
-			let candidateScore = - 1;
+			let bestCandidateFn = null;
+			let bestScore = - 1;
 
 			for ( const functionNode of this.functionNodes ) {
 
@@ -97,7 +105,7 @@ class FunctionOverloadingNode extends Node {
 
 				if ( params.length === inputs.length ) {
 
-					let score = 0;
+					let currentScore = 0;
 
 					for ( let i = 0; i < params.length; i ++ ) {
 
@@ -106,20 +114,16 @@ class FunctionOverloadingNode extends Node {
 
 						if ( param.getNodeType( builder ) === input.type ) {
 
-							score ++;
-
-						} else {
-
-							score = 0;
+							currentScore ++;
 
 						}
 
 					}
 
-					if ( score > candidateScore ) {
+					if ( currentScore > bestScore ) {
 
-						candidateFn = functionNode;
-						candidateScore = score;
+						bestCandidateFn = functionNode;
+						bestScore = currentScore;
 
 					}
 
@@ -127,11 +131,25 @@ class FunctionOverloadingNode extends Node {
 
 			}
 
-			this._candidateFnCall = candidateFnCall = candidateFn( ...params );
+			this._candidateFn = candidateFn = bestCandidateFn;
 
 		}
 
-		return candidateFnCall;
+		return candidateFn;
+
+	}
+
+	/**
+	 * Sets up the node for the current parameters.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The setup node.
+	 */
+	setup( builder ) {
+
+		const candidateFn = this.getCandidateFn( builder );
+
+		return candidateFn( ...this.parametersNodes );
 
 	}
 

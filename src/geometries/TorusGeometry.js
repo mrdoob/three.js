@@ -13,6 +13,7 @@ import { Vector3 } from '../math/Vector3.js';
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#TorusGeometry
  */
 class TorusGeometry extends BufferGeometry {
 
@@ -24,8 +25,10 @@ class TorusGeometry extends BufferGeometry {
 	 * @param {number} [radialSegments=12] - The number of radial segments.
 	 * @param {number} [tubularSegments=48] - The number of tubular segments.
 	 * @param {number} [arc=Math.PI*2] - Central angle in radians.
+	 * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
 	 */
-	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -43,7 +46,9 @@ class TorusGeometry extends BufferGeometry {
 			tube: tube,
 			radialSegments: radialSegments,
 			tubularSegments: tubularSegments,
-			arc: arc
+			arc: arc,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength,
 		};
 
 		radialSegments = Math.floor( radialSegments );
@@ -66,10 +71,11 @@ class TorusGeometry extends BufferGeometry {
 
 		for ( let j = 0; j <= radialSegments; j ++ ) {
 
+			const v = thetaStart + ( j / radialSegments ) * thetaLength;
+
 			for ( let i = 0; i <= tubularSegments; i ++ ) {
 
 				const u = i / tubularSegments * arc;
-				const v = j / radialSegments * Math.PI * 2;
 
 				// vertex
 

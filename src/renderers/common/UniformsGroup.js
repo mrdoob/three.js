@@ -1,5 +1,6 @@
 import UniformBuffer from './UniformBuffer.js';
 import { GPU_CHUNK_BYTES } from './Constants.js';
+import { error } from '../../utils.js';
 
 /**
  * This class represents a uniform buffer binding but with
@@ -45,6 +46,51 @@ class UniformsGroup extends UniformBuffer {
 		 * @type {Array<Uniform>}
 		 */
 		this.uniforms = [];
+
+		/**
+		 * A cache for the uniform update ranges.
+		 *
+		 * @private
+		 * @type {Map<number, {start: number, count: number}>}
+		 */
+		this._updateRangeCache = new Map();
+
+	}
+
+	/**
+	 * Adds a uniform's update range to this buffer.
+	 *
+	 * @param {Uniform} uniform - The uniform.
+	 */
+	addUniformUpdateRange( uniform ) {
+
+		const index = uniform.index;
+
+		if ( this._updateRangeCache.has( index ) !== true ) {
+
+			const updateRanges = this.updateRanges;
+
+			const start = uniform.offset;
+			const count = uniform.itemSize;
+
+			const range = { start, count };
+
+			updateRanges.push( range );
+
+			this._updateRangeCache.set( index, range );
+
+		}
+
+	}
+
+	/**
+	 * Clears all update ranges of this buffer.
+	 */
+	clearUpdateRanges() {
+
+		this._updateRangeCache.clear();
+
+		super.clearUpdateRanges();
 
 	}
 
@@ -155,6 +201,7 @@ class UniformsGroup extends UniformBuffer {
 			}
 
 			uniform.offset = offset / bytesPerElement;
+			uniform.index = i;
 
 			offset += itemSize;
 
@@ -208,7 +255,7 @@ class UniformsGroup extends UniformBuffer {
 		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
 		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
-		console.error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
+		error( 'WebGPUUniformsGroup: Unsupported uniform type.', uniform );
 
 	}
 
@@ -233,6 +280,8 @@ class UniformsGroup extends UniformBuffer {
 
 			b[ offset ] = a[ offset ] = v;
 			updated = true;
+
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -264,6 +313,8 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
+			this.addUniformUpdateRange( uniform );
+
 		}
 
 		return updated;
@@ -294,6 +345,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 2 ] = a[ offset + 2 ] = v.z;
 
 			updated = true;
+
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -327,6 +380,8 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
+			this.addUniformUpdateRange( uniform );
+
 		}
 
 		return updated;
@@ -356,6 +411,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 2 ] = a[ offset + 2 ] = c.b;
 
 			updated = true;
+
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -395,6 +452,8 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
+			this.addUniformUpdateRange( uniform );
+
 		}
 
 		return updated;
@@ -422,6 +481,8 @@ class UniformsGroup extends UniformBuffer {
 			setArray( a, e, offset );
 			updated = true;
 
+			this.addUniformUpdateRange( uniform );
+
 		}
 
 		return updated;
@@ -431,6 +492,7 @@ class UniformsGroup extends UniformBuffer {
 	/**
 	 * Returns a typed array that matches the given data type.
 	 *
+	 * @private
 	 * @param {string} type - The data type.
 	 * @return {TypedArray} The typed array.
 	 */

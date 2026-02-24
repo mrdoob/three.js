@@ -4,9 +4,20 @@
 		<title>three.js webgpu - arraycamera</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Array Camera</span>
+			</div>
+
+			<small>Array cameras allow to render the scene with multiple sub cameras but with a single render call.</small>
+		</div>
+
 
 		<script type="importmap">
 			{
@@ -23,11 +34,8 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			let camera, scene, renderer;
 			let mesh;
-			let stats;
 
 			const AMOUNT = 6;
 
@@ -58,7 +66,6 @@
 				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
-				light.shadow.bias = - 0.001;
 				light.shadow.camera.zoom = 4; // tighter shadow map
 				scene.add( light );
 
@@ -88,11 +95,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				//
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 			}
 
@@ -143,8 +145,6 @@
 				mesh.rotation.z += 0.01;
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

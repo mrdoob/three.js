@@ -4,12 +4,20 @@
 		<title>three.js webgpu - skinning instancing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - skinning instancing
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Skinning Instancing</span>
+			</div>
+
+			<small>
+				Skinning with multiple instances of the same model.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -32,9 +40,9 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
-			let mixer, clock;
+			let mixer, timer;
 
 			init();
 
@@ -46,7 +54,8 @@
 				scene = new THREE.Scene();
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -137,8 +146,8 @@
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
 				scenePassColorBlurred.directionNode = scenePassDepth;
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePassColorBlurred;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = scenePassColorBlurred;
 
 
 				// events
@@ -158,11 +167,13 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

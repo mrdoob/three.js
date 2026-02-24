@@ -1,7 +1,9 @@
 import InputNode from './InputNode.js';
+import StackTrace from '../core/StackTrace.js';
 import { objectGroup } from './UniformGroupNode.js';
-import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
+import { getConstNodeType } from '../tsl/TSLCore.js';
 import { getValueFromType } from './NodeUtils.js';
+import { warn } from '../../utils.js';
 
 /**
  * Class for representing a uniform.
@@ -77,7 +79,7 @@ class UniformNode extends InputNode {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -123,13 +125,11 @@ class UniformNode extends InputNode {
 
 	onUpdate( callback, updateType ) {
 
-		const self = this.getSelf();
-
-		callback = callback.bind( self );
+		callback = callback.bind( this );
 
 		return super.onUpdate( ( frame ) => {
 
-			const value = callback( frame, self );
+			const value = callback( frame, this );
 
 			if ( value !== undefined ) {
 
@@ -236,9 +236,24 @@ export const uniform = ( value, type ) => {
 
 	}
 
-	// @TODO: get ConstNode from .traverse() in the future
-	value = ( value && value.isNode === true ) ? ( value.node && value.node.value ) || value.value : value;
+	if ( value && value.isNode === true ) {
 
-	return nodeObject( new UniformNode( value, nodeType ) );
+		let v = value.value;
+
+		value.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				v = n.value;
+
+			}
+
+		} );
+
+		value = v;
+
+	}
+
+	return new UniformNode( value, nodeType );
 
 };

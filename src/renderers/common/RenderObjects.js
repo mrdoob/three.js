@@ -91,11 +91,14 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 
-		// reuse chainArray
+		// set chain keys
+
 		_chainKeys[ 0 ] = object;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
+
+		//
 
 		let renderObject = chainMap.get( _chainKeys );
 
@@ -106,6 +109,12 @@ class RenderObjects {
 			chainMap.set( _chainKeys, renderObject );
 
 		} else {
+
+			// update references
+
+			renderObject.camera = camera;
+
+			//
 
 			renderObject.updateClipping( clippingContext );
 
@@ -133,7 +142,14 @@ class RenderObjects {
 
 		}
 
-		_chainKeys.length = 0;
+		// reset chain array
+
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
+		_chainKeys[ 2 ] = null;
+		_chainKeys[ 3 ] = null;
+
+		//
 
 		return renderObject;
 
@@ -185,7 +201,7 @@ class RenderObjects {
 		renderObject.onDispose = () => {
 
 			this.pipelines.delete( renderObject );
-			this.bindings.delete( renderObject );
+			this.bindings.deleteForRender( renderObject );
 			this.nodes.delete( renderObject );
 
 			chainMap.delete( renderObject.getChainArray() );

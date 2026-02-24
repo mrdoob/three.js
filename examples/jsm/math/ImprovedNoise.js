@@ -36,7 +36,7 @@ function grad( hash, x, y, z ) {
 /**
  * A utility class providing a 3D noise function.
  *
- * The code is based on [IMPROVED NOISE]{@link https://cs.nyu.edu/~perlin/noise/}
+ * The code is based on [IMPROVED NOISE](https://cs.nyu.edu/~perlin/noise/)
  * by Ken Perlin, 2002.
  *
  * @three_import import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';

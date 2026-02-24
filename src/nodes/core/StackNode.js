@@ -1,6 +1,8 @@
 import Node from './Node.js';
+import StackTrace from '../core/StackTrace.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -68,6 +70,15 @@ class StackNode extends Node {
 		this._expressionNode = null;
 
 		/**
+		 * The current node being processed.
+		 *
+		 * @private
+		 * @type {Node}
+		 * @default null
+		 */
+		this._currentNode = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -78,15 +89,21 @@ class StackNode extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.hasOutput( builder ) ? this.outputNode.getElementType( builder ) : 'void';
+
+	}
+
 	getNodeType( builder ) {
 
-		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -94,20 +111,35 @@ class StackNode extends Node {
 	 * Adds a node to this stack.
 	 *
 	 * @param {Node} node - The node to add.
+	 * @param {number} [index=this.nodes.length] - The index where the node should be added.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node, index = this.nodes.length ) {
 
 		if ( node.isNode !== true ) {
 
-			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.', new StackTrace() );
 			return this;
 
 		}
 
-		this.nodes.push( node );
+		this.nodes.splice( index, 0, node );
 
 		return this;
+
+	}
+
+	/**
+	 * Adds a node to the stack before the current node.
+	 *
+	 * @param {Node} node - The node to add.
+	 * @return {StackNode} A reference to this stack node.
+	 */
+	addToStackBefore( node ) {
+
+		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+
+		return this.addToStack( node, index );
 
 	}
 
@@ -123,7 +155,7 @@ class StackNode extends Node {
 		const methodNode = new ShaderNode( method );
 		this._currentCond = select( boolNode, methodNode );
 
-		return this.add( this._currentCond );
+		return this.addToStack( this._currentCond );
 
 	}
 
@@ -198,7 +230,7 @@ class StackNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.', new StackTrace() );
 
 		}
 
@@ -225,7 +257,7 @@ class StackNode extends Node {
 
 			this._currentCond = condNode;
 
-			return this.add( this._currentCond );
+			return this.addToStack( this._currentCond );
 
 		} else {
 
@@ -260,11 +292,9 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.intent === true ) {
+			if ( childNode.isVarNode && childNode.isIntent( builder ) ) {
 
-				const properties = builder.getNodeProperties( childNode );
-
-				if ( properties.assign !== true ) {
+				if ( childNode.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -282,32 +312,33 @@ class StackNode extends Node {
 
 	}
 
-	get hasOutput() {
+	hasOutput( builder ) {
 
-		return this.outputNode && this.outputNode.isNode;
+		return this.outputNode && this.outputNode.isNode && this.outputNode.getNodeType( builder ) !== 'void';
 
 	}
 
 	build( builder, ...params ) {
 
-		const previousBuildStack = builder.currentStack;
 		const previousStack = getCurrentStack();
-
-		setCurrentStack( this );
-
-		builder.currentStack = this;
 
 		const buildStage = builder.buildStage;
 
-		for ( const node of this.nodes ) {
+		setCurrentStack( this );
 
-			if ( node.isVarNode && node.intent === true ) {
+		builder.setActiveStack( this );
 
-				const properties = builder.getNodeProperties( node );
+		//
 
-				if ( properties.assign !== true ) {
+		const buildNode = ( node ) => {
 
-					continue;
+			this._currentNode = node;
+
+			if ( node.isVarNode && node.isIntent( builder ) ) {
+
+				if ( node.isAssign( builder ) !== true ) {
+
+					return;
 
 				}
 
@@ -328,7 +359,7 @@ class StackNode extends Node {
 
 				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
 
-					continue; // skip var nodes that are only used in .toVarying()
+					return; // skip var nodes that are only used in .toVarying()
 
 				}
 
@@ -336,13 +367,33 @@ class StackNode extends Node {
 
 			}
 
+		};
+
+		//
+
+		const nodes = [ ...this.nodes ];
+
+		for ( const node of nodes ) {
+
+			buildNode( node );
+
+		}
+
+		this._currentNode = null;
+
+		const newNodes = this.nodes.filter( ( node ) => nodes.indexOf( node ) === - 1 );
+
+		for ( const node of newNodes ) {
+
+			buildNode( node );
+
 		}
 
 		//
 
 		let result;
 
-		if ( this.hasOutput ) {
+		if ( this.hasOutput( builder ) ) {
 
 			result = this.outputNode.build( builder, ...params );
 
@@ -354,7 +405,7 @@ class StackNode extends Node {
 
 		setCurrentStack( previousStack );
 
-		builder.currentStack = previousBuildStack;
+		builder.removeActiveStack( this );
 
 		return result;
 

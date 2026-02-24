@@ -1,15 +1,18 @@
 import {
 	InterpolateLinear,
 	InterpolateSmooth,
-	InterpolateDiscrete
+	InterpolateDiscrete,
+	InterpolateBezier
 } from '../constants.js';
 import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
+import { BezierInterpolant } from '../math/interpolants/BezierInterpolant.js';
 import * as AnimationUtils from './AnimationUtils.js';
+import { warn, error } from '../utils.js';
 
 /**
- * Represents s a timed sequence of keyframes, which are composed of lists of
+ * Represents a timed sequence of keyframes, which are composed of lists of
  * times and related values, and which are used to animate a specific property
  * of an object.
  */
@@ -21,7 +24,7 @@ class KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number|string|boolean>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -140,9 +143,36 @@ class KeyframeTrack {
 	}
 
 	/**
+	 * Factory method for creating a new Bezier interpolant.
+	 *
+	 * The Bezier interpolant requires tangent data to be set via the `settings` property
+	 * on the track before creating the interpolant. The settings should contain:
+	 * - `inTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 * - `outTangents`: Float32Array with [time, value] pairs per keyframe per component
+	 *
+	 * @static
+	 * @param {TypedArray} [result] - The result buffer.
+	 * @return {BezierInterpolant} The new interpolant.
+	 */
+	InterpolantFactoryMethodBezier( result ) {
+
+		const interpolant = new BezierInterpolant( this.times, this.values, this.getValueSize(), result );
+
+		// Pass tangent data from track settings to interpolant
+		if ( this.settings ) {
+
+			interpolant.settings = this.settings;
+
+		}
+
+		return interpolant;
+
+	}
+
+	/**
 	 * Defines the interpolation factor method for this keyframe track.
 	 *
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} interpolation - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} interpolation - The interpolation type.
 	 * @return {KeyframeTrack} A reference to this keyframe track.
 	 */
 	setInterpolation( interpolation ) {
@@ -169,6 +199,12 @@ class KeyframeTrack {
 
 				break;
 
+			case InterpolateBezier:
+
+				factoryMethod = this.InterpolantFactoryMethodBezier;
+
+				break;
+
 		}
 
 		if ( factoryMethod === undefined ) {
@@ -191,7 +227,7 @@ class KeyframeTrack {
 
 			}
 
-			console.warn( 'THREE.KeyframeTrack:', message );
+			warn( 'KeyframeTrack:', message );
 			return this;
 
 		}
@@ -205,7 +241,7 @@ class KeyframeTrack {
 	/**
 	 * Returns the current interpolation type.
 	 *
-	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} The interpolation type.
+	 * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} The interpolation type.
 	 */
 	getInterpolation() {
 
@@ -222,6 +258,10 @@ class KeyframeTrack {
 			case this.InterpolantFactoryMethodSmooth:
 
 				return InterpolateSmooth;
+
+			case this.InterpolantFactoryMethodBezier:
+
+				return InterpolateBezier;
 
 		}
 
@@ -351,7 +391,7 @@ class KeyframeTrack {
 		const valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
+			error( 'KeyframeTrack: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -363,7 +403,7 @@ class KeyframeTrack {
 
 		if ( nKeys === 0 ) {
 
-			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
+			error( 'KeyframeTrack: Track is empty.', this );
 			valid = false;
 
 		}
@@ -376,7 +416,7 @@ class KeyframeTrack {
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
+				error( 'KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
@@ -384,7 +424,7 @@ class KeyframeTrack {
 
 			if ( prevTime !== null && prevTime > currTime ) {
 
-				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
+				error( 'KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -404,7 +444,7 @@ class KeyframeTrack {
 
 					if ( isNaN( value ) ) {
 
-						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
+						error( 'KeyframeTrack: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 
@@ -424,7 +464,7 @@ class KeyframeTrack {
 	 * Optimizes this keyframe track by removing equivalent sequential keys (which are
 	 * common in morph target sequences).
 	 *
-	 * @return {AnimationClip} A reference to this animation clip.
+	 * @return {KeyframeTrack} A reference to this keyframe track.
 	 */
 	optimize() {
 
@@ -564,7 +604,7 @@ class KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default ''
  */
 KeyframeTrack.prototype.ValueTypeName = '';
@@ -588,7 +628,7 @@ KeyframeTrack.prototype.ValueBufferType = Float32Array;
 /**
  * The default interpolation type of this keyframe track.
  *
- * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)}
+ * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)}
  * @default InterpolateLinear
  */
 KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;

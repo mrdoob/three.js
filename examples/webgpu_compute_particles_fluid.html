@@ -4,13 +4,18 @@
 		<title>three.js webgpu - compute fluid particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - fluid particles<br />
-			MLS-MPM particle simulation running in compute shaders
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Fluid Particles</span>
+			</div>
+
+			<small>MLS-MPM particle simulation running in compute shaders.</small>
 		</div>
 
 		<script type="importmap">
@@ -28,26 +33,30 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4, cross, step } from 'three/tsl';
+			import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4, cross, step, storage } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let renderer, scene, camera, controls;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const maxParticles = 8192 * 16;
 			const gridSize1d = 64;
+			const workgroupSize = 64;
 			const gridSize = new THREE.Vector3( gridSize1d, gridSize1d, gridSize1d );
 			const fixedPointMultiplier = 1e7;
 
 			let particleCountUniform, stiffnessUniform, restDensityUniform, dynamicViscosityUniform, dtUniform, gravityUniform, gridSizeUniform;
 			let particleBuffer, cellBuffer, cellBufferFloat;
-			let clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel;
+			let clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel, workgroupKernel;
+			let p2g1KernelWorkgroupBuffer, p2g2KernelWorkgroupBuffer, g2pKernelWorkgroupBuffer;
 			let particleMesh;
 			const mouseCoord = new THREE.Vector3();
 			const prevMouseCoord = new THREE.Vector3();
@@ -60,8 +69,6 @@
 
 			}
 
-			const gui = new GUI();
-
 			const params = {
 				particleCount: 8192 * 4,
 			};
@@ -70,11 +77,12 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits: { maxStorageBuffersInVertexStage: 1 } } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -89,9 +97,9 @@
 				controls.maxPolarAngle = Math.PI * 0.35;
 				controls.touches = { TWO: THREE.TOUCH.DOLLY_ROTATE };
 
-				const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new UltraHDRLoader().setPath( 'textures/equirectangular/' );
 
-				const hdrTexture = await rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_2k.hdr.jpg' );
 				hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = hdrTexture;
 				scene.backgroundBlurriness = 0.5;
@@ -99,14 +107,30 @@
 
 				setupParticles();
 
+				const gui = renderer.inspector.createParameters( 'Settings' );
+			
+				const numWorkgroups = Math.ceil( params.particleCount / workgroupSize );
+
+				p2g1KernelWorkgroupBuffer = new THREE.IndirectStorageBufferAttribute( new Uint32Array( [ numWorkgroups, 1, 1 ] ), 1 );
+				p2g2KernelWorkgroupBuffer = new THREE.IndirectStorageBufferAttribute( new Uint32Array( [ numWorkgroups, 1, 1 ] ), 1 );
+				g2pKernelWorkgroupBuffer = new THREE.IndirectStorageBufferAttribute( new Uint32Array( [ numWorkgroups, 1, 1 ] ), 1 );
+
+				const p2g1WorkgroupStorage = storage( p2g1KernelWorkgroupBuffer, 'uint', 3 );
+				const p2g2WorkgroupStorage = storage( p2g2KernelWorkgroupBuffer, 'uint', 3 );
+				const g2pWorkgroupStorage = storage( g2pKernelWorkgroupBuffer, 'uint', 3 );
+
+				workgroupKernel = Fn( () => {
+
+					const workgroupsToDispatch = ( particleCountUniform.sub( 1 ) ).div( workgroupSize ).add( 1 );
+
+					p2g1WorkgroupStorage.element( 0 ).assign( workgroupsToDispatch );
+					p2g2WorkgroupStorage.element( 0 ).assign( workgroupsToDispatch );
+					g2pWorkgroupStorage.element( 0 ).assign( workgroupsToDispatch );
+
+				} )().compute( 1 );
+
 				gui.add( params, 'particleCount', 4096, maxParticles, 4096 ).onChange( value => {
 
-					p2g1Kernel.count = value;
-					p2g2Kernel.count = value;
-					g2pKernel.count = value;
-					p2g1Kernel.updateDispatchCount();
-					p2g2Kernel.updateDispatchCount();
-					g2pKernel.updateDispatchCount();
 					particleMesh.count = value;
 					particleCountUniform.value = value;
 
@@ -206,7 +230,7 @@
 					atomicStore( cellBuffer.element( instanceIndex ).get( 'z' ), 0 );
 					atomicStore( cellBuffer.element( instanceIndex ).get( 'mass' ), 0 );
 			
-				} )().compute( cellCount );
+				} )().compute( cellCount ).setName( 'clearGridKernel' );
 
 				p2g1Kernel = Fn( () => {
 
@@ -254,7 +278,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'p2g1Kernel' );
 
 				p2g2Kernel = Fn( () => {
 
@@ -325,7 +349,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'p2g2Kernel' );
 
 				updateGridKernel = Fn( () => {
 
@@ -367,7 +391,7 @@
 
 					cellBufferFloat.element( instanceIndex ).assign( vec4( vx, vy, vz, mass ) );
 			
-				} )().compute( cellCount );
+				} )().compute( cellCount ).setName( 'updateGridKernel' );
 
 
 				const clampToRoundedBox = ( pos, box, radius ) => {
@@ -473,7 +497,7 @@
 					particleBuffer.element( instanceIndex ).get( 'position' ).assign( particlePosition );
 					particleBuffer.element( instanceIndex ).get( 'velocity' ).assign( particleVelocity );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'g2pKernel' );
 
 			}
 
@@ -544,7 +568,9 @@
 
 			async function render() {
 
-				const deltaTime = THREE.MathUtils.clamp( clock.getDelta(), 0.00001, 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+				timer.update();
+
+				const deltaTime = THREE.MathUtils.clamp( timer.getDelta(), 0.00001, 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
 				dtUniform.value = deltaTime;
 
 				mouseForceUniform.value.copy( mouseCoord ).sub( prevMouseCoord ).multiplyScalar( 2 );
@@ -557,9 +583,16 @@
 
 				prevMouseCoord.copy( mouseCoord );
 
-				await renderer.computeAsync( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+				renderer.compute( workgroupKernel );
 
-				await renderer.renderAsync( scene, camera );
+				//renderer.compute( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+				renderer.compute( clearGridKernel );
+				renderer.compute( p2g1Kernel, p2g1KernelWorkgroupBuffer );
+				renderer.compute( p2g2Kernel, p2g2KernelWorkgroupBuffer );
+				renderer.compute( updateGridKernel );
+				renderer.compute( g2pKernel, g2pKernelWorkgroupBuffer );
+
+				renderer.render( scene, camera );
 
 			}
 

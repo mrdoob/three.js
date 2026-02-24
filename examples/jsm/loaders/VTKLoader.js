@@ -7,7 +7,7 @@ import {
 	Loader,
 	SRGBColorSpace
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.module.js';
 
 /**
  * A loader for the VTK format.
@@ -112,8 +112,20 @@ class VTKLoader extends Loader {
 			// pattern for detecting the end of a number sequence
 			const patWord = /^[^\d.\s-]+/;
 
-			// pattern for reading vertices, 3 floats or integers
-			const pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
+			function parseFloats( line ) {
+
+				const result = [];
+				const parts = line.split( /\s+/ );
+
+				for ( let i = 0; i < parts.length; i ++ ) {
+
+					if ( parts[ i ] !== '' ) result.push( parseFloat( parts[ i ] ) );
+
+				}
+
+				return result;
+
+			}
 
 			// pattern for connectivity, an integer followed by any number of ints
 			// the first integer is the number of polygon nodes
@@ -165,14 +177,15 @@ class VTKLoader extends Loader {
 				} else if ( inPointsSection ) {
 
 					// get the vertices
-					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+					if ( patWord.exec( line ) === null ) {
 
-						if ( patWord.exec( line ) !== null ) break;
+						const values = parseFloats( line );
 
-						const x = parseFloat( result[ 1 ] );
-						const y = parseFloat( result[ 2 ] );
-						const z = parseFloat( result[ 3 ] );
-						positions.push( x, y, z );
+						for ( let k = 0; k + 2 < values.length; k += 3 ) {
+
+							positions.push( values[ k ], values[ k + 1 ], values[ k + 2 ] );
+
+						}
 
 					}
 
@@ -243,17 +256,16 @@ class VTKLoader extends Loader {
 
 						// Get the colors
 
-						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+						if ( patWord.exec( line ) === null ) {
 
-							if ( patWord.exec( line ) !== null ) break;
+							const values = parseFloats( line );
 
-							const r = parseFloat( result[ 1 ] );
-							const g = parseFloat( result[ 2 ] );
-							const b = parseFloat( result[ 3 ] );
+							for ( let k = 0; k + 2 < values.length; k += 3 ) {
 
-							color.setRGB( r, g, b, SRGBColorSpace );
+								color.setRGB( values[ k ], values[ k + 1 ], values[ k + 2 ], SRGBColorSpace );
+								colors.push( color.r, color.g, color.b );
 
-							colors.push( color.r, color.g, color.b );
+							}
 
 						}
 
@@ -261,14 +273,15 @@ class VTKLoader extends Loader {
 
 						// Get the normal vectors
 
-						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+						if ( patWord.exec( line ) === null ) {
 
-							if ( patWord.exec( line ) !== null ) break;
+							const values = parseFloats( line );
 
-							const nx = parseFloat( result[ 1 ] );
-							const ny = parseFloat( result[ 2 ] );
-							const nz = parseFloat( result[ 3 ] );
-							normals.push( nx, ny, nz );
+							for ( let k = 0; k + 2 < values.length; k += 3 ) {
+
+								normals.push( values[ k ], values[ k + 1 ], values[ k + 2 ] );
+
+							}
 
 						}
 
@@ -400,7 +413,7 @@ class VTKLoader extends Loader {
 				let index = start;
 				let c = buffer[ index ];
 				const s = [];
-				while ( c !== 10 ) {
+				while ( c !== 10 && index < buffer.length ) {
 
 					s.push( String.fromCharCode( c ) );
 					index ++;
@@ -846,7 +859,7 @@ class VTKLoader extends Loader {
 
 					for ( let i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
+						const data = unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
 						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {

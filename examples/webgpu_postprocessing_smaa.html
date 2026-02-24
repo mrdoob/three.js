@@ -4,11 +4,18 @@
 		<title>three.js webgpu - postprocessing smaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - post-processing SMAA
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SMAA</span>
+			</div>
+
+			<small>Subpixel Morphological Anti-Aliasing.</small>
 		</div>
 
 		<script type="importmap">
@@ -28,10 +35,9 @@
 			import { pass } from 'three/tsl';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, stats;
+			let camera, scene, renderer, renderPipeline;
 
 			const params = {
 				enabled: true,
@@ -47,10 +53,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				//
 
@@ -77,33 +81,33 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePass = pass( scene, camera );
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 				const smaaPass = smaa( scenePass );
 
-				postProcessing.outputNode = smaaPass;
+				renderPipeline.outputNode = smaaPass;
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const smaaFolder = gui.addFolder( 'SMAA' );
 				smaaFolder.add( params, 'enabled' ).onChange( ( value ) => {
 			
 					if ( value === true ) {
 
-						postProcessing.outputNode = smaaPass;
+						renderPipeline.outputNode = smaaPass;
 
 					} else {
 
-						postProcessing.outputNode = scenePass;
+						renderPipeline.outputNode = scenePass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -126,8 +130,6 @@
 
 			function animate() {
 
-				stats.begin();
-
 				if ( params.autoRotate === true ) {
 
 					for ( let i = 0; i < scene.children.length; i ++ ) {
@@ -141,9 +143,7 @@
 
 				}
 
-				postProcessing.render();
-
-				stats.end();
+				renderPipeline.render();
 
 			}
 

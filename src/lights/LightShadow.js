@@ -3,7 +3,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
-import { UnsignedByteType } from '../constants.js';
+import { UnsignedByteType, WebGPUCoordinateSystem } from '../constants.js';
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
@@ -53,6 +53,16 @@ class LightShadow {
 		this.bias = 0;
 
 		/**
+		 * A node version of `bias`. Only supported with `WebGPURenderer`.
+		 *
+		 * If a bias node is defined, `bias` has no effect.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.biasNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -68,9 +78,6 @@ class LightShadow {
 		 * High values will cause unwanted banding effects in the shadows - a greater
 		 * map size will allow for a higher value to be used here before these effects
 		 * become visible.
-		 *
-		 * The property has no effect when the shadow map type is `PCFSoftShadowMap` and
-		 * and it is recommended to increase softness by decreasing the shadow map size instead.
 		 *
 		 * The property has no effect when the shadow map type is `BasicShadowMap`.
 		 *
@@ -206,12 +213,12 @@ class LightShadow {
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
-		if ( shadowCamera.reversedDepth ) {
+		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
 			shadowMatrix.set(
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
-				0.0, 0.0, 1.0, 0.0,
+				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
 				0.0, 0.0, 0.0, 1.0
 			);
 
@@ -294,6 +301,8 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+
+		this.biasNode = source.biasNode;
 
 		return this;
 

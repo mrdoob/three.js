@@ -314,6 +314,10 @@ class TSLEncoder {
 
 			code = this.emitVarying( node );
 
+		} else if ( node.isStructDefinition ) {
+
+			code = this.emitStructDefinition( node );
+
 		} else if ( node.isTernary ) {
 
 			code = this.emitTernary( node );
@@ -340,7 +344,7 @@ class TSLEncoder {
 
 			if ( node.hasAssignment ) {
 
-				if ( node.after === false ) {
+				if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
 
 					type += 'Before';
 
@@ -665,27 +669,35 @@ ${ this.tab }} )`;
 
 			}
 
-			if ( node.linker.assignments.length > 0 ) {
-
-				varStr += ' = ' + valueStr + '.toVar()';
-
-			} else {
-
-				varStr += ' = ' + valueStr;
-
-			}
+			varStr += ' = ' + valueStr;
 
 		} else {
 
-			varStr += ` = property( '${ type }' )`;
+			const program = node.getProgram();
 
-			this.addImport( 'property' );
+			if ( program.structTypes.has( type ) ) {
+
+				varStr += ` = ${ type }()`;
+
+			} else {
+
+				varStr += ` = property( '${ type }' )`;
+
+				this.addImport( 'property' );
+
+			}
 
 		}
 
 		if ( next ) {
 
 			varStr += ', ' + this.emitVariables( next, false );
+
+		}
+
+		if ( node.needsToVar ) {
+
+			varStr = varStr + '.toVar()';
 
 		}
 
@@ -701,6 +713,34 @@ ${ this.tab }} )`;
 		this.addImport( type );
 
 		return `const ${ name } = varying( ${ type }(), '${ name }' )`;
+
+	}
+
+	emitStructDefinition( node ) {
+
+		const { name, members } = node;
+
+		this.addImport( 'struct' );
+
+		let structString = `const ${ name } = struct( {\n`;
+
+		for ( let i = 0; i < members.length; i += 1 ) {
+
+			const member = members[ i ];
+
+			structString += `${this.tab}\t${member.name}: '${member.type}'`;
+
+			if ( i != members.length - 1 ) {
+
+				structString += ',\n';
+
+			}
+
+		}
+
+		structString += `\n${this.tab}}, \'${name}\' )`;
+
+		return structString;
 
 	}
 
@@ -758,6 +798,7 @@ ${ this.tab }} )`;
 			const mutableParam = new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ), null, true );
 			mutableParam.parent = param.parent; // link to the original node
 			mutableParam.linker.assignments.push( mutableParam );
+			mutableParam.needsToVar = true; // force var declaration
 
 			node.body.unshift( mutableParam );
 
@@ -799,7 +840,8 @@ ${ this.tab }}`;
 
 		if ( node.layout !== false && hasPointer === false ) {
 
-			funcStr += ', { ' + inputs.join( ', ' ) + ', return: \'' + type + '\' }';
+			const inputsStr = inputs.length > 0 ? inputs.join( ', ' ) + ', ' : '';
+			funcStr += ', { ' + inputsStr + 'return: \'' + type + '\' }';
 
 		}
 

@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { log } from '../../utils.js';
 
 class DebugNode extends TempNode {
 
@@ -41,22 +42,22 @@ class DebugNode extends TempNode {
 		const callback = this.callback;
 		const snippet = this.node.build( builder );
 
-		const title = '--- TSL debug - ' + builder.shaderStage + ' shader ---';
-		const border = '-'.repeat( title.length );
-
-		let code = '';
-		code += '// #' + title + '#\n';
-		code += builder.flow.code.replace( /^\t/mg, '' ) + '\n';
-		code += '/* ... */ ' + snippet + ' /* ... */\n';
-		code += '// #' + border + '#\n';
-
 		if ( callback !== null ) {
 
-			callback( builder, code );
+			callback( builder, snippet );
 
 		} else {
 
-			console.log( code );
+			const title = '--- TSL debug - ' + builder.shaderStage + ' shader ---';
+			const border = '-'.repeat( title.length );
+
+			let code = '';
+			code += '// #' + title + '#\n';
+			code += builder.flow.code.replace( /^\t/mg, '' ) + '\n';
+			code += '/* ... */ ' + snippet + ' /* ... */\n';
+			code += '// #' + border + '#\n';
+
+			log( code );
 
 		}
 
@@ -77,6 +78,6 @@ export default DebugNode;
  * @param {?Function} [callback=null] - Optional callback function to handle the debug output.
  * @returns {DebugNode}
  */
-export const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject( node ), callback ) ).toStack();
+export const debug = ( node, callback = null ) => new DebugNode( nodeObject( node ), callback ).toStack();
 
 addMethodChaining( 'debug', debug );

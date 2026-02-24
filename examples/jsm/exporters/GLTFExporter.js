@@ -65,13 +65,13 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 /**
  * An exporter for `glTF` 2.0.
  *
- * glTF (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/master/specification/2.0}
+ * glTF (GL Transmission Format) is an [open format specification](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
  * or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
  * data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
  * textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
  *
- * GLTFExporter supports the [glTF 2.0 extensions]{@link https://github.com/KhronosGroup/glTF/tree/master/extensions/}:
+ * GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/glTF/tree/master/extensions/):
  *
  * - KHR_lights_punctual
  * - KHR_materials_clearcoat
@@ -91,7 +91,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  *
- * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  *
  * ```js
  * const exporter = new GLTFExporter();
@@ -543,32 +543,36 @@ function getCanvas() {
 
 function getToBlobPromise( canvas, mimeType ) {
 
-	if ( canvas.toBlob !== undefined ) {
+	if ( typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas ) {
+
+		let quality;
+
+		// Blink's implementation of convertToBlob seems to default to a quality level of 100%
+		// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+		if ( mimeType === 'image/jpeg' ) {
+
+			quality = 0.92;
+
+		} else if ( mimeType === 'image/webp' ) {
+
+			quality = 0.8;
+
+		}
+
+		return canvas.convertToBlob( {
+
+			type: mimeType,
+			quality: quality
+
+		} );
+
+	} else {
+
+		// HTMLCanvasElement code path
 
 		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
 
 	}
-
-	let quality;
-
-	// Blink's implementation of convertToBlob seems to default to a quality level of 100%
-	// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
-	if ( mimeType === 'image/jpeg' ) {
-
-		quality = 0.92;
-
-	} else if ( mimeType === 'image/webp' ) {
-
-		quality = 0.8;
-
-	}
-
-	return canvas.convertToBlob( {
-
-		type: mimeType,
-		quality: quality
-
-	} );
 
 }
 
@@ -757,7 +761,7 @@ class GLTFWriter {
 	/**
 	 * Serializes a userData.
 	 *
-	 * @param {THREE.Object3D|THREE.Material} object
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry|THREE.AnimationClip} object
 	 * @param {Object} objectDef
 	 */
 	serializeUserData( object, objectDef ) {
@@ -1555,7 +1559,7 @@ class GLTFWriter {
 	/**
 	 * Process material
 	 * @param {THREE.Material} material Material to process
-	 * @return {Promise<number|null>} Index of the processed material in the "materials" array
+	 * @return {Promise<?number>} Index of the processed material in the "materials" array
 	 */
 	async processMaterialAsync( material ) {
 
@@ -1731,7 +1735,7 @@ class GLTFWriter {
 	/**
 	 * Process mesh
 	 * @param {THREE.Mesh} mesh Mesh to process
-	 * @return {Promise<number|null>} Index of the processed mesh in the "meshes" array
+	 * @return {Promise<?number>} Index of the processed mesh in the "meshes" array
 	 */
 	async processMeshAsync( mesh ) {
 
@@ -1848,12 +1852,12 @@ class GLTFWriter {
 				! ( array instanceof Uint8Array ) ) {
 
 				console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
-				modifiedAttribute = new BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+				modifiedAttribute = GLTFExporter.Utils.toTypedBufferAttribute( attribute, Uint16Array );
 
 			} else if ( ( array instanceof Uint32Array || array instanceof Int32Array ) && ! attributeName.startsWith( '_' ) ) {
 
 				console.warn( `GLTFExporter: Attribute "${ attributeName }" converted to type FLOAT.` );
-				modifiedAttribute = GLTFExporter.Utils.toFloat32BufferAttribute( attribute );
+				modifiedAttribute = GLTFExporter.Utils.toTypedBufferAttribute( attribute, Float32Array );
 
 			}
 
@@ -2185,7 +2189,7 @@ class GLTFWriter {
 	 *
 	 * @param {THREE.AnimationClip} clip
 	 * @param {THREE.Object3D} root
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	processAnimation( clip, root ) {
 
@@ -2279,11 +2283,15 @@ class GLTFWriter {
 
 		}
 
-		json.animations.push( {
+		const animationDef = {
 			name: clip.name || 'clip_' + json.animations.length,
 			samplers: samplers,
 			channels: channels
-		} );
+		};
+
+		this.serializeUserData( clip, animationDef );
+
+		json.animations.push( animationDef );
 
 		return json.animations.length - 1;
 
@@ -2291,7 +2299,7 @@ class GLTFWriter {
 
 	/**
 	 * @param {THREE.Object3D} object
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	 processSkin( object ) {
 
@@ -2346,6 +2354,13 @@ class GLTFWriter {
 		const nodeMap = this.nodeMap;
 
 		if ( ! json.nodes ) json.nodes = [];
+
+		// Handle pivot by creating a container node
+		if ( object.pivot !== null ) {
+
+			return await this._processNodeWithPivotAsync( object );
+
+		}
 
 		const nodeDef = {};
 
@@ -2440,6 +2455,126 @@ class GLTFWriter {
 		} );
 
 		return nodeIndex;
+
+	}
+
+	/**
+	 * Process Object3D node with pivot using container approach
+	 * @param {THREE.Object3D} object Object3D with pivot
+	 * @return {Promise<number>} Index of the container node
+	 */
+	async _processNodeWithPivotAsync( object ) {
+
+		const json = this.json;
+		const options = this.options;
+		const nodeMap = this.nodeMap;
+
+		const pivot = object.pivot;
+
+		// Container node: holds position + pivot offset, rotation, scale
+		// Animations will target this node
+		const containerDef = {};
+
+		const rotation = object.quaternion.toArray();
+		const position = [
+			object.position.x + pivot.x,
+			object.position.y + pivot.y,
+			object.position.z + pivot.z
+		];
+		const scale = object.scale.toArray();
+
+		if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+
+			containerDef.rotation = rotation;
+
+		}
+
+		if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
+
+			containerDef.translation = position;
+
+		}
+
+		if ( ! equalArray( scale, [ 1, 1, 1 ] ) ) {
+
+			containerDef.scale = scale;
+
+		}
+
+		// Store pivot in extras for round-trip reconstruction
+		containerDef.extras = { pivot: pivot.toArray() };
+
+		if ( object.name !== '' ) containerDef.name = String( object.name );
+
+		this.serializeUserData( object, containerDef );
+
+		const containerIndex = json.nodes.push( containerDef ) - 1;
+
+		// Map original object to container so animations target it
+		nodeMap.set( object, containerIndex );
+
+		// Child node: holds mesh with -pivot offset
+		const childDef = {};
+
+		const childPosition = [ - pivot.x, - pivot.y, - pivot.z ];
+
+		if ( ! equalArray( childPosition, [ 0, 0, 0 ] ) ) {
+
+			childDef.translation = childPosition;
+
+		}
+
+		if ( object.isMesh || object.isLine || object.isPoints ) {
+
+			const meshIndex = await this.processMeshAsync( object );
+
+			if ( meshIndex !== null ) childDef.mesh = meshIndex;
+
+		} else if ( object.isCamera ) {
+
+			childDef.camera = this.processCamera( object );
+
+		}
+
+		if ( object.isSkinnedMesh ) this.skins.push( object );
+
+		const childIndex = json.nodes.push( childDef ) - 1;
+
+		// Build children array for container
+		const containerChildren = [ childIndex ];
+
+		// Process object's children as children of the child node
+		if ( object.children.length > 0 ) {
+
+			const grandchildren = [];
+
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+				const child = object.children[ i ];
+
+				if ( child.visible || options.onlyVisible === false ) {
+
+					const childNodeIndex = await this.processNodeAsync( child );
+
+					if ( childNodeIndex !== null ) grandchildren.push( childNodeIndex );
+
+				}
+
+			}
+
+			if ( grandchildren.length > 0 ) childDef.children = grandchildren;
+
+		}
+
+		containerDef.children = containerChildren;
+
+		await this._invokeAllAsync( function ( ext ) {
+
+			ext.writeNode && ext.writeNode( object, containerDef );
+
+		} );
+
+		return containerIndex;
 
 	}
 
@@ -3530,9 +3665,9 @@ GLTFExporter.Utils = {
 
 	},
 
-	toFloat32BufferAttribute: function ( srcAttribute ) {
+	toTypedBufferAttribute: function ( srcAttribute, TypedArray ) {
 
-		const dstAttribute = new BufferAttribute( new Float32Array( srcAttribute.count * srcAttribute.itemSize ), srcAttribute.itemSize, false );
+		const dstAttribute = new BufferAttribute( new TypedArray( srcAttribute.count * srcAttribute.itemSize ), srcAttribute.itemSize, false );
 
 		if ( ! srcAttribute.normalized && ! srcAttribute.isInterleavedBufferAttribute ) {
 

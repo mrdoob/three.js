@@ -173,6 +173,7 @@ class NodeMaterialObserver {
 				geometry: {
 					id: geometry.id,
 					attributes: this.getAttributesData( geometry.attributes ),
+					indexId: geometry.index ? geometry.index.id : null,
 					indexVersion: geometry.index ? geometry.index.version : null,
 					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 				},
@@ -232,7 +233,8 @@ class NodeMaterialObserver {
 			const attribute = attributes[ name ];
 
 			attributesData[ name ] = {
-				version: attribute.version
+				id: attribute.id,
+				version: attribute.version,
 			};
 
 		}
@@ -259,7 +261,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.renderer.overrideNodes.modelViewMatrix !== null || builder.renderer.overrideNodes.modelNormalViewMatrix !== null )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow )
 			return true;
 
 		return false;
@@ -423,8 +425,9 @@ class NodeMaterialObserver {
 
 			}
 
-			if ( storedAttributeData.version !== attribute.version ) {
+			if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
 
+				storedAttributeData.id = attribute.id;
 				storedAttributeData.version = attribute.version;
 				return false;
 
@@ -435,11 +438,14 @@ class NodeMaterialObserver {
 		// check index
 
 		const index = geometry.index;
+		const storedIndexId = storedGeometryData.indexId;
 		const storedIndexVersion = storedGeometryData.indexVersion;
+		const currentIndexId = index ? index.id : null;
 		const currentIndexVersion = index ? index.version : null;
 
-		if ( storedIndexVersion !== currentIndexVersion ) {
+		if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
 
+			storedGeometryData.indexId = currentIndexId;
 			storedGeometryData.indexVersion = currentIndexVersion;
 			return false;
 
@@ -465,13 +471,14 @@ class NodeMaterialObserver {
 
 				if ( renderObjectData.morphTargetInfluences[ i ] !== object.morphTargetInfluences[ i ] ) {
 
+					renderObjectData.morphTargetInfluences[ i ] = object.morphTargetInfluences[ i ];
 					morphChanged = true;
 
 				}
 
 			}
 
-			if ( morphChanged ) return true;
+			if ( morphChanged ) return false;
 
 		}
 
@@ -548,7 +555,7 @@ class NodeMaterialObserver {
 	 *
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {number} renderId - The render ID.
-	 * @return {Array} The lights for the given lights node and render ID.
+	 * @return {Array<Object>} The lights for the given lights node and render ID.
 	 */
 	getLights( lightsNode, renderId ) {
 

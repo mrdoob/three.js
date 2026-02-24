@@ -4,11 +4,20 @@
 		<title>three.js webgpu - sky</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - sky + sun shader
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Sky</span>
+			</div>
+
+			<small>
+				Sky + Sun shader.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,7 +35,8 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 
@@ -54,7 +64,11 @@
 					mieDirectionalG: 0.7,
 					elevation: 2,
 					azimuth: 180,
-					exposure: renderer.toneMappingExposure
+					exposure: renderer.toneMappingExposure,
+					cloudCoverage: 0.4,
+					cloudDensity: 0.4,
+					cloudElevation: 0.5,
+					showSunDisc: true
 				};
 
 				function guiChanged() {
@@ -63,6 +77,10 @@
 					sky.rayleigh.value = effectController.rayleigh;
 					sky.mieCoefficient.value = effectController.mieCoefficient;
 					sky.mieDirectionalG.value = effectController.mieDirectionalG;
+					sky.cloudCoverage.value = effectController.cloudCoverage;
+					sky.cloudDensity.value = effectController.cloudDensity;
+					sky.cloudElevation.value = effectController.cloudElevation;
+					sky.showSunDisc.value = effectController.showSunDisc;
 
 					const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
 					const theta = THREE.MathUtils.degToRad( effectController.azimuth );
@@ -75,7 +93,7 @@
 
 				}
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
@@ -84,6 +102,12 @@
 				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
+				gui.add( effectController, 'showSunDisc' ).onChange( guiChanged );
+
+				const folderClouds = gui.addFolder( 'Clouds' );
+				folderClouds.add( effectController, 'cloudCoverage', 0, 1, 0.01 ).name( 'coverage' ).onChange( guiChanged );
+				folderClouds.add( effectController, 'cloudDensity', 0, 1, 0.01 ).name( 'density' ).onChange( guiChanged );
+				folderClouds.add( effectController, 'cloudElevation', 0, 1, 0.01 ).name( 'elevation' ).onChange( guiChanged );
 
 				guiChanged();
 
@@ -102,6 +126,7 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

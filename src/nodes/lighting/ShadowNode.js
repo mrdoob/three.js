@@ -1,7 +1,8 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, int, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
-import { texture } from '../accessors/TextureNode.js';
+import { texture, textureLoad } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -10,14 +11,16 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
-import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
+import { textureSize } from '../accessors/TextureSizeNode.js';
+import { uv } from '../accessors/UV.js';
 
 //
 
@@ -27,20 +30,13 @@ const _shadowRenderObjectKeys = [];
 /**
  * Creates a function to render shadow objects in a scene.
  *
+ * @tsl
+ * @function
  * @param {Renderer} renderer - The renderer.
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
  * @param {boolean} useVelocity - Whether to use velocity data for rendering.
- * @return {Function} A function that renders shadow objects.
- *
- * The returned function has the following parameters:
- * @param {Object3D} object - The 3D object to render.
- * @param {Scene} scene - The scene containing the object.
- * @param {Camera} _camera - The camera used for rendering.
- * @param {BufferGeometry} geometry - The geometry of the object.
- * @param {Material} material - The material of the object.
- * @param {Group} group - The group the object belongs to.
- * @param {...any} params - Additional parameters for rendering.
+ * @return {shadowRenderObjectFunction} A function that renders shadow objects.
  */
 export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
@@ -88,6 +84,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 /**
  * Represents the shader code for the first VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -126,7 +123,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -134,6 +131,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 /**
  * Represents the shader code for the second VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -170,7 +168,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -268,6 +266,22 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		/**
+		 * The current shadow map type of this shadow node.
+		 *
+		 * @type {?number}
+		 * @private
+		 * @default null
+		 */
+		this._currentShadowType = null;
+
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -327,7 +341,7 @@ class ShadowNode extends ShadowBaseNode {
 		const { shadow } = this;
 		const { renderer } = builder;
 
-		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+		const bias = shadow.biasNode || reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 
 		let shadowCoord = shadowPosition;
 		let coordZ;
@@ -337,12 +351,6 @@ class ShadowNode extends ShadowBaseNode {
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			coordZ = shadowCoord.z;
-
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
-
-			}
 
 		} else {
 
@@ -362,7 +370,7 @@ class ShadowNode extends ShadowBaseNode {
 		shadowCoord = vec3(
 			shadowCoord.x,
 			shadowCoord.y.oneMinus(), // follow webgpu standards
-			coordZ.add( bias )
+			renderer.reversedDepthBuffer ? coordZ.sub( bias ) : coordZ.add( bias )
 		);
 
 		return shadowCoord;
@@ -386,7 +394,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.name = 'ShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
@@ -405,14 +413,28 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	setupShadow( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		const { light, shadow } = this;
 
-		const shadowMapType = renderer.shadowMap.type;
-
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
+		const shadowMapType = renderer.shadowMap.type;
+		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+
+		if ( ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) && hasTextureCompare ) {
+
+			depthTexture.minFilter = LinearFilter;
+			depthTexture.magFilter = LinearFilter;
+
+		} else {
+
+			depthTexture.minFilter = NearestFilter;
+			depthTexture.magFilter = NearestFilter;
+
+		}
+
+		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
@@ -501,20 +523,79 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this.depthLayer } );
 
-		let shadowColor = texture( shadowMap.texture, shadowCoord );
+		let shadowColor;
 
-		if ( depthTexture.isArrayTexture ) {
+		if ( renderer.shadowMap.transmitted === true ) {
 
-			shadowColor = shadowColor.depth( this.depthLayer );
+			if ( shadowMap.texture.isCubeTexture ) {
+
+				// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+				shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+
+			} else {
+
+				shadowColor = texture( shadowMap.texture, shadowCoord );
+
+				if ( depthTexture.isArrayTexture ) {
+
+					shadowColor = shadowColor.depth( this.depthLayer );
+
+				}
+
+			}
 
 		}
 
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		//
+
+		let shadowOutput;
+
+		if ( shadowColor ) {
+
+			shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+
+		} else {
+
+			shadowOutput = mix( 1, shadowNode, shadowIntensity ).toVar();
+
+		}
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return shadowOutput;
+		// Shadow Output + Inspector
+
+		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+
+		if ( shadowColor ) {
+
+			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+
+				if ( this.shadowMap.texture.isCubeTexture ) {
+
+					return cubeTexture( this.shadowMap.texture );
+
+				}
+
+				return texture( this.shadowMap.texture );
+
+			} );
+
+		}
+
+		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
+
+			// TODO: Use linear depth
+
+			if ( this.shadowMap.texture.isCubeTexture ) {
+
+				return cubeTexture( this.shadowMap.texture ).r.oneMinus();
+
+			}
+
+			return textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).r.oneMinus();
+
+		} );
 
 	}
 
@@ -531,6 +612,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
+			const currentShadowType = builder.renderer.shadowMap.type;
+
+			if ( this._currentShadowType !== currentShadowType ) {
+
+				this._reset();
+				this._node = null;
+
+			}
+
 			let node = this._node;
 
 			this.setupShadowPosition( builder );
@@ -538,12 +628,7 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
-
-			}
-
-			if ( builder.material.shadowNode ) { // @deprecated, r171
-
-				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+				this._currentShadowType = currentShadowType;
 
 			}
 
@@ -576,7 +661,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
+		const currentSceneName = scene.name;
+
+		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+
 		renderer.render( scene, shadow.camera );
+
+		scene.name = currentSceneName;
 
 	}
 
@@ -664,8 +755,29 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.shadowMap.dispose();
-		this.shadowMap = null;
+		this._reset();
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Resets the resouce state of this shadow node.
+	 *
+	 * @private
+	 */
+	_reset() {
+
+		this._currentShadowType = null;
+
+		disposeShadowMaterial( this.light );
+
+		if ( this.shadowMap ) {
+
+			this.shadowMap.dispose();
+			this.shadowMap = null;
+
+		}
 
 		if ( this.vsmShadowMapVertical !== null ) {
 
@@ -686,8 +798,6 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
-
-		super.dispose();
 
 	}
 
@@ -733,6 +843,19 @@ class ShadowNode extends ShadowBaseNode {
 export default ShadowNode;
 
 /**
+ * Shadow Render Object Function.
+ *
+ * @function shadowRenderObjectFunction
+ * @param {Object3D} object - The 3D object to render.
+ * @param {Scene} scene - The scene containing the object.
+ * @param {Camera} _camera - The camera used for rendering.
+ * @param {BufferGeometry} geometry - The geometry of the object.
+ * @param {Material} material - The material of the object.
+ * @param {Group} group - The group the object belongs to.
+ * @param {...any} params - Additional parameters for rendering.
+ */
+
+/**
  * TSL function for creating an instance of `ShadowNode`.
  *
  * @tsl
@@ -741,4 +864,4 @@ export default ShadowNode;
  * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
-export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+export const shadow = ( light, shadow ) => new ShadowNode( light, shadow );

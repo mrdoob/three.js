@@ -31,7 +31,7 @@
 
 			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 
-			let container, stats, clock;
+			let container, stats, timer;
 			let camera, scene, renderer, elf;
 
 			init();
@@ -46,7 +46,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// loading manager
 
@@ -104,6 +105,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -111,7 +114,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( elf !== undefined ) {
 

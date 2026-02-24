@@ -146,7 +146,7 @@
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			// Texture width for simulation
@@ -174,7 +174,7 @@
 			let meshRay;
 			let gpuCompute;
 			let heightmapVariable;
-			let smoothShader;
+			// let smoothShader;
 			let readWaterLevelShader;
 			let readWaterLevelRenderTarget;
 			let readWaterLevelImage;
@@ -236,11 +236,11 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 
-				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( './textures/equirectangular/' );
 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
 				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 
-				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+				const [ env, model ] = await Promise.all( [ hdrLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
 				env.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environment = env;
 				scene.background = env;
@@ -328,8 +328,8 @@
 				borderGeom.rotateY( Math.PI * 0.25 );
 				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness: 0.2 } ) );
 				scene.add( poolBorder );
-				borderGeom.receiveShadow = true;
-				borderGeom.castShadow = true;
+				poolBorder.receiveShadow = true;
+				poolBorder.castShadow = true;
 
 				// THREE.Mesh just for mouse raycasting
 				const geometryRay = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );
@@ -362,7 +362,7 @@
 				if ( error !== null ) console.error( error );
 
 				// Create compute shader to smooth the water surface and velocity
-				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { smoothTexture: { value: null } } );
+				//smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { smoothTexture: { value: null } } );
 
 				// Create compute shader to read water level
 				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'readWaterLevelFragmentShader' ).textContent, {
@@ -460,22 +460,22 @@
 
 			}
 
-			function smoothWater() {
+			// function smoothWater() {
 
-				const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
-				const alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
+			// 	const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
+			// 	const alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
 
-				for ( let i = 0; i < 10; i ++ ) {
+			// 	for ( let i = 0; i < 10; i ++ ) {
 
-					smoothShader.uniforms[ 'smoothTexture' ].value = currentRenderTarget.texture;
-					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
+			// 		smoothShader.uniforms[ 'smoothTexture' ].value = currentRenderTarget.texture;
+			// 		gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
 
-					smoothShader.uniforms[ 'smoothTexture' ].value = alternateRenderTarget.texture;
-					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
+			// 		smoothShader.uniforms[ 'smoothTexture' ].value = alternateRenderTarget.texture;
+			// 		gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
-				}
+			// 	}
 
-			}
+			// }
 
 			function createducks() {
 

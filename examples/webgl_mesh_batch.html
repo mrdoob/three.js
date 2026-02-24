@@ -39,7 +39,7 @@
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
-		let geometries, mesh, material;
+		let geometries, mesh;
 		const ids = [];
 		const matrix = new THREE.Matrix4();
 
@@ -64,9 +64,9 @@
 			count: 256,
 			dynamic: 16,
 
+			transparent: true,
 			sortObjects: true,
 			perObjectFrustumCulled: true,
-			opacity: 1,
 			useCustomSort: true,
 		};
 
@@ -103,31 +103,67 @@
 
 		}
 
+		function randomizeColor( color ) {
+
+			return color.setHSL( Math.random() * 0.5, 0.6, 0.5 );
+
+		}
+
+		function randomizeAlpha() {
+
+			// make ~20% of all objects transparent
+			return Math.random() > 0.8 ? 0.5 : 1.0;
+
+		}
+
 		function initGeometries() {
 
-			geometries = [
-				new THREE.ConeGeometry( 1.0, 2.0 ),
-				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-				new THREE.SphereGeometry( 1.0, 16, 8 ),
-			];
+			const cone = new THREE.ConeGeometry( 1.0, 2.0 );
+			const box = new THREE.BoxGeometry( 2.0, 2.0, 2.0 );
+			const sphere = new THREE.SphereGeometry( 1.0, 16, 8 );
+
+			geometries = [ cone, box, sphere ];
+
+			for ( const geometry of geometries ) {
+
+				// add vertex colors for testing
+				const count = geometry.getAttribute( 'position' ).count;
+				const attribute = new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 );
+				geometry.setAttribute( 'color', attribute );
+
+				for ( let i = 0, l = attribute.array.length; i < l; ++ i ) {
+
+					attribute.array[ i ] = 1.0;
+
+				}
+
+			}
 
 		}
 
 		function createMaterial() {
 
-			if ( ! material ) {
-
-				material = new THREE.MeshNormalMaterial();
-
-			}
-
-			return material;
+			return new THREE.MeshPhongMaterial( {
+				vertexColors: true,
+				transparent: api.transparent,
+				depthWrite: ! api.transparent
+			} );
 
 		}
 
 		function cleanup() {
 
 			if ( mesh ) {
+
+				mesh.traverse( node => {
+
+					if ( node instanceof THREE.Mesh ) {
+
+						node.material.dispose();
+
+					}
+
+				} );
 
 				mesh.parent.remove( mesh );
 
@@ -160,9 +196,12 @@
 		function initRegularMesh() {
 
 			mesh = new THREE.Group();
-			const material = createMaterial();
 
 			for ( let i = 0; i < api.count; i ++ ) {
+
+				const material = createMaterial();
+				randomizeColor( material.color );
+				material.opacity = randomizeAlpha();
 
 				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
 				randomizeMatrix( child.matrix );
@@ -184,6 +223,8 @@
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
+			const color = new THREE.Color();
+			const colorWithAlpha = new THREE.Vector4();
 			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
 			mesh.userData.rotationSpeeds = [];
 
@@ -200,8 +241,12 @@
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
+				randomizeColor( color );
+				colorWithAlpha.set( color.r, color.g, color.b, randomizeAlpha() );
+
 				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				mesh.setColorAt( id, colorWithAlpha );
 
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
@@ -244,6 +289,13 @@
 			controls.autoRotate = true;
 			controls.autoRotateSpeed = 1.0;
 
+			// light
+
+			const ambientLight = new THREE.AmbientLight( 0xffffff, 2 );
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+			directionalLight.position.set( 1, 1, 1 );
+			scene.add( directionalLight, ambientLight );
+
 			// stats
 
 			stats = new Stats();
@@ -255,24 +307,20 @@
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 			gui.add( api, 'method', Method ).onChange( initMesh );
-			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
 
-				if ( v < 1 ) {
+			gui.add( api, 'transparent' ).onChange( v => mesh.traverse( node => {
 
-					material.transparent = true;
-					material.depthWrite = false;
+				if ( node instanceof THREE.Mesh ) {
 
-				} else {
-
-					material.transparent = false;
-					material.depthWrite = true;
+					const material = node.material;
+					material.transparent = v;
+					material.depthWrite = ! v;
+					material.needsUpdate = true;
 
 				}
 
-				material.opacity = v;
-				material.needsUpdate = true;
+			} ) );
 
-			} );
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );

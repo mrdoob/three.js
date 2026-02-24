@@ -1,5 +1,4 @@
 import CodeNode from './CodeNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * This class represents a native shader function. It can be used to implement
@@ -48,9 +47,32 @@ class FunctionNode extends CodeNode {
 
 	}
 
+	/**
+	 * Returns the type of this function node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The type.
+	 */
 	getNodeType( builder ) {
 
 		return this.getNodeFunction( builder ).type;
+
+	}
+
+	/**
+	 * Returns the type of a member of this function node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The name of the member.
+	 * @return {string} The type of the member.
+	 */
+	getMemberType( builder, name ) {
+
+		const type = this.getNodeType( builder );
+
+		const structType = builder.getStructTypeNode( type );
+
+		return structType.getMemberType( builder, name );
 
 	}
 
@@ -147,7 +169,7 @@ const nativeFn = ( code, includes = [], language = '' ) => {
 
 	}
 
-	const functionNode = nodeObject( new FunctionNode( code, includes, language ) );
+	const functionNode = new FunctionNode( code, includes, language );
 
 	const fn = ( ...params ) => functionNode.call( ...params );
 	fn.functionNode = functionNode;

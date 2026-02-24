@@ -8,7 +8,7 @@ import {
 	LinearSRGBColorSpace,
 	Loader
 } from 'three';
-import { RGBELoader } from '../loaders/RGBELoader.js';
+import { HDRLoader } from '../loaders/HDRLoader.js';
 
 /**
  * A loader for loading HDR cube textures.
@@ -40,9 +40,9 @@ class HDRCubeTextureLoader extends Loader {
 		 * The internal HDR loader that loads the
 		 * individual textures for each cube face.
 		 *
-		 * @type {RGBELoader}
+         * @type {HDRLoader}
 		 */
-		this.hdrLoader = new RGBELoader();
+		this.hdrLoader = new HDRLoader();
 
 		/**
 		 * The texture type.
@@ -147,8 +147,8 @@ class HDRCubeTextureLoader extends Loader {
 	/**
 	 * Sets the texture type.
 	 *
-	 * @param {(HalfFloatType|FloatType)} value - The texture type to set.
-	 * @return {RGBELoader} A reference to this loader.
+     * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+     * @return {HDRCubeTextureLoader} A reference to this loader.
 	 */
 	setDataType( value ) {
 

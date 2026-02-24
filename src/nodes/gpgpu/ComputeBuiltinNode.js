@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeObject } from '../tsl/TSLBase.js';
+import { warn } from '../../utils.js';
 
 /**
  * `ComputeBuiltinNode` represents a compute-scope builtin value that expose information
@@ -110,7 +110,7 @@ class ComputeBuiltinNode extends Node {
 
 		} else {
 
-			console.warn( `ComputeBuiltinNode: Compute built-in value ${builtinName} can not be accessed in the ${builder.shaderStage} stage` );
+			warn( `ComputeBuiltinNode: Compute built-in value ${builtinName} can not be accessed in the ${builder.shaderStage} stage` );
 			return builder.generateConst( nodeType );
 
 		}
@@ -148,7 +148,7 @@ export default ComputeBuiltinNode;
  * @param {string} nodeType - The node type.
  * @returns {ComputeBuiltinNode}
  */
-const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode( name, nodeType ) );
+const computeBuiltin = ( name, nodeType ) => new ComputeBuiltinNode( name, nodeType );
 
 /**
  * Represents the number of workgroups dispatched by the compute shader.

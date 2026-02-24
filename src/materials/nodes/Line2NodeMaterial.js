@@ -8,8 +8,8 @@ import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
-import { viewport } from '../../nodes/display/ScreenNode.js';
-import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
+import { screenDPR, viewport } from '../../nodes/display/ScreenNode.js';
+import { viewportOpaqueMipTexture } from '../../nodes/display/ViewportTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
 import { NoBlending } from '../../constants.js';
@@ -56,7 +56,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.useColor = parameters.vertexColors;
+		this.vertexColors = parameters.vertexColors;
 
 		/**
 		 * The dash offset.
@@ -133,7 +133,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		const { renderer } = builder;
 
 		const useAlphaToCoverage = this._useAlphaToCoverage;
-		const useColor = this.useColor;
+		const vertexColors = this.vertexColors;
 		const useDash = this._useDash;
 		const useWorldUnits = this._useWorldUnits;
 
@@ -300,7 +300,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w ) );
+				offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
 
 				// select end
 				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
@@ -378,7 +378,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				if ( ! useDash ) {
 
-					if ( useAlphaToCoverage && renderer.samples > 1 ) {
+					if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 						const dnorm = norm.fwidth();
 						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
@@ -395,7 +395,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// round endcaps
 
-				if ( useAlphaToCoverage && renderer.samples > 1 ) {
+				if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 					const a = vUv.x;
 					const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
@@ -434,7 +434,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			} else {
 
-				if ( useColor ) {
+				if ( vertexColors ) {
 
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
@@ -459,7 +459,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportSharedTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportOpaqueMipTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
 
 		}
 

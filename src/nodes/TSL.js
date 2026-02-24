@@ -5,7 +5,7 @@ export * from './core/constants.js';
 export * from './core/AssignNode.js';
 export * from './core/AttributeNode.js';
 export * from './core/BypassNode.js';
-export * from './core/CacheNode.js';
+export * from './core/IsolateNode.js';
 export * from './core/ContextNode.js';
 export * from './core/IndexNode.js';
 export * from './core/ParameterNode.js';
@@ -19,8 +19,12 @@ export * from './core/OutputStructNode.js';
 export * from './core/MRTNode.js';
 
 // math
+export * from './math/BitcastNode.js';
+export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
+export * from './math/PackFloatNode.js';
+export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
 // utils
@@ -36,7 +40,7 @@ export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
 export * from './utils/ViewportUtils.js';
 export * from './utils/RotateNode.js';
-export * from './utils/SpriteSheetUVNode.js';
+export * from './utils/SpriteSheetUV.js';
 export * from './utils/Timer.js';
 export * from './utils/TriplanarTextures.js';
 export * from './utils/ReflectorNode.js';
@@ -55,6 +59,7 @@ export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
 export * from './accessors/BufferAttributeNode.js';
 export * from './accessors/BufferNode.js';
+export * from './accessors/BuiltinNode.js';
 export * from './accessors/Camera.js';
 export * from './accessors/VertexColorNode.js';
 export * from './accessors/CubeTextureNode.js';
@@ -76,7 +81,7 @@ export * from './accessors/Position.js';
 export * from './accessors/ReferenceNode.js';
 export * from './accessors/ReflectVector.js';
 export * from './accessors/SkinningNode.js';
-export * from './accessors/SceneNode.js';
+export * from './accessors/SceneProperties.js';
 export * from './accessors/StorageBufferNode.js';
 export * from './accessors/Tangent.js';
 export * from './accessors/TextureNode.js';
@@ -94,7 +99,6 @@ export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
 export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
-export * from './display/PosterizeNode.js';
 export * from './display/ToneMappingNode.js';
 export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';
@@ -114,8 +118,6 @@ export * from './code/ExpressionNode.js';
 export * from './code/CodeNode.js';
 export * from './code/FunctionCallNode.js';
 export * from './code/FunctionNode.js';
-export * from './code/ScriptableNode.js';
-export * from './code/ScriptableValueNode.js';
 
 // fog
 export * from './fog/Fog.js';
@@ -129,6 +131,7 @@ export * from './gpgpu/ComputeBuiltinNode.js';
 export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
 export * from './gpgpu/AtomicFunctionNode.js';
+export * from './gpgpu/SubgroupFunctionNode.js';
 
 // lighting
 export * from './accessors/Lights.js';
@@ -157,7 +160,7 @@ export * from './materialx/MaterialXNodes.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
-export { default as DFGApprox } from './functions/BSDF/DFGApprox.js';
+export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';

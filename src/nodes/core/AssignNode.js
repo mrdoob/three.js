@@ -97,8 +97,10 @@ class AssignNode extends TempNode {
 
 		const { targetNode, sourceNode } = this;
 
-		const targetProperties = builder.getNodeProperties( targetNode );
-		targetProperties.assign = true;
+		const scope = targetNode.getScope();
+
+		const scopeData = builder.getDataFromNode( scope );
+		scopeData.assign = true;
 
 		const properties = builder.getNodeProperties( this );
 		properties.sourceNode = sourceNode;

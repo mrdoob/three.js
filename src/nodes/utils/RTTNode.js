@@ -202,8 +202,8 @@ class RTTNode extends TextureNode {
 			const pixelRatio = renderer.getPixelRatio();
 			const size = renderer.getSize( _size );
 
-			const effectiveWidth = size.width * pixelRatio;
-			const effectiveHeight = size.height * pixelRatio;
+			const effectiveWidth = Math.floor( size.width * pixelRatio );
+			const effectiveHeight = Math.floor( size.height * pixelRatio );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
@@ -217,7 +217,17 @@ class RTTNode extends TextureNode {
 
 		//
 
+		let name = 'RTT';
+
+		if ( this.node.name ) {
+
+			name = this.node.name + ' [ ' + name + ' ]';
+
+		}
+
+
 		this._quadMesh.material.fragmentNode = this._rttNode;
+		this._quadMesh.name = name;
 
 		//
 
@@ -256,7 +266,7 @@ export default RTTNode;
  * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
  * @returns {RTTNode}
  */
-export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
+export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...params );
 
 /**
  * TSL function for converting nodes to textures nodes.
@@ -271,7 +281,7 @@ export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( n
  */
 export const convertToTexture = ( node, ...params ) => {
 
-	if ( node.isTextureNode ) return node;
+	if ( node.isSampleNode || node.isTextureNode ) return node;
 	if ( node.isPassNode ) return node.getTextureNode();
 
 	return rtt( node, ...params );

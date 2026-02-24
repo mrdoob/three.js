@@ -36,7 +36,7 @@ class VaryingNode extends Node {
 		 *
 		 * @type {Node}
 		 */
-		this.node = node;
+		this.node = subBuild( node, 'VERTEX' );
 
 		/**
 		 * The name of the varying in the shader. If no name is defined,
@@ -208,19 +208,3 @@ export const vertexStage = ( node ) => varying( node );
 
 addMethodChaining( 'toVarying', varying );
 addMethodChaining( 'toVertexStage', vertexStage );
-
-// Deprecated
-
-addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
-
-	console.warn( 'THREE.TSL: .varying() has been renamed to .toVarying().' );
-	return varying( ...params );
-
-} );
-
-addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
-
-	console.warn( 'THREE.TSL: .vertexStage() has been renamed to .toVertexStage().' );
-	return varying( ...params );
-
-} );

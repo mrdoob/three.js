@@ -12,15 +12,15 @@ permissions:
 
 jobs:
   test:
-    name: Lint, Unit, Circular dependencies & Examples testing
+    name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          node-version: 18
+          node-version: 24
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -31,8 +31,8 @@ jobs:
       - name: === Unit testing ===
         run: npm run test-unit
 
-      - name: === Circular dependencies testing ===
-        run: npm run test-circular-deps
+      - name: === Unit addons testing ===
+        run: npm run test-unit-addons
 
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov
@@ -40,21 +40,21 @@ jobs:
   e2e:
     name: E2E testing
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest ]
-        CI: [ 0, 1, 2, 3 ]
+        os: [ ubuntu-latest ]
+        CI: [ 0, 1, 2, 3, 4 ]
     env:
       CI: ${{ matrix.CI }}
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          node-version: 18
+          node-version: 24
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -64,7 +64,7 @@ jobs:
       - name: === E2E testing ===
         run: npm run test-e2e
       - name: Upload output screenshots
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}

@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
+import { warn } from '../../utils.js';
 
 /**
  * Base class for representing data input nodes.
@@ -126,7 +127,7 @@ class InputNode extends Node {
 
 	generate( /*builder, output*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 

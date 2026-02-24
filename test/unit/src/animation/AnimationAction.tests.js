@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
 
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
@@ -7,7 +5,6 @@ import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants.js';
-
 
 function createAnimation() {
 
@@ -52,7 +49,6 @@ function createTwoAnimations() {
 
 }
 
-
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'AnimationAction', () => {
@@ -65,73 +61,6 @@ export default QUnit.module( 'Animation', () => {
 
 			const animationAction = new AnimationAction( mixer, clip );
 			assert.ok( animationAction, 'animationAction instantiated' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'blendMode', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'loop', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'time', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'timeScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'weight', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'repetitions', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'paused', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'enabled', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clampWhenFinished', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'zeroSlopeAtStart', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'zeroSlopeAtEnd', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -239,7 +168,6 @@ export default QUnit.module( 'Animation', () => {
 			animationAction.stop();
 			assert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it isn\'t scheduled anymore.' );
 
-
 		} );
 
 		QUnit.test( 'startAt', ( assert ) => {
@@ -258,7 +186,6 @@ export default QUnit.module( 'Animation', () => {
 			animationAction.stop();
 			assert.notOk( animationAction.isRunning(), 'When an animation is stopped, it is not running.' );
 			assert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it is not scheduled.' );
-
 
 		} );
 
@@ -357,7 +284,6 @@ export default QUnit.module( 'Animation', () => {
 			animationAction.setEffectiveWeight( 0.3 );
 			assert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
 
-
 			( { animationAction } = createAnimation() );
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.enabled = false;
@@ -446,54 +372,6 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( 'stopFading', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setEffectiveTimeScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getEffectiveTimeScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setDuration', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'syncWith', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'halt', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'warp', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'stopWarping', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'getMixer', ( assert ) => {
 
 			const { mixer, animationAction } = createAnimation();
@@ -565,6 +443,62 @@ export default QUnit.module( 'Animation', () => {
 			mixer.update( 250 );
 			assert.equal( root.rotation.x, 180, 'seventh' );
 			//console.log(mixer.time);
+
+		} );
+
+		QUnit.test( 'LoopRepeat with timeScale reversal during first loop', ( assert ) => {
+
+			// Regression test for #19151
+			const root = new Object3D();
+			const mixer = new AnimationMixer( root );
+			const track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 1000 ], [ 0, 360 ] );
+			const clip = new AnimationClip( 'clip1', 1000, [ track ] );
+
+			const animationAction = mixer.clipAction( clip );
+			animationAction.setLoop( LoopRepeat, Infinity );
+			animationAction.play();
+
+			// Advance partway into the first loop
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 180, 'At 500ms, rotation is 180 (halfway).' );
+
+			// Reverse timeScale
+			mixer.timeScale = - 1;
+
+			// Step backward — should smoothly reverse, not jump
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'After reversing and stepping 250ms back, rotation is 90.' );
+
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 0, 'After reversing and stepping another 250ms back, rotation is 0 (start).' );
+
+		} );
+
+		QUnit.test( 'LoopPingPong with timeScale reversal during first loop', ( assert ) => {
+
+			// Regression test for #19151
+			const root = new Object3D();
+			const mixer = new AnimationMixer( root );
+			const track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 1000 ], [ 0, 360 ] );
+			const clip = new AnimationClip( 'clip1', 1000, [ track ] );
+
+			const animationAction = mixer.clipAction( clip );
+			animationAction.setLoop( LoopPingPong, Infinity );
+			animationAction.play();
+
+			// Advance partway into the first loop
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 180, 'At 500ms, rotation is 180 (halfway).' );
+
+			// Reverse timeScale
+			mixer.timeScale = - 1;
+
+			// Step backward — should smoothly reverse, not jump
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'After reversing and stepping 250ms back, rotation is 90.' );
+
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 0, 'After reversing and stepping another 250ms back, rotation is 0 (start).' );
 
 		} );
 

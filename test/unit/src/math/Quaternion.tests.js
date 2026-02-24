@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -630,8 +628,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'slerp', ( assert ) => {
 
-			const a = new Quaternion( x, y, z, w );
-			const b = new Quaternion( - x, - y, - z, - w );
+			const a = new Quaternion( x, y, z, w ).normalize();
+			const b = new Quaternion( w, x, y, z ).normalize();
 
 			const c = a.clone().slerp( b, 0 );
 			const d = a.clone().slerp( b, 1 );

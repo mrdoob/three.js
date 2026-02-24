@@ -36,10 +36,10 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let scene, renderer, camera, floor, orbitControls;
-			let group, followGroup, model, skeleton, mixer, clock;
+			let group, followGroup, model, skeleton, mixer, timer;
 
 			let actions;
 
@@ -77,7 +77,8 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 2, - 5 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x5e5d5d );
@@ -110,7 +111,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 				container.appendChild( renderer.domElement );
 
 				orbitControls = new OrbitControls( camera, renderer.domElement );
@@ -129,7 +130,7 @@
 
 				// DEMO
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'lobe.hdr', function ( texture ) {
 
@@ -415,9 +416,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				// Render loop
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				updateCharacter( delta );
 

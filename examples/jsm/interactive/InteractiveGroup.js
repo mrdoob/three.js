@@ -52,7 +52,7 @@ class InteractiveGroup extends Group {
 		/**
 		 * The internal raycaster.
 		 *
-		 * @type {?HTMLDOMElement}
+		 * @type {?HTMLElement}
 		 * @default null
 		 */
 		this.element = null;

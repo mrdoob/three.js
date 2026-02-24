@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject } from '../tsl/TSLBase.js';
+import { context } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
@@ -10,6 +10,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -43,13 +44,23 @@ class PassTextureNode extends TextureNode {
 		 */
 		this.passNode = passNode;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 * @readonly
+		 */
+		this.isPassTextureNode = true;
+
 		this.setUpdateMatrix( false );
 
 	}
 
 	setup( builder ) {
 
-		this.passNode.build( builder );
+		const properties = builder.getNodeProperties( this );
+		properties.passNode = this.passNode;
 
 		return super.setup( builder );
 
@@ -106,6 +117,15 @@ class PassMultipleTextureNode extends PassTextureNode {
 		 */
 		this.previousTexture = previousTexture;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 * @readonly
+		 */
+		this.isPassMultipleTextureNode = true;
+
 	}
 
 	/**
@@ -135,6 +155,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
 
@@ -148,7 +169,7 @@ class PassMultipleTextureNode extends PassTextureNode {
  * via MRT for further processing.
  *
  * ```js
- * const postProcessing = new PostProcessing( renderer );
+ * const postProcessing = new RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
@@ -247,6 +268,45 @@ class PassNode extends TempNode {
 		this.renderTarget = renderTarget;
 
 		/**
+		 * An optional override material for the pass.
+		 *
+		 * @type {Material|null}
+		 */
+		this.overrideMaterial = null;
+
+		/**
+		 * Whether the pass is transparent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the pass is opaque.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.opaque = true;
+
+		/**
+		 * An optional global context for the pass.
+		 *
+		 * @type {ContextNode|null}
+		 */
+		this.contextNode = null;
+
+		/**
+		 * A cache for the context node.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._contextNodeCache = null;
+
+		/**
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
@@ -341,7 +401,7 @@ class PassNode extends TempNode {
 		 * @type {number}
 		 * @default 1
 		 */
-		this._resolution = 1;
+		this._resolutionScale = 1;
 
 		/**
 		 * Custom viewport definition.
@@ -390,17 +450,44 @@ class PassNode extends TempNode {
 	}
 
 	/**
+	 * Sets the resolution scale for the pass.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 */
+	setResolutionScale( resolutionScale ) {
+
+		this._resolutionScale = resolutionScale;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution scale of the pass.
+	 *
+	 * @return {number} The current resolution scale. A value of `1` means full resolution.
+	 */
+	getResolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	/**
 	 * Sets the resolution for the pass.
 	 * The resolution is a factor that is multiplied with the renderer's width and height.
 	 *
 	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
 	 * @return {PassNode} A reference to this pass.
+	 * @deprecated since r181. Use {@link PassNode#setResolutionScale `setResolutionScale()`} instead.
 	 */
-	setResolution( resolution ) {
+	setResolution( resolution ) { // @deprecated, r181
 
-		this._resolution = resolution;
+		warn( 'PassNode: .setResolution() is deprecated. Use .setResolutionScale() instead.' );
 
-		return this;
+		return this.setResolutionScale( resolution );
 
 	}
 
@@ -408,10 +495,13 @@ class PassNode extends TempNode {
 	 * Gets the current resolution of the pass.
 	 *
 	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @deprecated since r181. Use {@link PassNode#getResolutionScale `getResolutionScale()`} instead.
 	 */
-	getResolution() {
+	getResolution() { // @deprecated, r181
 
-		return this._resolution;
+		warn( 'PassNode: .getResolution() is deprecated. Use .getResolutionScale() instead.' );
+
+		return this.getResolutionScale();
 
 	}
 
@@ -552,7 +642,7 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			textureNode = new PassMultipleTextureNode( this, name );
 			textureNode.updateTexture();
 			this._textureNodes[ name ] = textureNode;
 
@@ -576,7 +666,7 @@ class PassNode extends TempNode {
 
 			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			textureNode = new PassMultipleTextureNode( this, name, true );
 			textureNode.updateTexture();
 			this._previousTextureNodes[ name ] = textureNode;
 
@@ -638,7 +728,7 @@ class PassNode extends TempNode {
 	/**
 	 * Precompiles the pass.
 	 *
-	 * Note that this method must be called after the pass configuartion is complete.
+	 * Note that this method must be called after the pass configuration is complete.
 	 * So calls like `setMRT()` and `getTextureNode()` must proceed the precompilation.
 	 *
 	 * @async
@@ -665,7 +755,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
-		this.renderTarget.texture.type = renderer.getColorBufferType();
+		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
@@ -705,7 +795,12 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
+		const currentTransparent = renderer.transparent;
+		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
+		const currentContextNode = renderer.contextNode;
+		const currentOverrideMaterial = scene.overrideMaterial;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -722,13 +817,48 @@ class PassNode extends TempNode {
 
 		}
 
+		if ( this.overrideMaterial !== null ) {
+
+			scene.overrideMaterial = this.overrideMaterial;
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+		renderer.autoClear = true;
+		renderer.transparent = this.transparent;
+		renderer.opaque = this.opaque;
+
+		if ( this.contextNode !== null ) {
+
+			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
+
+				this._contextNodeCache = {
+					version: this.version,
+					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
+				};
+
+			}
+
+			renderer.contextNode = this._contextNodeCache.context;
+
+		}
+
+		const currentSceneName = scene.name;
+
+		scene.name = this.name ? this.name : scene.name;
 
 		renderer.render( scene, camera );
 
+		scene.name = currentSceneName;
+		scene.overrideMaterial = currentOverrideMaterial;
+
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.autoClear = currentAutoClear;
+		renderer.transparent = currentTransparent;
+		renderer.opaque = currentOpaque;
+		renderer.contextNode = currentContextNode;
 
 		camera.layers.mask = currentMask;
 
@@ -745,8 +875,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio * this._resolution;
-		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
+		const effectiveWidth = Math.floor( this._width * this._pixelRatio * this._resolutionScale );
+		const effectiveHeight = Math.floor( this._height * this._pixelRatio * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -786,7 +916,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._scissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
@@ -822,7 +952,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._viewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
@@ -879,7 +1009,7 @@ export default PassNode;
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
+export const pass = ( scene, camera, options ) => new PassNode( PassNode.COLOR, scene, camera, options );
 
 /**
  * TSL function for creating a pass texture node.
@@ -890,7 +1020,7 @@ export const pass = ( scene, camera, options ) => nodeObject( new PassNode( Pass
  * @param {Texture} texture - The output texture.
  * @returns {PassTextureNode}
  */
-export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
+export const passTexture = ( pass, texture ) => new PassTextureNode( pass, texture );
 
 /**
  * TSL function for creating a depth pass node.
@@ -902,4 +1032,4 @@ export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode(
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-export const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );
+export const depthPass = ( scene, camera, options ) => new PassNode( PassNode.DEPTH, scene, camera, options );

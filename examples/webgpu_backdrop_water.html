@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Backdrop Water</title>
+		<title>three.js webgpu - backdrop water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Backdrop Water
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Backdrop Water</span>
+			</div>
+
+			<small>Water refraction with depth effect.</small>
 		</div>
 
 		<script type="importmap">
@@ -29,20 +35,17 @@
 			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			let camera, scene, renderer;
-			let mixer, objects, clock;
+			let mixer, objects, timer;
 			let model, floor, floorPosition;
-			let postProcessing;
+			let renderPipeline;
 			let controls;
-			let stats;
 
 			init();
 
@@ -57,16 +60,6 @@
 				camera.lookAt( 0, 1, 0 );
 
 				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
-				sunLight.castShadow = true;
-				sunLight.shadow.camera.near = .1;
-				sunLight.shadow.camera.far = 5;
-				sunLight.shadow.camera.right = 2;
-				sunLight.shadow.camera.left = - 2;
-				sunLight.shadow.camera.top = 1;
-				sunLight.shadow.camera.bottom = - 2;
-				sunLight.shadow.mapSize.width = 2048;
-				sunLight.shadow.mapSize.height = 2048;
-				sunLight.shadow.bias = - 0.001;
 				sunLight.position.set( .5, 3, .5 );
 
 				const waterAmbientLight = new THREE.HemisphereLight( 0x333366, 0x74ccf4, 5 );
@@ -76,7 +69,8 @@
 				scene.add( skyAmbientLight );
 				scene.add( waterAmbientLight );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// animated model
 
@@ -84,7 +78,6 @@
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
 					model = gltf.scene;
-					model.children[ 0 ].children[ 0 ].castShadow = true;
 
 					mixer = new THREE.AnimationMixer( model );
 
@@ -136,21 +129,21 @@
 
 				// water
 
-				const timer = time.mul( .8 );
+				const t = time.mul( .8 );
 				const floorUV = positionWorld.xzy;
 
-				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 4 ).add( timer ) );
-				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( timer ) );
+				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 4 ).add( t ) );
+				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( t ) );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
 
 				// linearDepth() returns the linear depth of the mesh
 				const depth = linearDepth();
-				const depthWater = viewportLinearDepth.sub( depth );
+				const depthWater = viewportLinearDepth.sub( depth ).toInspector( 'Water / Depth', ( node ) => node.oneMinus() );
 				const depthEffect = depthWater.remapClamp( - .002, .04 );
 
-				const refractionUV = screenUV.add( vec2( 0, waterIntensity.mul( .1 ) ) );
+				const refractionUV = screenUV.add( vec2( 0, waterIntensity.mul( .1 ) ) ).toInspector( 'Water / Refraction UV' );
 
 				// linearDepth( viewportDepthTexture( uv ) ) return the linear depth of the scene
 				const depthTestForRefraction = linearDepth( viewportDepthTexture( refractionUV ) ).sub( depth );
@@ -159,10 +152,10 @@
 
 				const finalUV = depthTestForRefraction.lessThan( 0 ).select( screenUV, refractionUV );
 
-				const viewportTexture = viewportSharedTexture( finalUV );
+				const viewportTexture = viewportSharedTexture( finalUV ).toInspector( 'Water / Viewport Texture + Refraction UV' );
 
 				const waterMaterial = new THREE.MeshBasicNodeMaterial();
-				waterMaterial.colorNode = waterColor;
+				waterMaterial.colorNode = waterColor.toInspector( 'Water / Color' );
 				waterMaterial.backdropNode = depthEffect.mix( viewportSharedTexture(), viewportTexture.mul( depthRefraction.mix( 1, waterColor ) ) );
 				waterMaterial.backdropAlphaNode = depthRefraction.oneMinus();
 				waterMaterial.transparent = true;
@@ -195,10 +188,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
@@ -211,11 +202,11 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				floorPosition = new THREE.Vector3( 0, .2, 0 );
 
-				gui.add( floorPosition, 'y', - 1, 1, .001 ).name( 'position' );
+				gui.add( floorPosition, 'y', - 1, 1, .001 ).name( 'floor position' );
 
 				// post processing
 
@@ -223,15 +214,15 @@
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassDepth = scenePass.getLinearDepthNode().remapClamp( .3, .5 );
 
-				const waterMask = objectPosition( camera ).y.greaterThan( screenUV.y.sub( .5 ).mul( camera.near ) );
+				const waterMask = objectPosition( camera ).y.greaterThan( screenUV.y.sub( .5 ).mul( camera.near ) ).toInspector( 'Post-Processing / Water Mask' );
 
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.directionNode = waterMask.select( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) );
+				scenePassColorBlurred.directionNode = waterMask.select( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) ).toInspector( 'Post-Processing / Blur Strength [ Depth ]', ( node ) => node.toFloat() );
 
-				const vignette = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
+				const vignette = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus().toInspector( 'Post-Processing / Vignette' );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
 
 				//
 
@@ -250,11 +241,11 @@
 
 			function animate() {
 
-				stats.update();
+				timer.update();
 
 				controls.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				floor.position.y = floorPosition.y - 5;
 
@@ -268,12 +259,12 @@
 
 				for ( const object of objects.children ) {
 
-					object.position.y = Math.sin( clock.elapsedTime + object.id ) * .3;
+					object.position.y = Math.sin( timer.getElapsed() + object.id ) * .3;
 					object.rotation.y += delta * .3;
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

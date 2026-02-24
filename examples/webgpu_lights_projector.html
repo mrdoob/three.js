@@ -4,12 +4,20 @@
 		<title>three.js webgpu - projector light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - projector light<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Projector Light</span>
+			</div>
+
+			<small>
+				Projector light with procedural caustics, video and texture projection.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -33,9 +41,7 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, color, mx_worley_noise_float, time } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -44,16 +50,9 @@
 
 			let projectorLight, lightHelper;
 
-			let stats;
-
 			init();
 
 			function init() {
-
-				// Stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				// Renderer
 
@@ -61,6 +60,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
@@ -117,7 +117,6 @@
 				projectorLight.shadow.camera.near = 1;
 				projectorLight.shadow.camera.far = 10;
 				projectorLight.shadow.focus = 1;
-				projectorLight.shadow.bias = - .003;
 				scene.add( projectorLight );
 
 				lightHelper = new THREE.SpotLightHelper( projectorLight );
@@ -156,7 +155,7 @@
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Projector Light' );
 
 				const params = {
 					type: 'procedural',
@@ -274,8 +273,6 @@
 
 				} );
 
-				gui.open();
-
 			}
 
 			function onWindowResize() {
@@ -290,8 +287,6 @@
 			function animate() {
 
 				const time = performance.now() / 3000;
-
-				stats.update();
 
 				projectorLight.position.x = Math.cos( time ) * 2.5;
 				projectorLight.position.z = Math.sin( time ) * 2.5;

@@ -445,6 +445,17 @@ class RenderObject {
 	}
 
 	/**
+	 * Returns the byte offset into the indirect attribute buffer.
+	 *
+	 * @return {number|Array<number>} The byte offset into the indirect attribute buffer.
+	 */
+	getIndirectOffset() {
+
+		return this._geometries.getIndirectOffset( this );
+
+	}
+
+	/**
 	 * Returns an array that acts as a key for identifying the render object in a chain map.
 	 *
 	 * @return {Array<Object>} An array with object references.
@@ -500,8 +511,7 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-
-				attributesId[ nodeAttribute.name ] = attribute.version;
+				attributesId[ nodeAttribute.name ] = attribute.id;
 
 			}
 
@@ -682,7 +692,7 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material } = this;
+		const { object, material, renderer } = this;
 
 		let cacheKey = material.customProgramCacheKey();
 
@@ -711,6 +721,18 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+
+						// WebGPU must honor the sampler data because they are part of the bindings
+
+						if ( renderer.backend.isWebGPUBackend === true ) {
+
+							valueKey += value.magFilter;
+							valueKey += value.minFilter;
+							valueKey += value.wrapS;
+							valueKey += value.wrapT;
+							valueKey += value.wrapR;
+
+						}
 
 					}
 
@@ -758,13 +780,15 @@ class RenderObject {
 
 		}
 
-		if ( object.count > 1 ) {
+		if ( object.isInstancedMesh || object.count > 1 || Array.isArray( object.morphTargetInfluences ) ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 
 			cacheKey += object.uuid + ',';
 
 		}
+
+		cacheKey += this.context.id + ',';
 
 		cacheKey += object.receiveShadow + ',';
 
@@ -856,6 +880,8 @@ class RenderObject {
 			cacheKey = hash( cacheKey, 1 );
 
 		}
+
+		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
 
 		return cacheKey;
 

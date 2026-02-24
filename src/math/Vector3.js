@@ -106,7 +106,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's x component to the given value
+	 * Sets the vector's x component to the given value.
 	 *
 	 * @param {number} x - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -120,7 +120,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's y component to the given value
+	 * Sets the vector's y component to the given value.
 	 *
 	 * @param {number} y - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -134,7 +134,7 @@ class Vector3 {
 	}
 
 	/**
-	 * Sets the vector's z component to the given value
+	 * Sets the vector's z component to the given value.
 	 *
 	 * @param {number} z - The value to set.
 	 * @return {Vector3} A reference to this vector.
@@ -743,8 +743,6 @@ class Vector3 {
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 
 	}
-
-	// TODO lengthSquared?
 
 	/**
 	 * Computes the square of the Euclidean length (straight-line length) from

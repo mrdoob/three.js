@@ -39,6 +39,18 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 	}
 
+	/**
+	 * Overwritten so the method always returns the unique shared
+	 * framebuffer texture.
+	 *
+	 * @return {FramebufferTexture} The shared framebuffer texture.
+	 */
+	getTextureForReference() {
+
+		return _sharedFramebuffer;
+
+	}
+
 	updateReference() {
 
 		return this;

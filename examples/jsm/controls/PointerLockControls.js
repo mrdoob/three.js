@@ -35,7 +35,7 @@ const _MOUSE_SENSITIVITY = 0.002;
 const _PI_2 = Math.PI / 2;
 
 /**
- * The implementation of this class is based on the [Pointer Lock API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API}.
+ * The implementation of this class is based on the [Pointer Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API).
  * `PointerLockControls` is a perfect choice for first person 3D games.
  *
  * ```js
@@ -64,7 +64,7 @@ class PointerLockControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( camera, domElement = null ) {
 
@@ -138,14 +138,6 @@ class PointerLockControls extends Controls {
 	dispose() {
 
 		this.disconnect();
-
-	}
-
-	getObject() {
-
-		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated. Use controls.object instead.' ); // @deprecated r169
-
-		return this.object;
 
 	}
 

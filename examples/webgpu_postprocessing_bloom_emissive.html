@@ -4,12 +4,18 @@
 		<title>three.js webgpu - bloom emissive</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - bloom emissive
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Emissive Bloom</span>
+			</div>
+
+			<small>Selective Bloom based on the "emissive" material property.</small>
 		</div>
 
 		<script type="importmap">
@@ -26,18 +32,18 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, emissive } from 'three/tsl';
+			import { pass, mrt, output, emissive, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -53,7 +59,7 @@
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'moonless_golf_1k.hdr', function ( texture ) {
 
@@ -80,23 +86,38 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				//
 
 				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output,
-					emissive
-				} ) );
 
-				const outputPass = scenePass.getTextureNode();
-				const emissivePass = scenePass.getTextureNode( 'emissive' );
+				// set up MRT with emissive
+
+				const mrtNode = mrt( {
+					output: output,
+					emissive: vec4( emissive, output.a )
+				} );
+
+				mrtNode.setBlendMode( 'emissive', new THREE.BlendMode( THREE.NormalBlending ) );
+
+				scenePass.setMRT( mrtNode );
+
+				// optimize the bandwidth
+
+				const emissiveTexture = scenePass.getTexture( 'emissive' );
+				emissiveTexture.type = THREE.UnsignedByteType;
+
+				//
+
+				const outputPass = scenePass.getTextureNode().toInspector( 'Color' );
+				const emissivePass = scenePass.getTextureNode( 'emissive' ).toInspector( 'Emissive' );
 
 				const bloomPass = bloom( emissivePass, 2.5, .5 );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outputPass.add( bloomPass );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = outputPass.add( bloomPass );
 
 				//
 
@@ -104,18 +125,19 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
-				const bloomFolder = gui.addFolder( 'bloom' );
+				const bloomFolder = gui.addFolder( 'Bloom' );
 				bloomFolder.add( bloomPass.strength, 'value', 0.0, 5.0 ).name( 'strength' );
 				bloomFolder.add( bloomPass.radius, 'value', 0.0, 1.0 ).name( 'radius' );
 
-				const toneMappingFolder = gui.addFolder( 'tone mapping' );
+				const toneMappingFolder = gui.addFolder( 'Tone Mapping' );
 				toneMappingFolder.add( renderer, 'toneMappingExposure', 0.1, 2 ).name( 'exposure' );
 
 			}
@@ -133,7 +155,7 @@
 
 			function render() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

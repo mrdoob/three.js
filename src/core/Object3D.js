@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { error } from '../utils.js';
 
 let _object3DId = 0;
 
@@ -241,7 +242,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the local matrix from position,
-		 * rotation and scale every frame.
+		 * rotation and scale every frame. If set to `false`, the app is responsible for recomputing
+		 * the local matrix by calling `updateMatrix()`.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_AUTO_UPDATE`.
 		 *
@@ -252,7 +254,8 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * When set to `true`, the engine automatically computes the world matrix from the current local
-		 * matrix and the object's transformation hierarchy.
+		 * matrix and the object's transformation hierarchy. If set to `false`, the app is responsible for
+		 * recomputing the world matrix by directly updating the `matrixWorld` property.
 		 *
 		 * The default values for all 3D objects is defined by `Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE`.
 		 *
@@ -354,12 +357,35 @@ class Object3D extends EventDispatcher {
 		this.customDistanceMaterial = undefined;
 
 		/**
+		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
+		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * geometry and material settings. A static 3D object can be processed by the renderer
+		 * slightly faster since certain state checks can be bypassed.
+		 *
+		 * Only relevant in context of {@link WebGPURenderer}.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.static = false;
+
+		/**
 		 * An object that can be used to store custom data about the 3D object. It
 		 * should not hold references to functions as these will not be cloned.
 		 *
 		 * @type {Object}
 		 */
 		this.userData = {};
+
+		/**
+		 * The pivot point for rotation and scale transformations.
+		 * When set, rotation and scale are applied around this point
+		 * instead of the object's origin.
+		 *
+		 * @type {?Vector3}
+		 * @default null
+		 */
+		this.pivot = null;
 
 	}
 
@@ -643,7 +669,7 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Converts the given vector from this 3D object's word space to local space.
+	 * Converts the given vector from this 3D object's world space to local space.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -733,7 +759,7 @@ class Object3D extends EventDispatcher {
 
 		if ( object === this ) {
 
-			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
+			error( 'Object3D.add: object can\'t be added as a child of itself.', object );
 			return this;
 
 		}
@@ -752,7 +778,7 @@ class Object3D extends EventDispatcher {
 
 		} else {
 
-			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
+			error( 'Object3D.add: object not an instance of THREE.Object3D.', object );
 
 		}
 
@@ -1108,6 +1134,19 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
+		const pivot = this.pivot;
+
+		if ( pivot !== null ) {
+
+			const px = pivot.x, py = pivot.y, pz = pivot.z;
+			const te = this.matrix.elements;
+
+			te[ 12 ] += px - te[ 0 ] * px - te[ 4 ] * py - te[ 8 ] * pz;
+			te[ 13 ] += py - te[ 1 ] * px - te[ 5 ] * py - te[ 9 ] * pz;
+			te[ 14 ] += pz - te[ 2 ] * px - te[ 6 ] * py - te[ 10 ] * pz;
+
+		}
+
 		this.matrixWorldNeedsUpdate = true;
 
 	}
@@ -1121,7 +1160,7 @@ class Object3D extends EventDispatcher {
 	 * `true` by default.  Set these flags to `false` if you need more control over the update matrix process.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
 	updateMatrixWorld( force ) {
 
@@ -1266,13 +1305,19 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
+		if ( this.static !== false ) object.static = this.static;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
 		object.up = this.up.toArray();
 
+		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
+
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
+		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
 
 		// object specific properties
 
@@ -1547,6 +1592,12 @@ class Object3D extends EventDispatcher {
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
 
+		if ( source.pivot !== null ) {
+
+			this.pivot = source.pivot.clone();
+
+		}
+
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );
 
@@ -1563,6 +1614,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.static = source.static;
 
 		this.animations = source.animations.slice();
 

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Scene } from '../../../../src/scenes/Scene.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
@@ -27,49 +25,6 @@ export default QUnit.module( 'Scenes', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'type', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'background', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'environment', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fog', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'backgroundBlurriness', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'backgroundIntensity', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'overrideMaterial', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isScene', ( assert ) => {
 
@@ -78,18 +33,6 @@ export default QUnit.module( 'Scenes', () => {
 				object.isScene,
 				'Scene.isScene should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

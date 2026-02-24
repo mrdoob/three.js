@@ -37,8 +37,8 @@
 
 			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			let SCREEN_WIDTH = window.innerWidth;
-			let SCREEN_HEIGHT = window.innerHeight;
+			const SCREEN_WIDTH = window.innerWidth;
+			const SCREEN_HEIGHT = window.innerHeight;
 			const FLOOR = - 250;
 
 			let camera, controls, scene, renderer;
@@ -53,7 +53,8 @@
 			let light;
 			let lightShadowMapViewer;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let showHUD = false;
 
@@ -328,6 +329,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -335,7 +338,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

@@ -26,6 +26,14 @@ class RenderContext {
 		this.id = _id ++;
 
 		/**
+		 * The MRT configuration.
+		 *
+		 * @type {?MRTNode}
+		 * @default null
+		 */
+		this.mrt = null;
+
+		/**
 		 * Whether the current active framebuffer has a color attachment.
 		 *
 		 * @type {boolean}
@@ -215,6 +223,14 @@ class RenderContext {
 		this.clippingContext = null;
 
 		/**
+		 * The current camera.
+		 *
+		 * @type {?Camera}
+		 * @default null
+		 */
+		this.camera = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -248,9 +264,9 @@ class RenderContext {
  */
 export function getCacheKey( renderContext ) {
 
-	const { textures, activeCubeFace } = renderContext;
+	const { textures, activeCubeFace, activeMipmapLevel } = renderContext;
 
-	const values = [ activeCubeFace ];
+	const values = [ activeCubeFace, activeMipmapLevel ];
 
 	for ( const texture of textures ) {
 

@@ -4,6 +4,7 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
+import { error } from '../../utils.js';
 
 /**
  * This node represents a tone mapping operation.
@@ -32,9 +33,10 @@ class ToneMappingNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
+		 * @private
 		 * @type {number}
 		 */
-		this.toneMapping = toneMapping;
+		this._toneMapping = toneMapping;
 
 		/**
 		 * The tone mapping exposure.
@@ -62,14 +64,39 @@ class ToneMappingNode extends TempNode {
 	 */
 	customCacheKey() {
 
-		return hash( this.toneMapping );
+		return hash( this._toneMapping );
+
+	}
+
+	/**
+	 * Sets the tone mapping type.
+	 *
+	 * @param {number} value - The tone mapping type.
+	 * @return {ToneMappingNode} A reference to this node.
+	 */
+	setToneMapping( value ) {
+
+		this._toneMapping = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the tone mapping type.
+	 *
+	 * @returns {number} The tone mapping type.
+	 */
+	getToneMapping() {
+
+		return this._toneMapping;
 
 	}
 
 	setup( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
-		const toneMapping = this.toneMapping;
+		const toneMapping = this._toneMapping;
 
 		if ( toneMapping === NoToneMapping ) return colorNode;
 
@@ -83,7 +110,7 @@ class ToneMappingNode extends TempNode {
 
 		} else {
 
-			console.error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
+			error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
 
 			outputNode = colorNode;
 
@@ -107,7 +134,7 @@ export default ToneMappingNode;
  * @param {Node<vec3> | Color} color - The color node to process.
  * @returns {ToneMappingNode<vec3>}
  */
-export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
+export const toneMapping = ( mapping, exposure, color ) => new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) );
 
 /**
  * TSL object that represents the global tone mapping exposure of the renderer.

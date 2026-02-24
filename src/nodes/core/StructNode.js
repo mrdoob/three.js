@@ -1,6 +1,5 @@
 import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * StructNode allows to create custom structures with multiple members.
@@ -30,11 +29,11 @@ class StructNode extends Node {
 
 	}
 
-	constructor( structLayoutNode, values ) {
+	constructor( structTypeNode, values ) {
 
 		super( 'vec3' );
 
-		this.structLayoutNode = structLayoutNode;
+		this.structTypeNode = structTypeNode;
 		this.values = values;
 
 		this.isStructNode = true;
@@ -43,13 +42,28 @@ class StructNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.structLayoutNode.getNodeType( builder );
+		return this.structTypeNode.getNodeType( builder );
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.structLayoutNode.getMemberType( builder, name );
+		return this.structTypeNode.getMemberType( builder, name );
+
+	}
+
+	_getChildren() {
+
+		// Ensure struct type is the last child for correct code generation order
+
+		const children = super._getChildren();
+
+		const structTypeProperty = children.find( child => child.childNode === this.structTypeNode );
+
+		children.splice( children.indexOf( structTypeProperty ), 1 );
+		children.push( structTypeProperty );
+
+		return children;
 
 	}
 
@@ -59,7 +73,7 @@ class StructNode extends Node {
 		const structType = nodeVar.type;
 		const propertyName = builder.getPropertyName( nodeVar );
 
-		builder.addLineFlowCode( `${ propertyName } = ${ builder.generateStruct( structType, this.structLayoutNode.membersLayout, this.values ) }`, this );
+		builder.addLineFlowCode( `${ propertyName } = ${ builder.generateStruct( structType, this.structTypeNode.membersLayout, this.values ) }`, this );
 
 		return nodeVar.name;
 
@@ -108,7 +122,7 @@ export const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return nodeObject( new StructNode( structLayout, values ) );
+		return new StructNode( structLayout, values );
 
 	};
 

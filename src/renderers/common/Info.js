@@ -1,3 +1,5 @@
+import { error } from '../../utils.js';
+
 /**
  * This renderer module provides a series of statistical information
  * about the GPU memory and the rendering process. Useful for debugging
@@ -52,7 +54,7 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
+		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -123,7 +125,7 @@ class Info {
 
 		} else {
 
-			console.error( 'THREE.WebGPUInfo: Unknown object type.' );
+			error( 'WebGPUInfo: Unknown object type.' );
 
 		}
 

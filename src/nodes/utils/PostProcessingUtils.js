@@ -1,4 +1,5 @@
-import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
+import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4, fract, dot, cos, sin } from '../tsl/TSLBase.js';
+import { sqrt } from '../math/MathNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { textureLoad } from '../accessors/TextureNode.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
@@ -92,4 +93,62 @@ export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projec
 
 	return normalize( cross( dpdx, dpdy ) );
 
+} );
+
+/**
+ * Interleaved Gradient Noise (IGN) from Jimenez 2014.
+ *
+ * IGN has "low discrepancy" resulting in evenly distributed samples. It's superior compared to
+ * default white noise, blue noise or Bayer.
+ *
+ * References:
+ * - {@link https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/}
+ * - {@link https://blog.demofox.org/2022/01/01/interleaved-gradient-noise-a-different-kind-of-low-discrepancy-sequence/}
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} position - The input position, usually screen coordinates.
+ * @return {Node<float>} The noise value.
+ */
+export const interleavedGradientNoise = Fn( ( [ position ] ) => {
+
+	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
+
+} ).setLayout( {
+	name: 'interleavedGradientNoise',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec2' }
+	]
+} );
+
+/**
+ * Vogel disk sampling for uniform circular distribution.
+ *
+ * This function generates sample points distributed uniformly on a disk using the golden angle,
+ * resulting in an efficient low-discrepancy sequence for sampling. The rotation parameter (phi)
+ * allows randomizing the pattern per-pixel when combined with IGN.
+ *
+ * @tsl
+ * @function
+ * @param {Node<int>} sampleIndex - The index of the current sample (0-based).
+ * @param {Node<int>} samplesCount - The total number of samples.
+ * @param {Node<float>} phi - Rotation angle in radians (typically from IGN * 2π).
+ * @return {Node<vec2>} A 2D point on the unit disk.
+ */
+export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
+
+	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
+	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );
+	const theta = float( sampleIndex ).mul( goldenAngle ).add( phi );
+	return vec2( cos( theta ), sin( theta ) ).mul( r );
+
+} ).setLayout( {
+	name: 'vogelDiskSample',
+	type: 'vec2',
+	inputs: [
+		{ name: 'sampleIndex', type: 'int' },
+		{ name: 'samplesCount', type: 'int' },
+		{ name: 'phi', type: 'float' }
+	]
 } );

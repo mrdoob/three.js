@@ -15,6 +15,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
+import { warn } from '../utils.js';
 
 let _textureId = 0;
 
@@ -67,7 +68,7 @@ class Texture extends EventDispatcher {
 		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 		/**
-		 * The UUID of the material.
+		 * The UUID of the texture.
 		 *
 		 * @type {string}
 		 * @readonly
@@ -75,7 +76,7 @@ class Texture extends EventDispatcher {
 		this.uuid = generateUUID();
 
 		/**
-		 * The name of the material.
+		 * The name of the texture.
 		 *
 		 * @type {string}
 		 */
@@ -157,7 +158,7 @@ class Texture extends EventDispatcher {
 		 * texture samples being used.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default Texture.DEFAULT_ANISOTROPY
 		 */
 		this.anisotropy = anisotropy;
 
@@ -521,7 +522,7 @@ class Texture extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				console.warn( `THREE.Texture.setValues(): parameter '${ key }' has value of undefined.` );
+				warn( `Texture.setValues(): parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -530,7 +531,7 @@ class Texture extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				console.warn( `THREE.Texture.setValues(): property '${ key }' does not exist.` );
+				warn( `Texture.setValues(): property '${ key }' does not exist.` );
 				continue;
 
 			}

@@ -51,7 +51,8 @@
 
 			const morphs = [], animGroups = [];
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -107,7 +108,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// CONTROLS
 
@@ -303,6 +304,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				stats.begin();
 				render();
 				stats.end();
@@ -311,7 +314,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

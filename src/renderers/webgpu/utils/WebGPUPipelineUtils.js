@@ -5,15 +5,17 @@ import {
 } from './WebGPUConstants.js';
 
 import {
-	FrontSide, BackSide, DoubleSide,
+	BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
-	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
+	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, MaterialBlending,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
 	OneMinusDstColorFactor, DstAlphaFactor, OneMinusDstAlphaFactor, SrcAlphaSaturateFactor,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
+
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -104,8 +106,9 @@ class WebGPUPipelineUtils {
 		for ( const bindGroup of renderObject.getBindings() ) {
 
 			const bindingsData = backend.get( bindGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 
@@ -113,13 +116,13 @@ class WebGPUPipelineUtils {
 
 		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
 
-		// blending
+		// material blending
 
-		let blending;
+		let materialBlending;
 
 		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
 
-			blending = this._getBlending( material );
+			materialBlending = this._getBlending( material );
 
 		}
 
@@ -145,10 +148,46 @@ class WebGPUPipelineUtils {
 		if ( renderObject.context.textures !== null ) {
 
 			const textures = renderObject.context.textures;
+			const mrt = renderObject.context.mrt;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
-				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
+				const texture = textures[ i ];
+				const colorFormat = utils.getTextureFormatGPU( texture );
+
+				// mrt blending
+
+				let blending;
+
+				if ( mrt !== null ) {
+
+					if ( this.backend.compatibilityMode !== true ) {
+
+						const blendMode = mrt.getBlendMode( texture.name );
+
+						if ( blendMode.blending === MaterialBlending ) {
+
+							blending = materialBlending;
+
+						} else if ( blendMode.blending !== NoBlending ) {
+
+							blending = this._getBlending( blendMode );
+
+						}
+
+					} else {
+
+						warnOnce( 'WebGPURenderer: Multiple Render Targets (MRT) blending configuration is not fully supported in compatibility mode. The material blending will be used for all render targets.' );
+
+						blending = materialBlending;
+
+					}
+
+				} else {
+
+					blending = materialBlending;
+
+				}
 
 				targets.push( {
 					format: colorFormat,
@@ -164,7 +203,7 @@ class WebGPUPipelineUtils {
 
 			targets.push( {
 				format: colorFormat,
-				blend: blending,
+				blend: materialBlending,
 				writeMask: colorWriteMask
 			} );
 
@@ -211,7 +250,7 @@ class WebGPUPipelineUtils {
 			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = {}; // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
+				depthStencil.stencilBack = stencilFront; // apply the same stencil ops to both faces, matching gl.stencilOp() which is not face-separated
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
@@ -229,21 +268,47 @@ class WebGPUPipelineUtils {
 
 		}
 
+		// create pipeline
+
+		device.pushErrorScope( 'validation' );
 
 		if ( promises === null ) {
 
 			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
 
+			device.popErrorScope().then( ( err ) => {
+
+				if ( err !== null ) {
+
+					pipelineData.error = true;
+
+					error( err.message );
+
+				}
+
+			} );
+
 		} else {
 
-			const p = new Promise( ( resolve /*, reject*/ ) => {
+			const p = new Promise( async ( resolve /*, reject*/ ) => {
 
-				device.createRenderPipelineAsync( pipelineDescriptor ).then( pipeline => {
+				try {
 
-					pipelineData.pipeline = pipeline;
-					resolve();
+					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
 
-				} );
+				} catch ( err ) { }
+
+				const errorScope = await device.popErrorScope();
+
+				if ( errorScope !== null ) {
+
+					pipelineData.error = true;
+
+					error( errorScope.message );
+
+				}
+
+				resolve();
 
 			} );
 
@@ -266,12 +331,12 @@ class WebGPUPipelineUtils {
 		const { utils, device } = backend;
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
-		const colorFormat = utils.getCurrentColorFormat( renderContext );
+		const colorFormats = utils.getCurrentColorFormats( renderContext );
 		const sampleCount = this._getSampleCount( renderContext );
 
 		const descriptor = {
-			label: label,
-			colorFormats: [ colorFormat ],
+			label,
+			colorFormats,
 			depthStencilFormat,
 			sampleCount
 		};
@@ -302,8 +367,9 @@ class WebGPUPipelineUtils {
 		for ( const bindingsGroup of bindings ) {
 
 			const bindingsData = backend.get( bindingsGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 
@@ -321,24 +387,24 @@ class WebGPUPipelineUtils {
 	 * for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Material} material - The material.
+	 * @param {Material|BlendMode} object - The object containing blending information.
 	 * @return {Object} The blending state.
 	 */
-	_getBlending( material ) {
+	_getBlending( object ) {
 
 		let color, alpha;
 
-		const blending = material.blending;
-		const blendSrc = material.blendSrc;
-		const blendDst = material.blendDst;
-		const blendEquation = material.blendEquation;
+		const blending = object.blending;
+		const blendSrc = object.blendSrc;
+		const blendDst = object.blendDst;
+		const blendEquation = object.blendEquation;
 
 
 		if ( blending === CustomBlending ) {
 
-			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : blendSrc;
-			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : blendDst;
-			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : blendEquation;
+			const blendSrcAlpha = object.blendSrcAlpha !== null ? object.blendSrcAlpha : blendSrc;
+			const blendDstAlpha = object.blendDstAlpha !== null ? object.blendDstAlpha : blendDst;
+			const blendEquationAlpha = object.blendEquationAlpha !== null ? object.blendEquationAlpha : blendEquation;
 
 			color = {
 				srcFactor: this._getBlendFactor( blendSrc ),
@@ -354,7 +420,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const premultipliedAlpha = material.premultipliedAlpha;
+			const premultipliedAlpha = object.premultipliedAlpha;
 
 			const setBlend = ( srcRGB, dstRGB, srcAlpha, dstAlpha ) => {
 
@@ -407,11 +473,11 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
-						console.error( 'THREE.WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
+						error( `WebGPURenderer: "SubtractiveBlending" requires "${ object.isMaterial ? 'material' : 'blendMode' }.premultipliedAlpha = true".` );
 						break;
 
 					case MultiplyBlending:
-						console.error( 'THREE.WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
+						error( `WebGPURenderer: "MultiplyBlending" requires "${ object.isMaterial ? 'material' : 'blendMode' }.premultipliedAlpha = true".` );
 						break;
 
 				}
@@ -426,7 +492,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			console.error( 'THREE.WebGPURenderer: Invalid blending: ', blending );
+			error( 'WebGPURenderer: Invalid blending: ', blending );
 
 		}
 
@@ -497,7 +563,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
+				error( 'WebGPURenderer: Blend factor not supported.', blend );
 
 		}
 
@@ -553,7 +619,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
+				error( 'WebGPURenderer: Invalid stencil function.', stencilFunc );
 
 		}
 
@@ -607,7 +673,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
+				error( 'WebGPURenderer: Invalid stencil operation.', stencilOperation );
 
 		}
 
@@ -649,7 +715,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
+				error( 'WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
 
 		}
 
@@ -672,6 +738,8 @@ class WebGPUPipelineUtils {
 		const descriptor = {};
 		const utils = this.backend.utils;
 
+		//
+
 		descriptor.topology = utils.getPrimitiveTopology( object, material );
 
 		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
@@ -680,28 +748,17 @@ class WebGPUPipelineUtils {
 
 		}
 
-		switch ( material.side ) {
+		//
 
-			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Back;
-				break;
+		let flipSided = ( material.side === BackSide );
 
-			case BackSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Front;
-				break;
+		if ( object.isMesh && object.matrixWorld.determinant() < 0 ) flipSided = ! flipSided;
 
-			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.None;
-				break;
+		descriptor.frontFace = ( flipSided === true ) ? GPUFrontFace.CW : GPUFrontFace.CCW;
 
-			default:
-				console.error( 'THREE.WebGPUPipelineUtils: Unknown material.side value.', material.side );
-				break;
+		//
 
-		}
+		descriptor.cullMode = ( material.side === DoubleSide ) ? GPUCullMode.None : GPUCullMode.Back;
 
 		return descriptor;
 
@@ -737,7 +794,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const depthFunc = material.depthFunc;
+			const depthFunc = ( this.backend.parameters.reversedDepthBuffer ) ? ReversedDepthFuncs[ material.depthFunc ] : material.depthFunc;
 
 			switch ( depthFunc ) {
 
@@ -774,7 +831,7 @@ class WebGPUPipelineUtils {
 					break;
 
 				default:
-					console.error( 'THREE.WebGPUPipelineUtils: Invalid depth function.', depthFunc );
+					error( 'WebGPUPipelineUtils: Invalid depth function.', depthFunc );
 
 			}
 

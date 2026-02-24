@@ -1,7 +1,6 @@
 import { Material } from '../Material.js';
-import { NormalBlending } from '../../constants.js';
 
-import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
@@ -12,7 +11,7 @@ import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.j
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
-import { mix } from '../../nodes/math/MathNode.js';
+import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
@@ -26,6 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
+import { error } from '../../utils.js';
 
 /**
  * Base class for all node materials.
@@ -181,7 +181,7 @@ class NodeMaterial extends Material {
 		 * and `alphaMap` properties. This node property allows to overwrite the default
 		 * and define the opacity with a node instead.
 		 *
-		 * If you don't want to overwrite the normals but modify the existing
+		 * If you don't want to overwrite the opacity but modify the existing
 		 * value instead, use {@link materialOpacity}.
 		 *
 		 * @type {?Node<float>}
@@ -239,6 +239,14 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.maskNode = null;
+
+		/**
+		 * This node can be used to implement a shadow mask for the material.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskShadowNode = null;
 
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
@@ -382,25 +390,41 @@ class NodeMaterial extends Material {
 		 */
 		this.vertexNode = null;
 
-		// Deprecated properties
+		/**
+		 * This node can be used as a global context management component for this material.
+		 *
+		 * @type {?ContextNode}
+		 * @default null
+		 */
+		this.contextNode = null;
 
-		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
+	}
 
-			get: () => {
+	/**
+	 * Returns an array of child nodes for this material.
+	 *
+	 * @private
+	 * @returns {Array<{property: string, childNode: Node}>}
+	 */
+	_getNodeChildren() {
 
-				return this.receivedShadowPositionNode;
+		const children = [];
 
-			},
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
 
-			set: ( value ) => {
+			if ( property.startsWith( '_' ) === true ) continue;
 
-				console.warn( 'THREE.NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
+			const object = this[ property ];
 
-				this.receivedShadowPositionNode = value;
+			if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
 
 			}
 
-		} );
+		}
+
+		return children;
 
 	}
 
@@ -412,7 +436,15 @@ class NodeMaterial extends Material {
 	 */
 	customProgramCacheKey() {
 
-		return this.type + getCacheKey( this );
+		const values = [];
+
+		for ( const { property, childNode } of this._getNodeChildren() ) {
+
+			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey() );
+
+		}
+
+		return this.type + hashArray( values );
 
 	}
 
@@ -453,13 +485,41 @@ class NodeMaterial extends Material {
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
 
+		// < CONTEXT >
+
+		if ( renderer.contextNode.isContextNode === true ) {
+
+			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
+
+		} else {
+
+			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
+
+		}
+
+		if ( this.contextNode !== null ) {
+
+			if ( this.contextNode.isContextNode === true ) {
+
+				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
+
+			} else {
+
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
+
+			}
+
+		}
+
 		// < VERTEX STAGE >
 
 		builder.addStack();
 
-		const mvp = subBuild( this.setupVertex( builder ), 'VERTEX' );
+		const mvp = this.setupVertex( builder );
 
-		const vertexNode = this.vertexNode || mvp;
+		const vertexNode = subBuild( this.vertexNode || mvp, 'VERTEX' );
+
+		builder.context.clipSpace = vertexNode;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -504,7 +564,7 @@ class NodeMaterial extends Material {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			if ( clippingNode !== null ) builder.stack.add( clippingNode );
+			if ( clippingNode !== null ) builder.stack.addToStack( clippingNode );
 
 			// force unsigned floats - useful for RenderTargets
 
@@ -521,6 +581,14 @@ class NodeMaterial extends Material {
 			const isCustomOutput = this.outputNode !== null;
 
 			if ( isCustomOutput ) resultNode = this.outputNode;
+
+			//
+
+			if ( builder.context.getOutput ) {
+
+				resultNode = builder.context.getOutput( resultNode, builder );
+
+			}
 
 			// MRT
 
@@ -589,7 +657,7 @@ class NodeMaterial extends Material {
 
 		if ( unionPlanes.length > 0 || intersectionPlanes.length > 0 ) {
 
-			const samples = builder.renderer.samples;
+			const samples = builder.renderer.currentSamples;
 
 			if ( this.alphaToCoverage && samples > 1 ) {
 
@@ -598,7 +666,7 @@ class NodeMaterial extends Material {
 
 			} else {
 
-				builder.stack.add( clipping() );
+				builder.stack.addToStack( clipping() );
 
 			}
 
@@ -625,7 +693,7 @@ class NodeMaterial extends Material {
 
 		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
 
-			builder.stack.add( hardwareClipping() );
+			builder.stack.addToStack( hardwareClipping() );
 
 			this.hardwareClipping = true;
 
@@ -717,7 +785,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
@@ -783,7 +851,9 @@ class NodeMaterial extends Material {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	setupDiffuseColor( { object, geometry } ) {
+	setupDiffuseColor( builder ) {
+
+		const { object, geometry } = builder;
 
 		// MASK
 
@@ -842,7 +912,16 @@ class NodeMaterial extends Material {
 
 			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+			if ( this.alphaToCoverage === true ) {
+
+				diffuseColor.a = smoothstep( alphaTestNode, alphaTestNode.add( fwidth( diffuseColor.a ) ), diffuseColor.a );
+				diffuseColor.a.lessThanEqual( 0 ).discard();
+
+			} else {
+
+				diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+			}
 
 		}
 
@@ -856,15 +935,9 @@ class NodeMaterial extends Material {
 
 		// OPAQUE
 
-		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
-
-		if ( isOpaque ) {
+		if ( builder.isOpaque() ) {
 
 			diffuseColor.a.assign( 1.0 );
-
-		} else if ( alphaTestNode === null ) {
-
-			diffuseColor.a.lessThanEqual( 0 ).discard();
 
 		}
 
@@ -977,9 +1050,21 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.aoNode !== null || builder.material.aoMap ) {
+		let aoNode = this.aoNode;
 
-			const aoNode = this.aoNode !== null ? this.aoNode : materialAO;
+		if ( aoNode === null && builder.material.aoMap ) {
+
+			aoNode = materialAO;
+
+		}
+
+		if ( builder.context.getAO ) {
+
+			aoNode = builder.context.getAO( aoNode, builder );
+
+		}
+
+		if ( aoNode ) {
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
@@ -1183,11 +1268,9 @@ class NodeMaterial extends Material {
 		}
 
 		const data = Material.prototype.toJSON.call( this, meta );
-		const nodeChildren = getNodeChildren( this );
-
 		data.inputNodes = {};
 
-		for ( const { property, childNode } of nodeChildren ) {
+		for ( const { property, childNode } of this._getNodeChildren() ) {
 
 			data.inputNodes[ property ] = childNode.toJSON( meta ).uuid;
 
@@ -1237,6 +1320,7 @@ class NodeMaterial extends Material {
 
 		this.lightsNode = source.lightsNode;
 		this.envNode = source.envNode;
+		this.aoNode = source.aoNode;
 
 		this.colorNode = source.colorNode;
 		this.normalNode = source.normalNode;
@@ -1245,6 +1329,7 @@ class NodeMaterial extends Material {
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
 		this.maskNode = source.maskNode;
+		this.maskShadowNode = source.maskShadowNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
@@ -1260,6 +1345,8 @@ class NodeMaterial extends Material {
 
 		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;
+
+		this.contextNode = source.contextNode;
 
 		return super.copy( source );
 

@@ -81,7 +81,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -94,7 +94,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -368,7 +368,7 @@
 
 			function updateProgressBar( fraction ) {
 
-				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100 ) + '%';
 
 			}
 

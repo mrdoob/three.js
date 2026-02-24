@@ -80,6 +80,10 @@ const wgslLib = {
 	'textureLod': 'textureSampleLevel',
 	'texelFetch': 'textureLoad',
 	'textureGrad': 'textureSampleGrad',
+	'floatBitsToInt': 'bitcast<i32>',
+	'floatBitsToUint': 'bitcast<u32>',
+	'intBitsToFloat': 'bitcast<f32>',
+	'uintBitsToFloat': 'bitcast<f32>',
 };
 
 class WGSLEncoder {
@@ -169,6 +173,26 @@ class WGSLEncoder {
 				}
 
 				code = `${ modFnName }( ${ snippets.join( ', ' ) } )`;
+
+			} else if ( fnName.startsWith( 'bitcast' ) ) {
+
+				const params = node.params.map( p => this.emitExpression( p ) ).join( ',' );
+				const types = node.params.map( p => p.getType() );
+
+				if ( /.*vec[234]/.test( types[ 0 ] ) ) {
+
+					const conversionType = fnName.substring( 8, fnName.length - 1 );
+					const vectorType = types[ 0 ].substring( - 1 );
+
+					code = `bitcast<${ vectorType }<${ conversionType }>>`;
+
+				} else {
+
+					code = fnName;
+
+				}
+
+				code += `( ${ params } )`;
 
 			} else if ( fnName.startsWith( 'texture' ) ) {
 
@@ -275,6 +299,10 @@ class WGSLEncoder {
 
 			this.varyings.push( node );
 			return ''; // Defer emission to the header
+
+		} else if ( node.isStructDefinition ) {
+
+			code = this.emitStructDefinition( node );
 
 		} else if ( node.isTernary ) {
 
@@ -557,6 +585,29 @@ class WGSLEncoder {
 
 		// In WGSL, multiple declarations in one line are not supported, so join with semicolons.
 		return declarations.join( ';\n' + this.tab );
+
+	}
+
+	emitStructDefinition( node ) {
+
+		const { name, members } = node;
+
+		let structString = `struct ${ name } {\n`;
+
+		for ( let i = 0; i < members.length; i += 1 ) {
+
+			const member = members[ i ];
+
+			structString += `${ this.tab }\t${ member.name }: ${ this.getWgslType( member.type ) }`;
+
+			const delimiter = ( i != members.length - 1 ) ? ',\n' : '\n';
+			structString += delimiter;
+
+		}
+
+		structString += this.tab + '}';
+
+		return structString;
 
 	}
 

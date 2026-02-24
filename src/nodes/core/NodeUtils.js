@@ -6,6 +6,9 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+import { error } from '../../utils.js';
+import StackTrace from '../core/StackTrace.js';
+
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
 // Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.
@@ -49,6 +52,7 @@ function cyrb53( value, seed = 0 ) {
 /**
  * Computes a hash for the given string.
  *
+ * @private
  * @method
  * @param {string} str - The string to be hashed.
  * @return {number} The hash.
@@ -58,6 +62,7 @@ export const hashString = ( str ) => cyrb53( str );
 /**
  * Computes a hash for the given array.
  *
+ * @private
  * @method
  * @param {Array<number>} array - The array to be hashed.
  * @return {number} The hash.
@@ -67,99 +72,12 @@ export const hashArray = ( array ) => cyrb53( array );
 /**
  * Computes a hash for the given list of parameters.
  *
+ * @private
  * @method
  * @param {...number} params - A list of parameters.
  * @return {number} The hash.
  */
 export const hash = ( ...params ) => cyrb53( params );
-
-/**
- * Computes a cache key for the given node.
- *
- * @method
- * @param {Object|Node} object - The object to be hashed.
- * @param {boolean} [force=false] - Whether to force a cache key computation or not.
- * @return {number} The hash.
- */
-export function getCacheKey( object, force = false ) {
-
-	const values = [];
-
-	if ( object.isNode === true ) {
-
-		values.push( object.id );
-		object = object.getSelf();
-
-	}
-
-	for ( const { property, childNode } of getNodeChildren( object ) ) {
-
-		values.push( cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
-
-	}
-
-	return cyrb53( values );
-
-}
-
-/**
- * This generator function can be used to iterate over the node children
- * of the given object.
- *
- * @generator
- * @param {Object} node - The object to be hashed.
- * @param {boolean} [toJSON=false] - Whether to return JSON or not.
- * @yields {Object} A result node holding the property, index (if available) and the child node.
- */
-export function* getNodeChildren( node, toJSON = false ) {
-
-	for ( const property in node ) {
-
-		// Ignore private properties.
-		if ( property.startsWith( '_' ) === true ) continue;
-
-		const object = node[ property ];
-
-		if ( Array.isArray( object ) === true ) {
-
-			for ( let i = 0; i < object.length; i ++ ) {
-
-				const child = object[ i ];
-
-				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
-
-					yield { property, index: i, childNode: child };
-
-				}
-
-			}
-
-		} else if ( object && object.isNode === true ) {
-
-			yield { property, childNode: object };
-
-		} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
-
-			for ( const subProperty in object ) {
-
-				// Ignore private properties.
-				if ( subProperty.startsWith( '_' ) === true ) continue;
-
-				const child = object[ subProperty ];
-
-				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
-
-					yield { property, index: subProperty, childNode: child };
-
-				}
-
-			}
-
-		}
-
-	}
-
-}
 
 const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 1, 'float' ],
@@ -175,6 +93,7 @@ const dataFromObject = /*@__PURE__*/ new WeakMap();
 /**
  * Returns the data type for the given the length.
  *
+ * @private
  * @method
  * @param {number} length - The length.
  * @return {string} The data type.
@@ -188,6 +107,7 @@ export function getTypeFromLength( length ) {
 /**
  * Returns the typed array for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {TypedArray} The typed array.
@@ -221,6 +141,7 @@ export function getTypedArrayFromType( type ) {
 /**
  * Returns the length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -235,13 +156,14 @@ export function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
 /**
  * Returns the gpu memory length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -256,34 +178,36 @@ export function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
 /**
- * Returns the byte boundary for the given data type.
+ * Returns the alignment requirement for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The byte boundary.
+ * @return {number} The alignment requirement in bytes.
  */
-export function getByteBoundaryFromType( type ) {
+export function getAlignmentFromType( type ) {
 
 	if ( /float|int|uint/.test( type ) ) return 4;
 	if ( /vec2/.test( type ) ) return 8;
 	if ( /vec3/.test( type ) ) return 16;
 	if ( /vec4/.test( type ) ) return 16;
 	if ( /mat2/.test( type ) ) return 8;
-	if ( /mat3/.test( type ) ) return 48;
-	if ( /mat4/.test( type ) ) return 64;
+	if ( /mat3/.test( type ) ) return 16;
+	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
 }
 
 /**
  * Returns the data type for the given value.
  *
+ * @private
  * @method
  * @param {any} value - The value.
  * @return {?string} The data type.
@@ -355,6 +279,7 @@ export function getValueType( value ) {
 /**
  * Returns the value/object for the given data type and parameters.
  *
+ * @private
  * @method
  * @param {string} type - The given type.
  * @param {...any} params - A parameter list.
@@ -425,6 +350,7 @@ export function getValueFromType( type, ...params ) {
 /**
  * Gets the object data that can be shared between different rendering steps.
  *
+ * @private
  * @param {Object} object - The object to get the data for.
  * @return {Object} The object data.
  */
@@ -446,6 +372,7 @@ export function getDataFromObject( object ) {
 /**
  * Converts the given array buffer to a Base64 string.
  *
+ * @private
  * @method
  * @param {ArrayBuffer} arrayBuffer - The array buffer.
  * @return {string} The Base64 string.
@@ -469,6 +396,7 @@ export function arrayBufferToBase64( arrayBuffer ) {
 /**
  * Converts the given Base64 string to an array buffer.
  *
+ * @private
  * @method
  * @param {string} base64 - The Base64 string.
  * @return {ArrayBuffer} The array buffer.

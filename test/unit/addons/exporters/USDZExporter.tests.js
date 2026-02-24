@@ -1,15 +1,15 @@
-/* global QUnit */
-
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
+import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import {
 	unzipSync,
 	strFromU8,
 } from '../../../../examples/jsm/libs/fflate.module.js';
 import {
-	Scene,
+	BoxGeometry,
 	Mesh,
 	MeshStandardMaterial,
-	BoxGeometry,
+	Scene,
+	SphereGeometry,
 } from '../../../../src/Three.js';
 
 function isValidUSDA( usda ) {
@@ -164,6 +164,91 @@ export default QUnit.module( 'Addons', () => {
 
 				assert.ok( usdaContent2.includes( 'box1' ), 'USDA contains box1' );
 				assert.ok( usdaContent2.includes( 'box2' ), 'USDA contains box2' );
+
+			} );
+
+			QUnit.test( 'export and import', async ( assert ) => {
+
+				const exporter = new USDZExporter();
+
+				const originalScene = new Scene();
+				const boxGeometry = new BoxGeometry( 1, 1, 1 );
+				const boxMaterial = new MeshStandardMaterial( {
+					color: 0x00ff00,
+					roughness: 0.5,
+					metalness: 0.8,
+				} );
+				const box = new Mesh( boxGeometry, boxMaterial );
+				box.name = 'box1';
+				box.position.set( 1, 2, 3 );
+				box.scale.set( 0.5, 1.5, 2.0 );
+				box.rotation.set( Math.PI / 4, Math.PI / 3, Math.PI / 2 );
+				originalScene.add( box );
+
+				const sphereGeometry = new SphereGeometry( 1, 8, 6 );
+				const sphereMaterial = new MeshStandardMaterial( {
+					color: 0x0000ff,
+					roughness: 0.9,
+					metalness: 0.1,
+				} );
+				const sphere = new Mesh( sphereGeometry, sphereMaterial );
+				sphere.name = 'sphere1';
+				sphere.position.set( 0, 0, 0 );
+				originalScene.add( sphere );
+
+				const meshes = [ box, sphere ];
+
+				originalScene.updateMatrixWorld( true );
+
+				const exportResult = await exporter.parseAsync( originalScene );
+
+				assert.ok(
+					exportResult.buffer instanceof ArrayBuffer,
+					'Export returns an ArrayBuffer'
+				);
+
+				const loader = new USDLoader();
+				const importedScene = loader.parse( exportResult.buffer );
+
+				assert.ok( importedScene, 'Loader successfully parses exported data' );
+
+				for ( const mesh of meshes ) {
+
+					const name = mesh.name;
+
+					const importedMesh = importedScene.getObjectByName( name );
+
+					assert.ok( importedMesh, 'Found imported mesh in scene' );
+					assert.equal( importedMesh.name, name, 'Mesh name preserved' );
+
+					const tolerance = 0.0000001;
+					const vectorCloseTo = ( a, b, tolerance ) => {
+
+						assert.closeTo( a.x, b.x, tolerance, 'X matches' );
+						assert.closeTo( a.y, b.y, tolerance, 'Y matches' );
+						assert.closeTo( a.z, b.z, tolerance, 'Z matches' );
+
+					};
+
+					vectorCloseTo( importedMesh.position, mesh.position, tolerance );
+					vectorCloseTo( importedMesh.scale, mesh.scale, tolerance );
+					vectorCloseTo( importedMesh.rotation, mesh.rotation, tolerance );
+
+					assert.ok( importedMesh.geometry, 'Geometry exists' );
+					assert.ok(
+						importedMesh.geometry.attributes.position,
+						'Position attribute exists'
+					);
+
+					assert.ok( importedMesh.material, 'Material exists' );
+					assert.ok( importedMesh.material.isMeshStandardMaterial, 'Material is a MeshStandardMaterial' );
+					assert.closeTo( importedMesh.material.color.r, mesh.material.color.r, tolerance, 'Material color r matches' );
+					assert.closeTo( importedMesh.material.color.g, mesh.material.color.g, tolerance, 'Material color g matches' );
+					assert.closeTo( importedMesh.material.color.b, mesh.material.color.b, tolerance, 'Material color b matches' );
+					assert.closeTo( importedMesh.material.roughness, mesh.material.roughness, tolerance, 'Material roughness matches' );
+					assert.closeTo( importedMesh.material.metalness, mesh.material.metalness, tolerance, 'Material metalness matches' );
+
+				}
 
 			} );
 

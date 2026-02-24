@@ -108,14 +108,13 @@ class VideoTexture extends Texture {
 
 	}
 
-	/**
-	 * @override
-	 */
 	dispose() {
 
 		if ( this._requestVideoFrameCallbackId !== 0 ) {
 
 			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
+
+			this._requestVideoFrameCallbackId = 0;
 
 		}
 

@@ -1,4 +1,5 @@
 import { FloatType, HalfFloatType, RGBAFormat, UnsignedByteType } from '../../constants.js';
+import { warn } from '../../utils.js';
 
 function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
@@ -86,7 +87,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	if ( maxPrecision !== precision ) {
 
-		console.warn( 'THREE.WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
+		warn( 'WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
 		precision = maxPrecision;
 
 	}
@@ -104,9 +105,8 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	const maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
 	const maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
-	const vertexTextures = maxVertexTextures > 0;
-
 	const maxSamples = gl.getParameter( gl.MAX_SAMPLES );
+	const samples = gl.getParameter( gl.SAMPLES );
 
 	return {
 
@@ -132,9 +132,9 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 		maxVaryings: maxVaryings,
 		maxFragmentUniforms: maxFragmentUniforms,
 
-		vertexTextures: vertexTextures,
+		maxSamples: maxSamples,
 
-		maxSamples: maxSamples
+		samples: samples
 
 	};
 

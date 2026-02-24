@@ -32,7 +32,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let renderer, scene, camera, controls;
 			let gui, guiExposure = null;
@@ -111,7 +111,7 @@
 				controls.target.set( 0, 0.03, 0 );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
+				const hdrLoader = new HDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const dracoLoader = new DRACOLoader();
@@ -122,7 +122,7 @@
 				gltfLoader.setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					hdrLoader.loadAsync( 'venice_sunset_1k.hdr' ),
 					gltfLoader.loadAsync( 'venice_mask.glb' ),
 				] );
 
@@ -149,7 +149,7 @@
 					.name( 'type' )
 					.onChange( function () {
 
-						updateGUI( toneMappingFolder );
+						updateGUI();
 
 						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 
@@ -181,7 +181,7 @@
 
 					} );
 
-				updateGUI( toneMappingFolder );
+				updateGUI();
 
 				gui.open();
 

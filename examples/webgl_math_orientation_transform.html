@@ -33,7 +33,8 @@
 			const spherical = new THREE.Spherical();
 			const rotationMatrix = new THREE.Matrix4();
 			const targetQuaternion = new THREE.Quaternion();
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const speed = Math.PI / 2;
 
 			const params = {
@@ -106,7 +107,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mesh.quaternion.equals( targetQuaternion ) === false ) {
 

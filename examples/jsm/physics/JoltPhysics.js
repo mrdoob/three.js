@@ -1,6 +1,6 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
 
-const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@0.23.0/dist/jolt-physics.wasm-compat.js';
+const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@1.0.0/dist/jolt-physics.wasm-compat.js';
 
 const frameRate = 60;
 
@@ -27,6 +27,8 @@ function getShape( geometry ) {
 		return new Jolt.SphereShape( radius, null );
 
 	}
+
+	console.error( 'JoltPhysics: Unsupported geometry type:', geometry.type );
 
 	return null;
 
@@ -75,7 +77,7 @@ async function JoltPhysics() {
 
 	if ( Jolt === null ) {
 
-		const { default: initJolt } = await import( `${JOLT_PATH}` );
+		const { default: initJolt } = await import( JOLT_PATH /* @vite-ignore */ );
 		Jolt = await initJolt();
 
 	}
@@ -220,11 +222,13 @@ async function JoltPhysics() {
 
 	//
 
-	const clock = new Clock();
+	const timer = new Timer();
 
 	function step() {
 
-		let deltaTime = clock.getDelta();
+		timer.update();
+
+		let deltaTime = timer.getDelta();
 
 		// Don't go below 30 Hz to prevent spiral of death
 		deltaTime = Math.min( deltaTime, 1.0 / 30.0 );
@@ -305,7 +309,7 @@ async function JoltPhysics() {
 		 * @name JoltPhysics#addMesh
 		 * @param {Mesh} mesh The mesh to add.
 		 * @param {number} [mass=0] The mass in kg of the mesh.
-		 * @param {number} [restitution=0] The restitution/friction of the mesh.
+		 * @param {number} [restitution=0] The restitution of the mesh, usually from 0 to 1. Represents how "bouncy" objects are when they collide with each other.
 		 */
 		addMesh: addMesh,
 

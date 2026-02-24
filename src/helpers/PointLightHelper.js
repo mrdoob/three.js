@@ -38,7 +38,7 @@ class PointLightHelper extends Mesh {
 		/**
 		 * The light being visualized.
 		 *
-		 * @type {HemisphereLight}
+		 * @type {PointLight}
 		 */
 		this.light = light;
 
@@ -56,30 +56,6 @@ class PointLightHelper extends Mesh {
 		this.matrixAutoUpdate = false;
 
 		this.update();
-
-
-		/*
-	// TODO: delete this comment?
-	const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-
-	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
-	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-
-	const d = light.distance;
-
-	if ( d === 0.0 ) {
-
-		this.lightDistance.visible = false;
-
-	} else {
-
-		this.lightDistance.scale.set( d, d, d );
-
-	}
-
-	this.add( this.lightDistance );
-	*/
 
 	}
 

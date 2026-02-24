@@ -100,6 +100,7 @@ class PCDLoader extends Loader {
 	/**
 	 * Get dataview value by field type and size.
 	 *
+	 * @private
 	 * @param {DataView} dataview - The DataView to read from.
 	 * @param {number} offset - The offset to start reading from.
 	 * @param {'F' | 'U' | 'I'} type - Field type.
@@ -517,7 +518,7 @@ class PCDLoader extends Loader {
 				if ( offset.label !== undefined ) {
 
 					const labelIndex = PCDheader.fields.indexOf( 'label' );
-					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
+					label.push( this._getDataView( dataview, ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, PCDheader.type[ labelIndex ], PCDheader.size[ labelIndex ] ) );
 
 				}
 
@@ -577,7 +578,8 @@ class PCDLoader extends Loader {
 
 				if ( offset.label !== undefined ) {
 
-					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( this._getDataView( dataview, row + offset.label, PCDheader.type[ labelIndex ], PCDheader.size[ labelIndex ] ) );
 
 				}
 

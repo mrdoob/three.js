@@ -17,8 +17,10 @@ const _point2 = new Vector3();
 const _plane = new Plane();
 const _line1 = new Line3();
 const _line2 = new Line3();
+const _box = new Box3();
 const _sphere = new Sphere();
 const _capsule = new Capsule();
+const _center = new Vector3();
 
 const _temp1 = new Vector3();
 const _temp2 = new Vector3();
@@ -374,6 +376,61 @@ class Octree {
 	}
 
 	/**
+	 * Computes the intersection between the given bounding box and triangle.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @param {Triangle} triangle - The triangle to test.
+	 * @return {Object|false} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
+	triangleBoxIntersect( box, triangle ) {
+
+		// cheap check
+
+		if ( Math.max( triangle.a.x, triangle.b.x, triangle.c.x ) < box.min.x ||
+				Math.min( triangle.a.x, triangle.b.x, triangle.c.x ) > box.max.x ||
+				Math.max( triangle.a.y, triangle.b.y, triangle.c.y ) < box.min.y ||
+				Math.min( triangle.a.y, triangle.b.y, triangle.c.y ) > box.max.y ||
+				Math.max( triangle.a.z, triangle.b.z, triangle.c.z ) < box.min.z ||
+				Math.min( triangle.a.z, triangle.b.z, triangle.c.z ) > box.max.z ) {
+
+			return false;
+
+		}
+
+		// expensive check
+
+		if ( ! box.intersectsTriangle( triangle ) ) return false;
+
+		// there is an intersection, now compute collision data
+
+		triangle.getPlane( _plane );
+
+		// determine which corner of the box is "deepest" into the plane
+
+		_v1.x = ( _plane.normal.x > 0 ) ? box.min.x : box.max.x;
+		_v1.y = ( _plane.normal.y > 0 ) ? box.min.y : box.max.y;
+		_v1.z = ( _plane.normal.z > 0 ) ? box.min.z : box.max.z;
+
+		// Calculate the distance from the plane to that corner (the distance will be negative
+		// because of the intersection)
+
+		const distance = _plane.distanceToPoint( _v1 );
+
+		const intersection = {
+			depth: - distance, // Flip sign so depth is positive
+			normal: _plane.normal.clone(),
+			point: _v1.clone()
+		};
+
+		// project the point onto the triangle surface
+		intersection.point.addScaledVector( intersection.normal, distance );
+
+		return intersection;
+
+	}
+
+	/**
 	 * Computes the intersection between the given sphere and triangle.
 	 *
 	 * @param {Sphere} sphere - The sphere to test.
@@ -456,6 +513,38 @@ class Octree {
 	}
 
 	/**
+	 * Computes the triangles that potentially intersect with the given bounding box.
+	 *
+	 * @param {Box3} box - The bounding box.
+	 * @param {Array<Triangle>} triangles - The target array that holds the triangles.
+	 */
+	getBoxTriangles( box, triangles ) {
+
+		for ( let i = 0; i < this.subTrees.length; i ++ ) {
+
+			const subTree = this.subTrees[ i ];
+
+			if ( ! box.intersectsBox( subTree.box ) ) continue;
+
+			if ( subTree.triangles.length > 0 ) {
+
+				for ( let j = 0; j < subTree.triangles.length; j ++ ) {
+
+					if ( triangles.indexOf( subTree.triangles[ j ] ) === - 1 ) triangles.push( subTree.triangles[ j ] );
+
+				}
+
+			} else {
+
+				subTree.getBoxTriangles( box, triangles );
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Computes the triangles that potentially intersect with the given capsule.
 	 *
 	 * @param {Capsule} capsule - The capsule to test.
@@ -484,6 +573,47 @@ class Octree {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Performs a bounding box intersection test with this Octree.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {Object|boolean} The intersection object. If no intersection
+	 * is detected, the method returns `false`.
+	 */
+	boxIntersect( box ) {
+
+		_box.copy( box );
+
+		const triangles = [];
+		let result, hit = false;
+
+		this.getBoxTriangles( box, triangles );
+
+		for ( let i = 0; i < triangles.length; i ++ ) {
+
+			if ( result = this.triangleBoxIntersect( _box, triangles[ i ] ) ) {
+
+				hit = true;
+
+				_box.translate( result.normal.multiplyScalar( result.depth ) );
+
+			}
+
+		}
+
+		if ( hit ) {
+
+			const collisionVector = _box.getCenter( _center ).sub( box.getCenter( _v1 ) );
+			const depth = collisionVector.length();
+
+			return { normal: collisionVector.normalize(), depth: depth };
+
+		}
+
+		return false;
 
 	}
 
@@ -558,7 +688,7 @@ class Octree {
 
 		if ( hit ) {
 
-			const collisionVector = _capsule.getCenter( new Vector3() ).sub( capsule.getCenter( _v1 ) );
+			const collisionVector = _capsule.getCenter( _center ).sub( capsule.getCenter( _v1 ) );
 			const depth = collisionVector.length();
 
 			return { normal: collisionVector.normalize(), depth: depth };

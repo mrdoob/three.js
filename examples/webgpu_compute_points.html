@@ -1,14 +1,23 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute</title>
+		<title>three.js webgpu - compute</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute - 300000 Points
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute</span>
+			</div>
+
+			<small>
+				300k points animated using GPU.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -17,8 +26,7 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,14 +35,11 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'stats-gl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
+			import { Fn, uniform, instancedArray, float, vec2, color, instanceIndex } from 'three/tsl';
 
-			import { Fn, uniform, instancedArray, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			let camera, scene, renderer, stats;
+			let camera, scene, renderer;
 			let computeNode;
 
 			const pointerVector = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
@@ -42,7 +47,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.OrthographicCamera( - 1.0, 1.0, 1.0, - 1.0, 0, 1 );
 				camera.position.z = 1;
@@ -76,13 +81,13 @@
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec3(), position ) );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec2(), position ) );
 
 				} );
 
 				// compute
 
-				computeNode = computeShaderFn().compute( particlesCount );
+				computeNode = computeShaderFn().compute( particlesCount ).setName( 'Update Particles' );
 				computeNode.onInit( ( { renderer } ) => {
 
 					const precomputeShaderNode = Fn( () => {
@@ -101,7 +106,7 @@
 
 					} );
 
-					renderer.computeAsync( precomputeShaderNode().compute( particlesCount ) );
+					renderer.compute( precomputeShaderNode().compute( particlesCount ) );
 
 				} );
 
@@ -119,31 +124,21 @@
 				mesh.count = particlesCount;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits: { maxStorageBuffersInVertexStage: 1 } } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats( {
-					precision: 4,
-					horizontal: false,
-					trackGPU: true,
-					trackCPT: true,
-					logsPerSecond: 10,
-					graphsPerSecond: 60,
-					samplesGraph: 30,
-				} );
-				stats.init( renderer );
-				document.body.appendChild( stats.dom );
-				stats.dom.style.position = 'absolute';
+				await renderer.init();
 
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'mousemove', onMouseMove );
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( scaleVector, 'x', 0, 1, 0.01 );
 				gui.add( scaleVector, 'y', 0, 1, 0.01 );
@@ -176,16 +171,7 @@
 			function animate() {
 
 				renderer.compute( computeNode );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-
 				renderer.render( scene, camera );
-
-
-				renderer.resolveTimestampsAsync().then( () => {
-
-					stats.update();
-
-				} );
 
 			}
 

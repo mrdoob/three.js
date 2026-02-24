@@ -36,6 +36,9 @@ class RoomEnvironment extends Scene {
 
 		super();
 
+		this.name = 'RoomEnvironment';
+		this.position.y = - 3.5;
+
 		const geometry = new BoxGeometry();
 		geometry.deleteAttribute( 'uv' );
 

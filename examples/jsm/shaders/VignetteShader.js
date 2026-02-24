@@ -4,7 +4,7 @@
  */
 
 /**
- * Based on [PaintEffect postprocess from ro.me]{@link http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js}.
+ * Based on [PaintEffect postprocess from ro.me](https://github.com/dataarts/3-dreams-of-black/blob/master/deploy/js/effects/PaintEffect.js).
  *
  * @constant
  * @type {ShaderMaterial~Shader}

@@ -6,6 +6,7 @@ import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } 
 import { materialEnvRotation } from './MaterialProperties.js';
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
+import { error } from '../../utils.js';
 
 const EmptyTexture = /*@__PURE__*/ new CubeTexture();
 
@@ -46,12 +47,18 @@ class CubeTextureNode extends TextureNode {
 	}
 
 	/**
-	 * Overwrites the default implementation to return a fixed value `'cubeTexture'`.
+	 * Overwrites the default implementation to return the appropriate cube texture type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
+
+		if ( this.value.isDepthTexture === true ) {
+
+			return 'cubeDepthTexture';
+
+		}
 
 		return 'cubeTexture';
 
@@ -76,7 +83,7 @@ class CubeTextureNode extends TextureNode {
 
 		} else {
 
-			console.error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+			error( 'CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
 
 			return vec3( 0, 0, 0 );
 
@@ -104,6 +111,19 @@ class CubeTextureNode extends TextureNode {
 
 		const texture = this.value;
 
+		// Depth textures (shadow maps) - no environment rotation, Y flip for WebGPU
+		if ( texture.isDepthTexture === true ) {
+
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				return vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+
+			}
+
+			return uvNode;
+
+		}
+
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 
 			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
@@ -123,7 +143,7 @@ class CubeTextureNode extends TextureNode {
 	 */
 	generateUV( builder, cubeUV ) {
 
-		return cubeUV.build( builder, 'vec3' );
+		return cubeUV.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 
@@ -149,7 +169,7 @@ export const cubeTextureBase = /*@__PURE__*/ nodeProxy( CubeTextureNode ).setPar
  *
  * @tsl
  * @function
- * @param {?CubeTexture|CubeTextureNode} [value=EmptyTexture] - The cube texture.
+ * @param {?(CubeTexture|CubeTextureNode)} [value=EmptyTexture] - The cube texture.
  * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
@@ -162,7 +182,7 @@ export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = nu
 	if ( value && value.isCubeTextureNode === true ) {
 
 		textureNode = nodeObject( value.clone() );
-		textureNode.referenceNode = value.getSelf(); // Ensure the reference is set to the original node
+		textureNode.referenceNode = value; // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
 		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );

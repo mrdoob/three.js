@@ -1,6 +1,7 @@
 import {
 	Color,
 	FrontSide,
+	HalfFloatType,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -21,9 +22,9 @@ import {
  *
  * References:
  *
- * - [Flat mirror for three.js]{@link https://github.com/Slayvin}
- * - [An implementation of water shader based on the flat mirror]{@link https://home.adelphi.edu/~stemkoski/}
- * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
+ * - [Flat mirror for three.js](https://github.com/Slayvin)
+ * - [An implementation of water shader based on the flat mirror](https://home.adelphi.edu/~stemkoski/)
+ * - [Water shader explanations in WebGL](http://29a.ch/slides/2012/webglwater/ )
  *
  * @augments Mesh
  * @three_import import { Water } from 'three/addons/objects/Water.js';
@@ -84,7 +85,7 @@ class Water extends Mesh {
 
 		const mirrorCamera = new PerspectiveCamera();
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: HalfFloatType } );
 
 		const mirrorShader = {
 
@@ -196,10 +197,10 @@ class Water extends Mesh {
 					vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );
 
 					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-					float rf0 = 0.3;
+					float rf0 = 0.02;
 					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );
 					vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
-					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);
+					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), reflectionSample + specularLight, reflectance );
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 

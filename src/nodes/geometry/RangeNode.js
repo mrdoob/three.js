@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import NodeError from '../core/NodeError.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
@@ -67,8 +68,11 @@ class RangeNode extends Node {
 	 */
 	getVectorLength( builder ) {
 
-		const minLength = builder.getTypeLength( getValueType( this.minNode.value ) );
-		const maxLength = builder.getTypeLength( getValueType( this.maxNode.value ) );
+		const minNode = this.getConstNode( this.minNode );
+		const maxNode = this.getConstNode( this.maxNode );
+
+		const minLength = builder.getTypeLength( getValueType( minNode.value ) );
+		const maxLength = builder.getTypeLength( getValueType( maxNode.value ) );
 
 		return minLength > maxLength ? minLength : maxLength;
 
@@ -86,6 +90,36 @@ class RangeNode extends Node {
 
 	}
 
+	/**
+	 * Returns a constant node from the given node by traversing it.
+	 *
+	 * @param {Node} node - The node to traverse.
+	 * @returns {Node} The constant node, if found.
+	 */
+	getConstNode( node ) {
+
+		let output = null;
+
+		node.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				output = n;
+
+			}
+
+		} );
+
+		if ( output === null ) {
+
+			throw new NodeError( 'THREE.TSL: No "ConstNode" found in node graph.', this.stackTrace );
+
+		}
+
+		return output;
+
+	}
+
 	setup( builder ) {
 
 		const object = builder.object;
@@ -94,8 +128,11 @@ class RangeNode extends Node {
 
 		if ( object.count > 1 ) {
 
-			const minValue = this.minNode.value;
-			const maxValue = this.maxNode.value;
+			const minNode = this.getConstNode( this.minNode );
+			const maxNode = this.getConstNode( this.maxNode );
+
+			const minValue = minNode.value;
+			const maxValue = maxNode.value;
 
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
@@ -131,8 +168,9 @@ class RangeNode extends Node {
 			}
 
 			const nodeType = this.getNodeType( builder );
+			const uniformBufferSize = object.count * 4 * 4; // count * 4 components * 4 bytes (float)
 
-			if ( object.count <= 4096 ) {
+			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 				output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
 

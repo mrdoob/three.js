@@ -1,5 +1,5 @@
-import { Color } from 'three';
-import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, modelViewProjection, NodeMaterial, normalize, positionGeometry, sign, uniform, varyingProperty, vec2, vec4 } from 'three/tsl';
+import { Color, NodeMaterial } from 'three/webgpu';
+import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, modelViewProjection, normalize, positionGeometry, sign, uniform, varyingProperty, vec2, vec4 } from 'three/tsl';
 
 /**
  * A special line material for meshes loaded via {@link LDrawLoader}.

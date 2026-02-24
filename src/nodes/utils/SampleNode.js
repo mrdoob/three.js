@@ -26,12 +26,21 @@ class SampleNode extends Node {
 	 * Creates an instance of SampleNode.
 	 *
 	 * @param {Function} callback - The function to be called when sampling. Should accept a UV node and return a value.
+	 * @param {?Node<vec2>} [uvNode=null] - The UV node to be used in the texture sampling.
 	 */
-	constructor( callback ) {
+	constructor( callback, uvNode = null ) {
 
 		super();
 
 		this.callback = callback;
+
+		/**
+		 * Represents the texture coordinates.
+		 *
+		 * @type {?Node<vec2|vec3>}
+		 * @default null
+		 */
+		this.uvNode = uvNode;
 
 		/**
 		 * This flag can be used for type testing.
@@ -76,6 +85,7 @@ export default SampleNode;
  *
  * @function
  * @param {Function} callback - The function to be called when sampling. Should accept a UV node and return a value.
+ * @param {?Node<vec2>} [uv=null] - The UV node to be used in the texture sampling.
  * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
  */
-export const sample = ( callback ) => nodeObject( new SampleNode( callback ) );
+export const sample = ( callback, uv = null ) => new SampleNode( callback, nodeObject( uv ) );

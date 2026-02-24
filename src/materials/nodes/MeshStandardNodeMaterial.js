@@ -1,11 +1,11 @@
 import NodeMaterial from './NodeMaterial.js';
-import { diffuseColor, metalness, roughness, specularColor, specularF90 } from '../../nodes/core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, metalness, roughness, specularColor, specularColorBlended, specularF90 } from '../../nodes/core/PropertyNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../../nodes/accessors/MaterialNode.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
 
@@ -135,7 +135,8 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalness );
 
-		specularColor.assign( specularColorNode );
+		specularColor.assign( vec3( 0.04 ) );
+		specularColorBlended.assign( specularColorNode );
 		specularF90.assign( 1.0 );
 
 	}
@@ -166,7 +167,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// DIFFUSE COLOR
 
-		diffuseColor.assign( vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
+		diffuseContribution.assign( diffuseColor.rgb.mul( metalnessNode.oneMinus() ) );
 
 	}
 

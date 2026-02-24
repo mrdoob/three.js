@@ -4,14 +4,20 @@
 		<title>three.js webgpu - procedural terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - procedural terrain
-			<br>
-			Based on <a href="https://threejs-journey.com/lessons/procedural-terrain-shader" target="_blank" rel="noopener">Three.js Journey</a> lessons
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Procedural Terrain</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/procedural-terrain-shader" target="_blank" rel="noopener">Three.js Journey</a> lessons.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -30,9 +36,10 @@
 			import * as THREE from 'three/webgpu';
 			import { mx_noise_float, color, cross, dot, float, transformNormalToView, positionLocal, sign, step, Fn, uniform, varying, vec2, vec3, Loop } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let camera, scene, renderer, controls, drag;
 
@@ -46,12 +53,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x201919 );
 
-				const gui = new GUI();
-
 				// environment
 
-				const rgbeLoader = new RGBELoader();
-				rgbeLoader.load( './textures/equirectangular/pedestrian_overpass_1k.hdr', ( environmentMap ) => {
+				const hdrLoader = new HDRLoader();
+				hdrLoader.load( './textures/equirectangular/pedestrian_overpass_1k.hdr', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -74,7 +79,6 @@
 				directionalLight.shadow.camera.bottom = - 8;
 				directionalLight.shadow.camera.left = - 8;
 				directionalLight.shadow.normalBias = 0.05;
-				directionalLight.shadow.bias = 0;
 				scene.add( directionalLight );
 
 				// terrain
@@ -187,21 +191,6 @@
 				terrain.castShadow = true;
 				scene.add( terrain );
 
-				// debug
-
-				const terrainGui = gui.addFolder( '🏔️ terrain' );
-
-				terrainGui.add( noiseIterations, 'value', 0, 10, 1 ).name( 'noiseIterations' );
-				terrainGui.add( positionFrequency, 'value', 0, 1, 0.001 ).name( 'positionFrequency' );
-				terrainGui.add( strength, 'value', 0, 20, 0.001 ).name( 'strength' );
-				terrainGui.add( warpFrequency, 'value', 0, 20, 0.001 ).name( 'warpFrequency' );
-				terrainGui.add( warpStrength, 'value', 0, 2, 0.001 ).name( 'warpStrength' );
-
-				terrainGui.addColor( { color: colorSand.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorSand' ).onChange( value => colorSand.value.set( value ) );
-				terrainGui.addColor( { color: colorGrass.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorGrass' ).onChange( value => colorGrass.value.set( value ) );
-				terrainGui.addColor( { color: colorSnow.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorSnow' ).onChange( value => colorSnow.value.set( value ) );
-				terrainGui.addColor( { color: colorRock.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorRock' ).onChange( value => colorRock.value.set( value ) );
-
 				// water
 			
 				const water = new THREE.Mesh(
@@ -216,31 +205,6 @@
 				water.rotation.x = - Math.PI * 0.5;
 				water.position.y = - 0.1;
 				scene.add( water );
-
-				const waterGui = gui.addFolder( '💧 water' );
-
-				waterGui.add( water.material, 'roughness', 0, 1, 0.01 );
-				waterGui.add( water.material, 'ior' ).min( 1 ).max( 2 ).step( 0.001 );
-				waterGui.addColor( { color: water.material.color.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'color' ).onChange( value => water.material.color.set( value ) );
-
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.shadowMap.enabled = true;
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
-
-				// controls
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.45;
-				controls.target.y = - 0.5;
-				controls.enableDamping = true;
-				controls.minDistance = 0.1;
-				controls.maxDistance = 50;
 
 				// drag
 
@@ -300,6 +264,55 @@
 
 				};
 
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// inspector
+
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.inspector.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.45;
+				controls.target.y = - 0.5;
+				controls.enableDamping = true;
+				controls.minDistance = 0.1;
+				controls.maxDistance = 50;
+
+				// debug
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+
+				const terrainGui = gui.addFolder( '🏔️ terrain' );
+
+				terrainGui.add( noiseIterations, 'value', 0, 10, 1 ).name( 'noiseIterations' );
+				terrainGui.add( positionFrequency, 'value', 0, 1, 0.001 ).name( 'positionFrequency' );
+				terrainGui.add( strength, 'value', 0, 20, 0.001 ).name( 'strength' );
+				terrainGui.add( warpFrequency, 'value', 0, 20, 0.001 ).name( 'warpFrequency' );
+				terrainGui.add( warpStrength, 'value', 0, 2, 0.001 ).name( 'warpStrength' );
+
+				terrainGui.addColor( { color: colorSand.value }, 'color' ).name( 'colorSand' );
+				terrainGui.addColor( { color: colorGrass.value }, 'color' ).name( 'colorGrass' );
+				terrainGui.addColor( { color: colorSnow.value }, 'color' ).name( 'colorSnow' );
+				terrainGui.addColor( { color: colorRock.value }, 'color' ).name( 'colorRock' );
+
+				const waterGui = gui.addFolder( '💧 water' );
+
+				waterGui.add( water.material, 'roughness', 0, 1, 0.01 );
+				waterGui.add( water.material, 'ior', 1, 2, 0.001 );
+				waterGui.addColor( { color: water.material.color }, 'color' ).name( 'color' );
+
+				// events
+
 				window.addEventListener( 'pointermove', ( event ) => {
 
 					drag.screenCoords.x = ( event.clientX / window.innerWidth - 0.5 ) * 2;
@@ -307,7 +320,7 @@
 
 				} );
 
-				window.addEventListener( 'pointerdown', () => {
+				renderer.domElement.addEventListener( 'pointerdown', () => {
 
 					if ( drag.hover ) {
 

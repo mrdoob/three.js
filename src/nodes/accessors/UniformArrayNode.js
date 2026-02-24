@@ -315,6 +315,8 @@ class UniformArrayNode extends BufferNode {
 		this.bufferCount = length;
 		this.bufferType = paddedType;
 
+		this.update(); // initialize the buffer values
+
 		return super.setup( builder );
 
 	}
@@ -328,7 +330,7 @@ class UniformArrayNode extends BufferNode {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new UniformArrayElementNode( this, nodeObject( indexNode ) ) );
+		return new UniformArrayElementNode( this, nodeObject( indexNode ) );
 
 	}
 
@@ -345,4 +347,4 @@ export default UniformArrayNode;
  * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
-export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
+export const uniformArray = ( values, nodeType ) => new UniformArrayNode( values, nodeType );

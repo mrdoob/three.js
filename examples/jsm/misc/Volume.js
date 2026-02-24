@@ -123,7 +123,6 @@ class Volume {
 				case 'uint64' :
 				case 'uint64_t' :
 					throw new Error( 'Error in Volume constructor : this type is not supported in JavaScript' );
-					break;
 				case 'Float32' :
 				case 'float32' :
 				case 'float' :
@@ -234,7 +233,7 @@ class Volume {
 		/**
 		 * The list of all the slices associated to this volume
 		 *
-		 * @type {Array}
+		 * @type {Array<VolumeSlice>}
 		 */
 		this.sliceList = [];
 

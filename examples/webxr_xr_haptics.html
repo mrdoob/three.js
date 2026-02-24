@@ -153,7 +153,7 @@
 
 				const oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
-				oscillator.start()
+				oscillator.start();
 
 				const audio = new THREE.PositionalAudio( listener );
 				audio.setNodeSource( oscillator );
@@ -168,11 +168,11 @@
 
 			}
 
-			function controllerDisconnected( event ) {
+			function controllerDisconnected() {
 
 				const audio = this.userData.audio;
 				audio.source.stop();
-				
+
 				this.remove( audio );
 
 			}
@@ -187,7 +187,7 @@
 			}
 
 
-			function handleCollisions( controller ) {
+			function handleCollisions() {
 
 				for ( let i = 0; i < group.children.length; i ++ ) {
 

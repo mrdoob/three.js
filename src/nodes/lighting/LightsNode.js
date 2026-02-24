@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeObject, property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
+import { warn } from '../../utils.js';
 
 const sortLights = ( lights ) => {
 
@@ -159,7 +160,7 @@ class LightsNode extends Node {
 
 			for ( const lightNode of this._lightNodes ) {
 
-				hash.push( lightNode.getSelf().getHash() );
+				hash.push( lightNode.getHash() );
 
 			}
 
@@ -224,7 +225,7 @@ class LightsNode extends Node {
 
 					if ( lightNodeClass === null ) {
 
-						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
 
 					}
@@ -233,7 +234,7 @@ class LightsNode extends Node {
 
 					if ( ! _lightsNodeRef.has( light ) ) {
 
-						lightNode = nodeObject( new lightNodeClass( light ) );
+						lightNode = new lightNodeClass( light );
 						_lightsNodeRef.set( light, lightNode );
 
 					} else {
@@ -368,8 +369,6 @@ class LightsNode extends Node {
 
 				}
 
-				context.material.transparent = true;
-
 			}
 
 			totalDiffuseNode.assign( totalDiffuse );
@@ -451,4 +450,4 @@ export default LightsNode;
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.
  */
-export const lights = ( lights = [] ) => nodeObject( new LightsNode() ).setLights( lights );
+export const lights = ( lights = [] ) => new LightsNode().setLights( lights );

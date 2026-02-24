@@ -4,9 +4,11 @@ import {
 	AdditiveBlending, SubtractiveBlending, MultiplyBlending, SubtractEquation, ReverseSubtractEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor,
 	OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor,
-	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth
+	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
+	MaterialBlending
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -61,6 +63,7 @@ class WebGLState {
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;
 		this.currentColorMask = null;
+		this.currentDepthReversed = false;
 		this.currentDepthFunc = null;
 		this.currentDepthMask = null;
 		this.currentStencilFunc = null;
@@ -83,7 +86,6 @@ class WebGLState {
 		this.currentTextureSlot = null;
 		this.currentBoundTextures = {};
 		this.currentBoundBufferBases = {};
-
 
 		this._init();
 
@@ -270,6 +272,151 @@ class WebGLState {
 
 	}
 
+	setMRTBlending( textures, mrt, material ) {
+
+		const gl = this.gl;
+		const drawBuffersIndexedExt = this.backend.drawBuffersIndexedExt;
+
+		if ( ! drawBuffersIndexedExt ) {
+
+			warnOnce( 'WebGPURenderer: Multiple Render Targets (MRT) blending configuration is not fully supported in compatibility mode. The material blending will be used for all render targets.' );
+
+			return;
+
+		}
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const texture = textures[ i ];
+
+			let blending = null;
+
+			if ( mrt !== null ) {
+
+				const blendMode = mrt.getBlendMode( texture.name );
+
+				if ( blendMode.blending === MaterialBlending ) {
+
+					// use material blending
+					blending = material;
+
+				} else if ( blendMode.blending !== NoBlending ) {
+
+					blending = blendMode;
+
+				}
+
+			} else {
+
+				// use material blending
+				blending = material;
+
+			}
+
+			if ( blending !== null ) {
+
+				this._setMRTBlendingIndex( i, blending );
+
+			} else {
+
+				// use opaque blending (no blending)
+				drawBuffersIndexedExt.blendFuncSeparateiOES( i, gl.ONE, gl.ZERO, gl.ONE, gl.ZERO );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Applies blending configuration for a specific draw buffer index.
+	 *
+	 * @private
+	 * @param {number} index - The draw buffer index.
+	 * @param {Object} blending - The blending configuration (material or BlendMode).
+	 */
+	_setMRTBlendingIndex( index, blending ) {
+
+		const { gl } = this;
+		const drawBuffersIndexedExt = this.backend.drawBuffersIndexedExt;
+
+		const blendingType = blending.blending;
+		const blendSrc = blending.blendSrc;
+		const blendDst = blending.blendDst;
+		const blendEquation = blending.blendEquation;
+		const premultipliedAlpha = blending.premultipliedAlpha;
+
+		if ( blendingType === CustomBlending ) {
+
+			const blendSrcAlpha = blending.blendSrcAlpha !== null ? blending.blendSrcAlpha : blendSrc;
+			const blendDstAlpha = blending.blendDstAlpha !== null ? blending.blendDstAlpha : blendDst;
+			const blendEquationAlpha = blending.blendEquationAlpha !== null ? blending.blendEquationAlpha : blendEquation;
+
+			drawBuffersIndexedExt.blendEquationSeparateiOES( index, equationToGL[ blendEquation ], equationToGL[ blendEquationAlpha ] );
+			drawBuffersIndexedExt.blendFuncSeparateiOES( index, factorToGL[ blendSrc ], factorToGL[ blendDst ], factorToGL[ blendSrcAlpha ], factorToGL[ blendDstAlpha ] );
+
+		} else {
+
+			drawBuffersIndexedExt.blendEquationSeparateiOES( index, gl.FUNC_ADD, gl.FUNC_ADD );
+
+			if ( premultipliedAlpha ) {
+
+				switch ( blendingType ) {
+
+					case NormalBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+						break;
+
+					case AdditiveBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.ONE, gl.ONE, gl.ONE, gl.ONE );
+						break;
+
+					case SubtractiveBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
+						break;
+
+					case MultiplyBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
+						break;
+
+					default:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+						break;
+
+				}
+
+			} else {
+
+				switch ( blendingType ) {
+
+					case NormalBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+						break;
+
+					case AdditiveBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
+						break;
+
+					case SubtractiveBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
+						break;
+
+					case MultiplyBlending:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
+						break;
+
+					default:
+						drawBuffersIndexedExt.blendFuncSeparateiOES( index, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+						break;
+
+				}
+
+			}
+
+		}
+
+	}
+
 	/**
 	 * Defines the blending.
 	 *
@@ -343,7 +490,7 @@ class WebGLState {
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -361,15 +508,15 @@ class WebGLState {
 							break;
 
 						case SubtractiveBlending:
-							console.error( 'THREE.WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							console.error( 'THREE.WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -462,6 +609,34 @@ class WebGLState {
 
 	}
 
+
+	/**
+	 * Configures the WebGL state to use a reversed depth buffer.
+	 *
+	 * @param {boolean} reversed - Whether the depth buffer is reversed or not.
+	 */
+	setReversedDepth( reversed ) {
+
+		if ( this.currentDepthReversed !== reversed ) {
+
+			const ext = this.backend.extensions.get( 'EXT_clip_control' );
+
+			if ( reversed ) {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+			} else {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+			}
+
+			this.currentDepthReversed = reversed;
+
+		}
+
+	}
+
 	/**
 	 * Specifies whether depth values can be written when rendering
 	 * into a framebuffer or not.
@@ -491,6 +666,8 @@ class WebGLState {
 	 * @param {number} depthFunc - The depth compare function.
 	 */
 	setDepthFunc( depthFunc ) {
+
+		if ( this.currentDepthReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 		if ( this.currentDepthFunc !== depthFunc ) {
 
@@ -609,11 +786,11 @@ class WebGLState {
 
 		if ( boolean ) {
 
-			gl.enable( gl.SCISSOR_TEST );
+			this.enable( gl.SCISSOR_TEST );
 
 		} else {
 
-			gl.disable( gl.SCISSOR_TEST );
+			this.disable( gl.SCISSOR_TEST );
 
 		}
 
@@ -754,7 +931,7 @@ class WebGLState {
 
 		this.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-		material.alphaToCoverage === true && this.backend.renderer.samples > 1
+		material.alphaToCoverage === true && this.backend.renderer.currentSamples > 0
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
@@ -848,7 +1025,7 @@ class WebGLState {
 	 * Sets the vertex state by binding the given VAO and element buffer.
 	 *
 	 * @param {WebGLVertexArrayObject} vao - The VAO.
-	 * @param {WebGLBuffer} indexBuffer - The index buffer.
+	 * @param {?WebGLBuffer} indexBuffer - The index buffer.
 	 * @return {boolean} Whether a vertex state has been changed or not.
 	 */
 	setVertexState( vao, indexBuffer = null ) {
