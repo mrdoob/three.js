@@ -347,6 +347,7 @@ MathNode.FRACT = 'fract';
 MathNode.SIN = 'sin';
 MathNode.COS = 'cos';
 MathNode.TAN = 'tan';
+MathNode.TANH = 'tanh';
 MathNode.ASIN = 'asin';
 MathNode.ACOS = 'acos';
 MathNode.ATAN = 'atan';
@@ -609,6 +610,16 @@ export const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setPa
  * @returns {Node}
  */
 export const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setParameterLength( 1 );
+
+/**
+ * Returns the hyperbolic tangent of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).setParameterLength( 1 );
 
 /**
  * Returns the arcsine of the parameter.
@@ -1089,6 +1100,7 @@ addMethodChaining( 'fract', fract );
 addMethodChaining( 'sin', sin );
 addMethodChaining( 'cos', cos );
 addMethodChaining( 'tan', tan );
+addMethodChaining( 'tanh', tanh );
 addMethodChaining( 'asin', asin );
 addMethodChaining( 'acos', acos );
 addMethodChaining( 'atan', atan );
