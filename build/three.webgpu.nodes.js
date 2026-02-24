@@ -80999,14 +80999,14 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
- * Copies data of the given source buffer attribute to the given destination buffer attribute.
- *
- * @param {BufferAttribute} srcAttribute - The source buffer attribute.
- * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
- * @param {number} byteLength - The number of bytes to copy.
- * @param {number} [srcOffset=0] - The source offset in bytes.
- * @param {number} [dstOffset=0] - The destination offset in bytes.
- */
+ 	* Copies data of the given source buffer attribute to the given destination buffer attribute.
+ 	*
+ 	* @param {BufferAttribute} srcAttribute - The source buffer attribute.
+ 	* @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+ 	* @param {number} byteLength - The number of bytes to copy.
+ 	* @param {number} [srcOffset=0] - The source offset in bytes.
+ 	* @param {number} [dstOffset=0] - The destination offset in bytes.
+ 	*/
 	copyBufferToBuffer( srcAttribute, dstAttribute, byteLength, srcOffset = 0, dstOffset = 0 ) {
 
 		if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( byteLength & 3 ) !== 0 ) {
@@ -81016,35 +81016,31 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const srcData = this.get( srcAttribute );
-		const dstData = this.get( dstAttribute );
+		// Ensure GPU buffers exist for both src and dst.
+		const getOrCreateBuffer = ( attribute ) => {
 
-		// Source must exist
-		if ( srcData.buffer === undefined ) {
+			const data = this.get( attribute );
 
-			error( 'WebGPUBackend: copyBufferToBuffer: src GPUBuffer is undefined.', { srcId: srcAttribute.id } );
-			return;
+			if ( data.buffer === undefined ) {
 
-		}
+				if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) {
 
-		// Destination may be created.
-		if ( dstData.buffer === undefined ) {
+					this.createStorageAttribute( attribute );
 
-			if ( dstAttribute.isStorageBufferAttribute || dstAttribute.isStorageInstancedBufferAttribute ) {
+				} else {
 
-				this.createStorageAttribute( dstAttribute );
+					this.createAttribute( attribute );
 
-			} else {
-
-				this.createAttribute( dstAttribute );
+				}
 
 			}
 
-		}
+			return data.buffer;
 
-		// Re-fetch buffers after possible create
-		const sourceGPU = this.get( srcAttribute ).buffer;
-		const destinationGPU = this.get( dstAttribute ).buffer;
+		};
+
+		const sourceGPU = getOrCreateBuffer( srcAttribute );
+		const destinationGPU = getOrCreateBuffer( dstAttribute );
 
 		if ( sourceGPU === undefined || destinationGPU === undefined ) {
 
