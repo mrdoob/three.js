@@ -1,6 +1,16 @@
 # FogExp2
 
 This class can be used to define an exponential squared fog, which gives a clear view near the camera and a faster than exponentially densening fog farther from the camera.
+			<p>
+		Unlike <a href="Fog.html">Fog</a>, which uses linear interpolation between near and far values,
+		FogExp2 applies an exponential equation, resulting in a more natural atmospheric attenuation.
+		</p> <p>
+		The fog factor is computed as:
+		</p>
+
+		<pre><code class="language-js">
+fogFactor = 1.0 - exp( - density * density * distance * distance );
+		</code></pre>
 
 ## Code Example
 
