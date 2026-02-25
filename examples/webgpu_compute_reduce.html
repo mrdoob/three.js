@@ -992,8 +992,13 @@
 
 				await renderer.init();
 
-				// Unfortunately, need to arbitrarily run compute shader to get access to device limits
-				renderer.compute( computeResetBuffer );
+				// Arbitrarily initialize renderer backend before rendering begins to access WebGPU device limits
+
+				if ( renderer.backend.device === null ) {
+
+					renderer.backend.init();
+			
+				}
 
 
 				if ( renderer.backend.device !== null ) {
