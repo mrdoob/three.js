@@ -58,15 +58,10 @@
 				new EXRLoader()
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
-						// memorial.exr is NPOT
-
 						//console.log( textureData );
 						//console.log( texture );
 
-						// EXRLoader sets these default settings
-						//texture.generateMipmaps = false;
-						//texture.minFilter = LinearFilter;
-						//texture.magFilter = LinearFilter;
+						texture.colorSpace = THREE.LinearSRGBColorSpace;
 
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
