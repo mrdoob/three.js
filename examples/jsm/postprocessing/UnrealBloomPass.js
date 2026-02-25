@@ -101,21 +101,22 @@ class UnrealBloomPass extends Pass {
 		this.nMips = 5;
 		let resx = Math.round( this.resolution.x / 2 );
 		let resy = Math.round( this.resolution.y / 2 );
+		const renderTargetOptions = { type: HalfFloatType, depthBuffer: false, resolveDepthBuffer: false };
 
-		this.renderTargetBright = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+		this.renderTargetBright = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this.renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this.nMips; i ++ ) {
 
-			const renderTargetHorizontal = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+			const renderTargetHorizontal = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 
 			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this.renderTargetsHorizontal.push( renderTargetHorizontal );
 
-			const renderTargetVertical = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+			const renderTargetVertical = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
