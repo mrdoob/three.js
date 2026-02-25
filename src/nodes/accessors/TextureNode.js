@@ -8,7 +8,7 @@ import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
-import { Compatibility, IntType, LessCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
+import { Compatibility, GreaterCompare, GreaterEqualCompare, IntType, LessCompare, LessEqualCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
 
 import { Texture } from '../../textures/Texture.js';
 import { warn, warnOnce } from '../../utils.js';
@@ -405,7 +405,9 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				if ( this.value.compareFunction === null || this.value.compareFunction === LessCompare ) {
+				const compareFunction = texture.compareFunction;
+
+				if ( compareFunction === null || compareFunction === LessCompare || compareFunction === LessEqualCompare || compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
 
 					compareStepNode = this.compareNode;
 
@@ -413,7 +415,7 @@ class TextureNode extends UniformNode {
 
 					compareNode = this.compareNode;
 
-					warnOnce( 'TSL: Only "LessCompare" is supported for depth texture comparison fallback.' );
+					warnOnce( 'TSL: Only "LessCompare", "LessEqualCompare", "GreaterCompare" and "GreaterEqualCompare" are supported for depth texture comparison fallback.' );
 
 				}
 
@@ -559,7 +561,17 @@ class TextureNode extends UniformNode {
 
 				if ( compareStepSnippet !== null ) {
 
-					snippet = step( expression( compareStepSnippet, 'float' ), expression( snippet, nodeType ) ).build( builder, nodeType );
+					const compareFunction = texture.compareFunction;
+
+					if ( compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
+
+						snippet = step( expression( snippet, nodeType ), expression( compareStepSnippet, 'float' ) ).build( builder, nodeType );
+
+					} else {
+
+						snippet = step( expression( compareStepSnippet, 'float' ), expression( snippet, nodeType ) ).build( builder, nodeType );
+
+					}
 
 				}
 

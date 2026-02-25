@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '183';
+const REVISION = '184dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -53175,6 +53175,15 @@ class AnimationAction {
 
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
+
+			// preserve interpolant settings (like tangent data from BezierInterpolant)
+
+			if ( interpolant.settings ) {
+
+				Object.assign( interpolantSettings, interpolant.settings );
+
+			}
+
 			interpolant.settings = interpolantSettings;
 
 		}
@@ -53981,6 +53990,7 @@ class AnimationAction {
 
 			} else {
 
+				this._loopCount = loopCount;
 				this.time = time;
 
 			}
@@ -54028,7 +54038,7 @@ class AnimationAction {
 
 			} else {
 
-				settings.endingEnd 	 = WrapAroundEnding;
+				settings.endingEnd = WrapAroundEnding;
 
 			}
 
@@ -67083,7 +67093,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 			instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
 
-			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
+			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace ),
 			alphaToCoverage: !! material.alphaToCoverage,
 
 			map: HAS_MAP,
@@ -77528,7 +77538,7 @@ class WebGLRenderer {
 
 			const fog = scene.fog;
 			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
-			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
+			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace );
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			const envMap = environments.get( material.envMap || environment, usePMREM );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;

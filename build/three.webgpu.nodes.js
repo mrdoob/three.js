@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, Compatibility, LessCompare, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RGFormat, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, GreaterEqualCompare, LessEqualCompare, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RGFormat, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
@@ -10835,9 +10835,9 @@ const Return = () => expression( 'return' ).toStack();
 addMethodChaining( 'discard', Discard );
 
 /**
- * Normally, tone mapping and color conversion happens automatically
- * before outputting pixel too the default (screen) framebuffer. In certain
- * post processing setups this happens to late because certain effects
+ * Normally, tone mapping and color conversion happens automatically just
+ * before outputting a pixel to the default (screen) framebuffer. In certain
+ * post processing setups this is too late because some effects such as FXAA
  * require e.g. sRGB input. For such scenarios, `RenderOutputNode` can be used
  * to apply tone mapping and color space conversion at an arbitrary point
  * in the effect chain.
@@ -10964,7 +10964,7 @@ class RenderOutputNode extends TempNode {
 }
 
 /**
- * TSL function for creating a posterize node.
+ * TSL function for creating a render output node.
  *
  * @tsl
  * @function
@@ -12088,7 +12088,9 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				if ( this.value.compareFunction === null || this.value.compareFunction === LessCompare ) {
+				const compareFunction = texture.compareFunction;
+
+				if ( compareFunction === null || compareFunction === LessCompare || compareFunction === LessEqualCompare || compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
 
 					compareStepNode = this.compareNode;
 
@@ -12096,7 +12098,7 @@ class TextureNode extends UniformNode {
 
 					compareNode = this.compareNode;
 
-					warnOnce( 'TSL: Only "LessCompare" is supported for depth texture comparison fallback.' );
+					warnOnce( 'TSL: Only "LessCompare", "LessEqualCompare", "GreaterCompare" and "GreaterEqualCompare" are supported for depth texture comparison fallback.' );
 
 				}
 
@@ -12242,7 +12244,17 @@ class TextureNode extends UniformNode {
 
 				if ( compareStepSnippet !== null ) {
 
-					snippet = step( expression( compareStepSnippet, 'float' ), expression( snippet, nodeType ) ).build( builder, nodeType );
+					const compareFunction = texture.compareFunction;
+
+					if ( compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
+
+						snippet = step( expression( snippet, nodeType ), expression( compareStepSnippet, 'float' ) ).build( builder, nodeType );
+
+					} else {
+
+						snippet = step( expression( compareStepSnippet, 'float' ), expression( snippet, nodeType ) ).build( builder, nodeType );
+
+					}
 
 				}
 
@@ -31425,6 +31437,26 @@ class Pipelines extends DataMap {
 	}
 
 	/**
+	 * Checks if the render pipeline for the given render object is ready for drawing.
+	 * Returns false if the GPU pipeline is still being compiled asynchronously.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {boolean} True if the pipeline is ready for drawing.
+	 */
+	isReady( renderObject ) {
+
+		const data = this.get( renderObject );
+		const pipeline = data.pipeline;
+
+		if ( pipeline === undefined ) return false;
+
+		const pipelineData = this.backend.get( pipeline );
+
+		return pipelineData.pipeline !== undefined && pipelineData.pipeline !== null;
+
+	}
+
+	/**
 	 * Deletes the pipeline for the given render object.
 	 *
 	 * @param {RenderObject} object - The render object.
@@ -43542,8 +43574,9 @@ class ShadowNode extends ShadowBaseNode {
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
 		const shadowMapType = renderer.shadowMap.type;
+		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
-		if ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) {
+		if ( ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) && hasTextureCompare ) {
 
 			depthTexture.minFilter = LinearFilter;
 			depthTexture.magFilter = LinearFilter;
@@ -51837,6 +51870,89 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Async version of build() that yields to main thread between shader stages.
+	 * Use this in compileAsync() to prevent blocking the main thread.
+	 *
+	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
+	 */
+	async buildAsync() {
+
+		const { object, material, renderer } = this;
+
+		if ( material !== null ) {
+
+			let nodeMaterial = renderer.library.fromMaterial( material );
+
+			if ( nodeMaterial === null ) {
+
+				error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+
+				nodeMaterial = new NodeMaterial();
+
+			}
+
+			nodeMaterial.build( this );
+
+		} else {
+
+			this.addFlow( 'compute', object );
+
+		}
+
+		// setup() -> stage 1: create possible new nodes and/or return an output reference node
+		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
+		// generate()  -> stage 3: generate shader
+
+		for ( const buildStage of defaultBuildStages ) {
+
+			this.setBuildStage( buildStage );
+
+			if ( this.context.position && this.context.position.isNode ) {
+
+				this.flowNodeFromShaderStage( 'vertex', this.context.position );
+
+			}
+
+			for ( const shaderStage of shaderStages ) {
+
+				this.setShaderStage( shaderStage );
+
+				const flowNodes = this.flowNodes[ shaderStage ];
+
+				for ( const node of flowNodes ) {
+
+					if ( buildStage === 'generate' ) {
+
+						this.flowNode( node );
+
+					} else {
+
+						node.build( this );
+
+					}
+
+				}
+
+				// Yield to main thread after each shader stage to prevent blocking
+				await yieldToMain();
+
+			}
+
+		}
+
+		this.setBuildStage( null );
+		this.setShaderStage( null );
+
+		// stage 4: build code for a specific output
+
+		this.buildCode();
+		this.buildUpdateNodes();
+
+		return this;
+
+	}
+
+	/**
 	 * Returns shared data object for the given node.
 	 *
 	 * @param {Node} node - The node to get shared data from.
@@ -53339,6 +53455,22 @@ class NodeManager extends DataMap {
 		this.groupsData = new ChainMap();
 
 		/**
+		 * Queue for pending async builds to limit concurrent compilation.
+		 *
+		 * @private
+		 * @type {Array<Function>}
+		 */
+		this._buildQueue = [];
+
+		/**
+		 * Whether an async build is currently in progress.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._buildInProgress = false;
+
+		/**
 		 * A cache for managing node objects of
 		 * scene properties like fog or environments.
 		 *
@@ -53437,12 +53569,43 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Creates a node builder configured for the given render object and material.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Material} material - The material to use.
+	 * @return {NodeBuilder} The configured node builder.
+	 */
+	_createNodeBuilder( renderObject, material ) {
+
+		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+		nodeBuilder.scene = renderObject.scene;
+		nodeBuilder.material = material;
+		nodeBuilder.camera = renderObject.camera;
+		nodeBuilder.context.material = material;
+		nodeBuilder.lightsNode = renderObject.lightsNode;
+		nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
+		nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+		nodeBuilder.clippingContext = renderObject.clippingContext;
+
+		if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+
+			nodeBuilder.enableMultiview();
+
+		}
+
+		return nodeBuilder;
+
+	}
+
+	/**
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {NodeBuilderState} The node builder state.
+	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForRender( renderObject ) {
+	getForRender( renderObject, useAsync = false ) {
 
 		const renderObjectData = this.get( renderObject );
 
@@ -53458,20 +53621,37 @@ class NodeManager extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
-				const createNodeBuilder = ( material ) => {
+				const buildNodeBuilder = async () => {
 
-					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
-					nodeBuilder.scene = renderObject.scene;
-					nodeBuilder.material = material;
-					nodeBuilder.camera = renderObject.camera;
-					nodeBuilder.context.material = material;
-					nodeBuilder.lightsNode = renderObject.lightsNode;
-					nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
-					nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
-					nodeBuilder.clippingContext = renderObject.clippingContext;
-					if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
 
-						nodeBuilder.enableMultiview();
+					try {
+
+						if ( useAsync ) {
+
+							await nodeBuilder.buildAsync();
+
+						} else {
+
+							nodeBuilder.build();
+
+						}
+
+					} catch ( e ) {
+
+						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+
+						if ( useAsync ) {
+
+							await nodeBuilder.buildAsync();
+
+						} else {
+
+							nodeBuilder.build();
+
+						}
+
+						error( 'TSL: ' + e );
 
 					}
 
@@ -53479,34 +53659,52 @@ class NodeManager extends DataMap {
 
 				};
 
-				let nodeBuilder = createNodeBuilder( renderObject.material );
+				if ( useAsync ) {
 
-				try {
+					return buildNodeBuilder().then( ( nodeBuilder ) => {
 
-					nodeBuilder.build();
+						nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+						nodeBuilderCache.set( cacheKey, nodeBuilderState );
+						nodeBuilderState.usedTimes ++;
+						renderObjectData.nodeBuilderState = nodeBuilderState;
 
-				} catch ( e ) {
+						return nodeBuilderState;
 
-					nodeBuilder = createNodeBuilder( new NodeMaterial() );
-					nodeBuilder.build();
+					} );
 
-					let stackTrace = e.stackTrace;
+				} else {
 
-					if ( ! stackTrace && e.stack ) {
+					// Synchronous path - call buildNodeBuilder but don't await
+					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
 
-						// Capture stack trace for JavaScript errors
+					try {
 
-						stackTrace = new StackTrace( e.stack );
+						nodeBuilder.build();
+
+					} catch ( e ) {
+
+						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+						nodeBuilder.build();
+
+						let stackTrace = e.stackTrace;
+
+						if ( ! stackTrace && e.stack ) {
+
+							// Capture stack trace for JavaScript errors
+
+							stackTrace = new StackTrace( e.stack );
+
+						}
+
+						error( 'TSL: ' + e, stackTrace );
 
 					}
 
-					error( 'TSL: ' + e, stackTrace );
+					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+					nodeBuilderCache.set( cacheKey, nodeBuilderState );
 
 				}
-
-				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-
-				nodeBuilderCache.set( cacheKey, nodeBuilderState );
 
 			}
 
@@ -53517,6 +53715,114 @@ class NodeManager extends DataMap {
 		}
 
 		return nodeBuilderState;
+
+	}
+
+	/**
+	 * Async version of getForRender() that yields to main thread during build.
+	 * Use this in compileAsync() to prevent blocking the main thread.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
+	 */
+	getForRenderAsync( renderObject ) {
+
+		const result = this.getForRender( renderObject, true );
+
+		// Ensure we always return a Promise (cache hit returns nodeBuilderState directly)
+		if ( result.then ) {
+
+			return result;
+
+		}
+
+		return Promise.resolve( result );
+
+	}
+
+	/**
+	 * Returns nodeBuilderState if ready, null if pending async build.
+	 * Queues async build on first call for cache miss.
+	 * Use this in render() path to enable non-blocking compilation.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {?NodeBuilderState} The node builder state, or null if still building.
+	 */
+	getForRenderDeferred( renderObject ) {
+
+		const renderObjectData = this.get( renderObject );
+
+		// Already built for this renderObject
+		if ( renderObjectData.nodeBuilderState !== undefined ) {
+
+			return renderObjectData.nodeBuilderState;
+
+		}
+
+		// Check cache with stable key
+		const cacheKey = this.getForRenderCacheKey( renderObject );
+		const nodeBuilderState = this.nodeBuilderCache.get( cacheKey );
+
+		if ( nodeBuilderState !== undefined ) {
+
+			// Cache hit - use it
+			nodeBuilderState.usedTimes ++;
+			renderObjectData.nodeBuilderState = nodeBuilderState;
+			return nodeBuilderState;
+
+		}
+
+		// Cache miss - check if async build already queued
+		if ( renderObjectData.pendingBuild !== true ) {
+
+			// Mark as pending and add to build queue
+			renderObjectData.pendingBuild = true;
+
+			this._buildQueue.push( () => {
+
+				return this.getForRenderAsync( renderObject ).then( () => {
+
+					renderObjectData.pendingBuild = false;
+
+				} );
+
+			} );
+
+			// Start processing queue if not already running
+			this._processBuildQueue();
+
+		}
+
+		return null; // Not ready
+
+	}
+
+	/**
+	 * Processes the build queue one item at a time.
+	 * This ensures builds don't all run simultaneously and freeze the main thread.
+	 *
+	 * @private
+	 */
+	_processBuildQueue() {
+
+		if ( this._buildInProgress || this._buildQueue.length === 0 ) {
+
+			return;
+
+		}
+
+		this._buildInProgress = true;
+
+		const buildFn = this._buildQueue.shift();
+
+		buildFn().then( () => {
+
+			this._buildInProgress = false;
+
+			// Process next item in queue
+			this._processBuildQueue();
+
+		} );
 
 	}
 
@@ -57620,11 +57926,15 @@ class Renderer {
 
 		//
 
-		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
-
 		if ( targetScene === null ) targetScene = scene;
 
-		const renderTarget = this._renderTarget;
+		// Use the actual scene for caching when compiling individual objects
+		// This ensures cache keys match between compileAsync and render
+		const sceneRef = ( scene.isScene === true ) ? scene : ( targetScene.isScene === true ) ? targetScene : _scene;
+
+		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
+		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
@@ -57657,7 +57967,8 @@ class Renderer {
 
 		//
 
-		const renderList = this._renderLists.get( scene, camera );
+		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
+		const renderList = this._renderLists.get( sceneRef, camera );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -57709,7 +58020,7 @@ class Renderer {
 
 		}
 
-		// process render lists
+		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -57728,9 +58039,39 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
-		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
+		// Process compilation work items sequentially to avoid freezing
+		// Yields between objects to keep animation smooth
 
-		await Promise.all( compilationPromises );
+		for ( const item of compilationPromises ) {
+
+			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+			renderObject.drawRange = item.object.geometry.drawRange;
+			renderObject.group = item.group;
+
+			this._geometries.updateForRender( renderObject );
+
+			// Use async node building to yield to main thread
+			await this._nodes.getForRenderAsync( renderObject );
+
+			this._nodes.updateBefore( renderObject );
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateForRender( renderObject );
+
+			// Wait for pipeline creation
+			const pipelinePromises = [];
+			this._pipelines.getForRender( renderObject, pipelinePromises );
+			if ( pipelinePromises.length > 0 ) {
+
+				await Promise.all( pipelinePromises );
+
+			}
+
+			this._nodes.updateAfter( renderObject );
+
+			// Yield between objects to allow animation frames
+			await yieldToMain();
+
+		}
 
 	}
 
@@ -60138,9 +60479,13 @@ class Renderer {
 
 		//
 
-		this.backend.draw( renderObject, this.info );
+		if ( this._pipelines.isReady( renderObject ) ) {
 
-		if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+			this.backend.draw( renderObject, this.info );
+
+			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+
+		}
 
 	}
 
@@ -60160,6 +60505,27 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
+		// If in async compilation mode, queue the work for sequential execution
+		if ( this._compilationPromises !== null ) {
+
+			// Store work items instead of promises - will be processed sequentially
+			this._compilationPromises.push( {
+				object,
+				material,
+				scene,
+				camera,
+				lightsNode,
+				group,
+				clippingContext,
+				passId,
+				renderContext: this._currentRenderContext
+			} );
+
+			return;
+
+		}
+
+		// Sync path
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
@@ -69651,7 +70017,8 @@ class WebGLBackend extends Backend {
 		//
 
 		this.set( pipeline, {
-			programGPU
+			programGPU,
+			pipeline: programGPU
 		} );
 
 	}
@@ -79811,6 +80178,7 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
+		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
 
 		const index = renderObject.getIndex();
@@ -81208,8 +81576,8 @@ class RenderPipeline {
 		 * Whether the default output tone mapping and color
 		 * space transformation should be enabled or not.
 		 *
-		 * It is enabled by default by it must be disabled when
-		 * effects must be executed after tone mapping and color
+		 * This is enabled by default but it must be disabled for
+		 * effects that expect to be executed after tone mapping and color
 		 * space conversion. A typical example is FXAA which
 		 * requires sRGB input.
 		 *
