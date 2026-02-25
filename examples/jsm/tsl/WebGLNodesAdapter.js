@@ -404,13 +404,14 @@ export class WebGLNodesAdapter {
 		nodeFrame.scene = scene;
 		nodeFrame.frameId ++;
 
-		if ( ! sceneContexts.get( scene ) ) {
+		let sceneContext = sceneContexts.get( scene );
+		if ( ! sceneContext ) {
 
-			sceneContexts.set( scene, new SceneContext( renderer, scene ) );
+			sceneContext = new SceneContext( renderer, scene );
+			sceneContexts.set( scene, sceneContext );
 
 		}
 
-		const sceneContext = sceneContexts.get( scene );
 		sceneContext.update();
 		renderStack.push( { sceneContext, camera } );
 
