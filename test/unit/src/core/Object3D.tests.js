@@ -682,6 +682,45 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'visibilitychange event', ( assert ) => {
+
+			const obj = new Object3D();
+			let eventCount = 0;
+			let lastEventVisible = null;
+
+			obj.addEventListener( 'visibilitychange', function ( event ) {
+
+				eventCount ++;
+				lastEventVisible = event.visible;
+
+			} );
+
+			// Initial state
+			assert.strictEqual( obj.visible, true, 'Object starts visible' );
+			assert.strictEqual( eventCount, 0, 'No events fired initially' );
+
+			// Change visibility to false
+			obj.visible = false;
+			assert.strictEqual( obj.visible, false, 'Visibility changed to false' );
+			assert.strictEqual( eventCount, 1, 'Event fired when visibility changed' );
+			assert.strictEqual( lastEventVisible, false, 'Event contains correct visible value (false)' );
+
+			// Set to same value - should not fire event
+			obj.visible = false;
+			assert.strictEqual( eventCount, 1, 'No event fired when setting same value' );
+
+			// Change visibility back to true
+			obj.visible = true;
+			assert.strictEqual( obj.visible, true, 'Visibility changed to true' );
+			assert.strictEqual( eventCount, 2, 'Event fired when visibility changed back' );
+			assert.strictEqual( lastEventVisible, true, 'Event contains correct visible value (true)' );
+
+			// Set to same value again - should not fire event
+			obj.visible = true;
+			assert.strictEqual( eventCount, 2, 'No event fired when setting same value again' );
+
+		} );
+
 		QUnit.test( 'updateMatrix', ( assert ) => {
 
 			const a = new Object3D();
