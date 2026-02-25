@@ -32,7 +32,26 @@ if ( typeof hljs !== 'undefined' ) {
 
 		const element = document.getElementById( hash );
 
-		if ( element ) element.scrollIntoView();
+		if ( element ) {
+
+			// Safari needs a small delay for iframe scrolling
+			const isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
+
+			if ( isSafari ) {
+
+				setTimeout( function () {
+
+					element.scrollIntoView();
+
+				}, 250 );
+
+			} else {
+
+				element.scrollIntoView();
+
+			}
+
+		}
 
 	}
 
