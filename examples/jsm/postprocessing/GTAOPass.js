@@ -27,9 +27,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 
 /**
- * A pass for an GTAO effect.
- *
- * `GTAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
+ * A pass for Ground-Truth Ambient Occlusion (GTAO).
  *
  * ```js
  * const gtaoPass = new GTAOPass( scene, camera, width, height );
@@ -220,6 +218,7 @@ class GTAOPass extends Pass {
 
 		this._fsQuad = new FullScreenQuad( null );
 
+		this._resolutionScale = 1;
 		this._originalClearColor = new Color();
 
 		this.setGBuffer( parameters ? parameters.depthTexture : undefined, parameters ? parameters.normalTexture : undefined );
@@ -239,6 +238,28 @@ class GTAOPass extends Pass {
 	}
 
 	/**
+	 * The resolution scale. Valid values are in the range
+	 * `[0,1]`. `1` means best quality but also results in
+	 * more computational overhead. Setting to `0.5` means
+	 * the effect is computed in half-resolution.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get resolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		this._resolutionScale = value;
+		this.setSize( this.width, this.height ); // force a resize when resolution scaling changes
+
+	}
+
+	/**
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
@@ -249,15 +270,19 @@ class GTAOPass extends Pass {
 		this.width = width;
 		this.height = height;
 
-		this.gtaoRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
-		this.pdRenderTarget.setSize( width, height );
+		const effectiveWidth = Math.round( this.resolutionScale * width );
+		const effectiveHeight = Math.round( this.resolutionScale * height );
 
-		this.gtaoMaterial.uniforms.resolution.value.set( width, height );
+
+		this.gtaoRenderTarget.setSize( effectiveWidth, effectiveHeight );
+		this.normalRenderTarget.setSize( effectiveWidth, effectiveHeight );
+		this.pdRenderTarget.setSize( effectiveWidth, effectiveHeight );
+
+		this.gtaoMaterial.uniforms.resolution.value.set( effectiveWidth, effectiveHeight );
 		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
-		this.pdMaterial.uniforms.resolution.value.set( width, height );
+		this.pdMaterial.uniforms.resolution.value.set( effectiveWidth, effectiveHeight );
 		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 	}
