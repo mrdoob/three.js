@@ -271,7 +271,7 @@ export class WebGLNodesAdapter {
 
 		this.renderer = null;
 		this.nodeFrame = new NodeFrame();
-		this.sceneContexts = new Map();
+		this.sceneContexts = new WeakMap();
 		this.programCache = new Map();
 		this.renderStack = [];
 
