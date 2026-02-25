@@ -79,7 +79,7 @@ function WebGLRenderList() {
 
 	}
 
-	function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+	function getNextRenderItem( object, geometry, material, groupOrder, z, group, effectiveLayers ) {
 
 		let renderItem = renderItems[ renderItemsIndex ];
 
@@ -94,7 +94,8 @@ function WebGLRenderList() {
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
-				group: group
+				group: group,
+				effectiveLayers: effectiveLayers
 			};
 
 			renderItems[ renderItemsIndex ] = renderItem;
@@ -110,6 +111,7 @@ function WebGLRenderList() {
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
+			renderItem.effectiveLayers = effectiveLayers;
 
 		}
 
@@ -119,9 +121,9 @@ function WebGLRenderList() {
 
 	}
 
-	function push( object, geometry, material, groupOrder, z, group ) {
+	function push( object, geometry, material, groupOrder, z, group, effectiveLayers ) {
 
-		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group, effectiveLayers );
 
 		if ( material.transmission > 0.0 ) {
 
@@ -139,9 +141,9 @@ function WebGLRenderList() {
 
 	}
 
-	function unshift( object, geometry, material, groupOrder, z, group ) {
+	function unshift( object, geometry, material, groupOrder, z, group, effectiveLayers ) {
 
-		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group, effectiveLayers );
 
 		if ( material.transmission > 0.0 ) {
 

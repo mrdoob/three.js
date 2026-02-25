@@ -225,7 +225,7 @@ class RenderList {
 	 * @param {ClippingContext} clippingContext - The current clipping context.
 	 * @return {Object} The render item.
 	 */
-	getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext ) {
+	getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext, effectiveLayers ) {
 
 		let renderItem = this.renderItems[ this.renderItemsIndex ];
 
@@ -240,7 +240,8 @@ class RenderList {
 				renderOrder: object.renderOrder,
 				z: z,
 				group: group,
-				clippingContext: clippingContext
+				clippingContext: clippingContext,
+				effectiveLayers: effectiveLayers
 			};
 
 			this.renderItems[ this.renderItemsIndex ] = renderItem;
@@ -256,6 +257,7 @@ class RenderList {
 			renderItem.z = z;
 			renderItem.group = group;
 			renderItem.clippingContext = clippingContext;
+			renderItem.effectiveLayers = effectiveLayers;
 
 		}
 
@@ -276,10 +278,11 @@ class RenderList {
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
 	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 * @param {Layers} effectiveLayers - The effective layers for layer visibility testing.
 	 */
-	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
+	push( object, geometry, material, groupOrder, z, group, clippingContext, effectiveLayers ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext, effectiveLayers );
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
@@ -310,10 +313,11 @@ class RenderList {
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
 	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 * @param {Layers} effectiveLayers - The effective layers for layer visibility testing.
 	 */
-	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {
+	unshift( object, geometry, material, groupOrder, z, group, clippingContext, effectiveLayers ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext, effectiveLayers );
 
 		if ( material.transparent === true || material.transmission > 0 ||
 			( material.transmissionNode && material.transmissionNode.isNode ) ||

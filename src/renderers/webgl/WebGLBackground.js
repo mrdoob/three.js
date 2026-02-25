@@ -165,7 +165,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 			boxMesh.layers.enableAll();
 
 			// push to the pre-sorted opaque render list
-			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null, boxMesh.layers );
 
 		} else if ( background && background.isTexture ) {
 
@@ -230,7 +230,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 			planeMesh.layers.enableAll();
 
 			// push to the pre-sorted opaque render list
-			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null );
+			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null, planeMesh.layers );
 
 		}
 

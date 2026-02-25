@@ -927,9 +927,9 @@ class Renderer {
 		// include lights from target scene
 		if ( targetScene !== scene ) {
 
-			targetScene.traverseVisible( function ( object ) {
+			targetScene.traverseVisibleWithLayers( camera.layers, function ( object ) {
 
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
+				if ( object.isLight ) {
 
 					renderList.pushLight( object );
 
@@ -2932,12 +2932,16 @@ class Renderer {
 	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
 	 * @param {RenderList} renderList - The current render list.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 * @param {Layers|null} inheritedLayers - Layers inherited from a recursive ancestor.
 	 */
-	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
+	_projectObject( object, camera, groupOrder, renderList, clippingContext, inheritedLayers = null ) {
 
 		if ( object.visible === false ) return;
 
-		const visible = object.layers.test( camera.layers );
+		const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+		const visible = effectiveLayers.test( camera.layers );
+
+		if ( visible === false && effectiveLayers.recursive === true ) return;
 
 		if ( visible ) {
 
@@ -2971,7 +2975,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext, effectiveLayers );
 
 					}
 
@@ -3011,7 +3015,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext, effectiveLayers );
 
 							}
 
@@ -3019,7 +3023,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext, effectiveLayers );
 
 					}
 
@@ -3048,11 +3052,13 @@ class Renderer {
 
 		}
 
+		const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 		const children = object.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
+			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext, childInheritedLayers );
 
 		}
 
@@ -3140,9 +3146,9 @@ class Renderer {
 
 		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
 
-			const { object, geometry, material, group, clippingContext } = renderList[ i ];
+			const { object, geometry, material, group, clippingContext, effectiveLayers } = renderList[ i ];
 
-			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
+			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId, effectiveLayers );
 
 		}
 
@@ -3270,8 +3276,9 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?ClippingContext} clippingContext - The clipping context.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
+	 * @param {?Layers} [effectiveLayers=null] - The effective layers for layer visibility testing.
 	 */
-	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null, effectiveLayers = null ) {
 
 		let materialOverride = false;
 		let materialColorNode;
@@ -3338,16 +3345,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide', effectiveLayers ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId, effectiveLayers ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId, effectiveLayers );
 
 		}
 
@@ -3394,12 +3401,14 @@ class Renderer {
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
+	 * @param {?Layers} [effectiveLayers=null] - The effective layers for layer visibility testing.
 	 */
-	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId, effectiveLayers = null ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
+		renderObject.effectiveLayers = effectiveLayers !== null ? effectiveLayers : object.layers;
 
 		if ( this._currentRenderBundle !== null ) {
 
@@ -3453,8 +3462,9 @@ class Renderer {
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
+	 * @param {?Layers} [effectiveLayers=null] - The effective layers for layer visibility testing.
 	 */
-	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId, effectiveLayers = null ) {
 
 		// If in async compilation mode, queue the work for sequential execution
 		if ( this._compilationPromises !== null ) {
@@ -3480,6 +3490,7 @@ class Renderer {
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
+		renderObject.effectiveLayers = effectiveLayers !== null ? effectiveLayers : object.layers;
 
 		//
 

@@ -233,11 +233,16 @@ function ascSort( a, b ) {
 
 }
 
-function intersect( object, raycaster, intersects, recursive ) {
+function intersect( object, raycaster, intersects, recursive, inheritedLayers = null ) {
+
+	const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+	const visible = effectiveLayers.test( raycaster.layers );
+
+	if ( visible === false && effectiveLayers.recursive === true ) return;
 
 	let propagate = true;
 
-	if ( object.layers.test( raycaster.layers ) ) {
+	if ( visible ) {
 
 		const result = object.raycast( raycaster, intersects );
 
@@ -247,11 +252,13 @@ function intersect( object, raycaster, intersects, recursive ) {
 
 	if ( propagate === true && recursive === true ) {
 
+		const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 		const children = object.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			intersect( children[ i ], raycaster, intersects, true );
+			intersect( children[ i ], raycaster, intersects, true, childInheritedLayers );
 
 		}
 
