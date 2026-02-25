@@ -1595,12 +1595,10 @@ class Renderer {
 
 		//
 
-		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
-
-		if ( ! camera.isArrayCamera ) {
+		if ( ! camera.perCameraCulling ) {
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 		}
 
@@ -2957,7 +2955,7 @@ class Renderer {
 
 			} else if ( object.isSprite ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.perCameraCulling ? _frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || frustum.intersectsSprite( object, camera ) ) {
 
@@ -2983,7 +2981,7 @@ class Renderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.perCameraCulling ? _frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || frustum.intersectsObject( object, camera ) ) {
 
