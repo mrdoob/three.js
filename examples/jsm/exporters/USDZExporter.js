@@ -298,6 +298,7 @@ class USDZExporter {
 		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
 
 		let offset = 0;
+		const currentDate = new Date();
 
 		for ( const filename in files ) {
 
@@ -313,7 +314,11 @@ class USDZExporter {
 				const padLength = 64 - offsetMod64;
 				const padding = new Uint8Array( padLength );
 
-				files[ filename ] = [ file, { extra: { 12345: padding } } ];
+				files[ filename ] = [ file, { extra: { 12345: padding }, mtime: currentDate } ];
+
+			} else {
+
+				files[ filename ] = [ file, { mtime: currentDate } ];
 
 			}
 
