@@ -856,6 +856,7 @@ class AnimationAction {
 
 			} else {
 
+				this._loopCount = loopCount;
 				this.time = time;
 
 			}

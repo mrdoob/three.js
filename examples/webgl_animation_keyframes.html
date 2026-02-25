@@ -68,6 +68,8 @@
 			// Sky
 
 			const sky = new Sky();
+			sky.scale.setScalar( 10000 );
+			scene.add( sky );
 
 			const uniforms = sky.material.uniforms;
 			uniforms[ 'turbidity' ].value = 0;
@@ -78,7 +80,6 @@
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 			const environment = pmremGenerator.fromScene( sky ).texture;
-			scene.background = environment;
 			scene.environment = environment;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
