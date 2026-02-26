@@ -15,7 +15,7 @@ class Pipelines extends DataMap {
 	 * Constructs a new pipeline management component.
 	 *
 	 * @param {Backend} backend - The renderer's backend.
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 */
 	constructor( backend, nodes ) {
 
@@ -31,7 +31,7 @@ class Pipelines extends DataMap {
 		/**
 		 * Renderer component for managing nodes related logic.
 		 *
-		 * @type {Nodes}
+		 * @type {NodeManager}
 		 */
 		this.nodes = nodes;
 
