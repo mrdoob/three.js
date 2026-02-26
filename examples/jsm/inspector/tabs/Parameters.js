@@ -314,7 +314,7 @@ class Parameters extends Tab {
 
 	constructor( options = {} ) {
 
-		super( 'Parameters', options );
+		super( options.name || 'Parameters', options );
 
 		const paramList = new List( 'Property', 'Value' );
 		paramList.domElement.classList.add( 'parameters' );

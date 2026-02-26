@@ -775,7 +775,7 @@ export class Style {
 	content: '⋮⋮';
 	position: absolute;
 	left: 3px;
-	top: calc(50% - 2px);
+	top: calc(50% + 1px);
 	transform: translateY(-50%);
 	color: var(--profiler-border);
 	font-size: 18px;
