@@ -1586,7 +1586,21 @@ export class Profiler {
 
 		try {
 
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( { layout } ) );
+			let data = {};
+			const savedData = localStorage.getItem( 'threejs-inspector' );
+
+			if ( savedData ) {
+
+				try {
+
+					data = JSON.parse( savedData );
+
+				} catch ( e ) {}
+
+			}
+
+			data.layout = layout;
+			localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
 		} catch ( e ) {
 
