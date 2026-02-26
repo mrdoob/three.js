@@ -1599,17 +1599,14 @@ export class Profiler {
 		try {
 
 			let data = {};
-			const savedData = localStorage.getItem( 'threejs-inspector' );
-
-			if ( savedData ) {
 
 				try {
 
-					data = JSON.parse( savedData );
+				const savedData = localStorage.getItem( 'threejs-inspector' );
 
-				} catch ( e ) {}
+				data = JSON.parse( savedData || '{}' );
 
-			}
+			} catch ( e ) {}
 
 			data.layout = layout;
 			localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
