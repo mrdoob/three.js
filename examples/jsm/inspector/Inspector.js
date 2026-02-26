@@ -224,12 +224,6 @@ class Inspector extends RendererInspector {
 
 			this.parameters.show();
 
-			if ( this.parameters.isDetached === false ) {
-
-				this.profiler.setActiveTab( this.parameters.id );
-
-			}
-
 		}
 
 		return this.parameters.createGroup( name );

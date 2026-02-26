@@ -56,9 +56,9 @@ export class Style {
 	border-color: var(--accent-color);
 }
 
-#profiler-toggle.hidden {
-	opacity: 0;
-	pointer-events: none;
+#profiler-toggle.panel-open #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.2);
+	color: var(--accent-color);
 }
 
 #toggle-icon {
@@ -72,6 +72,10 @@ export class Style {
 
 #profiler-toggle:hover #toggle-icon {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+#profiler-toggle.panel-open:hover #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.3);
 }
 
 .toggle-separator {

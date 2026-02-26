@@ -416,7 +416,12 @@ export class Profiler {
 
 		this.setupTabDragAndDrop( tab );
 
-		this.tabsContainer.appendChild( tab.button );
+		if ( ! tab.builtin ) {
+
+			this.tabsContainer.appendChild( tab.button );
+
+		}
+
 		this.contentWrapper.appendChild( tab.content );
 
 		// Apply the current visibility state to the DOM elements
@@ -473,88 +478,50 @@ export class Profiler {
 
 			e.stopPropagation(); // Prevent toggle panel from triggering
 
-			const isPanelVisible = this.panel.classList.contains( 'visible' );
+			// Toggle mini-panel for this tab
+			const isCurrentlyActive = miniContent.style.display !== 'none' && miniContent.children.length > 0;
 
-			if ( isPanelVisible ) {
+			// Hide all other mini-panel contents
+			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
 
-				// Panel is visible - navigate to tab
-				if ( ! tab.isVisible ) {
+				content.style.display = 'none';
 
-					tab.show();
+			} );
 
-				}
+			// Remove active state from all builtin buttons
+			this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
 
-				if ( tab.isDetached ) {
+				btn.classList.remove( 'active' );
 
-					// If tab is detached, just bring its window to front
-					if ( tab.detachedWindow ) {
+			} );
 
-						this.bringWindowToFront( tab.detachedWindow.panel );
+			if ( isCurrentlyActive ) {
 
-					}
-
-				} else {
-
-					// Activate the tab
-					this.setActiveTab( tab.id );
-
-				}
+				// Toggle off - hide mini-panel
+				this.miniPanel.classList.remove( 'visible' );
+				miniContent.style.display = 'none';
 
 			} else {
 
-				// Panel is hidden - toggle mini-panel for this tab
-				const isCurrentlyActive = miniContent.style.display !== 'none' && miniContent.children.length > 0;
+				// Toggle on - show mini-panel with this tab's content
+				builtinButton.classList.add( 'active' );
 
-				// Hide all other mini-panel contents
-				this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
+				// Move actual content to mini-panel (not clone) if not already there
+				if ( ! miniContent.firstChild ) {
 
-					content.style.display = 'none';
+					const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
 
-				} );
+					if ( actualContent ) {
 
-				// Remove active state from all builtin buttons
-				this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
-
-					btn.classList.remove( 'active' );
-
-				} );
-
-				if ( isCurrentlyActive ) {
-
-					// Toggle off - hide mini-panel and move content back
-					this.miniPanel.classList.remove( 'visible' );
-					miniContent.style.display = 'none';
-
-					// Move content back to main panel
-					if ( miniContent.firstChild ) {
-
-						tab.content.appendChild( miniContent.firstChild );
+						miniContent.appendChild( actualContent );
 
 					}
-
-				} else {
-
-					// Toggle on - show mini-panel with this tab's content
-					builtinButton.classList.add( 'active' );
-
-					// Move actual content to mini-panel (not clone) if not already there
-					if ( ! miniContent.firstChild ) {
-
-						const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
-
-						if ( actualContent ) {
-
-							miniContent.appendChild( actualContent );
-
-						}
-
-					}
-
-					// Show after content is moved
-					miniContent.style.display = 'block';
-					this.miniPanel.classList.add( 'visible' );
 
 				}
+
+				// Show after content is moved
+				miniContent.style.display = 'block';
+				this.miniPanel.classList.add( 'visible' );
 
 			}
 
@@ -1471,86 +1438,9 @@ export class Profiler {
 	togglePanel() {
 
 		this.panel.classList.toggle( 'visible' );
-		this.toggleButton.classList.toggle( 'hidden' );
+		this.toggleButton.classList.toggle( 'panel-open' );
 
 		const isVisible = this.panel.classList.contains( 'visible' );
-
-		if ( isVisible ) {
-
-			// Save mini-panel state before hiding
-			this.savedMiniPanelState = {
-				isVisible: this.miniPanel.classList.contains( 'visible' ),
-				activeTabId: null,
-				contentMap: {}
-			};
-
-			// Find which tab was active in mini-panel
-			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-				if ( content.style.display !== 'none' && content.firstChild ) {
-
-					// Find the tab that owns this content
-					Object.values( this.tabs ).forEach( tab => {
-
-						if ( tab.miniContent === content ) {
-
-							this.savedMiniPanelState.activeTabId = tab.id;
-							// Move content back to main panel
-							tab.content.appendChild( content.firstChild );
-
-						}
-
-					} );
-
-				}
-
-			} );
-
-			// Hide mini-panel temporarily
-			this.miniPanel.classList.remove( 'visible' );
-
-			// Hide all mini-panel contents
-			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-				content.style.display = 'none';
-
-			} );
-
-			// Remove active state from builtin buttons
-			this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
-
-				btn.classList.remove( 'active' );
-
-			} );
-
-		} else {
-
-			// Restore mini-panel state when minimizing
-			if ( this.savedMiniPanelState && this.savedMiniPanelState.isVisible && this.savedMiniPanelState.activeTabId ) {
-
-				const tab = this.tabs[ this.savedMiniPanelState.activeTabId ];
-
-				if ( tab && tab.miniContent && tab.builtinButton ) {
-
-					// Restore mini-panel visibility
-					this.miniPanel.classList.add( 'visible' );
-					tab.miniContent.style.display = 'block';
-					tab.builtinButton.classList.add( 'active' );
-
-					// Move content back to mini-panel
-					const actualContent = tab.content.querySelector( '.list-scroll-wrapper, .profiler-content > *' );
-
-					if ( actualContent ) {
-
-						tab.miniContent.appendChild( actualContent );
-
-					}
-
-				}
-
-			}
-
-		}
 
 		this.detachedWindows.forEach( detachedWindow => {
 
