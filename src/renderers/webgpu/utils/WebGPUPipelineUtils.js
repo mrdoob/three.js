@@ -350,8 +350,9 @@ class WebGPUPipelineUtils {
 	 *
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
-	createComputePipeline( pipeline, bindings ) {
+	createComputePipeline( pipeline, bindings, promises = null ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -373,12 +374,28 @@ class WebGPUPipelineUtils {
 
 		}
 
-		pipelineGPU.pipeline = device.createComputePipeline( {
+		const descriptor = {
 			compute: computeProgram,
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts
 			} )
-		} );
+		};
+
+		if ( promises !== null && device.createComputePipelineAsync !== undefined ) {
+
+			const promise = device.createComputePipelineAsync( descriptor ).then( function ( pipelineGPUImpl ) {
+
+				pipelineGPU.pipeline = pipelineGPUImpl;
+
+			} );
+
+			promises.push( promise );
+
+		} else {
+
+			pipelineGPU.pipeline = device.createComputePipeline( descriptor );
+
+		}
 
 	}
 
