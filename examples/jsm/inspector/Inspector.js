@@ -4,6 +4,7 @@ import { Profiler } from './ui/Profiler.js';
 import { Performance } from './tabs/Performance.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
+import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
@@ -58,6 +59,9 @@ class Inspector extends RendererInspector {
 
 		const consoleTab = new Console();
 		profiler.addTab( consoleTab );
+
+		const settings = new Settings();
+		profiler.addTab( settings );
 
 		profiler.loadLayout();
 
