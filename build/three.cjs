@@ -15292,7 +15292,7 @@ class Triangle {
 		_v1$5.subVectors( a, b );
 
 		// strictly front facing
-		return ( _v0$3.cross( _v1$5 ).dot( direction ) < 0 ) ? true : false;
+		return _v0$3.cross( _v1$5 ).dot( direction ) < 0;
 
 	}
 
@@ -24520,10 +24520,11 @@ class InstancedMesh extends Mesh {
 	 *
 	 * @param {number} index - The instance index.
 	 * @param {Color} color - The target object that is used to store the method's result.
+	 * @return {Color} A reference to the target color.
 	 */
 	getColorAt( index, color ) {
 
-		color.fromArray( this.instanceColor.array, index * 3 );
+		return color.fromArray( this.instanceColor.array, index * 3 );
 
 	}
 
@@ -24532,10 +24533,11 @@ class InstancedMesh extends Mesh {
 	 *
 	 * @param {number} index - The instance index.
 	 * @param {Matrix4} matrix - The target object that is used to store the method's result.
+	 * @return {Matrix4} A reference to the target matrix.
 	 */
 	getMatrixAt( index, matrix ) {
 
-		matrix.fromArray( this.instanceMatrix.array, index * 16 );
+		return matrix.fromArray( this.instanceMatrix.array, index * 16 );
 
 	}
 
@@ -24621,6 +24623,7 @@ class InstancedMesh extends Mesh {
 	 *
 	 * @param {number} index - The instance index.
 	 * @param {Color} color - The instance color.
+	 * @return {InstancedMesh} A reference to this instanced mesh.
 	 */
 	setColorAt( index, color ) {
 
@@ -24631,6 +24634,7 @@ class InstancedMesh extends Mesh {
 		}
 
 		color.toArray( this.instanceColor.array, index * 3 );
+		return this;
 
 	}
 
@@ -24640,10 +24644,12 @@ class InstancedMesh extends Mesh {
 	 *
 	 * @param {number} index - The instance index.
 	 * @param {Matrix4} matrix - The local transformation.
+	 * @return {InstancedMesh} A reference to this instanced mesh.
 	 */
 	setMatrixAt( index, matrix ) {
 
 		matrix.toArray( this.instanceMatrix.array, index * 16 );
+		return this;
 
 	}
 
@@ -24654,6 +24660,7 @@ class InstancedMesh extends Mesh {
 	 * @param {number} index - The instance index.
 	 * @param {Mesh} object -  A mesh which `morphTargetInfluences` property containing the morph target weights
 	 * of a single instance.
+	 * @return {InstancedMesh} A reference to this instanced mesh.
 	 */
 	setMorphAt( index, object ) {
 
@@ -24684,6 +24691,7 @@ class InstancedMesh extends Mesh {
 		array[ dataIndex ] = morphBaseInfluence;
 
 		array.set( objectInfluences, dataIndex + 1 );
+		return this;
 
 	}
 
@@ -47467,7 +47475,7 @@ class MaterialLoader extends Loader {
 
 			if ( typeof json.vertexColors === 'number' ) {
 
-				material.vertexColors = ( json.vertexColors > 0 ) ? true : false;
+				material.vertexColors = json.vertexColors > 0;
 
 			} else {
 
@@ -59910,7 +59918,7 @@ var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetB
 
 var normal_fragment_begin = "float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = dFdx( vViewPosition );\n\tvec3 fdy = dFdy( vViewPosition );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal *= faceDirection;\n\t#endif\n#endif\n#if defined( USE_NORMALMAP_TANGENTSPACE ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn = getTangentFrame( - vViewPosition, normal,\n\t\t#if defined( USE_NORMALMAP )\n\t\t\tvNormalMapUv\n\t\t#elif defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tvClearcoatNormalMapUv\n\t\t#else\n\t\t\tvUv\n\t\t#endif\n\t\t);\n\t#endif\n\t#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )\n\t\ttbn[0] *= faceDirection;\n\t\ttbn[1] *= faceDirection;\n\t#endif\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn2 = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn2 = getTangentFrame( - vViewPosition, normal, vClearcoatNormalMapUv );\n\t#endif\n\t#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )\n\t\ttbn2[0] *= faceDirection;\n\t\ttbn2[1] *= faceDirection;\n\t#endif\n#endif\nvec3 nonPerturbedNormal = normal;";
 
-var normal_fragment_maps = "#ifdef USE_NORMALMAP_OBJECTSPACE\n\tnormal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( USE_NORMALMAP_TANGENTSPACE )\n\tvec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\tmapN.xy *= normalScale;\n\tnormal = normalize( tbn * mapN );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
+var normal_fragment_maps = "#ifdef USE_NORMALMAP_OBJECTSPACE\n\tnormal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( USE_NORMALMAP_TANGENTSPACE )\n\tvec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#if defined( USE_PACKED_NORMALMAP )\n\t\tmapN = vec3( mapN.xy, sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) ) );\n\t#endif\n\tmapN.xy *= normalScale;\n\tnormal = normalize( tbn * mapN );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
 
 var normal_pars_fragment = "#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif";
 
@@ -66449,6 +66457,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.normalMap ? '#define USE_NORMALMAP' : '',
 			parameters.normalMapObjectSpace ? '#define USE_NORMALMAP_OBJECTSPACE' : '',
 			parameters.normalMapTangentSpace ? '#define USE_NORMALMAP_TANGENTSPACE' : '',
+			parameters.packedNormalMap ? '#define USE_PACKED_NORMALMAP' : '',
 			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
 
 			parameters.anisotropy ? '#define USE_ANISOTROPY' : '',
@@ -66900,6 +66909,12 @@ class WebGLShaderStage {
 
 }
 
+function isPackedRGFormat( format ) {
+
+	return format === RGFormat || format === RG11_EAC_Format || format === RED_GREEN_RGTC2_Format;
+
+}
+
 function WebGLPrograms( renderer, environments, extensions, capabilities, bindingStates, clipping ) {
 
 	const _programLayers = new Layers();
@@ -67110,6 +67125,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
 			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
+			packedNormalMap: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap && isPackedRGFormat( material.normalMap.format	),
 
 			metalnessMap: HAS_METALNESSMAP,
 			roughnessMap: HAS_ROUGHNESSMAP,
@@ -67414,6 +67430,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 20 );
 		if ( parameters.gradientMap )
 			_programLayers.enable( 21 );
+		if ( parameters.packedNormalMap )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -77220,7 +77238,7 @@ class WebGLRenderer {
 					generateMipmaps: true,
 					type: hasHalfFloatSupport ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
-					samples: capabilities.samples,
+					samples: Math.max( 4, capabilities.samples ), // to avoid feedback loops, the transmission render target requires a resolve, see #26177
 					stencilBuffer: stencil,
 					resolveDepthBuffer: false,
 					resolveStencilBuffer: false,
