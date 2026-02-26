@@ -538,9 +538,23 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			for ( let i = 0; i < options.image.depth; i ++ ) {
+			if ( texture.layerUpdates.size > 0 ) {
 
-				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, texture.flipY, i );
+				for ( const layerIndex of texture.layerUpdates ) {
+
+					this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, layerIndex, texture.flipY, layerIndex );
+
+				}
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				for ( let i = 0; i < options.image.depth; i ++ ) {
+
+					this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, texture.flipY, i );
+
+				}
 
 			}
 
