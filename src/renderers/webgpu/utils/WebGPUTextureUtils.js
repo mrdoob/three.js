@@ -539,13 +539,13 @@ class WebGPUTextureUtils {
 		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			if ( texture.layerUpdates.size > 0 ) {
-  
+
 				for ( const layerIndex of texture.layerUpdates ) {
 
 					this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, layerIndex, texture.flipY, layerIndex );
 
 				}
-  
+
 				texture.clearLayerUpdates();
 
 			} else {
