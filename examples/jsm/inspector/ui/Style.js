@@ -52,13 +52,25 @@ export class Style {
 	font-family: var(--font-family);
 }
 
+#profiler-toggle.position-right.panel-open {
+	right: auto;
+	left: 15px;
+	border-radius: 6px 12px 12px 6px;
+	flex-direction: row-reverse;
+}
+
+#profiler-toggle.position-right.panel-open #builtin-tabs-container {
+	border-right: none;
+	border-left: 1px solid #262636;
+}
+
 #profiler-toggle:hover {
 	border-color: var(--accent-color);
 }
 
-#profiler-toggle.hidden {
-	opacity: 0;
-	pointer-events: none;
+#profiler-toggle.panel-open #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.2);
+	color: var(--accent-color);
 }
 
 #toggle-icon {
@@ -72,6 +84,10 @@ export class Style {
 
 #profiler-toggle:hover #toggle-icon {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+#profiler-toggle.panel-open:hover #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.3);
 }
 
 .toggle-separator {
@@ -164,6 +180,11 @@ export class Style {
 	transform: translateY(-10px) scale(0.98);
 	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
 	            transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#profiler-mini-panel.position-right.panel-open {
+	right: auto;
+	left: 15px;
 }
 
 #profiler-mini-panel.visible {
