@@ -1600,7 +1600,7 @@ export class Profiler {
 
 			let data = {};
 
-				try {
+			try {
 
 				const savedData = localStorage.getItem( 'threejs-inspector' );
 
