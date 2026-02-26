@@ -256,6 +256,13 @@ export class Profiler {
 		// Set initial position class
 		this.panel.classList.add( `position-${this.position}` );
 
+		if ( this.position === 'right' ) {
+
+			this.toggleButton.classList.add( 'position-right' );
+			this.miniPanel.classList.add( 'position-right' );
+
+		}
+
 	}
 
 	setupResizing() {
@@ -1439,6 +1446,7 @@ export class Profiler {
 
 		this.panel.classList.toggle( 'visible' );
 		this.toggleButton.classList.toggle( 'panel-open' );
+		this.miniPanel.classList.toggle( 'panel-open' );
 
 		const isVisible = this.panel.classList.contains( 'visible' );
 
@@ -1488,6 +1496,8 @@ export class Profiler {
 			// Apply right position styles
 			this.panel.classList.remove( 'position-bottom' );
 			this.panel.classList.add( 'position-right' );
+			this.toggleButton.classList.add( 'position-right' );
+			this.miniPanel.classList.add( 'position-right' );
 			this.panel.style.bottom = '';
 			this.panel.style.top = '0';
 			this.panel.style.right = '0';
@@ -1516,6 +1526,8 @@ export class Profiler {
 			// Apply bottom position styles
 			this.panel.classList.remove( 'position-right' );
 			this.panel.classList.add( 'position-bottom' );
+			this.toggleButton.classList.remove( 'position-right' );
+			this.miniPanel.classList.remove( 'position-right' );
 			this.panel.style.top = '';
 			this.panel.style.right = '';
 			this.panel.style.bottom = '0';
@@ -1734,6 +1746,8 @@ export class Profiler {
 
 				this.panel.classList.remove( 'position-bottom' );
 				this.panel.classList.add( 'position-right' );
+				this.toggleButton.classList.add( 'position-right' );
+				this.miniPanel.classList.add( 'position-right' );
 				this.panel.style.bottom = '';
 				this.panel.style.top = '0';
 				this.panel.style.right = '0';
@@ -1769,6 +1783,13 @@ export class Profiler {
 
 			// Update panel size after loading layout
 			this.updatePanelSize();
+
+			// Ensure initial open state applies to mini panel as well
+			if ( this.panel.classList.contains( 'visible' ) ) {
+
+				this.miniPanel.classList.add( 'panel-open' );
+
+			}
 
 		} catch ( e ) {
 
