@@ -1586,7 +1586,7 @@ export class Profiler {
 
 		try {
 
-			localStorage.setItem( 'profiler-layout', JSON.stringify( layout ) );
+			localStorage.setItem( 'threejs-inspector', JSON.stringify( { layout } ) );
 
 		} catch ( e ) {
 
@@ -1600,11 +1600,14 @@ export class Profiler {
 
 		try {
 
-			const savedLayout = localStorage.getItem( 'profiler-layout' );
+			const savedData = localStorage.getItem( 'threejs-inspector' );
 
-			if ( ! savedLayout ) return;
+			if ( ! savedData ) return;
 
-			const layout = JSON.parse( savedLayout );
+			const parsedData = JSON.parse( savedData );
+			const layout = parsedData.layout;
+
+			if ( ! layout ) return;
 
 			// Constrain detached tabs positions to current screen bounds
 			if ( layout.detachedTabs && layout.detachedTabs.length > 0 ) {
