@@ -1,8 +1,12 @@
 import {
 	AnimationClip,
+	BoxGeometry,
 	BufferAttribute,
 	BufferGeometry,
+	CapsuleGeometry,
 	ClampToEdgeWrapping,
+	ConeGeometry,
+	CylinderGeometry,
 	Euler,
 	Group,
 	Matrix4,
@@ -20,6 +24,7 @@ import {
 	SkinnedMesh,
 	Skeleton,
 	Bone,
+	SphereGeometry,
 	SRGBColorSpace,
 	Texture,
 	Vector2,
@@ -681,6 +686,16 @@ class USDComposer {
 				parent.add( obj );
 				this._buildHierarchy( obj, path );
 
+			} else if ( typeName === 'Cube' || typeName === 'Sphere' || typeName === 'Cylinder' || typeName === 'Cone' || typeName === 'Capsule' ) {
+
+				const obj = this._buildGeomPrimitive( path, spec, typeName );
+				if ( obj ) {
+
+					parent.add( obj );
+					this._buildHierarchy( obj, path );
+
+				}
+
 			} else if ( typeName === 'Material' || typeName === 'Shader' || typeName === 'GeomSubset' ) {
 
 				// Skip materials/shaders/subsets, they're referenced by meshes
@@ -1070,6 +1085,86 @@ class USDComposer {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Build a mesh from a USD geometric primitive (Cube, Sphere, Cylinder, Cone, Capsule).
+	 */
+	_buildGeomPrimitive( path, spec, typeName ) {
+
+		const attrs = this._getAttributes( path );
+		const name = path.split( '/' ).pop();
+
+		let geometry;
+
+		switch ( typeName ) {
+
+			case 'Cube': {
+
+				const size = attrs[ 'size' ] || 2;
+				geometry = new BoxGeometry( size, size, size );
+				break;
+
+			}
+
+			case 'Sphere': {
+
+				const radius = attrs[ 'radius' ] || 1;
+				geometry = new SphereGeometry( radius, 32, 16 );
+				break;
+
+			}
+
+			case 'Cylinder': {
+
+				const height = attrs[ 'height' ] || 2;
+				const radius = attrs[ 'radius' ] || 1;
+				geometry = new CylinderGeometry( radius, radius, height, 32 );
+				break;
+
+			}
+
+			case 'Cone': {
+
+				const height = attrs[ 'height' ] || 2;
+				const radius = attrs[ 'radius' ] || 1;
+				geometry = new ConeGeometry( radius, height, 32 );
+				break;
+
+			}
+
+			case 'Capsule': {
+
+				const height = attrs[ 'height' ] || 1;
+				const radius = attrs[ 'radius' ] || 0.5;
+				geometry = new CapsuleGeometry( radius, height, 16, 32 );
+				break;
+
+			}
+
+		}
+
+		// USD defaults axis to "Z", Three.js uses Y
+		const axis = attrs[ 'axis' ] || 'Z';
+
+		if ( axis === 'X' ) {
+
+			geometry.rotateZ( - Math.PI / 2 );
+
+		} else if ( axis === 'Z' ) {
+
+			geometry.rotateX( Math.PI / 2 );
+
+		}
+
+		const material = this._buildMaterial( path, spec.fields );
+		const mesh = new Mesh( geometry, material );
+		mesh.name = name;
+
+		this.applyTransform( mesh, spec.fields, attrs );
+
+		return mesh;
 
 	}
 
