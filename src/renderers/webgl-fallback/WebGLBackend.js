@@ -271,7 +271,23 @@ class WebGLBackend extends Backend {
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
 
-		if ( parameters.reversedDepthBuffer === true && this.extensions.has( 'EXT_clip_control' ) ) {
+		if ( parameters.reversedDepthBuffer ) {
+
+			if ( this.extensions.has( 'EXT_clip_control' ) ) {
+
+				renderer.reversedDepthBuffer = true;
+
+			} else {
+
+				warn( 'WebGPURenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.' );
+
+				renderer.reversedDepthBuffer = false;
+
+			}
+
+		}
+
+		if ( renderer.reversedDepthBuffer ) {
 
 			this.state.setReversedDepth( true );
 
