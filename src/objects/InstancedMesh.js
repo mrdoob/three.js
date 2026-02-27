@@ -217,7 +217,15 @@ class InstancedMesh extends Mesh {
 	 */
 	getColorAt( index, color ) {
 
-		return color.fromArray( this.instanceColor.array, index * 3 );
+		if ( this.instanceColor === null ) {
+
+			return color.setRGB( 1, 1, 1 );
+
+		} else {
+
+			return color.fromArray( this.instanceColor.array, index * 3 );
+
+		}
 
 	}
 
