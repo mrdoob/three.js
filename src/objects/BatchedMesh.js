@@ -1135,7 +1135,15 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 		if ( this._colorsTexture === null ) {
 
-			return color.setRGB( 1, 1, 1 );
+			if ( color.isVector4 ) {
+
+				return color.set( 1, 1, 1, 1 );
+
+			} else {
+
+				return color.setRGB( 1, 1, 1 );
+
+			}
 
 		} else {
 
