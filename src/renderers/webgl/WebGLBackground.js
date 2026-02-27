@@ -4,7 +4,6 @@ import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Euler } from '../../math/Euler.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Mesh } from '../../objects/Mesh.js';
