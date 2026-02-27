@@ -1673,25 +1673,7 @@ class USDComposer {
 				const skinIndices = new Uint16Array( numVertices * 4 );
 				const skinWeights = new Float32Array( numVertices * 4 );
 
-				for ( let i = 0; i < numVertices; i ++ ) {
-
-					for ( let j = 0; j < 4; j ++ ) {
-
-						if ( j < elementSize ) {
-
-							skinIndices[ i * 4 + j ] = skinIndexData[ i * elementSize + j ] || 0;
-							skinWeights[ i * 4 + j ] = skinWeightData[ i * elementSize + j ] || 0;
-
-						} else {
-
-							skinIndices[ i * 4 + j ] = 0;
-							skinWeights[ i * 4 + j ] = 0;
-
-						}
-
-					}
-
-				}
+				this._selectTopWeights( skinIndexData, skinWeightData, elementSize, numVertices, skinIndices, skinWeights );
 
 				geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndices, 4 ) );
 				geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeights, 4 ) );
@@ -1867,8 +1849,8 @@ class USDComposer {
 		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
 		const uv1Data = uvs2 ? new Float32Array( vertexCount * 2 ) : null;
 		const normalData = ( normals || vertexNormals ) ? new Float32Array( vertexCount * 3 ) : null;
-		const skinIndexData = jointIndices ? new Uint16Array( vertexCount * 4 ) : null;
-		const skinWeightData = jointWeights ? new Float32Array( vertexCount * 4 ) : null;
+		const skinSrcIndices = jointIndices ? new Uint16Array( vertexCount * elementSize ) : null;
+		const skinSrcWeights = jointWeights ? new Float32Array( vertexCount * elementSize ) : null;
 
 		for ( let i = 0; i < sortedTriangles.length; i ++ ) {
 
@@ -1943,21 +1925,12 @@ class USDComposer {
 
 				}
 
-				if ( skinIndexData && skinWeightData && jointIndices && jointWeights ) {
+				if ( skinSrcIndices && skinSrcWeights && jointIndices && jointWeights ) {
 
-					for ( let j = 0; j < 4; j ++ ) {
+					for ( let j = 0; j < elementSize; j ++ ) {
 
-						if ( j < elementSize ) {
-
-							skinIndexData[ newIdx * 4 + j ] = jointIndices[ pointIdx * elementSize + j ] || 0;
-							skinWeightData[ newIdx * 4 + j ] = jointWeights[ pointIdx * elementSize + j ] || 0;
-
-						} else {
-
-							skinIndexData[ newIdx * 4 + j ] = 0;
-							skinWeightData[ newIdx * 4 + j ] = 0;
-
-						}
+						skinSrcIndices[ newIdx * elementSize + j ] = jointIndices[ pointIdx * elementSize + j ] || 0;
+						skinSrcWeights[ newIdx * elementSize + j ] = jointWeights[ pointIdx * elementSize + j ] || 0;
 
 					}
 
@@ -1983,19 +1956,115 @@ class USDComposer {
 
 		geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
 
-		if ( skinIndexData ) {
+		if ( skinSrcIndices && skinSrcWeights ) {
+
+			const skinIndexData = new Uint16Array( vertexCount * 4 );
+			const skinWeightData = new Float32Array( vertexCount * 4 );
+
+			this._selectTopWeights( skinSrcIndices, skinSrcWeights, elementSize, vertexCount, skinIndexData, skinWeightData );
 
 			geometry.setAttribute( 'skinIndex', new BufferAttribute( skinIndexData, 4 ) );
-
-		}
-
-		if ( skinWeightData ) {
-
 			geometry.setAttribute( 'skinWeight', new BufferAttribute( skinWeightData, 4 ) );
 
 		}
 
 		return geometry;
+
+	}
+
+	_selectTopWeights( srcIndices, srcWeights, elementSize, numVertices, dstIndices, dstWeights ) {
+
+		if ( elementSize <= 4 ) {
+
+			for ( let i = 0; i < numVertices; i ++ ) {
+
+				for ( let j = 0; j < 4; j ++ ) {
+
+					if ( j < elementSize ) {
+
+						dstIndices[ i * 4 + j ] = srcIndices[ i * elementSize + j ] || 0;
+						dstWeights[ i * 4 + j ] = srcWeights[ i * elementSize + j ] || 0;
+
+					} else {
+
+						dstIndices[ i * 4 + j ] = 0;
+						dstWeights[ i * 4 + j ] = 0;
+
+					}
+
+				}
+
+			}
+
+			return;
+
+		}
+
+		// When elementSize > 4, find the 4 largest weights per vertex
+		// using a partial selection sort (4 iterations of O(elementSize)).
+		const order = new Uint32Array( elementSize );
+
+		for ( let i = 0; i < numVertices; i ++ ) {
+
+			const base = i * elementSize;
+
+			for ( let j = 0; j < elementSize; j ++ ) order[ j ] = j;
+
+			for ( let k = 0; k < 4; k ++ ) {
+
+				let maxIdx = k;
+				let maxW = srcWeights[ base + order[ k ] ] || 0;
+
+				for ( let j = k + 1; j < elementSize; j ++ ) {
+
+					const w = srcWeights[ base + order[ j ] ] || 0;
+
+					if ( w > maxW ) {
+
+						maxW = w;
+						maxIdx = j;
+
+					}
+
+				}
+
+				if ( maxIdx !== k ) {
+
+					const tmp = order[ k ];
+					order[ k ] = order[ maxIdx ];
+					order[ maxIdx ] = tmp;
+
+				}
+
+			}
+
+			let total = 0;
+
+			for ( let j = 0; j < 4; j ++ ) {
+
+				total += srcWeights[ base + order[ j ] ] || 0;
+
+			}
+
+			for ( let j = 0; j < 4; j ++ ) {
+
+				const s = order[ j ];
+
+				if ( total > 0 ) {
+
+					dstIndices[ i * 4 + j ] = srcIndices[ base + s ] || 0;
+					dstWeights[ i * 4 + j ] = ( srcWeights[ base + s ] || 0 ) / total;
+
+				} else {
+
+					dstIndices[ i * 4 + j ] = 0;
+					dstWeights[ i * 4 + j ] = 0;
+
+				}
+
+			}
+
+		}
 
 	}
 
@@ -3730,13 +3799,67 @@ class USDComposer {
 
 		}
 
-		// Apply rest transforms to bones (local transforms)
-		if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
+		// Derive bone local transforms from bind transforms.
+		// The bind transforms are world-space matrices, so we compute each
+		// bone's local transform as: inverse(parentBind) * childBind.
+		// This ensures the skeleton is posed at the bind pose, where the
+		// mesh appears correctly without deformation. Using restTransforms
+		// can produce distortion when the rest pose differs from the bind pose.
+		if ( bindTransforms && bindTransforms.length >= joints.length * 16 ) {
+
+			const bindMatrices = [];
 
 			for ( let i = 0; i < joints.length; i ++ ) {
 
+				const m = bindTransforms.slice( i * 16, ( i + 1 ) * 16 );
+				const mat = new Matrix4();
+				mat.set(
+					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
+					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
+					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
+					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
+				);
+				bindMatrices.push( mat );
+
+			}
+
+			for ( let i = 0; i < joints.length; i ++ ) {
+
+				const jointPath = joints[ i ];
+				const parts = jointPath.split( '/' );
+				let localMatrix;
+
+				if ( parts.length > 1 ) {
+
+					const parentPath = parts.slice( 0, - 1 ).join( '/' );
+					const parentData = bonesByPath[ parentPath ];
+
+					if ( parentData ) {
+
+						localMatrix = bindMatrices[ parentData.index ].clone().invert().multiply( bindMatrices[ i ] );
+
+					} else {
+
+						localMatrix = bindMatrices[ i ];
+
+					}
+
+				} else {
+
+					localMatrix = bindMatrices[ i ];
+
+				}
+
+				localMatrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
+
+			}
+
+		} else if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
+
+			// Fallback to rest transforms if no bind transforms available
+			for ( let i = 0; i < joints.length; i ++ ) {
+
 				const matrix = new Matrix4();
-				// USD matrices are row-major, Three.js is column-major - need to transpose
 				const m = restTransforms.slice( i * 16, ( i + 1 ) * 16 );
 				matrix.set(
 					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
