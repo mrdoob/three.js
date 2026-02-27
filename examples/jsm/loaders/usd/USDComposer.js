@@ -443,18 +443,37 @@ class USDComposer {
 
 				}
 
-				// Build shader index (shaders are children of materials)
+				// Build shader index (shaders are children or descendants of materials)
 				if ( typeName === 'Shader' && lastSlash > 0 ) {
 
-					const materialPath = path.slice( 0, lastSlash );
+					// Walk up ancestors to find the nearest Material prim.
+					// Shaders may be direct children of a Material, or nested
+					// inside a NodeGraph (common with MaterialX materials).
 
-					if ( ! this.shadersByMaterialPath.has( materialPath ) ) {
+					let ancestorPath = path.slice( 0, lastSlash );
 
-						this.shadersByMaterialPath.set( materialPath, [] );
+					while ( ancestorPath.length > 0 ) {
+
+						const ancestorSpec = this.specsByPath[ ancestorPath ];
+
+						if ( ancestorSpec && ancestorSpec.specType === SpecType.Prim && ancestorSpec.fields.typeName === 'Material' ) {
+
+							if ( ! this.shadersByMaterialPath.has( ancestorPath ) ) {
+
+								this.shadersByMaterialPath.set( ancestorPath, [] );
+
+							}
+
+							this.shadersByMaterialPath.get( ancestorPath ).push( path );
+							break;
+
+						}
+
+						const slash = ancestorPath.lastIndexOf( '/' );
+						if ( slash <= 0 ) break;
+						ancestorPath = ancestorPath.slice( 0, slash );
 
 					}
-
-					this.shadersByMaterialPath.get( materialPath ).push( path );
 
 				}
 
@@ -2705,7 +2724,7 @@ class USDComposer {
 			const shaderAttrs = this._getAttributes( path );
 			const infoId = shaderAttrs[ 'info:id' ] || spec.fields[ 'info:id' ];
 
-			if ( infoId === 'UsdPreviewSurface' ) {
+			if ( infoId === 'UsdPreviewSurface' || infoId === 'ND_UsdPreviewSurface_surfaceshader' ) {
 
 				this._applyPreviewSurface( material, path );
 
