@@ -4,7 +4,6 @@ import { Euler } from '../../math/Euler.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 
-const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _m = /*@__PURE__*/ new Matrix3();
 

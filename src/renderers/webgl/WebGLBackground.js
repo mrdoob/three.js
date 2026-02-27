@@ -12,7 +12,6 @@ import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms, getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 const _rgb = { r: 0, b: 0, g: 0 };
-const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _m = /*@__PURE__*/ new Matrix3();
 
