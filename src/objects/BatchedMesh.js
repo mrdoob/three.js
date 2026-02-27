@@ -1133,7 +1133,15 @@ class BatchedMesh extends Mesh {
 	getColorAt( instanceId, color ) {
 
 		this.validateInstanceId( instanceId );
-		return color.fromArray( this._colorsTexture.image.data, instanceId * 4 );
+		if ( this._colorsTexture === null ) {
+
+			return color.setRGB( 1, 1, 1 );
+
+		} else {
+
+			return color.fromArray( this._colorsTexture.image.data, instanceId * 4 );
+
+		}
 
 	}
 
