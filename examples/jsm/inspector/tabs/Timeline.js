@@ -171,6 +171,7 @@ class Timeline extends Tab {
 		this.hoverIndicator.style.pointerEvents = 'none';
 		this.hoverIndicator.style.display = 'none';
 		this.hoverIndicator.style.zIndex = '9';
+		this.hoverIndicator.style.transform = 'translateX(-50%)';
 		this.graphSlider.appendChild( this.hoverIndicator );
 
 		// Playhead indicator (vertical line)
@@ -295,12 +296,14 @@ class Timeline extends Tab {
 				let localFrameIndex = Math.round( ( x - offset ) / pointStep );
 				localFrameIndex = Math.max( 0, Math.min( localFrameIndex, pointCount - 1 ) );
 
-				const snappedX = offset + localFrameIndex * pointStep;
+				let snappedX = offset + localFrameIndex * pointStep;
+				snappedX = Math.max( 1, Math.min( snappedX, rect.width - 1 ) );
 				this.hoverIndicator.style.left = snappedX + 'px';
 
 			} else {
 
-				this.hoverIndicator.style.left = x + 'px';
+				const clampedX = Math.max( 1, Math.min( x, rect.width - 1 ) );
+				this.hoverIndicator.style.left = clampedX + 'px';
 
 			}
 
@@ -380,12 +383,14 @@ class Timeline extends Tab {
 					let localFrameIndex = Math.round( ( x - offset ) / pointStep );
 					localFrameIndex = Math.max( 0, Math.min( localFrameIndex, pointCount - 1 ) );
 
-					const snappedX = offset + localFrameIndex * pointStep;
+					let snappedX = offset + localFrameIndex * pointStep;
+					snappedX = Math.max( 1, Math.min( snappedX, rect.width - 1 ) );
 					this.hoverIndicator.style.left = snappedX + 'px';
 
 				} else {
 
-					this.hoverIndicator.style.left = x + 'px';
+					const clampedX = Math.max( 1, Math.min( x, rect.width - 1 ) );
+					this.hoverIndicator.style.left = clampedX + 'px';
 
 				}
 
@@ -729,7 +734,8 @@ class Timeline extends Tab {
 			// The graph translates (slides) back if points length < maxPoints
 			// which means point 0 is at offset
 			const offset = rect.width - ( ( pointCount - 1 ) * pointStep );
-			const xPos = offset + ( localIndex * pointStep );
+			let xPos = offset + ( localIndex * pointStep );
+			xPos = Math.max( 1, Math.min( xPos, rect.width - 1 ) );
 
 			this.playhead.style.left = xPos + 'px';
 			this.playhead.style.display = 'block';
