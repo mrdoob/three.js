@@ -20,8 +20,8 @@ class Timeline extends Tab {
 
 		this.graph = new Graph( LIMIT ); // Accommodate standard graph points
 		// Make lines in timeline graph
-		this.graph.addLine( 'fps', '--accent-color' );
-		this.graph.addLine( 'calls', '--color-yellow' );
+		this.graph.addLine( 'fps', 'var( --color-fps )' );
+		this.graph.addLine( 'calls', 'var( --color-call )' );
 
 		this.buildHeader();
 		this.buildUI();
