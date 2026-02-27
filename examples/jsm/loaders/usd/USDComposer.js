@@ -112,6 +112,17 @@ class USDComposer {
 		// Bind skeletons to skinned meshes
 		this._bindSkeletons();
 
+		// Expose skeleton on the root group so that AnimationMixer's
+		// PropertyBinding.findNode resolves bone names before scene objects.
+		// Without this, Xform prims that share a name with a skeleton joint
+		// would be animated instead of the bone.
+		const skeletonPaths = Object.keys( this.skeletons );
+		if ( skeletonPaths.length === 1 ) {
+
+			group.skeleton = this.skeletons[ skeletonPaths[ 0 ] ].skeleton;
+
+		}
+
 		// Build animations
 		group.animations = this._buildAnimations();
 
