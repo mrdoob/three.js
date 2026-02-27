@@ -3799,64 +3799,12 @@ class USDComposer {
 
 		}
 
-		// Derive bone local transforms from bind transforms.
-		// The bind transforms are world-space matrices, so we compute each
-		// bone's local transform as: inverse(parentBind) * childBind.
-		// This ensures the skeleton is posed at the bind pose, where the
-		// mesh appears correctly without deformation. Using restTransforms
-		// can produce distortion when the rest pose differs from the bind pose.
-		if ( bindTransforms && bindTransforms.length >= joints.length * 16 ) {
+		// Apply rest transforms as bone local transforms.
+		// Rest transforms are the skeleton's default local-space pose and match
+		// the reference frame used by SkelAnimation data. Bind transforms are
+		// world-space matrices used only for computing inverse bind matrices.
+		if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
 
-			const bindMatrices = [];
-
-			for ( let i = 0; i < joints.length; i ++ ) {
-
-				const m = bindTransforms.slice( i * 16, ( i + 1 ) * 16 );
-				const mat = new Matrix4();
-				mat.set(
-					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
-					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
-					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
-					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
-				);
-				bindMatrices.push( mat );
-
-			}
-
-			for ( let i = 0; i < joints.length; i ++ ) {
-
-				const jointPath = joints[ i ];
-				const parts = jointPath.split( '/' );
-				let localMatrix;
-
-				if ( parts.length > 1 ) {
-
-					const parentPath = parts.slice( 0, - 1 ).join( '/' );
-					const parentData = bonesByPath[ parentPath ];
-
-					if ( parentData ) {
-
-						localMatrix = bindMatrices[ parentData.index ].clone().invert().multiply( bindMatrices[ i ] );
-
-					} else {
-
-						localMatrix = bindMatrices[ i ];
-
-					}
-
-				} else {
-
-					localMatrix = bindMatrices[ i ];
-
-				}
-
-				localMatrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
-
-			}
-
-		} else if ( restTransforms && restTransforms.length >= joints.length * 16 ) {
-
-			// Fallback to rest transforms if no bind transforms available
 			for ( let i = 0; i < joints.length; i ++ ) {
 
 				const matrix = new Matrix4();
