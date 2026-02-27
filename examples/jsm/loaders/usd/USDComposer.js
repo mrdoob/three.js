@@ -115,6 +115,15 @@ class USDComposer {
 		// Build animations
 		group.animations = this._buildAnimations();
 
+		// Handle metersPerUnit scaling
+		const metersPerUnit = rootFields.metersPerUnit;
+
+		if ( metersPerUnit !== undefined && metersPerUnit !== 1 ) {
+
+			group.scale.setScalar( metersPerUnit );
+
+		}
+
 		// Handle Z-up to Y-up conversion
 		if ( rootSpec && rootSpec.fields && rootSpec.fields.upAxis === 'Z' ) {
 
