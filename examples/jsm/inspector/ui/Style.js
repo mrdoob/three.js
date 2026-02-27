@@ -16,6 +16,8 @@ export class Style {
 	--color-green: #4caf50;
 	--color-yellow: #ffc107;
 	--color-red: #f44336;
+	--color-fps: rgb(63, 81, 181);
+	--color-call: rgba(255, 185, 34, 1);
 	--font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	--font-mono: 'Fira Code', 'Courier New', Courier, monospace;
 }
@@ -775,7 +777,7 @@ export class Style {
 	content: '⋮⋮';
 	position: absolute;
 	left: 3px;
-	top: calc(50% + 1px);
+	top: calc(50% - .1rem);
 	transform: translateY(-50%);
 	color: var(--profiler-border);
 	font-size: 18px;

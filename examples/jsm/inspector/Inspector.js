@@ -6,6 +6,7 @@ import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
 import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
+import { Timeline } from './tabs/Timeline.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
@@ -57,6 +58,9 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
+		const timeline = new Timeline();
+		profiler.addTab( timeline );
+
 		const consoleTab = new Console();
 		profiler.addTab( consoleTab );
 
@@ -78,6 +82,7 @@ class Inspector extends RendererInspector {
 		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
+		this.timeline = timeline;
 		this.once = {};
 
 		this.displayCycle = {
@@ -213,6 +218,8 @@ class Inspector extends RendererInspector {
 					}
 
 				} );
+
+				this.timeline.setRenderer( renderer );
 
 			}
 

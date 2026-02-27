@@ -1440,6 +1440,8 @@ export class Profiler {
 
 		}
 
+		this.saveLayout();
+
 	}
 
 	togglePanel() {
@@ -1467,6 +1469,8 @@ export class Profiler {
 			}
 
 		} );
+
+		this.saveLayout();
 
 	}
 
@@ -1565,12 +1569,15 @@ export class Profiler {
 
 	saveLayout() {
 
+		if ( this.isLoadingLayout ) return;
+
 		const layout = {
 			position: this.position,
 			lastHeightBottom: this.lastHeightBottom,
 			lastWidthRight: this.lastWidthRight,
 			activeTabId: this.activeTabId,
-			detachedTabs: []
+			detachedTabs: [],
+			isVisible: this.panel.classList.contains( 'visible' )
 		};
 
 		// Save detached windows state
@@ -1613,6 +1620,8 @@ export class Profiler {
 	}
 
 	loadLayout() {
+
+		this.isLoadingLayout = true;
 
 		try {
 
@@ -1751,16 +1760,16 @@ export class Profiler {
 
 			}
 
+			if ( layout.isVisible ) {
+
+				this.panel.classList.add( 'visible' );
+				this.toggleButton.classList.add( 'panel-open' );
+
+			}
+
 			if ( layout.activeTabId ) {
 
-				const willBeDetached = layout.detachedTabs &&
-					layout.detachedTabs.some( dt => dt.tabId === layout.activeTabId );
-
-				if ( willBeDetached ) {
-
-					this.setActiveTab( layout.activeTabId );
-
-				}
+				this.setActiveTab( layout.activeTabId );
 
 			}
 
@@ -1784,6 +1793,10 @@ export class Profiler {
 		} catch ( e ) {
 
 			console.warn( 'Failed to load profiler layout:', e );
+
+		} finally {
+
+			this.isLoadingLayout = false;
 
 		}
 
