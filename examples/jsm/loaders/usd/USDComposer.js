@@ -1451,7 +1451,12 @@ class USDComposer {
 
 		} else {
 
-			geometry.computeVertexNormals();
+			// Compute vertex normals from the original indexed topology where
+			// vertices are shared, then expand them like positions.
+			const vertexNormals = this._computeVertexNormals( points, indices );
+			geometry.setAttribute( 'normal', new BufferAttribute( new Float32Array(
+				this._expandAttribute( vertexNormals, indices, 3 )
+			), 3 ) );
 
 		}
 
@@ -1727,12 +1732,18 @@ class USDComposer {
 				? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
 				: null );
 
+		// When no normals are provided, compute vertex normals from
+		// the indexed topology so that shared vertices produce averaged normals.
+		const vertexNormals = ( ! normals && origIndices.length > 0 )
+			? this._computeVertexNormals( points, origIndices )
+			: null;
+
 		// Build reordered vertex data
 		const vertexCount = triangleCount * 3;
 		const positions = new Float32Array( vertexCount * 3 );
 		const uvData = uvs ? new Float32Array( vertexCount * 2 ) : null;
 		const uv1Data = uvs2 ? new Float32Array( vertexCount * 2 ) : null;
-		const normalData = normals ? new Float32Array( vertexCount * 3 ) : null;
+		const normalData = ( normals || vertexNormals ) ? new Float32Array( vertexCount * 3 ) : null;
 		const skinIndexData = jointIndices ? new Uint16Array( vertexCount * 4 ) : null;
 		const skinWeightData = jointWeights ? new Float32Array( vertexCount * 4 ) : null;
 
@@ -1784,20 +1795,26 @@ class USDComposer {
 
 				}
 
-				if ( normalData && normals ) {
+				if ( normalData ) {
 
-					if ( origNormalIndices ) {
+					if ( normals && origNormalIndices ) {
 
 						const normalIdx = origNormalIndices[ origIdx ];
 						normalData[ newIdx * 3 ] = normals[ normalIdx * 3 ];
 						normalData[ newIdx * 3 + 1 ] = normals[ normalIdx * 3 + 1 ];
 						normalData[ newIdx * 3 + 2 ] = normals[ normalIdx * 3 + 2 ];
 
-					} else if ( normals.length === points.length ) {
+					} else if ( normals && normals.length === points.length ) {
 
 						normalData[ newIdx * 3 ] = normals[ pointIdx * 3 ];
 						normalData[ newIdx * 3 + 1 ] = normals[ pointIdx * 3 + 1 ];
 						normalData[ newIdx * 3 + 2 ] = normals[ pointIdx * 3 + 2 ];
+
+					} else if ( vertexNormals ) {
+
+						normalData[ newIdx * 3 ] = vertexNormals[ pointIdx * 3 ];
+						normalData[ newIdx * 3 + 1 ] = vertexNormals[ pointIdx * 3 + 1 ];
+						normalData[ newIdx * 3 + 2 ] = vertexNormals[ pointIdx * 3 + 2 ];
 
 					}
 
@@ -1841,15 +1858,7 @@ class USDComposer {
 
 		}
 
-		if ( normalData ) {
-
-			geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
-
-		} else {
-
-			geometry.computeVertexNormals();
-
-		}
+		geometry.setAttribute( 'normal', new BufferAttribute( normalData, 3 ) );
 
 		if ( skinIndexData ) {
 
@@ -2349,6 +2358,57 @@ class USDComposer {
 		}
 
 		return expanded;
+
+	}
+
+	/**
+	 * Compute per-vertex normals from indexed triangle data.
+	 * Accumulates area-weighted face normals at each shared vertex and normalizes.
+	 */
+	_computeVertexNormals( points, indices ) {
+
+		const numVertices = points.length / 3;
+		const normals = new Float32Array( numVertices * 3 );
+
+		for ( let i = 0; i < indices.length; i += 3 ) {
+
+			const a = indices[ i ];
+			const b = indices[ i + 1 ];
+			const c = indices[ i + 2 ];
+
+			const ax = points[ a * 3 ], ay = points[ a * 3 + 1 ], az = points[ a * 3 + 2 ];
+			const bx = points[ b * 3 ], by = points[ b * 3 + 1 ], bz = points[ b * 3 + 2 ];
+			const cx = points[ c * 3 ], cy = points[ c * 3 + 1 ], cz = points[ c * 3 + 2 ];
+
+			const e1x = bx - ax, e1y = by - ay, e1z = bz - az;
+			const e2x = cx - ax, e2y = cy - ay, e2z = cz - az;
+
+			const nx = e1y * e2z - e1z * e2y;
+			const ny = e1z * e2x - e1x * e2z;
+			const nz = e1x * e2y - e1y * e2x;
+
+			normals[ a * 3 ] += nx; normals[ a * 3 + 1 ] += ny; normals[ a * 3 + 2 ] += nz;
+			normals[ b * 3 ] += nx; normals[ b * 3 + 1 ] += ny; normals[ b * 3 + 2 ] += nz;
+			normals[ c * 3 ] += nx; normals[ c * 3 + 1 ] += ny; normals[ c * 3 + 2 ] += nz;
+
+		}
+
+		for ( let i = 0; i < numVertices; i ++ ) {
+
+			const x = normals[ i * 3 ], y = normals[ i * 3 + 1 ], z = normals[ i * 3 + 2 ];
+			const len = Math.sqrt( x * x + y * y + z * z );
+
+			if ( len > 0 ) {
+
+				normals[ i * 3 ] /= len;
+				normals[ i * 3 + 1 ] /= len;
+				normals[ i * 3 + 2 ] /= len;
+
+			}
+
+		}
+
+		return normals;
 
 	}
 
