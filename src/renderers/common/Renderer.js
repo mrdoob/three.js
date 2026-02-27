@@ -3369,13 +3369,18 @@ class Renderer {
 	}
 
 	/**
-	 * Checks if the given compatibility is supported by the selected backend. If the
-	 * renderer has not been initialized, this method always returns `false`.
+	 * Checks if the given compatibility is supported by the selected backend.
 	 *
 	 * @param {string} name - The compatibility's name.
 	 * @return {boolean} Whether the compatibility is supported or not.
 	 */
 	hasCompatibility( name ) {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'Renderer: .hasCompatibility() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
+
+		}
 
 		return this.backend.hasCompatibility( name );
 
