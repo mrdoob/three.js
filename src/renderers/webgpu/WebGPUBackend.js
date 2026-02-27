@@ -2539,9 +2539,9 @@ class WebGPUBackend extends Backend {
 	 */
 	hasCompatibility( name ) {
 
-		if ( this._compatibility[ Compatibility.TEXTURE_COMPARE ] !== undefined ) {
+		if ( this._compatibility[ name ] !== undefined ) {
 
-			return this._compatibility[ Compatibility.TEXTURE_COMPARE ];
+			return this._compatibility[ name ];
 
 		}
 
