@@ -553,11 +553,19 @@ class TextureNode extends UniformNode {
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 
+				let finalDepthSnippet = depthSnippet;
+
+				if ( finalDepthSnippet === null && texture.isArrayTexture ) {
+
+					finalDepthSnippet = '0';
+
+				}
+
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, offsetSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
