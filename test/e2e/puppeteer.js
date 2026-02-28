@@ -72,6 +72,7 @@ const exceptionList = [
 	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_3d',
+	'webgpu_compute_texture_fluid',
 	'webgpu_compute_texture_pingpong',
 	'webgpu_compute_water',
 	'webgpu_hdr',
