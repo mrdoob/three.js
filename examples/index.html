@@ -189,13 +189,20 @@
 
 			};
 
-			// iOS iframe auto-resize workaround
+			// Safari iframe auto-resize workaround
 
-			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+			if ( /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) ) {
 
 				viewer.style.width = getComputedStyle( viewer ).width;
 				viewer.style.height = getComputedStyle( viewer ).height;
-				viewer.setAttribute( 'scrolling', 'no' );
+
+				// Allow scrolling for overlay examples
+				const currentExample = window.location.hash.substring( 1 );
+				if ( ! currentExample.includes( 'overlay' ) ) {
+
+					viewer.setAttribute( 'scrolling', 'no' );
+
+				}
 
 			}
 
