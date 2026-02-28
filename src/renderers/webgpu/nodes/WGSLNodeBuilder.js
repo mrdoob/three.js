@@ -2281,17 +2281,6 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the maximum uniform buffer size limit.
-	 *
-	 * @return {number} The maximum uniform buffer size in bytes.
-	 */
-	getUniformBufferLimit() {
-
-		return this.renderer.backend.device.limits.maxUniformBufferBindingSize;
-
-	}
-
-	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @private

@@ -2010,17 +2010,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {
-
-		return this.capabilities.getMaxAnisotropy();
-
-	}
-
-	/**
 	 * Copies data of the given source texture to the given destination texture.
 	 *
 	 * @param {Texture} srcTexture - The source texture.
