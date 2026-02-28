@@ -2813,7 +2813,15 @@ class GLTFParser {
 
 		updateMappings( object, ref );
 
-		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
+		const instanceSuffix = '_instance_' + ( cache.uses[ index ] ++ );
+
+		ref.name += instanceSuffix;
+
+		for ( const child of ref.children ) {
+
+			child.name += instanceSuffix;
+
+		}
 
 		return ref;
 
