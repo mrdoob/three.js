@@ -8,7 +8,7 @@ import { Ray } from '../math/Ray.js';
 import { AttachedBindMode, DetachedBindMode } from '../constants.js';
 import { warn } from '../utils.js';
 
-const _baseVector = /*@__PURE__*/ new Vector3();
+const _baseVector = /*@__PURE__*/ new Vector4();
 
 const _skinIndex = /*@__PURE__*/ new Vector4();
 const _skinWeight = /*@__PURE__*/ new Vector4();
