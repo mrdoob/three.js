@@ -229,9 +229,10 @@ class KTX2Loader extends Loader {
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
+				etc1Supported: false, // webgpu support provided by etc2
 				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
-				dxtSupported: renderer.hasFeature( 'texture-compression-s3tc' ),
+				dxtSupported: false, // rgb565 smooth and hard alpha provided by bc (bptc)
+				rgtcSupported: false, // 1 and 2 channel textures provided by bc (bptc)
 				bptcSupported: renderer.hasFeature( 'texture-compression-bc' ),
 				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
@@ -245,6 +246,7 @@ class KTX2Loader extends Loader {
 				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
 				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
 				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+				rgtcSupported: renderer.extensions.has( 'EXT_texture_compression_rgtc' ),
 				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
 				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
