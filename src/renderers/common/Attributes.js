@@ -15,8 +15,9 @@ class Attributes extends DataMap {
 	 * Constructs a new attribute management component.
 	 *
 	 * @param {Backend} backend - The renderer's backend.
+	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( backend ) {
+	constructor( backend, info ) {
 
 		super();
 
@@ -26,6 +27,13 @@ class Attributes extends DataMap {
 		 * @type {Backend}
 		 */
 		this.backend = backend;
+
+		/**
+		 * Renderer component for managing metrics and monitoring data.
+		 *
+		 * @type {Info}
+		 */
+		this.info = info;
 
 	}
 
@@ -42,6 +50,8 @@ class Attributes extends DataMap {
 		if ( attributeData !== null ) {
 
 			this.backend.destroyAttribute( attribute );
+
+			this.info.destroyAttribute( attribute );
 
 		}
 
@@ -65,18 +75,22 @@ class Attributes extends DataMap {
 			if ( type === AttributeType.VERTEX ) {
 
 				this.backend.createAttribute( attribute );
+				this.info.createAttribute( attribute );
 
 			} else if ( type === AttributeType.INDEX ) {
 
 				this.backend.createIndexAttribute( attribute );
+				this.info.createIndexAttribute( attribute );
 
 			} else if ( type === AttributeType.STORAGE ) {
 
 				this.backend.createStorageAttribute( attribute );
+				this.info.createStorageAttribute( attribute );
 
 			} else if ( type === AttributeType.INDIRECT ) {
 
 				this.backend.createIndirectStorageAttribute( attribute );
+				this.info.createIndirectStorageAttribute( attribute );
 
 			}
 

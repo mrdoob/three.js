@@ -16,8 +16,9 @@ class Pipelines extends DataMap {
 	 *
 	 * @param {Backend} backend - The renderer's backend.
 	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
+	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( backend, nodes ) {
+	constructor( backend, nodes, info ) {
 
 		super();
 
@@ -34,6 +35,13 @@ class Pipelines extends DataMap {
 		 * @type {NodeManager}
 		 */
 		this.nodes = nodes;
+
+		/**
+		 * Renderer component for managing metrics and monitoring data.
+		 *
+		 * @type {Info}
+		 */
+		this.info = info;
 
 		/**
 		 * A references to the bindings management component.
@@ -349,6 +357,8 @@ class Pipelines extends DataMap {
 
 			this.backend.createComputePipeline( pipeline, bindings );
 
+			this.info.memory.programs ++;
+
 		}
 
 		return pipeline;
@@ -387,6 +397,8 @@ class Pipelines extends DataMap {
 			// pending promises that resolve when the render pipelines are ready for rendering.
 
 			this.backend.createRenderPipeline( renderObject, promises );
+
+			this.info.memory.programs ++;
 
 		}
 
@@ -432,6 +444,8 @@ class Pipelines extends DataMap {
 	_releasePipeline( pipeline ) {
 
 		this.caches.delete( pipeline.cacheKey );
+
+		this.info.memory.programs --;
 
 	}
 

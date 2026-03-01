@@ -2,6 +2,7 @@
 import { RendererInspector } from './RendererInspector.js';
 import { Profiler } from './ui/Profiler.js';
 import { Performance } from './tabs/Performance.js';
+import { Memory } from './tabs/Memory.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
 import { Settings } from './tabs/Settings.js';
@@ -58,6 +59,9 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
+		const memory = new Memory();
+		profiler.addTab( memory );
+
 		const timeline = new Timeline();
 		profiler.addTab( timeline );
 
@@ -79,6 +83,7 @@ class Inspector extends RendererInspector {
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
+		this.memory = memory;
 		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
@@ -460,12 +465,14 @@ class Inspector extends RendererInspector {
 			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
+			this.memory.updateText( this );
 
 		}
 
 		if ( this.displayCycle.graph.needsUpdate ) {
 
 			this.performance.updateGraph( this, frame );
+			this.memory.updateGraph( this );
 
 		}
 

@@ -787,11 +787,11 @@ class Renderer {
 
 			this._nodes = new NodeManager( this, backend );
 			this._animation = new Animation( this, this._nodes, this.info );
-			this._attributes = new Attributes( backend );
+			this._attributes = new Attributes( backend, this.info );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
 			this._textures = new Textures( this, backend, this.info );
-			this._pipelines = new Pipelines( backend, this._nodes );
+			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists( this.lighting );
