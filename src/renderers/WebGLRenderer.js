@@ -292,6 +292,7 @@ class WebGLRenderer {
 		const _this = this;
 
 		let _isContextLost = false;
+		let _nodesAdapter = null;
 
 		// internal state cache
 
@@ -1043,6 +1044,20 @@ class WebGLRenderer {
 		};
 
 		/**
+		 * Sets a compatibility node builder for rendering node materials with WebGLRenderer.
+		 * This enables using TSL (Three.js Shading Language) node materials to prepare
+		 * for migration to WebGPURenderer.
+		 *
+		 * @param {WebGLNodesAdapter} nodesAdapter - The node builder instance.
+		 */
+		this.setWebGLNodesAdapter = function ( nodesAdapter ) {
+
+			nodesAdapter.setRenderer( this );
+			_nodesAdapter = nodesAdapter;
+
+		};
+
+		/**
 		 * Frees the GPU-related resources allocated by this instance. Call this
 		 * method whenever this instance is no longer used in your app.
 		 */
@@ -1602,6 +1617,13 @@ class WebGLRenderer {
 
 			if ( _isContextLost === true ) return;
 
+			// update node builder if available
+			if ( _nodesAdapter !== null ) {
+
+				_nodesAdapter.renderStart( scene, camera );
+
+			}
+
 			// use internal render target for HalfFloatType color buffer (only when tone mapping is enabled)
 
 			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
@@ -1792,6 +1814,12 @@ class WebGLRenderer {
 			} else {
 
 				currentRenderList = null;
+
+			}
+
+			if ( _nodesAdapter !== null ) {
+
+				_nodesAdapter.renderEnd();
 
 			}
 
@@ -2171,6 +2199,13 @@ class WebGLRenderer {
 
 				parameters.uniforms = programCache.getUniforms( material );
 
+				// Use node builder for node materials if available
+				if ( _nodesAdapter !== null && material.isNodeMaterial ) {
+
+					_nodesAdapter.build( material, object, parameters );
+
+				}
+
 				material.onBeforeCompile( parameters, _this );
 
 				program = programCache.acquireProgram( parameters, programCacheKey );
@@ -2436,6 +2471,14 @@ class WebGLRenderer {
 
 				program = getProgram( material, scene, object );
 
+				// notify the node builder that the program has changed so uniforms and update nodes can
+				// be cached and triggered.
+				if ( _nodesAdapter && material.isNodeMaterial ) {
+
+					_nodesAdapter.onUpdateProgram( material, program, materialProperties );
+
+				}
+
 			}
 
 			let refreshProgram = false;
@@ -2665,7 +2708,7 @@ class WebGLRenderer {
 
 			// UBOs
 
-			if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
+			if ( material.uniformsGroups !== undefined ) {
 
 				const groups = material.uniformsGroups;
 
