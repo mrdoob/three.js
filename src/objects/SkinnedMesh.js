@@ -356,6 +356,7 @@ class SkinnedMesh extends Mesh {
 
 		if ( target.isVector4 ) {
 
+			// ensure the homogenous coordinate remains unchanged after vector operations
 			target.w = _baseVector.w;
 
 		}
