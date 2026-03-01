@@ -226,7 +226,11 @@ class NodeMaterialObserver {
 	 */
 	getAttributesData( attributes ) {
 
-		const attributesData = {};
+		const attributesData = {
+
+			_keys: [ ...attributes._keys ],
+
+		};
 
 		for ( const name in attributes ) {
 
@@ -393,8 +397,8 @@ class NodeMaterialObserver {
 		const attributes = geometry.attributes;
 		const storedAttributes = storedGeometryData.attributes;
 
-		const storedAttributeNames = Object.keys( storedAttributes );
-		const currentAttributeNames = Object.keys( attributes );
+		const storedAttributeNames = storedAttributes._keys;
+		const currentAttributeNames = attributes._keys;
 
 		if ( storedGeometryData.id !== geometry.id ) {
 
