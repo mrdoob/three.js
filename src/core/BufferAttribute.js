@@ -654,6 +654,40 @@ class BufferAttribute {
 	}
 
 	/**
+	 * Return this BufferAttribute with a different type.
+	 *
+	 * @param {Function} TargetType - BufferAttribute type to return.
+	 * @return {BufferAttribute} Converted BufferAttribute.
+	 */
+	convert( TargetType ) {
+
+		if ( this.constructor === TargetType ) return this;
+
+		const target = new TargetType( this.count * this.itemSize, this.itemSize, this.normalized );
+
+		if ( target.isFloat16BufferAttribute )
+			target.normalized = false;
+
+		for ( let i = 0; i < this.count; ++ i ) {
+
+			switch ( this.itemSize ) {
+
+				case 1: target.setX( i, this.getX( i ) ); break;
+				case 2: target.setXY( i, this.getX( i ), this.getY( i ) ); break;
+				case 3: target.setXYZ( i, this.getX( i ), this.getY( i ), this.getZ( i ) ); break;
+				case 4: target.setXYZW( i, this.getX( i ), this.getY( i ), this.getZ( i ), this.getW( i ) ); break;
+
+			}
+
+		}
+
+		target.name = this.name;
+
+		return target;
+
+	}
+
+	/**
 	 * Serializes the buffer attribute into JSON.
 	 *
 	 * @return {Object} A JSON object representing the serialized buffer attribute.
