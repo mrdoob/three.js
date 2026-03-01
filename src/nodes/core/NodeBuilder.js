@@ -736,8 +736,6 @@ class NodeBuilder {
 			const bindingGroup = bindingsGroups[ i ];
 			this.bindingsIndexes[ bindingGroup.name ].group = i;
 
-			bindingGroup.index = i;
-
 		}
 
 	}

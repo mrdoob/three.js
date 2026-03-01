@@ -16,7 +16,7 @@ class BindGroup {
 	 * @param {Array<Binding>} bindings - An array of bindings.
 	 * @param {number} index - The group index.
 	 */
-	constructor( name = '', bindings = [], index = 0 ) {
+	constructor( name = '', bindings = [] ) {
 
 		/**
 		 * The bind group's name.
@@ -31,13 +31,6 @@ class BindGroup {
 		 * @type {Array<Binding>}
 		 */
 		this.bindings = bindings;
-
-		/**
-		 * The group index.
-		 *
-		 * @type {number}
-		 */
-		this.index = index;
 
 		/**
 		 * The group's ID.
