@@ -23,9 +23,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -131,6 +131,27 @@
 				const url = `https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/${ modelInfo.name }/${ variant.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF' }/${ variant }`;
 
 				if ( currentModel ) {
+
+					currentModel.traverse( ( model ) => {
+
+						if ( model.isMesh ) {
+
+							model.geometry.dispose();
+							model.material.dispose();
+
+							for ( const value of Object.values( model.material ) ) {
+
+								if ( value && value.isTexture ) {
+
+									value.dispose();
+
+								}
+
+							}
+
+						}
+
+					} );
 
 					scene.remove( currentModel );
 					currentModel = null;
