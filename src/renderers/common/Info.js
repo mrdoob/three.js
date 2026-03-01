@@ -102,6 +102,12 @@ class Info {
 		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
 		 * @property {number} programs - The number of active programs.
 		 * @property {number} renderTargets - The number of active renderTargets.
+		 * @property {number} total - The total memory size in bytes.
+		 * @property {number} texturesSize - The memory size of active textures in bytes.
+		 * @property {number} attributesSize - The memory size of active attributes in bytes.
+		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
+		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
 		 */
 		this.memory = {
 			geometries: 0,
