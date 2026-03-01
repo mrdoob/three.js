@@ -109,9 +109,9 @@ class Camera extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -129,9 +129,16 @@ class Camera extends Object3D {
 
 	}
 
-	updateWorldMatrix( updateParents, updateChildren ) {
+	ensureMatrices(
+		force,
+		updateParents,
+		updateChildren,
+		updateLocal,
+		updateWorld,
+		respectAutoUpdateFlags
+	) {
 
-		super.updateWorldMatrix( updateParents, updateChildren );
+		super.ensureMatrices( force, updateParents, updateChildren, updateLocal, updateWorld, respectAutoUpdateFlags );
 
 		// exclude scale from view matrix to be glTF conform
 

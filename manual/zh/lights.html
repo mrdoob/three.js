@@ -206,7 +206,7 @@ scene.add(helper);
 <p>注意，当辅助对象所表示的不可见对象有所改变的时候，我们必须调用辅助对象的 <code class="notranslate" translate="no">update</code> 方法来更新辅助对象本身的状态。因此我们传入一个 <code class="notranslate" translate="no">onChangeFn</code> 函数，每当 <code class="notranslate" translate="no">lil-gui</code> 改变了某个值的时候，就会被调用。</p>
 <p>应用到光照位置与目标点位置的控制，就如下所示：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
-+  light.target.updateMatrixWorld();
++  light.target.ensureMatrices();
 +  helper.update();
 +}
 +updateLight();
@@ -245,7 +245,7 @@ scene.add(helper);
 </pre>
 <p>因为点光源没有 <code class="notranslate" translate="no">target</code> 属性，所以 <code class="notranslate" translate="no">onChange</code> 函数可以简化。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLight() {
--  light.target.updateMatrixWorld();
+-  light.target.ensureMatrices();
   helper.update();
 }
 -updateLight();

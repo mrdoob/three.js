@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head>
+﻿<!DOCTYPE html><html lang="ko"><head>
     <meta charset="utf-8">
     <title>그림자<(Shadows)</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -326,7 +326,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 조명, 조명 헬퍼, 조명의 그림자용 카메라, 그림자용 카메라의 헬퍼를 업데이트할 거예요.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // 헬퍼가 가이드라인을 그릴 때 필요한 조명 목표(target)의 matrixWorld를 업데이트 합니다
-  light.target.updateMatrixWorld();
+  light.target.ensureMatrices();
   helper.update();
   // 그림자용 카메라의 투영 행렬(projection matrix)를 업데이트합니다
   light.shadow.camera.updateProjectionMatrix();

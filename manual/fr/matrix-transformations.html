@@ -69,7 +69,7 @@ object.matrixAutoUpdate = false;
             La matrice d'un objet stocke la transformation de l'objet <em>par rapport</em> à son parent ; pour obtenir la transformation de l'objet en coordonnées <em>du monde</em>, vous devez accéder à la matrice du monde de l'objet.
             </p>
             <p>
-            Lorsque la transformation du parent ou de l'enfant change, vous pouvez demander la mise à jour de la matrice du monde de l'objet enfant en appelant `object.updateMatrixWorld()`.
+            Lorsque la transformation du parent ou de l'enfant change, vous pouvez demander la mise à jour de la matrice du monde de l'objet enfant en appelant `object.ensureMatrices()`.
             </p>
             <p>
             Un objet peut être transformé via `applyMatrix4()`. Note : En coulisses, cette méthode repose sur `Matrix4.decompose()`, et toutes les matrices ne sont pas décomposables de cette manière. Par exemple, si un objet a un parent avec une mise à l'échelle non uniforme, la matrice du monde de l'objet peut ne pas être décomposable, et cette méthode pourrait ne pas être appropriée.

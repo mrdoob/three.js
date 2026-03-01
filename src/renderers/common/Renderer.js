@@ -1540,9 +1540,9 @@ class Renderer {
 
 		//
 
-		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.ensureMatrices();
 
-		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.ensureMatrices();
 
 		if ( xr.enabled === true && xr.isPresenting === true ) {
 

@@ -271,14 +271,14 @@ const viewProjection = new THREE.Matrix4();
 
 // before checking
 camera.updateMatrix();
-camera.updateMatrixWorld();
+camera.ensureMatrices();
 camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 
 // then for each mesh
 someMesh.updateMatrix();
-someMesh.updateMatrixWorld();
+someMesh.ensureMatrices();
 
 viewProjection.multiplyMatrices(
     camera.projectionMatrix, camera.matrixWorldInverse);

@@ -91,7 +91,7 @@ class ConvexHull {
 
 		const points = [];
 
-		object.updateMatrixWorld( true );
+		object.ensureMatrices( true );
 
 		object.traverse( function ( node ) {
 

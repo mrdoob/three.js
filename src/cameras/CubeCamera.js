@@ -162,7 +162,7 @@ class CubeCamera extends Object3D {
 
 			this.add( camera );
 
-			camera.updateMatrixWorld();
+			camera.ensureMatrices();
 
 		}
 
@@ -177,7 +177,7 @@ class CubeCamera extends Object3D {
 	 */
 	update( renderer, scene ) {
 
-		if ( this.parent === null ) this.updateMatrixWorld();
+		if ( this.parent === null ) this.ensureMatrices();
 
 		const { renderTarget, activeMipmapLevel } = this;
 

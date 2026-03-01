@@ -77,7 +77,7 @@ class VertexTangentsHelper extends LineSegments {
 	 */
 	update() {
 
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 
 		const matrixWorld = this.object.matrixWorld;
 

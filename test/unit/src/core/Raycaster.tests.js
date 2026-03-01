@@ -52,7 +52,7 @@ function getObjectsToCheck() {
 
 	for ( let i = 0; i < objects.length; i ++ ) {
 
-		objects[ i ].updateMatrixWorld();
+		objects[ i ].ensureMatrices();
 
 	}
 

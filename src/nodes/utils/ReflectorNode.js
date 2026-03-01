@@ -503,7 +503,7 @@ class ReflectorBaseNode extends Node {
 		virtualCamera.near = camera.near;
 		virtualCamera.far = camera.far;
 
-		virtualCamera.updateMatrixWorld();
+		virtualCamera.ensureMatrices();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html

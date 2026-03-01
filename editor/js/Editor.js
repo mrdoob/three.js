@@ -412,7 +412,7 @@ Editor.prototype = {
 					const light = object;
 					const editor = this;
 
-					helper.updateMatrixWorld = function () {
+					helper.ensureMatrices = function () {
 
 						light.getWorldPosition( this.position );
 
@@ -426,7 +426,7 @@ Editor.prototype = {
 
 						for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-							children[ i ].updateMatrixWorld();
+							children[ i ].ensureMatrices();
 
 						}
 

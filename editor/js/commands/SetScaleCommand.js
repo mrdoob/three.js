@@ -38,7 +38,7 @@ class SetScaleCommand extends Command {
 	execute() {
 
 		this.object.scale.copy( this.newScale );
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	}
@@ -46,7 +46,7 @@ class SetScaleCommand extends Command {
 	undo() {
 
 		this.object.scale.copy( this.oldScale );
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	}
