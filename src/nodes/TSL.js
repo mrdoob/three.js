@@ -111,6 +111,7 @@ export * from './display/ToonOutlinePassNode.js';
 export * from './display/PassNode.js';
 
 export * from './display/ColorSpaceFunctions.js';
+export * from './display/OKLCHFunctions.js';
 export * from './display/ToneMappingFunctions.js';
 
 // code

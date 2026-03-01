@@ -31,6 +31,9 @@ const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua'
 const _hslA = { h: 0, s: 0, l: 0 };
 const _hslB = { h: 0, s: 0, l: 0 };
 
+const _oklchA = { l: 0, c: 0, h: 0 };
+const _oklchB = { l: 0, c: 0, h: 0 };
+
 function hue2rgb( p, q, t ) {
 
 	if ( t < 0 ) t += 1;
@@ -39,6 +42,58 @@ function hue2rgb( p, q, t ) {
 	if ( t < 1 / 2 ) return q;
 	if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
 	return p;
+
+}
+
+function linearSRGBToOKLCH( r, g, b, target ) {
+
+	// Linear sRGB → LMS
+	const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+	const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+	const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+
+	// LMS → OKLab (cube root, then M2)
+	const l_ = Math.cbrt( l );
+	const m_ = Math.cbrt( m );
+	const s_ = Math.cbrt( s );
+
+	const L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+	const a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+	const bLab = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+
+	// OKLab → OKLCH
+	target.l = L;
+	target.c = Math.sqrt( a * a + bLab * bLab );
+
+	let h = Math.atan2( bLab, a ) / ( 2 * Math.PI );
+	if ( h < 0 ) h += 1;
+	target.h = h;
+
+	return target;
+
+}
+
+function oklchToLinearSRGB( L, C, H, target ) {
+
+	const hRad = H * 2 * Math.PI;
+	const a = C * Math.cos( hRad );
+	const b = C * Math.sin( hRad );
+
+	// OKLab → LMS (inverse M2)
+	const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+	const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+	const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+	// LMS → Linear sRGB (cube, then inverse M1)
+	const l = l_ * l_ * l_;
+	const m = m_ * m_ * m_;
+	const s = s_ * s_ * s_;
+
+	target.r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+	target.g = - 1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+	target.b = - 0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+	return target;
 
 }
 
@@ -274,6 +329,31 @@ class Color {
 	}
 
 	/**
+	 * Sets this color from OKLCH values. OKLCH is a perceptually uniform
+	 * cylindrical color space based on OKLab.
+	 *
+	 * @param {number} l - Lightness value between `0.0` and `1.0`.
+	 * @param {number} c - Chroma value, typically between `0.0` and `0.4`.
+	 * @param {number} h - Hue value between `0.0` and `1.0` (normalized).
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setOKLCH( l, c, h, colorSpace = ColorManagement.workingColorSpace ) {
+
+		// l,c,h ranges: l in 0-1, c >= 0, h in 0-1 (normalized)
+		h = euclideanModulo( h, 1 );
+		l = clamp( l, 0, 1 );
+		c = Math.max( c, 0 );
+
+		oklchToLinearSRGB( l, c, h, this );
+
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
+
+		return this;
+
+	}
+
+	/**
 	 * Sets this color from a CSS-style string. For example, `rgb(250, 0,0)`,
 	 * `rgb(100%, 0%, 0%)`, `hsl(0, 100%, 50%)`, `#ff0000`, `#f00`, or `red` ( or
 	 * any [X11 color name](https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart) -
@@ -359,6 +439,26 @@ class Color {
 							parseFloat( color[ 2 ] ) / 100,
 							parseFloat( color[ 3 ] ) / 100,
 							colorSpace
+						);
+
+					}
+
+					break;
+
+				case 'oklch':
+
+					if ( color = /^\s*(\d*\.?\d+)(%?)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s*(?:\/\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+
+						// oklch(0.7 0.15 180) oklch(70% 0.15 180)
+
+						handleAlpha( color[ 5 ] );
+
+						const l = color[ 2 ] === '%' ? parseFloat( color[ 1 ] ) / 100 : parseFloat( color[ 1 ] );
+
+						return this.setOKLCH(
+							l,
+							parseFloat( color[ 3 ] ),
+							parseFloat( color[ 4 ] ) / 360
 						);
 
 					}
@@ -610,6 +710,24 @@ class Color {
 	}
 
 	/**
+	 * Converts the colors RGB values into the OKLCH format and stores them into the
+	 * given target object. OKLCH is a perceptually uniform cylindrical color space.
+	 *
+	 * @param {{l:number,c:number,h:number}} target - The target object that is used to store the method's result.
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {{l:number,c:number,h:number}} The OKLCH representation of this color.
+	 */
+	getOKLCH( target, colorSpace = ColorManagement.workingColorSpace ) {
+
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
+
+		linearSRGBToOKLCH( _color.r, _color.g, _color.b, target );
+
+		return target;
+
+	}
+
+	/**
 	 * Returns the RGB values of this color and stores them into the given target object.
 	 *
 	 * @param {Color} target - The target color that is used to store the method's result.
@@ -826,6 +944,36 @@ class Color {
 		const l = lerp( _hslA.l, _hslB.l, alpha );
 
 		this.setHSL( h, s, l );
+
+		return this;
+
+	}
+
+	/**
+	 * Linearly interpolates this color's OKLCH values toward the OKLCH values of the
+	 * given color. Uses shortest-path hue interpolation for perceptually smooth transitions.
+	 * The alpha argument can be thought of as the ratio between the two colors,
+	 * where 0.0 is this color and 1.0 is the first argument.
+	 *
+	 * @param {Color} color - The color to converge on.
+	 * @param {number} alpha - The interpolation factor in the closed interval `[0,1]`.
+	 * @return {Color} A reference to this color.
+	 */
+	lerpOKLCH( color, alpha ) {
+
+		this.getOKLCH( _oklchA );
+		color.getOKLCH( _oklchB );
+
+		// shortest-path hue interpolation
+		let dh = _oklchB.h - _oklchA.h;
+		if ( dh > 0.5 ) dh -= 1;
+		if ( dh < - 0.5 ) dh += 1;
+
+		const h = _oklchA.h + dh * alpha;
+		const c = lerp( _oklchA.c, _oklchB.c, alpha );
+		const l = lerp( _oklchA.l, _oklchB.l, alpha );
+
+		this.setOKLCH( l, c, h );
 
 		return this;
 

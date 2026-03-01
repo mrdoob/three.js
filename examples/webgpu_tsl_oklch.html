@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - OKLCH color space</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>OKLCH Color Space</span>
+			</div>
+
+			<small>
+				HSL (left) vs OKLCH (right) &mdash; OKLCH maintains uniform perceived brightness.<br>
+				Gradients: RGB / HSL / OKLCH. 3D objects: HSL hues (top) vs OKLCH hues (bottom).
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import {
+				Fn, uv, uniform, vec3, float,
+				abs, atan, clamp, fract, mix, sqrt,
+				oklchToLinearSRGB, linearSRGBToOKLCH, sRGBTransferEOTF
+			} from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let renderer, camera, scene, controls;
+
+			const lightnessUniform = uniform( 0.7 );
+			const chromaMaxUniform = uniform( 0.15 );
+
+			const hslSphereMaterials = [];
+			const oklchSphereMaterials = [];
+
+			init();
+
+			function init() {
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 1, 12 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Lighting
+
+				const ambientLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.5 );
+				scene.add( ambientLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				dirLight.position.set( 5, 10, 7 );
+				scene.add( dirLight );
+
+				// Branchless HSL to sRGB conversion
+
+				const hslToRGB = Fn( ( [ h, s, l ] ) => {
+
+					const h6 = fract( h ).mul( 6.0 );
+
+					const r = clamp( abs( h6.sub( 3.0 ) ).sub( 1.0 ), 0.0, 1.0 );
+					const g = clamp( float( 2.0 ).sub( abs( h6.sub( 2.0 ) ) ), 0.0, 1.0 );
+					const b = clamp( float( 2.0 ).sub( abs( h6.sub( 4.0 ) ) ), 0.0, 1.0 );
+
+					const c = float( 1.0 ).sub( abs( l.mul( 2.0 ).sub( 1.0 ) ) ).mul( s );
+
+					return vec3( r, g, b ).sub( 0.5 ).mul( c ).add( l );
+
+				} );
+
+				// === Color Wheels ===
+
+				const hslWheelShader = Fn( () => {
+
+					const vUv = uv();
+					const p = vUv.sub( 0.5 ).mul( 2.0 );
+					const radius = sqrt( p.x.mul( p.x ).add( p.y.mul( p.y ) ) );
+					const angle = fract( atan( p.y, p.x ).div( 2 * Math.PI ) );
+
+					const rgb = sRGBTransferEOTF( hslToRGB( angle, radius, lightnessUniform ) );
+
+					const mask = clamp( float( 1.0 ).sub( radius ).mul( 100.0 ), 0.0, 1.0 );
+
+					return rgb.mul( mask );
+
+				} );
+
+				const oklchWheelShader = Fn( () => {
+
+					const vUv = uv();
+					const p = vUv.sub( 0.5 ).mul( 2.0 );
+					const radius = sqrt( p.x.mul( p.x ).add( p.y.mul( p.y ) ) );
+					const angle = fract( atan( p.y, p.x ).div( 2 * Math.PI ) );
+
+					const lch = vec3( lightnessUniform, radius.mul( chromaMaxUniform ), angle );
+					const rgb = clamp( oklchToLinearSRGB( lch ), 0.0, 1.0 );
+
+					const mask = clamp( float( 1.0 ).sub( radius ).mul( 100.0 ), 0.0, 1.0 );
+
+					return rgb.mul( mask );
+
+				} );
+
+				const wheelGeometry = new THREE.PlaneGeometry( 2.2, 2.2 );
+
+				const hslWheelMaterial = new THREE.MeshBasicNodeMaterial();
+				hslWheelMaterial.colorNode = hslWheelShader();
+
+				const hslWheel = new THREE.Mesh( wheelGeometry, hslWheelMaterial );
+				hslWheel.position.set( - 1.8, 3.2, 0 );
+				scene.add( hslWheel );
+
+				const oklchWheelMaterial = new THREE.MeshBasicNodeMaterial();
+				oklchWheelMaterial.colorNode = oklchWheelShader();
+
+				const oklchWheel = new THREE.Mesh( wheelGeometry, oklchWheelMaterial );
+				oklchWheel.position.set( 1.8, 3.2, 0 );
+				scene.add( oklchWheel );
+
+				// === Gradient Bars ===
+
+				const redLinear = vec3( 1.0, 0.0, 0.0 );
+				const blueLinear = vec3( 0.0, 0.0, 1.0 );
+
+				const rgbGradientShader = Fn( () => {
+
+					const t = uv().x;
+					return mix( redLinear, blueLinear, t );
+
+				} );
+
+				const hslGradientShader = Fn( () => {
+
+					const t = uv().x;
+					const h = t.mul( 240.0 / 360.0 );
+
+					return sRGBTransferEOTF( hslToRGB( h, float( 1.0 ), float( 0.5 ) ) );
+
+				} );
+
+				const oklchGradientShader = Fn( () => {
+
+					const t = uv().x;
+
+					const redLCH = linearSRGBToOKLCH( redLinear );
+					const blueLCH = linearSRGBToOKLCH( blueLinear );
+
+					const L = mix( redLCH.x, blueLCH.x, t );
+					const C = mix( redLCH.y, blueLCH.y, t );
+
+					const dh = fract( blueLCH.z.sub( redLCH.z ).add( 0.5 ) ).sub( 0.5 );
+					const H = redLCH.z.add( dh.mul( t ) );
+
+					return clamp( oklchToLinearSRGB( vec3( L, C, H ) ), 0.0, 1.0 );
+
+				} );
+
+				const gradientGeometry = new THREE.PlaneGeometry( 5.5, 0.25 );
+
+				const rgbGradMaterial = new THREE.MeshBasicNodeMaterial();
+				rgbGradMaterial.colorNode = rgbGradientShader();
+
+				const rgbGrad = new THREE.Mesh( gradientGeometry, rgbGradMaterial );
+				rgbGrad.position.set( 0, 1.55, 0 );
+				scene.add( rgbGrad );
+
+				const hslGradMaterial = new THREE.MeshBasicNodeMaterial();
+				hslGradMaterial.colorNode = hslGradientShader();
+
+				const hslGrad = new THREE.Mesh( gradientGeometry, hslGradMaterial );
+				hslGrad.position.set( 0, 1.15, 0 );
+				scene.add( hslGrad );
+
+				const oklchGradMaterial = new THREE.MeshBasicNodeMaterial();
+				oklchGradMaterial.colorNode = oklchGradientShader();
+
+				const oklchGrad = new THREE.Mesh( gradientGeometry, oklchGradMaterial );
+				oklchGrad.position.set( 0, 0.75, 0 );
+				scene.add( oklchGrad );
+
+				// === 3D Objects (classic Color API) ===
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.3, 32, 16 );
+				const count = 10;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const hue = i / count;
+					const x = - 3.5 + i * ( 7 / ( count - 1 ) );
+
+					// HSL sphere — uses Color.setHSL()
+
+					const hslSphereMat = new THREE.MeshStandardMaterial( { roughness: 0.35 } );
+					hslSphereMat.color.setHSL( hue, 1.0, 0.5, THREE.SRGBColorSpace );
+					hslSphereMaterials.push( { material: hslSphereMat, hue: hue } );
+
+					const hslSphere = new THREE.Mesh( sphereGeometry, hslSphereMat );
+					hslSphere.position.set( x, - 0.5, 0 );
+					scene.add( hslSphere );
+
+					// OKLCH sphere — uses Color.setOKLCH()
+
+					const oklchSphereMat = new THREE.MeshStandardMaterial( { roughness: 0.35 } );
+					oklchSphereMat.color.setOKLCH( 0.7, 0.15, hue );
+					oklchSphereMaterials.push( { material: oklchSphereMat, hue: hue } );
+
+					const oklchSphere = new THREE.Mesh( sphereGeometry, oklchSphereMat );
+					oklchSphere.position.set( x, - 1.8, 0 );
+					scene.add( oklchSphere );
+
+				}
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.5, 0 );
+				controls.update();
+
+				// Inspector GUI
+
+				renderer.inspector = new Inspector();
+
+				const gui = renderer.inspector.createParameters( 'OKLCH Controls' );
+				gui.add( lightnessUniform, 'value', 0, 1, 0.01 ).name( 'Lightness' );
+				gui.add( chromaMaxUniform, 'value', 0, 0.4, 0.01 ).name( 'Chroma' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function animate() {
+
+				const L = lightnessUniform.value;
+				const C = chromaMaxUniform.value;
+
+				for ( let i = 0; i < hslSphereMaterials.length; i ++ ) {
+
+					const entry = hslSphereMaterials[ i ];
+					entry.material.color.setHSL( entry.hue, 1.0, L, THREE.SRGBColorSpace );
+
+					const oklchEntry = oklchSphereMaterials[ i ];
+					oklchEntry.material.color.setOKLCH( L, C, oklchEntry.hue );
+
+				}
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+		</script>
+	</body>
+</html>
