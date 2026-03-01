@@ -76,7 +76,8 @@ exists. For RGB and RGBA textures, the renderer will use the green channel
 when sampling this texture due to the extra bit of precision provided for
 green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 luminance/alpha textures will also still work as expected.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -84,7 +85,8 @@ luminance/alpha textures will also still work as expected.</p>
 					<div class="description">
 						<p>The red channel of this texture is used as the ambient occlusion map.
 Requires a second set of UVs.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -103,7 +105,8 @@ red channel is also <code>1</code>, ambient light is fully occluded on a surface
 perceived depth in relation to the lights. Bump doesn't actually affect
 the geometry of the object, only the lighting. If a normal map is defined
 this will be ignored.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -138,7 +141,8 @@ displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
 repositions, the vertices of the mesh.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -171,7 +175,8 @@ unaffected by other lighting.</p>
 						<p>Set emissive (glow) map. The emissive map color is modulated by the
 emissive color and the emissive intensity. If you have an emissive map,
 be sure to set the emissive color to something other than black.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -179,7 +184,8 @@ be sure to set the emissive color to something other than black.</p>
 					<div class="description">
 						<p>The environment map. To ensure a physically correct rendering, environment maps
 are internally pre-processed with <a href="PMREMGenerator.html">PMREMGenerator</a>.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -221,7 +227,8 @@ are internally pre-processed with <a href="PMREMGenerator.html">PMREMGenerator</
 					<h3 class="name" id="lightMap" translate="no">.<a href="#lightMap">lightMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The light map. Requires a second set of UVs.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -237,7 +244,8 @@ are internally pre-processed with <a href="PMREMGenerator.html">PMREMGenerator</
 						<p>The color map. May optionally include an alpha channel, typically combined
 with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>. The texture map
 color is modulated by the diffuse <code>color</code>.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -255,7 +263,8 @@ If <code>metalnessMap</code> is also provided, both values are multiplied.</p>
 					<div class="description">
 						<p>The blue channel of this texture is used to alter the metalness of the
 material.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -267,7 +276,8 @@ maps do not change the actual shape of the surface, only the lighting. In
 case the material has a normal map authored using the left handed
 convention, the <code>y</code> component of <code>normalScale</code> should be negated to compensate
 for the different handedness.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -298,7 +308,8 @@ both values are multiplied.</p>
 					<div class="description">
 						<p>The green channel of this texture is used to alter the roughness of the
 material.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">

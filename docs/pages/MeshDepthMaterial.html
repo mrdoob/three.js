@@ -54,7 +54,8 @@ exists. For RGB and RGBA textures, the renderer will use the green channel
 when sampling this texture due to the extra bit of precision provided for
 green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 luminance/alpha textures will also still work as expected.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -82,7 +83,8 @@ displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
 repositions, the vertices of the mesh.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -106,7 +108,8 @@ map set, this value is not applied.</p>
 					<div class="description">
 						<p>The color map. May optionally include an alpha channel, typically combined
 with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">

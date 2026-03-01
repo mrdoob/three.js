@@ -70,6 +70,8 @@ Default is `1`.
 
 Sets the color of the lines using data from a texture. The texture map color is modulated by the diffuse `color`.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ## Source

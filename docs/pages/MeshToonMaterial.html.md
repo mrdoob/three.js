@@ -22,11 +22,15 @@ The alpha map is a grayscale texture that controls the opacity across the surfac
 
 Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .aoMap : Texture
 
 The red channel of this texture is used as the ambient occlusion map. Requires a second set of UVs.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -39,6 +43,8 @@ Default is `1`.
 ### .bumpMap : Texture
 
 The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights. Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will be ignored.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -64,6 +70,8 @@ Default is `0`.
 
 The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .displacementScale : number
@@ -88,6 +96,8 @@ Default is `1`.
 
 Set emissive (glow) map. The emissive map color is modulated by the emissive color and the emissive intensity. If you have an emissive map, be sure to set the emissive color to something other than black.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ### .fog : boolean
@@ -99,6 +109,8 @@ Default is `true`.
 ### .gradientMap : Texture
 
 Gradient map for toon shading. It's required to set [Texture#minFilter](Texture.html#minFilter) and [Texture#magFilter](Texture.html#magFilter) to {@linkNearestFilter} when using this type of texture.
+
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
 
 Default is `null`.
 
@@ -112,6 +124,8 @@ Default is `true`.
 
 The light map. Requires a second set of UVs.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ### .lightMapIntensity : number
@@ -124,11 +138,15 @@ Default is `1`.
 
 The color map. May optionally include an alpha channel, typically combined with [Material#transparent](Material.html#transparent) or [Material#alphaTest](Material.html#alphaTest). The texture map color is modulated by the diffuse `color`.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ### .normalMap : Texture
 
 The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting. In case the material has a normal map authored using the left handed convention, the `y` component of `normalScale` should be negated to compensate for the different handedness.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 

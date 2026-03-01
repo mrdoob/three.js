@@ -35,6 +35,8 @@ Default is `0`.
 
 Red and green channels represent the anisotropy direction in `[-1, 1]` tangent, bitangent space, to be rotated by `anisotropyRotation`. The blue channel contains strength as `[0, 1]` to be multiplied by `anisotropy`.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .anisotropyRotation : number
@@ -65,11 +67,15 @@ Default is `0`.
 
 The red channel of this texture is multiplied against `clearcoat`, for per-pixel control over a coating's intensity.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .clearcoatNormalMap : Texture
 
 Can be used to enable independent normals for the clear coat layer.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -88,6 +94,8 @@ Default is `0`.
 ### .clearcoatRoughnessMap : Texture
 
 The green channel of this texture is multiplied against `clearcoatRoughness`, for per-pixel control over a coating's roughness.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -119,6 +127,8 @@ Default is `1.3`.
 
 The red channel of this texture is multiplied against `iridescence`, for per-pixel control over iridescence.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .iridescenceThicknessMap : Texture
@@ -128,6 +138,8 @@ A texture that defines the thickness of the iridescence layer, stored in the gre
 *   `0.0` in the green channel will result in thickness equal to first element of the array.
 *   `1.0` in the green channel will result in thickness equal to second element of the array.
 *   Values in-between will linearly interpolate between the elements of the array.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -167,6 +179,8 @@ Default is `(0,0,0)`.
 
 The RGB channels of this texture are multiplied against `sheenColor`, for per-pixel control over sheen tint.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ### .sheenRoughness : number
@@ -178,6 +192,8 @@ Default is `1`.
 ### .sheenRoughnessMap : Texture
 
 The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control over sheen roughness.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -191,6 +207,8 @@ Default is `(1,1,1)`.
 
 The RGB channels of this texture are multiplied against `specularColor`, for per-pixel control over specular color.
 
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
+
 Default is `null`.
 
 ### .specularIntensity : number
@@ -203,6 +221,8 @@ Default is `1`.
 
 The alpha channel of this texture is multiplied against `specularIntensity`, for per-pixel control over specular intensity.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .thickness : number
@@ -214,6 +234,8 @@ Default is `0`.
 ### .thicknessMap : Texture
 
 A texture that defines the thickness, stored in the green channel. This will be multiplied by `thickness`.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 
@@ -230,6 +252,8 @@ Default is `0`.
 ### .transmissionMap : Texture
 
 The red channel of this texture is multiplied against `transmission`, for per-pixel control over optical transparency.
+
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
 
 Default is `null`.
 

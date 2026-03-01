@@ -76,7 +76,8 @@ by <a href="Color.html#set">Color#set</a>.</p>
 						<p>Red and green channels represent the anisotropy direction in <code>[-1, 1]</code> tangent,
 bitangent space, to be rotated by <code>anisotropyRotation</code>. The blue channel
 contains strength as <code>[0, 1]</code> to be multiplied by <code>anisotropy</code>.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -119,14 +120,16 @@ thin translucent layer over the base layer.</p>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>clearcoat</code>,
 for per-pixel control over a coating's intensity.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatNormalMap" translate="no">.<a href="#clearcoatNormalMap">clearcoatNormalMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>Can be used to enable independent normals for the clear coat layer.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -149,7 +152,8 @@ for per-pixel control over a coating's intensity.</p>
 					<div class="description">
 						<p>The green channel of this texture is multiplied against
 <code>clearcoatRoughness</code>, for per-pixel control over a coating's roughness.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -189,7 +193,8 @@ Between <code>1.0</code> to <code>2.333</code>.</p>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>iridescence</code>, for per-pixel
 control over iridescence.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -202,7 +207,8 @@ Minimum and maximum values of thickness are defined by <code>iridescenceThicknes
 <li><code>1.0</code> in the green channel will result in thickness equal to second element of the array.</li>
 <li>Values in-between will linearly interpolate between the elements of the array.</li>
 </ul>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -249,7 +255,8 @@ when <code>metalness</code> is <code>1.0</code></p>
 					<div class="description">
 						<p>The RGB channels of this texture are multiplied against  <code>sheenColor</code>, for per-pixel control
 over sheen tint.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -264,7 +271,8 @@ over sheen tint.</p>
 					<div class="description">
 						<p>The alpha channel of this texture is multiplied against <code>sheenRoughness</code>, for per-pixel control
 over sheen roughness.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -279,7 +287,8 @@ over sheen roughness.</p>
 					<div class="description">
 						<p>The RGB channels of this texture are multiplied against <code>specularColor</code>,
 for per-pixel control over specular color.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture may contain color data and must have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set appropriately. For an explanation, see <a href="Color.html">Color Management</a>.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -295,7 +304,8 @@ When set to zero, the model is effectively Lambertian. From <code>0.0</code> to 
 					<div class="description">
 						<p>The alpha channel of this texture is multiplied against <code>specularIntensity</code>,
 for per-pixel control over specular intensity.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -312,7 +322,8 @@ thin-walled. Otherwise the material is a volume boundary.</p>
 					<div class="description">
 						<p>A texture that defines the thickness, stored in the green channel. This will
 be multiplied by <code>thickness</code>.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -331,7 +342,8 @@ property can be used to model these materials.</p>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>transmission</code>, for per-pixel control over
 optical transparency.</p>
-						<p>Default is <code>null</code>.</p>
+												<p><strong>This texture does not contain color data and must not have its <a href="Texture.html#colorSpace">Texture#colorSpace</a> set.</strong></p>
+<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

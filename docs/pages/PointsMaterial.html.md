@@ -41,6 +41,8 @@ The alpha map is a grayscale texture that controls the opacity across the surfac
 
 Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.
 
+**This texture does not contain color data and must not have its [Texture#colorSpace](Texture.html#colorSpace) set.**
+
 Default is `null`.
 
 ### .color : Color
@@ -64,6 +66,8 @@ Default is `true`.
 ### .map : Texture
 
 The color map. May optionally include an alpha channel, typically combined with [Material#transparent](Material.html#transparent) or [Material#alphaTest](Material.html#alphaTest). The texture map color is modulated by the diffuse `color`.
+
+**This texture may contain color data and must have its [Texture#colorSpace](Texture.html#colorSpace) set appropriately. For an explanation, see [Color Management](Color.html).**
 
 Default is `null`.
 
