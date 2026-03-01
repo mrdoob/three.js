@@ -1088,6 +1088,18 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the global invocation index for compute shaders.
+	 * This is the linearized index of a compute invocation within a grid of workgroups.
+	 *
+	 * @abstract
+	 * @return {string} The invocation index shader string.
+	 */
+	getInvocationIndex() {
+
+		warn( 'Abstract function.' );
+
+	}
+	/**
 	 * Contextually returns either the vertex stage instance index builtin
 	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
