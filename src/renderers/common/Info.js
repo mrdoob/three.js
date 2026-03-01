@@ -1,4 +1,12 @@
 import { error } from '../../utils.js';
+import {
+	ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType,
+	IntType, UnsignedIntType, FloatType,
+	AlphaFormat, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat,
+	RGBFormat,
+	UnsignedShort4444Type, UnsignedShort5551Type,
+	UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type
+} from '../../constants.js';
 
 /**
  * This renderer module provides a series of statistical information
@@ -87,12 +95,38 @@ class Info {
 		 * @type {Object}
 		 * @readonly
 		 * @property {number} geometries - The number of active geometries.
-		 * @property {number} frameCalls - The number of active textures.
+		 * @property {number} textures - The number of active textures.
+		 * @property {number} attributes - The number of active attributes.
+		 * @property {number} indexAttributes - The number of active index attributes.
+		 * @property {number} storageAttributes - The number of active storage attributes.
+		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
+		 * @property {number} programs - The number of active programs.
+		 * @property {number} renderTargets - The number of active renderTargets.
 		 */
 		this.memory = {
 			geometries: 0,
-			textures: 0
+			textures: 0,
+			attributes: 0,
+			indexAttributes: 0,
+			storageAttributes: 0,
+			indirectStorageAttributes: 0,
+			programs: 0,
+			renderTargets: 0,
+			total: 0,
+			texturesSize: 0,
+			attributesSize: 0,
+			indexAttributesSize: 0,
+			storageAttributesSize: 0,
+			indirectStorageAttributesSize: 0
 		};
+
+		/**
+		 * Map for storing calculated byte sizes of tracked objects.
+		 *
+		 * @type {Map<Object, number>}
+		 * @private
+		 */
+		this.memoryMap = new Map();
 
 	}
 
@@ -161,8 +195,233 @@ class Info {
 
 		this.render.timestamp = 0;
 		this.compute.timestamp = 0;
-		this.memory.geometries = 0;
-		this.memory.textures = 0;
+
+		for ( const prop in this.memory ) {
+
+			this.memory[ prop ] = 0;
+
+		}
+
+		this.memoryMap.clear();
+
+	}
+
+	/**
+	 * Tracks texture memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Texture} texture
+	 */
+	createTexture( texture ) {
+
+		const size = this._getTextureMemorySize( texture );
+		this.memoryMap.set( texture, size );
+
+		this.memory.textures ++;
+		this.memory.total += size;
+		this.memory.texturesSize += size;
+
+	}
+
+	/**
+	 * Tracks texture memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Texture} texture
+	 */
+	destroyTexture( texture ) {
+
+		const size = this.memoryMap.get( texture ) || 0;
+		this.memoryMap.delete( texture );
+
+		this.memory.textures --;
+		this.memory.total -= size;
+		this.memory.texturesSize -= size;
+
+	}
+
+	/**
+	 * Tracks attribute memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {BufferAttribute} attribute
+	 * @param {string} type - type of attribute
+	 * @private
+	 */
+	_createAttribute( attribute, type ) {
+
+		const size = this._getAttributeMemorySize( attribute );
+		this.memoryMap.set( attribute, { size, type } );
+
+		this.memory[ type ] ++;
+		this.memory.total += size;
+		this.memory[ type + 'Size' ] += size;
+
+	}
+
+	/**
+	 * Tracks a regular attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to track.
+	 */
+	createAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'attributes' );
+
+	}
+
+	/**
+	 * Tracks an index attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The index attribute to track.
+	 */
+	createIndexAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'indexAttributes' );
+
+	}
+
+	/**
+	 * Tracks a storage attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The storage attribute to track.
+	 */
+	createStorageAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'storageAttributes' );
+
+	}
+
+	/**
+	 * Tracks an indirect storage attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The indirect storage attribute to track.
+	 */
+	createIndirectStorageAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'indirectStorageAttributes' );
+
+	}
+
+	/**
+	 * Tracks attribute memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {BufferAttribute} attribute
+	 */
+	destroyAttribute( attribute ) {
+
+		const data = this.memoryMap.get( attribute );
+
+		if ( data ) {
+
+			this.memoryMap.delete( attribute );
+
+			this.memory[ data.type ] --;
+			this.memory.total -= data.size;
+			this.memory[ data.type + 'Size' ] -= data.size;
+
+		}
+
+	}
+
+	/**
+	 * Calculates the memory size of a texture in bytes.
+	 *
+	 * @param {Texture} texture - The texture to calculate the size for.
+	 * @return {number} The calculated size in bytes.
+	 * @private
+	 */
+	_getTextureMemorySize( texture ) {
+
+		if ( texture.isCompressedTexture ) {
+
+			return 1; // Fallback estimate since exact format decompressed isn't readily available without format maps
+
+		}
+
+		let bytesPerChannel = 1;
+
+		if ( texture.type === ByteType || texture.type === UnsignedByteType ) bytesPerChannel = 1;
+		else if ( texture.type === ShortType || texture.type === UnsignedShortType || texture.type === HalfFloatType ) bytesPerChannel = 2;
+		else if ( texture.type === IntType || texture.type === UnsignedIntType || texture.type === FloatType ) bytesPerChannel = 4;
+
+		let channels = 4; // RGBA default
+
+		if ( texture.format === AlphaFormat || texture.format === RedFormat || texture.format === RedIntegerFormat || texture.format === DepthFormat || texture.format === DepthStencilFormat ) channels = 1;
+		else if ( texture.format === RGBFormat ) channels = 3;
+
+		let bytesPerPixel = bytesPerChannel * channels;
+
+		// Packed overrides
+		if ( texture.type === UnsignedShort4444Type || texture.type === UnsignedShort5551Type ) bytesPerPixel = 2;
+		else if ( texture.type === UnsignedInt248Type || texture.type === UnsignedInt5999Type || texture.type === UnsignedInt101111Type ) bytesPerPixel = 4;
+
+		let width = 1, height = 1, depth = 1;
+		const image = texture.image;
+
+		if ( image !== undefined ) {
+
+			width = image.width || 1;
+			height = image.height || 1;
+			depth = image.depth || 1;
+			if ( texture.isCubeTexture ) depth = 6;
+
+		}
+
+		let size = width * height * depth * bytesPerPixel;
+		const mipmaps = texture.mipmaps;
+
+		if ( mipmaps && mipmaps.length > 0 ) {
+
+			let mipmapSize = 0;
+			for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+				const mipmap = mipmaps[ i ];
+				if ( mipmap.data ) {
+
+					mipmapSize += mipmap.data.byteLength;
+
+				} else {
+
+					const mipWidth = mipmap.width || Math.max( 1, width >> i );
+					const mipHeight = mipmap.height || Math.max( 1, height >> i );
+					mipmapSize += mipWidth * mipHeight * depth * bytesPerPixel;
+
+				}
+
+			}
+
+			size += mipmapSize;
+
+		} else if ( texture.generateMipmaps ) {
+
+			size = size * 1.333; // MiP chain approximation
+
+		}
+
+		return Math.round( size );
+
+	}
+
+	/**
+	 * Calculates the memory size of an attribute in bytes.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to calculate the size for.
+	 * @return {number} The calculated size in bytes.
+	 * @private
+	 */
+	_getAttributeMemorySize( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		if ( attribute.array ) {
+
+			return attribute.array.byteLength;
+
+		} else if ( attribute.count && attribute.itemSize ) {
+
+			return attribute.count * attribute.itemSize * 4; // Assume Float32
+
+		}
+
+		return 0;
 
 	}
 
