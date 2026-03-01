@@ -96,7 +96,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "eslint": "^9.0.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-compat": "^6.0.0",
+    "eslint-plugin-compat": "^7.0.0",
     "eslint-plugin-html": "^8.1.3",
     "eslint-plugin-jsdoc": "^62.0.0",
     "globals": "^17.0.0",
