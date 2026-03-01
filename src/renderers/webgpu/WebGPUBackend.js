@@ -10,6 +10,7 @@ import Backend from '../common/Backend.js';
 import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
+import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
@@ -115,6 +116,14 @@ class WebGPUBackend extends Backend {
 		 * @type {WebGPUBindingUtils}
 		 */
 		this.bindingUtils = new WebGPUBindingUtils( this );
+
+		/**
+		 * A reference to a backend module holding device capability related
+		 * utility functions.
+		 *
+		 * @type {WebGPUCapabilities}
+		 */
+		this.capabilities = new WebGPUCapabilities( this );
 
 		/**
 		 * A reference to a backend module holding shader pipeline-related
@@ -2292,17 +2301,6 @@ class WebGPUBackend extends Backend {
 	}
 
 	// utils public
-
-	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {
-
-		return 16;
-
-	}
 
 	/**
 	 * Checks if the given feature is supported by the backend.

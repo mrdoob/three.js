@@ -1778,7 +1778,7 @@ class Renderer {
 	 */
 	getMaxAnisotropy() {
 
-		return this.backend.getMaxAnisotropy();
+		return this.backend.capabilities.getMaxAnisotropy();
 
 	}
 
