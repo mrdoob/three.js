@@ -64,7 +64,7 @@ jobs:
       - name: === E2E testing ===
         run: npm run test-e2e
       - name: Upload output screenshots
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: always()
         with:
           name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
