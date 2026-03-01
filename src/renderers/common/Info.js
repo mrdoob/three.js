@@ -359,17 +359,9 @@ class Info {
 		if ( texture.type === UnsignedShort4444Type || texture.type === UnsignedShort5551Type ) bytesPerPixel = 2;
 		else if ( texture.type === UnsignedInt248Type || texture.type === UnsignedInt5999Type || texture.type === UnsignedInt101111Type ) bytesPerPixel = 4;
 
-		let width = 1, height = 1, depth = 1;
-		const image = texture.image;
-
-		if ( image !== undefined ) {
-
-			width = image.width || 1;
-			height = image.height || 1;
-			depth = image.depth || 1;
-			if ( texture.isCubeTexture ) depth = 6;
-
-		}
+		const width = texture.width || 1;
+		const height = texture.height || 1;
+		const depth = texture.isCubeTexture ? 6 : ( texture.depth || 1 );
 
 		let size = width * height * depth * bytesPerPixel;
 		const mipmaps = texture.mipmaps;
