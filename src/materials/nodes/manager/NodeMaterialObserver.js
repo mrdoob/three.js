@@ -228,25 +228,6 @@ class NodeMaterialObserver {
 
 		const attributesData = {};
 
-		let _keys = attributes._keys;
-
-		if ( _keys === undefined ) {
-
-			// attributes._keys should only be undefined
-			// if attributes is NOT a BufferGeometry.
-
-			_keys = Object.keys( attributes );
-
-			Object.defineProperty( attributes, '_keys', {
-				value: _keys
-			} );
-
-		}
-
-		Object.defineProperty( attributesData, '_keys', {
-			value: _keys.slice()
-		} );
-
 		for ( const name in attributes ) {
 
 			const attribute = attributes[ name ];
@@ -412,8 +393,8 @@ class NodeMaterialObserver {
 		const attributes = geometry.attributes;
 		const storedAttributes = storedGeometryData.attributes;
 
-		const storedAttributeNames = storedAttributes._keys;
-		const currentAttributeNames = attributes._keys;
+		const storedAttributeNames = Object.keys( storedAttributes );
+		const currentAttributeNames = Object.keys( attributes );
 
 		if ( storedGeometryData.id !== geometry.id ) {
 
