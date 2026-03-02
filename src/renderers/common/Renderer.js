@@ -261,7 +261,7 @@ class Renderer {
 		 *
 		 * @type {Lighting}
 		 */
-		this.lighting = new Lighting();
+		this.lighting = new Lighting( this );
 
 		// internals
 
@@ -684,6 +684,30 @@ class Renderer {
 			enabled: false,
 			transmitted: false,
 			type: PCFShadowMap
+		};
+
+		/**
+		 * Lights configuration.
+		 * @typedef {Object} LightsConfig
+		 * @property {boolean} dynamic - When true, uses uniform buffers and shader loops so light count
+		 * changes don't trigger material recompilation (only light type changes do).
+		 * @property {number} maxDirectionalLights - Maximum number of directional lights in dynamic mode.
+		 * @property {number} maxPointLights - Maximum number of point lights in dynamic mode.
+		 * @property {number} maxSpotLights - Maximum number of spot lights in dynamic mode.
+		 * @property {number} maxHemisphereLights - Maximum number of hemisphere lights in dynamic mode.
+		 */
+
+		/**
+		 * The renderer's lights configuration.
+		 *
+		 * @type {LightsConfig}
+		 */
+		this.lights = {
+			dynamic: false,
+			maxDirectionalLights: 8,
+			maxPointLights: 16,
+			maxSpotLights: 16,
+			maxHemisphereLights: 4
 		};
 
 		/**

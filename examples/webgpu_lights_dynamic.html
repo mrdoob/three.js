@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - dynamic lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Dynamic Lights</span>
+			</div>
+
+			<small>
+				Opt-in dynamic lighting mode avoids shader recompilation when adding/removing lights.<br />
+				100 meshes with 50 unique PBR materials. Use the Inspector to explore the scene.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			let camera, scene, renderer, controls, timer, stats;
+
+			const pointLights = [];
+			let autoAddInterval = null;
+
+			const params = {
+				dynamic: true,
+				autoAdd: false,
+				lightCount: 2,
+				addLight() { addLight(); },
+				removeLight() { removeLight(); },
+				removeAll() { removeAllLights(); }
+			};
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 0, 15, 30 );
+
+				scene = new THREE.Scene();
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				// Stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// Floor
+
+				const floorGeometry = new THREE.PlaneGeometry( 120, 120 );
+				const floorMaterial = new THREE.MeshStandardMaterial( { color: 0x444444, roughness: 0.8 } );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				scene.add( floor );
+
+				// Shared geometries
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.8, 128, 128 );
+				const boxGeometry = new THREE.BoxGeometry( 1.2, 1.2, 1.2, 64, 64, 64 );
+				const torusGeometry = new THREE.TorusGeometry( 0.6, 0.25, 128, 128 );
+				const cylinderGeometry = new THREE.CylinderGeometry( 0.5, 0.5, 1.4, 128, 64 );
+				const coneGeometry = new THREE.ConeGeometry( 0.6, 1.4, 128, 64 );
+
+				const geometries = [ sphereGeometry, boxGeometry, torusGeometry, cylinderGeometry, coneGeometry ];
+
+				// 100 meshes — first 50 with unique PBR materials, remaining 50 reuse them
+
+				const uniqueMaterials = [];
+
+				for ( let i = 0; i < 50; i ++ ) {
+
+					const material = new THREE.MeshStandardMaterial( {
+						color: new THREE.Color().setHSL( i / 50, 0.6 + Math.random() * 0.4, 0.35 + Math.random() * 0.3 ),
+						roughness: Math.random(),
+						metalness: Math.random(),
+					} );
+					material.name = 'Standard_' + i;
+
+					uniqueMaterials.push( material );
+
+				}
+
+				const meshesPerRing = 10;
+
+				for ( let i = 0; i < 100; i ++ ) {
+
+					const material = i < 50 ? uniqueMaterials[ i ] : uniqueMaterials[ i - 50 ];
+					const geometry = geometries[ i % geometries.length ];
+					const mesh = new THREE.Mesh( geometry, material );
+
+					const ring = Math.floor( i / meshesPerRing );
+					const indexInRing = i % meshesPerRing;
+					const angle = ( indexInRing / meshesPerRing ) * Math.PI * 2 + ring * 0.3;
+					const radius = 6 + ring * 4;
+
+					mesh.position.set(
+						Math.cos( angle ) * radius,
+						0.7 + Math.random() * 2,
+						Math.sin( angle ) * radius
+					);
+
+					mesh.rotation.set(
+						Math.random() * Math.PI,
+						Math.random() * Math.PI,
+						0
+					);
+
+					scene.add( mesh );
+
+				}
+
+				// Center sphere
+
+				const centerMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.1, metalness: 0.9 } );
+				const centerSphere = new THREE.Mesh( new THREE.SphereGeometry( 2, 128, 128 ), centerMaterial );
+				centerSphere.position.y = 2;
+				scene.add( centerSphere );
+
+				// Ambient light
+
+				scene.add( new THREE.AmbientLight( 0x404040, 0.5 ) );
+
+				// Start with a couple point lights
+
+				addLight();
+				addLight();
+
+				// Renderer
+
+				createRenderer();
+
+				// Inspector GUI
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createRenderer() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				renderer.lights.dynamic = params.dynamic;
+
+				// Inspector GUI
+
+				const gui = renderer.inspector.createParameters( 'Dynamic Lights' );
+
+				gui.add( params, 'dynamic' ).name( 'dynamic mode' ).onChange( () => {
+
+					renderer.dispose();
+					document.body.removeChild( renderer.domElement );
+					clearInterval( autoAddInterval );
+					autoAddInterval = null;
+					params.autoAdd = false;
+					createRenderer();
+
+				} );
+
+				gui.add( params, 'autoAdd' ).name( 'auto-add lights' ).onChange( ( value ) => {
+
+					if ( value ) {
+
+						autoAddInterval = setInterval( () => {
+
+							addLight();
+
+						}, 500 );
+
+					} else {
+
+						clearInterval( autoAddInterval );
+						autoAddInterval = null;
+
+					}
+
+				} );
+
+				gui.add( params, 'addLight' ).name( 'add light' );
+				gui.add( params, 'removeLight' ).name( 'remove light' );
+				gui.add( params, 'removeAll' ).name( 'remove all lights' );
+				gui.add( params, 'lightCount' ).name( 'point lights' ).listen();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 2, 0 );
+				controls.update();
+
+			}
+
+			function addLight() {
+
+				const color = new THREE.Color().setHSL( Math.random(), 0.8, 0.5 );
+				const light = new THREE.PointLight( color, 1000 );
+
+				const angle = Math.random() * Math.PI * 2;
+				const radius = 5 + Math.random() * 20;
+				light.position.set(
+					Math.cos( angle ) * radius,
+					1 + Math.random() * 6,
+					Math.sin( angle ) * radius
+				);
+
+				light.userData.angle = angle;
+				light.userData.radius = radius;
+				light.userData.speed = 0.2 + Math.random() * 0.8;
+				light.userData.baseY = light.position.y;
+
+				// Visual indicator
+				const sphere = new THREE.Mesh(
+					new THREE.SphereGeometry( 0.15, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: color } )
+				);
+				light.add( sphere );
+
+				scene.add( light );
+				pointLights.push( light );
+
+				params.lightCount = pointLights.length;
+
+			}
+
+			function removeLight() {
+
+				if ( pointLights.length === 0 ) return;
+
+				const light = pointLights.pop();
+				scene.remove( light );
+				light.dispose();
+
+				params.lightCount = pointLights.length;
+
+			}
+
+			function removeAllLights() {
+
+				while ( pointLights.length > 0 ) {
+
+					const light = pointLights.pop();
+					scene.remove( light );
+					light.dispose();
+
+				}
+
+				params.lightCount = 0;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const time = timer.getElapsed();
+
+				controls.update();
+
+				// Animate lights
+
+				for ( let i = 0; i < pointLights.length; i ++ ) {
+
+					const light = pointLights[ i ];
+					const d = light.userData;
+					const t = time * d.speed + d.angle;
+
+					light.position.x = Math.cos( t ) * d.radius;
+					light.position.z = Math.sin( t ) * d.radius;
+					light.position.y = d.baseY + Math.sin( t * 2 ) * 0.5;
+
+				}
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>
