@@ -1,3 +1,5 @@
+import { BufferGeometry } from '../../../Three.Core.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -231,12 +233,6 @@ class NodeMaterialObserver {
 		let _keys = attributes._keys;
 
 		if ( _keys === undefined ) {
-
-			if ( attributes.constructor.name !== 'Object' ) {
-
-				throw new Error( 'attributes._keys should only be undefined if attributes is an object literal' );
-
-			}
 
 			_keys = Object.keys( attributes );
 
