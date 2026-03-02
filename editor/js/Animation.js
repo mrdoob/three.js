@@ -1,10 +1,12 @@
-import { UIPanel, UIText, UIButton } from './libs/ui.js';
+import { UIPanel, UIText, UIButton, UINumber } from './libs/ui.js';
 
 import { AnimationPathHelper } from 'three/addons/helpers/AnimationPathHelper.js';
 
 function Animation( editor ) {
 
 	const signals = editor.signals;
+	const strings = editor.strings;
+	const mixer = editor.mixer;
 
 	const container = new UIPanel();
 	container.setId( 'animation' );
@@ -33,9 +35,9 @@ function Animation( editor ) {
 	container.add( controlsPanel );
 
 	// SVG icons
-	const playIcon = `<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="currentColor"/></svg>`;
-	const pauseIcon = `<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1h3v10H2zM7 1h3v10H7z" fill="currentColor"/></svg>`;
-	const stopIcon = `<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="currentColor"/></svg>`;
+	const playIcon = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="currentColor"/></svg>';
+	const pauseIcon = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1h3v10H2zM7 1h3v10H7z" fill="currentColor"/></svg>';
+	const stopIcon = '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="currentColor"/></svg>';
 
 	const playButton = new UIButton();
 	playButton.dom.innerHTML = playIcon;
@@ -129,6 +131,17 @@ function Animation( editor ) {
 
 	const durationText = new UIText( '0.00' ).setWidth( '36px' );
 	timeDisplay.appendChild( durationText.dom );
+
+	// Time Scale
+	const mixerTimeScaleNumber = new UINumber( 1 ).setWidth( '60px' ).setRange( - 10, 10 );
+	mixerTimeScaleNumber.onChange( function () {
+
+		mixer.timeScale = mixerTimeScaleNumber.getValue();
+
+	} );
+
+	controlsPanel.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setClass( 'Label' ) );
+	controlsPanel.add( mixerTimeScaleNumber );
 
 	// Timeline area with track rows
 	const timelineArea = document.createElement( 'div' );
@@ -440,6 +453,7 @@ function Animation( editor ) {
 						trackTimeline.appendChild( keyframe );
 
 					}
+
 					trackRow.appendChild( trackTimeline );
 
 					// Hover on position tracks to show path helper
