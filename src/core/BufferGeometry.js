@@ -828,9 +828,9 @@ class BufferGeometry extends EventDispatcher {
 		// (per vertex tangents)
 
 		if ( index === null ||
-			attributes.position === undefined ||
-			attributes.normal === undefined ||
-			attributes.uv === undefined ) {
+			 attributes.position === undefined ||
+			 attributes.normal === undefined ||
+			 attributes.uv === undefined ) {
 
 			error( 'BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
 			return;
