@@ -67,7 +67,7 @@ class Renderer {
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
 	 * to overwrite the default.
 	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
-	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
+	 * @property {number} [workingBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
 	 */
@@ -101,7 +101,7 @@ class Renderer {
 			antialias = false,
 			samples = 0,
 			getFallback = null,
-			outputBufferType = HalfFloatType,
+			workingBufferType = HalfFloatType,
 			multiview = false
 		} = parameters;
 
@@ -604,7 +604,7 @@ class Renderer {
 		 * @type {number}
 		 * @default HalfFloatType
 		 */
-		this._outputBufferType = outputBufferType;
+		this._workingBufferType = workingBufferType;
 
 		/**
 		 * A cache for shadow nodes per material
@@ -1155,23 +1155,23 @@ class Renderer {
 	 *
 	 * @return {number} The output buffer type.
 	 */
-	getOutputBufferType() {
+	getWorkingBufferType() {
 
-		return this._outputBufferType;
+		return this._workingBufferType;
 
 	}
 
 	/**
 	 * Returns the output buffer type.
 	 *
-	 * @deprecated since r182. Use `.getOutputBufferType()` instead.
+	 * @deprecated since r182. Use `.getWorkingBufferType()` instead.
 	 * @return {number} The output buffer type.
 	 */
 	getColorBufferType() { // @deprecated, r182
 
-		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".' );
+		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getWorkingBufferType()".' );
 
-		return this.getOutputBufferType();
+		return this.getWorkingBufferType();
 
 	}
 
@@ -1349,7 +1349,7 @@ class Renderer {
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
-				type: this._outputBufferType,
+				type: this._workingBufferType,
 				format: RGBAFormat,
 				colorSpace: ColorManagement.workingColorSpace,
 				generateMipmaps: false,
