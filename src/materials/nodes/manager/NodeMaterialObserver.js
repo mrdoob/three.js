@@ -1,5 +1,3 @@
-import { BufferGeometry } from '../../../Three.Core.js';
-
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
