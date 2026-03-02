@@ -1491,7 +1491,27 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	_draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+	/**
+	 * Internal draw function that performs the draw with the given pass encoder.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 * @param {Object} renderContextData - The render context data object, holding current pass state and occlusion query tracking.
+	 * @param {GPURenderPipeline} pipelineGPU - The GPU render pipeline.
+	 * @param {Array<BufferAttribute>} vertexBuffers - The vertex buffers.
+	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
+	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
+	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
+	 */
+	_draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+
+		const { object, material, context } = renderObject;
+
+		const bindings = renderObject.getBindings();
+
+		const index = renderObject.getIndex();
+		const hasIndex = ( index !== null );
 
 		// pipeline
 		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
@@ -1662,18 +1682,13 @@ class WebGPUBackend extends Backend {
 	 */
 	draw( renderObject, info ) {
 
-		const { object, material, context, pipeline } = renderObject;
-		const bindings = renderObject.getBindings();
+		const { object, context, pipeline } = renderObject;
 		const renderContextData = this.get( context );
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
 		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
-
-		const index = renderObject.getIndex();
-		const hasIndex = ( index !== null );
-
 
 		const drawParams = renderObject.getDrawParameters();
 		if ( drawParams === null ) return;
@@ -1758,7 +1773,7 @@ class WebGPUBackend extends Backend {
 
 					}
 
-					this._draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, pass, sets );
+					this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, pass, sets );
 
 				}
 
@@ -1795,7 +1810,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				this._draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
+				this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
 
 			}
 
