@@ -41,6 +41,8 @@ class MeshDistanceMaterial extends Material {
 		 * The color map. May optionally include an alpha channel, typically combined
 		 * with {@link Material#transparent} or {@link Material#alphaTest}.
 		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -56,6 +58,8 @@ class MeshDistanceMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -68,6 +72,8 @@ class MeshDistanceMaterial extends Material {
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null

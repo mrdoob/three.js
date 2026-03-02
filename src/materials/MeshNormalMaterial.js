@@ -40,6 +40,8 @@ class MeshNormalMaterial extends Material {
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -60,6 +62,8 @@ class MeshNormalMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -89,6 +93,8 @@ class MeshNormalMaterial extends Material {
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null

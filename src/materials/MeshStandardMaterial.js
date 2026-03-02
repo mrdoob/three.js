@@ -100,6 +100,8 @@ class MeshStandardMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -107,6 +109,8 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -124,6 +128,8 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -162,6 +168,8 @@ class MeshStandardMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -172,6 +180,8 @@ class MeshStandardMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -193,6 +203,8 @@ class MeshStandardMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -223,6 +235,8 @@ class MeshStandardMaterial extends Material {
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -252,6 +266,8 @@ class MeshStandardMaterial extends Material {
 		 * The green channel of this texture is used to alter the roughness of the
 		 * material.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -260,6 +276,8 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The blue channel of this texture is used to alter the metalness of the
 		 * material.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -276,6 +294,8 @@ class MeshStandardMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -284,6 +304,8 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The environment map. To ensure a physically correct rendering, environment maps
 		 * are internally pre-processed with {@link PMREMGenerator}.
+		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
 		 *
 		 * @type {?Texture}
 		 * @default null

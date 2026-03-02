@@ -54,6 +54,8 @@ class MeshMatcapMaterial extends Material {
 		/**
 		 * The matcap map.
 		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -63,6 +65,8 @@ class MeshMatcapMaterial extends Material {
 		 * The color map. May optionally include an alpha channel, typically combined
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
+		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -74,6 +78,8 @@ class MeshMatcapMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -95,6 +101,8 @@ class MeshMatcapMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -124,6 +132,8 @@ class MeshMatcapMaterial extends Material {
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -159,6 +169,8 @@ class MeshMatcapMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null

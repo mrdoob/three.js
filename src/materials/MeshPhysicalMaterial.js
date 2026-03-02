@@ -77,6 +77,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * bitangent space, to be rotated by `anisotropyRotation`. The blue channel
 		 * contains strength as `[0, 1]` to be multiplied by `anisotropy`.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -85,6 +87,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The red channel of this texture is multiplied against `clearcoat`,
 		 * for per-pixel control over a coating's intensity.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -103,6 +107,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The green channel of this texture is multiplied against
 		 * `clearcoatRoughness`, for per-pixel control over a coating's roughness.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -119,6 +125,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		/**
 		 * Can be used to enable independent normals for the clear coat layer.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -161,6 +169,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The red channel of this texture is multiplied against `iridescence`, for per-pixel
 		 * control over iridescence.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -191,6 +201,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * - `1.0` in the green channel will result in thickness equal to second element of the array.
 		 * - Values in-between will linearly interpolate between the elements of the array.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -207,6 +219,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The RGB channels of this texture are multiplied against  `sheenColor`, for per-pixel control
 		 * over sheen tint.
+		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -225,6 +239,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control
 		 * over sheen roughness.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -233,6 +249,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The red channel of this texture is multiplied against `transmission`, for per-pixel control over
 		 * optical transparency.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -252,6 +270,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * A texture that defines the thickness, stored in the green channel. This will
 		 * be multiplied by `thickness`.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -290,6 +310,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The alpha channel of this texture is multiplied against `specularIntensity`,
 		 * for per-pixel control over specular intensity.
 		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -306,6 +328,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The RGB channels of this texture are multiplied against `specularColor`,
 		 * for per-pixel control over specular color.
+		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
 		 *
 		 * @type {?Texture}
 		 * @default null

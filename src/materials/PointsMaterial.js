@@ -65,6 +65,8 @@ class PointsMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * **Note:** The texture must have {@link Texture#colorSpace} set correctly. See {@link ColorManagement} for details.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -79,6 +81,8 @@ class PointsMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * **Note:** The texture should not have {@link Texture#colorSpace} set.
 		 *
 		 * @type {?Texture}
 		 * @default null
