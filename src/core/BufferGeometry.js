@@ -121,7 +121,10 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.indirectOffset = 0;
 
-		const attributeKeys = [];
+		const attributes = {};
+
+		// Use Object.defineProperty() so '_keys' is non-enumerable
+		Object.defineProperty( attributes, '_keys', { value: [] } );
 
 		let attributeKeysChanged = false;
 
@@ -132,42 +135,34 @@ class BufferGeometry extends EventDispatcher {
 		 *
 		 * @type {Object<string,(BufferAttribute|InterleavedBufferAttribute)>}
 		 */
-		this.attributes = new Proxy( {}, {
+		this.attributes = new Proxy( attributes, {
 
-			get( attributes, key, receiver ) {
+			get( obj, key, receiver ) {
 
-				if ( key === '_keys' ) {
+				if ( key === '_keys' && attributeKeysChanged ) {
 
-					if ( attributeKeysChanged ) {
+					attributeKeysChanged = false;
 
-						attributeKeysChanged = false;
+					const _keys = obj._keys;
 
-						const keys = Object.keys( attributes );
+					const keys = Object.keys( obj );
 
-						// Make sure that we keep the original array object reference.
-						attributeKeys.splice( 0, attributeKeys.length, ...keys );
+					// Update the original array object.
+					_keys.splice( 0, _keys.length, ...keys );
 
-					}
-
-					return attributeKeys;
+					return _keys;
 
 				}
 
-				return Reflect.get( attributes, key, receiver );
+				return Reflect.get( obj, key, receiver );
 
 			},
 
-			set( attributes, key, value, receiver ) {
+			set( obj, key, value, receiver ) {
 
-				if ( key === '_keys' ) {
+				const hadKey = Reflect.has( obj, key );
 
-					throw new Error( 'cannot edit _keys' );
-
-				}
-
-				const hadKey = Reflect.has( attributes, key );
-
-				Reflect.set( attributes, key, value, receiver );
+				Reflect.set( obj, key, value, receiver );
 
 				if ( ! hadKey ) {
 
@@ -179,15 +174,11 @@ class BufferGeometry extends EventDispatcher {
 
 			},
 
-			deleteProperty( attributes, key ) {
+			deleteProperty( obj, key ) {
 
-				if ( key === '_keys' ) {
+				if ( Reflect.has( obj, key ) ) {
 
-					throw new Error( 'cannot edit _keys' );
-
-				} else if ( Reflect.has( attributes, key ) ) {
-
-					Reflect.deleteProperty( attributes, key );
+					Reflect.deleteProperty( obj, key );
 
 					attributeKeysChanged = true;
 

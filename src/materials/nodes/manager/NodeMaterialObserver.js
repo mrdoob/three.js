@@ -226,11 +226,12 @@ class NodeMaterialObserver {
 	 */
 	getAttributesData( attributes ) {
 
-		const attributesData = {
+		const attributesData = {};
 
-			_keys: [ ...attributes._keys ],
-
-		};
+		// Use Object.defineProperty() so '_keys' is non-enumerable
+		Object.defineProperty( attributes, '_keys', {
+			value: attributes._keys.slice()
+		} );
 
 		for ( const name in attributes ) {
 
