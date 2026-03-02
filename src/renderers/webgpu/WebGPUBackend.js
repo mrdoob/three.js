@@ -1491,7 +1491,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	_setPipelineAndBindings( material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, passEncoderGPU, currentSets ) {
+	_draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
 
 		// pipeline
 		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
@@ -1553,13 +1553,6 @@ class WebGPUBackend extends Backend {
 			renderContextData.currentStencilRef = material.stencilRef;
 
 		}
-
-
-	}
-
-	_draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
-
-		this._setPipelineAndBindings( material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, passEncoderGPU, currentSets );
 
 		if ( object.isBatchedMesh === true ) {
 
