@@ -121,6 +121,13 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.indirectOffset = 0;
 
+		const attributes = {};
+
+		// Use Object.defineProperty() so '_keys' is non-enumerable
+		Object.defineProperty( attributes, '_keys', { value: [] } );
+
+		let attributeKeysChanged = false;
+
 		/**
 		 * This dictionary has as id the name of the attribute to be set and as value
 		 * the buffer attribute to set it to. Rather than accessing this property directly,
@@ -128,7 +135,60 @@ class BufferGeometry extends EventDispatcher {
 		 *
 		 * @type {Object<string,(BufferAttribute|InterleavedBufferAttribute)>}
 		 */
-		this.attributes = {};
+		this.attributes = new Proxy( attributes, {
+
+			get( obj, key, receiver ) {
+
+				if ( key === '_keys' && attributeKeysChanged ) {
+
+					attributeKeysChanged = false;
+
+					const _keys = obj._keys;
+
+					const keys = Object.keys( obj );
+
+					// Update the original array object.
+					_keys.splice( 0, _keys.length, ...keys );
+
+					return _keys;
+
+				}
+
+				return Reflect.get( obj, key, receiver );
+
+			},
+
+			set( obj, key, value, receiver ) {
+
+				const hadKey = Reflect.has( obj, key );
+
+				Reflect.set( obj, key, value, receiver );
+
+				if ( ! hadKey ) {
+
+					attributeKeysChanged = true;
+
+				}
+
+				return true;
+
+			},
+
+			deleteProperty( obj, key ) {
+
+				if ( Reflect.has( obj, key ) ) {
+
+					Reflect.deleteProperty( obj, key );
+
+					attributeKeysChanged = true;
+
+				}
+
+				return true;
+
+			}
+
+		} );
 
 		/**
 		 * This dictionary holds the morph targets of the geometry.

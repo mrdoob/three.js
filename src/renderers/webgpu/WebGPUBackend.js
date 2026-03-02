@@ -1491,6 +1491,174 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	_setPipelineAndBindings( material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, passEncoderGPU, currentSets ) {
+
+		// pipeline
+		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
+		currentSets.pipeline = pipelineGPU;
+
+		// bind groups
+		const currentBindingGroups = currentSets.bindingGroups;
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+
+				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+
+			}
+
+		}
+
+		// attributes
+
+		// index
+
+		if ( hasIndex === true ) {
+
+			if ( currentSets.index !== index ) {
+
+				const buffer = this.get( index ).buffer;
+				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+
+				currentSets.index = index;
+
+			}
+
+		}
+
+		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
+
+			const vertexBuffer = vertexBuffers[ i ];
+
+			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+
+				const buffer = this.get( vertexBuffer ).buffer;
+				passEncoderGPU.setVertexBuffer( i, buffer );
+
+				currentSets.attributes[ i ] = vertexBuffer;
+
+			}
+
+		}
+		// stencil
+
+		if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
+
+			passEncoderGPU.setStencilReference( material.stencilRef );
+			renderContextData.currentStencilRef = material.stencilRef;
+
+		}
+
+
+	}
+
+	_draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+
+		this._setPipelineAndBindings( material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, passEncoderGPU, currentSets );
+
+		if ( object.isBatchedMesh === true ) {
+
+			const starts = object._multiDrawStarts;
+			const counts = object._multiDrawCounts;
+			const drawCount = object._multiDrawCount;
+			const drawInstances = object._multiDrawInstances;
+
+			if ( drawInstances !== null ) {
+
+				// @deprecated, r174
+				warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+
+			}
+
+			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
+
+			if ( material.wireframe ) {
+
+				bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
+			}
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				const count = drawInstances ? drawInstances[ i ] : 1;
+				const firstInstance = count > 1 ? 0 : i;
+
+				if ( hasIndex === true ) {
+
+					passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
+
+				} else {
+
+					passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+
+				}
+
+				info.update( object, counts[ i ], count );
+
+			}
+
+		} else if ( hasIndex === true ) {
+
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
+
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+				const indirectOffset = renderObject.getIndirectOffset();
+				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+					passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
+
+				}
+
+			} else {
+
+				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
+			}
+
+			info.update( object, indexCount, instanceCount );
+
+		} else {
+
+			const { vertexCount, instanceCount, firstVertex } = drawParams;
+
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+				const indirectOffset = renderObject.getIndirectOffset();
+				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+					passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
+
+				}
+
+
+			} else {
+
+				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
+			}
+
+			info.update( object, vertexCount, instanceCount );
+
+		}
+
+	}
+
 	// render object
 
 	/**
@@ -1517,179 +1685,9 @@ class WebGPUBackend extends Backend {
 		const drawParams = renderObject.getDrawParameters();
 		if ( drawParams === null ) return;
 
-		// pipeline
+		// vertex buffers
 
-		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
-
-			// pipeline
-			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
-			currentSets.pipeline = pipelineGPU;
-
-			// bind groups
-			const currentBindingGroups = currentSets.bindingGroups;
-			for ( let i = 0, l = bindings.length; i < l; i ++ ) {
-
-				const bindGroup = bindings[ i ];
-				const bindingsData = this.get( bindGroup );
-				if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
-
-					passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-					currentBindingGroups[ bindGroup.index ] = bindGroup.id;
-
-				}
-
-			}
-
-			// attributes
-
-			// index
-
-			if ( hasIndex === true ) {
-
-				if ( currentSets.index !== index ) {
-
-					const buffer = this.get( index ).buffer;
-					const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
-
-					passEncoderGPU.setIndexBuffer( buffer, indexFormat );
-
-					currentSets.index = index;
-
-				}
-
-			}
-			// vertex buffers
-
-			const vertexBuffers = renderObject.getVertexBuffers();
-
-			for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
-
-				const vertexBuffer = vertexBuffers[ i ];
-
-				if ( currentSets.attributes[ i ] !== vertexBuffer ) {
-
-					const buffer = this.get( vertexBuffer ).buffer;
-					passEncoderGPU.setVertexBuffer( i, buffer );
-
-					currentSets.attributes[ i ] = vertexBuffer;
-
-				}
-
-			}
-			// stencil
-
-			if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
-
-				passEncoderGPU.setStencilReference( material.stencilRef );
-				renderContextData.currentStencilRef = material.stencilRef;
-
-			}
-
-
-		};
-
-		// Define draw function
-		const draw = ( passEncoderGPU, currentSets ) => {
-
-			setPipelineAndBindings( passEncoderGPU, currentSets );
-
-			if ( object.isBatchedMesh === true ) {
-
-				const starts = object._multiDrawStarts;
-				const counts = object._multiDrawCounts;
-				const drawCount = object._multiDrawCount;
-				const drawInstances = object._multiDrawInstances;
-
-				if ( drawInstances !== null ) {
-
-					// @deprecated, r174
-					warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-
-				}
-
-				let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
-
-				if ( material.wireframe ) {
-
-					bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
-
-				}
-
-				for ( let i = 0; i < drawCount; i ++ ) {
-
-					const count = drawInstances ? drawInstances[ i ] : 1;
-					const firstInstance = count > 1 ? 0 : i;
-
-					if ( hasIndex === true ) {
-
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
-
-					} else {
-
-						passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
-
-					}
-
-					info.update( object, counts[ i ], count );
-
-				}
-
-			} else if ( hasIndex === true ) {
-
-				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
-
-				const indirect = renderObject.getIndirect();
-
-				if ( indirect !== null ) {
-
-					const buffer = this.get( indirect ).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
-
-					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
-
-						passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
-
-					}
-
-				} else {
-
-					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
-
-				}
-
-				info.update( object, indexCount, instanceCount );
-
-			} else {
-
-				const { vertexCount, instanceCount, firstVertex } = drawParams;
-
-				const indirect = renderObject.getIndirect();
-
-				if ( indirect !== null ) {
-
-					const buffer = this.get( indirect ).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
-
-					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
-
-						passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
-
-					}
-
-
-				} else {
-
-					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
-
-				}
-
-				info.update( object, vertexCount, instanceCount );
-
-			}
-
-		};
+		const vertexBuffers = renderObject.getVertexBuffers();
 
 		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
@@ -1767,8 +1765,7 @@ class WebGPUBackend extends Backend {
 
 					}
 
-					draw( pass, sets );
-
+					this._draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, pass, sets );
 
 				}
 
@@ -1805,7 +1802,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				draw( renderContextData.currentPass, renderContextData.currentSets );
+				this._draw( renderObject, info, object, material, context, bindings, renderContextData, pipelineGPU, index, hasIndex, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
 
 			}
 
