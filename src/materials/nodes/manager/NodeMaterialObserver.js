@@ -237,15 +237,11 @@ class NodeMaterialObserver {
 
 			_keys = Object.keys( attributes );
 
-			Object.defineProperty( attributes, '_keys', {
-				value: _keys
-			} );
+			Object.defineProperty( attributes, '_keys', { value: _keys } );
 
 		}
 
-		Object.defineProperty( attributesData, '_keys', {
-			value: _keys.slice()
-		} );
+		Object.defineProperty( attributesData, '_keys', { value: _keys.slice() } );
 
 		for ( const name in attributes ) {
 
