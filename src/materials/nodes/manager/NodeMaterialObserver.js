@@ -229,7 +229,7 @@ class NodeMaterialObserver {
 		const attributesData = {};
 
 		// Use Object.defineProperty() so '_keys' is non-enumerable
-		Object.defineProperty( attributes, '_keys', {
+		Object.defineProperty( attributesData, '_keys', {
 			value: attributes._keys.slice()
 		} );
 
