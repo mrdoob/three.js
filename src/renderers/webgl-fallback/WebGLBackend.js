@@ -982,6 +982,16 @@ class WebGLBackend extends Backend {
 
 	}
 
+	/**
+	 * Internal draw function.
+	 *
+	 * @private
+	 * @param {Object3D} object - The object to render.
+	 * @param {WebGLBufferRenderer} renderer - The internal renderer.
+	 * @param {number} firstVertex - The first vertex to render.
+	 * @param {number} vertexCount - The vertex count.
+	 * @param {number} instanceCount - The intance count.
+	 */
 	_draw( object, renderer, firstVertex, vertexCount, instanceCount ) {
 
 		if ( object.isBatchedMesh ) {
