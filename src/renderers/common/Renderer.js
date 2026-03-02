@@ -456,13 +456,12 @@ class Renderer {
 		this._transparentSort = null;
 
 		/**
-		 * The framebuffer target.
+		 * Cache of framebuffer targets per canvas target.
 		 *
 		 * @private
-		 * @type {?RenderTarget}
-		 * @default null
+		 * @type {Map<CanvasTarget, RenderTarget>}
 		 */
-		this._frameBufferTarget = null;
+		this._frameBufferTargets = new Map();
 
 		const alphaClear = this.alpha === true ? 0 : 1;
 
@@ -1341,9 +1340,11 @@ class Renderer {
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
-		let frameBufferTarget = this._frameBufferTarget;
+		const canvasTarget = this._canvasTarget;
 
-		if ( frameBufferTarget === null ) {
+		let frameBufferTarget = this._frameBufferTargets.get( canvasTarget );
+
+		if ( frameBufferTarget === undefined ) {
 
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
@@ -1359,7 +1360,7 @@ class Renderer {
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
 
-			this._frameBufferTarget = frameBufferTarget;
+			this._frameBufferTargets.set( canvasTarget, frameBufferTarget );
 
 		}
 
@@ -1376,8 +1377,6 @@ class Renderer {
 			frameBufferTarget.setSize( width, height, 1 );
 
 		}
-
-		const canvasTarget = this._canvasTarget;
 
 		frameBufferTarget.viewport.copy( canvasTarget._viewport );
 		frameBufferTarget.scissor.copy( canvasTarget._scissor );
@@ -2034,7 +2033,7 @@ class Renderer {
 	 * Defines the viewport.
 	 *
 	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
-	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin  in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
 	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
@@ -2410,7 +2409,13 @@ class Renderer {
 			this._renderContexts.dispose();
 			this._textures.dispose();
 
-			if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
+			for ( const frameBufferTarget of this._frameBufferTargets.values() ) {
+
+				frameBufferTarget.dispose();
+
+			}
+
+			this._frameBufferTargets.clear();
 
 			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
@@ -2512,8 +2517,13 @@ class Renderer {
 		this.setOutputRenderTarget( null );
 		this.setRenderTarget( null );
 
-		this._frameBufferTarget.dispose();
-		this._frameBufferTarget = null;
+		for ( const frameBufferTarget of this._frameBufferTargets.values() ) {
+
+			frameBufferTarget.dispose();
+
+		}
+
+		this._frameBufferTargets.clear();
 
 	}
 

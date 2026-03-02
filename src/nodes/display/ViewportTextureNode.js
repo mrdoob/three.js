@@ -99,12 +99,12 @@ class ViewportTextureNode extends TextureNode {
 	}
 
 	/**
-	 * This methods returns a texture for the given render target reference.
+	 * This methods returns a texture for the given render target or canvas target reference.
 	 *
 	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
 	 * for different render contexts.
 	 *
-	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @param {?(RenderTarget|CanvasTarget)} [reference=null] - The render target or canvas target reference.
 	 * @return {Texture} The framebuffer texture.
 	 */
 	getTextureForReference( reference = null ) {
@@ -144,9 +144,13 @@ class ViewportTextureNode extends TextureNode {
 
 	updateReference( frame ) {
 
-		const renderTarget = frame.renderer.getRenderTarget();
+		const renderer = frame.renderer;
+		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		this.value = this.getTextureForReference( renderTarget );
+		const reference = renderTarget ? renderTarget : canvasTarget;
+
+		this.value = this.getTextureForReference( reference );
 
 		return this.value;
 
@@ -156,20 +160,27 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderer = frame.renderer;
 		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		if ( renderTarget === null ) {
+		const reference = renderTarget ? renderTarget : canvasTarget;
+
+		if ( reference === null ) {
 
 			renderer.getDrawingBufferSize( _size );
 
+		} else if ( reference.getDrawingBufferSize ) {
+
+			reference.getDrawingBufferSize( _size );
+
 		} else {
 
-			_size.set( renderTarget.width, renderTarget.height );
+			_size.set( reference.width, reference.height );
 
 		}
 
 		//
 
-		const framebufferTexture = this.getTextureForReference( renderTarget );
+		const framebufferTexture = this.getTextureForReference( reference );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
