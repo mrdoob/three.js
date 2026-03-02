@@ -1360,6 +1360,18 @@ class Renderer {
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
 
+			const dispose = () => {
+
+				canvasTarget.removeEventListener( 'dispose', dispose );
+
+				frameBufferTarget.dispose();
+
+				this._frameBufferTargets.delete( canvasTarget );
+
+			};
+
+			canvasTarget.addEventListener( 'dispose', dispose );
+
 			this._frameBufferTargets.set( canvasTarget, frameBufferTarget );
 
 		}
@@ -2409,13 +2421,11 @@ class Renderer {
 			this._renderContexts.dispose();
 			this._textures.dispose();
 
-			for ( const frameBufferTarget of this._frameBufferTargets.values() ) {
+			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
-				frameBufferTarget.dispose();
+				canvasTarget.dispose();
 
 			}
-
-			this._frameBufferTargets.clear();
 
 			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
@@ -2517,13 +2527,11 @@ class Renderer {
 		this.setOutputRenderTarget( null );
 		this.setRenderTarget( null );
 
-		for ( const frameBufferTarget of this._frameBufferTargets.values() ) {
+		for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
-			frameBufferTarget.dispose();
+			canvasTarget.dispose();
 
 		}
-
-		this._frameBufferTargets.clear();
 
 	}
 
