@@ -232,8 +232,11 @@ class NodeMaterialObserver {
 
 		if ( _keys === undefined ) {
 
-			// attributes._keys should only be undefined
-			// if attributes is NOT a BufferGeometry.
+			if ( attributes.constructor.name !== 'Object' ) {
+
+				throw new Error( 'attributes._keys should only be undefined if attributes is an object literal' );
+
+			}
 
 			_keys = Object.keys( attributes );
 
