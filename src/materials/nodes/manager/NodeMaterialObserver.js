@@ -228,23 +228,23 @@ class NodeMaterialObserver {
 
 		const attributesData = {};
 
-		let _keys;
+		let _keys = attributes._keys;
 
-		if ( attributes._keys === undefined ) {
+		if ( _keys === undefined ) {
 
 			// attributes._keys should only be undefined
 			// if attributes is NOT a BufferGeometry.
+
 			_keys = Object.keys( attributes );
 
-		} else {
-
-			_keys = attributes._keys.slice();
+			Object.defineProperty( attributes, '_keys', {
+				value: _keys
+			} );
 
 		}
 
-		// Use Object.defineProperty() so '_keys' is non-enumerable
 		Object.defineProperty( attributesData, '_keys', {
-			value: _keys
+			value: _keys.slice()
 		} );
 
 		for ( const name in attributes ) {
