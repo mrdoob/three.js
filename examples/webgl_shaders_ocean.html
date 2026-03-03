@@ -82,6 +82,7 @@
 				// Water
 
 				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
+				waterGeometry.name = 'waterGeometry';
 
 				water = new Water(
 					waterGeometry,
@@ -101,6 +102,8 @@
 					}
 				);
 
+				water.name = 'water';
+				water.material.name = 'waterMaterial';
 				water.rotation.x = - Math.PI / 2;
 
 				scene.add( water );
@@ -108,6 +111,8 @@
 				// Skybox
 
 				sky = new Sky();
+				sky.name = 'sky';
+				sky.material.name = 'skyMaterial';
 				sky.scale.setScalar( 10000 );
 				scene.add( sky );
 
@@ -148,6 +153,7 @@
 					renderTarget = pmremGenerator.fromScene( sceneEnv );
 					scene.add( sky );
 
+					renderTarget.texture.name = 'skyEnvironment';
 					scene.environment = renderTarget.texture;
 
 				}
@@ -157,14 +163,18 @@
 				//
 
 				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				geometry.name = 'boxGeometry';
 				const material = new THREE.MeshStandardMaterial( { roughness: 1 } );
+				material.name = 'boxMaterial';
 
 				mesh = new THREE.Mesh( geometry, material );
+				mesh.name = 'box';
 				scene.add( mesh );
 
 				// Debug light
 
 				debugLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				debugLight.name = 'debugLight';
 				debugLight.position.set( 100, 100, 100 );
 
 				//
