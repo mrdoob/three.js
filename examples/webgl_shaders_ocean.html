@@ -36,15 +36,7 @@
 
 			let container, stats;
 			let camera, scene, renderer;
-			let controls, water, sun, sky, mesh, bloomPass, debugLight;
-
-			const toggles = {
-				sky: true,
-				water: true,
-				bloom: false,
-				clouds: false,
-				debugLight: false
-			};
+			let controls, water, sun, sky, mesh, bloomPass;
 
 			init();
 
@@ -82,7 +74,6 @@
 				// Water
 
 				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
-				waterGeometry.name = 'waterGeometry';
 
 				water = new Water(
 					waterGeometry,
@@ -102,8 +93,6 @@
 					}
 				);
 
-				water.name = 'water';
-				water.material.name = 'waterMaterial';
 				water.rotation.x = - Math.PI / 2;
 
 				scene.add( water );
@@ -111,8 +100,6 @@
 				// Skybox
 
 				sky = new Sky();
-				sky.name = 'sky';
-				sky.material.name = 'skyMaterial';
 				sky.scale.setScalar( 10000 );
 				scene.add( sky );
 
@@ -127,7 +114,7 @@
 				skyUniforms[ 'cloudElevation' ].value = 0.5;
 
 				const parameters = {
-					elevation: 30,
+					elevation: 2,
 					azimuth: 180,
 					exposure: 0.1
 				};
@@ -153,7 +140,6 @@
 					renderTarget = pmremGenerator.fromScene( sceneEnv );
 					scene.add( sky );
 
-					renderTarget.texture.name = 'skyEnvironment';
 					scene.environment = renderTarget.texture;
 
 				}
@@ -163,19 +149,10 @@
 				//
 
 				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
-				geometry.name = 'boxGeometry';
-				const material = new THREE.MeshStandardMaterial( { roughness: 1 } );
-				material.name = 'boxMaterial';
+				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.name = 'box';
 				scene.add( mesh );
-
-				// Debug light
-
-				debugLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				debugLight.name = 'debugLight';
-				debugLight.position.set( 100, 100, 100 );
 
 				//
 
@@ -193,34 +170,9 @@
 
 				// GUI
 
-				let savedCloudCoverage = skyUniforms.cloudCoverage.value;
-
-				// Apply initial scene state from toggles
-				sky.visible = toggles.sky;
-				if ( ! toggles.sky ) scene.environment = null;
-				water.visible = toggles.water;
-				bloomPass.enabled = toggles.bloom;
-				if ( toggles.debugLight ) scene.add( debugLight );
-				if ( ! toggles.clouds ) skyUniforms.cloudCoverage.value = 0;
-
 				const gui = new GUI();
 
 				const folderSky = gui.addFolder( 'Sky' );
-				folderSky.add( toggles, 'sky' ).name( 'visible' ).onChange( value => {
-
-					sky.visible = value;
-
-					if ( value ) {
-
-						updateSun();
-
-					} else {
-
-						scene.environment = null;
-
-					}
-
-				} );
 				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
 				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
 				folderSky.add( parameters, 'exposure', 0, 1, 0.0001 ).onChange( function ( value ) {
@@ -233,57 +185,20 @@
 				const waterUniforms = water.material.uniforms;
 
 				const folderWater = gui.addFolder( 'Water' );
-				folderWater.add( toggles, 'water' ).name( 'visible' ).onChange( value => { water.visible = value; } );
 				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
 				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
 				folderWater.open();
 
 				const folderBloom = gui.addFolder( 'Bloom' );
-				folderBloom.add( toggles, 'bloom' ).name( 'enabled' ).onChange( value => { bloomPass.enabled = value; } );
 				folderBloom.add( bloomPass, 'strength', 0, 3, 0.01 );
 				folderBloom.add( bloomPass, 'radius', 0, 1, 0.01 );
 				folderBloom.open();
 
 				const folderClouds = gui.addFolder( 'Clouds' );
-				folderClouds.add( toggles, 'clouds' ).name( 'visible' ).onChange( value => {
-
-					if ( value ) {
-
-						skyUniforms.cloudCoverage.value = savedCloudCoverage;
-
-					} else {
-
-						savedCloudCoverage = skyUniforms.cloudCoverage.value;
-						skyUniforms.cloudCoverage.value = 0;
-
-					}
-
-				} );
 				folderClouds.add( skyUniforms.cloudCoverage, 'value', 0, 1, 0.01 ).name( 'coverage' );
 				folderClouds.add( skyUniforms.cloudDensity, 'value', 0, 1, 0.01 ).name( 'density' );
 				folderClouds.add( skyUniforms.cloudElevation, 'value', 0, 1, 0.01 ).name( 'elevation' );
 				folderClouds.open();
-
-				const folderDebugLight = gui.addFolder( 'Debug Light' );
-				folderDebugLight.add( toggles, 'debugLight' ).name( 'enabled' ).onChange( value => {
-
-					if ( value ) {
-
-						scene.add( debugLight );
-
-					} else {
-
-						scene.remove( debugLight );
-
-					}
-
-				} );
-				folderDebugLight.add( debugLight, 'intensity', 0, 10, 5 );
-				folderDebugLight.addColor( debugLight, 'color' );
-				folderDebugLight.add( debugLight.position, 'x', - 200, 200, 1 ).name( 'pos X' );
-				folderDebugLight.add( debugLight.position, 'y', - 200, 200, 1 ).name( 'pos Y' );
-				folderDebugLight.add( debugLight.position, 'z', - 200, 200, 1 ).name( 'pos Z' );
-				folderDebugLight.open();
 
 				//
 
