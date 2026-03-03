@@ -7,6 +7,7 @@ import {
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
+	FloatType,
 	BackSide,
 	LinearSRGBColorSpace
 } from '../constants.js';
@@ -288,11 +289,14 @@ class PMREMGenerator {
 		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
 		const height = 4 * this._cubeSize;
 
+		const extensions = this._renderer.extensions;
+		const type = extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : FloatType;
+
 		const params = {
 			magFilter: LinearFilter,
 			minFilter: LinearFilter,
 			generateMipmaps: false,
-			type: HalfFloatType,
+			type: type,
 			format: RGBAFormat,
 			colorSpace: LinearSRGBColorSpace,
 			depthBuffer: false
