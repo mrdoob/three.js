@@ -194,7 +194,7 @@ export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) =
 
 	const transformedNormal = modelNormalMatrix.mul( normal );
 
-	return worldToViewRotation.mul( transformedNormal );
+	return worldToViewRotation.mul( transformedNormal ).normalize();
 
 } );
 
