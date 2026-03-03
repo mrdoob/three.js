@@ -499,13 +499,27 @@ function Animation( editor ) {
 
 		}
 
-		// Select clip without playing
-		currentClip = clip;
-		currentRoot = root;
-		currentAction = editor.mixer.clipAction( clip, root );
+		if ( currentClip === clip ) {
 
-		// Update duration display
-		durationText.setValue( clip.duration.toFixed( 2 ) );
+			// Unselect clip
+			currentAction = null;
+			currentClip = null;
+			currentRoot = null;
+
+			timeText.setValue( '0.00' );
+			durationText.setValue( '0.00' );
+
+		} else {
+
+			// Select clip without playing
+			currentClip = clip;
+			currentRoot = root;
+			currentAction = editor.mixer.clipAction( clip, root );
+
+			// Update duration display
+			durationText.setValue( clip.duration.toFixed( 2 ) );
+
+		}
 
 	}
 
