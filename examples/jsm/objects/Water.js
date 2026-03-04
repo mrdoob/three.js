@@ -1,7 +1,6 @@
 import {
 	Color,
 	FrontSide,
-	FloatType,
 	HalfFloatType,
 	Matrix4,
 	Mesh,
@@ -86,7 +85,7 @@ class Water extends Mesh {
 
 		const mirrorCamera = new PerspectiveCamera();
 
-		let renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: HalfFloatType } );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: HalfFloatType } );
 
 		const mirrorShader = {
 
@@ -237,15 +236,6 @@ class Water extends Mesh {
 		scope.material = material;
 
 		scope.onBeforeRender = function ( renderer, scene, camera ) {
-
-			// Lazily fall back to FloatType if EXT_color_buffer_half_float is unsupported (e.g. some mobile GPUs)
-			if ( renderTarget.texture.type === HalfFloatType && ! renderer.extensions.has( 'EXT_color_buffer_half_float' ) ) {
-
-				renderTarget.dispose();
-				renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: FloatType } );
-				material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
-
-			}
 
 			mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
