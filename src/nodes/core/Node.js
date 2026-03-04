@@ -165,48 +165,6 @@ class Node extends EventDispatcher {
 
 		}
 
-		// Cache node types
-
-		const _getNodeType = this.getNodeType.bind( this );
-
-		this.getNodeType = ( builder, output = null ) => {
-
-			const nodeData = builder.getDataFromNode( this );
-
-			let type;
-
-			if ( output !== null ) {
-
-				nodeData.typeFromOutput = nodeData.typeFromOutput || {};
-
-				type = nodeData.typeFromOutput[ output ];
-
-				if ( type === undefined ) {
-
-					type = _getNodeType( builder, output );
-
-					nodeData.typeFromOutput[ output ] = type;
-
-				}
-
-			} else {
-
-				type = nodeData.type;
-
-				if ( type === undefined ) {
-
-					type = _getNodeType( builder );
-
-					nodeData.type = type;
-
-				}
-
-			}
-
-			return type;
-
-		};
-
 	}
 
 	/**
@@ -611,6 +569,51 @@ class Node extends EventDispatcher {
 	 * @return {string} The type of the node.
 	 */
 	getNodeType( builder, output = null ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		let type;
+
+		if ( output !== null ) {
+
+			nodeData.typeFromOutput = nodeData.typeFromOutput || {};
+
+			type = nodeData.typeFromOutput[ output ];
+
+			if ( type === undefined ) {
+
+				type = this.generateNodeType( builder, output );
+
+				nodeData.typeFromOutput[ output ] = type;
+
+			}
+
+		} else {
+
+			type = nodeData.type;
+
+			if ( type === undefined ) {
+
+				type = this.generateNodeType( builder );
+
+				nodeData.type = type;
+
+			}
+
+		}
+
+		return type;
+
+	}
+
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} [output=null] - The output of the node.
+	 * @return {string} The type of the node.
+	 */
+	generateNodeType( builder, output = null ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
 

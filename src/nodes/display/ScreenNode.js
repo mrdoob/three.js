@@ -72,7 +72,7 @@ class ScreenNode extends Node {
 	 *
 	 * @return {('float'|'vec2'|'vec4')} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';

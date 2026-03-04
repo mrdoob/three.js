@@ -51,7 +51,7 @@ class InputNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		if ( this.nodeType === null ) {
 

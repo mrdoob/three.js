@@ -62,7 +62,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	 *
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		return this.referenceNode.uniformType;
 
@@ -296,7 +296,7 @@ class ReferenceNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.node === null ) {
 
