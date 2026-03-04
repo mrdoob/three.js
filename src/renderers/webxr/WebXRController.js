@@ -322,7 +322,7 @@ class WebXRController {
 
 						}
 
-						//grip update event callback if enabled
+						// grip update event if enabled
 						if ( grip.eventsEnabled ) {
 
 							grip.dispatchEvent( {
