@@ -323,7 +323,15 @@ class WebXRController {
 						}
 
 						//grip update event callback if enabled
-						if ( grip.enableUpdate ) this._onGripUpdate( inputSource );
+						if ( grip.enableUpdate ) {
+
+							this._grip.dispatchEvent( {
+								type: 'update',
+								data: inputSource,
+								target: this
+							} );
+
+						}
 
 					}
 
@@ -398,20 +406,6 @@ class WebXRController {
 		}
 
 		return this;
-
-	}
-
-	/**
-	 * Dispatches a grip update event if enabled.
-	 * @param {XRInputSource} inputSource
-	 */
-	_onGripUpdate( inputSource ) {
-
-		this._grip.dispatchEvent( {
-			type: 'update',
-			data: inputSource,
-			target: this
-		} );
 
 	}
 
