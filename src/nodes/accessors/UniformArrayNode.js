@@ -41,7 +41,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
-		const type = this.getNodeType();
+		const type = this.getNodeType( builder );
 		const paddedType = this.node.getPaddedType();
 
 		return builder.format( snippet, paddedType, type );
