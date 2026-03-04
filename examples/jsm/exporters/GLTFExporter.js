@@ -1533,9 +1533,13 @@ class GLTFWriter {
 
 		}
 
-		let mimeType = map.userData.mimeType;
+		const mimeType = map.userData.mimeType;
 
-		if ( mimeType === 'image/webp' ) mimeType = 'image/png';
+		if ( mimeType === 'image/webp' ) {
+
+			this.extensionsUsed[ 'EXT_texture_webp' ] = true;
+
+		}
 
 		const textureDef = {
 			sampler: this.processSampler( map ),
