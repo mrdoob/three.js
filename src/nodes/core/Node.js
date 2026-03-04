@@ -69,14 +69,6 @@ class Node extends EventDispatcher {
 		this.updateAfterType = NodeUpdateType.NONE;
 
 		/**
-		 * The UUID of the node.
-		 *
-		 * @type {string}
-		 * @readonly
-		 */
-		this.uuid = MathUtils.generateUUID();
-
-		/**
 		 * The version of the node. The version automatically is increased when {@link Node#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
@@ -132,6 +124,15 @@ class Node extends EventDispatcher {
 		 * @default null
 		 */
 		this._cacheKey = null;
+
+		/**
+		 * The UUID of the node.
+		 *
+		 * @type {string}
+		 * @default null
+		 * @private
+		 */
+		this._uuid = null;
 
 		/**
 		 * The cache key's version.
@@ -216,6 +217,24 @@ class Node extends EventDispatcher {
 			this.version ++;
 
 		}
+
+	}
+
+	/**
+	 * The UUID of the node.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
+	get uuid() {
+
+		if ( this._uuid === null ) {
+
+			this._uuid = MathUtils.generateUUID();
+
+		}
+
+		return this._uuid;
 
 	}
 
