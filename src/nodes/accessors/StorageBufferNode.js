@@ -333,7 +333,7 @@ class StorageBufferNode extends BufferNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
-			return super.getNodeType( builder );
+			return super.generateNodeType( builder );
 
 		}
 
