@@ -165,6 +165,8 @@ class BufferAttributeNode extends InputNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferStride === 0 && this.bufferOffset === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -179,11 +181,15 @@ class BufferAttributeNode extends InputNode {
 
 			}
 
-			return bufferData.node.id;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.id;
+		return String( id );
 
 	}
 

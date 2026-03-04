@@ -168,6 +168,8 @@ class StorageBufferNode extends BufferNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferCount === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -182,11 +184,15 @@ class StorageBufferNode extends BufferNode {
 
 			}
 
-			return bufferData.node.id;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.id;
+		return String( id );
 
 	}
 

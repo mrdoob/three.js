@@ -536,7 +536,7 @@ class Node extends EventDispatcher {
 	 */
 	getHash( /*builder*/ ) {
 
-		return this.id;
+		return String( this.id );
 
 	}
 
