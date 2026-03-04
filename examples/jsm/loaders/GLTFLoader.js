@@ -1269,6 +1269,8 @@ class GLTFMaterialsIorExtension {
 
 		materialParams.ior = extension.ior !== undefined ? extension.ior : 1.5;
 
+		if ( materialParams.ior === 0 ) materialParams.ior = 1000; // see #26167
+
 		return Promise.resolve();
 
 	}
