@@ -143,7 +143,13 @@ class Node extends EventDispatcher {
 		 */
 		this._cacheKeyVersion = 0;
 
-		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+		/**
+		 * The unique ID of the node.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.id = _nodeId ++;
 
 		/**
 		 * The stack trace of the node for debugging purposes.
@@ -530,7 +536,7 @@ class Node extends EventDispatcher {
 	 */
 	getHash( /*builder*/ ) {
 
-		return this.uuid;
+		return this.id;
 
 	}
 

@@ -182,11 +182,11 @@ class StorageBufferNode extends BufferNode {
 
 			}
 
-			return bufferData.node.uuid;
+			return bufferData.node.id;
 
 		}
 
-		return this.uuid;
+		return this.id;
 
 	}
 

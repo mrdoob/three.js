@@ -179,11 +179,11 @@ class BufferAttributeNode extends InputNode {
 
 			}
 
-			return bufferData.node.uuid;
+			return bufferData.node.id;
 
 		}
 
-		return this.uuid;
+		return this.id;
 
 	}
 
