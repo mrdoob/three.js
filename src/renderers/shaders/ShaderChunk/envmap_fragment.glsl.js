@@ -36,25 +36,21 @@ export default /* glsl */`
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 envColor = textureCube( envMap, envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+		vec4 envColor = textureCube( envMap, envMapRotation * reflectVec );
 
-	#else
+		#ifdef ENVMAP_BLENDING_MULTIPLY
 
-		vec4 envColor = vec4( 0.0 );
+			outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
 
-	#endif
+		#elif defined( ENVMAP_BLENDING_MIX )
 
-	#ifdef ENVMAP_BLENDING_MULTIPLY
+			outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );
 
-		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
+		#elif defined( ENVMAP_BLENDING_ADD )
 
-	#elif defined( ENVMAP_BLENDING_MIX )
+			outgoingLight += envColor.xyz * specularStrength * reflectivity;
 
-		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );
-
-	#elif defined( ENVMAP_BLENDING_ADD )
-
-		outgoingLight += envColor.xyz * specularStrength * reflectivity;
+		#endif
 
 	#endif
 

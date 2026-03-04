@@ -1,5 +1,5 @@
 import {
-	Clock,
+	Timer,
 	Color,
 	Matrix4,
 	Mesh,
@@ -74,7 +74,7 @@ class Water extends Mesh {
 		const cycle = 0.15; // a cycle of a flow map phase
 		const halfCycle = cycle * 0.5;
 		const textureMatrix = new Matrix4();
-		const clock = new Clock();
+		const timer = new Timer();
 
 		// internal components
 
@@ -180,7 +180,7 @@ class Water extends Mesh {
 
 		function updateFlow() {
 
-			const delta = clock.getDelta();
+			const delta = timer.getDelta();
 			const config = scope.material.uniforms[ 'config' ];
 
 			config.value.x += flowSpeed * delta; // flowMapOffset0
@@ -206,6 +206,8 @@ class Water extends Mesh {
 		//
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
+
+			timer.update();
 
 			updateTextureMatrix( camera );
 			updateFlow();

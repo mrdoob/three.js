@@ -43,7 +43,8 @@
 			let mesh, texture;
 
 			const worldWidth = 256, worldDepth = 256;
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -214,6 +215,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -222,7 +225,7 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				controls.update( timer.getDelta() );
 				renderer.render( scene, camera );
 
 			}

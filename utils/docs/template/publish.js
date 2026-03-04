@@ -725,6 +725,21 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	fs.mkPath( outdir );
 
+	// Remove stale .html files from previous builds
+	const pagesDir = path.join( outdir, 'pages' );
+
+	if ( fs.existsSync( pagesDir ) ) {
+
+		const existingHtmlFiles = fs.readdirSync( pagesDir ).filter( f => f.endsWith( '.html' ) );
+
+		for ( const file of existingHtmlFiles ) {
+
+			fs.unlinkSync( path.join( pagesDir, file ) );
+
+		}
+
+	}
+
 	// copy the template's static files to outdir
 	const fromDir = path.join( templatePath, 'static' );
 	const staticFiles = fs.ls( fromDir, 3 );

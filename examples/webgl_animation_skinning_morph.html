@@ -52,7 +52,7 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			let container, stats, clock, gui, mixer, actions, activeAction, previousAction;
+			let container, stats, timer, gui, mixer, actions, activeAction, previousAction;
 			let camera, scene, renderer, model, face;
 
 			const api = { state: 'Walking' };
@@ -72,7 +72,8 @@
 				scene.background = new THREE.Color( 0xe0e0e0 );
 				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -252,7 +253,9 @@
 
 			function animate() {
 
-				const dt = clock.getDelta();
+				timer.update();
+
+				const dt = timer.getDelta();
 
 				if ( mixer ) mixer.update( dt );
 

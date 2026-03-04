@@ -39,7 +39,7 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let scene, renderer, camera, floor, orbitControls;
-			let group, followGroup, model, skeleton, mixer, clock;
+			let group, followGroup, model, skeleton, mixer, timer;
 
 			let actions;
 
@@ -77,7 +77,8 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 2, - 5 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x5e5d5d );
@@ -415,9 +416,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				// Render loop
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				updateCharacter( delta );
 

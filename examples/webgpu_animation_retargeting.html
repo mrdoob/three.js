@@ -59,7 +59,8 @@
 
 			//
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			export const lightSpeed = /*#__PURE__*/ Fn( ( [ suv_immutable ] ) => {
 
@@ -287,7 +288,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				source.mixer.update( delta );
 				mixer.update( delta );

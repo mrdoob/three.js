@@ -1,5 +1,5 @@
 import { AdditiveBlending, Color, Vector2, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
-import { nodeObject, uniform, mrt, texture, getTextureIndex, unpremultiplyAlpha } from 'three/tsl';
+import { uniform, mrt, texture, getTextureIndex, unpremultiplyAlpha } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -355,4 +355,4 @@ const _JitterVectors = [
  * @param {Camera} camera - The camera to render the scene with.
  * @returns {SSAAPassNode}
  */
-export const ssaaPass = ( scene, camera ) => nodeObject( new SSAAPassNode( scene, camera ) );
+export const ssaaPass = ( scene, camera ) => new SSAAPassNode( scene, camera );

@@ -123,11 +123,11 @@
 			brushMat.depthWrite = false;
 			brushMat.blending = THREE.AdditiveBlending; // additive to build HDR energy
 
-			const postProcessing = new THREE.PostProcessing( renderer );
+			const renderPipeline = new THREE.RenderPipeline( renderer );
 			const brushPass = pass( brushScene, camera, { type: THREE.HalfFloatType } );
 			brushPass.renderTarget.texture.colorSpace = ExtendedSRGBColorSpace;
 
-			postProcessing.outputNode = afterImage( brushPass, params.afterImageDecay );
+			renderPipeline.outputNode = afterImage( brushPass, params.afterImageDecay );
 
 			// HDR brush uniforms
 			const uColor = params.intensity;
@@ -193,7 +193,7 @@
 			// Main loop
 			renderer.setAnimationLoop( async () => {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			} );
 

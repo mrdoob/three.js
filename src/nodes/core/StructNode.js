@@ -52,6 +52,21 @@ class StructNode extends Node {
 
 	}
 
+	_getChildren() {
+
+		// Ensure struct type is the last child for correct code generation order
+
+		const children = super._getChildren();
+
+		const structTypeProperty = children.find( child => child.childNode === this.structTypeNode );
+
+		children.splice( children.indexOf( structTypeProperty ), 1 );
+		children.push( structTypeProperty );
+
+		return children;
+
+	}
+
 	generate( builder ) {
 
 		const nodeVar = builder.getVarFromNode( this );

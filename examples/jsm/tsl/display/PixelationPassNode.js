@@ -80,13 +80,13 @@ class PixelationNode extends TempNode {
 		this._resolution = uniform( new Vector4() );
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * The `updateType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
@@ -95,7 +95,7 @@ class PixelationNode extends TempNode {
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
-	updateBefore() {
+	update() {
 
 		const map = this.textureNode.value;
 
@@ -214,7 +214,7 @@ class PixelationNode extends TempNode {
 
 }
 
-const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
+const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) );
 
 /**
  * A special render pass node that renders the scene with a pixelation effect.
@@ -330,6 +330,6 @@ class PixelationPassNode extends PassNode {
  * @param {Node<float> | number} [depthEdgeStrength=0.4] - The depth edge strength.
  * @returns {PixelationPassNode}
  */
-export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
+export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength );
 
 export default PixelationPassNode;

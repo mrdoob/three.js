@@ -1,6 +1,6 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
 
-const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@0.23.0/dist/jolt-physics.wasm-compat.js';
+const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@1.0.0/dist/jolt-physics.wasm-compat.js';
 
 const frameRate = 60;
 
@@ -222,11 +222,13 @@ async function JoltPhysics() {
 
 	//
 
-	const clock = new Clock();
+	const timer = new Timer();
 
 	function step() {
 
-		let deltaTime = clock.getDelta();
+		timer.update();
+
+		let deltaTime = timer.getDelta();
 
 		// Don't go below 30 Hz to prevent spiral of death
 		deltaTime = Math.min( deltaTime, 1.0 / 30.0 );

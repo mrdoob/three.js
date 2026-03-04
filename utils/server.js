@@ -124,9 +124,17 @@ ${items}
 
 		if ( ! existsSync( filePath ) ) {
 
-			res.writeHead( 404 );
-			res.end( 'File not found' );
-			return;
+			if ( existsSync( filePath + '.html' ) ) {
+
+				filePath += '.html';
+
+			} else {
+
+				res.writeHead( 404 );
+				res.end( 'File not found' );
+				return;
+
+			}
 
 		}
 

@@ -94,9 +94,9 @@
 
 			const bloomPass = bloom( outputPass.mul( bloomIntensityPass ) );
 
-			const postProcessing = new THREE.PostProcessing( renderer );
-			postProcessing.outputColorTransform = false;
-			postProcessing.outputNode = outputPass.add( bloomPass ).renderOutput();
+			const renderPipeline = new THREE.RenderPipeline( renderer );
+			renderPipeline.outputColorTransform = false;
+			renderPipeline.outputNode = outputPass.add( bloomPass ).renderOutput();
 
 			// controls
 
@@ -160,7 +160,7 @@
 
 			function animate() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -17,8 +17,8 @@ export class Graph {
 
 		const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 		path.setAttribute( 'class', 'graph-path' );
-		path.style.stroke = `var(${color})`;
-		path.style.fill = `var(${color})`;
+		path.style.stroke = color;
+		path.style.fill = color;
 		this.domElement.appendChild( path );
 
 		this.lines[ id ] = { path, color, points: [] };

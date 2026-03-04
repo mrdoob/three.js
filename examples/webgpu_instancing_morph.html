@@ -50,7 +50,9 @@
 
 			}
 
-			const clock = new THREE.Clock( true );
+			const timer = new THREE.Timer();
+			timer.connect( document );
+
 
 			init();
 
@@ -79,8 +81,6 @@
 				light.shadow.camera.top = 5000;
 				light.shadow.camera.bottom = - 5000;
 				light.shadow.camera.far = 2000;
-
-				light.shadow.bias = - 0.01;
 
 				light.shadow.camera.updateProjectionMatrix();
 
@@ -170,7 +170,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				const r = 3000;
 				camera.position.set( Math.sin( time / 10 ) * r, 1500 + 1000 * Math.cos( time / 5 ), Math.cos( time / 10 ) * r );

@@ -44,7 +44,8 @@
 
 			let renderer, scene, camera, controls;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const maxParticles = 8192 * 16;
 			const gridSize1d = 64;
@@ -76,7 +77,7 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits: { maxStorageBuffersInVertexStage: 1 } } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -567,7 +568,9 @@
 
 			async function render() {
 
-				const deltaTime = THREE.MathUtils.clamp( clock.getDelta(), 0.00001, 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+				timer.update();
+
+				const deltaTime = THREE.MathUtils.clamp( timer.getDelta(), 0.00001, 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
 				dtUniform.value = deltaTime;
 
 				mouseForceUniform.value.copy( mouseCoord ).sub( prevMouseCoord ).multiplyScalar( 2 );

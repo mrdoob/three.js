@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RetroPassNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → <a href="PassNode.html">PassNode</a> → </p>
+	<h1 translate="no">RetroPassNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A post-processing pass that applies a retro PS1-style effect to the scene.</p>
+<p>This node renders the scene with classic PlayStation 1 visual characteristics:</p>
+<ul>
+<li><strong>Vertex snapping</strong>: Vertices are snapped to screen pixels, creating the iconic &quot;wobbly&quot; geometry</li>
+<li><strong>Affine texture mapping</strong>: Textures are sampled without perspective correction, resulting in distortion effects</li>
+<li><strong>Low resolution</strong>: Default 0.25 scale (typical 320x240 equivalent)</li>
+<li><strong>Nearest-neighbor filtering</strong>: Sharp pixelated textures without smoothing</li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="RetroPassNode" translate="no">new <a href="#RetroPassNode">RetroPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new RetroPassNode instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render from.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Additional options for the retro pass.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">affineDistortion</strong>
+									</td>
+									<td class="description last">
+										<p>An optional node to apply affine distortion to UVs.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/RetroPassNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/display/RetroPassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the glTF 2.0 format.</p>
-<p>[glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an <a href="https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)" target="_blank" rel="noopener">open format specification</a> whenever possible. Be advised that image bitmaps are not
+<p><a href="https://www.khronos.org/gltf/" target="_blank" rel="noopener">glTF</a> (GL Transmission Format) is an <a href="https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)" target="_blank" rel="noopener">open format specification</a> whenever possible. Be advised that image bitmaps are not
 automatically GC-collected when they are no longer referenced, and they require special handling during
 the disposal process.</p>
 <p><code>GLTFLoader</code> supports the following glTF 2.0 extensions:</p>
@@ -29,6 +29,7 @@ the disposal process.</p>
 <li>KHR_materials_unlit</li>
 <li>KHR_materials_volume</li>
 <li>KHR_mesh_quantization</li>
+<li>KHR_meshopt_compression</li>
 <li>KHR_lights_punctual</li>
 <li>KHR_texture_basisu</li>
 <li>KHR_texture_transform</li>
@@ -68,7 +69,7 @@ scene.add( gltf.scene );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>manager</strong>
+										<strong translate="no">manager</strong>
 									</td>
 									<td class="description last">
 										<p>The loading manager.</p>
@@ -89,7 +90,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>url</strong>
+										<strong translate="no">url</strong>
 									</td>
 									<td class="description last">
 										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
@@ -97,7 +98,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when the loading process has been finished.</p>
@@ -105,7 +106,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onProgress</strong>
+										<strong translate="no">onProgress</strong>
 									</td>
 									<td class="description last">
 										<p>Executed while the loading is in progress.</p>
@@ -113,7 +114,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onError</strong>
+										<strong translate="no">onError</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when errors occur.</p>
@@ -128,13 +129,13 @@ to the <code>onLoad()</code> callback.</p>
 					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type">string | ArrayBuffer</span>, path : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Parses the given FBX data and returns the resulting group.</p>
+							<p>Parses the given glTF data and returns the resulting group.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>data</strong>
+										<strong translate="no">data</strong>
 									</td>
 									<td class="description last">
 										<p>The raw glTF data.</p>
@@ -142,7 +143,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>path</strong>
+										<strong translate="no">path</strong>
 									</td>
 									<td class="description last">
 										<p>The URL base path.</p>
@@ -150,7 +151,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when the loading process has been finished.</p>
@@ -158,7 +159,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onError</strong>
+										<strong translate="no">onError</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when errors occur.</p>
@@ -179,7 +180,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>data</strong>
+										<strong translate="no">data</strong>
 									</td>
 									<td class="description last">
 										<p>The raw glTF data.</p>
@@ -187,7 +188,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>path</strong>
+										<strong translate="no">path</strong>
 									</td>
 									<td class="description last">
 										<p>The URL base path.</p>
@@ -210,7 +211,7 @@ to the loader.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The callback function to register.</p>
@@ -232,7 +233,7 @@ compressed with the <code>KHR_draco_mesh_compression</code> extension.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>dracoLoader</strong>
+										<strong translate="no">dracoLoader</strong>
 									</td>
 									<td class="description last">
 										<p>The Draco loader to set.</p>
@@ -254,7 +255,7 @@ compressed textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>ktx2Loader</strong>
+										<strong translate="no">ktx2Loader</strong>
 									</td>
 									<td class="description last">
 										<p>The KTX2 loader to set.</p>
@@ -276,7 +277,7 @@ compressed with the <code>EXT_meshopt_compression</code> extension.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>meshoptDecoder</strong>
+										<strong translate="no">meshoptDecoder</strong>
 									</td>
 									<td class="description last">
 										<p>The meshopt decoder to set.</p>
@@ -297,7 +298,7 @@ compressed with the <code>EXT_meshopt_compression</code> extension.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The callback function to unregister.</p>

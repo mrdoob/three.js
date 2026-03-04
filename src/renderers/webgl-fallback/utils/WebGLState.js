@@ -8,7 +8,7 @@ import {
 	MaterialBlending
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
-import { error } from '../../../utils.js';
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -63,6 +63,7 @@ class WebGLState {
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;
 		this.currentColorMask = null;
+		this.currentDepthReversed = false;
 		this.currentDepthFunc = null;
 		this.currentDepthMask = null;
 		this.currentStencilFunc = null;
@@ -276,7 +277,13 @@ class WebGLState {
 		const gl = this.gl;
 		const drawBuffersIndexedExt = this.backend.drawBuffersIndexedExt;
 
-		if ( ! drawBuffersIndexedExt ) return;
+		if ( ! drawBuffersIndexedExt ) {
+
+			warnOnce( 'WebGPURenderer: Multiple Render Targets (MRT) blending configuration is not fully supported in compatibility mode. The material blending will be used for all render targets.' );
+
+			return;
+
+		}
 
 		for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -602,6 +609,34 @@ class WebGLState {
 
 	}
 
+
+	/**
+	 * Configures the WebGL state to use a reversed depth buffer.
+	 *
+	 * @param {boolean} reversed - Whether the depth buffer is reversed or not.
+	 */
+	setReversedDepth( reversed ) {
+
+		if ( this.currentDepthReversed !== reversed ) {
+
+			const ext = this.backend.extensions.get( 'EXT_clip_control' );
+
+			if ( reversed ) {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+			} else {
+
+				ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+			}
+
+			this.currentDepthReversed = reversed;
+
+		}
+
+	}
+
 	/**
 	 * Specifies whether depth values can be written when rendering
 	 * into a framebuffer or not.
@@ -631,6 +666,8 @@ class WebGLState {
 	 * @param {number} depthFunc - The depth compare function.
 	 */
 	setDepthFunc( depthFunc ) {
+
+		if ( this.currentDepthReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 		if ( this.currentDepthFunc !== depthFunc ) {
 
