@@ -325,7 +325,7 @@ class WebXRController {
 						//grip update event callback if enabled
 						if ( grip.eventsEnabled ) {
 
-							this._grip.dispatchEvent( {
+							grip.dispatchEvent( {
 								type: 'gripUpdated',
 								data: inputSource,
 								target: this
