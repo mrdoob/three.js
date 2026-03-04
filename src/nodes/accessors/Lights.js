@@ -1,7 +1,7 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { worldToViewRotation } from './Camera.js';
+import { cameraViewRotationMatrix } from './Camera.js';
 import { positionWorld } from './Position.js';
 
 let uniformsLib;
@@ -136,4 +136,4 @@ export function lightViewPosition( light ) {
  * @param {Light} light -The light source.
  * @returns {Node<vec3>} The light's target direction.
  */
-export const lightTargetDirection = ( light ) => worldToViewRotation.mul( lightPosition( light ).sub( lightTargetPosition( light ) ) ).normalize();
+export const lightTargetDirection = ( light ) => cameraViewRotationMatrix.mul( lightPosition( light ).sub( lightTargetPosition( light ) ) ).normalize();

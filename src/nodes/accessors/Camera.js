@@ -198,7 +198,7 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 } ).once() )();
 
 /**
- * TSL object that represents the world-to-view rotation matrix of the camera used for the current render.
+ * TSL object that represents the view rotation matrix of the camera used for the current render.
  *
  * It is the upper-left 3x3 of {@link cameraViewMatrix} (translation removed) and is typically used to transform
  * direction vectors (e.g. normals) from world space into view space.
@@ -206,7 +206,15 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {Node<mat3>}
  */
-export const worldToViewRotation = /*@__PURE__*/ mat3( cameraViewMatrix[ 0 ].xyz, cameraViewMatrix[ 1 ].xyz, cameraViewMatrix[ 2 ].xyz ).toVar();
+export const cameraViewRotationMatrix = /*@__PURE__*/ mat3(
+
+	cameraViewMatrix[ 0 ].xyz,
+
+	cameraViewMatrix[ 1 ].xyz,
+
+	cameraViewMatrix[ 2 ].xyz
+
+).toVar( 'cameraViewRotationMatrix' );
 
 /**
  * TSL object that represents the world matrix of the camera used for the current render.
