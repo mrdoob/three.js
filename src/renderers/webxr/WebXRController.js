@@ -109,7 +109,7 @@ class WebXRController {
 			this._grip.linearVelocity = new Vector3();
 			this._grip.hasAngularVelocity = false;
 			this._grip.angularVelocity = new Vector3();
-			this._grip.enableUpdate = false;
+			this._grip.eventsEnabled = false;
 
 		}
 
@@ -323,10 +323,10 @@ class WebXRController {
 						}
 
 						//grip update event callback if enabled
-						if ( grip.enableUpdate ) {
+						if ( grip.eventsEnabled ) {
 
 							this._grip.dispatchEvent( {
-								type: 'update',
+								type: 'gripUpdated',
 								data: inputSource,
 								target: this
 							} );
