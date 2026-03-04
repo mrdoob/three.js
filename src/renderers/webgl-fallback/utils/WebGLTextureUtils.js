@@ -370,7 +370,7 @@ class WebGLTextureUtils {
 			if ( texture.anisotropy > 1 ) {
 
 				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
-				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.getMaxAnisotropy() ) );
+				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.capabilities.getMaxAnisotropy() ) );
 
 			}
 

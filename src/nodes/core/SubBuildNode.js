@@ -86,4 +86,4 @@ export default SubBuildNode;
  * @param {?string} [type=null] - The type of the node, if known.
  * @returns {Node} A node object wrapping the SubBuildNode instance.
  */
-export const subBuild = ( node, name, type = null ) => nodeObject( new SubBuildNode( nodeObject( node ), name, type ) );
+export const subBuild = ( node, name, type = null ) => new SubBuildNode( nodeObject( node ), name, type );

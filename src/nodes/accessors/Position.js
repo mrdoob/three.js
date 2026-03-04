@@ -1,7 +1,7 @@
 import { attribute } from '../core/AttributeNode.js';
 import { Fn, vec3, vec4 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
-import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
+import { cameraProjectionMatrixInverse } from './Camera.js';
 import { warnOnce } from '../../utils.js';
 
 /**
@@ -57,14 +57,6 @@ export const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'posit
  */
 export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
-
-		// reconstruct world position from view position
-
-		return cameraWorldMatrix.mul( positionView ).xyz.toVar( 'positionWorld' );
-
-	}
-
 	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
 
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
@@ -103,7 +95,7 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 
-}, 'vec3' ).once( [ 'POSITION' ] ) )();
+}, 'vec3' ).once( [ 'POSITION', 'VERTEX' ] ) )();
 
 /**
  * TSL object that represents the position view direction of the current rendered object.

@@ -52,7 +52,8 @@
 
 			let mixer;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const container = document.getElementById( 'container' );
 
 			const stats = new Stats();
@@ -125,7 +126,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

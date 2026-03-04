@@ -315,6 +315,8 @@ class UniformArrayNode extends BufferNode {
 		this.bufferCount = length;
 		this.bufferType = paddedType;
 
+		this.update(); // initialize the buffer values
+
 		return super.setup( builder );
 
 	}

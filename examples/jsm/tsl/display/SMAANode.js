@@ -1,5 +1,5 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
-import { abs, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
+import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -765,4 +765,4 @@ export default SMAANode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SMAANode}
  */
-export const smaa = ( node ) => nodeObject( new SMAANode( convertToTexture( node ) ) );
+export const smaa = ( node ) => new SMAANode( convertToTexture( node ) );

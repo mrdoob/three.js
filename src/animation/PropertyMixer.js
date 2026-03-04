@@ -88,7 +88,7 @@ class PropertyMixer {
 		this._addIndex = 4;
 
 		/**
-		 * TODO
+		 * Accumulated weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -96,7 +96,7 @@ class PropertyMixer {
 		this.cumulativeWeight = 0;
 
 		/**
-		 * TODO
+		 * Accumulated additive weight of the property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -104,7 +104,7 @@ class PropertyMixer {
 		this.cumulativeWeightAdditive = 0;
 
 		/**
-		 * TODO
+		 * Number of active keyframe tracks currently using this property binding.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -112,7 +112,7 @@ class PropertyMixer {
 		this.useCount = 0;
 
 		/**
-		 * TODO
+		 * Number of keyframe tracks referencing this property binding.
 		 *
 		 * @type {number}
 		 * @default 0

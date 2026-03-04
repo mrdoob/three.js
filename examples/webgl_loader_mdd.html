@@ -27,7 +27,7 @@
 
 			import { MDDLoader } from 'three/addons/loaders/MDDLoader.js';
 
-			let camera, scene, renderer, mixer, clock;
+			let camera, scene, renderer, mixer, timer;
 
 			init();
 
@@ -39,7 +39,8 @@
 				camera.position.set( 8, 8, 8 );
 				camera.lookAt( scene.position );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -86,7 +87,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

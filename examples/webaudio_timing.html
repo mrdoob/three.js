@@ -31,7 +31,7 @@
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		let scene, camera, renderer, clock;
+		let scene, camera, renderer, timer;
 
 		const objects = [];
 
@@ -51,7 +51,8 @@
 
 			scene = new THREE.Scene();
 
-			clock = new THREE.Clock();
+			timer = new THREE.Timer();
+			timer.connect( document );
 
 			//
 
@@ -165,7 +166,9 @@
 
 		function animate() {
 
-			const time = clock.getElapsedTime();
+			timer.update();
+
+			const time = timer.getElapsed();
 
 			for ( let i = 0; i < objects.length; i ++ ) {
 

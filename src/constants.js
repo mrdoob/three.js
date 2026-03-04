@@ -1,4 +1,4 @@
-export const REVISION = '183dev';
+export const REVISION = '184dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1164,6 +1164,17 @@ export const InterpolateLinear = 2301;
  * @constant
  */
 export const InterpolateSmooth = 2302;
+
+/**
+ * Bezier interpolation mode for keyframe tracks.
+ *
+ * Uses cubic Bezier curves with explicit 2D control points.
+ * Requires tangent data to be set on the track.
+ *
+ * @type {number}
+ * @constant
+ */
+export const InterpolateBezier = 2303;
 
 /**
  * Zero curvature ending for animations.

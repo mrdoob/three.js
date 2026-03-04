@@ -37,7 +37,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing;
+			let camera, scene, renderer, renderPipeline;
 			let index = 0;
 
 			init();
@@ -77,7 +77,7 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
@@ -94,7 +94,7 @@
 
 				const traaNode = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
 			
-				postProcessing.outputNode = traaNode;
+				renderPipeline.outputNode = traaNode;
 
 				//
 
@@ -131,7 +131,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

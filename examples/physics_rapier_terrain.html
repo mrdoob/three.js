@@ -45,7 +45,8 @@
 			let container, stats;
 			let camera, scene, renderer;
 			let terrainMesh;
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			// Physics variables
 			let physics;
@@ -262,6 +263,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 			
@@ -269,7 +272,7 @@
 
 			function render() {
 
-				const deltaTime = clock.getDelta();
+				const deltaTime = timer.getDelta();
 
 				// Generate new objects with a delay between them
 				if ( dynamicObjects.length < maxNumObjects && time > timeNextSpawn ) {

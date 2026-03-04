@@ -43,7 +43,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -116,8 +116,8 @@
 
 				const bloomPass = bloom( emissivePass, 2.5, .5 );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outputPass.add( bloomPass );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = outputPass.add( bloomPass );
 
 				//
 
@@ -155,7 +155,7 @@
 
 			function render() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -85,6 +85,8 @@ function SidebarProjectApp( editor ) {
 
 		const toZip = {};
 
+		const rendererType = config.getKey( 'project/renderer/type' );
+
 		//
 
 		let output = editor.toJSON();
@@ -114,6 +116,26 @@ function SidebarProjectApp( editor ) {
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
 			content = content.replace( '<!-- title -->', title );
+
+			//
+
+			const IMPORTMAP = {
+				WebGLRenderer: {
+					imports: {
+						'three': './js/three.module.js'
+					}
+				},
+				WebGPURenderer: {
+					imports: {
+						'three': './js/three.webgpu.js',
+						'three/webgpu': './js/three.webgpu.js'
+					}
+				}
+			};
+			const importmap = JSON.stringify( IMPORTMAP[ rendererType ], null, '\t' );
+			content = content.replace( '<!-- importmap -->', indent( '\n' + indent( importmap, 1 ) + '\n', 2 ) );
+
+			//
 
 			let editButton = '';
 
@@ -145,11 +167,24 @@ function SidebarProjectApp( editor ) {
 			toZip[ 'js/three.core.js' ] = strToU8( content );
 
 		} );
-		loader.load( '../build/three.module.js', function ( content ) {
 
-			toZip[ 'js/three.module.js' ] = strToU8( content );
+		if ( rendererType === 'WebGPURenderer' ) {
 
-		} );
+			loader.load( '../build/three.webgpu.js', function ( content ) {
+
+				toZip[ 'js/three.webgpu.js' ] = strToU8( content );
+
+			} );
+
+		} else {
+
+			loader.load( '../build/three.module.js', function ( content ) {
+
+				toZip[ 'js/three.module.js' ] = strToU8( content );
+
+			} );
+
+		}
 
 	} );
 	container.add( publishButton );
@@ -166,5 +201,18 @@ function SidebarProjectApp( editor ) {
 	return container;
 
 }
+
+//
+
+function indent( text, count, space = '\t' ) {
+
+	return text
+		.split( '\n' )
+		.map( line => space.repeat( count ) + line )
+		.join( '\n' );
+
+}
+
+//
 
 export { SidebarProjectApp };

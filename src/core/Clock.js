@@ -1,11 +1,16 @@
+import { warn } from '../utils.js';
+
 /**
  * Class for keeping track of time.
+ *
+ * @deprecated since r183.
  */
 class Clock {
 
 	/**
 	 * Constructs a new clock.
 	 *
+	 * @deprecated since 183.
 	 * @param {boolean} [autoStart=true] - Whether to automatically start the clock when
 	 * `getDelta()` is called for the first time.
 	 */
@@ -52,6 +57,8 @@ class Clock {
 		 * @default true
 		 */
 		this.running = false;
+
+		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
 
 	}
 

@@ -27,7 +27,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>parameters</strong>
+										<strong translate="no">parameters</strong>
 									</td>
 									<td class="description last">
 										<p>The configuration parameter.</p>
@@ -98,7 +98,7 @@ Points in space whose dot product with the plane is negative are cut away.</p>
 <li><code>checkShaderErrors</code>: If it is <code>true</code>, defines whether material shader programs are
 checked for errors during compilation and linkage process. It may be useful to disable
 this check in production for performance gain. It is strongly recommended to keep these
-checks enabled during development. If the shader does not compile and link - it will not
+checks enabled during development. If the shader does not compile and link, it will not
 work and associated material will not render.</li>
 <li><code>onShaderError(gl, program, glVertexShader,glFragmentShader)</code>: A callback function that
 can be used for custom error reporting. The callback receives the WebGL context, an instance
@@ -110,7 +110,7 @@ Assigning a custom function disables the default error reporting.</li>
 				<div class="member">
 					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLCanvasElement | OffscreenCanvas</span> </h3>
 					<div class="description">
-						<p>A canvas where the renderer draws its output.This is automatically created by the renderer
+						<p>A canvas where the renderer draws its output. This is automatically created by the renderer
 in the constructor (if not provided already); you just need to add it to your page like so:</p>
 <pre><code class="language-js">document.body.appendChild( renderer.domElement );
 </code></pre>
@@ -240,7 +240,7 @@ This method initializes the buffers to the current clear color values.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the color buffer should be cleared or not.</p>
@@ -249,7 +249,7 @@ This method initializes the buffers to the current clear color values.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depth</strong>
+										<strong translate="no">depth</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the depth buffer should be cleared or not.</p>
@@ -258,7 +258,7 @@ This method initializes the buffers to the current clear color values.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>stencil</strong>
+										<strong translate="no">stencil</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the stencil buffer should be cleared or not.</p>
@@ -298,7 +298,7 @@ optional parameter for applying the target scene.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or another type of 3D object to precompile.</p>
@@ -306,7 +306,7 @@ optional parameter for applying the target scene.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera.</p>
@@ -314,7 +314,7 @@ optional parameter for applying the target scene.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>targetScene</strong>
+										<strong translate="no">targetScene</strong>
 									</td>
 									<td class="description last">
 										<p>The target scene.</p>
@@ -338,7 +338,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene or another type of 3D object to precompile.</p>
@@ -346,7 +346,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera.</p>
@@ -354,7 +354,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>targetScene</strong>
+										<strong translate="no">targetScene</strong>
 									</td>
 									<td class="description last">
 										<p>The target scene.</p>
@@ -376,7 +376,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -384,7 +384,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>position</strong>
+										<strong translate="no">position</strong>
 									</td>
 									<td class="description last">
 										<p>The start position of the copy operation.</p>
@@ -393,7 +393,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>level</strong>
+										<strong translate="no">level</strong>
 									</td>
 									<td class="description last">
 										<p>The mip level. The default represents the base mip.</p>
@@ -414,7 +414,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>srcTexture</strong>
+										<strong translate="no">srcTexture</strong>
 									</td>
 									<td class="description last">
 										<p>The source texture.</p>
@@ -422,7 +422,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstTexture</strong>
+										<strong translate="no">dstTexture</strong>
 									</td>
 									<td class="description last">
 										<p>The destination texture.</p>
@@ -430,7 +430,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>srcRegion</strong>
+										<strong translate="no">srcRegion</strong>
 									</td>
 									<td class="description last">
 										<p>A bounding box which describes the source region. Can be two or three-dimensional.</p>
@@ -439,7 +439,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstPosition</strong>
+										<strong translate="no">dstPosition</strong>
 									</td>
 									<td class="description last">
 										<p>A vector that represents the origin of the destination region. Can be two or three-dimensional.</p>
@@ -448,7 +448,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>srcLevel</strong>
+										<strong translate="no">srcLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The source mipmap level to copy.</p>
@@ -457,7 +457,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dstLevel</strong>
+										<strong translate="no">dstLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The destination mipmap level.</p>
@@ -522,7 +522,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -561,7 +561,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -582,7 +582,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -622,7 +622,7 @@ is currently set.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -652,7 +652,7 @@ is currently set.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -673,7 +673,7 @@ is currently set.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The method writes the result in this target object.</p>
@@ -696,7 +696,7 @@ rendered to.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The render target.</p>
@@ -715,7 +715,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -733,7 +733,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to read from.</p>
@@ -741,7 +741,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>x</code> coordinate of the copy region's origin.</p>
@@ -749,7 +749,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>y</code> coordinate of the copy region's origin.</p>
@@ -757,7 +757,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the copy region.</p>
@@ -765,7 +765,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the copy region.</p>
@@ -773,7 +773,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>buffer</strong>
+										<strong translate="no">buffer</strong>
 									</td>
 									<td class="description last">
 										<p>The result buffer.</p>
@@ -781,7 +781,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeCubeFaceIndex</strong>
+										<strong translate="no">activeCubeFaceIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The active cube face index.</p>
@@ -789,7 +789,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureIndex</strong>
+										<strong translate="no">textureIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The texture index of an MRT render target.</p>
@@ -809,7 +809,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to read from.</p>
@@ -817,7 +817,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>x</code> coordinate of the copy region's origin.</p>
@@ -825,7 +825,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>y</code> coordinate of the copy region's origin.</p>
@@ -833,7 +833,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the copy region.</p>
@@ -841,7 +841,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the copy region.</p>
@@ -849,7 +849,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>buffer</strong>
+										<strong translate="no">buffer</strong>
 									</td>
 									<td class="description last">
 										<p>The result buffer.</p>
@@ -857,7 +857,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeCubeFaceIndex</strong>
+										<strong translate="no">activeCubeFaceIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The active cube face index.</p>
@@ -865,7 +865,7 @@ render (which can cause noticeable lags due to decode and GPU upload overhead).<
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureIndex</strong>
+										<strong translate="no">textureIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The texture index of an MRT render target.</p>
@@ -893,7 +893,7 @@ or <code>autoClearStencil</code> to <code>false</code>. To force a clear, use <a
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene to render.</p>
@@ -901,7 +901,7 @@ or <code>autoClearStencil</code> to <code>false</code>. To force a clear, use <a
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera.</p>
@@ -929,7 +929,7 @@ for best compatibility.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The application's animation loop.</p>
@@ -947,7 +947,7 @@ for best compatibility.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>alpha</strong>
+										<strong translate="no">alpha</strong>
 									</td>
 									<td class="description last">
 										<p>The clear alpha.</p>
@@ -965,7 +965,7 @@ for best compatibility.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The clear color.</p>
@@ -973,7 +973,7 @@ for best compatibility.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>alpha</strong>
+										<strong translate="no">alpha</strong>
 									</td>
 									<td class="description last">
 										<p>The clear alpha.</p>
@@ -997,7 +997,7 @@ size.y = height * pixelRatio;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width in logical pixels.</p>
@@ -1005,7 +1005,7 @@ size.y = height * pixelRatio;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height in logical pixels.</p>
@@ -1013,7 +1013,7 @@ size.y = height * pixelRatio;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>pixelRatio</strong>
+										<strong translate="no">pixelRatio</strong>
 									</td>
 									<td class="description last">
 										<p>The pixel ratio.</p>
@@ -1031,7 +1031,7 @@ size.y = height * pixelRatio;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>effects</strong>
+										<strong translate="no">effects</strong>
 									</td>
 									<td class="description last">
 										<p>An array of post-processing effects.</p>
@@ -1050,7 +1050,7 @@ to use the default <code>painterSortStable</code> function.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>method</strong>
+										<strong translate="no">method</strong>
 									</td>
 									<td class="description last">
 										<p>The opaque sort function.</p>
@@ -1068,7 +1068,7 @@ to use the default <code>painterSortStable</code> function.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The pixel ratio.</p>
@@ -1086,7 +1086,7 @@ to use the default <code>painterSortStable</code> function.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderTarget</strong>
+										<strong translate="no">renderTarget</strong>
 									</td>
 									<td class="description last">
 										<p>The render target to set. When <code>null</code> is given,
@@ -1095,7 +1095,7 @@ the canvas is set as the active render target instead.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeCubeFace</strong>
+										<strong translate="no">activeCubeFace</strong>
 									</td>
 									<td class="description last">
 										<p>The active cube face when using a cube render target.
@@ -1105,7 +1105,7 @@ Indicates the z layer to render in to when using 3D or array render targets.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>activeMipmapLevel</strong>
+										<strong translate="no">activeMipmapLevel</strong>
 									</td>
 									<td class="description last">
 										<p>The active mipmap level.</p>
@@ -1124,7 +1124,7 @@ Indicates the z layer to render in to when using 3D or array render targets.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the lower left corner of the scissor region origin in logical pixel unit.
@@ -1133,7 +1133,7 @@ Or alternatively a four-component vector specifying all the parameters of the sc
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the lower left corner of the scissor region origin  in logical pixel unit.</p>
@@ -1141,7 +1141,7 @@ Or alternatively a four-component vector specifying all the parameters of the sc
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the scissor region in logical pixel unit.</p>
@@ -1149,7 +1149,7 @@ Or alternatively a four-component vector specifying all the parameters of the sc
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the scissor region in logical pixel unit.</p>
@@ -1169,7 +1169,7 @@ actions.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>boolean</strong>
+										<strong translate="no">boolean</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the scissor test is enabled or not.</p>
@@ -1189,7 +1189,7 @@ into account, and also sets the viewport to fit that size, starting in (0,
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width in logical pixels.</p>
@@ -1197,7 +1197,7 @@ into account, and also sets the viewport to fit that size, starting in (0,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height in logical pixels.</p>
@@ -1205,7 +1205,7 @@ into account, and also sets the viewport to fit that size, starting in (0,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>updateStyle</strong>
+										<strong translate="no">updateStyle</strong>
 									</td>
 									<td class="description last">
 										<p>Whether to update the <code>style</code> attribute of the canvas or not.</p>
@@ -1225,7 +1225,7 @@ to use the default <code>reversePainterSortStable</code> function.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>method</strong>
+										<strong translate="no">method</strong>
 									</td>
 									<td class="description last">
 										<p>The opaque sort function.</p>
@@ -1243,7 +1243,7 @@ to use the default <code>reversePainterSortStable</code> function.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
@@ -1252,7 +1252,7 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p>
@@ -1260,7 +1260,7 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the viewport in logical pixel unit.</p>
@@ -1268,7 +1268,7 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the viewport in logical pixel unit.</p>

@@ -18,7 +18,8 @@
 <p>Current feature set:</p>
 <ul>
 <li>JPEG headers (required)</li>
-<li>XMP metadata (required)</li>
+<li>XMP metadata (legacy format, supported)</li>
+<li>ISO 21496-1 metadata (current standard, supported)</li>
 <li>XMP validation (not implemented)</li>
 <li>EXIF profile (not implemented)</li>
 <li>ICC profile (not implemented)</li>
@@ -50,7 +51,7 @@ scene.environment = texture;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>manager</strong>
+										<strong translate="no">manager</strong>
 									</td>
 									<td class="description last">
 										<p>The loading manager.</p>
@@ -79,7 +80,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>url</strong>
+										<strong translate="no">url</strong>
 									</td>
 									<td class="description last">
 										<p>The path/URL of the files to be loaded. This can also be a data URI.</p>
@@ -87,7 +88,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when the loading process has been finished.</p>
@@ -95,7 +96,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onProgress</strong>
+										<strong translate="no">onProgress</strong>
 									</td>
 									<td class="description last">
 										<p>Executed while the loading is in progress.</p>
@@ -103,7 +104,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onError</strong>
+										<strong translate="no">onError</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when errors occur.</p>
@@ -127,7 +128,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>buffer</strong>
+										<strong translate="no">buffer</strong>
 									</td>
 									<td class="description last">
 										<p>The raw texture data.</p>
@@ -135,7 +136,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>The <code>onLoad</code> callback.</p>
@@ -156,7 +157,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The texture type to set.</p>

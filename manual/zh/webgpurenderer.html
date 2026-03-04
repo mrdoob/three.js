@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>WebGPU 渲染器</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - WebGPU 渲染器">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+        <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+    {
+      "imports": {
+        "three": "../../build/three.module.js"
+      }
+    }
+    </script>
+    </head>
+    <body>
+      <div class="container">
+        <div class="lesson-title">
+          <h1>WebGPU 渲染器</h1>
+        </div>
+        <div class="lesson">
+          <div class="lesson-main">
+            
+            <p>
+              `WebGPURenderer` 是 three.js 的下一代渲染器。本文会简要介绍它的能力和基本使用方式。
+            </p>
+
+            <h2>概述</h2>
+
+            <p>
+              `WebGPURenderer` 被设计为 `WebGLRenderer` 的现代替代方案。
+              它优先使用 WebGPU（现代高性能图形与计算 API），
+              同时也被设计成通用渲染器：若设备/浏览器不支持 WebGPU，
+              会自动回退到 WebGL 2 后端。
+            </p>
+             <p>
+              这个回退机制非常关键：应用可以在支持 WebGPU 的平台获得新能力，
+              同时不牺牲仅支持 WebGL 2 设备的兼容性。
+             </p>
+
+             <p>
+             除了接入 WebGPU，`WebGPURenderer` 还提供了以下特性：
+             <p>
+
+            <ul>
+              <li>
+                内置全新的节点材质系统，开发自定义材质更灵活、更稳健。
+              </li>
+              <li>
+                支持 three.js 着色语言 TSL。你可以用 JavaScript 以跨平台方式编写 shader，
+                并根据后端自动转译为 WGSL 或 GLSL。
+              </li>
+              <li>
+                内置全新后处理栈，支持 MRT（多渲染目标）并可借助节点系统自动合并 pass。
+              </li>
+            </ul>
+
+            下面看看如何在 three.js 应用中集成 `WebGPURenderer`。
+
+            <h2>使用方式</h2>
+
+             <p>
+             `WebGPURenderer` 使用不同构建入口，因此导入方式需要调整：
+            </p>
+            
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  import * as THREE from 'three';
++  import * as THREE from 'three/webgpu';
+</pre>
+
+            <p>
+              如果你使用 import map，建议改成如下形式（路径按你的工程结构调整）：
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+  &lt;script type="importmap"&gt;
+    {
+      "imports": {
+        "three": "../build/three.webgpu.js",
+        "three/webgpu": "../build/three.webgpu.js",
+        "three/tsl": "../build/three.tsl.js",
+        "three/addons/": "./jsm/"
+      }
+    }
+  &lt;/script&gt;
+</pre>
+
+             <p>
+              创建渲染器实例的方式和 `WebGLRenderer` 类似：
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const renderer = new THREE.WebGPURenderer( { antialias: true } );
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( render );
+document.body.appendChild( renderer.domElement );
+</pre>
+            <p>
+              需要注意，WebGPU 初始化是异步的。因此推荐使用 `setAnimationLoop()`，
+              它能确保首次渲染前完成初始化。
+              如果你坚持使用 `window.requestAnimationFrame()` 或需要在初始化阶段直接使用渲染器，
+              则要额外调用一行初始化代码。
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const renderer = new THREE.WebGPURenderer( { antialias: true } );
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( render );
+document.body.appendChild( renderer.domElement );
+
++  await renderer.init();
+</pre>
+            <p>
+              `WebGLRenderer` 中常见的方法（如 `clear()`、`setRenderTarget()`、`dispose()`）
+              在 `WebGPURenderer` 中同样可用。完整接口请参考
+              <a href="https://threejs.org/docs/#Renderer" target="_blank">API 文档</a>。
+            </p>
+
+             <p>
+              正如前文所述，`WebGPURenderer` 默认使用 WebGPU，必要时回退 WebGL 2。
+              如果你想在测试中强制 WebGL 2，或出于某些原因禁用 WebGPU，
+              可以使用 `forceWebGL` 参数。
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  const renderer = new THREE.WebGPURenderer( { antialias: true } );
++  const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
+</pre>
+
+            <h2>迁移说明</h2>
+
+            <p>
+              准备迁移到 `WebGPURenderer` 时，需要注意以下几点：
+            </p>
+
+            <ul>
+              <li>
+                `ShaderMaterial`、`RawShaderMaterial` 以及通过 `onBeforeCompile()` 改造内置材质，
+                在 `WebGPURenderer` 中不受支持。相关逻辑需要迁移到节点材质与 TSL。
+              </li>
+              <li>
+                `EffectComposer` 及其传统 pass 在这里不支持，
+                因为 `WebGPURenderer` 提供了新一代后处理栈。
+                类似材质迁移，后处理效果也使用 TSL 编写，并以节点组合表达。
+                常用效果已迁移并提供了性能更好的节点版本，同时新增了 SSGI、SSS、
+                更好的 DoF 等新效果。可查看
+                <a href="https://threejs.org/examples/?q=webgpu%20postprocessing" target="_blank">官方示例</a>。
+              </li>
+              <li>
+                渲染器整体仍属于实验阶段，尽管成熟度近年已明显提升。
+                依据你的应用和场景，仍可能遇到缺失特性，或在某些场景下 `WebGLRenderer` 更快。
+                如遇问题建议在 GitHub 提 issue。`WebGPURenderer` 会持续迭代，
+                建议尽量使用最新版本。
+              </li>
+            </ul>
+
+            <h2>WebGLRenderer 的现状</h2>
+
+            <p>虽然当前研发重点在 `WebGPURenderer`、节点材质和 TSL，
+              `WebGLRenderer` 仍在维护，且依然是纯 WebGL 2 应用的推荐选择。
+              但请注意，项目已不计划为 `WebGLRenderer` 增加大型新特性，这一点从最近的版本说明（release notes）中也可以明显看出。
+              同时我们也在评估为其加入有限的节点材质支持，
+              以便某些项目更平滑地迁移到 `WebGPURenderer`。
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+    <script src="../resources/prettify.js"></script>
+    <script src="../resources/lesson.js"></script>
+  </body>
+</html>
+
+
+

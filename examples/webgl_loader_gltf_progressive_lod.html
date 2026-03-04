@@ -192,12 +192,15 @@
 
 			//
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			let time = 0;
 
 			function animate() {
 
-				const dt = clock.getDelta();
+				timer.update();
+
+				const dt = timer.getDelta();
 				time += dt;
 
 				mixer.update( dt );

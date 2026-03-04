@@ -40,10 +40,11 @@
 			import { uniform, pass } from 'three/tsl';
 			import { transition } from 'three/addons/tsl/display/TransitionNode.js';
 
-			let renderer, postProcessing, transitionController, transitionPass;
+			let renderer, renderPipeline, transitionController, transitionPass;
 
 			const textures = [];
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const effectController = {
 				animateScene: true,
@@ -167,14 +168,14 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
 				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
 
 				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode( textures[ effectController.texture ] ), effectController._transition, effectController.threshold, effectController._useTexture );
 
-				postProcessing.outputNode = transitionPass;
+				renderPipeline.outputNode = transitionPass;
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 
@@ -232,6 +233,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				if ( effectController.animateTransition ) TWEEN.update();
 
 				if ( textures[ effectController.texture ] ) {
@@ -241,7 +244,7 @@
 
 				}
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 				fxSceneA.update( delta );
 				fxSceneB.update( delta );
 
@@ -262,7 +265,7 @@
 
 				} else {
 
-					postProcessing.render();
+					renderPipeline.render();
 
 				}
 

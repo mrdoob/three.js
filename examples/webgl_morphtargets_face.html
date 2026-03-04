@@ -43,13 +43,14 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, stats, mixer, clock, controls;
+			let camera, scene, renderer, stats, mixer, timer, controls;
 
 			init();
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -135,7 +136,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) {
 

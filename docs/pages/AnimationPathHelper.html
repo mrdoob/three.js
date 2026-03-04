@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnimationPathHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">AnimationPathHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Visualizes the motion path of an animated object based on position keyframes
+from an AnimationClip.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const clip = model.animations[ 0 ];
+const helper = new AnimationPathHelper( model, clip, object );
+scene.add( helper );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">AnimationPathHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { AnimationPathHelper } from 'three/addons/helpers/AnimationPathHelper.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AnimationPathHelper" translate="no">new <a href="#AnimationPathHelper">AnimationPathHelper</a><span class="signature">( root : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new animation path helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">root</strong>
+									</td>
+									<td class="description last">
+										<p>The root object containing the animation clips.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip containing position keyframes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The specific object to show the path for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Configuration options.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The path line color.</p>
+										<p>Default is <code>0x00ff00</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">markerColor</strong>
+									</td>
+									<td class="description last">
+										<p>The keyframe marker color.</p>
+										<p>Default is <code>0xff0000</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">divisions</strong>
+									</td>
+									<td class="description last">
+										<p>Number of samples for smooth path interpolation.</p>
+										<p>Default is <code>100</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">showMarkers</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to show markers at keyframe positions.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">markerSize</strong>
+									</td>
+									<td class="description last">
+										<p>Size of keyframe markers in pixels.</p>
+										<p>Default is <code>5</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="clip" translate="no">.<a href="#clip">clip</a><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="description">
+						<p>The animation clip containing position keyframes.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="divisions" translate="no">.<a href="#divisions">divisions</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Number of samples for smooth path interpolation.</p>
+						<p>Default is <code>100</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isAnimationPathHelper" translate="no">.<a href="#isAnimationPathHelper">isAnimationPathHelper</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="line" translate="no">.<a href="#line">line</a><span class="type-signature"> : <a href="Line.html">Line</a></span> </h3>
+					<div class="description">
+						<p>The line representing the animation path.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="object" translate="no">.<a href="#object">object</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>The object whose path is being visualized.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="points" translate="no">.<a href="#points">points</a><span class="type-signature"> : <a href="Points.html">Points</a> | null</span> </h3>
+					<div class="description">
+						<p>Points marking keyframe positions.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="root" translate="no">.<a href="#root">root</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>The root object containing the animation clips.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setColor" translate="no">.<a href="#setColor">setColor</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the path line color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The new color.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMarkerColor" translate="no">.<a href="#setMarkerColor">setMarkerColor</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the keyframe marker color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The new color.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateMatrixWorld" translate="no">.<a href="#updateMatrixWorld">updateMatrixWorld</a><span class="signature">( force : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the helper's transform to match the object's parent.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">force</strong>
+									</td>
+									<td class="description last">
+										<p>Force matrix update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Object3D.html#updateMatrixWorld">Object3D#updateMatrixWorld</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/AnimationPathHelper.js" translate="no" target="_blank" rel="noopener">examples/jsm/helpers/AnimationPathHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -8,7 +8,7 @@ import {
 	Mesh,
 	MeshPhongMaterial
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 
 /**
  * A loader for the AMF format.
@@ -105,7 +105,7 @@ class AMFLoader extends Loader {
 
 				try {
 
-					zip = fflate.unzipSync( new Uint8Array( data ) );
+					zip = unzipSync( new Uint8Array( data ) );
 
 				} catch ( e ) {
 

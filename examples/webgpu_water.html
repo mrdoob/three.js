@@ -51,7 +51,7 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			let scene, camera, renderer, water, postProcessing, controls;
+			let scene, camera, renderer, water, renderPipeline, controls;
 
 			const params = {
 				color: '#99e0ff',
@@ -182,8 +182,8 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 			
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
@@ -199,7 +199,7 @@
 				const outputPass = renderOutput( beautyPass.add( bloomPass ) );
 
 				const fxaaPass = fxaa( outputPass );
-				postProcessing.outputNode = fxaaPass;
+				renderPipeline.outputNode = fxaaPass;
 
 				// gui
 
@@ -254,7 +254,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

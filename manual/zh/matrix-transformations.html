@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>矩阵变换</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 矩阵变换">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>矩阵变换</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Three.js 使用 `matrices`（矩阵）来表示 3D 变换：平移（position）、旋转和缩放。
+            每个 `Object3D` 实例都包含一个 `matrix`，用于存储该对象的位置、旋转与缩放。
+            本页介绍如何更新对象的变换。
+            </p>
+        
+            <h2>便捷属性与 `matrixAutoUpdate`</h2>
+        
+            <p>
+              更新对象变换有两种方式：
+            </p>
+            <ol>
+              <li>
+                修改对象的 `position`、`quaternion`、`scale` 属性，
+                由 three.js 根据这些属性重新计算矩阵：
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.position.copy( start_position );
+object.quaternion.copy( quaternion );
+</pre>
+                默认情况下 `matrixAutoUpdate = true`，矩阵会自动重算。
+                如果对象是静态的，或你希望手动控制重算时机，可将其设为 `false` 以获得更好性能：
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.matrixAutoUpdate = false;
+</pre>
+                修改属性后，再手动更新矩阵：
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.updateMatrix();
+</pre>
+              </li>
+              <li>
+                直接修改对象矩阵。`Matrix4` 提供了多种矩阵修改方法：
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.matrix.setRotationFromQuaternion( quaternion );
+object.matrix.setPosition( start_position );
+object.matrixAutoUpdate = false;
+</pre>
+                注意这种方式下 `matrixAutoUpdate` <em>必须</em>设为 `false`，
+                并且要确保<em>不要</em>调用 `updateMatrix`。
+                调用 `updateMatrix` 会根据 `position`、`scale` 等重新计算矩阵，
+                从而覆盖你手动写入的矩阵内容。
+              </li>
+            </ol>
+        
+            <h2>对象矩阵与世界矩阵</h2>
+            <p>
+            对象的 `matrix` 存储的是相对于父对象的<em>局部</em>变换；
+            若要获取对象在<em>世界坐标</em>中的变换，需要访问对象的世界矩阵。
+            </p>
+            <p>
+            当父对象或子对象变换发生变化时，可以调用 `object.updateMatrixWorld()`，
+            触发子对象世界矩阵更新。
+            </p>
+            <p>
+            也可以通过 `applyMatrix4()` 对对象施加变换。注意：该方法底层依赖
+            `Matrix4.decompose()`，并非所有矩阵都能这样分解。
+            例如父对象存在非均匀缩放时，子对象世界矩阵可能无法正确分解，
+            此时该方法并不适用。
+            </p>
+        
+            <h2>旋转与四元数</h2>
+            <p>
+            Three.js 提供两种 3D 旋转表示：欧拉角与四元数，并支持相互转换。
+            欧拉角会受到“万向节锁（gimbal lock）”问题影响，
+            在某些姿态下会丢失一个自由度（导致无法绕某一轴旋转）。
+            因此，对象旋转在内部<em>始终</em>存储为四元数。
+            </p>
+            <p>
+            旧版本库曾有 `useQuaternion` 属性，设为 false 时会用欧拉角计算对象矩阵。
+            这种做法已废弃。现在应使用 `object.setRotationFromEuler()`，
+            它会同步更新四元数。
+            </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+
+

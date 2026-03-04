@@ -50,7 +50,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -124,8 +124,8 @@
 
 				const blurPass = gaussianBlur( flarePass, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outputPass.add( bloomPass ).add( blurPass );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = outputPass.add( bloomPass ).add( blurPass );
 
 				//
 
@@ -172,7 +172,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

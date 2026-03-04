@@ -5,7 +5,7 @@ import {
 	LoadingManager
 } from 'three';
 import { ColladaLoader } from '../loaders/ColladaLoader.js';
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 
 /**
  * A loader for the KMZ format.
@@ -119,18 +119,18 @@ class KMZLoader extends Loader {
 
 		//
 
-		const zip = fflate.unzipSync( new Uint8Array( data ) );
+		const zip = unzipSync( new Uint8Array( data ) );
 
 		if ( zip[ 'doc.kml' ] ) {
 
-			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
+			const xml = new DOMParser().parseFromString( new TextDecoder().decode( zip[ 'doc.kml' ] ), 'application/xml' );
 
 			const model = xml.querySelector( 'Placemark Model Link href' );
 
 			if ( model ) {
 
 				const loader = new ColladaLoader( manager );
-				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) );
+				return loader.parse( new TextDecoder().decode( zip[ model.textContent ] ) );
 
 			}
 
@@ -145,7 +145,7 @@ class KMZLoader extends Loader {
 				if ( extension === 'dae' ) {
 
 					const loader = new ColladaLoader( manager );
-					return loader.parse( fflate.strFromU8( zip[ path ] ) );
+					return loader.parse( new TextDecoder().decode( zip[ path ] ) );
 
 				}
 

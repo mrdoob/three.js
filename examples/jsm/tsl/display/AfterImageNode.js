@@ -239,6 +239,6 @@ class AfterImageNode extends TempNode {
  * @param {(Node<float>|number)} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), nodeObject( damp ) ) );
+export const afterImage = ( node, damp ) => new AfterImageNode( convertToTexture( node ), nodeObject( damp ) );
 
 export default AfterImageNode;

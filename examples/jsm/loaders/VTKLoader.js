@@ -7,7 +7,7 @@ import {
 	Loader,
 	SRGBColorSpace
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.module.js';
 
 /**
  * A loader for the VTK format.
@@ -859,7 +859,7 @@ class VTKLoader extends Loader {
 
 					for ( let i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
+						const data = unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
 						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {

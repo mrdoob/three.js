@@ -2,9 +2,12 @@
 import { RendererInspector } from './RendererInspector.js';
 import { Profiler } from './ui/Profiler.js';
 import { Performance } from './tabs/Performance.js';
+import { Memory } from './tabs/Memory.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
+import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
+import { Timeline } from './tabs/Timeline.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
@@ -56,8 +59,17 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
+		const memory = new Memory();
+		profiler.addTab( memory );
+
+		const timeline = new Timeline();
+		profiler.addTab( timeline );
+
 		const consoleTab = new Console();
 		profiler.addTab( consoleTab );
+
+		const settings = new Settings();
+		profiler.addTab( settings );
 
 		profiler.loadLayout();
 
@@ -71,9 +83,11 @@ class Inspector extends RendererInspector {
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
+		this.memory = memory;
 		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
+		this.timeline = timeline;
 		this.once = {};
 
 		this.displayCycle = {
@@ -110,7 +124,7 @@ class Inspector extends RendererInspector {
 
 	}
 
-	resolveConsole( type, message ) {
+	resolveConsole( type, message, stackTrace = null ) {
 
 		switch ( type ) {
 
@@ -126,7 +140,15 @@ class Inspector extends RendererInspector {
 
 				this.console.addMessage( 'warn', message );
 
-				console.warn( message );
+				if ( stackTrace && stackTrace.isStackTrace ) {
+
+					console.warn( stackTrace.getError( message ) );
+
+				} else {
+
+					console.warn( message );
+
+				}
 
 				break;
 
@@ -134,7 +156,15 @@ class Inspector extends RendererInspector {
 
 				this.console.addMessage( 'error', message );
 
-				console.error( message );
+				if ( stackTrace && stackTrace.isStackTrace ) {
+
+					console.error( stackTrace.getError( message ) );
+
+				} else {
+
+					console.error( message );
+
+				}
 
 				break;
 
@@ -182,9 +212,9 @@ class Inspector extends RendererInspector {
 
 			if ( this.isAvailable ) {
 
-				renderer.backend.trackTimestamp = true;
-
 				renderer.init().then( () => {
+
+					renderer.backend.trackTimestamp = true;
 
 					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 
@@ -193,6 +223,8 @@ class Inspector extends RendererInspector {
 					}
 
 				} );
+
+				this.timeline.setRenderer( renderer );
 
 			}
 
@@ -207,12 +239,6 @@ class Inspector extends RendererInspector {
 		if ( this.parameters.isVisible === false ) {
 
 			this.parameters.show();
-
-			if ( this.parameters.isDetached === false ) {
-
-				this.profiler.setActiveTab( this.parameters.id );
-
-			}
 
 		}
 
@@ -439,12 +465,14 @@ class Inspector extends RendererInspector {
 			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
+			this.memory.updateText( this );
 
 		}
 
 		if ( this.displayCycle.graph.needsUpdate ) {
 
 			this.performance.updateGraph( this, frame );
+			this.memory.updateGraph( this );
 
 		}
 

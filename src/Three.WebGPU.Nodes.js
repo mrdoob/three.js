@@ -2,10 +2,13 @@ export * from './Three.Core.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nodes.js';
+export { default as WebGPUBackend } from './renderers/webgpu/WebGPUBackend.js';
+export { default as WebGLBackend } from './renderers/webgl-fallback/WebGLBackend.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
+export { default as RenderPipeline } from './renderers/common/RenderPipeline.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
 import * as RendererUtils from './renderers/common/RendererUtils.js';
 export { RendererUtils };

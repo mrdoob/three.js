@@ -27,11 +27,11 @@ export const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLoc
  * @tsl
  * @type {Node<vec3>}
  */
-export const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+export const tangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+	if ( builder.subBuildFn === 'VERTEX' || builder.geometry.hasAttribute( 'tangent' ) ) {
 
 		node = modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.toVarying( 'v_tangentView' ).normalize();
 
@@ -41,7 +41,7 @@ export const tangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, materia
 
 	}
 
-	if ( material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		node = directionToFaceDirection( node );
 

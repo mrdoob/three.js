@@ -44,7 +44,7 @@
 			};
 
 			let camera, scene, renderer, timer, group;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -126,7 +126,7 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 
@@ -137,7 +137,7 @@
 
 				const blurPass = radialBlur( scenePass, { weight: weightUniform, decay: decayUniform, count: countUniform, exposure: exposureUniform } );
 
-				postProcessing.outputNode = blurPass;
+				renderPipeline.outputNode = blurPass;
 
 				//
 
@@ -154,15 +154,15 @@
 			
 					if ( value === true ) {
 
-						postProcessing.outputNode = blurPass;
+						renderPipeline.outputNode = blurPass;
 
 					} else {
 
-						postProcessing.outputNode = scenePass;
+						renderPipeline.outputNode = scenePass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 				} );
 				gui.add( params, 'animated' );
@@ -191,7 +191,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

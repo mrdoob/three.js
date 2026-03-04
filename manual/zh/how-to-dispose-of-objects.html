@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>如何释放对象</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 如何释放对象">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>如何释放对象</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            为了提升性能并避免内存泄漏，及时释放不再使用的对象非常关键。
+            每当你创建一个 *three.js* 实例，都会分配一定内存。同时，*three.js*
+            还会为几何体、材质等对象创建渲染所需的 WebGL 资源（如缓冲区和着色器程序）。
+            这些资源不会自动释放，应用必须通过专用 API 主动清理。
+            本文简要说明这些 API 的使用方式，以及哪些对象需要关注。
+          </p>
+        
+          <h2>几何体</h2>
+        
+          <p>
+            几何体通常由一组顶点属性组成。*three.js* 会为每个属性在内部创建
+            [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]。
+            这些资源只有在调用 `BufferGeometry.dispose()` 后才会被删除。
+            当几何体不再使用时，应执行该方法释放相关资源。
+          </p>
+        
+          <h2>材质</h2>
+        
+          <p>
+            材质决定对象如何被渲染。*three.js* 会根据材质信息构建着色器程序。
+            着色器程序只有在对应材质被释放后才可能删除。出于性能考虑，
+            *three.js* 会尽量复用已存在的着色器程序，因此只有当相关材质都释放后，
+            着色器程序才会真正销毁。释放材质请调用 `Material.dispose()`。
+          </p>
+        
+          <h2>纹理</h2>
+        
+          <p>
+            释放材质不会影响纹理。纹理需要单独管理，因为一个纹理可能被多个材质共享。
+            每当创建 `Texture`，three.js 会在内部创建
+            [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]。
+            与缓冲区一样，它只能通过 `Texture.dispose()` 删除。
+          </p>
+        
+          <p>
+            如果纹理数据源是 `ImageBitmap`，你还需要在应用层调用
+            [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]()
+            来释放 CPU 侧资源。`Texture.dispose()` 无法自动调用该方法，
+            因为 `close()` 后图像位图将不可再用，而引擎无法判断它是否还被其他地方使用。
+          </p>
+        
+          <h2>渲染目标</h2>
+        
+          <p>
+            `WebGLRenderTarget` 不仅会分配
+            [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]，
+            还会分配 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]
+            和 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer]
+            来支持自定义渲染输出。这些资源只能通过 `WebGLRenderTarget.dispose()` 释放。
+          </p>
+        
+          <h2>蒙皮网格</h2>
+        
+          <p>
+            蒙皮网格通过骨架（skeleton）表示骨骼层级。若不再需要某个蒙皮网格，
+            可以对其骨架调用 `Skeleton.dispose()` 释放内部资源。
+            注意骨架可能被多个蒙皮网格共享，只有在确认未被其他活动对象使用时再释放。
+          </p>
+        
+          <h2>其他</h2>
+        
+          <p>
+            examples 目录中的其他类（如 controls、后处理 pass）也可能提供 `dispose()`，
+            用于移除内部事件监听器或渲染目标。通常建议查看类的 API / 文档，
+            只要有 `dispose()`，在清理阶段就应调用。
+          </p>
+        
+          <h2>常见问题</h2>
+        
+          <h3>为什么 *three.js* 不能自动释放对象？</h3>
+        
+          <p>
+            这是社区经常提出的问题。核心原因是：*three.js* 无法知道用户创建对象
+            （如几何体、材质）的生命周期与作用域，这属于应用层职责。
+            例如某材质当前帧没被使用，下一帧仍可能需要。
+            因此当应用确认对象可删除时，必须调用对应 `dispose()` 通知引擎。
+          </p>
+        
+          <h3>把 mesh 从场景移除后，几何体和材质会自动释放吗？</h3>
+        
+          <p>
+            不会。你需要显式调用 *dispose()* 释放几何体和材质。
+            同时要注意它们可能被多个 3D 对象共享。
+          </p>
+        
+          <h3>*three.js* 能查看缓存对象数量吗？</h3>
+        
+          <p>
+            可以。查看渲染器的 `renderer.info` 属性即可，它包含显存与渲染流程的统计信息，
+            包括当前内部缓存了多少纹理、几何体、着色器程序等。
+            如果应用出现性能问题，调试该属性有助于快速定位内存泄漏。
+          </p>
+        
+          <h3>纹理图像尚未加载完成时调用 `dispose()` 会怎样？</h3>
+        
+          <p>
+            纹理内部资源只有在图像完全加载后才会分配。
+            若在加载前就调用 `dispose()`，通常不会发生任何事；
+            因为资源尚未创建，也就无需清理。
+          </p>
+        
+          <h3>调用 `dispose()` 后又再次使用该对象，会怎样？</h3>
+        
+          <p>
+            取决于对象类型。对于几何体、材质、纹理、渲染目标和后处理 pass，
+            被删除的内部资源通常可以由引擎重新创建，因此不会直接报运行时错误；
+            但当前帧可能有性能损耗，尤其在需要重新编译着色器时。
+
+            controls 和 renderer 属于例外：调用 `dispose()` 后实例不可继续使用，
+            需要重新创建。
+          </p>
+        
+          <h3>应用里该如何管理 *three.js* 对象？什么时候该释放？</h3>
+        
+          <p>
+            没有唯一标准答案，取决于具体业务场景。需要强调的是，并非任何时候都必须立即释放。
+            例如多关卡游戏，切关通常是做统一清理的好时机：遍历旧场景并释放失效的材质、
+            几何体和纹理。就像上文所说，即使误释放了仍会被使用的对象，
+            一般也不会立刻报错，最坏情况通常是某一帧性能下降。
+          </p>
+        
+          <h3>为什么遍历场景并释放可达资源后，`renderer.info.memory` 仍显示几何体和纹理？</h3>
+        
+          <p>
+            某些情况下，Three.js 会创建一些内部使用的纹理和几何体，
+            它们无法通过遍历场景图直接访问到，因此也无法在遍历时释放。
+            所以即便做了完整场景清理，`renderer.info.memory` 仍可能显示这些对象。
+            这通常不代表泄漏，它们会在后续“清理-重建”循环中被复用。
+
+            常见相关场景包括使用 `material.envMap`、`scene.background`、
+            `scene.environment` 等，会触发引擎创建内部资源。
+          </p>
+        
+          <h2>`dispose()` 用法示例</h2>
+        
+          <p>
+            [example:webgl_test_memory WebGL / test / memory]<br />
+            [example:webgl_test_memory2 WebGL / test / memory2]<br />
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+

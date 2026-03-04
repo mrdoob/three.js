@@ -15,7 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error } from '../../../utils.js';
+import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -161,15 +161,25 @@ class WebGPUPipelineUtils {
 
 				if ( mrt !== null ) {
 
-					const blendMode = mrt.getBlendMode( texture.name );
+					if ( this.backend.compatibilityMode !== true ) {
 
-					if ( blendMode.blending === MaterialBlending ) {
+						const blendMode = mrt.getBlendMode( texture.name );
+
+						if ( blendMode.blending === MaterialBlending ) {
+
+							blending = materialBlending;
+
+						} else if ( blendMode.blending !== NoBlending ) {
+
+							blending = this._getBlending( blendMode );
+
+						}
+
+					} else {
+
+						warnOnce( 'WebGPURenderer: Multiple Render Targets (MRT) blending configuration is not fully supported in compatibility mode. The material blending will be used for all render targets.' );
 
 						blending = materialBlending;
-
-					} else if ( blendMode.blending !== NoBlending ) {
-
-						blending = this._getBlending( blendMode );
 
 					}
 
@@ -240,7 +250,7 @@ class WebGPUPipelineUtils {
 			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = {}; // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
+				depthStencil.stencilBack = stencilFront; // apply the same stencil ops to both faces, matching gl.stencilOp() which is not face-separated
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
@@ -784,7 +794,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			const depthFunc = material.depthFunc;
+			const depthFunc = ( this.backend.parameters.reversedDepthBuffer ) ? ReversedDepthFuncs[ material.depthFunc ] : material.depthFunc;
 
 			switch ( depthFunc ) {
 

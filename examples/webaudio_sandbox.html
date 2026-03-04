@@ -53,7 +53,8 @@
 
 			let analyser1, analyser2, analyser3;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
@@ -244,7 +245,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				controls.update( delta );
 

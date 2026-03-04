@@ -1,5 +1,5 @@
 import { TempNode } from 'three/webgpu';
-import { nodeObject, Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
+import { Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
 
 /**
  * Post processing node for shifting/splitting RGB color channels. The effect
@@ -93,4 +93,4 @@ export default RGBShiftNode;
  * @param {number} [angle=0] - Defines in which direction colors are shifted.
  * @returns {RGBShiftNode}
  */
-export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );
+export const rgbShift = ( node, amount, angle ) => new RGBShiftNode( convertToTexture( node ), amount, angle );
