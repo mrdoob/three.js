@@ -1204,7 +1204,7 @@ class Animal extends Component {
 +    globals.playerRadius = model.size / 2;
 </pre>
 <p>现在想想，让动物瞄准康加舞队列的头部而不是特定的玩家可能会更聪明。也许我以后会回来改。</p>
-<p>刚开始时我对所有动物只用一个半径，但这当然不好，因为哈巴狗比马小得多。所以我添加了不同的大小，但我想要能够可视化这些东西。为此我创建了一个 <code class="notranslate" translate="no">StatusDisplayHelper</code> 组件。</p>
+<p>刚开始时我对所有动物只用一个半径，但这当然不好，因为哈巴狗比马小得多。所以我添加了不同的大小，但我想要能够可视化这些东西。为此我创建了一个 <code class="notranslate" translate="no">StateDisplayHelper</code> 组件。</p>
 <p>它使用 <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> 在每个角色周围画一个圆圈，并使用 HTML 元素让每个角色显示一些状态，使用的是<a href="align-html-elements-to-3d.html">将 HTML 元素对齐到 3D 的文章</a>中介绍的技术。</p>
 <p>首先我们需要添加一些 HTML 来承载这些元素</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -1434,7 +1434,7 @@ class CoroutineRunner {
 <p>它和 <code class="notranslate" translate="no">SafeArray</code> 做了类似的事情，确保在其他协程运行时添加或移除协程是安全的。它还处理嵌套协程。</p>
 <p>要创建协程，你需要创建一个 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">JavaScript 生成器函数</a>。生成器函数前面有关键字 <code class="notranslate" translate="no">function*</code>（星号很重要！）</p>
 <p>生成器函数可以 <code class="notranslate" translate="no">yield</code>。例如</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* count0To9() {
   for (let i = 0; i &lt; 10; ++i) {
     console.log(i);
     yield;
