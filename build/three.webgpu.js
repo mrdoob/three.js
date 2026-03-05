@@ -401,9 +401,6 @@ class NodeMaterialObserver {
 		const attributes = geometry.attributes;
 		const storedAttributes = storedGeometryData.attributes;
 
-		const storedAttributeNames = Object.keys( storedAttributes );
-		const currentAttributeNames = Object.keys( attributes );
-
 		if ( storedGeometryData.id !== geometry.id ) {
 
 			storedGeometryData.id = geometry.id;
@@ -411,16 +408,16 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( storedAttributeNames.length !== currentAttributeNames.length ) {
+		// attributes
 
-			renderObjectData.geometry.attributes = this.getAttributesData( attributes );
-			return false;
+		let currentAttributeCount = 0;
+		let storedAttributeCount = 0;
 
-		}
+		for ( const _ in attributes ) currentAttributeCount ++; // eslint-disable-line no-unused-vars
 
-		// compare each attribute
+		for ( const name in storedAttributes ) {
 
-		for ( const name of storedAttributeNames ) {
+			storedAttributeCount ++;
 
 			const storedAttributeData = storedAttributes[ name ];
 			const attribute = attributes[ name ];
@@ -440,6 +437,13 @@ class NodeMaterialObserver {
 				return false;
 
 			}
+
+		}
+
+		if ( storedAttributeCount !== currentAttributeCount ) {
+
+			renderObjectData.geometry.attributes = this.getAttributesData( attributes );
+			return false;
 
 		}
 
@@ -1308,14 +1312,6 @@ class Node extends EventDispatcher {
 		this.updateAfterType = NodeUpdateType.NONE;
 
 		/**
-		 * The UUID of the node.
-		 *
-		 * @type {string}
-		 * @readonly
-		 */
-		this.uuid = MathUtils.generateUUID();
-
-		/**
 		 * The version of the node. The version automatically is increased when {@link Node#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
@@ -1373,6 +1369,15 @@ class Node extends EventDispatcher {
 		this._cacheKey = null;
 
 		/**
+		 * The UUID of the node.
+		 *
+		 * @type {string}
+		 * @default null
+		 * @private
+		 */
+		this._uuid = null;
+
+		/**
 		 * The cache key's version.
 		 *
 		 * @private
@@ -1381,7 +1386,13 @@ class Node extends EventDispatcher {
 		 */
 		this._cacheKeyVersion = 0;
 
-		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+		/**
+		 * The unique ID of the node.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.id = _nodeId ++;
 
 		/**
 		 * The stack trace of the node for debugging purposes.
@@ -1413,6 +1424,24 @@ class Node extends EventDispatcher {
 			this.version ++;
 
 		}
+
+	}
+
+	/**
+	 * The UUID of the node.
+	 *
+	 * @type {string}
+	 * @readonly
+	 */
+	get uuid() {
+
+		if ( this._uuid === null ) {
+
+			this._uuid = MathUtils.generateUUID();
+
+		}
+
+		return this._uuid;
 
 	}
 
@@ -1708,7 +1737,7 @@ class Node extends EventDispatcher {
 	 */
 	getHash( /*builder*/ ) {
 
-		return this.uuid;
+		return String( this.id );
 
 	}
 
@@ -1779,15 +1808,61 @@ class Node extends EventDispatcher {
 	 * Returns the node's type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} [output=null] - The output of the node.
 	 * @return {string} The type of the node.
 	 */
-	getNodeType( builder ) {
+	getNodeType( builder, output = null ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		let type;
+
+		if ( output !== null ) {
+
+			nodeData.typeFromOutput = nodeData.typeFromOutput || {};
+
+			type = nodeData.typeFromOutput[ output ];
+
+			if ( type === undefined ) {
+
+				type = this.generateNodeType( builder, output );
+
+				nodeData.typeFromOutput[ output ] = type;
+
+			}
+
+		} else {
+
+			type = nodeData.type;
+
+			if ( type === undefined ) {
+
+				type = this.generateNodeType( builder );
+
+				nodeData.type = type;
+
+			}
+
+		}
+
+		return type;
+
+	}
+
+	/**
+	 * Returns the node's type.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} [output=null] - The output of the node.
+	 * @return {string} The type of the node.
+	 */
+	generateNodeType( builder, output = null ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
 		if ( nodeProperties.outputNode ) {
 
-			return nodeProperties.outputNode.getNodeType( builder );
+			return nodeProperties.outputNode.getNodeType( builder, output );
 
 		}
 
@@ -2400,7 +2475,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getElementType( builder );
 
@@ -2480,7 +2555,7 @@ class ConvertNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const requestType = this.node.getNodeType( builder );
 
@@ -2655,7 +2730,7 @@ class JoinNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) {
 
@@ -2820,7 +2895,7 @@ class SplitNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length, this.getComponentType( builder ) );
 
@@ -2961,7 +3036,7 @@ class SetNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.sourceNode.getNodeType( builder );
 
@@ -3061,7 +3136,7 @@ class FlipNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.sourceNode.getNodeType( builder );
 
@@ -3157,7 +3232,7 @@ class InputNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		if ( this.nodeType === null ) {
 
@@ -3368,7 +3443,7 @@ class MemberNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.hasMember( builder ) === false ) {
 
@@ -3869,7 +3944,7 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
 
@@ -4325,7 +4400,25 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 // exports
 
-const defined = ( v ) => typeof v === 'object' && v !== null ? v.value : v; // TODO: remove boolean conversion and defined function
+function defined( value ) {
+
+	if ( value && value.isNode ) {
+
+		value.traverse( ( node ) => {
+
+			if ( node.isConstNode ) {
+
+				value = node.value;
+
+			}
+
+		} );
+
+	}
+
+	return Boolean( value );
+
+}
 
 // utils
 
@@ -4426,7 +4519,7 @@ class FnNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.shaderNode.getNodeType( builder ) || 'float';
 
@@ -5022,8 +5115,9 @@ class UniformGroupNode extends Node {
 	 * @param {string} name - The name of the uniform group node.
 	 * @param {boolean} [shared=false] - Whether this uniform group node is shared or not.
 	 * @param {number} [order=1] - Influences the internal sorting.
+	 * @param {string|null} [updateType=null] - The update type of the uniform group node.
 	 */
-	constructor( name, shared = false, order = 1 ) {
+	constructor( name, shared = false, order = 1, updateType = null ) {
 
 		super( 'string' );
 
@@ -5052,6 +5146,14 @@ class UniformGroupNode extends Node {
 		this.order = order;
 
 		/**
+		 * The update type of the uniform group node.
+		 *
+		 * @type {string|null}
+		 * @default null
+		 */
+		this.updateType = updateType;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -5062,6 +5164,21 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Marks the uniform group node as needing an update.
+	 * This will trigger the necessary updates in the rendering process.
+	 */
+	update() {
+
+		this.needsUpdate = true;
+
+	}
+
+	/**
+	 * Serializes the uniform group node to a JSON object.
+	 *
+	 * @param {Object} data - The object to store the serialized data.
+	 */
 	serialize( data ) {
 
 		super.serialize( data );
@@ -5072,6 +5189,11 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Deserializes the uniform group node from a JSON object.
+	 *
+	 * @param {Object} data - The object containing the serialized data.
+	 */
 	deserialize( data ) {
 
 		super.deserialize( data );
@@ -5092,7 +5214,7 @@ class UniformGroupNode extends Node {
  * @param {string} name - The name of the uniform group node.
  * @returns {UniformGroupNode}
  */
-const uniformGroup = ( name ) => new UniformGroupNode( name );
+const uniformGroup = ( name, order = 1, updateType = null ) => new UniformGroupNode( name, false, order, updateType );
 
 /**
  * TSL function for creating a shared uniform group node with the given name and order.
@@ -5103,7 +5225,7 @@ const uniformGroup = ( name ) => new UniformGroupNode( name );
  * @param {number} [order=0] - Influences the internal sorting.
  * @returns {UniformGroupNode}
  */
-const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
+const sharedUniformGroup = ( name, order = 0, updateType = null ) => new UniformGroupNode( name, true, order, updateType );
 
 /**
  * TSL object that represents a shared uniform group node which is updated once per frame.
@@ -5111,7 +5233,7 @@ const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, tr
  * @tsl
  * @type {UniformGroupNode}
  */
-const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame', 0, NodeUpdateType.FRAME );
 
 /**
  * TSL object that represents a shared uniform group node which is updated once per render.
@@ -5119,7 +5241,7 @@ const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
  * @tsl
  * @type {UniformGroupNode}
  */
-const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render', 0, NodeUpdateType.RENDER );
 
 /**
  * TSL object that represents a uniform group node which is updated once per object.
@@ -5127,7 +5249,7 @@ const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
  * @tsl
  * @type {UniformGroupNode}
  */
-const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
+const objectGroup = /*@__PURE__*/ uniformGroup( 'object', 1, NodeUpdateType.OBJECT );
 
 /**
  * Class for representing a uniform.
@@ -5456,7 +5578,7 @@ class ArrayNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The type of the node.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType === null ) {
 
@@ -5611,7 +5733,7 @@ class AssignNode extends TempNode {
 
 	}
 
-	getNodeType( builder, output ) {
+	generateNodeType( builder, output ) {
 
 		return output !== 'void' ? this.targetNode.getNodeType( builder ) : 'void';
 
@@ -5821,7 +5943,7 @@ class FunctionCallNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @returns {string} The type of this node.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.functionNode.getNodeType( builder );
 
@@ -6033,7 +6155,7 @@ class OperatorNode extends TempNode {
 	 * @param {?string} [output=null] - The output type.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder, output = null ) {
+	generateNodeType( builder, output = null ) {
 
 		const op = this.op;
 
@@ -6799,7 +6921,7 @@ class MathNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const method = this.method;
 
@@ -7856,7 +7978,7 @@ class ConditionalNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const { ifNode, elseNode } = builder.getNodeProperties( this );
 
@@ -8109,7 +8231,7 @@ class ContextNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 
@@ -8459,7 +8581,7 @@ class VarNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 
@@ -8717,7 +8839,7 @@ class SubBuildNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) return this.nodeType;
 
@@ -8858,7 +8980,7 @@ class VaryingNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// VaryingNode is auto type
 
@@ -9221,7 +9343,7 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 	 *
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		return this.referenceNode.uniformType;
 
@@ -9394,7 +9516,7 @@ class ReferenceBaseNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.node === null ) {
 
@@ -9875,6 +9997,8 @@ class BufferAttributeNode extends InputNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferStride === 0 && this.bufferOffset === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -9889,11 +10013,15 @@ class BufferAttributeNode extends InputNode {
 
 			}
 
-			return bufferData.node.uuid;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.uuid;
+		return String( id );
 
 	}
 
@@ -9904,7 +10032,7 @@ class BufferAttributeNode extends InputNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.bufferType === null ) {
 
@@ -10462,7 +10590,7 @@ class IsolateNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const previousCache = builder.getCache();
 		const cache = builder.getCacheFromNode( this, this.parent );
@@ -10593,7 +10721,7 @@ class BypassNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.outputNode.getNodeType( builder );
 
@@ -10631,120 +10759,46 @@ addMethodChaining( 'bypass', bypass );
 /**
  * This node allows to remap a node value from one range into another. E.g a value of
  * `0.4` in the range `[ 0.3, 0.5 ]` should be remapped into the normalized range `[ 0, 1 ]`.
- * `RemapNode` takes care of that and converts the original value of `0.4` to `0.5`.
+ * `remap` takes care of that and converts the original value of `0.4` to `0.5`.
  *
- * @augments Node
+ * @tsl
+ * @function
+ * @param {Node} node - The node that should be remapped.
+ * @param {Node} inLowNode - The source or current lower bound of the range.
+ * @param {Node} inHighNode - The source or current upper bound of the range.
+ * @param {?Node} [outLowNode=float(0)] - The target lower bound of the range.
+ * @param {?Node} [outHighNode=float(1)] - The target upper bound of the range.
+ * @returns {Node}
  */
-class RemapNode extends Node {
+const remap = /*@__PURE__*/ Fn( ( [ node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ), doClamp = bool( false ) ] ) => {
 
-	static get type() {
+	let t = node.sub( inLowNode ).div( inHighNode.sub( inLowNode ) );
 
-		return 'RemapNode';
+	if ( defined( doClamp ) ) t = t.clamp();
 
-	}
+	return t.mul( outHighNode.sub( outLowNode ) ).add( outLowNode );
 
-	/**
-	 * Constructs a new remap node.
-	 *
-	 * @param {Node} node - The node that should be remapped.
-	 * @param {Node} inLowNode - The source or current lower bound of the range.
-	 * @param {Node} inHighNode - The source or current upper bound of the range.
-	 * @param {Node} [outLowNode=float(0)] - The target lower bound of the range.
-	 * @param {Node} [outHighNode=float(1)] - The target upper bound of the range.
-	 */
-	constructor( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
+} );
 
-		super();
+/**
+ * This node allows to remap a node value from one range into another but with enabled clamping. E.g a value of
+ * `0.4` in the range `[ 0.3, 0.5 ]` should be remapped into the normalized range `[ 0, 1 ]`.
+ * `remapClamp` takes care of that and converts the original value of `0.4` to `0.5`.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node that should be remapped.
+ * @param {Node} inLowNode - The source or current lower bound of the range.
+ * @param {Node} inHighNode - The source or current upper bound of the range.
+ * @param {?Node} [outLowNode=float(0)] - The target lower bound of the range.
+ * @param {?Node} [outHighNode=float(1)] - The target upper bound of the range.
+ * @returns {Node}
+ */
+function remapClamp( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
 
-		/**
-		 * The node that should be remapped.
-		 *
-		 * @type {Node}
-		 */
-		this.node = node;
-
-		/**
-		 * The source or current lower bound of the range.
-		 *
-		 * @type {Node}
-		 */
-		this.inLowNode = inLowNode;
-
-		/**
-		 * The source or current upper bound of the range.
-		 *
-		 * @type {Node}
-		 */
-		this.inHighNode = inHighNode;
-
-		/**
-		 * The target lower bound of the range.
-		 *
-		 * @type {Node}
-		 * @default float(0)
-		 */
-		this.outLowNode = outLowNode;
-
-		/**
-		 * The target upper bound of the range.
-		 *
-		 * @type {Node}
-		 * @default float(1)
-		 */
-		this.outHighNode = outHighNode;
-
-		/**
-		 * Whether the node value should be clamped before
-		 * remapping it to the target range.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.doClamp = true;
-
-	}
-
-	setup() {
-
-		const { node, inLowNode, inHighNode, outLowNode, outHighNode, doClamp } = this;
-
-		let t = node.sub( inLowNode ).div( inHighNode.sub( inLowNode ) );
-
-		if ( doClamp === true ) t = t.clamp();
-
-		return t.mul( outHighNode.sub( outLowNode ) ).add( outLowNode );
-
-	}
+	return remap( node, inLowNode, inHighNode, outLowNode, outHighNode, true );
 
 }
-
-/**
- * TSL function for creating a remap node.
- *
- * @tsl
- * @function
- * @param {Node} node - The node that should be remapped.
- * @param {Node} inLowNode - The source or current lower bound of the range.
- * @param {Node} inHighNode - The source or current upper bound of the range.
- * @param {?Node} [outLowNode=float(0)] - The target lower bound of the range.
- * @param {?Node} [outHighNode=float(1)] - The target upper bound of the range.
- * @returns {RemapNode}
- */
-const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } ).setParameterLength( 3, 5 );
-
-/**
- * TSL function for creating a remap node, but with enabled clamping.
- *
- * @tsl
- * @function
- * @param {Node} node - The node that should be remapped.
- * @param {Node} inLowNode - The source or current lower bound of the range.
- * @param {Node} inHighNode - The source or current upper bound of the range.
- * @param {?Node} [outLowNode=float(0)] - The target lower bound of the range.
- * @param {?Node} [outHighNode=float(1)] - The target upper bound of the range.
- * @returns {RemapNode}
- */
-const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode ).setParameterLength( 3, 5 );
 
 addMethodChaining( 'remap', remap );
 addMethodChaining( 'remapClamp', remapClamp );
@@ -10994,7 +11048,7 @@ class DebugNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 
@@ -11268,7 +11322,7 @@ class InspectorNode extends Node {
 	 * @param {NodeBuilder} builder - The node builder.
 	 * @returns {string}
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 
@@ -11368,7 +11422,7 @@ class AttributeNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		let nodeType = this.nodeType;
 
@@ -11900,7 +11954,7 @@ class TextureNode extends UniformNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		if ( this.value.isDepthTexture === true ) return 'float';
 
@@ -12813,7 +12867,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
-		const type = this.getNodeType();
+		const type = this.getNodeType( builder );
 		const paddedType = this.node.getPaddedType();
 
 		return builder.format( snippet, paddedType, type );
@@ -12907,7 +12961,7 @@ class UniformArrayNode extends BufferNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		return this.paddedType;
 
@@ -13242,7 +13296,7 @@ class ScreenNode extends Node {
 	 *
 	 * @return {('float'|'vec2'|'vec4')} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
@@ -13925,7 +13979,7 @@ class Object3DNode extends Node {
 	 *
 	 * @return {('mat4'|'vec3'|'float')} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		const scope = this.scope;
 
@@ -15078,7 +15132,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	 *
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		return this.referenceNode.uniformType;
 
@@ -15087,8 +15141,8 @@ class ReferenceElementNode extends ArrayElementNode {
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
-		const arrayType = this.referenceNode.getNodeType();
-		const elementType = this.getNodeType();
+		const arrayType = this.referenceNode.getNodeType( builder );
+		const elementType = this.getNodeType( builder );
 
 		return builder.format( snippet, arrayType, elementType );
 
@@ -15312,7 +15366,7 @@ class ReferenceNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.node === null ) {
 
@@ -17103,6 +17157,8 @@ class StorageBufferNode extends BufferNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferCount === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -17117,11 +17173,15 @@ class StorageBufferNode extends BufferNode {
 
 			}
 
-			return bufferData.node.uuid;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.uuid;
+		return String( id );
 
 	}
 
@@ -17252,7 +17312,7 @@ class StorageBufferNode extends BufferNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.structTypeNode !== null ) {
 
@@ -17262,7 +17322,7 @@ class StorageBufferNode extends BufferNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
-			return super.getNodeType( builder );
+			return super.generateNodeType( builder );
 
 		}
 
@@ -28059,7 +28119,7 @@ class RotateNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node's type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.positionNode.getNodeType( builder );
 
@@ -33910,7 +33970,7 @@ class ParameterNode extends PropertyNode {
 
 	getHash() {
 
-		return this.uuid;
+		return String( this.id );
 
 	}
 
@@ -34024,7 +34084,7 @@ class StackNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.hasOutput( builder ) ? this.outputNode.getNodeType( builder ) : 'void';
 
@@ -34472,7 +34532,7 @@ class StructTypeNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const structType = builder.getStructTypeFromNode( this, this.membersLayout, this.name );
 
@@ -34534,7 +34594,7 @@ class StructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.structTypeNode.getNodeType( builder );
 
@@ -34666,7 +34726,7 @@ class OutputStructNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		return 'OutputType';
 
@@ -35116,7 +35176,7 @@ class BitcastNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// GLSL aliasing
 		if ( this.inputType !== null ) {
@@ -35756,7 +35816,7 @@ class PackFloatNode extends TempNode {
 
 	}
 
-	getNodeType() {
+	generateNodeType() {
 
 		return 'uint';
 
@@ -35850,7 +35910,7 @@ class UnpackFloatNode extends TempNode {
 
 	}
 
-	getNodeType() {
+	generateNodeType() {
 
 		return 'vec2';
 
@@ -36029,7 +36089,7 @@ class FunctionOverloadingNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const candidateFn = this.getCandidateFn( builder );
 
@@ -40682,7 +40742,7 @@ class FunctionNode extends CodeNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.getNodeFunction( builder ).type;
 
@@ -40976,7 +41036,7 @@ class RangeNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
@@ -41153,7 +41213,7 @@ class ComputeBuiltinNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		return this.nodeType;
 
@@ -41711,7 +41771,7 @@ class AtomicFunctionNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.getInputType( builder );
 
@@ -41973,7 +42033,7 @@ class SubgroupFunctionNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const method = this.method;
 
@@ -47430,7 +47490,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	refractView: refractView,
 	reinhardToneMapping: reinhardToneMapping,
 	remap: remap,
-	remapClamp: remapClamp,
 	renderGroup: renderGroup,
 	renderOutput: renderOutput,
 	rendererReference: rendererReference,
@@ -47832,7 +47891,7 @@ class BindGroup {
 	 * @param {Array<Binding>} bindings - An array of bindings.
 	 * @param {number} index - The group index.
 	 */
-	constructor( name = '', bindings = [], index = 0 ) {
+	constructor( name = '', bindings = [] ) {
 
 		/**
 		 * The bind group's name.
@@ -47847,13 +47906,6 @@ class BindGroup {
 		 * @type {Array<Binding>}
 		 */
 		this.bindings = bindings;
-
-		/**
-		 * The group index.
-		 *
-		 * @type {number}
-		 */
-		this.index = index;
 
 		/**
 		 * The group's ID.
@@ -47992,7 +48044,7 @@ class NodeBuilderState {
 
 			if ( shared !== true ) {
 
-				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index );
+				const bindingsGroup = new BindGroup( instanceGroup.name, [] );
 				bindings.push( bindingsGroup );
 
 				for ( const instanceBinding of instanceGroup.bindings ) {
@@ -49767,7 +49819,7 @@ class NodeBuilder {
 
 			if ( bindGroup === undefined ) {
 
-				bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
+				bindGroup = new BindGroup( groupName, bindings );
 
 				bindingGroupsCache.set( cacheKey, bindGroup );
 
@@ -49775,7 +49827,7 @@ class NodeBuilder {
 
 		} else {
 
-			bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
+			bindGroup = new BindGroup( groupName, bindings );
 
 		}
 
@@ -49881,8 +49933,6 @@ class NodeBuilder {
 
 			const bindingGroup = bindingsGroups[ i ];
 			this.bindingsIndexes[ bindingGroup.name ].group = i;
-
-			bindingGroup.index = i;
 
 		}
 
@@ -53785,51 +53835,6 @@ class NodeManager extends DataMap {
 	updateGroup( nodeUniformsGroup ) {
 
 		const groupNode = nodeUniformsGroup.groupNode;
-		const name = groupNode.name;
-
-		// objectGroup is always updated
-
-		if ( name === objectGroup.name ) return true;
-
-		// renderGroup is updated once per render/compute call
-
-		if ( name === renderGroup.name ) {
-
-			const uniformsGroupData = this.get( nodeUniformsGroup );
-			const renderId = this.nodeFrame.renderId;
-
-			if ( uniformsGroupData.renderId !== renderId ) {
-
-				uniformsGroupData.renderId = renderId;
-
-				return true;
-
-			}
-
-			return false;
-
-		}
-
-		// frameGroup is updated once per frame
-
-		if ( name === frameGroup.name ) {
-
-			const uniformsGroupData = this.get( nodeUniformsGroup );
-			const frameId = this.nodeFrame.frameId;
-
-			if ( uniformsGroupData.frameId !== frameId ) {
-
-				uniformsGroupData.frameId = frameId;
-
-				return true;
-
-			}
-
-			return false;
-
-		}
-
-		// other groups are updated just when groupNode.needsUpdate is true
 
 		_chainKeys$1[ 0 ] = groupNode;
 		_chainKeys$1[ 1 ] = nodeUniformsGroup;
@@ -69912,7 +69917,20 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const cameraIndexData = this.get( cameraIndex );
+			let cameraIndexBufferIndex = 0;
+
+			bindingsSearch: for ( const bindGroup of renderObject.getBindings() ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding === cameraIndex ) break bindingsSearch;
+
+					if ( binding.isUniformsGroup || binding.isUniformBuffer ) cameraIndexBufferIndex ++;
+
+				}
+
+			}
+
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			const renderTarget = this._currentContext.renderTarget;
@@ -69981,7 +69999,7 @@ class WebGLBackend extends Backend {
 
 					}
 
-					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
 					this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
 
@@ -70524,11 +70542,6 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 
-		const bindGroupData = this.get( bindGroup );
-
-		let i = bindGroupData.uniformBuffers;
-		let t = bindGroupData.textures;
-
 		for ( const binding of bindGroup.bindings ) {
 
 			const map = this.get( binding );
@@ -70585,7 +70598,6 @@ class WebGLBackend extends Backend {
 
 				}
 
-				map.index = i ++;
 				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
@@ -70594,7 +70606,6 @@ class WebGLBackend extends Backend {
 
 				const { textureGPU, glTextureType } = this.get( binding.texture );
 
-				map.index = t ++;
 				map.textureGPU = textureGPU;
 				map.glTextureType = glTextureType;
 
@@ -71269,20 +71280,22 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
-				const bindingData = this.get( binding );
-				const index = bindingData.index;
-
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					const location = gl.getUniformBlockIndex( programGPU, binding.name );
 					gl.uniformBlockBinding( programGPU, location, index );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					const location = gl.getUniformLocation( programGPU, binding.name );
 					gl.uniform1i( location, index );
 
@@ -71304,20 +71317,24 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
 				const bindingData = this.get( binding );
-				const index = bindingData.index;
 
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					// TODO USE bindBufferRange to group multiple uniform buffers
 					state.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 				}
@@ -80567,16 +80584,15 @@ class WebGPUBackend extends Backend {
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 * @param {Object} renderContextData - The render context data object, holding current pass state and occlusion query tracking.
 	 * @param {GPURenderPipeline} pipelineGPU - The GPU render pipeline.
+	 * @param {Array<BindGroup>} bindings - The bind groups.
 	 * @param {Array<BufferAttribute>} vertexBuffers - The vertex buffers.
 	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
 	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
 	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
 	 */
-	_draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
 
 		const { object, material, context } = renderObject;
-
-		const bindings = renderObject.getBindings();
 
 		const index = renderObject.getIndex();
 		const hasIndex = ( index !== null );
@@ -80591,10 +80607,10 @@ class WebGPUBackend extends Backend {
 
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
-			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+			if ( currentBindingGroups[ i ] !== bindGroup.id ) {
 
-				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+				passEncoderGPU.setBindGroup( i, bindingsData.group );
+				currentBindingGroups[ i ] = bindGroup.id;
 
 			}
 
@@ -80761,6 +80777,8 @@ class WebGPUBackend extends Backend {
 		const drawParams = renderObject.getDrawParameters();
 		if ( drawParams === null ) return;
 
+		const bindings = renderObject.getBindings();
+
 		// vertex buffers
 
 		const vertexBuffers = renderObject.getVertexBuffers();
@@ -80804,8 +80822,6 @@ class WebGPUBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-
-
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
 					if ( renderContextData.bundleEncoders ) {
@@ -80816,8 +80832,6 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
-
-
 
 					if ( vp ) {
 
@@ -80832,16 +80846,16 @@ class WebGPUBackend extends Backend {
 
 					}
 
-
 					// Set camera index binding for this layer
 					if ( cameraIndex && cameraData.indexesGPU ) {
 
-						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
-						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+						const indexPos = bindings.indexOf( cameraIndex );
+						pass.setBindGroup( indexPos, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ indexPos ] = cameraIndex.id;
 
 					}
 
-					this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, pass, sets );
+					this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, pass, sets );
 
 				}
 
@@ -80878,7 +80892,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
+				this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
 
 			}
 
@@ -83014,4 +83028,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeRenderTarget, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeRenderTarget, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
