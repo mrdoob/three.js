@@ -1,5 +1,5 @@
 import { Parameters } from './Parameters.js';
-import { WebGPURenderer, WebGLBackend } from 'three/webgpu';
+import { WebGPURenderer, WebGLBackend, Node } from 'three/webgpu';
 
 const _init = WebGPURenderer.prototype.init;
 
@@ -45,7 +45,8 @@ function loadState() {
 	}
 
 	const state = {
-		forceWebGL: settings.forceWebGL || false
+		forceWebGL: settings.forceWebGL || false,
+		captureStackTrace: settings.captureStackTrace || false
 	};
 
 	return state;
@@ -79,6 +80,14 @@ if ( state.forceWebGL ) {
 
 }
 
+if ( state.captureStackTrace ) {
+
+	Node.captureStackTrace = true;
+
+}
+
+//
+
 class Settings extends Parameters {
 
 	constructor() {
@@ -92,6 +101,15 @@ class Settings extends Parameters {
 		rendererGroup.add( state, 'forceWebGL' ).name( 'Force WebGL' ).onChange( ( enable ) => {
 
 			forceWebGL( enable );
+			saveState( state );
+
+			location.reload();
+
+		} );
+
+		rendererGroup.add( state, 'captureStackTrace' ).name( 'Capture Stack Trace' ).onChange( ( enable ) => {
+
+			Node.captureStackTrace = enable;
 			saveState( state );
 
 			location.reload();

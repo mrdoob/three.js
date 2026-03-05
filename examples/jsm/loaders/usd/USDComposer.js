@@ -5,8 +5,10 @@ import {
 	BufferGeometry,
 	CapsuleGeometry,
 	ClampToEdgeWrapping,
+	Color,
 	ConeGeometry,
 	CylinderGeometry,
+	DirectionalLight,
 	Euler,
 	Group,
 	Matrix4,
@@ -17,14 +19,17 @@ import {
 	Object3D,
 	OrthographicCamera,
 	PerspectiveCamera,
+	PointLight,
 	Quaternion,
 	QuaternionKeyframeTrack,
+	RectAreaLight,
 	RepeatWrapping,
 	ShapeUtils,
 	SkinnedMesh,
 	Skeleton,
 	Bone,
 	SphereGeometry,
+	SpotLight,
 	SRGBColorSpace,
 	Texture,
 	Vector2,
@@ -719,6 +724,15 @@ class USDComposer {
 			} else if ( typeName === 'Camera' ) {
 
 				const obj = this._buildCamera( path );
+				obj.name = name;
+				const attrs = this._getAttributes( path );
+				this.applyTransform( obj, spec.fields, attrs );
+				parent.add( obj );
+				this._buildHierarchy( obj, path );
+
+			} else if ( typeName === 'DistantLight' || typeName === 'SphereLight' || typeName === 'RectLight' || typeName === 'DiskLight' ) {
+
+				const obj = this._buildLight( path, typeName );
 				obj.name = name;
 				const attrs = this._getAttributes( path );
 				this.applyTransform( obj, spec.fields, attrs );
@@ -1432,6 +1446,122 @@ class USDComposer {
 		camera.userData.fStop = fStop;
 		camera.userData.usdProjection = projection;
 		return camera;
+
+	}
+
+	/**
+	 * Build a light from a UsdLux light spec.
+	 */
+	_buildLight( path, typeName ) {
+
+		const attrs = this._getAttributes( path );
+
+		const intensity = this._parseNumber( attrs[ 'inputs:intensity' ], 1 );
+		const baseColor = attrs[ 'inputs:color' ] || [ 1, 1, 1 ];
+		const enableColorTemperature = attrs[ 'inputs:enableColorTemperature' ] === true;
+		const colorTemperature = this._parseNumber( attrs[ 'inputs:colorTemperature' ], 6500 );
+
+		const color = new Color( baseColor[ 0 ], baseColor[ 1 ], baseColor[ 2 ] );
+
+		if ( enableColorTemperature ) {
+
+			const temp = this._colorTemperature( colorTemperature );
+			color.multiply( temp );
+
+		}
+
+		let light;
+
+		switch ( typeName ) {
+
+			case 'DistantLight':
+				light = new DirectionalLight( color, intensity );
+				break;
+
+			case 'SphereLight': {
+
+				const coneAngle = this._parseNumber( attrs[ 'shaping:cone:angle' ], 0 );
+
+				if ( coneAngle > 0 ) {
+
+					const angle = coneAngle * Math.PI / 180;
+					const softness = this._parseNumber( attrs[ 'shaping:cone:softness' ], 0 );
+					light = new SpotLight( color, intensity, 0, angle, softness );
+
+				} else {
+
+					light = new PointLight( color, intensity );
+
+				}
+
+				break;
+
+			}
+
+			case 'RectLight': {
+
+				const width = this._parseNumber( attrs[ 'inputs:width' ], 1 );
+				const height = this._parseNumber( attrs[ 'inputs:height' ], 1 );
+				light = new RectAreaLight( color, intensity, width, height );
+				break;
+
+			}
+
+			case 'DiskLight': {
+
+				const radius = this._parseNumber( attrs[ 'inputs:radius' ], 0.5 );
+				const side = radius * 2;
+				light = new RectAreaLight( color, intensity, side, side );
+				break;
+
+			}
+
+		}
+
+		return light;
+
+	}
+
+	/**
+	 * Convert a color temperature in Kelvin to an RGB Color.
+	 * Based on Tanner Helland's algorithm.
+	 */
+	_colorTemperature( kelvin ) {
+
+		const temp = kelvin / 100;
+		let r, g, b;
+
+		if ( temp <= 66 ) {
+
+			r = 1;
+			g = 0.39008157876901960784 * Math.log( temp ) - 0.63184144378862745098;
+
+		} else {
+
+			r = 1.29293618606274509804 * Math.pow( temp - 60, - 0.1332047592 );
+			g = 1.12989086089529411765 * Math.pow( temp - 60, - 0.0755148492 );
+
+		}
+
+		if ( temp >= 66 ) {
+
+			b = 1;
+
+		} else if ( temp <= 19 ) {
+
+			b = 0;
+
+		} else {
+
+			b = 0.54320678911019607843 * Math.log( temp - 10 ) - 1.19625408914;
+
+		}
+
+		return new Color(
+			Math.min( Math.max( r, 0 ), 1 ),
+			Math.min( Math.max( g, 0 ), 1 ),
+			Math.min( Math.max( b, 0 ), 1 )
+		);
 
 	}
 

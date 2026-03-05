@@ -217,7 +217,7 @@ class TextureNode extends UniformNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		if ( this.value.isDepthTexture === true ) return 'float';
 

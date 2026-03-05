@@ -35,7 +35,7 @@ export * from './utils/MatcapUV.js';
 export * from './utils/MaxMipLevelNode.js';
 export * from './utils/Oscillators.js';
 export * from './utils/Packing.js';
-export * from './utils/RemapNode.js';
+export * from './utils/Remap.js';
 export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
 export * from './utils/ViewportUtils.js';
