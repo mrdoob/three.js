@@ -98,7 +98,7 @@
 			let container;
 
 			let camera, object, object2, material, geometry, scene1, scene2, renderer;
-			let gridHelper, sphere, model, coffeemat;
+			let gridHelper, sphere, model, coffeemat, webpBox;
 
 			const params = {
 				trs: false,
@@ -112,6 +112,7 @@
 				exportObjects: exportObjects,
 				exportSceneObject: exportSceneObject,
 				exportCompressedObject: exportCompressedObject,
+				exportWebPModel: exportWebPModel,
 			};
 
 			init();
@@ -501,6 +502,30 @@
 
 				} );
 
+				// ---------------------------------------------------------------------
+				// Box with WebP texture (EXT_texture_webp)
+				// ---------------------------------------------------------------------
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 64;
+				canvas.height = 64;
+				const ctx = canvas.getContext( '2d' );
+				ctx.fillStyle = '#005BBB';
+				ctx.fillRect( 0, 0, 64, 64 );
+				ctx.fillStyle = '#FFD500';
+				ctx.fillRect( 16, 16, 32, 32 );
+
+				const webpTexture = new THREE.CanvasTexture( canvas );
+				webpTexture.userData.mimeType = 'image/webp';
+				webpTexture.colorSpace = THREE.SRGBColorSpace;
+
+				webpBox = new THREE.Mesh(
+					new THREE.BoxGeometry( 100, 100, 100 ),
+					new THREE.MeshBasicMaterial( { map: webpTexture } )
+				);
+				webpBox.position.set( 400, 0, 0 );
+				webpBox.name = 'WebPBox';
+				scene1.add( webpBox );
+
 				//
 
 				const gui = new GUI();
@@ -519,6 +544,7 @@
 				h.add( params, 'exportObjects' ).name( 'Export Sphere With Grid' );
 				h.add( params, 'exportSceneObject' ).name( 'Export Scene 1 and Object' );
 				h.add( params, 'exportCompressedObject' ).name( 'Export Coffeemat (from compressed data)' );
+				h.add( params, 'exportWebPModel' ).name( 'Export WebP Model (EXT_texture_webp)' );
 
 				gui.open();
 
@@ -563,6 +589,12 @@
 			function exportCompressedObject() {
 
 				exportGLTF( [ coffeemat ] );
+
+			}
+
+			function exportWebPModel() {
+
+				exportGLTF( webpBox );
 
 			}
 
