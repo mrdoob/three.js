@@ -66,7 +66,7 @@ class MemberNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.hasMember( builder ) === false ) {
 

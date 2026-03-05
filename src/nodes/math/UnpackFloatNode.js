@@ -48,7 +48,7 @@ class UnpackFloatNode extends TempNode {
 
 	}
 
-	getNodeType() {
+	generateNodeType() {
 
 		return 'vec2';
 
