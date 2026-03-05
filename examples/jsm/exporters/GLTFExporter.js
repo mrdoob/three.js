@@ -1543,8 +1543,9 @@ class GLTFWriter {
 
 		if ( mimeType === 'image/webp' ) {
 
-			textureDef.extensions = {
-				'EXT_texture_webp': { source: imageIndex }
+			textureDef.extensions = textureDef.extensions || {};
+			textureDef.extensions[ 'EXT_texture_webp' ] = {
+				source: imageIndex
 			};
 
 			this.extensionsUsed[ 'EXT_texture_webp' ] = true;
