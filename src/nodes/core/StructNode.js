@@ -40,7 +40,7 @@ class StructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.structTypeNode.getNodeType( builder );
 

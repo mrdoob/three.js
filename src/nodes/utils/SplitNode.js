@@ -94,7 +94,7 @@ class SplitNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length, this.getComponentType( builder ) );
 
