@@ -194,6 +194,14 @@ IncidentLight directLight;
 
 	#endif
 
+	#ifdef USE_IRRADIANCE_PROBE_GRID
+
+		vec3 probeWorldPos = ( inverse( viewMatrix ) * vec4( geometryPosition, 1.0 ) ).xyz;
+		vec3 probeWorldNormal = inverseTransformDirection( geometryNormal, viewMatrix );
+		irradiance += getProbeGridIrradiance( probeWorldPos, probeWorldNormal );
+
+	#endif
+
 #endif
 
 #if defined( RE_IndirectSpecular )

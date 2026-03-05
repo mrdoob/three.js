@@ -104,6 +104,15 @@ class Scene extends Object3D {
 		this.environmentRotation = new Euler();
 
 		/**
+		 * An optional irradiance probe grid that provides position-dependent
+		 * diffuse global illumination via a 3D grid of L1 SH probes.
+		 *
+		 * @type {?IrradianceProbeGrid}
+		 * @default null
+		 */
+		this.irradianceProbeGrid = null;
+
+		/**
 		 * Forces everything in the scene to be rendered with the defined material. It is possible
 		 * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
 		 *
@@ -134,6 +143,8 @@ class Scene extends Object3D {
 
 		this.environmentIntensity = source.environmentIntensity;
 		this.environmentRotation.copy( source.environmentRotation );
+
+		this.irradianceProbeGrid = source.irradianceProbeGrid;
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
