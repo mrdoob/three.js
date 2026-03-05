@@ -217,6 +217,15 @@ export const cameraViewRotationMatrix = /*@__PURE__*/ mat3(
 ).toVar( 'cameraViewRotationMatrix' );
 
 /**
+ * TSL function that transforms a vector from world space to view space.
+ *
+ * @tsl
+ * @param {Node<vec3>} vector The vector to transform.
+ * @returns {Node<vec3>}
+ */
+export const worldToViewRotation = Fn( ( [ vector ] ) => cameraViewRotationMatrix.mul( vector ) );
+
+/**
  * TSL object that represents the world matrix of the camera used for the current render.
  *
  * @tsl
