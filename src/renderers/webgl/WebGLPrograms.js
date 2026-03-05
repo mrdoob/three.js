@@ -343,7 +343,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			numLightProbes: lights.numLightProbes,
 
-			irradianceProbeGrid: !! scene.irradianceProbeGrid,
+			lightProbeVolume: !! scene.lightProbeVolume,
 
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
@@ -580,7 +580,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 20 );
 		if ( parameters.alphaToCoverage )
 			_programLayers.enable( 21 );
-		if ( parameters.irradianceProbeGrid )
+		if ( parameters.lightProbeVolume )
 			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );

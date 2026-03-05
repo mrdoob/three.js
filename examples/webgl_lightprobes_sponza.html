@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - irradiance probe grid (Sponza)</title>
+		<title>three.js webgl - light probe volume (Sponza)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - irradiance probe grid (Sponza)<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - light probe volume (Sponza)<br/>
 			WASD to move, mouse to look
 		</div>
 
@@ -30,8 +30,8 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
-			import { IrradianceProbeGrid } from 'three/addons/lighting/IrradianceProbeGrid.js';
-			import { IrradianceProbeGridHelper } from 'three/addons/helpers/IrradianceProbeGridHelper.js';
+			import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
+			import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
 
 			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
 			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
@@ -210,7 +210,7 @@
 						probeBounds.min.copy( center ).sub( halfSize );
 						probeBounds.max.copy( center ).add( halfSize );
 
-						probeGrid = new IrradianceProbeGrid(
+						probeGrid = new LightProbeVolume(
 							probeBounds,
 							new THREE.Vector3( params.countX, params.countY, params.countZ )
 						);
@@ -220,11 +220,11 @@
 							far: probeFar
 						} );
 
-						scene.irradianceProbeGrid = params.enabled ? probeGrid : null;
+						scene.lightProbeVolume = params.enabled ? probeGrid : null;
 
 						if ( ! probeGridHelper ) {
 
-							probeGridHelper = new IrradianceProbeGridHelper( probeGrid, params.probeSize );
+							probeGridHelper = new LightProbeVolumeHelper( probeGrid, params.probeSize );
 							probeGridHelper.visible = params.showProbes;
 							scene.add( probeGridHelper );
 
@@ -247,7 +247,7 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					scene.irradianceProbeGrid = value ? probeGrid : null;
+					scene.lightProbeVolume = value ? probeGrid : null;
 
 				} );
 
@@ -287,7 +287,7 @@
 
 						scene.remove( probeGridHelper );
 						probeGridHelper.dispose();
-						probeGridHelper = new IrradianceProbeGridHelper( probeGrid, value );
+						probeGridHelper = new LightProbeVolumeHelper( probeGrid, value );
 						probeGridHelper.visible = params.showProbes;
 						scene.add( probeGridHelper );
 

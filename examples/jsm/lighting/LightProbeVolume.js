@@ -56,9 +56,9 @@ const _savedScissor = /*@__PURE__*/ new Vector4();
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
  *
- * @three_import import { IrradianceProbeGrid } from 'three/addons/lighting/IrradianceProbeGrid.js';
+ * @three_import import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
  */
-class IrradianceProbeGrid {
+class LightProbeVolume {
 
 	/**
 	 * Constructs a new irradiance probe grid.
@@ -137,8 +137,8 @@ class IrradianceProbeGrid {
 		this._ensureTextures();
 
 		// Prevent feedback: temporarily remove the probe grid from the scene
-		const savedGrid = scene.irradianceProbeGrid;
-		scene.irradianceProbeGrid = null;
+		const savedGrid = scene.lightProbeVolume;
+		scene.lightProbeVolume = null;
 
 		const res = this.resolution;
 		const totalProbes = res.x * res.y * res.z;
@@ -227,9 +227,9 @@ class IrradianceProbeGrid {
 		renderer.setScissor( _savedScissor );
 		renderer.setScissorTest( savedScissorTest );
 
-		console.log( `IrradianceProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
+		console.log( `LightProbeVolume: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
-		scene.irradianceProbeGrid = savedGrid;
+		scene.lightProbeVolume = savedGrid;
 
 	}
 
@@ -511,4 +511,4 @@ function _ensureBatchTarget( totalProbes ) {
 
 }
 
-export { IrradianceProbeGrid };
+export { LightProbeVolume };
