@@ -2220,6 +2220,8 @@ class WebGLRenderer {
 
 			}
 
+			materialProperties.irradianceProbeGrid = scene.irradianceProbeGrid;
+
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
 
@@ -2419,6 +2421,10 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if ( !! materialProperties.irradianceProbeGrid !== !! scene.irradianceProbeGrid ) {
+
+					needsProgramChange = true;
+
 				}
 
 			} else {
@@ -2456,6 +2462,14 @@ class WebGLRenderer {
 			if ( material.id !== _currentMaterialId ) {
 
 				_currentMaterialId = material.id;
+
+				refreshMaterial = true;
+
+			}
+
+			if ( materialProperties.needsLights && materialProperties.__probeGrid !== ( scene.irradianceProbeGrid || null ) ) {
+
+				materialProperties.__probeGrid = scene.irradianceProbeGrid || null;
 
 				refreshMaterial = true;
 
@@ -2639,6 +2653,20 @@ class WebGLRenderer {
 				}
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
+
+				// irradiance probe grid
+
+				if ( materialProperties.needsLights && scene.irradianceProbeGrid ) {
+
+					const probeGrid = scene.irradianceProbeGrid;
+
+					m_uniforms.probeGridSH0.value = probeGrid.textures[ 0 ];
+					m_uniforms.probeGridSH1.value = probeGrid.textures[ 1 ];
+					m_uniforms.probeGridSH2.value = probeGrid.textures[ 2 ];
+					m_uniforms.probeGridMin.value.copy( probeGrid.boundingBox.min );
+					m_uniforms.probeGridMax.value.copy( probeGrid.boundingBox.max );
+
+				}
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
