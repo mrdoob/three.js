@@ -1,4 +1,5 @@
 import InputNode from './InputNode.js';
+import StackTrace from '../core/StackTrace.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { getConstNodeType } from '../tsl/TSLCore.js';
 import { getValueFromType } from './NodeUtils.js';
@@ -78,7 +79,7 @@ class UniformNode extends InputNode {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 

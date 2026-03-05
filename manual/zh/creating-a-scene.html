@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>创建场景</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 创建场景">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>创建场景</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <p>本节的目标是简要介绍 three.js。我们将从搭建一个包含旋转立方体的场景开始。页面底部提供了可运行的示例，如果你遇到困难可以参考。</p>
+
+		<h2>开始之前</h2>
+
+		<p>
+			如果你还没有阅读过<a href="installation.html">安装</a>指南，请先阅读它。我们假设你已经搭建好了相同的项目结构（包括 <i>index.html</i> 和 <i>main.js</i>），安装了 three.js，并且正在使用构建工具，或使用本地服务器并配合 CDN 与 import maps。
+		</p>
+
+		<h2>创建场景</h2>
+
+		<p>要使用 three.js 显示任何内容，我们需要三样东西：场景（scene）、相机（camera）和渲染器（renderer），这样我们才能通过相机来渲染场景。</p>
+
+		<p><i>main.js —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+</pre>
+
+		<p>让我们花点时间解释一下这里发生了什么。我们现在已经设置好了场景、相机和渲染器。</p>
+
+		<p>three.js 中有几种不同的相机。目前，我们先使用 `PerspectiveCamera`（透视相机）。</p>
+
+		<p>第一个参数是`视野范围`（field of view）。FOV 是指在任意时刻显示器上能看到的场景范围，值以角度为单位。</p>
+
+		<p>第二个参数是`宽高比`（aspect ratio）。几乎总是应该使用元素的宽度除以高度，否则会出现类似在宽屏电视上播放老电影的效果——画面看起来会被压扁。</p>
+
+		<p>接下来的两个参数是近裁剪面（`near`）和远裁剪面（`far`）。也就是说，距离相机比 `far` 更远或比 `near` 更近的物体将不会被渲染。你现在不必担心这个，但在实际应用中可能需要调整这些值以获得更好的性能。</p>
+
+		<p>接下来是渲染器。除了创建渲染器实例之外，我们还需要设置渲染尺寸。通常建议用应用需要填满的区域宽高——在这里就是浏览器窗口的宽度和高度。对于性能要求较高的应用，你也可以给 `setSize` 传入较小的值，例如 `window.innerWidth/2` 和 `window.innerHeight/2`，这会使应用以四分之一的尺寸进行渲染。</p>
+
+		<p>如果你希望保持应用的显示尺寸不变，但以较低的分辨率渲染，可以在调用 `setSize` 时将第三个参数 `updateStyle` 设为 false。例如，假设你的 &lt;canvas&gt; 宽高均为 100%，调用 `setSize(window.innerWidth/2, window.innerHeight/2, false)` 将以一半的分辨率渲染应用。</p>
+
+		<p>最后，我们将 `renderer` 元素添加到 HTML 文档中。这是一个 &lt;canvas&gt; 元素，渲染器用它来向我们展示场景。</p>
+
+		<p><em>"听起来不错，但你说好的立方体呢？"</em> 现在就来添加它。</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 5;
+</pre>
+
+		<p>要创建一个立方体，我们需要一个 `BoxGeometry`（立方体几何体）。这个对象包含了立方体的所有顶点（`vertices`）和面（`faces`）。我们以后会进一步探索这些内容。</p>
+
+		<p>除了几何体，我们还需要一个材质来为它着色。Three.js 提供了多种材质，这里我们先使用 `MeshBasicMaterial`。所有材质都接受一个属性对象。为了简单起见，我们只提供一个颜色属性 `0x00ff00`，即绿色。颜色的工作方式与 CSS 或 Photoshop 中的十六进制颜色（`hex colors`）相同。</p>
+
+		<p>我们需要的第三样东西是 `Mesh`（网格）。网格是一个接受几何体并将材质应用于其上的对象，然后我们可以将它插入场景中并自由移动。</p>
+
+		<p>默认情况下，当我们调用 `scene.add()` 时，添加的对象会被放置在坐标 `(0,0,0)` 处。这会导致相机和立方体重叠在一起。为了避免这种情况，我们只需将相机稍微向外移动一些。</p>
+
+		<h2>渲染场景</h2>
+
+		<p>如果你将上面的代码复制到之前创建的 main.js 文件中，你会发现什么都看不到。这是因为我们还没有真正进行渲染。为此，我们需要一个所谓的渲染循环或动画循环。</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+function animate( time ) {
+  renderer.render( scene, camera );
+}
+renderer.setAnimationLoop( animate );
+</pre>
+
+		<p>这会创建一个循环，让渲染器在每次屏幕刷新时绘制场景（在普通屏幕上这意味着每秒 60 次）。如果你是浏览器游戏开发的新手，可能会问<em>"为什么不直接用 setInterval？"</em>当然可以，但 `WebGLRenderer` 内部使用的 `requestAnimationFrame` 有很多优势。其中最重要的一点是，当用户切换到其他浏览器标签页时它会自动暂停，从而不会浪费宝贵的处理资源和电池寿命。</p>
+
+		<h2>让立方体动起来</h2>
+
+		<p>如果你将上面所有的代码都插入到文件中，你应该能看到一个绿色的立方体。让我们给它添加旋转，使它更有趣一些。</p>
+
+		<p>在 `animate` 函数中的 `renderer.render` 调用之前添加以下代码：</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+cube.rotation.x = time / 2000;
+cube.rotation.y = time / 1000;
+</pre>
+
+		<p>这段代码会在每一帧执行（通常每秒 60 次），让立方体产生流畅的旋转动画。基本上，在应用运行期间你想要移动或改变的任何东西都需要通过动画循环来实现。当然，你可以在其中调用其他函数，这样就不会让 `animate` 函数变得过于冗长。</p>
+
+		<h2>最终效果</h2>
+		<p>恭喜！你已经完成了你的第一个 three.js 应用。虽然很简单，但万事总要有个开始。</p>
+
+		<p>完整代码如下，也可以作为可编辑的 [link:https://jsfiddle.net/zycqb61k/ 在线示例] 查看。试着修改代码来加深理解。</p>
+
+		<p><i>index.html —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;My first three.js app&lt;/title&gt;
+    &lt;style&gt;
+      body { margin: 0; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+		<p><i>main.js —</i></p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( animate );
+document.body.appendChild( renderer.domElement );
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 5;
+
+function animate( time ) {
+
+  cube.rotation.x = time / 2000;
+  cube.rotation.y = time / 1000;
+
+  renderer.render( scene, camera );
+
+}
+</pre>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

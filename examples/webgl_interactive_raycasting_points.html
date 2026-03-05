@@ -31,7 +31,7 @@
 			let raycaster;
 			let intersection = null;
 			let spheresIndex = 0;
-			let clock;
+			let timer;
 			let toggle = 0;
 
 			const pointer = new THREE.Vector2();
@@ -158,7 +158,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 10, 10, 10 );
@@ -240,6 +241,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -273,7 +276,7 @@
 
 				}
 
-				toggle += clock.getDelta();
+				toggle += timer.getDelta();
 
 				renderer.render( scene, camera );
 

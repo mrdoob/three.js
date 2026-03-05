@@ -41,7 +41,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
-		const type = this.getNodeType();
+		const type = this.getNodeType( builder );
 		const paddedType = this.node.getPaddedType();
 
 		return builder.format( snippet, paddedType, type );
@@ -135,7 +135,7 @@ class UniformArrayNode extends BufferNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		return this.paddedType;
 
@@ -314,6 +314,8 @@ class UniformArrayNode extends BufferNode {
 		this.value = new arrayType( length * paddedElementLength );
 		this.bufferCount = length;
 		this.bufferType = paddedType;
+
+		this.update(); // initialize the buffer values
 
 		return super.setup( builder );
 

@@ -25,7 +25,7 @@ scene.add( torus );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TorusGeometry" translate="no">new <a href="#TorusGeometry">TorusGeometry</a><span class="signature">( radius : <span class="param-type">number</span>, tube : <span class="param-type">number</span>, radialSegments : <span class="param-type">number</span>, tubularSegments : <span class="param-type">number</span>, arc : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="TorusGeometry" translate="no">new <a href="#TorusGeometry">TorusGeometry</a><span class="signature">( radius : <span class="param-type">number</span>, tube : <span class="param-type">number</span>, radialSegments : <span class="param-type">number</span>, tubularSegments : <span class="param-type">number</span>, arc : <span class="param-type">number</span>, thetaStart : <span class="param-type">number</span>, thetaLength : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new torus geometry.</p>
@@ -34,7 +34,7 @@ scene.add( torus );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>radius</strong>
+										<strong translate="no">radius</strong>
 									</td>
 									<td class="description last">
 										<p>Radius of the torus, from the center of the torus to the center of the tube.</p>
@@ -43,7 +43,7 @@ scene.add( torus );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>tube</strong>
+										<strong translate="no">tube</strong>
 									</td>
 									<td class="description last">
 										<p>Radius of the tube. Must be smaller than <code>radius</code>.</p>
@@ -52,7 +52,7 @@ scene.add( torus );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>radialSegments</strong>
+										<strong translate="no">radialSegments</strong>
 									</td>
 									<td class="description last">
 										<p>The number of radial segments.</p>
@@ -61,7 +61,7 @@ scene.add( torus );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>tubularSegments</strong>
+										<strong translate="no">tubularSegments</strong>
 									</td>
 									<td class="description last">
 										<p>The number of tubular segments.</p>
@@ -70,10 +70,28 @@ scene.add( torus );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>arc</strong>
+										<strong translate="no">arc</strong>
 									</td>
 									<td class="description last">
 										<p>Central angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">thetaStart</strong>
+									</td>
+									<td class="description last">
+										<p>Start of the tubular sweep in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">thetaLength</strong>
+									</td>
+									<td class="description last">
+										<p>Length of the tubular sweep in radians.</p>
 										<p>Default is <code>Math.PI*2</code>.</p>
 									</td>
 								</tr>
@@ -101,7 +119,7 @@ JSON object.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>data</strong>
+										<strong translate="no">data</strong>
 									</td>
 									<td class="description last">
 										<p>A JSON object representing the serialized geometry.</p>

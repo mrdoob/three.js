@@ -1,5 +1,5 @@
 import { TextureLoader } from 'three';
-import { Fn, int, ivec2, textureLoad } from 'three/tsl';
+import { Fn, int, ivec2, textureLoad, screenUV, screenSize, mod, floor, float, vec3 } from 'three/tsl';
 
 /**
  * @module Bayer
@@ -30,5 +30,44 @@ export const bayer16 = Fn( ( [ uv ] ) => {
 	}
 
 	return textureLoad( bayer16Texture, ivec2( uv ).mod( int( 16 ) ) );
+
+} );
+
+/**
+ * This TSL function applies Bayer dithering to a color input. It uses a 4x4 Bayer matrix
+ * pattern to add structured noise before color quantization, which helps reduce visible
+ * color banding when limiting color depth.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} color - The input color to apply dithering to.
+ * @param {Node<float>} [steps=32] - The number of color steps per channel.
+ * @return {Node<vec3>} The dithered color ready for quantization.
+ *
+ * @example
+ * // Apply dithering with posterize
+ * const ditheredColor = bayerDither( inputColor, 32 );
+ * const finalColor = posterize( ditheredColor, 32 );
+ */
+export const bayerDither = Fn( ( [ color, steps = float( 32.0 ) ] ) => {
+
+	const screenPos = screenUV.mul( screenSize );
+	const x = mod( floor( screenPos.x ), float( 4.0 ) );
+	const y = mod( floor( screenPos.y ), float( 4.0 ) );
+
+	// Simplified Bayer matrix approximation
+	const bayer = mod(
+		floor( x.add( 1.0 ) ).mul( floor( y.add( 1.0 ) ) ).mul( 17.0 ),
+		16.0
+	).div( 16.0 ).sub( 0.5 );
+
+	// Apply dither offset before quantization
+	const ditherOffset = bayer.div( steps );
+
+	return vec3(
+		color.r.add( ditherOffset ),
+		color.g.add( ditherOffset ),
+		color.b.add( ditherOffset )
+	);
 
 } );

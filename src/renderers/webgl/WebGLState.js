@@ -1,19 +1,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { error } from '../../utils.js';
-
-const reversedFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
-	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
-	[ LessEqualDepth ]: GreaterEqualDepth,
-
-	[ AlwaysDepth ]: NeverDepth,
-	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
-	[ GreaterEqualDepth ]: LessEqualDepth,
-};
+import { error, ReversedDepthFuncs } from '../../utils.js';
 
 function WebGLState( gl, extensions ) {
 
@@ -146,7 +134,7 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( depthFunc ) {
 
-				if ( currentReversed ) depthFunc = reversedFuncs[ depthFunc ];
+				if ( currentReversed ) depthFunc = ReversedDepthFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -214,6 +202,8 @@ function WebGLState( gl, extensions ) {
 
 				if ( currentDepthClear !== depth ) {
 
+					currentDepthClear = depth;
+
 					if ( currentReversed ) {
 
 						depth = 1 - depth;
@@ -221,7 +211,6 @@ function WebGLState( gl, extensions ) {
 					}
 
 					gl.clearDepth( depth );
-					currentDepthClear = depth;
 
 				}
 
@@ -875,10 +864,16 @@ function WebGLState( gl, extensions ) {
 
 			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				currentPolygonOffsetFactor = factor;
 				currentPolygonOffsetUnits = units;
+
+				if ( depthBuffer.getReversed() ) {
+
+					factor = - factor;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 

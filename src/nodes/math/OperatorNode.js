@@ -1,5 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
+import StackTrace from '../core/StackTrace.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
 
@@ -107,7 +108,7 @@ class OperatorNode extends TempNode {
 	 * @param {?string} [output=null] - The output type.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder, output = null ) {
+	generateNodeType( builder, output = null ) {
 
 		const op = this.op;
 
@@ -743,7 +744,7 @@ addMethodChaining( 'decrement', decrement );
  */
 export const modInt = ( a, b ) => { // @deprecated, r175
 
-	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.', new StackTrace() );
 	return mod( int( a ), int( b ) );
 
 };

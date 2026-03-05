@@ -17,7 +17,7 @@
 <p>By default, the node affects the entire image. For a selective bloom,
 use the <code>emissive</code> material property to control which objects should
 contribute to bloom or not. This can be achieved via MRT.</p>
-<pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
+<pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 scenePass.setMRT( mrt( {
 	output,
@@ -26,14 +26,14 @@ scenePass.setMRT( mrt( {
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const emissivePass = scenePass.getTextureNode( 'emissive' );
 const bloomPass = bloom( emissivePass );
-postProcessing.outputNode = scenePassColor.add( bloomPass );
+renderPipeline.outputNode = scenePassColor.add( bloomPass );
 </code></pre></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const bloomPass = bloom( scenePassColor );
-postProcessing.outputNode = scenePassColor.add( bloomPass );
+renderPipeline.outputNode = scenePassColor.add( bloomPass );
 </code></pre></div>
 			</header>
 			<article>
@@ -51,7 +51,7 @@ postProcessing.outputNode = scenePassColor.add( bloomPass );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputNode</strong>
+										<strong translate="no">inputNode</strong>
 									</td>
 									<td class="description last">
 										<p>The node that represents the input of the effect.</p>
@@ -59,7 +59,7 @@ postProcessing.outputNode = scenePassColor.add( bloomPass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>strength</strong>
+										<strong translate="no">strength</strong>
 									</td>
 									<td class="description last">
 										<p>The strength of the bloom.</p>
@@ -68,7 +68,7 @@ postProcessing.outputNode = scenePassColor.add( bloomPass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>radius</strong>
+										<strong translate="no">radius</strong>
 									</td>
 									<td class="description last">
 										<p>The radius of the bloom.</p>
@@ -77,7 +77,7 @@ postProcessing.outputNode = scenePassColor.add( bloomPass );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>threshold</strong>
+										<strong translate="no">threshold</strong>
 									</td>
 									<td class="description last">
 										<p>The luminance threshold limits which bright areas contribute to the bloom effect.</p>
@@ -159,7 +159,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect.</p>
@@ -167,7 +167,7 @@ when the effect is no longer required.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect.</p>
@@ -185,7 +185,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -206,7 +206,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>The current node frame.</p>

@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import StackTrace from '../core/StackTrace.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
@@ -90,19 +91,19 @@ class StackNode extends Node {
 
 	getElementType( builder ) {
 
-		return this.hasOutput ? this.outputNode.getElementType( builder ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getElementType( builder ) : 'void';
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
-		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput( builder ) ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -117,7 +118,7 @@ class StackNode extends Node {
 
 		if ( node.isNode !== true ) {
 
-			error( 'TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.', new StackTrace() );
 			return this;
 
 		}
@@ -229,7 +230,7 @@ class StackNode extends Node {
 
 		} else {
 
-			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.', new StackTrace() );
 
 		}
 
@@ -311,9 +312,9 @@ class StackNode extends Node {
 
 	}
 
-	get hasOutput() {
+	hasOutput( builder ) {
 
-		return this.outputNode && this.outputNode.isNode;
+		return this.outputNode && this.outputNode.isNode && this.outputNode.getNodeType( builder ) !== 'void';
 
 	}
 
@@ -392,7 +393,7 @@ class StackNode extends Node {
 
 		let result;
 
-		if ( this.hasOutput ) {
+		if ( this.hasOutput( builder ) ) {
 
 			result = this.outputNode.build( builder, ...params );
 

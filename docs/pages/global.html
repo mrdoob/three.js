@@ -79,6 +79,116 @@ each other to build complex performances from smaller re-usable assets.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="AnaglyphAlgorithm" translate="no">.<a href="#AnaglyphAlgorithm">AnaglyphAlgorithm</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Anaglyph algorithm types.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>TRUE</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>GREY</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>COLOUR</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>HALF_COLOUR</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>DUBOIS</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>OPTIMISED</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>COMPROMISE</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="AnaglyphColorMode" translate="no">.<a href="#AnaglyphColorMode">AnaglyphColorMode</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Anaglyph color modes.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>RED_CYAN</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>MAGENTA_CYAN</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>MAGENTA_GREEN</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
 					<h3 class="name" id="AttachedBindMode" translate="no">.<a href="#AttachedBindMode">AttachedBindMode</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>The skinned mesh shares the same world space as the skeleton.</p>
@@ -396,6 +506,14 @@ the maximum representable unsigned value.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="InterpolateBezier" translate="no">.<a href="#InterpolateBezier">InterpolateBezier</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Bezier interpolation mode for keyframe tracks.</p>
+<p>Uses cubic Bezier curves with explicit 2D control points.
+Requires tangent data to be set on the track.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="InterpolateDiscrete" translate="no">.<a href="#InterpolateDiscrete">InterpolateDiscrete</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Discrete interpolation mode for keyframe tracks.</p>
@@ -553,6 +671,12 @@ the end of the clip directly to its beginning.</p>
 					<h3 class="name" id="MOUSE" translate="no">.<a href="#MOUSE">MOUSE</a><span class="type-signature"> : <a href="global.html#ConstantsMouse">ConstantsMouse</a></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Represents mouse buttons and interaction types in context of controls.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="MaterialBlending" translate="no">.<a href="#MaterialBlending">MaterialBlending</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Represents material blending.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1340,19 +1464,16 @@ compression in how the alpha compression is done.</p>
 						<p>UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format</p>
 <p>Short format brief:</p>
 <p>[JPEG headers]
-[XMP metadata describing the MPF container and <em>both</em> SDR and gainmap images]
+[Metadata describing the MPF container and both SDR and gainmap images]</p>
+<ul>
+<li>XMP metadata (legacy format)</li>
+<li>ISO 21496-1 metadata (current standard)
 [Optional metadata] [EXIF] [ICC Profile]
 [SDR image]
-[XMP metadata describing only the gainmap image]
-[Gainmap image]</p>
+[Gainmap image with metadata]</li>
+</ul>
 <p>Each section is separated by a 0xFFXX byte followed by a descriptor byte (0xFFE0, 0xFFE1, 0xFFE2.)
 Binary image storages are prefixed with a unique 0xFFD8 16-bit descriptor.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="ScriptableNodeResources" translate="no">.<a href="#ScriptableNodeResources">ScriptableNodeResources</a><span class="type-signature"> : <a href="Resources.html">Resources</a></span> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>Defines the resources (e.g. namespaces) of scriptable nodes.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1586,6 +1707,15 @@ When using VSMShadowMap all shadow receivers will also cast shadows.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="depthAwareBlend" translate="no">.<a href="#depthAwareBlend">depthAwareBlend</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Performs a depth-aware blend between a base scene and a secondary effect (like godrays).
+This function uses a Poisson disk sampling pattern to detect depth discontinuities
+in the neighborhood of the current pixel. If an edge is detected, it shifts the
+sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="disposeShadowMaterial" translate="no">.<a href="#disposeShadowMaterial">disposeShadowMaterial</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Disposes the shadow material for the given light source.</p>
@@ -1608,7 +1738,7 @@ with a binary <code>[0,1]</code> result.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -1616,7 +1746,7 @@ with a binary <code>[0,1]</code> result.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depthTexture</strong>
+										<strong translate="no">depthTexture</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the shadow map's texture data.</p>
@@ -1624,7 +1754,7 @@ with a binary <code>[0,1]</code> result.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCoord</strong>
+										<strong translate="no">shadowCoord</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow coordinates.</p>
@@ -1652,7 +1782,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -1660,7 +1790,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depthTexture</strong>
+										<strong translate="no">depthTexture</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the shadow map's texture data.</p>
@@ -1668,7 +1798,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCoord</strong>
+										<strong translate="no">shadowCoord</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow coordinates.</p>
@@ -1676,7 +1806,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadow</strong>
+										<strong translate="no">shadow</strong>
 									</td>
 									<td class="description last">
 										<p>The light shadow.</p>
@@ -1701,7 +1831,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -1709,7 +1839,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depthTexture</strong>
+										<strong translate="no">depthTexture</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the shadow map's texture data.</p>
@@ -1717,7 +1847,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCoord</strong>
+										<strong translate="no">shadowCoord</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow coordinates.</p>
@@ -1725,7 +1855,7 @@ filtering per sample), this effectively provides 20 filtered taps with better di
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadow</strong>
+										<strong translate="no">shadow</strong>
 									</td>
 									<td class="description last">
 										<p>The light shadow.</p>
@@ -1752,7 +1882,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -1760,7 +1890,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depthTexture</strong>
+										<strong translate="no">depthTexture</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the shadow cube map.</p>
@@ -1768,7 +1898,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bd3D</strong>
+										<strong translate="no">bd3D</strong>
 									</td>
 									<td class="description last">
 										<p>The normalized direction from light to fragment.</p>
@@ -1776,7 +1906,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dp</strong>
+										<strong translate="no">dp</strong>
 									</td>
 									<td class="description last">
 										<p>The depth value to compare against.</p>
@@ -1784,7 +1914,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadow</strong>
+										<strong translate="no">shadow</strong>
 									</td>
 									<td class="description last">
 										<p>The light shadow.</p>
@@ -1809,7 +1939,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The node to add.</p>
@@ -1830,7 +1960,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -1838,7 +1968,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>depthTexture</strong>
+										<strong translate="no">depthTexture</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the shadow map's texture data.</p>
@@ -1846,7 +1976,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCoord</strong>
+										<strong translate="no">shadowCoord</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow coordinates.</p>
@@ -1871,7 +2001,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>chunk</strong>
+										<strong translate="no">chunk</strong>
 									</td>
 									<td class="description last">
 										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
@@ -1892,7 +2022,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>chunk</strong>
+										<strong translate="no">chunk</strong>
 									</td>
 									<td class="description last">
 										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
@@ -1913,10 +2043,10 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
-										<p>The value to find a POT for.</p>
+										<p>The value to find a POT for. Must be greater than <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1934,7 +2064,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value to clamp.</p>
@@ -1942,7 +2072,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>min</strong>
+										<strong translate="no">min</strong>
 									</td>
 									<td class="description last">
 										<p>The min value.</p>
@@ -1950,7 +2080,7 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>max</strong>
+										<strong translate="no">max</strong>
 									</td>
 									<td class="description last">
 										<p>The max value.</p>
@@ -1973,7 +2103,7 @@ the texture. Akin to CSS <code>object-fit: contain</code></p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -1981,7 +2111,7 @@ the texture. Akin to CSS <code>object-fit: contain</code></p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>aspect</strong>
+										<strong translate="no">aspect</strong>
 									</td>
 									<td class="description last">
 										<p>The texture's aspect ratio.</p>
@@ -2002,7 +2132,7 @@ the texture. Akin to CSS <code>object-fit: contain</code></p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>array</strong>
+										<strong translate="no">array</strong>
 									</td>
 									<td class="description last">
 										<p>The array to convert.</p>
@@ -2010,7 +2140,7 @@ the texture. Akin to CSS <code>object-fit: contain</code></p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The constructor of a typed array that defines the new type.</p>
@@ -2033,7 +2163,7 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -2041,7 +2171,7 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>aspect</strong>
+										<strong translate="no">aspect</strong>
 									</td>
 									<td class="description last">
 										<p>The texture's aspect ratio.</p>
@@ -2053,6 +2183,18 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The updated texture.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="createCanvasElement" translate="no">.<a href="#createCanvasElement">createCanvasElement</a><span class="signature">()</span><span class="type-signature"> : HTMLCanvasElement</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a canvas element configured for block display.</p>
+<p>This is a convenience function that creates a canvas element with
+display style set to 'block', which is commonly used in three.js
+rendering contexts to avoid inline element spacing issues.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A canvas element with display set to 'block'.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="createEvent" translate="no">.<a href="#createEvent">createEvent</a><span class="signature">( type : <span class="param-type">string</span>, callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="EventNode.html">EventNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2062,7 +2204,7 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The event type.</p>
@@ -2070,7 +2212,7 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The callback function.</p>
@@ -2090,7 +2232,7 @@ time to maintain frame rate independent movement. For details, see
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The current point.</p>
@@ -2098,7 +2240,7 @@ time to maintain frame rate independent movement. For details, see
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The target point.</p>
@@ -2106,7 +2248,7 @@ time to maintain frame rate independent movement. For details, see
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>lambda</strong>
+										<strong translate="no">lambda</strong>
 									</td>
 									<td class="description last">
 										<p>A higher lambda value will make the movement more sudden,
@@ -2115,7 +2257,7 @@ and a lower value will make the movement more gradual.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>dt</strong>
+										<strong translate="no">dt</strong>
 									</td>
 									<td class="description last">
 										<p>Delta time in seconds.</p>
@@ -2136,7 +2278,7 @@ and a lower value will make the movement more gradual.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>degrees</strong>
+										<strong translate="no">degrees</strong>
 									</td>
 									<td class="description last">
 										<p>A value in degrees.</p>
@@ -2157,7 +2299,7 @@ and a lower value will make the movement more gradual.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value to denormalize.</p>
@@ -2165,7 +2307,7 @@ and a lower value will make the movement more gradual.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>array</strong>
+										<strong translate="no">array</strong>
 									</td>
 									<td class="description last">
 										<p>The typed array that defines the data type of the value.</p>
@@ -2177,6 +2319,49 @@ and a lower value will make the movement more gradual.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The denormalize (float) value in the range <code>[0,1]</code>.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="enhanceLogMessage" translate="no">.<a href="#enhanceLogMessage">enhanceLogMessage</a><span class="signature">( params : <span class="param-type">Array.&lt;<a href="global.html#any">any</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="global.html#any">any</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enhances log/warn/error messages related to TSL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">params</strong>
+									</td>
+									<td class="description last">
+										<p>The original message parameters.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The filtered and enhanced message parameters.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="error" translate="no">.<a href="#error">error</a><span class="signature">( &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Logs an error message with the 'THREE.' prefix.</p>
+<p>If a custom console function is set via setConsoleFunction(), it will be used
+instead of the native console.error. The first parameter is treated as the
+method name and is automatically prefixed with 'THREE.'.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">params</strong>
+									</td>
+									<td class="description last">
+										<p>The message components. The first param is used as
+the method name and prefixed with 'THREE.'.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="euclideanModulo" translate="no">.<a href="#euclideanModulo">euclideanModulo</a><span class="signature">( n : <span class="param-type">number</span>, m : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2187,7 +2372,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>n</strong>
+										<strong translate="no">n</strong>
 									</td>
 									<td class="description last">
 										<p>The first parameter.</p>
@@ -2195,7 +2380,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>m</strong>
+										<strong translate="no">m</strong>
 									</td>
 									<td class="description last">
 										<p>The second parameter.</p>
@@ -2216,7 +2401,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -2237,7 +2422,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>jsonKeys</strong>
+										<strong translate="no">jsonKeys</strong>
 									</td>
 									<td class="description last">
 										<p>A list of JSON keyframes.</p>
@@ -2245,7 +2430,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>times</strong>
+										<strong translate="no">times</strong>
 									</td>
 									<td class="description last">
 										<p>This array will be filled with keyframe times by this function.</p>
@@ -2253,7 +2438,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>values</strong>
+										<strong translate="no">values</strong>
 									</td>
 									<td class="description last">
 										<p>This array will be filled with keyframe values by this function.</p>
@@ -2261,7 +2446,7 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>valuePropertyName</strong>
+										<strong translate="no">valuePropertyName</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the property to use.</p>
@@ -2279,10 +2464,10 @@ is <code>( ( n % m ) + m ) % m</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
-										<p>The value to find a POT for.</p>
+										<p>The value to find a POT for. Must be greater than <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -2301,7 +2486,7 @@ precision floating point value (FP16).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>val</strong>
+										<strong translate="no">val</strong>
 									</td>
 									<td class="description last">
 										<p>A half precision floating point value.</p>
@@ -2322,7 +2507,7 @@ precision floating point value (FP16).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>size</strong>
+										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
 										<p>The noise size.</p>
@@ -2343,7 +2528,7 @@ precision floating point value (FP16).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>size</strong>
+										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
 										<p>The noise size.</p>
@@ -2375,7 +2560,7 @@ precision floating point value (FP16).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the texture.</p>
@@ -2383,7 +2568,7 @@ precision floating point value (FP16).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the texture.</p>
@@ -2391,7 +2576,7 @@ precision floating point value (FP16).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>format</strong>
+										<strong translate="no">format</strong>
 									</td>
 									<td class="description last">
 										<p>The texture's format.</p>
@@ -2399,7 +2584,7 @@ precision floating point value (FP16).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The texture's type.</p>
@@ -2422,7 +2607,7 @@ configure the correct attachments in the respective backend.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderContext</strong>
+										<strong translate="no">renderContext</strong>
 									</td>
 									<td class="description last">
 										<p>The render context.</p>
@@ -2434,6 +2619,15 @@ configure the correct attachments in the respective backend.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The cache key.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getConsoleFunction" translate="no">.<a href="#getConsoleFunction">getConsoleFunction</a><span class="signature">()</span><span class="type-signature"> : function | null</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Gets the currently set custom console function.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The custom console function, or null if not set.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getDistanceAttenuation" translate="no">.<a href="#getDistanceAttenuation">getDistanceAttenuation</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2443,7 +2637,7 @@ configure the correct attachments in the respective backend.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>inputs</strong>
+										<strong translate="no">inputs</strong>
 									</td>
 									<td class="description last">
 										<p>The input parameter object.</p>
@@ -2451,7 +2645,7 @@ configure the correct attachments in the respective backend.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>lightDistance</strong>
+										<strong translate="no">lightDistance</strong>
 									</td>
 									<td class="description last">
 										<p>The distance of the light's position to the current fragment position.</p>
@@ -2459,7 +2653,7 @@ configure the correct attachments in the respective backend.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cutoffDistance</strong>
+										<strong translate="no">cutoffDistance</strong>
 									</td>
 									<td class="description last">
 										<p>The light's cutoff distance.</p>
@@ -2467,7 +2661,7 @@ configure the correct attachments in the respective backend.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>decayExponent</strong>
+										<strong translate="no">decayExponent</strong>
 									</td>
 									<td class="description last">
 										<p>The light's decay exponent.</p>
@@ -2483,6 +2677,19 @@ configure the correct attachments in the respective backend.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The distance falloff.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getElementsByTagName" translate="no">.<a href="#getElementsByTagName">getElementsByTagName</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Utility functions for parsing</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getFilteredStack" translate="no">.<a href="#getFilteredStack">getFilteredStack</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the stack trace and filters out ignored files.
+Returns an array with function name, file, line, and column.</p>
+						</div>
+					</div>
 					<h3 class="name name-method" id="getFloatLength" translate="no">.<a href="#getFloatLength">getFloatLength</a><span class="signature">( floatLength : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2493,7 +2700,7 @@ It returns an padded value which ensure chunk size alignment according to STD140
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>floatLength</strong>
+										<strong translate="no">floatLength</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer length.</p>
@@ -2514,7 +2721,7 @@ It returns an padded value which ensure chunk size alignment according to STD140
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -2522,7 +2729,7 @@ It returns an padded value which ensure chunk size alignment according to STD140
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>device</strong>
+										<strong translate="no">device</strong>
 									</td>
 									<td class="description last">
 										<p>The GPU device which is used for feature detection.
@@ -2545,7 +2752,7 @@ It is not necessary to apply the device for most formats.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>times</strong>
+										<strong translate="no">times</strong>
 									</td>
 									<td class="description last">
 										<p>The keyframe time values.</p>
@@ -2568,7 +2775,7 @@ Each member layout includes the member's name, type, and whether it is atomic.</
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>members</strong>
+										<strong translate="no">members</strong>
 									</td>
 									<td class="description last">
 										<p>An object where keys are member names and values are either types (as strings) or objects with type and atomic properties.</p>
@@ -2590,7 +2797,7 @@ matches a predefined stride (in this case <code>4</code>).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>vectorLength</strong>
+										<strong translate="no">vectorLength</strong>
 									</td>
 									<td class="description last">
 										<p>The vector length.</p>
@@ -2611,7 +2818,7 @@ matches a predefined stride (in this case <code>4</code>).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>textures</strong>
+										<strong translate="no">textures</strong>
 									</td>
 									<td class="description last">
 										<p>The textures of a MRT-configured render target.</p>
@@ -2619,7 +2826,7 @@ matches a predefined stride (in this case <code>4</code>).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the MRT texture which index is requested.</p>
@@ -2640,7 +2847,7 @@ matches a predefined stride (in this case <code>4</code>).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>splineTexture</strong>
+										<strong translate="no">splineTexture</strong>
 									</td>
 									<td class="description last">
 										<p>Which holds the curve description.</p>
@@ -2662,7 +2869,7 @@ a total length in bytes with buffer alignment according to STD140 layout.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>count</strong>
+										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
 										<p>The number of vectors.</p>
@@ -2670,7 +2877,7 @@ a total length in bytes with buffer alignment according to STD140 layout.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>vectorLength</strong>
+										<strong translate="no">vectorLength</strong>
 									</td>
 									<td class="description last">
 										<p>The vector length.</p>
@@ -2696,7 +2903,7 @@ density increases when moving away from the camera.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -2718,7 +2925,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The start point</p>
@@ -2726,7 +2933,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The end point.</p>
@@ -2734,7 +2941,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>A value between start and end.</p>
@@ -2755,7 +2962,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value to check.</p>
@@ -2776,7 +2983,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>array</strong>
+										<strong translate="no">array</strong>
 									</td>
 									<td class="description last">
 										<p>The object to check.</p>
@@ -2798,7 +3005,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The start point</p>
@@ -2806,7 +3013,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The end point.</p>
@@ -2814,7 +3021,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>t</strong>
+										<strong translate="no">t</strong>
 									</td>
 									<td class="description last">
 										<p>The interpolation factor in the closed interval <code>[0, 1]</code>.</p>
@@ -2826,6 +3033,28 @@ between the start and end point.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="log" translate="no">.<a href="#log">log</a><span class="signature">( &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Logs an informational message with the 'THREE.' prefix.</p>
+<p>If a custom console function is set via setConsoleFunction(), it will be used
+instead of the native console.log. The first parameter is treated as the
+method name and is automatically prefixed with 'THREE.'.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">params</strong>
+									</td>
+									<td class="description last">
+										<p>The message components. The first param is used as
+the method name and prefixed with 'THREE.'.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="makeClipAdditive" translate="no">.<a href="#makeClipAdditive">makeClipAdditive</a><span class="signature">( targetClip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, referenceFrame : <span class="param-type">number</span>, referenceClip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, fps : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2835,7 +3064,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>targetClip</strong>
+										<strong translate="no">targetClip</strong>
 									</td>
 									<td class="description last">
 										<p>The clip to make additive.</p>
@@ -2843,7 +3072,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>referenceFrame</strong>
+										<strong translate="no">referenceFrame</strong>
 									</td>
 									<td class="description last">
 										<p>The reference frame.</p>
@@ -2852,7 +3081,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>referenceClip</strong>
+										<strong translate="no">referenceClip</strong>
 									</td>
 									<td class="description last">
 										<p>The reference clip.</p>
@@ -2861,7 +3090,7 @@ between the start and end point.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>fps</strong>
+										<strong translate="no">fps</strong>
 									</td>
 									<td class="description last">
 										<p>The FPS.</p>
@@ -2878,13 +3107,13 @@ between the start and end point.</p>
 					<div class="method">
 						<div class="description">
 							<p>Performs a linear mapping from range <code>&lt;a1, a2&gt;</code> to range <code>&lt;b1, b2&gt;</code>
-for the given value.</p>
+for the given value. <code>a2</code> must be greater than <code>a1</code>.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The value to be mapped.</p>
@@ -2892,7 +3121,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>a1</strong>
+										<strong translate="no">a1</strong>
 									</td>
 									<td class="description last">
 										<p>Minimum value for range A.</p>
@@ -2900,7 +3129,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>a2</strong>
+										<strong translate="no">a2</strong>
 									</td>
 									<td class="description last">
 										<p>Maximum value for range A.</p>
@@ -2908,7 +3137,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>b1</strong>
+										<strong translate="no">b1</strong>
 									</td>
 									<td class="description last">
 										<p>Minimum value for range B.</p>
@@ -2916,7 +3145,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>b2</strong>
+										<strong translate="no">b2</strong>
 									</td>
 									<td class="description last">
 										<p>Maximum value for range B.</p>
@@ -2937,7 +3166,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The float value in the range <code>[0,1]</code> to normalize.</p>
@@ -2945,7 +3174,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>array</strong>
+										<strong translate="no">array</strong>
 									</td>
 									<td class="description last">
 										<p>The typed array that defines the data type of the value.</p>
@@ -2966,7 +3195,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The value to pingpong.</p>
@@ -2974,7 +3203,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>length</strong>
+										<strong translate="no">length</strong>
 									</td>
 									<td class="description last">
 										<p>The positive value the function will pingpong to.</p>
@@ -2996,7 +3225,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>radians</strong>
+										<strong translate="no">radians</strong>
 									</td>
 									<td class="description last">
 										<p>A value in radians.</p>
@@ -3017,7 +3246,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>low</strong>
+										<strong translate="no">low</strong>
 									</td>
 									<td class="description last">
 										<p>The lower value boundary.</p>
@@ -3025,7 +3254,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>high</strong>
+										<strong translate="no">high</strong>
 									</td>
 									<td class="description last">
 										<p>The upper value boundary</p>
@@ -3046,7 +3275,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>range</strong>
+										<strong translate="no">range</strong>
 									</td>
 									<td class="description last">
 										<p>Defines the value range.</p>
@@ -3067,7 +3296,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>low</strong>
+										<strong translate="no">low</strong>
 									</td>
 									<td class="description last">
 										<p>The lower value boundary.</p>
@@ -3075,7 +3304,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>high</strong>
+										<strong translate="no">high</strong>
 									</td>
 									<td class="description last">
 										<p>The upper value boundary</p>
@@ -3096,7 +3325,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>The function to be called when sampling. Should accept a UV node and return a value.</p>
@@ -3104,7 +3333,7 @@ for the given value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uv</strong>
+										<strong translate="no">uv</strong>
 									</td>
 									<td class="description last">
 										<p>The UV node to be used in the texture sampling.</p>
@@ -3126,7 +3355,7 @@ for the given value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>s</strong>
+										<strong translate="no">s</strong>
 									</td>
 									<td class="description last">
 										<p>The integer seed.</p>
@@ -3137,6 +3366,28 @@ for the given value.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A random float.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="setConsoleFunction" translate="no">.<a href="#setConsoleFunction">setConsoleFunction</a><span class="signature">( fn : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a custom function to handle console output.</p>
+<p>This allows external code to intercept and handle console.log, console.warn,
+and console.error calls made by three.js, which is useful for custom logging,
+testing, or debugging workflows.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">fn</strong>
+									</td>
+									<td class="description last">
+										<p>The function to handle console output. Should accept
+(type, message, ...params) where type is 'log', 'warn', or 'error'.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="setProjectionFromUnion" translate="no">.<a href="#setProjectionFromUnion">setProjectionFromUnion</a><span class="signature">( camera : <span class="param-type"><a href="ArrayCamera.html">ArrayCamera</a></span>, cameraL : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span>, cameraR : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span> )</span> </h3>
 					<div class="method">
@@ -3150,7 +3401,7 @@ Visualization of this technique: https://computergraphics.stackexchange.com/a/47
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to update.</p>
@@ -3158,7 +3409,7 @@ Visualization of this technique: https://computergraphics.stackexchange.com/a/47
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cameraL</strong>
+										<strong translate="no">cameraL</strong>
 									</td>
 									<td class="description last">
 										<p>The left camera.</p>
@@ -3166,7 +3417,7 @@ Visualization of this technique: https://computergraphics.stackexchange.com/a/47
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cameraR</strong>
+										<strong translate="no">cameraR</strong>
 									</td>
 									<td class="description last">
 										<p>The right camera.</p>
@@ -3187,7 +3438,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>q</strong>
+										<strong translate="no">q</strong>
 									</td>
 									<td class="description last">
 										<p>The quaternion to set.</p>
@@ -3195,7 +3446,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>a</strong>
+										<strong translate="no">a</strong>
 									</td>
 									<td class="description last">
 										<p>The rotation applied to the first axis, in radians.</p>
@@ -3203,7 +3454,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>b</strong>
+										<strong translate="no">b</strong>
 									</td>
 									<td class="description last">
 										<p>The rotation applied to the second axis, in radians.</p>
@@ -3211,7 +3462,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>c</strong>
+										<strong translate="no">c</strong>
 									</td>
 									<td class="description last">
 										<p>The rotation applied to the third axis, in radians.</p>
@@ -3219,7 +3470,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>order</strong>
+										<strong translate="no">order</strong>
 									</td>
 									<td class="description last">
 										<p>A string specifying the axes order.</p>
@@ -3237,7 +3488,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to render.</p>
@@ -3245,7 +3496,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene containing the object.</p>
@@ -3253,7 +3504,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>_camera</strong>
+										<strong translate="no">_camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera used for rendering.</p>
@@ -3261,7 +3512,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry of the object.</p>
@@ -3269,7 +3520,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The material of the object.</p>
@@ -3277,7 +3528,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>The group the object belongs to.</p>
@@ -3285,7 +3536,7 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>params</strong>
+										<strong translate="no">params</strong>
 									</td>
 									<td class="description last">
 										<p>Additional parameters for rendering.</p>
@@ -3298,32 +3549,32 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 					<div class="method">
 						<div class="description">
 							<p>A <a href="https://en.wikipedia.org/wiki/Smoothstep#Variations" target="_blank" rel="noopener">variation on smoothstep</a>
-that has zero 1st and 2nd order derivatives at x=0 and x=1.</p>
+that has zero 1st and 2nd order derivatives at <code>x=0</code> and <code>x=1</code>.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
-										<p>The value to evaluate based on its position between min and max.</p>
+										<p>The value to evaluate based on its position between <code>min</code> and <code>max</code>.</p>
 									</td>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>min</strong>
+										<strong translate="no">min</strong>
 									</td>
 									<td class="description last">
-										<p>The min value. Any x value below min will be <code>0</code>.</p>
+										<p>The min value. Any <code>x</code> value below <code>min</code> will be <code>0</code>. <code>min</code> must be lower than <code>max</code>.</p>
 									</td>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>max</strong>
+										<strong translate="no">max</strong>
 									</td>
 									<td class="description last">
-										<p>The max value. Any x value above max will be <code>1</code>.</p>
+										<p>The max value. Any <code>x</code> value above <code>max</code> will be <code>1</code>. <code>max</code> must be greater than <code>min</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3344,26 +3595,26 @@ the <code>min</code> and <code>max</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
-										<p>The value to evaluate based on its position between min and max.</p>
+										<p>The value to evaluate based on its position between <code>min</code> and <code>max</code>.</p>
 									</td>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>min</strong>
+										<strong translate="no">min</strong>
 									</td>
 									<td class="description last">
-										<p>The min value. Any x value below min will be <code>0</code>.</p>
+										<p>The min value. Any <code>x</code> value below <code>min</code> will be <code>0</code>. <code>min</code> must be lower than <code>max</code>.</p>
 									</td>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>max</strong>
+										<strong translate="no">max</strong>
 									</td>
 									<td class="description last">
-										<p>The max value. Any x value above max will be <code>1</code>.</p>
+										<p>The max value. Any <code>x</code> value above <code>max</code> will be <code>1</code>. <code>max</code> must be greater than <code>min</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3381,7 +3632,7 @@ the <code>min</code> and <code>max</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>values</strong>
+										<strong translate="no">values</strong>
 									</td>
 									<td class="description last">
 										<p>The values to sort.</p>
@@ -3389,7 +3640,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>stride</strong>
+										<strong translate="no">stride</strong>
 									</td>
 									<td class="description last">
 										<p>The stride.</p>
@@ -3397,7 +3648,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>order</strong>
+										<strong translate="no">order</strong>
 									</td>
 									<td class="description last">
 										<p>The sort order.</p>
@@ -3418,7 +3669,7 @@ the <code>min</code> and <code>max</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>sourceClip</strong>
+										<strong translate="no">sourceClip</strong>
 									</td>
 									<td class="description last">
 										<p>The values to sort.</p>
@@ -3426,7 +3677,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the clip.</p>
@@ -3434,7 +3685,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>startFrame</strong>
+										<strong translate="no">startFrame</strong>
 									</td>
 									<td class="description last">
 										<p>The start frame.</p>
@@ -3442,7 +3693,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>endFrame</strong>
+										<strong translate="no">endFrame</strong>
 									</td>
 									<td class="description last">
 										<p>The end frame.</p>
@@ -3450,7 +3701,7 @@ the <code>min</code> and <code>max</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>fps</strong>
+										<strong translate="no">fps</strong>
 									</td>
 									<td class="description last">
 										<p>The FPS.</p>
@@ -3473,7 +3724,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>val</strong>
+										<strong translate="no">val</strong>
 									</td>
 									<td class="description last">
 										<p>A single precision floating point value.</p>
@@ -3494,7 +3745,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to update.</p>
@@ -3502,7 +3753,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>parent</strong>
+										<strong translate="no">parent</strong>
 									</td>
 									<td class="description last">
 										<p>The parent 3D object.</p>
@@ -3520,7 +3771,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to update.</p>
@@ -3528,7 +3779,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cameraXR</strong>
+										<strong translate="no">cameraXR</strong>
 									</td>
 									<td class="description last">
 										<p>The XR camera.</p>
@@ -3536,10 +3787,53 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>parent</strong>
+										<strong translate="no">parent</strong>
 									</td>
 									<td class="description last">
 										<p>The parent 3D object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="warn" translate="no">.<a href="#warn">warn</a><span class="signature">( &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Logs a warning message with the 'THREE.' prefix.</p>
+<p>If a custom console function is set via setConsoleFunction(), it will be used
+instead of the native console.warn. The first parameter is treated as the
+method name and is automatically prefixed with 'THREE.'.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">params</strong>
+									</td>
+									<td class="description last">
+										<p>The message components. The first param is used as
+the method name and prefixed with 'THREE.'.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="warnOnce" translate="no">.<a href="#warnOnce">warnOnce</a><span class="signature">( &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Logs a warning message only once, preventing duplicate warnings.</p>
+<p>This function maintains an internal cache of warning messages and will only
+output each unique warning message once. Useful for warnings that may be
+triggered repeatedly but should only be shown to the user once.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">params</strong>
+									</td>
+									<td class="description last">
+										<p>The warning message components.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3905,7 +4199,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>time</strong>
+										<strong translate="no">time</strong>
 									</td>
 									<td class="description last">
 										<p>A timestamp indicating the end time of the previous frame's rendering.</p>
@@ -3913,7 +4207,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current XR frame. Only relevant when using XR rendering.</p>
@@ -3931,7 +4225,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>error</strong>
+										<strong translate="no">error</strong>
 									</td>
 									<td class="description last">
 										<p>The error which occurred during the loading process.</p>
@@ -3949,7 +4243,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>event</strong>
+										<strong translate="no">event</strong>
 									</td>
 									<td class="description last">
 										<p>An instance of <code>ProgressEvent</code> that represents the current loading status.</p>
@@ -3967,7 +4261,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -3975,7 +4269,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene the 3D object belongs to.</p>
@@ -3983,7 +4277,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera the object should be rendered with.</p>
@@ -3991,7 +4285,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The object's geometry.</p>
@@ -3999,7 +4293,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The object's material.</p>
@@ -4007,7 +4301,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>Only relevant for objects using multiple materials. This represents a group entry from the respective <code>BufferGeometry</code>.</p>
@@ -4015,7 +4309,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>lightsNode</strong>
+										<strong translate="no">lightsNode</strong>
 									</td>
 									<td class="description last">
 										<p>The current lights node.</p>
@@ -4023,7 +4317,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>clippingContext</strong>
+										<strong translate="no">clippingContext</strong>
 									</td>
 									<td class="description last">
 										<p>The clipping context.</p>
@@ -4031,7 +4325,7 @@ precision floating point value (FP32).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>passId</strong>
+										<strong translate="no">passId</strong>
 									</td>
 									<td class="description last">
 										<p>An optional ID for identifying the pass.</p>
@@ -4050,7 +4344,7 @@ precision floating point value (FP32).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The current node.</p>

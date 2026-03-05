@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - volumetric lighting using TRAA</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Lighting using TRAA</span>
+			</div>
+
+			<small>Compatible with native lights and shadows using TRAA.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { vec2, vec3, Fn, texture3D, screenUV, uniform, screenCoordinate, pass, depthPass, mrt, output, velocity, fract, interleavedGradientNoise } from 'three/tsl';
+
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			// Halton sequence for temporal offset - matches TRAA's 32-sample Halton jitter
+			// This creates optimal low-discrepancy distribution that accumulates well with TRAA
+			function halton( index, base ) {
+
+				let result = 0;
+				let f = 1;
+
+				while ( index > 0 ) {
+
+					f /= base;
+					result += f * ( index % base );
+					index = Math.floor( index / base );
+
+				}
+
+				return result;
+
+			}
+
+			// Generate 32 Halton offsets (base 2, 3) - same length as TRAA
+			const _haltonOffsets = Array.from(
+				{ length: 32 },
+				( _, i ) => [ halton( i + 1, 2 ), halton( i + 1, 3 ) ]
+			);
+
+			let renderer, scene, camera;
+			let volumetricMesh, teapot, pointLight, spotLight;
+			let renderPipeline;
+			let temporalOffset, temporalRotation, shaderTime;
+			let params;
+
+			init();
+
+			function createTexture3D() {
+
+				let i = 0;
+
+				const size = 128;
+				const data = new Uint8Array( size * size * size );
+
+				const scale = 10;
+				const perlin = new ImprovedNoise();
+
+				const repeatFactor = 5.0;
+
+				for ( let z = 0; z < size; z ++ ) {
+
+					for ( let y = 0; y < size; y ++ ) {
+
+						for ( let x = 0; x < size; x ++ ) {
+
+							const nx = ( x / size ) * repeatFactor;
+							const ny = ( y / size ) * repeatFactor;
+							const nz = ( z / size ) * repeatFactor;
+
+							const noiseValue = perlin.noise( nx * scale, ny * scale, nz * scale );
+
+							data[ i ] = ( 128 + 128 * noiseValue );
+
+							i ++;
+
+						}
+
+					}
+
+				}
+
+				const texture = new THREE.Data3DTexture( data, size, size, size );
+				texture.format = THREE.RedFormat;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.unpackAlignment = 1;
+				texture.needsUpdate = true;
+
+				return texture;
+
+			}
+
+			function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				// renderer.setPixelRatio( window.devicePixelRatio ); // Disable DPR for performance
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 2;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( - 8, 1, - 6 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxDistance = 40;
+				controls.minDistance = 2;
+
+				// Volumetric Fog Area
+
+				const noiseTexture3D = createTexture3D();
+
+				const smokeAmount = uniform( 2 );
+
+				const volumetricMaterial = new THREE.VolumeNodeMaterial();
+				volumetricMaterial.steps = 12;
+				volumetricMaterial.transparent = true;
+				volumetricMaterial.blending = THREE.AdditiveBlending;
+
+				// Temporal dithering using Interleaved Gradient Noise (IGN) + Halton sequence
+				temporalOffset = uniform( 0 );
+				temporalRotation = uniform( 0 );
+				shaderTime = uniform( 0 );
+
+				const temporalJitter2D = vec2( temporalOffset, temporalRotation );
+				volumetricMaterial.offsetNode = fract( interleavedGradientNoise( screenCoordinate.add( temporalJitter2D.mul( 100 ) ) ).add( temporalOffset ) );
+				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
+
+					const timeScaled = vec3( shaderTime, 0, shaderTime.mul( .3 ) );
+
+					const sampleGrain = ( scale, timeScale = 1 ) => texture3D( noiseTexture3D, positionRay.add( timeScaled.mul( timeScale ) ).mul( scale ).mod( 1 ), 0 ).r.add( .5 );
+
+					let density = sampleGrain( .1 );
+					density = density.mul( sampleGrain( .05, 1 ) );
+					density = density.mul( sampleGrain( .02, 2 ) );
+
+					return smokeAmount.mix( 1, density );
+
+				} );
+
+				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( 20, 10, 20 ), volumetricMaterial );
+				volumetricMesh.receiveShadow = true;
+				volumetricMesh.position.y = 2;
+				scene.add( volumetricMesh );
+
+				// Objects
+
+				teapot = new THREE.Mesh( new TeapotGeometry( .8, 18 ), new THREE.MeshStandardMaterial( { color: 0xffffff, side: THREE.DoubleSide } ) );
+				teapot.castShadow = true;
+				scene.add( teapot );
+
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+				floor.rotation.x = - Math.PI / 2;
+				floor.position.y = - 3;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Lights
+
+				pointLight = new THREE.PointLight( 0xf9bb50, 3, 100 );
+				pointLight.castShadow = true;
+				pointLight.position.set( 0, 1.4, 0 );
+				scene.add( pointLight );
+
+				spotLight = new THREE.SpotLight( 0xffffff, 100 );
+				spotLight.position.set( 2.5, 5, 2.5 );
+				spotLight.angle = Math.PI / 6;
+				spotLight.penumbra = 1;
+				spotLight.decay = 2;
+				spotLight.distance = 0;
+				spotLight.map = new THREE.TextureLoader().setPath( 'textures/' ).load( 'colors.png' );
+				spotLight.castShadow = true;
+				spotLight.shadow.intensity = .98;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.far = 15;
+				spotLight.shadow.focus = 1;
+				scene.add( spotLight );
+
+				// Render Pipeline
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const volumetricIntensity = uniform( 1 );
+
+				// Pre-Pass: Opaque objects only (volumetric is transparent, excluded automatically)
+
+				const prePass = depthPass( scene, camera );
+				prePass.name = 'Pre Pass';
+				prePass.transparent = false;
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+
+				// Apply depth to volumetric material for proper occlusion
+
+				volumetricMaterial.depthNode = prePassDepth.sample( screenUV );
+
+				// Scene Pass: Full scene including volumetric with MRT
+
+				const scenePass = pass( scene, camera ).toInspector( 'Scene' );
+				scenePass.name = 'Scene Pass';
+				scenePass.setMRT( mrt( {
+					output: output,
+					velocity: velocity
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode().toInspector( 'Output' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// TRAA with scene pass depth/velocity (includes volumetric)
+
+				const traaPass = traa( scenePassColor, prePassDepth, scenePassVelocity, camera );
+
+				renderPipeline.outputNode = traaPass;
+
+				// GUI
+
+				params = {
+					traa: true,
+					animated: true
+				};
+
+				const gui = renderer.inspector.createParameters( 'Volumetric Lighting' );
+
+				gui.add( params, 'animated' );
+				gui.add( params, 'traa' ).name( 'TRAA' ).onChange( updatePostProcessing );
+
+				const rayMarching = gui.addFolder( 'Ray Marching' );
+				rayMarching.add( volumetricMaterial, 'steps', 2, 16, 1 ).name( 'step count' );
+
+				function updatePostProcessing() {
+
+					renderPipeline.outputNode = params.traa ? traaPass : scenePassColor;
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				const lighting = gui.addFolder( 'Lighting / Scene' );
+				lighting.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
+				lighting.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
+				lighting.add( volumetricIntensity, 'value', 0, 2 ).name( 'volumetric intensity' );
+				lighting.add( smokeAmount, 'value', 0, 3 ).name( 'smoke amount' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			let frameCount = 0;
+			let animationTime = 0;
+			let lastTime = performance.now();
+
+			function animate() {
+
+				const currentTime = performance.now();
+				const delta = ( currentTime - lastTime ) * 0.001;
+				lastTime = currentTime;
+
+				// Update temporal uniforms - synced with TRAA's Halton sequence for optimal accumulation
+				const haltonIndex = frameCount % 32;
+				temporalOffset.value = _haltonOffsets[ haltonIndex ][ 0 ];
+				temporalRotation.value = _haltonOffsets[ haltonIndex ][ 1 ];
+				frameCount ++;
+
+				if ( params.animated ) {
+
+					animationTime += delta;
+
+				}
+
+				shaderTime.value = animationTime;
+
+				const scale = 2.4;
+
+				pointLight.position.x = Math.sin( animationTime * 0.7 ) * scale;
+				pointLight.position.y = Math.cos( animationTime * 0.5 ) * scale;
+				pointLight.position.z = Math.cos( animationTime * 0.3 ) * scale;
+
+				spotLight.position.x = Math.cos( animationTime * 0.3 ) * scale;
+				spotLight.lookAt( 0, 0, 0 );
+
+				teapot.rotation.y = animationTime * 0.2;
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

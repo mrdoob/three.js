@@ -1,5 +1,11 @@
 import OutputStructNode from './OutputStructNode.js';
 import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
+import { MaterialBlending, NoBlending } from '../../constants.js';
+import BlendMode from '../../renderers/common/BlendMode.js';
+
+// Predefined blend modes for MRT nodes.
+const _noBlending = /**@__PURE__*/ new BlendMode( NoBlending );
+const _materialBlending = /**@__PURE__*/ new BlendMode( MaterialBlending );
 
 /**
  * Returns the MRT texture index for the given name.
@@ -64,6 +70,15 @@ class MRTNode extends OutputStructNode {
 		this.outputNodes = outputNodes;
 
 		/**
+		 * A dictionary storing the blend modes for each output.
+		 *
+		 * @type {Object<string, BlendMode>}
+		 */
+		this.blendModes = {
+			output: _materialBlending
+		};
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -71,6 +86,33 @@ class MRTNode extends OutputStructNode {
 		 * @default true
 		 */
 		this.isMRTNode = true;
+
+	}
+
+	/**
+	 * Sets the blend mode for the given output name.
+	 *
+	 * @param {string} name - The name of the output.
+	 * @param {BlendMode} blend - The blending mode.
+	 * @return {MRTNode} The current MRT node.
+	 */
+	setBlendMode( name, blend ) {
+
+		this.blendModes[ name ] = blend;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the blend mode for the given output name.
+	 *
+	 * @param {string} name - The name of the output.
+	 * @return {BlendMode} The blend mode.
+	 */
+	getBlendMode( name ) {
+
+		return this.blendModes[ name ] || _noBlending;
 
 	}
 
@@ -107,8 +149,12 @@ class MRTNode extends OutputStructNode {
 	merge( mrtNode ) {
 
 		const outputs = { ...this.outputNodes, ...mrtNode.outputNodes };
+		const blendings = { ...this.blendModes, ...mrtNode.blendModes };
 
-		return mrt( outputs );
+		const mrtTarget = mrt( outputs );
+		mrtTarget.blendings = blendings;
+
+		return mrtTarget;
 
 	}
 

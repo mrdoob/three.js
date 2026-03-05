@@ -28,7 +28,7 @@
 
 			import { XYZLoader } from 'three/addons/loaders/XYZLoader.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 
 			let points;
 
@@ -43,7 +43,8 @@
 				scene.add( camera );
 				camera.lookAt( scene.position );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const loader = new XYZLoader();
 				loader.load( 'models/xyz/helix_201.xyz', function ( geometry ) {
@@ -84,7 +85,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( points ) {
 

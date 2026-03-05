@@ -59,7 +59,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbbbbbb );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
 				environment.dispose();
 
 				const grid = new THREE.GridHelper( 500, 10, 0xffffff, 0xffffff );

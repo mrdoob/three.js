@@ -29,7 +29,7 @@
 			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 			let model, animations;
 
 			const mixers = [], objects = [];
@@ -46,7 +46,8 @@
 				camera.position.set( 2, 3, - 6 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -237,7 +238,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				for ( const mixer of mixers ) mixer.update( delta );
 

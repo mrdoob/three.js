@@ -28,6 +28,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @typedef {Object} WebGLBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
@@ -184,7 +185,6 @@ class WebGLBackend extends Backend {
 		 */
 		this._knownBindings = new WeakSet();
 
-
 		/**
 		 * Whether the device supports framebuffers invalidation or not.
 		 *
@@ -265,10 +265,33 @@ class WebGLBackend extends Backend {
 		this.extensions.get( 'WEBGL_render_shared_exponent' );
 		this.extensions.get( 'WEBGL_multi_draw' );
 		this.extensions.get( 'OVR_multiview2' );
+		this.extensions.get( 'EXT_clip_control' );
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
+
+		if ( parameters.reversedDepthBuffer ) {
+
+			if ( this.extensions.has( 'EXT_clip_control' ) ) {
+
+				renderer.reversedDepthBuffer = true;
+
+			} else {
+
+				warn( 'WebGPURenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.' );
+
+				renderer.reversedDepthBuffer = false;
+
+			}
+
+		}
+
+		if ( renderer.reversedDepthBuffer ) {
+
+			this.state.setReversedDepth( true );
+
+		}
 
 	}
 
@@ -446,9 +469,12 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.scissor ) {
 
-			const { x, y, width, height } = renderContext.scissorValue;
+			this.updateScissor( renderContext );
 
-			state.scissor( x, renderContext.height - height - y, width, height );
+		} else {
+
+			const { width, height } = this.getDrawingBufferSize();
+			state.scissor( 0, 0, width, height );
 
 		}
 
@@ -542,6 +568,17 @@ class WebGLBackend extends Backend {
 
 				const { width, height } = this.getDrawingBufferSize();
 				state.viewport( 0, 0, width, height );
+
+			}
+
+			if ( previousContext.scissor ) {
+
+				this.updateScissor( previousContext );
+
+			} else {
+
+				const { width, height } = this.getDrawingBufferSize();
+				state.scissor( 0, 0, width, height );
 
 			}
 
@@ -643,6 +680,20 @@ class WebGLBackend extends Backend {
 		const { x, y, width, height } = renderContext.viewportValue;
 
 		state.viewport( x, renderContext.height - height - y, width, height );
+
+	}
+
+	/**
+	 * Updates the scissor with the values from the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	updateScissor( renderContext ) {
+
+		const { state } = this;
+		const { x, y, width, height } = renderContext.scissorValue;
+
+		state.scissor( x, renderContext.height - height - y, width, height );
 
 	}
 
@@ -932,6 +983,48 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Internal draw function.
+	 *
+	 * @private
+	 * @param {Object3D} object - The object to render.
+	 * @param {WebGLBufferRenderer} renderer - The internal renderer.
+	 * @param {number} firstVertex - The first vertex to render.
+	 * @param {number} vertexCount - The vertex count.
+	 * @param {number} instanceCount - The intance count.
+	 */
+	_draw( object, renderer, firstVertex, vertexCount, instanceCount ) {
+
+		if ( object.isBatchedMesh ) {
+
+			if ( object._multiDrawInstances !== null ) {
+
+				// @deprecated, r174
+				warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
+
+				warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
+
+			} else {
+
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+			}
+
+		} else if ( instanceCount > 1 ) {
+
+			renderer.renderInstances( firstVertex, vertexCount, instanceCount );
+
+		} else {
+
+			renderer.render( firstVertex, vertexCount );
+
+		}
+
+	}
+
+	/**
 	 * Executes a draw command for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object to draw.
@@ -958,9 +1051,9 @@ class WebGLBackend extends Backend {
 
 		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
 
-		if ( context.textures !== null && context.textures.length > 1 ) {
+		if ( context.mrt !== null && context.textures !== null ) {
 
-			state.setMRTBlending( context.textures );
+			state.setMRTBlending( context.textures, context.mrt, material );
 
 		}
 
@@ -1068,38 +1161,6 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const draw = () => {
-
-			if ( object.isBatchedMesh ) {
-
-				if ( object._multiDrawInstances !== null ) {
-
-					// @deprecated, r174
-					warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
-
-				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
-
-					warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
-
-				} else {
-
-					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
-
-				}
-
-			} else if ( instanceCount > 1 ) {
-
-				renderer.renderInstances( firstVertex, vertexCount, instanceCount );
-
-			} else {
-
-				renderer.render( firstVertex, vertexCount );
-
-			}
-
-		};
-
 		if ( renderObject.camera.isArrayCamera === true && renderObject.camera.cameras.length > 0 && renderObject.camera.isMultiViewCamera === false ) {
 
 			const cameraData = this.get( renderObject.camera );
@@ -1128,7 +1189,20 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const cameraIndexData = this.get( cameraIndex );
+			let cameraIndexBufferIndex = 0;
+
+			bindingsSearch: for ( const bindGroup of renderObject.getBindings() ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding === cameraIndex ) break bindingsSearch;
+
+					if ( binding.isUniformsGroup || binding.isUniformBuffer ) cameraIndexBufferIndex ++;
+
+				}
+
+			}
+
 			const pixelRatio = this.renderer.getPixelRatio();
 
 			const renderTarget = this._currentContext.renderTarget;
@@ -1197,9 +1271,9 @@ class WebGLBackend extends Backend {
 
 					}
 
-					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
-					draw();
+					this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
 
 				}
 
@@ -1210,7 +1284,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			draw();
+			this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
 
 		}
 
@@ -1583,7 +1657,8 @@ class WebGLBackend extends Backend {
 		//
 
 		this.set( pipeline, {
-			programGPU
+			programGPU,
+			pipeline: programGPU
 		} );
 
 	}
@@ -1739,11 +1814,6 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 
-		const bindGroupData = this.get( bindGroup );
-
-		let i = bindGroupData.uniformBuffers;
-		let t = bindGroupData.textures;
-
 		for ( const binding of bindGroup.bindings ) {
 
 			const map = this.get( binding );
@@ -1800,7 +1870,6 @@ class WebGLBackend extends Backend {
 
 				}
 
-				map.index = i ++;
 				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
@@ -1809,7 +1878,6 @@ class WebGLBackend extends Backend {
 
 				const { textureGPU, glTextureType } = this.get( binding.texture );
 
-				map.index = t ++;
 				map.textureGPU = textureGPU;
 				map.glTextureType = glTextureType;
 
@@ -1958,17 +2026,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {
-
-		return this.capabilities.getMaxAnisotropy();
-
-	}
-
-	/**
 	 * Copies data of the given source texture to the given destination texture.
 	 *
 	 * @param {Texture} srcTexture - The source texture.
@@ -2012,6 +2069,21 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Initializes the render target defined in the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	initRenderTarget( renderContext ) {
+
+		const { gl, state } = this;
+
+		this._setFramebuffer( renderContext );
+
+		state.bindFramebuffer( gl.FRAMEBUFFER, null );
+
+	}
+
+	/**
 	 * Configures the active framebuffer from the given render context.
 	 *
 	 * @private
@@ -2029,7 +2101,7 @@ class WebGLBackend extends Backend {
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
 
-			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
+			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
 			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
@@ -2480,20 +2552,22 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
-				const bindingData = this.get( binding );
-				const index = bindingData.index;
-
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					const location = gl.getUniformBlockIndex( programGPU, binding.name );
 					gl.uniformBlockBinding( programGPU, location, index );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					const location = gl.getUniformLocation( programGPU, binding.name );
 					gl.uniform1i( location, index );
 
@@ -2515,20 +2589,24 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
+		let uniformBuffers = 0;
+		let textures = 0;
+
 		for ( const bindGroup of bindings ) {
 
 			for ( const binding of bindGroup.bindings ) {
 
 				const bindingData = this.get( binding );
-				const index = bindingData.index;
 
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
+					const index = uniformBuffers ++;
 					// TODO USE bindBufferRange to group multiple uniform buffers
 					state.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
 				} else if ( binding.isSampledTexture ) {
 
+					const index = textures ++;
 					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 				}

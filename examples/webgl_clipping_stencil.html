@@ -27,7 +27,7 @@
 
 			let camera, scene, renderer, object, stats;
 			let planes, planeObjects, planeHelpers;
-			let clock;
+			let timer;
 
 			const params = {
 
@@ -100,7 +100,8 @@
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 
@@ -284,7 +285,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( params.animate ) {
 

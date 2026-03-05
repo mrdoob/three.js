@@ -40,7 +40,7 @@ class StructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.structTypeNode.getNodeType( builder );
 
@@ -49,6 +49,21 @@ class StructNode extends Node {
 	getMemberType( builder, name ) {
 
 		return this.structTypeNode.getMemberType( builder, name );
+
+	}
+
+	_getChildren() {
+
+		// Ensure struct type is the last child for correct code generation order
+
+		const children = super._getChildren();
+
+		const structTypeProperty = children.find( child => child.childNode === this.structTypeNode );
+
+		children.splice( children.indexOf( structTypeProperty ), 1 );
+		children.push( structTypeProperty );
+
+		return children;
 
 	}
 

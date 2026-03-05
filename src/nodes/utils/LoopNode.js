@@ -265,7 +265,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.', this.stackTrace );
 
 								updateSnippet = 'break /* invalid update */';
 

@@ -48,7 +48,8 @@
 
 				let mixer;
 
-				const clock = new THREE.Clock();
+				const timer = new THREE.Timer();
+				timer.connect( document );
 
 				const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.set( - 1.8, 0.8, 3 );
@@ -69,7 +70,7 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene.background = new THREE.Color( 0x666666 );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
 
 				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
@@ -118,7 +119,9 @@
 
 				function animate() {
 
-					const delta = clock.getDelta();
+					timer.update();
+
+					const delta = timer.getDelta();
 
 					if ( mixer ) {
 

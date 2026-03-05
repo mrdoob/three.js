@@ -45,7 +45,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
-			let model, mixer, clock;
+			let model, mixer, timer;
 			let controls;
 			let gui;
 
@@ -63,7 +63,8 @@
 				const waterAmbientLight = new THREE.HemisphereLight( 0xffffff, 0x0066ff, 10 );
 				scene.add( waterAmbientLight );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// animated model
 
@@ -228,9 +229,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				controls.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( model ) {
 

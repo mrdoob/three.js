@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>安装</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 安装">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>安装</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <h2>项目结构</h2>
+
+          <p>
+            每个 three.js 项目至少需要一个 HTML 文件来定义网页，以及一个 JavaScript 文件来运行你的 three.js 代码。下面的结构和命名方式并非强制要求，但为了保持一致性，本指南将始终使用这种方式。
+          </p>
+
+          <ul>
+            <li>
+              <i>index.html</i>
+    <pre class="prettyprint notranslate lang-js" translate="no">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;My first three.js app&lt;/title&gt;
+    &lt;style&gt;
+      body { margin: 0; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+    </pre>
+  </li>
+  <li>
+    <i>main.js</i>
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+
+...
+</pre>
+            </li>
+            <li>
+              <i>public/</i>
+              <ul>
+                <li>
+                  <i>public/</i> 文件夹有时也被称为"static"（静态）文件夹，因为其中的文件会原封不动地发布到网站上。通常纹理、音频和 3D 模型会放在这里。
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <p>
+            现在我们已经搭建好了基本的项目结构，接下来需要一种方式在本地运行项目并通过浏览器访问它。安装和本地开发可以通过 npm 和构建工具来完成，也可以通过从 CDN 导入 three.js 来实现。下面将分别介绍这两种方式。
+          </p>
+
+          <h2>方式一：使用 NPM 和构建工具安装</h2>
+
+          <h3>开发</h3>
+
+          <p>
+            从 [link:https://www.npmjs.com/ npm 包注册表] 安装并使用 [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC 构建工具] 对大多数用户来说是推荐的方式——你的项目依赖越多，就越可能遇到静态托管难以解决的问题。使用构建工具时，导入本地 JavaScript 文件和 npm 包无需 import map 即可直接使用。
+          </p>
+
+
+          <ol>
+            <li>
+              安装 [link:https://nodejs.org/ Node.js]。我们需要它来管理依赖和运行构建工具。
+            </li>
+            <li>
+              <p>
+                在项目文件夹中打开 [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ 终端]，安装 three.js 和构建工具 [link:https://vitejs.dev/ Vite]。Vite 仅在开发过程中使用，不会成为最终网页的一部分。如果你更喜欢使用其他构建工具也没问题——我们支持任何能导入 [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ES Modules] 的现代构建工具。
+              </p>
+<pre class="prettyprint notranslate" translate="no">
+# three.js
+npm install --save three
+
+# vite
+npm install --save-dev vite
+</pre>
+              <aside>
+                <details>
+                  <summary>安装后项目中多出了 <i>node_modules/</i> 和 <i>package.json</i>，它们是什么？</summary>
+                  <p>
+                    npm 使用 <i>package.json</i> 来记录你安装的每个依赖的版本。如果有其他人和你一起开发项目，他们只需运行 <i>npm install</i> 就能安装相同版本的依赖。如果你使用版本控制，请提交 <i>package.json</i>。
+                  </p>
+                  <p>
+                    npm 将每个依赖的代码安装到新的 <i>node_modules/</i> 文件夹中。当 Vite 构建你的应用时，它会看到对 'three' 的导入，并自动从这个文件夹中获取 three.js 文件。<i>node_modules/</i> 文件夹仅在开发时使用，不应上传到你的网站托管服务商或提交到版本历史中。
+                  </p>
+                </details>
+                <details>
+                  <summary>使用 <i>jsconfig</i> 或 <i>tsconfig</i> 改善编辑器自动补全</summary>
+                  <p>
+                    在项目根目录放置一个 <i>jsconfig.json</i>（TypeScript 项目则使用 <i>tsconfig.json</i>）。添加以下配置可以帮助编辑器定位 three.js 文件，从而增强自动补全功能。
+                  </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+{
+  "compilerOptions": {
+    // other options...
+    "paths": {
+      "three/webgpu": ["node_modules/three/build/three.webgpu.js"],
+      "three/tsl": ["node_modules/three/build/three.tsl.js"],
+    },
+  }
+}
+</pre>
+                </details>
+              </aside>
+            </li>
+            <li>
+              在终端中运行：
+              <pre class="prettyprint notranslate" translate="no">npx vite </pre>
+              <aside>
+                <details>
+                  <summary><i>npx</i> 是什么？</summary>
+                  <p>
+                    npx 随 Node.js 一起安装，用于运行 Vite 等命令行程序，这样你就不必自己在 <i>node_modules/</i> 中查找正确的文件。如果你愿意，也可以将 [link:https://vitejs.dev/guide/#command-line-interface Vite 的常用命令] 添加到 [link:https://docs.npmjs.com/cli/v9/using-npm/scripts package.json:scripts] 列表中，然后使用 <i>npm run dev</i> 来代替。
+                  </p>
+                </details>
+              </aside>
+            </li>
+            <li>
+              如果一切顺利，你会在终端中看到一个类似 <i>http://localhost:5173</i> 的 URL，打开该 URL 即可查看你的 Web 应用。
+            </li>
+          </ol>
+
+          <p>
+            页面将是空白的——你已经准备好<a href="creating-a-scene.html">创建一个场景</a>了。
+          </p>
+
+          <p>
+            如果你想在继续之前了解更多关于这些工具的信息，请参阅：
+          </p>
+
+          <ul>
+            <li>
+              [link:https://threejs-journey.com/lessons/local-server three.js journey: 本地服务器]
+            </li>
+            <li>
+              [link:https://cn.vite.dev/guide/cli Vite: 命令行接口]
+            </li>
+            <li>
+              [link:https://developer.mozilla.org/zh-CN/docs/Learn_web_development/Extensions/Client-side_tools/Package_management MDN: 包管理基础]
+            </li>
+          </ul>
+
+          <h3>生产环境</h3>
+
+          <p>
+            稍后，当你准备部署 Web 应用时，只需让 Vite 执行生产构建——<i>npx vite build</i>。应用使用的所有内容都会被编译、优化并复制到 <i>dist/</i> 文件夹中。该文件夹的内容即可直接托管到你的网站上。
+          </p>
+
+          <h2>方式二：从 CDN 导入</h2>
+
+          <h3>开发</h3>
+
+          <p>不使用构建工具进行安装需要对上述项目结构做一些修改。</p>
+
+          <ol>
+            <li>
+              <p>
+                我们在 <i>main.js</i> 中从 'three'（一个 npm 包）导入了代码，但浏览器并不知道这意味着什么。在 <i>index.html</i> 中，我们需要添加一个 [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap import map] 来定义从哪里获取该包。将以下代码放在 <i>&lt;head>&lt/head></i> 标签内，样式之后。
+              </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+&lt;script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/examples/jsm/"
+  }
+}
+&lt;/script>
+</pre>
+              <p>
+                别忘了将 <i>&lt;version&gt;</i> 替换为 three.js 的实际版本号，例如 <i>"v0.149.0"</i>。最新版本可以在 [link:https://www.npmjs.com/package/three?activeTab=versions npm 版本列表] 中找到。
+              </p>
+            </li>
+            <li>
+              <p>
+                我们还需要运行一个<i>本地服务器</i>来将这些文件托管到浏览器可以访问的 URL 上。虽然技术上可以双击 HTML 文件在浏览器中打开，但出于安全原因，我们后续要实现的重要功能在以这种方式打开页面时无法正常工作。
+              </p>
+              <p>
+                安装 [link:https://nodejs.org/ Node.js]，然后在项目目录中运行 [link:https://www.npmjs.com/package/serve serve] 来启动本地服务器：
+              </p>
+              <pre class="prettyprint notranslate" translate="no">npx serve .</pre>
+            </li>
+            <li>
+              如果一切顺利，你会在终端中看到一个类似 http://localhost:3000 的 URL，打开该 URL 即可查看你的 Web 应用。
+            </li>
+          </ol>
+
+          <p>
+            页面将是空白的——你已经准备好 [link:#manual/introduction/Creating-a-scene 创建一个场景] 了。
+          </p>
+
+          <p>
+            还有许多其他本地静态服务器可供选择——有些使用 Node.js 以外的语言，有些是桌面应用程序。它们的工作方式基本相同，下面列出了一些替代方案。
+          </p>
+
+          <details>
+            <summary>更多本地服务器</summary>
+
+            <h3>命令行</h3>
+
+            <p>命令行本地服务器从终端窗口运行。可能需要先安装相应的编程语言。</p>
+
+            <ul>
+              <li><i>npx http-server</i> (Node.js)</li>
+              <li><i>npx five-server</i> (Node.js)</li>
+              <li><i>python -m SimpleHTTPServer</i> (Python 2.x)</li>
+              <li><i>python -m http.server</i> (Python 3.x)</li>
+              <li><i>php -S localhost:8000</i> (PHP 5.4+)</li>
+            </ul>
+
+
+            <h3>图形界面</h3>
+
+            <p>图形界面本地服务器以应用程序窗口的形式在你的计算机上运行，可能带有用户界面。</p>
+
+            <ul>
+              <li>[link:https://greggman.github.io/servez Servez]</li>
+            </ul>
+
+            <h3>代码编辑器插件</h3>
+
+            <p>一些代码编辑器提供插件，可按需启动简单服务器。</p>
+
+            <ul>
+              <li>[link:https://marketplace.visualstudio.com/items?itemName=yandeu.five-server Five Server]，适用于 Visual Studio Code</li>
+              <li>[link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server]，适用于 Visual Studio Code</li>
+              <li>[link:https://atom.io/packages/atom-live-server Live Server]，适用于 Atom</li>
+            </ul>
+
+
+          </details>
+
+          <h3>生产环境</h3>
+
+          <p>
+            当你准备部署 Web 应用时，只需将源文件推送到你的网站托管服务商——无需构建或编译任何内容。这种方式的缺点是，你需要小心地确保 import map 与应用所需的所有依赖（以及依赖的依赖！）同步更新。如果托管这些依赖的 CDN 暂时宕机，你的网站也会停止工作。
+          </p>
+
+          <p>
+            <i><b>重要提示：</b>所有依赖都应从同一版本的 three.js 和同一个 CDN 导入。混合使用不同来源的文件可能导致代码被重复引入，甚至以意想不到的方式破坏应用。</i>
+          </p>
+
+          <h2>附加组件</h2>
+
+          <p>
+            three.js 开箱即用地包含了 3D 引擎的基础功能。其他 three.js 组件——如控制器、加载器和后期处理效果——属于 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm addons/] 目录的一部分。附加组件不需要单独<i>安装</i>，但需要单独<i>导入</i>。
+          </p>
+
+          <p>
+            下面的示例展示了如何导入 three.js 以及 `OrbitControls` 和 `GLTFLoader` 附加组件。在必要时，每个附加组件的文档或示例中也会提到这一点。
+          </p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const controls = new OrbitControls( camera, renderer.domElement );
+const loader = new GLTFLoader();
+</pre>
+
+          <p>
+            也有一些优秀的第三方项目可用于 three.js。这些需要单独安装——请参阅<a href="libraries-and-plugins">库和插件</a>。
+          </p>
+
+          <h2>下一步</h2>
+
+          <p>
+            你现在已经准备好<a href="creating-a-scene.html">创建一个场景</a>了。
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

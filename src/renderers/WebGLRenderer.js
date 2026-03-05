@@ -8,7 +8,6 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	SRGBColorSpace,
-	LinearSRGBColorSpace,
 	RGBAIntegerFormat,
 	RGIntegerFormat,
 	RedIntegerFormat,
@@ -31,8 +30,7 @@ import { WebGLBindingStates } from './webgl/WebGLBindingStates.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
-import { WebGLCubeMaps } from './webgl/WebGLCubeMaps.js';
-import { WebGLCubeUVMaps } from './webgl/WebGLCubeUVMaps.js';
+import { WebGLEnvironments } from './webgl/WebGLEnvironments.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { WebGLGeometries } from './webgl/WebGLGeometries.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
@@ -414,7 +412,7 @@ class WebGLRenderer {
 		}
 
 		let extensions, capabilities, state, info;
-		let properties, textures, cubemaps, cubeuvmaps, attributes, geometries, objects;
+		let properties, textures, environments, attributes, geometries, objects;
 		let programCache, materials, renderLists, renderStates, clipping, shadowMap;
 
 		let background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -441,19 +439,18 @@ class WebGLRenderer {
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
-			cubemaps = new WebGLCubeMaps( _this );
-			cubeuvmaps = new WebGLCubeUVMaps( _this );
+			environments = new WebGLEnvironments( _this );
 			attributes = new WebGLAttributes( _gl );
 			bindingStates = new WebGLBindingStates( _gl, attributes );
 			geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 			objects = new WebGLObjects( _gl, geometries, attributes, bindingStates, info );
 			morphtargets = new WebGLMorphtargets( _gl, capabilities, textures );
 			clipping = new WebGLClipping( properties );
-			programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
+			programCache = new WebGLPrograms( _this, environments, extensions, capabilities, bindingStates, clipping );
 			materials = new WebGLMaterials( _this, properties );
 			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates( extensions );
-			background = new WebGLBackground( _this, cubemaps, cubeuvmaps, state, objects, _alpha, premultipliedAlpha );
+			background = new WebGLBackground( _this, environments, state, objects, _alpha, premultipliedAlpha );
 			shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 			uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 
@@ -1010,7 +1007,11 @@ class WebGLRenderer {
 
 			}
 
-			_gl.clear( bits );
+			if ( bits !== 0 ) {
+
+				_gl.clear( bits );
+
+			}
 
 		};
 
@@ -1055,8 +1056,7 @@ class WebGLRenderer {
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
-			cubemaps.dispose();
-			cubeuvmaps.dispose();
+			environments.dispose();
 			objects.dispose();
 			bindingStates.dispose();
 			uniformsGroups.dispose();
@@ -1952,7 +1952,7 @@ class WebGLRenderer {
 					generateMipmaps: true,
 					type: hasHalfFloatSupport ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
-					samples: capabilities.samples,
+					samples: Math.max( 4, capabilities.samples ), // to avoid feedback loops, the transmission render target requires a resolve, see #26177
 					stencilBuffer: stencil,
 					resolveDepthBuffer: false,
 					resolveStencilBuffer: false,
@@ -2134,9 +2134,11 @@ class WebGLRenderer {
 
 			// always update environment and fog - changing these trigger an getProgram call, but it's possible that the program doesn't change
 
-			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
+			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
-			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
+
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
+			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
 			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 			if ( programs === undefined ) {
@@ -2268,9 +2270,10 @@ class WebGLRenderer {
 			textures.resetTextureUnits();
 
 			const fog = scene.fog;
-			const environment = material.isMeshStandardMaterial ? scene.environment : null;
-			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
-			const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
+			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
+			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace );
+			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
+			const envMap = environments.get( material.envMap || environment, usePMREM );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !! geometry.attributes.tangent && ( !! material.normalMap || material.anisotropy > 0 );
 			const morphTargets = !! geometry.morphAttributes.position;
@@ -2599,7 +2602,7 @@ class WebGLRenderer {
 
 			}
 
-			if ( material.isMeshStandardMaterial && material.envMap === null && scene.environment !== null ) {
+			if ( ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) && material.envMap === null && scene.environment !== null ) {
 
 				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
 

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BlendMode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">BlendMode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents blending configuration.</p>
+<p>This class encapsulates all blending-related properties that control how
+a material's colors are combined with the colors already in the frame buffer.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BlendMode" translate="no">new <a href="#BlendMode">BlendMode</a><span class="signature">( blending : <span class="param-type"><a href="global.html#NoBlending">NoBlending</a> | <a href="global.html#NormalBlending">NormalBlending</a> | <a href="global.html#AdditiveBlending">AdditiveBlending</a> | <a href="global.html#SubtractiveBlending">SubtractiveBlending</a> | <a href="global.html#MultiplyBlending">MultiplyBlending</a> | <a href="global.html#CustomBlending">CustomBlending</a> | <a href="global.html#MaterialBlending">MaterialBlending</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new blending configuration.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">blending</strong>
+									</td>
+									<td class="description last">
+										<p>The blending mode.</p>
+										<p>Default is <code>NormalBlending</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="blendDst" translate="no">.<a href="#blendDst">blendDst</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending destination factor.</p>
+<p>This determines how the destination (existing) fragment color in the frame buffer
+is factored before being combined with the source (incoming) fragment color.</p>
+						<p>Default is <code>OneMinusSrcAlphaFactor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendDstAlpha" translate="no">.<a href="#blendDstAlpha">blendDstAlpha</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending destination alpha factor.</p>
+<p>When set, this allows separate control of the alpha channel's destination blending factor.
+If <code>null</code>, <a href="BlendMode.html#blendDst">BlendMode#blendDst</a> is used for the alpha channel as well.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendEquation" translate="no">.<a href="#blendEquation">blendEquation</a><span class="type-signature"> : <a href="global.html#AddEquation">AddEquation</a> | <a href="global.html#SubtractEquation">SubtractEquation</a> | <a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a> | <a href="global.html#MinEquation">MinEquation</a> | <a href="global.html#MaxEquation">MaxEquation</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending equation.</p>
+<p>This determines how the source and destination colors are combined.</p>
+						<p>Default is <code>AddEquation</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendEquationAlpha" translate="no">.<a href="#blendEquationAlpha">blendEquationAlpha</a><span class="type-signature"> : <a href="global.html#AddEquation">AddEquation</a> | <a href="global.html#SubtractEquation">SubtractEquation</a> | <a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a> | <a href="global.html#MinEquation">MinEquation</a> | <a href="global.html#MaxEquation">MaxEquation</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending equation of the alpha channel.</p>
+<p>When set, this allows separate control of the alpha channel's blending equation.
+If <code>null</code>, <a href="BlendMode.html#blendEquation">BlendMode#blendEquation</a> is used for the alpha channel as well.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendSrc" translate="no">.<a href="#blendSrc">blendSrc</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending source factor.</p>
+<p>This determines how the source (incoming) fragment color is factored before being added
+to the destination (existing) fragment color in the frame buffer.</p>
+						<p>Default is <code>SrcAlphaFactor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendSrcAlpha" translate="no">.<a href="#blendSrcAlpha">blendSrcAlpha</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending source alpha factor.</p>
+<p>When set, this allows separate control of the alpha channel's source blending factor.
+If <code>null</code>, <a href="BlendMode.html#blendSrc">BlendMode#blendSrc</a> is used for the alpha channel as well.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blending" translate="no">.<a href="#blending">blending</a><span class="type-signature"> : <a href="global.html#NoBlending">NoBlending</a> | <a href="global.html#NormalBlending">NormalBlending</a> | <a href="global.html#AdditiveBlending">AdditiveBlending</a> | <a href="global.html#SubtractiveBlending">SubtractiveBlending</a> | <a href="global.html#MultiplyBlending">MultiplyBlending</a> | <a href="global.html#CustomBlending">CustomBlending</a> | <a href="global.html#MaterialBlending">MaterialBlending</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending type.</p>
+<p>It must be set to <code>CustomBlending</code> if custom blending properties like
+<a href="BlendMode.html#blendSrc">BlendMode#blendSrc</a>, <a href="BlendMode.html#blendDst">BlendMode#blendDst</a> or <a href="BlendMode.html#blendEquation">BlendMode#blendEquation</a>
+should have any effect.</p>
+						<p>Default is <code>NormalBlending</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="premultiplyAlpha" translate="no">.<a href="#premultiplyAlpha">premultiplyAlpha</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether to premultiply the alpha (transparency) value.</p>
+<p>If <code>true</code>, the RGB color of the texture or material is multiplied by its alpha value.
+This is useful for transparent textures/materials where the color data
+should already include the transparency information.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="BlendMode.html">BlendMode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a clone of this blending configuration.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new Blending instance with the same properties.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="BlendMode.html">BlendMode</a></span> )</span><span class="type-signature"> : <a href="BlendMode.html">BlendMode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the blending properties from the given source to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">source</strong>
+									</td>
+									<td class="description last">
+										<p>The blending configuration to copy from.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/BlendMode.js" translate="no" target="_blank" rel="noopener">src/renderers/common/BlendMode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>
