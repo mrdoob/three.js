@@ -42,7 +42,7 @@ class FirstPersonControls extends Controls {
 		 * @type {number}
 		 * @default 0.005
 		 */
-		this.lookSpeed = 0.005;
+		this.lookSpeed = 0.1;
 
 		/**
 		 * Whether it's possible to vertically look around or not.
@@ -59,14 +59,6 @@ class FirstPersonControls extends Controls {
 		 * @default false
 		 */
 		this.autoForward = false;
-
-		/**
-		 * Whether it's possible to look around or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.activeLook = true;
 
 		/**
 		 * Whether or not the camera's height influences the forward movement speed.
@@ -138,16 +130,13 @@ class FirstPersonControls extends Controls {
 
 		this._autoSpeedFactor = 0.0;
 
-		this._pointerX = 0;
-		this._pointerY = 0;
+		this._pointerDeltaX = 0;
+		this._pointerDeltaY = 0;
 
 		this._moveForward = false;
 		this._moveBackward = false;
 		this._moveLeft = false;
 		this._moveRight = false;
-
-		this._viewHalfX = 0;
-		this._viewHalfY = 0;
 
 		this._lat = 0;
 		this._lon = 0;
@@ -166,8 +155,6 @@ class FirstPersonControls extends Controls {
 		if ( domElement !== null ) {
 
 			this.connect( domElement );
-
-			this.handleResize();
 
 		}
 
@@ -204,25 +191,6 @@ class FirstPersonControls extends Controls {
 	dispose() {
 
 		this.disconnect();
-
-	}
-
-	/**
-	 * Must be called if the application window is resized.
-	 */
-	handleResize() {
-
-		if ( this.domElement === document ) {
-
-			this._viewHalfX = window.innerWidth / 2;
-			this._viewHalfY = window.innerHeight / 2;
-
-		} else {
-
-			this._viewHalfX = this.domElement.offsetWidth / 2;
-			this._viewHalfY = this.domElement.offsetHeight / 2;
-
-		}
 
 	}
 
@@ -282,14 +250,6 @@ class FirstPersonControls extends Controls {
 		if ( this._moveUp ) this.object.translateY( actualMoveSpeed );
 		if ( this._moveDown ) this.object.translateY( - actualMoveSpeed );
 
-		let actualLookSpeed = delta * this.lookSpeed;
-
-		if ( ! this.activeLook ) {
-
-			actualLookSpeed = 0;
-
-		}
-
 		let verticalLookRatio = 1;
 
 		if ( this.constrainVertical ) {
@@ -298,8 +258,11 @@ class FirstPersonControls extends Controls {
 
 		}
 
-		this._lon -= this._pointerX * actualLookSpeed;
-		if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+		this._lon -= this._pointerDeltaX * this.lookSpeed;
+		if ( this.lookVertical ) this._lat -= this._pointerDeltaY * this.lookSpeed * verticalLookRatio;
+
+		this._pointerDeltaX = 0;
+		this._pointerDeltaY = 0;
 
 		this._lat = Math.max( - 85, Math.min( 85, this._lat ) );
 
@@ -332,6 +295,15 @@ class FirstPersonControls extends Controls {
 
 	}
 
+	/**
+	 * @deprecated, r184. The controls now handle resize internally.
+	 */
+	handleResize() {
+
+		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed. The controls now handle resize internally.' );
+
+	}
+
 }
 
 function onPointerDown( event ) {
@@ -342,16 +314,7 @@ function onPointerDown( event ) {
 
 	}
 
-	if ( this.activeLook ) {
-
-		switch ( event.button ) {
-
-			case 0: this._moveForward = true; break;
-			case 2: this._moveBackward = true; break;
-
-		}
-
-	}
+	this.domElement.setPointerCapture( event.pointerId );
 
 	this.mouseDragOn = true;
 
@@ -359,16 +322,7 @@ function onPointerDown( event ) {
 
 function onPointerUp( event ) {
 
-	if ( this.activeLook ) {
-
-		switch ( event.button ) {
-
-			case 0: this._moveForward = false; break;
-			case 2: this._moveBackward = false; break;
-
-		}
-
-	}
+	this.domElement.releasePointerCapture( event.pointerId );
 
 	this.mouseDragOn = false;
 
@@ -376,17 +330,10 @@ function onPointerUp( event ) {
 
 function onPointerMove( event ) {
 
-	if ( this.domElement === document ) {
+	if ( this.mouseDragOn === false ) return;
 
-		this._pointerX = event.pageX - this._viewHalfX;
-		this._pointerY = event.pageY - this._viewHalfY;
-
-	} else {
-
-		this._pointerX = event.pageX - this.domElement.offsetLeft - this._viewHalfX;
-		this._pointerY = event.pageY - this.domElement.offsetTop - this._viewHalfY;
-
-	}
+	this._pointerDeltaX += event.movementX;
+	this._pointerDeltaY += event.movementY;
 
 }
 
