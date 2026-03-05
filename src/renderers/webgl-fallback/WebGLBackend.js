@@ -271,7 +271,23 @@ class WebGLBackend extends Backend {
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
 
-		if ( parameters.reversedDepthBuffer === true && this.extensions.has( 'EXT_clip_control' ) ) {
+		if ( parameters.reversedDepthBuffer ) {
+
+			if ( this.extensions.has( 'EXT_clip_control' ) ) {
+
+				renderer.reversedDepthBuffer = true;
+
+			} else {
+
+				warn( 'WebGPURenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.' );
+
+				renderer.reversedDepthBuffer = false;
+
+			}
+
+		}
+
+		if ( renderer.reversedDepthBuffer ) {
 
 			this.state.setReversedDepth( true );
 
@@ -967,6 +983,48 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Internal draw function.
+	 *
+	 * @private
+	 * @param {Object3D} object - The object to render.
+	 * @param {WebGLBufferRenderer} renderer - The internal renderer.
+	 * @param {number} firstVertex - The first vertex to render.
+	 * @param {number} vertexCount - The vertex count.
+	 * @param {number} instanceCount - The intance count.
+	 */
+	_draw( object, renderer, firstVertex, vertexCount, instanceCount ) {
+
+		if ( object.isBatchedMesh ) {
+
+			if ( object._multiDrawInstances !== null ) {
+
+				// @deprecated, r174
+				warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
+
+				warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
+
+			} else {
+
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+			}
+
+		} else if ( instanceCount > 1 ) {
+
+			renderer.renderInstances( firstVertex, vertexCount, instanceCount );
+
+		} else {
+
+			renderer.render( firstVertex, vertexCount );
+
+		}
+
+	}
+
+	/**
 	 * Executes a draw command for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object to draw.
@@ -1103,38 +1161,6 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const draw = () => {
-
-			if ( object.isBatchedMesh ) {
-
-				if ( object._multiDrawInstances !== null ) {
-
-					// @deprecated, r174
-					warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
-
-				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
-
-					warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
-
-				} else {
-
-					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
-
-				}
-
-			} else if ( instanceCount > 1 ) {
-
-				renderer.renderInstances( firstVertex, vertexCount, instanceCount );
-
-			} else {
-
-				renderer.render( firstVertex, vertexCount );
-
-			}
-
-		};
-
 		if ( renderObject.camera.isArrayCamera === true && renderObject.camera.cameras.length > 0 && renderObject.camera.isMultiViewCamera === false ) {
 
 			const cameraData = this.get( renderObject.camera );
@@ -1247,7 +1273,7 @@ class WebGLBackend extends Backend {
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
-					draw();
+					this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
 
 				}
 
@@ -1258,7 +1284,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			draw();
+			this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
 
 		}
 
@@ -1996,17 +2022,6 @@ class WebGLBackend extends Backend {
 		}
 
 		return false;
-
-	}
-
-	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {
-
-		return this.capabilities.getMaxAnisotropy();
 
 	}
 

@@ -864,7 +864,7 @@ class NodeBuilder {
 	 */
 	getUniformBufferLimit() {
 
-		return 16384;
+		return this.renderer.backend.capabilities.getUniformBufferLimit();
 
 	}
 

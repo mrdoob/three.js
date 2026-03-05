@@ -46,7 +46,7 @@ class SubBuildNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) return this.nodeType;
 

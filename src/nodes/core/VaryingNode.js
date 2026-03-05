@@ -104,7 +104,7 @@ class VaryingNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// VaryingNode is auto type
 

@@ -79,7 +79,7 @@ class ContextNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 

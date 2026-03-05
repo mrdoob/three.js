@@ -68,7 +68,7 @@ class ParameterNode extends PropertyNode {
 
 	getHash() {
 
-		return this.uuid;
+		return String( this.id );
 
 	}
 

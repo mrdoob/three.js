@@ -42,7 +42,7 @@ class OutputStructNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	generateNodeType( /*builder*/ ) {
 
 		return 'OutputType';
 

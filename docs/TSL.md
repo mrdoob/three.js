@@ -1483,11 +1483,11 @@ Example:
 ```js
 import { billboarding } from 'three/tsl';
 
-// Full billboarding (like particles) - faces camera in all directions
+// Default: Horizontal only (like trees) - rotates around Y axis only
 material.vertexNode = billboarding();
 
-// Horizontal only (like trees) - rotates around Y axis only
-material.vertexNode = billboarding( { horizontal: true, vertical: false } );
+// Full billboarding (like particles) - faces camera in all directions
+material.vertexNode = billboarding( { horizontal: true, vertical: true } );
 ```
 
 ## NodeMaterial

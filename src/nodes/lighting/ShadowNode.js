@@ -11,7 +11,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
+import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
@@ -420,8 +420,9 @@ class ShadowNode extends ShadowBaseNode {
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
 		const shadowMapType = renderer.shadowMap.type;
+		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
-		if ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) {
+		if ( ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) && hasTextureCompare ) {
 
 			depthTexture.minFilter = LinearFilter;
 			depthTexture.magFilter = LinearFilter;
