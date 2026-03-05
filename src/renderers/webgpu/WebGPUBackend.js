@@ -1499,16 +1499,15 @@ class WebGPUBackend extends Backend {
 	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
 	 * @param {Object} renderContextData - The render context data object, holding current pass state and occlusion query tracking.
 	 * @param {GPURenderPipeline} pipelineGPU - The GPU render pipeline.
+	 * @param {Array<BindGroup>} bindings - The bind groups.
 	 * @param {Array<BufferAttribute>} vertexBuffers - The vertex buffers.
 	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
 	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
 	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
 	 */
-	_draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
 
 		const { object, material, context } = renderObject;
-
-		const bindings = renderObject.getBindings();
 
 		const index = renderObject.getIndex();
 		const hasIndex = ( index !== null );
@@ -1523,10 +1522,10 @@ class WebGPUBackend extends Backend {
 
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
-			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+			if ( currentBindingGroups[ i ] !== bindGroup.id ) {
 
-				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+				passEncoderGPU.setBindGroup( i, bindingsData.group );
+				currentBindingGroups[ i ] = bindGroup.id;
 
 			}
 
@@ -1693,6 +1692,8 @@ class WebGPUBackend extends Backend {
 		const drawParams = renderObject.getDrawParameters();
 		if ( drawParams === null ) return;
 
+		const bindings = renderObject.getBindings();
+
 		// vertex buffers
 
 		const vertexBuffers = renderObject.getVertexBuffers();
@@ -1736,8 +1737,6 @@ class WebGPUBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-
-
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
 					if ( renderContextData.bundleEncoders ) {
@@ -1748,8 +1747,6 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
-
-
 
 					if ( vp ) {
 
@@ -1764,16 +1761,16 @@ class WebGPUBackend extends Backend {
 
 					}
 
-
 					// Set camera index binding for this layer
 					if ( cameraIndex && cameraData.indexesGPU ) {
 
-						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
-						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+						const indexPos = bindings.indexOf( cameraIndex );
+						pass.setBindGroup( indexPos, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ indexPos ] = cameraIndex.id;
 
 					}
 
-					this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, pass, sets );
+					this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, pass, sets );
 
 				}
 
@@ -1810,7 +1807,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				this._draw( renderObject, info, renderContextData, pipelineGPU, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
+				this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
 
 			}
 
