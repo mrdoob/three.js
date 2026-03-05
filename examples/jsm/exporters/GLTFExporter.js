@@ -88,6 +88,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * - KHR_texture_transform
  * - EXT_materials_bump
  * - EXT_mesh_gpu_instancing
+ * - EXT_texture_webp
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  *
