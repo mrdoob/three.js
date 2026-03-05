@@ -8,25 +8,25 @@ import {
 } from 'three';
 
 /**
- * Visualizes an {@link IrradianceProbeGrid} by rendering a sphere at each
+ * Visualizes an {@link LightProbeVolume} by rendering a sphere at each
  * probe position, shaded with the probe's L1 spherical harmonics.
  *
  * Uses a single `InstancedMesh` draw call for all probes.
  *
  * ```js
- * const helper = new IrradianceProbeGridHelper( probeGrid );
+ * const helper = new LightProbeVolumeHelper( probeGrid );
  * scene.add( helper );
  * ```
  *
  * @augments InstancedMesh
- * @three_import import { IrradianceProbeGridHelper } from 'three/addons/helpers/IrradianceProbeGridHelper.js';
+ * @three_import import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
  */
-class IrradianceProbeGridHelper extends InstancedMesh {
+class LightProbeVolumeHelper extends InstancedMesh {
 
 	/**
 	 * Constructs a new irradiance probe grid helper.
 	 *
-	 * @param {IrradianceProbeGrid} probeGrid - The probe grid to visualize.
+	 * @param {LightProbeVolume} probeGrid - The probe grid to visualize.
 	 * @param {number} [sphereSize=0.12] - The radius of each probe sphere.
 	 */
 	constructor( probeGrid, sphereSize = 0.12 ) {
@@ -105,11 +105,11 @@ class IrradianceProbeGridHelper extends InstancedMesh {
 		/**
 		 * The probe grid to visualize.
 		 *
-		 * @type {IrradianceProbeGrid}
+		 * @type {LightProbeVolume}
 		 */
 		this.probeGrid = probeGrid;
 
-		this.type = 'IrradianceProbeGridHelper';
+		this.type = 'LightProbeVolumeHelper';
 
 		this.update();
 
@@ -147,7 +147,7 @@ class IrradianceProbeGridHelper extends InstancedMesh {
 
 				for ( let ix = 0; ix < res.x; ix ++ ) {
 
-					// Remap to texel centers (must match irradiance_probe_grid_pars_fragment.glsl.js)
+					// Remap to texel centers (must match light_probe_volume_pars_fragment.glsl.js)
 					uvwArray[ i * 3 ] = ( ix + 0.5 ) / res.x;
 					uvwArray[ i * 3 + 1 ] = ( iy + 0.5 ) / res.y;
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
@@ -189,4 +189,4 @@ class IrradianceProbeGridHelper extends InstancedMesh {
 
 }
 
-export { IrradianceProbeGridHelper };
+export { LightProbeVolumeHelper };

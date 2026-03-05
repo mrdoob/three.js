@@ -2220,7 +2220,7 @@ class WebGLRenderer {
 
 			}
 
-			materialProperties.irradianceProbeGrid = scene.irradianceProbeGrid;
+			materialProperties.lightProbeVolume = scene.lightProbeVolume;
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
@@ -2421,7 +2421,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( !! materialProperties.irradianceProbeGrid !== !! scene.irradianceProbeGrid ) {
+				} else if ( !! materialProperties.lightProbeVolume !== !! scene.lightProbeVolume ) {
 
 					needsProgramChange = true;
 
@@ -2467,9 +2467,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( materialProperties.needsLights && materialProperties.__probeGrid !== ( scene.irradianceProbeGrid || null ) ) {
+			if ( materialProperties.needsLights && materialProperties.__lightProbeVolume !== ( scene.lightProbeVolume || null ) ) {
 
-				materialProperties.__probeGrid = scene.irradianceProbeGrid || null;
+				materialProperties.__lightProbeVolume = scene.lightProbeVolume || null;
 
 				refreshMaterial = true;
 
@@ -2656,15 +2656,15 @@ class WebGLRenderer {
 
 				// irradiance probe grid
 
-				if ( materialProperties.needsLights && scene.irradianceProbeGrid ) {
+				if ( materialProperties.needsLights && scene.lightProbeVolume ) {
 
-					const probeGrid = scene.irradianceProbeGrid;
+					const volume = scene.lightProbeVolume;
 
-					m_uniforms.probeGridSH0.value = probeGrid.textures[ 0 ];
-					m_uniforms.probeGridSH1.value = probeGrid.textures[ 1 ];
-					m_uniforms.probeGridSH2.value = probeGrid.textures[ 2 ];
-					m_uniforms.probeGridMin.value.copy( probeGrid.boundingBox.min );
-					m_uniforms.probeGridMax.value.copy( probeGrid.boundingBox.max );
+					m_uniforms.probeGridSH0.value = volume.textures[ 0 ];
+					m_uniforms.probeGridSH1.value = volume.textures[ 1 ];
+					m_uniforms.probeGridSH2.value = volume.textures[ 2 ];
+					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
+					m_uniforms.probeGridMax.value.copy( volume.boundingBox.max );
 
 				}
 

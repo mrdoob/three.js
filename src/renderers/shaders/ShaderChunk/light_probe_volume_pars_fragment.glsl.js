@@ -1,5 +1,5 @@
 export default /* glsl */`
-#ifdef USE_IRRADIANCE_PROBE_GRID
+#ifdef USE_LIGHT_PROBE_VOLUME
 
 uniform highp sampler3D probeGridSH0;
 uniform highp sampler3D probeGridSH1;
@@ -8,7 +8,7 @@ uniform highp sampler3D probeGridSH2;
 uniform vec3 probeGridMin;
 uniform vec3 probeGridMax;
 
-vec3 getProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
+vec3 getLightProbeVolumeIrradiance( vec3 worldPos, vec3 worldNormal ) {
 
 	vec3 texSize = vec3( textureSize( probeGridSH0, 0 ) );
 	vec3 texSizeMinusOne = texSize - 1.0;

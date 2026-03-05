@@ -755,7 +755,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
-			parameters.irradianceProbeGrid ? '#define USE_IRRADIANCE_PROBE_GRID' : '',
+			parameters.lightProbeVolume ? '#define USE_LIGHT_PROBE_VOLUME' : '',
 
 			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
 			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',
