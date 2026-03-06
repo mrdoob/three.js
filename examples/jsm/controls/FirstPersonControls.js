@@ -136,6 +136,8 @@ class FirstPersonControls extends Controls {
 		this._pointerDownX = 0;
 		this._pointerDownY = 0;
 
+		this._pointerCount = 0;
+
 		this._moveForward = false;
 		this._moveBackward = false;
 		this._moveLeft = false;
@@ -326,10 +328,21 @@ function onPointerDown( event ) {
 
 	this.domElement.setPointerCapture( event.pointerId );
 
-	switch ( event.button ) {
+	this._pointerCount ++;
 
-		case 0: this._moveForward = true; break;
-		case 2: this._moveBackward = true; break;
+	if ( event.pointerType === 'touch' ) {
+
+		this._moveForward = this._pointerCount === 1;
+		this._moveBackward = this._pointerCount >= 2;
+
+	} else {
+
+		switch ( event.button ) {
+
+			case 0: this._moveForward = true; break;
+			case 2: this._moveBackward = true; break;
+
+		}
 
 	}
 
@@ -347,17 +360,28 @@ function onPointerUp( event ) {
 
 	this.domElement.releasePointerCapture( event.pointerId );
 
-	switch ( event.button ) {
+	this._pointerCount --;
 
-		case 0: this._moveForward = false; break;
-		case 2: this._moveBackward = false; break;
+	if ( event.pointerType === 'touch' ) {
+
+		this._moveForward = this._pointerCount === 1;
+		this._moveBackward = false;
+
+	} else {
+
+		switch ( event.button ) {
+
+			case 0: this._moveForward = false; break;
+			case 2: this._moveBackward = false; break;
+
+		}
 
 	}
 
 	this._pointerX = 0;
 	this._pointerY = 0;
 
-	this.mouseDragOn = false;
+	if ( this._pointerCount === 0 ) this.mouseDragOn = false;
 
 }
 
