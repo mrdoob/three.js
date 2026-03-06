@@ -42,7 +42,7 @@ class FirstPersonControls extends Controls {
 		 * @type {number}
 		 * @default 0.005
 		 */
-		this.lookSpeed = 0.1;
+		this.lookSpeed = 0.005;
 
 		/**
 		 * Whether it's possible to vertically look around or not.
@@ -130,8 +130,11 @@ class FirstPersonControls extends Controls {
 
 		this._autoSpeedFactor = 0.0;
 
-		this._pointerDeltaX = 0;
-		this._pointerDeltaY = 0;
+		this._pointerX = 0;
+		this._pointerY = 0;
+
+		this._pointerDownX = 0;
+		this._pointerDownY = 0;
 
 		this._moveForward = false;
 		this._moveBackward = false;
@@ -250,6 +253,8 @@ class FirstPersonControls extends Controls {
 		if ( this._moveUp ) this.object.translateY( actualMoveSpeed );
 		if ( this._moveDown ) this.object.translateY( - actualMoveSpeed );
 
+		const actualLookSpeed = delta * this.lookSpeed;
+
 		let verticalLookRatio = 1;
 
 		if ( this.constrainVertical ) {
@@ -258,11 +263,12 @@ class FirstPersonControls extends Controls {
 
 		}
 
-		this._lon -= this._pointerDeltaX * this.lookSpeed;
-		if ( this.lookVertical ) this._lat -= this._pointerDeltaY * this.lookSpeed * verticalLookRatio;
+		if ( this.mouseDragOn ) {
 
-		this._pointerDeltaX = 0;
-		this._pointerDeltaY = 0;
+			this._lon -= this._pointerX * actualLookSpeed;
+			if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+
+		}
 
 		this._lat = Math.max( - 85, Math.min( 85, this._lat ) );
 
@@ -316,6 +322,19 @@ function onPointerDown( event ) {
 
 	this.domElement.setPointerCapture( event.pointerId );
 
+	switch ( event.button ) {
+
+		case 0: this._moveForward = true; break;
+		case 2: this._moveBackward = true; break;
+
+	}
+
+	this._pointerDownX = event.pageX;
+	this._pointerDownY = event.pageY;
+
+	this._pointerX = 0;
+	this._pointerY = 0;
+
 	this.mouseDragOn = true;
 
 }
@@ -323,6 +342,16 @@ function onPointerDown( event ) {
 function onPointerUp( event ) {
 
 	this.domElement.releasePointerCapture( event.pointerId );
+
+	switch ( event.button ) {
+
+		case 0: this._moveForward = false; break;
+		case 2: this._moveBackward = false; break;
+
+	}
+
+	this._pointerX = 0;
+	this._pointerY = 0;
 
 	this.mouseDragOn = false;
 
@@ -332,8 +361,8 @@ function onPointerMove( event ) {
 
 	if ( this.mouseDragOn === false ) return;
 
-	this._pointerDeltaX += event.movementX;
-	this._pointerDeltaY += event.movementY;
+	this._pointerX = event.pageX - this._pointerDownX;
+	this._pointerY = event.pageY - this._pointerDownY;
 
 }
 
