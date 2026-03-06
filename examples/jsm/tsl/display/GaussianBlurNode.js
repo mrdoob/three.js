@@ -99,6 +99,14 @@ class GaussianBlurNode extends TempNode {
 		this._textureNode.uvNode = textureNode.uvNode;
 
 		/**
+		 * The material for the blur pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._material = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -302,6 +310,8 @@ class GaussianBlurNode extends TempNode {
 
 		this._horizontalRT.dispose();
 		this._verticalRT.dispose();
+
+		if ( this._material !== null ) this._material.dispose();
 
 	}
 
