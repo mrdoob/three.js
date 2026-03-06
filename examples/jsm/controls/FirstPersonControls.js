@@ -308,11 +308,11 @@ class FirstPersonControls extends Controls {
 	}
 
 	/**
-	 * @deprecated, r184. The controls now handle resize internally.
+	 * @deprecated, r184. This method is no longer needed.
 	 */
 	handleResize() {
 
-		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed. The controls now handle resize internally.' );
+		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed.' );
 
 	}
 
