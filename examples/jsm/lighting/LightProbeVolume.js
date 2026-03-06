@@ -49,9 +49,9 @@ const _savedViewport = /*@__PURE__*/ new Vector4();
 const _savedScissor = /*@__PURE__*/ new Vector4();
 
 /**
- * A 3D grid of L1 Spherical Harmonic irradiance probes that provides
+ * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
  * position-dependent diffuse global illumination. The probe data is stored
- * in three RGBA `WebGL3DRenderTarget` instances with `LinearFilter` for
+ * in seven RGBA `WebGL3DRenderTarget` instances with `LinearFilter` for
  * hardware trilinear interpolation.
  *
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
@@ -93,16 +93,16 @@ class LightProbeVolume extends Object3D {
 		this.resolution = resolution.clone();
 
 		/**
-		 * The three RGBA 3D textures storing packed SH coefficients.
+		 * The seven RGBA 3D textures storing packed SH coefficients.
 		 * @type {Data3DTexture[]}
 		 */
-		this.textures = [ null, null, null ];
+		this.textures = [ null, null, null, null, null, null, null ];
 
 		/**
 		 * Internal render targets for GPU-resident baking.
 		 * @private
 		 */
-		this._renderTargets = [ null, null, null ];
+		this._renderTargets = [ null, null, null, null, null, null, null ];
 
 	}
 
@@ -133,7 +133,7 @@ class LightProbeVolume extends Object3D {
 
 	/**
 	 * Bakes all probes by rendering cubemaps at each probe position
-	 * and projecting to L1 SH. Fully GPU-resident with zero CPU readback.
+	 * and projecting to L2 SH. Fully GPU-resident with zero CPU readback.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
@@ -154,7 +154,7 @@ class LightProbeVolume extends Object3D {
 		const res = this.resolution;
 		const totalProbes = res.x * res.y * res.z;
 
-		// Batch render target for SH coefficients: 4 pixels wide, one row per probe
+		// Batch render target for SH coefficients: 9 pixels wide, one row per probe
 		const batchTarget = _ensureBatchTarget( totalProbes );
 
 		// Save renderer state
@@ -165,7 +165,7 @@ class LightProbeVolume extends Object3D {
 
 		// Clear pooled batch target so skipped probes read as zero
 		batchTarget.scissorTest = false;
-		batchTarget.viewport.set( 0, 0, 4, totalProbes );
+		batchTarget.viewport.set( 0, 0, 9, totalProbes );
 		renderer.setRenderTarget( batchTarget );
 		renderer.clear();
 
@@ -196,8 +196,8 @@ class LightProbeVolume extends Object3D {
 					// SH projection
 					_shMaterial.uniforms.envMap.value = cubeRenderTarget.texture;
 					_mesh.material = _shMaterial;
-					batchTarget.viewport.set( 0, probeIndex, 4, 1 );
-					batchTarget.scissor.set( 0, probeIndex, 4, 1 );
+					batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+					batchTarget.scissor.set( 0, probeIndex, 9, 1 );
 					renderer.setRenderTarget( batchTarget );
 					renderer.render( _scene, _camera );
 
@@ -212,7 +212,7 @@ class LightProbeVolume extends Object3D {
 		// Phase 2: Repack SH data from batch target into 3D textures (GPU-to-GPU)
 		_ensureRepackResources();
 
-		for ( let t = 0; t < 3; t ++ ) {
+		for ( let t = 0; t < 7; t ++ ) {
 
 			_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
 			_repackMaterials[ t ].uniforms.resolution.value.copy( res );
@@ -253,7 +253,7 @@ class LightProbeVolume extends Object3D {
 		const res = this.resolution;
 		const nx = res.x, ny = res.y, nz = res.z;
 
-		for ( let t = 0; t < 3; t ++ ) {
+		for ( let t = 0; t < 7; t ++ ) {
 
 			if ( this._renderTargets[ t ] !== null ) continue;
 
@@ -278,7 +278,7 @@ class LightProbeVolume extends Object3D {
 	 */
 	dispose() {
 
-		for ( let t = 0; t < 3; t ++ ) {
+		for ( let t = 0; t < 7; t ++ ) {
 
 			if ( this._renderTargets[ t ] !== null ) {
 
@@ -343,6 +343,11 @@ function _ensureGPUResources( cubemapSize, flip ) {
 					vec3 accum1 = vec3( 0.0 );
 					vec3 accum2 = vec3( 0.0 );
 					vec3 accum3 = vec3( 0.0 );
+					vec3 accum4 = vec3( 0.0 );
+					vec3 accum5 = vec3( 0.0 );
+					vec3 accum6 = vec3( 0.0 );
+					vec3 accum7 = vec3( 0.0 );
+					vec3 accum8 = vec3( 0.0 );
 					float totalWeight = 0.0;
 					float pixelSize = 2.0 / float( CUBEMAP_SIZE );
 
@@ -375,6 +380,11 @@ function _ensureGPUResources( cubemapSize, flip ) {
 								accum1 += cw * ( 0.488603 * dir.y );
 								accum2 += cw * ( 0.488603 * dir.z );
 								accum3 += cw * ( 0.488603 * dir.x );
+								accum4 += cw * ( 1.092548 * dir.x * dir.y );
+								accum5 += cw * ( 1.092548 * dir.y * dir.z );
+								accum6 += cw * ( 0.315392 * ( 3.0 * dir.z * dir.z - 1.0 ) );
+								accum7 += cw * ( 1.092548 * dir.x * dir.z );
+								accum8 += cw * ( 0.546274 * ( dir.x * dir.x - dir.y * dir.y ) );
 
 							}
 
@@ -388,7 +398,12 @@ function _ensureGPUResources( cubemapSize, flip ) {
 					if ( coefIndex == 0 ) accum = accum0;
 					else if ( coefIndex == 1 ) accum = accum1;
 					else if ( coefIndex == 2 ) accum = accum2;
-					else accum = accum3;
+					else if ( coefIndex == 3 ) accum = accum3;
+					else if ( coefIndex == 4 ) accum = accum4;
+					else if ( coefIndex == 5 ) accum = accum5;
+					else if ( coefIndex == 6 ) accum = accum6;
+					else if ( coefIndex == 7 ) accum = accum7;
+					else accum = accum8;
 
 					gl_FragColor = vec4( accum * norm, 1.0 );
 
@@ -410,10 +425,14 @@ function _ensureRepackResources() {
 
 	_ensureScene();
 
-	// Create 3 materials, one per output texture packing
+	// Create 7 materials, one per output texture packing
 	// Texture 0: (c0.r, c0.g, c0.b, c1.r)
 	// Texture 1: (c1.g, c1.b, c2.r, c2.g)
 	// Texture 2: (c2.b, c3.r, c3.g, c3.b)
+	// Texture 3: (c4.r, c4.g, c4.b, c5.r)
+	// Texture 4: (c5.g, c5.b, c6.r, c6.g)
+	// Texture 5: (c6.b, c7.r, c7.g, c7.b)
+	// Texture 6: (c8.r, c8.g, c8.b, 0.0)
 
 	const repackVertexShader = /* glsl */`
 		void main() {
@@ -423,7 +442,7 @@ function _ensureRepackResources() {
 
 	_repackMaterials = [];
 
-	for ( let t = 0; t < 3; t ++ ) {
+	for ( let t = 0; t < 7; t ++ ) {
 
 		_repackMaterials[ t ] = new ShaderMaterial( {
 			defines: {
@@ -449,19 +468,32 @@ function _ensureRepackResources() {
 
 					int probeIndex = ix + iy * int( resolution.x ) + iz * int( resolution.x ) * int( resolution.y );
 
-					// Read 4 SH coefficients from the batch texture row
+					// Read 9 SH coefficients from the batch texture row
 					vec4 c0 = texelFetch( batchTexture, ivec2( 0, probeIndex ), 0 );
 					vec4 c1 = texelFetch( batchTexture, ivec2( 1, probeIndex ), 0 );
 					vec4 c2 = texelFetch( batchTexture, ivec2( 2, probeIndex ), 0 );
 					vec4 c3 = texelFetch( batchTexture, ivec2( 3, probeIndex ), 0 );
+					vec4 c4 = texelFetch( batchTexture, ivec2( 4, probeIndex ), 0 );
+					vec4 c5 = texelFetch( batchTexture, ivec2( 5, probeIndex ), 0 );
+					vec4 c6 = texelFetch( batchTexture, ivec2( 6, probeIndex ), 0 );
+					vec4 c7 = texelFetch( batchTexture, ivec2( 7, probeIndex ), 0 );
+					vec4 c8 = texelFetch( batchTexture, ivec2( 8, probeIndex ), 0 );
 
 					// Pack into the output format for this texture index
 					#if TEXTURE_INDEX == 0
 						gl_FragColor = vec4( c0.rgb, c1.r );
 					#elif TEXTURE_INDEX == 1
 						gl_FragColor = vec4( c1.gb, c2.rg );
-					#else
+					#elif TEXTURE_INDEX == 2
 						gl_FragColor = vec4( c2.b, c3.rgb );
+					#elif TEXTURE_INDEX == 3
+						gl_FragColor = vec4( c4.rgb, c5.r );
+					#elif TEXTURE_INDEX == 4
+						gl_FragColor = vec4( c5.gb, c6.rg );
+					#elif TEXTURE_INDEX == 5
+						gl_FragColor = vec4( c6.b, c7.rgb );
+					#else
+						gl_FragColor = vec4( c8.rgb, 0.0 );
 					#endif
 
 				}
@@ -507,7 +539,7 @@ function _ensureBatchTarget( totalProbes ) {
 
 		if ( _batchTarget !== null ) _batchTarget.dispose();
 
-		_batchTarget = new WebGLRenderTarget( 4, totalProbes, {
+		_batchTarget = new WebGLRenderTarget( 9, totalProbes, {
 			type: FloatType,
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
