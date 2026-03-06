@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - light probe volume</title>
+		<title>three.js webgl - light probe volume (multi-room)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,8 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - light probe volume<br/>
-			Position-dependent diffuse global illumination via L1 SH probe grid
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - light probe volume (multi-room)<br/>
+			Two rooms with independent probe volumes showcasing multi-volume scene.add() API
 		</div>
 
 		<script type="importmap">
@@ -32,7 +32,8 @@
 			import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
 
 			let camera, scene, renderer, controls;
-			let probeGrid, probeGridHelper;
+			let probeGridLeft, probeGridRight;
+			let probeGridHelperLeft, probeGridHelperRight;
 
 			init();
 
@@ -41,45 +42,89 @@
 				// Camera
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 3, 8 );
+				camera.position.set( 0, 5, 16 );
 
 				// Scene
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111111 );
 
-				// Room
+				// Materials
 
 				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc, side: THREE.BackSide } );
-				const room = new THREE.Mesh( new THREE.BoxGeometry( 8, 5, 8 ), wallMaterial );
-				room.position.y = 2.5;
-				room.receiveShadow = true;
-				scene.add( room );
+				const whiteMat = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
 
-				// Colored accent walls
+				// Left room (warm/red): x=-8 to 0, z=-4 to 4, y=0 to 5
+
+				const leftRoom = new THREE.Mesh( new THREE.BoxGeometry( 8, 5, 8 ), wallMaterial );
+				leftRoom.position.set( - 4, 2.5, 0 );
+				leftRoom.receiveShadow = true;
+				scene.add( leftRoom );
+
 				const redWall = new THREE.Mesh(
 					new THREE.PlaneGeometry( 8, 5 ),
 					new THREE.MeshStandardMaterial( { color: 0xdd2200 } )
 				);
 				redWall.rotation.y = Math.PI / 2;
-				redWall.position.set( - 3.99, 2.5, 0 );
+				redWall.position.set( - 7.99, 2.5, 0 );
 				scene.add( redWall );
+
+				// Right room (cool/blue): x=0 to 8, z=-4 to 4, y=0 to 5
+
+				const rightRoom = new THREE.Mesh( new THREE.BoxGeometry( 8, 5, 8 ), wallMaterial.clone() );
+				rightRoom.position.set( 4, 2.5, 0 );
+				rightRoom.receiveShadow = true;
+				scene.add( rightRoom );
 
 				const blueWall = new THREE.Mesh(
 					new THREE.PlaneGeometry( 8, 5 ),
 					new THREE.MeshStandardMaterial( { color: 0x0044ff } )
 				);
 				blueWall.rotation.y = - Math.PI / 2;
-				blueWall.position.set( 3.99, 2.5, 0 );
+				blueWall.position.set( 7.99, 2.5, 0 );
 				scene.add( blueWall );
 
-				// Objects
+				// Dividing wall at x=0 with doorway
 
-				const whiteMat = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+				const dividerMat = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const doorwayHalfGap = 1.25;
+
+				// Left section of divider (z = -4 to -1.25)
+				const dividerLeft = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 5, 4 - doorwayHalfGap ),
+					dividerMat
+				);
+				dividerLeft.position.set( 0, 2.5, - ( doorwayHalfGap + ( 4 - doorwayHalfGap ) / 2 ) );
+				dividerLeft.castShadow = true;
+				dividerLeft.receiveShadow = true;
+				scene.add( dividerLeft );
+
+				// Right section of divider (z = 1.25 to 4)
+				const dividerRight = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 5, 4 - doorwayHalfGap ),
+					dividerMat
+				);
+				dividerRight.position.set( 0, 2.5, doorwayHalfGap + ( 4 - doorwayHalfGap ) / 2 );
+				dividerRight.castShadow = true;
+				dividerRight.receiveShadow = true;
+				scene.add( dividerRight );
+
+				// Lintel above doorway
+				const lintel = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 1.2, doorwayHalfGap * 2 ),
+					dividerMat
+				);
+				lintel.position.set( 0, 4.4, 0 );
+				lintel.castShadow = true;
+				lintel.receiveShadow = true;
+				scene.add( lintel );
+
+				// Left room objects
 
 				// Columns
 				const columnGeom = new THREE.CylinderGeometry( 0.3, 0.3, 4, 16 );
-				for ( const x of [ - 2.5, 2.5 ] ) {
+
+				for ( const x of [ - 6, - 2 ] ) {
 
 					for ( const z of [ - 2.5, 2.5 ] ) {
 
@@ -93,18 +138,19 @@
 
 				}
 
-				// Center table
+				// Table with golden sphere
 				const tableTop = new THREE.Mesh(
 					new THREE.BoxGeometry( 2.4, 0.12, 1.4 ),
 					new THREE.MeshStandardMaterial( { color: 0x886644 } )
 				);
-				tableTop.position.set( 0, 1.0, 0 );
+				tableTop.position.set( - 4, 1.0, 0 );
 				tableTop.castShadow = true;
 				tableTop.receiveShadow = true;
 				scene.add( tableTop );
 
 				const legGeom = new THREE.BoxGeometry( 0.1, 1, 0.1 );
-				for ( const x of [ - 1.05, 1.05 ] ) {
+
+				for ( const x of [ - 5.05, - 2.95 ] ) {
 
 					for ( const z of [ - 0.55, 0.55 ] ) {
 
@@ -117,80 +163,99 @@
 
 				}
 
-				// Objects on table
 				const sphere = new THREE.Mesh(
-					new THREE.SphereGeometry( 0.3, 32, 32 ),
+					new THREE.SphereGeometry( 0.35, 32, 32 ),
 					new THREE.MeshStandardMaterial( { color: 0xffd700, metalness: 0.3, roughness: 0.4 } )
 				);
-				sphere.position.set( - 0.5, 1.36, 0 );
+				sphere.position.set( - 4, 1.41, 0 );
 				sphere.castShadow = true;
 				sphere.receiveShadow = true;
 				scene.add( sphere );
 
-				const torusKnot = new THREE.Mesh(
-					new THREE.TorusKnotGeometry( 0.22, 0.08, 64, 16 ),
-					new THREE.MeshStandardMaterial( { color: 0xff44aa, metalness: 0.2, roughness: 0.5 } )
-				);
-				torusKnot.position.set( 0.5, 1.36, 0 );
-				torusKnot.castShadow = true;
-				torusKnot.receiveShadow = true;
-				scene.add( torusKnot );
-
-				// Archway / partition wall
-				const partitionMat = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-
-				const pillarGeom = new THREE.BoxGeometry( 0.4, 4.5, 0.4 );
-				const leftPillar = new THREE.Mesh( pillarGeom, partitionMat );
-				leftPillar.position.set( 0, 2.25, - 2.8 );
-				leftPillar.castShadow = true;
-				leftPillar.receiveShadow = true;
-				scene.add( leftPillar );
-
-				// Stepped blocks near wall
+				// Stepped blocks near red wall
 				const step1 = new THREE.Mesh( new THREE.BoxGeometry( 1.5, 0.5, 1 ), whiteMat );
-				step1.position.set( - 2.5, 0.25, 1.5 );
+				step1.position.set( - 6.5, 0.25, 2 );
 				step1.castShadow = true;
 				step1.receiveShadow = true;
 				scene.add( step1 );
 
 				const step2 = new THREE.Mesh( new THREE.BoxGeometry( 1.0, 1.0, 1 ), whiteMat );
-				step2.position.set( - 2.5, 0.5, 1.5 );
+				step2.position.set( - 6.5, 0.5, 2 );
 				step2.castShadow = true;
 				step2.receiveShadow = true;
 				scene.add( step2 );
 
 				const step3 = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 1.5, 1 ), whiteMat );
-				step3.position.set( - 2.5, 0.75, 1.5 );
+				step3.position.set( - 6.5, 0.75, 2 );
 				step3.castShadow = true;
 				step3.receiveShadow = true;
 				scene.add( step3 );
 
-				// Tall sculpture near blue wall
+				// Right room objects
+
+				// Columns
+				for ( const x of [ 2, 6 ] ) {
+
+					for ( const z of [ - 2.5, 2.5 ] ) {
+
+						const col = new THREE.Mesh( columnGeom, whiteMat );
+						col.position.set( x, 2, z );
+						col.castShadow = true;
+						col.receiveShadow = true;
+						scene.add( col );
+
+					}
+
+				}
+
+				// Pedestal with torus knot
+				const pedestal = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.8, 1.2, 0.8 ),
+					whiteMat
+				);
+				pedestal.position.set( 4, 0.6, 0 );
+				pedestal.castShadow = true;
+				pedestal.receiveShadow = true;
+				scene.add( pedestal );
+
+				const torusKnot = new THREE.Mesh(
+					new THREE.TorusKnotGeometry( 0.3, 0.1, 64, 16 ),
+					new THREE.MeshStandardMaterial( { color: 0xff44aa, metalness: 0.2, roughness: 0.5 } )
+				);
+				torusKnot.position.set( 4, 1.5, 0 );
+				torusKnot.castShadow = true;
+				torusKnot.receiveShadow = true;
+				scene.add( torusKnot );
+
+				// Tall cone sculpture
 				const sculpture = new THREE.Mesh(
 					new THREE.ConeGeometry( 0.4, 2.5, 5 ),
 					new THREE.MeshStandardMaterial( { color: 0xeeeeee } )
 				);
-				sculpture.position.set( 2.5, 1.25, - 1 );
+				sculpture.position.set( 6.5, 1.25, - 1.5 );
 				sculpture.castShadow = true;
 				sculpture.receiveShadow = true;
 				scene.add( sculpture );
 
 				// Lights
-				const mainLight = new THREE.PointLight( 0xffffff, 30 );
-				mainLight.position.set( 0, 4.5, 0 );
-				mainLight.castShadow = true;
-				mainLight.shadow.mapSize.setScalar( 256 );
-				mainLight.shadow.radius = 12;
-				mainLight.shadow.bias = - 0.002;
-				scene.add( mainLight );
 
-				const warmLight = new THREE.PointLight( 0xffaa44, 10 );
-				warmLight.position.set( - 2, 3, - 2 );
+				// Warm point light in left room
+				const warmLight = new THREE.PointLight( 0xffaa44, 30 );
+				warmLight.position.set( - 4, 4.5, 0 );
 				warmLight.castShadow = true;
 				warmLight.shadow.mapSize.setScalar( 256 );
-				warmLight.shadow.radius = 8;
+				warmLight.shadow.radius = 12;
 				warmLight.shadow.bias = - 0.002;
 				scene.add( warmLight );
+
+				// Cool point light in right room
+				const coolLight = new THREE.PointLight( 0x88bbff, 30 );
+				coolLight.position.set( 4, 4.5, 0 );
+				coolLight.castShadow = true;
+				coolLight.shadow.mapSize.setScalar( 256 );
+				coolLight.shadow.radius = 12;
+				coolLight.shadow.bias = - 0.002;
+				scene.add( coolLight );
 
 				// Renderer
 
@@ -209,49 +274,77 @@
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				// Bake light probe volume
+				// Probe volumes
 
-				const bounds = new THREE.Box3(
-					new THREE.Vector3( - 3.8, 0.1, - 3.8 ),
-					new THREE.Vector3( 3.8, 4.8, 3.8 )
+				const boundsLeft = new THREE.Box3(
+					new THREE.Vector3( - 7.8, 0.1, - 3.8 ),
+					new THREE.Vector3( 0, 4.8, 3.8 )
 				);
 
-				async function bakeWithResolution( resolution ) {
-
-					if ( probeGrid ) {
-
-						scene.remove( probeGrid );
-						probeGrid.dispose();
-
-					}
-
-					probeGrid = new LightProbeVolume( bounds, new THREE.Vector3( resolution, resolution, resolution ) );
-					probeGrid.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probeGrid.visible = params.enabled;
-					scene.add( probeGrid );
-
-					// Update debug visualization
-
-					if ( ! probeGridHelper ) {
-
-						probeGridHelper = new LightProbeVolumeHelper( probeGrid );
-						probeGridHelper.visible = params.showProbes;
-						scene.add( probeGridHelper );
-
-					} else {
-
-						probeGridHelper.probeGrid = probeGrid;
-						probeGridHelper.update();
-
-					}
-
-				}
+				const boundsRight = new THREE.Box3(
+					new THREE.Vector3( 0, 0.1, - 3.8 ),
+					new THREE.Vector3( 7.8, 4.8, 3.8 )
+				);
 
 				const params = {
 					enabled: true,
 					showProbes: false,
 					resolution: 6
 				};
+
+				async function bakeWithResolution( resolution ) {
+
+					// Left volume
+
+					if ( probeGridLeft ) {
+
+						scene.remove( probeGridLeft );
+						probeGridLeft.dispose();
+
+					}
+
+					probeGridLeft = new LightProbeVolume( boundsLeft, new THREE.Vector3( resolution, resolution, resolution ) );
+					probeGridLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probeGridLeft.visible = params.enabled;
+					scene.add( probeGridLeft );
+
+					// Right volume
+
+					if ( probeGridRight ) {
+
+						scene.remove( probeGridRight );
+						probeGridRight.dispose();
+
+					}
+
+					probeGridRight = new LightProbeVolume( boundsRight, new THREE.Vector3( resolution, resolution, resolution ) );
+					probeGridRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probeGridRight.visible = params.enabled;
+					scene.add( probeGridRight );
+
+					// Update debug visualization
+
+					if ( ! probeGridHelperLeft ) {
+
+						probeGridHelperLeft = new LightProbeVolumeHelper( probeGridLeft );
+						probeGridHelperLeft.visible = params.showProbes;
+						scene.add( probeGridHelperLeft );
+
+						probeGridHelperRight = new LightProbeVolumeHelper( probeGridRight );
+						probeGridHelperRight.visible = params.showProbes;
+						scene.add( probeGridHelperRight );
+
+					} else {
+
+						probeGridHelperLeft.probeGrid = probeGridLeft;
+						probeGridHelperLeft.update();
+
+						probeGridHelperRight.probeGrid = probeGridRight;
+						probeGridHelperRight.update();
+
+					}
+
+				}
 
 				await bakeWithResolution( params.resolution );
 
@@ -260,7 +353,8 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					probeGrid.visible = value;
+					probeGridLeft.visible = value;
+					probeGridRight.visible = value;
 
 				} );
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onFinishChange( ( value ) => {
@@ -270,7 +364,8 @@
 				} );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					probeGridHelper.visible = value;
+					probeGridHelperLeft.visible = value;
+					probeGridHelperRight.visible = value;
 
 				} );
 
