@@ -55,6 +55,32 @@ import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../
 import { ColorManagement } from '../math/ColorManagement.js';
 import { getDFGLUT } from './shaders/DFGLUTData.js';
 
+const _objectPosition = /*@__PURE__*/ new Vector3();
+
+function findLightProbeVolume( volumes, object ) {
+
+	if ( volumes.length === 0 ) return null;
+
+	if ( volumes.length === 1 ) {
+
+		return volumes[ 0 ].textures[ 0 ] !== null ? volumes[ 0 ] : null;
+
+	}
+
+	_objectPosition.setFromMatrixPosition( object.matrixWorld );
+
+	for ( let i = 0, l = volumes.length; i < l; i ++ ) {
+
+		const v = volumes[ i ];
+
+		if ( v.textures[ 0 ] !== null && v.boundingBox.containsPoint( _objectPosition ) ) return v;
+
+	}
+
+	return null;
+
+}
+
 /**
  * This renderer uses WebGL 2 to display scenes.
  *
@@ -1813,6 +1839,10 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
+				} else if ( object.isLightProbeVolume ) {
+
+					currentRenderState.pushLightProbeVolume( object );
+
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
@@ -2128,7 +2158,7 @@ class WebGLRenderer {
 
 			const lightsStateVersion = lights.state.version;
 
-			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
+			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeVolumesArray );
 			const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 			let programs = materialProperties.programs;
@@ -2220,7 +2250,7 @@ class WebGLRenderer {
 
 			}
 
-			materialProperties.lightProbeVolume = scene.lightProbeVolume;
+			materialProperties.lightProbeVolume = currentRenderState.state.lightProbeVolumesArray.length > 0;
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
@@ -2421,7 +2451,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( !! materialProperties.lightProbeVolume !== !! scene.lightProbeVolume ) {
+				} else if ( !! materialProperties.lightProbeVolume !== ( currentRenderState.state.lightProbeVolumesArray.length > 0 ) ) {
 
 					needsProgramChange = true;
 
@@ -2467,11 +2497,16 @@ class WebGLRenderer {
 
 			}
 
-			if ( materialProperties.needsLights && materialProperties.__lightProbeVolume !== ( scene.lightProbeVolume || null ) ) {
+			if ( materialProperties.needsLights ) {
 
-				materialProperties.__lightProbeVolume = scene.lightProbeVolume || null;
+				const objectVolume = findLightProbeVolume( currentRenderState.state.lightProbeVolumesArray, object );
 
-				refreshMaterial = true;
+				if ( materialProperties.__lightProbeVolume !== objectVolume ) {
+
+					materialProperties.__lightProbeVolume = objectVolume;
+					refreshMaterial = true;
+
+				}
 
 			}
 
@@ -2656,9 +2691,9 @@ class WebGLRenderer {
 
 				// irradiance probe grid
 
-				if ( materialProperties.needsLights && scene.lightProbeVolume ) {
+				if ( materialProperties.needsLights && materialProperties.__lightProbeVolume ) {
 
-					const volume = scene.lightProbeVolume;
+					const volume = materialProperties.__lightProbeVolume;
 
 					m_uniforms.probeGridSH0.value = volume.textures[ 0 ];
 					m_uniforms.probeGridSH1.value = volume.textures[ 1 ];
