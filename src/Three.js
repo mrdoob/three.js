@@ -10,10 +10,3 @@ export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { ShaderMaterial } from './materials/ShaderMaterial.js';
 export { RawShaderMaterial } from './materials/RawShaderMaterial.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
-
-import { ShaderMaterial } from './materials/ShaderMaterial.js';
-import { RawShaderMaterial } from './materials/RawShaderMaterial.js';
-import { MaterialLoader } from './loaders/MaterialLoader.js';
-
-MaterialLoader.registerMaterial( 'ShaderMaterial', ShaderMaterial );
-MaterialLoader.registerMaterial( 'RawShaderMaterial', RawShaderMaterial );
