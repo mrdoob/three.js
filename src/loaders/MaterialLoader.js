@@ -24,7 +24,7 @@ import {
 	LineBasicMaterial,
 	Material,
 } from '../materials/Materials.js';
-import { error, warn } from '../utils.js';
+import { error, warn, warnOnce } from '../utils.js';
 
 const _customMaterials = {};
 
@@ -429,7 +429,22 @@ class MaterialLoader extends Loader {
 			... _customMaterials
 		};
 
-		return new materialLib[ type ]();
+		const MaterialType = materialLib[ type ];
+
+		let materialInstance;
+
+		if ( MaterialType === undefined ) {
+
+			warnOnce( `MaterialLoader: Unknown material type "${ type }". Use .registerMaterial() before starting the deserialization process.` );
+			materialInstance = new Material();
+
+		} else {
+
+			materialInstance = new MaterialType();
+
+		}
+
+		return materialInstance;
 
 	}
 
