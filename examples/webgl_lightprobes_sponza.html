@@ -203,7 +203,12 @@
 
 						bakeQueued = false;
 
-						if ( probeGrid ) probeGrid.dispose();
+						if ( probeGrid ) {
+
+							scene.remove( probeGrid );
+							probeGrid.dispose();
+
+						}
 
 						const halfSize = new THREE.Vector3( params.sizeX / 2, params.sizeY / 2, params.sizeZ / 2 );
 						const center = new THREE.Vector3( params.boundsX, params.boundsY, params.boundsZ );
@@ -219,8 +224,8 @@
 							near: 0.05,
 							far: probeFar
 						} );
-
-						scene.lightProbeVolume = params.enabled ? probeGrid : null;
+						probeGrid.visible = params.enabled;
+						scene.add( probeGrid );
 
 						if ( ! probeGridHelper ) {
 
@@ -247,7 +252,7 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					scene.lightProbeVolume = value ? probeGrid : null;
+					if ( probeGrid ) probeGrid.visible = value;
 
 				} );
 

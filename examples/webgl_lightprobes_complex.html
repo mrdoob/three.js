@@ -218,12 +218,17 @@
 
 				async function bakeWithResolution( resolution ) {
 
-					if ( probeGrid ) probeGrid.dispose();
+					if ( probeGrid ) {
+
+						scene.remove( probeGrid );
+						probeGrid.dispose();
+
+					}
 
 					probeGrid = new LightProbeVolume( bounds, new THREE.Vector3( resolution, resolution, resolution ) );
 					probeGrid.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-
-					scene.lightProbeVolume = params.enabled ? probeGrid : null;
+					probeGrid.visible = params.enabled;
+					scene.add( probeGrid );
 
 					// Update debug visualization
 
@@ -255,7 +260,7 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					scene.lightProbeVolume = value ? probeGrid : null;
+					probeGrid.visible = value;
 
 				} );
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onFinishChange( ( value ) => {

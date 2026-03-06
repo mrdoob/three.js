@@ -5,6 +5,7 @@ import {
 	LinearFilter,
 	Mesh,
 	NearestFilter,
+	Object3D,
 	OrthographicCamera,
 	PlaneGeometry,
 	RGBAFormat,
@@ -58,7 +59,7 @@ const _savedScissor = /*@__PURE__*/ new Vector4();
  *
  * @three_import import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
  */
-class LightProbeVolume {
+class LightProbeVolume extends Object3D {
 
 	/**
 	 * Constructs a new irradiance probe grid.
@@ -67,6 +68,17 @@ class LightProbeVolume {
 	 * @param {Vector3} resolution - The number of probes along each axis (x, y, z).
 	 */
 	constructor( boundingBox, resolution ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLightProbeVolume = true;
 
 		/**
 		 * The world-space bounding box for the grid.
@@ -136,9 +148,8 @@ class LightProbeVolume {
 
 		this._ensureTextures();
 
-		// Prevent feedback: temporarily remove the probe grid from the scene
-		const savedGrid = scene.lightProbeVolume;
-		scene.lightProbeVolume = null;
+		// Prevent feedback: temporarily hide the volume during baking
+		this.visible = false;
 
 		const res = this.resolution;
 		const totalProbes = res.x * res.y * res.z;
@@ -229,7 +240,7 @@ class LightProbeVolume {
 
 		console.log( `LightProbeVolume: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
-		scene.lightProbeVolume = savedGrid;
+		this.visible = true;
 
 	}
 
