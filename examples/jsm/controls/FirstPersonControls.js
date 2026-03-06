@@ -177,6 +177,8 @@ class FirstPersonControls extends Controls {
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = 'none'; // disable touch scroll
+
 	}
 
 	disconnect() {
@@ -188,6 +190,8 @@ class FirstPersonControls extends Controls {
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
+
+		this.domElement.style.touchAction = 'auto';
 
 	}
 
