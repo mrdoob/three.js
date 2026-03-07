@@ -12292,7 +12292,7 @@ class TextureNode extends UniformNode {
 
 				let finalDepthSnippet = depthSnippet;
 
-				if ( finalDepthSnippet === null && texture.isArrayTexture ) {
+				if ( finalDepthSnippet === null && texture.isArrayTexture && this.isTexture3DNode !== true ) {
 
 					finalDepthSnippet = '0';
 
@@ -54601,7 +54601,7 @@ class NodeManager extends DataMap {
 		const cacheKey = this.getOutputCacheKey();
 
 		const output = outputTarget.isArrayTexture ?
-			texture3D( outputTarget, vec3( screenUV, builtin( 'gl_ViewID_OVR' ) ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
+			texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
 			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
 		_outputNodeMap.set( outputTarget, cacheKey );
