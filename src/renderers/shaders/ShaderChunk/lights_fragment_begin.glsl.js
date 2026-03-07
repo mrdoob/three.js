@@ -196,7 +196,7 @@ IncidentLight directLight;
 
 	#ifdef USE_LIGHT_PROBE_VOLUME
 
-		vec3 probeWorldPos = vec3( vec4( geometryPosition, 1.0 ) * viewMatrix ) + cameraPosition;
+		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
 		vec3 probeWorldNormal = inverseTransformDirection( geometryNormal, viewMatrix );
 		irradiance += getLightProbeVolumeIrradiance( probeWorldPos, probeWorldNormal );
 
