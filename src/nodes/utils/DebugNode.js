@@ -19,7 +19,7 @@ class DebugNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 

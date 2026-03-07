@@ -621,7 +621,7 @@ class NodeBuilder {
 
 			if ( bindGroup === undefined ) {
 
-				bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
+				bindGroup = new BindGroup( groupName, bindings );
 
 				bindingGroupsCache.set( cacheKey, bindGroup );
 
@@ -629,7 +629,7 @@ class NodeBuilder {
 
 		} else {
 
-			bindGroup = new BindGroup( groupName, bindings, this.bindingsIndexes[ groupName ].group );
+			bindGroup = new BindGroup( groupName, bindings );
 
 		}
 
@@ -735,8 +735,6 @@ class NodeBuilder {
 
 			const bindingGroup = bindingsGroups[ i ];
 			this.bindingsIndexes[ bindingGroup.name ].group = i;
-
-			bindingGroup.index = i;
 
 		}
 
@@ -866,7 +864,7 @@ class NodeBuilder {
 	 */
 	getUniformBufferLimit() {
 
-		return 16384;
+		return this.renderer.backend.capabilities.getUniformBufferLimit();
 
 	}
 

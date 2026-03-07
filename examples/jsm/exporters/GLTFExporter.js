@@ -88,6 +88,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * - KHR_texture_transform
  * - EXT_materials_bump
  * - EXT_mesh_gpu_instancing
+ * - EXT_texture_webp
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  *
@@ -1533,14 +1534,29 @@ class GLTFWriter {
 
 		}
 
-		let mimeType = map.userData.mimeType;
+		const mimeType = map.userData.mimeType;
 
-		if ( mimeType === 'image/webp' ) mimeType = 'image/png';
+		const imageIndex = this.processImage( map.image, map.format, map.flipY, mimeType );
 
 		const textureDef = {
-			sampler: this.processSampler( map ),
-			source: this.processImage( map.image, map.format, map.flipY, mimeType )
+			sampler: this.processSampler( map )
 		};
+
+		if ( mimeType === 'image/webp' ) {
+
+			textureDef.extensions = textureDef.extensions || {};
+			textureDef.extensions[ 'EXT_texture_webp' ] = {
+				source: imageIndex
+			};
+
+			this.extensionsUsed[ 'EXT_texture_webp' ] = true;
+			this.extensionsRequired[ 'EXT_texture_webp' ] = true;
+
+		} else {
+
+			textureDef.source = imageIndex;
+
+		}
 
 		if ( map.name ) textureDef.name = map.name;
 

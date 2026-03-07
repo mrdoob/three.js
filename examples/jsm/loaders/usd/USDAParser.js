@@ -454,6 +454,12 @@ class USDAParser {
 
 			}
 
+			if ( header.metersPerUnit !== undefined ) {
+
+				rootFields.metersPerUnit = parseFloat( header.metersPerUnit );
+
+			}
+
 		}
 
 		specsByPath[ '/' ] = { specType: SpecType.Prim, fields: rootFields };

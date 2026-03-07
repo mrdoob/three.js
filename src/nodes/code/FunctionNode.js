@@ -53,7 +53,7 @@ class FunctionNode extends CodeNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.getNodeFunction( builder ).type;
 

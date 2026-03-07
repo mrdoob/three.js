@@ -162,6 +162,8 @@ class Textures extends DataMap {
 
 			renderTargetData.initialized = true;
 
+			this.info.memory.renderTargets ++;
+
 			// dispose
 
 			renderTargetData.onDispose = () => {
@@ -322,7 +324,7 @@ class Textures extends DataMap {
 
 			//
 
-			this.info.memory.textures ++;
+			this.info.createTexture( texture );
 
 			//
 
@@ -504,6 +506,8 @@ class Textures extends DataMap {
 			this.delete( renderTarget );
 			this.backend.delete( renderTarget );
 
+			this.info.memory.renderTargets --;
+
 		}
 
 	}
@@ -549,7 +553,7 @@ class Textures extends DataMap {
 
 			this.delete( texture );
 
-			this.info.memory.textures --;
+			this.info.destroyTexture( texture );
 
 		}
 

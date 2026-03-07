@@ -109,7 +109,7 @@ class CubeRenderTarget extends RenderTarget {
 		renderer.setMRT( currentMRT );
 
 		texture.minFilter = currentMinFilter;
-		texture.currentGenerateMipmaps = currentGenerateMipmaps;
+		texture.generateMipmaps = currentGenerateMipmaps;
 
 		mesh.geometry.dispose();
 		mesh.material.dispose();
