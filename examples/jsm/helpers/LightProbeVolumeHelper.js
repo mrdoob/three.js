@@ -91,6 +91,9 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 					gl_FragColor = vec4( max( result, vec3( 0.0 ) ), 1.0 );
 
+					#include <tonemapping_fragment>
+					#include <colorspace_fragment>
+
 				}
 
 			`
