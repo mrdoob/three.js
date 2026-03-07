@@ -555,7 +555,7 @@ class TextureNode extends UniformNode {
 
 				let finalDepthSnippet = depthSnippet;
 
-				if ( finalDepthSnippet === null && texture.isArrayTexture ) {
+				if ( finalDepthSnippet === null && texture.isArrayTexture && this.isTexture3DNode !== true ) {
 
 					finalDepthSnippet = '0';
 
