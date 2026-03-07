@@ -415,7 +415,7 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
-	 * Updates the texture transformation matrix from the from the properties {@link Texture#offset},
+	 * Updates the texture transformation matrix from the properties {@link Texture#offset},
 	 * {@link Texture#repeat}, {@link Texture#rotation}, and {@link Texture#center}.
 	 */
 	updateMatrix() {
