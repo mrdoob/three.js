@@ -99,6 +99,15 @@ class AnamorphicNode extends TempNode {
 		this._textureNode = passTexture( this, this._renderTarget.texture );
 
 		/**
+		 * The material for the anamorphic pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._material = null;
+
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -238,6 +247,8 @@ class AnamorphicNode extends TempNode {
 	dispose() {
 
 		this._renderTarget.dispose();
+
+		if ( this._material !== null ) this._material.dispose();
 
 	}
 

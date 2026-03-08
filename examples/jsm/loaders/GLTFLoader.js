@@ -83,8 +83,11 @@ import { clone } from '../utils/SkeletonUtils.js';
  *
  * `GLTFLoader` supports the following glTF 2.0 extensions:
  * - KHR_draco_mesh_compression
+ * - KHR_lights_punctual
+ * - KHR_materials_anisotropy
  * - KHR_materials_clearcoat
  * - KHR_materials_dispersion
+ * - KHR_materials_emissive_strength
  * - KHR_materials_ior
  * - KHR_materials_specular
  * - KHR_materials_transmission
@@ -93,12 +96,13 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - KHR_materials_volume
  * - KHR_mesh_quantization
  * - KHR_meshopt_compression
- * - KHR_lights_punctual
  * - KHR_texture_basisu
  * - KHR_texture_transform
- * - EXT_texture_webp
+ * - EXT_materials_bump
  * - EXT_meshopt_compression
  * - EXT_mesh_gpu_instancing
+ * - EXT_texture_avif
+ * - EXT_texture_webp
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
