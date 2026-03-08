@@ -28,6 +28,19 @@
  */
 class Matrix3 {
 
+	static {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Matrix3.prototype.isMatrix3 = true;
+
+	}
+
 	/**
 	 * Constructs a new 3x3 matrix. The arguments are supposed to be
 	 * in row-major order. If no arguments are provided, the constructor
@@ -44,15 +57,6 @@ class Matrix3 {
 	 * @param {number} [n33] - 3-3 matrix element.
 	 */
 	constructor( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Matrix3.prototype.isMatrix3 = true;
 
 		/**
 		 * A column-major list of matrix values.
