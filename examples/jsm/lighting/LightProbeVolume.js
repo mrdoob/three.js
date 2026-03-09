@@ -470,28 +470,25 @@ function _ensureRepackResources() {
 
 					int probeIndex = ix + iy * int( resolution.x ) + iz * int( resolution.x ) * int( resolution.y );
 
-					// Read 9 SH coefficients from the batch texture row
-					vec4 c0 = texelFetch( batchTexture, ivec2( 0, probeIndex ), 0 );
-					vec4 c1 = texelFetch( batchTexture, ivec2( 1, probeIndex ), 0 );
-					vec4 c2 = texelFetch( batchTexture, ivec2( 2, probeIndex ), 0 );
-					vec4 c3 = texelFetch( batchTexture, ivec2( 3, probeIndex ), 0 );
-					vec4 c4 = texelFetch( batchTexture, ivec2( 4, probeIndex ), 0 );
-					vec4 c5 = texelFetch( batchTexture, ivec2( 5, probeIndex ), 0 );
-					vec4 c6 = texelFetch( batchTexture, ivec2( 6, probeIndex ), 0 );
-					vec4 c7 = texelFetch( batchTexture, ivec2( 7, probeIndex ), 0 );
-					vec4 c8 = texelFetch( batchTexture, ivec2( 8, probeIndex ), 0 );
-
-					// Pack L1 as RGB + L2 luminance in alpha
 					#if TEXTURE_INDEX == 0
-						gl_FragColor = vec4( c0.rgb, dot( c4.rgb, LUM ) );
+						vec4 cL1 = texelFetch( batchTexture, ivec2( 0, probeIndex ), 0 );
+						vec4 cL2 = texelFetch( batchTexture, ivec2( 4, probeIndex ), 0 );
+						gl_FragColor = vec4( cL1.rgb, dot( cL2.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 1
-						gl_FragColor = vec4( c1.rgb, dot( c5.rgb, LUM ) );
+						vec4 cL1 = texelFetch( batchTexture, ivec2( 1, probeIndex ), 0 );
+						vec4 cL2 = texelFetch( batchTexture, ivec2( 5, probeIndex ), 0 );
+						gl_FragColor = vec4( cL1.rgb, dot( cL2.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 2
-						gl_FragColor = vec4( c2.rgb, dot( c6.rgb, LUM ) );
+						vec4 cL1 = texelFetch( batchTexture, ivec2( 2, probeIndex ), 0 );
+						vec4 cL2 = texelFetch( batchTexture, ivec2( 6, probeIndex ), 0 );
+						gl_FragColor = vec4( cL1.rgb, dot( cL2.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 3
-						gl_FragColor = vec4( c3.rgb, dot( c7.rgb, LUM ) );
+						vec4 cL1 = texelFetch( batchTexture, ivec2( 3, probeIndex ), 0 );
+						vec4 cL2 = texelFetch( batchTexture, ivec2( 7, probeIndex ), 0 );
+						gl_FragColor = vec4( cL1.rgb, dot( cL2.rgb, LUM ) );
 					#else
-						gl_FragColor = vec4( dot( c8.rgb, LUM ), 0.0, 0.0, 0.0 );
+						vec4 cL2 = texelFetch( batchTexture, ivec2( 8, probeIndex ), 0 );
+						gl_FragColor = vec4( dot( cL2.rgb, LUM ), 0.0, 0.0, 0.0 );
 					#endif
 
 				}
@@ -533,7 +530,7 @@ function _ensureBakeResources( renderer, options ) {
 
 function _ensureBatchTarget( totalProbes ) {
 
-	if ( _batchTarget === null || _batchTargetProbes !== totalProbes ) {
+	if ( _batchTarget === null || _batchTargetProbes < totalProbes ) {
 
 		if ( _batchTarget !== null ) _batchTarget.dispose();
 
