@@ -32,10 +32,12 @@ import {
 	Skeleton,
 	SkinnedMesh,
 	SpotLight,
+	Triangle,
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack,
-	SRGBColorSpace
+	SRGBColorSpace,
+	ShapeUtils
 } from 'three';
 
 import { getElementsByTagName, parseFloats } from './ColladaParser.js';
@@ -1626,6 +1628,7 @@ class ColladaComposer {
 					count = primitive.count * 3;
 					break;
 
+				case 'polygons':
 				case 'polylist':
 
 					for ( let g = 0; g < primitive.count; g ++ ) {
@@ -1674,7 +1677,7 @@ class ColladaComposer {
 
 				const input = inputs[ name ];
 
-				switch ( name )	{
+				switch ( name ) {
 
 					case 'VERTEX':
 						for ( const key in vertices ) {
@@ -1856,13 +1859,103 @@ class ColladaComposer {
 
 				} else if ( count > 4 ) {
 
-					for ( let k = 1, kl = ( count - 2 ); k <= kl; k ++ ) {
+					const vertices = [];
 
-						const a = index + stride * 0;
-						const b = index + stride * k;
-						const c = index + stride * ( k + 1 );
+					// prepare vertices which represent the polygon's contour
 
-						pushVector( a ); pushVector( b ); pushVector( c );
+					for ( let k = 0; k < count; k ++ ) {
+
+						const a = index + stride * k;
+						const positionIndex = indices[ a ] * sourceStride;
+
+						const x = sourceArray[ positionIndex ];
+						const y = sourceArray[ positionIndex + 1 ];
+						const z = sourceArray[ positionIndex + 2 ];
+
+						vertices.push( new Vector3( x, y, z ) );
+
+					}
+
+					// determine surface normal
+
+					const normal = new Vector3();
+					const _triangle = new Triangle();
+
+					_triangle.a = vertices[ 0 ];
+					_triangle.b = vertices[ 1 ];
+					_triangle.c = vertices[ 2 ];
+					_triangle.getNormal( normal );
+
+					// project to 2D and triangulate
+
+					const vertices2D = [];
+
+					if ( Math.abs( normal.x ) > Math.abs( normal.y ) && Math.abs( normal.x ) > Math.abs( normal.z ) ) {
+
+						for ( let k = 0; k < count; k ++ ) {
+
+							vertices2D.push( new Vector2( vertices[ k ].y, vertices[ k ].z ) );
+
+						}
+
+					} else if ( Math.abs( normal.y ) > Math.abs( normal.z ) ) {
+
+						for ( let k = 0; k < count; k ++ ) {
+
+							vertices2D.push( new Vector2( vertices[ k ].x, vertices[ k ].z ) );
+
+						}
+
+					} else {
+
+						for ( let k = 0; k < count; k ++ ) {
+
+							vertices2D.push( new Vector2( vertices[ k ].x, vertices[ k ].y ) );
+
+						}
+
+					}
+
+					const isClockWise = ShapeUtils.isClockWise( vertices2D );
+
+					if ( isClockWise === true ) {
+
+						vertices2D.reverse();
+
+					}
+
+					const faces = ShapeUtils.triangulateShape( vertices2D, [] );
+
+					// build indices
+
+					for ( let k = 0; k < faces.length; k ++ ) {
+
+						const face = faces[ k ];
+
+						let i0, i1, i2;
+
+						if ( isClockWise === false ) {
+
+							i0 = face[ 0 ];
+							i1 = face[ 1 ];
+							i2 = face[ 2 ];
+
+
+						} else {
+
+							i0 = count - 1 - face[ 0 ];
+							i1 = count - 1 - face[ 2 ];
+							i2 = count - 1 - face[ 1 ];
+
+						}
+
+						const a = index + stride * i0;
+						const b = index + stride * i1;
+						const c = index + stride * i2;
+
+						pushVector( a );
+						pushVector( b );
+						pushVector( c );
 
 					}
 
@@ -2627,6 +2720,7 @@ class ColladaComposer {
 					break;
 
 				case 'triangles':
+				case 'polygons':
 				case 'polylist':
 					if ( skinning ) {
 

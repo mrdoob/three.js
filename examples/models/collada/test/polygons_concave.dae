@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <created>2026-03-09T12:30:00Z</created>
+    <modified>2026-03-09T12:30:00Z</modified>
+    <unit name="meter" meter="1.0"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_geometries>
+    <geometry id="ConcaveGeom" name="ConcaveL">
+      <mesh>
+        <source id="Concave-pos">
+          <float_array id="Concave-pos-array" count="18">
+             0.0 0.0 -1.0
+            -1.0 0.0 -1.0
+            -1.0 0.0  1.0
+             2.0 0.0  1.0
+             2.0 0.0  0.0
+             0.0 0.0  0.0
+          </float_array>
+          <technique_common>
+            <accessor source="#Concave-pos-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Concave-vertices">
+          <input semantic="POSITION" source="#Concave-pos"/>
+        </vertices>
+        <polygons count="1">
+          <input semantic="VERTEX" source="#Concave-vertices" offset="0"/>
+          <p>0 1 2 3 4 5</p>
+        </polygons>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene">
+      <node id="ConcaveNode">
+        <instance_geometry url="#ConcaveGeom"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
