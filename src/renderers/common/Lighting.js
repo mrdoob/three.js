@@ -15,17 +15,6 @@ const _weakMap = /*@__PURE__*/ new WeakMap();
 class Lighting {
 
 	/**
-	 * Constructs a new lighting module.
-	 *
-	 * @param {Renderer} renderer - The renderer.
-	 */
-	constructor( renderer ) {
-
-		this.renderer = renderer;
-
-	}
-
-	/**
 	 * Creates a new lights node for the given array of lights.
 	 *
 	 * @param {Array<Light>} lights - The render object.
@@ -33,9 +22,7 @@ class Lighting {
 	 */
 	createNode( lights = [] ) {
 
-		const node = new LightsNode();
-		node._renderer = this.renderer;
-		return node.setLights( lights );
+		return new LightsNode().setLights( lights );
 
 	}
 
@@ -60,9 +47,6 @@ class Lighting {
 			_weakMap.set( scene, node );
 
 		}
-
-		// Always update renderer reference (e.g. when renderer is recreated)
-		node._renderer = this.renderer;
 
 		return node;
 

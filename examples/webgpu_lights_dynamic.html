@@ -16,7 +16,7 @@
 			</div>
 
 			<small>
-				Opt-in dynamic lighting mode avoids shader recompilation when adding/removing lights.<br />
+				Opt-in DynamicLighting avoids shader recompilation when adding/removing supported lights.<br />
 				100 meshes with 50 unique PBR materials. Use the Inspector to explore the scene.
 			</small>
 		</div>
@@ -37,6 +37,7 @@
 			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DynamicLighting } from 'three/addons/lighting/DynamicLighting.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -49,9 +50,21 @@
 				dynamic: true,
 				autoAdd: false,
 				lightCount: 2,
-				addLight() { addLight(); },
-				removeLight() { removeLight(); },
-				removeAll() { removeAllLights(); }
+				addLight() {
+
+					addLight();
+
+				},
+				removeLight() {
+
+					removeLight();
+
+				},
+				removeAll() {
+
+					removeAllLights();
+
+				}
 			};
 
 			init();
@@ -170,7 +183,7 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				renderer.lights.dynamic = params.dynamic;
+				if ( params.dynamic ) renderer.lighting = new DynamicLighting();
 
 				// Inspector GUI
 

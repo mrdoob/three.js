@@ -1,12 +1,8 @@
-import Node from '../../core/Node.js';
-import { NodeUpdateType } from '../../core/constants.js';
-import { uniform } from '../../core/UniformNode.js';
-import { renderGroup } from '../../core/UniformGroupNode.js';
-import { Color } from '../../../math/Color.js';
+import { Color, Node } from 'three/webgpu';
+import { NodeUpdateType, renderGroup, uniform } from 'three/tsl';
 
 /**
  * Batched data node for ambient lights in dynamic lighting mode.
- * Sums all ambient light colors into a single uniform vec3.
  *
  * @augments Node
  */
@@ -23,12 +19,10 @@ class AmbientLightDataNode extends Node {
 		super();
 
 		this._color = new Color();
+		this._lights = [];
 
 		this.colorNode = uniform( this._color ).setGroup( renderGroup );
-
 		this.updateType = NodeUpdateType.RENDER;
-
-		this._lights = [];
 
 	}
 
@@ -36,17 +30,18 @@ class AmbientLightDataNode extends Node {
 
 		this._lights = lights;
 
+		return this;
+
 	}
 
-	update( /* frame */ ) {
-
-		const lights = this._lights;
+	update() {
 
 		this._color.setScalar( 0 );
 
-		for ( let i = 0; i < lights.length; i ++ ) {
+		for ( let i = 0; i < this._lights.length; i ++ ) {
 
-			const light = lights[ i ];
+			const light = this._lights[ i ];
+
 			this._color.r += light.color.r * light.intensity;
 			this._color.g += light.color.g * light.intensity;
 			this._color.b += light.color.b * light.intensity;
