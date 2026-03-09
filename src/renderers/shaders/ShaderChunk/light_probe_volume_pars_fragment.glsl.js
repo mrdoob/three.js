@@ -6,8 +6,6 @@ uniform highp sampler3D probeGridSH1;
 uniform highp sampler3D probeGridSH2;
 uniform highp sampler3D probeGridSH3;
 uniform highp sampler3D probeGridSH4;
-uniform highp sampler3D probeGridSH5;
-uniform highp sampler3D probeGridSH6;
 
 uniform vec3 probeGridMin;
 uniform vec3 probeGridMax;
@@ -29,32 +27,35 @@ vec3 getLightProbeVolumeIrradiance( vec3 worldPos, vec3 worldNormal ) {
 	vec4 s2 = texture( probeGridSH2, uvw );
 	vec4 s3 = texture( probeGridSH3, uvw );
 	vec4 s4 = texture( probeGridSH4, uvw );
-	vec4 s5 = texture( probeGridSH5, uvw );
-	vec4 s6 = texture( probeGridSH6, uvw );
 
-	// Unpack 9 vec3 SH L2 coefficients
-	vec3 c0 = s0.xyz;
-	vec3 c1 = vec3( s0.w, s1.xy );
-	vec3 c2 = vec3( s1.zw, s2.x );
-	vec3 c3 = s2.yzw;
-	vec3 c4 = s3.xyz;
-	vec3 c5 = vec3( s3.w, s4.xy );
-	vec3 c6 = vec3( s4.zw, s5.x );
-	vec3 c7 = s5.yzw;
-	vec3 c8 = s6.xyz;
+	// Unpack L1 coefficients (RGB) and L2 coefficients (luminance)
+	vec3 c0 = s0.rgb;
+	vec3 c1 = s1.rgb;
+	vec3 c2 = s2.rgb;
+	vec3 c3 = s3.rgb;
 
-	// Evaluate L2 irradiance
+	float c4 = s0.a;
+	float c5 = s1.a;
+	float c6 = s2.a;
+	float c7 = s3.a;
+	float c8 = s4.r;
+
+	// Evaluate L1 irradiance (color)
 	float x = worldNormal.x, y = worldNormal.y, z = worldNormal.z;
 
 	vec3 result = c0 * 0.886227;
 	result += c1 * 2.0 * 0.511664 * y;
 	result += c2 * 2.0 * 0.511664 * z;
 	result += c3 * 2.0 * 0.511664 * x;
-	result += c4 * 2.0 * 0.429043 * x * y;
-	result += c5 * 2.0 * 0.429043 * y * z;
-	result += c6 * ( 0.743125 * z * z - 0.247708 );
-	result += c7 * 2.0 * 0.429043 * x * z;
-	result += c8 * 0.429043 * ( x * x - y * y );
+
+	// Evaluate L2 irradiance (luminance)
+	float l2 = c4 * 2.0 * 0.429043 * x * y;
+	l2 += c5 * 2.0 * 0.429043 * y * z;
+	l2 += c6 * ( 0.743125 * z * z - 0.247708 );
+	l2 += c7 * 2.0 * 0.429043 * x * z;
+	l2 += c8 * 0.429043 * ( x * x - y * y );
+
+	result += vec3( l2 );
 
 	return max( result, vec3( 0.0 ) );
 

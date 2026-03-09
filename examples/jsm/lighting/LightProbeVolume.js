@@ -50,9 +50,10 @@ const _savedScissor = /*@__PURE__*/ new Vector4();
 
 /**
  * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
- * position-dependent diffuse global illumination. The probe data is stored
- * in seven RGBA `WebGL3DRenderTarget` instances with `LinearFilter` for
- * hardware trilinear interpolation.
+ * position-dependent diffuse global illumination. L1 coefficients are stored
+ * in full RGB and L2 coefficients as luminance, packed into five RGBA
+ * `WebGL3DRenderTarget` instances with `LinearFilter` for hardware trilinear
+ * interpolation.
  *
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
@@ -93,16 +94,16 @@ class LightProbeVolume extends Object3D {
 		this.resolution = resolution.clone();
 
 		/**
-		 * The seven RGBA 3D textures storing packed SH coefficients.
+		 * The five RGBA 3D textures storing packed SH coefficients.
 		 * @type {Data3DTexture[]}
 		 */
-		this.textures = [ null, null, null, null, null, null, null ];
+		this.textures = [ null, null, null, null, null ];
 
 		/**
 		 * Internal render targets for GPU-resident baking.
 		 * @private
 		 */
-		this._renderTargets = [ null, null, null, null, null, null, null ];
+		this._renderTargets = [ null, null, null, null, null ];
 
 	}
 
@@ -212,7 +213,7 @@ class LightProbeVolume extends Object3D {
 		// Phase 2: Repack SH data from batch target into 3D textures (GPU-to-GPU)
 		_ensureRepackResources();
 
-		for ( let t = 0; t < 7; t ++ ) {
+		for ( let t = 0; t < 5; t ++ ) {
 
 			_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
 			_repackMaterials[ t ].uniforms.resolution.value.copy( res );
@@ -253,7 +254,7 @@ class LightProbeVolume extends Object3D {
 		const res = this.resolution;
 		const nx = res.x, ny = res.y, nz = res.z;
 
-		for ( let t = 0; t < 7; t ++ ) {
+		for ( let t = 0; t < 5; t ++ ) {
 
 			if ( this._renderTargets[ t ] !== null ) continue;
 
@@ -278,7 +279,7 @@ class LightProbeVolume extends Object3D {
 	 */
 	dispose() {
 
-		for ( let t = 0; t < 7; t ++ ) {
+		for ( let t = 0; t < 5; t ++ ) {
 
 			if ( this._renderTargets[ t ] !== null ) {
 
@@ -425,14 +426,13 @@ function _ensureRepackResources() {
 
 	_ensureScene();
 
-	// Create 7 materials, one per output texture packing
-	// Texture 0: (c0.r, c0.g, c0.b, c1.r)
-	// Texture 1: (c1.g, c1.b, c2.r, c2.g)
-	// Texture 2: (c2.b, c3.r, c3.g, c3.b)
-	// Texture 3: (c4.r, c4.g, c4.b, c5.r)
-	// Texture 4: (c5.g, c5.b, c6.r, c6.g)
-	// Texture 5: (c6.b, c7.r, c7.g, c7.b)
-	// Texture 6: (c8.r, c8.g, c8.b, 0.0)
+	// Create 5 materials, one per output texture packing
+	// L1 coefficients stored as RGB, L2 as luminance in alpha/red
+	// Texture 0: (c0.rgb, c4_lum)
+	// Texture 1: (c1.rgb, c5_lum)
+	// Texture 2: (c2.rgb, c6_lum)
+	// Texture 3: (c3.rgb, c7_lum)
+	// Texture 4: (c8_lum, 0.0, 0.0, 0.0)
 
 	const repackVertexShader = /* glsl */`
 		void main() {
@@ -442,7 +442,7 @@ function _ensureRepackResources() {
 
 	_repackMaterials = [];
 
-	for ( let t = 0; t < 7; t ++ ) {
+	for ( let t = 0; t < 5; t ++ ) {
 
 		_repackMaterials[ t ] = new ShaderMaterial( {
 			defines: {
@@ -459,6 +459,8 @@ function _ensureRepackResources() {
 				uniform sampler2D batchTexture;
 				uniform vec3 resolution;
 				uniform int sliceZ;
+
+				const vec3 LUM = vec3( 0.2126, 0.7152, 0.0722 );
 
 				void main() {
 
@@ -479,21 +481,17 @@ function _ensureRepackResources() {
 					vec4 c7 = texelFetch( batchTexture, ivec2( 7, probeIndex ), 0 );
 					vec4 c8 = texelFetch( batchTexture, ivec2( 8, probeIndex ), 0 );
 
-					// Pack into the output format for this texture index
+					// Pack L1 as RGB + L2 luminance in alpha
 					#if TEXTURE_INDEX == 0
-						gl_FragColor = vec4( c0.rgb, c1.r );
+						gl_FragColor = vec4( c0.rgb, dot( c4.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 1
-						gl_FragColor = vec4( c1.gb, c2.rg );
+						gl_FragColor = vec4( c1.rgb, dot( c5.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 2
-						gl_FragColor = vec4( c2.b, c3.rgb );
+						gl_FragColor = vec4( c2.rgb, dot( c6.rgb, LUM ) );
 					#elif TEXTURE_INDEX == 3
-						gl_FragColor = vec4( c4.rgb, c5.r );
-					#elif TEXTURE_INDEX == 4
-						gl_FragColor = vec4( c5.gb, c6.rg );
-					#elif TEXTURE_INDEX == 5
-						gl_FragColor = vec4( c6.b, c7.rgb );
+						gl_FragColor = vec4( c3.rgb, dot( c7.rgb, LUM ) );
 					#else
-						gl_FragColor = vec4( c8.rgb, 0.0 );
+						gl_FragColor = vec4( dot( c8.rgb, LUM ), 0.0, 0.0, 0.0 );
 					#endif
 
 				}

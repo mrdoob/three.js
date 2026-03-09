@@ -39,7 +39,9 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 				probeGridSH0: { value: null },
 				probeGridSH1: { value: null },
-				probeGridSH2: { value: null }
+				probeGridSH2: { value: null },
+				probeGridSH3: { value: null },
+				probeGridSH4: { value: null }
 
 			},
 
@@ -67,6 +69,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 				uniform sampler3D probeGridSH0;
 				uniform sampler3D probeGridSH1;
 				uniform sampler3D probeGridSH2;
+				uniform sampler3D probeGridSH3;
+				uniform sampler3D probeGridSH4;
 
 				varying vec3 vWorldNormal;
 				varying vec3 vUVW;
@@ -76,18 +80,35 @@ class LightProbeVolumeHelper extends InstancedMesh {
 					vec4 s0 = texture( probeGridSH0, vUVW );
 					vec4 s1 = texture( probeGridSH1, vUVW );
 					vec4 s2 = texture( probeGridSH2, vUVW );
+					vec4 s3 = texture( probeGridSH3, vUVW );
+					vec4 s4 = texture( probeGridSH4, vUVW );
 
 					vec3 c0 = s0.rgb;
-					vec3 c1 = vec3( s0.a, s1.rg );
-					vec3 c2 = vec3( s1.ba, s2.r );
-					vec3 c3 = s2.gba;
+					vec3 c1 = s1.rgb;
+					vec3 c2 = s2.rgb;
+					vec3 c3 = s3.rgb;
+
+					float c4 = s0.a;
+					float c5 = s1.a;
+					float c6 = s2.a;
+					float c7 = s3.a;
+					float c8 = s4.r;
 
 					vec3 n = normalize( vWorldNormal );
+					float x = n.x, y = n.y, z = n.z;
 
 					vec3 result = c0 * 0.886227;
-					result += c1 * 2.0 * 0.511664 * n.y;
-					result += c2 * 2.0 * 0.511664 * n.z;
-					result += c3 * 2.0 * 0.511664 * n.x;
+					result += c1 * 2.0 * 0.511664 * y;
+					result += c2 * 2.0 * 0.511664 * z;
+					result += c3 * 2.0 * 0.511664 * x;
+
+					float l2 = c4 * 2.0 * 0.429043 * x * y;
+					l2 += c5 * 2.0 * 0.429043 * y * z;
+					l2 += c6 * ( 0.743125 * z * z - 0.247708 );
+					l2 += c7 * 2.0 * 0.429043 * x * z;
+					l2 += c8 * 0.429043 * ( x * x - y * y );
+
+					result += vec3( l2 );
 
 					gl_FragColor = vec4( max( result, vec3( 0.0 ) ), 1.0 );
 
@@ -176,6 +197,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 		this.material.uniforms.probeGridSH0.value = probeGrid.textures[ 0 ];
 		this.material.uniforms.probeGridSH1.value = probeGrid.textures[ 1 ];
 		this.material.uniforms.probeGridSH2.value = probeGrid.textures[ 2 ];
+		this.material.uniforms.probeGridSH3.value = probeGrid.textures[ 3 ];
+		this.material.uniforms.probeGridSH4.value = probeGrid.textures[ 4 ];
 
 	}
 

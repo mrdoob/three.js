@@ -2700,8 +2700,6 @@ class WebGLRenderer {
 					m_uniforms.probeGridSH2.value = volume.textures[ 2 ];
 					m_uniforms.probeGridSH3.value = volume.textures[ 3 ];
 					m_uniforms.probeGridSH4.value = volume.textures[ 4 ];
-					m_uniforms.probeGridSH5.value = volume.textures[ 5 ];
-					m_uniforms.probeGridSH6.value = volume.textures[ 6 ];
 					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
 					m_uniforms.probeGridMax.value.copy( volume.boundingBox.max );
 
