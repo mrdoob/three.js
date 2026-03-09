@@ -373,7 +373,7 @@ class TransformControls extends Controls {
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -384,7 +384,7 @@ class TransformControls extends Controls {
 		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'auto';
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 

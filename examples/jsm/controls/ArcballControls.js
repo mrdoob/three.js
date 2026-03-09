@@ -453,7 +453,6 @@ class ArcballControls extends Controls {
 
 		super.connect( element );
 
-		this.domElement.style.touchAction = 'none';
 		this._devPxRatio = window.devicePixelRatio;
 
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
@@ -462,6 +461,8 @@ class ArcballControls extends Controls {
 		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
 
 		window.addEventListener( 'resize', this._onWindowResize );
+
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -476,6 +477,8 @@ class ArcballControls extends Controls {
 		window.removeEventListener( 'pointerup', this._onPointerUp );
 
 		window.removeEventListener( 'resize', this._onWindowResize );
+
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 
