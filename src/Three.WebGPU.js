@@ -31,3 +31,16 @@ export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
 import * as TSL from './nodes/TSL.js';
 export { TSL };
+
+export {
+
+	UVMapFactors,
+	createMesh,
+	createMaterial,
+	createMeshMaterial,
+	createSphereGeometry,
+	createSphereMesh,
+	createPlaneMesh
+
+} from './renderers/common/XRLayerUtils.js';
+
