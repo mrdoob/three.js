@@ -605,14 +605,6 @@ class Backend {
 	hasFeature( /*name*/ ) {}
 
 	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @abstract
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {}
-
-	/**
 	 * Returns the drawing buffer size.
 	 *
 	 * @return {Vector2} The drawing buffer size.

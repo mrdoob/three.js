@@ -154,7 +154,6 @@ export { default as LoopNode } from './utils/LoopNode.js';
 export { default as MaxMipLevelNode } from './utils/MaxMipLevelNode.js';
 export { default as MemberNode } from './utils/MemberNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
-export { default as RemapNode } from './utils/RemapNode.js';
 export { default as RotateNode } from './utils/RotateNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 export { default as SampleNode } from './utils/SampleNode.js';

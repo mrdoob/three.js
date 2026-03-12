@@ -1231,9 +1231,6 @@ class ColladaParser {
 					break;
 
 				case 'polygons':
-					console.warn( 'THREE.ColladaLoader: Unsupported primitive type: ', child.nodeName );
-					break;
-
 				case 'lines':
 				case 'linestrips':
 				case 'polylist':
@@ -1350,6 +1347,12 @@ class ColladaParser {
 					break;
 
 			}
+
+		}
+
+		if ( primitive.type === 'polygons' ) {
+
+			primitive.vcount = [ primitive.p.length / primitive.stride ];
 
 		}
 

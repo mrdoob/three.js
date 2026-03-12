@@ -461,8 +461,6 @@ class SSGINode extends TempNode {
 
 			const color = vec3( 0 );
 
-			const lastSampleViewPosition = vec3( viewPosition ).toVar();
-
 			Loop( { start: uint( 0 ), end: STEP_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
 				const offset = pow( abs( mul( stepRadius, float( i ).add( initialRayStep ) ).div( radiusVS ) ), EXP_FACTOR ).mul( radiusVS ).toConst();
@@ -528,8 +526,6 @@ class SSGINode extends TempNode {
 					} );
 
 				} );
-
-				lastSampleViewPosition.assign( sampleViewPosition );
 
 			} );
 

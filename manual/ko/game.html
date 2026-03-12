@@ -1206,7 +1206,7 @@ class Animal extends Component {
 +    globals.playerRadius = model.size / 2;
 </pre>
 <p>이제 와 생각해보니 플레이어가 아니라 기차의 머리를 바라보게 하는 편이 더 나았겠네요. 이건 나중에 돌아와 고치도록 하겠습니다.</p>
-<p>예제를 처음 만들었을 때는 동물들이 모두 같은 크기의 경계 원(radius)을 썼지만, 이렇게 하고 보니 말과 퍼그(강아지)의 크기가 같은 게 말이 안 된다는 생각이 들었습니다. 그래서 각 모델의 크기에 따라 경계 원을 따로 지정했죠. 그리고 상태를 보여주면 좋겠다는 생각이 들어 상태를 보여 줄 <code class="notranslate" translate="no">StatusDisplayHelper</code> 컴포넌트를 추가했습니다.</p>
+<p>예제를 처음 만들었을 때는 동물들이 모두 같은 크기의 경계 원(radius)을 썼지만, 이렇게 하고 보니 말과 퍼그(강아지)의 크기가 같은 게 말이 안 된다는 생각이 들었습니다. 그래서 각 모델의 크기에 따라 경계 원을 따로 지정했죠. 그리고 상태를 보여주면 좋겠다는 생각이 들어 상태를 보여 줄 <code class="notranslate" translate="no">StateDisplayHelper</code> 컴포넌트를 추가했습니다.</p>
 <p>또한 <a href="/docs/#api/ko/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a>를 써 각 캐릭터의 경계 원이 보이도록 했고, <a href="align-html-elements-to-3d.html">HTML 요소를 3D로 정렬하기</a>에서 썼던 방법으로 각 캐릭터의 상태를 HTML로 보여주도록 했습니다.</p>
 <p>먼저 각 요소를 담을 HTML을 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -1438,7 +1438,7 @@ class CoroutineRunner {
 <p>위 클래스는 다른 코루틴이 실행되는 동안 요소를 안전하게 제거/추가하도록 <code class="notranslate" translate="no">SafeArray</code>와 비슷한 구조로 만들었습니다. 또한 이 클래스는 중첩된 코루틴도 처리합니다.</p>
 <p>코루틴을 만들려면 자바스크립트의 <a href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/function*">제너레이터 함수</a>를 만들어야 합니다. 제너레이터 함수는 <code class="notranslate" translate="no">function*</code>이라는 키워드로 생성하죠(별표를 붙여야 합니다!).</p>
 <p>제너레이터 함수는 <code class="notranslate" translate="no">yield</code> 키워드로 실행 순서를 <strong>양보(yield)</strong>할 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* count0To9() {
   for (let i = 0; i &lt; 10; ++i) {
     console.log(i);
     yield;

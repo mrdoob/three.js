@@ -2,9 +2,12 @@
 import { RendererInspector } from './RendererInspector.js';
 import { Profiler } from './ui/Profiler.js';
 import { Performance } from './tabs/Performance.js';
+import { Memory } from './tabs/Memory.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
+import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
+import { Timeline } from './tabs/Timeline.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
@@ -56,8 +59,17 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
+		const memory = new Memory();
+		profiler.addTab( memory );
+
+		const timeline = new Timeline();
+		profiler.addTab( timeline );
+
 		const consoleTab = new Console();
 		profiler.addTab( consoleTab );
+
+		const settings = new Settings();
+		profiler.addTab( settings );
 
 		profiler.loadLayout();
 
@@ -71,9 +83,11 @@ class Inspector extends RendererInspector {
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
+		this.memory = memory;
 		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
+		this.timeline = timeline;
 		this.once = {};
 
 		this.displayCycle = {
@@ -210,6 +224,8 @@ class Inspector extends RendererInspector {
 
 				} );
 
+				this.timeline.setRenderer( renderer );
+
 			}
 
 		}
@@ -223,12 +239,6 @@ class Inspector extends RendererInspector {
 		if ( this.parameters.isVisible === false ) {
 
 			this.parameters.show();
-
-			if ( this.parameters.isDetached === false ) {
-
-				this.profiler.setActiveTab( this.parameters.id );
-
-			}
 
 		}
 
@@ -455,12 +465,14 @@ class Inspector extends RendererInspector {
 			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
+			this.memory.updateText( this );
 
 		}
 
 		if ( this.displayCycle.graph.needsUpdate ) {
 
 			this.performance.updateGraph( this, frame );
+			this.memory.updateGraph( this );
 
 		}
 
