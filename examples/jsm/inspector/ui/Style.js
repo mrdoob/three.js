@@ -1200,6 +1200,11 @@ export class Style {
 	box-sizing: border-box;
 }
 
+.param-control input:focus {
+	outline: none;
+	border-color: var(--accent-color);
+}
+
 .param-control select {
 	padding-top: 3px;
 	padding-bottom: 1px;
