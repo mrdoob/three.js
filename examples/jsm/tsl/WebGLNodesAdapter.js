@@ -23,6 +23,7 @@ import {
 	InspectorBase,
 	GLSLNodeBuilder,
 	BasicNodeLibrary,
+	WebGLCapabilities,
 } from 'three/webgpu';
 
 // Limitations
@@ -198,15 +199,20 @@ class RendererProxy {
 
 	constructor( renderer ) {
 
+		const backend = {
+			isWebGPUBackend: false,
+			extensions: renderer.extensions,
+			gl: renderer.getContext(),
+			capabilities: null,
+		};
+
+		backend.capabilities = new WebGLCapabilities( backend );
+
 		this.contextNode = context();
 		this.inspector = new InspectorBase();
 		this.library = new BasicNodeLibrary();
 		this.lighting = new Lighting();
-		this.backend = {
-			isWebGPUBackend: false,
-			extensions: renderer.extensions,
-			gl: renderer.getContext(),
-		};
+		this.backend = backend;
 
 		const self = this;
 		return new Proxy( renderer, {
