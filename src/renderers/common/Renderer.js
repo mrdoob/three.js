@@ -1340,9 +1340,10 @@ class Renderer {
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
-		const canvasTarget = this._canvasTarget;
+		// TODO: Unify CanvasTarget and OutputRenderTarget
+		const target = this._outputRenderTarget || this._canvasTarget;
 
-		let frameBufferTarget = this._frameBufferTargets.get( canvasTarget );
+		let frameBufferTarget = this._frameBufferTargets.get( target );
 
 		if ( frameBufferTarget === undefined ) {
 
@@ -1362,17 +1363,17 @@ class Renderer {
 
 			const dispose = () => {
 
-				canvasTarget.removeEventListener( 'dispose', dispose );
+				target.removeEventListener( 'dispose', dispose );
 
 				frameBufferTarget.dispose();
 
-				this._frameBufferTargets.delete( canvasTarget );
+				this._frameBufferTargets.delete( target );
 
 			};
 
-			canvasTarget.addEventListener( 'dispose', dispose );
+			target.addEventListener( 'dispose', dispose );
 
-			this._frameBufferTargets.set( canvasTarget, frameBufferTarget );
+			this._frameBufferTargets.set( target, frameBufferTarget );
 
 		}
 
@@ -1380,6 +1381,7 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
+
 		if ( outputRenderTarget !== null ) {
 
 			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
@@ -1390,11 +1392,18 @@ class Renderer {
 
 		}
 
-		frameBufferTarget.viewport.copy( canvasTarget._viewport );
-		frameBufferTarget.scissor.copy( canvasTarget._scissor );
-		frameBufferTarget.viewport.multiplyScalar( canvasTarget._pixelRatio );
-		frameBufferTarget.scissor.multiplyScalar( canvasTarget._pixelRatio );
-		frameBufferTarget.scissorTest = canvasTarget._scissorTest;
+		// RenderTarget || CanvasTarget
+
+		const viewport = this._outputRenderTarget ? this._outputRenderTarget.viewport : target._viewport;
+		const scissor = this._outputRenderTarget ? this._outputRenderTarget.scissor : target._scissor;
+		const pixelRatio = this._outputRenderTarget ? 1 : target._pixelRatio;
+		const scissorTest = this._outputRenderTarget ? this._outputRenderTarget.scissorTest : target._scissorTest;
+
+		frameBufferTarget.viewport.copy( viewport );
+		frameBufferTarget.scissor.copy( scissor );
+		frameBufferTarget.viewport.multiplyScalar( pixelRatio );
+		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
+		frameBufferTarget.scissorTest = scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
