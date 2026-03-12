@@ -3241,6 +3241,8 @@ class WebGLRenderer {
 
 			}
 
+			state.activeTexture( _gl.TEXTURE0 ); // see #33153
+
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
