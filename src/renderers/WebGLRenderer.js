@@ -3238,6 +3238,7 @@ class WebGLRenderer {
 
 				textures.setTexture2D( dstTexture, 0 );
 				glTarget = _gl.TEXTURE_2D;
+				state.activeTexture( _gl.TEXTURE0 );
 
 			}
 
