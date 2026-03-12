@@ -346,6 +346,7 @@
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
 		"webgpu_lights_custom",
+		"webgpu_lights_dynamic",
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
 		"webgpu_lights_physical",
