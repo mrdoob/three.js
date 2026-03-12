@@ -48,7 +48,7 @@ const getOrCreateLightNode = ( light, nodeLibrary ) => {
 
 	if ( lightNodeClass === null ) {
 
-		warn( `Light node not found for ${ light.constructor.name }.` );
+		warn( `DynamicLightsNode: Light node not found for ${ light.constructor.name }.` );
 		return null;
 
 	}
