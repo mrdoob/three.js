@@ -414,11 +414,16 @@ class NodeManager extends DataMap {
 		if ( object.isRenderObject ) {
 
 			const nodeBuilderState = this.get( object ).nodeBuilderState;
-			nodeBuilderState.usedTimes --;
 
-			if ( nodeBuilderState.usedTimes === 0 ) {
+			if ( nodeBuilderState !== undefined ) {
 
-				this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
+				nodeBuilderState.usedTimes --;
+
+				if ( nodeBuilderState.usedTimes === 0 ) {
+
+					this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
+
+				}
 
 			}
 
