@@ -55,6 +55,32 @@ import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../
 import { ColorManagement } from '../math/ColorManagement.js';
 import { getDFGLUT } from './shaders/DFGLUTData.js';
 
+const _objectPosition = /*@__PURE__*/ new Vector3();
+
+function findLightProbeVolume( volumes, object ) {
+
+	if ( volumes.length === 0 ) return null;
+
+	if ( volumes.length === 1 ) {
+
+		return volumes[ 0 ].textures[ 0 ] !== null ? volumes[ 0 ] : null;
+
+	}
+
+	_objectPosition.setFromMatrixPosition( object.matrixWorld );
+
+	for ( let i = 0, l = volumes.length; i < l; i ++ ) {
+
+		const v = volumes[ i ];
+
+		if ( v.textures[ 0 ] !== null && v.boundingBox.containsPoint( _objectPosition ) ) return v;
+
+	}
+
+	return null;
+
+}
+
 /**
  * This renderer uses WebGL 2 to display scenes.
  *
@@ -1813,6 +1839,10 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
+				} else if ( object.isLightProbeVolume ) {
+
+					currentRenderState.pushLightProbeVolume( object );
+
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
@@ -2128,7 +2158,7 @@ class WebGLRenderer {
 
 			const lightsStateVersion = lights.state.version;
 
-			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
+			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeVolumesArray );
 			const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 			let programs = materialProperties.programs;
@@ -2219,6 +2249,8 @@ class WebGLRenderer {
 				// TODO (abelnation): add area lights shadow info to uniforms
 
 			}
+
+			materialProperties.lightProbeVolume = currentRenderState.state.lightProbeVolumesArray.length > 0;
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
@@ -2419,6 +2451,10 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if ( !! materialProperties.lightProbeVolume !== ( currentRenderState.state.lightProbeVolumesArray.length > 0 ) ) {
+
+					needsProgramChange = true;
+
 				}
 
 			} else {
@@ -2458,6 +2494,19 @@ class WebGLRenderer {
 				_currentMaterialId = material.id;
 
 				refreshMaterial = true;
+
+			}
+
+			if ( materialProperties.needsLights ) {
+
+				const objectVolume = findLightProbeVolume( currentRenderState.state.lightProbeVolumesArray, object );
+
+				if ( materialProperties.__lightProbeVolume !== objectVolume ) {
+
+					materialProperties.__lightProbeVolume = objectVolume;
+					refreshMaterial = true;
+
+				}
 
 			}
 
@@ -2639,6 +2688,24 @@ class WebGLRenderer {
 				}
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
+
+				// irradiance probe grid
+
+				if ( materialProperties.needsLights && materialProperties.__lightProbeVolume ) {
+
+					const volume = materialProperties.__lightProbeVolume;
+
+					m_uniforms.probeGridSH0.value = volume.textures[ 0 ];
+					m_uniforms.probeGridSH1.value = volume.textures[ 1 ];
+					m_uniforms.probeGridSH2.value = volume.textures[ 2 ];
+					m_uniforms.probeGridSH3.value = volume.textures[ 3 ];
+					m_uniforms.probeGridSH4.value = volume.textures[ 4 ];
+					m_uniforms.probeGridSH5.value = volume.textures[ 5 ];
+					m_uniforms.probeGridSH6.value = volume.textures[ 6 ];
+					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
+					m_uniforms.probeGridMax.value.copy( volume.boundingBox.max );
+
+				}
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 

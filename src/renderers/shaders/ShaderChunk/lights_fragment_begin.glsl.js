@@ -194,6 +194,14 @@ IncidentLight directLight;
 
 	#endif
 
+	#ifdef USE_LIGHT_PROBE_VOLUME
+
+		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
+		vec3 probeWorldNormal = inverseTransformDirection( geometryNormal, viewMatrix );
+		irradiance += getLightProbeVolumeIrradiance( probeWorldPos, probeWorldNormal );
+
+	#endif
+
 #endif
 
 #if defined( RE_IndirectSpecular )

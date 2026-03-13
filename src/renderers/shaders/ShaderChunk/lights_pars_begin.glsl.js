@@ -211,4 +211,6 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 	}
 
 #endif
+
+#include <light_probe_volume_pars_fragment>
 `;
