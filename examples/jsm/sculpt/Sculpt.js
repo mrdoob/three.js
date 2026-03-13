@@ -77,6 +77,7 @@ class Sculpt {
 		this._dragDir = [ 0, 0, 0 ];
 		this._scalePrevX = 0;
 		this._scaleDelta = 0;
+		this._cachedRect = null;
 
 		// Bind event handlers
 		this._onPointerDown = this._onPointerDown.bind( this );
@@ -99,9 +100,21 @@ class Sculpt {
 
 	// ---- Picking ----
 
+	_getRect() {
+
+		if ( this._cachedRect === null ) {
+
+			this._cachedRect = this._domElement.getBoundingClientRect();
+
+		}
+
+		return this._cachedRect;
+
+	}
+
 	_unproject( mouseX, mouseY, z ) {
 
-		const rect = this._domElement.getBoundingClientRect();
+		const rect = this._getRect();
 		const x = ( ( mouseX - rect.left ) / rect.width ) * 2 - 1;
 		const y = - ( ( mouseY - rect.top ) / rect.height ) * 2 + 1;
 		_v3Temp.set( x, y, z ).unproject( this._camera );
@@ -112,7 +125,7 @@ class Sculpt {
 	_project( point ) {
 
 		_v3Temp.set( point[ 0 ], point[ 1 ], point[ 2 ] ).project( this._camera );
-		const rect = this._domElement.getBoundingClientRect();
+		const rect = this._getRect();
 		return [
 			( _v3Temp.x * 0.5 + 0.5 ) * rect.width + rect.left,
 			( - _v3Temp.y * 0.5 + 0.5 ) * rect.height + rect.top,
@@ -540,47 +553,37 @@ class Sculpt {
 
 		if ( event.button !== 0 ) return;
 
+		this._cachedRect = null;
+
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 
-		if ( this.tool === 'drag' ) {
-
-			if ( ! this._intersectionRayMesh( mouseX, mouseY ) ) return;
-			this._sculpting = true;
-			this._lastMouseX = mouseX;
-			this._lastMouseY = mouseY;
-			try { this._domElement.setPointerCapture( event.pointerId ); } catch ( e ) { /* synthetic events */ }
-			return;
-
-		}
-
-		if ( this.tool === 'scale' ) {
-
-			if ( ! this._intersectionRayMesh( mouseX, mouseY ) ) return;
-			this._sculpting = true;
-			this._scalePrevX = mouseX;
-			this._lastMouseX = mouseX;
-			this._lastMouseY = mouseY;
-			try { this._domElement.setPointerCapture( event.pointerId ); } catch ( e ) { /* synthetic events */ }
-			return;
-
-		}
-
 		if ( ! this._intersectionRayMesh( mouseX, mouseY ) ) return;
+
 		this._sculpting = true;
 		this._lastMouseX = mouseX;
 		this._lastMouseY = mouseY;
 		try { this._domElement.setPointerCapture( event.pointerId ); } catch ( e ) { /* synthetic events */ }
 
-		// Do first stroke immediately
-		this._makeStroke( mouseX, mouseY );
-		this._syncGeometry();
+		if ( this.tool === 'scale' ) {
+
+			this._scalePrevX = mouseX;
+
+		} else if ( this.tool !== 'drag' ) {
+
+			// Do first stroke immediately
+			this._makeStroke( mouseX, mouseY );
+			this._syncGeometry();
+
+		}
 
 	}
 
 	_onPointerMove( event ) {
 
 		if ( ! this._sculpting ) return;
+
+		this._cachedRect = null;
 
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
@@ -621,6 +624,22 @@ class Sculpt {
 	get hitPoint() {
 
 		return this._interPoint;
+
+	}
+
+	get hitNormal() {
+
+		return this._pickedNormal;
+
+	}
+
+	pickFromMouse( mouseX, mouseY ) {
+
+		this._cachedRect = null;
+
+		if ( ! this._intersectionRayMesh( mouseX, mouseY ) ) return false;
+		this._computePickedNormal();
+		return true;
 
 	}
 
