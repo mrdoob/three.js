@@ -22,27 +22,41 @@
  */
 class EventDispatcher {
 
+	constructor() {
+
+		/**
+		 * A collection of event listener functions, organized by event type.
+		 *
+		 * @type {Map<string, Function>}
+		 */
+		this._listenerFunctions = new Map();
+
+		/**
+		 * A collection of event listener objects, organized by event type.
+		 *
+		 * @type {Map<string, object>}
+		 */
+		this._listenerObjects = new Map();
+
+	}
+
 	/**
 	 * Adds the given event listener to the given event type.
 	 *
 	 * @param {string} type - The type of event to listen to.
-	 * @param {Function} listener - The function that gets called when the event is fired.
+	 * @param {Function|object} listener - The function that gets called when the event is fired.
 	 */
 	addEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
+		const m = ( typeof listener === 'function' ) ? this._listenerFunctions : this._listenerObjects;
 
-		const listeners = this._listeners;
+		if ( m.has( type ) ) {
 
-		if ( listeners[ type ] === undefined ) {
+			m.get( type ).add( listener );
 
-			listeners[ type ] = [];
+		} else {
 
-		}
-
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-
-			listeners[ type ].push( listener );
+			m.set( type, new Set( [ listener ] ) );
 
 		}
 
@@ -52,16 +66,20 @@ class EventDispatcher {
 	 * Returns `true` if the given event listener has been added to the given event type.
 	 *
 	 * @param {string} type - The type of event.
-	 * @param {Function} listener - The listener to check.
+	 * @param {Function|object} listener - The listener to check.
 	 * @return {boolean} Whether the given event listener has been added to the given event type.
 	 */
 	hasEventListener( type, listener ) {
 
-		const listeners = this._listeners;
+		const m = ( typeof listener === 'function' ) ? this._listenerFunctions : this._listenerObjects;
 
-		if ( listeners === undefined ) return false;
+		if ( ! m.has( type ) ) {
 
-		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
+			return false;
+
+		}
+
+		return m.get( type ).has( listener );
 
 	}
 
@@ -73,21 +91,19 @@ class EventDispatcher {
 	 */
 	removeEventListener( type, listener ) {
 
-		const listeners = this._listeners;
+		const m = ( typeof listener === 'function' ) ? this._listenerFunctions : this._listenerObjects;
 
-		if ( listeners === undefined ) return;
+		if ( ! m.has( type ) ) {
 
-		const listenerArray = listeners[ type ];
+			return;
 
-		if ( listenerArray !== undefined ) {
+		}
 
-			const index = listenerArray.indexOf( listener );
+		const listeners = m.get( type );
 
-			if ( index !== - 1 ) {
+		if ( listeners.delete( listener ) && listeners.size === 0 ) {
 
-				listenerArray.splice( index, 1 );
-
-			}
+			m.delete( type );
 
 		}
 
@@ -100,32 +116,37 @@ class EventDispatcher {
 	 */
 	dispatchEvent( event ) {
 
-		const listeners = this._listeners;
+		const listenerFunctions = this._listenerFunctions;
+		const listenerObjects = this._listenerObjects;
 
-		if ( listeners === undefined ) return;
+		event.target = this;
 
-		const listenerArray = listeners[ event.type ];
+		if ( listenerFunctions.has( event.type ) ) {
 
-		if ( listenerArray !== undefined ) {
+			const listeners = listenerFunctions.get( event.type );
 
-			event.target = this;
+			for ( const listener of listeners ) {
 
-			// Make a copy, in case listeners are removed while iterating.
-			const array = listenerArray.slice( 0 );
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				array[ i ].call( this, event );
+				listener.call( this, event );
 
 			}
 
-			event.target = null;
+		}
+
+		if ( listenerObjects.has( event.type ) ) {
+
+			const listeners = listenerObjects.get( event.type );
+
+			for ( const listener of listeners ) {
+
+				listener.handleEvent( event );
+
+			}
 
 		}
 
 	}
 
 }
-
 
 export { EventDispatcher };
