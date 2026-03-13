@@ -139,7 +139,7 @@
 
 				const params = {
 					tool: 'brush',
-					radius: 50,
+					size: 50,
 					strength: 1.5,
 					subdivision: 0.75,
 					decimation: 0,
@@ -156,9 +156,9 @@
 
 				} );
 
-				gui.add( params, 'radius', 10, 200 ).onChange( function ( value ) {
+				gui.add( params, 'size', 10, 200 ).onChange( function ( value ) {
 
-					sculpt.radius = value;
+					sculpt.size = value;
 
 				} );
 
@@ -245,12 +245,12 @@
 
 						}
 
-						// Scale to match brush radius in world space
+						// Scale to match brush size in world space
 						const dist = cursorGroup.position.distanceTo( camera.position );
 						const fov = camera.fov * Math.PI / 180;
 						const screenHeight = 2 * dist * Math.tan( fov / 2 );
-						const worldRadius = ( sculpt.radius / window.innerHeight ) * screenHeight;
-						cursorGroup.scale.setScalar( worldRadius );
+						const worldSize = ( sculpt.size / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldSize );
 
 						cursorRing.visible = picking;
 						cursorDot.visible = true;
@@ -271,8 +271,8 @@
 						const dist = cursorGroup.position.distanceTo( camera.position );
 						const fov = camera.fov * Math.PI / 180;
 						const screenHeight = 2 * dist * Math.tan( fov / 2 );
-						const worldRadius = ( sculpt.radius / window.innerHeight ) * screenHeight;
-						cursorGroup.scale.setScalar( worldRadius );
+						const worldSize = ( sculpt.size / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldSize );
 
 						cursorRing.visible = true;
 						cursorDot.visible = true;
