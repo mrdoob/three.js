@@ -78,6 +78,10 @@
 				<input type="checkbox" id="negative">
 				<label for="negative">Negative</label>
 			</div>
+			<div class="checkbox-row">
+				<input type="checkbox" id="wireframe">
+				<label for="wireframe">Wireframe</label>
+			</div>
 		</div>
 
 		<div class="cursor-circle" id="cursorCircle"></div>
@@ -191,6 +195,9 @@
 
 				const negativeCheckbox = document.getElementById( 'negative' );
 				negativeCheckbox.addEventListener( 'change', function () { sculpt.negative = this.checked; } );
+
+				const wireframeCheckbox = document.getElementById( 'wireframe' );
+				wireframeCheckbox.addEventListener( 'change', function () { mesh.material.wireframe = this.checked; } );
 
 				// Cursor circle
 
