@@ -552,7 +552,7 @@ export default QUnit.module( 'Core', () => {
 			let j = a.toJSON();
 			const gold = {
 				'metadata': {
-					'version': 4.7,
+					'version': 5,
 					'type': 'BufferGeometry',
 					'generator': 'BufferGeometry.toJSON'
 				},

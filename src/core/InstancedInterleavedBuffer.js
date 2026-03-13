@@ -62,7 +62,7 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 		const json = super.toJSON( data );
 
-		json.isInstancedInterleavedBuffer = true;
+		json.type = 'InstancedInterleavedBuffer';
 		json.meshPerAttribute = this.meshPerAttribute;
 
 		return json;
