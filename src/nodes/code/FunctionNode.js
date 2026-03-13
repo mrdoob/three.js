@@ -1,4 +1,5 @@
 import CodeNode from './CodeNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * This class represents a native shader function. It can be used to implement
@@ -44,6 +45,15 @@ class FunctionNode extends CodeNode {
 	constructor( code = '', includes = [], language = '' ) {
 
 		super( code, includes, language );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isFunctionNode = true;
 
 	}
 
@@ -114,6 +124,35 @@ class FunctionNode extends CodeNode {
 
 	generate( builder, output ) {
 
+		// Get storage binding map if set by FunctionCallNode (before building includes)
+		const nodeData = builder.getDataFromNode( this );
+		const storageBindingMap = nodeData.storageBindingMap || null;
+
+		// Propagate storage binding map to included functions before building them
+		if ( storageBindingMap !== null ) {
+
+			const includes = this.getIncludes( builder );
+
+			for ( const include of includes ) {
+
+				if ( include.isFunctionNode || ( include.value && include.value.isFunctionNode ) ) {
+
+					const includeNode = include.isFunctionNode ? include : include.value;
+					const includeData = builder.getDataFromNode( includeNode );
+
+					// Merge storage binding maps (don't overwrite if already set)
+					if ( ! includeData.storageBindingMap ) {
+
+						includeData.storageBindingMap = storageBindingMap;
+
+					}
+
+				}
+
+			}
+
+		}
+
 		super.generate( builder );
 
 		const nodeFunction = this.getNodeFunction( builder );
@@ -133,7 +172,7 @@ class FunctionNode extends CodeNode {
 
 		const propertyName = builder.getPropertyName( nodeCode );
 
-		const code = this.getNodeFunction( builder ).getCode( propertyName );
+		const code = this.getNodeFunction( builder ).getCode( propertyName, storageBindingMap );
 
 		nodeCode.code = code + '\n';
 
