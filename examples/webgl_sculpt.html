@@ -28,6 +28,7 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -37,6 +38,29 @@
 			const _normal = new THREE.Vector3();
 			const _forward = new THREE.Vector3( 0, 0, 1 );
 			const _mouse = new THREE.Vector3();
+
+			const link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link );
+
+			function exportGLTF() {
+
+				const exporter = new GLTFExporter();
+
+				exporter.parse( mesh, function ( buffer ) {
+
+					const blob = new Blob( [ buffer ], { type: 'application/octet-stream' } );
+					link.href = URL.createObjectURL( blob );
+					link.download = 'sculpt.glb';
+					link.click();
+
+				}, function ( error ) {
+
+					console.error( error );
+
+				}, { binary: true } );
+
+			}
 
 			init();
 
@@ -120,7 +144,8 @@
 					subdivision: 0.75,
 					decimation: 0,
 					negative: false,
-					wireframe: false
+					wireframe: false,
+					export: exportGLTF
 				};
 
 				const gui = new GUI();
@@ -166,6 +191,8 @@
 					mesh.material.wireframe = value;
 
 				} );
+
+				gui.add( params, 'export' );
 
 				// 3D Cursor
 
