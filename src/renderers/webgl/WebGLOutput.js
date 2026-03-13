@@ -34,13 +34,15 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
-		stencilBuffer: stencil
+		stencilBuffer: stencil,
+		resolveDepthBuffer: false
 	} );
 
 	const targetB = new WebGLRenderTarget( width, height, {
 		type: HalfFloatType,
 		depthBuffer: false,
-		stencilBuffer: false
+		stencilBuffer: false,
+		resolveDepthBuffer: false
 	} );
 
 	// create fullscreen triangle geometry
