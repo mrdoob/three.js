@@ -5,23 +5,28 @@ import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
 
 /**
- * A material rendered with custom shaders. A shader is a small program written in GLSL.
- * that runs on the GPU. You may want to use a custom shader if you need to implement an
- * effect not included with any of the built-in materials.
+ * A material rendered with custom shaders.
  *
- * There are the following notes to bear in mind when using a `ShaderMaterial`:
+ * Shaders are programs written in GLSL that run on the GPU. You may want to use a custom shader if you need to
+ * implement an effect not included with any of the built-in materials.
+ *
+ * Please note the following behavior of `ShaderMaterial`:
  *
  * - `ShaderMaterial` can only be used with {@link WebGLRenderer}.
- * - Built in attributes and uniforms are passed to the shaders along with your code. If
- * you don't want that, use {@link RawShaderMaterial} instead.
- * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end`
- * in order to unroll a `for` loop in GLSL by the shader preprocessor. The directive has
- * to be placed right above the loop. The loop formatting has to correspond to a defined standard.
+ * - Built-in attributes and uniforms are passed to the shaders along with your code. If you don't want that, use
+ *   {@link RawShaderMaterial} instead.
+ * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end` in order to unroll a `for` loop
+ *   in GLSL by the shader preprocessor. The directive has to be placed right above the loop. The loop formatting has to
+ *   correspond to a defined standard.
  *   - The loop has to be [normalized](https://en.wikipedia.org/wiki/Normalized_loop).
  *   - The loop variable has to be *i*.
- *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly
- * value of *i* for the given iteration and can be used in preprocessor
- * statements.
+ *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicit value of *i* for the given iteration and can
+ *     be used in preprocessor statements.
+ * - [Outputs](https://wikis.khronos.org/opengl/Fragment_Shader#Outputs) will be defined automatically for all texture
+ *   attachments of the current render target unless already defined. Outputs follow the naming scheme `out_FragData{i}`
+ *   where `i` is the index of the texture. The names of MRT textures are used to define macros of the form
+ *   `out_${name}` for convenience. For example, if a texture's `name` is `"Normal"`, the macro `out_Normal` will be
+ *   defined. The primary output `out_FragData0` is always available under the alias `gl_FragColor`.
  *
  * ```js
  * const material = new THREE.ShaderMaterial( {
