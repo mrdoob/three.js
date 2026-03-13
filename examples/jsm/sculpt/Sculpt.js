@@ -51,10 +51,10 @@ class Sculpt {
 
 		this.tool = 'brush';
 		this.size = 50;
-		this.strength = 1.5;
+		this.strength = 0.5;
 		this.negative = false;
 		this.subdivision = 0.75;
-		this.decimation = 0;
+		this.decimation = 0.75;
 
 		this._mesh = mesh;
 		this._camera = camera;

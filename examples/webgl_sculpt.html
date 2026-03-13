@@ -140,9 +140,9 @@
 				const params = {
 					tool: 'brush',
 					size: 50,
-					strength: 1.5,
+					strength: 0.5,
 					subdivision: 0.75,
-					decimation: 0,
+					decimation: 0.75,
 					negative: false,
 					wireframe: false,
 					export: exportGLTF
@@ -162,7 +162,7 @@
 
 				} );
 
-				gui.add( params, 'strength', 0, 3 ).onChange( function ( value ) {
+				gui.add( params, 'strength', 0, 1 ).onChange( function ( value ) {
 
 					sculpt.strength = value;
 
