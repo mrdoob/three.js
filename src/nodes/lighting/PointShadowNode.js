@@ -283,7 +283,7 @@ class PointShadowNode extends ShadowNode {
 			_lookTarget.add( cubeDirections[ face ] );
 			camera.up.copy( cubeUps[ face ] );
 			camera.lookAt( _lookTarget );
-			camera.updateMatrixWorld();
+			camera.ensureMatrices();
 
 			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 

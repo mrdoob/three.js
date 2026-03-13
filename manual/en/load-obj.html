@@ -517,7 +517,7 @@ and then set them on the <a href="/docs/#examples/loaders/OBJLoader"><code class
 +    const objLoader = new OBJLoader();
 +    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
-      root.updateMatrixWorld();
+      root.ensureMatrices();
       scene.add(root);
       // compute the box that contains all the stuff
       // from root and below

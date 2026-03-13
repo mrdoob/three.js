@@ -113,9 +113,9 @@ class ParallaxBarrierEffect {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.ensureMatrices();
 
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.ensureMatrices();
 
 			_stereo.update( camera );
 

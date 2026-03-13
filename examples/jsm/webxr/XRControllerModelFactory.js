@@ -81,13 +81,10 @@ class XRControllerModel extends Object3D {
 	/**
 	 * Overwritten with a custom implementation. Polls data from the XRInputSource and updates the
 	 * model's components to match the real world data.
-	 *
-	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 		if ( ! this.motionController ) return;
 

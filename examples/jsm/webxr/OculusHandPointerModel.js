@@ -391,13 +391,11 @@ class OculusHandPointerModel extends Object3D {
 
 	/**
 	 * Overwritten with a custom implementation. Makes sure the internal pointer and raycaster are updated.
-	 *
-	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
+
 		if ( this.pointerGeometry ) {
 
 			this._updatePointer();

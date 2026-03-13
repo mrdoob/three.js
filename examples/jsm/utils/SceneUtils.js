@@ -46,7 +46,7 @@ function createMeshesFromInstancedMesh( instancedMesh ) {
 	}
 
 	group.copy( instancedMesh );
-	group.updateMatrixWorld(); // ensure correct world matrices of meshes
+	group.ensureMatrices(); // ensure correct world matrices of meshes
 
 	return group;
 

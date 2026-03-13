@@ -259,7 +259,7 @@ appelée chaque fois que lil-gui met à jour une valeur.</p>
 <p>Ensuite, nous pouvons l'utiliser à la fois pour la position de la lumière
 et pour la position de la cible, comme ceci</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
-+  light.target.updateMatrixWorld();
++  light.target.ensureMatrices();
 +  helper.update();
 +}
 +updateLight();
@@ -303,7 +303,7 @@ scene.add(helper);
 </pre>
 <p>et comme il n'y a pas de cible, la fonction <code class="notranslate" translate="no">onChange</code> peut être plus simple.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLight() {
--  light.target.updateMatrixWorld();
+-  light.target.ensureMatrices();
   helper.update();
 }
 -updateLight();

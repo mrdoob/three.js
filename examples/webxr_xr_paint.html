@@ -85,7 +85,7 @@
 
 				function onSelectStart() {
 
-					this.updateMatrixWorld( true );
+					this.ensureMatrices( true );
 
 					const pivot = this.getObjectByName( 'pivot' );
 					cursor.setFromMatrixPosition( pivot.matrixWorld );
@@ -166,7 +166,7 @@
 
 			function handleController( controller ) {
 
-				controller.updateMatrixWorld( true );
+				controller.ensureMatrices( true );
 
 				const userData = controller.userData;
 				const painter = userData.painter;

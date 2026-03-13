@@ -233,8 +233,8 @@ class CSS3DRenderer {
 
 			}
 
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.ensureMatrices();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.ensureMatrices();
 
 			let tx, ty;
 

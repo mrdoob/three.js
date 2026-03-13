@@ -432,8 +432,8 @@ class TransformControls extends Controls {
 
 			if ( planeIntersect ) {
 
-				this.object.updateMatrixWorld();
-				this.object.parent.updateMatrixWorld();
+				this.object.ensureMatrices();
+				this.object.parent.ensureMatrices();
 
 				this._positionStart.copy( this.object.position );
 				this._quaternionStart.copy( this.object.quaternion );
@@ -1055,13 +1055,13 @@ class TransformControlsRoot extends Object3D {
 	}
 
 	// updateMatrixWorld updates key transformation variables
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		const controls = this.controls;
 
 		if ( controls.object !== undefined ) {
 
-			controls.object.updateMatrixWorld();
+			controls.object.ensureMatrices();
 
 			if ( controls.object.parent === null ) {
 
@@ -1080,7 +1080,7 @@ class TransformControlsRoot extends Object3D {
 
 		}
 
-		controls.camera.updateMatrixWorld();
+		controls.camera.ensureMatrices();
 		controls.camera.matrixWorld.decompose( controls.cameraPosition, controls.cameraQuaternion, controls._cameraScale );
 
 		if ( controls.camera.isOrthographicCamera ) {
@@ -1093,7 +1093,7 @@ class TransformControlsRoot extends Object3D {
 
 		}
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 
@@ -1504,7 +1504,7 @@ class TransformControlsGizmo extends Object3D {
 
 	// updateMatrixWorld will update transformations and appearance of individual handles
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		const space = ( this.mode === 'scale' ) ? 'local' : this.space; // scale always oriented to local rotation
 
@@ -1814,7 +1814,7 @@ class TransformControlsGizmo extends Object3D {
 
 		}
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 
@@ -1837,7 +1837,7 @@ class TransformControlsPlane extends Mesh {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		let space = this.space;
 
@@ -1909,7 +1909,7 @@ class TransformControlsPlane extends Mesh {
 
 		}
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 

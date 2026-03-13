@@ -387,7 +387,7 @@
 				// set the orientation of an object based on a world matrix
 
 				const parent = object.parent;
-				scene.updateMatrixWorld();
+				scene.ensureMatrices();
 				object.matrix.copy( parent.matrixWorld ).invert();
 				object.applyMatrix4( matrix );
 

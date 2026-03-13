@@ -2688,7 +2688,7 @@ class GLTFParser {
 
 				for ( const scene of result.scenes ) {
 
-					scene.updateMatrixWorld();
+					scene.ensureMatrices();
 
 				}
 

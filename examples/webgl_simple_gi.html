@@ -49,7 +49,7 @@
 
 				const camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
 
-				scene.updateMatrixWorld( true );
+				scene.ensureMatrices( true );
 
 				let clone = scene.clone();
 				clone.matrixWorldAutoUpdate = false;

@@ -201,7 +201,7 @@ class TileShadowNode extends ShadowBaseNode {
 			this.syncLightTransformation( lwLight, light );
 
 			this.lights.push( lwLight );
-			lShadow.camera.updateMatrixWorld();
+			lShadow.camera.ensureMatrices();
 
 			cameras.push( lShadow.camera );
 			const shadowNode = shadow( lwLight, lShadow );
@@ -254,7 +254,7 @@ class TileShadowNode extends ShadowBaseNode {
 			lShadow.camera.far = light.shadow.camera.far;
 			lShadow.camera.updateProjectionMatrix();
 			lShadow.camera.updateWorldMatrix( true, false );
-			lShadow.camera.updateMatrixWorld( true );
+			lShadow.camera.ensureMatrices( true );
 			this._shadowNodes[ i ].shadow.needsUpdate = true;
 
 		}
@@ -383,9 +383,9 @@ class TileShadowNode extends ShadowBaseNode {
 		lwLight.quaternion.copy( sourceLight.getWorldQuaternion( _quatTemp1 ) );
 		lwLight.scale.copy( sourceLight.scale );
 		lwLight.updateMatrix();
-		lwLight.updateMatrixWorld( true );
+		lwLight.ensureMatrices( true );
 		lwLight.target.updateMatrix();
-		lwLight.target.updateMatrixWorld( true );
+		lwLight.target.ensureMatrices( true );
 
 	}
 

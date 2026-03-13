@@ -402,7 +402,7 @@
 
 				camera.lookAt( target );
 
-				camera.updateMatrixWorld();
+				camera.ensureMatrices();
 
 				if ( effectController.jsDepthCalculation ) {
 

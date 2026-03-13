@@ -272,7 +272,7 @@ class Water extends Mesh {
 
 			mirrorCamera.far = camera.far; // Used in WebGLBackground
 
-			mirrorCamera.updateMatrixWorld();
+			mirrorCamera.ensureMatrices();
 			mirrorCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 			// Update the texture matrix

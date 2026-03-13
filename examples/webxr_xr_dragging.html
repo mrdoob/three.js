@@ -219,7 +219,7 @@
 
 			function getIntersections( controller ) {
 
-				controller.updateMatrixWorld();
+				controller.ensureMatrices();
 
 				raycaster.setFromXRController( controller );
 

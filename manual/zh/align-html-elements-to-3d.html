@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh">
 
 <head>
@@ -263,14 +263,14 @@ const viewProjection = new THREE.Matrix4();
 
 // 在检查前
 camera.updateMatrix();
-camera.updateMatrixWorld();
+camera.ensureMatrices();
 camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 
 // 然后，对每一个Mesh
 someMesh.updateMatrix();
-someMesh.updateMatrixWorld();
+someMesh.ensureMatrices();
 
 viewProjection.multiplyMatrices(
     camera.projectionMatrix, camera.matrixWorldInverse);

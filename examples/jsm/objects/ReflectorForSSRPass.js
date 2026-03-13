@@ -192,7 +192,7 @@ class ReflectorForSSRPass extends Mesh {
 
 			virtualCamera.far = camera.far; // Used in WebGLBackground
 
-			virtualCamera.updateMatrixWorld();
+			virtualCamera.ensureMatrices();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 			material.uniforms[ 'virtualCameraNear' ].value = camera.near;

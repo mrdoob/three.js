@@ -209,7 +209,7 @@
 					object.rotation.y += delta * Math.PI * 0.1;
 
 					object.updateMatrix();
-					object.updateMatrixWorld();
+					object.ensureMatrices();
 
 					// update OBB
 

@@ -331,7 +331,7 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 caméra d'ombre de la lumière et l'helper affichant la caméra d'ombre de la lumière.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // mettre à jour le matrixWorld de la cible de la lumière car il est nécessaire pour l'helper
-  light.target.updateMatrixWorld();
+  light.target.ensureMatrices();
   helper.update();
   // mettre à jour la matrice de projection de la caméra d'ombre de la lumière
   light.shadow.camera.updateProjectionMatrix();

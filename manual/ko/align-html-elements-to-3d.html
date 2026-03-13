@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head>
+﻿<!DOCTYPE html><html lang="ko"><head>
     <meta charset="utf-8">
     <title>HTML 요소를 3D로 정렬하기</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -245,14 +245,14 @@ const viewProjection = new THREE.Matrix4();
 
 // 좌표 확인 전
 camera.updateMatrix();
-camera.updateMatrixWorld();
+camera.ensureMatrices();
 camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 
 // 각 mesh마다 좌표를 업데이트합니다.
 someMesh.updateMatrix();
-someMesh.updateMatrixWorld();
+someMesh.ensureMatrices();
 
 viewProjection.multiplyMatrices(
     camera.projectionMatrix, camera.matrixWorldInverse);

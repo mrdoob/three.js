@@ -115,7 +115,7 @@ class CCDIKSolver {
 		const target = bones[ ik.target ];
 
 		// don't use getWorldPosition() here for the performance
-		// because it calls updateMatrixWorld( true ) inside.
+		// because it calls updateWorldMatrix( true ) inside.
 		_targetPos.setFromMatrixPosition( target.matrixWorld );
 
 		const links = ik.links;
@@ -148,7 +148,7 @@ class CCDIKSolver {
 				const rotationMax = links[ j ].rotationMax;
 
 				// don't use getWorldPosition/Quaternion() here for the performance
-				// because they call updateMatrixWorld( true ) inside.
+				// because they call updateWorldMatrix( true ) inside.
 				link.matrixWorld.decompose( _linkPos, _invLinkQ, _linkScale );
 				_invLinkQ.invert();
 				_effectorPos.setFromMatrixPosition( effector.matrixWorld );
@@ -224,7 +224,7 @@ class CCDIKSolver {
 
 				}
 
-				link.updateMatrixWorld( true );
+				link.ensureMatrices( true );
 
 				rotated = true;
 
@@ -244,7 +244,7 @@ class CCDIKSolver {
 			  this._workingQuaternion.copy( initialQuaternions[ j ] ).slerp( link.quaternion, chainBlend );
 
 			  link.quaternion.copy( this._workingQuaternion );
-			  link.updateMatrixWorld( true );
+			  link.ensureMatrices( true );
 
 			}
 
@@ -413,7 +413,7 @@ class CCDIKHelper extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		const mesh = this.root;
 
@@ -472,7 +472,7 @@ class CCDIKHelper extends Object3D {
 
 		this.matrix.copy( mesh.matrixWorld );
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 

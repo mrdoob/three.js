@@ -199,7 +199,7 @@
 				// since the focus point is expressed in view space, it must be updated on every
 				// camera change. for simplicity, do this every frame.
 
-				camera.updateMatrixWorld();
+				camera.ensureMatrices();
 				focusPointView.value.copy( focusPoint ).applyMatrix4( camera.matrixWorldInverse );
 
 				renderPipeline.render();

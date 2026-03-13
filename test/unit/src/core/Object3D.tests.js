@@ -354,7 +354,7 @@ export default QUnit.module( 'Core', () => {
 			child.scale.set( 1, 2, 1 );
 
 			parent.add( child );
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			child.localToWorld( v.set( 2, 2, 2 ) );
 
@@ -384,7 +384,7 @@ export default QUnit.module( 'Core', () => {
 			child.scale.set( 1, 2, 1 );
 
 			parent.add( child );
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			child.worldToLocal( v.set( 2, 2, 2 ) );
 
@@ -469,8 +469,8 @@ export default QUnit.module( 'Core', () => {
 			newParent.rotation.set( Math.PI / 5, Math.PI / 6, Math.PI / 7 );
 			newParent.scale.set( 5, 5, 5 );
 
-			object.updateMatrixWorld();
-			newParent.updateMatrixWorld();
+			object.ensureMatrices();
+			newParent.ensureMatrices();
 			expectedMatrixWorld.copy( object.matrixWorld );
 
 			newParent.attach( object );
@@ -494,8 +494,8 @@ export default QUnit.module( 'Core', () => {
 			newParent.scale.set( 6, 6, 6 );
 
 			oldParent.add( object );
-			oldParent.updateMatrixWorld();
-			newParent.updateMatrixWorld();
+			oldParent.ensureMatrices();
+			newParent.ensureMatrices();
 			expectedMatrixWorld.copy( object.matrixWorld );
 
 			newParent.attach( object );
@@ -720,7 +720,7 @@ export default QUnit.module( 'Core', () => {
 			child.position.set( 4, 5, 6 );
 			parent.add( child );
 
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			assert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,
@@ -768,12 +768,12 @@ export default QUnit.module( 'Core', () => {
 
 			// Resetting local and world matrices to the origin
 			child.position.set( 0, 0, 0 );
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			parent.position.set( 1, 2, 3 );
 			parent.matrixAutoUpdate = false;
 			child.matrixAutoUpdate = false;
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			assert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,
@@ -805,7 +805,7 @@ export default QUnit.module( 'Core', () => {
 			child.matrixAutoUpdate = true;
 			parent.matrixWorldNeedsUpdate = true;
 			child.matrixWorldAutoUpdate = false;
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			assert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
@@ -819,7 +819,7 @@ export default QUnit.module( 'Core', () => {
 			child.position.set( 0, 0, 0 );
 			parent.position.set( 1, 2, 3 );
 			child.matrixWorldAutoUpdate = true;
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			assert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
@@ -833,14 +833,14 @@ export default QUnit.module( 'Core', () => {
 			// Resetting the local and world matrices to the origin
 			child.position.set( 0, 0, 0 );
 			child.matrixAutoUpdate = true;
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			parent.position.set( 1, 2, 3 );
 			parent.updateMatrix();
 			parent.matrixAutoUpdate = false;
 			parent.matrixWorldNeedsUpdate = false;
 
-			parent.updateMatrixWorld( true );
+			parent.ensureMatrices( true );
 
 			assert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
@@ -856,12 +856,12 @@ export default QUnit.module( 'Core', () => {
 			child.position.set( 0, 0, 0 );
 			parent.matrixAutoUpdate = true;
 			child.matrixAutoUpdate = true;
-			parent.updateMatrixWorld();
+			parent.ensureMatrices();
 
 			parent.position.set( 1, 2, 3 );
 			child.position.set( 4, 5, 6 );
 
-			child.updateMatrixWorld();
+			child.ensureMatrices();
 
 			assert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ja"><head>
+﻿<!DOCTYPE html><html lang="ja"><head>
     <meta charset="utf-8">
     <title>のカスタムバッファジオメトリ</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -290,7 +290,7 @@ geometry.setIndex([
   function getPoint(lat, long) {
     latHelper.rotation.x = lat;
     longHelper.rotation.y = long;
-    longHelper.updateMatrixWorld(true);
+    longHelper.ensureMatrices(true);
     return pointHelper.getWorldPosition(temp).toArray();
   }
 

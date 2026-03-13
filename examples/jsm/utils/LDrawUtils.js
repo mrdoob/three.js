@@ -114,7 +114,7 @@ class LDrawUtils {
 		const linesGeometries = {};
 		const condLinesGeometries = {};
 
-		object.updateMatrixWorld( true );
+		object.ensureMatrices( true );
 		const normalMatrix = new Matrix3();
 
 		object.traverse( c => {

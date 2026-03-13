@@ -112,21 +112,21 @@ export default QUnit.module( 'Objects', () => {
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( 150 );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length > 0, 'bounding sphere between near and far' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( raycaster.near );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length > 0, 'bounding sphere across near' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( raycaster.far );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length > 0, 'bounding sphere across far' );
@@ -134,21 +134,21 @@ export default QUnit.module( 'Objects', () => {
 			mesh.matrixWorld.identity();
 			mesh.position.setX( 150 );
 			mesh.scale.setY( 9999 );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length > 0, 'bounding sphere across near and far' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( - 9999 );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length === 0, 'bounding sphere behind near' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( 9999 );
-			mesh.updateMatrixWorld( true );
+			mesh.ensureMatrices( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
 			assert.ok( intersections.length === 0, 'bounding sphere beyond far' );

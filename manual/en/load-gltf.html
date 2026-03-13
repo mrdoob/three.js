@@ -272,7 +272,7 @@ the new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translat
 +      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
 +    ];
 +
-+    root.updateMatrixWorld();
++    root.ensureMatrices();
 +    for (const car of loadedCars.children.slice()) {
 +      const fix = fixes.find(fix =&gt; car.name.startsWith(fix.prefix));
 +      const obj = new THREE.Object3D();
@@ -592,7 +592,7 @@ const fixes = [
 +  { prefix: 'Car_04', y: 40, rot: [0, Math.PI, 0], },
 ];
 
-root.updateMatrixWorld();
+root.ensureMatrices();
 for (const car of loadedCars.children.slice()) {
   const fix = fixes.find(fix =&gt; car.name.startsWith(fix.prefix));
   const obj = new THREE.Object3D();

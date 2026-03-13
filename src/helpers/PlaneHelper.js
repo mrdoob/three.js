@@ -62,19 +62,32 @@ class PlaneHelper extends Line {
 
 		this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false, toneMapped: false } ) ) );
 
+		this._calculatingMatrixWorld = false;
+
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		this.position.set( 0, 0, 0 );
+		if ( ! this._calculatingMatrixWorld ) {
 
-		this.scale.set( 0.5 * this.size, 0.5 * this.size, 1 );
+			// this.lookAt() internally calls this.updateMatrixWorld(), so put this
+			// code in an if-statement to avoid a 'too much recursion' error.
 
-		this.lookAt( this.plane.normal );
+			this._calculatingMatrixWorld = true;
 
-		this.translateZ( - this.plane.constant );
+			this.position.set( 0, 0, 0 );
 
-		super.updateMatrixWorld( force );
+			this.scale.set( 0.5 * this.size, 0.5 * this.size, 1 );
+
+			this.lookAt( this.plane.normal );
+
+			this.translateZ( - this.plane.constant );
+
+			this._calculatingMatrixWorld = false;
+
+		}
+
+		super.updateMatrixWorld();
 
 	}
 

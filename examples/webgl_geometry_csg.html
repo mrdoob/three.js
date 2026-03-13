@@ -201,7 +201,7 @@
 				baseBrush.rotation.x = t * 0.0001;
 				baseBrush.rotation.y = t * 0.00025;
 				baseBrush.rotation.z = t * 0.0005;
-				baseBrush.updateMatrixWorld();
+				baseBrush.ensureMatrices();
 
 				brush.rotation.x = t * - 0.0002;
 				brush.rotation.y = t * - 0.0005;
@@ -209,7 +209,7 @@
 
 				const s = 0.5 + 0.5 * ( 1 + Math.sin( t * 0.001 ) );
 				brush.scale.set( s, 1, s );
-				brush.updateMatrixWorld();
+				brush.ensureMatrices();
 
 				// update the csg
 				updateCSG();

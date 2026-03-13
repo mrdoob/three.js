@@ -154,7 +154,7 @@ function main() {
 
 		const onChange = () => {
 
-			light.target.updateMatrixWorld();
+			light.target.ensureMatrices();
 			helper.update();
 
 		};
