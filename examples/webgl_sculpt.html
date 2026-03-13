@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#toolbar {
+				position: absolute;
+				top: 50px;
+				left: 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				background: rgba(0,0,0,0.7);
+				padding: 10px;
+				border-radius: 6px;
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				user-select: none;
+			}
+			#toolbar label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			#toolbar select, #toolbar input[type="range"] {
+				width: 120px;
+			}
+			#toolbar .checkbox-row {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.cursor-circle {
+				position: absolute;
+				border: 1.5px solid rgba(255,255,255,0.6);
+				border-radius: 50%;
+				pointer-events: none;
+				transform: translate(-50%, -50%);
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sculpt
+		</div>
+
+		<div id="toolbar">
+			<label>Tool
+				<select id="tool">
+					<option value="brush">Brush</option>
+					<option value="inflate">Inflate</option>
+					<option value="smooth">Smooth</option>
+					<option value="flatten">Flatten</option>
+					<option value="pinch">Pinch</option>
+					<option value="crease">Crease</option>
+					<option value="drag">Drag</option>
+					<option value="scale">Scale</option>
+				</select>
+			</label>
+			<label>Radius
+				<input type="range" id="radius" min="10" max="200" value="50">
+			</label>
+			<label>Intensity
+				<input type="range" id="intensity" min="0" max="100" value="50">
+			</label>
+			<label>Subdivision
+				<input type="range" id="subdivision" min="0" max="100" value="75">
+			</label>
+			<label>Decimation
+				<input type="range" id="decimation" min="0" max="100" value="0">
+			</label>
+			<div class="checkbox-row">
+				<input type="checkbox" id="negative">
+				<label for="negative">Negative</label>
+			</div>
+		</div>
+
+		<div class="cursor-circle" id="cursorCircle"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
+
+			let renderer, scene, camera, controls, sculpt, mesh;
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 4 );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
+				dirLight.position.set( 1, 1.5, 2 );
+				scene.add( dirLight );
+
+				const dirLight2 = new THREE.DirectionalLight( 0x88aaff, 0.5 );
+				dirLight2.position.set( - 1, - 0.5, - 1 );
+				scene.add( dirLight2 );
+
+				// Mesh
+
+				const geometry = new THREE.IcosahedronGeometry( 1, 5 );
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xcc6644,
+					roughness: 0.4,
+					metalness: 0.1
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+
+				// Sculpt
+
+				sculpt = new Sculpt( mesh, camera, renderer.domElement );
+
+				// Disable orbit controls while sculpting
+
+				renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
+
+					if ( event.button === 0 && sculpt.isSculpting ) {
+
+						controls.enabled = false;
+
+					}
+
+				}, true );
+
+				// Use a tiny delay to check sculpting state after Sculpt processes the event
+				renderer.domElement.addEventListener( 'pointerdown', function () {
+
+					requestAnimationFrame( function () {
+
+						if ( sculpt.isSculpting ) controls.enabled = false;
+
+					} );
+
+				} );
+
+				renderer.domElement.addEventListener( 'pointerup', function () {
+
+					controls.enabled = true;
+
+				} );
+
+				// UI
+
+				const toolSelect = document.getElementById( 'tool' );
+				toolSelect.addEventListener( 'change', function () { sculpt.tool = this.value; } );
+
+				const radiusSlider = document.getElementById( 'radius' );
+				radiusSlider.addEventListener( 'input', function () { sculpt.radius = Number( this.value ); } );
+
+				const intensitySlider = document.getElementById( 'intensity' );
+				intensitySlider.addEventListener( 'input', function () { sculpt.intensity = Number( this.value ) / 100; } );
+
+				const subdivisionSlider = document.getElementById( 'subdivision' );
+				subdivisionSlider.addEventListener( 'input', function () { sculpt.subdivision = Number( this.value ) / 100; } );
+
+				const decimationSlider = document.getElementById( 'decimation' );
+				decimationSlider.addEventListener( 'input', function () { sculpt.decimation = Number( this.value ) / 100; } );
+
+				const negativeCheckbox = document.getElementById( 'negative' );
+				negativeCheckbox.addEventListener( 'change', function () { sculpt.negative = this.checked; } );
+
+				// Cursor circle
+
+				const cursorCircle = document.getElementById( 'cursorCircle' );
+				renderer.domElement.addEventListener( 'pointermove', function ( event ) {
+
+					const size = sculpt.radius * 2;
+					cursorCircle.style.width = size + 'px';
+					cursorCircle.style.height = size + 'px';
+					cursorCircle.style.left = event.clientX + 'px';
+					cursorCircle.style.top = event.clientY + 'px';
+
+				} );
+
+				// Resize
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
