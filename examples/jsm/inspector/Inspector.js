@@ -44,6 +44,7 @@ class Inspector extends RendererInspector {
 		// init profiler
 
 		const profiler = new Profiler();
+		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
 
 		const parameters = new Parameters( {
 			builtin: true,
@@ -108,6 +109,48 @@ class Inspector extends RendererInspector {
 	get domElement() {
 
 		return this.profiler.domElement;
+
+	}
+
+	hide() {
+
+		this.profiler.hide();
+
+	}
+
+	show() {
+
+		this.profiler.show();
+
+	}
+
+	getSize() {
+
+		return this.profiler.getSize();
+
+	}
+
+	setActiveTab( tab ) {
+
+		this.profiler.setActiveTab( tab.id );
+
+		return this;
+
+	}
+
+	addTab( tab ) {
+
+		this.profiler.addTab( tab );
+
+		return this;
+
+	}
+
+	removeTab( tab ) {
+
+		this.profiler.removeTab( tab );
+
+		return this;
 
 	}
 

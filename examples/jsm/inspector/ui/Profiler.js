@@ -1,8 +1,11 @@
+import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
 
-export class Profiler {
+export class Profiler extends EventDispatcher {
 
 	constructor() {
+
+		super();
 
 		this.tabs = {};
 		this.activeTabId = null;
@@ -29,6 +32,26 @@ export class Profiler {
 
 		// Setup window resize listener to constrain detached windows
 		this.setupWindowResizeListener();
+
+	}
+
+	getSize() {
+
+		if ( this.panel.classList.contains( 'visible' ) === false || this.panel.classList.contains( 'no-tabs' ) ) {
+
+			return { width: 0, height: 0 };
+
+		}
+
+		if ( this.position === 'right' ) {
+
+			return { width: this.panel.offsetWidth, height: 0 };
+
+		} else {
+
+			return { width: 0, height: this.panel.offsetHeight };
+
+		}
 
 	}
 
@@ -310,6 +333,8 @@ export class Profiler {
 
 				}
 
+				this.dispatchEvent( { type: 'resize' } );
+
 			};
 
 			const onEnd = () => {
@@ -402,6 +427,49 @@ export class Profiler {
 
 		}
 
+		this.dispatchEvent( { type: 'resize' } );
+
+	}
+
+	hide() {
+
+		this.miniPanel.classList.remove( 'visible' );
+
+		this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
+
+			content.style.display = 'none';
+
+		} );
+
+		this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
+
+			btn.classList.remove( 'active' );
+
+		} );
+
+	}
+
+	show( tab ) {
+
+		this.hide();
+
+		tab.builtinButton.classList.add( 'active' );
+
+		if ( ! tab.miniContent.firstChild ) {
+
+			const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
+
+			if ( actualContent ) {
+
+				tab.miniContent.appendChild( actualContent );
+
+			}
+
+		}
+
+		tab.miniContent.style.display = 'block';
+		this.miniPanel.classList.add( 'visible' );
+
 	}
 
 	addTab( tab ) {
@@ -488,47 +556,13 @@ export class Profiler {
 			// Toggle mini-panel for this tab
 			const isCurrentlyActive = miniContent.style.display !== 'none' && miniContent.children.length > 0;
 
-			// Hide all other mini-panel contents
-			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-				content.style.display = 'none';
-
-			} );
-
-			// Remove active state from all builtin buttons
-			this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
-
-				btn.classList.remove( 'active' );
-
-			} );
-
 			if ( isCurrentlyActive ) {
 
-				// Toggle off - hide mini-panel
-				this.miniPanel.classList.remove( 'visible' );
-				miniContent.style.display = 'none';
+				this.hide();
 
 			} else {
 
-				// Toggle on - show mini-panel with this tab's content
-				builtinButton.classList.add( 'active' );
-
-				// Move actual content to mini-panel (not clone) if not already there
-				if ( ! miniContent.firstChild ) {
-
-					const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
-
-					if ( actualContent ) {
-
-						miniContent.appendChild( actualContent );
-
-					}
-
-				}
-
-				// Show after content is moved
-				miniContent.style.display = 'block';
-				this.miniPanel.classList.add( 'visible' );
+				this.show( tab );
 
 			}
 
@@ -621,6 +655,8 @@ export class Profiler {
 			}
 
 		}
+
+		this.dispatchEvent( { type: 'resize' } );
 
 	}
 
@@ -1469,6 +1505,8 @@ export class Profiler {
 			}
 
 		} );
+
+		this.dispatchEvent( { type: 'resize' } );
 
 		this.saveLayout();
 
