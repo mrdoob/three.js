@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js xr - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - sculpt<br/>
+			Trigger to sculpt. Squeeze to toggle negative. Thumbstick to cycle tools.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
+
+			let renderer, scene, camera, controls;
+			let controller1, controller2, controllerGrip1, controllerGrip2;
+			let sculpt, mesh;
+			let cursor1, cursor2;
+
+			const tools = [ 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
+			let toolIndex = 0;
+			let brushRadius = 0.06;
+
+			const _origin = new THREE.Vector3();
+			const _direction = new THREE.Vector3();
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.xr.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( XRButton.createButton( renderer ) );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera.position.set( 0, 1.6, 3 );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+				// Lights
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788, 3 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 1, 3, 2 );
+				scene.add( dirLight );
+
+				// Grid
+
+				const grid = new THREE.GridHelper( 4, 1, 0x111111, 0x111111 );
+				scene.add( grid );
+
+				// Mesh
+
+				const geometry = new THREE.IcosahedronGeometry( 0.3, 5 );
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xcc6644,
+					roughness: 0.4,
+					metalness: 0.1
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set( 0, 1, 0 );
+				scene.add( mesh );
+
+				// Sculpt
+
+				sculpt = new Sculpt( mesh, camera, renderer.domElement );
+				sculpt.tool = tools[ toolIndex ];
+				sculpt.intensity = 0.5;
+				sculpt.subdivision = 0.75;
+
+				// Controllers
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+					sculpt.endStroke();
+
+				}
+
+				function onSqueezeStart() {
+
+					sculpt.negative = ! sculpt.negative;
+
+				}
+
+				controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
+				controller1.addEventListener( 'squeezestart', onSqueezeStart );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
+				controller2.addEventListener( 'squeezestart', onSqueezeStart );
+				scene.add( controller2 );
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				// Controller ray lines
+
+				const lineGeometry = new THREE.BufferGeometry().setFromPoints( [
+					new THREE.Vector3( 0, 0, 0 ),
+					new THREE.Vector3( 0, 0, - 5 )
+				] );
+				const lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.25 } );
+
+				controller1.add( new THREE.Line( lineGeometry, lineMaterial ) );
+				controller2.add( new THREE.Line( lineGeometry, lineMaterial ) );
+
+				// Cursor spheres (show brush intersection on mesh)
+
+				const cursorGeo = new THREE.SphereGeometry( 1, 16, 12 );
+				const cursorMat = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.15,
+					depthWrite: false
+				} );
+
+				cursor1 = new THREE.Mesh( cursorGeo, cursorMat );
+				cursor1.visible = false;
+				scene.add( cursor1 );
+
+				cursor2 = new THREE.Mesh( cursorGeo, cursorMat.clone() );
+				cursor2.visible = false;
+				scene.add( cursor2 );
+
+				// Resize
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function handleController( controller, cursor ) {
+
+				controller.updateMatrixWorld( true );
+
+				// Get ray from controller
+				_origin.set( 0, 0, 0 ).applyMatrix4( controller.matrixWorld );
+				_direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
+
+				if ( controller.userData.isSelecting ) {
+
+					const hit = sculpt.strokeFromRay( _origin, _direction, brushRadius );
+					if ( hit ) {
+
+						// Show cursor at intersection point (transform from local to world)
+						const ip = sculpt.hitPoint;
+						cursor.position.set( ip[ 0 ], ip[ 1 ], ip[ 2 ] );
+						cursor.position.applyMatrix4( mesh.matrixWorld );
+						cursor.scale.setScalar( brushRadius );
+						cursor.visible = true;
+
+					} else {
+
+						cursor.visible = false;
+
+					}
+
+				} else {
+
+					cursor.visible = false;
+
+				}
+
+				// Handle thumbstick for tool cycling
+				const session = renderer.xr.getSession();
+				if ( session ) {
+
+					const sources = session.inputSources;
+					for ( let i = 0; i < sources.length; i ++ ) {
+
+						const source = sources[ i ];
+						if ( source.handedness === ( controller === controller1 ? 'left' : 'right' ) ) continue;
+						if ( ! source.gamepad ) continue;
+
+						const axes = source.gamepad.axes;
+						if ( axes.length >= 4 ) {
+
+							const thumbX = axes[ 2 ];
+							if ( ! controller.userData.thumbMoved && Math.abs( thumbX ) > 0.8 ) {
+
+								controller.userData.thumbMoved = true;
+								toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
+								sculpt.tool = tools[ toolIndex ];
+
+							} else if ( Math.abs( thumbX ) < 0.3 ) {
+
+								controller.userData.thumbMoved = false;
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function animate() {
+
+				handleController( controller1, cursor1 );
+				handleController( controller2, cursor2 );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
