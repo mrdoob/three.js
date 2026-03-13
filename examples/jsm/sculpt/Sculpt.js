@@ -540,9 +540,41 @@ class Sculpt {
 		const nbVerts = sm.getNbVertices();
 		const nbTris = sm.getNbTriangles();
 
-		geometry.setAttribute( 'position', new BufferAttribute( sm.getVertices().slice( 0, nbVerts * 3 ), 3 ) );
-		geometry.setAttribute( 'normal', new BufferAttribute( sm.getNormals().slice( 0, nbVerts * 3 ), 3 ) );
-		geometry.setIndex( new BufferAttribute( sm.getTriangles().slice( 0, nbTris * 3 ), 1 ) );
+		const posAttr = geometry.getAttribute( 'position' );
+		const normAttr = geometry.getAttribute( 'normal' );
+		const indexAttr = geometry.getIndex();
+
+		const positions = sm.getVertices().slice( 0, nbVerts * 3 );
+		const normals = sm.getNormals().slice( 0, nbVerts * 3 );
+		const indices = sm.getTriangles().slice( 0, nbTris * 3 );
+
+		if ( posAttr && posAttr.count === nbVerts ) {
+
+			posAttr.array.set( positions );
+			posAttr.needsUpdate = true;
+			normAttr.array.set( normals );
+			normAttr.needsUpdate = true;
+
+		} else {
+
+			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+
+		}
+
+		if ( indexAttr && indexAttr.count === nbTris * 3 ) {
+
+			indexAttr.array.set( indices );
+			indexAttr.needsUpdate = true;
+
+		} else {
+
+			const newIndex = new BufferAttribute( indices, 1 );
+			newIndex.version = indexAttr ? indexAttr.version + 1 : 0;
+			geometry.setIndex( newIndex );
+
+		}
+
 		geometry.computeBoundingSphere();
 
 	}
