@@ -1592,11 +1592,7 @@ class Object3D extends EventDispatcher {
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
 
-		if ( source.pivot !== null ) {
-
-			this.pivot = source.pivot.clone();
-
-		}
+		this.pivot = source.pivot ? source.pivot.clone() : null;
 
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );
