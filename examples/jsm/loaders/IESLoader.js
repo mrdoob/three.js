@@ -7,6 +7,7 @@ import {
 	Loader,
 	UnsignedByteType,
 	LinearFilter,
+	RepeatWrapping,
 	HalfFloatType,
 	DataUtils
 } from 'three';
@@ -50,81 +51,90 @@ class IESLoader extends Loader {
 
 	_getIESValues( iesLamp, type ) {
 
-		const width = 360;
-		const height = 180;
-		const size = width * height;
+		function findIndex( angles, value ) {
 
-		const data = new Array( size );
+			for ( let i = 0; i < angles.length - 2; ++ i ) {
 
-		function interpolateCandelaValues( phi, theta ) {
+				if ( value < angles[ i + 1 ] ) {
 
-			let phiIndex = 0, thetaIndex = 0;
-			let startTheta = 0, endTheta = 0, startPhi = 0, endPhi = 0;
-
-			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) { // numHorAngles = horAngles.length-1 because of extra padding, so this wont cause an out of bounds error
-
-				if ( theta < iesLamp.horAngles[ i + 1 ] || i == iesLamp.numHorAngles - 2 ) {
-
-					thetaIndex = i;
-					startTheta = iesLamp.horAngles[ i ];
-					endTheta = iesLamp.horAngles[ i + 1 ];
-
-					break;
+					return i;
 
 				}
 
 			}
 
-			for ( let i = 0; i < iesLamp.numVerAngles - 1; ++ i ) {
+			return angles.length - 2;
 
-				if ( phi < iesLamp.verAngles[ i + 1 ] || i == iesLamp.numVerAngles - 2 ) {
+		}
 
-					phiIndex = i;
-					startPhi = iesLamp.verAngles[ i ];
-					endPhi = iesLamp.verAngles[ i + 1 ];
+		function interpolateCandelaValues( azimuth, inclination ) {
 
-					break;
+			const azimuthIndex = findIndex( iesLamp.horAngles, azimuth );
+			const deltaAzimuth = iesLamp.horAngles[ azimuthIndex + 1 ] - iesLamp.horAngles[ azimuthIndex ];
+			const tAzimuth = ( azimuth - iesLamp.horAngles[ azimuthIndex ] ) / deltaAzimuth;
 
-				}
+			const inclinationIndex = findIndex( iesLamp.verAngles, inclination );
+			const deltaInclination = iesLamp.verAngles[ inclinationIndex + 1 ] - iesLamp.verAngles[ inclinationIndex ];
+			const tInclination = ( inclination - iesLamp.verAngles[ inclinationIndex ] ) / deltaInclination;
 
-			}
-
-			const deltaTheta = endTheta - startTheta;
-			const deltaPhi = endPhi - startPhi;
-
-			if ( deltaPhi === 0 ) // Outside range
-				return 0;
-
-			const t1 = deltaTheta === 0 ? 0 : ( theta - startTheta ) / deltaTheta;
-			const t2 = ( phi - startPhi ) / deltaPhi;
-
-			const nextThetaIndex = deltaTheta === 0 ? thetaIndex : thetaIndex + 1;
-
-			const v1 = MathUtils.lerp( iesLamp.candelaValues[ thetaIndex ][ phiIndex ], iesLamp.candelaValues[ nextThetaIndex ][ phiIndex ], t1 );
-			const v2 = MathUtils.lerp( iesLamp.candelaValues[ thetaIndex ][ phiIndex + 1 ], iesLamp.candelaValues[ nextThetaIndex ][ phiIndex + 1 ], t1 );
-			const v = MathUtils.lerp( v1, v2, t2 );
-
+			const v1 = MathUtils.lerp( iesLamp.candelaValues[ azimuthIndex ][ inclinationIndex ], iesLamp.candelaValues[ azimuthIndex ][ inclinationIndex + 1 ], tInclination );
+			const v2 = MathUtils.lerp( iesLamp.candelaValues[ azimuthIndex + 1 ][ inclinationIndex ], iesLamp.candelaValues[ azimuthIndex + 1 ][ inclinationIndex + 1 ], tInclination );
+			const v = MathUtils.lerp( v1, v2, tAzimuth );
 			return v;
 
 		}
 
-		const startTheta = iesLamp.horAngles[ 0 ], endTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
+		const startAzimuth = iesLamp.horAngles[ 0 ], endAzimuth = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
+		const startInclination = iesLamp.verAngles[ 0 ], endInclination = iesLamp.verAngles[ iesLamp.numVerAngles - 1 ];
 
-		for ( let i = 0; i < size; ++ i ) {
+		// compute the best resolution for the IES texture based on the minium sampling angle
+		const nh = iesLamp.horAngles.length;
+		const nv = iesLamp.verAngles.length;
+		let dAzimuth = 360;
+		for ( let i = 0; i < nh - 1; ++ i ) {
 
-			let theta = i % width;
-			const phi = Math.floor( i / width );
+			dAzimuth = Math.min( dAzimuth, iesLamp.horAngles[ i + 1 ] - iesLamp.horAngles[ i ] );
 
-			if ( endTheta - startTheta !== 0 && ( theta < startTheta || theta >= endTheta ) ) { // Handle symmetry for hor angles
+		}
 
-				theta %= endTheta * 2;
+		dAzimuth = Math.max( dAzimuth, 0.5 );
+		let dInclination = 180;
+		for ( let i = 0; i < nv - 1; ++ i ) {
 
-				if ( theta > endTheta )
-					theta = endTheta * 2 - theta;
+			dInclination = Math.min( dInclination, iesLamp.verAngles[ i + 1 ] - iesLamp.verAngles[ i ] );
+
+		}
+
+		dInclination = Math.max( dInclination, 0.5 );
+
+		const rangeAzimuth = iesLamp.horAngles[ nh - 1 ] - iesLamp.horAngles[ 0 ];
+		const nAzimuth = Math.round( rangeAzimuth / dAzimuth ) + 1;
+		const rangeInclination = iesLamp.verAngles[ nv - 1 ] - iesLamp.verAngles[ 0 ];
+		const nInclination = Math.round( rangeInclination / dInclination ) + 1;
+
+		const data = new Array( nAzimuth * nInclination );
+
+		for ( let iAzimuth = 0; iAzimuth < nAzimuth; ++ iAzimuth ) {
+
+			const azimuth = iAzimuth * 360 / ( nAzimuth - 1 );
+			if ( azimuth < startAzimuth || azimuth > endAzimuth ) {
+
+				continue;
 
 			}
 
-			data[ phi + theta * height ] = interpolateCandelaValues( phi, theta );
+			for ( let iInclination = 0; iInclination < nInclination; ++ iInclination ) {
+
+				const inclination = iInclination * 180 / ( nInclination - 1 );
+				if ( inclination < startInclination || inclination > endInclination ) {
+
+					continue;
+
+				}
+
+				data[ iAzimuth + iInclination * nAzimuth ] = interpolateCandelaValues( azimuth, inclination );
+
+			}
 
 		}
 
@@ -135,7 +145,7 @@ class IESLoader extends Loader {
 		else if ( type === FloatType ) result = Float32Array.from( data );
 		else console.error( 'IESLoader: Unsupported type:', type );
 
-		return result;
+		return { data: result, width: nAzimuth, height: nInclination };
 
 	}
 
@@ -176,11 +186,12 @@ class IESLoader extends Loader {
 		const type = this.type;
 
 		const iesLamp = new IESLamp( text );
-		const data = this._getIESValues( iesLamp, type );
+		const result = this._getIESValues( iesLamp, type );
 
-		const texture = new DataTexture( data, 180, 1, RedFormat, type );
+		const texture = new DataTexture( result.data, result.width, result.height, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
+		texture.wrapS = RepeatWrapping;
 		texture.needsUpdate = true;
 
 		return texture;
@@ -286,6 +297,122 @@ function IESLamp( text ) {
 
 	}
 
+	function _unrollTypeA() {
+
+		if ( _self.horAngles.at( 0 ) == 0 ) {
+
+			const candelaValues = [];
+			const horAngles = [];
+			for ( let i = _self.numHorAngles - 1; i > 0; -- i ) {
+
+				candelaValues.push( _self.candelaValues[ i ].slice() );
+				horAngles.push( - _self.horAngles[ i ] );
+
+			}
+
+			_self.candelaValues = candelaValues.concat( _self.candelaValues );
+			_self.horAngles = horAngles.concat( _self.horAngles );
+
+		}
+
+		for ( let iv = 0; iv < _self.verAngles.length; ++ iv ) {
+
+			_self.verAngles[ iv ] += 90;
+
+		}
+
+	}
+
+	function _unrollTypeB() {
+
+		console.log( 'Type B : this type is not supported correctly, sorry.' );
+		if ( _self.horAngles.at( 0 ) == 0 ) {
+
+			const candelaValues = [];
+			const horAngles = [];
+			for ( let i = _self.numHorAngles - 1; i > 0; -- i ) {
+
+				candelaValues.push( _self.candelaValues[ i ].slice() );
+				horAngles.push( - _self.horAngles[ i ] );
+
+			}
+
+			_self.candelaValues = candelaValues.concat( _self.candelaValues );
+			_self.horAngles = horAngles.concat( _self.horAngles );
+
+		}
+
+		for ( let iv = 0; iv < _self.verAngles.length; ++ iv ) {
+
+			_self.verAngles[ iv ] += 90;
+
+		}
+
+	}
+
+	function _unrollTypeC() {
+
+		if ( _self.horAngles.at( - 1 ) == 0 ) {
+
+			_self.candelaValues.push( _self.candelaValues.at( - 1 ).slice() );
+			_self.horAngles.push( 360 );
+			_self.numHorAngles = 2;
+
+		}
+
+		if ( _self.horAngles.at( - 1 ) == 90 ) {
+
+			for ( let i = _self.numHorAngles - 2; i >= 0; -- i ) {
+
+				_self.candelaValues.push( _self.candelaValues[ i ].slice() );
+				_self.horAngles.push( 180 - _self.horAngles[ i ] );
+
+			}
+
+			_self.numHorAngles = 2 * _self.numHorAngles - 1;
+
+		}
+
+		if ( _self.horAngles.at( - 1 ) == 180 ) {
+
+			for ( let i = _self.numHorAngles - 2; i >= 0; -- i ) {
+
+				_self.candelaValues.push( _self.candelaValues[ i ].slice() );
+				_self.horAngles.push( 360 - _self.horAngles[ i ] );
+
+			}
+
+			_self.numHorAngles = 2 * _self.numHorAngles - 1;
+
+		}
+
+		if ( _self.horAngles.at( - 1 ) != 360 ) {
+
+			//do nothing
+			console.log( 'Type C : There is an issue in the horizontal angles.' );
+
+		}
+
+	}
+
+	function unroll() {
+
+		if ( _self.gonioType == 1 ) {
+
+			_unrollTypeC();
+
+		} else if ( _self.gonioType == 3 ) {
+
+			_unrollTypeA();
+
+		} else if ( _self.gonioType == 2 ) {
+
+			_unrollTypeB();
+
+		}
+
+	}
+
 	while ( true ) {
 
 		line = textArray[ lineNumber ++ ];
@@ -327,6 +454,8 @@ function IESLamp( text ) {
 	readArray( _self.numVerAngles, _self.verAngles );
 	readArray( _self.numHorAngles, _self.horAngles );
 
+
+
 	// Parse Candela values
 	for ( let i = 0; i < _self.numHorAngles; ++ i ) {
 
@@ -335,12 +464,12 @@ function IESLamp( text ) {
 	}
 
 	// Calculate actual candela values, and normalize.
+	const factor = _self.multiplier * _self.ballFactor * _self.blpFactor;
 	for ( let i = 0; i < _self.numHorAngles; ++ i ) {
 
 		for ( let j = 0; j < _self.numVerAngles; ++ j ) {
 
-			_self.candelaValues[ i ][ j ] *= _self.candelaValues[ i ][ j ] * _self.multiplier
-				* _self.ballFactor * _self.blpFactor;
+			_self.candelaValues[ i ][ j ] *= factor;
 
 		}
 
@@ -372,6 +501,8 @@ function IESLamp( text ) {
 		}
 
 	}
+
+	unroll();
 
 }
 

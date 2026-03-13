@@ -3,8 +3,9 @@ import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { lightTargetDirection, lightProjectionUV } from '../accessors/Lights.js';
+import { lightTargetDirection, lightProjectionUV, lightPosition, lightTargetPosition } from '../accessors/Lights.js';
 import { texture } from '../accessors/TextureNode.js';
+import { positionWorld } from '../accessors/Position.js';
 
 /**
  * Module for representing spot lights as nodes.
@@ -89,9 +90,10 @@ class SpotLightNode extends AnalyticLightNode {
 	 *
 	 * @param {NodeBuilder} builder - The node builder.
 	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @param {Node<float>} azimuthAngle - The azimuthal angle
 	 * @return {Node<float>} The spot attenuation.
 	 */
-	getSpotAttenuation( builder, angleCosine ) {
+	getSpotAttenuation( builder, angleCosine, azimuthAngle ) {
 
 		const { coneCosNode, penumbraCosNode } = this;
 
@@ -120,12 +122,20 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
-		const lightVector = this.getLightVector( builder );
 
+		const vecLight = lightPosition( light ).sub( builder.context.positionWorld || positionWorld ).normalize();
+
+		const vecTargetToLight = lightPosition( light ).sub( lightTargetPosition( light ) ).normalize();
+		const vecTarget = lightTargetPosition( light ).normalize();
+		const vecRight = vecTarget.cross( vecTargetToLight ).normalize();
+		const vecUp = vecTargetToLight.cross( vecRight ).normalize();
+		const rotationAngle = vecLight.dot( vecRight ).atan( vecLight.dot( vecUp ) ).add( Math.PI * 2 );
+
+		const lightVector = this.getLightVector( builder );
 		const lightDirection = lightVector.normalize();
 		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
 
-		const spotAttenuation = this.getSpotAttenuation( builder, angleCos );
+		const spotAttenuation = this.getSpotAttenuation( builder, angleCos, rotationAngle );
 
 		const lightDistance = lightVector.length();
 
