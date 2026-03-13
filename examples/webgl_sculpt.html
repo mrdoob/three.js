@@ -156,17 +156,6 @@
 
 				// Disable orbit controls while sculpting
 
-				renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
-
-					if ( event.button === 0 && sculpt.isSculpting ) {
-
-						controls.enabled = false;
-
-					}
-
-				}, true );
-
-				// Use a tiny delay to check sculpting state after Sculpt processes the event
 				renderer.domElement.addEventListener( 'pointerdown', function () {
 
 					requestAnimationFrame( function () {

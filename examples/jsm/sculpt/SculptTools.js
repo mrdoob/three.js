@@ -8,7 +8,8 @@ import {
 	intersectionArrays,
 	sqrDist,
 	triangleInsideSphere,
-	pointInsideTriangle
+	pointInsideTriangle,
+	falloff
 } from './SculptUtils.js';
 
 // ---- Subdivision ----
@@ -900,9 +901,7 @@ function toolBrush( mesh, iVerts, aNormal, center, radiusSq, intensity, negative
 		const dx = vAr[ ind ] - cx, dy = vAr[ ind + 1 ] - cy, dz = vAr[ ind + 2 ] - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= mAr[ ind + 2 ] * deform;
+		const fallOff = falloff( dist ) * mAr[ ind + 2 ] * deform;
 		vAr[ ind ] += anx * fallOff;
 		vAr[ ind + 1 ] += any * fallOff;
 		vAr[ ind + 2 ] += anz * fallOff;
@@ -929,9 +928,7 @@ function toolFlatten( mesh, iVerts, aNormal, aCenter2, center, radiusSq, intensi
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= distToPlane * intensity * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * distToPlane * intensity * mAr[ ind + 2 ];
 		vAr[ ind ] -= anx * fallOff;
 		vAr[ ind + 1 ] -= any * fallOff;
 		vAr[ ind + 2 ] -= anz * fallOff;
@@ -955,9 +952,7 @@ function toolInflate( mesh, iVerts, center, radiusSq, intensity, negative ) {
 		const dx = vAr[ ind ] - cx, dy = vAr[ ind + 1 ] - cy, dz = vAr[ ind + 2 ] - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff = deform * fallOff;
+		let fallOff = falloff( dist ) * deform;
 		const nx = nAr[ ind ], ny = nAr[ ind + 1 ], nz = nAr[ ind + 2 ];
 		const nLen = Math.sqrt( nx * nx + ny * ny + nz * nz );
 		if ( nLen > 0 ) fallOff /= nLen;
@@ -1006,9 +1001,7 @@ function toolPinch( mesh, iVerts, center, radiusSq, intensity, negative ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = cx - vx, dy = cy - vy, dz = cz - vz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= deform * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * deform * mAr[ ind + 2 ];
 		vAr[ ind ] = vx + dx * fallOff;
 		vAr[ ind + 1 ] = vy + dy * fallOff;
 		vAr[ ind + 2 ] = vz + dz * fallOff;
@@ -1034,9 +1027,7 @@ function toolCrease( mesh, iVerts, aNormal, center, radiusSq, intensity, negativ
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * mAr[ ind + 2 ];
 		const brushMod = Math.pow( fallOff, 5 ) * brushFactor;
 		const pinchF = fallOff * deform;
 		vAr[ ind ] = vx + dx * pinchF + anx * brushMod;
@@ -1060,9 +1051,7 @@ function toolDrag( mesh, iVerts, center, radiusSq, dragDir ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * mAr[ ind + 2 ];
 		vAr[ ind ] = vx + dirx * fallOff;
 		vAr[ ind + 1 ] = vy + diry * fallOff;
 		vAr[ ind + 2 ] = vz + dirz * fallOff;
@@ -1084,9 +1073,7 @@ function toolScale( mesh, iVerts, center, radiusSq, deltaScale ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		let fallOff = dist * dist;
-		fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
-		fallOff *= scale * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * scale * mAr[ ind + 2 ];
 		vAr[ ind ] = vx + dx * fallOff;
 		vAr[ ind + 1 ] = vy + dy * fallOff;
 		vAr[ ind + 2 ] = vz + dz * fallOff;
