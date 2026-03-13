@@ -27,8 +27,9 @@ class SphereGeometry extends BufferGeometry {
 	 * @param {number} [phiLength=Math.PI*2] - The horizontal sweep angle size.
 	 * @param {number} [thetaStart=0] - The vertical starting angle in radians.
 	 * @param {number} [thetaLength=Math.PI] - The vertical sweep angle size.
+	 * @param {Object} [attributes={}] - Attribute precision specifiers.
 	 */
-	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
+	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI, precision = { position: Float32BufferAttribute, uv: Float32BufferAttribute, normal: Float32BufferAttribute } ) {
 
 		super();
 
@@ -48,7 +49,8 @@ class SphereGeometry extends BufferGeometry {
 			phiStart: phiStart,
 			phiLength: phiLength,
 			thetaStart: thetaStart,
-			thetaLength: thetaLength
+			thetaLength: thetaLength,
+			precision: precision
 		};
 
 		widthSegments = Math.max( 3, Math.floor( widthSegments ) );
@@ -141,9 +143,11 @@ class SphereGeometry extends BufferGeometry {
 		// build geometry
 
 		this.setIndex( indices );
-		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ).convert( precision.position ) );
+		if ( precision.normal !== null )
+			this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3, true ).convert( precision.normal ) );
+		if ( precision.uv !== null )
+			this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2, true ).convert( precision.uv ) );
 
 	}
 
@@ -166,7 +170,7 @@ class SphereGeometry extends BufferGeometry {
 	 */
 	static fromJSON( data ) {
 
-		return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
+		return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength, data.precision );
 
 	}
 
