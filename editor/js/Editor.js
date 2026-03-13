@@ -435,6 +435,8 @@ Editor.prototype = {
 				} else if ( object.isDirectionalLight ) {
 
 					helper = new THREE.DirectionalLightHelper( object, 1 );
+					
+					object.helper = helper;
 
 				} else if ( object.isSpotLight ) {
 
