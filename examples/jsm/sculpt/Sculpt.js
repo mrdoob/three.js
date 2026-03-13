@@ -342,6 +342,9 @@ class Sculpt {
 		const sm = this._sculptMesh;
 		const tool = this.tool;
 
+		// Compute before dynamic topology changes the picked face
+		if ( tool === 'crease' ) this._computePickedNormal();
+
 		// Dynamic topology for all tools except scale
 		if ( tool !== 'scale' ) {
 
@@ -386,7 +389,6 @@ class Sculpt {
 
 		} else if ( tool === 'crease' ) {
 
-			this._computePickedNormal();
 			const pN = this._pickedNormal;
 			toolCrease( sm, iVerts, pN, center, rLocal2, intensity, negative );
 
