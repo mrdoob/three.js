@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - html texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ffffff;
+			}
+			#canvas {
+				display: block;
+			}
+			#draw_element {
+				width: 600px;
+				background-color: #aaaaaa;
+				color: #000000;
+				font-family: sans-serif;
+				font-size: 30px;
+				line-height: 1.5;
+				text-align: center;
+				padding: 30px;
+				/* border: 10px solid #cccccc; */
+			}
+			#draw_element img {
+			  animation: swing 1s ease-in-out infinite alternate;
+			}
+			@keyframes swing {
+				from { transform: rotate(-15deg); }
+				to { transform: rotate(15deg); }
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - HTMLTexture
+		</div>
+
+		<canvas id="canvas" width="600" height="600" layoutsubtree="true">
+			<!-- inert to prevent hit testing in this example. -->
+			<div id="draw_element" inert>
+				Hello world!<br>I'm multi-line, <b>formatted</b>,
+				rotated text with emoji (&#128512;), RTL text
+				<span dir=rtl>من فارسی صحبت میکنم</span>,
+				vertical text,
+				<p style="writing-mode: vertical-rl;">
+				这是垂直文本
+				</p>
+				an inline image (<img width="150" src="files/wolf.jpg">), and
+				<svg width="50" height="50">
+				<circle cx="25" cy="25" r="20" fill="green" />
+				<text x="25" y="30" font-size="15" text-anchor="middle" fill="#fff">
+					SVG
+				</text>
+				</svg>!
+			</div>
+		</canvas>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			let camera, scene, renderer, mesh;
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				// document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
+				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.02 ).texture;
+
+				const geometry = new RoundedBoxGeometry( 200, 200, 200, 10, 10 );
+
+				const material = new THREE.MeshStandardMaterial( { roughness: 0, metalness: 0.5 } );
+				material.map = new THREE.HTMLTexture( draw_element );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate( time ) {
+
+				mesh.rotation.x = Math.sin( time * 0.0005 ) * 0.5;
+				mesh.rotation.y = Math.cos( time * 0.0008 ) * 0.5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
