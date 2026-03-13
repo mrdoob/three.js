@@ -226,7 +226,13 @@ class WebGPUUtils {
 
 		const parameters = this.backend.parameters;
 
-		const bufferType = parameters.outputType;
+		let bufferType = parameters.outputBufferType;
+
+		if ( bufferType === undefined ) {
+
+			bufferType = parameters.outputType;
+
+		}
 
 		if ( bufferType === undefined ) {
 
