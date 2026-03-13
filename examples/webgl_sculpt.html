@@ -6,13 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			.cursor-circle {
-				position: absolute;
-				border: 1.5px solid rgba(255,255,255,0.6);
-				border-radius: 50%;
-				pointer-events: none;
-				transform: translate(-50%, -50%);
-			}
+			canvas { cursor: none; }
 		</style>
 	</head>
 	<body>
@@ -20,8 +14,6 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sculpt
 		</div>
-
-		<div class="cursor-circle" id="cursorCircle"></div>
 
 		<script type="importmap">
 			{
@@ -40,6 +32,11 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let renderer, scene, camera, controls, sculpt, mesh;
+			let cursorGroup, cursorRing, cursorDot;
+
+			const _normal = new THREE.Vector3();
+			const _forward = new THREE.Vector3( 0, 0, 1 );
+			const _mouse = new THREE.Vector3();
 
 			init();
 
@@ -170,16 +167,91 @@
 
 				} );
 
-				// Cursor circle
+				// 3D Cursor
 
-				const cursorCircle = document.getElementById( 'cursorCircle' );
+				const cursorMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0.5,
+					depthTest: false
+				} );
+
+				cursorRing = new THREE.Mesh( new THREE.RingGeometry( 0.95, 1, 48 ), cursorMaterial );
+				cursorDot = new THREE.Mesh( new THREE.CircleGeometry( 0.04, 16 ), cursorMaterial );
+
+				cursorGroup = new THREE.Group();
+				cursorGroup.add( cursorRing );
+				cursorGroup.add( cursorDot );
+				cursorGroup.visible = false;
+				cursorGroup.renderOrder = 1;
+				cursorRing.renderOrder = 1;
+				cursorDot.renderOrder = 1;
+				scene.add( cursorGroup );
+
 				renderer.domElement.addEventListener( 'pointermove', function ( event ) {
 
-					const size = sculpt.radius * 2;
-					cursorCircle.style.width = size + 'px';
-					cursorCircle.style.height = size + 'px';
-					cursorCircle.style.left = event.clientX + 'px';
-					cursorCircle.style.top = event.clientY + 'px';
+					// Hide cursor while orbiting
+					if ( event.buttons > 0 && ! sculpt.isSculpting ) {
+
+						cursorGroup.visible = false;
+						return;
+
+					}
+
+					const picking = ! sculpt.isSculpting;
+					const hit = picking && sculpt.pickFromMouse( event.clientX, event.clientY );
+
+					if ( hit || sculpt.isSculpting ) {
+
+						const ip = sculpt.hitPoint;
+						const n = sculpt.hitNormal;
+
+						// Position in world space
+						cursorGroup.position.set( ip[ 0 ], ip[ 1 ], ip[ 2 ] ).applyMatrix4( mesh.matrixWorld );
+
+						// Orient to surface normal (transform normal to world space)
+						if ( picking ) {
+
+							_normal.set( n[ 0 ], n[ 1 ], n[ 2 ] ).transformDirection( mesh.matrixWorld );
+							cursorGroup.quaternion.setFromUnitVectors( _forward, _normal );
+
+						}
+
+						// Scale to match brush radius in world space
+						const dist = cursorGroup.position.distanceTo( camera.position );
+						const fov = camera.fov * Math.PI / 180;
+						const screenHeight = 2 * dist * Math.tan( fov / 2 );
+						const worldRadius = ( sculpt.radius / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldRadius );
+
+						cursorRing.visible = picking;
+						cursorDot.visible = true;
+						cursorGroup.visible = true;
+
+					} else {
+
+						// No intersection: show ring facing camera at fixed depth
+						const rect = renderer.domElement.getBoundingClientRect();
+						_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+						_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+						_mouse.z = 0.5;
+						_mouse.unproject( camera );
+
+						cursorGroup.position.copy( _mouse );
+						cursorGroup.quaternion.copy( camera.quaternion );
+
+						const dist = cursorGroup.position.distanceTo( camera.position );
+						const fov = camera.fov * Math.PI / 180;
+						const screenHeight = 2 * dist * Math.tan( fov / 2 );
+						const worldRadius = ( sculpt.radius / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldRadius );
+
+						cursorRing.visible = true;
+						cursorDot.visible = true;
+						cursorGroup.visible = true;
+
+					}
 
 				} );
 
