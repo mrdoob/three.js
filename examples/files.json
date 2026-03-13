@@ -526,8 +526,8 @@
 		"webxr_xr_dragging",
 		"webxr_xr_dragging_custom_depth",
 		"webxr_xr_haptics",
-		"webxr_xr_paint",
-		"webxr_xr_sculpt"
+		"webxr_xr_marchingcubes",
+		"webxr_xr_paint"
 	],
 	"games": [
 		"games_fps"
