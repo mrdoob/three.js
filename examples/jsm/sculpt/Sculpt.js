@@ -51,7 +51,7 @@ class Sculpt {
 
 		this.tool = 'brush';
 		this.radius = 50;
-		this.intensity = 0.5;
+		this.strength = 1.5;
 		this.negative = false;
 		this.subdivision = 0.75;
 		this.decimation = 0;
@@ -367,7 +367,7 @@ class Sculpt {
 
 		const iVertsFront = getFrontVertices( sm, iVerts, this._eyeDir );
 		const center = this._interPoint;
-		const intensity = this.intensity;
+		const intensity = this.strength;
 		const negative = this.negative;
 
 		if ( tool === 'brush' ) {
