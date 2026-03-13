@@ -47,8 +47,6 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
-const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
-
 /**
  * Base class for renderers.
  */
@@ -3340,15 +3338,7 @@ class Renderer {
 
 				const { colorNode, depthNode, positionNode } = this._getShadowNodes( material );
 
-				if ( this.shadowMap.type === VSMShadowMap ) {
-
-					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
-
-				} else {
-
-					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : _shadowSide[ material.side ];
-
-				}
+				overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
 
 				if ( colorNode !== null ) overrideMaterial.colorNode = colorNode;
 				if ( depthNode !== null ) overrideMaterial.depthNode = depthNode;
