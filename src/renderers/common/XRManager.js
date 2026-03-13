@@ -1161,7 +1161,7 @@ class XRManager extends EventDispatcher {
 
 		} else {
 
-			// assume single camera setup (AR)
+			// view frustum culling will be performed per camera, but assign this anyway
 
 			cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
 
@@ -1587,6 +1587,7 @@ function onAnimationFrame( time, frame ) {
 
 			cameraXR.cameras.length = 0;
 			cameraXRNeedsUpdate = true;
+			cameraXR.perCameraCulling = views.length !== 2;
 
 		}
 
