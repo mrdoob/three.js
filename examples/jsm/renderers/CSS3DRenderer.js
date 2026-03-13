@@ -359,7 +359,7 @@ class CSS3DRenderer {
 
 		}
 
-		function renderObject( object, scene, camera, cameraCSSMatrix ) {
+		function renderObject( object, scene, camera, cameraCSSMatrix, inheritedLayers = null ) {
 
 			if ( object.visible === false ) {
 
@@ -369,9 +369,20 @@ class CSS3DRenderer {
 
 			}
 
+			const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+			const layerVisible = effectiveLayers.test( camera.layers );
+
+			if ( layerVisible === false && effectiveLayers.recursive === true ) {
+
+				hideObject( object );
+
+				return;
+
+			}
+
 			if ( object.isCSS3DObject ) {
 
-				const visible = ( object.layers.test( camera.layers ) === true );
+				const visible = layerVisible;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';
@@ -431,9 +442,11 @@ class CSS3DRenderer {
 
 			}
 
+			const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-				renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
+				renderObject( object.children[ i ], scene, camera, cameraCSSMatrix, childInheritedLayers );
 
 			}
 

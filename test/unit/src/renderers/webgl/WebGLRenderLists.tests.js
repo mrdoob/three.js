@@ -80,7 +80,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The first transparent render list item is structured correctly.'
 				);
@@ -99,7 +100,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The second transparent render list item is structured correctly.'
 				);
@@ -118,7 +120,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The first opaque render list item is structured correctly.'
 				);
@@ -137,7 +140,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The second opaque render list item is structured correctly.'
 				);
@@ -178,7 +182,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The first transparent render list item is structured correctly.'
 				);
@@ -197,7 +202,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The second transparent render list item is structured correctly.'
 				);
@@ -216,7 +222,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The first opaque render list item is structured correctly.'
 				);
@@ -235,7 +242,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
-						group: {}
+						group: {},
+						effectiveLayers: undefined
 					},
 					'The second opaque render list item is structured correctly.'
 				);

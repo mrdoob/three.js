@@ -211,9 +211,20 @@ class CSS2DRenderer {
 
 		}
 
-		function renderObject( object, scene, camera ) {
+		function renderObject( object, scene, camera, inheritedLayers = null ) {
 
 			if ( object.visible === false ) {
+
+				hideObject( object );
+
+				return;
+
+			}
+
+			const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+			const layerVisible = effectiveLayers.test( camera.layers );
+
+			if ( layerVisible === false && effectiveLayers.recursive === true ) {
 
 				hideObject( object );
 
@@ -226,7 +237,7 @@ class CSS2DRenderer {
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && layerVisible;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';
@@ -255,9 +266,11 @@ class CSS2DRenderer {
 
 			}
 
+			const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-				renderObject( object.children[ i ], scene, camera );
+				renderObject( object.children[ i ], scene, camera, childInheritedLayers );
 
 			}
 

@@ -1373,9 +1373,9 @@ class WebGLRenderer {
 
 			// gather lights from both the target scene and the new object that will be added to the scene.
 
-			targetScene.traverseVisible( function ( object ) {
+			targetScene.traverseVisibleWithLayers( camera.layers, function ( object ) {
 
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
+				if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
 
@@ -1391,9 +1391,9 @@ class WebGLRenderer {
 
 			if ( scene !== targetScene ) {
 
-				scene.traverseVisible( function ( object ) {
+				scene.traverseVisibleWithLayers( camera.layers, function ( object ) {
 
-					if ( object.isLight && object.layers.test( camera.layers ) ) {
+					if ( object.isLight ) {
 
 						currentRenderState.pushLight( object );
 
@@ -1797,11 +1797,14 @@ class WebGLRenderer {
 
 		};
 
-		function projectObject( object, camera, groupOrder, sortObjects ) {
+		function projectObject( object, camera, groupOrder, sortObjects, inheritedLayers = null ) {
 
 			if ( object.visible === false ) return;
 
-			const visible = object.layers.test( camera.layers );
+			const effectiveLayers = inheritedLayers !== null ? inheritedLayers : object.layers;
+			const visible = effectiveLayers.test( camera.layers );
+
+			if ( visible === false && effectiveLayers.recursive === true ) return;
 
 			if ( visible ) {
 
@@ -1839,7 +1842,7 @@ class WebGLRenderer {
 
 						if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null, effectiveLayers );
 
 						}
 
@@ -1883,7 +1886,7 @@ class WebGLRenderer {
 
 								if ( groupMaterial && groupMaterial.visible ) {
 
-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
+									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, effectiveLayers );
 
 								}
 
@@ -1891,7 +1894,7 @@ class WebGLRenderer {
 
 						} else if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null, effectiveLayers );
 
 						}
 
@@ -1901,11 +1904,13 @@ class WebGLRenderer {
 
 			}
 
+			const childInheritedLayers = object.layers.recursive === true ? object.layers : inheritedLayers;
+
 			const children = object.children;
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects );
+				projectObject( children[ i ], camera, groupOrder, sortObjects, childInheritedLayers );
 
 			}
 
@@ -2020,9 +2025,9 @@ class WebGLRenderer {
 
 					const renderItem = transmissiveObjects[ i ];
 
-					const { object, geometry, material, group } = renderItem;
+					const { object, geometry, material, group, effectiveLayers } = renderItem;
 
-					if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
+					if ( material.side === DoubleSide && effectiveLayers.test( camera.layers ) ) {
 
 						const currentSide = material.side;
 
@@ -2067,7 +2072,7 @@ class WebGLRenderer {
 
 				const renderItem = renderList[ i ];
 
-				const { object, geometry, group } = renderItem;
+				const { object, geometry, group, effectiveLayers } = renderItem;
 				let material = renderItem.material;
 
 				if ( material.allowOverride === true && overrideMaterial !== null ) {
@@ -2076,7 +2081,7 @@ class WebGLRenderer {
 
 				}
 
-				if ( object.layers.test( camera.layers ) ) {
+				if ( effectiveLayers.test( camera.layers ) ) {
 
 					renderObject( object, scene, camera, geometry, material, group );
 
