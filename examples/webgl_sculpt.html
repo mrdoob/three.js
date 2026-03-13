@@ -6,34 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			#toolbar {
-				position: absolute;
-				top: 50px;
-				left: 10px;
-				display: flex;
-				flex-direction: column;
-				gap: 6px;
-				background: rgba(0,0,0,0.7);
-				padding: 10px;
-				border-radius: 6px;
-				color: #fff;
-				font-family: monospace;
-				font-size: 12px;
-				user-select: none;
-			}
-			#toolbar label {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-			}
-			#toolbar select, #toolbar input[type="range"] {
-				width: 120px;
-			}
-			#toolbar .checkbox-row {
-				display: flex;
-				align-items: center;
-				gap: 4px;
-			}
 			.cursor-circle {
 				position: absolute;
 				border: 1.5px solid rgba(255,255,255,0.6);
@@ -47,41 +19,6 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sculpt
-		</div>
-
-		<div id="toolbar">
-			<label>Tool
-				<select id="tool">
-					<option value="brush">Brush</option>
-					<option value="inflate">Inflate</option>
-					<option value="smooth">Smooth</option>
-					<option value="flatten">Flatten</option>
-					<option value="pinch">Pinch</option>
-					<option value="crease">Crease</option>
-					<option value="drag">Drag</option>
-					<option value="scale">Scale</option>
-				</select>
-			</label>
-			<label>Radius
-				<input type="range" id="radius" min="10" max="200" value="50">
-			</label>
-			<label>Intensity
-				<input type="range" id="intensity" min="0" max="100" value="50">
-			</label>
-			<label>Subdivision
-				<input type="range" id="subdivision" min="0" max="100" value="75">
-			</label>
-			<label>Decimation
-				<input type="range" id="decimation" min="0" max="100" value="0">
-			</label>
-			<div class="checkbox-row">
-				<input type="checkbox" id="negative">
-				<label for="negative">Negative</label>
-			</div>
-			<div class="checkbox-row">
-				<input type="checkbox" id="wireframe">
-				<label for="wireframe">Wireframe</label>
-			</div>
 		</div>
 
 		<div class="cursor-circle" id="cursorCircle"></div>
@@ -100,6 +37,7 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let renderer, scene, camera, controls, sculpt, mesh;
 
@@ -176,28 +114,61 @@
 
 				} );
 
-				// UI
+				// GUI
 
-				const toolSelect = document.getElementById( 'tool' );
-				toolSelect.addEventListener( 'change', function () { sculpt.tool = this.value; } );
+				const params = {
+					tool: 'brush',
+					radius: 50,
+					intensity: 0.5,
+					subdivision: 0.75,
+					decimation: 0,
+					negative: false,
+					wireframe: false
+				};
 
-				const radiusSlider = document.getElementById( 'radius' );
-				radiusSlider.addEventListener( 'input', function () { sculpt.radius = Number( this.value ); } );
+				const gui = new GUI();
 
-				const intensitySlider = document.getElementById( 'intensity' );
-				intensitySlider.addEventListener( 'input', function () { sculpt.intensity = Number( this.value ) / 100; } );
+				gui.add( params, 'tool', [ 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease', 'drag', 'scale' ] ).onChange( function ( value ) {
 
-				const subdivisionSlider = document.getElementById( 'subdivision' );
-				subdivisionSlider.addEventListener( 'input', function () { sculpt.subdivision = Number( this.value ) / 100; } );
+					sculpt.tool = value;
 
-				const decimationSlider = document.getElementById( 'decimation' );
-				decimationSlider.addEventListener( 'input', function () { sculpt.decimation = Number( this.value ) / 100; } );
+				} );
 
-				const negativeCheckbox = document.getElementById( 'negative' );
-				negativeCheckbox.addEventListener( 'change', function () { sculpt.negative = this.checked; } );
+				gui.add( params, 'radius', 10, 200 ).onChange( function ( value ) {
 
-				const wireframeCheckbox = document.getElementById( 'wireframe' );
-				wireframeCheckbox.addEventListener( 'change', function () { mesh.material.wireframe = this.checked; } );
+					sculpt.radius = value;
+
+				} );
+
+				gui.add( params, 'intensity', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.intensity = value;
+
+				} );
+
+				gui.add( params, 'subdivision', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.subdivision = value;
+
+				} );
+
+				gui.add( params, 'decimation', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.decimation = value;
+
+				} );
+
+				gui.add( params, 'negative' ).onChange( function ( value ) {
+
+					sculpt.negative = value;
+
+				} );
+
+				gui.add( params, 'wireframe' ).onChange( function ( value ) {
+
+					mesh.material.wireframe = value;
+
+				} );
 
 				// Cursor circle
 
