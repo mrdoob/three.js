@@ -25,7 +25,6 @@ import {
 	getFrontVertices,
 	areaNormal,
 	areaCenter,
-	toolBrush,
 	toolFlatten,
 	toolInflate,
 	toolSmooth,
@@ -44,6 +43,7 @@ const _tmpInter = [ 0, 0, 0 ];
 const _tmpV1 = [ 0, 0, 0 ];
 const _tmpV2 = [ 0, 0, 0 ];
 const _tmpV3 = [ 0, 0, 0 ];
+const _v3Temp = new Vector3();
 
 class Sculpt {
 
@@ -104,41 +104,24 @@ class Sculpt {
 		const rect = this._domElement.getBoundingClientRect();
 		const x = ( ( mouseX - rect.left ) / rect.width ) * 2 - 1;
 		const y = - ( ( mouseY - rect.top ) / rect.height ) * 2 + 1;
-		const v = new Vector3( x, y, z );
-		v.unproject( this._camera );
-		return [ v.x, v.y, v.z ];
+		_v3Temp.set( x, y, z ).unproject( this._camera );
+		return [ _v3Temp.x, _v3Temp.y, _v3Temp.z ];
 
 	}
 
 	_project( point ) {
 
-		const v = new Vector3( point[ 0 ], point[ 1 ], point[ 2 ] );
-		v.project( this._camera );
+		_v3Temp.set( point[ 0 ], point[ 1 ], point[ 2 ] ).project( this._camera );
 		const rect = this._domElement.getBoundingClientRect();
 		return [
-			( v.x * 0.5 + 0.5 ) * rect.width + rect.left,
-			( - v.y * 0.5 + 0.5 ) * rect.height + rect.top,
-			v.z
+			( _v3Temp.x * 0.5 + 0.5 ) * rect.width + rect.left,
+			( - _v3Temp.y * 0.5 + 0.5 ) * rect.height + rect.top,
+			_v3Temp.z
 		];
 
 	}
 
-	_intersectionRayMesh( mouseX, mouseY ) {
-
-		const vNear = this._unproject( mouseX, mouseY, 0 );
-		const vFar = this._unproject( mouseX, mouseY, 0.1 );
-
-		// Transform to local space
-		_matInverse.copy( this._mesh.matrixWorld ).invert();
-		_v3NearLocal.set( vNear[ 0 ], vNear[ 1 ], vNear[ 2 ] ).applyMatrix4( _matInverse );
-		_v3FarLocal.set( vFar[ 0 ], vFar[ 1 ], vFar[ 2 ] ).applyMatrix4( _matInverse );
-
-		const near = [ _v3NearLocal.x, _v3NearLocal.y, _v3NearLocal.z ];
-		const far = [ _v3FarLocal.x, _v3FarLocal.y, _v3FarLocal.z ];
-		const eyeDir = this._eyeDir;
-		sub( eyeDir, far, near );
-		const len = Math.sqrt( sqrLen( eyeDir ) );
-		eyeDir[ 0 ] /= len; eyeDir[ 1 ] /= len; eyeDir[ 2 ] /= len;
+	_pickClosestFace( near, eyeDir ) {
 
 		const sm = this._sculptMesh;
 		const iFacesCandidates = sm.intersectRay( near, eyeDir );
@@ -167,14 +150,31 @@ class Sculpt {
 
 		}
 
-		if ( this._pickedFace !== - 1 ) {
+		return this._pickedFace !== - 1;
 
-			this._updateLocalAndWorldRadius2();
-			return true;
+	}
 
-		}
+	_intersectionRayMesh( mouseX, mouseY ) {
 
-		return false;
+		const vNear = this._unproject( mouseX, mouseY, 0 );
+		const vFar = this._unproject( mouseX, mouseY, 0.1 );
+
+		// Transform to local space
+		_matInverse.copy( this._mesh.matrixWorld ).invert();
+		_v3NearLocal.set( vNear[ 0 ], vNear[ 1 ], vNear[ 2 ] ).applyMatrix4( _matInverse );
+		_v3FarLocal.set( vFar[ 0 ], vFar[ 1 ], vFar[ 2 ] ).applyMatrix4( _matInverse );
+
+		const near = [ _v3NearLocal.x, _v3NearLocal.y, _v3NearLocal.z ];
+		const far = [ _v3FarLocal.x, _v3FarLocal.y, _v3FarLocal.z ];
+		const eyeDir = this._eyeDir;
+		sub( eyeDir, far, near );
+		const len = Math.sqrt( sqrLen( eyeDir ) );
+		eyeDir[ 0 ] /= len; eyeDir[ 1 ] /= len; eyeDir[ 2 ] /= len;
+
+		if ( ! this._pickClosestFace( near, eyeDir ) ) return false;
+
+		this._updateLocalAndWorldRadius2();
+		return true;
 
 	}
 
@@ -182,13 +182,13 @@ class Sculpt {
 
 		// Transform intersection to world space
 		const ip = this._interPoint;
-		const v = new Vector3( ip[ 0 ], ip[ 1 ], ip[ 2 ] );
-		v.applyMatrix4( this._mesh.matrixWorld );
+		_v3Temp.set( ip[ 0 ], ip[ 1 ], ip[ 2 ] ).applyMatrix4( this._mesh.matrixWorld );
+		const wx = _v3Temp.x, wy = _v3Temp.y, wz = _v3Temp.z;
 
-		const screenInter = this._project( [ v.x, v.y, v.z ] );
+		const screenInter = this._project( [ wx, wy, wz ] );
 		const offsetX = this.radius;
 		const worldPoint = this._unproject( screenInter[ 0 ] + offsetX, screenInter[ 1 ], screenInter[ 2 ] );
-		const rWorld2 = sqrDist( [ v.x, v.y, v.z ], worldPoint );
+		const rWorld2 = sqrDist( [ wx, wy, wz ], worldPoint );
 
 		// Convert to local space
 		const m = this._mesh.matrixWorld.elements;
@@ -306,34 +306,7 @@ class Sculpt {
 		const eyeDir = this._eyeDir;
 		eyeDir[ 0 ] = _v3FarLocal.x; eyeDir[ 1 ] = _v3FarLocal.y; eyeDir[ 2 ] = _v3FarLocal.z;
 
-		const sm = this._sculptMesh;
-		const iFacesCandidates = sm.intersectRay( near, eyeDir );
-		const vAr = sm.getVertices();
-		const fAr = sm.getFaces();
-		let distance = Infinity;
-		this._pickedFace = - 1;
-
-		for ( let i = 0, l = iFacesCandidates.length; i < l; ++ i ) {
-
-			const indFace = iFacesCandidates[ i ] * 4;
-			const ind1 = fAr[ indFace ] * 3, ind2 = fAr[ indFace + 1 ] * 3, ind3 = fAr[ indFace + 2 ] * 3;
-			_tmpV1[ 0 ] = vAr[ ind1 ]; _tmpV1[ 1 ] = vAr[ ind1 + 1 ]; _tmpV1[ 2 ] = vAr[ ind1 + 2 ];
-			_tmpV2[ 0 ] = vAr[ ind2 ]; _tmpV2[ 1 ] = vAr[ ind2 + 1 ]; _tmpV2[ 2 ] = vAr[ ind2 + 2 ];
-			_tmpV3[ 0 ] = vAr[ ind3 ]; _tmpV3[ 1 ] = vAr[ ind3 + 1 ]; _tmpV3[ 2 ] = vAr[ ind3 + 2 ];
-			const hitDist = intersectionRayTriangle( near, eyeDir, _tmpV1, _tmpV2, _tmpV3, _tmpInter );
-			if ( hitDist >= 0 && hitDist < distance ) {
-
-				distance = hitDist;
-				this._interPoint[ 0 ] = _tmpInter[ 0 ];
-				this._interPoint[ 1 ] = _tmpInter[ 1 ];
-				this._interPoint[ 2 ] = _tmpInter[ 2 ];
-				this._pickedFace = iFacesCandidates[ i ];
-
-			}
-
-		}
-
-		if ( this._pickedFace === - 1 ) return false;
+		if ( ! this._pickClosestFace( near, eyeDir ) ) return false;
 
 		// Set radius in local space from world radius
 		const m = this._mesh.matrixWorld.elements;
@@ -356,7 +329,6 @@ class Sculpt {
 	endStroke() {
 
 		this._sculptMesh.balanceOctree();
-		this._syncGeometry();
 
 	}
 
@@ -366,7 +338,6 @@ class Sculpt {
 
 		const rLocal2 = this._rLocal2;
 		let iVerts = this._pickVerticesInSphere( rLocal2 );
-		this._computePickedNormal();
 
 		const sm = this._sculptMesh;
 		const tool = this.tool;
@@ -415,6 +386,7 @@ class Sculpt {
 
 		} else if ( tool === 'crease' ) {
 
+			this._computePickedNormal();
 			const pN = this._pickedNormal;
 			toolCrease( sm, iVerts, pN, center, rLocal2, intensity, negative );
 
@@ -635,7 +607,6 @@ class Sculpt {
 
 		// Balance octree after stroke
 		this._sculptMesh.balanceOctree();
-		this._syncGeometry();
 
 	}
 

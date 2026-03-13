@@ -192,18 +192,30 @@ function triangleInsideSphere( point, radiusSq, v1, v2, v3 ) {
 
 }
 
+const _pit1 = [ 0, 0, 0 ];
+const _pit2 = [ 0, 0, 0 ];
+const _pitp1 = [ 0, 0, 0 ];
+const _pitp2 = [ 0, 0, 0 ];
+const _pitx = [ 0, 0, 0 ];
+
 function pointInsideTriangle( point, v1, v2, v3 ) {
 
-	const vec1 = [ v1[ 0 ] - v2[ 0 ], v1[ 1 ] - v2[ 1 ], v1[ 2 ] - v2[ 2 ] ];
-	const vec2b = [ v1[ 0 ] - v3[ 0 ], v1[ 1 ] - v3[ 1 ], v1[ 2 ] - v3[ 2 ] ];
-	const vecP1 = [ point[ 0 ] - v2[ 0 ], point[ 1 ] - v2[ 1 ], point[ 2 ] - v2[ 2 ] ];
-	const vecP2 = [ point[ 0 ] - v3[ 0 ], point[ 1 ] - v3[ 1 ], point[ 2 ] - v3[ 2 ] ];
-	const tmp = [ 0, 0, 0 ];
-	const total = Math.sqrt( sqrLen( cross( tmp, vec1, vec2b ) ) );
-	const area1 = Math.sqrt( sqrLen( cross( tmp, vec1, vecP1 ) ) );
-	const area2 = Math.sqrt( sqrLen( cross( tmp, vec2b, vecP2 ) ) );
-	const area3 = Math.sqrt( sqrLen( cross( tmp, vecP1, vecP2 ) ) );
+	_pit1[ 0 ] = v1[ 0 ] - v2[ 0 ]; _pit1[ 1 ] = v1[ 1 ] - v2[ 1 ]; _pit1[ 2 ] = v1[ 2 ] - v2[ 2 ];
+	_pit2[ 0 ] = v1[ 0 ] - v3[ 0 ]; _pit2[ 1 ] = v1[ 1 ] - v3[ 1 ]; _pit2[ 2 ] = v1[ 2 ] - v3[ 2 ];
+	_pitp1[ 0 ] = point[ 0 ] - v2[ 0 ]; _pitp1[ 1 ] = point[ 1 ] - v2[ 1 ]; _pitp1[ 2 ] = point[ 2 ] - v2[ 2 ];
+	_pitp2[ 0 ] = point[ 0 ] - v3[ 0 ]; _pitp2[ 1 ] = point[ 1 ] - v3[ 1 ]; _pitp2[ 2 ] = point[ 2 ] - v3[ 2 ];
+	const total = Math.sqrt( sqrLen( cross( _pitx, _pit1, _pit2 ) ) );
+	const area1 = Math.sqrt( sqrLen( cross( _pitx, _pit1, _pitp1 ) ) );
+	const area2 = Math.sqrt( sqrLen( cross( _pitx, _pit2, _pitp2 ) ) );
+	const area3 = Math.sqrt( sqrLen( cross( _pitx, _pitp1, _pitp2 ) ) );
 	return Math.abs( total - ( area1 + area2 + area3 ) ) < 1e-20;
+
+}
+
+function falloff( dist ) {
+
+	const d2 = dist * dist;
+	return 3.0 * d2 * d2 - 4.0 * d2 * dist + 1.0;
 
 }
 
@@ -232,5 +244,6 @@ export {
 	intersectionRayTriangle,
 	triangleInsideSphere,
 	pointInsideTriangle,
+	falloff,
 	vertexOnLine
 };
