@@ -50,7 +50,7 @@ class Sculpt {
 	constructor( mesh, camera, domElement ) {
 
 		this.tool = 'brush';
-		this.radius = 50;
+		this.size = 50;
 		this.strength = 1.5;
 		this.negative = false;
 		this.subdivision = 0.75;
@@ -199,7 +199,7 @@ class Sculpt {
 		const wx = _v3Temp.x, wy = _v3Temp.y, wz = _v3Temp.z;
 
 		const screenInter = this._project( [ wx, wy, wz ] );
-		const offsetX = this.radius;
+		const offsetX = this.size;
 		const worldPoint = this._unproject( screenInter[ 0 ] + offsetX, screenInter[ 1 ], screenInter[ 2 ] );
 		const rWorld2 = sqrDist( [ wx, wy, wz ], worldPoint );
 
@@ -434,7 +434,7 @@ class Sculpt {
 		const dx = mouseX - this._lastMouseX;
 		const dy = mouseY - this._lastMouseY;
 		const dist = Math.sqrt( dx * dx + dy * dy );
-		const minSpacing = 0.15 * this.radius;
+		const minSpacing = 0.15 * this.size;
 
 		if ( dist <= minSpacing ) return;
 
@@ -496,7 +496,7 @@ class Sculpt {
 		const dx = mouseX - this._lastMouseX;
 		const dy = mouseY - this._lastMouseY;
 		const dist = Math.sqrt( dx * dx + dy * dy );
-		const minSpacing = 0.15 * this.radius;
+		const minSpacing = 0.15 * this.size;
 		const step = 1.0 / Math.max( 1, Math.floor( dist / minSpacing ) );
 		const stepX = dx * step;
 		const stepY = dy * step;
