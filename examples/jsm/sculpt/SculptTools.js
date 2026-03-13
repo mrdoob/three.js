@@ -818,7 +818,7 @@ function smoothTangentVerts( mesh, iVerts, intensity ) {
 		const i3 = i * 3;
 		const smx = smoothVerts[ i3 ], smy = smoothVerts[ i3 + 1 ], smz = smoothVerts[ i3 + 2 ];
 		const d = nx * ( smx - vx ) + ny * ( smy - vy ) + nz * ( smz - vz );
-		const mI = intensity * mAr[ ind + 2 ];
+		const mI = Math.min( intensity * mAr[ ind + 2 ], 1.0 );
 		vAr[ ind ] = vx + ( smx - nx * d - vx ) * mI;
 		vAr[ ind + 1 ] = vy + ( smy - ny * d - vy ) * mI;
 		vAr[ ind + 2 ] = vz + ( smz - nz * d - vz ) * mI;
@@ -977,7 +977,7 @@ function toolSmooth( mesh, iVerts, intensity ) {
 		const ind = iVerts[ i ] * 3;
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const i3 = i * 3;
-		const mI = intensity * mAr[ ind + 2 ];
+		const mI = Math.min( intensity * mAr[ ind + 2 ], 1.0 );
 		const intComp = 1.0 - mI;
 		vAr[ ind ] = vx * intComp + smoothVerts[ i3 ] * mI;
 		vAr[ ind + 1 ] = vy * intComp + smoothVerts[ i3 + 1 ] * mI;
