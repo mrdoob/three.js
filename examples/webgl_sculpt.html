@@ -140,7 +140,7 @@
 				const params = {
 					tool: 'brush',
 					radius: 50,
-					intensity: 0.5,
+					strength: 1.5,
 					subdivision: 0.75,
 					decimation: 0,
 					negative: false,
@@ -162,9 +162,9 @@
 
 				} );
 
-				gui.add( params, 'intensity', 0, 1 ).onChange( function ( value ) {
+				gui.add( params, 'strength', 0, 3 ).onChange( function ( value ) {
 
-					sculpt.intensity = value;
+					sculpt.strength = value;
 
 				} );
 
