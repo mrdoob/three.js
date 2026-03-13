@@ -146,19 +146,14 @@ class StorageTextureNode extends TextureNode {
 	 */
 	generate( builder, output ) {
 
-		let snippet;
-
 		if ( this.storeNode !== null ) {
 
-			snippet = this.generateStore( builder );
-
-		} else {
-
-			snippet = super.generate( builder, output );
+			this.generateStore( builder );
+			return '';
 
 		}
 
-		return snippet;
+		return super.generate( builder, output );
 
 	}
 
@@ -233,7 +228,7 @@ class StorageTextureNode extends TextureNode {
 		const storeSnippet = storeNode.build( builder, 'vec4' );
 		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 
-		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, depthSnippet, storeSnippet );
+		const snippet = builder.generateTextureStore( this.value, textureProperty, uvSnippet, depthSnippet, storeSnippet );
 
 		builder.addLineFlowCode( snippet, this );
 
