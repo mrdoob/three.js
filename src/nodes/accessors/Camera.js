@@ -1,7 +1,7 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup, sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { Fn, vec4, mat3 } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
 import { screenSize } from '../display/ScreenNode.js';
@@ -196,6 +196,34 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 	return cameraViewMatrix;
 
 } ).once() )();
+
+/**
+ * TSL object that represents the view rotation matrix of the camera used for the current render.
+ *
+ * It is the upper-left 3x3 of {@link cameraViewMatrix} (translation removed) and is typically used to transform
+ * direction vectors (e.g. normals) from world space into view space.
+ *
+ * @tsl
+ * @type {Node<mat3>}
+ */
+export const cameraViewRotationMatrix = /*@__PURE__*/ mat3(
+
+	cameraViewMatrix[ 0 ].xyz,
+
+	cameraViewMatrix[ 1 ].xyz,
+
+	cameraViewMatrix[ 2 ].xyz
+
+).toVar( 'cameraViewRotationMatrix' );
+
+/**
+ * TSL function that transforms a vector from world space to view space.
+ *
+ * @tsl
+ * @param {Node<vec3>} vector The vector to transform.
+ * @returns {Node<vec3>}
+ */
+export const worldToViewRotation = Fn( ( [ vector ] ) => cameraViewRotationMatrix.mul( vector ) );
 
 /**
  * TSL object that represents the world matrix of the camera used for the current render.
