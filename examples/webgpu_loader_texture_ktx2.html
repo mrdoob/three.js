@@ -88,69 +88,78 @@
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
-			let canvas, renderer;
+			const canvas = document.getElementById( 'c' );
+
+			const renderer = new THREE.WebGPURenderer( { canvas, antialias: true, forceWebGL: false } );
+			renderer.setClearColor( 0xffffff, 1 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+
+			const loader = new KTX2Loader()
+				.setTranscoderPath( 'jsm/libs/basis/' )
+				.setPath( 'textures/ktx2/' );
 
 			const scenes = [];
 
-			const sections = [
-				{
-					title: 'Uncompressed',
-					description: 'Uncompressed formats (rgba8, rgba16, rgba32) load as THREE.DataTexture objects.'
-						+ ' Lossless, easy to read/write, uncompressed on GPU, optionally compressed over the network.',
-					textures: [
-						{ path: '2d_rgba8.ktx2' },
-						{ path: '2d_rgba8_linear.ktx2' },
-						{ path: '2d_rgba16_linear.ktx2' },
-						{ path: '2d_rgba32_linear.ktx2' },
-						{ path: '2d_rgb9e5_linear.ktx2' },
-						{ path: '2d_r11g11b10_linear.ktx2' },
-					]
-				},
-				{
-					title: 'Compressed',
-					description: 'Compressed formats (ASTC, BCn, ...) load as THREE.CompressedTexture objects,'
-						+ ' reducing memory cost. Requires native support on the device GPU: no single compressed'
-						+ ' format is supported on every device.',
-					textures: [
-						{ path: '2d_astc4x4.ktx2' },
-						{ path: '2d_etc1.ktx2' },
-						{ path: '2d_etc2.ktx2' },
-						{ path: '2d_bc1.ktx2' },
-						{ path: '2d_bc3.ktx2' },
-						{ path: '2d_bc4.ktx2' },
-						{ path: '2d_bc5.ktx2' },
-						{ path: '2d_bc7.ktx2' },
-					]
-				},
+			let sections;
 
-				{
-					title: 'Universal',
-					description: 'Basis Universal textures are specialized intermediate formats supporting fast'
-						+ ' runtime transcoding into other GPU texture compression formats. After transcoding,'
-						+ ' universal textures can be used on any device at reduced memory cost.',
-					textures: [
-						{ path: '2d_etc1s.ktx2' },
-						{ path: '2d_uastc.ktx2' },
-					]
-				},
-			];
+			initRenderer();
 
-			init();
-
-			async function init() {
-
-				canvas = document.getElementById( 'c' );
-
-				renderer = new THREE.WebGPURenderer( { canvas, antialias: true, forceWebGL: false } );
-				renderer.setClearColor( 0xffffff, 1 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-
+			async function initRenderer() {
+			
 				await renderer.init();
 
-				const loader = new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
-					.setPath( 'textures/ktx2/' )
-					.detectSupport( renderer );
+				loader.detectSupport( renderer );
+
+				const formats = loader.workerConfig;
+
+				sections = [
+					{
+						title: 'Uncompressed',
+						description: 'Uncompressed formats (rgba8, rgba16, rgba32) load as THREE.DataTexture objects.'
+							+ ' Lossless, easy to read/write, uncompressed on GPU, optionally compressed over the network.',
+						textures: [
+							{ path: '2d_rgba8.ktx2' },
+							{ path: '2d_rgba8_linear.ktx2' },
+							{ path: '2d_rgba16_linear.ktx2' },
+							{ path: '2d_rgba32_linear.ktx2' },
+							{ path: '2d_rgb9e5_linear.ktx2' },
+							{ path: '2d_r11g11b10_linear.ktx2' },
+						]
+					},
+					{
+						title: 'Compressed',
+						description: 'Compressed formats (ASTC, BCn, ...) load as THREE.CompressedTexture objects,'
+							+ ' reducing memory cost. Requires native support on the device GPU: no single compressed'
+							+ ' format is supported on every device.',
+						textures: [
+							{ path: '2d_astc4x4.ktx2', supported: formats[ 'astcSupported' ] },
+							{ path: '2d_etc1.ktx2', supported: formats[ 'etc2Supported' ] },
+							{ path: '2d_etc2.ktx2', supported: formats[ 'etc2Supported' ] },
+							{ path: '2d_bc1.ktx2', supported: formats[ 'bptcSupported' ] },
+							{ path: '2d_bc3.ktx2', supported: formats[ 'bptcSupported' ] },
+							{ path: '2d_bc4.ktx2', supported: formats[ 'bptcSupported' ] },
+							{ path: '2d_bc5.ktx2', supported: formats[ 'bptcSupported' ] },
+							{ path: '2d_bc7.ktx2', supported: formats[ 'bptcSupported' ] }
+						]
+					},
+
+					{
+						title: 'Universal',
+						description: 'Basis Universal textures are specialized intermediate formats supporting fast'
+							+ ' runtime transcoding into other GPU texture compression formats. After transcoding,'
+							+ ' universal textures can be used on any device at reduced memory cost.',
+						textures: [
+							{ path: '2d_etc1s.ktx2' },
+							{ path: '2d_uastc.ktx2' },
+						]
+					},
+				];
+
+				await init();
+			
+			}
+
+			async function init() {
 
 				const geometry = flipY( new THREE.PlaneGeometry( 1, 1 ) );
 
