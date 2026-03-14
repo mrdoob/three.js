@@ -176,7 +176,7 @@
 				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
 				renderer = new WebGLRenderer( { antialias: true } );
-				renderer.setWebGLNodesHandler( new WebGLNodesHandler() );
+				renderer.setNodesHandler( new WebGLNodesHandler() );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

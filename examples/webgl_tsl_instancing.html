@@ -259,7 +259,7 @@
 			// renderer
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setWebGLNodesHandler( new WebGLNodesHandler() );
+			renderer.setNodesHandler( new WebGLNodesHandler() );
 
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( width, height );

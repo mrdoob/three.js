@@ -1050,7 +1050,7 @@ class WebGLRenderer {
 		 *
 		 * @param {WebGLNodesHandler} nodesAdapter - The node builder instance.
 		 */
-		this.setWebGLNodesHandler = function ( nodesAdapter ) {
+		this.setNodesHandler = function ( nodesAdapter ) {
 
 			nodesAdapter.setRenderer( this );
 			_nodesAdapter = nodesAdapter;
