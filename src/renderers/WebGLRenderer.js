@@ -292,7 +292,7 @@ class WebGLRenderer {
 		const _this = this;
 
 		let _isContextLost = false;
-		let _nodesAdapter = null;
+		let _nodesHandler = null;
 
 		// internal state cache
 
@@ -1048,12 +1048,12 @@ class WebGLRenderer {
 		 * This enables using TSL (Three.js Shading Language) node materials to prepare
 		 * for migration to WebGPURenderer.
 		 *
-		 * @param {WebGLNodesHandler} nodesAdapter - The node builder instance.
+		 * @param {WebGLNodesHandler} nodesHandler - The node builder instance.
 		 */
-		this.setNodesHandler = function ( nodesAdapter ) {
+		this.setNodesHandler = function ( nodesHandler ) {
 
-			nodesAdapter.setRenderer( this );
-			_nodesAdapter = nodesAdapter;
+			nodesHandler.setRenderer( this );
+			_nodesHandler = nodesHandler;
 
 		};
 
@@ -1618,9 +1618,9 @@ class WebGLRenderer {
 			if ( _isContextLost === true ) return;
 
 			// update node builder if available
-			if ( _nodesAdapter !== null ) {
+			if ( _nodesHandler !== null ) {
 
-				_nodesAdapter.renderStart( scene, camera );
+				_nodesHandler.renderStart( scene, camera );
 
 			}
 
@@ -1817,9 +1817,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( _nodesAdapter !== null ) {
+			if ( _nodesHandler !== null ) {
 
-				_nodesAdapter.renderEnd();
+				_nodesHandler.renderEnd();
 
 			}
 
@@ -2200,9 +2200,9 @@ class WebGLRenderer {
 				parameters.uniforms = programCache.getUniforms( material );
 
 				// Use node builder for node materials if available
-				if ( _nodesAdapter !== null && material.isNodeMaterial ) {
+				if ( _nodesHandler !== null && material.isNodeMaterial ) {
 
-					_nodesAdapter.build( material, object, parameters );
+					_nodesHandler.build( material, object, parameters );
 
 				}
 
@@ -2473,9 +2473,9 @@ class WebGLRenderer {
 
 				// notify the node builder that the program has changed so uniforms and update nodes can
 				// be cached and triggered.
-				if ( _nodesAdapter && material.isNodeMaterial ) {
+				if ( _nodesHandler && material.isNodeMaterial ) {
 
-					_nodesAdapter.onUpdateProgram( material, program, materialProperties );
+					_nodesHandler.onUpdateProgram( material, program, materialProperties );
 
 				}
 
