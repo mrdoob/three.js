@@ -295,6 +295,12 @@
 		"webgl_worker_offscreencanvas",
 		"webgl_performance"
 	],
+	"webgl / tsl": [
+		"webgl_tsl_shadowmap",
+		"webgl_tsl_skinning",
+		"webgl_tsl_clearcoat",
+		"webgl_tsl_instancing"
+	],
 	"webgpu (wip)": [
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
