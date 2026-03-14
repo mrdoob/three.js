@@ -112,6 +112,15 @@ class WebXRManager extends EventDispatcher {
 		this.isPresenting = false;
 
 		/**
+		 * When `true`, both eyes use the left eye's view position. Useful for content
+		 * that must be viewed from a single viewpoint (e.g. 360° panoramas, Matterport-style).
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.forceMonoscopic = false;
+
+		/**
 		 * Returns a group representing the `target ray` space of the XR controller.
 		 * Use this space for visualizing 3D objects that support the user in pointing
 		 * tasks like UI interaction.
@@ -982,6 +991,13 @@ class WebXRManager extends EventDispatcher {
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+					if ( scope.forceMonoscopic && i === 1 && cameras[ 0 ] !== undefined ) {
+
+						camera.position.copy( cameras[ 0 ].position );
+						camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
+
+					}
+
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
 					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
