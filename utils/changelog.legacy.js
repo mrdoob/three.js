@@ -44,7 +44,7 @@ function exec( command ) {
 
 	try {
 
-		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 } ).trim();
+		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, stdio: [ 'pipe', 'pipe', 'ignore' ] } ).trim();
 
 	} catch ( error ) {
 
@@ -101,7 +101,7 @@ function extractPRNumber( subject ) {
 
 function getPRInfo( prNumber ) {
 
-	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}' 2>/dev/null` );
+	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}'` );
 
 	try {
 
@@ -332,7 +332,7 @@ function addToGroup( groups, key, value ) {
 
 function validateEnvironment() {
 
-	if ( ! exec( 'gh --version 2>/dev/null' ) ) {
+	if ( ! exec( 'gh --version' ) ) {
 
 		console.error( 'GitHub CLI (gh) is required but not installed.' );
 		console.error( 'Install from: https://cli.github.com/' );
