@@ -197,6 +197,7 @@
 		"webgl_renderer_pathtracer",
 		"webgl_refraction",
 		"webgl_rtt",
+		"webgl_sculpt",
 		"webgl_shader",
 		"webgl_shader_lava",
 		"webgl_shaders_ocean",
@@ -533,7 +534,8 @@
 		"webxr_xr_dragging_custom_depth",
 		"webxr_xr_haptics",
 		"webxr_xr_marchingcubes",
-		"webxr_xr_paint"
+		"webxr_xr_paint",
+		"webxr_xr_sculpt"
 	],
 	"games": [
 		"games_fps"
