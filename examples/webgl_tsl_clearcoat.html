@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { WebGLNodesAdapter } from 'three/addons/tsl/WebGLNodesAdapter.js';
+			import { WebGLNodesHandler } from 'three/addons/tsl/WebGLNodesHandler.js';
 			import { WebGLRenderer } from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -176,7 +176,7 @@
 				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
 				renderer = new WebGLRenderer( { antialias: true } );
-				renderer.setWebGLNodesAdapter( new WebGLNodesAdapter() );
+				renderer.setWebGLNodesHandler( new WebGLNodesHandler() );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

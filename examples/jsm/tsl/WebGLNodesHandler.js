@@ -268,7 +268,7 @@ class RendererProxy {
 /**
  * Compatibility loader and builder for TSL Node materials in WebGLRenderer.
  */
-export class WebGLNodesAdapter {
+export class WebGLNodesHandler {
 
 	/**
 	 * Constructs a new WebGL node adapter.

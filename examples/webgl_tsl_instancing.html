@@ -39,7 +39,7 @@
 
 	<script type="module">
 		import * as THREE from 'three';
-		import { WebGLNodesAdapter } from 'three/addons/tsl/WebGLNodesAdapter.js';
+		import { WebGLNodesHandler } from 'three/addons/tsl/WebGLNodesHandler.js';
 		
 		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -259,7 +259,7 @@
 			// renderer
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setWebGLNodesAdapter( new WebGLNodesAdapter() );
+			renderer.setWebGLNodesHandler( new WebGLNodesHandler() );
 
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( width, height );
