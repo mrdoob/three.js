@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedIntType, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, NoColorSpace, LinearSRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, SRGBTransfer, LinearTransfer, UnsignedShortType, UnsignedInt248Type } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedIntType, HalfFloatType, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, NoColorSpace, LinearSRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, SRGBTransfer, LinearTransfer, UnsignedShortType, UnsignedInt248Type } from '../../constants.js';
 import { createElementNS, warn, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -12,6 +12,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
 	let _canvas;
+
+	let _halfFloatFallbackWarned = false;
 
 	const _sources = new WeakMap(); // maps WebglTexture objects to instances of Source
 
@@ -1906,6 +1908,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	// Set up GL resources for the render target
 	function setupRenderTarget( renderTarget ) {
+
+		// Auto-fallback: HalfFloatType render targets require EXT_color_buffer_half_float.
+		// When unavailable, cascade to FloatType (requires EXT_color_buffer_float) or UnsignedByteType.
+		if ( ! extensions.has( 'EXT_color_buffer_half_float' ) ) {
+
+			const fallbackType = extensions.has( 'EXT_color_buffer_float' ) ? FloatType : UnsignedByteType;
+
+			for ( const texture of renderTarget.textures ) {
+
+				if ( texture.type === HalfFloatType ) {
+
+					texture.type = fallbackType;
+
+					if ( ! _halfFloatFallbackWarned ) {
+
+						warn( 'THREE.WebGLTextures: HalfFloatType render target is not supported on this device; falling back to ' + ( fallbackType === FloatType ? 'FloatType' : 'UnsignedByteType' ) + '.' );
+						_halfFloatFallbackWarned = true;
+
+					}
+
+				}
+
+			}
+
+		}
 
 		const texture = renderTarget.texture;
 
