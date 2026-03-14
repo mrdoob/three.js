@@ -100,7 +100,7 @@ class HDRLoader extends DataTextureLoader {
 
 					s += chunk; len += chunk.length;
 					p += chunkSize;
-					chunk += String.fromCharCode.apply( null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) );
+					chunk = String.fromCharCode.apply( null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) );
 
 				}
 
