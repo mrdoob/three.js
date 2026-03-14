@@ -7,6 +7,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 /**
  * This node implements the vertex shader logic which is required
@@ -133,6 +134,12 @@ class BatchNode extends Node {
 		const bm = mat3( batchingMatrix );
 
 		positionLocal.assign( batchingMatrix.mul( positionLocal ) );
+
+		if ( builder.material instanceof NodeMaterial && builder.material.instancePositionNode != null ) {
+
+			positionLocal.assign( builder.material.instancePositionNode );
+
+		}
 
 		const transformedNormal = normalLocal.div( vec3( bm[ 0 ].dot( bm[ 0 ] ), bm[ 1 ].dot( bm[ 1 ] ), bm[ 2 ].dot( bm[ 2 ] ) ) );
 

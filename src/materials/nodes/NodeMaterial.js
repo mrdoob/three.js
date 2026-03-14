@@ -266,6 +266,17 @@ class NodeMaterial extends Material {
 		this.positionNode = null;
 
 		/**
+		 * Allows to overwrite {@link positionLocal} immediately after it has
+		 * been transformed by the instance matrix in the vertex shader.
+		 * Note: this node property only has an effect when used with
+		 * an {@link InstancedMesh} or a {@link BatchedMesh}.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.instancePositionNode = null;
+
+		/**
 		 * This node property is intended for logic which modifies geometry data once or per animation step.
 		 * Apps usually place such logic randomly in initialization routines or in the animation loop.
 		 * `geometryNode` is intended as a dedicated API so there is an intended spot where geometry modifications
