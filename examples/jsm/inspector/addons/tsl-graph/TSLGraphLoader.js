@@ -181,7 +181,7 @@ export class TSLGraphLoader extends FileLoader {
 
 	}
 
-	static hasGraphs() {
+	static get hasGraphs() {
 
 		return Object.keys( TSLGraphLoader.getCodes().materials ).length > 0;
 

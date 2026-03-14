@@ -96,9 +96,9 @@ export class TSLGraphEditor extends Tab {
 
 	}
 
-	hasGraphs() {
+	get hasGraphs() {
 
-		return TSLGraphLoader.hasGraphs();
+		return TSLGraphLoader.hasGraphs;
 
 	}
 
