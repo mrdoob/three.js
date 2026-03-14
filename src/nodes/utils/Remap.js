@@ -38,7 +38,7 @@ export const remap = /*@__PURE__*/ Fn( ( [ node, inLowNode, inHighNode, outLowNo
  * @param {?Node} [outHighNode=float(1)] - The target upper bound of the range.
  * @returns {Node}
  */
-function remapClamp( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
+export function remapClamp( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
 
 	return remap( node, inLowNode, inHighNode, outLowNode, outHighNode, true );
 

@@ -1097,6 +1097,11 @@ export class Style {
 	border-radius: 15px;
 }
 
+.console-filter-input:focus {
+	outline: none;
+	border-color: var(--text-secondary);
+}
+
 .console-copy-button {
 	background: transparent;
 	border: none;
@@ -1629,6 +1634,25 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 #profiler-panel input[type="number"],
 .detached-tab-content input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+.panel-action-btn {
+	background: transparent;
+	color: var(--text-primary);
+	border: 1px solid var(--profiler-border);
+	border-radius: 4px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-family: var(--font-family);
+	font-size: 12px;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel-action-btn:hover {
+	background-color: rgba(255, 255, 255, 0.05);
 }
 `;
 		const styleElement = document.createElement( 'style' );
