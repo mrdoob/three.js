@@ -212,7 +212,7 @@ export class TSLGraphEditor extends Tab {
 
 			const graphData = await this.getGraph();
 
-			const graphId = this.material.graphId;
+			const graphId = this.material.userData.graphId;
 
 			TSLGraphLoader.setGraph( graphId, graphData );
 
@@ -267,9 +267,17 @@ export class TSLGraphEditor extends Tab {
 
 		}
 
-		if ( material.isTSLGraphMaterial !== true ) {
+		if ( material.isNodeMaterial !== true ) {
 
-			error( 'Inspector: Material needs be a "GraphMaterial".' );
+			error( 'Inspector: "Material" needs be a "NodeMaterial".' );
+
+			return;
+
+		}
+
+		if ( material.userData.graphId === undefined ) {
+
+			error( 'Inspector: "NodeMaterial" has no graphId. Set a "graphId" for the material in "material.userData.graphId".' );
 
 			return;
 
@@ -281,6 +289,7 @@ export class TSLGraphEditor extends Tab {
 
 			//materialDefault = material.clone();
 			materialDefault = new material.constructor();
+			materialDefault.userData = material.userData;
 
 			_refMaterials.set( material, materialDefault );
 
@@ -290,7 +299,7 @@ export class TSLGraphEditor extends Tab {
 		this.materialDefault = materialDefault;
 		this.uniforms = null;
 
-		const graphData = TSLGraphLoader.getGraph( this.material.graphId );
+		const graphData = TSLGraphLoader.getGraph( this.material.userData.graphId );
 
 		if ( graphData ) {
 
@@ -300,9 +309,21 @@ export class TSLGraphEditor extends Tab {
 
 			await this.command( 'clear-graph' );
 
-			await this.command( 'set-root-material', { materialType: this.material.graphType } );
+			await this.command( 'set-root-material', { materialType: this._getGraphType( this.material ) } );
 
 		}
+
+	}
+
+	_getGraphType( material ) {
+
+		if ( material.isMeshPhysicalNodeMaterial ) return 'material/physical';
+		if ( material.isMeshStandardNodeMaterial ) return 'material/standard';
+		if ( material.isMeshPhongNodeMaterial ) return 'material/phong';
+		if ( material.isMeshBasicNodeMaterial ) return 'material/basic';
+		if ( material.isSpriteNodeMaterial ) return 'material/sprite';
+
+		return 'material/node';
 
 	}
 
@@ -504,7 +525,7 @@ export class TSLGraphEditor extends Tab {
 
 					_refMaterials.delete( this.material );
 
-					if ( this.material && this.material.graphId === id ) {
+					if ( this.material && this.material.userData.graphId === id ) {
 
 						this.restoreMaterial( this.material );
 
@@ -632,13 +653,13 @@ export class TSLGraphEditor extends Tab {
 
 	_saveCode() {
 
-		const graphId = this.material.graphId;
+		const graphId = this.material.userData.graphId;
 
 		clearTimeout( this._codeSaveTimeout );
 
 		this._codeSaveTimeout = setTimeout( async () => {
 
-			if ( this.material === null || graphId !== this.material.graphId ) return;
+			if ( this.material === null || graphId !== this.material.userData.graphId ) return;
 
 			const codes = this.getCodes();
 			const codeData = await this.getCode();

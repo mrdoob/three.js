@@ -49,7 +49,6 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { GraphStandardNodeMaterial, GraphBasicNodeMaterial, GraphPhysicalNodeMaterial, GraphPhongNodeMaterial } from 'three/addons/inspector/addons/tsl-graph/TSLGraphMaterials.js';
 			import { TSLGraphLoader } from 'three/addons/inspector/addons/tsl-graph/TSLGraphLoader.js';
 			import { TSLGraphEditor } from 'three/addons/inspector/addons/tsl-graph/TSLGraphEditor.js';
 
@@ -71,12 +70,19 @@
 
 				// Create Materials
 
-				const materials = [
-					new GraphPhysicalNodeMaterial( { graphId: 'mat_1-physical' } ),
-					new GraphStandardNodeMaterial( { graphId: 'mat_2-standard' } ),
-					new GraphPhongNodeMaterial( { graphId: 'mat_3-phong' } ),
-					new GraphBasicNodeMaterial( { graphId: 'mat_4-basic' } )
-				];
+				const m1 = new THREE.MeshPhysicalNodeMaterial();
+				m1.userData.graphId = 'mat_1-physical';
+
+				const m2 = new THREE.MeshStandardNodeMaterial();
+				m2.userData.graphId = 'mat_2-standard';
+
+				const m3 = new THREE.MeshPhongNodeMaterial();
+				m3.userData.graphId = 'mat_3-phong';
+
+				const m4 = new THREE.MeshBasicNodeMaterial();
+				m4.userData.graphId = 'mat_4-basic';
+
+				const materials = [ m1, m2, m3, m4 ];
 
 				for ( let i = 0; i < materials.length; i ++ ) {
 
@@ -134,7 +140,7 @@
 
 					scene.traverse( ( object ) => {
 
-						if ( object.material && object.material.graphId === graphId ) {
+						if ( object.material && object.material.userData && object.material.userData.graphId === graphId ) {
 
 							tslGraph.restoreMaterial( object.material );
 
@@ -144,7 +150,17 @@
 
 				} );
 
-				renderer.domElement.addEventListener( 'click', ( e ) => {
+				const pointerDownPosition = new THREE.Vector2();
+
+				renderer.domElement.addEventListener( 'pointerdown', ( e ) => {
+
+					pointerDownPosition.set( e.clientX, e.clientY );
+
+				} );
+
+				renderer.domElement.addEventListener( 'pointerup', ( e ) => {
+
+					if ( pointerDownPosition.distanceTo( pointer.set( e.clientX, e.clientY ) ) > 2 ) return;
 
 					const rect = renderer.domElement.getBoundingClientRect();
 					pointer.x = ( ( e.clientX - rect.left ) / rect.width ) * 2 - 1;
@@ -158,21 +174,31 @@
 
 					if ( intersects.length > 0 ) {
 
-						const object = intersects[ 0 ].object;
-						const material = object.material;
-			
-						if ( material.isTSLGraphMaterial ) {
+						for ( const intersect of intersects ) {
 
-							if ( boundingBox ) {
+							const object = intersect.object;
+							const material = object.material;
 
-								removeBoundingBox();
+							if ( material.userData && material.userData.graphId ) {
+
+								if ( boundingBox ) {
+
+									removeBoundingBox();
+
+								}
+
+								boundingBox = new THREE.BoxHelper( object, 0xffff00 );
+								scene.add( boundingBox );
+
+								graphMaterial = material;
 
 							}
 
-							boundingBox = new THREE.BoxHelper( object, 0xffff00 );
-							scene.add( boundingBox );
+							if ( object.isMesh || object.isSprite ) {
 
-							graphMaterial = material;
+								break;
+
+							}
 
 						}
 

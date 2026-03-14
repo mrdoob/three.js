@@ -30,11 +30,11 @@ class TSLGraphLoaderApplier {
 
 		scene.traverse( ( object ) => {
 
-			if ( object.material && object.material.isTSLGraphMaterial ) {
+			if ( object.material && object.material.userData.graphId ) {
 
-				if ( tslGraphFns[ object.material.graphId ] ) {
+				if ( tslGraphFns[ object.material.userData.graphId ] ) {
 
-					tslGraphFns[ object.material.graphId ]( object.material );
+					tslGraphFns[ object.material.userData.graphId ]( object.material );
 
 					object.material.needsUpdate = true;
 
