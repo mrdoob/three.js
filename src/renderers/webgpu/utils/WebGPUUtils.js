@@ -46,7 +46,15 @@ class WebGPUUtils {
 
 			} else {
 
-				format = GPUTextureFormat.Depth24Plus;
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32Float;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24Plus;
+
+				}
 
 			}
 

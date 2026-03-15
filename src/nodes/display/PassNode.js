@@ -5,7 +5,7 @@ import { context } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
-import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
+import { HalfFloatType, FloatType } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -756,6 +756,12 @@ class PassNode extends TempNode {
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
+
+		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null && this.renderTarget.stencilBuffer !== true ) {
+
+			this.renderTarget.depthTexture.type = FloatType;
+
+		}
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
