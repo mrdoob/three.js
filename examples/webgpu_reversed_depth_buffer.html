@@ -193,7 +193,6 @@
 				reverseDepthTexture.magFilter = THREE.NearestFilter;
 				reverseRenderPipeline.outputNode = reverseScenePass;
 
-
 				await Promise.all( [ normalRenderer.init(), logarithmicRenderer.init(), reverseRenderer.init() ] );
 
 				window.addEventListener( 'resize', onWindowResize );
