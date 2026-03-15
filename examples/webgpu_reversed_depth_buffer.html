@@ -185,9 +185,7 @@
 				logarithmicRenderPipeline.outputNode = pass( scene, camera );
 
 				reverseRenderPipeline = new THREE.RenderPipeline( reverseRenderer );
-				const reverseScenePass = pass( scene, reversedCamera );
-				reverseScenePass.renderTarget.depthTexture.type = THREE.FloatType;
-				reverseRenderPipeline.outputNode = reverseScenePass;
+				reverseRenderPipeline.outputNode = pass( scene, reversedCamera );
 
 				await Promise.all( [ normalRenderer.init(), logarithmicRenderer.init(), reverseRenderer.init() ] );
 
