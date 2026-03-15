@@ -1,615 +1,484 @@
-import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import readline from 'readline';
 
-// Path-based categories (used as fallback for non-JS files)
-// Ordered from most specific to least specific
-const categoryPaths = [
-	// Specific renderer paths
-	[ 'src/renderers/webgl', 'WebGLRenderer' ],
-	[ 'src/renderers/webgpu', 'WebGPURenderer' ],
-	[ 'src/renderers/common', 'Renderer' ],
+const __filename = fileURLToPath( import.meta.url );
+const __dirname = path.dirname( __filename );
 
-	// Main sections
-	[ 'docs', 'Docs' ],
-	[ 'manual', 'Manual' ],
-	[ 'editor', 'Editor' ],
-	[ 'test', 'Tests' ],
-	[ 'playground', 'Playground' ],
-	[ 'utils', 'Utils' ],
-	[ 'build', 'Build' ],
-	[ 'examples/jsm', 'Addons' ],
-	[ 'examples', 'Examples' ],
-	[ 'src', 'Global' ]
-];
+async function askQuestion( query ) {
 
-// Skip patterns - commits matching these will be excluded
-const skipPatterns = [
-	/^Updated? builds?\.?$/i,
-	/^Merge /i,
-	/^Update dependency .* to /i,
-	/^Update devDependencies/i,
-	/^Update github\/codeql-action/i,
-	/^Update actions\//i,
-	/^Bump .* and /i,
-	/^Updated package-lock\.json/i,
-	/^Update copyright year/i,
-	/^Update \w+\.js\.?$/i, // Generic "Update File.js" commits
-	/^Updated? docs\.?$/i,
-	/^Update REVISION/i
-];
-
-// Categories that map to sections
-const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Utils', 'Build' ];
-
-function exec( command ) {
-
-	try {
-
-		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 } ).trim();
-
-	} catch ( error ) {
-
-		return '';
-
-	}
-
-}
-
-function getLastTag() {
-
-	return exec( 'git describe --tags --abbrev=0' );
-
-}
-
-function getCommitsSinceTag( tag ) {
-
-	// Get commits since tag, oldest first, excluding merge commits
-	const log = exec( `git log ${tag}..HEAD --no-merges --reverse --format="%H|%s|%an"` );
-
-	if ( ! log ) return [];
-
-	return log.split( '\n' ).filter( Boolean ).map( line => {
-
-		const [ hash, subject, author ] = line.split( '|' );
-		return { hash, subject, author };
-
+	const rl = readline.createInterface( {
+		input: process.stdin,
+		output: process.stdout
 	} );
 
-}
+	return new Promise( resolve => rl.question( query, ans => {
 
-function getChangedFiles( hash ) {
+		rl.close();
+		resolve( ans );
 
-	const files = exec( `git diff-tree --no-commit-id --name-only -r ${hash}` );
-	return files ? files.split( '\n' ).filter( Boolean ) : [];
-
-}
-
-function getCoAuthors( hash ) {
-
-	const body = exec( `git log -1 --format="%b" ${hash}` );
-	const regex = /Co-authored-by:\s*([^<]+)\s*<[^>]+>/gi;
-	return [ ...body.matchAll( regex ) ].map( m => m[ 1 ].trim() );
+	} ) );
 
 }
 
-function extractPRNumber( subject ) {
+async function generateReport() {
 
-	// Match patterns like "(#12345)" or "#12345" at end
-	const match = subject.match( /\(#(\d+)\)|\s#(\d+)$/ );
-	return match ? ( match[ 1 ] || match[ 2 ] ) : null;
+	let arg = process.argv[ 2 ];
 
-}
+	if ( ! arg || arg === '-cache' ) {
 
-function getPRInfo( prNumber ) {
+		// Fallback to reading REVISION from src/constants.js
+		try {
 
-	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}' 2>/dev/null` );
+			const constantsPath = path.join( __dirname, '../src/constants.js' );
+			const constantsContent = fs.readFileSync( constantsPath, 'utf8' );
+			const revisionMatch = constantsContent.match( /export\s+const\s+REVISION\s*=\s*['"](.*?)['"]/ );
 
-	try {
+			if ( revisionMatch && revisionMatch[ 1 ] ) {
 
-		return result ? JSON.parse( result ) : null;
+				arg = revisionMatch[ 1 ].replace( /dev$/, '' );
+				console.log( `No release specified. Using current REVISION: ${arg}` );
 
-	} catch ( e ) {
+				// Adjust argv indexing if the first argument was actually the -cache flag
+				if ( process.argv[ 2 ] === '-cache' ) {
 
-		return null;
-
-	}
-
-}
-
-function categorizeFile( file ) {
-
-	// Extract category from JS filename in src/ or examples/jsm/
-	if ( file.endsWith( '.js' ) ) {
-
-		const isAddon = file.startsWith( 'examples/jsm/' );
-
-		if ( file.startsWith( 'src/' ) || isAddon ) {
-
-			const match = file.match( /\/([^/]+)\.js$/ );
-			if ( match ) return { category: match[ 1 ], isAddon };
-
-		}
-
-	}
-
-	// Check path-based categories for non-JS files or other paths
-	for ( const [ pathPrefix, category ] of categoryPaths ) {
-
-		if ( file.startsWith( pathPrefix ) ) {
-
-			return {
-				category,
-				isAddon: file.startsWith( 'examples/jsm/' ),
-				section: sectionCategories.includes( category ) ? category : null
-			};
-
-		}
-
-	}
-
-	return { category: 'Global', isAddon: false };
-
-}
-
-function categorizeCommit( files ) {
-
-	const categoryCounts = {};
-	const sectionCounts = {};
-	let hasAddon = false;
-	let addonCategory = null;
-	let addonCount = 0;
-	let srcCount = 0;
-
-	for ( const file of files ) {
-
-		const result = categorizeFile( file );
-		const cat = result.category;
-
-		categoryCounts[ cat ] = ( categoryCounts[ cat ] || 0 ) + 1;
-
-		// Track src files vs addon files
-		if ( file.startsWith( 'src/' ) ) srcCount ++;
-
-		if ( result.isAddon ) {
-
-			hasAddon = true;
-			addonCount ++;
-
-			// Track addon category separately (ignore generic ones)
-			if ( cat !== 'Examples' && cat !== 'Loaders' && cat !== 'Exporters' ) {
-
-				if ( ! addonCategory || categoryCounts[ cat ] > categoryCounts[ addonCategory ] ) {
-
-					addonCategory = cat;
+					process.argv.splice( 2, 0, arg ); // Shift everything over by acting as if arg was passed
 
 				}
 
-			} else if ( ! addonCategory ) {
+			} else {
 
-				addonCategory = cat;
+				console.error( 'Usage: npm run changelog [milestone-url-or-number] [-cache <per_page>]' );
+				console.error( 'Example: npm run changelog https://github.com/mrdoob/three.js/milestone/97 -cache 50' );
+				console.error( 'Could not find REVISION in src/constants.js.' );
+				process.exit( 1 );
+
+			}
+
+		} catch ( e ) {
+
+			console.error( 'Usage: npm run changelog [milestone-url-or-number] [-cache <per_page>]' );
+			console.error( 'Example: npm run changelog https://github.com/mrdoob/three.js/milestone/97 -cache 50' );
+			console.error( 'Error reading src/constants.js:', e.message );
+			process.exit( 1 );
+
+		}
+
+	}
+
+	let perPage = 100;
+
+	for ( let i = 2; i < process.argv.length; i ++ ) { // start from 2, just in case -cache is the first arg now
+
+		const param = process.argv[ i ];
+
+		if ( param === '-cache' && i + 1 < process.argv.length ) {
+
+			perPage = parseInt( process.argv[ i + 1 ], 10 );
+			// skip the value
+
+			if ( isNaN( perPage ) || perPage <= 0 || perPage > 100 ) {
+
+				console.error( 'Invalid -cache value. It must be a number between 1 and 100.' );
+				process.exit( 1 );
 
 			}
 
 		}
 
-		if ( result.section ) {
-
-			sectionCounts[ result.section ] = ( sectionCounts[ result.section ] || 0 ) + 1;
-
-		}
-
 	}
 
-	// If commit primarily touches src/ files, don't treat as addon even if it has some addon files
-	if ( srcCount > addonCount ) {
+	const match = arg.match( /(\d+)$/ );
+	if ( ! match ) {
 
-		hasAddon = false;
-
-	}
-
-	// If this commit has addon files and a specific addon category, use it
-	if ( hasAddon && addonCategory && addonCategory !== 'Examples' ) {
-
-		return { category: addonCategory, isAddon: true, section: null };
-
-	}
-
-	// Find the most common section (excluding Tests unless it's dominant)
-	let maxSection = null;
-	let maxSectionCount = 0;
-	const totalFiles = files.length;
-
-	for ( const [ sec, count ] of Object.entries( sectionCounts ) ) {
-
-		// Only use Tests/Build section if it's the majority of files
-		if ( ( sec === 'Tests' || sec === 'Build' ) && count < totalFiles * 0.5 ) continue;
-
-		if ( count > maxSectionCount ) {
-
-			maxSectionCount = count;
-			maxSection = sec;
-
-		}
-
-	}
-
-	// Return the category with the most files changed
-	let maxCategory = 'Global';
-	let maxCount = 0;
-
-	for ( const [ cat, count ] of Object.entries( categoryCounts ) ) {
-
-		if ( count > maxCount ) {
-
-			maxCount = count;
-			maxCategory = cat;
-
-		}
-
-	}
-
-	return { category: maxCategory, isAddon: false, section: maxSection };
-
-}
-
-function shouldSkipCommit( subject ) {
-
-	return skipPatterns.some( pattern => pattern.test( subject ) );
-
-}
-
-function extractCategoryFromTitle( title ) {
-
-	// Extract category from title prefix like "Object3D: Added pivot"
-	const match = title.match( /^([A-Za-z0-9_/]+):\s/ );
-	return match ? match[ 1 ] : null;
-
-}
-
-function cleanSubject( subject, category ) {
-
-	// Remove PR number from subject
-	let cleaned = subject.replace( /\s*\(#\d+\)\s*$/, '' ).replace( /\s*#\d+\s*$/, '' ).trim();
-
-	// Remove category prefix if it matches (e.g., "Editor: " when category is "Editor")
-	const prefixPattern = new RegExp( `^${category}:\\s*`, 'i' );
-	cleaned = cleaned.replace( prefixPattern, '' );
-
-	// Also remove common prefixes
-	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
-
-	// Remove trailing period if present, we'll add it back
-	cleaned = cleaned.replace( /\.\s*$/, '' );
-
-	return cleaned;
-
-}
-
-function normalizeAuthor( author ) {
-
-	const lower = author.toLowerCase();
-	if ( lower === 'mr.doob' ) return 'mrdoob';
-	if ( lower === 'michael herzog' ) return 'Mugen87';
-	if ( lower === 'garrett johnson' ) return 'gkjohnson';
-	if ( lower.startsWith( 'claude' ) ) return 'claude';
-	if ( lower.startsWith( 'copilot' ) ) return 'microsoftcopilot';
-	if ( lower.includes( 'dependabot' ) ) return 'dependabot';
-
-	return author;
-
-}
-
-function formatEntry( subject, prNumber, hash, author, coAuthors, category ) {
-
-	let entry = `${cleanSubject( subject, category )}.`;
-
-	if ( prNumber ) {
-
-		entry += ` #${prNumber}`;
-
-	} else if ( hash ) {
-
-		entry += ` ${hash}`;
-
-	}
-
-	if ( author ) {
-
-		const authors = [ ...new Set( [ author, ...( coAuthors || [] ) ].map( normalizeAuthor ) ) ];
-		entry += ` (@${authors.join( ', @' )})`;
-
-	}
-
-	return entry;
-
-}
-
-function addToGroup( groups, key, value ) {
-
-	if ( ! groups[ key ] ) groups[ key ] = [];
-	groups[ key ].push( value );
-
-}
-
-function validateEnvironment() {
-
-	if ( ! exec( 'gh --version 2>/dev/null' ) ) {
-
-		console.error( 'GitHub CLI (gh) is required but not installed.' );
-		console.error( 'Install from: https://cli.github.com/' );
+		console.error( 'Invalid format. Please provide a release number (e.g. 184 or r184).' );
 		process.exit( 1 );
 
 	}
 
-	const lastTag = getLastTag();
+	const releaseNumber = parseInt( match[ 1 ], 10 );
+	const milestoneNumber = releaseNumber - 87;
 
-	if ( ! lastTag ) {
+	const githubToken = await askQuestion( 'Enter GitHub API Token (or press Enter to skip): ' );
+	const geminiToken = await askQuestion( 'Enter Gemini API Token (or press Enter to skip AI summary): ' );
+	let geminiModel = '';
 
-		console.error( 'No tags found in repository' );
-		process.exit( 1 );
+	if ( geminiToken ) {
 
-	}
+		console.error( '\nFetching available Gemini models...' );
 
-	return lastTag;
+		try {
 
-}
+			const modelsRes = await fetch( `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiToken}` );
+			if ( ! modelsRes.ok ) {
 
-function collectRevertedTitles( commits ) {
+				console.error( 'Failed to fetch Gemini models. Please check your API token.' );
+				process.exit( 1 );
 
-	const reverted = new Set();
+			}
 
-	for ( const { subject } of commits ) {
+			const modelsData = await modelsRes.json();
+			const rawModels = modelsData.models
+				.filter( m => m.name.includes( 'gemini' ) && m.supportedGenerationMethods && m.supportedGenerationMethods.includes( 'generateContent' ) )
+				.filter( m => ! m.name.includes( 'vision' ) )
+				.map( m => {
 
-		const match = subject.match( /^Revert "(.+)"/ );
-		if ( match ) reverted.add( match[ 1 ] );
+					return {
+						id: m.name.replace( 'models/', '' ),
+						displayName: m.displayName || m.name.replace( 'models/', '' )
+					};
 
-	}
+				} );
 
-	return reverted;
+			// Filter out unwanted and noisy models
+			const filteredModels = rawModels.filter( m => {
 
-}
+				const id = m.id.toLowerCase();
+				const name = m.displayName.toLowerCase();
+				if ( name.includes( 'nano' ) || name.includes( 'banana' ) || id.includes( 'nano' ) || id.includes( 'banana' ) ) return false;
+				if ( id.includes( '-latest' ) || id.includes( 'computer-use' ) || id.includes( 'robotics' ) || id.includes( '-tts' ) ) return false;
+				// Filter out very specific preview builds if they are too noisy, but we'll leave most previews as per the example.
+				return true;
 
-function processCommit( commit, revertedTitles ) {
+			} );
 
-	// Skip reverts
-	if ( /^Revert "/.test( commit.subject ) ) return null;
+			// Group by version
+			const groups = {};
+			filteredModels.forEach( m => {
 
-	// Check if this commit was reverted
-	const subjectWithoutPR = commit.subject.replace( /\s*\(#\d+\)\s*$/, '' );
-	if ( revertedTitles.has( subjectWithoutPR ) ) return null;
+				// Try to extract version like "2.5", "3.1", "2.0", "3"
+				const versionMatch = m.id.match( /gemini-(\d+(?:\.\d+)?)/ );
+				if ( versionMatch ) {
 
-	// Skip certain commits
-	if ( shouldSkipCommit( commit.subject ) ) return null;
-
-	const prNumber = extractPRNumber( commit.subject );
-
-	// Try to get PR info for better title and author
-	let author = null;
-	let subject = commit.subject;
-	let files = null;
-
-	if ( prNumber ) {
-
-		const prInfo = getPRInfo( prNumber );
-
-		if ( prInfo ) {
-
-			author = prInfo.author;
-			if ( prInfo.title ) subject = prInfo.title;
-			if ( prInfo.files && prInfo.files.length > 0 ) files = prInfo.files;
-
-		}
-
-	}
-
-	// Fall back to git data
-	if ( ! files ) files = getChangedFiles( commit.hash );
-	if ( ! author ) author = commit.author;
-
-	const result = categorizeCommit( files );
-	let { category, section } = result;
-	const { isAddon } = result;
-
-	// Override category if title has a clear prefix
-	const titleCategory = extractCategoryFromTitle( subject );
-
-	if ( titleCategory ) {
-
-		category = titleCategory;
-		if ( category === 'Puppeteer' ) category = 'Tests';
-		if ( category === 'Scripts' ) category = 'Utils';
-		section = sectionCategories.includes( category ) ? category : null;
-
-	}
-
-	// Route jsdoc/typo/docs-related commits to Docs section
-	if ( /\b(jsdoc|typo|spelling|documentation)\b/i.test( subject ) ) {
-
-		section = 'Docs';
-
-	}
-
-	const coAuthors = getCoAuthors( commit.hash );
-
-	return {
-		entry: {
-			subject,
-			prNumber,
-			author,
-			category,
-			formatted: formatEntry( subject, prNumber, commit.hash, author, coAuthors, category )
-		},
-		category,
-		section,
-		isAddon
-	};
-
-}
-
-function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
-
-	let output = '';
-
-	// Migration guide and milestone links
-	const version = lastTag.replace( 'r', '' );
-	const nextVersion = parseInt( version ) + 1;
-	output += `https://github.com/mrdoob/three.js/wiki/Migration-Guide#${version}--${nextVersion}\n`;
-	output += 'https://github.com/mrdoob/three.js/milestone/XX?closed=1\n\n';
-
-	// Core changes (Global first, then alphabetically)
-	const sortedCore = Object.keys( coreChanges ).sort( ( a, b ) => {
-
-		if ( a === 'Global' ) return - 1;
-		if ( b === 'Global' ) return 1;
-		return a.localeCompare( b );
-
-	} );
-
-	for ( const category of sortedCore ) {
-
-		output += `- ${category}\n`;
-
-		for ( const entry of coreChanges[ category ] ) {
-
-			output += `  - ${entry.formatted}\n`;
-
-		}
-
-	}
-
-	// Output sections in order
-	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Utils', 'Build' ];
-
-	for ( const sectionName of sectionOrder ) {
-
-		// Addons section has nested categories
-		if ( sectionName === 'Addons' ) {
-
-			const sortedAddons = Object.keys( addonChanges ).sort();
-
-			if ( sortedAddons.length > 0 ) {
-
-				output += '\n**Addons**\n\n';
-
-				for ( const category of sortedAddons ) {
-
-					output += `- ${category}\n`;
-
-					for ( const entry of addonChanges[ category ] ) {
-
-						output += `  - ${entry.formatted}\n`;
-
-					}
-
-					output += '\n';
+					const version = versionMatch[ 1 ];
+					if ( ! groups[ version ] ) groups[ version ] = [];
+					groups[ version ].push( m );
 
 				}
 
-			}
+			} );
 
-			continue;
+			const sortedVersions = Object.keys( groups ).sort( ( a, b ) => parseFloat( b ) - parseFloat( a ) );
 
-		}
+			if ( sortedVersions.length === 0 ) {
 
-		if ( sections[ sectionName ].length > 0 ) {
-
-			output += `\n**${sectionName}**\n\n`;
-
-			for ( const entry of sections[ sectionName ] ) {
-
-				output += `- ${entry.formatted}\n`;
+				console.error( 'No suitable Gemini models found after filtering.' );
+				process.exit( 1 );
 
 			}
+
+			console.log( '\nSelect Gemini Version Family:' );
+			sortedVersions.forEach( ( v, i ) => {
+
+				console.log( `${i + 1}: Gemini ${v}` );
+
+			} );
+
+			const versionChoice = await askQuestion( `Enter choice (1-${sortedVersions.length}) [1]: ` );
+			let vIndex = parseInt( versionChoice, 10 );
+			if ( isNaN( vIndex ) || vIndex < 1 || vIndex > sortedVersions.length ) {
+
+				vIndex = 1;
+
+			}
+
+			const selectedVersion = sortedVersions[ vIndex - 1 ];
+			const familyModels = groups[ selectedVersion ].reverse(); // latest variants first
+
+			console.log( `\nSelect Model for Gemini ${selectedVersion}:` );
+			familyModels.forEach( ( m, i ) => {
+
+				console.log( `${i + 1}: ${m.displayName} (${m.id})` );
+
+			} );
+
+			const modelChoice = await askQuestion( `Enter choice (1-${familyModels.length}) [1]: ` );
+			let mIndex = parseInt( modelChoice, 10 );
+			if ( isNaN( mIndex ) || mIndex < 1 || mIndex > familyModels.length ) {
+
+				mIndex = 1;
+
+			}
+
+			geminiModel = familyModels[ mIndex - 1 ].id;
+
+		} catch ( e ) {
+
+			console.error( 'Error fetching models:', e.message );
+			process.exit( 1 );
 
 		}
 
 	}
 
-	return output;
+	const repo = 'mrdoob/three.js';
 
-}
+	console.error( `Fetching milestone for release r${releaseNumber} (ID: ${milestoneNumber})...` );
 
-function generateChangelog() {
+	const headers = {
+		'User-Agent': 'NodeJS/ThreeJS-Report',
+		'Accept': 'application/vnd.github.v3+json'
+	};
 
-	const lastTag = validateEnvironment();
+	if ( githubToken ) {
 
-	console.error( `Generating changelog since ${lastTag}...\n` );
+		headers[ 'Authorization' ] = `token ${githubToken}`;
 
-	const commits = getCommitsSinceTag( lastTag );
+	}
 
-	if ( commits.length === 0 ) {
+	const milestoneRes = await fetch( `https://api.github.com/repos/${repo}/milestones/${milestoneNumber}`, { headers } );
+	if ( ! milestoneRes.ok ) {
 
-		console.error( 'No commits found since last tag' );
+		console.error( 'Failed to fetch milestone. Check if the milestone exists or rate limit exceeded.' );
 		process.exit( 1 );
 
 	}
 
-	console.error( `Found ${commits.length} commits\n` );
+	const milestoneData = await milestoneRes.json();
+	const milestoneName = milestoneData.title;
 
-	const revertedTitles = collectRevertedTitles( commits );
+	console.error( `Fetching PRs for milestone: ${milestoneName}...` );
 
-	// Group commits by category
-	const coreChanges = {};
-	const addonChanges = {};
-	const sections = {
-		Docs: [],
-		Manual: [],
-		Examples: [],
-		Editor: [],
-		Tests: [],
-		Utils: [],
-		Build: []
-	};
+	let page = 1;
+	let totalPages = '?';
+	const cacheFiles = [];
+	const categories = {};
+	let prDescriptionsForAI = '';
+	let totalPRs = 0;
 
-	let skipped = 0;
-	const total = commits.length;
-	const barWidth = 40;
+	const changelogDir = path.join( __dirname, '../changelog' );
+	if ( ! fs.existsSync( changelogDir ) ) {
 
-	for ( let i = 0; i < total; i ++ ) {
+		fs.mkdirSync( changelogDir );
 
-		const commit = commits[ i ];
-		const done = i + 1;
-		const filled = Math.round( barWidth * done / total );
-		const bar = '█'.repeat( filled ) + '░'.repeat( barWidth - filled );
-		const pct = Math.round( 100 * done / total );
-		process.stderr.write( `\r  ${bar} ${pct}% (${done}/${total})` );
+	}
 
-		const result = processCommit( commit, revertedTitles );
+	while ( true ) {
 
-		if ( ! result ) {
+		process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
 
-			skipped ++;
-			continue;
+		const cacheFilename = path.join( changelogDir, `r${releaseNumber}_page_${page}.md` );
+		let pageContent = '';
+		let isLastPage = false;
 
-		}
+		if ( fs.existsSync( cacheFilename ) ) {
 
-		const { entry, category, section, isAddon } = result;
-
-		if ( section && sections[ section ] ) {
-
-			sections[ section ].push( entry );
-
-		} else if ( isAddon ) {
-
-			addToGroup( addonChanges, category, entry );
+			pageContent = fs.readFileSync( cacheFilename, 'utf8' );
 
 		} else {
 
-			addToGroup( coreChanges, category, entry );
+			const res = await fetch( `https://api.github.com/repos/${repo}/issues?milestone=${milestoneNumber}&state=closed&per_page=${perPage}&page=${page}`, { headers } );
+			if ( ! res.ok ) {
+
+				console.error( '\nFailed to fetch PRs.' );
+				process.exit( 1 );
+
+			}
+
+			if ( totalPages === '?' ) {
+
+				const linkHeader = res.headers.get( 'link' );
+				if ( linkHeader ) {
+
+					const lastPageMatch = linkHeader.match( /page=(\d+)>; rel="last"/ );
+					if ( lastPageMatch ) {
+
+						totalPages = lastPageMatch[ 1 ];
+						process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
+
+					}
+
+				}
+
+			}
+
+			const data = await res.json();
+			if ( data.length === 0 ) break;
+
+			const prsInData = data.filter( issue => issue.pull_request && issue.pull_request.merged_at );
+
+			for ( const pr of prsInData ) {
+
+				let title = pr.title;
+				let category = 'Other';
+
+				const catMatch = title.match( /^([^:]+):\s*(.*)$/ );
+				if ( catMatch ) {
+
+					category = catMatch[ 1 ].trim();
+					title = catMatch[ 2 ].trim();
+
+				}
+
+				title = title.replace( /\s*\(#\d+\)\s*$/, '' ).trim();
+				title = title.replace( /\.\s*$/, '' );
+
+				const authors = new Set();
+				if ( pr.user && pr.user.login ) authors.add( pr.user.login );
+
+				if ( pr.body ) {
+
+					const coAuthRegex1 = /Co-authored-by:\s*(?:@)?([a-zA-Z0-9-]+)/gi;
+					let m;
+					while ( ( m = coAuthRegex1.exec( pr.body ) ) !== null ) {
+
+						authors.add( m[ 1 ] );
+
+					}
+
+				}
+
+				const authorsList = Array.from( authors ).map( a => `@${a}` ).join( ', ' );
+
+				pageContent += `## ${category}: ${title} #${pr.number} (${authorsList})\n\n${pr.body || ''}\n\n---\n\n`;
+
+			}
+
+			fs.writeFileSync( cacheFilename, pageContent );
+
+			if ( data.length < perPage ) isLastPage = true;
+
+		}
+
+		if ( pageContent.length > 0 ) {
+
+			cacheFiles.push( cacheFilename );
+
+			if ( geminiToken ) {
+
+				prDescriptionsForAI += pageContent;
+
+			}
+
+			const prRegex = /^## (.*?):\s*(.*?)\s+#(\d+)\s+\((.*?)\)(?:\r?\n)([\s\S]*?)(?=\n---|$)/gm;
+			let m;
+			while ( ( m = prRegex.exec( pageContent ) ) !== null ) {
+
+				const category = m[ 1 ].trim();
+				const title = m[ 2 ].trim();
+				const number = parseInt( m[ 3 ], 10 );
+				const authorsList = m[ 4 ].trim();
+
+				if ( ! categories[ category ] ) categories[ category ] = [];
+				categories[ category ].push( { title: title + '.', number, authors: authorsList } );
+
+				totalPRs ++;
+
+			}
+
+		} else if ( ! fs.existsSync( cacheFilename ) ) {
+
+			break;
+
+		}
+
+		if ( isLastPage ) break;
+
+		page ++;
+
+	}
+
+	console.error( `\nFound ${totalPRs} PRs.` );
+
+	const sortedCategories = Object.keys( categories ).sort();
+
+	let output = `## ${milestoneName}\n\n`;
+
+	for ( let i = 0; i < sortedCategories.length; i ++ ) {
+
+		const cat = sortedCategories[ i ];
+
+		if ( i > 0 ) output += '\n'; // Add an empty line between categories
+
+		output += `- ${cat}\n`;
+
+		const sortedPRs = categories[ cat ].sort( ( a, b ) => a.number - b.number );
+
+		for ( const pr of sortedPRs ) {
+
+			output += `  - ${pr.title} #${pr.number} (${pr.authors})\n`;
 
 		}
 
 	}
 
-	process.stderr.write( '\n\n' );
+	if ( geminiToken && prDescriptionsForAI ) {
 
-	if ( skipped > 0 ) {
+		console.error( `Generating AI Summary with Gemini (${geminiModel})...` );
 
-		console.error( `Skipped ${skipped} commits (builds, dependency updates, etc.)\n` );
+		const aiPrompt = `You are an assistant analyzing the changes of a new release of the Three.js library (release r${releaseNumber}).
+Here are the descriptions of the Pull Requests merged in this release:
+
+${prDescriptionsForAI}
+
+Please provide the following information formatted in Markdown (ALL EXPLANATIONS MUST BE WRITTEN IN ENGLISH):
+- A detailed and comprehensive summary focusing on the most important changes, including new features, major refactorings, API changes, and breaking changes. IMPORTANT: Add an extra blank line between each bullet point in your lists for better readability.
+- Migration tips for users upgrading to this new version. Use the exact heading "### Migration Tips" (without any numbering). IMPORTANT: If a property or feature was created and then renamed or removed within this same release milestone, DO NOT include it as a migration tip (since it was never released to the public in the first place).
+
+Output only the markdown content, without extra code block delimiters. Do not include a code examples section.`;
+
+		try {
+
+			const geminiRes = await fetch( `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiToken}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( {
+					contents: [ { parts: [ { text: aiPrompt } ] } ]
+				} )
+			} );
+
+			if ( geminiRes.ok ) {
+
+				const geminiData = await geminiRes.json();
+				if ( geminiData.candidates && geminiData.candidates[ 0 ] && geminiData.candidates[ 0 ].content ) {
+
+					const aiText = geminiData.candidates[ 0 ].content.parts[ 0 ].text;
+					const aiFooter = `\n\n*Generated by ${geminiModel}*`;
+					output = `## AI Summary (r${releaseNumber})\n\n${aiText}${aiFooter}\n\n---\n\n` + output;
+
+				}
+
+			} else {
+
+				console.error( 'Failed to generate AI summary:', await geminiRes.text() );
+
+			}
+
+		} catch ( e ) {
+
+			console.error( 'Error generating AI summary:', e.message );
+
+		}
 
 	}
 
-	console.log( formatOutput( lastTag, coreChanges, addonChanges, sections ) );
+	const descriptionsFilePath = path.join( changelogDir, `r${releaseNumber}_descriptions.md` );
+	const reportFilePath = path.join( changelogDir, `r${releaseNumber}.md` );
+
+	fs.writeFileSync( descriptionsFilePath, prDescriptionsForAI );
+	fs.writeFileSync( reportFilePath, output );
+
+	for ( const cacheFile of cacheFiles ) {
+
+		if ( fs.existsSync( cacheFile ) ) {
+
+			fs.unlinkSync( cacheFile );
+
+		}
+
+	}
+
+	console.log( `\n✅ Report for r${releaseNumber} generated successfully:` );
+	console.log( `   📄 \x1b[36m${reportFilePath}\x1b[0m` );
+
+	if ( geminiToken && prDescriptionsForAI ) {
+
+		console.log( '\n✅ Descriptions for AI saved in:' );
+		console.log( `   📄 \x1b[36m${descriptionsFilePath}\x1b[0m\n` );
+
+	}
 
 }
 
-generateChangelog();
+generateReport().catch( console.error );
