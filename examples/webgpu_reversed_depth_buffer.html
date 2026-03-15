@@ -186,11 +186,7 @@
 
 				reverseRenderPipeline = new THREE.RenderPipeline( reverseRenderer );
 				const reverseScenePass = pass( scene, reversedCamera );
-				const reverseDepthTexture = reverseScenePass.getTexture( 'depth' );
-				reverseDepthTexture.type = THREE.FloatType;
-				reverseDepthTexture.format = THREE.DepthFormat;
-				reverseDepthTexture.minFilter = THREE.NearestFilter;
-				reverseDepthTexture.magFilter = THREE.NearestFilter;
+				reverseScenePass.renderTarget.depthTexture.type = THREE.FloatType;
 				reverseRenderPipeline.outputNode = reverseScenePass;
 
 				await Promise.all( [ normalRenderer.init(), logarithmicRenderer.init(), reverseRenderer.init() ] );
