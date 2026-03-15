@@ -9,8 +9,6 @@ import { Loader } from './Loader.js';
 import {
 	ShadowMaterial,
 	SpriteMaterial,
-	RawShaderMaterial,
-	ShaderMaterial,
 	PointsMaterial,
 	MeshPhysicalMaterial,
 	MeshStandardMaterial,
@@ -26,7 +24,9 @@ import {
 	LineBasicMaterial,
 	Material,
 } from '../materials/Materials.js';
-import { error, warn } from '../utils.js';
+import { error, warn, warnOnce } from '../utils.js';
+
+const _customMaterials = {};
 
 /**
  * Class for loading materials. The files are internally
@@ -412,8 +412,6 @@ class MaterialLoader extends Loader {
 		const materialLib = {
 			ShadowMaterial,
 			SpriteMaterial,
-			RawShaderMaterial,
-			ShaderMaterial,
 			PointsMaterial,
 			MeshPhysicalMaterial,
 			MeshStandardMaterial,
@@ -427,10 +425,40 @@ class MaterialLoader extends Loader {
 			MeshMatcapMaterial,
 			LineDashedMaterial,
 			LineBasicMaterial,
-			Material
+			Material,
+			... _customMaterials
 		};
 
-		return new materialLib[ type ]();
+		const MaterialType = materialLib[ type ];
+
+		let materialInstance;
+
+		if ( MaterialType === undefined ) {
+
+			warnOnce( `MaterialLoader: Unknown material type "${ type }". Use .registerMaterial() before starting the deserialization process.` );
+			materialInstance = new Material();
+
+		} else {
+
+			materialInstance = new MaterialType();
+
+		}
+
+		return materialInstance;
+
+	}
+
+	/**
+	 * Registers the given material at the internal
+	 * material library.
+	 *
+	 * @static
+	 * @param {string} type - The material type.
+	 * @param {Material} materialClass - The material class.
+	 */
+	static registerMaterial( type, materialClass ) {
+
+		_customMaterials[ type ] = materialClass;
 
 	}
 

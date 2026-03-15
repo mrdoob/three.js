@@ -17,6 +17,9 @@ function Loader( editor ) {
 
 	this.texturePath = '';
 
+	THREE.MaterialLoader.registerMaterial( 'ShaderMaterial', THREE.ShaderMaterial );
+	THREE.MaterialLoader.registerMaterial( 'RawShaderMaterial', THREE.RawShaderMaterial );
+
 	this.loadItemList = function ( items ) {
 
 		LoaderUtils.getFilesFromItemList( items, function ( files, filesMap ) {
