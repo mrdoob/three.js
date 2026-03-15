@@ -500,7 +500,7 @@ class WebXRManager extends EventDispatcher {
 							glProjLayer.forceMonoPresentation = true;
 
 						} catch ( e ) {}
-			
+
 					}
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
@@ -1007,9 +1007,9 @@ class WebXRManager extends EventDispatcher {
 					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 					// Monoscopic fallback: override right eye position when native API not available
-					if ( scope.forceMonoscopic && i === 1 && cameras[0] !== undefined ) {
+					if ( scope.forceMonoscopic && i === 1 && cameras[ 0 ] !== undefined ) {
 
-						camera.position.copy( cameras[0].position );
+						camera.position.copy( cameras[ 0 ].position );
 						camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
 
 					}
