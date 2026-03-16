@@ -1465,6 +1465,28 @@ class Renderer {
 
 		}
 
+		// make sure a new render target has correct default depth values
+
+		if ( renderTarget !== null && renderTarget.depthBuffer === true ) {
+
+			const renderTargetData = this._textures.get( renderTarget );
+
+			if ( renderTargetData.depthInitialized !== true ) {
+
+				// we need a single manual clear if auto clear depth is disabled
+
+				if ( this.autoClear === false || ( this.autoClear === true && this.autoClearDepth === false ) ) {
+
+					this.clearDepth();
+
+				}
+
+				renderTargetData.depthInitialized = true;
+
+			}
+
+		}
+
 		//
 
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
@@ -2217,6 +2239,8 @@ class Renderer {
 			renderContext.activeCubeFace = this.getActiveCubeFace();
 			renderContext.activeMipmapLevel = this.getActiveMipmapLevel();
 
+			if ( renderTarget.depthBuffer === true ) renderTargetData.depthInitialized = true;
+
 		}
 
 		this.backend.clear( color, depth, stencil, renderContext );
@@ -2480,7 +2504,7 @@ class Renderer {
 	/**
 	 * Sets the output render target for the renderer.
 	 *
-	 * @param {Object} renderTarget - The render target to set as the output target.
+	 * @param {?RenderTarget} renderTarget - The render target to set as the output target.
 	 */
 	setOutputRenderTarget( renderTarget ) {
 
