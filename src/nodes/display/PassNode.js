@@ -757,7 +757,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
-		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null && this.renderTarget.stencilBuffer !== true ) {
+		if ( renderer.reversedDepthBuffer === true ) {
 
 			this.renderTarget.depthTexture.type = FloatType;
 

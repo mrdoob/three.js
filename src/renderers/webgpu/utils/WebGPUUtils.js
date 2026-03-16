@@ -42,7 +42,15 @@ class WebGPUUtils {
 
 			} else if ( renderContext.stencil ) {
 
-				format = GPUTextureFormat.Depth24PlusStencil8;
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32FloatStencil8;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24PlusStencil8;
+
+				}
 
 			} else {
 
