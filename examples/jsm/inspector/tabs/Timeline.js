@@ -609,9 +609,9 @@ class Timeline extends Tab {
 					}
 
 					const call = { method: methodLabel };
-					const detail = this.getCallDetail( prop, args );
+					const details = this.getCallDetail( prop, args );
 
-					if ( detail ) call.detail = detail;
+					if ( details ) call.details = details;
 
 					this.currentFrame.calls.push( call );
 
@@ -686,25 +686,25 @@ class Timeline extends Tab {
 				const renderObject = args[ 0 ];
 				if ( ! renderObject ) return null;
 
-				const detail = {};
+				const details = {};
 				if ( renderObject.object ) {
 
-					detail.object = renderObject.object.name || renderObject.object.type;
+					details.object = renderObject.object.name || renderObject.object.type;
 
 					if ( renderObject.object.count > 1 ) {
 
-						detail.instances = renderObject.object.count;
+						details.instance = renderObject.object.count;
 
 					}
 
 				}
 
-				if ( renderObject.material ) detail.material = renderObject.material.name || renderObject.material.type;
-				if ( renderObject.geometry ) detail.geometry = renderObject.geometry.name || undefined;
+				if ( renderObject.material ) details.material = renderObject.material.name || renderObject.material.type;
+				if ( renderObject.geometry ) details.geometry = renderObject.geometry.name || undefined;
 
-				if ( renderObject.camera ) detail.camera = renderObject.camera.name || renderObject.camera.type;
+				if ( renderObject.camera ) details.camera = renderObject.camera.name || renderObject.camera.type;
 
-				return detail;
+				return details;
 
 			}
 
@@ -744,15 +744,15 @@ class Timeline extends Tab {
 
 	}
 
-	formatDetail( detail ) {
+	formatDetails( details ) {
 
 		const parts = [];
 
-		for ( const key in detail ) {
+		for ( const key in details ) {
 
-			if ( detail[ key ] !== undefined ) {
+			if ( details[ key ] !== undefined ) {
 
-				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 0.8">${detail[ key ]}</span>` );
+				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 0.8">${details[ key ]}</span>` );
 
 			}
 
@@ -885,15 +885,15 @@ class Timeline extends Tab {
 
 				const call = frame.calls[ i ];
 				const isStructural = call.method.startsWith( 'begin' ) || call.method.startsWith( 'finish' );
-				const detailStr = call.detail ? this.formatDetail( call.detail ) : '';
+				const formatedDetails = call.details ? this.formatDetails( call.details ) : '';
 
-				if ( currentGroup && currentGroup.method === call.method && currentGroup.detailStr === detailStr && ! isStructural ) {
+				if ( currentGroup && currentGroup.method === call.method && currentGroup.formatedDetails === formatedDetails && ! isStructural ) {
 
 					currentGroup.count ++;
 
 				} else {
 
-					currentGroup = { method: call.method, count: 1, detailStr };
+					currentGroup = { method: call.method, count: 1, formatedDetails };
 					groupedCalls.push( currentGroup );
 
 				}
@@ -954,7 +954,7 @@ class Timeline extends Tab {
 
 					// Title
 					const title = document.createElement( 'span' );
-					title.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					title.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 					block.appendChild( title );
 
 					block.addEventListener( 'click', ( e ) => {
@@ -980,14 +980,14 @@ class Timeline extends Tab {
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
 
 				} else {
 
-					block.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 				}
 
