@@ -752,7 +752,7 @@ class Timeline extends Tab {
 
 			if ( details[ key ] !== undefined ) {
 
-				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 0.8">${details[ key ]}</span>` );
+				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 1">${details[ key ]}</span>` );
 
 			}
 
@@ -760,7 +760,7 @@ class Timeline extends Tab {
 
 		if ( parts.length === 0 ) return '';
 
-		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 0.8;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
+		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 1;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
 
 	}
 
