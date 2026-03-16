@@ -736,11 +736,17 @@ class Timeline extends Tab {
 
 		for ( const key in detail ) {
 
-			if ( detail[ key ] !== undefined ) parts.push( detail[ key ] );
+			if ( detail[ key ] !== undefined ) {
+
+				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 0.8">${detail[ key ]}</span>` );
+
+			}
 
 		}
 
-		return parts.length > 0 ? '[ ' + parts.join( ', ' ) + ' ]' : '';
+		if ( parts.length === 0 ) return '';
+
+		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 0.8;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
 
 	}
 
@@ -934,7 +940,7 @@ class Timeline extends Tab {
 
 					// Title
 					const title = document.createElement( 'span' );
-					title.textContent = call.method + ( call.detailStr ? ' ' + call.detailStr : '' ) + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					title.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 					block.appendChild( title );
 
 					block.addEventListener( 'click', ( e ) => {
@@ -960,14 +966,14 @@ class Timeline extends Tab {
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.textContent = call.method + ( call.detailStr ? ' ' + call.detailStr : '' ) + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					block.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
 
 				} else {
 
-					block.textContent = call.method + ( call.detailStr ? ' ' + call.detailStr : '' ) + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					block.innerHTML = call.method + ( call.detailStr ? call.detailStr : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 				}
 
