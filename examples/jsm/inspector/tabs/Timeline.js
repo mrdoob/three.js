@@ -701,6 +701,9 @@ class Timeline extends Tab {
 
 				if ( renderObject.material ) detail.material = renderObject.material.name || renderObject.material.type;
 				if ( renderObject.geometry ) detail.geometry = renderObject.geometry.name || undefined;
+
+				if ( renderObject.camera ) detail.camera = renderObject.camera.name || renderObject.camera.type;
+
 				return detail;
 
 			}
