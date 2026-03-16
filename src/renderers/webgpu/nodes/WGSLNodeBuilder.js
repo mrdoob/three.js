@@ -2408,13 +2408,15 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 
 		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
 
+		const hasBoundsCheck = this.object.count !== null;
+
 		return `${ this.getSignature() }
 // directives
 ${ shaderData.directives }
 
 // system
 var<private> instanceIndex : u32;
-override nodeInstanceCount : u32 = 0xFFFFFFFFu;
+${ hasBoundsCheck ? 'override nodeInstanceCount : u32 = 0xFFFFFFFFu;' : '' }
 
 // locals
 ${ shaderData.scopedArrays }
@@ -2435,12 +2437,12 @@ fn main( ${ shaderData.attributes } ) {
 	instanceIndex = globalId.x
 		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
 		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
-
+${ hasBoundsCheck ? `
 	// bounds check
 	if ( instanceIndex >= nodeInstanceCount ) {
 		return;
 	}
-
+` : '' }
 	// vars
 	${ shaderData.vars }
 
