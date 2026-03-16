@@ -94,6 +94,23 @@ class RenderPipeline {
 		 */
 		this._context = null;
 
+		/**
+		 * The current tone mapping.
+		 *
+		 * @private
+		 * @type {ToneMapping}
+		 */
+		this._toneMapping = renderer.toneMapping;
+
+		/**
+		 * The current output color space.
+		 *
+		 * @private
+		 * @type {ColorSpace}
+		 */
+		this._outputColorSpace = renderer.outputColorSpace;
+
+
 	}
 
 	/**
@@ -161,12 +178,24 @@ class RenderPipeline {
 	 */
 	_update() {
 
+		if ( this._toneMapping !== this.renderer.toneMapping ) {
+
+			this._toneMapping = this.renderer.toneMapping;
+			this.needsUpdate = true;
+
+		}
+
+		if ( this._outputColorSpace !== this.renderer.outputColorSpace ) {
+
+			this._outputColorSpace = this.renderer.outputColorSpace;
+			this.needsUpdate = true;
+
+		}
+
 		if ( this.needsUpdate === true ) {
 
-			const renderer = this.renderer;
-
-			const toneMapping = renderer.toneMapping;
-			const outputColorSpace = renderer.outputColorSpace;
+			const toneMapping = this._toneMapping;
+			const outputColorSpace = this._outputColorSpace;
 
 			const context = {
 				renderPipeline: this,
