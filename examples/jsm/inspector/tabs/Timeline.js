@@ -102,11 +102,22 @@ class Timeline extends Tab {
 
 		} );
 
+		this.exportButton = document.createElement( 'button' );
+		this.exportButton.className = 'console-copy-button';
+		this.exportButton.title = 'Export';
+		this.exportButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+		this.exportButton.style.padding = '0 10px';
+		this.exportButton.style.lineHeight = '24px';
+		this.exportButton.style.display = 'flex';
+		this.exportButton.style.alignItems = 'center';
+		this.exportButton.addEventListener( 'click', () => this.exportData() );
+
 		const buttonsGroup = document.createElement( 'div' );
 		buttonsGroup.className = 'console-buttons-group';
 		buttonsGroup.appendChild( this.viewModeButton );
 		buttonsGroup.appendChild( this.recordButton );
 		buttonsGroup.appendChild( this.recordRefreshButton );
+		buttonsGroup.appendChild( this.exportButton );
 		buttonsGroup.appendChild( clearButton );
 
 		header.style.display = 'flex';
@@ -597,8 +608,12 @@ class Timeline extends Tab {
 
 					}
 
-					// Only record method name as requested, skipping detail arguments
-					this.currentFrame.calls.push( { method: methodLabel } );
+					const call = { method: methodLabel };
+					const details = this.getCallDetail( prop, args );
+
+					if ( details ) call.details = details;
+
+					this.currentFrame.calls.push( call );
 
 					return originalFunc.apply( backend, args );
 
@@ -644,6 +659,108 @@ class Timeline extends Tab {
 		this.graph.lines[ 'fps' ].points = [];
 		this.graph.resetLimit();
 		this.graph.update();
+
+	}
+
+	exportData() {
+
+		if ( this.frames.length === 0 ) return;
+
+		const data = JSON.stringify( this.frames, null, '\t' );
+		const blob = new Blob( [ data ], { type: 'application/json' } );
+		const url = URL.createObjectURL( blob );
+		const a = document.createElement( 'a' );
+		a.href = url;
+		a.download = 'threejs-timeline.json';
+		a.click();
+		URL.revokeObjectURL( url );
+
+	}
+
+	getCallDetail( method, args ) {
+
+		switch ( method ) {
+
+			case 'draw': {
+
+				const renderObject = args[ 0 ];
+				if ( ! renderObject ) return null;
+
+				const details = {};
+				if ( renderObject.object ) {
+
+					details.object = renderObject.object.name || renderObject.object.type;
+
+					if ( renderObject.object.count > 1 ) {
+
+						details.instance = renderObject.object.count;
+
+					}
+
+				}
+
+				if ( renderObject.material ) details.material = renderObject.material.name || renderObject.material.type;
+				if ( renderObject.geometry ) details.geometry = renderObject.geometry.name || undefined;
+
+				if ( renderObject.camera ) details.camera = renderObject.camera.name || renderObject.camera.type;
+
+				return details;
+
+			}
+
+			case 'updateBinding': {
+
+				const binding = args[ 0 ];
+				return binding?.name ? { binding: binding.name } : null;
+
+			}
+
+			case 'createProgram': {
+
+				const program = args[ 0 ];
+				if ( ! program ) return null;
+				return { stage: program.stage, name: program.name || undefined };
+
+			}
+
+			case 'createBindings': {
+
+				const bindGroup = args[ 0 ];
+				return bindGroup?.name ? { group: bindGroup.name } : null;
+
+			}
+
+			case 'createTexture':
+			case 'destroyTexture': {
+
+				const texture = args[ 0 ];
+				return texture?.name ? { texture: texture.name } : null;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	formatDetails( details ) {
+
+		const parts = [];
+
+		for ( const key in details ) {
+
+			if ( details[ key ] !== undefined ) {
+
+				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 1">${details[ key ]}</span>` );
+
+			}
+
+		}
+
+		if ( parts.length === 0 ) return '';
+
+		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 1;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
 
 	}
 
@@ -768,14 +885,15 @@ class Timeline extends Tab {
 
 				const call = frame.calls[ i ];
 				const isStructural = call.method.startsWith( 'begin' ) || call.method.startsWith( 'finish' );
+				const formatedDetails = call.details ? this.formatDetails( call.details ) : '';
 
-				if ( currentGroup && currentGroup.method === call.method && ! isStructural ) {
+				if ( currentGroup && currentGroup.method === call.method && currentGroup.formatedDetails === formatedDetails && ! isStructural ) {
 
 					currentGroup.count ++;
 
 				} else {
 
-					currentGroup = { method: call.method, count: 1 };
+					currentGroup = { method: call.method, count: 1, formatedDetails };
 					groupedCalls.push( currentGroup );
 
 				}
@@ -836,7 +954,7 @@ class Timeline extends Tab {
 
 					// Title
 					const title = document.createElement( 'span' );
-					title.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					title.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 					block.appendChild( title );
 
 					block.addEventListener( 'click', ( e ) => {
@@ -862,14 +980,14 @@ class Timeline extends Tab {
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
 
 				} else {
 
-					block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 				}
 
