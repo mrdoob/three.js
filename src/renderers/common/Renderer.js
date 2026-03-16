@@ -2220,7 +2220,7 @@ class Renderer {
 
 			const renderTargetData = this._textures.get( renderTarget );
 
-			renderContext = this._renderContexts.get( renderTarget );
+			renderContext = this._renderContexts.get( renderTarget, null, - 1 ); // using - 1 for the call depth to get a render context for the clear operation
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
