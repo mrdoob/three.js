@@ -51,6 +51,7 @@ class WebXRManager extends EventDispatcher {
 		let glBinding = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
+		let supportsMonoscopic = false;
 		let xrFrame = null;
 
 		const supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
@@ -438,6 +439,8 @@ class WebXRManager extends EventDispatcher {
 
 				if ( ! supportsLayers ) {
 
+					supportsMonoscopic = false;
+
 					const layerInit = {
 						antialias: attributes.antialias,
 						alpha: true,
@@ -491,15 +494,12 @@ class WebXRManager extends EventDispatcher {
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
+					supportsMonoscopic = 'forceMonoPresentation' in glProjLayer;
 					// Monoscopic: fallback to native XR API if available.
 					// This will be ignored if the device/browser already supports native mono presentation
-					if ( scope.forceMonoscopic && 'forceMonoPresentation' in glProjLayer ) {
+					if ( scope.forceMonoscopic && supportsMonoscopic ) {
 
-						try {
-
-							glProjLayer.forceMonoPresentation = true;
-
-						} catch ( e ) {}
+						glProjLayer.forceMonoPresentation = true;
 
 					}
 
@@ -1007,7 +1007,7 @@ class WebXRManager extends EventDispatcher {
 					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 					// Monoscopic fallback: override right eye position when native API not available
-					if ( scope.forceMonoscopic && i === 1 && cameras[ 0 ] !== undefined ) {
+					if ( scope.forceMonoscopic && ! supportsMonoscopic && i === 1 && cameras[ 0 ] !== undefined ) {
 
 						camera.position.copy( cameras[ 0 ].position );
 						camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
