@@ -687,7 +687,18 @@ class Timeline extends Tab {
 				if ( ! renderObject ) return null;
 
 				const detail = {};
-				if ( renderObject.object ) detail.object = renderObject.object.name || renderObject.object.type;
+				if ( renderObject.object ) {
+
+					detail.object = renderObject.object.name || renderObject.object.type;
+
+					if ( renderObject.object.count > 1 ) {
+
+						detail.instances = renderObject.object.count;
+
+					}
+
+				}
+
 				if ( renderObject.material ) detail.material = renderObject.material.name || renderObject.material.type;
 				if ( renderObject.geometry ) detail.geometry = renderObject.geometry.name || undefined;
 				return detail;
