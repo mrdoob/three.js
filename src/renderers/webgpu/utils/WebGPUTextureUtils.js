@@ -463,7 +463,7 @@ class WebGPUTextureUtils {
 		if ( stencil ) {
 
 			format = DepthStencilFormat;
-			type = UnsignedInt248Type;
+			type = backend.renderer.reversedDepthBuffer === true ? FloatType : UnsignedInt248Type;
 
 		} else if ( depth ) {
 
