@@ -116,6 +116,13 @@ class NodeMaterialObserver {
 		 */
 		this.renderId = 0;
 
+		/**
+		 * Holds the material data for comparison.
+		 *
+		 * @type {WeakMap<Material,Object>}
+		 */
+		this._materialCache = new WeakMap();
+
 	}
 
 	/**
@@ -277,31 +284,39 @@ class NodeMaterialObserver {
 	 */
 	getMaterialData( material ) {
 
-		const data = {};
+		let data = this._materialCache.get( material );
 
-		for ( const property of this.refreshUniforms ) {
+		if ( data === undefined ) {
 
-			const value = material[ property ];
+			data = { _renderId: - 1, _equal: false };
 
-			if ( value === null || value === undefined ) continue;
+			for ( const property of this.refreshUniforms ) {
 
-			if ( typeof value === 'object' && value.clone !== undefined ) {
+				const value = material[ property ];
 
-				if ( value.isTexture === true ) {
+				if ( value === null || value === undefined ) continue;
 
-					data[ property ] = { id: value.id, version: value.version };
+				if ( typeof value === 'object' && value.clone !== undefined ) {
+
+					if ( value.isTexture === true ) {
+
+						data[ property ] = { id: value.id, version: value.version };
+
+					} else {
+
+						data[ property ] = value.clone();
+
+					}
 
 				} else {
 
-					data[ property ] = value.clone();
+					data[ property ] = value;
 
 				}
 
-			} else {
-
-				data[ property ] = value;
-
 			}
+
+			this._materialCache.set( material, data );
 
 		}
 
@@ -314,9 +329,10 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Light>} lightsData - The current material lights.
+	 * @param {number} renderId - The current render ID.
 	 * @return {boolean} Whether the given render object has changed its state or not.
 	 */
-	equals( renderObject, lightsData ) {
+	equals( renderObject, lightsData, renderId ) {
 
 		const { object, material, geometry } = renderObject;
 
@@ -336,54 +352,75 @@ class NodeMaterialObserver {
 
 		const materialData = renderObjectData.material;
 
-		for ( const property in materialData ) {
+		// check the material for the "equal" state just once per render for all render objects
 
-			const value = materialData[ property ];
-			const mtlValue = material[ property ];
+		if ( materialData._renderId !== renderId ) {
 
-			if ( value.equals !== undefined ) {
+			materialData._renderId = renderId;
 
-				if ( value.equals( mtlValue ) === false ) {
+			for ( const property in materialData ) {
 
-					value.copy( mtlValue );
+				const value = materialData[ property ];
+				const mtlValue = material[ property ];
 
+				if ( property === '_renderId' ) continue;
+				if ( property === '_equal' ) continue;
+
+				if ( value.equals !== undefined ) {
+
+					if ( value.equals( mtlValue ) === false ) {
+
+						value.copy( mtlValue );
+
+						materialData._equal = false;
+						return false;
+
+					}
+
+				} else if ( mtlValue.isTexture === true ) {
+
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+
+						value.id = mtlValue.id;
+						value.version = mtlValue.version;
+
+						materialData._equal = false;
+						return false;
+
+					}
+
+				} else if ( value !== mtlValue ) {
+
+					materialData[ property ] = mtlValue;
+
+					materialData._equal = false;
 					return false;
 
 				}
 
-			} else if ( mtlValue.isTexture === true ) {
+			}
 
-				if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+			if ( materialData.transmission > 0 ) {
 
-					value.id = mtlValue.id;
-					value.version = mtlValue.version;
+				const { width, height } = renderObject.context;
 
+				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+					renderObjectData.bufferWidth = width;
+					renderObjectData.bufferHeight = height;
+
+					materialData._equal = false;
 					return false;
 
 				}
 
-			} else if ( value !== mtlValue ) {
-
-				materialData[ property ] = mtlValue;
-
-				return false;
-
 			}
 
-		}
+			materialData._equal = true;
 
-		if ( materialData.transmission > 0 ) {
+		} else {
 
-			const { width, height } = renderObject.context;
-
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
-
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
-
-			}
+			if ( materialData._equal === false ) return false;
 
 		}
 
@@ -612,7 +649,7 @@ class NodeMaterialObserver {
 			return false;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
-		const notEqual = this.equals( renderObject, lightsData ) !== true;
+		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
 		return notEqual;
 
