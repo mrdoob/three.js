@@ -285,11 +285,11 @@ class Color {
 	 */
 	setStyle( style, colorSpace = SRGBColorSpace ) {
 
-		function handleAlpha( string ) {
+		function handleAlpha( value ) {
 
-			if ( string === undefined ) return;
+			if ( value === undefined ) return;
 
-			if ( parseFloat( string ) < 1 ) {
+			if ( value < 1 ) {
 
 				warn( 'Color: Alpha component of ' + style + ' will be ignored.' );
 
@@ -297,15 +297,103 @@ class Color {
 
 		}
 
+		function parseAlpha( string ) {
+
+			if ( string === undefined ) return undefined;
+
+			const match = /^([+-]?\d*\.?\d+)(%)?$/.exec( string.trim() );
+			if ( match === null ) return null;
+
+			let alpha = parseFloat( match[ 1 ] );
+
+			if ( match[ 2 ] === '%' ) {
+
+				alpha /= 100;
+
+			}
+
+			return clamp( alpha, 0, 1 );
+
+		}
+
+		function parseFunctionComponents( components ) {
+
+			if ( components.includes( ',' ) ) {
+
+				const parts = components.split( /\s*,\s*/ );
+				if ( parts.length !== 3 && parts.length !== 4 ) return null;
+
+				if ( parts.some( ( part ) => part.length === 0 ) ) return null;
+
+				return {
+					values: parts.slice( 0, 3 ),
+					alpha: parts[ 3 ]
+				};
+
+			}
+
+			const slashParts = components.split( /\s*\/\s*/ );
+
+			if ( slashParts.length > 2 ) return null;
+
+			const values = slashParts[ 0 ].trim().split( /\s+/ );
+			if ( values.length !== 3 || values.some( ( value ) => value.length === 0 ) ) return null;
+
+			return {
+				values: values,
+				alpha: slashParts[ 1 ]
+			};
+
+		}
+
+		function parseRGBValue( string ) {
+
+			const match = /^([+-]?\d*\.?\d+)(%)?$/.exec( string.trim() );
+			if ( match === null ) return null;
+
+			let value = parseFloat( match[ 1 ] );
+
+			if ( match[ 2 ] === '%' ) {
+
+				value = Math.min( 100, value ) / 100;
+
+			} else {
+
+				value = Math.min( 255, value ) / 255;
+
+			}
+
+			return value;
+
+		}
+
+		function parseHue( string ) {
+
+			const match = /^([+-]?\d*\.?\d+)(deg)?$/i.exec( string.trim() );
+			if ( match === null ) return null;
+
+			return parseFloat( match[ 1 ] );
+
+		}
+
+		function parsePercent( string ) {
+
+			const match = /^([+-]?\d*\.?\d+)%$/.exec( string.trim() );
+			if ( match === null ) return null;
+
+			return parseFloat( match[ 1 ] ) / 100;
+
+		}
+
 
 		let m;
 
-		if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^\s*([A-Za-z]+)\(([^\)]*)\)\s*$/.exec( style ) ) {
 
 			// rgb / hsl
 
 			let color;
-			const name = m[ 1 ];
+			const name = m[ 1 ].toLowerCase();
 			const components = m[ 2 ];
 
 			switch ( name ) {
@@ -313,55 +401,56 @@ class Color {
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					color = parseFunctionComponents( components );
 
-						// rgb(255,0,0) rgba(255,0,0,0.5)
+					if ( color !== null ) {
 
-						handleAlpha( color[ 4 ] );
+						const alpha = parseAlpha( color.alpha );
+						const r = parseRGBValue( color.values[ 0 ] );
+						const g = parseRGBValue( color.values[ 1 ] );
+						const b = parseRGBValue( color.values[ 2 ] );
 
-						return this.setRGB(
-							Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255,
-							Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255,
-							Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255,
-							colorSpace
-						);
+						if ( alpha !== null && r !== null && g !== null && b !== null ) {
 
-					}
+							// rgb(255,0,0), rgb(255 0 0), rgb(255 0 0 / 50%), rgba(...)
 
-					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+							handleAlpha( alpha );
 
-						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
+							return this.setRGB( r, g, b, colorSpace );
 
-						handleAlpha( color[ 4 ] );
-
-						return this.setRGB(
-							Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
-							Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
-							Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
-							colorSpace
-						);
+						}
 
 					}
+
+					warn( 'Color: Invalid color components ' + style );
 
 					break;
 
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					color = parseFunctionComponents( components );
 
-						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
+					if ( color !== null ) {
 
-						handleAlpha( color[ 4 ] );
+						const alpha = parseAlpha( color.alpha );
+						const h = parseHue( color.values[ 0 ] );
+						const s = parsePercent( color.values[ 1 ] );
+						const l = parsePercent( color.values[ 2 ] );
 
-						return this.setHSL(
-							parseFloat( color[ 1 ] ) / 360,
-							parseFloat( color[ 2 ] ) / 100,
-							parseFloat( color[ 3 ] ) / 100,
-							colorSpace
-						);
+						if ( alpha !== null && h !== null && s !== null && l !== null ) {
+
+							// hsl(120,50%,50%), hsl(120deg 50% 50% / 50%), hsla(...)
+
+							handleAlpha( alpha );
+
+							return this.setHSL( h / 360, s, l, colorSpace );
+
+						}
 
 					}
+
+					warn( 'Color: Invalid color components ' + style );
 
 					break;
 

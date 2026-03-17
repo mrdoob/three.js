@@ -690,6 +690,50 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'setStyleRGBSpaceSeparated', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+			c.setStyle( 'rgb(255 0 0)' );
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleRGBSpaceSeparatedWithAlpha', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
+			c.setStyle( 'rgb(255 0 0 / 0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleRGBPercentAlphaPercent', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
+			c.setStyle( 'rgb(100%,50%,10%,50%)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g == 0.5, 'Green: ' + c.g );
+			assert.ok( c.b == 0.1, 'Blue: ' + c.b );
+
+		} );
+
 		QUnit.test( 'setStyleHSLRed', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
@@ -771,6 +815,56 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.r == 1, 'Red: ' + c.r );
 			assert.ok( c.g === 0, 'Green: ' + c.g );
 			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleHSLSpaceSeparatedWithDegrees', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+			c.setStyle( 'hsl(120deg 100% 50%)' );
+			assert.ok( Math.abs( c.r ) <= eps, 'Red: ' + c.r );
+			assert.ok( c.g == 1, 'Green: ' + c.g );
+			assert.ok( Math.abs( c.b ) <= eps, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleUpperCaseRGBModel', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+			c.setStyle( 'RGB(255,0,0)' );
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleUpperCaseHSLModel', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color();
+			c.setStyle( 'HSL(120,100%,50%)' );
+			assert.ok( Math.abs( c.r ) <= eps, 'Red: ' + c.r );
+			assert.ok( c.g == 1, 'Green: ' + c.g );
+			assert.ok( Math.abs( c.b ) <= eps, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleInvalidKnownModelDoesNotApply', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color( 0x123456 );
+
+			console.level = CONSOLE_LEVEL.ERROR;
+			c.setStyle( 'rgb(255,0,oops)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.strictEqual( c.getHex(), 0x123456, 'Invalid known-model components should not mutate color.' );
 
 		} );
 
