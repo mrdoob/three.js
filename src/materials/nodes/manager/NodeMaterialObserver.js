@@ -66,6 +66,14 @@ const refreshUniforms = [
 const _lightsCache = new WeakMap();
 
 /**
+ * Holds the material data for comparison.
+ *
+ * @private
+ * @type {WeakMap<Material,Object>}
+ */
+const _materialCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -115,13 +123,6 @@ class NodeMaterialObserver {
 		 * @default 0
 		 */
 		this.renderId = 0;
-
-		/**
-		 * Holds the material data for comparison.
-		 *
-		 * @type {WeakMap<Material,Object>}
-		 */
-		this._materialCache = new WeakMap();
 
 	}
 
@@ -283,7 +284,7 @@ class NodeMaterialObserver {
 	 */
 	getMaterialData( material ) {
 
-		let data = this._materialCache.get( material );
+		let data = _materialCache.get( material );
 
 		if ( data === undefined ) {
 
@@ -315,7 +316,7 @@ class NodeMaterialObserver {
 
 			}
 
-			this._materialCache.set( material, data );
+			_materialCache.set( material, data );
 
 		}
 
