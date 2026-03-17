@@ -74,6 +74,22 @@ const refreshUniforms = [
 const _lightsCache = new WeakMap();
 
 /**
+ * Holds the material data for comparison.
+ *
+ * @private
+ * @type {WeakMap<Material,Object>}
+ */
+const _materialCache = new WeakMap();
+
+/**
+ * Holds the geometry data for comparison.
+ *
+ * @private
+ * @type {WeakMap<BufferGeometry,Object>}
+ */
+const _geometryCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -174,17 +190,10 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			const { geometry, material, object } = renderObject;
+			const { geometry, object } = renderObject;
 
 			data = {
-				material: this.getMaterialData( material ),
-				geometry: {
-					id: geometry.id,
-					attributes: this.getAttributesData( geometry.attributes ),
-					indexId: geometry.index ? geometry.index.id : null,
-					indexVersion: geometry.index ? geometry.index.version : null,
-					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
-				},
+				geometryId: geometry.id,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -206,7 +215,7 @@ class NodeMaterialObserver {
 
 			}
 
-			if ( data.material.transmission > 0 ) {
+			if ( renderObject.material.transmission > 0 ) {
 
 				const { width, height } = renderObject.context;
 
@@ -277,6 +286,37 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns a geometry data structure holding the geometry property values for
+	 * monitoring.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {Object} An object for monitoring geometry properties.
+	 */
+	getGeometryData( geometry ) {
+
+		let data = _geometryCache.get( geometry );
+
+		if ( data === undefined ) {
+
+			data = {
+				_renderId: -1,
+				_equal: false,
+
+				attributes: this.getAttributesData( geometry.attributes ),
+				indexId: geometry.index ? geometry.index.id : null,
+				indexVersion: geometry.index ? geometry.index.version : null,
+				drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
+			};
+
+			_geometryCache.set( geometry, data );
+
+		}
+
+		return data;
+
+	}
+
+	/**
 	 * Returns a material data structure holding the material property values for
 	 * monitoring.
 	 *
@@ -285,31 +325,39 @@ class NodeMaterialObserver {
 	 */
 	getMaterialData( material ) {
 
-		const data = {};
+		let data = _materialCache.get( material );
 
-		for ( const property of this.refreshUniforms ) {
+		if ( data === undefined ) {
 
-			const value = material[ property ];
+			data = { _renderId: -1, _equal: false };
 
-			if ( value === null || value === undefined ) continue;
+			for ( const property of this.refreshUniforms ) {
 
-			if ( typeof value === 'object' && value.clone !== undefined ) {
+				const value = material[ property ];
 
-				if ( value.isTexture === true ) {
+				if ( value === null || value === undefined ) continue;
 
-					data[ property ] = { id: value.id, version: value.version };
+				if ( typeof value === 'object' && value.clone !== undefined ) {
+
+					if ( value.isTexture === true ) {
+
+						data[ property ] = { id: value.id, version: value.version };
+
+					} else {
+
+						data[ property ] = value.clone();
+
+					}
 
 				} else {
 
-					data[ property ] = value.clone();
+					data[ property ] = value;
 
 				}
 
-			} else {
-
-				data[ property ] = value;
-
 			}
+
+			_materialCache.set( material, data );
 
 		}
 
@@ -322,9 +370,10 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Light>} lightsData - The current material lights.
+	 * @param {number} renderId - The current render ID.
 	 * @return {boolean} Whether the given render object has changed its state or not.
 	 */
-	equals( renderObject, lightsData ) {
+	equals( renderObject, lightsData, renderId ) {
 
 		const { object, material, geometry } = renderObject;
 
@@ -342,134 +391,180 @@ class NodeMaterialObserver {
 
 		// material
 
-		const materialData = renderObjectData.material;
+		const materialData = this.getMaterialData( renderObject.material );
 
-		for ( const property in materialData ) {
+		// check the material for the "equal" state just once per render for all render objects
 
-			const value = materialData[ property ];
-			const mtlValue = material[ property ];
+		if ( materialData._renderId !== renderId ) {
 
-			if ( value.equals !== undefined ) {
+			materialData._renderId = renderId;
 
-				if ( value.equals( mtlValue ) === false ) {
+			for ( const property in materialData ) {
 
-					value.copy( mtlValue );
+				const value = materialData[ property ];
+				const mtlValue = material[ property ];
 
+				if ( property === '_renderId' ) continue;
+				if ( property === '_equal' ) continue;
+
+				if ( value.equals !== undefined ) {
+
+					if ( value.equals( mtlValue ) === false ) {
+
+						value.copy( mtlValue );
+
+						materialData._equal = false;
+						return false;
+
+					}
+
+				} else if ( mtlValue.isTexture === true ) {
+
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+
+						value.id = mtlValue.id;
+						value.version = mtlValue.version;
+
+						materialData._equal = false;
+						return false;
+
+					}
+
+				} else if ( value !== mtlValue ) {
+
+					materialData[ property ] = mtlValue;
+
+					materialData._equal = false;
 					return false;
 
 				}
 
-			} else if ( mtlValue.isTexture === true ) {
+			}
 
-				if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+			if ( materialData.transmission > 0 ) {
 
-					value.id = mtlValue.id;
-					value.version = mtlValue.version;
+				const { width, height } = renderObject.context;
 
+				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+					renderObjectData.bufferWidth = width;
+					renderObjectData.bufferHeight = height;
+
+					materialData._equal = false;
 					return false;
 
 				}
 
-			} else if ( value !== mtlValue ) {
-
-				materialData[ property ] = mtlValue;
-
-				return false;
-
 			}
 
-		}
+			materialData._equal = true;
 
-		if ( materialData.transmission > 0 ) {
+		} else {
 
-			const { width, height } = renderObject.context;
-
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
-
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
-
-			}
+			if ( materialData._equal === false ) return false;
 
 		}
 
 		// geometry
 
-		const storedGeometryData = renderObjectData.geometry;
-		const attributes = geometry.attributes;
-		const storedAttributes = storedGeometryData.attributes;
+		if ( renderObjectData.geometryId !== geometry.id ) {
 
-		if ( storedGeometryData.id !== geometry.id ) {
-
-			storedGeometryData.id = geometry.id;
+			renderObjectData.geometryId = geometry.id;
 			return false;
 
 		}
 
-		// attributes
+		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		let currentAttributeCount = 0;
-		let storedAttributeCount = 0;
+		// check the geoemtry for the "equal" state just once per render for all render objects
 
-		for ( const _ in attributes ) currentAttributeCount ++; // eslint-disable-line no-unused-vars
+		if ( geometryData._renderId !== renderId ) {
 
-		for ( const name in storedAttributes ) {
+			geometryData._renderId = renderId;
 
-			storedAttributeCount ++;
+			// attributes
 
-			const storedAttributeData = storedAttributes[ name ];
-			const attribute = attributes[ name ];
+			const attributes = geometry.attributes;
+			const storedAttributes = geometryData.attributes;
 
-			if ( attribute === undefined ) {
+			let currentAttributeCount = 0;
+			let storedAttributeCount = 0;
 
-				// attribute was removed
-				delete storedAttributes[ name ];
+			for ( const _ in attributes ) currentAttributeCount ++; // eslint-disable-line no-unused-vars
+
+			for ( const name in storedAttributes ) {
+
+				storedAttributeCount ++;
+
+				const storedAttributeData = storedAttributes[ name ];
+				const attribute = attributes[ name ];
+
+				if ( attribute === undefined ) {
+
+					// attribute was removed
+					delete storedAttributes[ name ];
+
+					geometryData._equal = false;
+					return false;
+
+				}
+
+				if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+
+					storedAttributeData.id = attribute.id;
+					storedAttributeData.version = attribute.version;
+
+					geometryData._equal = false;
+					return false;
+
+				}
+
+			}
+
+			if ( storedAttributeCount !== currentAttributeCount ) {
+
+				geometryData.attributes = this.getAttributesData( attributes );
+
+				geometryData._equal = false;
 				return false;
 
 			}
 
-			if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+			// check index
 
-				storedAttributeData.id = attribute.id;
-				storedAttributeData.version = attribute.version;
+			const index = geometry.index;
+			const storedIndexId = geometryData.indexId;
+			const storedIndexVersion = geometryData.indexVersion;
+			const currentIndexId = index ? index.id : null;
+			const currentIndexVersion = index ? index.version : null;
+
+			if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+
+				geometryData.indexId = currentIndexId;
+				geometryData.indexVersion = currentIndexVersion;
+
+				geometryData._equal = false;
 				return false;
 
 			}
 
-		}
+			// check drawRange
 
-		if ( storedAttributeCount !== currentAttributeCount ) {
+			if ( geometryData.drawRange.start !== geometry.drawRange.start || geometryData.drawRange.count !== geometry.drawRange.count ) {
 
-			renderObjectData.geometry.attributes = this.getAttributesData( attributes );
-			return false;
+				geometryData.drawRange.start = geometry.drawRange.start;
+				geometryData.drawRange.count = geometry.drawRange.count;
 
-		}
+				geometryData._equal = false;
+				return false;
 
-		// check index
+			}
 
-		const index = geometry.index;
-		const storedIndexId = storedGeometryData.indexId;
-		const storedIndexVersion = storedGeometryData.indexVersion;
-		const currentIndexId = index ? index.id : null;
-		const currentIndexVersion = index ? index.version : null;
+			geometryData._equal = true;
 
-		if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+		} else {
 
-			storedGeometryData.indexId = currentIndexId;
-			storedGeometryData.indexVersion = currentIndexVersion;
-			return false;
-
-		}
-
-		// check drawRange
-
-		if ( storedGeometryData.drawRange.start !== geometry.drawRange.start || storedGeometryData.drawRange.count !== geometry.drawRange.count ) {
-
-			storedGeometryData.drawRange.start = geometry.drawRange.start;
-			storedGeometryData.drawRange.count = geometry.drawRange.count;
-			return false;
+			if ( geometryData._equal === false ) return false;
 
 		}
 
@@ -620,7 +715,7 @@ class NodeMaterialObserver {
 			return false;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
-		const notEqual = this.equals( renderObject, lightsData ) !== true;
+		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
 		return notEqual;
 
@@ -39825,6 +39920,12 @@ class PassNode extends TempNode {
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
+		if ( renderer.reversedDepthBuffer === true ) {
+
+			this.renderTarget.depthTexture.type = FloatType;
+
+		}
+
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
 	}
@@ -58814,6 +58915,28 @@ class Renderer {
 
 		}
 
+		// make sure a new render target has correct default depth values
+
+		if ( renderTarget !== null && renderTarget.depthBuffer === true ) {
+
+			const renderTargetData = this._textures.get( renderTarget );
+
+			if ( renderTargetData.depthInitialized !== true ) {
+
+				// we need a single manual clear if auto clear depth is disabled
+
+				if ( this.autoClear === false || ( this.autoClear === true && this.autoClearDepth === false ) ) {
+
+					this.clearDepth();
+
+				}
+
+				renderTargetData.depthInitialized = true;
+
+			}
+
+		}
+
 		//
 
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
@@ -59547,7 +59670,7 @@ class Renderer {
 
 			const renderTargetData = this._textures.get( renderTarget );
 
-			renderContext = this._renderContexts.get( renderTarget );
+			renderContext = this._renderContexts.get( renderTarget, null, -1 ); // using - 1 for the call depth to get a render context for the clear operation
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
@@ -59565,6 +59688,8 @@ class Renderer {
 			renderContext.clearStencilValue = this.getClearStencil();
 			renderContext.activeCubeFace = this.getActiveCubeFace();
 			renderContext.activeMipmapLevel = this.getActiveMipmapLevel();
+
+			if ( renderTarget.depthBuffer === true ) renderTargetData.depthInitialized = true;
 
 		}
 
@@ -59829,7 +59954,7 @@ class Renderer {
 	/**
 	 * Sets the output render target for the renderer.
 	 *
-	 * @param {Object} renderTarget - The render target to set as the output target.
+	 * @param {?RenderTarget} renderTarget - The render target to set as the output target.
 	 */
 	setOutputRenderTarget( renderTarget ) {
 
@@ -72800,12 +72925,12 @@ class WebGPUTextureUtils {
 		if ( stencil ) {
 
 			format = DepthStencilFormat;
-			type = UnsignedInt248Type;
+			type = backend.renderer.reversedDepthBuffer === true ? FloatType : UnsignedInt248Type;
 
 		} else if ( depth ) {
 
 			format = DepthFormat;
-			type = UnsignedIntType;
+			type = backend.renderer.reversedDepthBuffer === true ? FloatType : UnsignedIntType;
 
 		}
 
@@ -76658,11 +76783,27 @@ class WebGPUUtils {
 
 			} else if ( renderContext.stencil ) {
 
-				format = GPUTextureFormat.Depth24PlusStencil8;
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32FloatStencil8;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24PlusStencil8;
+
+				}
 
 			} else {
 
-				format = GPUTextureFormat.Depth24Plus;
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32Float;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24Plus;
+
+				}
 
 			}
 
@@ -79111,6 +79252,8 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 //*/
 
 
+const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -79775,7 +79918,21 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.clearColor ) {
 
-					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
+					if ( i === 0 ) {
+
+						colorAttachment.clearValue = renderContext.clearColorValue;
+
+					} else {
+
+						_clearValue.r = 0;
+						_clearValue.g = 0;
+						_clearValue.b = 0;
+						_clearValue.a = 1;
+
+						colorAttachment.clearValue = _clearValue;
+
+					}
+
 					colorAttachment.loadOp = GPULoadOp.Clear;
 
 				} else {
@@ -80317,7 +80474,6 @@ class WebGPUBackend extends Backend {
 
 		let colorAttachments = [];
 		let depthStencilAttachment;
-		let clearValue;
 
 		let supportsDepth;
 		let supportsStencil;
@@ -80325,7 +80481,11 @@ class WebGPUBackend extends Backend {
 		if ( color ) {
 
 			const clearColor = this.getClearColor();
-			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+
+			_clearValue.r = clearColor.r;
+			_clearValue.g = clearColor.g;
+			_clearValue.b = clearColor.b;
+			_clearValue.a = clearColor.a;
 
 		}
 
@@ -80342,7 +80502,7 @@ class WebGPUBackend extends Backend {
 
 				const colorAttachment = colorAttachments[ 0 ];
 
-				colorAttachment.clearValue = clearValue;
+				colorAttachment.clearValue = _clearValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
 
@@ -80361,7 +80521,7 @@ class WebGPUBackend extends Backend {
 
 			const clearConfig = {
 				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
-				clearValue: color ? clearValue : undefined
+				clearValue: color ? _clearValue : undefined
 			};
 
 			if ( supportsDepth ) {
@@ -82034,6 +82194,23 @@ class RenderPipeline {
 		 */
 		this._context = null;
 
+		/**
+		 * The current tone mapping.
+		 *
+		 * @private
+		 * @type {ToneMapping}
+		 */
+		this._toneMapping = renderer.toneMapping;
+
+		/**
+		 * The current output color space.
+		 *
+		 * @private
+		 * @type {ColorSpace}
+		 */
+		this._outputColorSpace = renderer.outputColorSpace;
+
+
 	}
 
 	/**
@@ -82101,12 +82278,24 @@ class RenderPipeline {
 	 */
 	_update() {
 
+		if ( this._toneMapping !== this.renderer.toneMapping ) {
+
+			this._toneMapping = this.renderer.toneMapping;
+			this.needsUpdate = true;
+
+		}
+
+		if ( this._outputColorSpace !== this.renderer.outputColorSpace ) {
+
+			this._outputColorSpace = this.renderer.outputColorSpace;
+			this.needsUpdate = true;
+
+		}
+
 		if ( this.needsUpdate === true ) {
 
-			const renderer = this.renderer;
-
-			const toneMapping = renderer.toneMapping;
-			const outputColorSpace = renderer.outputColorSpace;
+			const toneMapping = this._toneMapping;
+			const outputColorSpace = this._outputColorSpace;
 
 			const context = {
 				renderPipeline: this,
