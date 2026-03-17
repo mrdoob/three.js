@@ -37,9 +37,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 			uniforms: {
 
-				probeGridSH0: { value: null },
-				probeGridSH1: { value: null },
-				probeGridSH2: { value: null }
+				probeGridSH: { value: null },
+				probeGridResolution: { value: new Vector3() },
 
 			},
 
@@ -64,30 +63,58 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 				precision highp sampler3D;
 
-				uniform sampler3D probeGridSH0;
-				uniform sampler3D probeGridSH1;
-				uniform sampler3D probeGridSH2;
+				uniform sampler3D probeGridSH;
+				uniform vec3 probeGridResolution;
 
 				varying vec3 vWorldNormal;
 				varying vec3 vUVW;
 
 				void main() {
 
-					vec4 s0 = texture( probeGridSH0, vUVW );
-					vec4 s1 = texture( probeGridSH1, vUVW );
-					vec4 s2 = texture( probeGridSH2, vUVW );
+					// Atlas UV mapping — must match light_probe_volume_pars_fragment.glsl.js
+					float nz          = probeGridResolution.z;
+					float paddedSlices = nz + 2.0;
+					float atlasDepth  = 7.0 * paddedSlices;
+					float uvZBase     = vUVW.z * nz + 1.0;
 
-					vec3 c0 = s0.rgb;
-					vec3 c1 = vec3( s0.a, s1.rg );
-					vec3 c2 = vec3( s1.ba, s2.r );
-					vec3 c3 = s2.gba;
+					vec4 s0 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ) );
+					vec4 s1 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
+					vec4 s2 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s3 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s4 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s5 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s6 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
+
+					// Unpack 9 vec3 SH L2 coefficients
+
+					vec3 c0 = s0.xyz;
+					vec3 c1 = vec3( s0.w, s1.xy );
+					vec3 c2 = vec3( s1.zw, s2.x );
+					vec3 c3 = s2.yzw;
+					vec3 c4 = s3.xyz;
+					vec3 c5 = vec3( s3.w, s4.xy );
+					vec3 c6 = vec3( s4.zw, s5.x );
+					vec3 c7 = s5.yzw;
+					vec3 c8 = s6.xyz;
 
 					vec3 n = normalize( vWorldNormal );
 
+					float x = n.x, y = n.y, z = n.z;
+
+					// band 0
 					vec3 result = c0 * 0.886227;
-					result += c1 * 2.0 * 0.511664 * n.y;
-					result += c2 * 2.0 * 0.511664 * n.z;
-					result += c3 * 2.0 * 0.511664 * n.x;
+
+					// band 1,
+					result += c1 * 2.0 * 0.511664 * y;
+					result += c2 * 2.0 * 0.511664 * z;
+					result += c3 * 2.0 * 0.511664 * x;
+
+					// band 2,
+					result += c4 * 2.0 * 0.429043 * x * y;
+					result += c5 * 2.0 * 0.429043 * y * z;
+					result += c6 * ( 0.743125 * z * z - 0.247708 );
+					result += c7 * 2.0 * 0.429043 * x * z;
+					result += c8 * 0.429043 * ( x * x - y * y );
 
 					gl_FragColor = vec4( max( result, vec3( 0.0 ) ), 1.0 );
 
@@ -173,9 +200,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 		// Update texture uniforms
 
-		this.material.uniforms.probeGridSH0.value = probeGrid.textures[ 0 ];
-		this.material.uniforms.probeGridSH1.value = probeGrid.textures[ 1 ];
-		this.material.uniforms.probeGridSH2.value = probeGrid.textures[ 2 ];
+		this.material.uniforms.probeGridSH.value = probeGrid.texture;
+		this.material.uniforms.probeGridResolution.value.copy( probeGrid.resolution );
 
 	}
 

@@ -29,7 +29,7 @@ let _shMaterial = null;
 let _lastCubemapSize = 0;
 let _lastFlip = 0;
 
-// Repack materials (one per output texture)
+// Repack materials (one per output sub-volume / texture index)
 let _repackMaterials = null;
 
 // Cached bake resources
@@ -48,11 +48,29 @@ const _position = /*@__PURE__*/ new Vector3();
 const _savedViewport = /*@__PURE__*/ new Vector4();
 const _savedScissor = /*@__PURE__*/ new Vector4();
 
+// Number of padding texels added at each boundary of every sub-volume in the atlas.
+const ATLAS_PADDING = 1;
+
 /**
  * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
- * position-dependent diffuse global illumination. The probe data is stored
- * in seven RGBA `WebGL3DRenderTarget` instances with `LinearFilter` for
- * hardware trilinear interpolation.
+ * position-dependent diffuse global illumination.
+ *
+ * All seven packed SH sub-volumes are stored in a **single** RGBA
+ * `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis.
+ * Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at
+ * each end (a copy of the nearest edge data slice) to prevent color bleeding
+ * when the hardware trilinear filter reads across a sub-volume boundary.
+ *
+ * Atlas layout (nz = resolution.z, PADDING = 1):
+ * ```
+ *   slice   0              : padding  (copy of sub-volume 0, data slice 0)
+ *   slices  1 … nz         : sub-volume 0 data
+ *   slice   nz + 1         : padding  (copy of sub-volume 0, data slice nz-1)
+ *   slice   nz + 2         : padding  (copy of sub-volume 1, data slice 0)
+ *   slices  nz+3 … 2*nz+2  : sub-volume 1 data
+ *   …
+ * ```
+ * Total atlas depth = `7 * ( nz + 2 )`.
  *
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
@@ -93,16 +111,16 @@ class LightProbeVolume extends Object3D {
 		this.resolution = resolution.clone();
 
 		/**
-		 * The seven RGBA 3D textures storing packed SH coefficients.
-		 * @type {Data3DTexture[]}
+		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
+		 * @type {Data3DTexture|null}
 		 */
-		this.textures = [ null, null, null, null, null, null, null ];
+		this.texture = null;
 
 		/**
-		 * Internal render targets for GPU-resident baking.
+		 * Internal render target for GPU-resident baking.
 		 * @private
 		 */
-		this._renderTargets = [ null, null, null, null, null, null, null ];
+		this._renderTarget = null;
 
 	}
 
@@ -209,26 +227,50 @@ class LightProbeVolume extends Object3D {
 
 		renderer.shadowMap.autoUpdate = savedShadowAutoUpdate;
 
-		// Phase 2: Repack SH data from batch target into 3D textures (GPU-to-GPU)
+		// Phase 2: Repack SH data from batch target into the atlas 3D texture (GPU-to-GPU).
+		//
+		// For each of the 7 packed sub-volumes (texture index t) we write:
+		//   - A leading padding slice  (copy of data slice iz = 0)
+		//   - All nz data slices       (iz = 0 … nz-1)
+		//   - A trailing padding slice (copy of data slice iz = nz-1)
+		//
+		// In the atlas the slices for sub-volume t occupy the range:
+		//   [ t * paddedSlices, t * paddedSlices + paddedSlices - 1 ]
+		// where paddedSlices = nz + 2 * ATLAS_PADDING.
+
 		_ensureRepackResources();
+
+		const paddedSlices = res.z + 2 * ATLAS_PADDING;
+		const rt = this._renderTarget;
+		rt.scissorTest = false;
+		rt.viewport.set( 0, 0, res.x, res.y );
 
 		for ( let t = 0; t < 7; t ++ ) {
 
 			_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
 			_repackMaterials[ t ].uniforms.resolution.value.copy( res );
 
-			const rt = this._renderTargets[ t ];
-			rt.scissorTest = false;
-			rt.viewport.set( 0, 0, res.x, res.y );
-
+			// Write data slices
 			for ( let iz = 0; iz < res.z; iz ++ ) {
 
 				_repackMaterials[ t ].uniforms.sliceZ.value = iz;
 				_mesh.material = _repackMaterials[ t ];
-				renderer.setRenderTarget( rt, iz );
+				renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + iz );
 				renderer.render( _scene, _camera );
 
 			}
+
+			// Leading padding: copy of data slice iz = 0
+			_repackMaterials[ t ].uniforms.sliceZ.value = 0;
+			_mesh.material = _repackMaterials[ t ];
+			renderer.setRenderTarget( rt, t * paddedSlices );
+			renderer.render( _scene, _camera );
+
+			// Trailing padding: copy of data slice iz = nz - 1
+			_repackMaterials[ t ].uniforms.sliceZ.value = res.z - 1;
+			_mesh.material = _repackMaterials[ t ];
+			renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + res.z );
+			renderer.render( _scene, _camera );
 
 		}
 
@@ -245,31 +287,30 @@ class LightProbeVolume extends Object3D {
 	}
 
 	/**
-	 * Ensures the 3D render target textures exist with the correct dimensions.
+	 * Ensures the atlas 3D render target exists with the correct dimensions.
 	 * @private
 	 */
 	_ensureTextures() {
 
+		if ( this._renderTarget !== null ) return;
+
 		const res = this.resolution;
 		const nx = res.x, ny = res.y, nz = res.z;
 
-		for ( let t = 0; t < 7; t ++ ) {
+		// Atlas depth: 7 sub-volumes, each with ATLAS_PADDING slices at both ends
+		const atlasDepth = 7 * ( nz + 2 * ATLAS_PADDING );
 
-			if ( this._renderTargets[ t ] !== null ) continue;
+		const rt = new WebGL3DRenderTarget( nx, ny, atlasDepth, {
+			format: RGBAFormat,
+			type: FloatType,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			generateMipmaps: false,
+			depthBuffer: false
+		} );
 
-			const rt = new WebGL3DRenderTarget( nx, ny, nz, {
-				format: RGBAFormat,
-				type: FloatType,
-				minFilter: LinearFilter,
-				magFilter: LinearFilter,
-				generateMipmaps: false,
-				depthBuffer: false
-			} );
-
-			this._renderTargets[ t ] = rt;
-			this.textures[ t ] = rt.texture;
-
-		}
+		this._renderTarget = rt;
+		this.texture = rt.texture;
 
 	}
 
@@ -278,15 +319,11 @@ class LightProbeVolume extends Object3D {
 	 */
 	dispose() {
 
-		for ( let t = 0; t < 7; t ++ ) {
+		if ( this._renderTarget !== null ) {
 
-			if ( this._renderTargets[ t ] !== null ) {
-
-				this._renderTargets[ t ].dispose();
-				this._renderTargets[ t ] = null;
-				this.textures[ t ] = null;
-
-			}
+			this._renderTarget.dispose();
+			this._renderTarget = null;
+			this.texture = null;
 
 		}
 
@@ -418,7 +455,7 @@ function _ensureGPUResources( cubemapSize, flip ) {
 
 }
 
-// Internal: Ensure GPU resources for repacking SH into 3D textures
+// Internal: Ensure GPU resources for repacking SH into the atlas 3D texture
 function _ensureRepackResources() {
 
 	if ( _repackMaterials !== null ) return;

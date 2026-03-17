@@ -194,15 +194,10 @@ const UniformsLib = {
 		ltc_1: { value: null },
 		ltc_2: { value: null },
 
-		probeGridSH0: { value: null },
-		probeGridSH1: { value: null },
-		probeGridSH2: { value: null },
-		probeGridSH3: { value: null },
-		probeGridSH4: { value: null },
-		probeGridSH5: { value: null },
-		probeGridSH6: { value: null },
+		probeGridSH: { value: null },
 		probeGridMin: { value: /*@__PURE__*/ new Vector3() },
-		probeGridMax: { value: /*@__PURE__*/ new Vector3() }
+		probeGridMax: { value: /*@__PURE__*/ new Vector3() },
+		probeGridResolution: { value: /*@__PURE__*/ new Vector3() }
 
 	},
 

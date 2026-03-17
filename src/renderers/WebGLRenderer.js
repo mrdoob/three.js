@@ -63,7 +63,7 @@ function findLightProbeVolume( volumes, object ) {
 
 	if ( volumes.length === 1 ) {
 
-		return volumes[ 0 ].textures[ 0 ] !== null ? volumes[ 0 ] : null;
+		return volumes[ 0 ].texture !== null ? volumes[ 0 ] : null;
 
 	}
 
@@ -73,7 +73,7 @@ function findLightProbeVolume( volumes, object ) {
 
 		const v = volumes[ i ];
 
-		if ( v.textures[ 0 ] !== null && v.boundingBox.containsPoint( _objectPosition ) ) return v;
+		if ( v.texture !== null && v.boundingBox.containsPoint( _objectPosition ) ) return v;
 
 	}
 
@@ -2695,15 +2695,10 @@ class WebGLRenderer {
 
 					const volume = materialProperties.__lightProbeVolume;
 
-					m_uniforms.probeGridSH0.value = volume.textures[ 0 ];
-					m_uniforms.probeGridSH1.value = volume.textures[ 1 ];
-					m_uniforms.probeGridSH2.value = volume.textures[ 2 ];
-					m_uniforms.probeGridSH3.value = volume.textures[ 3 ];
-					m_uniforms.probeGridSH4.value = volume.textures[ 4 ];
-					m_uniforms.probeGridSH5.value = volume.textures[ 5 ];
-					m_uniforms.probeGridSH6.value = volume.textures[ 6 ];
+					m_uniforms.probeGridSH.value = volume.texture;
 					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
 					m_uniforms.probeGridMax.value.copy( volume.boundingBox.max );
+					m_uniforms.probeGridResolution.value.copy( volume.resolution );
 
 				}
 
