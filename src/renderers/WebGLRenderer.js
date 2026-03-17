@@ -55,32 +55,6 @@ import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../
 import { ColorManagement } from '../math/ColorManagement.js';
 import { getDFGLUT } from './shaders/DFGLUTData.js';
 
-const _objectPosition = /*@__PURE__*/ new Vector3();
-
-function findLightProbeVolume( volumes, object ) {
-
-	if ( volumes.length === 0 ) return null;
-
-	if ( volumes.length === 1 ) {
-
-		return volumes[ 0 ].texture !== null ? volumes[ 0 ] : null;
-
-	}
-
-	_objectPosition.setFromMatrixPosition( object.matrixWorld );
-
-	for ( let i = 0, l = volumes.length; i < l; i ++ ) {
-
-		const v = volumes[ i ];
-
-		if ( v.texture !== null && v.boundingBox.containsPoint( _objectPosition ) ) return v;
-
-	}
-
-	return null;
-
-}
-
 /**
  * This renderer uses WebGL 2 to display scenes.
  *
@@ -156,6 +130,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
+		const objectPosition = new Vector3();
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -2295,6 +2270,30 @@ class WebGLRenderer {
 
 		}
 
+		function findLightProbeVolume( volumes, object ) {
+
+			if ( volumes.length === 0 ) return null;
+
+			if ( volumes.length === 1 ) {
+
+				return volumes[ 0 ].texture !== null ? volumes[ 0 ] : null;
+
+			}
+
+			objectPosition.setFromMatrixPosition( object.matrixWorld );
+
+			for ( let i = 0, l = volumes.length; i < l; i ++ ) {
+
+				const v = volumes[ i ];
+
+				if ( v.texture !== null && v.boundingBox.containsPoint( objectPosition ) ) return v;
+
+			}
+
+			return null;
+
+		}
+
 		function setProgram( camera, scene, geometry, material, object ) {
 
 			if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
@@ -2501,9 +2500,9 @@ class WebGLRenderer {
 
 				const objectVolume = findLightProbeVolume( currentRenderState.state.lightProbeVolumesArray, object );
 
-				if ( materialProperties.__lightProbeVolume !== objectVolume ) {
+				if ( materialProperties.lightProbeVolume !== objectVolume ) {
 
-					materialProperties.__lightProbeVolume = objectVolume;
+					materialProperties.lightProbeVolume = objectVolume;
 					refreshMaterial = true;
 
 				}
@@ -2689,11 +2688,11 @@ class WebGLRenderer {
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
 
-				// irradiance probe grid
+				// light probe volume
 
-				if ( materialProperties.needsLights && materialProperties.__lightProbeVolume ) {
+				if ( materialProperties.needsLights && materialProperties.lightProbeVolume ) {
 
-					const volume = materialProperties.__lightProbeVolume;
+					const volume = materialProperties.lightProbeVolume;
 
 					m_uniforms.probeGridSH.value = volume.texture;
 					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
