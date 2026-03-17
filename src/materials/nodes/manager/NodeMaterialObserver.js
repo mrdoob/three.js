@@ -74,6 +74,14 @@ const _lightsCache = new WeakMap();
 const _materialCache = new WeakMap();
 
 /**
+ * Holds the geometry data for comparison.
+ *
+ * @private
+ * @type {WeakMap<BufferGeometry,Object>}
+ */
+const _geometryCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -177,13 +185,7 @@ class NodeMaterialObserver {
 			const { geometry, object } = renderObject;
 
 			data = {
-				geometry: {
-					id: geometry.id,
-					attributes: this.getAttributesData( geometry.attributes ),
-					indexId: geometry.index ? geometry.index.id : null,
-					indexVersion: geometry.index ? geometry.index.version : null,
-					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
-				},
+				geometryId: geometry.id,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -272,6 +274,37 @@ class NodeMaterialObserver {
 			return true;
 
 		return false;
+
+	}
+
+	/**
+	 * Returns a geometry data structure holding the geometry property values for
+	 * monitoring.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {Object} An object for monitoring geometry properties.
+	 */
+	getGeometryData( geometry ) {
+
+		let data = _geometryCache.get( geometry );
+
+		if ( data === undefined ) {
+
+			data = {
+				_renderId: - 1,
+				_equal: false,
+
+				attributes: this.getAttributesData( geometry.attributes ),
+				indexId: geometry.index ? geometry.index.id : null,
+				indexVersion: geometry.index ? geometry.index.version : null,
+				drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
+			};
+
+			_geometryCache.set( geometry, data );
+
+		}
+
+		return data;
 
 	}
 
@@ -426,79 +459,104 @@ class NodeMaterialObserver {
 
 		// geometry
 
-		const storedGeometryData = renderObjectData.geometry;
-		const attributes = geometry.attributes;
-		const storedAttributes = storedGeometryData.attributes;
+		if ( renderObjectData.geometryId !== geometry.id ) {
 
-		if ( storedGeometryData.id !== geometry.id ) {
-
-			storedGeometryData.id = geometry.id;
+			renderObjectData.geometryId = geometry.id;
 			return false;
 
 		}
 
-		// attributes
+		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		let currentAttributeCount = 0;
-		let storedAttributeCount = 0;
+		// check the geoemtry for the "equal" state just once per render for all render objects
 
-		for ( const _ in attributes ) currentAttributeCount ++; // eslint-disable-line no-unused-vars
+		if ( geometryData._renderId !== renderId ) {
 
-		for ( const name in storedAttributes ) {
+			geometryData._renderId = renderId;
 
-			storedAttributeCount ++;
+			// attributes
 
-			const storedAttributeData = storedAttributes[ name ];
-			const attribute = attributes[ name ];
+			const attributes = geometry.attributes;
+			const storedAttributes = geometryData.attributes;
 
-			if ( attribute === undefined ) {
+			let currentAttributeCount = 0;
+			let storedAttributeCount = 0;
 
-				// attribute was removed
-				delete storedAttributes[ name ];
+			for ( const _ in attributes ) currentAttributeCount ++; // eslint-disable-line no-unused-vars
+
+			for ( const name in storedAttributes ) {
+
+				storedAttributeCount ++;
+
+				const storedAttributeData = storedAttributes[ name ];
+				const attribute = attributes[ name ];
+
+				if ( attribute === undefined ) {
+
+					// attribute was removed
+					delete storedAttributes[ name ];
+
+					geometryData._equal = false;
+					return false;
+
+				}
+
+				if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+
+					storedAttributeData.id = attribute.id;
+					storedAttributeData.version = attribute.version;
+
+					geometryData._equal = false;
+					return false;
+
+				}
+
+			}
+
+			if ( storedAttributeCount !== currentAttributeCount ) {
+
+				geometryData.attributes = this.getAttributesData( attributes );
+
+				geometryData._equal = false;
 				return false;
 
 			}
 
-			if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+			// check index
 
-				storedAttributeData.id = attribute.id;
-				storedAttributeData.version = attribute.version;
+			const index = geometry.index;
+			const storedIndexId = geometryData.indexId;
+			const storedIndexVersion = geometryData.indexVersion;
+			const currentIndexId = index ? index.id : null;
+			const currentIndexVersion = index ? index.version : null;
+
+			if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+
+				geometryData.indexId = currentIndexId;
+				geometryData.indexVersion = currentIndexVersion;
+
+				geometryData._equal = false;
 				return false;
 
 			}
 
-		}
+			// check drawRange
 
-		if ( storedAttributeCount !== currentAttributeCount ) {
+			if ( geometryData.drawRange.start !== geometry.drawRange.start || geometryData.drawRange.count !== geometry.drawRange.count ) {
 
-			renderObjectData.geometry.attributes = this.getAttributesData( attributes );
-			return false;
+				geometryData.drawRange.start = geometry.drawRange.start;
+				geometryData.drawRange.count = geometry.drawRange.count;
 
-		}
+				geometryData._equal = false;
+				return false;
 
-		// check index
+			}
 
-		const index = geometry.index;
-		const storedIndexId = storedGeometryData.indexId;
-		const storedIndexVersion = storedGeometryData.indexVersion;
-		const currentIndexId = index ? index.id : null;
-		const currentIndexVersion = index ? index.version : null;
+			geometryData._equal = true;
 
-		if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+		} else {
 
-			storedGeometryData.indexId = currentIndexId;
-			storedGeometryData.indexVersion = currentIndexVersion;
-			return false;
-
-		}
-
-		// check drawRange
-
-		if ( storedGeometryData.drawRange.start !== geometry.drawRange.start || storedGeometryData.drawRange.count !== geometry.drawRange.count ) {
-
-			storedGeometryData.drawRange.start = geometry.drawRange.start;
-			storedGeometryData.drawRange.count = geometry.drawRange.count;
-			return false;
+			if ( geometryData._equal === false ) return false;
 
 		}
 
