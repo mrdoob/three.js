@@ -173,10 +173,9 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			const { geometry, material, object } = renderObject;
+			const { geometry, object } = renderObject;
 
 			data = {
-				material: this.getMaterialData( material ),
 				geometry: {
 					id: geometry.id,
 					attributes: this.getAttributesData( geometry.attributes ),
@@ -205,7 +204,7 @@ class NodeMaterialObserver {
 
 			}
 
-			if ( data.material.transmission > 0 ) {
+			if ( renderObject.material.transmission > 0 ) {
 
 				const { width, height } = renderObject.context;
 
@@ -350,7 +349,7 @@ class NodeMaterialObserver {
 
 		// material
 
-		const materialData = renderObjectData.material;
+		const materialData = this.getMaterialData( renderObject.material );
 
 		// check the material for the "equal" state just once per render for all render objects
 
