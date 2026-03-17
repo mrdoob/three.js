@@ -212,7 +212,7 @@ async function selectGeminiModel( geminiToken ) {
 
 }
 
-async function fetchMilestoneName( repo, milestoneNumber, headers ) {
+async function fetchMilestoneData( repo, milestoneNumber, headers ) {
 
 	const milestoneRes = await fetch( `https://api.github.com/repos/${repo}/milestones/${milestoneNumber}`, { headers } );
 	if ( ! milestoneRes.ok ) {
@@ -223,18 +223,20 @@ async function fetchMilestoneName( repo, milestoneNumber, headers ) {
 	}
 
 	const milestoneData = await milestoneRes.json();
-	return milestoneData.title;
+	return { title: milestoneData.title, closed_issues: milestoneData.closed_issues };
 
 }
 
-async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken ) {
+async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, totalExpectedPRs ) {
 
 	let page = 1;
 	let totalPages = '?';
+	let totalPRs = 0;
+	let processedPRs = 0;
+
 	const cacheFiles = [];
 	const categories = {};
 	let prDescriptionsForAI = '';
-	let totalPRs = 0;
 
 	const changelogDir = path.join( __dirname, '../changelog' );
 	if ( ! fs.existsSync( changelogDir ) ) {
@@ -243,9 +245,36 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 
 	}
 
+	const barWidth = 40;
+
+	function updateProgress() {
+
+		if ( totalExpectedPRs > 0 ) {
+
+			const done = processedPRs;
+			const total = totalExpectedPRs;
+			const filled = Math.min( barWidth, Math.round( barWidth * done / total ) );
+			const bar = '█'.repeat( filled ) + '░'.repeat( Math.max( 0, barWidth - filled ) );
+			const pct = Math.min( 100, Math.round( 100 * done / total ) );
+			process.stderr.write( `\r  ${bar} ${pct}% (${done}/${total})` );
+
+		} else {
+
+			process.stderr.write( `\rFetching PR page ${page}/${totalPages}...` );
+
+		}
+
+	}
+
+	// We no longer need the initial 1-page fetch because we have totalExpectedPRs
+
 	while ( true ) {
 
-		process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
+		if ( totalExpectedPRs === 0 ) {
+
+			process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
+
+		}
 
 		const cacheFilename = path.join( changelogDir, `r${releaseNumber}_page_${page}.md` );
 		let pageContent = '';
@@ -254,6 +283,22 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 		if ( fs.existsSync( cacheFilename ) ) {
 
 			pageContent = fs.readFileSync( cacheFilename, 'utf8' );
+
+			if ( totalExpectedPRs > 0 ) {
+
+				// we need to guess how many PRs were in this cached file to update the progress bar
+				const prRegex = /^## (.*?):\s*(.*?)\s+#(\d+)\s+\((.*?)\)(?:\r?\n)([\s\S]*?)(?=\n---|$)/gm;
+				let cachedCount = 0;
+				while ( prRegex.exec( pageContent ) !== null ) {
+
+					cachedCount ++;
+
+				}
+
+				processedPRs += cachedCount;
+				updateProgress();
+
+			}
 
 		} else {
 
@@ -265,7 +310,7 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 
 			}
 
-			if ( totalPages === '?' ) {
+			if ( totalPages === '?' || totalExpectedPRs === 0 ) {
 
 				const linkHeader = res.headers.get( 'link' );
 				if ( linkHeader ) {
@@ -274,7 +319,7 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 					if ( lastPageMatch ) {
 
 						totalPages = lastPageMatch[ 1 ];
-						process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
+						if ( totalExpectedPRs === 0 ) process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
 
 					}
 
@@ -290,7 +335,7 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 			for ( const pr of prsInData ) {
 
 				let title = pr.title;
-				let category = 'Other';
+				let category = 'Others';
 
 				const catMatch = title.match( /^([^:]+):\s*(.*)$/ );
 				if ( catMatch ) {
@@ -321,6 +366,10 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 				const authorsList = Array.from( authors ).map( a => `@${a}` ).join( ', ' );
 
 				pageContent += `## ${category}: ${title} #${pr.number} (${authorsList})\n\n${pr.body || ''}\n\n---\n\n`;
+
+				processedPRs ++;
+
+				if ( totalExpectedPRs > 0 ) updateProgress();
 
 			}
 
@@ -368,7 +417,13 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 
 	}
 
-	console.error( `\nFound ${totalPRs} PRs.` );
+	if ( totalExpectedPRs > 0 ) {
+
+		process.stderr.write( '\n\n' );
+
+	}
+
+	console.error( `Found ${totalPRs} PRs.` );
 
 	return { categories, prDescriptionsForAI, cacheFiles };
 
@@ -514,11 +569,12 @@ async function generateChangelog() {
 
 	}
 
-	const milestoneName = await fetchMilestoneName( repo, milestoneNumber, headers );
+	const milestoneData = await fetchMilestoneData( repo, milestoneNumber, headers );
+	const milestoneName = milestoneData.title;
 
 	console.error( `Fetching PRs for milestone: ${milestoneName}...` );
 
-	const { categories, prDescriptionsForAI, cacheFiles } = await fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken );
+	const { categories, prDescriptionsForAI, cacheFiles } = await fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, milestoneData.closed_issues );
 
 	let output = formatChangelogData( milestoneName, categories );
 
