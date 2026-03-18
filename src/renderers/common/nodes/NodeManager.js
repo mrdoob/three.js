@@ -863,6 +863,8 @@ class NodeManager extends DataMap {
 	 */
 	hasOutputChange( outputTarget ) {
 
+		if ( this.renderer._lastOutputFramebufferTexture !== outputTarget ) return true;
+
 		const cacheKey = _outputNodeMap.get( outputTarget );
 
 		return cacheKey !== this.getOutputCacheKey();
@@ -886,6 +888,7 @@ class NodeManager extends DataMap {
 			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
 		_outputNodeMap.set( outputTarget, cacheKey );
+		renderer._lastOutputFramebufferTexture = outputTarget;
 
 		return output;
 

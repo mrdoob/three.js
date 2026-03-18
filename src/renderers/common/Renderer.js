@@ -463,6 +463,14 @@ class Renderer {
 		 */
 		this._frameBufferTargets = new Map();
 
+		/**
+		 * Intermediate color texture last used for the output pass.
+		 *
+		 * @private
+		 * @type {?Texture}
+		 */
+		this._lastOutputFramebufferTexture = null;
+
 		const alphaClear = this.alpha === true ? 0 : 1;
 
 		/**
