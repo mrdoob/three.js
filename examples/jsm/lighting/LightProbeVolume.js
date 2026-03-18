@@ -116,6 +116,7 @@ class LightProbeVolume extends Object3D {
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
 		 *
 		 * @type {?Data3DTexture}
+		 * @default null
 		 */
 		this.texture = null;
 
@@ -124,6 +125,7 @@ class LightProbeVolume extends Object3D {
 		 *
 		 * @private
 		 * @type {?WebGL3DRenderTarget}
+		 * @default null
 		 */
 		this._renderTarget = null;
 
@@ -362,6 +364,7 @@ function _ensureGPUResources( cubemapSize, flip ) {
 		if ( _shMaterial !== null ) _shMaterial.dispose();
 
 		_shMaterial = new ShaderMaterial( {
+			precision: 'highp',
 			defines: {
 				CUBEMAP_SIZE: cubemapSize,
 				FLIP: flip.toFixed( 1 )
@@ -375,7 +378,8 @@ function _ensureGPUResources( cubemapSize, flip ) {
 				}
 			`,
 			fragmentShader: /* glsl */`
-				precision highp float;
+				#include <common>
+
 				uniform samplerCube envMap;
 
 				void main() {
@@ -419,14 +423,19 @@ function _ensureGPUResources( cubemapSize, flip ) {
 								vec3 dir = normalize( coord );
 								vec3 cw = textureCube( envMap, coord ).rgb * weight;
 
+								// band 0
 								accum0 += cw * 0.282095;
+
+								// band 1
 								accum1 += cw * ( 0.488603 * dir.y );
 								accum2 += cw * ( 0.488603 * dir.z );
 								accum3 += cw * ( 0.488603 * dir.x );
-								accum4 += cw * ( 1.092548 * dir.x * dir.y );
-								accum5 += cw * ( 1.092548 * dir.y * dir.z );
+
+								// band 2
+								accum4 += cw * ( 1.092548 * ( dir.x * dir.y ) );
+								accum5 += cw * ( 1.092548 * ( dir.y * dir.z ) );
 								accum6 += cw * ( 0.315392 * ( 3.0 * dir.z * dir.z - 1.0 ) );
-								accum7 += cw * ( 1.092548 * dir.x * dir.z );
+								accum7 += cw * ( 1.092548 * ( dir.x * dir.z ) );
 								accum8 += cw * ( 0.546274 * ( dir.x * dir.x - dir.y * dir.y ) );
 
 							}
@@ -435,7 +444,7 @@ function _ensureGPUResources( cubemapSize, flip ) {
 
 					}
 
-					float norm = 4.0 * 3.14159265359 / totalWeight;
+					float norm = 4.0 * PI / totalWeight;
 
 					vec3 accum;
 					if ( coefIndex == 0 ) accum = accum0;
@@ -488,6 +497,7 @@ function _ensureRepackResources() {
 	for ( let t = 0; t < 7; t ++ ) {
 
 		_repackMaterials[ t ] = new ShaderMaterial( {
+			precision: 'highp',
 			defines: {
 				TEXTURE_INDEX: t
 			},
@@ -498,7 +508,6 @@ function _ensureRepackResources() {
 			},
 			vertexShader: repackVertexShader,
 			fragmentShader: /* glsl */`
-				precision highp float;
 				uniform sampler2D batchTexture;
 				uniform vec3 resolution;
 				uniform int sliceZ;
