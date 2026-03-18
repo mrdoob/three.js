@@ -38,7 +38,7 @@ function _loadState() {
 
 	if ( _state !== null ) return _state;
 
-	const settings = getItem( 'settings' ) || {};
+	const settings = getItem( 'settings' );
 
 	_state = {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
