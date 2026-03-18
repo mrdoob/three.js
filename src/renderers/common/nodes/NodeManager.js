@@ -11,7 +11,7 @@ import { CubeUVReflectionMapping, EquirectangularReflectionMapping, Equirectangu
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
 import { error } from '../../../utils.js';
 
-const _outputNodeMap = new WeakMap();
+const _outputNodeCache = new WeakMap();
 const _chainKeys = [];
 const _cacheKeyValues = [];
 
@@ -855,23 +855,8 @@ class NodeManager extends DataMap {
 	}
 
 	/**
-	 * Checks if the output configuration (tone mapping and color space) for
-	 * the given target has changed.
-	 *
-	 * @param {Texture} outputTarget - The output target.
-	 * @return {boolean} Whether the output configuration has changed or not.
-	 */
-	hasOutputChange( outputTarget ) {
-
-		const cacheKey = _outputNodeMap.get( outputTarget );
-
-		return cacheKey !== this.getOutputCacheKey();
-
-	}
-
-	/**
-	 * Returns a node that represents the output configuration (tone mapping and
-	 * color space) for the current target.
+	 * Returns a cached node that represents the output configuration (tone
+	 * mapping and color space) for the current target.
 	 *
 	 * @param {Texture} outputTarget - The output target.
 	 * @return {Node} The output node.
@@ -880,12 +865,19 @@ class NodeManager extends DataMap {
 
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
+		const cachedOutput = _outputNodeCache.get( outputTarget );
+
+		if ( cachedOutput !== undefined && cachedOutput.cacheKey === cacheKey ) {
+
+			return cachedOutput.node;
+
+		}
 
 		const output = outputTarget.isArrayTexture ?
 			texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
 			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
-		_outputNodeMap.set( outputTarget, cacheKey );
+		_outputNodeCache.set( outputTarget, { cacheKey, node: output } );
 
 		return output;
 

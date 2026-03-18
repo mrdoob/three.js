@@ -1789,10 +1789,11 @@ class Renderer {
 	_renderOutput( renderTarget ) {
 
 		const quad = this._quad;
+		const outputNode = this._nodes.getOutputNode( renderTarget.texture );
 
-		if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+		if ( quad.material.fragmentNode !== outputNode ) {
 
-			quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			quad.material.fragmentNode = outputNode;
 			quad.material.needsUpdate = true;
 
 		}
