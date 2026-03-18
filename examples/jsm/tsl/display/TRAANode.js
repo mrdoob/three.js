@@ -84,14 +84,6 @@ class TRAANode extends TempNode {
 		this.camera = camera;
 
 		/**
-		 * The velocity node used as the source for `velocityNode`, which requires
-		 * the original projection matrix to be updated before the jitter is applied.
-		 *
-		 * @type {Node}
-		 */
-		this.velocityNodeSource = velocity;
-
-		/**
 		 * When the difference between the current and previous depth goes above this threshold,
 		 * the history is considered invalid.
 		 *
@@ -290,7 +282,7 @@ class TRAANode extends TempNode {
 		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 
-		this.velocityNodeSource.setProjectionMatrix( this._originalProjectionMatrix );
+		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
@@ -326,7 +318,7 @@ class TRAANode extends TempNode {
 
 		this.camera.clearViewOffset();
 
-		this.velocityNodeSource.setProjectionMatrix( null );
+		velocity.setProjectionMatrix( null );
 
 		// update jitter index
 
