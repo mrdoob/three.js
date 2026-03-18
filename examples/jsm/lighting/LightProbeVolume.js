@@ -14,7 +14,6 @@ import {
 	Vector3,
 	Vector4,
 	WebGL3DRenderTarget,
-	WebGLCoordinateSystem,
 	WebGLCubeRenderTarget,
 	WebGLRenderTarget
 } from 'three';
@@ -24,10 +23,9 @@ let _scene = null;
 let _camera = null;
 let _mesh = null;
 
-// SH projection material (depends on cubemapSize + flip)
+// SH projection material (depends on cubemapSize)
 let _shMaterial = null;
 let _lastCubemapSize = 0;
-let _lastFlip = 0;
 
 // Repack materials (one per output sub-volume / texture index)
 let _repackMaterials = null;
@@ -169,7 +167,7 @@ class LightProbeVolume extends Object3D {
 	 */
 	bake( renderer, scene, options = {} ) {
 
-		const { cubeRenderTarget, cubeCamera } = _ensureBakeResources( renderer, options );
+		const { cubeRenderTarget, cubeCamera } = _ensureBakeResources( options );
 
 		this._ensureTextures();
 
@@ -354,20 +352,19 @@ function _ensureScene() {
 }
 
 // Internal: Ensure GPU resources for SH projection are created
-function _ensureGPUResources( cubemapSize, flip ) {
+function _ensureGPUResources( cubemapSize ) {
 
 	_ensureScene();
 
-	// Recreate material when cubemap size or flip changes
-	if ( cubemapSize !== _lastCubemapSize || flip !== _lastFlip ) {
+	// Recreate material when cubemap size changes
+	if ( cubemapSize !== _lastCubemapSize ) {
 
 		if ( _shMaterial !== null ) _shMaterial.dispose();
 
 		_shMaterial = new ShaderMaterial( {
 			precision: 'highp',
 			defines: {
-				CUBEMAP_SIZE: cubemapSize,
-				FLIP: flip.toFixed( 1 )
+				CUBEMAP_SIZE: cubemapSize
 			},
 			uniforms: {
 				envMap: { value: null }
@@ -404,13 +401,14 @@ function _ensureGPUResources( cubemapSize, flip ) {
 
 							for ( int ix = 0; ix < CUBEMAP_SIZE; ix ++ ) {
 
-								float col = ( 1.0 - ( float( ix ) + 0.5 ) * pixelSize ) * FLIP;
+								// WebGL cubemaps have a left-handed orientation (flip = -1)
+								float col = ( float( ix ) + 0.5 ) * pixelSize - 1.0;
 								float row = 1.0 - ( float( iy ) + 0.5 ) * pixelSize;
 
 								vec3 coord;
 
-								if ( face == 0 ) coord = vec3( -1.0 * FLIP, row, col * FLIP );
-								else if ( face == 1 ) coord = vec3( 1.0 * FLIP, row, -col * FLIP );
+								if ( face == 0 ) coord = vec3( 1.0, row, -col );
+								else if ( face == 1 ) coord = vec3( -1.0, row, col );
 								else if ( face == 2 ) coord = vec3( col, 1.0, -row );
 								else if ( face == 3 ) coord = vec3( col, -1.0, row );
 								else if ( face == 4 ) coord = vec3( col, row, 1.0 );
@@ -464,7 +462,6 @@ function _ensureGPUResources( cubemapSize, flip ) {
 		} );
 
 		_lastCubemapSize = cubemapSize;
-		_lastFlip = flip;
 
 	}
 
@@ -557,7 +554,7 @@ function _ensureRepackResources() {
 }
 
 // Internal: Ensure cube render target and camera exist with the right parameters
-function _ensureBakeResources( renderer, options ) {
+function _ensureBakeResources( options ) {
 
 	const {
 		cubemapSize = 8,
@@ -577,9 +574,7 @@ function _ensureBakeResources( renderer, options ) {
 
 	}
 
-	const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? - 1 : 1;
-
-	_ensureGPUResources( cubemapSize, flip );
+	_ensureGPUResources( cubemapSize );
 
 	return { cubeRenderTarget: _cubeRenderTarget, cubeCamera: _cubeCamera };
 
