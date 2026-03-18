@@ -1,6 +1,7 @@
 export * from './Three.Core.js';
 
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
+export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
 export { UniformsLib } from './renderers/shaders/UniformsLib.js';
 export { UniformsUtils } from './renderers/shaders/UniformsUtils.js';

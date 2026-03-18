@@ -2,6 +2,7 @@ import { LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping } from '../
 import { FileLoader } from './FileLoader.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { Loader } from './Loader.js';
+import { error } from '../utils.js';
 
 /**
  * Abstract base class for loading binary texture formats RGBE, EXR or TGA.
@@ -57,15 +58,15 @@ class DataTextureLoader extends Loader {
 
 				texData = scope.parse( buffer );
 
-			} catch ( error ) {
+			} catch ( e ) {
 
 				if ( onError !== undefined ) {
 
-					onError( error );
+					onError( e );
 
 				} else {
 
-					error( error );
+					error( e );
 					return;
 
 				}

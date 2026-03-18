@@ -9,7 +9,7 @@ const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, 
 	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
 	const v = div( 0.5, gv.add( gl ) );
 
-	return v.saturate();
+	return v;
 
 } ).setLayout( {
 	name: 'V_GGX_SmithCorrelated_Anisotropic',

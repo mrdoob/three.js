@@ -266,7 +266,7 @@ export default RTTNode;
  * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
  * @returns {RTTNode}
  */
-export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
+export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...params );
 
 /**
  * TSL function for converting nodes to textures nodes.

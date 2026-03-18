@@ -1,7 +1,7 @@
 
-( function () { // eslint-disable-line strict
+( function () {
 
-	'use strict'; // eslint-disable-line strict
+	'use strict';
 
 	function dirname( path ) {
 

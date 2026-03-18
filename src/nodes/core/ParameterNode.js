@@ -1,5 +1,5 @@
-import { nodeObject } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
+import StackTrace from '../core/StackTrace.js';
 import PropertyNode from './PropertyNode.js';
 
 /**
@@ -56,7 +56,7 @@ class ParameterNode extends PropertyNode {
 
 		} else {
 
-			error( `TSL: Member "${ name }" not found in struct "${ type }".` );
+			error( `TSL: Member "${ name }" not found in struct "${ type }".`, new StackTrace() );
 
 			memberType = 'float';
 
@@ -68,7 +68,7 @@ class ParameterNode extends PropertyNode {
 
 	getHash() {
 
-		return this.uuid;
+		return String( this.id );
 
 	}
 
@@ -91,4 +91,4 @@ export default ParameterNode;
  * @param {?string} name - The name of the parameter in the shader.
  * @returns {ParameterNode}
  */
-export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
+export const parameter = ( type, name ) => new ParameterNode( type, name );

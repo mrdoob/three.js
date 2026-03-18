@@ -223,7 +223,7 @@
 						const cube = new THREE.Mesh( blockGeometry, material );
 
 						cube.position.copy( getGridPosition( x, y ) );
-						material.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( -0.1, 0, Math.random() ) );
+						material.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( - 0.1, 0, Math.random() ) );
 						base.add( cube );
 
 						await new Promise( resolve => setTimeout( resolve, 0 ) );
@@ -278,7 +278,7 @@
 					smallWarpScale: 2,
 					fineWarpStrength: 0.006,
 					fineWarpScale: 32.8,
-					ringThickness: 1/34,
+					ringThickness: 1 / 34,
 					ringBias: 0.03,
 					ringSizeVariance: 0.03,
 					ringVarianceScale: 4.4,
@@ -287,7 +287,7 @@
 					splotchIntensity: 0.541,
 					cellScale: 910,
 					cellSize: 0.1,
-					darkGrainColor: new THREE.Color( '#0c0504') ,
+					darkGrainColor: new THREE.Color( '#0c0504' ),
 					lightGrainColor: new THREE.Color( '#926c50' ),
 					clearcoat: 1,
 					clearcoatRoughness: 0.2
@@ -301,7 +301,7 @@
 				gui.add( customMaterial, 'fineWarpStrength', 0.0, 0.05, 0.001 ).name( 'fineWarpStrength' );
 				gui.add( customMaterial, 'fineWarpScale', 0.0, 50.0, 0.1 ).name( 'fineWarpScale' );
 				gui.add( customMaterial, 'ringThickness', 0.0, 0.1, 0.001 ).name( 'ringThickness' );
-				gui.add( customMaterial, 'ringBias', -0.2, 0.2, 0.001 ).name( 'ringBias' );
+				gui.add( customMaterial, 'ringBias', - 0.2, 0.2, 0.001 ).name( 'ringBias' );
 				gui.add( customMaterial, 'ringSizeVariance', 0.0, 0.2, 0.001 ).name( 'ringSizeVariance' );
 				gui.add( customMaterial, 'ringVarianceScale', 0.0, 10.0, 0.1 ).name( 'ringVarianceScale' );
 				gui.add( customMaterial, 'barkThickness', 0.0, 1.0, 0.01 ).name( 'barkThickness' );
@@ -316,7 +316,7 @@
 
 				const cube = new THREE.Mesh( blockGeometry, customMaterial );
 
-				customMaterial.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( -0.1, 0, Math.random() ) );
+				customMaterial.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( - 0.1, 0, Math.random() ) );
 				cube.position.copy( getGridPosition( Math.round( WoodGenuses.length / 2 ), 5 ) );
 
 				base.add( cube );

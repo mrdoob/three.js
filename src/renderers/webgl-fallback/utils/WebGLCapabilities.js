@@ -27,6 +27,14 @@ class WebGLCapabilities {
 		 */
 		this.maxAnisotropy = null;
 
+		/**
+		 * This value holds the cached max uniform block size value.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.maxUniformBlockSize = null;
+
 	}
 
 	/**
@@ -56,6 +64,23 @@ class WebGLCapabilities {
 		}
 
 		return this.maxAnisotropy;
+
+	}
+
+	/**
+	 * Returns the maximum number of bytes available for uniform buffers.
+	 *
+	 * @return {number} The maximum number of bytes available for uniform buffers.
+	 */
+	getUniformBufferLimit() {
+
+		if ( this.maxUniformBlockSize !== null ) return this.maxUniformBlockSize;
+
+		const gl = this.backend.gl;
+
+		this.maxUniformBlockSize = gl.getParameter( gl.MAX_UNIFORM_BLOCK_SIZE );
+
+		return this.maxUniformBlockSize;
 
 	}
 

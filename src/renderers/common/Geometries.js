@@ -1,6 +1,5 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-import { arrayNeedsUint32 } from '../../utils.js';
 
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
 
@@ -15,6 +14,20 @@ import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferA
 function getWireframeVersion( geometry ) {
 
 	return ( geometry.index !== null ) ? geometry.index.version : geometry.attributes.position.version;
+
+}
+
+/**
+ * Returns the wireframe ID for the given geometry.
+ *
+ * @private
+ * @function
+ * @param {BufferGeometry} geometry - The geometry.
+ * @return {number} The ID.
+ */
+function getWireframeId( geometry ) {
+
+	return ( geometry.index !== null ) ? geometry.index.id : geometry.attributes.position.id;
 
 }
 
@@ -63,8 +76,9 @@ function getWireframeIndex( geometry ) {
 
 	}
 
-	const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+	const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 	attribute.version = getWireframeVersion( geometry );
+	attribute.__id = getWireframeId( geometry );
 
 	return attribute;
 
@@ -311,6 +325,18 @@ class Geometries extends DataMap {
 	}
 
 	/**
+	 * Returns the byte offset into the indirect attribute buffer of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {number} The byte offset into the indirect attribute buffer.
+	 */
+	getIndirectOffset( renderObject ) {
+
+		return renderObject.geometry.indirectOffset;
+
+	}
+
+	/**
 	 * Returns the index of the given render object's geometry. This is implemented
 	 * in a method to return a wireframe index if necessary.
 	 *
@@ -335,7 +361,7 @@ class Geometries extends DataMap {
 
 				wireframes.set( geometry, wireframeAttribute );
 
-			} else if ( wireframeAttribute.version !== getWireframeVersion( geometry ) ) {
+			} else if ( wireframeAttribute.version !== getWireframeVersion( geometry ) || wireframeAttribute.__id !== getWireframeId( geometry ) ) {
 
 				this.attributes.delete( wireframeAttribute );
 

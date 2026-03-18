@@ -38,13 +38,13 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, color, rangeFogFactor } from 'three/tsl';
 
-			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -81,15 +81,15 @@
 				// mix fog using fog factor and fog color
 				const compose = fogFactor.mix( scenePassTM, fogColor );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
-				postProcessing.outputNode = compose;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
+				renderPipeline.outputNode = compose;
 
 				//
 
-				new HDRLoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 						scene.environment = texture;
@@ -130,7 +130,7 @@
 
 			function animate() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

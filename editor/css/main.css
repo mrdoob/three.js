@@ -18,37 +18,37 @@ hr {
 	border-top: 1px solid #ccc;
 }
 
-button {
+.Button {
 	position: relative;
 }
 
-input {
+.Input {
 	vertical-align: middle;
 }
 
-	input[type="color"]::-webkit-color-swatch-wrapper {
+	.Input[type="color"]::-webkit-color-swatch-wrapper {
 		padding: 0;
 	}
-	input[type="color"]::-webkit-color-swatch {
+	.Input[type="color"]::-webkit-color-swatch {
 		border: none;
 	}
 
-textarea {
+.TextArea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
 }
 
-	textarea.success {
+	.TextArea.success {
 		border-color: #8b8 !important;
 	}
 
-	textarea.fail {
+	.TextArea.fail {
 		border-color: #f00 !important;
 		background-color: rgba(255,0,0,0.05);
 	}
 
-textarea, input { outline: none; } /* osx */
+.TextArea, .Input { outline: none; } /* osx */
 
 .Panel {
 	-moz-user-select: none;
@@ -103,7 +103,7 @@ textarea, input { outline: none; } /* osx */
 
 	.TabbedPanel .Panels {
 		position: absolute;
-		top: 40px;
+		top: 36px;
 		display: block;
 		width: 100%;
 	}
@@ -121,9 +121,13 @@ textarea, input { outline: none; } /* osx */
 }
 
 .Listbox .ListboxItem {
-	padding: 6px;
+	padding: 4px;
 	color: #666;
 	white-space: nowrap;
+}
+
+.Listbox .ListboxItem:hover {
+	background-color: rgba(0, 0, 0, 0.02);
 }
 
 .Listbox .ListboxItem.active {
@@ -264,7 +268,7 @@ textarea, input { outline: none; } /* osx */
 
 /*  */
 
-button {
+.Button {
 	color: #555;
 	background-color: #ddd;
 	border: 0px;
@@ -276,36 +280,37 @@ button {
 	outline: none;
 }
 
-	button:hover {
+	.Button:hover {
 		background-color: #fff;
 	}
 
-	button.selected {
+	.Button.selected {
 		background-color: #fff;
 	}
 
-input, textarea {
+.Input, .TextArea {
 	border: 1px solid transparent;
 	color: #444;
 }
 
-input.Number {
+.Input.Number {
 	color: #08f!important;
 	font-size: 12px;
 	border: 0px;
 	padding: 2px;
 }
 
-select {
+.Select {
 	color: #666;
 	background-color: #ddd;
-	border: 0px;
+	border: 3px solid #ddd;
+	border-radius: 4px;
 	text-transform: uppercase;
 	cursor: pointer;
 	outline: none;
 }
 
-	select:hover {
+	.Select:hover {
 		background-color: #fff;
 	}
 
@@ -314,7 +319,7 @@ select {
 #resizer {
 	position: absolute;
 	z-index: 2; /* Above #sidebar */
-	top: 32px;
+	top: 36px;
 	right: 350px;
 	width: 5px;
 	bottom: 0px;
@@ -335,10 +340,10 @@ select {
 
 #viewport {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
-	bottom: 0;
+	bottom: 36px;
 }
 
 	#viewport .Text {
@@ -346,9 +351,51 @@ select {
 		pointer-events: none;
 	}
 
+#animation {
+	position: absolute;
+	left: 0;
+	right: 350px;
+	bottom: 0;
+	height: 36px;
+	background: #eee;
+	border-top: 1px solid #ccc;
+	display: none;
+	flex-direction: row;
+}
+
+	#animation .Panel {
+		color: #888;
+	}
+
+	#animation input[type="range"] {
+		accent-color: #08f;
+	}
+
+#animation-resizer {
+	position: absolute;
+	left: 0;
+	right: 350px;
+	bottom: 36px;
+	height: 5px;
+	transform: translateY(2.5px);
+	cursor: row-resize;
+	z-index: 2;
+}
+
+	#animation-resizer:hover {
+		background-color: #08f8;
+		transition-property: background-color;
+		transition-delay: 0.1s;
+		transition-duration: 0.2s;
+	}
+
+	#animation-resizer:active {
+		background-color: #08f;
+	}
+
 #script {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
 	bottom: 0;
@@ -357,7 +404,7 @@ select {
 
 #player {
 	position: absolute;
-	top: 32px;
+	top: 36px;
 	left: 0;
 	right: 350px;
 	bottom: 0;
@@ -366,7 +413,7 @@ select {
 #menubar {
 	position: absolute;
 	width: 100%;
-	height: 32px;
+	height: 36px;
 	background: #eee;
 	padding: 0;
 	margin: 0;
@@ -391,7 +438,7 @@ select {
 			display: inline-block;
 			color: #888;
 			margin: 0;
-			padding: 8px;
+			padding: 10px;
 			line-height: 16px;
 		}
 
@@ -402,6 +449,7 @@ select {
 			border: 1px solid #ccc;
 			border-radius: 4px;
 			font-size: 9px;
+			line-height: normal;
 			padding: 2px 4px;
 			right: 10px;
 			pointer-events: none;
@@ -431,6 +479,7 @@ select {
 				color: #666;
 				background-color: transparent;
 				padding: 5px 10px;
+				line-height: 25px;
 				margin: 0 !important;
 			}
 
@@ -468,6 +517,7 @@ select {
 			color: #bbb;
 			background-color: transparent;
 			padding: 5px 10px;
+			line-height: 25px;
 			margin: 0 !important;
 			cursor: not-allowed;
 		}
@@ -477,7 +527,7 @@ select {
 #sidebar {
 	position: absolute;
 	right: 0;
-	top: 32px;
+	top: 36px;
 	bottom: 0;
 	width: 350px;
 	background: #eee;
@@ -526,18 +576,29 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: 10px;
-	top: 42px;
-	width: 32px;
+	left: calc(50% - 175px);
+	transform: translateX(-50%);
+	bottom: 56px;
+	height: 32px;
 	background: #eee;
 	text-align: center;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	border-radius: 6px;
+	border: 3px solid #eee;
+	overflow: hidden;
 }
 
-	#toolbar button, #toolbar input {
+	#toolbar .Button, #toolbar .Input {
 		height: 32px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-		#toolbar button img {
+		#toolbar .Button img {
 			width: 16px;
 			opacity: 0.5;
 		}
@@ -602,6 +663,10 @@ select {
 		display: none;
 	}
 
+	#animation-resizer {
+		display: none;
+	}
+
 	#menubar .menu .options {
 		max-height: calc(100% - 80px);
 	}
@@ -613,22 +678,22 @@ select {
 	#viewport {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#script {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#player {
 		left: 0;
 		right: 0;
-		top: 32px;
-		height: calc(100% - 352px);
+		top: 36px;
+		height: calc(100% - 356px);
 	}
 
 	#sidebar {
@@ -638,39 +703,50 @@ select {
 		bottom: 0;
 	}
 
+	#toolbar {
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: 330px;
+	}
+
+	#animation {
+		display: none !important;
+	}
+
 }
 
 /* DARK MODE */
 
 @media ( prefers-color-scheme: dark ) {
 
-	button {
+	.Button {
 		color: #aaa;
 		background-color: #222;
 	}
 
-		button:hover {
+		.Button:hover {
 			color: #ccc;
 			background-color: #444;
 		}
 
-		button.selected {
+		.Button.selected {
 			color: #fff;
 			background-color: #08f;
 		}
 
-	input, textarea {
+	.Input, .TextArea {
 		background-color: #222;
 		border: 1px solid transparent;
 		color: #888;
 	}
 
-	select {
+	.Select {
 		color: #aaa;
 		background-color: #222;
+		border-color: #222;
 	}
 
-		select:hover {
+		.Select:hover {
 			color: #ccc;
 			background-color: #444;
 		}
@@ -714,6 +790,19 @@ select {
 			border: solid 1px #5A5A5A;
 		}
 
+	#animation {
+		background-color: #111;
+		border-top: 1px solid #222;
+	}
+
+		#animation .Panel {
+			border-bottom: 1px solid #222;
+		}
+
+		#animation .timeline-container {
+			background: rgba(255, 255, 255, 0.05);
+		}
+
 	#tabs {
 		background-color: #1b1b1b;
 		border-top: 1px solid #222;
@@ -730,6 +819,7 @@ select {
 
 	#toolbar {
 		background-color: #111;
+		border-color: #111;
 	}
 
 		#toolbar img {
@@ -783,6 +873,80 @@ select {
 	.Listbox .ListboxItem.active {
 		background-color: rgba(21,60,94,1);
 	}
+
+}
+
+/* Dialog */
+
+.Dialog {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.Dialog-background {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.Dialog-content {
+	position: relative;
+	background: #eee;
+	min-width: 300px;
+	max-width: 90%;
+	max-height: 90%;
+	overflow: auto;
+}
+
+.Dialog-title {
+	padding: 10px 15px;
+	color: #666;
+	text-transform: uppercase;
+}
+
+.Dialog-body {
+	padding: 15px;
+}
+
+.Dialog-body .Row {
+	display: flex;
+	align-items: center;
+	min-height: 24px;
+	margin-bottom: 10px;
+}
+
+.Dialog-body .Row .Label {
+	width: 120px;
+	color: #888;
+}
+
+.Dialog-buttons {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 15px;
+}
+
+@media ( prefers-color-scheme: dark ) {
+
+	.Dialog-content {
+		background: #111;
+	}
+
+	.Dialog-title {
+		color: #888;
+	}
+
+
 
 }
 

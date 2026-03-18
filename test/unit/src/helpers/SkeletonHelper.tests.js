@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
@@ -42,30 +40,6 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'root', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'bones', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isSkeletonHelper', ( assert ) => {
 
@@ -75,12 +49,6 @@ export default QUnit.module( 'Helpers', () => {
 				object.isSkeletonHelper,
 				'SkeletonHelper.isSkeletonHelper should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -35,7 +35,7 @@ class DecalGeometry extends BufferGeometry {
 	 * @param {Mesh} [mesh] - The base mesh the decal should be projected on.
 	 * @param {Vector3} [position] - The position of the decal projector.
 	 * @param {Euler} [orientation] - The orientation of the decal projector.
-	 * @param {Vector3} [size] - Tje scale of the decal projector.
+	 * @param {Vector3} [size] - The scale of the decal projector.
 	 */
 	constructor( mesh = new Mesh(), position = new Vector3(), orientation = new Euler(), size = new Vector3( 1, 1, 1 ) ) {
 

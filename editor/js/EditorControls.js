@@ -364,7 +364,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
-					var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
+					// Divide by 10 to offset inherent over-sensitivity (https://github.com/mrdoob/three.js/issues/32442)
+					var distance = touches[ 0 ].distanceTo( touches[ 1 ] ) / 10;
 					scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 					prevDistance = distance;
 
@@ -442,6 +443,20 @@ class EditorControls extends THREE.EventDispatcher {
 			return pointerPositions[ pointerId ];
 
 		}
+
+	}
+
+	fromJSON( json ) {
+
+		if ( json.center !== undefined ) this.center.fromArray( json.center );
+
+	}
+
+	toJSON() {
+
+		return {
+			center: this.center.toArray()
+		};
 
 	}
 

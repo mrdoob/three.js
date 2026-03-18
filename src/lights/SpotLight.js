@@ -147,6 +147,8 @@ class SpotLight extends Light {
 
 	dispose() {
 
+		super.dispose();
+
 		this.shadow.dispose();
 
 	}
@@ -161,10 +163,29 @@ class SpotLight extends Light {
 		this.decay = source.decay;
 
 		this.target = source.target.clone();
-
+		this.map = source.map;
 		this.shadow = source.shadow.clone();
 
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.distance = this.distance;
+		data.object.angle = this.angle;
+		data.object.decay = this.decay;
+		data.object.penumbra = this.penumbra;
+
+		data.object.target = this.target.uuid;
+
+		if ( this.map && this.map.isTexture ) data.object.map = this.map.toJSON( meta ).uuid;
+
+		data.object.shadow = this.shadow.toJSON();
+
+		return data;
 
 	}
 

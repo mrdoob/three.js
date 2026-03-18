@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div, mod, equal } from './OperatorNode.js';
+import { sub, mul, div, mod } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 import { warn } from '../../utils.js';
@@ -133,7 +133,7 @@ class MathNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const method = this.method;
 
@@ -291,7 +291,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.`, this.stackTrace );
 
 					method = '/*' + method + '*/';
 
@@ -785,23 +785,6 @@ export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE
 // 2 inputs
 
 /**
- * Returns `true` if `x` equals `y`.
- *
- * @tsl
- * @function
- * @param {Node | number} x - The first parameter.
- * @param {Node | number} y - The second parameter.
- * @deprecated since r175. Use {@link equal} instead.
- * @returns {Node<bool>}
- */
-export const equals = ( x, y ) => { // @deprecated, r172
-
-	warn( 'TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
-	return equal( x, y );
-
-};
-
-/**
  * Returns the least of the given values.
  *
  * @tsl
@@ -981,7 +964,7 @@ export const mix = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIX ).setPa
  * @param {Node | number} [high=1] - The upper bound.
  * @returns {Node}
  */
-export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
+export const clamp = ( value, low = 0, high = 1 ) => new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) );
 
 /**
  * Constrains a value between `0` and `1`.
@@ -1081,24 +1064,6 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
  */
 export const stepElement = ( x, edge ) => step( edge, x );
 
-/**
- * Returns the arc-tangent of the quotient of its parameters.
- *
- * @tsl
- * @function
- * @deprecated since r172. Use {@link atan} instead.
- *
- * @param {Node | number} y - The y parameter.
- * @param {Node | number} x - The x parameter.
- * @returns {Node}
- */
-export const atan2 = ( y, x ) => { // @deprecated, r172
-
-	warn( 'TSL: "atan2" is overloaded. Use "atan" instead.' );
-	return atan( y, x );
-
-};
-
 // GLSL alias function
 
 export const faceforward = faceForward;
@@ -1108,7 +1073,6 @@ export const inversesqrt = inverseSqrt;
 
 addMethodChaining( 'all', all );
 addMethodChaining( 'any', any );
-addMethodChaining( 'equals', equals );
 
 addMethodChaining( 'radians', radians );
 addMethodChaining( 'degrees', degrees );
@@ -1140,7 +1104,6 @@ addMethodChaining( 'round', round );
 addMethodChaining( 'reciprocal', reciprocal );
 addMethodChaining( 'trunc', trunc );
 addMethodChaining( 'fwidth', fwidth );
-addMethodChaining( 'atan2', atan2 );
 addMethodChaining( 'min', min );
 addMethodChaining( 'max', max );
 addMethodChaining( 'step', stepElement );

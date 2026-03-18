@@ -389,7 +389,6 @@ class TGALoader extends DataTextureLoader {
 
 					default:
 						throw new Error( 'THREE.TGALoader: Format not supported.' );
-						break;
 
 				}
 
@@ -415,7 +414,6 @@ class TGALoader extends DataTextureLoader {
 
 					default:
 						throw new Error( 'THREE.TGALoader: Format not supported.' );
-						break;
 
 				}
 

@@ -174,7 +174,7 @@
 			let meshRay;
 			let gpuCompute;
 			let heightmapVariable;
-			let smoothShader;
+			// let smoothShader;
 			let readWaterLevelShader;
 			let readWaterLevelRenderTarget;
 			let readWaterLevelImage;
@@ -362,7 +362,7 @@
 				if ( error !== null ) console.error( error );
 
 				// Create compute shader to smooth the water surface and velocity
-				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { smoothTexture: { value: null } } );
+				//smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { smoothTexture: { value: null } } );
 
 				// Create compute shader to read water level
 				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'readWaterLevelFragmentShader' ).textContent, {
@@ -460,22 +460,22 @@
 
 			}
 
-			function smoothWater() {
+			// function smoothWater() {
 
-				const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
-				const alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
+			// 	const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
+			// 	const alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
 
-				for ( let i = 0; i < 10; i ++ ) {
+			// 	for ( let i = 0; i < 10; i ++ ) {
 
-					smoothShader.uniforms[ 'smoothTexture' ].value = currentRenderTarget.texture;
-					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
+			// 		smoothShader.uniforms[ 'smoothTexture' ].value = currentRenderTarget.texture;
+			// 		gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
 
-					smoothShader.uniforms[ 'smoothTexture' ].value = alternateRenderTarget.texture;
-					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
+			// 		smoothShader.uniforms[ 'smoothTexture' ].value = alternateRenderTarget.texture;
+			// 		gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
-				}
+			// 	}
 
-			}
+			// }
 
 			function createducks() {
 

@@ -17,7 +17,7 @@
 This pass produces a render for the given scene and camera and can provide multiple outputs
 via MRT for further processing.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const postProcessing = new PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const postProcessing = new RenderPipeline( renderer );
 const scenePass = pass( scene, camera );
 postProcessing.outputNode = scenePass;
 </code></pre></div>
@@ -34,7 +34,7 @@ postProcessing.outputNode = scenePass;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>scope</strong>
+										<strong translate="no">scope</strong>
 									</td>
 									<td class="description last">
 										<p>The scope of the pass. The scope determines whether the node outputs color or depth.</p>
@@ -42,7 +42,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the scene.</p>
@@ -50,7 +50,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the camera.</p>
@@ -58,7 +58,7 @@ postProcessing.outputNode = scenePass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>options</strong>
+										<strong translate="no">options</strong>
 									</td>
 									<td class="description last">
 										<p>Options for the internal render target.</p>
@@ -73,6 +73,12 @@ postProcessing.outputNode = scenePass;
 					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
 					<div class="description">
 						<p>A reference to the camera.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="contextNode" translate="no">.<a href="#contextNode">contextNode</a><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a> | null</span> </h3>
+					<div class="description">
+						<p>An optional global context for the pass.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -93,9 +99,22 @@ postProcessing.outputNode = scenePass;
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="opaque" translate="no">.<a href="#opaque">opaque</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the pass is opaque.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="options" translate="no">.<a href="#options">options</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>Options for the internal render target.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="overrideMaterial" translate="no">.<a href="#overrideMaterial">overrideMaterial</a><span class="type-signature"> : <a href="Material.html">Material</a> | null</span> </h3>
+					<div class="description">
+						<p>An optional override material for the pass.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -114,6 +133,13 @@ postProcessing.outputNode = scenePass;
 					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : 'color' | 'depth'</span> </h3>
 					<div class="description">
 						<p>The scope of the pass. The scope determines whether the node outputs color or depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the pass is transparent.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -145,7 +171,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -192,7 +218,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the linear depth node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.</p>
@@ -223,7 +249,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the texture for.</p>
@@ -244,7 +270,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the previous texture node for.</p>
@@ -287,7 +313,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the texture for.</p>
@@ -308,7 +334,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the texture node for.</p>
@@ -330,7 +356,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name to get the viewZ node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.</p>
@@ -352,7 +378,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>layers</strong>
+										<strong translate="no">layers</strong>
 									</td>
 									<td class="description last">
 										<p>The layers object to set.</p>
@@ -373,7 +399,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>mrt</strong>
+										<strong translate="no">mrt</strong>
 									</td>
 									<td class="description last">
 										<p>The MRT object.</p>
@@ -394,7 +420,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>pixelRatio</strong>
+										<strong translate="no">pixelRatio</strong>
 									</td>
 									<td class="description last">
 										<p>The pixel ratio to set.</p>
@@ -413,7 +439,7 @@ The resolution is a factor that is multiplied with the renderer's width and heig
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>resolution</strong>
+										<strong translate="no">resolution</strong>
 									</td>
 									<td class="description last">
 										<p>The resolution to set. A value of <code>1</code> means full resolution.</p>
@@ -438,7 +464,7 @@ The resolution scale is a factor that is multiplied with the renderer's width an
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>resolutionScale</strong>
+										<strong translate="no">resolutionScale</strong>
 									</td>
 									<td class="description last">
 										<p>The resolution scale to set. A value of <code>1</code> means full resolution.</p>
@@ -461,7 +487,7 @@ with <code>null</code> as the single argument.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the lower left corner of the box in logical pixel unit.
@@ -470,7 +496,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the lower left corner of the box in logical pixel unit.</p>
@@ -478,7 +504,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the scissor box in logical pixel unit.</p>
@@ -486,7 +512,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the scissor box in logical pixel unit.</p>
@@ -504,7 +530,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width to set.</p>
@@ -512,7 +538,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height to set.</p>
@@ -532,7 +558,7 @@ with <code>null</code> as the single argument.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.</p>
@@ -540,7 +566,7 @@ with <code>null</code> as the single argument.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p>
@@ -548,7 +574,7 @@ with <code>null</code> as the single argument.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the viewport in logical pixel unit.</p>
@@ -556,7 +582,7 @@ with <code>null</code> as the single argument.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the viewport in logical pixel unit.</p>
@@ -574,7 +600,7 @@ with <code>null</code> as the single argument.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The output name.</p>

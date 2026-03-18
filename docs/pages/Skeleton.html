@@ -40,7 +40,7 @@ const armSkeleton = new THREE.Skeleton( bones );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>bones</strong>
+										<strong translate="no">bones</strong>
 									</td>
 									<td class="description last">
 										<p>An array of bones.</p>
@@ -48,7 +48,7 @@ const armSkeleton = new THREE.Skeleton( bones );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>boneInverses</strong>
+										<strong translate="no">boneInverses</strong>
 									</td>
 									<td class="description last">
 										<p>An array of bone inverse matrices.
@@ -86,6 +86,14 @@ in the vertex shader.</p>
 					<h3 class="name" id="bones" translate="no">.<a href="#bones">bones</a><span class="type-signature"> : Array.&lt;<a href="Bone.html">Bone</a>></span> </h3>
 					<div class="description">
 						<p>An array of bones defining the skeleton.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="previousBoneMatrices" translate="no">.<a href="#previousBoneMatrices">previousBoneMatrices</a><span class="type-signature"> : Float32Array</span> </h3>
+					<div class="description">
+						<p>An array buffer holding the bone data of the previous frame.
+Required for computing velocity. Maintained in <a href="SkinningNode.html">SkinningNode</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -130,7 +138,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>json</strong>
+										<strong translate="no">json</strong>
 									</td>
 									<td class="description last">
 										<p>The skeleton as serialized JSON.</p>
@@ -138,7 +146,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bones</strong>
+										<strong translate="no">bones</strong>
 									</td>
 									<td class="description last">
 										<p>An array of bones.</p>
@@ -160,7 +168,7 @@ matching name.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the bone.</p>

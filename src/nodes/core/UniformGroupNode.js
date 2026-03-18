@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import { NodeUpdateType } from './constants.js';
 
 /**
  * This node can be used to group single instances of {@link UniformNode}
@@ -27,8 +28,9 @@ class UniformGroupNode extends Node {
 	 * @param {string} name - The name of the uniform group node.
 	 * @param {boolean} [shared=false] - Whether this uniform group node is shared or not.
 	 * @param {number} [order=1] - Influences the internal sorting.
+	 * @param {string|null} [updateType=null] - The update type of the uniform group node.
 	 */
-	constructor( name, shared = false, order = 1 ) {
+	constructor( name, shared = false, order = 1, updateType = null ) {
 
 		super( 'string' );
 
@@ -57,6 +59,14 @@ class UniformGroupNode extends Node {
 		this.order = order;
 
 		/**
+		 * The update type of the uniform group node.
+		 *
+		 * @type {string|null}
+		 * @default null
+		 */
+		this.updateType = updateType;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -67,6 +77,21 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Marks the uniform group node as needing an update.
+	 * This will trigger the necessary updates in the rendering process.
+	 */
+	update() {
+
+		this.needsUpdate = true;
+
+	}
+
+	/**
+	 * Serializes the uniform group node to a JSON object.
+	 *
+	 * @param {Object} data - The object to store the serialized data.
+	 */
 	serialize( data ) {
 
 		super.serialize( data );
@@ -77,6 +102,11 @@ class UniformGroupNode extends Node {
 
 	}
 
+	/**
+	 * Deserializes the uniform group node from a JSON object.
+	 *
+	 * @param {Object} data - The object containing the serialized data.
+	 */
 	deserialize( data ) {
 
 		super.deserialize( data );
@@ -99,7 +129,7 @@ export default UniformGroupNode;
  * @param {string} name - The name of the uniform group node.
  * @returns {UniformGroupNode}
  */
-export const uniformGroup = ( name ) => new UniformGroupNode( name );
+export const uniformGroup = ( name, order = 1, updateType = null ) => new UniformGroupNode( name, false, order, updateType );
 
 /**
  * TSL function for creating a shared uniform group node with the given name and order.
@@ -110,7 +140,7 @@ export const uniformGroup = ( name ) => new UniformGroupNode( name );
  * @param {number} [order=0] - Influences the internal sorting.
  * @returns {UniformGroupNode}
  */
-export const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
+export const sharedUniformGroup = ( name, order = 0, updateType = null ) => new UniformGroupNode( name, true, order, updateType );
 
 /**
  * TSL object that represents a shared uniform group node which is updated once per frame.
@@ -118,7 +148,7 @@ export const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( n
  * @tsl
  * @type {UniformGroupNode}
  */
-export const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+export const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame', 0, NodeUpdateType.FRAME );
 
 /**
  * TSL object that represents a shared uniform group node which is updated once per render.
@@ -126,7 +156,7 @@ export const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
  * @tsl
  * @type {UniformGroupNode}
  */
-export const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+export const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render', 0, NodeUpdateType.RENDER );
 
 /**
  * TSL object that represents a uniform group node which is updated once per object.
@@ -134,4 +164,4 @@ export const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
  * @tsl
  * @type {UniformGroupNode}
  */
-export const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
+export const objectGroup = /*@__PURE__*/ uniformGroup( 'object', 1, NodeUpdateType.OBJECT );

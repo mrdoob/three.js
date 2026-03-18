@@ -48,7 +48,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
 
-			let camera, controls, scene, timer, renderer, model, mixer, raycaster, postProcessing;
+			let camera, controls, scene, timer, renderer, model, mixer, raycaster, renderPipeline;
 
 			const pointerCoords = new THREE.Vector2();
 			const focusPoint = new THREE.Vector3( 1, 1.75, - 0.4 );
@@ -90,7 +90,6 @@
 				//
 
 				const hdrLoader = new UltraHDRLoader();
-				hdrLoader.setDataType( THREE.HalfFloatType );
 				const envMap = await hdrLoader.loadAsync( 'textures/equirectangular/spruit_sunrise_2k.hdr.jpg' );
 				envMap.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environmentRotation.y = Math.PI * 0.5;
@@ -108,8 +107,8 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				// DOF uniforms
 
@@ -134,7 +133,7 @@
 				const outputPass = renderOutput( dofPass );
 				const fxaaPass = fxaa( outputPass );
 
-				postProcessing.outputNode = fxaaPass;
+				renderPipeline.outputNode = fxaaPass;
 
 				// GUI
 
@@ -203,7 +202,7 @@
 				camera.updateMatrixWorld();
 				focusPointView.value.copy( focusPoint ).applyMatrix4( camera.matrixWorldInverse );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 
 			}

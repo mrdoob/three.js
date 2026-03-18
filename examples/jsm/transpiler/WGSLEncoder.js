@@ -300,6 +300,10 @@ class WGSLEncoder {
 			this.varyings.push( node );
 			return ''; // Defer emission to the header
 
+		} else if ( node.isStructDefinition ) {
+
+			code = this.emitStructDefinition( node );
+
 		} else if ( node.isTernary ) {
 
 			const cond = this.emitExpression( node.cond );
@@ -581,6 +585,29 @@ class WGSLEncoder {
 
 		// In WGSL, multiple declarations in one line are not supported, so join with semicolons.
 		return declarations.join( ';\n' + this.tab );
+
+	}
+
+	emitStructDefinition( node ) {
+
+		const { name, members } = node;
+
+		let structString = `struct ${ name } {\n`;
+
+		for ( let i = 0; i < members.length; i += 1 ) {
+
+			const member = members[ i ];
+
+			structString += `${ this.tab }\t${ member.name }: ${ this.getWgslType( member.type ) }`;
+
+			const delimiter = ( i != members.length - 1 ) ? ',\n' : '\n';
+			structString += delimiter;
+
+		}
+
+		structString += this.tab + '}';
+
+		return structString;
 
 	}
 

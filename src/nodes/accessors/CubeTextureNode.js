@@ -47,12 +47,18 @@ class CubeTextureNode extends TextureNode {
 	}
 
 	/**
-	 * Overwrites the default implementation to return a fixed value `'cubeTexture'`.
+	 * Overwrites the default implementation to return the appropriate cube texture type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The input type.
 	 */
 	getInputType( /*builder*/ ) {
+
+		if ( this.value.isDepthTexture === true ) {
+
+			return 'cubeDepthTexture';
+
+		}
 
 		return 'cubeTexture';
 
@@ -104,6 +110,19 @@ class CubeTextureNode extends TextureNode {
 	setupUV( builder, uvNode ) {
 
 		const texture = this.value;
+
+		// Depth textures (shadow maps) - no environment rotation, Y flip for WebGPU
+		if ( texture.isDepthTexture === true ) {
+
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				return vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
+
+			}
+
+			return uvNode;
+
+		}
 
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 

@@ -151,7 +151,28 @@ function buildSearchListForData() {
 		'TSL': []
 	};
 
+	// State flags that should appear in search (not type-checking properties)
+	const allowedIsProperties = new Set( [
+		'isPlaying',
+		'isDisposed',
+		'isPresenting'
+	] );
+
 	data().each( ( item ) => {
+
+		// Skip .is* type-checking properties (e.g., isCamera, isMesh)
+		// but keep state flags listed in allowedIsProperties
+		if ( item.name && item.kind === 'member' ) {
+
+			const name = item.name;
+
+			if ( name.startsWith( 'is' ) && ! allowedIsProperties.has( name ) ) {
+
+				return;
+
+			}
+
+		}
 
 		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
@@ -340,7 +361,7 @@ function getFullAugmentsChain( doclet ) {
 	}
 
 	// Start with the immediate parent
-	const parentName = doclet.augments[0];
+	const parentName = doclet.augments[ 0 ];
 	chain.push( parentName );
 
 	// Recursively find the parent's ancestors
@@ -348,7 +369,7 @@ function getFullAugmentsChain( doclet ) {
 
 	if ( parentDoclet && parentDoclet.length > 0 ) {
 
-		const parentChain = getFullAugmentsChain( parentDoclet[0] );
+		const parentChain = getFullAugmentsChain( parentDoclet[ 0 ] );
 		chain.unshift( ...parentChain );
 
 	}
@@ -367,7 +388,7 @@ function generate( title, docs, filename, resolveLinks ) {
 		env: env,
 		title: title,
 		docs: docs,
-		augments: docs && docs[0] ? getFullAugmentsChain( docs[0] ) : null
+		augments: docs && docs[ 0 ] ? getFullAugmentsChain( docs[ 0 ] ) : null
 	};
 
 	// Put HTML files in pages/ subdirectory
@@ -703,6 +724,21 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 	} );
 
 	fs.mkPath( outdir );
+
+	// Remove stale .html files from previous builds
+	const pagesDir = path.join( outdir, 'pages' );
+
+	if ( fs.existsSync( pagesDir ) ) {
+
+		const existingHtmlFiles = fs.readdirSync( pagesDir ).filter( f => f.endsWith( '.html' ) );
+
+		for ( const file of existingHtmlFiles ) {
+
+			fs.unlinkSync( path.join( pagesDir, file ) );
+
+		}
+
+	}
 
 	// copy the template's static files to outdir
 	const fromDir = path.join( templatePath, 'static' );

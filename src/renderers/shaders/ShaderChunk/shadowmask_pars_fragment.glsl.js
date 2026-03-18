@@ -35,7 +35,7 @@ float getShadowMask() {
 
 	#endif
 
-	#if NUM_POINT_LIGHT_SHADOWS > 0
+	#if NUM_POINT_LIGHT_SHADOWS > 0 && ( defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_BASIC ) )
 
 	PointLightShadow pointLight;
 

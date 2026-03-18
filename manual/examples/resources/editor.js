@@ -1,8 +1,8 @@
-( function () { // eslint-disable-line strict
+( function () {
 
-	'use strict'; // eslint-disable-line strict
+	'use strict';
 
-	/* global monaco, require, lessonEditorSettings */
+	/* global monaco, lessonEditorSettings */
 
 	const {
 		fixSourceLinks,

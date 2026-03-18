@@ -138,4 +138,4 @@ export default TransitionNode;
  * @param {Node<float> | number} useTexture - Whether `mixTextureNode` should influence the transition or not.
  * @returns {TransitionNode}
  */
-export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTextureNode ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
+export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTextureNode ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) );

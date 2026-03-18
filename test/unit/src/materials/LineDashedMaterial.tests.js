@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineDashedMaterial } from '../../../../src/materials/LineDashedMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
@@ -38,24 +36,6 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'scale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'dashSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'gapSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isLineDashedMaterial', ( assert ) => {
 
@@ -64,12 +44,6 @@ export default QUnit.module( 'Materials', () => {
 				object.isLineDashedMaterial,
 				'LineDashedMaterial.isLineDashedMaterial should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -26,7 +26,7 @@
 
 			import * as THREE from 'three';
 
-			let camera, scene, renderer, clock, dataTexture, diffuseMap;
+			let camera, scene, renderer, timer, dataTexture, diffuseMap;
 
 			let last = 0;
 			const position = new THREE.Vector2();
@@ -41,7 +41,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const loader = new THREE.TextureLoader();
 				diffuseMap = await loader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
@@ -88,7 +89,9 @@
 
 			function animate() {
 
-				const elapsedTime = clock.getElapsedTime();
+				timer.update();
+
+				const elapsedTime = timer.getElapsed();
 
 				if ( elapsedTime - last > 0.1 ) {
 

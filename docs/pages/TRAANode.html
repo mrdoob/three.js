@@ -35,7 +35,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>beautyNode</strong>
+										<strong translate="no">beautyNode</strong>
 									</td>
 									<td class="description last">
 										<p>The texture node that represents the input of the effect.</p>
@@ -43,7 +43,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthNode</strong>
+										<strong translate="no">depthNode</strong>
 									</td>
 									<td class="description last">
 										<p>A node that represents the scene's depth.</p>
@@ -51,7 +51,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>velocityNode</strong>
+										<strong translate="no">velocityNode</strong>
 									</td>
 									<td class="description last">
 										<p>A node that represents the scene's velocity.</p>
@@ -59,7 +59,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera the scene is rendered with.</p>
@@ -89,10 +89,32 @@
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="depthThreshold" translate="no">.<a href="#depthThreshold">depthThreshold</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>When the difference between the current and previous depth goes above this threshold,
+the history is considered invalid.</p>
+						<p>Default is <code>0.0005</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="edgeDepthDiff" translate="no">.<a href="#edgeDepthDiff">edgeDepthDiff</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The depth difference within the 3×3 neighborhood to consider a pixel as an edge.</p>
+						<p>Default is <code>0.001</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isTRAANode" translate="no">.<a href="#isTRAANode">isTRAANode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
 						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxVelocityLength" translate="no">.<a href="#maxVelocityLength">maxVelocityLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The history becomes invalid as the pixel length of the velocity approaches this value.</p>
+						<p>Default is <code>128</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -105,6 +127,14 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
 						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useSubpixelCorrection" translate="no">.<a href="#useSubpixelCorrection">useSubpixelCorrection</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to decrease the weight on the current frame when the velocity is more subpixel.
+This reduces blurriness under motion, but can introduce a square pattern artifact.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="velocityNode" translate="no">.<a href="#velocityNode">velocityNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
@@ -147,7 +177,7 @@ when the effect is no longer required.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect.</p>
@@ -155,7 +185,7 @@ when the effect is no longer required.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect.</p>
@@ -174,7 +204,7 @@ to the scene's camera.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>width</strong>
+										<strong translate="no">width</strong>
 									</td>
 									<td class="description last">
 										<p>The width of the effect.</p>
@@ -182,7 +212,7 @@ to the scene's camera.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>height</strong>
+										<strong translate="no">height</strong>
 									</td>
 									<td class="description last">
 										<p>The height of the effect.</p>
@@ -200,7 +230,7 @@ to the scene's camera.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -221,7 +251,7 @@ to the scene's camera.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>The current node frame.</p>

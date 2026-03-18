@@ -1,11 +1,4 @@
-import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
-import { Scene } from '../../scenes/Scene.js';
-import { Camera } from '../../cameras/Camera.js';
-
-const _chainKeys = [];
-const _defaultScene = /*@__PURE__*/ new Scene();
-const _defaultCamera = /*@__PURE__*/ new Camera();
 
 /**
  * This module manages the render contexts of the renderer.
@@ -16,43 +9,38 @@ class RenderContexts {
 
 	/**
 	 * Constructs a new render context management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
 	 */
-	constructor() {
+	constructor( renderer ) {
 
 		/**
-		 * A dictionary that manages render contexts in chain maps
-		 * for each attachment state.
+		 * The renderer.
 		 *
-		 * @type {Object<string,ChainMap>}
+		 * @type {Renderer}
 		 */
-		this.chainMaps = {};
+		this.renderer = renderer;
+
+		/**
+		 * A dictionary that manages render contexts.
+		 *
+		 * @type {Object<string,RenderContext>}
+		 */
+		this._renderContexts = {};
 
 	}
 
 	/**
 	 * Returns a render context for the given scene, camera and render target.
 	 *
-	 * @param {Scene} scene - The scene.
-	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
-	 * @param {?MRT} [mrt=null] - The active multiple render target.
+	 * @param {?MRTNode} [mrt=null] - The MRT configuration
+	 * @param {?number} [callDepth=0] - The call depth of the renderer.
 	 * @return {RenderContext} The render context.
 	 */
-	get( scene, camera, renderTarget = null, mrt = null ) {
+	get( renderTarget = null, mrt = null, callDepth = 0 ) {
 
-		let index = 0;
-
-		if ( mrt !== null ) {
-
-			// TODO: Improve ChainMap so that it only matches submaps corresponding to the key lengths.
-			// For we use: if ( mrt !== null ) _chainKeys[ 2 ] = mrt;
-
-			_chainKeys[ index ++ ] = mrt;
-
-		}
-
-		_chainKeys[ index ++ ] = scene;
-		_chainKeys[ index ++ ] = camera;
+		//
 
 		let attachmentState;
 
@@ -63,54 +51,38 @@ class RenderContexts {
 		} else {
 
 			const format = renderTarget.texture.format;
+			const type = renderTarget.texture.type;
 			const count = renderTarget.textures.length;
 
-			attachmentState = `${ count }:${ format }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
 		}
 
-		const chainMap = this._getChainMap( attachmentState );
+		//
 
-		let renderState = chainMap.get( _chainKeys );
+		const mrtState = ( mrt !== null ) ? mrt.id : 'default';
+
+		//
+
+		const renderStateKey = attachmentState + '-' + mrtState + '-' + callDepth;
+
+		let renderState = this._renderContexts[ renderStateKey ];
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
+			renderState.mrt = mrt;
 
-			chainMap.set( _chainKeys, renderState );
+			this._renderContexts[ renderStateKey ] = renderState;
 
 		}
 
-		_chainKeys.length = 0;
-
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
+		renderState.clearDepthValue = this.renderer.getClearDepth();
+		renderState.clearStencilValue = this.renderer.getClearStencil();
+
 		return renderState;
-
-	}
-
-	/**
-	 * Returns a render context intended for clear operations.
-	 *
-	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
-	 * @return {RenderContext} The render context.
-	 */
-	getForClear( renderTarget = null ) {
-
-		return this.get( _defaultScene, _defaultCamera, renderTarget );
-
-	}
-
-	/**
-	 * Returns a chain map for the given attachment state.
-	 *
-	 * @private
-	 * @param {string} attachmentState - The attachment state.
-	 * @return {ChainMap} The chain map.
-	 */
-	_getChainMap( attachmentState ) {
-
-		return this.chainMaps[ attachmentState ] || ( this.chainMaps[ attachmentState ] = new ChainMap() );
 
 	}
 
@@ -119,7 +91,7 @@ class RenderContexts {
 	 */
 	dispose() {
 
-		this.chainMaps = {};
+		this._renderContexts = {};
 
 	}
 

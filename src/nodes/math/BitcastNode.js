@@ -60,7 +60,7 @@ class BitcastNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// GLSL aliasing
 		if ( this.inputType !== null ) {

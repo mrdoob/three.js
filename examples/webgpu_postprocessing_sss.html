@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, vec3, vec4, mrt, output, velocity } from 'three/tsl';
+			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -45,7 +45,7 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			init();
 
@@ -67,13 +67,13 @@
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
+				dirLight.shadow.bias = - 0.001; // remove self-shadowing artifacts
 				dirLight.shadow.camera.top = 4;
 				dirLight.shadow.camera.bottom = - 4;
 				dirLight.shadow.camera.left = - 4;
 				dirLight.shadow.camera.right = 4;
 				dirLight.shadow.camera.near = 0.1;
 				dirLight.shadow.camera.far = 40;
-				dirLight.shadow.bias = - 0.001;
 				dirLight.shadow.mapSize.width = 1024;
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
@@ -128,34 +128,44 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				// post-processing
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					velocity: velocity
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// pre-pass
+
+				const prePass = pass( scene, camera );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: velocity
 				} ) );
 
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'output' ).toInspector( 'Velocity' );
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
 				// sss
 
-				const sssPass = sss( scenePassDepth, camera, dirLight );
-				sssPass.shadowIntensity.value = 0.3;
+				const sssPass = sss( prePassDepth, camera, dirLight );
 				sssPass.maxDistance.value = 0.2;
 				sssPass.useTemporalFiltering = true;
 
-				// composite
+				// scene context
 
-				const compositePass = vec4( scenePassColor.rgb.mul( sssPass.r ), scenePassColor.a );
-				compositePass.name = 'Composite';
-			
+				const sssSample = sssPass.getTextureNode().sample( screenUV ).r;
+				const sssContext = builtinShadowContext( sssSample, dirLight );
+
+				scenePass.contextNode = sssContext;
+
 				// traa
 
-				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
-				postProcessing.outputNode = traaPass;
+				const traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+				renderPipeline.outputNode = traaPass;
 
 				//
 
@@ -184,21 +194,19 @@
 
 				function updatePostprocessing() {
 
-					if ( params.output === 1 ) {
+					scenePass.contextNode = params.output !== 1 ? sssContext : null;
 
-						postProcessing.outputNode = scenePassColor;
+					if ( params.output === 2 ) {
 
-					} else if ( params.output === 2 ) {
-
-						postProcessing.outputNode = vec4( vec3( sssPass.r ), 1 );
+						renderPipeline.outputNode = vec4( vec3( sssPass.r ), 1 );
 
 					} else {
 
-						postProcessing.outputNode = sssPass.useTemporalFiltering ? traaPass : compositePass;
+						renderPipeline.outputNode = sssPass.useTemporalFiltering ? traaPass : scenePass;
 
 					}
 
-					postProcessing.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
 
 
 				}
@@ -223,7 +231,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -155,9 +155,13 @@ class NodeFrame {
 
 			if ( nodeUpdateBeforeMap.frameId !== this.frameId ) {
 
-				if ( node.updateBefore( this ) !== false ) {
+				const previousFrameId = nodeUpdateBeforeMap.frameId;
 
-					nodeUpdateBeforeMap.frameId = this.frameId;
+				nodeUpdateBeforeMap.frameId = this.frameId;
+
+				if ( node.updateBefore( this ) === false ) {
+
+					nodeUpdateBeforeMap.frameId = previousFrameId;
 
 				}
 
@@ -169,9 +173,13 @@ class NodeFrame {
 
 			if ( nodeUpdateBeforeMap.renderId !== this.renderId ) {
 
-				if ( node.updateBefore( this ) !== false ) {
+				const previousRenderId = nodeUpdateBeforeMap.renderId;
 
-					nodeUpdateBeforeMap.renderId = this.renderId;
+				nodeUpdateBeforeMap.renderId = this.renderId;
+
+				if ( node.updateBefore( this ) === false ) {
+
+					nodeUpdateBeforeMap.renderId = previousRenderId;
 
 				}
 

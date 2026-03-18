@@ -667,7 +667,7 @@ function DRACOWorker() {
 		const srcByteStride = itemSize * TypedArray.BYTES_PER_ELEMENT;
 		const dstByteStride = Math.ceil( srcByteStride / 4 ) * 4;
 
-		const dstStride = dstByteStride / TypedArray.BYTES_PER_ELEMENT
+		const dstStride = dstByteStride / TypedArray.BYTES_PER_ELEMENT;
 
 		const srcByteLength = count * srcByteStride;
 		const dstByteLength = count * dstByteStride;
@@ -690,13 +690,13 @@ function DRACOWorker() {
 
 			dstArray = new TypedArray( dstByteLength / TypedArray.BYTES_PER_ELEMENT );
 
-			let dstOffset = 0
+			let dstOffset = 0;
 
-			for ( let i = 0, il = srcArray.length; i < il; i++ ) {
+			for ( let i = 0, il = srcArray.length; i < il; i ++ ) {
 
-				for ( let j = 0; j < itemSize; j++ ) {
+				for ( let j = 0; j < itemSize; j ++ ) {
 
-					dstArray[ dstOffset + j ] = srcArray[ i * itemSize + j ]
+					dstArray[ dstOffset + j ] = srcArray[ i * itemSize + j ];
 
 				}
 

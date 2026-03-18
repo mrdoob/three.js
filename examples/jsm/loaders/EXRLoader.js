@@ -9,7 +9,7 @@ import {
 	RGFormat,
 	RGBAFormat
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.module.js';
 
 // Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
 // implementation, so I have preserved their copyright notices.
@@ -1363,7 +1363,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			const rawBuffer = fflate.unzlibSync( compressed );
+			const rawBuffer = unzlibSync( compressed );
 			const tmpBuffer = new Uint8Array( rawBuffer.length );
 
 			predictor( rawBuffer ); // revert predictor
@@ -1480,7 +1480,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			const rawBuffer = fflate.unzlibSync( compressed );
+			const rawBuffer = unzlibSync( compressed );
 
 			const byteSize = info.inputChannels.length * info.lines * info.columns * info.totalBytes;
 			const tmpBuffer = new ArrayBuffer( byteSize );
@@ -1663,7 +1663,7 @@ class EXRLoader extends DataTextureLoader {
 					case DEFLATE:
 
 						const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						const data = fflate.unzlibSync( compressed );
+						const data = unzlibSync( compressed );
 						acBuffer = new Uint16Array( data.buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1690,7 +1690,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				const data = fflate.unzlibSync( compressed );
+				const data = unzlibSync( compressed );
 				rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;

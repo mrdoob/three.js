@@ -72,7 +72,7 @@ class InspectorNode extends Node {
 	 * @param {NodeBuilder} builder - The node builder.
 	 * @returns {string}
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
 

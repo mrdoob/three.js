@@ -1,0 +1,1309 @@
+{
+	"codes": {
+		"materials": {
+			"mat_4-basic": {
+				"code": "// Expected material: MeshBasicNodeMaterial\nfunction tslGraph(material) {\n    const _node0 = time;\n    const _node1 = normalWorld;\n    const _node2 = color(\"#00a9ff\");\n    const _node3 = color(\"#ffffff\");\n    const _node4 = add(_node1, _node0);\n    const _node5 = mx_fractal_noise_float(_node4, 3, 3, 0.4, 0.5);\n    const _node6 = mix(_node2, _node3, _node5);\n    const _node7 = add(_node5, 0.6);\n\n    material.colorNode = _node6;\n    material.opacityNode = _node7;\n    material.transparent = true;\n    material.depthWrite = true;\n\n    const uniforms = {};\n\n    return { uniforms };\n}",
+				"error": null,
+				"imports": [
+					{
+						"from": "three/tsl",
+						"imports": [
+							"add",
+							"color",
+							"float",
+							"mix",
+							"mx_fractal_noise_float",
+							"normalWorld",
+							"time",
+							"vec3"
+						]
+					}
+				]
+			},
+			"mat_3-phong": {
+				"code": "// Expected material: MeshPhongNodeMaterial\nfunction tslGraph(material) {\n    const _node0 = positionWorld;\n    const _node1 = time;\n    const _node2 = color(\"#29fcff\");\n    const _node3 = mul(_node0, 3.7);\n    const _node4 = add(_node3, _node1);\n    const _node5 = mx_worley_noise_float(_node4, 1);\n    const _node6 = add(_node5, _node2);\n\n    material.colorNode = _node6;\n    material.opacityNode = float(1);\n\n    const uniforms = {};\n\n    return { uniforms };\n}",
+				"error": null,
+				"imports": [
+					{
+						"from": "three/tsl",
+						"imports": [
+							"add",
+							"color",
+							"float",
+							"mul",
+							"mx_worley_noise_float",
+							"positionWorld",
+							"time",
+							"vec3"
+						]
+					}
+				]
+			},
+			"mat_1-physical": {
+				"code": "// Expected material: MeshStandardNodeMaterial\nfunction tslGraph(material) {\n    const _node0 = positionWorld;\n    const _node1 = triNoise3D(_node0, 1, 0);\n\n    material.colorNode = _node1;\n    material.roughnessNode = float(1);\n    material.metalnessNode = float(0);\n\n    const uniforms = {};\n\n    return { uniforms };\n}",
+				"error": null,
+				"imports": [
+					{
+						"from": "three/tsl",
+						"imports": [
+							"color",
+							"float",
+							"positionWorld",
+							"triNoise3D",
+							"vec3"
+						]
+					}
+				]
+			},
+			"mat_2-standard": {
+				"code": "// Expected material: MeshStandardNodeMaterial\nfunction tslGraph(material) {\n    const _node0 = normalWorld;\n    const _node1 = positionWorld;\n    const _node2 = color(\"#a4fb47\");\n    const _node3 = color(\"#044813\");\n    const _node4 = clamp(_node0.y, 0, 1);\n    const _node5 = triNoise3D(_node1, 1, 0);\n    const _node6 = mul(_node1, 66.7);\n    const _node7 = mx_fractal_noise_float(_node6, 4, 2, 0.5, 0.5);\n    const _node8 = clamp(_node7, 0, 1);\n    const _node9 = mix(_node3, _node2, _node8);\n    const _node10 = mix(_node5, _node9, _node4);\n\n    material.colorNode = _node10;\n    material.roughnessNode = float(1);\n    material.metalnessNode = float(0);\n\n    const uniforms = {};\n\n    return { uniforms };\n}",
+				"error": null,
+				"imports": [
+					{
+						"from": "three/tsl",
+						"imports": [
+							"clamp",
+							"color",
+							"float",
+							"mix",
+							"mul",
+							"mx_fractal_noise_float",
+							"normalWorld",
+							"positionWorld",
+							"triNoise3D",
+							"vec3"
+						]
+					}
+				]
+			}
+		}
+	},
+	"graphs": {
+		"mat_4-basic": {
+			"version": 2,
+			"activeRootGraph": "material",
+			"nodes": [
+				{
+					"id": "geo/time-1773372379325",
+					"type": "geo/time",
+					"position": {
+						"x": -629.6646199110978,
+						"y": 132.77241839057913
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/time",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 51,
+						"height": 76
+					},
+					"dragging": false
+				},
+				{
+					"id": "noise/fractal_noise_float-1773372389185",
+					"type": "noise/fractal_noise_float",
+					"position": {
+						"x": -108.19329226448991,
+						"y": 204.01144901950525
+					},
+					"selected": false,
+					"data": {
+						"type": "noise/fractal_noise_float",
+						"values": {
+							"lacunarity": 3,
+							"diminish": 0.4
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 155,
+						"height": 164
+					},
+					"dragging": false
+				},
+				{
+					"id": "geo/normalWorld-1773372396270",
+					"type": "geo/normalWorld",
+					"position": {
+						"x": -631.6394825210048,
+						"y": -67.32705910748909
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/normalWorld",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 117,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773372424142",
+					"type": "math/multiOp",
+					"position": {
+						"x": -396.8985991102374,
+						"y": 8.110749830457827
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773372424142_1471",
+								"op": "add"
+							}
+						]
+					},
+					"measured": {
+						"width": 167,
+						"height": 156
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/mix-1773372441343",
+					"type": "math/mix",
+					"position": {
+						"x": 163.707215774629,
+						"y": 89.46017629226604
+					},
+					"selected": false,
+					"data": {
+						"type": "math/mix",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 69,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "const/color-1773372452446",
+					"type": "const/color",
+					"position": {
+						"x": -91.240461081968,
+						"y": -181.34711479088952
+					},
+					"selected": false,
+					"data": {
+						"type": "const/color",
+						"values": {
+							"value": "#00a9ff"
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 93,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "const/color-1773372478735",
+					"type": "const/color",
+					"position": {
+						"x": -98.77050453829891,
+						"y": -0.4595856112190475
+					},
+					"selected": false,
+					"data": {
+						"type": "const/color",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 93,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "root-material",
+					"type": "material/basic",
+					"position": {
+						"x": 529.8544423320919,
+						"y": 177.33904317581556
+					},
+					"data": {
+						"values": {
+							"transparent": true
+						},
+						"connected": {},
+						"type": "material/basic",
+						"activeInputs": [
+							"colorNode",
+							"opacityNode",
+							"transparent",
+							"depthWrite"
+						]
+					},
+					"measured": {
+						"width": 142,
+						"height": 142
+					},
+					"selected": false,
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773372904506",
+					"type": "math/multiOp",
+					"position": {
+						"x": 152.55183728862042,
+						"y": 260.6341647070865
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {
+							"op_op_1773372904506_8391_b": 0.6
+						},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773372904506_8391",
+								"op": "add"
+							}
+						]
+					},
+					"measured": {
+						"width": 207,
+						"height": 156
+					},
+					"dragging": false
+				}
+			],
+			"edges": [
+				{
+					"id": "edge-geo/normalWorld-1773372396270-out-math/multiOp-1773372424142-op_op_1773372424142_1471_a",
+					"source": "geo/normalWorld-1773372396270",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773372424142",
+					"targetHandle": "op_op_1773372424142_1471_a"
+				},
+				{
+					"source": "math/multiOp-1773372424142",
+					"sourceHandle": "out",
+					"target": "noise/fractal_noise_float-1773372389185",
+					"targetHandle": "position",
+					"id": "xy-edge__math/multiOp-1773372424142out-noise/fractal_noise_float-1773372389185position"
+				},
+				{
+					"source": "noise/fractal_noise_float-1773372389185",
+					"sourceHandle": "out",
+					"target": "math/mix-1773372441343",
+					"targetHandle": "t",
+					"id": "xy-edge__noise/fractal_noise_float-1773372389185out-math/mix-1773372441343t"
+				},
+				{
+					"source": "const/color-1773372452446",
+					"sourceHandle": "out",
+					"target": "math/mix-1773372441343",
+					"targetHandle": "a",
+					"id": "xy-edge__const/color-1773372452446out-math/mix-1773372441343a"
+				},
+				{
+					"source": "const/color-1773372478735",
+					"sourceHandle": "out",
+					"target": "math/mix-1773372441343",
+					"targetHandle": "b",
+					"id": "xy-edge__const/color-1773372478735out-math/mix-1773372441343b"
+				},
+				{
+					"source": "geo/time-1773372379325",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773372424142",
+					"targetHandle": "op_op_1773372424142_1471_b",
+					"id": "xy-edge__geo/time-1773372379325out-math/multiOp-1773372424142op_op_1773372424142_1471_b"
+				},
+				{
+					"source": "math/mix-1773372441343",
+					"sourceHandle": "out",
+					"target": "root-material",
+					"targetHandle": "colorNode",
+					"id": "xy-edge__math/mix-1773372441343out-root-materialcolorNode"
+				},
+				{
+					"id": "edge-noise/fractal_noise_float-1773372389185-out-math/multiOp-1773372904506-op_op_1773372904506_8391_a",
+					"source": "noise/fractal_noise_float-1773372389185",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773372904506",
+					"targetHandle": "op_op_1773372904506_8391_a"
+				},
+				{
+					"source": "math/multiOp-1773372904506",
+					"sourceHandle": "out",
+					"target": "root-material",
+					"targetHandle": "opacityNode",
+					"id": "xy-edge__math/multiOp-1773372904506out-root-materialopacityNode"
+				}
+			],
+			"postNodes": [
+				{
+					"id": "post-input",
+					"type": "post/input",
+					"position": {
+						"x": -400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/input",
+						"values": {},
+						"connected": {}
+					}
+				},
+				{
+					"id": "post-output",
+					"type": "post/output",
+					"position": {
+						"x": 400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/output",
+						"values": {},
+						"connected": {}
+					}
+				}
+			],
+			"postEdges": [],
+			"globals": [],
+			"subgraphs": {},
+			"codeNodes": {},
+			"previewSettings": {
+				"mesh": "sphere",
+				"isInstanced": false,
+				"instanceCount": 100,
+				"geometryScript": "",
+				"codeMode": "generated",
+				"customCode": "",
+				"environment": "none",
+				"environmentIntensity": 1,
+				"showEnvironmentBackground": false,
+				"showBackdrop": false,
+				"showGrid": true,
+				"postEnabled": true,
+				"config": {
+					"width": 1.5,
+					"height": 1.5,
+					"depth": 1.5,
+					"widthSegments": 1,
+					"heightSegments": 1,
+					"depthSegments": 1,
+					"radius": 1,
+					"widthSegmentsSphere": 32,
+					"heightSegmentsSphere": 16,
+					"radiusTorus": 0.8,
+					"tube": 0.3,
+					"radialSegments": 16,
+					"tubularSegments": 32,
+					"widthPlane": 1,
+					"heightPlane": 1,
+					"widthSegmentsPlane": 1,
+					"heightSegmentsPlane": 1,
+					"radiusTop": 1,
+					"radiusBottom": 1,
+					"heightCylinder": 1,
+					"radialSegmentsCylinder": 20,
+					"heightSegmentsCylinder": 20,
+					"openEnded": true
+				}
+			}
+		},
+		"mat_3-phong": {
+			"version": 2,
+			"activeRootGraph": "material",
+			"nodes": [
+				{
+					"id": "root-material",
+					"type": "material/phong",
+					"position": {
+						"x": 308.8327848876186,
+						"y": -19.015027519991655
+					},
+					"data": {
+						"values": {
+							"transparent": false,
+							"colorNode": "#da3939"
+						},
+						"connected": {},
+						"type": "material/phong",
+						"activeInputs": [
+							"colorNode",
+							"positionNode",
+							"opacityNode"
+						]
+					},
+					"measured": {
+						"width": 150,
+						"height": 120
+					},
+					"selected": false,
+					"dragging": false
+				},
+				{
+					"id": "noise/worley_float-1773373082664",
+					"type": "noise/worley_float",
+					"position": {
+						"x": -181.58472656498714,
+						"y": 26.292216277347077
+					},
+					"selected": false,
+					"data": {
+						"type": "noise/worley_float",
+						"values": {
+							"jitter": 1
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 153,
+						"height": 98
+					},
+					"dragging": false
+				},
+				{
+					"id": "geo/positionWorld-1773373139191",
+					"type": "geo/positionWorld",
+					"position": {
+						"x": -921.2857614166131,
+						"y": -212.74155272575058
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/positionWorld",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 122,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773373148510",
+					"type": "math/multiOp",
+					"position": {
+						"x": -709.2537795020332,
+						"y": -81.61272195352191
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {
+							"op_op_1773373148510_2336_b": 3.7
+						},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773373148510_2336",
+								"op": "mul"
+							}
+						]
+					},
+					"measured": {
+						"width": 207,
+						"height": 156
+					},
+					"dragging": false
+				},
+				{
+					"id": "geo/time-1773373271419",
+					"type": "geo/time",
+					"position": {
+						"x": -608.432592117811,
+						"y": 138.10129480844304
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/time",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 51,
+						"height": 76
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773373290147",
+					"type": "math/multiOp",
+					"position": {
+						"x": -402.03009870276213,
+						"y": -2.588146485305984
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773373290147_7719",
+								"op": "add"
+							}
+						]
+					},
+					"measured": {
+						"width": 167,
+						"height": 156
+					},
+					"dragging": false
+				},
+				{
+					"id": "const/color-1773373398767",
+					"type": "const/color",
+					"position": {
+						"x": -132.51582820969844,
+						"y": 145.92580777895932
+					},
+					"selected": false,
+					"data": {
+						"type": "const/color",
+						"values": {
+							"value": "#29fcff"
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 93,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773373409199",
+					"type": "math/multiOp",
+					"position": {
+						"x": 30.400676090869368,
+						"y": 104.03555298707752
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773373409199_9297",
+								"op": "add"
+							}
+						]
+					},
+					"measured": {
+						"width": 167,
+						"height": 156
+					},
+					"dragging": false
+				}
+			],
+			"edges": [
+				{
+					"id": "edge-geo/positionWorld-1773373139191-out-math/multiOp-1773373148510-op_op_1773373148510_2336_a",
+					"source": "geo/positionWorld-1773373139191",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773373148510",
+					"targetHandle": "op_op_1773373148510_2336_a"
+				},
+				{
+					"id": "edge-math/multiOp-1773373148510-out-math/multiOp-1773373290147-op_op_1773373290147_7719_a",
+					"source": "math/multiOp-1773373148510",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773373290147",
+					"targetHandle": "op_op_1773373290147_7719_a"
+				},
+				{
+					"source": "math/multiOp-1773373290147",
+					"sourceHandle": "out",
+					"target": "noise/worley_float-1773373082664",
+					"targetHandle": "position",
+					"id": "xy-edge__math/multiOp-1773373290147out-noise/worley_float-1773373082664position"
+				},
+				{
+					"source": "geo/time-1773373271419",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773373290147",
+					"targetHandle": "op_op_1773373290147_7719_b",
+					"id": "xy-edge__geo/time-1773373271419out-math/multiOp-1773373290147op_op_1773373290147_7719_b"
+				},
+				{
+					"id": "edge-noise/worley_float-1773373082664-out-math/multiOp-1773373409199-op_op_1773373409199_9297_a",
+					"source": "noise/worley_float-1773373082664",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773373409199",
+					"targetHandle": "op_op_1773373409199_9297_a"
+				},
+				{
+					"source": "const/color-1773373398767",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773373409199",
+					"targetHandle": "op_op_1773373409199_9297_b",
+					"id": "xy-edge__const/color-1773373398767out-math/multiOp-1773373409199op_op_1773373409199_9297_b"
+				},
+				{
+					"source": "math/multiOp-1773373409199",
+					"sourceHandle": "out",
+					"target": "root-material",
+					"targetHandle": "colorNode",
+					"id": "xy-edge__math/multiOp-1773373409199out-root-materialcolorNode"
+				}
+			],
+			"postNodes": [
+				{
+					"id": "post-input",
+					"type": "post/input",
+					"position": {
+						"x": -400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/input",
+						"values": {},
+						"connected": {}
+					}
+				},
+				{
+					"id": "post-output",
+					"type": "post/output",
+					"position": {
+						"x": 400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/output",
+						"values": {},
+						"connected": {}
+					}
+				}
+			],
+			"postEdges": [],
+			"globals": [],
+			"subgraphs": {},
+			"codeNodes": {},
+			"previewSettings": {
+				"mesh": "sphere",
+				"isInstanced": false,
+				"instanceCount": 100,
+				"geometryScript": "",
+				"codeMode": "generated",
+				"customCode": "",
+				"environment": "none",
+				"environmentIntensity": 1,
+				"showEnvironmentBackground": false,
+				"showBackdrop": false,
+				"showGrid": true,
+				"postEnabled": true,
+				"config": {
+					"width": 1.5,
+					"height": 1.5,
+					"depth": 1.5,
+					"widthSegments": 1,
+					"heightSegments": 1,
+					"depthSegments": 1,
+					"radius": 1,
+					"widthSegmentsSphere": 32,
+					"heightSegmentsSphere": 16,
+					"radiusTorus": 0.8,
+					"tube": 0.3,
+					"radialSegments": 16,
+					"tubularSegments": 32,
+					"widthPlane": 1,
+					"heightPlane": 1,
+					"widthSegmentsPlane": 1,
+					"heightSegmentsPlane": 1,
+					"radiusTop": 1,
+					"radiusBottom": 1,
+					"heightCylinder": 1,
+					"radialSegmentsCylinder": 20,
+					"heightSegmentsCylinder": 20,
+					"openEnded": true
+				}
+			}
+		},
+		"mat_1-physical": {
+			"version": 2,
+			"activeRootGraph": "material",
+			"nodes": [
+				{
+					"id": "geo/positionWorld-1773373497071",
+					"type": "geo/positionWorld",
+					"position": {
+						"x": -479.37891233902394,
+						"y": -28.03331550830903
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/positionWorld",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 122,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "noise/tri_noise_3d-1773373514019",
+					"type": "noise/tri_noise_3d",
+					"position": {
+						"x": -213.9845343995448,
+						"y": 131.5974524617551
+					},
+					"selected": false,
+					"data": {
+						"type": "noise/tri_noise_3d",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 111,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "root-material",
+					"type": "material/standard",
+					"position": {
+						"x": 0,
+						"y": 0
+					},
+					"data": {
+						"values": {
+							"colorNode": "#ffffff",
+							"roughnessNode": 1
+						},
+						"connected": {},
+						"type": "material/standard",
+						"activeInputs": [
+							"colorNode",
+							"positionNode",
+							"roughnessNode",
+							"metalnessNode"
+						]
+					},
+					"measured": {
+						"width": 170,
+						"height": 142
+					},
+					"selected": true
+				}
+			],
+			"edges": [
+				{
+					"source": "geo/positionWorld-1773373497071",
+					"sourceHandle": "out",
+					"target": "noise/tri_noise_3d-1773373514019",
+					"targetHandle": "position",
+					"id": "xy-edge__geo/positionWorld-1773373497071out-noise/tri_noise_3d-1773373514019position"
+				},
+				{
+					"source": "noise/tri_noise_3d-1773373514019",
+					"sourceHandle": "out",
+					"target": "root-material",
+					"targetHandle": "colorNode",
+					"id": "xy-edge__noise/tri_noise_3d-1773373514019out-root-materialcolorNode"
+				}
+			],
+			"postNodes": [
+				{
+					"id": "post-input",
+					"type": "post/input",
+					"position": {
+						"x": -400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/input",
+						"values": {},
+						"connected": {}
+					}
+				},
+				{
+					"id": "post-output",
+					"type": "post/output",
+					"position": {
+						"x": 400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/output",
+						"values": {},
+						"connected": {}
+					}
+				}
+			],
+			"postEdges": [],
+			"globals": [],
+			"subgraphs": {},
+			"codeNodes": {},
+			"previewSettings": {
+				"mesh": "sphere",
+				"isInstanced": false,
+				"instanceCount": 100,
+				"geometryScript": "",
+				"codeMode": "generated",
+				"customCode": "",
+				"environment": "none",
+				"environmentIntensity": 1,
+				"showEnvironmentBackground": false,
+				"showBackdrop": false,
+				"showGrid": true,
+				"postEnabled": true,
+				"config": {
+					"width": 1.5,
+					"height": 1.5,
+					"depth": 1.5,
+					"widthSegments": 1,
+					"heightSegments": 1,
+					"depthSegments": 1,
+					"radius": 1,
+					"widthSegmentsSphere": 32,
+					"heightSegmentsSphere": 16,
+					"radiusTorus": 0.8,
+					"tube": 0.3,
+					"radialSegments": 16,
+					"tubularSegments": 32,
+					"widthPlane": 1,
+					"heightPlane": 1,
+					"widthSegmentsPlane": 1,
+					"heightSegmentsPlane": 1,
+					"radiusTop": 1,
+					"radiusBottom": 1,
+					"heightCylinder": 1,
+					"radialSegmentsCylinder": 20,
+					"heightSegmentsCylinder": 20,
+					"openEnded": true
+				}
+			}
+		},
+		"mat_2-standard": {
+			"version": 2,
+			"activeRootGraph": "material",
+			"nodes": [
+				{
+					"id": "noise/tri_noise_3d-1773373560195",
+					"type": "noise/tri_noise_3d",
+					"position": {
+						"x": -571.5500459485202,
+						"y": -85.26775870089736
+					},
+					"selected": false,
+					"data": {
+						"type": "noise/tri_noise_3d",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 111,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "geo/normalWorld-1773373569960",
+					"type": "geo/normalWorld",
+					"position": {
+						"x": -546.0657202943696,
+						"y": 311.98499287363376
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/normalWorld",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 117,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/mix-1773373573981",
+					"type": "math/mix",
+					"position": {
+						"x": -214.4059798432642,
+						"y": -2.1649144661627204
+					},
+					"selected": false,
+					"data": {
+						"type": "math/mix",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 69,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "geo/positionWorld-1773373584631",
+					"type": "geo/positionWorld",
+					"position": {
+						"x": -1433.94251744813,
+						"y": -135.01461143841146
+					},
+					"selected": false,
+					"data": {
+						"type": "geo/positionWorld",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 122,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "const/color-1773373695600",
+					"type": "const/color",
+					"position": {
+						"x": -891.4966712873143,
+						"y": 351.8835858072191
+					},
+					"selected": false,
+					"data": {
+						"type": "const/color",
+						"values": {
+							"value": "#a4fb47"
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 93,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "noise/fractal_noise_float-1773373726185",
+					"type": "noise/fractal_noise_float",
+					"position": {
+						"x": -931.6729541310845,
+						"y": -4.0550609248271385
+					},
+					"selected": false,
+					"data": {
+						"type": "noise/fractal_noise_float",
+						"values": {
+							"octaves": 4,
+							"lacunarity": 2
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 155,
+						"height": 164
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/mix-1773373826479",
+					"type": "math/mix",
+					"position": {
+						"x": -521.8025735699398,
+						"y": 154.9725741278549
+					},
+					"selected": false,
+					"data": {
+						"type": "math/mix",
+						"values": {
+							"a": 0,
+							"b": 1,
+							"t": 0.5
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 69,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "const/color-1773373842192",
+					"type": "const/color",
+					"position": {
+						"x": -897.2658844184299,
+						"y": 177.1817694642336
+					},
+					"selected": false,
+					"data": {
+						"type": "const/color",
+						"values": {
+							"value": "#044813"
+						},
+						"connected": {}
+					},
+					"measured": {
+						"width": 93,
+						"height": 142
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/clamp-1773373874892",
+					"type": "math/clamp",
+					"position": {
+						"x": -317.6997222284098,
+						"y": 159.16643724155531
+					},
+					"selected": false,
+					"data": {
+						"type": "math/clamp",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 68,
+						"height": 120
+					}
+				},
+				{
+					"id": "math/clamp-1773373914936",
+					"type": "math/clamp",
+					"position": {
+						"x": -700.7459282048039,
+						"y": 32.28547527202021
+					},
+					"selected": false,
+					"data": {
+						"type": "math/clamp",
+						"values": {},
+						"connected": {}
+					},
+					"measured": {
+						"width": 68,
+						"height": 120
+					},
+					"dragging": false
+				},
+				{
+					"id": "math/multiOp-1773374085600",
+					"type": "math/multiOp",
+					"position": {
+						"x": -1181.154599038152,
+						"y": 57.500254462638964
+					},
+					"selected": false,
+					"data": {
+						"type": "math/multiOp",
+						"values": {
+							"op_op_1773374085601_8822_b": 66.7
+						},
+						"connected": {},
+						"operations": [
+							{
+								"id": "op_1773374085601_8822",
+								"op": "mul"
+							}
+						]
+					},
+					"measured": {
+						"width": 212,
+						"height": 156
+					}
+				},
+				{
+					"id": "root-material",
+					"type": "material/standard",
+					"position": {
+						"x": 38.21195091405497,
+						"y": -99.60597545702748
+					},
+					"data": {
+						"values": {
+							"roughnessNode": 1
+						},
+						"connected": {},
+						"type": "material/standard",
+						"activeInputs": [
+							"colorNode",
+							"positionNode",
+							"roughnessNode",
+							"metalnessNode"
+						]
+					},
+					"measured": {
+						"width": 170,
+						"height": 142
+					},
+					"selected": false,
+					"dragging": false
+				}
+			],
+			"edges": [
+				{
+					"source": "noise/tri_noise_3d-1773373560195",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373573981",
+					"targetHandle": "a",
+					"id": "xy-edge__noise/tri_noise_3d-1773373560195out-math/mix-1773373573981a"
+				},
+				{
+					"source": "geo/positionWorld-1773373584631",
+					"sourceHandle": "out",
+					"target": "noise/tri_noise_3d-1773373560195",
+					"targetHandle": "position",
+					"id": "xy-edge__geo/positionWorld-1773373584631out-noise/tri_noise_3d-1773373560195position"
+				},
+				{
+					"source": "math/mix-1773373573981",
+					"sourceHandle": "out",
+					"target": "root-material",
+					"targetHandle": "colorNode",
+					"id": "xy-edge__math/mix-1773373573981out-root-materialcolorNode"
+				},
+				{
+					"id": "edge-const/color-1773373695600-out-math/mix-1773373826479-b",
+					"source": "const/color-1773373695600",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373826479",
+					"targetHandle": "b"
+				},
+				{
+					"source": "math/mix-1773373826479",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373573981",
+					"targetHandle": "b",
+					"id": "xy-edge__math/mix-1773373826479out-math/mix-1773373573981b"
+				},
+				{
+					"id": "edge-const/color-1773373842192-out-math/mix-1773373826479-a",
+					"source": "const/color-1773373842192",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373826479",
+					"targetHandle": "a"
+				},
+				{
+					"source": "geo/normalWorld-1773373569960",
+					"sourceHandle": "y",
+					"target": "math/clamp-1773373874892",
+					"targetHandle": "x",
+					"id": "xy-edge__geo/normalWorld-1773373569960y-math/clamp-1773373874892x"
+				},
+				{
+					"source": "math/clamp-1773373874892",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373573981",
+					"targetHandle": "t",
+					"id": "xy-edge__math/clamp-1773373874892out-math/mix-1773373573981t"
+				},
+				{
+					"source": "noise/fractal_noise_float-1773373726185",
+					"sourceHandle": "out",
+					"target": "math/clamp-1773373914936",
+					"targetHandle": "x",
+					"id": "xy-edge__noise/fractal_noise_float-1773373726185out-math/clamp-1773373914936x"
+				},
+				{
+					"source": "math/clamp-1773373914936",
+					"sourceHandle": "out",
+					"target": "math/mix-1773373826479",
+					"targetHandle": "t",
+					"id": "xy-edge__math/clamp-1773373914936out-math/mix-1773373826479t"
+				},
+				{
+					"id": "edge-geo/positionWorld-1773373584631-out-math/multiOp-1773374085600-op_op_1773374085601_8822_a",
+					"source": "geo/positionWorld-1773373584631",
+					"sourceHandle": "out",
+					"target": "math/multiOp-1773374085600",
+					"targetHandle": "op_op_1773374085601_8822_a"
+				},
+				{
+					"source": "math/multiOp-1773374085600",
+					"sourceHandle": "out",
+					"target": "noise/fractal_noise_float-1773373726185",
+					"targetHandle": "position",
+					"id": "xy-edge__math/multiOp-1773374085600out-noise/fractal_noise_float-1773373726185position"
+				}
+			],
+			"postNodes": [
+				{
+					"id": "post-input",
+					"type": "post/input",
+					"position": {
+						"x": -400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/input",
+						"values": {},
+						"connected": {}
+					}
+				},
+				{
+					"id": "post-output",
+					"type": "post/output",
+					"position": {
+						"x": 400,
+						"y": 200
+					},
+					"data": {
+						"type": "post/output",
+						"values": {},
+						"connected": {}
+					}
+				}
+			],
+			"postEdges": [],
+			"globals": [],
+			"subgraphs": {},
+			"codeNodes": {},
+			"previewSettings": {
+				"mesh": "sphere",
+				"isInstanced": false,
+				"instanceCount": 100,
+				"geometryScript": "",
+				"codeMode": "generated",
+				"customCode": "",
+				"environment": "none",
+				"environmentIntensity": 1,
+				"showEnvironmentBackground": false,
+				"showBackdrop": false,
+				"showGrid": true,
+				"postEnabled": true,
+				"config": {
+					"width": 1.5,
+					"height": 1.5,
+					"depth": 1.5,
+					"widthSegments": 1,
+					"heightSegments": 1,
+					"depthSegments": 1,
+					"radius": 1,
+					"widthSegmentsSphere": 32,
+					"heightSegmentsSphere": 16,
+					"radiusTorus": 0.8,
+					"tube": 0.3,
+					"radialSegments": 16,
+					"tubularSegments": 32,
+					"widthPlane": 1,
+					"heightPlane": 1,
+					"widthSegmentsPlane": 1,
+					"heightSegmentsPlane": 1,
+					"radiusTop": 1,
+					"radiusBottom": 1,
+					"heightCylinder": 1,
+					"radialSegmentsCylinder": 20,
+					"heightSegmentsCylinder": 20,
+					"openEnded": true
+				}
+			}
+		}
+	}
+}

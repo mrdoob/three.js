@@ -1,3 +1,5 @@
+import { EventDispatcher } from 'three';
+
 /**
  * Tab class
  * @param {string} title - The title of the tab
@@ -23,9 +25,11 @@
  * tab3.showBuiltin(); // Show the builtin button and mini-content
  * tab3.hideBuiltin(); // Hide the builtin button and mini-content
  */
-export class Tab {
+export class Tab extends EventDispatcher {
 
 	constructor( title, options = {} ) {
+
+		super();
 
 		this.id = title.toLowerCase();
 		this.button = document.createElement( 'button' );

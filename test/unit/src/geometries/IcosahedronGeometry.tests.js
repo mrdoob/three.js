@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { IcosahedronGeometry } from '../../../../src/geometries/IcosahedronGeometry.js';
 
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
@@ -52,19 +50,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'IcosahedronGeometry',
 				'IcosahedronGeometry.type should be IcosahedronGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

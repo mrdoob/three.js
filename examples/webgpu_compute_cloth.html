@@ -38,7 +38,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let renderer, scene, camera, controls;
@@ -62,7 +62,8 @@
 			const verletSprings = [];
 			const verletVertexColumns = [];
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const params = {
 				wireframe: false,
@@ -89,7 +90,7 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits: { maxStorageBuffersInVertexStage: 1 } } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NeutralToneMapping;
@@ -108,9 +109,9 @@
 				controls.target.set( 0, - 0.1, 0 );
 				controls.update();
 
-				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new UltraHDRLoader().setPath( 'textures/equirectangular/' );
 
-				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_2k.hdr.jpg' );
 				hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = hdrTexture;
 				scene.backgroundBlurriness = 0.5;
@@ -558,6 +559,8 @@
 
 			async function render() {
 
+				timer.update();
+
 				sphere.visible = params.sphere;
 				sphereUniform.value = params.sphere ? 1 : 0;
 				windUniform.value = params.wind;
@@ -565,7 +568,7 @@
 				vertexWireframeObject.visible = params.wireframe;
 				springWireframeObject.visible = params.wireframe;
 
-				const deltaTime = Math.min( clock.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+				const deltaTime = Math.min( timer.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
 				const stepsPerSecond = 360; // ensure the same amount of simulation steps per second on all systems, independent of refresh rate
 				const timePerStep = 1 / stepsPerSecond;
 

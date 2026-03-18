@@ -92,7 +92,7 @@
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, renderer, composer, clock;
+			let camera, renderer, composer, timer;
 
 			let uniforms, mesh;
 
@@ -107,7 +107,8 @@
 
 				const scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const textureLoader = new THREE.TextureLoader();
 
@@ -185,7 +186,9 @@
 
 			function animate() {
 
-				const delta = 5 * clock.getDelta();
+				timer.update();
+
+				const delta = 5 * timer.getDelta();
 
 				uniforms[ 'time' ].value += 0.2 * delta;
 

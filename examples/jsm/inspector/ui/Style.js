@@ -16,6 +16,8 @@ export class Style {
 	--color-green: #4caf50;
 	--color-yellow: #ffc107;
 	--color-red: #f44336;
+	--color-fps: rgb(63, 81, 181);
+	--color-call: rgba(255, 185, 34, 1);
 	--font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	--font-mono: 'Fira Code', 'Courier New', Courier, monospace;
 }
@@ -52,13 +54,25 @@ export class Style {
 	font-family: var(--font-family);
 }
 
+#profiler-toggle.position-right.panel-open {
+	right: auto;
+	left: 15px;
+	border-radius: 6px 12px 12px 6px;
+	flex-direction: row-reverse;
+}
+
+#profiler-toggle.position-right.panel-open #builtin-tabs-container {
+	border-right: none;
+	border-left: 1px solid #262636;
+}
+
 #profiler-toggle:hover {
 	border-color: var(--accent-color);
 }
 
-#profiler-toggle.hidden {
-	opacity: 0;
-	pointer-events: none;
+#profiler-toggle.panel-open #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.2);
+	color: var(--accent-color);
 }
 
 #toggle-icon {
@@ -72,6 +86,10 @@ export class Style {
 
 #profiler-toggle:hover #toggle-icon {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+#profiler-toggle.panel-open:hover #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.3);
 }
 
 .toggle-separator {
@@ -164,6 +182,11 @@ export class Style {
 	transform: translateY(-10px) scale(0.98);
 	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
 	            transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#profiler-mini-panel.position-right.panel-open {
+	right: auto;
+	left: 15px;
 }
 
 #profiler-mini-panel.visible {
@@ -754,7 +777,7 @@ export class Style {
 	content: '⋮⋮';
 	position: absolute;
 	left: 3px;
-	top: calc(50% - 2px);
+	top: calc(50% - .1rem);
 	transform: translateY(-50%);
 	color: var(--profiler-border);
 	font-size: 18px;
@@ -881,6 +904,14 @@ export class Style {
 	-webkit-user-select: none;
 }
 
+.parameters .list-item-row {
+	min-height: 31px;
+}
+
+.mini-panel-content .parameters .list-item-row {
+	min-height: 21px;
+}
+
 .list-item-wrapper {
 	margin-top: 2px;
 	margin-bottom: 2px;
@@ -903,6 +934,7 @@ export class Style {
 
 .list-item-wrapper.header-wrapper>.list-item-row>.list-item-cell:first-child {
 	font-weight: 600;
+	line-height: 1;
 }
 
 .list-item-row.collapsible,
@@ -912,6 +944,7 @@ export class Style {
 
 .list-item-row.collapsible {
 	background-color: rgba(0, 170, 255, 0.15) !important;
+	min-height: 23px;
 }
 
 .list-item-row.collapsible.alert,
@@ -1047,7 +1080,7 @@ export class Style {
 	justify-content: space-between;
 }
 
-.console-filters-group {
+.console-buttons-group {
 	display: flex;
 	gap: 20px;
 }
@@ -1064,6 +1097,33 @@ export class Style {
 	border-radius: 15px;
 }
 
+.console-filter-input:focus {
+	outline: none;
+	border-color: var(--text-secondary);
+}
+
+.console-copy-button {
+	background: transparent;
+	border: none;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: color 0.2s, background-color 0.2s;
+}
+
+.console-copy-button:hover {
+	color: var(--text-primary);
+	background-color: var(--profiler-hover);
+}
+
+.console-copy-button.copied {
+	color: var(--color-green);
+}
+
 #console-log {
 	display: flex;
 	flex-direction: column;
@@ -1071,6 +1131,8 @@ export class Style {
 	padding: 10px;
 	overflow-y: auto;
 	flex-grow: 1;
+	user-select: text;
+	-webkit-user-select: text;
 }
 
 .log-message {
@@ -1143,6 +1205,11 @@ export class Style {
 	box-sizing: border-box;
 }
 
+.param-control input:focus {
+	outline: none;
+	border-color: var(--accent-color);
+}
+
 .param-control select {
 	padding-top: 3px;
 	padding-bottom: 1px;
@@ -1175,6 +1242,7 @@ export class Style {
 	align-items: center;
 	cursor: pointer;
 	gap: 8px;
+	will-change: transform;
 }
 
 .custom-checkbox input {
@@ -1184,7 +1252,7 @@ export class Style {
 .custom-checkbox .checkmark {
 	width: 14px;
 	height: 14px;
-	border: 1px solid var(--profiler-border);
+	border: 1px solid var(--accent-color);
 	border-radius: 3px;
 	display: inline-flex;
 	justify-content: center;
@@ -1194,8 +1262,8 @@ export class Style {
 
 .custom-checkbox .checkmark::after {
 	content: '';
-	width: 8px;
-	height: 8px;
+	width: 6px;
+	height: 6px;
 	background-color: var(--accent-color);
 	border-radius: 1px;
 	display: block;
@@ -1267,6 +1335,7 @@ export class Style {
 .mini-panel-content .param-control select,
 .mini-panel-content .param-control button {
 	background-color: #1e1e24c2;
+	line-height: 1.0;
 }
 
 .mini-panel-content .param-control select {
@@ -1294,11 +1363,11 @@ export class Style {
 	width: 12px;
 	height: 12px;
 	margin-bottom: 2px;
+	will-change: transform;
 }
 
-.mini-panel-content .custom-checkbox .checkmark::after {
-	width: 8px;
-	height: 8px;
+.mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
+	margin-bottom: 2px;
 }
 
 @media screen and (max-width: 450px) and (orientation: portrait) {
@@ -1565,6 +1634,25 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 #profiler-panel input[type="number"],
 .detached-tab-content input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+.panel-action-btn {
+	background: transparent;
+	color: var(--text-primary);
+	border: 1px solid var(--profiler-border);
+	border-radius: 4px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-family: var(--font-family);
+	font-size: 12px;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel-action-btn:hover {
+	background-color: rgba(255, 255, 255, 0.05);
 }
 `;
 		const styleElement = document.createElement( 'style' );

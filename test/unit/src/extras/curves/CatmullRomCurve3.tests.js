@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
@@ -51,30 +49,6 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'points', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'closed', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'curveType', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'tension', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'isCatmullRomCurve3', ( assert ) => {
 
@@ -83,30 +57,6 @@ export default QUnit.module( 'Extras', () => {
 					object.isCatmullRomCurve3,
 					'CatmullRomCurve3.isCatmullRomCurve3 should be true'
 				);
-
-			} );
-
-			QUnit.todo( 'getPoint', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

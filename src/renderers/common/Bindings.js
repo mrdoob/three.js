@@ -13,7 +13,7 @@ class Bindings extends DataMap {
 	 * Constructs a new bindings management component.
 	 *
 	 * @param {Backend} backend - The renderer's backend.
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 * @param {Textures} textures - Renderer component for managing textures.
 	 * @param {Attributes} attributes - Renderer component for managing attributes.
 	 * @param {Pipelines} pipelines - Renderer component for managing pipelines.
@@ -54,7 +54,7 @@ class Bindings extends DataMap {
 		/**
 		 * Renderer component for managing nodes related logic.
 		 *
-		 * @type {Nodes}
+		 * @type {NodeManager}
 		 */
 		this.nodes = nodes;
 
@@ -164,6 +164,7 @@ class Bindings extends DataMap {
 
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
@@ -181,6 +182,7 @@ class Bindings extends DataMap {
 
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
@@ -265,8 +267,17 @@ class Bindings extends DataMap {
 				const attribute = binding.attribute;
 				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
 
+				const bindingData = backend.get( binding );
+
 				this.attributes.update( attribute, attributeType );
 
+				if ( bindingData.attribute !== attribute ) {
+
+					bindingData.attribute = attribute;
+
+					needsBindingsUpdate = true;
+
+				}
 
 			}
 
@@ -295,7 +306,7 @@ class Bindings extends DataMap {
 
 					this.textures.updateTexture( texture );
 
-					// generation: update the bindings if a new texture has been created
+					// generation: update the bindings if the binding refers to a different texture object
 
 					if ( binding.generation !== texturesTextureData.generation ) {
 
@@ -303,9 +314,11 @@ class Bindings extends DataMap {
 
 						needsBindingsUpdate = true;
 
-						cacheBindings = false;
-
 					}
+
+					// keep track which bind groups refer to the current texture (this is needed for dispose)
+
+					texturesTextureData.bindGroups.add( bindGroup );
 
 				}
 
@@ -354,11 +367,15 @@ class Bindings extends DataMap {
 
 						needsBindingsUpdate = true;
 
-						cacheBindings = false;
-
 					}
 
 				}
+
+			}
+
+			if ( binding.isBuffer && binding.updateRanges.length > 0 ) {
+
+				binding.clearUpdateRanges();
 
 			}
 

@@ -1,4 +1,5 @@
-import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4, fract, dot } from '../tsl/TSLBase.js';
+import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4, fract, dot, cos, sin } from '../tsl/TSLBase.js';
+import { sqrt } from '../math/MathNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { textureLoad } from '../accessors/TextureNode.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
@@ -118,5 +119,36 @@ export const interleavedGradientNoise = Fn( ( [ position ] ) => {
 	type: 'float',
 	inputs: [
 		{ name: 'position', type: 'vec2' }
+	]
+} );
+
+/**
+ * Vogel disk sampling for uniform circular distribution.
+ *
+ * This function generates sample points distributed uniformly on a disk using the golden angle,
+ * resulting in an efficient low-discrepancy sequence for sampling. The rotation parameter (phi)
+ * allows randomizing the pattern per-pixel when combined with IGN.
+ *
+ * @tsl
+ * @function
+ * @param {Node<int>} sampleIndex - The index of the current sample (0-based).
+ * @param {Node<int>} samplesCount - The total number of samples.
+ * @param {Node<float>} phi - Rotation angle in radians (typically from IGN * 2π).
+ * @return {Node<vec2>} A 2D point on the unit disk.
+ */
+export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
+
+	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
+	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );
+	const theta = float( sampleIndex ).mul( goldenAngle ).add( phi );
+	return vec2( cos( theta ), sin( theta ) ).mul( r );
+
+} ).setLayout( {
+	name: 'vogelDiskSample',
+	type: 'vec2',
+	inputs: [
+		{ name: 'sampleIndex', type: 'int' },
+		{ name: 'samplesCount', type: 'int' },
+		{ name: 'phi', type: 'float' }
 	]
 } );

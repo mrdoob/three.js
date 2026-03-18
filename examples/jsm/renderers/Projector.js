@@ -172,7 +172,7 @@ class Projector {
 				{ sign: + 1 },
 				{ sign: - 1 }
 			];
-		
+
 		//
 
 		function RenderList() {
@@ -348,7 +348,7 @@ class Projector {
 						_face.v3.copy( v3 );
 						_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 						_face.renderOrder = object.renderOrder;
-						
+
 						// face normal
 						_vector3.subVectors( v3.position, v2.position );
 						_vector4.subVectors( v1.position, v2.position );
@@ -397,7 +397,7 @@ class Projector {
 				for ( let i = 0; i < clippedCount; i ++ ) {
 
 					const cv = _clipInput[ i ];
-					
+
 					// Get or create renderable vertex from pool
 					let sv = _screenVertexPool[ i ];
 					if ( ! sv ) {
@@ -1095,7 +1095,7 @@ class Projector {
 			return inputCount;
 
 		}
-	
+
 		function clipLine( s1, s2 ) {
 
 			let alpha1 = 0, alpha2 = 1;

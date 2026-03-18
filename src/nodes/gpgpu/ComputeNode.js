@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import StackTrace from '../core/StackTrace.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { warn, error } from '../../utils.js';
@@ -148,7 +149,7 @@ class ComputeNode extends Node {
 	 */
 	label( name ) {
 
-		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.', new StackTrace() ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -242,7 +243,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
 
-		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
+		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements', new StackTrace() );
 
 	}
 
@@ -252,7 +253,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 		if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
 
-			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
+			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer`, new StackTrace() );
 
 		}
 
@@ -264,7 +265,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	//
 
-	return nodeObject( new ComputeNode( nodeObject( node ), workgroupSize ) );
+	return new ComputeNode( nodeObject( node ), workgroupSize );
 
 };
 

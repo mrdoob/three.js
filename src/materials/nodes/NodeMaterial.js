@@ -25,7 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
-import { warn } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * Base class for all node materials.
@@ -241,6 +241,14 @@ class NodeMaterial extends Material {
 		this.maskNode = null;
 
 		/**
+		 * This node can be used to implement a shadow mask for the material.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskShadowNode = null;
+
+		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
 		 * the default and define local vertex positions with nodes instead.
@@ -382,25 +390,13 @@ class NodeMaterial extends Material {
 		 */
 		this.vertexNode = null;
 
-		// Deprecated properties
-
-		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
-
-			get: () => {
-
-				return this.receivedShadowPositionNode;
-
-			},
-
-			set: ( value ) => {
-
-				warn( 'NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
-
-				this.receivedShadowPositionNode = value;
-
-			}
-
-		} );
+		/**
+		 * This node can be used as a global context management component for this material.
+		 *
+		 * @type {?ContextNode}
+		 * @default null
+		 */
+		this.contextNode = null;
 
 	}
 
@@ -489,13 +485,41 @@ class NodeMaterial extends Material {
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
 
+		// < CONTEXT >
+
+		if ( renderer.contextNode.isContextNode === true ) {
+
+			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
+
+		} else {
+
+			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
+
+		}
+
+		if ( this.contextNode !== null ) {
+
+			if ( this.contextNode.isContextNode === true ) {
+
+				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
+
+			} else {
+
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
+
+			}
+
+		}
+
 		// < VERTEX STAGE >
 
 		builder.addStack();
 
-		const mvp = subBuild( this.setupVertex( builder ), 'VERTEX' );
+		const mvp = this.setupVertex( builder );
 
-		const vertexNode = this.vertexNode || mvp;
+		const vertexNode = subBuild( this.vertexNode || mvp, 'VERTEX' );
+
+		builder.context.clipSpace = vertexNode;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -557,6 +581,14 @@ class NodeMaterial extends Material {
 			const isCustomOutput = this.outputNode !== null;
 
 			if ( isCustomOutput ) resultNode = this.outputNode;
+
+			//
+
+			if ( builder.context.getOutput ) {
+
+				resultNode = builder.context.getOutput( resultNode, builder );
+
+			}
 
 			// MRT
 
@@ -753,7 +785,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
@@ -1018,9 +1050,21 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.aoNode !== null || builder.material.aoMap ) {
+		let aoNode = this.aoNode;
 
-			const aoNode = this.aoNode !== null ? this.aoNode : materialAO;
+		if ( aoNode === null && builder.material.aoMap ) {
+
+			aoNode = materialAO;
+
+		}
+
+		if ( builder.context.getAO ) {
+
+			aoNode = builder.context.getAO( aoNode, builder );
+
+		}
+
+		if ( aoNode ) {
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
@@ -1285,6 +1329,7 @@ class NodeMaterial extends Material {
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
 		this.maskNode = source.maskNode;
+		this.maskShadowNode = source.maskShadowNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;
@@ -1300,6 +1345,8 @@ class NodeMaterial extends Material {
 
 		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;
+
+		this.contextNode = source.contextNode;
 
 		return super.copy( source );
 

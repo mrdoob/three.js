@@ -31,7 +31,8 @@
 
 			let camera, scene, renderer, controls;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -119,7 +120,9 @@
 
 			function animate() {
 
-				controls.update( clock.getDelta() );
+				timer.update();
+
+				controls.update( timer.getDelta() );
 
 				renderer.render( scene, camera );
 

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { OctahedronGeometry } from '../../../../src/geometries/OctahedronGeometry.js';
 
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
@@ -52,19 +50,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'OctahedronGeometry',
 				'OctahedronGeometry.type should be OctahedronGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

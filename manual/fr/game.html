@@ -1196,7 +1196,7 @@ et modifierai cela plus tard.</p>
 <p>Lorsque j'ai commencé cela, j'ai utilisé un seul rayon pour tous les animaux,
 mais bien sûr, ce n'était pas bon, car le carlin est beaucoup plus petit que le cheval.
 J'ai donc ajouté les différentes tailles, mais je voulais pouvoir visualiser
-les choses. Pour ce faire, j'ai créé un composant <code class="notranslate" translate="no">StatusDisplayHelper</code>.</p>
+les choses. Pour ce faire, j'ai créé un composant <code class="notranslate" translate="no">StateDisplayHelper</code>.</p>
 <p>J'utilise un <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> pour dessiner un cercle autour de chaque personnage,
 et il utilise des éléments html pour permettre à chaque personnage d'afficher un certain statut en utilisant
 les techniques couvertes dans <a href="align-html-elements-to-3d.html">l'article sur l'alignement des éléments html en 3D</a>.</p>
@@ -1498,7 +1498,7 @@ des coroutines pendant que d'autres coroutines s'exécutent. Il gère également
 <p>Pour créer une coroutine, vous créez une <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">fonction génératrice JavaScript</a>.
 Une fonction génératrice est précédée du mot-clé <code class="notranslate" translate="no">function*</code> (l'astérisque est important !)</p>
 <p>Les fonctions génératrices peuvent <code class="notranslate" translate="no">yield</code> (céder). Par exemple</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* count0To9() {
   for (let i = 0; i &lt; 10; ++i) {
     console.log(i);
     yield;
