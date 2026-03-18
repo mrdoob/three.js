@@ -2,7 +2,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
 import { Timer } from '../core/Timer.js';
 import { Object3D } from '../core/Object3D.js';
-import { AudioContext } from './AudioContext.js';
+import { AudioContextProvider } from './AudioContextProvider.js';
 
 const _position = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
@@ -38,7 +38,7 @@ class AudioListener extends Object3D {
 		 * @type {AudioContext}
 		 * @readonly
 		 */
-		this.context = AudioContext.getContext();
+		this.context = AudioContextProvider.getContext();
 
 		/**
 		 * The gain node used for volume control.

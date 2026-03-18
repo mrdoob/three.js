@@ -71,7 +71,7 @@ export { ArrayCamera } from './cameras/ArrayCamera.js';
 export { Camera } from './cameras/Camera.js';
 export { AudioListener } from './audio/AudioListener.js';
 export { PositionalAudio } from './audio/PositionalAudio.js';
-export { AudioContext } from './audio/AudioContext.js';
+export { AudioContextProvider } from './audio/AudioContextProvider.js';
 export { AudioAnalyser } from './audio/AudioAnalyser.js';
 export { Audio } from './audio/Audio.js';
 export { VectorKeyframeTrack } from './animation/tracks/VectorKeyframeTrack.js';

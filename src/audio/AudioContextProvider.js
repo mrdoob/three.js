@@ -5,7 +5,7 @@ let _context;
  *
  * @hideconstructor
  */
-class AudioContext {
+class AudioContextProvider {
 
 	/**
 	 * Returns the global native audio context.
@@ -37,4 +37,4 @@ class AudioContext {
 
 }
 
-export { AudioContext };
+export { AudioContextProvider };

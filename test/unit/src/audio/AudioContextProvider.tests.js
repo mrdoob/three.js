@@ -1,8 +1,8 @@
-import { AudioContext } from '../../../../src/audio/AudioContext.js';
+import { AudioContextProvider } from '../../../../src/audio/AudioContextProvider.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module( 'AudioContext', ( hooks ) => {
+	QUnit.module( 'AudioContextProvider', ( hooks ) => {
 
 		function mockWindowAudioContext() {
 
@@ -43,21 +43,21 @@ export default QUnit.module( 'Audios', () => {
 		// STATIC
 		QUnit.test( 'getContext', ( assert ) => {
 
-			const context = AudioContext.getContext();
+			const context = AudioContextProvider.getContext();
 			assert.strictEqual(
 				context instanceof Object, true,
-				'AudioContext.getContext creates a context.'
+				'AudioContextProvider.getContext creates a context.'
 			);
 
 		} );
 
 		QUnit.test( 'setContext', ( assert ) => {
 
-			AudioContext.setContext( new window.AudioContext() );
-			const context = AudioContext.getContext();
+			AudioContextProvider.setContext( new window.AudioContext() );
+			const context = AudioContextProvider.getContext();
 			assert.strictEqual(
 				context instanceof Object, true,
-				'AudioContext.setContext updates the context.'
+				'AudioContextProvider.setContext updates the context.'
 			);
 
 		} );

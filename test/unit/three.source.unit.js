@@ -28,7 +28,7 @@ import './src/animation/tracks/VectorKeyframeTrack.tests.js';
 //src/audio
 import './src/audio/Audio.tests.js';
 import './src/audio/AudioAnalyser.tests.js';
-import './src/audio/AudioContext.tests.js';
+import './src/audio/AudioContextProvider.tests.js';
 import './src/audio/AudioListener.tests.js';
 import './src/audio/PositionalAudio.tests.js';
 
