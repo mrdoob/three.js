@@ -41,9 +41,9 @@ function _loadState() {
 	const settings = getItem( 'settings' ) || {};
 
 	_state = {
-		forceWebGL: settings.forceWebGL || false,
-		captureStackTrace: settings.captureStackTrace || false,
-		activeExtensions: settings.activeExtensions || {}
+		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
+		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
+		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {}
 	};
 
 	if ( _state.forceWebGL ) {
