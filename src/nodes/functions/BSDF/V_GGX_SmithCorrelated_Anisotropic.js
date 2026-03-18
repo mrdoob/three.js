@@ -8,7 +8,7 @@ const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, 
 
 	const gv = dotNL.mul( vec3( alphaT.mul( dotTV ), alphaB.mul( dotBV ), dotNV ).length() );
 	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
-	
+
 	return div( 0.5, gv.add( gl ).max( EPSILON ) );
 
 } ).setLayout( {
