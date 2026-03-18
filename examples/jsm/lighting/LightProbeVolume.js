@@ -100,25 +100,30 @@ class LightProbeVolume extends Object3D {
 
 		/**
 		 * The world-space bounding box for the grid.
+		 *
 		 * @type {Box3}
 		 */
-		this.boundingBox = boundingBox.clone();
+		this.boundingBox = boundingBox;
 
 		/**
 		 * The number of probes along each axis.
+		 *
 		 * @type {Vector3}
 		 */
-		this.resolution = resolution.clone();
+		this.resolution = resolution;
 
 		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
-		 * @type {Data3DTexture|null}
+		 *
+		 * @type {?Data3DTexture}
 		 */
 		this.texture = null;
 
 		/**
 		 * Internal render target for GPU-resident baking.
+		 *
 		 * @private
+		 * @type {?WebGL3DRenderTarget}
 		 */
 		this._renderTarget = null;
 
@@ -187,7 +192,7 @@ class LightProbeVolume extends Object3D {
 		renderer.setRenderTarget( batchTarget );
 		renderer.clear();
 
-		const t0 = performance.now();
+		// const t0 = performance.now();
 
 		// Phase 1: Render cubemaps and project to SH into batch target
 		// Note: set viewport/scissor on the render target directly to avoid pixel ratio scaling
@@ -280,7 +285,7 @@ class LightProbeVolume extends Object3D {
 		renderer.setScissor( _savedScissor );
 		renderer.setScissorTest( savedScissorTest );
 
-		console.log( `LightProbeVolume: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
+		// console.log( `LightProbeVolume: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
 		this.visible = true;
 
@@ -288,6 +293,7 @@ class LightProbeVolume extends Object3D {
 
 	/**
 	 * Ensures the atlas 3D render target exists with the correct dimensions.
+	 *
 	 * @private
 	 */
 	_ensureTextures() {
