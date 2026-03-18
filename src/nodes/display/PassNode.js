@@ -886,8 +886,26 @@ class PassNode extends TempNode {
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
-		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
-		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
+		// scissor
+
+		if ( this._scissor !== null ) {
+
+			this.renderTarget.scissor.copy( this._scissor ).multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+			this.renderTarget.scissorTest = true;
+
+		} else {
+
+			this.renderTarget.scissorTest = false;
+
+		}
+
+		// viewport
+
+		if ( this._viewport !== null ) {
+
+			this.renderTarget.viewport.copy( this._viewport ).multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+
+		}
 
 	}
 
@@ -922,8 +940,6 @@ class PassNode extends TempNode {
 
 			}
 
-			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
-
 		}
 
 	}
@@ -957,8 +973,6 @@ class PassNode extends TempNode {
 				this._viewport.set( x, y, width, height );
 
 			}
-
-			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
