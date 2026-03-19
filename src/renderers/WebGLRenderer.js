@@ -1798,7 +1798,7 @@ class WebGLRenderer {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
 
-				textures.setTextureUnits( currentRenderState.state.textureUnits || 0 );
+				textures.setTextureUnits( currentRenderState.state.textureUnits );
 
 				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
 
