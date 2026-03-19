@@ -23780,9 +23780,8 @@ const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, 
 
 	const gv = dotNL.mul( vec3( alphaT.mul( dotTV ), alphaB.mul( dotBV ), dotNV ).length() );
 	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
-	const v = div( 0.5, gv.add( gl ) );
 
-	return v;
+	return div( 0.5, gv.add( gl ).max( EPSILON ) );
 
 } ).setLayout( {
 	name: 'V_GGX_SmithCorrelated_Anisotropic',
@@ -40049,8 +40048,26 @@ class PassNode extends TempNode {
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
-		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
-		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
+		// scissor
+
+		if ( this._scissor !== null ) {
+
+			this.renderTarget.scissor.copy( this._scissor ).multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+			this.renderTarget.scissorTest = true;
+
+		} else {
+
+			this.renderTarget.scissorTest = false;
+
+		}
+
+		// viewport
+
+		if ( this._viewport !== null ) {
+
+			this.renderTarget.viewport.copy( this._viewport ).multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+
+		}
 
 	}
 
@@ -40085,8 +40102,6 @@ class PassNode extends TempNode {
 
 			}
 
-			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
-
 		}
 
 	}
@@ -40120,8 +40135,6 @@ class PassNode extends TempNode {
 				this._viewport.set( x, y, width, height );
 
 			}
-
-			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
