@@ -1,5 +1,6 @@
 import { Tab } from '../ui/Tab.js';
 import { Graph } from '../ui/Graph.js';
+import { getItem, setItem } from '../Inspector.js';
 
 const LIMIT = 500;
 
@@ -93,10 +94,9 @@ class Timeline extends Tab {
 		this.recordRefreshButton.style.alignItems = 'center';
 		this.recordRefreshButton.addEventListener( 'click', () => {
 
-			const storage = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-			storage.timeline = storage.timeline || {};
-			storage.timeline.recording = true;
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( storage ) );
+			const timelineSettings = getItem( 'timeline' );
+			timelineSettings.recording = true;
+			setItem( 'timeline', timelineSettings );
 
 			window.location.reload();
 
@@ -442,12 +442,12 @@ class Timeline extends Tab {
 
 		this.renderer = renderer;
 
-		const storage = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
+		const timelineSettings = getItem( 'timeline' );
 
-		if ( storage.timeline && storage.timeline.recording ) {
+		if ( timelineSettings.recording ) {
 
-			storage.timeline.recording = false;
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( storage ) );
+			timelineSettings.recording = false;
+			setItem( 'timeline', timelineSettings );
 
 			this.toggleRecording();
 

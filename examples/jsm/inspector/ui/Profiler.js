@@ -1,12 +1,14 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
+import { getItem, setItem } from '../Inspector.js';
 
 export class Profiler extends EventDispatcher {
 
-	constructor() {
+	constructor( inspector ) {
 
 		super();
 
+		this.inspector = inspector;
 		this.tabs = {};
 		this.activeTabId = null;
 		this.isResizing = false;
@@ -517,6 +519,9 @@ export class Profiler extends EventDispatcher {
 		// Update panel size when tabs change
 		this.updatePanelSize();
 
+		// Set profiler reference
+		tab.profiler = this;
+
 	}
 
 	addBuiltinTab( tab ) {
@@ -573,7 +578,6 @@ export class Profiler extends EventDispatcher {
 		// Store references
 		tab.builtinButton = builtinButton;
 		tab.miniContent = miniContent;
-		tab.profiler = this;
 
 		// If the tab was hidden before being added, hide the builtin button
 		if ( ! tab.isVisible ) {
@@ -592,6 +596,98 @@ export class Profiler extends EventDispatcher {
 			}
 
 		}
+
+	}
+
+	removeTab( tab ) {
+
+		if ( ! tab || this.tabs[ tab.id ] === undefined ) return;
+
+		delete this.tabs[ tab.id ];
+
+		if ( tab.isDetached && tab.detachedWindow ) {
+
+			if ( tab.detachedWindow.panel && tab.detachedWindow.panel.parentNode ) {
+
+				tab.detachedWindow.panel.parentNode.removeChild( tab.detachedWindow.panel );
+
+			}
+
+			const index = this.detachedWindows.indexOf( tab.detachedWindow );
+
+			if ( index !== - 1 ) {
+
+				this.detachedWindows.splice( index, 1 );
+
+			}
+
+		}
+
+		if ( ! tab.builtin ) {
+
+			if ( tab.button && tab.button.parentNode ) {
+
+				tab.button.parentNode.removeChild( tab.button );
+
+			}
+
+		} else {
+
+			if ( tab.builtinButton && tab.builtinButton.parentNode ) {
+
+				tab.builtinButton.parentNode.removeChild( tab.builtinButton );
+
+			}
+
+			if ( tab.miniContent && tab.miniContent.parentNode ) {
+
+				tab.miniContent.parentNode.removeChild( tab.miniContent );
+
+			}
+
+			// Clean up builtin container if empty
+			const hasVisibleBuiltinButtons = Array.from( this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ) )
+				.some( btn => btn.style.display !== 'none' );
+
+			if ( ! hasVisibleBuiltinButtons ) {
+
+				this.builtinTabsContainer.style.display = 'none';
+
+			}
+
+		}
+
+		if ( tab.content && tab.content.parentNode ) {
+
+			tab.content.parentNode.removeChild( tab.content );
+
+		}
+
+		if ( this.activeTabId === tab.id ) {
+
+			this.activeTabId = null;
+
+			// Try to activate another tab
+			const remainingTabs = Object.values( this.tabs ).filter( t => ! t.isDetached && t.isVisible );
+
+			if ( remainingTabs.length > 0 ) {
+
+				this.setActiveTab( remainingTabs[ 0 ].id );
+
+			} else {
+
+				this.updatePanelSize();
+
+			}
+
+		} else {
+
+			this.updatePanelSize();
+
+		}
+
+		tab.onVisibilityChange = null;
+		tab.profiler = null;
 
 	}
 
@@ -1643,11 +1739,7 @@ export class Profiler extends EventDispatcher {
 
 		try {
 
-			const savedData = localStorage.getItem( 'threejs-inspector' );
-			const data = JSON.parse( savedData || '{}' );
-
-			data.layout = layout;
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
+			setItem( 'layout', layout );
 
 		} catch ( e ) {
 
@@ -1663,14 +1755,9 @@ export class Profiler extends EventDispatcher {
 
 		try {
 
-			const savedData = localStorage.getItem( 'threejs-inspector' );
+			const layout = getItem( 'layout' );
 
-			if ( ! savedData ) return;
-
-			const parsedData = JSON.parse( savedData );
-			const layout = parsedData.layout;
-
-			if ( ! layout ) return;
+			if ( Object.keys( layout ).length === 0 ) return;
 
 			// Constrain detached tabs positions to current screen bounds
 			if ( layout.detachedTabs && layout.detachedTabs.length > 0 ) {

@@ -173,7 +173,7 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	resolveViewer() { }
+	updateTabs() { }
 
 	resolveFrame( /*frame*/ ) { }
 
@@ -321,7 +321,7 @@ export class RendererInspector extends InspectorBase {
 
 		if ( this.isAvailable ) {
 
-			this.resolveViewer();
+			this.updateTabs();
 			this.resolveTimestamp();
 
 		}

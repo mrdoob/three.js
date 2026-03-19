@@ -1,5 +1,5 @@
-import { error } from 'three/webgpu';
-import { Tab } from '../../ui/Tab.js';
+import { Raycaster, Vector2, BoxHelper, error, warn } from 'three/webgpu';
+import { Extension } from 'three/addons/inspector/Extension.js';
 import { TSLGraphLoader } from './TSLGraphLoader.js';
 
 const HOST_SOURCE = 'tsl-graph-host';
@@ -15,7 +15,7 @@ const _resposeByCommand = {
 
 const _refMaterials = new WeakMap();
 
-export class TSLGraphEditor extends Tab {
+class TSLGraphEditor extends Extension {
 
 	constructor( options = {} ) {
 
@@ -37,6 +37,7 @@ export class TSLGraphEditor extends Tab {
 		headerDiv.style.display = 'flex';
 		headerDiv.style.justifyContent = 'center';
 		headerDiv.style.gap = '4px';
+		headerDiv.style.position = 'relative';
 
 		const importBtn = document.createElement( 'button' );
 		importBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
@@ -59,17 +60,46 @@ export class TSLGraphEditor extends Tab {
 		manageBtn.style.padding = '5px 8px';
 		manageBtn.onclick = () => this._showManagerModal();
 
+		const autoIdBtn = document.createElement( 'button' );
+		autoIdBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.132 5.466 2.534 7.868 8 8-5.466.132-7.868 2.534-8 8-.132-5.466-2.534-7.868-8-8 5.466-.132 7.868-2.534 8-8z"></path></svg>';
+		autoIdBtn.className = 'panel-action-btn';
+		autoIdBtn.title = 'Auto-Generate Graph ID';
+		autoIdBtn.style.padding = '5px 8px';
+		autoIdBtn.style.position = 'absolute';
+		autoIdBtn.style.right = '4px';
+		autoIdBtn.style.top = '4px';
+
+		this.autoGraphId = false;
+
+		autoIdBtn.onclick = () => {
+
+			this.autoGraphId = ! this.autoGraphId;
+
+			if ( this.autoGraphId ) {
+
+				autoIdBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+				autoIdBtn.style.color = '#fff';
+
+			} else {
+
+				autoIdBtn.style.backgroundColor = '';
+				autoIdBtn.style.color = '';
+
+			}
+
+		};
+
 		headerDiv.appendChild( importBtn );
 		headerDiv.appendChild( exportBtn );
 		headerDiv.appendChild( manageBtn );
+		headerDiv.appendChild( autoIdBtn );
 
 		this.content.appendChild( headerDiv );
 
 		this.iframe = document.createElement( 'iframe' );
 		this.iframe.style.width = '100%';
-		this.iframe.style.minHeight = '600px';
+		this.iframe.style.height = '100%';
 		this.iframe.style.border = 'none';
-		this.iframe.style.flex = '1';
 		this.iframe.src = editorUrl.toString();
 		this.editorOrigin = new URL( this.iframe.src ).origin;
 
@@ -102,6 +132,126 @@ export class TSLGraphEditor extends Tab {
 
 	}
 
+	_initPicker( inspector ) {
+
+		const renderer = inspector.getRenderer();
+
+		let boundingBox = null;
+
+		const raycaster = new Raycaster();
+		const pointer = new Vector2();
+
+		const removeBoundingBox = () => {
+
+			if ( boundingBox ) {
+
+				boundingBox.removeFromParent();
+				boundingBox.dispose();
+				boundingBox = null;
+
+			}
+
+		};
+
+		this.addEventListener( 'change', ( { material } ) => {
+
+			if ( material === null ) {
+
+				removeBoundingBox();
+
+			}
+
+		} );
+
+		this.addEventListener( 'remove', ( { graphId } ) => {
+
+			const frame = inspector.getFrame();
+			const scene = frame && frame.renders.length > 0 ? frame.renders[ 0 ].scene : null;
+
+			if ( scene ) {
+
+				scene.traverse( ( object ) => {
+
+					if ( object.material && object.material.userData && object.material.userData.graphId === graphId ) {
+
+						this.restoreMaterial( object.material );
+
+					}
+
+				} );
+
+			}
+
+		} );
+
+		const pointerDownPosition = new Vector2();
+
+		renderer.domElement.addEventListener( 'pointerdown', ( e ) => {
+
+			pointerDownPosition.set( e.clientX, e.clientY );
+
+		} );
+
+		renderer.domElement.addEventListener( 'pointerup', ( e ) => {
+
+			const frame = inspector.getFrame();
+
+			for ( const render of frame.renders ) {
+
+				const scene = render.scene;
+
+				if ( scene.isScene !== true ) continue;
+
+				const camera = render.camera;
+
+				if ( pointerDownPosition.distanceTo( pointer.set( e.clientX, e.clientY ) ) > 2 ) return;
+
+				const rect = renderer.domElement.getBoundingClientRect();
+				pointer.x = ( ( e.clientX - rect.left ) / rect.width ) * 2 - 1;
+				pointer.y = - ( ( e.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				const intersects = raycaster.intersectObjects( scene.children, true );
+
+				let graphMaterial = null;
+
+				if ( intersects.length > 0 ) {
+
+					for ( const intersect of intersects ) {
+
+						const object = intersect.object;
+						const material = object.material;
+
+						if ( material && material.isNodeMaterial ) {
+
+							removeBoundingBox();
+
+							boundingBox = new BoxHelper( object, 0xffff00 );
+							scene.add( boundingBox );
+
+							graphMaterial = material;
+
+						}
+
+						if ( object.isMesh || object.isSprite ) {
+
+							break;
+
+						}
+
+					}
+
+				}
+
+				this.setMaterial( graphMaterial );
+
+			}
+
+		} );
+
+	}
+
 	apply( scene ) {
 
 		const loader = new TSLGraphLoader();
@@ -116,6 +266,12 @@ export class TSLGraphEditor extends Tab {
 
 		material.copy( new material.constructor() );
 		material.needsUpdate = true;
+
+	}
+
+	init( inspector ) {
+
+		this._initPicker( inspector );
 
 	}
 
@@ -269,7 +425,7 @@ export class TSLGraphEditor extends Tab {
 
 		if ( material.isNodeMaterial !== true ) {
 
-			error( 'Inspector: "Material" needs be a "NodeMaterial".' );
+			error( 'TSLGraphEditor: "Material" needs be a "NodeMaterial".' );
 
 			return;
 
@@ -277,9 +433,17 @@ export class TSLGraphEditor extends Tab {
 
 		if ( material.userData.graphId === undefined ) {
 
-			error( 'Inspector: "NodeMaterial" has no graphId. Set a "graphId" for the material in "material.userData.graphId".' );
+			if ( this.autoGraphId ) {
 
-			return;
+				material.userData.graphId = material.name || 'id:' + material.id;
+
+			} else {
+
+				warn( 'TSLGraphEditor: "NodeMaterial" has no graphId. Set a "graphId" for the material in "material.userData.graphId".' );
+
+				return;
+
+			}
 
 		}
 
@@ -625,7 +789,7 @@ export class TSLGraphEditor extends Tab {
 
 				} catch ( err ) {
 
-					error( 'TSLGraph: Failed to parse or load imported JSON.', err );
+					error( 'TSLGraphEditor: Failed to parse or load imported JSON.', err );
 
 				}
 
@@ -748,3 +912,5 @@ export class TSLGraphEditor extends Tab {
 	}
 
 }
+
+export default TSLGraphEditor;
