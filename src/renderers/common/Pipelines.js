@@ -351,7 +351,7 @@ class Pipelines extends DataMap {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new ComputePipeline( cacheKey, stageCompute, computeNode.count );
+			pipeline = new ComputePipeline( cacheKey, stageCompute );
 
 			this.caches.set( cacheKey, pipeline );
 
@@ -416,7 +416,7 @@ class Pipelines extends DataMap {
 	 */
 	_getComputeCacheKey( computeNode, stageCompute ) {
 
-		return computeNode.id + ',' + stageCompute.id + ',' + computeNode.count;
+		return computeNode.id + ',' + stageCompute.id;
 
 	}
 

@@ -1,5 +1,7 @@
 import Node from '../core/Node.js';
+import { instanceIndex } from '../core/IndexNode.js';
 import StackTrace from '../core/StackTrace.js';
+import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { warn, error } from '../../utils.js';
@@ -90,6 +92,14 @@ class ComputeNode extends Node {
 		 */
 		this.onInitFunction = null;
 
+		/**
+		 * A uniform node holding the dispatch count for bounds checking.
+		 * Created automatically when `count` is a number.
+		 *
+		 * @type {?UniformNode}
+		 */
+		this.countNode = null;
+
 	}
 
 	/**
@@ -101,6 +111,12 @@ class ComputeNode extends Node {
 	setCount( count ) {
 
 		this.count = count;
+
+		if ( this.countNode !== null && typeof count === 'number' ) {
+
+			this.countNode.value = count;
+
+		}
 
 		return this;
 
@@ -182,6 +198,22 @@ class ComputeNode extends Node {
 
 	setup( builder ) {
 
+		if ( typeof this.count === 'number' ) {
+
+			if ( this.countNode === null ) {
+
+				this.countNode = uniform( this.count, 'uint' );
+
+			} else {
+
+				this.countNode.value = this.count;
+
+			}
+
+			this.countNode.build( builder );
+
+		}
+
 		const result = this.computeNode.build( builder );
 
 		if ( result ) {
@@ -202,6 +234,15 @@ class ComputeNode extends Node {
 		const { shaderStage } = builder;
 
 		if ( shaderStage === 'compute' ) {
+
+			if ( typeof this.count === 'number' ) {
+
+				const countSnippet = this.countNode.build( builder, 'uint' );
+				const indexSnippet = instanceIndex.build( builder, 'uint' );
+
+				builder.addLineFlowCode( `if ( ${ indexSnippet } >= ${ countSnippet } ) { return; }`, this );
+
+			}
 
 			const snippet = this.computeNode.build( builder, 'void' );
 

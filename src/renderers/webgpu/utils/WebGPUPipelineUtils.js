@@ -373,12 +373,8 @@ class WebGPUPipelineUtils {
 
 		}
 
-		const computeStage = ( pipeline.count !== null )
-			? { ...computeProgram, constants: { nodeInstanceCount: pipeline.count } }
-			: computeProgram;
-
 		pipelineGPU.pipeline = device.createComputePipeline( {
-			compute: computeStage,
+			compute: computeProgram,
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts
 			} )
