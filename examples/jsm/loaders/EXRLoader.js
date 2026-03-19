@@ -1826,11 +1826,14 @@ class EXRLoader extends DataTextureLoader {
 
 				const cd = channelData[ offset ];
 
+				const dotIndex = cd.name.lastIndexOf( '.' );
+				const suffix = dotIndex >= 0 ? cd.name.substring( dotIndex + 1 ) : cd.name;
+
 				for ( let i = 0; i < channelRules.length; ++ i ) {
 
 					const rule = channelRules[ i ];
 
-					if ( cd.name == rule.name ) {
+					if ( suffix === rule.name && cd.type === rule.type ) {
 
 						cd.compression = rule.compression;
 
