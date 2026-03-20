@@ -20,4 +20,3 @@ test/treeshake/index.webgpu.nodes.bundle.min.js
 test/unit/build
 
 **/node_modules
-**/changelog

@@ -312,15 +312,7 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 	let totalPRs = 0;
 	let processedPRs = 0;
 
-	const cacheFiles = [];
 	let prDescriptionsForAI = '';
-
-	const changelogDir = path.join( __dirname, '../changelog' );
-	if ( ! fs.existsSync( changelogDir ) ) {
-
-		fs.mkdirSync( changelogDir );
-
-	}
 
 	const barWidth = 40;
 
@@ -344,7 +336,6 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 	}
 
 	// We no longer need the initial 1-page fetch because we have totalExpectedPRs
-
 	while ( true ) {
 
 		if ( totalExpectedPRs === 0 ) {
@@ -353,129 +344,88 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 
 		}
 
-		const cacheFilename = path.join( changelogDir, `r${releaseNumber}_page_${page}.md` );
 		let pageContent = '';
 		let isLastPage = false;
 
-		if ( fs.existsSync( cacheFilename ) ) {
+		const res = await fetch( `https://api.github.com/repos/${repo}/issues?milestone=${milestoneNumber}&state=closed&per_page=${perPage}&page=${page}`, { headers } );
+		if ( ! res.ok ) {
 
-			pageContent = fs.readFileSync( cacheFilename, 'utf8' );
-
-			if ( totalExpectedPRs > 0 ) {
-
-				// we need to guess how many PRs were in this cached file to update the progress bar
-				const prRegex = /^## (.*?):\s*(.*?)\s+#(\d+)\s+\((.*?)\)(?:\r?\n)([\s\S]*?)(?=\n---|$)/gm;
-				let cachedCount = 0;
-				while ( prRegex.exec( pageContent ) !== null ) {
-
-					cachedCount ++;
-
-				}
-
-				processedPRs += cachedCount;
-				updateProgress();
-
-			}
-
-		} else {
-
-			const res = await fetch( `https://api.github.com/repos/${repo}/issues?milestone=${milestoneNumber}&state=closed&per_page=${perPage}&page=${page}`, { headers } );
-			if ( ! res.ok ) {
-
-				console.error( '\nFailed to fetch PRs.' );
-				process.exit( 1 );
-
-			}
-
-			if ( totalPages === '?' || totalExpectedPRs === 0 ) {
-
-				const linkHeader = res.headers.get( 'link' );
-				if ( linkHeader ) {
-
-					const lastPageMatch = linkHeader.match( /page=(\d+)>; rel="last"/ );
-					if ( lastPageMatch ) {
-
-						totalPages = lastPageMatch[ 1 ];
-						if ( totalExpectedPRs === 0 ) process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
-
-					}
-
-				}
-
-			}
-
-			const data = await res.json();
-			if ( data.length === 0 ) break;
-
-			const prsInData = data.filter( issue => issue.pull_request && issue.pull_request.merged_at );
-
-			for ( const pr of prsInData ) {
-
-				let title = pr.title;
-				let category = 'Others';
-
-				const catMatch = title.match( /^([^:]+):\s*(.*)$/ );
-				if ( catMatch ) {
-
-					category = catMatch[ 1 ].trim();
-					title = catMatch[ 2 ].trim();
-
-				}
-
-				title = title.replace( /\s*\(#\d+\)\s*$/, '' ).trim();
-				title = title.replace( /\.\s*$/, '' );
-
-				const authors = new Set();
-				if ( pr.user && pr.user.login ) authors.add( pr.user.login );
-
-				if ( pr.body ) {
-
-					const coAuthRegex1 = /Co-authored-by:\s*(?:@)?([a-zA-Z0-9-]+)/gi;
-					let m;
-					while ( ( m = coAuthRegex1.exec( pr.body ) ) !== null ) {
-
-						authors.add( m[ 1 ] );
-
-					}
-
-				}
-
-				const authorsList = Array.from( authors ).map( a => `@${a}` ).join( ', ' );
-
-				pageContent += `## ${category}: ${title} #${pr.number} (${authorsList})\n\n${pr.body || ''}`;
-
-				processedPRs ++;
-
-				if ( totalExpectedPRs > 0 ) updateProgress();
-
-			}
-
-			fs.writeFileSync( cacheFilename, pageContent );
-
-			if ( data.length < perPage ) isLastPage = true;
+			console.error( '\nFailed to fetch PRs.' );
+			process.exit( 1 );
 
 		}
 
-		if ( pageContent.length > 0 ) {
+		if ( totalPages === '?' || totalExpectedPRs === 0 ) {
 
-			cacheFiles.push( cacheFilename );
+			const linkHeader = res.headers.get( 'link' );
+			if ( linkHeader ) {
 
-			if ( geminiToken ) {
+				const lastPageMatch = linkHeader.match( /page=(\d+)>; rel="last"/ );
+				if ( lastPageMatch ) {
 
-				prDescriptionsForAI += pageContent;
+					totalPages = lastPageMatch[ 1 ];
+					if ( totalExpectedPRs === 0 ) process.stdout.write( `\rFetching PR page ${page}/${totalPages}...` );
 
-			}
-
-			const prRegex = /^## (.*?):\s*(.*?)\s+#(\d+)\s+\((.*?)\)(?:\r?\n)([\s\S]*?)(?=\n---|$)/gm;
-			while ( prRegex.exec( pageContent ) !== null ) {
-
-				totalPRs ++;
+				}
 
 			}
 
-		} else if ( ! fs.existsSync( cacheFilename ) ) {
+		}
 
-			break;
+		const data = await res.json();
+		if ( data.length === 0 ) break;
+
+		const prsInData = data.filter( issue => issue.pull_request && issue.pull_request.merged_at );
+
+		for ( const pr of prsInData ) {
+
+			let title = pr.title;
+			let category = 'Others';
+
+			const catMatch = title.match( /^([^:]+):\s*(.*)$/ );
+			if ( catMatch ) {
+
+				category = catMatch[ 1 ].trim();
+				title = catMatch[ 2 ].trim();
+
+			}
+
+			title = title.replace( /\s*\(#\d+\)\s*$/, '' ).trim();
+			title = title.replace( /\.\s*$/, '' );
+
+			const authors = new Set();
+			if ( pr.user && pr.user.login ) authors.add( pr.user.login );
+
+			if ( pr.body ) {
+
+				const coAuthRegex1 = /Co-authored-by:\s*(?:@)?([a-zA-Z0-9-]+)/gi;
+				let m;
+				while ( ( m = coAuthRegex1.exec( pr.body ) ) !== null ) {
+
+					authors.add( m[ 1 ] );
+
+				}
+
+			}
+
+			const authorsList = Array.from( authors ).map( a => `@${a}` ).join( ', ' );
+
+			pageContent += `## ${category}: ${title} #${pr.number} (${authorsList})\n\n${pr.body || ''}\n\n`;
+
+			processedPRs ++;
+
+			if ( totalExpectedPRs > 0 ) updateProgress();
+
+		}
+
+		if ( data.length < perPage ) isLastPage = true;
+
+		prDescriptionsForAI += pageContent;
+
+		const prRegex = /^## (.*?):\s*(.*?)\s+#(\d+)\s+\((.*?)\)(?:\r?\n)([\s\S]*?)(?=\n## |$)/gm;
+		while ( prRegex.exec( pageContent ) !== null ) {
+
+			totalPRs ++;
 
 		}
 
@@ -493,7 +443,7 @@ async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, 
 
 	console.error( `Found ${totalPRs} PRs.` );
 
-	return { prDescriptionsForAI, cacheFiles };
+	return { prDescriptionsForAI };
 
 }
 
@@ -548,37 +498,6 @@ async function fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, 
 
 }
 
-function cleanupAndSave( releaseNumber, output, prDescriptionsForAI, cacheFiles, geminiToken ) {
-
-	const changelogDir = path.join( __dirname, '../changelog' );
-	const descriptionsFilePath = path.join( changelogDir, `r${releaseNumber}_descriptions.md` );
-	const changelogFilePath = path.join( changelogDir, `r${releaseNumber}.md` );
-
-	fs.writeFileSync( descriptionsFilePath, prDescriptionsForAI );
-	fs.writeFileSync( changelogFilePath, output );
-
-	for ( const cacheFile of cacheFiles ) {
-
-		if ( fs.existsSync( cacheFile ) ) {
-
-			fs.unlinkSync( cacheFile );
-
-		}
-
-	}
-
-	console.log( `\n✅ Changelog for r${releaseNumber} generated successfully:` );
-	console.log( `   📄 \x1b[36m${changelogFilePath}\x1b[0m` );
-
-	if ( geminiToken && prDescriptionsForAI ) {
-
-		console.log( '\n✅ Descriptions for AI saved in:' );
-		console.log( `   📄 \x1b[36m${descriptionsFilePath}\x1b[0m\n` );
-
-	}
-
-}
-
 async function generateChangelog() {
 
 	const { releaseNumber, milestoneNumber, perPage } = getReleaseAndCacheArgs();
@@ -613,22 +532,26 @@ async function generateChangelog() {
 
 	console.error( `Fetching PRs for milestone: ${milestoneName}...` );
 
-	const { prDescriptionsForAI, cacheFiles } = await fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, milestoneData.closed_issues );
-
-	let output = '';
+	const { prDescriptionsForAI } = await fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, milestoneData.closed_issues );
 
 	if ( geminiToken && prDescriptionsForAI ) {
 
 		const aiSummary = await fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, geminiToken );
 		if ( aiSummary ) {
 
-			output = aiSummary;
+			console.log( '\n\n========================================================================\n\n' );
+			console.log( aiSummary );
+			console.log( '\n\n========================================================================\n' );
 
 		}
 
-	}
+	} else if ( prDescriptionsForAI ) {
 
-	cleanupAndSave( releaseNumber, output, prDescriptionsForAI, cacheFiles, geminiToken );
+		console.log( '\n\n========================================================================\n\n' );
+		console.log( prDescriptionsForAI );
+		console.log( '\n\n========================================================================\n' );
+
+	}
 
 }
 
