@@ -463,6 +463,7 @@ async function fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, 
 
 	try {
 
+		// codeql[js/file-access-to-http] - False Positive: The prompt template file is intentionally sent to the LLM API.
 		const geminiRes = await fetch( `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiToken}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
