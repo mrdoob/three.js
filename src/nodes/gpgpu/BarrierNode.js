@@ -21,12 +21,16 @@ class BarrierNode extends Node {
 
 		this.scope = scope;
 
+		this.isBarrierNode = true;
+
 	}
 
 	generate( builder ) {
 
 		const { scope } = this;
 		const { renderer } = builder;
+
+		builder.allowEarlyReturns = false;
 
 		if ( renderer.backend.isWebGLBackend === true ) {
 

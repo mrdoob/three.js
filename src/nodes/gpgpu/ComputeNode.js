@@ -7,7 +7,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { warn, error } from '../../utils.js';
 
 /**
- * TODO
+ * Represents a compute shader node.
  *
  * @augments Node
  */
@@ -22,8 +22,8 @@ class ComputeNode extends Node {
 	/**
 	 * Constructs a new compute node.
 	 *
-	 * @param {Node} computeNode - TODO
-	 * @param {Array<number>} workgroupSize - TODO.
+	 * @param {Node} computeNode - The node that defines the compute shader logic.
+	 * @param {Array<number>} workgroupSize - An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.
 	 */
 	constructor( computeNode, workgroupSize ) {
 
@@ -39,15 +39,14 @@ class ComputeNode extends Node {
 		this.isComputeNode = true;
 
 		/**
-		 * TODO
+		 * The node that defines the compute shader logic.
 		 *
 		 * @type {Node}
 		 */
 		this.computeNode = computeNode;
 
-
 		/**
-		 * TODO
+		 * An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.
 		 *
 		 * @type {Array<number>}
 		 * @default [ 64 ]
@@ -55,14 +54,23 @@ class ComputeNode extends Node {
 		this.workgroupSize = workgroupSize;
 
 		/**
-		 * TODO
+		 * The total number of threads (invocations) to execute. If it is a number, it will be used
+		 * to automatically generate bounds checking against `instanceIndex`.
 		 *
 		 * @type {number|Array<number>}
 		 */
 		this.count = null;
 
 		/**
-		 * TODO
+		 * The dispatch size for workgroups on X, Y, and Z axes.
+		 * Used directly if `count` is not provided.
+		 *
+		 * @type {number|Array<number>}
+		 */
+		this.dispatchSize = null;
+
+		/**
+		 * The version of the node.
 		 *
 		 * @type {number}
 		 */
@@ -86,7 +94,7 @@ class ComputeNode extends Node {
 		this.updateBeforeType = NodeUpdateType.OBJECT;
 
 		/**
-		 * TODO
+		 * A callback executed when the compute node finishes initialization.
 		 *
 		 * @type {?Function}
 		 */
@@ -99,37 +107,6 @@ class ComputeNode extends Node {
 		 * @type {?UniformNode}
 		 */
 		this.countNode = null;
-
-	}
-
-	/**
-	 * TODO
-	 *
-	 * @param {number|Array<number>} count - Array with [ x, y, z ] values for dispatch or a single number for the count
-	 * @return {ComputeNode}
-	 */
-	setCount( count ) {
-
-		this.count = count;
-
-		if ( this.countNode !== null && typeof count === 'number' ) {
-
-			this.countNode.value = count;
-
-		}
-
-		return this;
-
-	}
-
-	/**
-	 * TODO
-	 *
-	 * @return {number|Array<number>}
-	 */
-	getCount() {
-
-		return this.count;
 
 	}
 
@@ -172,9 +149,9 @@ class ComputeNode extends Node {
 	}
 
 	/**
-	 * TODO
+	 * Sets the callback to run during initialization.
 	 *
-	 * @param {Function} callback - TODO.
+	 * @param {Function} callback - The callback function.
 	 * @return {ComputeNode} A reference to this node.
 	 */
 	onInit( callback ) {
@@ -198,19 +175,9 @@ class ComputeNode extends Node {
 
 	setup( builder ) {
 
-		if ( typeof this.count === 'number' ) {
+		if ( this.count !== null && this.countNode === null ) {
 
-			if ( this.countNode === null ) {
-
-				this.countNode = uniform( this.count, 'uint' );
-
-			} else {
-
-				this.countNode.value = this.count;
-
-			}
-
-			this.countNode.build( builder );
+			this.countNode = uniform( this.count, 'uint' ).onObjectUpdate( () => this.count );
 
 		}
 
@@ -235,15 +202,6 @@ class ComputeNode extends Node {
 
 		if ( shaderStage === 'compute' ) {
 
-			if ( typeof this.count === 'number' ) {
-
-				const countSnippet = this.countNode.build( builder, 'uint' );
-				const indexSnippet = instanceIndex.build( builder, 'uint' );
-
-				builder.addLineFlowCode( `if ( ${ indexSnippet } >= ${ countSnippet } ) { return; }`, this );
-
-			}
-
 			const snippet = this.computeNode.build( builder, 'void' );
 
 			if ( snippet !== '' ) {
@@ -251,6 +209,16 @@ class ComputeNode extends Node {
 				builder.addLineFlowCode( snippet, this );
 
 			}
+
+			if ( this.count !== null && builder.allowEarlyReturns === true ) {
+
+				const countSnippet = this.countNode.build( builder, 'uint' );
+				const indexSnippet = instanceIndex.build( builder, 'uint' );
+
+				builder.flow.code = `${ builder.tab }if ( ${ indexSnippet } >= ${ countSnippet } ) { return; }\n\n${ builder.flow.code }`;
+
+			}
+
 
 		} else {
 
@@ -276,9 +244,9 @@ export default ComputeNode;
  *
  * @tsl
  * @function
- * @param {Node} node - TODO
- * @param {Array<number>} [workgroupSize=[64]] - TODO.
- * @returns {AtomicFunctionNode}
+ * @param {Node} node - The TSL logic for the compute shader.
+ * @param {Array<number>} [workgroupSize=[64]] - The workgroup size.
+ * @returns {ComputeNode}
  */
 export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
@@ -315,12 +283,28 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
  *
  * @tsl
  * @function
- * @param {Node} node - TODO
- * @param {number|Array<number>} count - TODO.
- * @param {Array<number>} [workgroupSize=[64]] - TODO.
- * @returns {AtomicFunctionNode}
- */
-export const compute = ( node, count, workgroupSize ) => computeKernel( node, workgroupSize ).setCount( count );
+ * @param {Node} node - The TSL logic for the compute shader.
+ * @param {number|Array<number>} count - The compute count or dispatch size.
+ * @param {Array<number>} [workgroupSize=[64]] - The workgroup size.
+ * @returns {ComputeNode}
+,  */
+export const compute = ( node, count, workgroupSize ) => {
+
+	const computeNode = computeKernel( node, workgroupSize );
+
+	if ( typeof count === 'number' ) {
+
+		computeNode.count = count;
+
+	} else {
+
+		computeNode.dispatchSize = count;
+
+	}
+
+	return computeNode;
+
+};
 
 addMethodChaining( 'compute', compute );
 addMethodChaining( 'computeKernel', computeKernel );

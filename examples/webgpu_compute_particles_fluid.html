@@ -132,9 +132,9 @@
 				gui.add( params, 'particleCount', 4096, maxParticles, 4096 ).onChange( value => {
 
 					particleMesh.count = value;
-					p2g1Kernel.setCount( value );
-					p2g2Kernel.setCount( value );
-					g2pKernel.setCount( value );
+					p2g1Kernel.count = value;
+					p2g2Kernel.count = value;
+					g2pKernel.count = value;
 					particleCountUniform.value = value;
 
 				} );

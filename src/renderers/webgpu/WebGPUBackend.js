@@ -1406,13 +1406,13 @@ class WebGPUBackend extends Backend {
 
 		if ( dispatchSize === null ) {
 
-			dispatchSize = computeNode.count;
+			dispatchSize = computeNode.dispatchSize || computeNode.count;
 
 		}
 
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
-		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+		if ( dispatchSize && dispatchSize.isIndirectStorageBufferAttribute ) {
 
 			const dispatchBuffer = this.get( dispatchSize ).buffer;
 

@@ -230,6 +230,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 */
 		this.scopedArrays = new Map();
 
+		/**
+		 * A flag that indicates that early returns are allowed.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowEarlyReturns = true;
+
 	}
 
 	/**
