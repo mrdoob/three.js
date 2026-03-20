@@ -437,11 +437,11 @@ async function fetchAndParsePRs( repo, milestoneNumber, perPage, headers, totalE
 
 	if ( totalExpectedPRs > 0 ) {
 
+		const bar = '█'.repeat( barWidth );
+		process.stderr.write( `\r  ${bar} 100% (${totalPRs}/${totalPRs})` );
 		process.stderr.write( '\n\n' );
 
 	}
-
-	console.error( `Found ${totalPRs} PRs.` );
 
 	return { prDescriptionsForAI };
 
