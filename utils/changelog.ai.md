@@ -8,7 +8,7 @@ And here is the list of examples added, modified, and removed in this release:
 
 Please provide the following information formatted in Markdown (ALL EXPLANATIONS MUST BE WRITTEN IN ENGLISH):
 - A detailed and comprehensive overview of the most important changes, including new features, major refactorings, API additions/deprecations, and optimizations.
-- Group the changes logically by components (e.g., Core, WebGPU, Renderer, Materials, Geometries, Loaders, Nodes, Editor).
+- Group the changes logically by components (e.g., Core, WebGPU, Renderer, Materials, Geometries, Loaders, Nodes, Editor). You MUST use the exact heading level `##` for each component category (e.g., `## Core`, etc.).
 - For each significant change, provide technical context explaining *what* changed and *why* it matters to developers. Give detailed and complete descriptions, avoiding vague or generic statements.
 - IMPORTANT: Add an extra blank line between each bullet point in your lists for better readability.
 - A section for Examples. You MUST divide it into three sub-categories: `- **New Examples:**`, `- **Modified Examples:**`, and `- **Removed Examples:**` (if applicable). Under each sub-category, group related examples compactly into single bullet points. You MUST place the description on a new line purely using Markdown formatting (a regular line break and indentation), without HTML tags. For the modified ones, briefly explain what was changed. For new examples, briefly describe their purpose. Format each bullet EXACTLY like this:
