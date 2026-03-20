@@ -540,17 +540,15 @@ async function generateChangelog() {
 		const aiSummary = await fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, geminiToken );
 		if ( aiSummary ) {
 
-			console.log( '\n\n========================================================================\n\n' );
-			console.log( aiSummary );
-			console.log( '\n\n========================================================================\n' );
+			console.clear();
+			console.log( aiSummary + '\n' );
 
 		}
 
 	} else if ( prDescriptionsForAI ) {
 
-		console.log( '\n\n========================================================================\n\n' );
-		console.log( prDescriptionsForAI );
-		console.log( '\n\n========================================================================\n' );
+		console.clear();
+		console.log( prDescriptionsForAI + '\n' );
 
 	}
 
