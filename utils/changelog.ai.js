@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import readline from 'readline';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );
@@ -19,6 +20,83 @@ async function askQuestion( query ) {
 		resolve( ans );
 
 	} ) );
+
+}
+
+function getExamplesChanges( releaseNumber ) {
+
+	const added = [];
+	const modified = [];
+	const removed = [];
+
+	try {
+
+		const diff = execSync( `git diff --name-status r${releaseNumber - 1}..HEAD -- examples/`, { cwd: path.join( __dirname, '..' ), encoding: 'utf8' } );
+		const lines = diff.split( '\n' );
+
+		for ( const line of lines ) {
+
+			if ( ! line ) continue;
+
+			if ( line.startsWith( 'R' ) ) {
+
+				const parts = line.split( /\s+/ );
+				if ( parts.length >= 3 ) {
+
+					const remName = parts[ 1 ].replace( 'examples/', '' ).replace( '.html', '' );
+					const addName = parts[ 2 ].replace( 'examples/', '' ).replace( '.html', '' );
+
+					removed.push( `[${remName}](https://threejs.org/examples/#${remName})` );
+					added.push( `[${addName}](https://threejs.org/examples/#${addName})` );
+
+				}
+
+				continue;
+
+			}
+
+			const parts = line.split( /\s+/ );
+			if ( parts.length < 2 ) continue;
+
+			const status = parts[ 0 ];
+			const file = parts[ 1 ];
+
+			if ( file.endsWith( '.html' ) ) {
+
+				const name = file.replace( 'examples/', '' ).replace( '.html', '' );
+				const link = `[${name}](https://threejs.org/examples/#${name})`;
+
+				if ( status.startsWith( 'A' ) ) {
+
+					added.push( link );
+
+				} else if ( status.startsWith( 'D' ) ) {
+
+					removed.push( link );
+
+				} else if ( status.startsWith( 'M' ) ) {
+
+					modified.push( link );
+
+				}
+
+			}
+
+		}
+
+	} catch ( e ) {
+
+		console.error( 'Failed to get examples diff:', e.message );
+
+	}
+
+	let output = '';
+
+	if ( added.length > 0 ) output += `**New Examples:**\n${added.join( ', ' )}\n\n`;
+	if ( modified.length > 0 ) output += `**Modified Examples:**\n${modified.join( ', ' )}\n\n`;
+	if ( removed.length > 0 ) output += `**Removed Examples:**\n${removed.join( ', ' )}\n\n`;
+
+	return output;
 
 }
 
@@ -426,9 +504,12 @@ async function fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, 
 	const promptTemplatePath = path.join( __dirname, 'changelog.ai.md' );
 	const promptTemplate = fs.readFileSync( promptTemplatePath, 'utf8' );
 
+	const examplesChanges = getExamplesChanges( releaseNumber );
+
 	const aiPrompt = promptTemplate
 		.replace( '{RELEASE}', releaseNumber )
-		.replace( '{DESCRIPTION}', prDescriptionsForAI );
+		.replace( '{DESCRIPTION}', prDescriptionsForAI )
+		.replace( '{EXAMPLES_CHANGES}', examplesChanges );
 
 	try {
 
