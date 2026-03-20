@@ -83,7 +83,7 @@ import { unzlibSync } from '../libs/fflate.module.js';
 /**
  * A loader for the OpenEXR texture format.
  *
- * `EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * `EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ, B44/A and DWA/B compression.
  * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * ```js
@@ -163,6 +163,8 @@ class EXRLoader extends DataTextureLoader {
 		const RLE = 2;
 
 		const logBase = Math.pow( 2.7182818, 2.2 );
+
+		let b44LogTable = null; // lazily initialized for pLinear B44 channels
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -1548,6 +1550,205 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
+		function uncompressB44( info ) {
+
+			const src = info.array;
+			let srcOffset = info.offset.value;
+
+			const width = info.columns;
+			const height = info.lines;
+			const channels = info.inputChannels;
+			const totalBytes = info.totalBytes;
+
+			// B44A allows 3-byte flat blocks; B44 always uses 14-byte blocks
+			const isB44A = EXRHeader.compression === 'B44A_COMPRESSION';
+
+			// Output buffer organised as:
+			// for each scanline y: [ ch0 pixels (w×2 bytes) | ch1 pixels | … ]
+			const outBuffer = new Uint8Array( height * width * totalBytes );
+
+			// Reusable 4×4 block buffer
+			const block = new Uint16Array( 16 );
+
+			// chByteOffset mirrors channelByteOffsets accumulation in setupDecoder
+			let chByteOffset = 0;
+
+			for ( let c = 0; c < channels.length; c ++ ) {
+
+				const channel = channels[ c ];
+				const pixelSize = channel.pixelType * 2; // HALF=2, FLOAT=4
+
+				// Effective dimensions for this channel (subsampled channels are smaller)
+				const chanWidth = Math.ceil( width / channel.xSampling );
+				const chanHeight = Math.ceil( height / channel.ySampling );
+				const isFullRes = channel.xSampling === 1 && channel.ySampling === 1;
+
+				if ( channel.pixelType !== 1 ) {
+
+					// Non-HALF channels are stored raw, scanline by scanline
+					for ( let y = 0; y < chanHeight; y ++ ) {
+
+						if ( isFullRes ) {
+
+							const lineBase = y * width * totalBytes + chByteOffset * width;
+							for ( let x = 0; x < chanWidth * pixelSize; x ++ ) {
+
+								outBuffer[ lineBase + x ] = src[ srcOffset ++ ];
+
+							}
+
+						} else {
+
+							srcOffset += chanWidth * pixelSize;
+
+						}
+
+					}
+
+					chByteOffset += pixelSize;
+					continue;
+
+				}
+
+				// HALF channel — process 4×4 blocks at effective channel dimensions
+				const numBlocksX = Math.ceil( chanWidth / 4 );
+				const numBlocksY = Math.ceil( chanHeight / 4 );
+
+				for ( let by = 0; by < numBlocksY; by ++ ) {
+
+					for ( let bx = 0; bx < numBlocksX; bx ++ ) {
+
+						// B44A only: flat-block when shift ≥ 13 (byte[2] ≥ 52)
+						if ( isB44A && src[ srcOffset + 2 ] >= 52 ) {
+
+							// 3-byte flat block — all 16 pixels share one value
+							const t = ( src[ srcOffset ] << 8 ) | src[ srcOffset + 1 ];
+							const h = ( t & 0x8000 ) ? ( t & 0x7fff ) : ( ( ~ t ) & 0xffff );
+							block.fill( h );
+							srcOffset += 3;
+
+						} else {
+
+							// 14-byte B44 block
+							const s0 = ( src[ srcOffset ] << 8 ) | src[ srcOffset + 1 ];
+							const shift = src[ srcOffset + 2 ] >> 2;
+							const bias = 0x20 << shift;
+
+							// Reconstruct 16 ordered-magnitude values from 6-bit running deltas.
+							// Prediction structure (row = 4 pixels wide):
+							//   column 0 top-to-bottom: s0 → s4 → s8  → s12
+							//   then row-wise:          s0 → s1 → s2  → s3
+							//                           s4 → s5 → s6  → s7  etc.
+
+							const s4 = ( s0 + ( ( ( src[ srcOffset + 2 ] << 4 ) | ( src[ srcOffset + 3 ] >> 4 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s8 = ( s4 + ( ( ( src[ srcOffset + 3 ] << 2 ) | ( src[ srcOffset + 4 ] >> 6 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s12 = ( s8 + ( src[ srcOffset + 4 ] & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+
+							const s1 = ( s0 + ( ( src[ srcOffset + 5 ] >> 2 ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s5 = ( s4 + ( ( ( src[ srcOffset + 5 ] << 4 ) | ( src[ srcOffset + 6 ] >> 4 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s9 = ( s8 + ( ( ( src[ srcOffset + 6 ] << 2 ) | ( src[ srcOffset + 7 ] >> 6 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s13 = ( s12 + ( src[ srcOffset + 7 ] & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+
+							const s2 = ( s1 + ( ( src[ srcOffset + 8 ] >> 2 ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s6 = ( s5 + ( ( ( src[ srcOffset + 8 ] << 4 ) | ( src[ srcOffset + 9 ] >> 4 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s10 = ( s9 + ( ( ( src[ srcOffset + 9 ] << 2 ) | ( src[ srcOffset + 10 ] >> 6 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s14 = ( s13 + ( src[ srcOffset + 10 ] & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+
+							const s3 = ( s2 + ( ( src[ srcOffset + 11 ] >> 2 ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s7 = ( s6 + ( ( ( src[ srcOffset + 11 ] << 4 ) | ( src[ srcOffset + 12 ] >> 4 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s11 = ( s10 + ( ( ( src[ srcOffset + 12 ] << 2 ) | ( src[ srcOffset + 13 ] >> 6 ) ) & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+							const s15 = ( s14 + ( src[ srcOffset + 13 ] & 0x3f ) * ( 1 << shift ) - bias ) & 0xffff;
+
+							// Convert ordered-magnitude → half-float:
+							// positive (bit15=1): clear sign bit; negative (bit15=0): invert all bits
+							const t = [ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15 ];
+							for ( let i = 0; i < 16; i ++ ) {
+
+								block[ i ] = ( t[ i ] & 0x8000 ) ? ( t[ i ] & 0x7fff ) : ( ( ~ t[ i ] ) & 0xffff );
+
+							}
+
+							srcOffset += 14;
+
+						}
+
+						// pLinear channels: data was stored as exp(x/8), convert back with 8·log(x)
+						if ( channel.pLinear ) {
+
+							if ( b44LogTable === null ) {
+
+								b44LogTable = new Uint16Array( 65536 );
+								for ( let i = 0; i < 65536; i ++ ) {
+
+									if ( ( i & 0x7c00 ) === 0x7c00 || i > 0x8000 ) {
+
+										b44LogTable[ i ] = 0;
+
+									} else {
+
+										const f = decodeFloat16( i );
+										b44LogTable[ i ] = ( f <= 0 ) ? 0 : DataUtils.toHalfFloat( 8 * Math.log( f ) );
+
+									}
+
+								}
+
+							}
+
+							for ( let i = 0; i < 16; i ++ ) block[ i ] = b44LogTable[ block[ i ] ];
+
+						}
+
+						// Scatter the 16 pixels into the scanline-interleaved output buffer.
+						// For subsampled channels (e.g. RY/BY with xSampling=ySampling=2) each decoded
+						// pixel is replicated across its xSampling×ySampling footprint so the output
+						// buffer has uniform full-resolution scanlines that parseScanline can read directly.
+						for ( let py = 0; py < 4; py ++ ) {
+
+							const chanY = by * 4 + py;
+							if ( chanY >= chanHeight ) continue;
+
+							for ( let px = 0; px < 4; px ++ ) {
+
+								const chanX = bx * 4 + px;
+								if ( chanX >= chanWidth ) continue;
+
+								const val = block[ py * 4 + px ];
+
+								for ( let dy = 0; dy < channel.ySampling; dy ++ ) {
+
+									const fullY = chanY * channel.ySampling + dy;
+									if ( fullY >= height ) continue;
+
+									for ( let dx = 0; dx < channel.xSampling; dx ++ ) {
+
+										const fullX = chanX * channel.xSampling + dx;
+										if ( fullX >= width ) continue;
+
+										const outIdx = fullY * width * totalBytes + chByteOffset * width + fullX * 2;
+										outBuffer[ outIdx ] = val & 0xff;
+										outBuffer[ outIdx + 1 ] = ( val >> 8 ) & 0xff;
+
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+				chByteOffset += 2; // HALF = 2 bytes per pixel
+
+			}
+
+			return new DataView( outBuffer.buffer );
+
+		}
+
 		function uncompressDWA( info ) {
 
 			const inDataView = info.viewer;
@@ -1625,11 +1826,14 @@ class EXRLoader extends DataTextureLoader {
 
 				const cd = channelData[ offset ];
 
+				const dotIndex = cd.name.lastIndexOf( '.' );
+				const suffix = dotIndex >= 0 ? cd.name.substring( dotIndex + 1 ) : cd.name;
+
 				for ( let i = 0; i < channelRules.length; ++ i ) {
 
 					const rule = channelRules[ i ];
 
-					if ( cd.name == rule.name ) {
+					if ( suffix === rule.name && cd.type === rule.type ) {
 
 						cd.compression = rule.compression;
 
@@ -2394,6 +2598,7 @@ class EXRLoader extends DataTextureLoader {
 				inputChannels: EXRHeader.channels,
 				channelByteOffsets: {},
 				shouldExpand: false,
+				yCbCr: false,
 				scanOrder: null,
 				totalBytes: null,
 				columns: null,
@@ -2437,6 +2642,12 @@ class EXRLoader extends DataTextureLoader {
 					EXRDecoder.uncompress = uncompressPXR;
 					break;
 
+				case 'B44_COMPRESSION':
+				case 'B44A_COMPRESSION':
+					EXRDecoder.blockHeight = 32;
+					EXRDecoder.uncompress = uncompressB44;
+					break;
+
 				case 'DWAA_COMPRESSION':
 					EXRDecoder.blockHeight = 32;
 					EXRDecoder.uncompress = uncompressDWA;
@@ -2457,6 +2668,8 @@ class EXRLoader extends DataTextureLoader {
 
 				switch ( channel.name ) {
 
+					case 'BY':
+					case 'RY':
 					case 'Y':
 					case 'R':
 					case 'G':
@@ -2474,7 +2687,12 @@ class EXRLoader extends DataTextureLoader {
 			let invalidOutput = false;
 
 			// Validate if input texture contain supported channels
-			if ( channels.R && channels.G && channels.B ) {
+			if ( channels.Y && channels.RY && channels.BY ) {
+
+				EXRDecoder.outputChannels = 4;
+				EXRDecoder.yCbCr = true;
+
+			} else if ( channels.R && channels.G && channels.B ) {
 
 				EXRDecoder.outputChannels = 4;
 
@@ -2564,6 +2782,16 @@ class EXRLoader extends DataTextureLoader {
 			}
 
 			if ( invalidOutput ) throw new Error( 'EXRLoader.parse: invalid output format for specified file.' );
+
+			// Luminance/chroma images always decode to RGBA; override whatever the output-format switch selected.
+			if ( EXRDecoder.yCbCr ) {
+
+				EXRDecoder.format = RGBAFormat;
+				EXRDecoder.outputChannels = 4;
+				EXRDecoder.decodeChannels = { Y: 0, RY: 1, BY: 2 };
+				fillAlpha = true;
+
+			}
 
 			if ( EXRDecoder.type == 1 ) {
 
@@ -2718,6 +2946,51 @@ class EXRLoader extends DataTextureLoader {
 
 				for ( let i = 0; i < byteArray.length; i += 2 )
 					byteArray[ i + 1 ] = byteArray[ i ];
+
+			}
+
+		}
+
+		// Luminance/chroma → RGB conversion (second pass).
+		// Y/RY/BY were decoded into output slots 0/1/2; convert in-place using Rec.709 coefficients:
+		//   R = ( 1 + RY ) * Y,  B = ( 1 + BY ) * Y,  G = ( Y − R·0.2126 − B·0.0722 ) / 0.7152
+		if ( EXRDecoder.yCbCr ) {
+
+			const byteArray = EXRDecoder.byteArray;
+			const nPixels = EXRDecoder.width * EXRDecoder.height;
+
+			if ( this.type === HalfFloatType ) {
+
+				for ( let i = 0; i < nPixels; i ++ ) {
+
+					const base = i * 4;
+					const Y = decodeFloat16( byteArray[ base ] );
+					const RY = decodeFloat16( byteArray[ base + 1 ] );
+					const BY = decodeFloat16( byteArray[ base + 2 ] );
+					const R = ( 1 + RY ) * Y;
+					const B = ( 1 + BY ) * Y;
+					const G = ( Y - R * 0.2126 - B * 0.0722 ) / 0.7152;
+					byteArray[ base ] = DataUtils.toHalfFloat( Math.max( 0, R ) );
+					byteArray[ base + 1 ] = DataUtils.toHalfFloat( Math.max( 0, G ) );
+					byteArray[ base + 2 ] = DataUtils.toHalfFloat( Math.max( 0, B ) );
+
+				}
+
+			} else {
+
+				for ( let i = 0; i < nPixels; i ++ ) {
+
+					const base = i * 4;
+					const Y = byteArray[ base ];
+					const RY = byteArray[ base + 1 ];
+					const BY = byteArray[ base + 2 ];
+					const R = ( 1 + RY ) * Y;
+					const B = ( 1 + BY ) * Y;
+					byteArray[ base ] = Math.max( 0, R );
+					byteArray[ base + 1 ] = Math.max( 0, ( Y - R * 0.2126 - B * 0.0722 ) / 0.7152 );
+					byteArray[ base + 2 ] = Math.max( 0, B );
+
+				}
 
 			}
 

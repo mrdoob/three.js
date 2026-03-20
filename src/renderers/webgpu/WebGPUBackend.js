@@ -18,6 +18,8 @@ import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compat
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
 
+const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -682,7 +684,21 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.clearColor ) {
 
-					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
+					if ( i === 0 ) {
+
+						colorAttachment.clearValue = renderContext.clearColorValue;
+
+					} else {
+
+						_clearValue.r = 0;
+						_clearValue.g = 0;
+						_clearValue.b = 0;
+						_clearValue.a = 1;
+
+						colorAttachment.clearValue = _clearValue;
+
+					}
+
 					colorAttachment.loadOp = GPULoadOp.Clear;
 
 				} else {
@@ -1224,7 +1240,6 @@ class WebGPUBackend extends Backend {
 
 		let colorAttachments = [];
 		let depthStencilAttachment;
-		let clearValue;
 
 		let supportsDepth;
 		let supportsStencil;
@@ -1232,7 +1247,11 @@ class WebGPUBackend extends Backend {
 		if ( color ) {
 
 			const clearColor = this.getClearColor();
-			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+
+			_clearValue.r = clearColor.r;
+			_clearValue.g = clearColor.g;
+			_clearValue.b = clearColor.b;
+			_clearValue.a = clearColor.a;
 
 		}
 
@@ -1249,7 +1268,7 @@ class WebGPUBackend extends Backend {
 
 				const colorAttachment = colorAttachments[ 0 ];
 
-				colorAttachment.clearValue = clearValue;
+				colorAttachment.clearValue = _clearValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
 
@@ -1268,7 +1287,7 @@ class WebGPUBackend extends Backend {
 
 			const clearConfig = {
 				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
-				clearValue: color ? clearValue : undefined
+				clearValue: color ? _clearValue : undefined
 			};
 
 			if ( supportsDepth ) {
@@ -1406,13 +1425,13 @@ class WebGPUBackend extends Backend {
 
 		if ( dispatchSize === null ) {
 
-			dispatchSize = computeNode.count;
+			dispatchSize = computeNode.dispatchSize || computeNode.count;
 
 		}
 
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
-		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+		if ( dispatchSize && dispatchSize.isIndirectStorageBufferAttribute ) {
 
 			const dispatchBuffer = this.get( dispatchSize ).buffer;
 

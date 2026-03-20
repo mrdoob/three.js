@@ -574,8 +574,12 @@ class CSMShadowNode extends ShadowBaseNode {
 			const light = this.lights[ i ];
 			const parent = light.parent;
 
-			parent.remove( light.target );
-			parent.remove( light );
+			if ( parent !== null ) {
+
+				parent.remove( light.target );
+				parent.remove( light );
+
+			}
 
 		}
 

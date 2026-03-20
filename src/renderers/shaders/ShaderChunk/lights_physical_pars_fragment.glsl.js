@@ -103,9 +103,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 		float gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );
 		float gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
-		float v = 0.5 / ( gv + gl );
-
-		return v;
+		return 0.5 / max( gv + gl, EPSILON );
 
 	}
 

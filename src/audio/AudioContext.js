@@ -10,7 +10,7 @@ class AudioContext {
 	/**
 	 * Returns the global native audio context.
 	 *
-	 * @return {AudioContext} The native audio context.
+	 * @return {Window.AudioContext} The native audio context.
 	 */
 	static getContext() {
 
@@ -27,7 +27,7 @@ class AudioContext {
 	/**
 	 * Allows to set the global native audio context from outside.
 	 *
-	 * @param {AudioContext} value - The native context to set.
+	 * @param {Window.AudioContext} value - The native context to set.
 	 */
 	static setContext( value ) {
 

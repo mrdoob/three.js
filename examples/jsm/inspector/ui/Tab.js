@@ -54,6 +54,16 @@ export class Tab extends EventDispatcher {
 
 	}
 
+	get inspector() {
+
+		return this.profiler.inspector;
+
+	}
+
+	init( /*inspector*/ ) { }
+
+	update( /*inspector*/ ) { }
+
 	setActive( isActive ) {
 
 		this.button.classList.toggle( 'active', isActive );
