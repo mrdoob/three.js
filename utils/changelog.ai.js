@@ -305,7 +305,7 @@ async function fetchMilestoneData( repo, milestoneNumber, headers ) {
 
 }
 
-async function fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, totalExpectedPRs ) {
+async function fetchAndParsePRs( repo, milestoneNumber, perPage, headers, totalExpectedPRs ) {
 
 	let page = 1;
 	let totalPages = '?';
@@ -533,7 +533,7 @@ async function generateChangelog() {
 
 	console.error( `Fetching PRs for milestone: ${milestoneName}...` );
 
-	const { prDescriptionsForAI } = await fetchAndParsePRs( repo, milestoneNumber, releaseNumber, perPage, headers, geminiToken, milestoneData.closed_issues );
+	const { prDescriptionsForAI } = await fetchAndParsePRs( repo, milestoneNumber, perPage, headers, milestoneData.closed_issues );
 
 	if ( geminiToken && prDescriptionsForAI ) {
 
