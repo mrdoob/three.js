@@ -121,6 +121,14 @@ class EXRLoader extends DataTextureLoader {
 		 */
 		this.outputFormat = RGBAFormat;
 
+		/**
+		 * For multi-part EXR files, the index of the part to load.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.part = 0;
+
 	}
 
 	/**
@@ -2520,9 +2528,300 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseHeader( dataView, buffer, offset ) {
+		function parseMultiPartScanline() {
 
-			const EXRHeader = {};
+			const EXRDecoder = this;
+			const chunkOffsets = EXRDecoder.chunkOffsets;
+			const tmpOffset = { value: 0 };
+
+			for ( let chunkIdx = 0; chunkIdx < chunkOffsets.length; chunkIdx ++ ) {
+
+				const offset = { value: chunkOffsets[ chunkIdx ] };
+
+				offset.value += INT32_SIZE; // skip part number
+
+				const line = parseInt32( EXRDecoder.viewer, offset ) - EXRHeader.dataWindow.yMin;
+				EXRDecoder.size = parseUint32( EXRDecoder.viewer, offset );
+				EXRDecoder.lines = ( ( line + EXRDecoder.blockHeight > EXRDecoder.height ) ? ( EXRDecoder.height - line ) : EXRDecoder.blockHeight );
+
+				const bytesPerLine = EXRDecoder.columns * EXRDecoder.totalBytes;
+				const isCompressed = EXRDecoder.size < EXRDecoder.lines * bytesPerLine;
+
+				const savedOffset = EXRDecoder.offset;
+				EXRDecoder.offset = offset;
+				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
+				EXRDecoder.offset = savedOffset;
+
+				for ( let line_y = 0; line_y < EXRDecoder.blockHeight; line_y ++ ) {
+
+					const true_y = line_y + line;
+					if ( true_y >= EXRDecoder.height ) continue;
+
+					const lineOffset = line_y * bytesPerLine;
+					const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
+
+					for ( let channelID = 0; channelID < EXRDecoder.inputChannels.length; channelID ++ ) {
+
+						const name = EXRHeader.channels[ channelID ].name;
+						const lOff = EXRDecoder.channelByteOffsets[ name ] * EXRDecoder.columns;
+						const cOff = EXRDecoder.decodeChannels[ name ];
+
+						if ( cOff === undefined ) continue;
+
+						tmpOffset.value = lineOffset + lOff;
+
+						for ( let x = 0; x < EXRDecoder.columns; x ++ ) {
+
+							const outIndex = outLineOffset + x * EXRDecoder.outputChannels + cOff;
+							EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		function decompressDeepData( array, compressedOffset, compressedSize, compression ) {
+
+			if ( compressedSize === 0 ) return null;
+
+			const compressed = array.slice( compressedOffset, compressedOffset + compressedSize );
+
+			switch ( compression ) {
+
+				case 'NO_COMPRESSION':
+					return new DataView( compressed.buffer, compressed.byteOffset, compressed.byteLength );
+
+				case 'RLE_COMPRESSION': {
+
+					const rawBuffer = new Uint8Array( decodeRunLength( compressed.buffer.slice( compressed.byteOffset, compressed.byteOffset + compressed.byteLength ) ) );
+					const tmpBuffer = new Uint8Array( rawBuffer.length );
+					predictor( rawBuffer );
+					interleaveScalar( rawBuffer, tmpBuffer );
+					return new DataView( tmpBuffer.buffer );
+
+				}
+
+				case 'ZIPS_COMPRESSION': {
+
+					const rawBuffer = unzlibSync( compressed );
+					const tmpBuffer = new Uint8Array( rawBuffer.length );
+					predictor( rawBuffer );
+					interleaveScalar( rawBuffer, tmpBuffer );
+					return new DataView( tmpBuffer.buffer );
+
+				}
+
+				default:
+					throw new Error( 'EXRLoader.parse: ' + compression + ' is unsupported for deep data' );
+
+			}
+
+		}
+
+		function parseDeepScanline() {
+
+			const EXRDecoder = this;
+			const chunkOffsets = EXRDecoder.chunkOffsets;
+			const width = EXRDecoder.width;
+			const height = EXRDecoder.height;
+			const deepChannels = EXRDecoder.deepChannels;
+			const compression = EXRHeader.compression;
+			const isMultiPart = EXRDecoder.multiPart;
+
+			// Build a map from channel name to decode output slot
+			const decodeChannels = EXRDecoder.decodeChannels;
+			const outputChannels = EXRDecoder.outputChannels;
+			const isHalfOutput = EXRDecoder.byteArray instanceof Uint16Array;
+
+			// Find the alpha channel index in deepChannels (for compositing)
+			let alphaChannelIdx = - 1;
+
+			for ( let i = 0; i < deepChannels.length; i ++ ) {
+
+				if ( deepChannels[ i ].name === 'A' ) {
+
+					alphaChannelIdx = i;
+					break;
+
+				}
+
+			}
+
+			for ( let chunkIdx = 0; chunkIdx < chunkOffsets.length; chunkIdx ++ ) {
+
+				const chunkOffset = { value: chunkOffsets[ chunkIdx ] };
+
+				// Multi-part files have a part number prefix per chunk
+				if ( isMultiPart ) chunkOffset.value += INT32_SIZE;
+
+				const line = parseInt32( EXRDecoder.viewer, chunkOffset ) - EXRHeader.dataWindow.yMin;
+
+				// Read deep scanline sizes
+				const sctCompressedSize = parseInt64( EXRDecoder.viewer, chunkOffset );
+				const dataCompressedSize = parseInt64( EXRDecoder.viewer, chunkOffset );
+				parseInt64( EXRDecoder.viewer, chunkOffset ); // uncompressed data size (unused)
+
+				// Decompress sample count table
+				const sctView = decompressDeepData( EXRDecoder.array, chunkOffset.value, sctCompressedSize, compression );
+				chunkOffset.value += sctCompressedSize;
+
+				if ( sctView === null ) continue;
+
+				// Parse cumulative sample counts
+				const cumulativeCounts = new Uint32Array( width );
+
+				for ( let x = 0; x < width; x ++ ) {
+
+					cumulativeCounts[ x ] = sctView.getUint32( x * 4, true );
+
+				}
+
+				const totalSamples = cumulativeCounts[ width - 1 ];
+
+				if ( totalSamples === 0 ) {
+
+					chunkOffset.value += dataCompressedSize;
+					continue;
+
+				}
+
+				// Decompress pixel data
+				const pixelView = decompressDeepData( EXRDecoder.array, chunkOffset.value, dataCompressedSize, compression );
+
+				// Compute channel byte offsets within the decompressed pixel data.
+				// Deep data layout: channels are contiguous, each has totalSamples values.
+				const channelOffsets = [];
+				let bytePos = 0;
+
+				for ( let i = 0; i < deepChannels.length; i ++ ) {
+
+					channelOffsets.push( bytePos );
+					bytePos += totalSamples * deepChannels[ i ].bytesPerSample;
+
+				}
+
+				// Flatten deep samples: front-to-back composite with premultiplied alpha
+				const outLineOffset = ( height - 1 - line ) * EXRDecoder.outLineWidth;
+
+				for ( let x = 0; x < width; x ++ ) {
+
+					const startSample = x === 0 ? 0 : cumulativeCounts[ x - 1 ];
+					const endSample = cumulativeCounts[ x ];
+					const numSamples = endSample - startSample;
+
+					if ( numSamples === 0 ) continue;
+
+					// Composite samples front-to-back (premultiplied alpha)
+					const composited = new Float32Array( outputChannels );
+					let compositedAlpha = 0;
+
+					for ( let s = 0; s < numSamples; s ++ ) {
+
+						const sampleIdx = startSample + s;
+						const factor = 1 - compositedAlpha;
+
+						if ( factor <= 0 ) break;
+
+						// Read alpha for this sample
+						let sampleAlpha = 1;
+
+						if ( alphaChannelIdx >= 0 ) {
+
+							const aBps = deepChannels[ alphaChannelIdx ].bytesPerSample;
+							const aOff = channelOffsets[ alphaChannelIdx ] + sampleIdx * aBps;
+
+							sampleAlpha = aBps === 2
+								? decodeFloat16( pixelView.getUint16( aOff, true ) )
+								: pixelView.getFloat32( aOff, true );
+
+						}
+
+						// Read and composite each output channel
+						for ( let ci = 0; ci < deepChannels.length; ci ++ ) {
+
+							const ch = deepChannels[ ci ];
+							const cOff = decodeChannels[ ch.name ];
+
+							if ( cOff === undefined ) continue;
+
+							const bps = ch.bytesPerSample;
+							const dataOff = channelOffsets[ ci ] + sampleIdx * bps;
+
+							const value = bps === 2
+								? decodeFloat16( pixelView.getUint16( dataOff, true ) )
+								: pixelView.getFloat32( dataOff, true );
+
+							composited[ cOff ] += value * factor;
+
+						}
+
+						compositedAlpha += sampleAlpha * factor;
+
+					}
+
+					// If alpha channel is being output, set it
+					if ( decodeChannels[ 'A' ] !== undefined ) {
+
+						composited[ decodeChannels[ 'A' ] ] = compositedAlpha;
+
+					}
+
+					// Write to output buffer
+					const outIndex = outLineOffset + x * outputChannels;
+
+					for ( let c = 0; c < outputChannels; c ++ ) {
+
+						EXRDecoder.byteArray[ outIndex + c ] = isHalfOutput
+							? DataUtils.toHalfFloat( composited[ c ] )
+							: composited[ c ];
+
+					}
+
+				}
+
+			}
+
+		}
+
+		function parsePartHeader( dataView, buffer, offset ) {
+
+			const header = {};
+			let hasAttributes = false;
+
+			while ( true ) {
+
+				const attributeName = parseNullTerminatedString( buffer, offset );
+
+				if ( attributeName === '' ) break;
+
+				hasAttributes = true;
+
+				const attributeType = parseNullTerminatedString( buffer, offset );
+				const attributeSize = parseUint32( dataView, offset );
+				const attributeValue = parseValue( dataView, buffer, offset, attributeType, attributeSize );
+
+				if ( attributeValue === undefined ) {
+
+					console.warn( `THREE.EXRLoader: Skipped unknown header attribute type \'${attributeType}\'.` );
+
+				} else {
+
+					header[ attributeName ] = attributeValue;
+
+				}
+
+			}
+
+			return hasAttributes ? header : null;
+
+		}
+
+		function parseHeader( dataView, buffer, offset ) {
 
 			if ( dataView.getUint32( 0, true ) != 20000630 ) { // magic
 
@@ -2530,11 +2829,11 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			EXRHeader.version = dataView.getUint8( 4 );
+			const version = dataView.getUint8( 4 );
 
 			const spec = dataView.getUint8( 5 ); // fullMask
 
-			EXRHeader.spec = {
+			const flags = {
 				singleTile: !! ( spec & 2 ),
 				longName: !! ( spec & 4 ),
 				deepFormat: !! ( spec & 8 ),
@@ -2545,44 +2844,43 @@ class EXRLoader extends DataTextureLoader {
 
 			offset.value = 8; // start at 8 - after pre-amble
 
-			let keepReading = true;
+			const headers = [];
 
-			while ( keepReading ) {
+			if ( flags.multiPart ) {
 
-				const attributeName = parseNullTerminatedString( buffer, offset );
+				// Multi-part files: parse all part headers.
+				// Each part header ends with an empty attribute name (null byte).
+				// The header section ends when a null byte is read with no preceding attributes.
 
-				if ( attributeName === '' ) {
+				while ( true ) {
 
-					keepReading = false;
+					const header = parsePartHeader( dataView, buffer, offset );
+					if ( header === null ) break;
 
-				} else {
-
-					const attributeType = parseNullTerminatedString( buffer, offset );
-					const attributeSize = parseUint32( dataView, offset );
-					const attributeValue = parseValue( dataView, buffer, offset, attributeType, attributeSize );
-
-					if ( attributeValue === undefined ) {
-
-						console.warn( `THREE.EXRLoader: Skipped unknown header attribute type \'${attributeType}\'.` );
-
-					} else {
-
-						EXRHeader[ attributeName ] = attributeValue;
-
-					}
+					header.version = version;
+					header.spec = flags;
+					headers.push( header );
 
 				}
 
+				if ( headers.length === 0 ) {
+
+					throw new Error( 'THREE.EXRLoader: No valid part headers found.' );
+
+				}
+
+			} else {
+
+				// Single-part (standard or deep): one header
+
+				const header = parsePartHeader( dataView, buffer, offset );
+				header.version = version;
+				header.spec = flags;
+				headers.push( header );
+
 			}
 
-			if ( ( spec & ~ 0x06 ) != 0 ) { // unsupported deep-image, multi-part
-
-				console.error( 'THREE.EXRHeader:', EXRHeader );
-				throw new Error( 'THREE.EXRLoader: Provided file is currently unsupported.' );
-
-			}
-
-			return EXRHeader;
+			return headers;
 
 		}
 
@@ -2882,7 +3180,33 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( EXRHeader.spec.singleTile ) {
+			if ( EXRHeader.spec.deepFormat ) {
+
+				// Deep format: offset tables are already parsed in the main flow.
+				// Compute per-channel byte sizes for the deep pixel data layout.
+
+				EXRDecoder.deepChannels = [];
+				let deepBytesPerSample = 0;
+
+				for ( const channel of EXRHeader.channels ) {
+
+					// UINT=0→4bytes, HALF=1→2bytes, FLOAT=2→4bytes
+					const bytesPerSample = channel.pixelType === 0 ? 4 : channel.pixelType * 2;
+					EXRDecoder.deepChannels.push( {
+						name: channel.name,
+						pixelType: channel.pixelType,
+						bytesPerSample: bytesPerSample,
+					} );
+					deepBytesPerSample += bytesPerSample;
+
+				}
+
+				EXRDecoder.deepBytesPerSample = deepBytesPerSample;
+				EXRDecoder.chunkOffsets = EXRHeader._chunkOffsets;
+				EXRDecoder.multiPart = EXRHeader.spec.multiPart;
+				EXRDecoder.decode = parseDeepScanline.bind( EXRDecoder );
+
+			} else if ( EXRHeader.spec.singleTile ) {
 
 				EXRDecoder.blockHeight = EXRHeader.tiles.ySize;
 				EXRDecoder.blockWidth = EXRHeader.tiles.xSize;
@@ -2901,6 +3225,13 @@ class EXRLoader extends DataTextureLoader {
 							parseInt64( dataView, offset ); // tileOffset
 
 				EXRDecoder.decode = parseTiles.bind( EXRDecoder );
+
+			} else if ( EXRHeader.spec.multiPart ) {
+
+				// Multi-part scanline: offsets already parsed in main flow.
+				EXRDecoder.blockWidth = EXRDecoder.width;
+				EXRDecoder.chunkOffsets = EXRHeader._chunkOffsets;
+				EXRDecoder.decode = parseMultiPartScanline.bind( EXRDecoder );
 
 			} else {
 
@@ -2924,7 +3255,38 @@ class EXRLoader extends DataTextureLoader {
 		const uInt8Array = new Uint8Array( buffer );
 
 		// get header information and validate format.
-		const EXRHeader = parseHeader( bufferDataView, buffer, offset );
+		const EXRHeaders = parseHeader( bufferDataView, buffer, offset );
+
+		// select part to decode
+		const partIndex = Math.max( 0, Math.min( this.part, EXRHeaders.length - 1 ) );
+		const EXRHeader = EXRHeaders[ partIndex ];
+
+		// for multi-part deep files, skip offset tables for other parts
+		if ( EXRHeader.spec.multiPart || EXRHeader.spec.deepFormat ) {
+
+			for ( let p = 0; p < EXRHeaders.length; p ++ ) {
+
+				const chunkCount = EXRHeaders[ p ].chunkCount;
+
+				if ( p === partIndex ) {
+
+					// store offset table for the selected part
+					EXRHeader._chunkOffsets = [];
+
+					for ( let i = 0; i < chunkCount; i ++ )
+						EXRHeader._chunkOffsets.push( parseInt64( bufferDataView, offset ) );
+
+				} else {
+
+					// skip other parts' offset tables
+					for ( let i = 0; i < chunkCount; i ++ )
+						parseInt64( bufferDataView, offset );
+
+				}
+
+			}
+
+		}
 
 		// get input compression information and prepare decoding.
 		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type, this.outputFormat );
@@ -3030,6 +3392,19 @@ class EXRLoader extends DataTextureLoader {
 	setOutputFormat( value ) {
 
 		this.outputFormat = value;
+		return this;
+
+	}
+
+	/**
+	 * For multi-part EXR files, sets which part to load.
+	 *
+	 * @param {number} value - The part index to load.
+	 * @return {EXRLoader} A reference to this loader.
+	 */
+	setPart( value ) {
+
+		this.part = value;
 		return this;
 
 	}
