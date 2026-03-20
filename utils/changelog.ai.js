@@ -535,22 +535,21 @@ async function generateChangelog() {
 
 	const { prDescriptionsForAI } = await fetchAndParsePRs( repo, milestoneNumber, perPage, headers, milestoneData.closed_issues );
 
+	let summary = '';
+
 	if ( geminiToken && prDescriptionsForAI ) {
 
-		const aiSummary = await fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, geminiToken );
-		if ( aiSummary ) {
-
-			console.clear();
-			console.log( aiSummary + '\n' );
-
-		}
+		summary = await fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, geminiToken );
 
 	} else if ( prDescriptionsForAI ) {
 
-		console.clear();
-		console.log( prDescriptionsForAI + '\n' );
+		summary = prDescriptionsForAI;
 
 	}
+
+	console.log( '\n' + '-'.repeat( 100 ) + '\n' );
+	console.log( summary );
+	console.log( '\n' );
 
 }
 
