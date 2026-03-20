@@ -451,7 +451,7 @@ async function fetchAISummary( releaseNumber, prDescriptionsForAI, geminiModel, 
 
 	console.error( `Generating AI Summary with Gemini (${geminiModel})...` );
 
-	const promptTemplatePath = path.join( __dirname, 'changelog.ai.md' );
+	const promptTemplatePath = path.join( __dirname, 'changelog.summary.md' );
 	const promptTemplate = fs.readFileSync( promptTemplatePath, 'utf8' );
 
 	const examplesChanges = getExamplesChanges( releaseNumber );
