@@ -79,7 +79,7 @@
 					scene.add( group );
 
 					// To make sure that the matrixWorld is up to date for the boxhelpers
-					group.updateMatrixWorld( true );
+					group.ensureMatrices( true );
 
 					group.add( mesh );
 

@@ -333,7 +333,7 @@ Let's write that function to update the light, the helper for the light, the
 light's shadow camera, and the helper showing the light's shadow camera.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // update the light target's matrixWorld because it's needed by the helper
-  light.target.updateMatrixWorld();
+  light.target.ensureMatrices();
   helper.update();
   // update the light's shadow camera's projection matrix
   light.shadow.camera.updateProjectionMatrix();

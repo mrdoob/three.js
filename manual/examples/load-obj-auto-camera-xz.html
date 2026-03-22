@@ -131,7 +131,7 @@ function main() {
 		const objLoader = new OBJLoader();
 		objLoader.load( 'resources/models/windmill_2/windmill.obj', ( root ) => {
 
-			root.updateMatrixWorld();
+			root.ensureMatrices();
 			scene.add( root );
 			// compute the box that contains all the stuff
 			// from root and below

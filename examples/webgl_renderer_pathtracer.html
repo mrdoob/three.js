@@ -164,7 +164,7 @@
 							// Convert from LDraw coordinates: rotate 180 degrees around OX
 							legoGroup = LDrawUtils.mergeObject( legoGroup );
 							legoGroup.rotation.x = Math.PI;
-							legoGroup.updateMatrixWorld();
+							legoGroup.ensureMatrices();
 							model = legoGroup;
 
 							legoGroup.traverse( c => {

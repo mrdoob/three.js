@@ -204,7 +204,7 @@ class RenderImageDialog {
 			const camera = await loader.parseAsync( json.camera );
 			camera.aspect = imageWidth.getValue() / imageHeight.getValue();
 			camera.updateProjectionMatrix();
-			camera.updateMatrixWorld();
+			camera.ensureMatrices();
 
 			const scene = await loader.parseAsync( json.scene );
 

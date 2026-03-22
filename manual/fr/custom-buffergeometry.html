@@ -341,7 +341,7 @@ les points de la sphère. La façon dont cela fonctionne est expliquée dans <a 
   function getPoint(lat, long) {
     latHelper.rotation.x = lat;
     longHelper.rotation.y = long;
-    longHelper.updateMatrixWorld(true);
+    longHelper.ensureMatrices(true);
     return pointHelper.getWorldPosition(temp).toArray();
   }
 

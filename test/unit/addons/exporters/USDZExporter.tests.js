@@ -198,7 +198,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const meshes = [ box, sphere ];
 
-				originalScene.updateMatrixWorld( true );
+				originalScene.ensureMatrices( true );
 
 				const exportResult = await exporter.parseAsync( originalScene );
 

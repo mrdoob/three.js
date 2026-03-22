@@ -296,7 +296,7 @@
 
 			function animate() {
 
-				camera.updateMatrixWorld();
+				camera.ensureMatrices();
 				controls.update();
 
 				if ( params.orthographic ) {

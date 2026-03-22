@@ -798,7 +798,7 @@ class WebXRManager extends EventDispatcher {
 			}
 
 			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
-			camera.updateMatrixWorld( true );
+			camera.ensureMatrices( true );
 
 			camera.projectionMatrix.copy( cameraXR.projectionMatrix );
 			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );

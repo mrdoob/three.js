@@ -355,7 +355,7 @@
 
 			function getIntersections( controller ) {
 
-				controller.updateMatrixWorld();
+				controller.ensureMatrices();
 
 				tempMatrix.identity().extractRotation( controller.matrixWorld );
 

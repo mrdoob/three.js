@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ru"><head>
+﻿<!DOCTYPE html><html lang="ru"><head>
     <meta charset="utf-8">
     <title>- Освещение</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -258,7 +258,7 @@ scene.add(helper);
 <p>Затем мы можем использовать это как для положения источника света,
 так и для цели, как тут</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
-+  light.target.updateMatrixWorld();
++  light.target.ensureMatrices();
 +  helper.update();
 +}
 +updateLight();
@@ -301,7 +301,7 @@ scene.add(helper);
 </pre>
 <p>и поскольку нет цели, то <code class="notranslate" translate="no">onChange</code> функция может быть проще.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLight() {
--  light.target.updateMatrixWorld();
+-  light.target.ensureMatrices();
   helper.update();
 }
 -updateLight();

@@ -168,7 +168,7 @@ function main() {
 
 		function updateLight() {
 
-			light.target.updateMatrixWorld();
+			light.target.ensureMatrices();
 			helper.update();
 
 		}

@@ -333,7 +333,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 					_lookTarget.add( _cubeDirections[ face ] );
 					camera.up.copy( _cubeUps[ face ] );
 					camera.lookAt( _lookTarget );
-					camera.updateMatrixWorld();
+					camera.ensureMatrices();
 
 					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 

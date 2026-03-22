@@ -199,13 +199,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.notOk( intersects, 'No intersection' );
 
 			object.position.set( - 1, - 1, - 1 );
-			object.updateMatrixWorld();
+			object.ensureMatrices();
 
 			intersects = a.intersectsObject( object );
 			assert.ok( intersects, 'Successful intersection' );
 
 			object.position.set( 1, 1, 1 );
-			object.updateMatrixWorld();
+			object.ensureMatrices();
 
 			intersects = a.intersectsObject( object );
 			assert.notOk( intersects, 'No intersection' );
@@ -223,7 +223,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.notOk( intersects, 'No intersection' );
 
 			sprite.position.set( - 1, - 1, - 1 );
-			sprite.updateMatrixWorld();
+			sprite.ensureMatrices();
 
 			intersects = a.intersectsSprite( sprite );
 			assert.ok( intersects, 'Successful intersection' );

@@ -84,7 +84,7 @@ function retarget( target, source, options = {} ) {
 
 		// reset matrix
 
-		target.updateMatrixWorld();
+		target.ensureMatrices();
 
 		target.matrixWorld.identity();
 
@@ -92,7 +92,7 @@ function retarget( target, source, options = {} ) {
 
 		for ( let i = 0; i < target.children.length; ++ i ) {
 
-			target.children[ i ].updateMatrixWorld( true );
+			target.children[ i ].ensureMatrices( true );
 
 		}
 
@@ -109,7 +109,7 @@ function retarget( target, source, options = {} ) {
 
 		if ( boneTo ) {
 
-			boneTo.updateMatrixWorld();
+			boneTo.ensureMatrices();
 
 			if ( options.useTargetMatrix ) {
 
@@ -178,7 +178,7 @@ function retarget( target, source, options = {} ) {
 
 		bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
-		bone.updateMatrixWorld();
+		bone.ensureMatrices();
 
 	}
 
@@ -203,7 +203,7 @@ function retarget( target, source, options = {} ) {
 
 		// restore matrix
 
-		target.updateMatrixWorld( true );
+		target.ensureMatrices( true );
 
 	}
 
@@ -263,7 +263,7 @@ function retargetClip( target, source, clip, options = {} ) {
 
 	}
 
-	source.updateMatrixWorld();
+	source.ensureMatrices();
 
 	//
 
@@ -341,7 +341,7 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		}
 
-		source.updateMatrixWorld();
+		source.ensureMatrices();
 
 	}
 

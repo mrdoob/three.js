@@ -167,7 +167,7 @@ class TileShadowNodeHelper extends Group {
 			if ( helper ) {
 
 				helper.update(); // Update CameraHelper matrices
-				helper.updateMatrixWorld( true ); // Ensure world matrix is current
+				helper.ensureMatrices( true ); // Ensure world matrix is current
 
 			}
 

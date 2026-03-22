@@ -51,7 +51,7 @@ class Box3Helper extends LineSegments {
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
 		const box = this.box;
 
@@ -63,7 +63,7 @@ class Box3Helper extends LineSegments {
 
 		this.scale.multiplyScalar( 0.5 );
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 	}
 

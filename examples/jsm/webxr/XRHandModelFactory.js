@@ -61,13 +61,10 @@ class XRHandModel extends Object3D {
 
 	/**
 	 * Overwritten with a custom implementation. Makes sure the motion controller updates the mesh.
-	 *
-	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
-	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorld() {
 
-		super.updateMatrixWorld( force );
+		super.updateMatrixWorld();
 
 		if ( this.motionController ) {
 

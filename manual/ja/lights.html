@@ -231,7 +231,7 @@ scene.add(helper);
 そのため、lil-guiが値を更新時に <code class="notranslate" translate="no">onChangeFn</code> 関数を渡しています。</p>
 <p>makeXYZGUI関数はlight.positionとlight.target.positionの両方に使えます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
-+  light.target.updateMatrixWorld();
++  light.target.ensureMatrices();
 +  helper.update();
 +}
 +updateLight();
@@ -273,7 +273,7 @@ scene.add(helper);
 </pre>
 <p>light.targetがないので <code class="notranslate" translate="no">onChange</code> 関数はもっとシンプルになります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLight() {
--  light.target.updateMatrixWorld();
+-  light.target.ensureMatrices();
   helper.update();
 }
 -updateLight();

@@ -127,7 +127,7 @@ class CSMHelper extends Group {
 		this.position.copy( camera.position );
 		this.quaternion.copy( camera.quaternion );
 		this.scale.copy( camera.scale );
-		this.updateMatrixWorld( true );
+		this.ensureMatrices( true );
 
 		while ( cascadeLines.length > cascades ) {
 
@@ -181,7 +181,7 @@ class CSMHelper extends Group {
 			shadowLineGroup.position.copy( shadowCam.position );
 			shadowLineGroup.quaternion.copy( shadowCam.quaternion );
 			shadowLineGroup.scale.copy( shadowCam.scale );
-			shadowLineGroup.updateMatrixWorld( true );
+			shadowLineGroup.ensureMatrices( true );
 			this.attach( shadowLineGroup );
 
 			shadowLine.box.min.set( shadowCam.bottom, shadowCam.left, - shadowCam.far );

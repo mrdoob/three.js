@@ -153,7 +153,7 @@ class SelectionBox {
 		}
 
 		this.camera.updateProjectionMatrix();
-		this.camera.updateMatrixWorld();
+		this.camera.ensureMatrices();
 
 		if ( this.camera.isPerspectiveCamera ) {
 

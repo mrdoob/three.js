@@ -251,7 +251,7 @@
 			function render() {
 
 				camera.applyMatrix4( rotateY );
-				camera.updateMatrixWorld();
+				camera.ensureMatrices();
 
 				raycaster.setFromCamera( pointer, camera );
 

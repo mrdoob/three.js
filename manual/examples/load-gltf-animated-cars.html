@@ -202,7 +202,7 @@ function main() {
 				{ prefix: 'Car_04', y: 40, rot: [ 0, Math.PI, 0 ], },
 			];
 
-			root.updateMatrixWorld();
+			root.ensureMatrices();
 			for ( const car of loadedCars.children.slice() ) {
 
 				const fix = fixes.find( fix => car.name.startsWith( fix.prefix ) );

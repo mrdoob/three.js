@@ -177,7 +177,7 @@
 			function placeOnXYPlane( object ) {
 
 				// Update world matrix so bounding box reflects transforms
-				object.updateMatrixWorld( true );
+				object.ensureMatrices( true );
 
 				const box = new THREE.Box3().setFromObject( object );
 				const minZ = box.min.z;
@@ -186,7 +186,7 @@
 
 					// Shift object upward by -minZ so it rests on z=0
 					object.position.z -= minZ;
-					object.updateMatrixWorld( true );
+					object.ensureMatrices( true );
 
 				}
 

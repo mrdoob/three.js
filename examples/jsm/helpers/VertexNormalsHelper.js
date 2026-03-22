@@ -93,7 +93,7 @@ class VertexNormalsHelper extends LineSegments {
 	 */
 	update() {
 
-		this.object.updateMatrixWorld( true );
+		this.object.ensureMatrices( true );
 
 		_normalMatrix.getNormalMatrix( this.object.matrixWorld );
 

@@ -208,7 +208,7 @@ class LightShadow {
 
 		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 		shadowCamera.lookAt( _lookTarget );
-		shadowCamera.updateMatrixWorld();
+		shadowCamera.ensureMatrices();
 
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
