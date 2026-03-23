@@ -418,15 +418,14 @@ class Renderer {
 		this._background = null;
 
 		/**
+		 * Cache for the fullscreen quad.
 		 * This fullscreen quad is used for internal render passes
 		 * like the tone mapping and color space output pass.
 		 *
 		 * @private
-		 * @type {QuadMesh}
+		 * @type {Map<Texture,QuadMesh>}
 		 */
-		this._quad = new QuadMesh( new NodeMaterial() );
-		this._quad.name = 'Output Color Transform';
-		this._quad.material.name = 'outputColorTransform';
+		this._quadCache = new Map();
 
 		/**
 		 * A reference to the current render context.
@@ -1788,12 +1787,52 @@ class Renderer {
 	 */
 	_renderOutput( renderTarget ) {
 
-		const quad = this._quad;
+		const cacheKey = this._nodes.getOutputCacheKey();
 
-		if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+		let quadData = this._quadCache.get( renderTarget.texture );
+		let quad;
+
+		if ( quadData === undefined ) {
+
+			quad = new QuadMesh( new NodeMaterial() );
+			quad.name = 'Output Color Transform';
+			quad.material.name = 'outputColorTransform';
 
 			quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-			quad.material.needsUpdate = true;
+
+			quadData = {
+				quad,
+				cacheKey
+			};
+
+			this._quadCache.set( renderTarget.texture, quadData );
+
+			// dispose logic
+
+			const dispose = () => {
+
+				quad.material.dispose();
+
+				this._quadCache.delete( renderTarget.texture );
+
+				renderTarget.texture.removeEventListener( 'dispose', dispose );
+
+			};
+
+			renderTarget.texture.addEventListener( 'dispose', dispose );
+
+		} else {
+
+			quad = quadData.quad;
+
+			if ( quadData.cacheKey !== cacheKey ) {
+
+				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				quad.material.needsUpdate = true;
+
+				quadData.cacheKey = cacheKey;
+
+			}
 
 		}
 
