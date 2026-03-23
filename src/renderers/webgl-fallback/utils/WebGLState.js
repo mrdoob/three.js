@@ -50,6 +50,7 @@ class WebGLState {
 		// documented for convenience reasons.
 
 		this.enabled = {};
+		this.parameters = {};
 		this.currentFlipSided = null;
 		this.currentCullFace = null;
 		this.currentProgram = null;
@@ -1291,7 +1292,6 @@ class WebGLState {
 
 	}
 
-
 	/**
 	 * Unbinds the current bound texture.
 	 *
@@ -1310,6 +1310,47 @@ class WebGLState {
 
 			boundTexture.type = undefined;
 			boundTexture.texture = undefined;
+
+		}
+
+	}
+
+	/**
+	 * Returns the value for the given parameter.
+	 *
+	 * @param {number} name - The paramter to get the value for.
+	 * @return {any} The value for the given parameter.
+	 */
+	getParameter( name ) {
+
+		const { gl, parameters } = this;
+
+		if ( parameters[ name ] !== undefined ) {
+
+			return parameters[ name ];
+
+		} else {
+
+			return gl.getParameter( name );
+
+		}
+
+	}
+
+	/**
+	 * Specifies a pixel storage mode.
+	 *
+	 * @param {number} name - The parameter to set.
+	 * @param {any} value - A value to set the parameter to.
+	 */
+	pixelStorei( name, value ) {
+
+		const { gl, parameters } = this;
+
+		if ( parameters[ name ] !== value ) {
+
+			gl.pixelStorei( name, value );
+			parameters[ name ] = value;
 
 		}
 

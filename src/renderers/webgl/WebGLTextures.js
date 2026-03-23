@@ -831,11 +831,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// Trim the array to only contain the merged ranges.
 			updateRanges.length = mergeIndex + 1;
 
-			const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
-			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
-			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+			const currentUnpackRowLen = state.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const currentUnpackSkipPixels = state.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const currentUnpackSkipRows = state.getParameter( _gl.UNPACK_SKIP_ROWS );
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+			state.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -851,8 +851,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const width = pixelCount;
 				const height = 1;
 
-				_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
+				state.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
+				state.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
 
 				state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, width, height, glFormat, glType, image.data );
 
@@ -860,9 +860,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			texture.clearUpdateRanges();
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+			state.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+			state.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+			state.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
 
 		}
 
@@ -894,13 +894,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
 				const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
-				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-				_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-				_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+				state.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+				state.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+				state.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 			}
 
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+			state.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			let image = resizeImage( texture.image, false, capabilities.maxTextureSize );
 			image = verifyColorSpace( texture, image );
@@ -1328,10 +1328,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
 			const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
-			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+			state.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+			state.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+			state.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+			state.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 			const isCompressed = ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture );
 			const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
