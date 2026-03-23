@@ -1323,13 +1323,15 @@ class WebGLState {
 	 */
 	getParameter( name ) {
 
-		if ( this.parameters[ name ] !== undefined ) {
+		const { gl, parameters } = this;
 
-			return this.parameters[ name ];
+		if ( parameters[ name ] !== undefined ) {
+
+			return parameters[ name ];
 
 		} else {
 
-			return this.gl.getParameter( name );
+			return gl.getParameter( name );
 
 		}
 
