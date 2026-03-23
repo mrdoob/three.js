@@ -1807,13 +1807,15 @@ ${ flowData.code }
 			const varyings = this.varyings;
 			const vars = this.vars[ shaderStage ];
 
+			let varyingIndex = 0;
+
 			for ( let index = 0; index < varyings.length; index ++ ) {
 
 				const varying = varyings[ index ];
 
 				if ( varying.needsInterpolation ) {
 
-					let attributesSnippet = `@location( ${index} )`;
+					let attributesSnippet = `@location( ${ varyingIndex ++ } )`;
 
 					if ( varying.interpolationType ) {
 
@@ -2124,7 +2126,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = '\t@location(0) color: vec4<f32>';
+							let structSnippet = '\t@location( 0 ) color: vec4<f32>';
 
 							const builtins = this.getBuiltins( 'output' );
 
