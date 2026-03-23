@@ -34,7 +34,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { nodeObject, uniform } from 'three/tsl';
+			import { uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -99,7 +99,7 @@
 				const plane = new THREE.Mesh( planeGeometry, new THREE.MeshPhongNodeMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
 				const sphere = new THREE.Mesh( sphereGeometry, new THREE.MeshPhongNodeMaterial( { color: 0xffff00 } ) );
 
-				const instanceUniform = nodeObject( new OcclusionNode( sphere, new THREE.Color( 0x0000ff ), new THREE.Color( 0x00ff00 ) ) );
+				const instanceUniform = new OcclusionNode( sphere, new THREE.Color( 0x0000ff ), new THREE.Color( 0x00ff00 ) );
 
 				plane.material.colorNode = instanceUniform;
 

@@ -312,30 +312,24 @@ const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
 // GGX VNDF importance sampling (Eric Heitz 2018)
 // "Sampling the GGX Distribution of Visible Normals"
 // https://jcgt.org/published/0007/04/01/
-const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughness_immutable ] ) => {
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V, roughness ] ) => {
 
-	const V = vec3( V_immutable ).toVar();
-	const roughness = float( roughness_immutable );
-	const alpha = roughness.mul( roughness ).toVar();
-
-	// Section 3.2: Transform view direction to hemisphere configuration
-	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
+	const alpha = roughness.mul( roughness ).toConst();
 
 	// Section 4.1: Orthonormal basis
-	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
-	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
-	const T2 = cross( Vh, T1 ).toVar();
+	const T1 = vec3( 1.0, 0.0, 0.0 ).toConst();
+	const T2 = cross( V, T1 ).toConst();
 
 	// Section 4.2: Parameterization of projected area
-	const r = sqrt( Xi.x );
-	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
-	const t1 = r.mul( cos( phi ) ).toVar();
+	const r = sqrt( Xi.x ).toConst();
+	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y ).toConst();
+	const t1 = r.mul( cos( phi ) ).toConst();
 	const t2 = r.mul( sin( phi ) ).toVar();
-	const s = mul( 0.5, Vh.z.add( 1.0 ) );
+	const s = mul( 0.5, V.z.add( 1.0 ) ).toConst();
 	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
 
 	// Section 4.3: Reprojection onto hemisphere
-	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( V.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
 
 	// Section 3.4: Transform back to ellipsoid configuration
 	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max( 0.0, Nh.z ) ) );

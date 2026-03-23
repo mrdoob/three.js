@@ -24,6 +24,7 @@ class SetSceneCommand extends Command {
 			this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
 			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
 			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'animations', scene.animations ) );
 
 			while ( scene.children.length > 0 ) {
 

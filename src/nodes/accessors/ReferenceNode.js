@@ -62,7 +62,7 @@ class ReferenceElementNode extends ArrayElementNode {
 	 *
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		return this.referenceNode.uniformType;
 
@@ -71,8 +71,8 @@ class ReferenceElementNode extends ArrayElementNode {
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
-		const arrayType = this.referenceNode.getNodeType();
-		const elementType = this.getNodeType();
+		const arrayType = this.referenceNode.getNodeType( builder );
+		const elementType = this.getNodeType( builder );
 
 		return builder.format( snippet, arrayType, elementType );
 
@@ -296,7 +296,7 @@ class ReferenceNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.node === null ) {
 

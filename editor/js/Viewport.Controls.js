@@ -8,12 +8,10 @@ function ViewportControls( editor ) {
 	container.setPosition( 'absolute' );
 	container.setRight( '10px' );
 	container.setTop( '10px' );
-	container.setColor( '#ffffff' );
 
 	// camera
 
 	const cameraSelect = new UISelect();
-	cameraSelect.setMarginLeft( '10px' );
 	cameraSelect.setMarginRight( '10px' );
 	cameraSelect.onChange( function () {
 
@@ -28,7 +26,7 @@ function ViewportControls( editor ) {
 
 		if ( object.isCamera ) {
 
-			update();
+			updateCameraList();
 
 		}
 
@@ -61,7 +59,7 @@ function ViewportControls( editor ) {
 
 	//
 
-	function update() {
+	function updateCameraList() {
 
 		const options = {};
 
@@ -81,6 +79,14 @@ function ViewportControls( editor ) {
 			: editor.camera;
 
 		cameraSelect.setValue( selectedCamera.uuid );
+
+		return selectedCamera;
+
+	}
+
+	function update() {
+
+		const selectedCamera = updateCameraList();
 		editor.setViewportCamera( selectedCamera.uuid );
 
 	}

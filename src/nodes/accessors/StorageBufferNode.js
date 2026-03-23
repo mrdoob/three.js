@@ -168,6 +168,8 @@ class StorageBufferNode extends BufferNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferCount === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -182,11 +184,15 @@ class StorageBufferNode extends BufferNode {
 
 			}
 
-			return bufferData.node.uuid;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.uuid;
+		return String( id );
 
 	}
 
@@ -317,7 +323,7 @@ class StorageBufferNode extends BufferNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.structTypeNode !== null ) {
 
@@ -327,7 +333,7 @@ class StorageBufferNode extends BufferNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
-			return super.getNodeType( builder );
+			return super.generateNodeType( builder );
 
 		}
 

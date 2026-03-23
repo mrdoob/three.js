@@ -61,14 +61,6 @@ class FirstPersonControls extends Controls {
 		this.autoForward = false;
 
 		/**
-		 * Whether it's possible to look around or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.activeLook = true;
-
-		/**
 		 * Whether or not the camera's height influences the forward movement speed.
 		 * Use the properties `heightCoef`, `heightMin` and `heightMax` for configuration.
 		 *
@@ -141,13 +133,15 @@ class FirstPersonControls extends Controls {
 		this._pointerX = 0;
 		this._pointerY = 0;
 
+		this._pointerDownX = 0;
+		this._pointerDownY = 0;
+
+		this._pointerCount = 0;
+
 		this._moveForward = false;
 		this._moveBackward = false;
 		this._moveLeft = false;
 		this._moveRight = false;
-
-		this._viewHalfX = 0;
-		this._viewHalfY = 0;
 
 		this._lat = 0;
 		this._lon = 0;
@@ -167,8 +161,6 @@ class FirstPersonControls extends Controls {
 
 			this.connect( domElement );
 
-			this.handleResize();
-
 		}
 
 		this._setOrientation();
@@ -187,6 +179,8 @@ class FirstPersonControls extends Controls {
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
+
 	}
 
 	disconnect() {
@@ -199,30 +193,13 @@ class FirstPersonControls extends Controls {
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = ''; // Restore touch scroll
+
 	}
 
 	dispose() {
 
 		this.disconnect();
-
-	}
-
-	/**
-	 * Must be called if the application window is resized.
-	 */
-	handleResize() {
-
-		if ( this.domElement === document ) {
-
-			this._viewHalfX = window.innerWidth / 2;
-			this._viewHalfY = window.innerHeight / 2;
-
-		} else {
-
-			this._viewHalfX = this.domElement.offsetWidth / 2;
-			this._viewHalfY = this.domElement.offsetHeight / 2;
-
-		}
 
 	}
 
@@ -282,13 +259,7 @@ class FirstPersonControls extends Controls {
 		if ( this._moveUp ) this.object.translateY( actualMoveSpeed );
 		if ( this._moveDown ) this.object.translateY( - actualMoveSpeed );
 
-		let actualLookSpeed = delta * this.lookSpeed;
-
-		if ( ! this.activeLook ) {
-
-			actualLookSpeed = 0;
-
-		}
+		const actualLookSpeed = delta * this.lookSpeed;
 
 		let verticalLookRatio = 1;
 
@@ -298,8 +269,12 @@ class FirstPersonControls extends Controls {
 
 		}
 
-		this._lon -= this._pointerX * actualLookSpeed;
-		if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+		if ( this.mouseDragOn ) {
+
+			this._lon -= this._pointerX * actualLookSpeed;
+			if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+
+		}
 
 		this._lat = Math.max( - 85, Math.min( 85, this._lat ) );
 
@@ -332,6 +307,15 @@ class FirstPersonControls extends Controls {
 
 	}
 
+	/**
+	 * @deprecated, r184. This method is no longer needed.
+	 */
+	handleResize() {
+
+		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed.' );
+
+	}
+
 }
 
 function onPointerDown( event ) {
@@ -342,7 +326,16 @@ function onPointerDown( event ) {
 
 	}
 
-	if ( this.activeLook ) {
+	this.domElement.setPointerCapture( event.pointerId );
+
+	this._pointerCount ++;
+
+	if ( event.pointerType === 'touch' ) {
+
+		this._moveForward = this._pointerCount === 1;
+		this._moveBackward = this._pointerCount >= 2;
+
+	} else {
 
 		switch ( event.button ) {
 
@@ -353,13 +346,28 @@ function onPointerDown( event ) {
 
 	}
 
+	this._pointerDownX = event.pageX;
+	this._pointerDownY = event.pageY;
+
+	this._pointerX = 0;
+	this._pointerY = 0;
+
 	this.mouseDragOn = true;
 
 }
 
 function onPointerUp( event ) {
 
-	if ( this.activeLook ) {
+	this.domElement.releasePointerCapture( event.pointerId );
+
+	this._pointerCount --;
+
+	if ( event.pointerType === 'touch' ) {
+
+		this._moveForward = this._pointerCount === 1;
+		this._moveBackward = false;
+
+	} else {
 
 		switch ( event.button ) {
 
@@ -370,23 +378,19 @@ function onPointerUp( event ) {
 
 	}
 
-	this.mouseDragOn = false;
+	this._pointerX = 0;
+	this._pointerY = 0;
+
+	if ( this._pointerCount === 0 ) this.mouseDragOn = false;
 
 }
 
 function onPointerMove( event ) {
 
-	if ( this.domElement === document ) {
+	if ( this.mouseDragOn === false ) return;
 
-		this._pointerX = event.pageX - this._viewHalfX;
-		this._pointerY = event.pageY - this._viewHalfY;
-
-	} else {
-
-		this._pointerX = event.pageX - this.domElement.offsetLeft - this._viewHalfX;
-		this._pointerY = event.pageY - this.domElement.offsetTop - this._viewHalfY;
-
-	}
+	this._pointerX = event.pageX - this._pointerDownX;
+	this._pointerY = event.pageY - this._pointerDownY;
 
 }
 

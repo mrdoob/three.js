@@ -204,7 +204,7 @@ class ValueCheckbox extends Value {
 
 	setValue( val ) {
 
-		this.checkbox.value = val;
+		this.checkbox.checked = val;
 
 		return super.setValue( val );
 
@@ -436,4 +436,41 @@ class ValueButton extends Value {
 
 }
 
-export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor, ValueButton };
+class ValueString extends Value {
+
+	constructor( { value = '' } ) {
+
+		super();
+
+		const input = document.createElement( 'input' );
+		input.type = 'text';
+		input.value = value;
+		this.input = input;
+
+		input.addEventListener( 'input', () => {
+
+			this.dispatchChange();
+
+		} );
+
+		this.domElement.appendChild( input );
+
+	}
+
+	setValue( val ) {
+
+		this.input.value = val;
+
+		return super.setValue( val );
+
+	}
+
+	getValue() {
+
+		return this.input.value;
+
+	}
+
+}
+
+export { Value, ValueNumber, ValueString, ValueCheckbox, ValueSlider, ValueSelect, ValueColor, ValueButton };

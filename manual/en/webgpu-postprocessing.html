@@ -45,7 +45,7 @@
             </p>
             <ul>
               <li>
-                `WebGPURenderer` and `PostProcessing` come with full, built-in MRT support.
+                `WebGPURenderer` comes with full, built-in MRT support.
               </li>
               <li>
                 The system combines effects if possible which reduces the overall number of render passes.
@@ -55,27 +55,27 @@
               </li>
             </ul>
             <p>
-               Let's find out how to integrate `PostProcessing` in three.js applications.
+               Let's find out how to integrate post-processing in three.js applications.
             </p>
 
             <h2>Basics</h2>
 
             <p>
               First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your 
-              imports. After that, you can create an instance of the post-processing module like so.
+              imports. After that, you can create an instance of the render pipleine module like so:
             </p>
 
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
-const postProcessing = new THREE.PostProcessing( renderer );
+const renderPipeline = new THREE.RenderPipeline( renderer );
 </pre>
 
             <p>
-              The instance of `PostProcessing` replaces the previous instance of `EffectComposer`. To make sure you actually
+              The instance of `RenderPipeline` replaces the previous instance of `EffectComposer`. To make sure you actually
               use the output of the module, you have to update your animation loop like so:
             </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
 -  renderer.render( scene, camera );
-+  postProcessing.render();
++  renderPipeline.render();
 </pre>
 
             <p>
@@ -109,10 +109,10 @@ const scenePass = pass( scene, camera );
 </pre>
 
             <p>
-            When you are done, you can simply assign the final node to the `PostProcessing` instance.
+            When you are done, you can simply assign the final node to the `RenderPipeline` instance.
             </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
-postProcessing.outputNode = rgbShiftPass;
+renderPipeline.outputNode = rgbShiftPass;
 </pre>
 
             <h2>Tone Mapping and Color Spaces</h2>
@@ -130,8 +130,8 @@ import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 
 // in your init routine
 
-const postProcessing = new THREE.PostProcessing( renderer );
-postProcessing.outputColorTransform = false; // disable default output color transform
+const renderPipeline = new THREE.RenderPipeline( renderer );
+renderPipeline.outputColorTransform = false; // disable default output color transform
 
 const scenePass = pass( scene, camera );
 const outputPass = renderOutput( scenePass ); // apply tone mapping and color space conversion here
@@ -139,7 +139,7 @@ const outputPass = renderOutput( scenePass ); // apply tone mapping and color sp
 // FXAA must be computed in sRGB color space
 
 const fxaaPass = fxaa( outputPass );
-postProcessing.outputNode = fxaaPass;
+renderPipeline.outputNode = fxaaPass;
 </pre>
 
           <p>
@@ -183,7 +183,7 @@ const scenePassDepth = scenePass.getTextureNode( 'depth' );
 const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
 const traaPass = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
-postProcessing.outputNode = traaPass;
+renderPipeline.outputNode = traaPass;
 </pre>
 
           <p>

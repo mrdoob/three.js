@@ -446,6 +446,62 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'LoopRepeat with timeScale reversal during first loop', ( assert ) => {
+
+			// Regression test for #19151
+			const root = new Object3D();
+			const mixer = new AnimationMixer( root );
+			const track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 1000 ], [ 0, 360 ] );
+			const clip = new AnimationClip( 'clip1', 1000, [ track ] );
+
+			const animationAction = mixer.clipAction( clip );
+			animationAction.setLoop( LoopRepeat, Infinity );
+			animationAction.play();
+
+			// Advance partway into the first loop
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 180, 'At 500ms, rotation is 180 (halfway).' );
+
+			// Reverse timeScale
+			mixer.timeScale = - 1;
+
+			// Step backward — should smoothly reverse, not jump
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'After reversing and stepping 250ms back, rotation is 90.' );
+
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 0, 'After reversing and stepping another 250ms back, rotation is 0 (start).' );
+
+		} );
+
+		QUnit.test( 'LoopPingPong with timeScale reversal during first loop', ( assert ) => {
+
+			// Regression test for #19151
+			const root = new Object3D();
+			const mixer = new AnimationMixer( root );
+			const track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 1000 ], [ 0, 360 ] );
+			const clip = new AnimationClip( 'clip1', 1000, [ track ] );
+
+			const animationAction = mixer.clipAction( clip );
+			animationAction.setLoop( LoopPingPong, Infinity );
+			animationAction.play();
+
+			// Advance partway into the first loop
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 180, 'At 500ms, rotation is 180 (halfway).' );
+
+			// Reverse timeScale
+			mixer.timeScale = - 1;
+
+			// Step backward — should smoothly reverse, not jump
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'After reversing and stepping 250ms back, rotation is 90.' );
+
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 0, 'After reversing and stepping another 250ms back, rotation is 0 (start).' );
+
+		} );
+
 	} );
 
 } );

@@ -14,8 +14,10 @@
 		<section>
 			<header>
 				<div class="class-description"><p>Helper object to assist with visualizing a <a href="DirectionalLight.html">DirectionalLight</a>'s
-effect on the scene. This consists of plane and a line representing the
-light's position and direction.</p></div>
+effect on the scene. This consists of a plane and a line representing the
+light's position and direction.</p>
+<p>When the directional light or its target are transformed or light properties
+are changed, it's necessary to call the <code>update()</code> method of the respective helper.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const light = new THREE.DirectionalLight( 0xFFFFFF );
 scene.add( light );
@@ -35,7 +37,7 @@ scene.add( helper );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>light</strong>
+										<strong translate="no">light</strong>
 									</td>
 									<td class="description last">
 										<p>The light to be visualized.</p>
@@ -43,7 +45,7 @@ scene.add( helper );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>size</strong>
+										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
 										<p>The dimensions of the plane.</p>
@@ -52,7 +54,7 @@ scene.add( helper );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The helper's color. If not set, the helper will take

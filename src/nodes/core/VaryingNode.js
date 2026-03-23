@@ -36,7 +36,7 @@ class VaryingNode extends Node {
 		 *
 		 * @type {Node}
 		 */
-		this.node = node;
+		this.node = subBuild( node, 'VERTEX' );
 
 		/**
 		 * The name of the varying in the shader. If no name is defined,
@@ -104,7 +104,7 @@ class VaryingNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// VaryingNode is auto type
 

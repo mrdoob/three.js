@@ -75,7 +75,7 @@ class SubgroupFunctionNode extends TempNode {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const method = this.method;
 

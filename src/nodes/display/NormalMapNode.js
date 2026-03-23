@@ -69,7 +69,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	setup( { material } ) {
+	setup( builder ) {
 
 		const { normalMapType, scaleNode, unpackNormalMode } = this;
 
@@ -105,7 +105,7 @@ class NormalMapNode extends TempNode {
 
 			let scale = scaleNode;
 
-			if ( material.flatShading === true ) {
+			if ( builder.isFlatShading() === true ) {
 
 				scale = directionToFaceDirection( scale );
 

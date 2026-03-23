@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
-import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 import { boxBlur } from './boxBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -275,7 +275,8 @@ class SSRNode extends TempNode {
 		if ( this.roughnessNode !== null ) {
 
 			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const lod = float( this.roughnessNode ).mul( mips ).clamp( 0, mips );
+			const r = float( this.roughnessNode );
+			const lod = r.mul( r ).mul( mips ).clamp( 0, mips );
 
 			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
 
@@ -399,10 +400,9 @@ class SSRNode extends TempNode {
 			// https://en.wikipedia.org/wiki/Plane_(geometry)
 			// http://paulbourke.net/geometry/pointlineplane/
 
+			// planeNormal is already normalized, so denominator is 1
 			const d = mul( planeNormal.x, planePoint.x ).add( mul( planeNormal.y, planePoint.y ) ).add( mul( planeNormal.z, planePoint.z ) ).negate().toVar();
-
-			const denominator = sqrt( mul( planeNormal.x, planeNormal.x, ).add( mul( planeNormal.y, planeNormal.y ) ).add( mul( planeNormal.z, planeNormal.z ) ) ).toVar();
-			const distance = div( mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d ), denominator );
+			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
 			return distance;
 
 		} );
@@ -589,7 +589,7 @@ class SSRNode extends TempNode {
 
 						// output
 						const reflectColor = this.colorNode.sample( uvNode );
-						output.assign( vec4( reflectColor.rgb, op ) );
+						output.assign( vec4( reflectColor.rgb.mul( op ), 1 ) );
 						Break();
 
 					} );
@@ -653,4 +653,4 @@ export default SSRNode;
  * @param {?Camera} [camera=null] - The camera the scene is rendered with.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera ) );
+export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera );

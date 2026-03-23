@@ -223,7 +223,6 @@ export * from './shaders/FilmShader.js';
 export * from './shaders/FocusShader.js';
 export * from './shaders/FreiChenShader.js';
 export * from './shaders/GammaCorrectionShader.js';
-export * from './shaders/GodRaysShader.js';
 export * from './shaders/GTAOShader.js';
 export * from './shaders/HalftoneShader.js';
 export * from './shaders/HorizontalBlurShader.js';

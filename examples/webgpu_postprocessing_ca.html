@@ -51,8 +51,8 @@
 				cameraDistance: 40
 			};
 
-			let camera, scene, renderer, clock, mainGroup;
-			let controls, postProcessing;
+			let camera, scene, renderer, timer, mainGroup;
+			let controls, renderPipeline;
 
 			init();
 
@@ -84,7 +84,8 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// Create main group
 				mainGroup = new THREE.Group();
@@ -99,8 +100,8 @@
 				scene.add( gridHelper );
 
 				// post processing
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				// scene pass
 				const scenePass = pass( scene, camera );
@@ -115,7 +116,7 @@
 				const caPass = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
 
 				// Set initial output based on params
-				postProcessing.outputNode = params.enabled ? caPass : outputPass;
+				renderPipeline.outputNode = params.enabled ? caPass : outputPass;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -125,8 +126,8 @@
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 
-					postProcessing.outputNode = value ? caPass : outputPass;
-					postProcessing.needsUpdate = true;
+					renderPipeline.outputNode = value ? caPass : outputPass;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -296,7 +297,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				controls.update();
 
@@ -333,7 +336,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 			
 			}
 

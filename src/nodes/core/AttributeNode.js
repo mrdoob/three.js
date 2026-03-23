@@ -43,7 +43,7 @@ class AttributeNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		let nodeType = this.nodeType;
 

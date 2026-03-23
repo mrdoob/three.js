@@ -55,7 +55,7 @@ class BypassNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.outputNode.getNodeType( builder );
 

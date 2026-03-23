@@ -295,6 +295,12 @@
 		"webgl_worker_offscreencanvas",
 		"webgl_performance"
 	],
+	"webgl / tsl": [
+		"webgl_tsl_shadowmap",
+		"webgl_tsl_skinning",
+		"webgl_tsl_clearcoat",
+		"webgl_tsl_instancing"
+	],
 	"webgpu (wip)": [
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
@@ -308,6 +314,7 @@
 		"webgpu_centroid_sampling",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
+		"webgpu_compile_async",
 		"webgpu_compute_audio",
 		"webgpu_compute_birds",
 		"webgpu_compute_cloth",
@@ -328,9 +335,11 @@
 		"webgpu_cubemap_mix",
 		"webgpu_custom_fog",
 		"webgpu_custom_fog_background",
+		"webgpu_custom_fog_scattering",
 		"webgpu_depth_texture",
 		"webgpu_display_stereo",
 		"webgpu_equirectangular",
+		"webgpu_fog_height",
 		"webgpu_hdr",
 		"webgpu_instance_mesh",
 		"webgpu_instance_path",
@@ -343,6 +352,7 @@
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
 		"webgpu_lights_custom",
+		"webgpu_lights_dynamic",
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
 		"webgpu_lights_physical",
@@ -414,6 +424,7 @@
 		"webgpu_postprocessing_dof",
 		"webgpu_postprocessing_dof_basic",
 		"webgpu_postprocessing_fxaa",
+		"webgpu_postprocessing_godrays",
 		"webgpu_postprocessing_lensflare",
 		"webgpu_postprocessing_masking",
 		"webgpu_postprocessing_ca",
@@ -421,6 +432,7 @@
 		"webgpu_postprocessing_outline",
 		"webgpu_postprocessing_pixel",
 		"webgpu_postprocessing_radial_blur",
+		"webgpu_postprocessing_retro",
 		"webgpu_postprocessing_smaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
@@ -436,6 +448,7 @@
 		"webgpu_reflection_roughness",
 		"webgpu_refraction",
 		"webgpu_rendertarget_2d-array_3d",
+		"webgpu_reversed_depth_buffer",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
@@ -466,6 +479,7 @@
 		"webgpu_tsl_earth",
 		"webgpu_tsl_editor",
 		"webgpu_tsl_galaxy",
+		"webgpu_tsl_graph",
 		"webgpu_tsl_halftone",
 		"webgpu_tsl_interoperability",
 		"webgpu_tsl_procedural_terrain",
@@ -481,6 +495,7 @@
 		"webgpu_volume_cloud",
 		"webgpu_volume_lighting",
 		"webgpu_volume_lighting_rectarea",
+		"webgpu_volume_lighting_traa",
 		"webgpu_volume_perlin",
 		"webgpu_water",
 		"webgpu_xr_rollercoaster",
@@ -518,8 +533,8 @@
 		"webxr_xr_dragging",
 		"webxr_xr_dragging_custom_depth",
 		"webxr_xr_haptics",
-		"webxr_xr_paint",
-		"webxr_xr_sculpt"
+		"webxr_xr_marchingcubes",
+		"webxr_xr_paint"
 	],
 	"games": [
 		"games_fps"

@@ -42,7 +42,7 @@
 				speed: 0
 			};
 
-			let camera, renderer, postProcessing;
+			let camera, renderer, renderPipeline;
 			let timer, mesh, controls;
 
 			init();
@@ -80,7 +80,7 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 
@@ -91,7 +91,7 @@
 
 				const saturationAmount = luminance( frameDiff ).mul( 1000 ).clamp( 0, 3 );
 
-				postProcessing.outputNode = saturation( currentTexture, saturationAmount );
+				renderPipeline.outputNode = saturation( currentTexture, saturationAmount );
 
 				//
 
@@ -127,7 +127,7 @@
 
 				mesh.rotation.y += timer.getDelta() * 5 * params.speed;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

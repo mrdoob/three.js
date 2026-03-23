@@ -1,14 +1,19 @@
+import { EventDispatcher } from '../../core/EventDispatcher.js';
+
 /**
  * InspectorBase is the base class for all inspectors.
  *
  * @class InspectorBase
+ * @augments EventDispatcher
  */
-class InspectorBase {
+class InspectorBase extends EventDispatcher {
 
 	/**
 	 * Creates a new InspectorBase.
 	 */
 	constructor() {
+
+		super();
 
 		/**
 		 * The renderer associated with this inspector.

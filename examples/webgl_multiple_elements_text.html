@@ -67,7 +67,8 @@
 
 			const scenes = [];
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let views, t, canvas, renderer;
 
@@ -185,6 +186,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				updateSize();
 
 				renderer.setClearColor( 0xffffff );
@@ -239,7 +242,7 @@
 
 				} );
 
-				t += clock.getDelta() * 60;
+				t += timer.getDelta() * 60;
 
 			}
 

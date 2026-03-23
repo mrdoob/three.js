@@ -20,9 +20,9 @@ require e.g. sRGB input. For such scenarios, <code>RenderOutputNode</code> can b
 to apply tone mapping and color space conversion at an arbitrary point
 in the effect chain.</p>
 <p>When applying tone mapping and color space conversion manually with this node,
-you have to set <a href="PostProcessing.html#outputColorTransform">PostProcessing#outputColorTransform</a> to <code>false</code>.</p></div>
+you have to set <a href="RenderPipeline.html#outputColorTransform">RenderPipeline#outputColorTransform</a> to <code>false</code>.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const postProcessing = new PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const postProcessing = new RenderPipeline( renderer );
 postProcessing.outputColorTransform = false;
 const scenePass = pass( scene, camera );
 const outputPass = renderOutput( scenePass );
@@ -41,7 +41,7 @@ postProcessing.outputNode = outputPass;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>colorNode</strong>
+										<strong translate="no">colorNode</strong>
 									</td>
 									<td class="description last">
 										<p>The color node to process.</p>
@@ -49,7 +49,7 @@ postProcessing.outputNode = outputPass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>toneMapping</strong>
+										<strong translate="no">toneMapping</strong>
 									</td>
 									<td class="description last">
 										<p>The tone mapping type.</p>
@@ -57,7 +57,7 @@ postProcessing.outputNode = outputPass;
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>outputColorSpace</strong>
+										<strong translate="no">outputColorSpace</strong>
 									</td>
 									<td class="description last">
 										<p>The output color space.</p>
@@ -106,7 +106,7 @@ postProcessing.outputNode = outputPass;
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The tone mapping type.</p>

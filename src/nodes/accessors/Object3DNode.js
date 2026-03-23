@@ -75,7 +75,7 @@ class Object3DNode extends Node {
 	 *
 	 * @return {('mat4'|'vec3'|'float')} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		const scope = this.scope;
 

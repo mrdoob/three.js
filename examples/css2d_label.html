@@ -65,7 +65,8 @@
 
 			};
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const textureLoader = new THREE.TextureLoader();
 
 			let moon;
@@ -206,9 +207,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				requestAnimationFrame( animate );
 
-				const elapsed = clock.getElapsedTime();
+				const elapsed = timer.getElapsed();
 
 				moon.position.set( Math.sin( elapsed ) * 5, 0, Math.cos( elapsed ) * 5 );
 

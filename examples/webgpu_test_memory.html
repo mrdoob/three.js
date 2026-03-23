@@ -44,7 +44,7 @@
 			let camera, scene, renderer, light;
 			let generateMeshes = true;
 			let mesh;
-			let postProcessing;
+			let renderPipeline;
 			let aoNode, outlineNode, scenePass, prePass;
 			const selectedObjects = [];
 
@@ -143,10 +143,10 @@
 
 			function updatePostProcessing() {
 
-				if ( postProcessing ) {
+				if ( renderPipeline ) {
 
-					postProcessing.dispose();
-					postProcessing = null;
+					renderPipeline.dispose();
+					renderPipeline = null;
 
 				}
 
@@ -180,7 +180,7 @@
 
 				if ( params.enablePP ) {
 
-					postProcessing = new THREE.PostProcessing( renderer );
+					renderPipeline = new THREE.RenderPipeline( renderer );
 
 					scenePass = pass( scene, camera );
 					let colorNode = scenePass;
@@ -216,7 +216,7 @@
 
 					}
 
-					postProcessing.outputNode = colorNode;
+					renderPipeline.outputNode = colorNode;
 
 				}
 
@@ -283,9 +283,9 @@
 
 				}
 
-				if ( postProcessing ) {
+				if ( renderPipeline ) {
 
-					postProcessing.render();
+					renderPipeline.render();
 
 				} else {
 

@@ -59,7 +59,7 @@ class RenderObject {
 	/**
 	 * Constructs a new render object.
 	 *
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 * @param {Geometries} geometries - Renderer component for managing geometries.
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Object3D} object - The 3D object.
@@ -78,7 +78,7 @@ class RenderObject {
 		/**
 		 * Renderer component for managing nodes related logic.
 		 *
-		 * @type {Nodes}
+		 * @type {NodeManager}
 		 * @private
 		 */
 		this._nodes = nodes;
@@ -540,8 +540,7 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-
-				attributesId[ nodeAttribute.name ] = attribute.version;
+				attributesId[ nodeAttribute.name ] = attribute.id;
 
 			}
 

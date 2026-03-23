@@ -14,7 +14,9 @@
 		<section>
 			<header>
 				<div class="class-description"><p>Creates a visual aid consisting of a spherical mesh for a
-given <a href="HemisphereLight.html">HemisphereLight</a>.</p></div>
+given <a href="HemisphereLight.html">HemisphereLight</a>.</p>
+<p>When the hemisphere light is transformed or its light properties are changed,
+it's necessary to call the <code>update()</code> method of the respective helper.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 const helper = new THREE.HemisphereLightHelper( light, 5 );
@@ -33,7 +35,7 @@ scene.add( helper );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>light</strong>
+										<strong translate="no">light</strong>
 									</td>
 									<td class="description last">
 										<p>The light to be visualized.</p>
@@ -41,7 +43,7 @@ scene.add( helper );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>size</strong>
+										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
 										<p>The size of the mesh used to visualize the light.</p>
@@ -50,7 +52,7 @@ scene.add( helper );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The helper's color. If not set, the helper will take

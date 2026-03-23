@@ -484,6 +484,12 @@ class LineMaterial extends ShaderMaterial {
 
 	set worldUnits( value ) {
 
+		if ( ( value === true ) !== this.worldUnits ) {
+
+			this.needsUpdate = true;
+
+		}
+
 		if ( value === true ) {
 
 			this.defines.WORLD_UNITS = '';

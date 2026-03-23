@@ -1,7 +1,6 @@
 .claude/
 .DS_Store
 .idea/
-.jshintrc
 .project
 .puppeteer_profile/
 .vs/

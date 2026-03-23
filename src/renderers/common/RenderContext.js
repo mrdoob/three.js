@@ -26,6 +26,14 @@ class RenderContext {
 		this.id = _id ++;
 
 		/**
+		 * The MRT configuration.
+		 *
+		 * @type {?MRTNode}
+		 * @default null
+		 */
+		this.mrt = null;
+
+		/**
 		 * Whether the current active framebuffer has a color attachment.
 		 *
 		 * @type {boolean}

@@ -41,7 +41,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, particles;
-			let postProcessing, afterImagePass, scenePass;
+			let renderPipeline, afterImagePass, scenePass;
 
 			const params = {
 
@@ -121,13 +121,13 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				scenePass = pass( scene, camera );
 
 				afterImagePass = afterImage( scenePass, params.damp );
 
-				postProcessing.outputNode = afterImagePass;
+				renderPipeline.outputNode = afterImagePass;
 
 				//
 
@@ -143,15 +143,15 @@
 
 				if ( params.enabled === true ) {
 
-					postProcessing.outputNode = afterImagePass;
+					renderPipeline.outputNode = afterImagePass;
 
 				} else {
 
-					postProcessing.outputNode = scenePass;
+					renderPipeline.outputNode = scenePass;
 
 				}
 
-				postProcessing.needsUpdate = true;
+				renderPipeline.needsUpdate = true;
 
 
 			}
@@ -185,7 +185,7 @@
 
 				particles.rotation.z = time * 0.001;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

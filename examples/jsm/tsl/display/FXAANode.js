@@ -1,5 +1,5 @@
 import { Vector2, TempNode } from 'three/webgpu';
-import { nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
+import { Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
 /**
  * Post processing node for applying FXAA. This node requires sRGB input
@@ -362,4 +362,4 @@ export default FXAANode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {FXAANode}
  */
-export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );
+export const fxaa = ( node ) => new FXAANode( convertToTexture( node ) );

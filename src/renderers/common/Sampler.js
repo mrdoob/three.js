@@ -35,7 +35,7 @@ class Sampler extends Binding {
 		this._onTextureDispose = () => {
 
 			this.generation = null;
-			this.version = 0;
+			this.version = - 1;
 
 		};
 
@@ -47,7 +47,7 @@ class Sampler extends Binding {
 		 *
 		 * @type {number}
 		 */
-		this.version = texture ? texture.version : 0;
+		this.version = texture ? texture.version : - 1;
 
 		/**
 		 * The binding's generation which is an additional version
@@ -95,7 +95,7 @@ class Sampler extends Binding {
 		this._texture = value;
 
 		this.generation = null;
-		this.version = 0;
+		this.version = - 1;
 
 		if ( this._texture ) {
 
@@ -150,7 +150,7 @@ class Sampler extends Binding {
 		clonedSampler._onTextureDispose = () => {
 
 			clonedSampler.generation = null;
-			clonedSampler.version = 0;
+			clonedSampler.version = - 1;
 
 		};
 

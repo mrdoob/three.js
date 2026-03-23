@@ -320,15 +320,16 @@ class WebGLTextureUtils {
 	setTextureParameters( textureType, texture ) {
 
 		const { gl, extensions, backend } = this;
+		const { state } = this.backend;
 
 		const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
 		const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
 		const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? gl.NONE : gl.BROWSER_DEFAULT_WEBGL;
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+		state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		state.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		state.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		state.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
@@ -370,7 +371,7 @@ class WebGLTextureUtils {
 			if ( texture.anisotropy > 1 ) {
 
 				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
-				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.getMaxAnisotropy() ) );
+				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.capabilities.getMaxAnisotropy() ) );
 
 			}
 
@@ -470,6 +471,7 @@ class WebGLTextureUtils {
 	copyBufferToTexture( buffer, texture ) {
 
 		const { gl, backend } = this;
+		const { state } = backend;
 
 		const { textureGPU, glTextureType, glFormat, glType } = backend.get( texture );
 
@@ -479,8 +481,8 @@ class WebGLTextureUtils {
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+		state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+		state.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
 		gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, 0 );
 
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, null );
@@ -832,22 +834,22 @@ class WebGLTextureUtils {
 
 		}
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
+		state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
+		state.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
+		state.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
 		// used for copying data from cpu
-		const currentUnpackRowLen = gl.getParameter( gl.UNPACK_ROW_LENGTH );
-		const currentUnpackImageHeight = gl.getParameter( gl.UNPACK_IMAGE_HEIGHT );
-		const currentUnpackSkipPixels = gl.getParameter( gl.UNPACK_SKIP_PIXELS );
-		const currentUnpackSkipRows = gl.getParameter( gl.UNPACK_SKIP_ROWS );
-		const currentUnpackSkipImages = gl.getParameter( gl.UNPACK_SKIP_IMAGES );
+		const currentUnpackRowLen = state.getParameter( gl.UNPACK_ROW_LENGTH );
+		const currentUnpackImageHeight = state.getParameter( gl.UNPACK_IMAGE_HEIGHT );
+		const currentUnpackSkipPixels = state.getParameter( gl.UNPACK_SKIP_PIXELS );
+		const currentUnpackSkipRows = state.getParameter( gl.UNPACK_SKIP_ROWS );
+		const currentUnpackSkipImages = state.getParameter( gl.UNPACK_SKIP_IMAGES );
 
-		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, image.width );
-		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, image.height );
-		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
-		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
-		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
+		state.pixelStorei( gl.UNPACK_ROW_LENGTH, image.width );
+		state.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, image.height );
+		state.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
+		state.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
+		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
 		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || dstTexture.isArrayTexture;
@@ -981,11 +983,11 @@ class WebGLTextureUtils {
 		}
 
 		// reset values
-		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
-		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
-		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
-		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
-		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
+		state.pixelStorei( gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+		state.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
+		state.pixelStorei( gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+		state.pixelStorei( gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {

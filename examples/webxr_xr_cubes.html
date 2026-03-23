@@ -29,7 +29,8 @@
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let container;
 			let camera, scene, raycaster, renderer;
@@ -186,7 +187,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta() * 60;
+				timer.update();
+
+				const delta = timer.getDelta() * 60;
 
 				if ( controller.userData.isSelecting === true ) {
 
