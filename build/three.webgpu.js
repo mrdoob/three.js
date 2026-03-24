@@ -80962,6 +80962,27 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		if ( sourceGPU === destinationGPU ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: Source and destination buffers must be different.' );
+			return;
+
+		}
+
+		if ( ( sourceGPU.usage & GPUBufferUsage.COPY_SRC ) === 0 ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: Source buffer is missing COPY_SRC usage.' );
+			return;
+
+		}
+
+		if ( ( destinationGPU.usage & GPUBufferUsage.COPY_DST ) === 0 ) {
+
+			error( 'WebGPUBackend: copyBufferToBuffer: Destination buffer is missing COPY_DST usage.' );
+			return;
+
+		}
+
 		if ( size === null ) {
 
 			if ( srcOffset !== 0 || dstOffset !== 0 ) {
