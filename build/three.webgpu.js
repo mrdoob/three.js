@@ -80962,27 +80962,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( sourceGPU === destinationGPU ) {
-
-			error( 'WebGPUBackend: copyBufferToBuffer: Source and destination buffers must be different.' );
-			return;
-
-		}
-
-		if ( ( sourceGPU.usage & GPUBufferUsage.COPY_SRC ) === 0 ) {
-
-			error( 'WebGPUBackend: copyBufferToBuffer: Source buffer is missing COPY_SRC usage.' );
-			return;
-
-		}
-
-		if ( ( destinationGPU.usage & GPUBufferUsage.COPY_DST ) === 0 ) {
-
-			error( 'WebGPUBackend: copyBufferToBuffer: Destination buffer is missing COPY_DST usage.' );
-			return;
-
-		}
-
 		if ( size === null ) {
 
 			if ( srcOffset !== 0 || dstOffset !== 0 ) {
@@ -80999,21 +80978,10 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		} else {
+		} else if ( srcOffset + size > sourceGPU.size || dstOffset + size > destinationGPU.size ) {
 
-			if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( size & 3 ) !== 0 ) {
-
-				error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and size must be multiples of 4 bytes.' );
-				return;
-
-			}
-
-			if ( srcOffset + size > sourceGPU.size || dstOffset + size > destinationGPU.size ) {
-
-				error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
-				return;
-
-			}
+			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
+			return;
 
 		}
 
