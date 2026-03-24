@@ -672,7 +672,7 @@ export class Style {
 }
 
 /* Hide drag indicator on mobile devices */
-#profiler-panel.hide-position-toggle .tab-btn.active::before {
+#profiler-panel.is-mobile .tab-btn.active::before {
 	display: none;
 }
 
@@ -765,7 +765,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
-	touch-action: none;
+	touch-action: pan-x;
 }
 
 .tab-btn.active {
