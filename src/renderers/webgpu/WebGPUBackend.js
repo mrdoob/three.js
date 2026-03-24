@@ -16,7 +16,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
-import { warnOnce, error } from '../../utils.js';
+import { error } from '../../utils.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 
@@ -1597,14 +1597,6 @@ class WebGPUBackend extends Backend {
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
-			const drawInstances = object._multiDrawInstances;
-
-			if ( drawInstances !== null ) {
-
-				// @deprecated, r174
-				warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-
-			}
 
 			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
 
@@ -1616,7 +1608,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				const count = drawInstances ? drawInstances[ i ] : 1;
+				const count = 1;
 				const firstInstance = count > 1 ? 0 : i;
 
 				if ( hasIndex === true ) {
