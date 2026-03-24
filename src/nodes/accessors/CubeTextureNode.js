@@ -124,13 +124,19 @@ class CubeTextureNode extends TextureNode {
 
 		}
 
+		// rotate first
+
+		uvNode = materialEnvRotation.mul( uvNode );
+
+		// flip
+
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 
 			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
 		}
 
-		return materialEnvRotation.mul( uvNode );
+		return uvNode;
 
 	}
 
