@@ -7011,12 +7011,17 @@ MathNode.CEIL = 'ceil';
 MathNode.NORMALIZE = 'normalize';
 MathNode.FRACT = 'fract';
 MathNode.SIN = 'sin';
+MathNode.SINH = 'sinh';
 MathNode.COS = 'cos';
+MathNode.COSH = 'cosh';
 MathNode.TAN = 'tan';
 MathNode.TANH = 'tanh';
 MathNode.ASIN = 'asin';
+MathNode.ASINH = 'asinh';
 MathNode.ACOS = 'acos';
+MathNode.ACOSH = 'acosh';
 MathNode.ATAN = 'atan';
+MathNode.ATANH = 'atanh';
 MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
@@ -7256,6 +7261,16 @@ const fract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FRACT ).setParam
 const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setParameterLength( 1 );
 
 /**
+ * Returns the hyperbolic sine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const sinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SINH ).setParameterLength( 1 );
+
+/**
  * Returns the cosine of the parameter.
  *
  * @tsl
@@ -7264,6 +7279,16 @@ const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setParameter
  * @returns {Node}
  */
 const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setParameterLength( 1 );
+
+/**
+ * Returns the hyperbolic cosine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const cosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COSH ).setParameterLength( 1 );
 
 /**
  * Returns the tangent of the parameter.
@@ -7296,6 +7321,16 @@ const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).setParamet
 const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).setParameterLength( 1 );
 
 /**
+ * Returns the inverse hyperbolic sine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const asinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASINH ).setParameterLength( 1 );
+
+/**
  * Returns the arccosine of the parameter.
  *
  * @tsl
@@ -7304,6 +7339,16 @@ const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).setParamet
  * @returns {Node}
  */
 const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).setParameterLength( 1 );
+
+/**
+ * Returns the inverse hyperbolic cosine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const acosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOSH ).setParameterLength( 1 );
 
 /**
  * Returns the arc-tangent of the parameter.
@@ -7316,6 +7361,16 @@ const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).setParamet
  * @returns {Node}
  */
 const atan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
+
+/**
+ * Returns the inverse hyperbolic tangent of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+const atanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATANH ).setParameterLength( 1 );
 
 /**
  * Returns the absolute value of the parameter.
@@ -7762,12 +7817,17 @@ addMethodChaining( 'ceil', ceil );
 addMethodChaining( 'normalize', normalize );
 addMethodChaining( 'fract', fract );
 addMethodChaining( 'sin', sin );
+addMethodChaining( 'sinh', sinh );
 addMethodChaining( 'cos', cos );
+addMethodChaining( 'cosh', cosh );
 addMethodChaining( 'tan', tan );
 addMethodChaining( 'tanh', tanh );
 addMethodChaining( 'asin', asin );
+addMethodChaining( 'asinh', asinh );
 addMethodChaining( 'acos', acos );
+addMethodChaining( 'acosh', acosh );
 addMethodChaining( 'atan', atan );
+addMethodChaining( 'atanh', atanh );
 addMethodChaining( 'abs', abs );
 addMethodChaining( 'sign', sign );
 addMethodChaining( 'length', length );
@@ -46690,6 +46750,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	abs: abs,
 	acesFilmicToneMapping: acesFilmicToneMapping,
 	acos: acos,
+	acosh: acosh,
 	add: add,
 	addMethodChaining: addMethodChaining,
 	addNodeElement: addNodeElement,
@@ -46705,8 +46766,10 @@ var TSL = /*#__PURE__*/Object.freeze({
 	array: array,
 	arrayBuffer: arrayBuffer,
 	asin: asin,
+	asinh: asinh,
 	assign: assign,
 	atan: atan,
+	atanh: atanh,
 	atomicAdd: atomicAdd,
 	atomicAnd: atomicAnd,
 	atomicFunc: atomicFunc,
@@ -46787,6 +46850,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	convertColorSpace: convertColorSpace,
 	convertToTexture: convertToTexture,
 	cos: cos,
+	cosh: cosh,
 	countLeadingZeros: countLeadingZeros,
 	countOneBits: countOneBits,
 	countTrailingZeros: countTrailingZeros,
@@ -47150,6 +47214,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	sign: sign,
 	sin: sin,
 	sinc: sinc,
+	sinh: sinh,
 	skinning: skinning,
 	smoothstep: smoothstep,
 	smoothstepElement: smoothstepElement,
