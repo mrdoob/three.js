@@ -25,15 +25,11 @@ export class Profiler extends EventDispatcher {
 		this.setupShell();
 		this.setupResizing();
 
-		// Setup orientation change listener for mobile devices
-		if ( this.isMobile ) {
-
-			this.setupOrientationListener();
-
-		}
-
-		// Setup window resize listener to constrain detached windows
+		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
+
+		// Setup orientation change listener for mobile devices
+		this.setupOrientationListener();
 
 	}
 
@@ -72,6 +68,8 @@ export class Profiler extends EventDispatcher {
 	setupOrientationListener() {
 
 		const handleOrientationChange = () => {
+
+			if ( ! this.isMobile ) return;
 
 			// Check if device is in landscape or portrait mode
 			const isLandscape = window.innerWidth > window.innerHeight;
@@ -147,6 +145,25 @@ export class Profiler extends EventDispatcher {
 
 		// Listen for window resize events
 		window.addEventListener( 'resize', () => {
+
+			const wasMobile = this.isMobile;
+			this.isMobile = this.detectMobile();
+
+			if ( this.isMobile !== wasMobile ) {
+
+				if ( this.isMobile ) {
+
+					this.floatingBtn.style.display = 'none';
+					this.panel.classList.add( 'hide-position-toggle' );
+
+				} else {
+
+					this.floatingBtn.style.display = '';
+					this.panel.classList.remove( 'hide-position-toggle' );
+
+				}
+
+			}
 
 			constrainDetachedWindows();
 			constrainMainPanel();
