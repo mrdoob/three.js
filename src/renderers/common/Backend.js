@@ -371,11 +371,11 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
 	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {number} byteLength - The number of bytes to copy.
+	 * @param {?number} [size=null] - The number of bytes to copy. If `null`, the entire source buffer is copied.
 	 * @param {number} [srcOffset=0] - The source offset in bytes.
 	 * @param {number} [dstOffset=0] - The destination offset in bytes.
 	 */
-	copyBufferToBuffer( /*srcAttribute, dstAttribute, byteLength, srcOffset=0, dstOffset=0*/ ) {}
+	copyBufferToBuffer( /* srcAttribute, dstAttribute, size = null, srcOffset = 0, dstOffset = 0 */ ) {}
 
 	/**
 	 * Creates the GPU buffer of a shader attribute.
