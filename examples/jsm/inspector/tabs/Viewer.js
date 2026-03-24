@@ -170,6 +170,8 @@ class Viewer extends Tab {
 
 		}
 
+		if ( ! this.isActive ) return;
+
 		const canvasDataList = nodes.map( node => this.getCanvasDataByNode( renderer, node ) );
 
 		//
