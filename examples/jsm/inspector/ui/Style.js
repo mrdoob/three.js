@@ -1041,10 +1041,11 @@ export class Style {
 }
 
 .list-scroll-wrapper {
-	overflow-x: auto;
-	width: 100%;
-	user-select: none;
-	-webkit-user-select: none;
+	width: max-content;
+	min-width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {

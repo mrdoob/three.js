@@ -29,6 +29,11 @@ class Timeline extends Tab {
 		this.graph.addLine( 'calls', 'var( --color-call )' );
 		this.graph.addLine( 'triangles', 'var( --color-red )' );
 
+		const scrollWrapper = document.createElement( 'div' );
+		scrollWrapper.className = 'list-scroll-wrapper';
+		this.scrollWrapper = scrollWrapper;
+		this.content.appendChild( scrollWrapper );
+
 		this.buildHeader();
 		this.buildUI();
 
@@ -131,7 +136,7 @@ class Timeline extends Tab {
 		header.style.borderBottom = '1px solid var(--border-color)';
 
 		const titleElement = document.createElement( 'div' );
-		titleElement.textContent = 'Backend Calls Timeline';
+		titleElement.textContent = 'Backend Calls';
 		titleElement.style.display = 'flex';
 		titleElement.style.alignItems = 'center';
 		titleElement.style.color = 'var(--text-primary)';
@@ -149,7 +154,7 @@ class Timeline extends Tab {
 
 		header.appendChild( titleElement );
 		header.appendChild( buttonsGroup );
-		this.content.appendChild( header );
+		this.scrollWrapper.appendChild( header );
 
 	}
 
@@ -443,7 +448,7 @@ class Timeline extends Tab {
 		mainArea.appendChild( this.timelineTrack );
 
 		container.appendChild( mainArea );
-		this.content.appendChild( container );
+		this.scrollWrapper.appendChild( container );
 
 	}
 

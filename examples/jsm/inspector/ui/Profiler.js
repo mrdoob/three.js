@@ -508,11 +508,9 @@ export class Profiler extends EventDispatcher {
 
 		if ( ! tab.miniContent.firstChild ) {
 
-			const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
+			while ( tab.content.firstChild ) {
 
-			if ( actualContent ) {
-
-				tab.miniContent.appendChild( actualContent );
+				tab.miniContent.appendChild( tab.content.firstChild );
 
 			}
 
