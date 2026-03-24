@@ -843,6 +843,22 @@ class Timeline extends Tab {
 
 			}
 
+			case 'updateSampler': {
+
+				const texture = args[ 0 ];
+
+				const details = {
+					magFilter: this.getTextureFilterName( texture.magFilter ),
+					minFilter: this.getTextureFilterName( texture.minFilter ),
+					wrapS: this.getTextureWrapName( texture.wrapS ),
+					wrapT: this.getTextureWrapName( texture.wrapT ),
+					anisotropy: texture.anisotropy
+				};
+
+				return details;
+
+			}
+
 			case 'createTexture':
 			case 'destroyTexture': {
 
@@ -886,6 +902,33 @@ class Timeline extends Tab {
 		}
 
 		return 'Texture';
+
+	}
+
+	getTextureFilterName( filter ) {
+
+		const filters = {
+			1003: 'Nearest',
+			1004: 'NearestMipmapNearest',
+			1005: 'NearestMipmapLinear',
+			1006: 'Linear',
+			1007: 'LinearMipmapNearest',
+			1008: 'LinearMipmapLinear'
+		};
+
+		return filters[ filter ] || filter;
+
+	}
+
+	getTextureWrapName( wrap ) {
+
+		const wrappings = {
+			1000: 'Repeat',
+			1001: 'ClampToEdge',
+			1002: 'MirroredRepeat'
+		};
+
+		return wrappings[ wrap ] || wrap;
 
 	}
 
