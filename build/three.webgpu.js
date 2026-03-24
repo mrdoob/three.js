@@ -59629,80 +59629,15 @@ class Renderer {
 	 *
 	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
 	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {?number} [count=null] - The number of items to copy. If `null`, the overlapping range is copied.
-	 * @param {number} [srcIndex=0] - The source start index (in items).
-	 * @param {number} [dstIndex=0] - The destination start index (in items).
+	 * @param {?number} [size=null] - The number of bytes to copy. If `null`, the entire source buffer is copied.
+	 * @param {number} [srcOffset=0] - The source offset in bytes.
+	 * @param {number} [dstOffset=0] - The destination offset in bytes.
 	 */
-	copyBufferToBuffer(
-		srcAttribute,
-		dstAttribute,
-		count = null,
-		srcIndex = 0,
-		dstIndex = 0,
-	) {
+	copyBufferToBuffer( srcAttribute, dstAttribute, size = null, srcOffset = 0, dstOffset = 0 ) {
 
-		// Layout must match for item-wise copy.
-		if (
-			srcAttribute.itemSize !== dstAttribute.itemSize ||
-			srcAttribute.array.BYTES_PER_ELEMENT !==
-				dstAttribute.array.BYTES_PER_ELEMENT
-		) {
-
-			error( 'Renderer.copyBufferToBuffer: Incompatible attribute layouts.' );
-			return;
-
-		}
-
-		const stride = srcAttribute.itemSize * srcAttribute.array.BYTES_PER_ELEMENT;
-
-		const maxCount = Math.max(
-			0,
-			Math.min( srcAttribute.count - srcIndex, dstAttribute.count - dstIndex ),
-		);
-
-		if ( count === null ) count = maxCount;
-		else count = Math.max( 0, Math.min( count, maxCount ) );
-
-		if ( count <= 0 ) {
-
-			error(
-				'Renderer.copyBufferToBuffer: Copy would produce a zero-sized GPU buffer region.\n' +
-					'This leads to invalid WebGPU bindings.\n' +
-					`src.count=${srcAttribute.count}, dst.count=${dstAttribute.count}, ` +
-					`srcIndex=${srcIndex}, dstIndex=${dstIndex}`,
-			);
-			return;
-
-		}
-
-		const byteLength = count * stride;
-		const srcOffset = srcIndex * stride;
-		const dstOffset = dstIndex * stride;
-
-		// Keep behavior consistent with WebGPU backend validation.
-		if (
-			( byteLength & 3 ) !== 0 ||
-			( srcOffset & 3 ) !== 0 ||
-			( dstOffset & 3 ) !== 0
-		) {
-
-			error(
-				`Renderer.copyBufferToBuffer: WebGPU requires 4-byte aligned copies. Got srcOffset=${srcOffset}, dstOffset=${dstOffset}, byteLength=${byteLength}.`,
-			);
-			return;
-
-		}
-
-		this.backend.copyBufferToBuffer(
-			srcAttribute,
-			dstAttribute,
-			byteLength,
-			srcOffset,
-			dstOffset,
-		);
+		this.backend.copyBufferToBuffer( srcAttribute, dstAttribute, size, srcOffset, dstOffset );
 
 	}
-
 
 	/**
 	 * Reads pixel data from the given render target.
@@ -63642,11 +63577,11 @@ class Backend {
 	 * @abstract
 	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
 	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {number} byteLength - The number of bytes to copy.
+	 * @param {?number} [size=null] - The number of bytes to copy. If `null`, the entire source buffer is copied.
 	 * @param {number} [srcOffset=0] - The source offset in bytes.
 	 * @param {number} [dstOffset=0] - The destination offset in bytes.
 	 */
-	copyBufferToBuffer( /*srcAttribute, dstAttribute, byteLength, srcOffset=0, dstOffset=0*/ ) {}
+	copyBufferToBuffer( /* srcAttribute, dstAttribute, size = null, srcOffset = 0, dstOffset = 0 */ ) {}
 
 	/**
 	 * Creates the GPU buffer of a shader attribute.
@@ -70173,21 +70108,15 @@ class WebGLBackend extends Backend {
 	/**
 	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
 	 *
-	 *  Uses WebGL2 `copyBufferSubData`.
+	 * Uses WebGL2 `copyBufferSubData`.
 	 *
 	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
 	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
-	 * @param {number} byteLength - The number of bytes to copy.
+	 * @param {?number} [size=null] - The number of bytes to copy. If `null`, the entire source buffer is copied.
 	 * @param {number} [srcOffset=0] - The source offset in bytes.
 	 * @param {number} [dstOffset=0] - The destination offset in bytes.
 	 */
-	copyBufferToBuffer(
-		srcAttribute,
-		dstAttribute,
-		byteLength,
-		srcOffset = 0,
-		dstOffset = 0,
-	) {
+	copyBufferToBuffer( srcAttribute, dstAttribute, size = null, srcOffset = 0, dstOffset = 0 ) {
 
 		const gl = this.gl;
 
@@ -70199,26 +70128,18 @@ class WebGLBackend extends Backend {
 
 		const srcGPU = srcData.bufferGPU;
 		const dstGPU = dstData.bufferGPU;
+		const byteLength = size === null ? srcGPU.size : size;
 
 		const prevRead = gl.getParameter( gl.COPY_READ_BUFFER_BINDING );
 		const prevWrite = gl.getParameter( gl.COPY_WRITE_BUFFER_BINDING );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, srcGPU );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, dstGPU );
-
-		gl.copyBufferSubData(
-			gl.COPY_READ_BUFFER,
-			gl.COPY_WRITE_BUFFER,
-			srcOffset,
-			dstOffset,
-			byteLength,
-		);
-
+		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, srcOffset, dstOffset, byteLength );
 		gl.bindBuffer( gl.COPY_READ_BUFFER, prevRead );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, prevWrite );
 
 	}
-
 
 	/**
 	 * Checks if the given compatibility is supported by the backend.
@@ -80999,24 +80920,16 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
- 	* Copies data of the given source buffer attribute to the given destination buffer attribute.
- 	*
- 	* @param {BufferAttribute} srcAttribute - The source buffer attribute.
- 	* @param {BufferAttribute} dstAttribute - The destination buffer attribute.
- 	* @param {number} byteLength - The number of bytes to copy.
- 	* @param {number} [srcOffset=0] - The source offset in bytes.
- 	* @param {number} [dstOffset=0] - The destination offset in bytes.
- 	*/
-	copyBufferToBuffer( srcAttribute, dstAttribute, byteLength, srcOffset = 0, dstOffset = 0 ) {
+	 * Copies data of the given source buffer attribute to the given destination buffer attribute.
+	 *
+	 * @param {BufferAttribute} srcAttribute - The source buffer attribute.
+	 * @param {BufferAttribute} dstAttribute - The destination buffer attribute.
+	 * @param {?number} [size=null] - The number of bytes to copy. If `null`, the entire source buffer is copied.
+	 * @param {number} [srcOffset=0] - The source offset in bytes.
+	 * @param {number} [dstOffset=0] - The destination offset in bytes.
+	 */
+	copyBufferToBuffer( srcAttribute, dstAttribute, size = null, srcOffset = 0, dstOffset = 0 ) {
 
-		if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( byteLength & 3 ) !== 0 ) {
-
-			error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and byteLength must be multiples of 4 bytes.' );
-			return;
-
-		}
-
-		// Ensure GPU buffers exist for both src and dst.
 		const getOrCreateBuffer = ( attribute ) => {
 
 			const data = this.get( attribute );
@@ -81044,28 +80957,42 @@ class WebGPUBackend extends Backend {
 
 		if ( sourceGPU === undefined || destinationGPU === undefined ) {
 
-			error( 'WebGPUBackend: copyBufferToBuffer: missing GPUBuffer(s) after ensure.', {
-				srcId: srcAttribute.id,
-				dstId: dstAttribute.id,
-				srcHasBuffer: sourceGPU !== undefined,
-				dstHasBuffer: destinationGPU !== undefined,
-			} );
-
+			error( 'WebGPUBackend: copyBufferToBuffer: Missing GPUBuffer.' );
 			return;
 
 		}
 
-		if ( srcOffset + byteLength > sourceGPU.size || dstOffset + byteLength > destinationGPU.size ) {
+		if ( size === null ) {
 
-			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.', {
-				srcSize: sourceGPU.size,
-				dstSize: destinationGPU.size,
-				srcOffset,
-				dstOffset,
-				byteLength,
-			} );
+			if ( srcOffset !== 0 || dstOffset !== 0 ) {
 
-			return;
+				error( 'WebGPUBackend: copyBufferToBuffer: Offsets require an explicit size.' );
+				return;
+
+			}
+
+			if ( sourceGPU.size > destinationGPU.size ) {
+
+				error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
+				return;
+
+			}
+
+		} else {
+
+			if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( size & 3 ) !== 0 ) {
+
+				error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and size must be multiples of 4 bytes.' );
+				return;
+
+			}
+
+			if ( srcOffset + size > sourceGPU.size || dstOffset + size > destinationGPU.size ) {
+
+				error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
+				return;
+
+			}
 
 		}
 
@@ -81073,7 +81000,19 @@ class WebGPUBackend extends Backend {
 			label: 'copyBufferToBuffer_' + srcAttribute.id + '_' + dstAttribute.id,
 		} );
 
-		encoder.copyBufferToBuffer( sourceGPU, srcOffset, destinationGPU, dstOffset, byteLength );
+		if ( size === null ) {
+
+			encoder.copyBufferToBuffer( sourceGPU, destinationGPU );
+
+		} else if ( srcOffset === 0 && dstOffset === 0 ) {
+
+			encoder.copyBufferToBuffer( sourceGPU, destinationGPU, size );
+
+		} else {
+
+			encoder.copyBufferToBuffer( sourceGPU, srcOffset, destinationGPU, dstOffset, size );
+
+		}
 
 		this.device.queue.submit( [ encoder.finish() ] );
 
