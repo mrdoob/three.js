@@ -17,7 +17,8 @@ class Timeline extends Tab {
 		this.baseTriangles = 0;
 		this.currentFrame = null;
 		this.isHierarchicalView = true;
-
+		this.callBlocks = new WeakMap();
+		this.fallbackBlocks = [];
 		this.originalBackend = null;
 		this.originalMethods = new Map();
 		this.renderer = null;
@@ -621,7 +622,7 @@ class Timeline extends Tab {
 
 					}
 
-					const call = { method: prop };
+					const call = { method: prop, target: args[ 0 ] };
 					const details = this.getCallDetail( prop, args );
 
 					if ( details ) {
@@ -1024,11 +1025,104 @@ class Timeline extends Tab {
 
 	}
 
+	getCallBlock( call, fallbackIndex, instanceIndex = 0 ) {
+
+		const target = call.target;
+		let block;
+
+		if ( target && typeof target === 'object' ) {
+
+			let blocks = this.callBlocks.get( target );
+
+			if ( ! blocks ) {
+
+				blocks = [];
+				this.callBlocks.set( target, blocks );
+
+			}
+
+			block = blocks[ instanceIndex ];
+
+		} else {
+
+			block = this.fallbackBlocks[ fallbackIndex ];
+
+		}
+
+		if ( ! block ) {
+
+			block = document.createElement( 'div' );
+			block.style.padding = '4px 8px';
+			block.style.margin = '2px 0';
+			block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+			block.style.fontFamily = 'monospace';
+			block.style.fontSize = '12px';
+			block.style.color = 'var(--text-primary)';
+			block.style.whiteSpace = 'nowrap';
+			block.style.overflow = 'hidden';
+			block.style.textOverflow = 'ellipsis';
+			block.style.display = 'flex';
+			block.style.alignItems = 'center';
+
+			block.arrow = document.createElement( 'span' );
+			block.arrow.style.fontSize = '10px';
+			block.arrow.style.marginRight = '10px';
+			block.arrow.style.cursor = 'pointer';
+			block.arrow.style.width = '26px';
+			block.arrow.style.textAlign = 'center';
+			block.appendChild( block.arrow );
+
+			block.titleSpan = document.createElement( 'span' );
+			block.appendChild( block.titleSpan );
+
+			block.addEventListener( 'click', ( e ) => {
+
+				if ( ! block._groupId ) return;
+
+				e.stopPropagation();
+
+				if ( this.collapsedGroups.has( block._groupId ) ) {
+
+					this.collapsedGroups.delete( block._groupId );
+
+				} else {
+
+					this.collapsedGroups.add( block._groupId );
+
+				}
+
+				this.renderTimelineTrack( this.frames[ this.selectedFrameIndex ] );
+
+			} );
+
+			if ( target && typeof target === 'object' ) {
+
+				this.callBlocks.get( target )[ instanceIndex ] = block;
+
+			} else {
+
+				this.fallbackBlocks[ fallbackIndex ] = block;
+
+			}
+
+		}
+
+		block.style.cursor = 'default';
+		block._groupId = null;
+		block.arrow.style.display = 'none';
+
+		return block;
+
+	}
+
 	renderTimelineTrack( frame ) {
 
-		this.timelineTrack.innerHTML = '';
+		if ( ! frame || frame.calls.length === 0 ) {
 
-		if ( ! frame || frame.calls.length === 0 ) return;
+			this.timelineTrack.innerHTML = '';
+			return;
+
+		}
 
 		// Track collapsed states
 		if ( ! this.collapsedGroups ) {
@@ -1037,7 +1131,10 @@ class Timeline extends Tab {
 
 		}
 
-		const frag = document.createDocumentFragment();
+		let blockIndex = 0;
+		const trackChildren = this.timelineTrack.children;
+		let childIndex = 0;
+		const instanceCounts = new WeakMap();
 
 		if ( this.isHierarchicalView ) {
 
@@ -1056,7 +1153,7 @@ class Timeline extends Tab {
 
 				} else {
 
-					currentGroup = { method: call.method, count: 1, formatedDetails };
+					currentGroup = { method: call.method, count: 1, formatedDetails, target: call.target };
 					groupedCalls.push( currentGroup );
 
 				}
@@ -1067,90 +1164,67 @@ class Timeline extends Tab {
 			const indentSize = 24;
 
 			// Stack to keep track of parent elements and their collapsed state
-			const elementStack = [ { element: frag, isCollapsed: false, id: '' } ];
+			const elementStack = [ { element: this.timelineTrack, isCollapsed: false, id: '', beginCount: 0 } ];
 
 			for ( let i = 0; i < groupedCalls.length; i ++ ) {
 
 				const call = groupedCalls[ i ];
 
-				const block = document.createElement( 'div' );
-				block.style.padding = '4px 8px';
-				block.style.margin = '2px 0';
+				let instanceIndex = 0;
+
+				if ( call.target && typeof call.target === 'object' ) {
+
+					instanceIndex = instanceCounts.get( call.target ) || 0;
+					instanceCounts.set( call.target, instanceIndex + 1 );
+
+				}
+
+				const block = this.getCallBlock( call, blockIndex ++, instanceIndex );
 				block.style.marginLeft = ( currentIndent * indentSize ) + 'px';
 				block.style.borderLeft = '4px solid ' + this.getColorForMethod( call.method );
-				block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-				block.style.fontFamily = 'monospace';
-				block.style.fontSize = '12px';
-				block.style.color = 'var(--text-primary)';
-				block.style.whiteSpace = 'nowrap';
-				block.style.overflow = 'hidden';
-				block.style.textOverflow = 'ellipsis';
-				block.style.display = 'flex';
-				block.style.alignItems = 'center';
 
 				const currentParent = elementStack[ elementStack.length - 1 ];
 
 				// Only add to DOM if parent is not collapsed
 				if ( ! currentParent.isCollapsed ) {
 
-					frag.appendChild( block );
+					if ( trackChildren[ childIndex ] !== block ) {
+
+						this.timelineTrack.insertBefore( block, trackChildren[ childIndex ] );
+
+					}
+
+					childIndex ++;
 
 				}
 
 				if ( call.method.startsWith( 'begin' ) ) {
 
-					const groupId = currentParent.id + '/' + call.method + '-' + i;
+					const beginIndex = currentParent.beginCount ++;
+					const groupId = currentParent.id + '/' + call.method + '-' + beginIndex;
 					const isCollapsed = this.collapsedGroups.has( groupId );
 
-					// Add toggle arrow
-					const arrow = document.createElement( 'span' );
-					arrow.textContent = isCollapsed ? '[ + ]' : '[ - ]';
-					arrow.style.fontSize = '10px';
-					arrow.style.marginRight = '10px';
-					arrow.style.cursor = 'pointer';
-					arrow.style.width = '26px';
-					arrow.style.display = 'inline-block';
-					arrow.style.textAlign = 'center';
-					block.appendChild( arrow );
-
+					block._groupId = groupId;
 					block.style.cursor = 'pointer';
 
-					// Title
-					const title = document.createElement( 'span' );
-					title.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
-					block.appendChild( title );
+					block.arrow.style.display = 'inline-block';
+					block.arrow.textContent = isCollapsed ? '[ + ]' : '[ - ]';
 
-					block.addEventListener( 'click', ( e ) => {
-
-						e.stopPropagation();
-						if ( isCollapsed ) {
-
-							this.collapsedGroups.delete( groupId );
-
-						} else {
-
-							this.collapsedGroups.add( groupId );
-
-						}
-
-						// Re-render to apply changes
-						this.renderTimelineTrack( this.frames[ this.selectedFrameIndex ] );
-
-					} );
+					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent ++;
-					elementStack.push( { element: block, isCollapsed: currentParent.isCollapsed || isCollapsed, id: groupId } );
+					elementStack.push( { element: block, isCollapsed: currentParent.isCollapsed || isCollapsed, id: groupId, beginCount: 0 } );
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
 
 				} else {
 
-					block.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 				}
 
@@ -1177,27 +1251,29 @@ class Timeline extends Tab {
 
 				const call = sortedCalls[ i ];
 
-				const block = document.createElement( 'div' );
-				block.style.padding = '4px 8px';
-				block.style.margin = '2px 0';
+				const block = this.getCallBlock( call, blockIndex ++ );
+				block.style.marginLeft = '0px';
 				block.style.borderLeft = '4px solid ' + this.getColorForMethod( call.method );
-				block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-				block.style.fontFamily = 'monospace';
-				block.style.fontSize = '12px';
-				block.style.color = 'var(--text-primary)';
-				block.style.whiteSpace = 'nowrap';
-				block.style.overflow = 'hidden';
-				block.style.textOverflow = 'ellipsis';
 
-				block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
+				block.titleSpan.innerHTML = call.method + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
-				frag.appendChild( block );
+				if ( trackChildren[ childIndex ] !== block ) {
+
+					this.timelineTrack.insertBefore( block, trackChildren[ childIndex ] );
+
+				}
+
+				childIndex ++;
 
 			}
 
 		}
 
-		this.timelineTrack.appendChild( frag );
+		while ( this.timelineTrack.children.length > childIndex ) {
+
+			this.timelineTrack.removeChild( this.timelineTrack.lastChild );
+
+		}
 
 	}
 
