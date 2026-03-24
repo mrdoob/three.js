@@ -2965,6 +2965,16 @@ class NodeBuilder {
 
 			this.addFlow( 'compute', object );
 
+			if ( renderer.contextNode.isContextNode === true ) {
+
+				this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+
+			} else {
+
+				error( 'NodeBuilder: "renderer.contextNode" must be an instance of `context()`.' );
+
+			}
+
 		}
 
 		// setup() -> stage 1: create possible new nodes and/or return an output reference node
