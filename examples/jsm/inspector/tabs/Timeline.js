@@ -3,6 +3,7 @@ import { Graph } from '../ui/Graph.js';
 import { getItem, setItem } from '../Inspector.js';
 
 const LIMIT = 500;
+const TRIANGLES_GRAPH_LIMIT = 60;
 
 class Timeline extends Tab {
 
@@ -12,6 +13,8 @@ class Timeline extends Tab {
 
 		this.isRecording = false;
 		this.frames = []; // Array of { id: number, calls: [] }
+
+		this.baseTriangles = 0;
 		this.currentFrame = null;
 		this.isHierarchicalView = true;
 
@@ -23,6 +26,7 @@ class Timeline extends Tab {
 		// Make lines in timeline graph
 		this.graph.addLine( 'fps', 'var( --color-fps )' );
 		this.graph.addLine( 'calls', 'var( --color-call )' );
+		this.graph.addLine( 'triangles', 'var( --color-red )' );
 
 		this.buildHeader();
 		this.buildUI();
@@ -127,11 +131,15 @@ class Timeline extends Tab {
 
 		const titleElement = document.createElement( 'div' );
 		titleElement.textContent = 'Backend Calls Timeline';
+		titleElement.style.display = 'flex';
+		titleElement.style.alignItems = 'center';
 		titleElement.style.color = 'var(--text-primary)';
 		titleElement.style.alignSelf = 'center';
 		titleElement.style.paddingLeft = '5px';
 
 		this.frameInfo = document.createElement( 'span' );
+		this.frameInfo.style.display = 'inline-flex';
+		this.frameInfo.style.alignItems = 'center';
 		this.frameInfo.style.marginLeft = '15px';
 		this.frameInfo.style.fontFamily = 'monospace';
 		this.frameInfo.style.color = 'var(--text-secondary)';
@@ -534,13 +542,38 @@ class Timeline extends Tab {
 
 							}
 
+							const t = this.currentFrame.triangles || 0;
+
+							if ( t > this.baseTriangles ) {
+
+								const oldBase = this.baseTriangles;
+								this.baseTriangles = t;
+
+								if ( oldBase > 0 ) {
+
+									const ratio = oldBase / this.baseTriangles;
+									const points = this.graph.lines[ 'triangles' ].points;
+
+									for ( let i = 0; i < points.length; i ++ ) {
+
+										points[ i ] *= ratio;
+
+									}
+
+								}
+
+							}
+
+							const normalizedTriangles = this.baseTriangles > 0 ? ( t / this.baseTriangles ) * TRIANGLES_GRAPH_LIMIT : 0;
+
 							this.graph.addPoint( 'calls', this.currentFrame.calls.length );
 							this.graph.addPoint( 'fps', this.currentFrame.fps );
+							this.graph.addPoint( 'triangles', normalizedTriangles );
 							this.graph.update();
 
 						}
 
-						this.currentFrame = { id: frameNumber, calls: [], fps: 0 };
+						this.currentFrame = { id: frameNumber, calls: [], fps: 0, triangles: 0 };
 						this.frames.push( this.currentFrame );
 
 						if ( this.frames.length > LIMIT ) {
@@ -588,30 +621,20 @@ class Timeline extends Tab {
 
 					}
 
-					let methodLabel = prop;
+					const call = { method: prop };
+					const details = this.getCallDetail( prop, args );
 
-					if ( prop === 'beginRender' ) {
+					if ( details ) {
 
-						if ( this.renderer.inspector && this.renderer.inspector.currentRender ) {
+						call.details = details;
 
-							methodLabel += ' - ' + this.renderer.inspector.currentRender.name;
+						if ( details.triangles !== undefined ) {
 
-						}
-
-					} else if ( prop === 'beginCompute' ) {
-
-						if ( this.renderer.inspector && this.renderer.inspector.currentCompute ) {
-
-							methodLabel += ' - ' + this.renderer.inspector.currentCompute.name;
+							this.currentFrame.triangles += details.triangles;
 
 						}
 
 					}
-
-					const call = { method: methodLabel };
-					const details = this.getCallDetail( prop, args );
-
-					if ( details ) call.details = details;
 
 					this.currentFrame.calls.push( call );
 
@@ -655,8 +678,10 @@ class Timeline extends Tab {
 		this.timelineTrack.innerHTML = '';
 		this.playhead.style.display = 'none';
 		this.frameInfo.textContent = '';
+		this.baseTriangles = 0;
 		this.graph.lines[ 'calls' ].points = [];
 		this.graph.lines[ 'fps' ].points = [];
+		this.graph.lines[ 'triangles' ].points = [];
 		this.graph.resetLimit();
 		this.graph.update();
 
@@ -691,20 +716,83 @@ class Timeline extends Tab {
 
 					details.object = renderObject.object.name || renderObject.object.type;
 
-					if ( renderObject.object.count > 1 ) {
+					if ( renderObject.material ) {
 
-						details.instance = renderObject.object.count;
+						details.material = renderObject.material.name || renderObject.material.type;
+
+					}
+
+					if ( renderObject.geometry ) {
+
+						details.geometry = renderObject.geometry.name || undefined;
+
+						if ( renderObject.getDrawParameters ) {
+
+							const drawParams = renderObject.getDrawParameters();
+
+							if ( drawParams ) {
+
+								if ( renderObject.object.isMesh || renderObject.object.isSprite ) {
+
+									details.triangles = drawParams.vertexCount / 3;
+
+									if ( renderObject.object.count > 1 ) {
+
+										details.instance = renderObject.object.count;
+
+										details[ 'triangles per instance' ] = details.triangles;
+										details.triangles *= details.instance;
+
+									}
+
+								}
+
+							}
+
+						}
 
 					}
 
 				}
 
-				if ( renderObject.material ) details.material = renderObject.material.name || renderObject.material.type;
-				if ( renderObject.geometry ) details.geometry = renderObject.geometry.name || undefined;
-
-				if ( renderObject.camera ) details.camera = renderObject.camera.name || renderObject.camera.type;
-
 				return details;
+
+			}
+
+			case 'beginRender': {
+
+				const renderContext = args[ 0 ];
+				if ( ! renderContext ) return null;
+
+				const details = {};
+
+				if ( this.renderer.inspector && this.renderer.inspector.currentRender ) {
+
+					details.scene = this.renderer.inspector.currentRender.name;
+
+				}
+
+				if ( renderContext.camera && renderContext.camera.isCamera ) {
+
+					details.camera = renderContext.camera.name || renderContext.camera.type;
+
+				}
+
+				return Object.keys( details ).length > 0 ? details : null;
+
+			}
+
+			case 'beginCompute': {
+
+				const details = {};
+
+				if ( this.renderer.inspector && this.renderer.inspector.currentCompute ) {
+
+					details.compute = this.renderer.inspector.currentCompute.name;
+
+				}
+
+				return Object.keys( details ).length > 0 ? details : null;
 
 			}
 
@@ -730,17 +818,73 @@ class Timeline extends Tab {
 
 			}
 
+			case 'copyFramebufferToTexture': {
+
+				const target = args[ 0 ];
+				const rectangle = args[ 2 ];
+
+				const details = {};
+				details.target = this.getTextureName( target );
+
+				if ( rectangle ) {
+
+					details.width = rectangle.z;
+					details.height = rectangle.w;
+
+				} else if ( target && target.image ) {
+
+					if ( target.image.width !== undefined ) details.width = target.image.width;
+					if ( target.image.height !== undefined ) details.height = target.image.height;
+
+				}
+
+				return details;
+
+			}
+
 			case 'createTexture':
 			case 'destroyTexture': {
 
 				const texture = args[ 0 ];
-				return texture?.name ? { texture: texture.name } : null;
+				const name = this.getTextureName( texture );
+				const details = name ? { texture: name } : null;
+
+				if ( details && texture && texture.image ) {
+
+					if ( texture.image.width !== undefined ) details.width = texture.image.width;
+					if ( texture.image.height !== undefined ) details.height = texture.image.height;
+
+				}
+
+				return details;
 
 			}
 
 		}
 
 		return null;
+
+	}
+
+	getTextureName( texture ) {
+
+		if ( ! texture ) return '';
+		if ( texture.name ) return texture.name;
+
+		const types = [
+			'isFramebufferTexture', 'isDepthTexture', 'isDataArrayTexture',
+			'isData3DTexture', 'isDataTexture', 'isCompressedArrayTexture',
+			'isCompressedTexture', 'isCubeTexture', 'isVideoTexture',
+			'isCanvasTexture', 'isTexture'
+		];
+
+		for ( const type of types ) {
+
+			if ( texture[ type ] ) return type.replace( 'is', '' );
+
+		}
+
+		return 'Texture';
 
 	}
 
@@ -777,6 +921,7 @@ class Timeline extends Tab {
 		// Reset graph safely to fit recorded frames exactly up to maxPoints
 		this.graph.lines[ 'calls' ].points = [];
 		this.graph.lines[ 'fps' ].points = [];
+		this.graph.lines[ 'triangles' ].points = [];
 		this.graph.resetLimit();
 
 		// If recorded frames exceed SVG Graph maxPoints, we sample/slice it
@@ -790,11 +935,28 @@ class Timeline extends Tab {
 
 		}
 
+		let maxTriangles = 0;
+
 		for ( let i = 0; i < framesToRender.length; i ++ ) {
+
+			const t = framesToRender[ i ].triangles || 0;
+			if ( t > maxTriangles ) {
+
+				maxTriangles = t;
+
+			}
+
+		}
+
+		for ( let i = 0; i < framesToRender.length; i ++ ) {
+
+			const t = framesToRender[ i ].triangles || 0;
+			const normalizedTriangles = maxTriangles > 0 ? ( t / maxTriangles ) * TRIANGLES_GRAPH_LIMIT : 0;
 
 			// Adding calls length to the Graph SVG to visualize workload geometry
 			this.graph.addPoint( 'calls', framesToRender[ i ].calls.length );
 			this.graph.addPoint( 'fps', framesToRender[ i ].fps || 0 );
+			this.graph.addPoint( 'triangles', normalizedTriangles );
 
 		}
 
@@ -828,7 +990,8 @@ class Timeline extends Tab {
 		this.renderTimelineTrack( frame );
 
 		// Update UI texts
-		this.frameInfo.textContent = 'Frame: ' + frame.id + ' [' + frame.calls.length + ' calls] [' + ( frame.fps || 0 ).toFixed( 1 ) + ' FPS]';
+		const group = ( c, text ) => `<span style="display:inline-flex;align-items:center;margin-left:12px;"><span style="width:6px;height:6px;border-radius:50%;background-color:${c};margin-right:6px;"></span>${text}</span>`;
+		this.frameInfo.innerHTML = 'Frame: ' + frame.id + group( 'var(--color-fps)', ( frame.fps || 0 ).toFixed( 1 ) + ' FPS' ) + group( 'var(--color-call)', frame.calls.length + ' calls' ) + group( 'var(--color-red)', ( frame.triangles || 0 ) + ' triangles' );
 
 		// Update playhead position
 		const rect = this.graphSlider.getBoundingClientRect();
