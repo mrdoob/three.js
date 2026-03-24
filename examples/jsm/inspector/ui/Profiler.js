@@ -252,6 +252,19 @@ export class Profiler extends EventDispatcher {
 
 		const header = document.createElement( 'div' );
 		header.className = 'profiler-header';
+
+		// Enable horizontal scrolling with vertical mouse wheel
+		header.addEventListener( 'wheel', ( e ) => {
+
+			if ( e.deltaY !== 0 ) {
+
+				e.preventDefault();
+				header.scrollLeft += e.deltaY * .25;
+
+			}
+
+		}, { passive: false } );
+
 		this.tabsContainer = document.createElement( 'div' );
 		this.tabsContainer.className = 'profiler-tabs';
 
