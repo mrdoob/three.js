@@ -2590,21 +2590,10 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		} else {
+		} else if ( srcOffset + size > sourceGPU.size || dstOffset + size > destinationGPU.size ) {
 
-			if ( ( srcOffset & 3 ) !== 0 || ( dstOffset & 3 ) !== 0 || ( size & 3 ) !== 0 ) {
-
-				error( 'WebGPUBackend: copyBufferToBuffer: srcOffset, dstOffset and size must be multiples of 4 bytes.' );
-				return;
-
-			}
-
-			if ( srcOffset + size > sourceGPU.size || dstOffset + size > destinationGPU.size ) {
-
-				error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
-				return;
-
-			}
+			error( 'WebGPUBackend: copyBufferToBuffer: Copy region out of bounds.' );
+			return;
 
 		}
 
