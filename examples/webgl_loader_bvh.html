@@ -37,7 +37,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let camera, controls, scene, renderer;
 			let mixer;
@@ -94,7 +95,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

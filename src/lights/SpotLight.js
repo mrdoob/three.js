@@ -147,6 +147,8 @@ class SpotLight extends Light {
 
 	dispose() {
 
+		super.dispose();
+
 		this.shadow.dispose();
 
 	}

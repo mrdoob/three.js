@@ -123,7 +123,6 @@ class Volume {
 				case 'uint64' :
 				case 'uint64_t' :
 					throw new Error( 'Error in Volume constructor : this type is not supported in JavaScript' );
-					break;
 				case 'Float32' :
 				case 'float32' :
 				case 'float' :

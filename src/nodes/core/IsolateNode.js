@@ -53,7 +53,7 @@ class IsolateNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const previousCache = builder.getCache();
 		const cache = builder.getCacheFromNode( this, this.parent );

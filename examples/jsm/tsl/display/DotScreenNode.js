@@ -101,4 +101,4 @@ export default DotScreenNode;
  * @param {number} [scale=1] - The scale of the effect. A higher value means smaller dots.
  * @returns {DotScreenNode}
  */
-export const dotScreen = ( node, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), angle, scale ) );
+export const dotScreen = ( node, angle, scale ) => new DotScreenNode( nodeObject( node ), angle, scale );

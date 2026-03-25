@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>USDComposer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">USDComposer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>USDComposer handles scene composition from parsed USD data.
+This includes reference resolution, variant selection, transform handling,
+and building the Three.js scene graph.</p>
+<p>Works with specsByPath format from USDCParser.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="USDComposer" translate="no">new <a href="#USDComposer">USDComposer</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="_applyMaterialBinding" translate="no">.<a href="#_applyMaterialBinding">_applyMaterialBinding</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Apply material binding from a prim path to a mesh.
+Used when merging referenced geometry into a prim that has material binding.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_applyTextureOrValue" translate="no">.<a href="#_applyTextureOrValue">_applyTextureOrValue</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Shared helper for applying texture or value from shader attribute.
+Reduces duplication between _applyPreviewSurface and _applyOpenPBRSurface.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_buildHierarchy" translate="no">.<a href="#_buildHierarchy">_buildHierarchy</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Build the scene hierarchy recursively.
+Uses childrenByPath index for O(1) child lookup instead of O(n) iteration.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_buildIndexes" translate="no">.<a href="#_buildIndexes">_buildIndexes</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Build indexes for efficient lookups.
+Called once during compose() to avoid O(n) scans per lookup.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_buildMesh" translate="no">.<a href="#_buildMesh">_buildMesh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Build a mesh from a Mesh spec.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_findSingleMesh" translate="no">.<a href="#_findSingleMesh">_findSingleMesh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Find a single mesh in the group's shallow hierarchy.
+Only returns a mesh if it's at depth 0 or 1, not deeply nested.
+This preserves transforms in complex hierarchies like Kitchen Set
+while supporting USDZExporter round-trip (Xform &gt; Xform &gt; Mesh pattern).</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getAttributes" translate="no">.<a href="#_getAttributes">_getAttributes</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get attributes for a path from attribute specs.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getBasePath" translate="no">.<a href="#_getBasePath">_getBasePath</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the base path (directory) from a file path.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getLocalVariantSelections" translate="no">.<a href="#_getLocalVariantSelections">_getLocalVariantSelections</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Extract variant selections from a spec's fields.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getMaterialBindingTarget" translate="no">.<a href="#_getMaterialBindingTarget">_getMaterialBindingTarget</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get material binding target path, checking variant paths if needed.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getMaterialPath" translate="no">.<a href="#_getMaterialPath">_getMaterialPath</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the material path for a mesh, checking various binding sources.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getReference" translate="no">.<a href="#_getReference">_getReference</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get reference value from a prim spec.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_getVariantPaths" translate="no">.<a href="#_getVariantPaths">_getVariantPaths</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get variant paths for a parent path based on variant selections.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_hasNonIdentityTransform" translate="no">.<a href="#_hasNonIdentityTransform">_hasNonIdentityTransform</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Check if an object has a non-identity local transform.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_isDirectChild" translate="no">.<a href="#_isDirectChild">_isDirectChild</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Check if a path is a direct child of parentPath.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_resolveFilePath" translate="no">.<a href="#_resolveFilePath">_resolveFilePath</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resolve a file path relative to basePath.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_resolveReference" translate="no">.<a href="#_resolveReference">_resolveReference</a><span class="signature">( refValue : <span class="param-type">string</span>, localVariants : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a> | null</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resolve a USD reference and return the composed content.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">refValue</strong>
+									</td>
+									<td class="description last">
+										<p>Reference value like &quot;@./path/to/file.usdc@&quot;</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">localVariants</strong>
+									</td>
+									<td class="description last">
+										<p>Variant selections to apply</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Composed content or null</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyTransform" translate="no">.<a href="#applyTransform">applyTransform</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Apply USD transforms to a Three.js object.
+Handles xformOpOrder with proper matrix composition.
+USD uses row-vector convention, Three.js uses column-vector.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="compose" translate="no">.<a href="#compose">compose</a><span class="signature">( parsedData : <span class="param-type">Object</span>, assets : <span class="param-type">Object</span>, variantSelections : <span class="param-type">Object</span>, basePath : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Compose a Three.js scene from parsed USD data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parsedData</strong>
+									</td>
+									<td class="description last">
+										<p>Data from USDCParser or USDAParser</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">assets</strong>
+									</td>
+									<td class="description last">
+										<p>Dictionary of referenced assets (specsByPath or blob URLs)</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">variantSelections</strong>
+									</td>
+									<td class="description last">
+										<p>External variant selections</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">basePath</strong>
+									</td>
+									<td class="description last">
+										<p>Base path for resolving relative references</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Three.js scene graph</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/usd/USDComposer.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/usd/USDComposer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

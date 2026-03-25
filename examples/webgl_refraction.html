@@ -38,7 +38,7 @@
 			import { Refractor } from 'three/addons/objects/Refractor.js';
 			import { WaterRefractionShader } from 'three/addons/shaders/WaterRefractionShader.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 
 			let refractor, smallSphere;
 
@@ -48,7 +48,8 @@
 
 				const container = document.getElementById( 'container' );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// scene
 				scene = new THREE.Scene();
@@ -162,7 +163,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				refractor.material.uniforms.time.value = time;
 

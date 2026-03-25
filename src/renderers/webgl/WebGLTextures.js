@@ -24,8 +24,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
-			// eslint-disable-next-line compat/compat
 			&& ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
 
 	} catch ( err ) {
 
@@ -38,7 +38,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		// Use OffscreenCanvas when available. Specially needed in web workers
 
 		return useOffscreenCanvas ?
-			// eslint-disable-next-line compat/compat
 			new OffscreenCanvas( width, height ) : createElementNS( 'canvas' );
 
 	}
@@ -469,6 +468,18 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getTextureUnits() {
+
+		return textureUnits;
+
+	}
+
+	function setTextureUnits( value ) {
+
+		textureUnits = value;
+
+	}
+
 	function allocateTextureUnit() {
 
 		const textureUnit = textureUnits;
@@ -820,11 +831,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// Trim the array to only contain the merged ranges.
 			updateRanges.length = mergeIndex + 1;
 
-			const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
-			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
-			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+			const currentUnpackRowLen = state.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const currentUnpackSkipPixels = state.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const currentUnpackSkipRows = state.getParameter( _gl.UNPACK_SKIP_ROWS );
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+			state.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -840,8 +851,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const width = pixelCount;
 				const height = 1;
 
-				_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
+				state.pixelStorei( _gl.UNPACK_SKIP_PIXELS, x );
+				state.pixelStorei( _gl.UNPACK_SKIP_ROWS, y );
 
 				state.texSubImage2D( _gl.TEXTURE_2D, 0, x, y, width, height, glFormat, glType, image.data );
 
@@ -849,9 +860,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			texture.clearUpdateRanges();
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+			state.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+			state.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+			state.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
 
 		}
 
@@ -875,14 +886,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.activeTexture( _gl.TEXTURE0 + slot );
 
-			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
-			const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
+			const isImageBitmap = ( typeof ImageBitmap !== 'undefined' && texture.image instanceof ImageBitmap );
 
-			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+			if ( isImageBitmap === false ) {
+
+				const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
+				const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
+				const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
+
+				state.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+				state.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+				state.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+
+			}
+
+			state.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			let image = resizeImage( texture.image, false, capabilities.maxTextureSize );
 			image = verifyColorSpace( texture, image );
@@ -1310,10 +1328,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
 			const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
-			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
+			state.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+			state.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+			state.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+			state.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 			const isCompressed = ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture );
 			const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
@@ -1575,7 +1593,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	function setupRenderBufferStorage( renderbuffer, renderTarget, isMultisample ) {
+	function setupRenderBufferStorage( renderbuffer, renderTarget, useMultisample ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -1588,15 +1606,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const glAttachmentType = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
 
 			// set up the attachment
-			const samples = getRenderTargetSamples( renderTarget );
-			const isUseMultisampledRTT = useMultisampledRTT( renderTarget );
-			if ( isUseMultisampledRTT ) {
+			if ( useMultisampledRTT( renderTarget ) ) {
 
-				multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+				multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, getRenderTargetSamples( renderTarget ), glInternalFormat, renderTarget.width, renderTarget.height );
 
-			} else if ( isMultisample ) {
+			} else if ( useMultisample ) {
 
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, getRenderTargetSamples( renderTarget ), glInternalFormat, renderTarget.width, renderTarget.height );
 
 			} else {
 
@@ -1617,15 +1633,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const glFormat = utils.convert( texture.format, texture.colorSpace );
 				const glType = utils.convert( texture.type );
 				const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
-				const samples = getRenderTargetSamples( renderTarget );
 
-				if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
+				if ( useMultisampledRTT( renderTarget ) ) {
 
-					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, getRenderTargetSamples( renderTarget ), glInternalFormat, renderTarget.width, renderTarget.height );
 
-				} else if ( useMultisampledRTT( renderTarget ) ) {
+				} else if ( useMultisample ) {
 
-					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, getRenderTargetSamples( renderTarget ), glInternalFormat, renderTarget.width, renderTarget.height );
 
 				} else {
 
@@ -2383,6 +2398,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	this.allocateTextureUnit = allocateTextureUnit;
 	this.resetTextureUnits = resetTextureUnits;
+	this.getTextureUnits = getTextureUnits;
+	this.setTextureUnits = setTextureUnits;
 
 	this.setTexture2D = setTexture2D;
 	this.setTexture2DArray = setTexture2DArray;

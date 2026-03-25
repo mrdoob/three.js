@@ -90,7 +90,7 @@ class Source {
 
 		} else if ( ( typeof VideoFrame !== 'undefined' ) && ( data instanceof VideoFrame ) ) {
 
-			target.set( data.displayHeight, data.displayWidth, 0 );
+			target.set( data.displayWidth, data.displayHeight, 0 );
 
 		} else if ( data !== null ) {
 

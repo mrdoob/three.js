@@ -27,7 +27,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let stats, clock;
+			let stats, timer;
 			let scene, camera, renderer, mixer;
 
 			init();
@@ -106,7 +106,8 @@
 
 				//
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -125,7 +126,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) {
 

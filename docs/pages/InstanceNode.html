@@ -30,7 +30,7 @@ data.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>count</strong>
+										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
 										<p>The number of instances.</p>
@@ -38,7 +38,7 @@ data.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>instanceMatrix</strong>
+										<strong translate="no">instanceMatrix</strong>
 									</td>
 									<td class="description last">
 										<p>Instanced buffer attribute representing the instance transformations.</p>
@@ -46,7 +46,7 @@ data.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>instanceColor</strong>
+										<strong translate="no">instanceColor</strong>
 									</td>
 									<td class="description last">
 										<p>Instanced buffer attribute representing the instance colors.</p>
@@ -114,6 +114,13 @@ data.</p></div>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="previousInstanceMatrixNode" translate="no">.<a href="#previousInstanceMatrixNode">previousInstanceMatrixNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The previous instance matrices. Required for computing motion vectors.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The update type is set to <code>frame</code> since an update
@@ -125,6 +132,27 @@ of instanced buffer data must be checked per frame.</p>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getPreviousInstancedPosition" translate="no">.<a href="#getPreviousInstancedPosition">getPreviousInstancedPosition</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the transformed/instanced vertex position of the previous frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instanced position from the previous frame.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -136,7 +164,7 @@ like with morph and skinning nodes.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -157,7 +185,7 @@ like with morph and skinning nodes.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>The current node frame.</p>

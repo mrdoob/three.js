@@ -191,7 +191,7 @@ class Audio extends Object3D {
 		/**
 		 * Defines the source type.
 		 *
-		 * The property is automatically by one of the `set*()` methods.
+		 * The property is automatically set by one of the `set*()` methods.
 		 *
 		 * @type {('empty'|'audioNode'|'mediaNode'|'mediaStreamNode'|'buffer')}
 		 * @readonly

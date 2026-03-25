@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Raycaster } from '../../../../src/core/Raycaster.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
@@ -78,43 +76,6 @@ export default QUnit.module( 'Core', () => {
 			// no params
 			const object = new Raycaster();
 			assert.ok( object, 'Can instantiate a Raycaster.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'ray', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'near', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'far', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'camera', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'layers', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'params', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

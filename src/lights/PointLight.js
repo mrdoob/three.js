@@ -94,6 +94,8 @@ class PointLight extends Light {
 
 	dispose() {
 
+		super.dispose();
+
 		this.shadow.dispose();
 
 	}

@@ -41,7 +41,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			init();
 
@@ -288,14 +288,14 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 
 				const bloomPass = bloom( scenePassColor, 1, 0.1, 1 );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				// controls
 
@@ -336,7 +336,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

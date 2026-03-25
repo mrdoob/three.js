@@ -24,9 +24,9 @@
 		<script type="module">
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { VOXLoader, VOXData3DTexture } from 'three/addons/loaders/VOXLoader.js';
+			import { VOXLoader, buildData3DTexture } from 'three/addons/loaders/VOXLoader.js';
 
-			let renderer, scene, camera, controls, clock;
+			let renderer, scene, camera, controls, timer;
 
 			init();
 
@@ -48,7 +48,8 @@
 				controls.autoRotateSpeed = - 1.0;
 				controls.enableDamping = true;
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// Material
 
@@ -199,7 +200,7 @@
 						const material = new THREE.RawShaderMaterial( {
 							glslVersion: THREE.GLSL3,
 							uniforms: {
-								map: { value: new VOXData3DTexture( chunk ) },
+								map: { value: buildData3DTexture( chunk ) },
 								cameraPos: { value: new THREE.Vector3() }
 							},
 							vertexShader,
@@ -249,7 +250,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 				controls.update( delta );
 
 				renderer.render( scene, camera );

@@ -215,7 +215,7 @@ class MaterialLoader extends Loader {
 
 			if ( typeof json.vertexColors === 'number' ) {
 
-				material.vertexColors = ( json.vertexColors > 0 ) ? true : false;
+				material.vertexColors = json.vertexColors > 0;
 
 			} else {
 

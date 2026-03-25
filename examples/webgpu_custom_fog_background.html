@@ -44,7 +44,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -81,9 +81,9 @@
 				// mix fog using fog factor and fog color
 				const compose = fogFactor.mix( scenePassTM, fogColor );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
-				postProcessing.outputNode = compose;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
+				renderPipeline.outputNode = compose;
 
 				//
 
@@ -130,7 +130,7 @@
 
 			function animate() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

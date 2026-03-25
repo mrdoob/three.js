@@ -81,6 +81,14 @@ class AfterImageNode extends TempNode {
 		this._textureNodeOld = texture( this._oldRT.texture );
 
 		/**
+		 * The material for the composite pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._materialComposed = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -226,6 +234,8 @@ class AfterImageNode extends TempNode {
 		this._compRT.dispose();
 		this._oldRT.dispose();
 
+		if ( this._materialComposed !== null ) this._materialComposed.dispose();
+
 	}
 
 }
@@ -239,6 +249,6 @@ class AfterImageNode extends TempNode {
  * @param {(Node<float>|number)} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), nodeObject( damp ) ) );
+export const afterImage = ( node, damp ) => new AfterImageNode( convertToTexture( node ), nodeObject( damp ) );
 
 export default AfterImageNode;

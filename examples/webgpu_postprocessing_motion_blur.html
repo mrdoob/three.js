@@ -42,8 +42,8 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
-			let boxLeft, boxRight, model, mixer, clock;
-			let postProcessing;
+			let boxLeft, boxRight, model, mixer, timer;
+			let renderPipeline;
 			let controls;
 
 			const params = {
@@ -68,9 +68,8 @@
 				sunLight.shadow.camera.left = - 2;
 				sunLight.shadow.camera.top = 2;
 				sunLight.shadow.camera.bottom = - 2;
-				sunLight.shadow.mapSize.width = 2048;
-				sunLight.shadow.mapSize.height = 2048;
-				sunLight.shadow.bias = - 0.001;
+				sunLight.shadow.mapSize.width = 1024;
+				sunLight.shadow.mapSize.height = 1024;
 				sunLight.position.set( 4, 4, 2 );
 
 				const waterAmbientLight = new THREE.HemisphereLight( 0x333366, 0x74ccf4, 5 );
@@ -80,7 +79,8 @@
 				scene.add( skyAmbientLight );
 				scene.add( waterAmbientLight );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// animated model
 
@@ -193,8 +193,8 @@
 
 				const vignette = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mBlur.mul( vignette );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = mBlur.mul( vignette );
 
 				//
 
@@ -220,13 +220,15 @@
 
 			function animate() {
 
+				timer.update();
+
 				controls.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 				const speed = params.speed;
 
 				boxRight.rotation.y += delta * 4 * speed;
-				boxLeft.scale.setScalar( 1 + Math.sin( clock.elapsedTime * 10 * speed ) * .2 );
+				boxLeft.scale.setScalar( 1 + Math.sin( timer.getElapsed() * 10 * speed ) * .2 );
 
 				if ( model ) {
 
@@ -234,7 +236,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

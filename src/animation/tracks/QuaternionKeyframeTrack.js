@@ -40,7 +40,7 @@ class QuaternionKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'quaternion'
  */
 QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';

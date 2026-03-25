@@ -51,7 +51,7 @@ scene.add( batchedMesh );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>maxInstanceCount</strong>
+										<strong translate="no">maxInstanceCount</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum number of individual instances planned to be added and rendered.</p>
@@ -59,7 +59,7 @@ scene.add( batchedMesh );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>maxVertexCount</strong>
+										<strong translate="no">maxVertexCount</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum number of vertices to be used by all unique geometries.</p>
@@ -67,7 +67,7 @@ scene.add( batchedMesh );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>maxIndexCount</strong>
+										<strong translate="no">maxIndexCount</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum number of indices to be used by all unique geometries</p>
@@ -76,7 +76,7 @@ scene.add( batchedMesh );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The mesh material.</p>
@@ -168,7 +168,7 @@ geometry id referring to it to be used in other functions.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry to add.</p>
@@ -176,7 +176,7 @@ geometry id referring to it to be used in other functions.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>reservedVertexCount</strong>
+										<strong translate="no">reservedVertexCount</strong>
 									</td>
 									<td class="description last">
 										<p>Optional parameter specifying the amount of
@@ -188,7 +188,7 @@ Defaults to the length of the given geometry vertex buffer.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>reservedIndexCount</strong>
+										<strong translate="no">reservedIndexCount</strong>
 									</td>
 									<td class="description last">
 										<p>Optional parameter specifying the amount of index
@@ -214,7 +214,7 @@ a new id referring to the new instance to be used by other functions.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of a previously added geometry via <a href="BatchedMesh.html#addGeometry">BatchedMesh#addGeometry</a>.</p>
@@ -252,7 +252,7 @@ this geometry will also be removed as a side effect.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the geometry to remove from the batch.</p>
@@ -273,7 +273,7 @@ this geometry will also be removed as a side effect.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the instance to remove from the batch.</p>
@@ -301,7 +301,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the geometry to return the bounding box for.</p>
@@ -309,7 +309,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -330,7 +330,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the geometry to return the bounding sphere for.</p>
@@ -338,7 +338,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -350,7 +350,7 @@ method whenever this instance is no longer used in your app.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The geometry's bounding sphere. Returns <code>null</code> if no geometry has been found for the given ID.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getColorAt" translate="no">.<a href="#getColorAt">getColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="getColorAt" translate="no">.<a href="#getColorAt">getColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a> | <a href="Vector4.html">Vector4</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a> | <a href="Vector4.html">Vector4</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the color of the defined instance.</p>
@@ -359,7 +359,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to get the color of.</p>
@@ -367,7 +367,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -376,7 +376,7 @@ method whenever this instance is no longer used in your app.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The instance's color.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The instance's color.  Use a <code>Vector4</code> to also retrieve alpha.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getGeometryIdAt" translate="no">.<a href="#getGeometryIdAt">getGeometryIdAt</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
@@ -388,7 +388,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to get the geometry ID of.</p>
@@ -410,7 +410,7 @@ indicating the starting offset and count, or <code>null</code> if invalid.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The id of the geometry to get the range of.</p>
@@ -418,7 +418,7 @@ indicating the starting offset and count, or <code>null</code> if invalid.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -439,7 +439,7 @@ indicating the starting offset and count, or <code>null</code> if invalid.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to get the matrix of.</p>
@@ -447,7 +447,7 @@ indicating the starting offset and count, or <code>null</code> if invalid.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>matrix</strong>
+										<strong translate="no">matrix</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -468,7 +468,7 @@ indicating the starting offset and count, or <code>null</code> if invalid.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to get the visibility state of.</p>
@@ -490,7 +490,7 @@ previously deleted geometry, freeing up space to add new geometry.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setColorAt" translate="no">.<a href="#setColorAt">setColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<h3 class="name name-method" id="setColorAt" translate="no">.<a href="#setColorAt">setColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a> | <a href="Vector4.html">Vector4</a></span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given color to the defined instance.</p>
@@ -499,7 +499,7 @@ previously deleted geometry, freeing up space to add new geometry.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to set the color of.</p>
@@ -507,10 +507,10 @@ previously deleted geometry, freeing up space to add new geometry.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
-										<p>The color to set the instance to.</p>
+										<p>The color to set the instance to. Use a <code>Vector4</code> to also define alpha.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -529,7 +529,7 @@ sort and a camera. The objects in the list include a &quot;z&quot; field to perf
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>func</strong>
+										<strong translate="no">func</strong>
 									</td>
 									<td class="description last">
 										<p>The custom sort function.</p>
@@ -552,7 +552,7 @@ rendering that geometry.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the geometry that should be replaced with the given geometry.</p>
@@ -560,7 +560,7 @@ rendering that geometry.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The new geometry.</p>
@@ -581,7 +581,7 @@ rendering that geometry.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of the instance to set the geometry ID of.</p>
@@ -589,7 +589,7 @@ rendering that geometry.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry ID to be use by the instance.</p>
@@ -612,7 +612,7 @@ end of the geometry attributes then an error is thrown.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>maxVertexCount</strong>
+										<strong translate="no">maxVertexCount</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum number of vertices to be used by all unique geometries to resize to.</p>
@@ -620,7 +620,7 @@ end of the geometry attributes then an error is thrown.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>maxIndexCount</strong>
+										<strong translate="no">maxIndexCount</strong>
 									</td>
 									<td class="description last">
 										<p>The maximum number of indices to be used by all unique geometries to resize to.</p>
@@ -640,7 +640,7 @@ unused Ids at the end of the list then an error is thrown.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>maxInstanceCount</strong>
+										<strong translate="no">maxInstanceCount</strong>
 									</td>
 									<td class="description last">
 										<p>The max number of individual instances that can be added and rendered by the batch.</p>
@@ -659,7 +659,7 @@ Negatively scaled matrices are not supported.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The ID of an instance to set the matrix of.</p>
@@ -667,7 +667,7 @@ Negatively scaled matrices are not supported.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>matrix</strong>
+										<strong translate="no">matrix</strong>
 									</td>
 									<td class="description last">
 										<p>A 4x4 matrix representing the local transformation of a single instance.</p>
@@ -688,7 +688,7 @@ Negatively scaled matrices are not supported.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The id of the instance to set the visibility of.</p>
@@ -696,7 +696,7 @@ Negatively scaled matrices are not supported.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>visible</strong>
+										<strong translate="no">visible</strong>
 									</td>
 									<td class="description last">
 										<p>Whether the instance is visible or not.</p>
@@ -717,7 +717,7 @@ Negatively scaled matrices are not supported.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometryId</strong>
+										<strong translate="no">geometryId</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry to validate.</p>
@@ -735,7 +735,7 @@ Negatively scaled matrices are not supported.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>instanceId</strong>
+										<strong translate="no">instanceId</strong>
 									</td>
 									<td class="description last">
 										<p>The instance to validate.</p>

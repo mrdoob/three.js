@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
@@ -42,18 +40,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'width', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'height', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC STUFF
 		QUnit.test( 'isVector2', ( assert ) => {
 
@@ -71,42 +57,6 @@ export default QUnit.module( 'Maths', () => {
 			a.set( x, y );
 			assert.ok( a.x == x, 'Passed!' );
 			assert.ok( a.y == y, 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'setScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setX', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setComponent', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getComponent', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -140,18 +90,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'addScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'addVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'addScaledVector', ( assert ) => {
 
 			const a = new Vector2( x, y );
@@ -179,42 +117,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'subScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'subVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'multiply', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'multiplyScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'divide', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'divideScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'applyMatrix3', ( assert ) => {
 
 			const a = new Vector2( x, y );
@@ -223,60 +125,6 @@ export default QUnit.module( 'Maths', () => {
 			a.applyMatrix3( m );
 			assert.strictEqual( a.x, 18, 'Check x' );
 			assert.strictEqual( a.y, 60, 'Check y' );
-
-		} );
-
-		QUnit.todo( 'min', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'max', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clamp', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clampScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clampLength', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'floor', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'ceil', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'round', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'roundToZero', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -315,18 +163,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'lengthSq', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'length', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'manhattanLength', ( assert ) => {
 
 			const a = new Vector2( x, 0 );
@@ -357,12 +193,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'angle', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'angleTo', ( assert ) => {
 
 			const a = new Vector2( - 0.18851655680720186, 0.9820700116639124 );
@@ -381,24 +211,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'distanceTo', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'distanceToSquared', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'manhattanDistanceTo', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'setLength', ( assert ) => {
 
 			let a = new Vector2( x, 0 );
@@ -413,18 +225,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.length() == 0, 'Passed!' );
 			a.setLength();
 			assert.ok( isNaN( a.length() ), 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'lerp', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'lerpVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -496,12 +296,6 @@ export default QUnit.module( 'Maths', () => {
 			a.fromBufferAttribute( attr, 1 );
 			assert.strictEqual( a.x, 3, 'Offset 1: check x' );
 			assert.strictEqual( a.y, 4, 'Offset 1: check y' );
-
-		} );
-
-		QUnit.todo( 'rotateAround', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

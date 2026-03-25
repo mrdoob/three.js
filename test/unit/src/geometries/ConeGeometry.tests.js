@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ConeGeometry } from '../../../../src/geometries/ConeGeometry.js';
 
 import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
@@ -45,19 +43,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'ConeGeometry',
 				'ConeGeometry.type should be ConeGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

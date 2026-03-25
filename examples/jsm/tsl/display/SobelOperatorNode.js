@@ -1,5 +1,5 @@
 import { Vector2, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
+import { Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
 
 /**
  * Post processing node for detecting edges with a sobel filter.
@@ -165,4 +165,4 @@ export default SobelOperatorNode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SobelOperatorNode}
  */
-export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );
+export const sobel = ( node ) => new SobelOperatorNode( convertToTexture( node ) );

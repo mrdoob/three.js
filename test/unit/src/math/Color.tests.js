@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Color } from '../../../../src/math/Color.js';
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
@@ -41,7 +39,6 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'Color.NAMES', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
-
 
 			assert.ok( Color.NAMES.aliceblue == 0xF0F8FF, 'Exposed Color.NAMES' );
 
@@ -202,7 +199,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'clone', ( assert ) => {
-
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 			const c = new Color( 'teal' );
@@ -385,7 +381,6 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( d.equals( c ), 'Passed' );
 
-
 		} );
 
 		QUnit.test( 'addScalar', ( assert ) => {
@@ -456,20 +451,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'lerpColors', ( assert ) => {
-
-			// lerpColors( color1, color2, alpha )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'lerpHSL', ( assert ) => {
-
-			// lerpHSL( color, alpha )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'equals', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
@@ -537,13 +518,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 1 ], r, 'With array and offset: check r' );
 			assert.strictEqual( array[ 2 ], g, 'With array and offset: check g' );
 			assert.strictEqual( array[ 3 ], b, 'With array and offset: check b' );
-
-		} );
-
-		QUnit.todo( 'fromBufferAttribute', ( assert ) => {
-
-			// fromBufferAttribute( attribute, index )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -861,7 +835,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 2 ], 1, 'Color is iterable.' );
 
 		} );
-
 
 	} );
 

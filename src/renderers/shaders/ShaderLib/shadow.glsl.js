@@ -52,6 +52,7 @@ void main() {
 	#include <tonemapping_fragment>
 	#include <colorspace_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
 
 }
 `;

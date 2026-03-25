@@ -20,7 +20,7 @@ const _line2 = new Line3();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _capsule = new Capsule();
-const _center = new Capsule();
+const _center = new Vector3();
 
 const _temp1 = new Vector3();
 const _temp2 = new Vector3();

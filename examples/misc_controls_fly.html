@@ -62,14 +62,15 @@
 			let geometry, meshPlanet, meshClouds, meshMoon;
 			let dirLight;
 
-			let postProcessing;
+			let renderPipeline;
 
 			const textureLoader = new THREE.TextureLoader();
 
 			let d, dPlanet, dMoon;
 			const dMoonVec = new THREE.Vector3();
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -218,12 +219,12 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
 
-				postProcessing.outputNode = film( scenePassColor );
+				renderPipeline.outputNode = film( scenePassColor );
 
 			}
 
@@ -241,6 +242,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -250,7 +253,7 @@
 
 				// rotate the planet and clouds
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
@@ -275,7 +278,7 @@
 				controls.movementSpeed = 0.33 * d;
 				controls.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

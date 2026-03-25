@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>颜色管理</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 颜色管理">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+<style>
+  blockquote {
+    font-size: 0.8em;
+    line-height: 1.5em;
+    margin-left: 0;
+    border-left: 4px solid #cccccc;
+    padding: 1em 2em 1em 2em;
+  }
+
+  blockquote p:first-child {
+    margin-top: 0;
+  }
+
+  blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  figure {
+    width: 100%;
+    margin: 1em 0;
+    font-style: italic;
+  }
+
+  figure img {
+    width: 100%;
+  }
+
+  figure.float {
+    float: right;
+    max-width: 30%;
+    margin: 1em;
+  }
+
+  @media all and ( max-width: 640px ) {
+
+    figure.float {
+      float: none;
+      max-width: 100%;
+    }
+
+  }
+</style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>颜色管理</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+        
+			<h2>什么是色彩空间？</h2>
+
+	<p>
+		每一种色彩空间，都是一组经过权衡的设计选择。它们共同目标是：
+		在满足精度和显示技术限制的前提下，覆盖尽可能大的颜色范围。
+		在创建 3D 资源或把多个 3D 资源组装进同一场景时，
+		理解这些属性及其在不同色彩空间之间的关系非常重要。
+	</p>
+
+	<figure class="float">
+		<img src="../resources/srgb_gamut.png" alt="">
+		<figcaption>
+			参考 CIE 1931 色度图中的 sRGB 颜色与白点（D65）。
+			彩色区域是 sRGB 色域（三维体积）在二维中的投影。
+			来源：<a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
+		</figcaption>
+	</figure>
+
+	<ul>
+		<li>
+			<b>色彩原色（Color primaries）：</b>原色（如红、绿、蓝）并非绝对值；
+			它们是在有限精度与显示设备能力约束下，从可见光谱中选定的。
+			颜色由各原色的比例来表达。
+		</li>
+		<li>
+			<b>白点（White point）：</b>大多数色彩空间都会定义：
+			当原色满足 <i>R = G = B</i> 时呈现“无色（中性）”。
+			白、灰等中性色的视觉效果依赖人眼感知，而感知又与观察环境相关。
+			因此色彩空间会指定一个“白点”以统一基准。
+			sRGB 的白点是 [link:https://en.wikipedia.org/wiki/Illuminant_D65 D65]。
+		</li>
+		<li>
+			<b>传递函数（Transfer functions）：</b>在确定色域和颜色模型后，
+			还要定义数值与颜色空间之间的映射（传递函数）。
+			<i>r = 0.5</i> 是表示物理光照比 <i>r = 1.0</i> 少 50%，
+			还是表示人眼感知亮度少 50%？两者并不等价，
+			差异由数学函数来描述。根据目标不同，传递函数可以是
+			<i>线性</i>或<i>非线性</i>。sRGB 使用非线性传递函数。
+			这些函数有时会近似为<i>伽马函数</i>，但“gamma”一词在这里含义模糊，
+			应尽量避免混用。
+		</li>
+	</ul>
+
+	以上三个参数（原色、白点、传递函数）共同定义了一个色彩空间。
+	在此基础上，再补充几个术语会更清晰：
+
+	<ul>
+		<li>
+			<b>颜色模型（Color model）：</b>在既定色域中用数字描述颜色的方式，
+			可理解为颜色坐标系。在 three.js 里我们主要使用 RGB 模型，
+			坐标为 <i>r, g, b ∈ [0,1]</i>（闭区间）或
+			<i>r, g, b ∈ [0,+∞)</i>（开域），每一项都表示某个原色所占比例。
+			其他模型（HSL、Lab、LCH）常用于美术调色。
+		</li>
+		<li>
+			<b>色域（Color gamut）：</b>当原色与白点确定后，就确定了可见光谱中的一个体积范围，
+			这就是“色域”。不在这个体积内的颜色（超出色域）无法用闭区间 [0,1] 的 RGB 表达。
+			在开域 [0,+∞) 中，色域在数学上可以视为无限。
+		</li>
+	</ul>
+
+	<p>
+		来看两个最常见的色彩空间：`SRGBColorSpace`（sRGB）与
+		`LinearSRGBColorSpace`（Linear-sRGB）。两者原色和白点相同，
+		因此色域一致，也都使用 RGB 模型。它们只在传递函数上不同：
+		Linear-sRGB 相对于物理光强是线性的；sRGB 使用非线性传递函数，
+		更接近人眼感知与常见显示设备的响应特性。
+	</p>
+
+	<p>
+		这个差异非常关键。光照计算和大多数渲染运算通常必须在线性色彩空间中完成。
+		但线性颜色在图像或帧缓冲中的存储效率较低，且直接显示给人眼时观感不正确。
+		因此，输入纹理与最终输出图像通常会使用非线性的 sRGB 色彩空间。
+	</p>
+
+	<blockquote>
+		<p>
+			ℹ️ <i><b>注意：</b>虽然部分现代显示器支持 Display-P3 等更宽色域，
+				但 Web 平台图形 API 仍主要基于 sRGB。
+				当前 three.js 应用通常只会使用 sRGB 与 Linear-sRGB。</i>
+		</p>
+	</blockquote>
+
+	<h2>色彩空间在流程中的角色</h2>
+
+	<p>
+		现代渲染所需的线性工作流通常会涉及不止一种色彩空间，
+		每种色彩空间承担不同职责。线性与非线性色彩空间适用于不同环节，
+		如下所示。
+	</p>
+
+	<h3>输入色彩空间</h3>
+
+	<p>
+		传入 three.js 的颜色（来自取色器、纹理、3D 模型等）都带有各自色彩空间。
+		凡是不在 Linear-sRGB 工作色彩空间中的输入，都需要转换；
+		纹理也必须正确设置 <i>texture.colorSpace</i>。
+		如果在初始化颜色前启用 THREE.ColorManagement，
+		某些转换（如十六进制颜色与 CSS sRGB 颜色）会自动处理：
+	</p>
+
+	<code>
+THREE.ColorManagement.enabled = true;
+	</code>
+
+	<p>
+		THREE.ColorManagement 默认已启用。
+	</p>
+
+	<ul>
+		<li>
+			<b>材质、灯光与着色器：</b>其颜色数据中的 RGB 分量存储在线性的
+			Linear-sRGB 工作空间中。
+		</li>
+		<li>
+			<b>顶点颜色：</b>`BufferAttribute` 中的 RGB 分量也存储在
+			Linear-sRGB 工作空间中。
+		</li>
+		<li>
+			<b>颜色纹理：</b>包含颜色信息的 PNG/JPEG `Texture`
+			（如 `.map`、`.emissiveMap`）应使用闭区间 sRGB，
+			并标注 <i>texture.colorSpace = SRGBColorSpace</i>。
+			OpenEXR 等格式（常用于 `.envMap`、`.lightMap`）则使用 Linear-sRGB，
+			标注为 <i>texture.colorSpace = LinearSRGBColorSpace</i>，
+			并且可能包含开域 [0,+∞) 的值。
+		</li>
+		<li>
+			<b>非颜色纹理：</b>不存储颜色信息的纹理（如 `.normalMap`、`.roughnessMap`）
+			没有对应色彩空间，一般使用默认标注
+			<i>texture.colorSpace = NoColorSpace</i>。
+			在少数场景下，非颜色数据可能因技术原因采用其他非线性编码。
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>警告：</b>许多 3D 模型格式并未正确或一致地定义色彩空间信息。
+			three.js 虽会尽量处理常见情况，但旧格式仍常出现问题。
+			为获得最佳结果，请优先使用 glTF 2.0（`GLTFLoader`），
+			并尽早在在线查看器中验证资源本身是否正确。</i>
+		</p>
+	</blockquote>
+
+	<h3>工作色彩空间</h3>
+
+	<p>
+		渲染、插值及许多其他计算，必须在开域的线性工作色彩空间中进行，
+		此时 RGB 分量与物理光照强度成比例。在 three.js 中，
+		工作色彩空间是 Linear-sRGB。
+	</p>
+
+	<h3>输出色彩空间</h3>
+
+	<p>
+		输出到显示设备、图片或视频时，通常需要将开域 Linear-sRGB
+		工作空间转换到目标色彩空间。该转换由
+		`WebGLRenderer.outputColorSpace` 定义。
+		使用后处理时，需要 `OutputPass`。
+	</p>
+
+	<ul>
+		<li>
+			<b>显示：</b>写入 WebGL 画布并显示的颜色应使用 sRGB。
+		</li>
+		<li>
+			<b>图像：</b>写入图像时应使用与格式和用途匹配的色彩空间。
+			完整渲染后保存为 PNG/JPEG 的图片通常使用 sRGB。
+			若图像包含自发光、光照贴图或其他不受 [0,1] 限制的数据，
+			通常使用开域 Linear-sRGB，并配合 OpenEXR 等兼容格式。
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>警告：</b>渲染目标可使用 sRGB 或 Linear-sRGB。
+			sRGB 在有限精度下利用率更高：在闭区间内，sRGB 常用 8-bit 即可，
+			而 Linear-sRGB 可能需要至少 16-bit（half float）。
+			若后续管线阶段还要求 Linear-sRGB 输入，额外转换会带来一定性能开销。</i>
+		</p>
+	</blockquote>
+
+	<p>
+		基于 `ShaderMaterial` 和 `RawShaderMaterial` 的自定义材质需要自行实现输出色彩空间转换。
+		对于 `ShaderMaterial`，通常在片元着色器 `main()` 中加入
+		`colorspace_fragment` shader chunk 即可。
+	</p>
+
+	<h2>使用 THREE.Color 实例</h2>
+
+	<p>
+		读取或修改 `Color` 的方法默认假设数据已经在 three.js 的工作色彩空间
+		（Linear-sRGB）中。RGB 与 HSL 分量都直接对应 `Color` 实例内部数据，
+		不会被隐式转换。你可以显式调用
+		<i>.convertLinearToSRGB()</i> 或 <i>.convertSRGBToLinear()</i> 进行转换。
+	</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+// RGB 分量（不发生转换）。
+color.r = color.g = color.b = 0.5;
+console.log( color.r ); // → 0.5
+
+// 手动转换。
+color.r = 0.5;
+color.convertSRGBToLinear();
+console.log( color.r ); // → 0.214041140
+</pre>
+
+	<p>
+		当设置 <i>ColorManagement.enabled = true</i>（推荐，且默认开启）后，
+		某些转换会自动执行。由于十六进制与 CSS 颜色通常属于 sRGB，
+		`Color` 在 setter 中会把它们从 sRGB 转为 Linear-sRGB；
+		在 getter 返回十六进制或 CSS 值时，则会从 Linear-sRGB 转回 sRGB。
+	</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+// 十六进制转换。
+color.setHex( 0x808080 );
+console.log( color.r ); // → 0.214041140
+console.log( color.getHex() ); // → 0x808080
+
+// CSS 颜色转换。
+color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
+console.log( color.r ); // → 0.214041140
+
+// 通过 'colorSpace' 参数覆盖默认转换。
+color.setHex( 0x808080, LinearSRGBColorSpace );
+console.log( color.r ); // → 0.5
+console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
+console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
+</pre>
+
+	<h2>常见错误</h2>
+
+	<p>
+		当某个颜色或纹理配置错误时，它看起来会比预期更亮或更暗。
+		当渲染器输出色彩空间配置错误时，整张场景都可能偏暗
+		（例如遗漏了到 sRGB 的转换）或偏亮（例如后处理中重复转换到 sRGB）。
+		这类问题通常并非全局线性偏差，单纯增减光照并不能真正解决。
+	</p>
+
+	<p>
+		更隐蔽的问题是：当输入和输出色彩空间<i>都</i>设置错误时，
+		整体亮度看似正常，但颜色会在不同光照下异常变化，
+		或明暗层次变得过曝、生硬。两个错误不会相互抵消。
+		务必确保工作色彩空间是线性的（scene referred），
+		输出色彩空间是非线性的（display referred）。
+	</p>
+
+	<h2>延伸阅读</h2>
+
+	<ul>
+		<li>
+			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: The Importance of Being Linear</a>, by Larry Gritz and Eugene d'Eon
+		</li>
+		<li>
+			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">What every coder should know about gamma</a>, by John Novak
+		</li>
+		<li>
+			<a href="https://hg2dc.com/" target="_blank" rel="noopener">The Hitchhiker's Guide to Digital Color</a>, by Troy Sobotka
+		</li>
+		<li>
+			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">Color Management</a>, Blender
+		</li>
+	</ul>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+
+

@@ -39,7 +39,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
+			let camera, scene, renderer, timer, controls, stats, raycaster, hitbox;
 
 			const objects = [], mouse = new THREE.Vector2();
 
@@ -53,7 +53,8 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				raycaster = new THREE.Raycaster();
 
@@ -192,11 +193,13 @@
 
 			function animate() {
 
+				timer.update();
+
 				controls.update();
 
 				// transform cubes
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				for ( let i = 0, il = objects.length; i < il; i ++ ) {
 

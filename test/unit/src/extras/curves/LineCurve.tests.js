@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineCurve } from '../../../../../src/extras/curves/LineCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
@@ -56,18 +54,6 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'v1', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'v2', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'isLineCurve', ( assert ) => {
 
@@ -76,12 +62,6 @@ export default QUnit.module( 'Extras', () => {
 					object.isLineCurve,
 					'LineCurve.isLineCurve should be true'
 				);
-
-			} );
-
-			QUnit.todo( 'getPoint', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
@@ -122,24 +102,6 @@ export default QUnit.module( 'Extras', () => {
 
 				assert.numEqual( tangent.x, expectedTangent, 'tangentAt.x correct' );
 				assert.numEqual( tangent.y, expectedTangent, 'tangentAt.y correct' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

@@ -56,7 +56,7 @@ class UnrealBloomPass extends Pass {
 		this.strength = strength;
 
 		/**
-		 * The Bloom radius.
+		 * The Bloom radius. Must be in the range `[0,1]`.
 		 *
 		 * @type {number}
 		 */
@@ -187,6 +187,7 @@ class UnrealBloomPass extends Pass {
 			uniforms: this.copyUniforms,
 			vertexShader: CopyShader.vertexShader,
 			fragmentShader: CopyShader.fragmentShader,
+			premultipliedAlpha: true,
 			blending: AdditiveBlending,
 			depthTest: false,
 			depthWrite: false,
@@ -399,33 +400,46 @@ class UnrealBloomPass extends Pass {
 				'gaussianCoefficients': { value: coefficients } // precomputed Gaussian coefficients
 			},
 
-			vertexShader:
-				`varying vec2 vUv;
+			vertexShader: /* glsl */`
+
+				varying vec2 vUv;
+
 				void main() {
+
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 				}`,
 
-			fragmentShader:
-				`#include <common>
+			fragmentShader: /* glsl */`
+
+				#include <common>
+
 				varying vec2 vUv;
+
 				uniform sampler2D colorTexture;
 				uniform vec2 invSize;
 				uniform vec2 direction;
 				uniform float gaussianCoefficients[KERNEL_RADIUS];
 
 				void main() {
+
 					float weightSum = gaussianCoefficients[0];
 					vec3 diffuseSum = texture2D( colorTexture, vUv ).rgb * weightSum;
-					for( int i = 1; i < KERNEL_RADIUS; i ++ ) {
-						float x = float(i);
+
+					for ( int i = 1; i < KERNEL_RADIUS; i ++ ) {
+
+						float x = float( i );
 						float w = gaussianCoefficients[i];
 						vec2 uvOffset = direction * invSize * x;
 						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset ).rgb;
 						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset ).rgb;
 						diffuseSum += ( sample1 + sample2 ) * w;
+
 					}
+
 					gl_FragColor = vec4( diffuseSum, 1.0 );
+
 				}`
 		} );
 
@@ -451,15 +465,21 @@ class UnrealBloomPass extends Pass {
 				'bloomRadius': { value: 0.0 }
 			},
 
-			vertexShader:
-				`varying vec2 vUv;
+			vertexShader: /* glsl */`
+
+				varying vec2 vUv;
+
 				void main() {
+
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 				}`,
 
-			fragmentShader:
-				`varying vec2 vUv;
+			fragmentShader: /* glsl */`
+
+				varying vec2 vUv;
+
 				uniform sampler2D blurTexture1;
 				uniform sampler2D blurTexture2;
 				uniform sampler2D blurTexture3;
@@ -470,17 +490,27 @@ class UnrealBloomPass extends Pass {
 				uniform float bloomFactors[NUM_MIPS];
 				uniform vec3 bloomTintColors[NUM_MIPS];
 
-				float lerpBloomFactor(const in float factor) {
+				float lerpBloomFactor( const in float factor ) {
+
 					float mirrorFactor = 1.2 - factor;
-					return mix(factor, mirrorFactor, bloomRadius);
+					return mix( factor, mirrorFactor, bloomRadius );
+
 				}
 
 				void main() {
-					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv) +
-						lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv) +
-						lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv) +
-						lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv) +
-						lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv) );
+
+					// 3.0 for backwards compatibility with previous alpha-based intensity
+					vec3 bloom = 3.0 * bloomStrength * (
+						lerpBloomFactor( bloomFactors[ 0 ] ) * bloomTintColors[ 0 ] * texture2D( blurTexture1, vUv ).rgb +
+						lerpBloomFactor( bloomFactors[ 1 ] ) * bloomTintColors[ 1 ] * texture2D( blurTexture2, vUv ).rgb +
+						lerpBloomFactor( bloomFactors[ 2 ] ) * bloomTintColors[ 2 ] * texture2D( blurTexture3, vUv ).rgb +
+						lerpBloomFactor( bloomFactors[ 3 ] ) * bloomTintColors[ 3 ] * texture2D( blurTexture4, vUv ).rgb +
+						lerpBloomFactor( bloomFactors[ 4 ] ) * bloomTintColors[ 4 ] * texture2D( blurTexture5, vUv ).rgb
+					);
+
+					float bloomAlpha = max( bloom.r, max( bloom.g, bloom.b ) );
+					gl_FragColor = vec4( bloom, bloomAlpha );
+
 				}`
 		} );
 

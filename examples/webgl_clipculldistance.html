@@ -62,7 +62,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, controls, clock, scene, renderer, stats;
+			let camera, controls, timer, scene, renderer, stats;
 
 			let material;
 
@@ -75,7 +75,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -174,10 +175,12 @@
 
 			function animate() {
 
+				timer.update();
+
 				controls.update();
 				stats.update();
 
-				material.uniforms.time.value = clock.getElapsedTime();
+				material.uniforms.time.value = timer.getElapsed();
 
 				renderer.render( scene, camera );
 

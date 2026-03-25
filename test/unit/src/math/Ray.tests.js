@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Ray } from '../../../../src/math/Ray.js';
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -281,12 +279,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'distanceToPlane', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'intersectPlane', ( assert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
@@ -390,12 +382,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'intersectsBox', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'intersectTriangle', ( assert ) => {
 
 			const ray = new Ray();
@@ -468,12 +454,6 @@ export default QUnit.module( 'Maths', () => {
 			a2 = a.clone().applyMatrix4( m );
 			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Passed!' );
 			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'equals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

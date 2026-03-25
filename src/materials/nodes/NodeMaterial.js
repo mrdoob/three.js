@@ -25,7 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
-import { error, warn } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * Base class for all node materials.
@@ -241,6 +241,14 @@ class NodeMaterial extends Material {
 		this.maskNode = null;
 
 		/**
+		 * This node can be used to implement a shadow mask for the material.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskShadowNode = null;
+
+		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
 		 * the default and define local vertex positions with nodes instead.
@@ -390,26 +398,6 @@ class NodeMaterial extends Material {
 		 */
 		this.contextNode = null;
 
-		// Deprecated properties
-
-		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
-
-			get: () => {
-
-				return this.receivedShadowPositionNode;
-
-			},
-
-			set: ( value ) => {
-
-				warn( 'NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
-
-				this.receivedShadowPositionNode = value;
-
-			}
-
-		} );
-
 	}
 
 	/**
@@ -527,9 +515,11 @@ class NodeMaterial extends Material {
 
 		builder.addStack();
 
-		const mvp = subBuild( this.setupVertex( builder ), 'VERTEX' );
+		const mvp = this.setupVertex( builder );
 
-		const vertexNode = this.vertexNode || mvp;
+		const vertexNode = subBuild( this.vertexNode || mvp, 'VERTEX' );
+
+		builder.context.clipSpace = vertexNode;
 
 		builder.stack.outputNode = vertexNode;
 
@@ -795,7 +785,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
@@ -1339,6 +1329,7 @@ class NodeMaterial extends Material {
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
 		this.maskNode = source.maskNode;
+		this.maskShadowNode = source.maskShadowNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;

@@ -1,4 +1,4 @@
-export const REVISION = '182dev';
+export const REVISION = '184dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -154,6 +154,14 @@ export const MultiplyBlending = 4;
  * @constant
  */
 export const CustomBlending = 5;
+
+/**
+ * Represents material blending.
+ *
+ * @type {number}
+ * @constant
+ */
+export const MaterialBlending = 6;
 
 /**
  * A `source + destination` blending equation.
@@ -1158,6 +1166,17 @@ export const InterpolateLinear = 2301;
 export const InterpolateSmooth = 2302;
 
 /**
+ * Bezier interpolation mode for keyframe tracks.
+ *
+ * Uses cubic Bezier curves with explicit 2D control points.
+ * Requires tangent data to be set on the track.
+ *
+ * @type {number}
+ * @constant
+ */
+export const InterpolateBezier = 2303;
+
+/**
  * Zero curvature ending for animations.
  *
  * @type {number}
@@ -1253,14 +1272,6 @@ export const RGBDepthPacking = 3202;
  * @constant
  */
 export const RGDepthPacking = 3203;
-
-/**
- * The depth value is not packed.
- *
- * @type {number}
- * @constant
- */
-export const IdentityDepthPacking = 3204;
 
 /**
  * Normal information is relative to the underlying surface.
@@ -1686,6 +1697,16 @@ export const InterpolationSamplingMode = {
 	SAMPLE: 'sample',
 	FIRST: 'first',
 	EITHER: 'either'
+};
+
+/**
+ * Compatibility flags for features that may not be supported across all platforms.
+ *
+ * @type {Object}
+ * @constant
+ */
+export const Compatibility = {
+	TEXTURE_COMPARE: 'depthTextureCompare'
 };
 
 /**

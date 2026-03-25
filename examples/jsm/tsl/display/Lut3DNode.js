@@ -106,4 +106,4 @@ export default Lut3DNode;
  * @param {Node<float> | number} intensity - Controls the intensity of the effect.
  * @returns {Lut3DNode}
  */
-export const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );
+export const lut3D = ( node, lut, size, intensity ) => new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) );

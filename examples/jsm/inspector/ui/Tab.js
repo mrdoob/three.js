@@ -1,3 +1,5 @@
+import { EventDispatcher } from 'three';
+
 /**
  * Tab class
  * @param {string} title - The title of the tab
@@ -23,9 +25,11 @@
  * tab3.showBuiltin(); // Show the builtin button and mini-content
  * tab3.hideBuiltin(); // Hide the builtin button and mini-content
  */
-export class Tab {
+export class Tab extends EventDispatcher {
 
 	constructor( title, options = {} ) {
+
+		super();
 
 		this.id = title.toLowerCase();
 		this.button = document.createElement( 'button' );
@@ -36,7 +40,7 @@ export class Tab {
 		this.content.id = `${this.id}-content`;
 		this.content.className = 'profiler-content';
 
-		this.isActive = false;
+		this._isActive = false;
 		this.isVisible = true;
 		this.isDetached = false;
 		this.detachedWindow = null;
@@ -49,6 +53,32 @@ export class Tab {
 		this.onVisibilityChange = null; // Callback for visibility changes
 
 	}
+
+	get inspector() {
+
+		return this.profiler.inspector;
+
+	}
+
+	get isActive() {
+
+		const isProfilerVisible = this.profiler && this.profiler.panel.classList.contains( 'visible' );
+
+		if ( ! isProfilerVisible ) return false;
+
+		return this.isDetached || this._isActive;
+
+	}
+
+	set isActive( value ) {
+
+		this._isActive = value;
+
+	}
+
+	init( /*inspector*/ ) { }
+
+	update( /*inspector*/ ) { }
 
 	setActive( isActive ) {
 
@@ -154,11 +184,9 @@ export class Tab {
 			// Move content to mini-panel if not already there
 			if ( ! this.miniContent.firstChild ) {
 
-				const actualContent = this.content.querySelector( '.list-scroll-wrapper' ) || this.content.firstElementChild;
+				while ( this.content.firstChild ) {
 
-				if ( actualContent ) {
-
-					this.miniContent.appendChild( actualContent );
+					this.miniContent.appendChild( this.content.firstChild );
 
 				}
 
@@ -191,7 +219,11 @@ export class Tab {
 			// Move content back to main panel
 			if ( this.miniContent.firstChild ) {
 
-				this.content.appendChild( this.miniContent.firstChild );
+				while ( this.miniContent.firstChild ) {
+
+					this.content.appendChild( this.miniContent.firstChild );
+
+				}
 
 			}
 

@@ -16,6 +16,7 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format,
 	R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format,
+	Compatibility
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { Texture } from '../../../textures/Texture.js';
@@ -124,6 +125,15 @@ class WebGPUTextureUtils {
 				maxAnisotropy: 1
 			};
 
+			// Depth textures without compare function must use non-filtering (nearest) sampling
+			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+
+				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
+				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
+				samplerDescriptorGPU.mipmapFilter = GPUFilterMode.Nearest;
+
+			}
+
 			// anisotropy can only be used when all filter modes are set to linear.
 
 			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
@@ -132,7 +142,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
 
@@ -302,7 +312,17 @@ class WebGPUTextureUtils {
 
 		}
 
-		textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+		try {
+
+			textureData.texture = backend.device.createTexture( textureDescriptorGPU );
+
+		} catch ( e ) {
+
+			warn( 'WebGPURenderer: Failed to create texture with descriptor:', textureDescriptorGPU );
+			this.createDefaultTexture( texture );
+			return;
+
+		}
 
 		if ( isMSAA ) {
 
@@ -351,25 +371,7 @@ class WebGPUTextureUtils {
 
 		const textureData = this.backend.get( texture );
 
-		if ( texture.isCubeTexture ) {
-
-			for ( let i = 0; i < 6; i ++ ) {
-
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
-
-			}
-
-		} else {
-
-			const depth = texture.image.depth || 1;
-
-			for ( let i = 0; i < depth; i ++ ) {
-
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
-
-			}
-
-		}
+		this._generateMipmaps( textureData.texture, encoder );
 
 	}
 
@@ -461,12 +463,12 @@ class WebGPUTextureUtils {
 		if ( stencil ) {
 
 			format = DepthStencilFormat;
-			type = UnsignedInt248Type;
+			type = backend.renderer.reversedDepthBuffer === true ? FloatType : UnsignedInt248Type;
 
 		} else if ( depth ) {
 
 			format = DepthFormat;
-			type = UnsignedIntType;
+			type = backend.renderer.reversedDepthBuffer === true ? FloatType : UnsignedIntType;
 
 		}
 
@@ -536,9 +538,23 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			for ( let i = 0; i < options.image.depth; i ++ ) {
+			if ( texture.layerUpdates && texture.layerUpdates.size > 0 ) {
 
-				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, texture.flipY, i );
+				for ( const layerIndex of texture.layerUpdates ) {
+
+					this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, layerIndex, texture.flipY, layerIndex );
+
+				}
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				for ( let i = 0; i < options.image.depth; i ++ ) {
+
+					this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, texture.flipY, i );
+
+				}
 
 			}
 
@@ -771,21 +787,27 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
-		device.queue.copyExternalImageToTexture(
-			{
-				source: image,
-				flipY: flipY
-			}, {
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth },
-				premultipliedAlpha: premultiplyAlpha
-			}, {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			}
-		);
+		try {
+
+			device.queue.copyExternalImageToTexture(
+				{
+					source: image,
+					flipY: flipY
+				}, {
+					texture: textureGPU,
+					mipLevel: mipLevel,
+					origin: { x: 0, y: 0, z: originDepth },
+					premultipliedAlpha: premultiplyAlpha
+				}, {
+					width: width,
+					height: height,
+					depthOrArrayLayers: 1
+				}
+			);
+
+			// try/catch has been added to fix bad video frame data on certain devices, see #32391
+
+		} catch ( _ ) {}
 
 	}
 
@@ -814,13 +836,11 @@ class WebGPUTextureUtils {
 	 *
 	 * @private
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
-	 * @param {Object} textureDescriptorGPU - The texture descriptor.
-	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
 	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
+	_generateMipmaps( textureGPU, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
+		this._getPassUtils().generateMipmaps( textureGPU, encoder );
 
 	}
 

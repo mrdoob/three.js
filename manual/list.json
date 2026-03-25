@@ -38,7 +38,8 @@
 			"Shadows": "en/shadows",
 			"Fog": "en/fog",
 			"Render Targets": "en/rendertargets",
-			"Custom BufferGeometry": "en/custom-buffergeometry"
+			"Custom BufferGeometry": "en/custom-buffergeometry",
+			"Physics": "en/physics"
 		},
 		"Tips": {
 			"Rendering On Demand": "en/rendering-on-demand",
@@ -326,6 +327,28 @@
 		}
 	},
 	"zh": {
+		"入门": {
+			"安装": "zh/installation",
+			"创建场景": "zh/creating-a-scene",
+			"创建文本": "zh/creating-text",
+			"绘制线条": "zh/drawing-lines",
+			"常见问题": "zh/faq",
+			"库和插件": "zh/libraries-and-plugins",
+			"加载3D模型": "zh/loading-3d-models",
+			"Uniform类型": "zh/uniform-types",
+			"相关资源": "zh/useful-links",
+			"WebGL兼容性检查": "zh/webgl-compatibility-check"
+		},
+		"进阶": {
+			"动画系统": "zh/animation-system",
+			"颜色管理": "zh/color-management",
+			"如何创建VR内容": "zh/how-to-create-vr-content",
+			"如何释放对象": "zh/how-to-dispose-of-objects",
+			"如何更新对象": "zh/how-to-update-things",
+			"如何使用后处理": "zh/how-to-use-post-processing",
+			"矩阵变换": "zh/matrix-transformations"
+		},
+		"---": {},
 		"基本": {
 			"基础": "zh/fundamentals",
 			"响应式设计": "zh/responsive",
@@ -342,7 +365,8 @@
 			"阴影": "zh/shadows",
 			"雾": "zh/fog",
 			"渲染目标": "zh/rendertargets",
-			"自定义缓冲几何体": "zh/custom-buffergeometry"
+			"自定义缓冲几何体": "zh/custom-buffergeometry",
+			"物理": "zh/physics"
 		},
 		"技巧": {
 			"按需渲染": "zh/rendering-on-demand",
@@ -375,6 +399,10 @@
 			"释放资源": "zh/cleanup",
 			"体素几何体 (Minecraft)": "zh/voxel-geometry",
 			"来试试做一个游戏吧": "zh/game"
+		},
+		"WebGPU": {
+			"WebGPU渲染器": "zh/webgpurenderer",
+			"后处理": "zh/webgpu-postprocessing"
 		},
 		"WebXR": {
 			"VR - 基础": "zh/webxr-basics",

@@ -1,4 +1,4 @@
-import { nodeObject, float } from '../../nodes/tsl/TSLBase.js';
+import { float } from '../../nodes/tsl/TSLBase.js';
 
 import { Loader } from '../Loader.js';
 import { FileLoader } from '../../loaders/FileLoader.js';
@@ -185,7 +185,7 @@ class NodeLoader extends Loader {
 
 		}
 
-		return nodeObject( new this.nodes[ type ]() );
+		return new this.nodes[ type ]();
 
 	}
 

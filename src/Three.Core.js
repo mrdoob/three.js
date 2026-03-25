@@ -3,7 +3,6 @@ import { warn } from './utils.js';
 
 export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget.js';
 export { WebGL3DRenderTarget } from './renderers/WebGL3DRenderTarget.js';
-export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebXRController } from './renderers/webxr/WebXRController.js';
 export { FogExp2 } from './scenes/FogExp2.js';
@@ -111,6 +110,7 @@ export { QuaternionLinearInterpolant } from './math/interpolants/QuaternionLinea
 export { LinearInterpolant } from './math/interpolants/LinearInterpolant.js';
 export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js';
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
+export { BezierInterpolant } from './math/interpolants/BezierInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
 export { MathUtils } from './math/MathUtils.js';

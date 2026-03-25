@@ -1,5 +1,4 @@
 import UniformNode from '../core/UniformNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * A special type of uniform node which represents array-like data
@@ -126,4 +125,4 @@ export default BufferNode;
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}
  */
-export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
+export const buffer = ( value, type, count ) => new BufferNode( value, type, count );

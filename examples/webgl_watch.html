@@ -10,7 +10,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Rolex + aomap - 610 ko
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Rolex + aomap - 1200 ko
 		</div>
 
 		<script type="importmap">
@@ -35,12 +35,10 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
 
-			let composer, camera, scene, renderer;
+			let camera, scene, renderer;
 			let gui, dirLight, pointLight, controls, bloomPass, taaPass;
 			let ready = false;
 
@@ -49,11 +47,11 @@
 			const torad = Math.PI / 180;
 
 			const setting = {
-				roughness: 0.09,
+				roughness: 0.1,
 				metalness: 1.0,
-				opacity: 0.4,
+				opacity: 0.8,
 				threshold: 0,
-				strength: 0.08,
+				strength: 0.007,
 				radius: 0.0,
 				postProcess: false
 			};
@@ -69,15 +67,22 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 0.7;
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.VSMShadowMap;
 				container.appendChild( renderer.domElement );
+
+				taaPass = new TAARenderPass( scene, camera );
+				taaPass.sampleLevel = 2;
+
+				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+				bloomPass.threshold = setting.threshold;
+				bloomPass.strength = setting.strength;
+				bloomPass.radius = setting.radius;
 
 				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
@@ -105,8 +110,9 @@
 									if ( child.isMesh ) {
 
 										child.material.vertexColors = false;
-										materials[ child.material.name ] = child.material;
-										if ( child.name !== 'glass' ) {
+										if ( materials[ child.material.name ] ) child.material = materials[ child.material.name ];
+										else materials[ child.material.name ] = child.material;
+										if ( child.name !== 'glass' && child.name !== 'floor' ) {
 
 											child.receiveShadow = true;
 										    child.castShadow = true;
@@ -151,11 +157,11 @@
 				controls.update();
 
 				dirLight = new THREE.DirectionalLight( 0xFFFFFF, 6 );
-				dirLight.position.set( - 0.1, 0.6, 0.4 );
+				dirLight.position.set( 0.2, 0.6, 0.4 );
 				dirLight.castShadow = true;
 				scene.add( dirLight );
 				const shadow = dirLight.shadow;
-				shadow.mapSize.width = shadow.mapSize.height = 1024;
+				shadow.mapSize.width = shadow.mapSize.height = 2048;
 				shadow.radius = 8;
 				shadow.bias = - 0.0005;
 				const shadowCam = shadow.camera, s = 0.5;
@@ -167,7 +173,7 @@
 				//scene.add(  new THREE.CameraHelper(shadowCam) );
 
 				pointLight = new THREE.PointLight( 0x7b8cad, 1, 0, 2 );
-				pointLight.position.set( 0.3, - 0.2, - 0.2 );
+				pointLight.position.set( - 0.3, - 0.2, - 0.2 );
 				scene.add( pointLight );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -213,32 +219,11 @@
 
 				if ( b ) {
 
-					if ( composer ) return;
-
-					bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-					bloomPass.threshold = setting.threshold;
-					bloomPass.strength = setting.strength;
-					bloomPass.radius = setting.radius;
-
-					taaPass = new TAARenderPass( scene, camera );
-					taaPass.sampleLevel = 2;
-					taaPass.unbiased = false;
-
-					composer = new EffectComposer( renderer );
-					composer.setPixelRatio( window.devicePixelRatio );
-					composer.setSize( window.innerWidth, window.innerHeight );
-
-					composer.addPass( taaPass );
-					composer.addPass( bloomPass );
-					composer.addPass( new OutputPass() );
+					renderer.setEffects( [ taaPass, bloomPass ] );
 
 				} else {
 
-					if ( ! composer ) return;
-					composer.dispose();
-					composer = null;
-					bloomPass = null;
-					taaPass = null;
+					renderer.setEffects( null );
 
 				}
 
@@ -255,7 +240,7 @@
 
 				gui.add( setting, 'postProcess' ).onChange( postProcess );
 				gui.add( setting, 'threshold', 0, 1, 0.01 ).onChange( upBloom );
-				gui.add( setting, 'strength', 0, 3, 0.01 ).onChange( upBloom );
+				gui.add( setting, 'strength', 0, 0.1, 0.001 ).onChange( upBloom );
 				gui.add( setting, 'radius', 0, 1, 0.01 ).onChange( upBloom );
 
 			}
@@ -306,11 +291,6 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
-				if ( composer ) {
-
-					composer.setSize( width, height );
-
-				}
 
 			}
 
@@ -322,8 +302,7 @@
 
 				TWEEN.update();
 
-				if ( composer ) composer.render();
-				else renderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 				if ( ready ) getTime();
 

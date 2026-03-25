@@ -1,6 +1,5 @@
 // Licensed under a BSD license. See license.html for license
-/* eslint-disable strict */
-'use strict';  // eslint-disable-line
+'use strict';
 
 ( function () {
 

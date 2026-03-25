@@ -122,7 +122,7 @@ class StructTypeNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const structType = builder.getStructTypeFromNode( this, this.membersLayout, this.name );
 

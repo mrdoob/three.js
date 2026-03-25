@@ -103,6 +103,7 @@
 				if ( validRedirects.has( file ) === true ) {
 
 					selectFile( file );
+					updateLinkScroll();
 					viewer.src = validRedirects.get( file );
 					viewer.style.display = 'unset';
 
@@ -170,6 +171,7 @@
 
 				event.preventDefault();
 				panel.classList.toggle( 'open' );
+				updateLinkScroll();
 
 			} );
 
@@ -269,7 +271,7 @@
 		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+			v = v.replace( /[\s_]+/gi, ' ' ); // replace multiple whitespaces or underscores with a single one
 
 			if ( v !== '' ) {
 
@@ -381,6 +383,17 @@
 			const div = document.createElement( 'div' );
 			div.innerHTML = htmlString.trim();
 			return div.firstChild;
+
+		}
+
+		function updateLinkScroll() {
+
+			if ( selected !== null ) {
+
+				const link = links[ selected ];
+				content.scrollTop = link.offsetTop - content.offsetTop - ( content.clientHeight - link.offsetHeight ) / 2;
+
+			}
 
 		}
 
