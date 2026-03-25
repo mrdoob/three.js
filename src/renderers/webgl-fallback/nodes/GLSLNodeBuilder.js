@@ -1145,9 +1145,11 @@ ${ flowData.code }
 
 			return 'uint( gl_DrawID )';
 
-		}
+		} else {
 
-		return null;
+			return 'nodeUniformDrawId'; // fallback to uniform
+
+		}
 
 	}
 
@@ -1221,9 +1223,17 @@ ${ flowData.code }
 			const ext = this.renderer.backend.extensions;
 			const isBatchedMesh = this.object.isBatchedMesh;
 
-			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
+			if ( isBatchedMesh ) {
 
-				this.enableExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
+				if ( ext.has( 'WEBGL_multi_draw' ) ) {
+
+					this.enableExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
+
+				} else {
+
+					snippets.push( 'uniform uint nodeUniformDrawId;' );
+
+				}
 
 			}
 
