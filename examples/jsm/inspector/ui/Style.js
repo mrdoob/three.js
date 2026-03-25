@@ -232,6 +232,7 @@ export class Style {
 	max-height: calc(100vh - 120px);
 	overflow-y: auto;
 	overflow-x: hidden;
+	width: 100%;
 }
 
 .mini-panel-content .list-scroll-wrapper::-webkit-scrollbar {
