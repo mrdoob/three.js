@@ -848,6 +848,14 @@ class Timeline extends Tab {
 
 			}
 
+			case 'createComputePipeline':
+			case 'destroyComputePipeline': {
+
+				const pipeline = args[ 0 ];
+				return { name: pipeline.name || 'unknown' };
+
+			}
+
 			case 'createBindings':
 			case 'updateBindings': {
 
@@ -881,8 +889,10 @@ class Timeline extends Tab {
 
 			case 'createAttribute':
 			case 'createIndexAttribute':
+			case 'createStorageAttribute':
 			case 'destroyAttribute':
-			case 'destroyIndexAttribute': {
+			case 'destroyIndexAttribute':
+			case 'destroyStorageAttribute': {
 
 				const attribute = args[ 0 ];
 				const details = {};
