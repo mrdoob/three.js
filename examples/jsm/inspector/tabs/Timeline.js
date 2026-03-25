@@ -1104,6 +1104,20 @@ class Timeline extends Tab {
 
 			}
 
+			case 'copyTextureToTexture': {
+
+				const srcTexture = args[ 0 ];
+				const dstTexture = args[ 1 ];
+
+				const details = {
+					source: this.getTextureName( srcTexture ),
+					destination: this.getTextureName( dstTexture )
+				};
+
+				return details;
+
+			}
+
 			case 'updateSampler': {
 
 				const texture = args[ 0 ];
