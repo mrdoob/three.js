@@ -828,6 +828,24 @@ class Timeline extends Tab {
 
 			}
 
+			case 'updateViewport': {
+
+				const renderContext = args[ 0 ];
+				const { x, y, width, height } = renderContext.viewportValue;
+
+				return { x, y, width, height };
+
+			}
+
+			case 'updateScissor': {
+
+				const renderContext = args[ 0 ];
+				const { x, y, width, height } = renderContext.scissorValue;
+
+				return { x, y, width, height };
+
+			}
+
 			case 'createProgram':
 			case 'destroyProgram': {
 
