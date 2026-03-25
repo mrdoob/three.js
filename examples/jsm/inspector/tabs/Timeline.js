@@ -828,6 +828,17 @@ class Timeline extends Tab {
 
 			}
 
+			case 'clear': {
+
+				return {
+					color: args[ 0 ],
+					depth: args[ 1 ],
+					stencil: args[ 2 ],
+					target: args[ 3 ] ? 'RenderTarget' : 'CanvasTarget'
+				};
+
+			}
+
 			case 'updateViewport': {
 
 				const renderContext = args[ 0 ];
