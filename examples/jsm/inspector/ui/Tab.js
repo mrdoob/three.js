@@ -40,7 +40,7 @@ export class Tab extends EventDispatcher {
 		this.content.id = `${this.id}-content`;
 		this.content.className = 'profiler-content';
 
-		this.isActive = false;
+		this._isActive = false;
 		this.isVisible = true;
 		this.isDetached = false;
 		this.detachedWindow = null;
@@ -57,6 +57,22 @@ export class Tab extends EventDispatcher {
 	get inspector() {
 
 		return this.profiler.inspector;
+
+	}
+
+	get isActive() {
+
+		const isProfilerVisible = this.profiler && this.profiler.panel.classList.contains( 'visible' );
+
+		if ( ! isProfilerVisible ) return false;
+
+		return this.isDetached || this._isActive;
+
+	}
+
+	set isActive( value ) {
+
+		this._isActive = value;
 
 	}
 
