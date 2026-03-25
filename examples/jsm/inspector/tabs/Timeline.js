@@ -774,6 +774,52 @@ class Timeline extends Tab {
 
 			}
 
+			case 'compute': {
+
+				const computeNode = args[ 1 ];
+				const bindings = args[ 2 ];
+				const dispatchSize = args[ 4 ] || computeNode.dispatchSize || computeNode.count;
+
+				const node = computeNode.name || computeNode.type || 'unknown';
+
+				// bindings
+
+				let bindingsCount = 0;
+
+				if ( bindings ) {
+
+					bindingsCount = bindings.length;
+
+				}
+
+				// dispatch
+
+				let dispatch;
+
+				if ( dispatchSize.isIndirectStorageBufferAttribute ) {
+
+					dispatch = 'indirect';
+
+				} else if ( Array.isArray( dispatchSize ) ) {
+
+					dispatch = dispatchSize.join( ', ' );
+
+				} else {
+
+					dispatch = dispatchSize;
+
+				}
+
+				// details
+
+				return {
+					node,
+					bindings: bindingsCount,
+					dispatch
+				};
+
+			}
+
 			case 'updateBinding': {
 
 				const binding = args[ 0 ];
