@@ -256,7 +256,7 @@ class PassNode extends TempNode {
 
 		let depthTexture = null;
 
-		if ( PassNode.DEPTH || options.depthBuffer !== false ) {
+		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
 			depthTexture = new DepthTexture();
 			depthTexture.isRenderTargetTexture = true;
