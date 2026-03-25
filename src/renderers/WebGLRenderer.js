@@ -998,6 +998,7 @@ class WebGLRenderer {
 			if ( depth ) {
 
 				bits |= _gl.DEPTH_BUFFER_BIT;
+				this.state.buffers.depth.setMask( true );
 
 			}
 
