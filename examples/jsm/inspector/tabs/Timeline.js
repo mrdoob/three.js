@@ -1,6 +1,32 @@
 import { Tab } from '../ui/Tab.js';
 import { Graph } from '../ui/Graph.js';
 import { getItem, setItem } from '../Inspector.js';
+import {
+	ByteType,
+	FloatType,
+	HalfFloatType,
+	IntType,
+	ShortType,
+	UnsignedByteType,
+	UnsignedInt101111Type,
+	UnsignedInt248Type,
+	UnsignedInt5999Type,
+	UnsignedIntType,
+	UnsignedShort4444Type,
+	UnsignedShort5551Type,
+	UnsignedShortType,
+	AlphaFormat,
+	RGBFormat,
+	RGBAFormat,
+	DepthFormat,
+	DepthStencilFormat,
+	RedFormat,
+	RedIntegerFormat,
+	RGFormat,
+	RGIntegerFormat,
+	RGBIntegerFormat,
+	RGBAIntegerFormat
+} from 'three';
 
 const LIMIT = 500;
 const TRIANGLES_GRAPH_LIMIT = 60;
@@ -708,6 +734,102 @@ class Timeline extends Tab {
 
 	}
 
+	getRenderTargetDetails( renderTarget ) {
+
+		const textures = renderTarget.textures;
+		const attachments = [];
+
+		const getBPC = ( texture ) => {
+
+			switch ( texture.type ) {
+
+				case ByteType:
+				case UnsignedByteType:
+					return '8';
+				case ShortType:
+				case UnsignedShortType:
+				case HalfFloatType:
+				case UnsignedShort4444Type:
+				case UnsignedShort5551Type:
+					return '16';
+				case IntType:
+				case UnsignedIntType:
+				case FloatType:
+				case UnsignedInt248Type:
+				case UnsignedInt5999Type:
+				case UnsignedInt101111Type:
+					return '32';
+				default:
+					return '?';
+
+			}
+
+		};
+
+		const getFormat = ( texture ) => {
+
+			switch ( texture.format ) {
+
+				case AlphaFormat:
+					return 'a';
+				case RedFormat:
+				case RedIntegerFormat:
+					return 'r';
+				case RGFormat:
+				case RGIntegerFormat:
+					return 'rg';
+				case RGBFormat:
+				case RGBIntegerFormat:
+					return 'rgb';
+				case DepthFormat:
+					return 'depth';
+				case DepthStencilFormat:
+					return 'depth-stencil';
+				case RGBAFormat:
+				case RGBAIntegerFormat:
+				default:
+					return 'rgba';
+
+			}
+
+		};
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const texture = textures[ i ];
+
+			const bpc = getBPC( texture );
+			const format = getFormat( texture );
+
+			let description = `[${ i }]`;
+
+			if ( texture.name && ! ( texture.isDepthTexture && texture.name === 'depth' ) ) {
+
+				description += ` ${ texture.name }`;
+
+			}
+
+			description += ` ${ format } ${ bpc } bpc`;
+
+			attachments.push( description );
+
+		}
+
+		const details = {
+			target: renderTarget.name || 'RenderTarget',
+			[ `attachments(${ textures.length })` ]: attachments.join( ', ' )
+		};
+
+		if ( renderTarget.depthTexture ) {
+
+			details.depth = `${ getBPC( renderTarget.depthTexture ) } bpc`;
+
+		}
+
+		return details;
+
+	}
+
 	getCallDetail( method, args ) {
 
 		switch ( method ) {
@@ -759,6 +881,16 @@ class Timeline extends Tab {
 					scene: this.renderer.inspector.currentRender.name || 'unknown',
 					camera: renderContext.camera.name || renderContext.camera.type
 				};
+
+				if ( renderContext.renderTarget && ! renderContext.renderTarget.isPostProcessingRenderTarget ) {
+
+					Object.assign( details, this.getRenderTargetDetails( renderContext.renderTarget ) );
+
+				} else {
+
+					details.target = 'CanvasTarget';
+
+				}
 
 				return details;
 
@@ -830,12 +962,35 @@ class Timeline extends Tab {
 
 			case 'clear': {
 
-				return {
+				const renderContext = args[ 3 ];
+
+				const details = {
 					color: args[ 0 ],
 					depth: args[ 1 ],
-					stencil: args[ 2 ],
-					target: args[ 3 ] ? 'RenderTarget' : 'CanvasTarget'
+					stencil: args[ 2 ]
 				};
+
+				if ( renderContext.renderTarget && ! renderContext.renderTarget.isPostProcessingRenderTarget ) {
+
+					const renderTargetDetails = this.getRenderTargetDetails( renderContext.renderTarget );
+
+					if ( renderTargetDetails.depth ) {
+
+						renderTargetDetails[ 'depth texture' ] = renderTargetDetails.depth;
+
+						delete renderTargetDetails.depth;
+
+					}
+
+					Object.assign( details, renderTargetDetails );
+
+				} else {
+
+					details.target = 'CanvasTarget';
+
+				}
+
+				return details;
 
 			}
 
