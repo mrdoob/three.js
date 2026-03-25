@@ -3,6 +3,7 @@
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
+import { FileLoader } from '../../../../src/loaders/FileLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 
@@ -41,9 +42,24 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parse', ( assert ) => {
+		QUnit.test( 'parse - invalid json variable shadowing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const loader = new ObjectLoader();
+			let callbackFired = false;
+
+			const originalLoad = FileLoader.prototype.load;
+			FileLoader.prototype.load = function ( url, onLoad ) {
+				onLoad( '{malformed}' );
+			};
+
+			loader.load( 'dummy.json', function () {}, undefined, function ( err ) {
+				callbackFired = err instanceof SyntaxError;
+			} );
+
+			// We won't reach here because it crashes, but we add an assertion to satisfy QUnit if it doesn't 
+			assert.ok( callbackFired, 'onError is properly called before the crash' );
+
+			FileLoader.prototype.load = originalLoad;
 
 		} );
 
