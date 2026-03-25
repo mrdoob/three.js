@@ -168,11 +168,9 @@ export class Tab extends EventDispatcher {
 			// Move content to mini-panel if not already there
 			if ( ! this.miniContent.firstChild ) {
 
-				const actualContent = this.content.querySelector( '.list-scroll-wrapper' ) || this.content.firstElementChild;
+				while ( this.content.firstChild ) {
 
-				if ( actualContent ) {
-
-					this.miniContent.appendChild( actualContent );
+					this.miniContent.appendChild( this.content.firstChild );
 
 				}
 
@@ -205,7 +203,11 @@ export class Tab extends EventDispatcher {
 			// Move content back to main panel
 			if ( this.miniContent.firstChild ) {
 
-				this.content.appendChild( this.miniContent.firstChild );
+				while ( this.miniContent.firstChild ) {
+
+					this.content.appendChild( this.miniContent.firstChild );
+
+				}
 
 			}
 

@@ -16,7 +16,6 @@ export class Profiler extends EventDispatcher {
 		this.lastWidthRight = 450; // Width for right position
 		this.position = 'bottom'; // 'bottom' or 'right'
 		this.detachedWindows = []; // Array to store detached tab windows
-		this.isMobile = this.detectMobile();
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
@@ -25,15 +24,11 @@ export class Profiler extends EventDispatcher {
 		this.setupShell();
 		this.setupResizing();
 
-		// Setup orientation change listener for mobile devices
-		if ( this.isMobile ) {
-
-			this.setupOrientationListener();
-
-		}
-
-		// Setup window resize listener to constrain detached windows
+		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
+
+		// Setup orientation change listener for mobile devices
+		this.setupOrientationListener();
 
 	}
 
@@ -57,21 +52,34 @@ export class Profiler extends EventDispatcher {
 
 	}
 
+	get isMobile() {
+
+		return this.detectMobile();
+
+	}
+
+	get isSmallScreen() {
+
+		return window.innerWidth <= 768;
+
+	}
+
 	detectMobile() {
 
 		// Check for mobile devices
 		const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 		const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test( userAgent );
 		const isTouchDevice = ( 'ontouchstart' in window ) || ( navigator.maxTouchPoints > 0 );
-		const isSmallScreen = window.innerWidth <= 768;
 
-		return isMobileUA || ( isTouchDevice && isSmallScreen );
+		return isMobileUA || ( isTouchDevice && this.isSmallScreen );
 
 	}
 
 	setupOrientationListener() {
 
 		const handleOrientationChange = () => {
+
+			if ( ! this.isMobile ) return;
 
 			// Check if device is in landscape or portrait mode
 			const isLandscape = window.innerWidth > window.innerHeight;
@@ -147,6 +155,28 @@ export class Profiler extends EventDispatcher {
 
 		// Listen for window resize events
 		window.addEventListener( 'resize', () => {
+
+			if ( this.isSmallScreen ) {
+
+				this.floatingBtn.style.display = 'none';
+				this.panel.classList.add( 'hide-position-toggle' );
+
+			} else {
+
+				this.floatingBtn.style.display = '';
+				this.panel.classList.remove( 'hide-position-toggle' );
+
+			}
+
+			if ( this.isMobile ) {
+
+				this.panel.classList.add( 'is-mobile' );
+
+			} else {
+
+				this.panel.classList.remove( 'is-mobile' );
+
+			}
 
 			constrainDetachedWindows();
 			constrainMainPanel();
@@ -235,6 +265,19 @@ export class Profiler extends EventDispatcher {
 
 		const header = document.createElement( 'div' );
 		header.className = 'profiler-header';
+
+		// Enable horizontal scrolling with vertical mouse wheel
+		header.addEventListener( 'wheel', ( e ) => {
+
+			if ( e.deltaY !== 0 ) {
+
+				e.preventDefault();
+				header.scrollLeft += e.deltaY * .25;
+
+			}
+
+		}, { passive: false } );
+
 		this.tabsContainer = document.createElement( 'div' );
 		this.tabsContainer.className = 'profiler-tabs';
 
@@ -247,11 +290,17 @@ export class Profiler extends EventDispatcher {
 		this.floatingBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>';
 		this.floatingBtn.onclick = () => this.togglePosition();
 
-		// Hide position toggle button on mobile devices
-		if ( this.isMobile ) {
+		// Hide position toggle button on small screens
+		if ( this.isSmallScreen ) {
 
 			this.floatingBtn.style.display = 'none';
 			this.panel.classList.add( 'hide-position-toggle' );
+
+		}
+
+		if ( this.isMobile ) {
+
+			this.panel.classList.add( 'is-mobile' );
 
 		}
 
@@ -459,11 +508,9 @@ export class Profiler extends EventDispatcher {
 
 		if ( ! tab.miniContent.firstChild ) {
 
-			const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
+			while ( tab.content.firstChild ) {
 
-			if ( actualContent ) {
-
-				tab.miniContent.appendChild( actualContent );
+				tab.miniContent.appendChild( tab.content.firstChild );
 
 			}
 
@@ -758,27 +805,19 @@ export class Profiler extends EventDispatcher {
 
 	setupTabDragAndDrop( tab ) {
 
-		// Disable drag and drop on mobile devices
-		if ( this.isMobile ) {
+		// Always handle basic click
+		tab.button.addEventListener( 'click', () => {
 
-			tab.button.addEventListener( 'click', () => {
+			if ( ! isDragging ) {
 
 				this.setActiveTab( tab.id );
 
-			} );
+			}
 
-			return;
-
-		}
+		} );
 
 		// Disable drag and drop if tab doesn't allow detach
 		if ( tab.allowDetach === false ) {
-
-			tab.button.addEventListener( 'click', () => {
-
-				this.setActiveTab( tab.id );
-
-			} );
 
 			tab.button.style.cursor = 'default';
 
@@ -883,6 +922,8 @@ export class Profiler extends EventDispatcher {
 		};
 
 		tab.button.addEventListener( 'pointerdown', ( e ) => {
+
+			if ( this.isMobile && e.pointerType !== 'mouse' ) return;
 
 			onDragStart( e );
 			tab.button.addEventListener( 'pointermove', onDragMove );

@@ -55,7 +55,7 @@ class Memory extends Tab {
 		this.indirectStorageAttributes = new Item( 'Indirect Storage Attributes', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.indirectStorageAttributes );
 
-		this.programs = new Item( 'Programs', createValueSpan(), 'N/A' );
+		this.programs = new Item( 'Programs', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.programs );
 
 		this.renderTargets = new Item( 'Render Targets', createValueSpan(), 'N/A' );
@@ -106,6 +106,7 @@ class Memory extends Tab {
 		setText( this.indirectStorageAttributes.data[ 2 ], formatBytes( memory.indirectStorageAttributesSize ) );
 
 		setText( this.programs.data[ 1 ], memory.programs.toString() );
+		setText( this.programs.data[ 2 ], formatBytes( memory.programsSize ) );
 
 		setText( this.renderTargets.data[ 1 ], memory.renderTargets.toString() );
 

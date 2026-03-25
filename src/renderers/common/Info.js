@@ -108,6 +108,7 @@ class Info {
 		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
 		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
+		 * @property {number} programsSize - The memory size of active programs in bytes.
 		 */
 		this.memory = {
 			geometries: 0,
@@ -123,7 +124,8 @@ class Info {
 			attributesSize: 0,
 			indexAttributesSize: 0,
 			storageAttributesSize: 0,
-			indirectStorageAttributesSize: 0
+			indirectStorageAttributesSize: 0,
+			programsSize: 0
 		};
 
 		/**
@@ -324,6 +326,39 @@ class Info {
 			this.memory[ data.type + 'Size' ] -= data.size;
 
 		}
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {ProgrammableStage} program - The program to track.
+	 */
+	createProgram( program ) {
+
+		const size = program.code.length; // Approx size
+
+		this.memoryMap.set( program, size );
+
+		this.memory.programs ++;
+		this.memory.total += size;
+		this.memory.programsSize += size;
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Object} program - The program to track.
+	 */
+	destroyProgram( program ) {
+
+		const size = this.memoryMap.get( program ) || 0;
+		this.memoryMap.delete( program );
+
+		this.memory.programs --;
+		this.memory.total -= size;
+		this.memory.programsSize -= size;
 
 	}
 
