@@ -1223,17 +1223,9 @@ ${ flowData.code }
 			const ext = this.renderer.backend.extensions;
 			const isBatchedMesh = this.object.isBatchedMesh;
 
-			if ( isBatchedMesh ) {
+			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
 
-				if ( ext.has( 'WEBGL_multi_draw' ) ) {
-
-					this.enableExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
-
-				} else {
-
-					snippets.push( 'uniform uint nodeUniformDrawId;' );
-
-				}
+				this.enableExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
 
 			}
 
@@ -1565,6 +1557,20 @@ void main() {
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.transforms = this.getTransforms( shaderStage );
 			stageData.flow = flow;
+
+			// fallbacks
+
+			if ( shaderStage === 'vertex' ) {
+
+				const ext = this.renderer.backend.extensions;
+
+				if ( this.object.isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) === false ) {
+
+					stageData.uniforms += '\nuniform uint nodeUniformDrawId;\n';
+
+				}
+
+			}
 
 		}
 
