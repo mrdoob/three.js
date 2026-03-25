@@ -1057,7 +1057,8 @@ class Timeline extends Tab {
 
 		// Update UI texts
 		const group = ( c, text ) => `<span style="display:inline-flex;align-items:center;margin-left:12px;"><span style="width:6px;height:6px;border-radius:50%;background-color:${c};margin-right:6px;"></span>${text}</span>`;
-		this.frameInfo.innerHTML = 'Frame: ' + frame.id + group( 'var(--color-fps)', ( frame.fps || 0 ).toFixed( 1 ) + ' FPS' ) + group( 'var(--color-call)', frame.calls.length + ' calls' ) + group( 'var(--color-red)', ( frame.triangles || 0 ) + ' triangles' );
+		const maxTriangles = Math.max( this.baseTriangles, frame.triangles || 0 );
+		this.frameInfo.innerHTML = 'Frame: ' + frame.id + group( 'var(--color-fps)', ( frame.fps || 0 ).toFixed( 1 ) + ' FPS' ) + group( 'var(--color-call)', frame.calls.length + ' calls' ) + group( 'var(--color-red)', ( frame.triangles || 0 ) + ' / ' + maxTriangles + ' triangles' );
 
 		// Update playhead position
 		const rect = this.graphSlider.getBoundingClientRect();
