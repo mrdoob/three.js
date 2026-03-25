@@ -67,9 +67,10 @@ class DataTextureLoader extends Loader {
 				} else {
 
 					error( e );
-					return;
 
 				}
+
+				return;
 
 			}
 
