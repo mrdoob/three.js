@@ -715,43 +715,29 @@ class Timeline extends Tab {
 			case 'draw': {
 
 				const renderObject = args[ 0 ];
-				if ( ! renderObject ) return null;
 
-				const details = {};
-				if ( renderObject.object ) {
+				const details = {
+					object: renderObject.object.name || renderObject.object.type,
+					material: renderObject.material.name || renderObject.material.type,
+					geometry: renderObject.geometry.name || renderObject.geometry.type
+				};
 
-					details.object = renderObject.object.name || renderObject.object.type;
+				if ( renderObject.getDrawParameters ) {
 
-					if ( renderObject.material ) {
+					const drawParams = renderObject.getDrawParameters();
 
-						details.material = renderObject.material.name || renderObject.material.type;
+					if ( drawParams ) {
 
-					}
+						if ( renderObject.object.isMesh || renderObject.object.isSprite ) {
 
-					if ( renderObject.geometry ) {
+							details.triangles = drawParams.vertexCount / 3;
 
-						details.geometry = renderObject.geometry.name || undefined;
+							if ( renderObject.object.count > 1 ) {
 
-						if ( renderObject.getDrawParameters ) {
+								details.instance = renderObject.object.count;
 
-							const drawParams = renderObject.getDrawParameters();
-
-							if ( drawParams ) {
-
-								if ( renderObject.object.isMesh || renderObject.object.isSprite ) {
-
-									details.triangles = drawParams.vertexCount / 3;
-
-									if ( renderObject.object.count > 1 ) {
-
-										details.instance = renderObject.object.count;
-
-										details[ 'triangles per instance' ] = details.triangles;
-										details.triangles *= details.instance;
-
-									}
-
-								}
+								details[ 'triangles per instance' ] = details.triangles;
+								details.triangles *= details.instance;
 
 							}
 
@@ -768,59 +754,98 @@ class Timeline extends Tab {
 			case 'beginRender': {
 
 				const renderContext = args[ 0 ];
-				if ( ! renderContext ) return null;
 
-				const details = {};
+				const details = {
+					scene: this.renderer.inspector.currentRender.name || 'unknown',
+					camera: renderContext.camera.name || renderContext.camera.type
+				};
 
-				if ( this.renderer.inspector && this.renderer.inspector.currentRender ) {
-
-					details.scene = this.renderer.inspector.currentRender.name;
-
-				}
-
-				if ( renderContext.camera && renderContext.camera.isCamera ) {
-
-					details.camera = renderContext.camera.name || renderContext.camera.type;
-
-				}
-
-				return Object.keys( details ).length > 0 ? details : null;
+				return details;
 
 			}
 
 			case 'beginCompute': {
 
-				const details = {};
+				const details = {
+					compute: this.renderer.inspector.currentCompute.name || 'unknown'
+				};
 
-				if ( this.renderer.inspector && this.renderer.inspector.currentCompute ) {
-
-					details.compute = this.renderer.inspector.currentCompute.name;
-
-				}
-
-				return Object.keys( details ).length > 0 ? details : null;
+				return details;
 
 			}
 
 			case 'updateBinding': {
 
 				const binding = args[ 0 ];
-				return binding?.name ? { binding: binding.name } : null;
+
+				return { group: binding.name || 'unknown' };
 
 			}
 
-			case 'createProgram': {
+			case 'createProgram':
+			case 'destroyProgram': {
 
 				const program = args[ 0 ];
-				if ( ! program ) return null;
-				return { stage: program.stage, name: program.name || undefined };
+				return { stage: program.stage, name: program.name || 'unknown' };
 
 			}
 
-			case 'createBindings': {
+			case 'createRenderPipeline': {
+
+				const renderObject = args[ 0 ];
+				const details = {
+					object: renderObject.object ? ( renderObject.object.name || renderObject.object.type || 'unknown' ) : 'unknown',
+					material: renderObject.material ? ( renderObject.material.name || renderObject.material.type || 'unknown' ) : 'unknown'
+				};
+
+				return details;
+
+			}
+
+			case 'createBindings':
+			case 'updateBindings': {
 
 				const bindGroup = args[ 0 ];
-				return bindGroup?.name ? { group: bindGroup.name } : null;
+				const details = { group: bindGroup.name || 'unknown' };
+
+				if ( bindGroup.bindings ) {
+
+					details.count = bindGroup.bindings.length;
+
+				}
+
+				return details;
+
+			}
+
+			case 'createNodeBuilder': {
+
+				const object = args[ 0 ];
+				const details = { object: object.name || object.type || 'unknown' };
+
+				if ( object.material ) {
+
+					details.material = object.material.name || object.material.type || 'unknown';
+
+				}
+
+				return details;
+
+			}
+
+			case 'createAttribute':
+			case 'createIndexAttribute':
+			case 'destroyAttribute':
+			case 'destroyIndexAttribute': {
+
+				const attribute = args[ 0 ];
+				const details = {};
+
+				if ( attribute.name ) details.name = attribute.name;
+				if ( attribute.count !== undefined ) details.count = attribute.count;
+				if ( attribute.itemSize !== undefined ) details.itemSize = attribute.itemSize;
+
+				return details;
 
 			}
 
@@ -829,20 +854,11 @@ class Timeline extends Tab {
 				const target = args[ 0 ];
 				const rectangle = args[ 2 ];
 
-				const details = {};
-				details.target = this.getTextureName( target );
-
-				if ( rectangle ) {
-
-					details.width = rectangle.z;
-					details.height = rectangle.w;
-
-				} else if ( target && target.image ) {
-
-					if ( target.image.width !== undefined ) details.width = target.image.width;
-					if ( target.image.height !== undefined ) details.height = target.image.height;
-
-				}
+				const details = {
+					target: this.getTextureName( target ),
+					width: rectangle.z,
+					height: rectangle.w
+				};
 
 				return details;
 
@@ -864,14 +880,16 @@ class Timeline extends Tab {
 
 			}
 
+			case 'updateTexture':
+			case 'generateMipmaps':
 			case 'createTexture':
 			case 'destroyTexture': {
 
 				const texture = args[ 0 ];
 				const name = this.getTextureName( texture );
-				const details = name ? { texture: name } : null;
+				const details = { texture: name };
 
-				if ( details && texture && texture.image ) {
+				if ( texture.image ) {
 
 					if ( texture.image.width !== undefined ) details.width = texture.image.width;
 					if ( texture.image.height !== undefined ) details.height = texture.image.height;
@@ -890,7 +908,6 @@ class Timeline extends Tab {
 
 	getTextureName( texture ) {
 
-		if ( ! texture ) return '';
 		if ( texture.name ) return texture.name;
 
 		const types = [
