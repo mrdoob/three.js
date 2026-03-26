@@ -155,6 +155,7 @@ class NodeManager extends DataMap {
 	_createNodeBuilder( renderObject, material ) {
 
 		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+		nodeBuilder.instances = renderObject.instances;
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
 		nodeBuilder.camera = renderObject.camera;
@@ -478,7 +479,8 @@ class NodeManager extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
-			nodeBuilder.transforms
+			nodeBuilder.transforms,
+			nodeBuilder.instances
 		);
 
 	}
@@ -821,7 +823,7 @@ class NodeManager extends DataMap {
 
 	}
 
-	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null ) {
+	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null, instances = null ) {
 
 		const nodeFrame = this.nodeFrame;
 		nodeFrame.renderer = renderer;
@@ -829,6 +831,7 @@ class NodeManager extends DataMap {
 		nodeFrame.object = object;
 		nodeFrame.camera = camera;
 		nodeFrame.material = material;
+		nodeFrame.instances = instances;
 
 		return nodeFrame;
 
@@ -836,7 +839,7 @@ class NodeManager extends DataMap {
 
 	getNodeFrameForRender( renderObject ) {
 
-		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material );
+		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material, renderObject.instances );
 
 	}
 

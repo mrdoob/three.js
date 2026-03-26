@@ -106,6 +106,13 @@ class NodeFrame {
 		 */
 		this.scene = null;
 
+		/**
+		 * A reference to the current instances array.
+		 * @type {?Array<Object3D>}
+		 * @default null
+		 */
+		this.instances = null;
+
 	}
 
 	/**
