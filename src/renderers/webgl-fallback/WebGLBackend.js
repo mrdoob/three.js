@@ -991,14 +991,28 @@ class WebGLBackend extends Backend {
 	 * @param {number} firstVertex - The first vertex to render.
 	 * @param {number} vertexCount - The vertex count.
 	 * @param {number} instanceCount - The intance count.
+	 * @param {WebGLProgram} programGPU - The raw WebGL shader program.
 	 */
-	_draw( object, renderer, firstVertex, vertexCount, instanceCount ) {
+	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU ) {
 
 		if ( object.isBatchedMesh ) {
 
 			if ( this.hasFeature( 'WEBGL_multi_draw' ) === false ) {
 
-				warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
+				const { gl } = this;
+
+				const drawIdLocation = gl.getUniformLocation( programGPU, 'nodeUniformDrawId' );
+
+				const starts = object._multiDrawStarts;
+				const counts = object._multiDrawCounts;
+				const drawCount = object._multiDrawCount;
+
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					gl.uniform1ui( drawIdLocation, i );
+					renderer.render( starts[ i ], counts[ i ] );
+
+				}
 
 			} else {
 
@@ -1267,7 +1281,7 @@ class WebGLBackend extends Backend {
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
-					this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
+					this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
 
 				}
 
@@ -1278,7 +1292,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
+			this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
 
 		}
 
