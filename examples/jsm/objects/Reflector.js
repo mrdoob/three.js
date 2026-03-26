@@ -2,7 +2,6 @@ import {
 	Color,
 	Matrix4,
 	Mesh,
-	PerspectiveCamera,
 	Plane,
 	ShaderMaterial,
 	UniformsUtils,
@@ -67,12 +66,12 @@ class Reflector extends Mesh {
 		this.forceUpdate = false;
 
 		/**
-		 * The reflector's virtual camera. This is used to render
-		 * the scene from the mirror's point of view.
+		 * Weak map for managing virtual cameras.
 		 *
-		 * @type {PerspectiveCamera}
+		 * @private
+		 * @type {WeakMap<Camera, Camera>}
 		 */
-		this.camera = new PerspectiveCamera();
+		this._virtualCameras = new WeakMap();
 
 		const scope = this;
 
@@ -98,7 +97,6 @@ class Reflector extends Mesh {
 		const q = new Vector4();
 
 		const textureMatrix = new Matrix4();
-		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
@@ -116,6 +114,8 @@ class Reflector extends Mesh {
 		this.material = material;
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
+
+			const virtualCamera = this._getVirtualCamera( camera );
 
 			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -176,10 +176,21 @@ class Reflector extends Mesh {
 
 			const projectionMatrix = virtualCamera.projectionMatrix;
 
-			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
-			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-			q.z = - 1.0;
-			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+			if ( virtualCamera.isOrthographicCamera ) {
+
+				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+				q.z = - camera.far; // actual view-space z at the far plane, no normalization needed
+				q.w = 1.0; // w_clip = 1 in orthographic (no perspective division)
+
+			} else {
+
+				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+				q.z = - 1.0;
+				q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+
+			}
 
 			// Calculate the scaled plane vector
 			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
@@ -187,8 +198,21 @@ class Reflector extends Mesh {
 			// Replacing the third row of the projection matrix
 			projectionMatrix.elements[ 2 ] = clipPlane.x;
 			projectionMatrix.elements[ 6 ] = clipPlane.y;
-			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
-			projectionMatrix.elements[ 14 ] = clipPlane.w;
+
+			if ( virtualCamera.isOrthographicCamera ) {
+
+				// For orthographic cameras, w_clip = 1 always (no perspective division),
+				// so the -1 near-plane offset must go into the constant term (elements[14])
+				// rather than the z coefficient (elements[10]).
+				projectionMatrix.elements[ 10 ] = clipPlane.z - clipBias;
+				projectionMatrix.elements[ 14 ] = clipPlane.w - 1.0;
+
+			} else {
+
+				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
+				projectionMatrix.elements[ 14 ] = clipPlane.w;
+
+			}
 
 			// Render
 			scope.visible = false;
@@ -247,6 +271,30 @@ class Reflector extends Mesh {
 
 			renderTarget.dispose();
 			scope.material.dispose();
+
+		};
+
+		/**
+		 * Returns a virtual camera for the given camera. The virtual camera is used to
+		 * render the scene from the reflector's view so correct reflections can be produced.
+		 *
+		 * @private
+		 * @param {Camera} camera - The scene's camera.
+		 * @return {Camera} The corresponding virtual camera.
+		 */
+		this._getVirtualCamera = function ( camera ) {
+
+			let virtualCamera = this._virtualCameras.get( camera );
+
+			if ( virtualCamera === undefined ) {
+
+				virtualCamera = camera.clone();
+
+				this._virtualCameras.set( camera, virtualCamera );
+
+			}
+
+			return virtualCamera;
 
 		};
 
