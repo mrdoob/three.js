@@ -368,6 +368,15 @@ class Texture extends EventDispatcher {
 		 */
 		this.pmremVersion = 0;
 
+		/**
+		 * Whether the texture should use one of the 16 bit integer formats which are normalized
+		 * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.normalized = false;
+
 	}
 
 	/**
@@ -497,6 +506,7 @@ class Texture extends EventDispatcher {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.colorSpace = source.colorSpace;
+		this.normalized = source.normalized;
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
@@ -611,7 +621,8 @@ class Texture extends EventDispatcher {
 
 			generateMipmaps: this.generateMipmaps,
 			premultiplyAlpha: this.premultiplyAlpha,
-			unpackAlignment: this.unpackAlignment
+			unpackAlignment: this.unpackAlignment,
+			normalized: this.normalized
 
 		};
 

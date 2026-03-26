@@ -3,7 +3,7 @@ import {
 	ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType,
 	IntType, UnsignedIntType, FloatType,
 	AlphaFormat, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat,
-	RGBFormat,
+	RGFormat, RGBFormat,
 	UnsignedShort4444Type, UnsignedShort5551Type,
 	UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type
 } from '../../constants.js';
@@ -386,6 +386,7 @@ class Info {
 		let channels = 4; // RGBA default
 
 		if ( texture.format === AlphaFormat || texture.format === RedFormat || texture.format === RedIntegerFormat || texture.format === DepthFormat || texture.format === DepthStencilFormat ) channels = 1;
+		else if ( texture.format === RGFormat ) channels = 2;
 		else if ( texture.format === RGBFormat ) channels = 3;
 
 		let bytesPerPixel = bytesPerChannel * channels;

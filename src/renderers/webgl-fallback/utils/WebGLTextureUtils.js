@@ -162,7 +162,7 @@ class WebGLTextureUtils {
 	 * @param {boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
 	 * @return {GLenum} The internal format.
 	 */
-	getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
+	getInternalFormat( internalFormatName, glFormat, glType, normalized, colorSpace, forceLinearTransfer = false ) {
 
 		const { gl, extensions } = this;
 
@@ -181,10 +181,10 @@ class WebGLTextureUtils {
 			if ( glType === gl.FLOAT ) internalFormat = gl.R32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.R16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.R8;
-			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.R16;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).R16_EXT : gl.R16;
 			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.R32UI;
 			if ( glType === gl.BYTE ) internalFormat = gl.R8I;
-			if ( glType === gl.SHORT ) internalFormat = gl.R16I;
+			if ( glType === gl.SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).R16_SNORM_EXT : gl.R16I;
 			if ( glType === gl.INT ) internalFormat = gl.R32I;
 
 		}
@@ -205,10 +205,10 @@ class WebGLTextureUtils {
 			if ( glType === gl.FLOAT ) internalFormat = gl.RG32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RG16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RG8;
-			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RG16;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RG16_EXT : gl.RG16;
 			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RG32UI;
 			if ( glType === gl.BYTE ) internalFormat = gl.RG8I;
-			if ( glType === gl.SHORT ) internalFormat = gl.RG16I;
+			if ( glType === gl.SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RG16_SNORM_EXT : gl.RG16I;
 			if ( glType === gl.INT ) internalFormat = gl.RG32I;
 
 		}
@@ -231,10 +231,10 @@ class WebGLTextureUtils {
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGB32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RGB16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGB8;
-			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RGB16;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RGB16_EXT : gl.RGB16;
 			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RGB32UI;
 			if ( glType === gl.BYTE ) internalFormat = gl.RGB8I;
-			if ( glType === gl.SHORT ) internalFormat = gl.RGB16I;
+			if ( glType === gl.SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RGB16_SNORM_EXT : gl.RGB16I;
 			if ( glType === gl.INT ) internalFormat = gl.RGB32I;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( transfer === SRGBTransfer ) ? gl.SRGB8 : gl.RGB8;
 			if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) internalFormat = gl.RGB565;
@@ -263,10 +263,10 @@ class WebGLTextureUtils {
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGBA32F;
 			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RGBA16F;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGBA8;
-			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RGBA16;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RGBA16_EXT : gl.RGBA16;
 			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RGBA32UI;
 			if ( glType === gl.BYTE ) internalFormat = gl.RGBA8I;
-			if ( glType === gl.SHORT ) internalFormat = gl.RGBA16I;
+			if ( glType === gl.SHORT ) internalFormat = normalized ? extensions.get( 'EXT_texture_norm16' ).RGBA16_SNORM_EXT : gl.RGBA16I;
 			if ( glType === gl.INT ) internalFormat = gl.RGBA32I;
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( transfer === SRGBTransfer ) ? gl.SRGB8_ALPHA8 : gl.RGBA8;
 			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGBA4;
@@ -429,7 +429,7 @@ class WebGLTextureUtils {
 
 		const glFormat = backend.utils.convert( texture.format, texture.colorSpace );
 		const glType = backend.utils.convert( texture.type );
-		const glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
+		const glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace, texture.isVideoTexture );
 
 		const textureGPU = gl.createTexture();
 		const glTextureType = this.getGLTextureType( texture );
