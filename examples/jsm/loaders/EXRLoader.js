@@ -2357,8 +2357,9 @@ class EXRLoader extends DataTextureLoader {
 
 				return parseTimecode( dataView, offset );
 
-			} else if ( type === 'preview' ) {
+			} else if ( type === 'preview' || type === 'deepImageState' || type === 'idmanifest' ) {
 
+				// Known metadata-only types: silently skip, they carry no pixel data.
 				offset.value += size;
 				return 'skipped';
 
