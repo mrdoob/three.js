@@ -66,12 +66,12 @@ class Reflector extends Mesh {
 		this.forceUpdate = false;
 
 		/**
-		 * Weak map for managing virtual cameras.
+		 * Weak map for managing reflection cameras.
 		 *
 		 * @private
 		 * @type {WeakMap<Camera, Camera>}
 		 */
-		this._virtualCameras = new WeakMap();
+		this._reflectionCameras = new WeakMap();
 
 		const scope = this;
 
@@ -115,7 +115,7 @@ class Reflector extends Mesh {
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
-			const virtualCamera = this._getVirtualCamera( camera );
+			const reflectionCamera = this._getReflectionCamera( camera );
 
 			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -145,16 +145,16 @@ class Reflector extends Mesh {
 			target.reflect( normal ).negate();
 			target.add( reflectorWorldPosition );
 
-			virtualCamera.position.copy( view );
-			virtualCamera.up.set( 0, 1, 0 );
-			virtualCamera.up.applyMatrix4( rotationMatrix );
-			virtualCamera.up.reflect( normal );
-			virtualCamera.lookAt( target );
+			reflectionCamera.position.copy( view );
+			reflectionCamera.up.set( 0, 1, 0 );
+			reflectionCamera.up.applyMatrix4( rotationMatrix );
+			reflectionCamera.up.reflect( normal );
+			reflectionCamera.lookAt( target );
 
-			virtualCamera.far = camera.far; // Used in WebGLBackground
+			reflectionCamera.far = camera.far; // Used in WebGLBackground
 
-			virtualCamera.updateMatrixWorld();
-			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+			reflectionCamera.updateMatrixWorld();
+			reflectionCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 			// Update the texture matrix
 			textureMatrix.set(
@@ -163,20 +163,20 @@ class Reflector extends Mesh {
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
-			textureMatrix.multiply( virtualCamera.projectionMatrix );
-			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
+			textureMatrix.multiply( reflectionCamera.projectionMatrix );
+			textureMatrix.multiply( reflectionCamera.matrixWorldInverse );
 			textureMatrix.multiply( scope.matrixWorld );
 
 			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+			reflectorPlane.applyMatrix4( reflectionCamera.matrixWorldInverse );
 
 			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
 
-			const projectionMatrix = virtualCamera.projectionMatrix;
+			const projectionMatrix = reflectionCamera.projectionMatrix;
 
-			if ( virtualCamera.isOrthographicCamera ) {
+			if ( reflectionCamera.isOrthographicCamera ) {
 
 				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
 				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
@@ -199,7 +199,7 @@ class Reflector extends Mesh {
 			projectionMatrix.elements[ 2 ] = clipPlane.x;
 			projectionMatrix.elements[ 6 ] = clipPlane.y;
 
-			if ( virtualCamera.isOrthographicCamera ) {
+			if ( reflectionCamera.isOrthographicCamera ) {
 
 				// For orthographic cameras, w_clip = 1 always (no perspective division),
 				// so the -1 near-plane offset must go into the constant term (elements[14])
@@ -230,7 +230,7 @@ class Reflector extends Mesh {
 			renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
 			if ( renderer.autoClear === false ) renderer.clear();
-			renderer.render( scene, virtualCamera );
+			renderer.render( scene, reflectionCamera );
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -275,26 +275,26 @@ class Reflector extends Mesh {
 		};
 
 		/**
-		 * Returns a virtual camera for the given camera. The virtual camera is used to
+		 * Returns a reflection camera for the given camera. The reflection camera is used to
 		 * render the scene from the reflector's view so correct reflections can be produced.
 		 *
 		 * @private
 		 * @param {Camera} camera - The scene's camera.
-		 * @return {Camera} The corresponding virtual camera.
+		 * @return {Camera} The corresponding reflection camera.
 		 */
-		this._getVirtualCamera = function ( camera ) {
+		this._getReflectionCamera = function ( camera ) {
 
-			let virtualCamera = this._virtualCameras.get( camera );
+			let reflectionCamera = this._reflectionCameras.get( camera );
 
-			if ( virtualCamera === undefined ) {
+			if ( reflectionCamera === undefined ) {
 
-				virtualCamera = camera.clone();
+				reflectionCamera = camera.clone();
 
-				this._virtualCameras.set( camera, virtualCamera );
+				this._reflectionCameras.set( camera, reflectionCamera );
 
 			}
 
-			return virtualCamera;
+			return reflectionCamera;
 
 		};
 
