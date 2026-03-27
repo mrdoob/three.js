@@ -21,7 +21,7 @@ class XRHandMeshModel {
 	 * @param {?Loader} [loader=null] - The loader. If not provided, an instance of `GLTFLoader` will be used to load models.
 	 * @param {?Function} [onLoad=null] - A callback that is executed when a controller model has been loaded.
 	 */
-	constructor( handModel, controller, path, handedness, loader = null, onLoad = null ) {
+	constructor( handModel, controller, path, handedness, loader = null, onLoad = null, customCache = null ) {
 
 		/**
 		 * The WebXR controller.
@@ -45,16 +45,11 @@ class XRHandMeshModel {
 		 */
 		this.bones = [];
 
-		if ( loader === null ) {
+		const pathToUse = path || DEFAULT_HAND_PROFILE_PATH;
 
-			loader = new GLTFLoader();
-			loader.setPath( path || DEFAULT_HAND_PROFILE_PATH );
+		const processAsset = ( gltf ) => {
 
-		}
-
-		loader.load( `${handedness}.glb`, gltf => {
-
-			const object = gltf.scene.children[ 0 ];
+			const object = gltf.scene.children[ 0 ].clone();
 			this.handModel.add( object );
 
 			const mesh = object.getObjectByProperty( 'type', 'SkinnedMesh' );
@@ -110,7 +105,36 @@ class XRHandMeshModel {
 
 			if ( onLoad ) onLoad( object );
 
-		} );
+		};
+
+		const assetUrl = `${pathToUse}${handedness}.glb`;
+
+		if ( customCache && customCache[ assetUrl ] ) {
+
+			processAsset( customCache[ assetUrl ] );
+
+		} else {
+
+			if ( loader === null ) {
+
+				loader = new GLTFLoader();
+				loader.setPath( pathToUse );
+
+			}
+
+			loader.load( `${handedness}.glb`, gltf => {
+
+				if ( customCache ) {
+
+					customCache[ assetUrl ] = gltf;
+
+				}
+
+				processAsset( gltf );
+
+			} );
+
+		}
 
 	}
 
