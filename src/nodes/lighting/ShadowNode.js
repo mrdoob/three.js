@@ -508,15 +508,16 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
+		const shadowMatrix = lightShadowMatrix( light );
+		const shadowNormalBias = normalWorld.mul( normalBias );
+
 		let shadowPosition;
 
 		if ( ! renderer.highPrecision || builder.material.receivedShadowPositionNode || builder.context.shadowPositionWorld ) {
 
-			shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( normalWorld.mul( normalBias ) ) );
+			shadowPosition = shadowMatrix.mul( shadowPositionWorld.add( shadowNormalBias ) );
 
 		} else {
-
-			const shadowMatrix = lightShadowMatrix( light );
 
 			const highpShadowModelMatrix = uniform( 'mat4' ).onObjectUpdate( ( { object }, self ) => {
 
@@ -524,7 +525,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			} );
 
-			shadowPosition = highpShadowModelMatrix.mul( positionLocal ).add( shadowMatrix.mul( vec4( normalWorld.mul( normalBias ), 0 ) ) );
+			shadowPosition = highpShadowModelMatrix.mul( positionLocal ).add( shadowMatrix.mul( vec4( shadowNormalBias, 0 ) ) );
 
 		}
 
