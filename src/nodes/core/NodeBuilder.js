@@ -2939,6 +2939,43 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Updates the context of the node builder.
+	 */
+	updateContext() {
+
+		const { renderer, material } = this;
+
+		// < renderer.contextNode >
+
+		if ( renderer.contextNode.isContextNode === true ) {
+
+			this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+
+		} else {
+
+			error( 'NodeBuilder: "renderer.contextNode" must be an instance of `context()`.' );
+
+		}
+
+		// < material.contextNode >
+
+		if ( material && material.contextNode ) {
+
+			if ( material.contextNode.isContextNode === true ) {
+
+				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+
+			} else {
+
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Central build method which controls the build for the given object.
 	 *
 	 * @return {NodeBuilder} A reference to this node builder.
@@ -2946,6 +2983,8 @@ class NodeBuilder {
 	build() {
 
 		const { object, material, renderer } = this;
+
+		this.updateContext();
 
 		if ( material !== null ) {
 
@@ -2964,16 +3003,6 @@ class NodeBuilder {
 		} else {
 
 			this.addFlow( 'compute', object );
-
-			if ( renderer.contextNode.isContextNode === true ) {
-
-				this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
-
-			} else {
-
-				error( 'NodeBuilder: "renderer.contextNode" must be an instance of `context()`.' );
-
-			}
 
 		}
 
@@ -3036,6 +3065,8 @@ class NodeBuilder {
 	async buildAsync() {
 
 		const { object, material, renderer } = this;
+
+		this.updateContext();
 
 		if ( material !== null ) {
 
