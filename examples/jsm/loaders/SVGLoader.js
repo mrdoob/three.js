@@ -2993,7 +2993,7 @@ class SVGLoader extends Loader {
 
 			tempV2_3.copy( p1 );
 
-			for ( let i = 0, il = arcDivisions - 1; i < il; i ++ ) {
+			for ( let i = 0; i < arcDivisions; i ++ ) {
 
 				tempV2_4.copy( tempV2_3 ).rotateAround( center, angle );
 
@@ -3004,10 +3004,6 @@ class SVGLoader extends Loader {
 				tempV2_3.copy( tempV2_4 );
 
 			}
-
-			addVertex( tempV2_4, u, v );
-			addVertex( p2, u, v );
-			addVertex( center, u, 0.5 );
 
 		}
 
