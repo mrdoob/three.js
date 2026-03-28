@@ -1,4 +1,5 @@
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
+import { clone } from '../utils/SkeletonUtils.js';
 
 const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
 
@@ -20,6 +21,7 @@ class XRHandMeshModel {
 	 * @param {XRHandedness} handedness - The handedness of the XR input source.
 	 * @param {?Loader} [loader=null] - The loader. If not provided, an instance of `GLTFLoader` will be used to load models.
 	 * @param {?Function} [onLoad=null] - A callback that is executed when a controller model has been loaded.
+	 * @param {?Object} [customCache=null] - An optional shared cache object for storing and reusing loaded assets across instances.
 	 */
 	constructor( handModel, controller, path, handedness, loader = null, onLoad = null, customCache = null ) {
 
@@ -49,7 +51,7 @@ class XRHandMeshModel {
 
 		const processAsset = ( gltf ) => {
 
-			const object = gltf.scene.children[ 0 ].clone();
+			const object = clone( gltf.scene.children[ 0 ] );
 			this.handModel.add( object );
 
 			const mesh = object.getObjectByProperty( 'type', 'SkinnedMesh' );
