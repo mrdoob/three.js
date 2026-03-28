@@ -650,7 +650,7 @@ class Vector4 {
 		this.x = ( m32 - m23 ) / s;
 		this.y = ( m13 - m31 ) / s;
 		this.z = ( m21 - m12 ) / s;
-		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) / 2 );
+		this.w = Math.acos( clamp( ( m11 + m22 + m33 - 1 ) / 2, - 1, 1 ) );
 
 		return this;
 
