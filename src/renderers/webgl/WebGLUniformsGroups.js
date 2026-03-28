@@ -375,7 +375,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		uniformsGroup.removeEventListener( 'dispose', onUniformsGroupsDispose );
 
 		const index = allocatedBindingPoints.indexOf( uniformsGroup.__bindingPointIndex );
-		allocatedBindingPoints.splice( index, 1 );
+		if ( index !== - 1 ) {
+
+			allocatedBindingPoints.splice( index, 1 );
+
+		}
 
 		gl.deleteBuffer( buffers[ uniformsGroup.id ] );
 
