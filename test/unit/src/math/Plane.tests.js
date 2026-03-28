@@ -231,6 +231,26 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'intersectsLine', ( assert ) => {
+
+			let a = new Plane( new Vector3( 1, 0, 0 ), 0 );
+
+			const l1 = new Line3( new Vector3( - 10, 0, 0 ), new Vector3( 10, 0, 0 ) );
+			assert.ok( a.intersectsLine( l1 ), 'Passed!' );
+
+			const l2 = new Line3( new Vector3( 10, 0, 0 ), new Vector3( 20, 0, 0 ) );
+			assert.ok( ! a.intersectsLine( l2 ), 'Passed!' );
+
+			// coplanar line
+			const l3 = new Line3( new Vector3( 0, - 10, 0 ), new Vector3( 0, 10, 0 ) );
+			assert.ok( a.intersectsLine( l3 ), 'Passed!' );
+
+			// touching line
+			const l4 = new Line3( new Vector3( 0, 0, 0 ), new Vector3( 10, 0, 0 ) );
+			assert.ok( a.intersectsLine( l4 ), 'Passed!' );
+
+		} );
+
 		QUnit.test( 'intersectsBox', ( assert ) => {
 
 			const a = new Box3( zero3.clone(), one3.clone() );

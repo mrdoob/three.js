@@ -257,7 +257,7 @@ class Plane {
 		const startSign = this.distanceToPoint( line.start );
 		const endSign = this.distanceToPoint( line.end );
 
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+		return ( startSign <= 0 && endSign >= 0 ) || ( endSign <= 0 && startSign >= 0 );
 
 	}
 
