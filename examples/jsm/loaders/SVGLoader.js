@@ -2535,7 +2535,7 @@ class SVGLoader extends Loader {
 		const innerPoint = new Vector2();
 		const outerPoint = new Vector2();
 
-		arcDivisions = arcDivisions !== undefined ? arcDivisions : 12;
+		arcDivisions = arcDivisions !== undefined ? arcDivisions : 1;
 		minDistance = minDistance !== undefined ? minDistance : 0.001;
 		vertexOffset = vertexOffset !== undefined ? vertexOffset : 0;
 
@@ -2993,7 +2993,7 @@ class SVGLoader extends Loader {
 
 			tempV2_3.copy( p1 );
 
-			for ( let i = 0; i < arcDivisions; i ++ ) {
+			for ( let i = 0, il = arcDivisions - 1; i < il; i ++ ) {
 
 				tempV2_4.copy( tempV2_3 ).rotateAround( center, angle );
 
@@ -3004,6 +3004,10 @@ class SVGLoader extends Loader {
 				tempV2_3.copy( tempV2_4 );
 
 			}
+
+			addVertex( tempV2_3, u, v );
+			addVertex( p2, u, v );
+			addVertex( center, u, 0.5 );
 
 		}
 
