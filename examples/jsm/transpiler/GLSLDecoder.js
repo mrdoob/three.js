@@ -170,7 +170,7 @@ class Tokenizer {
 
 	skip( ...params ) {
 
-		let remainingCode = this.source.substr( this.position );
+		let remainingCode = this.source.slice( this.position );
 		let i = params.length;
 
 		while ( i -- ) {
@@ -182,7 +182,7 @@ class Tokenizer {
 
 				this.position += skipLength;
 
-				remainingCode = this.source.substr( this.position );
+				remainingCode = this.source.slice( this.position );
 
 				// re-skip, new remainingCode is generated
 				// maybe exist previous regexp non detected
