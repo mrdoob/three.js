@@ -96,7 +96,6 @@ ShaderLib[ 'line' ] = {
 			#ifdef USE_DASH
 
 				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
-				vUv = uv;
 
 			#endif
 
@@ -110,6 +109,12 @@ ShaderLib[ 'line' ] = {
 
 				worldStart = start.xyz;
 				worldEnd = end.xyz;
+
+				#ifdef USE_DASH
+
+					vUv = uv;
+
+				#endif
 
 			#else
 
