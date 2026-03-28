@@ -387,6 +387,26 @@ export default QUnit.module( 'Extras', () => {
 				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
 
 			} );
+			
+			QUnit.test( 'two points', ( assert ) => {
+
+				const curve = new CatmullRomCurve3( [
+					new Vector3( 0, 0, 0 ),
+					new Vector3( 10, 0, 0 )
+				], false, 'catmullrom' );
+
+				const expectedPoints = [
+					new Vector3( 0, 0, 0 ),
+					new Vector3( 5, 0, 0 ),
+					new Vector3( 10, 0, 0 )
+				];
+
+				const points = curve.getPoints( 2 );
+
+				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
+				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+
+			} );
 
 		} );
 
