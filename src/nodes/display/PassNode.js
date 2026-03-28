@@ -251,14 +251,19 @@ class PassNode extends TempNode {
 		 */
 		this._height = 1;
 
-		const depthTexture = new DepthTexture();
-		depthTexture.isRenderTargetTexture = true;
-		//depthTexture.type = FloatType;
-		depthTexture.name = 'depth';
-
 		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options, } );
 		renderTarget.texture.name = 'output';
-		renderTarget.depthTexture = depthTexture;
+
+		if ( options.depthBuffer !== false ) {
+
+			const depthTexture = new DepthTexture();
+			depthTexture.isRenderTargetTexture = true;
+			//depthTexture.type = FloatType;
+			depthTexture.name = 'depth';
+
+			renderTarget.depthTexture = depthTexture;
+
+		}
 
 		/**
 		 * The pass's render target.
@@ -314,7 +319,7 @@ class PassNode extends TempNode {
 		 */
 		this._textures = {
 			output: renderTarget.texture,
-			depth: depthTexture
+			depth: renderTarget.depthTexture || null
 		};
 
 		/**
@@ -757,7 +762,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
-		if ( renderer.reversedDepthBuffer === true ) {
+		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
 			this.renderTarget.depthTexture.type = FloatType;
 
