@@ -369,7 +369,7 @@ class UniformsGroup extends UniformBuffer {
 		const offset = uniform.offset;
 		const type = uniform.getType();
 
-		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
+		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 3 ] !== v.w ) {
 
 			const b = this._getBufferForType( type );
 
