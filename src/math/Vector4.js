@@ -497,7 +497,7 @@ class Vector4 {
 
 		// q is assumed to be normalized
 
-		this.w = 2 * Math.acos( q.w );
+		this.w = 2 * Math.acos( clamp( q.w, - 1, 1 ) );
 
 		const s = Math.sqrt( 1 - q.w * q.w );
 
