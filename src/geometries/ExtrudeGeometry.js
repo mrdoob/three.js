@@ -189,6 +189,8 @@ class ExtrudeGeometry extends BufferGeometry {
 					const thresholdSqScaled = THRESHOLD_SQ * scalingFactorSqrt * scalingFactorSqrt;
 					if ( distSq <= thresholdSqScaled ) {
 
+						if ( points.length <= 1 ) break;
+
 						points.splice( currentIndex, 1 );
 						i --;
 						continue;
