@@ -2535,7 +2535,7 @@ class SVGLoader extends Loader {
 		const innerPoint = new Vector2();
 		const outerPoint = new Vector2();
 
-		arcDivisions = arcDivisions !== undefined ? arcDivisions : 1;
+		arcDivisions = arcDivisions !== undefined ? arcDivisions : 12;
 		minDistance = minDistance !== undefined ? minDistance : 0.001;
 		vertexOffset = vertexOffset !== undefined ? vertexOffset : 0;
 
