@@ -327,6 +327,32 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'bind - gracefully handles undefined morphTargetDictionary', ( assert ) => {
+
+		// Scenario: A user adds morphAttributes to a geometry *after* the Mesh is constructed,
+		// but hasn't called updateMorphTargets() yet. In this lifecycle gap, 
+		// mesh.morphTargetDictionary remains undefined.
+		const geometry = new BoxGeometry();
+		geometry.morphAttributes.position = [ geometry.getAttribute( 'position' ).clone() ];
+		
+		const mesh = new Mesh( geometry, new MeshBasicMaterial() );
+
+		// Force the dictionary to undefined to guarantee we simulate this exact state.
+		mesh.morphTargetDictionary = undefined;
+
+		// Attempting to bind to a named morph target (like 'smile') in this state 
+		// should fail gracefully instead of throwing a fatal TypeError.
+		const binding = new PropertyBinding( mesh, '.morphTargetInfluences[smile]' );
+		
+		try {
+			binding.bind();
+			assert.ok( true, 'bind() safely aborted without throwing a TypeError.' );
+		} catch ( error ) {
+			assert.ok( false, `bind() threw an unexpected error: ${error.message}` );
+		}
+
+	} );
+
 	} );
 
 } );

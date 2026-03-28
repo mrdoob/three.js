@@ -677,7 +677,7 @@ class PropertyBinding {
 
 				}
 
-				if ( targetObject.morphTargetDictionary[ propertyIndex ] !== undefined ) {
+				if ( targetObject.morphTargetDictionary !== undefined && targetObject.morphTargetDictionary[ propertyIndex ] !== undefined ) {
 
 					propertyIndex = targetObject.morphTargetDictionary[ propertyIndex ];
 
