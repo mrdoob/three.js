@@ -414,7 +414,7 @@ class KeyframeTrack {
 
 			const currTime = times[ i ];
 
-			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
+			if ( typeof currTime === 'number' && Number.isNaN( currTime ) ) {
 
 				error( 'KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
