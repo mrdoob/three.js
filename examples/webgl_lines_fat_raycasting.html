@@ -17,8 +17,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,7 +26,6 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'stats-gl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -40,9 +38,8 @@
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
-			let stats;
 			let gui;
-			let clock;
+			let timer;
 
 			const color = new THREE.Color();
 
@@ -85,7 +82,7 @@
 				'width': matLine.linewidth,
 				'alphaToCoverage': matLine.alphaToCoverage,
 				'threshold': raycaster.params.Line2.threshold,
-				'translation': raycaster.params.Line2.threshold,
+				'translation': 0,
 				'animate': true
 
 			};
@@ -94,7 +91,8 @@
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -194,10 +192,6 @@
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats( { horizontal: false, trackGPU: true } );
-				stats.init( renderer );
-				document.body.appendChild( stats.dom );
-			
 				initGui();
 
 			}
@@ -220,7 +214,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				const obj = line.visible ? line : segments;
 				thresholdLine.position.copy( line.position );
@@ -268,8 +264,6 @@
 
 				renderer.render( scene, camera );
 
-				stats.update();
-
 			}
 
 			//
@@ -313,10 +307,7 @@
 				gui.add( params, 'world units' ).onChange( function ( val ) {
 
 					matLine.worldUnits = val;
-					matLine.needsUpdate = true;
-
 					matThresholdLine.worldUnits = val;
-					matThresholdLine.needsUpdate = true;
 
 				} );
 

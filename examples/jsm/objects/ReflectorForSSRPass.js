@@ -387,6 +387,7 @@ ReflectorForSSRPass.ReflectorShader = {
  * @property {number} [clipBias=0] - The clip bias.
  * @property {Object} [shader] - Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.
  * @property {boolean} [useDepthTexture=true] - Whether to store depth values in a texture or not.
+ * @property {Vector2} [resolution] - Resolution for the Reflector Pass.
  **/
 
 export { ReflectorForSSRPass };

@@ -1013,7 +1013,7 @@ class DataViewReader {
 
 	getFloat64() {
 
-		const value = this.dv.getFloat64( this.offset, this.littleEndian );
+		const value = this.dv.getFloat64( this.offset );
 		this.offset += 8;
 		return value;
 

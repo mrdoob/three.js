@@ -1,3 +1,4 @@
+import { warn } from '../../utils.js';
 /**
  * Base class for node parsers. A derived parser must be implemented
  * for each supported native shader language.
@@ -13,7 +14,7 @@ class NodeParser {
 	 */
 	parseFunction( /*source*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 

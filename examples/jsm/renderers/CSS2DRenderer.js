@@ -16,7 +16,7 @@ class CSS2DObject extends Object3D {
 	/**
 	 * Constructs a new CSS2D object.
 	 *
-	 * @param {DOMElement} [element] - The DOM element.
+	 * @param {HTMLElement} [element] - The DOM element.
 	 */
 	constructor( element = document.createElement( 'div' ) ) {
 
@@ -34,7 +34,7 @@ class CSS2DObject extends Object3D {
 		/**
 		 * The DOM element which defines the appearance of this 3D object.
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLElement}
 		 * @readonly
 		 * @default true
 		 */
@@ -59,6 +59,7 @@ class CSS2DObject extends Object3D {
 			this.traverse( function ( object ) {
 
 				if (
+					object.element &&
 					object.element instanceof object.element.ownerDocument.defaultView.Element &&
 					object.element.parentNode !== null
 				) {
@@ -132,9 +133,19 @@ class CSS2DRenderer {
 		/**
 		 * The DOM where the renderer appends its child-elements.
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLElement}
 		 */
 		this.domElement = domElement;
+
+		/**
+		 * Controls whether the renderer assigns `z-index` values to CSS2DObject DOM elements.
+		 * If set to `true`, z-index values are assigned first based on the `renderOrder`
+		 * and secondly - the distance to the camera. If set to `false`, no z-index values are assigned.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.sortObjects = true;
 
 		/**
 		 * Returns an object containing the width and height of the renderer.
@@ -165,7 +176,7 @@ class CSS2DRenderer {
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
 			renderObject( scene, scene, camera );
-			zOrder( scene );
+			if ( this.sortObjects ) zOrder( scene );
 
 		};
 
@@ -310,7 +321,7 @@ class CSS2DRenderer {
  * Constructor parameters of `CSS2DRenderer`.
  *
  * @typedef {Object} CSS2DRenderer~Parameters
- * @property {DOMElement} [element] - A DOM element where the renderer appends its child-elements.
+ * @property {HTMLElement} [element] - A DOM element where the renderer appends its child-elements.
  * If not passed in here, a new div element will be created.
  **/
 

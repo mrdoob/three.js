@@ -44,7 +44,7 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-import * as fflate from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
 let fbxTree;
@@ -61,10 +61,10 @@ let sceneGraph;
  * - Morph normals / blend shape normals
  *
  * FBX format references:
- * - [C++ SDK reference]{@link https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html}
+ * - [C++ SDK reference](https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html)
  *
  * Binary format specification:
- * - [FBX binary file format specification]{@link https://code.blender.org/2013/08/fbx-binary-file-format-specification/}
+ * - [FBX binary file format specification](https://code.blender.org/2013/08/fbx-binary-file-format-specification/)
  *
  * ```js
  * const loader = new FBXLoader();
@@ -1615,11 +1615,9 @@ class GeometryParser {
 
 			case 'Mesh':
 				return this.parseMeshGeometry( relationships, geoNode, deformers );
-				break;
 
 			case 'NurbsCurve':
 				return this.parseNurbsGeometry( geoNode );
-				break;
 
 		}
 
@@ -3799,7 +3797,7 @@ class BinaryParser {
 
 				}
 
-				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+				const data = unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
 				const reader2 = new BinaryReader( data.buffer );
 
 				switch ( type ) {

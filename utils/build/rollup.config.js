@@ -1,7 +1,7 @@
 import terser from '@rollup/plugin-terser';
 import MagicString from 'magic-string';
 
-export function glsl() {
+function glsl() {
 
 	return {
 
@@ -45,7 +45,7 @@ function header() {
 
 			code.prepend( `/**
  * @license
- * Copyright 2010-2025 Three.js Authors
+ * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */\n` );
 
@@ -198,4 +198,4 @@ const builds = [
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds.slice( 0, 4 ) : builds;
+export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;

@@ -2,14 +2,22 @@
 	<head>
 		<title>three.js webgpu - mrt readback</title>
 		<meta charset="utf-8">
-        <link rel="shortcut icon" href="#">
+		<link rel="shortcut icon" href="#">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mrt readback
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Multiple Render Targets</span>
+			</div>
+
+			<small>
+				Using multiple render targets to output color and normals to separate buffers.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -30,18 +38,14 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, torus;
 			let quadMesh, sceneMRT, renderTarget, readbackTarget, material, readbackMaterial, pixelBuffer, pixelBufferTexture;
 
-			const gui = new GUI();
-
 			const options = {
 				selection: 'mrt',
 			};
-
-			gui.add( options, 'selection', [ 'mrt', 'diffuse', 'normal' ] );
 
 			init();
 
@@ -52,6 +56,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				renderer.inspector = new Inspector();
+
+				//
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( options, 'selection', [ 'mrt', 'diffuse', 'normal' ] );
 
 				// Create a multi render target with Float buffers
 
@@ -142,26 +155,26 @@
 
 				torus.rotation.y = ( time / 1000 ) * .4;
 
-				const isMRT = selection === 'mrt';
+				const isReadback = ( selection !== 'mrt' );
 
 				// render scene into target
-				renderer.setMRT( isMRT ? sceneMRT : null );
-				renderer.setRenderTarget( isMRT ? renderTarget : readbackTarget );
+				renderer.setMRT( sceneMRT );
+				renderer.setRenderTarget( isReadback ? readbackTarget : renderTarget );
 				renderer.render( scene, camera );
 
 				// render post FX
 				renderer.setMRT( null );
 				renderer.setRenderTarget( null );
 
-				if ( isMRT ) {
-
-					quadMesh.material = material;
-
-				} else {
+				if ( isReadback ) {
 
 					quadMesh.material = readbackMaterial;
 
 					await readback();
+
+				} else {
+
+					quadMesh.material = material;
 
 				}
 

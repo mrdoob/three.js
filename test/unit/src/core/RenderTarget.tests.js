@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { NearestFilter } from '../../../../src/constants.js';
 import { RenderTarget } from '../../../../src/core/RenderTarget.js';
 
@@ -21,19 +19,6 @@ export default QUnit.module( 'Core', () => {
 
 			const options = new RenderTarget( 1, 1, { magFilter: NearestFilter } );
 			assert.ok( options.width === 1 && options.height === 1 && options.texture.magFilter === NearestFilter, 'Can instantiate a RenderTarget with texture options.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'texture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'depthTexture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

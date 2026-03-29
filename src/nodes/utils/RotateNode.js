@@ -49,7 +49,7 @@ class RotateNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node's type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.positionNode.getNodeType( builder );
 

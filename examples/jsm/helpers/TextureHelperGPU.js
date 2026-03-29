@@ -6,7 +6,7 @@ import {
 	PlaneGeometry,
 	DoubleSide,
 	Vector3,
-} from 'three';
+} from 'three/webgpu';
 import { texture as textureNode, cubeTexture, texture3D, float, vec4, attribute } from 'three/tsl';
 import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
 

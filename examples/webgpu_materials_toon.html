@@ -4,12 +4,23 @@
 		<title>three.js webgpu - toon material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - toon material</div>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Toon Material</span>
+			</div>
+
+			<small>
+				Toon material and outline post-processing effect.
+			</small>
+		</div>
 
 		<script type="importmap">
 			{
@@ -27,15 +38,15 @@
 			import * as THREE from 'three/webgpu';
 			import { toonOutlinePass } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			let container, stats;
+			let container;
 
-			let camera, scene, renderer, postProcessing;
+			let camera, scene, renderer, renderPipeline;
 			let particleLight;
 
 			const loader = new FontLoader();
@@ -64,13 +75,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				//
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				postProcessing.outputNode = toonOutlinePass( scene, camera );
+				renderPipeline.outputNode = toonOutlinePass( scene, camera );
 
 
 				// Materials
@@ -161,9 +173,6 @@
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 200;
 				controls.maxDistance = 2000;
@@ -191,11 +200,7 @@
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;
 				particleLight.position.z = Math.cos( timer * 3 ) * 300;
 
-				stats.begin();
-
-				postProcessing.render();
-
-				stats.end();
+				renderPipeline.render();
 
 			}
 

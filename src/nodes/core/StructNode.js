@@ -1,6 +1,5 @@
 import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * StructNode allows to create custom structures with multiple members.
@@ -41,7 +40,7 @@ class StructNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.structTypeNode.getNodeType( builder );
 
@@ -50,6 +49,21 @@ class StructNode extends Node {
 	getMemberType( builder, name ) {
 
 		return this.structTypeNode.getMemberType( builder, name );
+
+	}
+
+	_getChildren() {
+
+		// Ensure struct type is the last child for correct code generation order
+
+		const children = super._getChildren();
+
+		const structTypeProperty = children.find( child => child.childNode === this.structTypeNode );
+
+		children.splice( children.indexOf( structTypeProperty ), 1 );
+		children.push( structTypeProperty );
+
+		return children;
 
 	}
 
@@ -108,7 +122,7 @@ export const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return nodeObject( new StructNode( structLayout, values ) );
+		return new StructNode( structLayout, values );
 
 	};
 

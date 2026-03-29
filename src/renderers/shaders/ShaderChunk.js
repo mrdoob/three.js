@@ -110,7 +110,7 @@ import * as background from './ShaderLib/background.glsl.js';
 import * as backgroundCube from './ShaderLib/backgroundCube.glsl.js';
 import * as cube from './ShaderLib/cube.glsl.js';
 import * as depth from './ShaderLib/depth.glsl.js';
-import * as distanceRGBA from './ShaderLib/distanceRGBA.glsl.js';
+import * as distance from './ShaderLib/distance.glsl.js';
 import * as equirect from './ShaderLib/equirect.glsl.js';
 import * as linedashed from './ShaderLib/linedashed.glsl.js';
 import * as meshbasic from './ShaderLib/meshbasic.glsl.js';
@@ -241,8 +241,8 @@ export const ShaderChunk = {
 	cube_frag: cube.fragment,
 	depth_vert: depth.vertex,
 	depth_frag: depth.fragment,
-	distanceRGBA_vert: distanceRGBA.vertex,
-	distanceRGBA_frag: distanceRGBA.fragment,
+	distance_vert: distance.vertex,
+	distance_frag: distance.fragment,
 	equirect_vert: equirect.vertex,
 	equirect_frag: equirect.fragment,
 	linedashed_vert: linedashed.vertex,

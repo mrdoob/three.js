@@ -1,5 +1,5 @@
-import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
-import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference } from 'three/tsl';
+import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference, color } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -13,7 +13,7 @@ let _rendererState;
  * gives you great flexibility in composing the final outline look depending on
  * your requirements.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  *
@@ -36,7 +36,7 @@ let _rendererState;
  * const { visibleEdge, hiddenEdge } = outlinePass;
  * const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
  *
- * postProcessing.outputNode = outlineColor.add( scenePass );
+ * renderPipeline.outputNode = outlineColor.add( scenePass );
  * ```
  *
  * @augments TempNode
@@ -56,7 +56,7 @@ class OutlineNode extends TempNode {
 	 * @param {Scene} scene - A reference to the scene.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 * @param {Object} params - The configuration parameters.
-	 * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
+	 * @param {Array<Object3D>} [params.selectedObjects] - An array of selected objects.
 	 * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
 	 * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for an animated glow/pulse effects.
 	 * @param {number} [params.downSampleRatio=2] - The downsample ratio.
@@ -293,8 +293,12 @@ class OutlineNode extends TempNode {
 		 * @type {NodeMaterial}
 		 */
 		this._depthMaterial = new NodeMaterial();
-		this._depthMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
+		this._depthMaterial.colorNode = color( 0, 0, 0 );
 		this._depthMaterial.name = 'OutlineNode.depth';
+
+		this._depthSpriteMaterial = new SpriteNodeMaterial();
+		this._depthSpriteMaterial.colorNode = color( 0, 0, 0 );
+		this._depthSpriteMaterial.name = 'OutlineNode.depthSprite';
 
 		/**
 		 * The material for preparing the mask.
@@ -304,6 +308,9 @@ class OutlineNode extends TempNode {
 		 */
 		this._prepareMaskMaterial = new NodeMaterial();
 		this._prepareMaskMaterial.name = 'OutlineNode.prepareMask';
+
+		this._prepareMaskSpriteMaterial = new SpriteNodeMaterial();
+		this._prepareMaskSpriteMaterial.name = 'OutlineNode.prepareMaskSprite';
 
 		/**
 		 * The copy material
@@ -455,38 +462,42 @@ class OutlineNode extends TempNode {
 
 		this._updateSelectionCache();
 
+		const currentSceneName = scene.name;
+
 		// 1. Draw non-selected objects in the depth buffer
 
-		scene.overrideMaterial = this._depthMaterial;
-
 		renderer.setRenderTarget( this._renderTargetDepthBuffer );
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
+		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode, clippingContext ) => {
 
 			if ( this._selectionCache.has( object ) === false ) {
 
-				renderer.renderObject( object, ...params );
+				const overrideMaterial = object.isSprite ? this._depthSpriteMaterial : this._depthMaterial;
+
+				renderer.renderObject( object, scene, camera, geometry, overrideMaterial, group, lightsNode, clippingContext );
 
 			}
 
 		} );
 
+		scene.name = 'Outline [ Non-Selected Objects Pass ]';
 		renderer.render( scene, camera );
 
 		// 2. Draw only the selected objects by comparing the depth buffer of non-selected objects
 
-		scene.overrideMaterial = this._prepareMaskMaterial;
-
 		renderer.setRenderTarget( this._renderTargetMaskBuffer );
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
+		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode, clippingContext ) => {
 
 			if ( this._selectionCache.has( object ) === true ) {
 
-				renderer.renderObject( object, ...params );
+				const overrideMaterial = object.isSprite ? this._prepareMaskSpriteMaterial : this._prepareMaskMaterial;
+
+				renderer.renderObject( object, scene, camera, geometry, overrideMaterial, group, lightsNode, clippingContext );
 
 			}
 
 		} );
 
+		scene.name = 'Outline [ Selected Objects Pass ]';
 		renderer.render( scene, camera );
 
 		//
@@ -495,15 +506,19 @@ class OutlineNode extends TempNode {
 
 		this._selectionCache.clear();
 
+		scene.name = currentSceneName;
+
 		// 3. Downsample to (at least) half resolution
 
 		_quadMesh.material = this._materialCopy;
+		_quadMesh.name = 'Outline [ Downsample ]';
 		renderer.setRenderTarget( this._renderTargetMaskDownSampleBuffer );
 		_quadMesh.render( renderer );
 
 		// 4. Perform edge detection (half resolution)
 
 		_quadMesh.material = this._edgeDetectionMaterial;
+		_quadMesh.name = 'Outline [ Edge Detection ]';
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer1 );
 		_quadMesh.render( renderer );
 
@@ -513,6 +528,7 @@ class OutlineNode extends TempNode {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial;
+		_quadMesh.name = 'Outline [ Blur Half Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer1 );
 		_quadMesh.render( renderer );
 
@@ -528,6 +544,7 @@ class OutlineNode extends TempNode {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial2;
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer2 );
 		_quadMesh.render( renderer );
 
@@ -540,6 +557,7 @@ class OutlineNode extends TempNode {
 		// 7. Composite
 
 		_quadMesh.material = this._compositeMaterial;
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetComposite );
 		_quadMesh.render( renderer );
 
@@ -576,12 +594,15 @@ class OutlineNode extends TempNode {
 			}
 
 			const depthTest = positionView.z.lessThanEqual( viewZNode ).select( 1, 0 );
-			return vec4( 0.0, depthTest, 1.0, 1.0 );
+			return vec3( 0.0, depthTest, 1.0 );
 
 		};
 
-		this._prepareMaskMaterial.fragmentNode = prepareMask();
+		this._prepareMaskMaterial.colorNode = prepareMask();
 		this._prepareMaskMaterial.needsUpdate = true;
+
+		this._prepareMaskSpriteMaterial.colorNode = prepareMask();
+		this._prepareMaskSpriteMaterial.needsUpdate = true;
 
 		// copy material
 
@@ -701,7 +722,9 @@ class OutlineNode extends TempNode {
 		this._renderTargetComposite.dispose();
 
 		this._depthMaterial.dispose();
+		this._depthSpriteMaterial.dispose();
 		this._prepareMaskMaterial.dispose();
+		this._prepareMaskSpriteMaterial.dispose();
 		this._materialCopy.dispose();
 		this._edgeDetectionMaterial.dispose();
 		this._separableBlurMaterial.dispose();
@@ -722,7 +745,7 @@ class OutlineNode extends TempNode {
 			const selectedObject = this.selectedObjects[ i ];
 			selectedObject.traverse( ( object ) => {
 
-				if ( object.isMesh ) this._selectionCache.add( object );
+				if ( object.isMesh || object.isSprite ) this._selectionCache.add( object );
 
 			} );
 
@@ -742,10 +765,10 @@ export default OutlineNode;
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @param {Object} params - The configuration parameters.
- * @param {Array<Object3D>} params.selectedObjects - An array of selected objects.
+ * @param {Array<Object3D>} [params.selectedObjects] - An array of selected objects.
  * @param {Node<float>} [params.edgeThickness=float(1)] - The thickness of the edges.
  * @param {Node<float>} [params.edgeGlow=float(0)] - Can be used for animated glow/pulse effects.
  * @param {number} [params.downSampleRatio=2] - The downsample ratio.
  * @returns {OutlineNode}
  */
-export const outline = ( scene, camera, params ) => nodeObject( new OutlineNode( scene, camera, params ) );
+export const outline = ( scene, camera, params ) => new OutlineNode( scene, camera, params );

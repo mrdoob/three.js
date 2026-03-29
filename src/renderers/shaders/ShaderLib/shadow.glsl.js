@@ -36,7 +36,6 @@ uniform vec3 color;
 uniform float opacity;
 
 #include <common>
-#include <packing>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
@@ -53,6 +52,7 @@ void main() {
 	#include <tonemapping_fragment>
 	#include <colorspace_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
 
 }
 `;

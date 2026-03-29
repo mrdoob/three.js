@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferGeometryLoader } from '../../../../src/loaders/BufferGeometryLoader.js';
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
@@ -27,19 +25,6 @@ export default QUnit.module( 'Loaders', () => {
 
 			const object = new BufferGeometryLoader();
 			assert.ok( object, 'Can instantiate a BufferGeometryLoader.' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'parse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

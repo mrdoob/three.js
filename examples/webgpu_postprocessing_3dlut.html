@@ -4,15 +4,22 @@
 		<title>three.js webgpu - 3d luts</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - post processing - 3D LUTs<br />
-			Based on <a href="https://threejs-journey.com/lessons/coffee-smoke-shader" target="_blank" rel="noopener">Three.js Journey</a> lesson<br />
-			Perlin noise texture from <a href="http://kitfox.com/projects/perlinNoiseMaker/" target="_blank" rel="noopener">Perlin Noise Maker</a>, 
-			LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>, <a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>3D LUTs</span>
+			</div>
+
+			<small>
+				3D Lookup-Tables for color grading, based on <a href="https://threejs-journey.com/lessons/coffee-smoke-shader" target="_blank" rel="noopener">Three.js Journey</a> lesson.<br />
+				Perlin noise texture from <a href="http://kitfox.com/projects/perlinNoiseMaker/" target="_blank" rel="noopener">Perlin Noise Maker</a>, 
+				LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>, <a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -37,7 +44,7 @@
 			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
 			import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
 			import { LUTImageLoader } from 'three/addons/loaders/LUTImageLoader.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
 				lut: 'Bourbon 64.CUBE',
@@ -56,7 +63,7 @@
 				'NightLUT': null
 			};
 
-			let camera, scene, renderer, postProcessing, controls, lutPass;
+			let camera, scene, renderer, renderPipeline, controls, lutPass;
 
 			init();
 
@@ -195,16 +202,17 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// ignore default output color transform ( toneMapping and outputColorSpace )
 				// use renderOutput() for control the sequence
 
-				postProcessing.outputColorTransform = false;
+				renderPipeline.outputColorTransform = false;
 
 				// scene pass
 
@@ -214,7 +222,7 @@
 				const lut = lutMap[ params.lut ];
 				lutPass = lut3D( outputPass, texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
 
-				postProcessing.outputNode = lutPass;
+				renderPipeline.outputNode = lutPass;
 
 				// controls
 
@@ -226,9 +234,9 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( params, 'lut', Object.keys( lutMap ) );
-				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
+				gui.add( params, 'intensity', 0, 1 );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -257,7 +265,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

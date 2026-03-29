@@ -1,5 +1,6 @@
 import Node from './Node.js';
-import { nodeImmutable, varying } from '../tsl/TSLBase.js';
+import { nodeImmutable } from '../tsl/TSLCore.js';
+import { varying } from './VaryingNode.js';
 
 /**
  * This class represents shader indices of different types. The following predefined node
@@ -10,7 +11,7 @@ import { nodeImmutable, varying } from '../tsl/TSLBase.js';
  * - `drawIndex`: The index of a draw call.
  * - `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
  * - `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
- * - `subgroupIndex`: The index of the subgroup the current compute invocation belongs to.
+ * - `subgroupIndex`: The index of a compute invocation's subgroup within its workgroup.
  *
  * @augments Node
  */
@@ -25,7 +26,7 @@ class IndexNode extends Node {
 	/**
 	 * Constructs a new index node.
 	 *
-	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
+	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
 	 */
 	constructor( scope ) {
 

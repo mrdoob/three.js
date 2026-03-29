@@ -54,7 +54,6 @@ class VolumeSlice {
 
 				index = value;
 				slice.geometryNeedsUpdate = true;
-				return index;
 
 			}
 		} );

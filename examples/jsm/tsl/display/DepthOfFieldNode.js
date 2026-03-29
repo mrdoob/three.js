@@ -285,6 +285,7 @@ class DepthOfFieldNode extends TempNode {
 
 		_quadMesh.material = this._CoCMaterial;
 		renderer.setRenderTarget( this._CoCRT );
+		_quadMesh.name = 'DoF [ CoC ]';
 		_quadMesh.render( renderer );
 
 		// blur near field to avoid visible aliased edges when the near field
@@ -294,6 +295,7 @@ class DepthOfFieldNode extends TempNode {
 
 		_quadMesh.material = this._CoCBlurredMaterial;
 		renderer.setRenderTarget( this._CoCBlurredRT );
+		_quadMesh.name = 'DoF [ CoC Blur ]';
 		_quadMesh.render( renderer );
 
 		// blur64 near
@@ -302,12 +304,14 @@ class DepthOfFieldNode extends TempNode {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
+		_quadMesh.name = 'DoF [ Blur64 Near ]';
 		_quadMesh.render( renderer );
 
 		// blur16 near
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16NearRT );
+		_quadMesh.name = 'DoF [ Blur16 Near ]';
 		_quadMesh.render( renderer );
 
 		// blur64 far
@@ -316,18 +320,21 @@ class DepthOfFieldNode extends TempNode {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
+		_quadMesh.name = 'DoF [ Blur64 Far ]';
 		_quadMesh.render( renderer );
 
 		// blur16 far
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16FarRT );
+		_quadMesh.name = 'DoF [ Blur16 Far ]';
 		_quadMesh.render( renderer );
 
 		// composite
 
 		_quadMesh.material = this._compositeMaterial;
 		renderer.setRenderTarget( this._compositeRT );
+		_quadMesh.name = 'DoF [ Composite ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -544,4 +551,4 @@ export default DepthOfFieldNode;
  * @param {Node<float> | number} bokehScale - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
-export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) ) );
+export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );

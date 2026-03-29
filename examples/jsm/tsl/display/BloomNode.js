@@ -12,20 +12,20 @@ let _rendererState;
 /**
  * Post processing node for creating a bloom effect.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  * const scenePassColor = scenePass.getTextureNode( 'output' );
  *
  * const bloomPass = bloom( scenePassColor );
  *
- * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * renderPipeline.outputNode = scenePassColor.add( bloomPass );
  * ```
  * By default, the node affects the entire image. For a selective bloom,
  * use the `emissive` material property to control which objects should
  * contribute to bloom or not. This can be achieved via MRT.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  * scenePass.setMRT( mrt( {
@@ -37,7 +37,7 @@ let _rendererState;
  * const emissivePass = scenePass.getTextureNode( 'emissive' );
  *
  * const bloomPass = bloom( emissivePass );
- * postProcessing.outputNode = scenePassColor.add( bloomPass );
+ * renderPipeline.outputNode = scenePassColor.add( bloomPass );
  * ```
  * @augments TempNode
  * @three_import import { bloom } from 'three/addons/tsl/display/BloomNode.js';
@@ -77,7 +77,7 @@ class BloomNode extends TempNode {
 		this.strength = uniform( strength );
 
 		/**
-		 * The radius of the bloom.
+		 * The radius of the bloom. Must be in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -300,6 +300,7 @@ class BloomNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTargetBright );
 		_quadMesh.material = this._highPassFilterMaterial;
+		_quadMesh.name = 'Bloom [ High Pass ]';
 		_quadMesh.render( renderer );
 
 		// 2. Blur all the mips progressively
@@ -313,11 +314,13 @@ class BloomNode extends TempNode {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
+			_quadMesh.name = `Bloom [ Blur Horizontal - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
+			_quadMesh.name = `Bloom [ Blur Vertical - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -328,6 +331,7 @@ class BloomNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
 		_quadMesh.material = this._compositeMaterial;
+		_quadMesh.name = 'Bloom [ Composite ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -439,11 +443,21 @@ class BloomNode extends TempNode {
 
 		this._renderTargetBright.dispose();
 
+		if ( this._highPassFilterMaterial !== null ) this._highPassFilterMaterial.dispose();
+		if ( this._compositeMaterial !== null ) this._compositeMaterial.dispose();
+
+		for ( let i = 0; i < this._separableBlurMaterials.length; i ++ ) {
+
+			this._separableBlurMaterials[ i ].dispose();
+
+		}
+
 	}
 
 	/**
 	 * Create a separable blur material for the given kernel radius.
 	 *
+	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
@@ -515,6 +529,6 @@ class BloomNode extends TempNode {
  * @param {number} [threshold=0] - The luminance threshold limits which bright areas contribute to the bloom effect.
  * @returns {BloomNode}
  */
-export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );
+export const bloom = ( node, strength, radius, threshold ) => new BloomNode( nodeObject( node ), strength, radius, threshold );
 
 export default BloomNode;

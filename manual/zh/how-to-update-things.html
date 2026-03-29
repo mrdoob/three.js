@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>如何更新对象</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 如何更新对象">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>如何更新对象</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <div>
+            <p>默认情况下，只要对象被添加到场景中，就会自动更新其矩阵：</p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const object = new THREE.Object3D();
+scene.add( object );
+</pre>
+            或者，它是某个已加入场景对象的子对象：
+<pre class="prettyprint notranslate lang-js" translate="no">
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
+
+object1.add( object2 );
+scene.add( object1 ); // object1 和 object2 都会自动更新它们的矩阵
+</pre>
+          </div>
+      
+          <p>但如果你确定对象是静态的，可以关闭自动更新，仅在需要时手动更新变换矩阵。</p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.matrixAutoUpdate = false;
+object.updateMatrix();
+</pre>
+      
+          <h2>BufferGeometry</h2>
+          <div>
+            <p>
+              BufferGeometry 把顶点位置、面索引、法线、颜色、UV 以及自定义属性等信息
+              存在属性缓冲中，也就是
+              [link:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Typed_arrays 类型化数组]。
+              这种结构通常比旧版 Geometry 更快，但使用起来通常更复杂。
+            </p>
+            <p>
+              更新 BufferGeometry 时最重要的一点是：不能调整缓冲区大小
+              （开销很大，基本等同于新建几何体），但可以更新缓冲区已有内容。
+            </p>
+            <p>
+              这意味着如果你知道某个属性会增长（如顶点数增加），
+              必须预先分配足够大的缓冲区来容纳新增数据。
+              同时也意味着 BufferGeometry 必然存在最大容量，
+              无法做到无限高效扩展。
+            </p>
+            <p>
+              下面以“运行时不断延长的线段”为例：
+              先为 500 个顶点分配空间，但起初只绘制 2 个点，
+              通过 `BufferGeometry.drawRange` 控制绘制范围。
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const MAX_POINTS = 500;
+
+// 几何体
+const geometry = new THREE.BufferGeometry();
+
+// 属性
+const positions = new Float32Array( MAX_POINTS * 3 ); // 每个点使用 3 个浮点数（x、y、z）
+geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+// 绘制范围
+const drawCount = 2; // 仅绘制前 2 个点
+geometry.setDrawRange( 0, drawCount );
+
+// 材质
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+// 线段
+const line = new THREE.Line( geometry, material );
+scene.add( line );
+</pre>
+             <p>
+              接着按如下方式随机写入线段点位：
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const positionAttribute = line.geometry.getAttribute( 'position' );
+
+let x = 0, y = 0, z = 0;
+
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+    positionAttribute.setXYZ( i, x, y, z );
+
+    x += ( Math.random() - 0.5 ) * 30;
+    y += ( Math.random() - 0.5 ) * 30;
+    z += ( Math.random() - 0.5 ) * 30;
+
+}
+</pre>
+            <p>
+              如果要在首次渲染后改变<em>绘制点数量</em>，这样做：
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+line.geometry.setDrawRange( 0, newValue );
+</pre>
+            <p>
+              如果要在首次渲染后修改位置数据，需要设置 `needsUpdate`：
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+positionAttribute.needsUpdate = true; // 首次渲染后修改数据时必须设置
+</pre>
+      
+            <p>
+              首次渲染后修改位置数据时，通常还需要重新计算包围体，
+              以保证视锥体裁剪、辅助器等功能正常工作。
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+line.geometry.computeBoundingBox();
+line.geometry.computeBoundingSphere();
+</pre>
+      
+            <p>
+              [link:https://jsfiddle.net/t4m85pLr/1/ 这个 fiddle 示例]
+              展示了一个动画线段，你可以按需改造。
+            </p>
+      
+            <h3>示例</h3>
+      
+            <p>
+              [example:webgl_custom_attributes WebGL / custom / attributes]<br />
+              [example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+            </p>
+      
+          </div>
+      
+          <h2>材质</h2>
+          <div>
+            <p>所有 uniforms 都可以自由修改（如颜色、纹理、不透明度等），并会在每帧传入着色器。</p>
+      
+            <p>GL 状态相关参数也可随时修改（如 depthTest、blending、polygonOffset 等）。</p>
+      
+            <p>以下属性在运行时不易修改（尤其材质至少渲染过一次后）：</p>
+            <ul>
+              <li>uniform 的数量与类型</li>
+              <li>是否启用以下特性
+                <ul>
+                  <li>texture（纹理）</li>
+                  <li>fog（雾）</li>
+                  <li>vertex colors（顶点色）</li>
+                  <li>morphing（变形）</li>
+                  <li>shadow map（阴影贴图）</li>
+                  <li>alpha test（Alpha 测试）</li>
+                  <li>transparent（透明）</li>
+                </ul>
+              </li>
+            </ul>
+      
+            <p>这些变化会触发重建着色器程序，你需要设置：</p>
+            <code>material.needsUpdate = true</code>
+      
+            <p>注意这一步可能较慢并导致帧率抖动或卡顿（尤其在 Windows 上，DirectX 下编译 shader 往往比 OpenGL 更慢）。</p>
+      
+            <p>为获得更平滑体验，可以通过“占位值”模拟部分开关效果，比如强度为 0 的灯光、纯白纹理或密度为 0 的雾。</p>
+      
+            <p>你可以替换几何体分块所用材质，但无法在运行时改变对象按面材质划分分块的方式。</p>
+      
+            <h3>如果你需要在运行时切换多套材质配置：</h3>
+            <p>若材质/分块数量较少，可提前分块（例如人物：头发/脸/身体/上衣/裤子；汽车：前/侧/顶/玻璃/轮胎/内饰）。</p>
+      
+            <p>若数量很大（例如每个面都可能不同），建议改用属性或纹理驱动每面外观，而非大量分块材质。</p>
+      
+            <h3>示例</h3>
+            <p>
+              [example:webgl_materials_car WebGL / materials / car]<br />
+              [example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+            </p>
+          </div>
+      
+      
+          <h2>纹理</h2>
+          <div>
+            <p>图像、Canvas、视频和数据纹理若内容有变更，需要设置：</p>
+            <code>
+              texture.needsUpdate = true;
+            </code>
+            <p>渲染目标会自动更新。</p>
+      
+            <h3>示例</h3>
+            <p>
+              [example:webgl_materials_video WebGL / materials / video]<br />
+              [example:webgl_rtt WebGL / rtt]
+            </p>
+      
+          </div>
+      
+          <h2>相机</h2>
+          <div>
+            <p>相机位置和目标会自动更新。如果你要修改以下参数：</p>
+            <ul>
+              <li>
+                fov（视野范围）
+              </li>
+              <li>
+                aspect（宽高比）
+              </li>
+              <li>
+                near（近裁剪面）
+              </li>
+              <li>
+                far（远裁剪面）
+              </li>
+            </ul>
+            <p>
+              则需要重新计算投影矩阵：
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+</pre>
+          </div>
+      
+          <h2>InstancedMesh</h2>
+          <div>
+            <p>
+              `InstancedMesh` 用于在 `three.js` 中便捷地进行实例化渲染。
+              视锥体裁剪、射线检测等功能依赖最新包围体（包围盒和包围球）。
+              由于 `InstancedMesh` 的工作方式，它具有自己的 `boundingBox` 与 `boundingSphere`，
+              会覆盖几何体级别的包围体。
+            </p>
+            <p>
+              与几何体类似，只要底层数据变化就应重算包围体。
+              对 `InstancedMesh` 来说，常见场景是通过 `setMatrixAt()` 修改实例变换矩阵后，
+              再重算包围体。处理方式与几何体相同。
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+instancedMesh.computeBoundingBox();
+instancedMesh.computeBoundingSphere();
+</pre>
+      
+          </div>
+      
+          <h2>SkinnedMesh</h2>
+          <div>
+            <p>
+              在包围体机制上，`SkinnedMesh` 与 `InstancedMesh` 原则相同：
+              它拥有自己的 `boundingBox` 与 `boundingSphere`，用于正确包裹动画中的网格。
+              当调用 `computeBoundingBox()` 与 `computeBoundingSphere()` 时，
+              会基于当前骨骼变换（即当前动画状态）计算对应包围体。
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+
+

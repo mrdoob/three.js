@@ -16,7 +16,7 @@ export const shapeCircle = Fn( ( [ coord = uv() ], { renderer, material } ) => {
 
 	let alpha;
 
-	if ( material.alphaToCoverage && renderer.samples > 1 ) {
+	if ( material.alphaToCoverage && renderer.currentSamples > 0 ) {
 
 		const dlen = float( len2.fwidth() ).toVar();
 

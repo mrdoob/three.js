@@ -60,7 +60,6 @@ uniform float shininess;
 uniform float opacity;
 
 #include <common>
-#include <packing>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
@@ -71,8 +70,10 @@ uniform float opacity;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <cube_uv_reflection_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
+#include <envmap_physical_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>

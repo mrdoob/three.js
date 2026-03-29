@@ -1,4 +1,4 @@
-import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
+import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.17.3';
 
@@ -73,6 +73,8 @@ function getShape( geometry ) {
 
 	}
 
+	console.error( 'RapierPhysics: Unsupported geometry type:', geometry.type );
+
 	return null;
 
 }
@@ -95,7 +97,7 @@ async function RapierPhysics() {
 
 	if ( RAPIER === null ) {
 
-		RAPIER = await import( `${RAPIER_PATH}` );
+		RAPIER = await import( RAPIER_PATH /* @vite-ignore */ );
 		await RAPIER.init();
 
 	}
@@ -299,11 +301,13 @@ async function RapierPhysics() {
 
 	//
 
-	const clock = new Clock();
+	const timer = new Timer();
 
 	function step() {
 
-		world.timestep = clock.getDelta();
+		timer.update();
+
+		world.timestep = timer.getDelta();
 		world.step();
 
 		//
@@ -372,7 +376,7 @@ async function RapierPhysics() {
 		 * @name RapierPhysics#addMesh
 		 * @param {Mesh} mesh The mesh to add.
 		 * @param {number} [mass=0] The mass in kg of the mesh.
-		 * @param {number} [restitution=0] The restitution/friction of the mesh.
+		 * @param {number} [restitution=0] The restitution of the mesh, usually from 0 to 1. Represents how "bouncy" objects are when they collide with each other.
 		 */
 		addMesh: addMesh,
 

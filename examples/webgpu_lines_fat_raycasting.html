@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - lines - fat</title>
+		<title>three.js webgpu - fat lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="container"></div>
 
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines raycasting</div>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Fat Lines</span>
+			</div>
+
+			<small>
+				Raycasting on fat lines. Move mouse to test raycasting.
+			</small>
+		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,22 +38,21 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'stats-gl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { LineSegments2 } from 'three/addons/lines/webgpu/LineSegments2.js';
 			import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 			import { Line2 } from 'three/addons/lines/webgpu/Line2.js';
 			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 
+			//
 
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
-			let stats;
 			let gui;
-			let clock;
+			let timer;
 
 			const color = new THREE.Color();
 
@@ -80,13 +89,13 @@
 
 			const params = {
 
-				'line type': 0,
+				'line type': 1,
 				'world units': matLine.worldUnits,
 				'visualize threshold': matThresholdLine.visible,
 				'width': matLine.linewidth,
 				'alphaToCoverage': matLine.alphaToCoverage,
 				'threshold': raycaster.params.Line2.threshold,
-				'translation': raycaster.params.Line2.threshold,
+				'translation': 0,
 				'animate': true
 
 			};
@@ -95,13 +104,15 @@
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -167,13 +178,11 @@
 				segments.computeLineDistances();
 				segments.scale.set( 1, 1, 1 );
 				scene.add( segments );
-				segments.visible = false;
 
 				thresholdSegments = new LineSegments2( segmentsGeometry, matThresholdLine );
 				thresholdSegments.computeLineDistances();
 				thresholdSegments.scale.set( 1, 1, 1 );
 				scene.add( thresholdSegments );
-				thresholdSegments.visible = false;
 
 				line = new Line2( lineGeometry, matLine );
 				line.computeLineDistances();
@@ -191,14 +200,14 @@
 
 				//
 
+				switchLine( params[ 'line type' ] );
+
+				//
+
 				document.addEventListener( 'pointermove', onPointerMove );
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats( { horizontal: false, trackGPU: true } );
-				stats.init( renderer );
-				document.body.appendChild( stats.dom );
-			
 				initGui();
 
 			}
@@ -221,7 +230,9 @@
 
 			async function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				const obj = line.visible ? line : segments;
 				thresholdLine.position.copy( line.position );
@@ -267,9 +278,7 @@
 
 				}
 
-				await renderer.renderAsync( scene, camera );
-
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 
@@ -303,13 +312,13 @@
 
 			function initGui() {
 
-				gui = new GUI();
+				gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( params, 'line type', { 'LineGeometry': 0, 'LineSegmentsGeometry': 1 } ).onChange( function ( val ) {
 
 					switchLine( val );
 
-				} ).setValue( 1 );
+				} );
 
 				gui.add( params, 'world units' ).onChange( function ( val ) {
 

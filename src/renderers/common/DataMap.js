@@ -15,7 +15,7 @@ class DataMap {
 		 * `DataMap` internally uses a weak map
 		 * to manage its data.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Object, Object>}
 		 */
 		this.data = new WeakMap();
 

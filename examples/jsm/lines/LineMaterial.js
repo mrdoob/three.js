@@ -484,6 +484,12 @@ class LineMaterial extends ShaderMaterial {
 
 	set worldUnits( value ) {
 
+		if ( ( value === true ) !== this.worldUnits ) {
+
+			this.needsUpdate = true;
+
+		}
+
 		if ( value === true ) {
 
 			this.defines.WORLD_UNITS = '';
@@ -641,7 +647,7 @@ class LineMaterial extends ShaderMaterial {
 
 	/**
 	 * The size of the viewport, in screen pixels. This must be kept updated to make
-	 * screen-space rendering accurate.The `LineSegments2.onBeforeRender` callback
+	 * screen-space rendering accurate. The `LineSegments2.onBeforeRender` callback
 	 * performs the update for visible objects.
 	 *
 	 * @type {Vector2}

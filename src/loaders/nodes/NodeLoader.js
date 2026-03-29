@@ -1,7 +1,8 @@
-import { nodeObject, float } from '../../nodes/tsl/TSLBase.js';
+import { float } from '../../nodes/tsl/TSLBase.js';
 
 import { Loader } from '../Loader.js';
 import { FileLoader } from '../../loaders/FileLoader.js';
+import { error } from '../../utils.js';
 
 /**
  * A loader for loading node objects in the three.js JSON Object/Scene format.
@@ -63,7 +64,7 @@ class NodeLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 
@@ -179,12 +180,12 @@ class NodeLoader extends Loader {
 
 		if ( this.nodes[ type ] === undefined ) {
 
-			console.error( 'THREE.NodeLoader: Node type not found:', type );
+			error( 'NodeLoader: Node type not found:', type );
 			return float();
 
 		}
 
-		return nodeObject( new this.nodes[ type ]() );
+		return new this.nodes[ type ]();
 
 	}
 

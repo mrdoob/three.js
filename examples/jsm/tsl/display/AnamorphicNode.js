@@ -69,7 +69,7 @@ class AnamorphicNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {float}
+		 * @type {number}
 		 */
 		this.resolutionScale = 1;
 
@@ -97,6 +97,15 @@ class AnamorphicNode extends TempNode {
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._renderTarget.texture );
+
+		/**
+		 * The material for the anamorphic pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._material = null;
+
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -158,6 +167,7 @@ class AnamorphicNode extends TempNode {
 		const currentTexture = textureNode.value;
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'Anamorphic';
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -238,6 +248,8 @@ class AnamorphicNode extends TempNode {
 
 		this._renderTarget.dispose();
 
+		if ( this._material !== null ) this._material.dispose();
+
 	}
 
 	/**
@@ -276,6 +288,6 @@ class AnamorphicNode extends TempNode {
  * @param {number} [samples=32] - More samples result in larger flares and a more expensive runtime behavior.
  * @returns {AnamorphicNode}
  */
-export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( convertToTexture( node ), nodeObject( threshold ), nodeObject( scale ), samples ) );
+export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => new AnamorphicNode( convertToTexture( node ), nodeObject( threshold ), nodeObject( scale ), samples );
 
 export default AnamorphicNode;

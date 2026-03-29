@@ -8,7 +8,7 @@ import {
  */
 
 /**
- * Triangle blur shader based on [glfx.js triangle blur shader]{@link https://github.com/evanw/glfx.js}.
+ * Triangle blur shader based on [glfx.js triangle blur shader](https://github.com/evanw/glfx.js).
  *
  * A basic blur filter, which convolves the image with a
  * pyramid filter. The pyramid filter is separable and is applied as two

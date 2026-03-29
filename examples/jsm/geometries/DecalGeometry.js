@@ -13,9 +13,9 @@ import {
  * adding unique details to models, performing dynamic visual environmental changes or covering seams.
  *
  * Please not that decal projections can be distorted when used around corners. More information at
- * this GitHub issue: [Decal projections without distortions]{@link https://github.com/mrdoob/three.js/issues/21187}.
+ * this GitHub issue: [Decal projections without distortions](https://github.com/mrdoob/three.js/issues/21187).
  *
- * Reference: [How to project decals]{@link http://blog.wolfire.com/2009/06/how-to-project-decals/}
+ * Reference: [How to project decals](http://blog.wolfire.com/2009/06/how-to-project-decals/)
  *
  * ```js
  * const geometry = new DecalGeometry( mesh, position, orientation, size );
@@ -35,7 +35,7 @@ class DecalGeometry extends BufferGeometry {
 	 * @param {Mesh} [mesh] - The base mesh the decal should be projected on.
 	 * @param {Vector3} [position] - The position of the decal projector.
 	 * @param {Euler} [orientation] - The orientation of the decal projector.
-	 * @param {Vector3} [size] - Tje scale of the decal projector.
+	 * @param {Vector3} [size] - The scale of the decal projector.
 	 */
 	constructor( mesh = new Mesh(), position = new Vector3(), orientation = new Euler(), size = new Vector3( 1, 1, 1 ) ) {
 

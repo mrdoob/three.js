@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TextureLoader } from '../../../../src/loaders/TextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -24,13 +22,6 @@ export default QUnit.module( 'Loaders', () => {
 
 			const object = new TextureLoader();
 			assert.ok( object, 'Can instantiate a TextureLoader.' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

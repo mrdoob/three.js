@@ -10,7 +10,7 @@ import {
 /**
  * A loader for the PDB format.
  *
- * The [Protein Data Bank]{@link https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)}
+ * The [Protein Data Bank](https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format))
  * file format is a textual file describing the three-dimensional structures of molecules.
  *
  * ```js

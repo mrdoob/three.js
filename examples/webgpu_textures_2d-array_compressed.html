@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - 2D compressed texture array</title>
+		<title>three.js webgpu - 2D compressed texture array</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - 2D Compressed Texture Array<br />
-			Loop from the movie Spirited away
-			by the <a href="https://www.ghibli.jp/" target="_blank" rel="noopener">Studio Ghibli</a><br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Texture Gradient</span>
+			</div>
+
+			<small>
+				Loop from the movie Spirited away
+				by the <a href="https://www.ghibli.jp/" target="_blank" rel="noopener">Studio Ghibli</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,10 +39,11 @@
 
 			import { texture, uniform, uv } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
-			let camera, scene, mesh, renderer, stats, clock;
+			//
+
+			let camera, scene, mesh, renderer, timer;
 
 			const depth = uniform( 0 );
 
@@ -56,7 +65,8 @@
 				scene = new THREE.Scene();
 
 				//
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -64,11 +74,13 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				//
 
 				const ktx2Loader = new KTX2Loader();
 				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
-				await ktx2Loader.detectSupportAsync( renderer );
+				ktx2Loader.detectSupport( renderer );
 
 				ktx2Loader.load( 'textures/spiritedaway.ktx2', function ( texturearray ) {
 
@@ -82,10 +94,6 @@
 					scene.add( mesh );
 
 				} );
-
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -102,9 +110,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				if ( mesh ) {
 
-					const delta = clock.getDelta() * 10;
+					const delta = timer.getDelta() * 10;
 
 					depthStep += delta;
 
@@ -115,7 +125,6 @@
 				}
 
 				render();
-				stats.update();
 
 			}
 

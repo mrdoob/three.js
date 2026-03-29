@@ -1,5 +1,6 @@
 import { PropertyBinding } from './PropertyBinding.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { error } from '../utils.js';
 
 /**
  * A group of objects that receives a shared animation state.
@@ -175,7 +176,7 @@ class AnimationObjectGroup {
 
 			} else if ( objects[ index ] !== knownObject ) {
 
-				console.error( 'THREE.AnimationObjectGroup: Different objects with the same UUID ' +
+				error( 'AnimationObjectGroup: Different objects with the same UUID ' +
 					'detected. Clean the caches or recreate your infrastructure when reloading scenes.' );
 
 			} // else the object is already where we want it to be

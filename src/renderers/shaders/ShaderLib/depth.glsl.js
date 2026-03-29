@@ -98,14 +98,17 @@ void main() {
 
 	#elif DEPTH_PACKING == 3201
 
+		// TODO Deprecate
 		gl_FragColor = packDepthToRGBA( fragCoordZ );
 
 	#elif DEPTH_PACKING == 3202
 
+		// TODO Deprecate
 		gl_FragColor = vec4( packDepthToRGB( fragCoordZ ), 1.0 );
 
 	#elif DEPTH_PACKING == 3203
 
+		// TODO Deprecate
 		gl_FragColor = vec4( packDepthToRG( fragCoordZ ), 0.0, 1.0 );
 
 	#endif

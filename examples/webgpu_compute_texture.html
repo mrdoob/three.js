@@ -1,14 +1,23 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Texture</title>
+		<title>three.js webgpu - compute texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Texture
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Texture</span>
+			</div>
+
+			<small>
+				Compute texture using GPU.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,10 +40,9 @@
 
 			let camera, scene, renderer;
 
-			init();
-			render();
+			init().then( render );
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -99,8 +107,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				// compute texture
-				renderer.computeAsync( computeNode );
+				renderer.compute( computeNode );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -125,7 +135,7 @@
 
 			function render() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

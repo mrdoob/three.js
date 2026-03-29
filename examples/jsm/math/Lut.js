@@ -45,7 +45,7 @@ class Lut {
 		/**
 		 * The currently selected color map.
 		 *
-		 * @type {Array}
+		 * @type {Array<Array<number>>}
 		 */
 		this.map = [];
 
@@ -219,7 +219,7 @@ class Lut {
 	 * Adds a color map to this Lut instance.
 	 *
 	 * @param {string} name - The name of the color map.
-	 * @param {Array} arrayOfColors - An array of color values. Each value is an array
+	 * @param {Array<Array<number>>} arrayOfColors - An array of color values. Each value is an array
 	 * holding a threshold and the actual color value as a hexadecimal number.
 	 * @return {Lut} A reference to this LUT.
 	 */

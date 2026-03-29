@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Line3 } from '../../../../src/math/Line3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Vector4 } from '../../../../src/math/Vector4.js';
@@ -161,6 +159,12 @@ export default QUnit.module( 'Maths', () => {
 			// exactly on the ray
 			assert.ok( a.closestPointToPointParameter( one3.clone(), true ) == 0, 'Passed!' );
 			a.closestPointToPoint( one3.clone(), true, point );
+			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
+
+			// degenerate line (zero-length)
+			const b = new Line3( one3.clone(), one3.clone() );
+			assert.ok( b.closestPointToPointParameter( zero3.clone(), true ) == 0, 'Passed!' );
+			b.closestPointToPoint( zero3.clone(), true, point );
 			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
 
 		} );

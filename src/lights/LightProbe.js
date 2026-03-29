@@ -60,21 +60,6 @@ class LightProbe extends Light {
 
 	}
 
-	/**
-	 * Deserializes the light prove from the given JSON.
-	 *
-	 * @param {Object} json - The JSON holding the serialized light probe.
-	 * @return {LightProbe} A reference to this light probe.
-	 */
-	fromJSON( json ) {
-
-		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
-		this.sh.fromArray( json.sh );
-
-		return this;
-
-	}
-
 	toJSON( meta ) {
 
 		const data = super.toJSON( meta );

@@ -58,7 +58,6 @@ uniform float opacity;
 
 #endif
 
-#include <packing>
 #include <uv_pars_fragment>
 #include <normal_pars_fragment>
 #include <bumpmap_pars_fragment>
@@ -75,7 +74,7 @@ void main() {
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
-	gl_FragColor = vec4( packNormalToRGB( normal ), diffuseColor.a );
+	gl_FragColor = vec4( normalize( normal ) * 0.5 + 0.5, diffuseColor.a );
 
 	#ifdef OPAQUE
 

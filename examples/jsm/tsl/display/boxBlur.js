@@ -14,6 +14,7 @@ import { Fn, vec2, uv, Loop, vec4, premultiplyAlpha, unpremultiplyAlpha, max, in
  *
  * Reference: {@link https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/shaders/fragment/box-blur.frag}.
  *
+ * @tsl
  * @function
  * @param {Node<vec4>} textureNode - The texture node that should be blurred.
  * @param {Object} [options={}] - Additional options for the hash blur effect.

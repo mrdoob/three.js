@@ -92,6 +92,12 @@ class SelectionBox {
 		 * @type {Object}
 		 */
 		this.instances = {};
+		/**
+		 * The selected batches of batched meshes.
+		 *
+		 * @type {Object}
+		 */
+		this.batches = {};
 
 		/**
 		 * How deep the selection frustum of perspective cameras should extend.
@@ -254,6 +260,30 @@ class SelectionBox {
 					if ( frustum.containsPoint( _center ) ) {
 
 						this.instances[ object.uuid ].push( instanceId );
+
+					}
+
+				}
+
+			} else if ( object.isBatchedMesh ) {
+
+				this.batches[ object.uuid ] = [];
+
+				for ( let instanceId = 0, count = 0; count < object.instanceCount; instanceId ++ ) {
+
+					// skip invalid instances in the batchedMesh
+
+					if ( object.validateInstanceId( instanceId ) === false ) continue;
+
+					count ++;
+
+					object.getMatrixAt( instanceId, _matrix );
+					_matrix.decompose( _center, _quaternion, _scale );
+					_center.applyMatrix4( object.matrixWorld );
+
+					if ( frustum.containsPoint( _center ) ) {
+
+						this.batches[ object.uuid ].push( instanceId );
 
 					}
 

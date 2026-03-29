@@ -11,6 +11,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * ] );
  *
  * const redColor = tintColors.element( 0 );
+ * ```
  *
  * @augments TempNode
  */
@@ -76,11 +77,11 @@ class ArrayNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The type of the node.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType === null ) {
 
-			this.nodeType = this.values[ 0 ].getNodeType( builder );
+			return this.values[ 0 ].getNodeType( builder );
 
 		}
 
@@ -97,6 +98,25 @@ class ArrayNode extends TempNode {
 	getElementType( builder ) {
 
 		return this.getNodeType( builder );
+
+	}
+
+	/**
+	 * Returns the type of a member variable.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The name of the member variable.
+	 * @return {string} The type of the member variable.
+	 */
+	getMemberType( builder, name ) {
+
+		if ( this.nodeType === null ) {
+
+			return this.values[ 0 ].getMemberType( builder, name );
+
+		}
+
+		return super.getMemberType( builder, name );
 
 	}
 

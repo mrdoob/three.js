@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - lensflares</title>
+		<title>three.js webgpu - lens flares</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
-			textures from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/>
-			fly with WASD/RF/QE + mouse
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Lens Flares</span>
+			</div>
+
+			<small>
+				Fly with WASD/RF/QE + mouse.<br/>
+				Textures from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -29,17 +37,17 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
 			import { LensflareMesh, LensflareElement } from 'three/addons/objects/LensflareMesh.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let container, stats;
+			let container;
 
 			let camera, scene, renderer;
 			let controls;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -125,10 +133,11 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				//
@@ -140,11 +149,6 @@
 				controls.rollSpeed = Math.PI / 6;
 				controls.autoForward = false;
 				controls.dragToLook = false;
-
-				// stats
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				// events
 
@@ -167,14 +171,15 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
-				stats.update();
 
 			}
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				controls.update( delta );
 				renderer.render( scene, camera );

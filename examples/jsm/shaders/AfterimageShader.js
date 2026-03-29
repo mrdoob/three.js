@@ -4,7 +4,7 @@
  */
 
 /**
- * Inspired by [Three.js FBO motion trails]{@link https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&}.
+ * Inspired by [Three.js FBO motion trails](https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&).
  *
  * @constant
  * @type {ShaderMaterial~Shader}

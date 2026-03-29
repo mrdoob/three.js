@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>动画系统</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - 动画系统">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>动画系统</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+ 
+          <h2>概述</h2>
+
+		<p class="desc">
+			在 three.js 的动画系统中，你可以为模型的多种属性制作动画：
+			例如蒙皮绑定模型的骨骼、形态目标（morph targets）、不同材质属性
+			（颜色、不透明度、布尔值）、可见性与变换。动画属性可以淡入、
+			淡出、交叉淡化（crossfade）和变速。即使是同一对象上的多个动画，
+			或不同对象上的多个动画，也可以独立调整权重和时间缩放，
+			并进行同步。<br /><br />
+
+			为了在一个统一系统中实现这些功能，three.js 动画系统在
+			2015 年[link:https://github.com/mrdoob/three.js/issues/6881 发生了彻底重构]
+			（注意甄别过时资料）。当前架构与 Unity / Unreal Engine 4
+			更接近。本页将简要介绍该系统的核心组件，以及它们如何协同工作。
+
+		</p>
+
+		<h3>动画片段（Animation Clips）</h3>
+
+		<p class="desc">
+
+			当你成功导入一个带动画的 3D 对象后（无论它使用骨骼、形态目标，或两者兼有），
+			比如通过 [link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender 导出器]
+			从 Blender 导出，再使用 `GLTFLoader` 加载到 three.js 场景中，
+			返回结果中通常会有一个名为 "animations" 的数组字段，
+			其中包含该模型的动画片段（下文会列出支持此能力的加载器）。<br /><br />
+
+			每个 `AnimationClip` 一般表示对象的一种动作数据。以角色模型为例，
+			可以有一个片段表示走路，第二个表示跳跃，第三个表示侧移，等等。
+
+		</p>
+
+		<h3>关键帧轨道（Keyframe Tracks）</h3>
+
+		<p class="desc">
+
+			在 `AnimationClip` 内部，每个被动画驱动的属性都会存储在独立的
+			`KeyframeTrack` 中。假设角色有骨架，那么一条轨道可以记录前臂骨骼
+			随时间变化的位置数据，另一条记录同一骨骼的旋转变化，第三条记录
+			其他骨骼的位置、旋转或缩放，依此类推。也就是说，
+			一个 AnimationClip 通常由大量此类轨道组成。<br /><br />
+
+			如果模型有形态目标（比如一个表示微笑，另一个表示愤怒），
+			每条相关轨道会描述某个形态目标在该片段播放过程中，
+			其影响权重如何随时间变化。
+
+		</p>
+
+		<h3>动画混合器（Animation Mixer）</h3>
+
+		<p class="desc">
+
+			这些存储的数据只是动画基础，真正的播放控制由 `AnimationMixer` 完成。
+			你可以把它理解成不只是一个“播放器”，更像一台真实的混音台：
+			能够同时控制多个动画，并对它们进行混合与融合。
+
+		</p>
+
+		<h3>动画动作（Animation Actions）</h3>
+
+		<p class="desc">
+
+			`AnimationMixer` 本身只有少量通用属性和方法，
+			因为它主要通过动画动作来驱动。通过配置 `AnimationAction`，
+			你可以决定某个 `AnimationClip` 在某个 mixer 上何时播放、暂停或停止，
+			是否循环、循环次数、是否淡入淡出、是否进行时间缩放，
+			以及更多高级控制（如交叉淡化与同步）。
+
+		</p>
+
+		<h3>动画对象组（Animation Object Groups）</h3>
+
+		<p class="desc">
+
+			如果你希望一组对象共享同一套动画状态，
+			可以使用 `AnimationObjectGroup`。
+
+		</p>
+
+		<h3>支持的格式与加载器</h3>
+
+		<p class="desc">
+			请注意，并非所有模型格式都包含动画（例如 OBJ 就不包含），
+			而且只有部分 three.js 加载器支持 `AnimationClip` 序列。
+			下面这些加载器<i>支持</i>这种动画数据：
+		</p>
+
+			<ul>
+				<li>THREE.ObjectLoader</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>THREE.GLTFLoader</li>
+			</ul>
+
+		<p class="desc">
+			另外，3ds Max 和 Maya 目前还不能直接将多个动画
+			（即不在同一时间轴上的动画）导出到同一个文件中。
+		</p>
+
+		<h2>示例</h2>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+let mesh;
+
+// 创建 AnimationMixer，并获取 AnimationClip 列表
+const mixer = new THREE.AnimationMixer( mesh );
+const clips = mesh.animations;
+
+// 每帧更新 mixer
+function update () {
+  mixer.update( deltaSeconds );
+}
+
+// 播放指定动画
+const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+const action = mixer.clipAction( clip );
+action.play();
+
+// 播放全部动画
+clips.forEach( function ( clip ) {
+  mixer.clipAction( clip ).play();
+} );
+</pre>
+         
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>
+
+
+

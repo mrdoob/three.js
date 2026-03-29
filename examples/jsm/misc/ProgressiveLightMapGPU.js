@@ -4,7 +4,7 @@ import { add, float, mix, output, sub, texture, uniform, uv, vec2, vec4 } from '
 import { potpack } from '../libs/potpack.module.js';
 
 /**
- * Progressive Light Map Accumulator, by [zalo]{@link https://github.com/zalo/}.
+ * Progressive Light Map Accumulator, by [zalo](https://github.com/zalo/).
  *
  * To use, simply construct a `ProgressiveLightMap` object,
  * `plmap.addObjectsToLightMap(object)` an array of semi-static
@@ -98,6 +98,12 @@ class ProgressiveLightMap {
 			if ( object.geometry.hasAttribute( 'uv' ) === false ) {
 
 				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need uvs.' ); continue;
+
+			}
+
+			if ( object.geometry.hasAttribute( 'normal' ) === false ) {
+
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need normals.' ); continue;
 
 			}
 

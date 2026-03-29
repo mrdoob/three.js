@@ -15,8 +15,8 @@ import {
  * Segments 'n' determines the number of triangles output. Total triangles = 32*2*n*n - 8*n
  * (degenerates at the top and bottom cusps are deleted).
  *
- * Code based on [SPD software]{@link http://tog.acm.org/resources/SPD/}
- * Created for the Udacity course [Interactive Rendering]{@link http://bit.ly/ericity}
+ * Code based on [SPD software](http://tog.acm.org/resources/SPD/)
+ * Created for the Udacity course [Interactive Rendering](http://bit.ly/ericity)
  *
  * ```js
  * const geometry = new TeapotGeometry( 50, 18 );

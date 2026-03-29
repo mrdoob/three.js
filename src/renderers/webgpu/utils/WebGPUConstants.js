@@ -6,6 +6,8 @@ export const GPUPrimitiveTopology = {
 	TriangleStrip: 'triangle-strip',
 };
 
+export const GPUShaderStage = ( typeof self !== 'undefined' && self.GPUShaderStage ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+
 export const GPUCompareFunction = {
 	Never: 'never',
 	Less: 'less',
@@ -336,4 +338,9 @@ export const GPUFeatureName = {
 	Subgroups: 'subgroups',
 	TextureFormatsTier1: 'texture-formats-tier1',
 	TextureFormatsTier2: 'texture-formats-tier2'
+};
+
+export const GPUFeatureMap = {
+	'texture-compression-s3tc': 'texture-compression-bc',
+	'texture-compression-etc1': 'texture-compression-etc2'
 };

@@ -228,7 +228,7 @@ class Triangle {
 		_v1.subVectors( a, b );
 
 		// strictly front facing
-		return ( _v0.cross( _v1 ).dot( direction ) < 0 ) ? true : false;
+		return _v0.cross( _v1 ).dot( direction ) < 0;
 
 	}
 

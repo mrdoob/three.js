@@ -88,4 +88,4 @@ export default SampleNode;
  * @param {?Node<vec2>} [uv=null] - The UV node to be used in the texture sampling.
  * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
  */
-export const sample = ( callback, uv = null ) => nodeObject( new SampleNode( callback, nodeObject( uv ) ) );
+export const sample = ( callback, uv = null ) => new SampleNode( callback, nodeObject( uv ) );

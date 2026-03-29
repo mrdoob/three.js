@@ -38,6 +38,8 @@ class ShaderToyDecoder extends GLSLDecoder {
 			node.body.unshift( new VariableDeclaration( 'vec4', 'fragColor' ) );
 			node.body.push( new Return( fragColor ) );
 
+			node.initialize();
+
 		}
 
 		return node;

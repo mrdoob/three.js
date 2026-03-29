@@ -9,6 +9,7 @@ import { Euler } from '../math/Euler.js';
  * This material is not affected by lights.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshBasicMaterial
  */
 class MeshBasicMaterial extends Material {
 

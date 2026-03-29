@@ -4,12 +4,18 @@
 		<title>three.js webgpu - compute cloth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - compute cloth<br />
-			Simple cloth simulation with a verlet system running in compute shaders
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Cloth</span>
+			</div>
+
+			<small>Simple cloth simulation with a verlet system running in compute shaders.</small>
 		</div>
 
 		<script type="importmap">
@@ -27,11 +33,12 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
+			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let renderer, scene, camera, controls;
@@ -55,7 +62,8 @@
 			const verletSprings = [];
 			const verletVertexColumns = [];
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const params = {
 				wireframe: false,
@@ -82,11 +90,12 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits: { maxStorageBuffersInVertexStage: 1 } } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -100,9 +109,9 @@
 				controls.target.set( 0, - 0.1, 0 );
 				controls.update();
 
-				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new UltraHDRLoader().setPath( 'textures/equirectangular/' );
 
-				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_2k.hdr.jpg' );
 				hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = hdrTexture;
 				scene.backgroundBlurriness = 0.5;
@@ -110,7 +119,7 @@
 
 				setupCloth();
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( stiffnessUniform, 'value', 0.1, 0.5, 0.01 ).name( 'stiffness' );
 				gui.add( params, 'wireframe' );
 				gui.add( params, 'sphere' );
@@ -298,14 +307,6 @@
 				// This shader computes a force for each spring, depending on the distance between the two vertices connected by that spring and the targeted rest length
 				computeSpringForces = Fn( () => {
 
-					If( instanceIndex.greaterThanEqual( uint( springCount ) ), () => {
-
-						// compute Shaders are executed in groups of 64, so instanceIndex might be bigger than the amount of springs.
-						// in that case, return.
-						Return();
-
-					} );
-
 					const vertexIds = springVertexIdBuffer.element( instanceIndex );
 					const restLength = springRestLengthBuffer.element( instanceIndex );
 
@@ -317,7 +318,7 @@
 					const force = dist.sub( restLength ).mul( stiffnessUniform ).mul( delta ).mul( 0.5 ).div( dist );
 					springForceBuffer.element( instanceIndex ).assign( force );
 
-				} )().compute( springCount );
+				} )().compute( springCount ).setName( 'Spring Forces' );
 
 				// 2. computeVertexForces:
 				// This shader accumulates the force for each vertex.
@@ -325,14 +326,6 @@
 				// Then it adds a gravital force, wind force, and the collision with the sphere.
 				// In the end it adds the force to the vertex' position.
 				computeVertexForces = Fn( () => {
-
-					If( instanceIndex.greaterThanEqual( uint( vertexCount ) ), () => {
-
-						// compute Shaders are executed in groups of 64, so instanceIndex might be bigger than the amount of vertices.
-						// in that case, return.
-						Return();
-
-					} );
 
 					const params = vertexParamsBuffer.element( instanceIndex ).toVar();
 					const isFixed = params.x;
@@ -381,7 +374,7 @@
 					vertexForceBuffer.element( instanceIndex ).assign( force );
 					vertexPositionBuffer.element( instanceIndex ).addAssign( force );
 
-				} )().compute( vertexCount );
+				} )().compute( vertexCount ).setName( 'Vertex Forces' );
 
 			}
 
@@ -550,6 +543,8 @@
 
 			async function render() {
 
+				timer.update();
+
 				sphere.visible = params.sphere;
 				sphereUniform.value = params.sphere ? 1 : 0;
 				windUniform.value = params.wind;
@@ -557,7 +552,7 @@
 				vertexWireframeObject.visible = params.wireframe;
 				springWireframeObject.visible = params.wireframe;
 
-				const deltaTime = Math.min( clock.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
+				const deltaTime = Math.min( timer.getDelta(), 1 / 60 ); // don't advance the time too far, for example when the window is out of focus
 				const stepsPerSecond = 360; // ensure the same amount of simulation steps per second on all systems, independent of refresh rate
 				const timePerStep = 1 / stepsPerSecond;
 
@@ -569,12 +564,12 @@
 					timestamp += timePerStep;
 					timeSinceLastStep -= timePerStep;
 					updateSphere();
-					await renderer.computeAsync( computeSpringForces );
-					await renderer.computeAsync( computeVertexForces );
+					renderer.compute( computeSpringForces );
+					renderer.compute( computeVertexForces );
 
 				}
 
-				await renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

@@ -1,6 +1,7 @@
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
+import { error } from '../utils.js';
 
 /**
  * Class for loading animation clips in the JSON format. The files are internally
@@ -57,7 +58,7 @@ class AnimationLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 

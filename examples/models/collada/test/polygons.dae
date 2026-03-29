@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <created>2026-03-09T12:00:00Z</created>
+    <modified>2026-03-09T12:00:00Z</modified>
+    <unit name="meter" meter="1.0"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_geometries>
+    <geometry id="QuadGeom" name="Quad">
+      <mesh>
+        <source id="Quad-pos">
+          <float_array id="Quad-pos-array" count="12">
+            -1.0 0.0  1.0
+             1.0 0.0  1.0
+             1.0 0.0 -1.0
+            -1.0 0.0 -1.0
+          </float_array>
+          <technique_common>
+            <accessor source="#Quad-pos-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Quad-vertices">
+          <input semantic="POSITION" source="#Quad-pos"/>
+        </vertices>
+        <polygons count="1">
+          <input semantic="VERTEX" source="#Quad-vertices" offset="0"/>
+          <p>0 1 2 3</p>
+        </polygons>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="QuadNode" name="QuadNode">
+        <instance_geometry url="#QuadGeom"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

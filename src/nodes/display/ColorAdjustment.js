@@ -82,7 +82,7 @@ export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
  * @function
  * @param {Node<vec3>} color - The color value to compute the luminance for.
  * @param {?Node<vec3>} luminanceCoefficients - The luminance coefficients. By default predefined values of the current working color space are used.
- * @return {Node<vec3>} The luminance.
+ * @return {Node<float>} The luminance.
  */
 export const luminance = (
 	color,
@@ -139,3 +139,20 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 	return vec4( v.rgb, color.a );
 
 } );
+
+/**
+ * TSL function for creating a posterize effect which reduces the number of colors
+ * in an image, resulting in a more blocky and stylized appearance.
+ *
+ * @tsl
+ * @function
+ * @param {Node} sourceNode - The input color.
+ * @param {Node} stepsNode - Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.
+ * @returns {Node} The posterized color.
+ */
+export const posterize = Fn( ( [ source, steps ] ) => {
+
+	return source.mul( steps ).floor().div( steps );
+
+} );
+

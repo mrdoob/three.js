@@ -308,7 +308,7 @@ class PMREMNode extends TempNode {
 
 		if ( uvNode === null && builder.context.getUV ) {
 
-			uvNode = builder.context.getUV( this );
+			uvNode = builder.context.getUV( this, builder );
 
 		}
 

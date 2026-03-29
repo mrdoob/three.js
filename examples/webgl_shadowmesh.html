@@ -34,7 +34,8 @@
 
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const renderer = new THREE.WebGLRenderer( { stencil: true } );
 
 			const sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 3 );
@@ -179,7 +180,9 @@
 
 			function animate() {
 
-				frameTime = clock.getDelta();
+				timer.update();
+
+				frameTime = timer.getDelta();
 
 				cube.rotation.x += 1.0 * frameTime;
 				cube.rotation.y += 1.0 * frameTime;

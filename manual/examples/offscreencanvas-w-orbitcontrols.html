@@ -85,11 +85,11 @@ function makeSendPropertiesHandler( properties ) {
 }
 
 function touchEventHandler( event, sendFn ) {
-	
-	// preventDefault() fixes mousemove, mouseup and mousedown 
+
+	// preventDefault() fixes mousemove, mouseup and mousedown
 	// firing at touch events when doing a simple touchup touchdown
 	// Happens only at offscreen canvas
-	event.preventDefault(); 
+	event.preventDefault();
 	const touches = [];
 	const data = { type: event.type, touches };
 	for ( let i = 0; i < event.touches.length; ++ i ) {
@@ -206,14 +206,14 @@ function startWorker( canvas ) {
 		canvas: offscreen,
 		canvasId: proxy.id,
 	}, [ offscreen ] );
-	console.log( 'using OffscreenCanvas' ); /* eslint-disable-line no-console */
+	console.log( 'using OffscreenCanvas' );
 
 }
 
 function startMainPage( canvas ) {
 
 	init( { canvas, inputElement: canvas } );
-	console.log( 'using regular canvas' ); /* eslint-disable-line no-console */
+	console.log( 'using regular canvas' );
 
 }
 

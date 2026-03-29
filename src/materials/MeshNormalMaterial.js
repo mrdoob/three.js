@@ -6,6 +6,7 @@ import { Vector2 } from '../math/Vector2.js';
  * A material that maps the normal vectors to RGB colors.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshNormalMaterial
  */
 class MeshNormalMaterial extends Material {
 

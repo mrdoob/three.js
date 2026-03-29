@@ -7,7 +7,7 @@ import {
 /**
  * A loader for loading fonts.
  *
- * You can convert fonts online using [facetype.js]{@link https://gero3.github.io/facetype.js/}.
+ * You can convert fonts online using [facetype.js](https://gero3.github.io/facetype.js/).
  *
  * ```js
  * const loader = new FontLoader();
@@ -109,12 +109,13 @@ class Font {
 	 *
 	 * @param {string} text - The text.
 	 * @param {number} [size=100] - The text size.
+	 * @param {string} [direction='ltr'] - Char direction: ltr(left to right), rtl(right to left) & tb(top bottom).
 	 * @return {Array<Shape>} An array of shapes representing the text.
 	 */
-	generateShapes( text, size = 100 ) {
+	generateShapes( text, size = 100, direction = 'ltr' ) {
 
 		const shapes = [];
-		const paths = createPaths( text, size, this.data );
+		const paths = createPaths( text, size, this.data, direction );
 
 		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
@@ -128,7 +129,7 @@ class Font {
 
 }
 
-function createPaths( text, size, data ) {
+function createPaths( text, size, data, direction ) {
 
 	const chars = Array.from( text );
 	const scale = size / data.resolution;
@@ -137,6 +138,12 @@ function createPaths( text, size, data ) {
 	const paths = [];
 
 	let offsetX = 0, offsetY = 0;
+
+	if ( direction == 'rtl' || direction == 'tb' ) {
+
+		chars.reverse();
+
+	}
 
 	for ( let i = 0; i < chars.length; i ++ ) {
 
@@ -150,7 +157,18 @@ function createPaths( text, size, data ) {
 		} else {
 
 			const ret = createPath( char, scale, offsetX, offsetY, data );
-			offsetX += ret.offsetX;
+
+			if ( direction == 'tb' ) {
+
+				offsetX = 0;
+				offsetY += data.ascender * scale;
+
+			} else {
+
+				offsetX += ret.offsetX;
+
+			}
+
 			paths.push( ret.path );
 
 		}

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
@@ -55,24 +53,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'target', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'shadow', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isDirectionalLight', ( assert ) => {
 
@@ -92,12 +72,6 @@ export default QUnit.module( 'Lights', () => {
 			object.dispose();
 
 			// ensure calls dispose() on shadow
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

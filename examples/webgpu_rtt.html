@@ -3,12 +3,18 @@
 		<title>three.js webgpu - rtt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - rtt
+	<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WebGPU RTT</span>
+			</div>
+
+			<small>Basic Render-to-Texture demo.</small>
 		</div>
 
 		<script type="importmap">
@@ -26,6 +32,8 @@
 
 			import * as THREE from 'three/webgpu';
 			import { texture, uniform, saturation, hue } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -68,6 +76,8 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				renderer.inspector = new Inspector();
+
 				renderTarget = new THREE.RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'mousemove', onWindowMouseMove );
@@ -80,9 +90,12 @@
 				const screenFXNode = uniform( mouse );
 
 				const materialFX = new THREE.MeshBasicNodeMaterial();
-				materialFX.colorNode = hue( saturation( texture( renderTarget.texture ).rgb, screenFXNode.x.oneMinus() ), screenFXNode.y );
+
+				const scenePassTexture = texture( renderTarget.texture ).toInspector( 'Scene Pass' );
+				materialFX.colorNode = hue( saturation( scenePassTexture.rgb, screenFXNode.x.oneMinus() ), screenFXNode.y );
 
 				quadMesh = new THREE.QuadMesh( materialFX );
+				quadMesh.name = 'Post-Processing';
 
 			}
 

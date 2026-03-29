@@ -1,6 +1,6 @@
 
 import Node from '../core/Node.js';
-import { nodeObject, Fn, bool, float } from '../tsl/TSLBase.js';
+import { Fn, bool, float } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { Loop } from '../utils/LoopNode.js';
@@ -234,7 +234,7 @@ export default ClippingNode;
  * @function
  * @returns {ClippingNode}
  */
-export const clipping = () => nodeObject( new ClippingNode() );
+export const clipping = () => new ClippingNode();
 
 /**
  * TSL function for setting up alpha to coverage.
@@ -243,7 +243,7 @@ export const clipping = () => nodeObject( new ClippingNode() );
  * @function
  * @returns {ClippingNode}
  */
-export const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE ) );
+export const clippingAlpha = () => new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE );
 
 /**
  * TSL function for setting up hardware-based clipping.
@@ -252,4 +252,4 @@ export const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.AL
  * @function
  * @returns {ClippingNode}
  */
-export const hardwareClipping = () => nodeObject( new ClippingNode( ClippingNode.HARDWARE ) );
+export const hardwareClipping = () => new ClippingNode( ClippingNode.HARDWARE );

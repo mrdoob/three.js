@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
+import { Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -27,7 +27,7 @@ class GaussianBlurNode extends TempNode {
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 * @param {Object} [options={}] - Additional options for the gaussian blur effect.
 	 * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
-	 * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
+	 * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
 	 */
 	constructor( textureNode, directionNode = null, sigma = 4, options = {} ) {
 
@@ -99,6 +99,14 @@ class GaussianBlurNode extends TempNode {
 		this._textureNode.uvNode = textureNode.uvNode;
 
 		/**
+		 * The material for the blur pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._material = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -110,7 +118,7 @@ class GaussianBlurNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {float}
+		 * @type {number}
 		 * @default (1)
 		 */
 		this.resolutionScale = options.resolutionScale || 1;
@@ -123,6 +131,15 @@ class GaussianBlurNode extends TempNode {
 		 * @default false
 		 */
 		this.premultipliedAlpha = options.premultipliedAlpha || false;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 * @readonly
+		 */
+		this.isGaussianBlurNode = true;
 
 	}
 
@@ -176,6 +193,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
+		_quadMesh.name = 'Gaussian Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -185,6 +203,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
+		_quadMesh.name = 'Gaussian Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -292,6 +311,8 @@ class GaussianBlurNode extends TempNode {
 		this._horizontalRT.dispose();
 		this._verticalRT.dispose();
 
+		if ( this._material !== null ) this._material.dispose();
+
 	}
 
 	/**
@@ -353,10 +374,10 @@ export default GaussianBlurNode;
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @param {Object} [options={}] - Additional options for the gaussian blur effect.
  * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
- * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
+ * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
-export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options ) );
+export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options );
 
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.

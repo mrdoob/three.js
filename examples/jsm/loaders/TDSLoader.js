@@ -684,11 +684,9 @@ class TDSLoader extends Loader {
 
 			case INT_PERCENTAGE:
 				return ( subChunk.readShort( ) / 100 );
-				break;
 
 			case FLOAT_PERCENTAGE:
 				return subChunk.readFloat( );
-				break;
 
 			default:
 				this.debugMessage( '      Unknown percentage chunk: ' + subChunk.hexId );

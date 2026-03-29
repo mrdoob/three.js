@@ -1,14 +1,20 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Particles Rain</title>
+		<title>three.js webgpu - compute particles rain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Rain
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Rain</span>
+			</div>
+
+			<small>Compatible with native lights and shadows using post-processing pass.</small>
 		</div>
 
 		<script type="importmap">
@@ -27,11 +33,9 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, texture, uv, uint, instancedArray, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, If } from 'three/tsl';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -39,17 +43,17 @@
 			const instanceCount = maxParticleCount / 2;
 
 			let camera, scene, renderer;
-			let controls, stats;
+			let controls;
 			let computeParticles;
 			let monkey;
-			let clock;
+			let timer;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
 			let collisionBoxPos, collisionBoxPosUI;
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const { innerWidth, innerHeight } = window;
 
@@ -60,20 +64,9 @@
 				scene = new THREE.Scene();
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-				dirLight.castShadow = true;
 				dirLight.position.set( 3, 17, 17 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.near = 1;
-				dirLight.shadow.camera.far = 50;
-				dirLight.shadow.camera.right = 25;
-				dirLight.shadow.camera.left = - 25;
-				dirLight.shadow.camera.top = 25;
-				dirLight.shadow.camera.bottom = - 25;
-				dirLight.shadow.mapSize.width = 2048;
-				dirLight.shadow.mapSize.height = 2048;
-				dirLight.shadow.bias = - 0.01;
-
 				scene.add( dirLight );
+			
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
 				//
@@ -181,7 +174,7 @@
 
 				} );
 
-				computeParticles = computeUpdate().compute( maxParticleCount );
+				computeParticles = computeUpdate().compute( maxParticleCount ).setName( 'Particles' );
 
 				// rain
 
@@ -253,7 +246,6 @@
 				collisionBox.position.y = 12;
 				collisionBox.scale.x = 3.5;
 				collisionBox.layers.enable( 1 );
-				collisionBox.castShadow = true;
 				scene.add( collisionBox );
 
 				//
@@ -264,7 +256,6 @@
 					geometry.computeVertexNormals();
 
 					monkey = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { roughness: 1, metalness: 0 } ) );
-					monkey.receiveShadow = true;
 					monkey.scale.setScalar( 5 );
 					monkey.rotation.y = Math.PI / 2;
 					monkey.position.y = 4.5;
@@ -276,7 +267,8 @@
 
 				//
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -284,13 +276,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+
+				await renderer.init();
 
 				//
 
-				renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
 				//
 
@@ -305,7 +298,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				// use lerp to smooth the movement
 				collisionBoxPosUI = new THREE.Vector3().copy( collisionBox.position );
@@ -330,9 +323,9 @@
 
 			function animate() {
 
-				stats.update();
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( monkey ) {
 
@@ -347,6 +340,7 @@
 				// position
 
 				scene.overrideMaterial = collisionPosMaterial;
+				scene.name = 'Collision Scene';
 				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
 
@@ -357,6 +351,7 @@
 				// result
 
 				scene.overrideMaterial = null;
+				scene.name = 'Scene';
 				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 

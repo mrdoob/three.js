@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { RenderTarget3D } from '../../../../src/core/RenderTarget3D.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

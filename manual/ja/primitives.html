@@ -49,7 +49,7 @@
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体（12面のもの）</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">
 押し出しでできた2次元形状、ベベルオプション付き。
-これは<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>と<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>のそれぞれの基礎になることに注意してください。</div>
+これは<a href="/docs/#examples/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>と<a href="/docs/#examples/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>のそれぞれの基礎になることに注意してください。</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体（20面のもの）</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">線を回転させてできる形状。例としてはこんなところでしょうか：ランプやボーリングのピン、ろうそく、ろうそく立て、ワイングラス、ドリンクグラス、などなど...。点の連続として2次元の輪郭を与え、その輪郭を軸の周りで回転させる際に、どのくらい細分化するかthree.jsに指示することができます。</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体（8面）</div>
@@ -151,7 +151,7 @@ function addObject(x, y, obj) {
 
 <p></p>
 <p>上記のパターンには、2つの特筆すべき例外があります。
-一番大きなものは、たぶん<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>です。テキストのメッシュを作るときは、事前に3Dフォントデータを読み込む必要があります。このデータの読み込みは非同期的に行われるので、ジオメトリを作ろうとする前に、読み込みを待つ必要があります。フォントの読み込みにpromiseを使うと、もっと速く読み込むことができます。
+一番大きなものは、たぶん<a href="/docs/#examples/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>です。テキストのメッシュを作るときは、事前に3Dフォントデータを読み込む必要があります。このデータの読み込みは非同期的に行われるので、ジオメトリを作ろうとする前に、読み込みを待つ必要があります。フォントの読み込みにpromiseを使うと、もっと速く読み込むことができます。
 <a href="/docs/#api/ja/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>を作成し、読み込みが完了するとフォントを提供してくれるpromiseを返す<code class="notranslate" translate="no">loadFont</code>関数を作ります。
 次に、<code class="notranslate" translate="no">doit</code> と呼ばれる<code class="notranslate" translate="no">async</code>関数を作り、<code class="notranslate" translate="no">await</code>を使ってフォントを読み込みます。
 最後に、ジオメトリを作り、<code class="notranslate" translate="no">addObject</code>を呼んでシーンに追加します。</p>

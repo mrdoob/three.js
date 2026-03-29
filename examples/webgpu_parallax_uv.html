@@ -4,14 +4,21 @@
 		<title>three.js webgpu - parallax uv</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - parallax uv<br />
-			Textures by <a href="https://ambientcg.com/view?id=Ice002" target="_blank" rel="noopener">ambientCG</a><br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Parallax UV</span>
+			</div>
+
+			<small>
+				Textures by <a href="https://ambientcg.com/view?id=Ice002" target="_blank" rel="noopener">ambientCG</a>.
+				HDR by <a href="https://hdri-skies.com/free-hdris/" target="_blank" rel="noopener">HDRI Skies</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,9 +35,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { texture, parallaxUV, blendOverlay, uv } from 'three/tsl';
+			import { texture, parallaxUV, blendOverlay, uv, normalMap, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -46,18 +56,20 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, .1, 50 );
-				camera.position.set( 10, 14, 10 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, .1, 100 );
+				camera.position.set( 15, 7, 15 );
 
 				// environment
 
-				const environmentTexture = await new THREE.CubeTextureLoader()
-					.setPath( './textures/cube/Park2/' )
-					.loadAsync( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+				const environmentTexture = await new HDRLoader()
+					.loadAsync( './textures/equirectangular/752-hdri-skies-com_1k.hdr' );
+
+				environmentTexture.mapping = THREE.EquirectangularReflectionMapping;
 
 
 				scene.environment = environmentTexture;
 				scene.background = environmentTexture;
+				scene.backgroundBlurriness = 0.4;
 
 				// textures
 
@@ -65,15 +77,23 @@
 
 				const topTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Color.jpg' );
 				topTexture.colorSpace = THREE.SRGBColorSpace;
+				topTexture.wrapS = THREE.RepeatWrapping;
+				topTexture.wrapT = THREE.RepeatWrapping;
 
 				const roughnessTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Roughness.jpg' );
 				roughnessTexture.colorSpace = THREE.NoColorSpace;
+				roughnessTexture.wrapS = THREE.RepeatWrapping;
+				roughnessTexture.wrapT = THREE.RepeatWrapping;
 
 				const normalTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_NormalGL.jpg' );
 				normalTexture.colorSpace = THREE.NoColorSpace;
+				normalTexture.wrapS = THREE.RepeatWrapping;
+				normalTexture.wrapT = THREE.RepeatWrapping;
 
 				const displaceTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Displacement.jpg' );
 				displaceTexture.colorSpace = THREE.NoColorSpace;
+				displaceTexture.wrapS = THREE.RepeatWrapping;
+				displaceTexture.wrapT = THREE.RepeatWrapping;
 
 				//
 
@@ -84,23 +104,26 @@
 
 				// parallax effect
 
-				const parallaxScale = .3;
-				const offsetUV = texture( displaceTexture ).mul( parallaxScale );
+				const scaleUV = uniform( 3 );
+				const scaledUV = uv().mul( scaleUV );
 
-				const parallaxUVOffset = parallaxUV( uv(), offsetUV );
+				const parallaxScale = uniform( 0.5 ); // parallax scale
+				const offsetUV = texture( displaceTexture, scaledUV ).mul( parallaxScale );
+
+				const parallaxUVOffset = parallaxUV( scaledUV, offsetUV );
 				const parallaxResult = texture( bottomTexture, parallaxUVOffset );
 
-				const iceNode = blendOverlay( texture( topTexture ), parallaxResult );
+				const iceNode = blendOverlay( texture( topTexture, scaledUV ), parallaxResult );
 
 				// material
 
 				const material = new THREE.MeshStandardNodeMaterial();
 				material.colorNode = iceNode.mul( 5 ); // increase the color intensity to 5 ( contrast )
-				material.roughnessNode = texture( roughnessTexture );
-				material.normalMap = normalTexture;
+				material.roughnessNode = texture( roughnessTexture, scaledUV );
+				material.normalNode = normalMap( texture( normalTexture, scaledUV ) );
 				material.metalness = 0;
 
-				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
+				const geometry = new THREE.CircleGeometry( 25, 64 );
 
 				const ground = new THREE.Mesh( geometry, material );
 				ground.rotateX( - Math.PI / 2 );
@@ -114,7 +137,15 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 6;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Scene' );
+				gui.add( scene, 'backgroundBlurriness', 0, 1 ).name( 'Background Blurriness' );
+				gui.add( parallaxScale, 'value', .2, .5 ).name( 'Parallax Scale' );
+				gui.add( scaleUV, 'value', 1, 5 ).name( 'UV Scale' );
 
 				// controls
 

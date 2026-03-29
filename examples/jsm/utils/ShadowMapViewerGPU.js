@@ -9,7 +9,7 @@ import {
 	Scene,
 	DepthTexture,
 	Vector2
-} from 'three';
+} from 'three/webgpu';
 import { uv, uniform, textureLoad } from 'three/tsl';
 
 /**

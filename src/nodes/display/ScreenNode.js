@@ -1,10 +1,12 @@
 import Node from '../core/Node.js';
+import StackTrace from '../core/StackTrace.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { warn } from '../../utils.js';
 
 let _screenSizeVec, _viewportVec;
 
@@ -48,6 +50,7 @@ class ScreenNode extends Node {
 		/**
 		 * This output node.
 		 *
+		 * @private
 		 * @type {?Node}
 		 * @default null
 		 */
@@ -69,7 +72,7 @@ class ScreenNode extends Node {
 	 *
 	 * @return {('float'|'vec2'|'vec4')} The node type.
 	 */
-	getNodeType() {
+	generateNodeType() {
 
 		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
@@ -282,7 +285,7 @@ export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	console.warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.', new StackTrace() );
 
 	return screenSize;
 

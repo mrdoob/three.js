@@ -29,7 +29,7 @@ class FlyControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Object3D} object - The object that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( object, domElement = null ) {
 
@@ -109,6 +109,8 @@ class FlyControls extends Controls {
 		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
+
 	}
 
 	disconnect() {
@@ -121,6 +123,8 @@ class FlyControls extends Controls {
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'pointercancel', this._onPointerCancel );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
+
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 

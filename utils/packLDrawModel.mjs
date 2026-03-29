@@ -16,6 +16,8 @@
  *
  */
 
+/* global process, console */
+
 const ldrawPath = './';
 const materialsFileName = 'LDConfig.ldr';
 
@@ -125,7 +127,7 @@ function parseObject( fileName, isRoot ) {
 			objectContent = fs.readFileSync( absoluteObjectPath, { encoding: 'utf8' } );
 			break;
 
-		} catch ( e ) {
+		} catch ( e ) { // eslint-disable-line no-unused-vars
 
 			prefix = 'parts/';
 			absoluteObjectPath = path.join( ldrawPath, prefix, fileName );
@@ -135,7 +137,7 @@ function parseObject( fileName, isRoot ) {
 				objectContent = fs.readFileSync( absoluteObjectPath, { encoding: 'utf8' } );
 				break;
 
-			} catch ( e ) {
+			} catch ( e ) { // eslint-disable-line no-unused-vars
 
 				prefix = 'p/';
 				absoluteObjectPath = path.join( ldrawPath, prefix, fileName );
@@ -145,7 +147,7 @@ function parseObject( fileName, isRoot ) {
 					objectContent = fs.readFileSync( absoluteObjectPath, { encoding: 'utf8' } );
 					break;
 
-				} catch ( e ) {
+				} catch ( e ) { // eslint-disable-line no-unused-vars
 
 					try {
 
@@ -155,7 +157,7 @@ function parseObject( fileName, isRoot ) {
 						objectContent = fs.readFileSync( absoluteObjectPath, { encoding: 'utf8' } );
 						break;
 
-					} catch ( e ) {
+					} catch ( e ) { // eslint-disable-line no-unused-vars
 
 						if ( attempt === 1 ) {
 

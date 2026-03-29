@@ -4,24 +4,22 @@
 		<title>three.js webgpu - postprocessing - bloom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-		#info > * {
-			max-width: 650px;
-			margin-left: auto;
-			margin-right: auto;
-		}
-		</style>
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
-		<div id="container"></div>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
-			<br/>
-			Model: <a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a> by
-			<a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a>, CC Attribution.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Bloom</span>
+			</div>
+
+			<small>
+				Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>.<br/>
+				<a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a>
+				by <a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -41,15 +39,14 @@
 			import { pass } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
-			let camera, stats;
-			let postProcessing, renderer, mixer, clock;
+			let camera;
+			let renderPipeline, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -62,9 +59,8 @@
 
 			async function init() {
 
-				const container = document.getElementById( 'container' );
-
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -94,23 +90,19 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ReinhardToneMapping;
-				container.appendChild( renderer.domElement );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
 
 				//
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 
-				const bloomPass = bloom( scenePassColor );
+				const bloomPass = bloom( scenePassColor ).toInspector( 'Bloom' );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				//
 
@@ -121,7 +113,7 @@
 
 				//
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const bloomFolder = gui.addFolder( 'bloom' );
 
@@ -137,7 +129,7 @@
 
 				} );
 
-				gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'radius', 0.0, 1.0, 0.01 ).onChange( function ( value ) {
 
 					bloomPass.radius.value = value;
 
@@ -169,13 +161,13 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 
-				postProcessing.render();
-
-				stats.update();
+				renderPipeline.render();
 
 			}
 

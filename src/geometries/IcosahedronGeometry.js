@@ -11,6 +11,7 @@ import { PolyhedronGeometry } from './PolyhedronGeometry.js';
  * ```
  *
  * @augments PolyhedronGeometry
+ * @demo scenes/geometry-browser.html#IcosahedronGeometry
  */
 class IcosahedronGeometry extends PolyhedronGeometry {
 

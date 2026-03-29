@@ -1,6 +1,6 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
-import { Clock } from '../core/Clock.js';
+import { Timer } from '../core/Timer.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
@@ -71,7 +71,7 @@ class AudioListener extends Object3D {
 
 		// private
 
-		this._clock = new Clock();
+		this._timer = new Timer();
 
 	}
 
@@ -176,9 +176,11 @@ class AudioListener extends Object3D {
 
 		super.updateMatrixWorld( force );
 
+		this._timer.update();
+
 		const listener = this.context.listener;
 
-		this.timeDelta = this._clock.getDelta();
+		this.timeDelta = this._timer.getDelta();
 
 		this.matrixWorld.decompose( _position, _quaternion, _scale );
 

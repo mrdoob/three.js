@@ -4,14 +4,22 @@
 		<title>three.js webgpu - ambient occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - ambient occlusion<br />
-			<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by 
-			<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>AO</span>
+			</div>
+
+			<small>
+				Ambient Occlusion based on GTAO.<br />
+				<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by
+				<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -37,25 +45,21 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls, stats;
+			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, traaPass, blendPassAO, scenePassColor;
+			let aoPass, traaPass, transparentMesh;
 
 			const params = {
+				samples: 16,
 				distanceExponent: 1,
 				distanceFallOff: 1,
 				radius: 0.25,
 				scale: 1,
 				thickness: 1,
-				denoised: false,
-				enabled: true,
-				denoiseRadius: 5,
-				lumaPhi: 5,
-				depthPhi: 5,
-				normalPhi: 5
+				aoOnly: false,
+				transparentOpacity: 0.3
 			};
 
 			init();
@@ -71,22 +75,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.domElement );
 
 				await renderer.init();
 
-				const environment = new RoomEnvironment();
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-
-				scene.background = new THREE.Color( 0x666666 );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
-				environment.dispose();
-				pmremGenerator.dispose();
-
-				//
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0.5, - 1 );
@@ -96,35 +90,69 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 8;
 
-				//
+				// environment
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					normal: normalView,
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				// post-processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// pre-pass
+
+				const prePass = pass( scene, camera ).toInspector( 'Normal', ( inspectNode ) => colorSpaceToWorking( inspectNode, THREE.SRGBColorSpace ) );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: directionToColor( normalView ),
 					velocity: velocity
 				} ) );
 
-				scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+				const prePassNormal = sample( ( uv ) => {
+
+					return colorToDirection( prePass.getTextureNode().sample( uv ) );
+
+				} );
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// pre-pass - bandwidth optimization
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
 				// ao
 
-				aoPass = ao( scenePassDepth, scenePassNormal, camera );
+				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				aoPass.useTemporalFiltering = true;
 
-				// traa
+				const aoPassOutput = aoPass.getTextureNode();
 
-				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
+				// scene context
 
-				postProcessing.outputNode = traaPass;
+				scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
 
-				//
+				// final output + traa
+
+				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+				traaPass.useSubpixelCorrection = false;
+
+				renderPipeline.outputNode = traaPass;
+
+				// models
 
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
@@ -139,40 +167,59 @@
 				model.position.set( 0, 1, 0 );
 				scene.add( model );
 
-				model.traverse( ( o ) => {
+				//
 
-					// Transparent objects (e.g. loaded via GLTFLoader) might have "depthWrite" set to "false".
-					// This is wanted when rendering the beauty pass however it produces wrong results when computing
-					// AO since depth and normal data are out of sync. Computing normals from depth by not using MRT
-					// can mitigate the issue although the depth information (and thus the normals) are not correct in
-					// first place. Besides, normal estimation is computationally more expensive than just sampling a
-					// normal texture. So depending on your scene, consider to enable "depthWrite" for all transparent objects.
+				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
+				transparentMesh.position.z = 0;
+				transparentMesh.position.y = 0.5;
+				transparentMesh.visible = false;
+				scene.add( transparentMesh );
 
-					if ( o.material ) o.material.depthWrite = true;
-
-				} );
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				const gui = new GUI();
-				gui.title( 'AO settings' );
-				gui.add( params, 'distanceExponent' ).min( 1 ).max( 4 ).onChange( updateParameters );
-				gui.add( params, 'distanceFallOff' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'radius' ).min( 0.1 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
+				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
+				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
+				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
+				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
+
+					if ( value === true ) {
+
+						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
+
+					} else {
+
+
+						renderPipeline.outputNode = traaPass;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				} );
 
 			}
 
 			function updateParameters() {
 
+				aoPass.samples.value = params.samples;
 				aoPass.distanceExponent.value = params.distanceExponent;
 				aoPass.distanceFallOff.value = params.distanceFallOff;
 				aoPass.radius.value = params.radius;
 				aoPass.scale.value = params.scale;
 				aoPass.thickness.value = params.thickness;
+
+				transparentMesh.material.opacity = params.transparentOpacity;
 
 			}
 
@@ -192,9 +239,7 @@
 
 				controls.update();
 
-				stats.update();
-
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

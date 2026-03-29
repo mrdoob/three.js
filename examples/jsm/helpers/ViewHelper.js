@@ -20,7 +20,7 @@ import {
 /**
  * A special type of helper that visualizes the camera's transformation
  * in a small viewport area as an axes helper. Such a helper is often wanted
- * in 3D modeling tools or scene editors like the [three.js editor]{@link https://threejs.org/editor}.
+ * in 3D modeling tools or scene editors like the [three.js editor](https://threejs.org/editor).
  *
  * The helper allows to click on the X, Y and Z axes which animates the camera
  * so it looks along the selected axis.
@@ -34,7 +34,7 @@ class ViewHelper extends Object3D {
 	 * Constructs a new view helper.
 	 *
 	 * @param {Camera} camera - The camera whose transformation should be visualized.
-	 * @param {HTMLDOMElement} [domElement] - The DOM element that is used to render the view.
+	 * @param {HTMLElement} [domElement] - The DOM element that is used to render the view.
 	 */
 	constructor( camera, domElement ) {
 
@@ -64,6 +64,20 @@ class ViewHelper extends Object3D {
 		 * @type {Vector3}
 		 */
 		this.center = new Vector3();
+
+		/**
+		 * Controls the position of the helper in the viewport.
+		 * Use `top`/`bottom` for vertical positioning and `left`/`right` for horizontal.
+		 * If `left` is `null`, `right` is used. If `top` is `null`, `bottom` is used.
+		 *
+		 * @type {{top: number|null, right: number, bottom: number, left: number|null}}
+		 */
+		this.location = {
+			top: null,
+			right: 0,
+			bottom: 0,
+			left: null
+		};
 
 		const color1 = new Color( '#ff4466' );
 		const color2 = new Color( '#88ff44' );
@@ -142,8 +156,8 @@ class ViewHelper extends Object3D {
 		const turnRate = 2 * Math.PI; // turn rate in angles per second
 
 		/**
-		 * Renders the helper in a separate view in the bottom-right corner
-		 * of the viewport.
+		 * Renders the helper in a separate view in the viewport.
+		 * Position is controlled by the `location` property.
 		 *
 		 * @param {WebGLRenderer|WebGPURenderer} renderer - The renderer.
 		 */
@@ -157,8 +171,31 @@ class ViewHelper extends Object3D {
 
 			//
 
-			const x = domElement.offsetWidth - dim;
-			const y = renderer.isWebGPURenderer ? domElement.offsetHeight - dim : 0;
+			const location = this.location;
+
+			let x, y;
+
+			if ( location.left !== null ) {
+
+				x = location.left;
+
+			} else {
+
+				x = domElement.offsetWidth - dim - location.right;
+
+			}
+
+			if ( location.top !== null ) {
+
+				// Position from top
+				y = renderer.isWebGPURenderer ? location.top : domElement.offsetHeight - dim - location.top;
+
+			} else {
+
+				// Position from bottom
+				y = renderer.isWebGPURenderer ? domElement.offsetHeight - dim - location.bottom : location.bottom;
+
+			}
 
 			renderer.clearDepth();
 
@@ -191,10 +228,32 @@ class ViewHelper extends Object3D {
 			if ( this.animating === true ) return false;
 
 			const rect = domElement.getBoundingClientRect();
-			const offsetX = rect.left + ( domElement.offsetWidth - dim );
-			const offsetY = rect.top + ( domElement.offsetHeight - dim );
-			mouse.x = ( ( event.clientX - offsetX ) / ( rect.right - offsetX ) ) * 2 - 1;
-			mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+			const location = this.location;
+
+			let offsetX, offsetY;
+
+			if ( location.left !== null ) {
+
+				offsetX = rect.left + location.left;
+
+			} else {
+
+				offsetX = rect.left + domElement.offsetWidth - dim - location.right;
+
+			}
+
+			if ( location.top !== null ) {
+
+				offsetY = rect.top + location.top;
+
+			} else {
+
+				offsetY = rect.top + domElement.offsetHeight - dim - location.bottom;
+
+			}
+
+			mouse.x = ( ( event.clientX - offsetX ) / dim ) * 2 - 1;
+			mouse.y = - ( ( event.clientY - offsetY ) / dim ) * 2 + 1;
 
 			raycaster.setFromCamera( mouse, orthoCamera );
 
@@ -368,13 +427,51 @@ class ViewHelper extends Object3D {
 
 		}
 
+		function useOffscreenCanvas() {
+
+			let result = false;
+
+			try {
+
+				// this check has been adapted from WebGLTextures
+
+				result = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
+			} catch ( err ) {
+
+				// Ignore any errors
+
+			}
+
+			return result;
+
+		}
+
+		function createCanvas( width, height ) {
+
+			let canvas;
+
+			if ( useOffscreenCanvas() ) {
+
+				canvas = new OffscreenCanvas( width, height );
+
+			} else {
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+			}
+
+			return canvas;
+
+		}
+
 		function getSpriteMaterial( color, text ) {
 
 			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
 
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = 64;
-			canvas.height = 64;
+			const canvas = createCanvas( 64, 64 );
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();

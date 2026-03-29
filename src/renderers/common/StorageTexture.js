@@ -52,8 +52,16 @@ class StorageTexture extends Texture {
 		 */
 		this.isStorageTexture = true;
 
-	}
+		/**
+		 * When `true`, mipmaps will be auto-generated after compute writes.
+		 * When `false`, mipmaps must be written manually via compute shaders.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.mipmapsAutoUpdate = true;
 
+	}
 	/**
 	 * Sets the size of the storage texture.
 	 *

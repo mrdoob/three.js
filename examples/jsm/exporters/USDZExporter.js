@@ -501,7 +501,6 @@ function buildHierarchy( object, parentNode, materials, usedNames, files, option
 function buildXform( object, usedNames ) {
 
 	const name = getName( object, usedNames );
-	const transform = buildMatrix( object.matrix );
 
 	if ( object.matrix.determinant() < 0 ) {
 
@@ -514,8 +513,28 @@ function buildXform( object, usedNames ) {
 
 	const node = new USDNode( name, 'Xform' );
 
-	node.addProperty( `matrix4d xformOp:transform = ${transform}` );
-	node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
+	if ( object.pivot !== null ) {
+
+		// Export with pivot using separate transform ops
+		const p = object.position;
+		const q = object.quaternion;
+		const s = object.scale;
+		const piv = object.pivot;
+
+		node.addProperty( `float3 xformOp:translate = (${p.x.toPrecision( PRECISION )}, ${p.y.toPrecision( PRECISION )}, ${p.z.toPrecision( PRECISION )})` );
+		node.addProperty( `float3 xformOp:translate:pivot = (${piv.x.toPrecision( PRECISION )}, ${piv.y.toPrecision( PRECISION )}, ${piv.z.toPrecision( PRECISION )})` );
+		node.addProperty( `quatf xformOp:orient = (${q.w.toPrecision( PRECISION )}, ${q.x.toPrecision( PRECISION )}, ${q.y.toPrecision( PRECISION )}, ${q.z.toPrecision( PRECISION )})` );
+		node.addProperty( `float3 xformOp:scale = (${s.x.toPrecision( PRECISION )}, ${s.y.toPrecision( PRECISION )}, ${s.z.toPrecision( PRECISION )})` );
+		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:translate:pivot", "xformOp:orient", "xformOp:scale", "!invert!xformOp:translate:pivot"]' );
+
+	} else {
+
+		// Export as single transform matrix
+		const transform = buildMatrix( object.matrix );
+		node.addProperty( `matrix4d xformOp:transform = ${transform}` );
+		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
+
+	}
 
 	return node;
 
@@ -794,13 +813,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			'uniform token info:id = "UsdPrimvarReader_float2"'
 		);
 		primvarReaderNode.addProperty( 'float2 inputs:fallback = (0.0, 0.0)' );
-		primvarReaderNode.addProperty( `token inputs:varname = "${uv}"` );
+		primvarReaderNode.addProperty( `string inputs:varname = "${uv}"` );
 		primvarReaderNode.addProperty( 'float2 outputs:result' );
 
 		const transform2dNode = new USDNode( `Transform2d_${mapType}`, 'Shader' );
 		transform2dNode.addProperty( 'uniform token info:id = "UsdTransform2d"' );
 		transform2dNode.addProperty(
-			`token inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
+			`float2 inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
 		);
 		transform2dNode.addProperty(
 			`float inputs:rotation = ${( rotation * ( 180 / Math.PI ) ).toFixed(
@@ -828,6 +847,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		if ( color !== undefined ) {
 
 			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color )}` );
+
+		}
+
+		if ( mapType === 'normal' ) {
+
+			textureNode.addProperty( 'float4 inputs:scale = (2, 2, 2, 1)' );
+			textureNode.addProperty( 'float4 inputs:bias = (-1, -1, -1, 0)' );
 
 		}
 

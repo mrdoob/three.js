@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CompressedArrayTexture } from '../../../../src/textures/CompressedArrayTexture.js';
 
 import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
@@ -24,20 +22,6 @@ export default QUnit.module( 'Textures', () => {
 
 			const object = new CompressedArrayTexture();
 			assert.ok( object, 'Can instantiate a CompressedArrayTexture.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'image.depth', ( assert ) => {
-
-			// { width: width, height: height, depth: depth }
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wrapR', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

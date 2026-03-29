@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - VSM Shadows example</title>
+		<title>three.js webgpu - vsm shadows example</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VSM Shadows example by <a href="https://github.com/supereggbert">Paul Brunt</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>VSM Shadows</span>
+			</div>
+
+			<small>
+				VSM Shadows example by <a href="https://github.com/supereggbert">Paul Brunt</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,15 +35,21 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer, clock, stats;
+			let camera, scene, renderer, timer;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
-			let config;
+
+			const config = {
+				spotlightRadius: 4,
+				spotlightSamples: 8,
+				dirlightRadius: 4,
+				dirlightSamples: 8,
+				animate: true
+			};
 
 			init();
 
@@ -44,18 +59,10 @@
 				initMisc();
 
 				// Init gui
-				const gui = new GUI();
-
-				config = {
-					spotlightRadius: 4,
-					spotlightSamples: 8,
-					dirlightRadius: 4,
-					dirlightSamples: 8,
-					animate: true
-				};
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const spotlightFolder = gui.addFolder( 'Spotlight' );
-				spotlightFolder.add( config, 'spotlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
+				spotlightFolder.add( config, 'spotlightRadius', 0, 25 ).name( 'radius' ).onChange( function ( value ) {
 
 					spotLight.shadow.radius = value;
 
@@ -66,10 +73,9 @@
 					spotLight.shadow.blurSamples = value;
 
 				} );
-				spotlightFolder.open();
 
 				const dirlightFolder = gui.addFolder( 'Directional Light' );
-				dirlightFolder.add( config, 'dirlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
+				dirlightFolder.add( config, 'dirlightRadius', 0, 25 ).name( 'radius' ).onChange( function ( value ) {
 
 					dirLight.shadow.radius = value;
 
@@ -80,7 +86,6 @@
 					dirLight.shadow.blurSamples = value;
 
 				} );
-				dirlightFolder.open();
 
 				gui.add( config, 'animate' );
 
@@ -191,6 +196,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.VSMShadowMap;
 
@@ -199,10 +205,8 @@
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				clock = new THREE.Clock();
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 			}
 
@@ -217,7 +221,9 @@
 
 			function animate( time ) {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( config.animate === true ) {
 
@@ -231,8 +237,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

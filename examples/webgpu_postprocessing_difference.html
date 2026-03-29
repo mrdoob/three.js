@@ -4,13 +4,18 @@
 		<title>three.js webgpu - frame difference</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br/>saturated color of objects according to the difference from one frame to another
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Difference</span>
+			</div>
+
+			<small>Saturated color of objects according to the difference from one frame to another.</small>
 		</div>
 
 		<script type="importmap">
@@ -31,13 +36,13 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
 				speed: 0
 			};
 
-			let camera, renderer, postProcessing;
+			let camera, renderer, renderPipeline;
 			let timer, mesh, controls;
 
 			init();
@@ -48,6 +53,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				document.body.appendChild( renderer.domElement );
 
@@ -74,7 +80,7 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 
@@ -85,7 +91,7 @@
 
 				const saturationAmount = luminance( frameDiff ).mul( 1000 ).clamp( 0, 3 );
 
-				postProcessing.outputNode = saturation( currentTexture, saturationAmount );
+				renderPipeline.outputNode = saturation( currentTexture, saturationAmount );
 
 				//
 
@@ -99,7 +105,7 @@
 
 				//
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( params, 'speed', 0, 2 );
 
 			}
@@ -121,7 +127,7 @@
 
 				mesh.rotation.y += timer.getDelta() * 5 * params.speed;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

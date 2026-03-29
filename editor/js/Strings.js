@@ -73,6 +73,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': 'بیست وجهی',
 			'menubar/add/mesh/octahedron': 'هشت وجهی',
 			'menubar/add/mesh/tetrahedron': 'چهار وجهی',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': 'توروس (دونات)',
 			'menubar/add/mesh/tube': 'لوله',
 			'menubar/add/mesh/torusknot': 'torusknot',
@@ -98,6 +99,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': 'کمک کننده دوربین',
 			'menubar/view/lightHelpers': 'کمک کننده نور',
 			'menubar/view/skeletonHelpers': 'کمک کننده اسکلتون',
+
+			'menubar/render': 'رندر',
+			'menubar/render/image': 'عکس',
+			'menubar/render/video': 'ویدیو',
+			'menubar/render/quality': 'کیفیت',
+			'menubar/render/cancel': 'لغو',
 
 			'menubar/help': 'کمک',
 			'menubar/help/source_code': 'سورس کد',
@@ -165,6 +172,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'محاسبه مماس ها',
 			'sidebar/geometry/center': 'وسط',
 			'sidebar/geometry/export': 'اکسپورت جیسون',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'عرض',
 			'sidebar/geometry/box_geometry/height': 'ارتفاع',
@@ -234,6 +242,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': 'بخش های فی',
 			'sidebar/geometry/ring_geometry/thetastart': 'شروع تتا',
 			'sidebar/geometry/ring_geometry/thetalength': 'طول تتا',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': 'بخش های منحنی',
 			'sidebar/geometry/shape_geometry/extrude': 'اکسترود کردن',
@@ -345,10 +364,13 @@ function Strings( config ) {
 			'sidebar/script/remove': 'حذف',
 
 			'sidebar/project': 'پروژه ها',
+			'sidebar/project/renderer': 'رندرر',
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
 			'sidebar/project/toneMapping': 'تون مپینگ',
+			'sidebar/project/geometries': 'هندسه ها',
 			'sidebar/project/materials': 'متریال ها',
+			'sidebar/project/textures': 'تکستچرها',
 			'sidebar/project/Assign': 'اختصاص',
 
 			'sidebar/project/app': 'اپ',
@@ -401,7 +423,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'شیدر راس',
 			'script/title/fragmentShader': 'شیدر فرگمنت',
-			'script/title/programInfo': 'خواص برنامه'
+			'script/title/programInfo': 'خواص برنامه',
+
+			'dialog/gltf/title': 'Import glTF',
+			'dialog/gltf/asScene': 'Import glTF as root scene',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Cancel'
 
 		},
 		en: {
@@ -475,6 +502,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': 'Icosahedron',
 			'menubar/add/mesh/octahedron': 'Octahedron',
 			'menubar/add/mesh/tetrahedron': 'Tetrahedron',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': 'Torus',
 			'menubar/add/mesh/tube': 'Tube',
 			'menubar/add/mesh/torusknot': 'TorusKnot',
@@ -500,6 +528,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': 'Camera Helpers',
 			'menubar/view/lightHelpers': 'Light Helpers',
 			'menubar/view/skeletonHelpers': 'Skeleton Helpers',
+
+			'menubar/render': 'Render',
+			'menubar/render/image': 'Image',
+			'menubar/render/video': 'Video',
+			'menubar/render/quality': 'Quality',
+			'menubar/render/cancel': 'Cancel',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -567,6 +601,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Export JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -636,6 +671,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': 'Phi segments',
 			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
 			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': 'Curve Segments',
 			'sidebar/geometry/shape_geometry/extrude': 'Extrude',
@@ -747,10 +793,13 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
+			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
 			'sidebar/project/toneMapping': 'Tonemapping',
+			'sidebar/project/geometries': 'Geometries',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/project/app': 'App',
@@ -803,7 +852,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'Vertex Shader',
 			'script/title/fragmentShader': 'Fragment Shader',
-			'script/title/programInfo': 'Program Properties'
+			'script/title/programInfo': 'Program Properties',
+
+			'dialog/gltf/title': 'Import glTF',
+			'dialog/gltf/asScene': 'Import glTF as root scene',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Cancel'
 
 		},
 
@@ -878,6 +932,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': 'Icosaèdre',
 			'menubar/add/mesh/octahedron': 'Octaèdre',
 			'menubar/add/mesh/tetrahedron': 'Tétraèdre',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': 'Torus',
 			'menubar/add/mesh/tube': 'Tube',
 			'menubar/add/mesh/torusknot': 'Noeud Torus',
@@ -903,6 +958,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': 'Aides à la caméra',
 			'menubar/view/lightHelpers': 'Aides Lumière',
 			'menubar/view/skeletonHelpers': 'Aides squelettes',
+
+			'menubar/render': 'Rendu',
+			'menubar/render/image': 'Image',
+			'menubar/render/video': 'Vidéo',
+			'menubar/render/quality': 'Qualité',
+			'menubar/render/cancel': 'Annuler',
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
@@ -970,6 +1031,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
 			'sidebar/geometry/export': 'Exporter JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -1039,6 +1101,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': 'Phi segments',
 			'sidebar/geometry/ring_geometry/thetastart': 'Début Thêta',
 			'sidebar/geometry/ring_geometry/thetalength': 'Longueur Thêta',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': 'Segments de courbe',
 			'sidebar/geometry/shape_geometry/extrude': 'Extruder',
@@ -1150,10 +1223,13 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
+			'sidebar/project/renderer': 'Moteur',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
+			'sidebar/project/geometries': 'Géométries',
 			'sidebar/project/materials': 'Matériaux',
+			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Attribuer',
 
 			'sidebar/project/app': 'App',
@@ -1206,7 +1282,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': 'Vertex Shader',
 			'script/title/fragmentShader': 'Fragment Shader',
-			'script/title/programInfo': 'Propriétés du programme'
+			'script/title/programInfo': 'Propriétés du programme',
+
+			'dialog/gltf/title': 'Importer glTF',
+			'dialog/gltf/asScene': 'Importer glTF comme scène racine',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'Annuler'
 
 		},
 
@@ -1281,6 +1362,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': '二十面体',
 			'menubar/add/mesh/octahedron': '八面体',
 			'menubar/add/mesh/tetrahedron': '四面体',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': '圆环体',
 			'menubar/add/mesh/torusknot': '环面纽结体',
 			'menubar/add/mesh/tube': '管',
@@ -1306,6 +1388,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': '相机助手',
 			'menubar/view/lightHelpers': '光助手',
 			'menubar/view/skeletonHelpers': '骷髅助手',
+
+			'menubar/render': '渲染',
+			'menubar/render/image': '图片',
+			'menubar/render/video': '视频',
+			'menubar/render/quality': '质量',
+			'menubar/render/cancel': '取消',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -1373,6 +1461,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '计算切线',
 			'sidebar/geometry/center': '居中',
 			'sidebar/geometry/export': '导出JSON',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -1442,6 +1531,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': '经度分段',
 			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
 			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': '曲线段',
 			'sidebar/geometry/shape_geometry/extrude': '拉伸',
@@ -1553,10 +1653,13 @@ function Strings( config ) {
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
+			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/toneMapping': '色调映射',
+			'sidebar/project/geometries': '几何体',
 			'sidebar/project/materials': '材质',
+			'sidebar/project/textures': '纹理',
 			'sidebar/project/Assign': '应用',
 
 			'sidebar/project/app': 'App',
@@ -1609,7 +1712,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '顶点着色器',
 			'script/title/fragmentShader': '片段着色器',
-			'script/title/programInfo': '程序属性'
+			'script/title/programInfo': '程序属性',
+
+			'dialog/gltf/title': '导入 glTF',
+			'dialog/gltf/asScene': '将 glTF 导入为根场景',
+			'dialog/ok': '确定',
+			'dialog/cancel': '取消'
 
 		},
 
@@ -1684,6 +1792,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': '二十面体',
 			'menubar/add/mesh/octahedron': '八面体',
 			'menubar/add/mesh/tetrahedron': '四面体',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': 'トーラス',
 			'menubar/add/mesh/tube': 'チューブ',
 			'menubar/add/mesh/torusknot': 'ノットトーラス',
@@ -1709,6 +1818,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': 'カメラヘルパー',
 			'menubar/view/lightHelpers': 'ライトヘルパー',
 			'menubar/view/skeletonHelpers': 'スケルトンヘルパー',
+
+			'menubar/render': 'レンダー',
+			'menubar/render/image': '画像',
+			'menubar/render/video': '動画',
+			'menubar/render/quality': '品質',
+			'menubar/render/cancel': 'キャンセル',
 
 			'menubar/help': 'ヘルプ',
 			'menubar/help/source_code': 'ソースコード',
@@ -1776,6 +1891,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '接線を計算',
 			'sidebar/geometry/center': '中央',
 			'sidebar/geometry/export': 'JSONをエクスポート',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '幅',
 			'sidebar/geometry/box_geometry/height': '高さ',
@@ -1845,6 +1961,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': 'リングの分割数',
 			'sidebar/geometry/ring_geometry/thetastart': '開始角度',
 			'sidebar/geometry/ring_geometry/thetalength': '角度の大きさ',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': '分割数',
 			'sidebar/geometry/shape_geometry/extrude': '押し出し',
@@ -1956,10 +2083,13 @@ function Strings( config ) {
 			'sidebar/script/remove': '削除',
 
 			'sidebar/project': 'プロジェクト',
+			'sidebar/project/renderer': 'レンダラー',
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
 			'sidebar/project/toneMapping': 'トーンマッピング',
+			'sidebar/project/geometries': 'ジオメトリ',
 			'sidebar/project/materials': 'マテリアル',
+			'sidebar/project/textures': 'テクスチャ',
 			'sidebar/project/Assign': '割り当て',
 
 			'sidebar/project/app': 'アプリ',
@@ -2012,7 +2142,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '頂点シェーダー',
 			'script/title/fragmentShader': 'フラグメントシェーダ',
-			'script/title/programInfo': 'プログラムのプロパティ'
+			'script/title/programInfo': 'プログラムのプロパティ',
+
+			'dialog/gltf/title': 'glTFをインポート',
+			'dialog/gltf/asScene': 'glTFをルートシーンとしてインポート',
+			'dialog/ok': 'OK',
+			'dialog/cancel': 'キャンセル'
 
 		},
 
@@ -2086,6 +2221,7 @@ function Strings( config ) {
 			'menubar/add/mesh/icosahedron': '이십면체',
 			'menubar/add/mesh/octahedron': '팔면체',
 			'menubar/add/mesh/tetrahedron': '사면체',
+			'menubar/add/text': 'Text',
 			'menubar/add/mesh/torus': '토러스',
 			'menubar/add/mesh/tube': '튜브',
 			'menubar/add/mesh/torusknot': '토러스 매듭',
@@ -2111,6 +2247,12 @@ function Strings( config ) {
 			'menubar/view/cameraHelpers': '카메라 도우미',
 			'menubar/view/lightHelpers': '조명 도우미',
 			'menubar/view/skeletonHelpers': '골격 도우미',
+
+			'menubar/render': '렌더',
+			'menubar/render/image': '이미지',
+			'menubar/render/video': '비디오',
+			'menubar/render/quality': '품질',
+			'menubar/render/cancel': '취소',
 
 			'menubar/help': '도움말',
 			'menubar/help/source_code': '소스 코드',
@@ -2178,6 +2320,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_tangents': '접선 계산',
 			'sidebar/geometry/center': '중앙',
 			'sidebar/geometry/export': 'JSON으로 내보내기',
+			'sidebar/geometry/morph': 'Morph Targets',
 
 			'sidebar/geometry/box_geometry/width': '너비',
 			'sidebar/geometry/box_geometry/height': '높이',
@@ -2247,6 +2390,17 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': '링 분할 수',
 			'sidebar/geometry/ring_geometry/thetastart': '시작 각도',
 			'sidebar/geometry/ring_geometry/thetalength': '각도 길이',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/shape_geometry/curveSegments': '곡선 분할 수',
 			'sidebar/geometry/shape_geometry/extrude': '압출',
@@ -2358,10 +2512,13 @@ function Strings( config ) {
 			'sidebar/script/remove': '삭제',
 
 			'sidebar/project': '프로젝트',
+			'sidebar/project/renderer': '렌더러',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
 			'sidebar/project/toneMapping': '톤 매핑',
+			'sidebar/project/geometries': '지오메트리',
 			'sidebar/project/materials': '머티리얼',
+			'sidebar/project/textures': '텍스처',
 			'sidebar/project/Assign': '할당',
 
 			'sidebar/project/app': '앱',
@@ -2414,7 +2571,12 @@ function Strings( config ) {
 
 			'script/title/vertexShader': '버텍스 셰이더',
 			'script/title/fragmentShader': '프래그먼트 셰이더',
-			'script/title/programInfo': '프로그램 속성'
+			'script/title/programInfo': '프로그램 속성',
+
+			'dialog/gltf/title': 'glTF 가져오기',
+			'dialog/gltf/asScene': 'glTF를 루트 씬으로 가져오기',
+			'dialog/ok': '확인',
+			'dialog/cancel': '취소'
 		}
 	};
 

@@ -4,13 +4,19 @@
 		<title>three.js webgpu - chromatic aberration</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - chromatic aberration
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>CA</span>
+			</div>
+
+			<small>Chromatic Aberration effect.</small>
 		</div>
 
 		<script type="importmap">
@@ -33,7 +39,7 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
 				enabled: true,
@@ -45,8 +51,8 @@
 				cameraDistance: 40
 			};
 
-			let camera, scene, renderer, clock, mainGroup;
-			let controls, postProcessing;
+			let camera, scene, renderer, timer, mainGroup;
+			let controls, renderPipeline;
 
 			init();
 
@@ -56,6 +62,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -77,7 +84,8 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// Create main group
 				mainGroup = new THREE.Group();
@@ -92,8 +100,8 @@
 				scene.add( gridHelper );
 
 				// post processing
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				// scene pass
 				const scenePass = pass( scene, camera );
@@ -108,19 +116,18 @@
 				const caPass = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
 
 				// Set initial output based on params
-				postProcessing.outputNode = params.enabled ? caPass : outputPass;
+				renderPipeline.outputNode = params.enabled ? caPass : outputPass;
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
 
-				const gui = new GUI();
-				gui.title( 'Chromatic Aberration' );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 
-					postProcessing.outputNode = value ? caPass : outputPass;
-					postProcessing.needsUpdate = true;
+					renderPipeline.outputNode = value ? caPass : outputPass;
+					renderPipeline.needsUpdate = true;
 
 				} );
 
@@ -290,7 +297,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				controls.update();
 
@@ -327,7 +336,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 			
 			}
 

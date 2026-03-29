@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import * as DataUtils from '../../../../src/extras/DataUtils.js';
 
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';

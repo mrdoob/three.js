@@ -6,10 +6,8 @@ import {
 	OrthographicCamera,
 	PlaneGeometry,
 	Scene,
-	ShaderMaterial,
-	UniformsUtils
+	ShaderMaterial
 } from 'three';
-import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
 
 /**
  * This is a helper for visualising a given light's shadow map.
@@ -57,13 +55,29 @@ class ShadowMapViewer {
 		const scene = new Scene();
 
 		//HUD for shadow map
-		const shader = UnpackDepthRGBAShader;
-
-		const uniforms = UniformsUtils.clone( shader.uniforms );
 		const material = new ShaderMaterial( {
-			uniforms: uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
+			uniforms: {
+				tDiffuse: { value: null },
+				opacity: { value: 1.0 }
+			},
+			vertexShader: /* glsl */`
+				varying vec2 vUv;
+				void main() {
+					vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				}`,
+			fragmentShader: /* glsl */`
+				uniform float opacity;
+				uniform sampler2D tDiffuse;
+				varying vec2 vUv;
+				void main() {
+					float depth = texture2D( tDiffuse, vUv ).r;
+					#ifdef USE_REVERSED_DEPTH_BUFFER
+						gl_FragColor = vec4( vec3( depth ), opacity );
+					#else
+						gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
+					#endif
+				}`
 		} );
 		const plane = new PlaneGeometry( frame.width, frame.height );
 		const mesh = new Mesh( plane, material );
@@ -177,7 +191,7 @@ class ShadowMapViewer {
 				//always end up with the scene's first added shadow casting light's shadowMap
 				//in the shader
 				//See: https://github.com/mrdoob/three.js/issues/5932
-				uniforms.tDiffuse.value = light.shadow.map.texture;
+				material.uniforms.tDiffuse.value = light.shadow.map.texture;
 
 				userAutoClearSetting = renderer.autoClear;
 				renderer.autoClear = false; // To allow render overlay

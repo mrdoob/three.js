@@ -15,8 +15,8 @@ import {
  * GTAO shader. Use by {@link GTAOPass}.
  *
  * References:
- * - [Practical Realtime Strategies for Accurate Indirect Occlusion]{@link https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf}.
- * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
+ * - [Practical Realtime Strategies for Accurate Indirect Occlusion](https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf).
+ * - [Horizon-Based Indirect Lighting (HBIL)](https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf)
  *
  * @constant
  * @type {ShaderMaterial~Shader}
@@ -91,8 +91,12 @@ const GTAOShader = {
 		#define FRAGMENT_OUTPUT vec4(vec3(ao), 1.)
 		#endif
 
-		vec3 getViewPosition(const in vec2 screenPosition, const in float depth) {
-			vec4 clipSpacePosition = vec4(vec3(screenPosition, depth) * 2.0 - 1.0, 1.0);
+		vec3 getViewPosition( const in vec2 screenPosition, const in float depth ) {
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+				vec4 clipSpacePosition = vec4( vec2( screenPosition ) * 2.0 - 1.0, depth, 1.0 );
+			#else
+				vec4 clipSpacePosition = vec4( vec3( screenPosition, depth ) * 2.0 - 1.0, 1.0 );
+			#endif
 			vec4 viewSpacePosition = cameraProjectionMatrixInverse * clipSpacePosition;
 			return viewSpacePosition.xyz / viewSpacePosition.w;
 		}
@@ -154,10 +158,19 @@ const GTAOShader = {
 
 		void main() {
 			float depth = getDepth(vUv.xy);
-			if (depth >= 1.0) {
-				discard;
-				return;
-			}
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+				if (depth <= 0.0) {
+					discard;
+					return;
+				}
+			#else
+				if (depth >= 1.0) {
+					discard;
+					return;
+				}
+			#endif
+			
 			vec3 viewPos = getViewPosition(vUv, depth);
 			vec3 viewNormal = getViewNormal(vUv);
 

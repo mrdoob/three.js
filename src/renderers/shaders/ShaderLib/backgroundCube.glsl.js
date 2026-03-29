@@ -27,7 +27,6 @@ export const fragment = /* glsl */`
 
 #endif
 
-uniform float flipEnvMap;
 uniform float backgroundBlurriness;
 uniform float backgroundIntensity;
 uniform mat3 backgroundRotation;
@@ -40,7 +39,7 @@ void main() {
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 texColor = textureCube( envMap, backgroundRotation * vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );
+		vec4 texColor = textureCube( envMap, backgroundRotation * vWorldDirection );
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 

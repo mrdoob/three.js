@@ -1,5 +1,4 @@
 import UniformNode from '../core/UniformNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * A special type of uniform node which represents array-like data
@@ -58,6 +57,34 @@ class BufferNode extends UniformNode {
 		 */
 		this.bufferCount = bufferCount;
 
+		/**
+		 * An array of update ranges.
+		 *
+		 * @type {Array<{start: number, count: number}>}
+		 */
+		this.updateRanges = [];
+
+	}
+
+	/**
+	 * Adds a range of data in the data array to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
 	}
 
 	/**
@@ -93,9 +120,9 @@ export default BufferNode;
  *
  * @tsl
  * @function
- * @param {Array} value - Array-like buffer data.
+ * @param {Array<number>} value - Array-like buffer data.
  * @param {string} type - The data type of a buffer element.
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}
  */
-export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
+export const buffer = ( value, type, count ) => new BufferNode( value, type, count );

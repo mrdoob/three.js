@@ -238,13 +238,6 @@
 
 			}
 
-			Math.lerp = function ( value1, value2, amount ) {
-
-				amount = Math.max( Math.min( amount, 1 ), 0 );
-				return value1 + ( value2 - value1 ) * amount;
-
-			};
-
 			const gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ];
 			const colors = [ 0xccFFFF, 0xffdeff ];
 			const sizes = [ 0.2, 0.1 ];
@@ -277,17 +270,17 @@
 							d0 = morphAttributes[ curMorph ].array[ i * 3 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 ] = THREE.MathUtils.lerp( d0, d1, lerpAmount );
 
 							d0 = morphAttributes[ curMorph ].array[ i * 3 + 1 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 1 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 1 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 1 ] = THREE.MathUtils.lerp( d0, d1, lerpAmount );
 
 							d0 = morphAttributes[ curMorph ].array[ i * 3 + 2 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 2 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 2 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 2 ] = THREE.MathUtils.lerp( d0, d1, lerpAmount );
 
 							tData[ offset + i * 4 + 3 ] = 1;
 
