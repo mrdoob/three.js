@@ -437,6 +437,7 @@
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_ssgi",
+		"webgpu_postprocessing_ssgi_ballpool",
 		"webgpu_postprocessing_ssr",
 		"webgpu_postprocessing_sss",
 		"webgpu_postprocessing_traa",
