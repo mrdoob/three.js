@@ -880,7 +880,7 @@ class XRManager extends EventDispatcher {
 
 		renderTarget._autoAllocateDepthBuffer = true;
 
-		const plane = createPlaneMesh( renderTarget.texture, 1, width, height, translation, quaternion );
+		const plane = createPlaneMesh( renderTarget.texture, 0, width, height, translation, quaternion );
 		plane.material.map.offset.y = 1;
 		plane.material.map.repeat.y = - 1;
 
@@ -963,7 +963,7 @@ class XRManager extends EventDispatcher {
 
 		renderTarget._autoAllocateDepthBuffer = true;
 
-		const plane = createMesh( renderTarget.texture, 1, geometry );
+		const plane = createMesh( renderTarget.texture, 0, geometry );
 		plane.material.side = BackSide;
 		plane.material.map.offset.y = 1;
 		plane.material.map.repeat.y = - 1;
