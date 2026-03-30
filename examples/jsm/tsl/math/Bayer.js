@@ -33,6 +33,7 @@ export const bayer16 = Fn( ( [ uv ] ) => {
 		loader.load( bayer16Base64, ( imageBitmap ) => {
 
 			bayer16Texture.image = imageBitmap;
+			bayer16Texture.flipY = false;
 			bayer16Texture.needsUpdate = true;
 
 		} );
