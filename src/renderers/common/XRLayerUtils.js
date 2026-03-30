@@ -117,7 +117,7 @@ const createSphereGeometry = ( radius, widthSegments, heightSegments, is180 = fa
  * @param {Object} [uvFactors] The uv factors for a set stereo layout.
  * @return {Mesh} The created mono/stereo transformed mesh.
  */
-const createMesh = ( texture, eyeIndex = 0, geometry, material, uvFactors = null ) => {
+const createMesh = ( texture, geometry, eyeIndex = 0, material, uvFactors = null ) => {
 
 	//if has stereo layout set the uv mapping.
 	if ( uvFactors ) {
@@ -147,7 +147,7 @@ const createMesh = ( texture, eyeIndex = 0, geometry, material, uvFactors = null
 const createSphereMesh = ( texture, eyeIndex = 0, radius, widthSegments, heightSegments, uvFactors = null, is180 = false, material = null ) => {
 
 	const geometry = createSphereGeometry( radius, widthSegments, heightSegments, is180 ),
-		mesh = createMesh( texture, eyeIndex, geometry, material, uvFactors );
+		mesh = createMesh( texture, geometry, eyeIndex, material, uvFactors );
 
 	//only rotate for stereo layouts.
 	mesh.rotation.y = uvFactors ? - Math.PI / 2 : 0;
@@ -170,7 +170,7 @@ const createSphereMesh = ( texture, eyeIndex = 0, radius, widthSegments, heightS
 const createPlaneMesh = ( texture, eyeIndex = 0, quadWidth = 1, quadHeight = 1, translation = {}, quaternion = {}, uvFactors = null, material = null ) => {
 
 	const geometry = new PlaneGeometry( quadWidth, quadHeight ),
-		mesh = createMesh( texture, eyeIndex, geometry, material, uvFactors );
+		mesh = createMesh( texture, geometry, eyeIndex, material, uvFactors );
 
 	positionQuad( mesh, translation, quaternion );
 
