@@ -1,4 +1,5 @@
 import { IntType } from '../../../constants.js';
+import MappedStorageBufferData from '../../common/MappedStorageBufferData.js';
 
 let _id = 0;
 
@@ -30,7 +31,7 @@ class DualAttributeData {
 
 	get id() {
 
-		return `${ this.baseId }|${ this.activeBufferIndex }`;
+		return `${this.baseId}|${this.activeBufferIndex}`;
 
 	}
 
@@ -258,7 +259,7 @@ class WebGLAttributeUtils {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute ) {
 
@@ -294,7 +295,7 @@ class WebGLAttributeUtils {
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer.buffer;
+		return new MappedStorageBufferData( dstBuffer.buffer );
 
 	}
 

@@ -963,7 +963,7 @@
 				functionObj[ logFunctionName ] = async() => {
 
 					const selectedBuffer = buffers[ unifiedEffectController.loggedBuffer ];
-					console.log( new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value ) ) );
+					const mappedData = await renderer.getArrayBufferAsync( selectedBuffer.value );\n\t\t\t\t\tconsole.log( new Uint32Array( mappedData.array.slice( 0 ) ) );\n\t\t\t\t\tmappedData.destroy();
 
 				};
 
@@ -1306,7 +1306,7 @@
 
 						}
 
-						// DEBUG: const reductionResult = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) )[0];
+						// DEBUG: const mappedData = await renderer.getArrayBufferAsync( currentBuffer.value ); const reductionResult = new Uint32Array( mappedData.array )[ 0 ]; mappedData.destroy();
 
 						let passInfoString = '';
 

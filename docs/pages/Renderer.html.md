@@ -445,7 +445,7 @@ Returns the current animation loop callback.
 
 **Returns:** The current animation loop callback.
 
-### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<ArrayBuffer> (async)
+### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<MappedStorageBufferData> (async)
 
 Can be used to transfer buffer data from a storage buffer attribute from the GPU to the CPU in context of compute shaders.
 

@@ -1858,7 +1858,7 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute ) {
 

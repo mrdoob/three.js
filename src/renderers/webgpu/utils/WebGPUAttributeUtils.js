@@ -1,4 +1,5 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
+import MappedStorageBufferData from '../../common/MappedStorageBufferData.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
 import { isTypedArray, error } from '../../../utils.js';
@@ -319,7 +320,7 @@ class WebGPUAttributeUtils {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute ) {
 
@@ -331,13 +332,13 @@ class WebGPUAttributeUtils {
 		const size = bufferGPU.size;
 
 		const readBufferGPU = device.createBuffer( {
-			label: `${ attribute.name }_readback`,
+			label: `${attribute.name}_readback`,
 			size,
 			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 		} );
 
 		const cmdEncoder = device.createCommandEncoder( {
-			label: `readback_encoder_${ attribute.name }`
+			label: `readback_encoder_${attribute.name}`
 		} );
 
 		cmdEncoder.copyBufferToBuffer(
@@ -355,11 +356,7 @@ class WebGPUAttributeUtils {
 
 		const arrayBuffer = readBufferGPU.getMappedRange();
 
-		const dstBuffer = new attribute.array.constructor( arrayBuffer.slice( 0 ) );
-
-		readBufferGPU.unmap();
-
-		return dstBuffer.buffer;
+		return new MappedStorageBufferData( arrayBuffer, readBufferGPU );
 
 	}
 

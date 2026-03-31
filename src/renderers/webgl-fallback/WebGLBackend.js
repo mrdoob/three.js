@@ -227,7 +227,7 @@ class WebGLBackend extends Backend {
 
 		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2', contextAttributes );
 
-	 	function onContextLost( event ) {
+		function onContextLost( event ) {
 
 			event.preventDefault();
 
@@ -313,7 +313,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute ) {
 

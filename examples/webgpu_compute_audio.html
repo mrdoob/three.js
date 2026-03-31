@@ -58,7 +58,7 @@
 
 				renderer.compute( computeNode );
 
-				const wave = new Float32Array( await renderer.getArrayBufferAsync( waveArray.value ) );
+				const mappedData = await renderer.getArrayBufferAsync( waveArray.value );\n\t\t\t\tconst wave = new Float32Array( mappedData.array.slice( 0 ) );\n\t\t\t\tmappedData.destroy();
 
 				// play result
 
@@ -111,7 +111,7 @@
 				const originalWave = instancedArray( waveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
-				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
+				// As used in `renderer.getArrayBufferAsync( waveArray.value ).array`.
 
 				originalWave.setPBO( true );
 				waveArray.setPBO( true );

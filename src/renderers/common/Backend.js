@@ -60,8 +60,8 @@ class Backend {
 
 		/**
 		 * A reference to the timestamp query pool.
-   		 *
-   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
+				 *
+				 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
 			[ TimestampQuery.RENDER ]: null,
@@ -100,7 +100,7 @@ class Backend {
 	 * @type {number}
 	 * @readonly
 	 */
-	get coordinateSystem() {}
+	get coordinateSystem() { }
 
 	// render context
 
@@ -112,7 +112,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	beginRender( /*renderContext*/ ) {}
+	beginRender( /*renderContext*/ ) { }
 
 	/**
 	 * This method is executed at the end of a render call and
@@ -122,7 +122,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	finishRender( /*renderContext*/ ) {}
+	finishRender( /*renderContext*/ ) { }
 
 	/**
 	 * This method is executed at the beginning of a compute call and
@@ -132,7 +132,7 @@ class Backend {
 	 * @abstract
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute( /*computeGroup*/ ) {}
+	beginCompute( /*computeGroup*/ ) { }
 
 	/**
 	 * This method is executed at the end of a compute call and
@@ -142,7 +142,7 @@ class Backend {
 	 * @abstract
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute( /*computeGroup*/ ) {}
+	finishCompute( /*computeGroup*/ ) { }
 
 	// render object
 
@@ -338,7 +338,7 @@ class Backend {
 	 * @param {number} faceIndex - The face index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) {}
+	async copyTextureToBuffer( /*texture, x, y, width, height, faceIndex*/ ) { }
 
 	/**
 	 * Copies data of the given source texture to the given destination texture.
@@ -351,7 +351,7 @@ class Backend {
 	 * @param {number} [srcLevel=0] - The source mip level to copy from.
 	 * @param {number} [dstLevel=0] - The destination mip level to copy to.
 	 */
-	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/ ) {}
+	copyTextureToTexture( /*srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0*/ ) { }
 
 	/**
 	* Copies the current bound framebuffer to the given texture.
@@ -361,7 +361,7 @@ class Backend {
 	* @param {RenderContext} renderContext - The render context.
 	* @param {Vector4} rectangle - A four dimensional vector defining the origin and dimension of the copy.
 	*/
-	copyFramebufferToTexture( /*texture, renderContext, rectangle*/ ) {}
+	copyFramebufferToTexture( /*texture, renderContext, rectangle*/ ) { }
 
 	// attributes
 
@@ -429,7 +429,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	updateViewport( /*renderContext*/ ) {}
+	updateViewport( /*renderContext*/ ) { }
 
 	// utils
 
@@ -540,7 +540,7 @@ class Backend {
 	 * @param {Object3D} object - The 3D object to test.
 	 * @return {boolean} Whether the 3D object is fully occluded or not.
 	 */
-	isOccluded( /*renderContext, object*/ ) {}
+	isOccluded( /*renderContext, object*/ ) { }
 
 	/**
 	 * Resolves the time stamp for the given render context and type.
@@ -581,9 +581,9 @@ class Backend {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( /* attribute */ ) {}
+	async getArrayBufferAsync( /* attribute */ ) { }
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -602,7 +602,7 @@ class Backend {
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
-	hasFeature( /*name*/ ) {}
+	hasFeature( /*name*/ ) { }
 
 	/**
 	 * Returns the drawing buffer size.
@@ -689,7 +689,7 @@ class Backend {
 	 * @abstract
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	initRenderTarget( /*renderContext*/ ) {}
+	initRenderTarget( /*renderContext*/ ) { }
 
 	/**
 	 * Sets a dictionary for the given object into the

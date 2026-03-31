@@ -287,7 +287,7 @@ class WebGPUBackend extends Backend {
 			}
 
 			// OffscreenCanvas does not have setAttribute, see #22811
-			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${ REVISION } webgpu` );
+			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${REVISION} webgpu` );
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
@@ -329,7 +329,7 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @return {Promise<MappedStorageBufferData>} A promise that resolves with the mapped buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute ) {
 
@@ -474,7 +474,7 @@ class WebGPUBackend extends Backend {
 				const textureData = this.get( textures[ i ] );
 
 				const viewDescriptor = {
-					label: `colorAttachment_${ i }`,
+					label: `colorAttachment_${i}`,
 					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
@@ -646,7 +646,7 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${renderContext.id}` } );
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
@@ -726,7 +726,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  	colorAttachment.storeOp = GPUStoreOp.Store;
+			colorAttachment.storeOp = GPUStoreOp.Store;
 
 		}
 
@@ -745,13 +745,13 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 		}
 
 		if ( renderContext.stencil ) {
 
-		  if ( renderContext.clearStencil ) {
+			if ( renderContext.clearStencil ) {
 
 				depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
@@ -762,7 +762,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -1000,16 +1000,16 @@ class WebGPUBackend extends Backend {
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
-		  const bundles = [];
+			const bundles = [];
 
-		  for ( let i = 0; i < renderContextData.bundleEncoders.length; i ++ ) {
+			for ( let i = 0; i < renderContextData.bundleEncoders.length; i ++ ) {
 
 				const bundleEncoder = renderContextData.bundleEncoders[ i ];
 				bundles.push( bundleEncoder.finish() );
 
 			}
 
-		  for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
+			for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
 
 				if ( i < bundles.length ) {
 
@@ -1040,7 +1040,7 @@ class WebGPUBackend extends Backend {
 
 		} else if ( renderContextData.currentPass ) {
 
-		  renderContextData.currentPass.end();
+			renderContextData.currentPass.end();
 
 		}
 
@@ -2086,7 +2086,7 @@ class WebGPUBackend extends Backend {
 		const programGPU = this.get( program );
 
 		programGPU.module = {
-			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${ program.name }` : '' ) } ),
+			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${program.name}` : '' ) } ),
 			entryPoint: 'main'
 		};
 
