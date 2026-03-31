@@ -169,22 +169,20 @@
 				controls.setEllipsoid( tiles.ellipsoid, tiles.group );
 				controls.enableDamping = true;
 
-				// Workaround: GlobeControls adjusts the camera height as tiles load,
-				// causing the camera to drift upward. Disable controls until the first
-				// user interaction to keep the initial camera position stable.
-				controls.enabled = false;
+				// Workaround: adjustHeight causes camera drift as tiles load.
+				// Disable until first user interaction.
+				controls.adjustHeight = false;
 
-				function enableControls( event ) {
+				function enableAdjustHeight() {
 
-					controls.enabled = true;
-					renderer.domElement.removeEventListener( 'pointerdown', enableControls );
-					renderer.domElement.removeEventListener( 'wheel', enableControls );
-					renderer.domElement.dispatchEvent( new event.constructor( event.type, event ) );
+					controls.adjustHeight = true;
+					renderer.domElement.removeEventListener( 'pointerdown', enableAdjustHeight );
+					renderer.domElement.removeEventListener( 'wheel', enableAdjustHeight );
 
 				}
 
-				renderer.domElement.addEventListener( 'pointerdown', enableControls );
-				renderer.domElement.addEventListener( 'wheel', enableControls );
+				renderer.domElement.addEventListener( 'pointerdown', enableAdjustHeight );
+				renderer.domElement.addEventListener( 'wheel', enableAdjustHeight );
 
 				// sun direction (9AM Tokyo, March 1)
 				const sunDirection = new THREE.Vector3();
