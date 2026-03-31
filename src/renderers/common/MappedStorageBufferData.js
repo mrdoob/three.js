@@ -11,7 +11,7 @@ class MappedStorageBufferData {
 	 * @param {ArrayBuffer} array - The mapped data.
 	 * @param {GPUBuffer} [readBufferGPU=null] - The GPU buffer the data is mapped from.
 	 */
-	constructor(array, readBufferGPU = null) {
+	constructor( array, readBufferGPU = null ) {
 
 		/**
 		 * The mapped data as an ArrayBuffer.
@@ -37,7 +37,7 @@ class MappedStorageBufferData {
 	 */
 	destroy() {
 
-		if (this.readBufferGPU !== null) {
+		if ( this.readBufferGPU !== null ) {
 
 			this.readBufferGPU.unmap();
 			this.readBufferGPU.destroy();
