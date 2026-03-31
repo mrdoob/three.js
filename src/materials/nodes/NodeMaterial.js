@@ -592,15 +592,7 @@ class NodeMaterial extends Material {
 
 		} else {
 
-			let fragmentNode = this.fragmentNode;
-
-			if ( fragmentNode.isOutputStructNode !== true ) {
-
-				fragmentNode = vec4( fragmentNode );
-
-			}
-
-			resultNode = this.setupOutput( builder, fragmentNode );
+			resultNode = this.setupOutput( builder, this.fragmentNode );
 
 		}
 

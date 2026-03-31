@@ -23,7 +23,7 @@ import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending, RedFormat, RGFormat, RGBFormat, RedIntegerFormat, RGIntegerFormat, RGBIntegerFormat } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -531,6 +531,60 @@ class NodeBuilder {
 	includes( node ) {
 
 		return this.nodes.includes( node );
+
+	}
+
+	/**
+	 * Returns the type of the color output based on the renderer's render target.
+	 *
+	 * @return {string} The type.
+	 */
+	getOutputType() {
+
+		let type = 'vec4';
+
+		const renderTarget = this.renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetType = renderTarget.texture.type;
+			const renderTargetFormat = renderTarget.texture.format;
+
+			let typeStr = 'vec';
+
+			if ( renderTargetType === IntType ) {
+
+				typeStr = 'ivec';
+
+			} else if ( renderTargetType === UnsignedIntType ) {
+
+				typeStr = 'uvec';
+
+			}
+
+			if ( renderTargetFormat === RedFormat || renderTargetFormat === RedIntegerFormat ) {
+
+				if ( renderTargetType === IntType ) type = 'int';
+				else if ( renderTargetType === UnsignedIntType ) type = 'uint';
+				else type = 'float';
+
+			} else if ( renderTargetFormat === RGFormat || renderTargetFormat === RGIntegerFormat ) {
+
+				type = `${ typeStr }2`;
+
+			} else if ( renderTargetFormat === RGBFormat || renderTargetFormat === RGBIntegerFormat ) {
+
+				type = `${ typeStr }3`;
+
+			} else {
+
+				type = `${ typeStr }4`;
+
+			}
+
+		}
+
+		return type;
 
 	}
 
@@ -1468,12 +1522,10 @@ class NodeBuilder {
 
 		const type = texture.type;
 
-		if ( texture.isDataTexture ) {
+		if ( texture.isDepthTexture === true ) return 'float';
 
-			if ( type === IntType ) return 'int';
-			if ( type === UnsignedIntType ) return 'uint';
-
-		}
+		if ( type === IntType ) return 'int';
+		if ( type === UnsignedIntType ) return 'uint';
 
 		return 'float';
 

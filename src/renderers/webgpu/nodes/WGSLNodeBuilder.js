@@ -2126,7 +2126,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = '\t@location( 0 ) color: vec4<f32>';
+							let structSnippet = `\t@location( 0 ) color: ${ this.getOutputType() }`;
 
 							const builtins = this.getBuiltins( 'output' );
 
@@ -2136,7 +2136,7 @@ ${ flowData.code }
 							stageData.structs += this._getWGSLStruct( 'OutputStruct', structSnippet );
 							stageData.structs += '\nvar<private> output : OutputStruct;';
 
-							flow += `output.color = ${ flowSlotData.result };\n\n\treturn output;`;
+							flow += `output.color = ${ this.format( flowSlotData.result, mainNode.getNodeType( this ), this.getOutputType() ) };\n\n\treturn output;`;
 
 						}
 
@@ -2259,6 +2259,18 @@ ${ flowData.code }
 		return wgslTypeLib[ type ] || type;
 
 	}
+
+	/**
+	 * Returns the type of the color output based on the renderer's render target.
+	 *
+	 * @return {string} The WGSL type.
+	 */
+	getOutputType() {
+
+		return this.getType( super.getOutputType() );
+
+	}
+
 
 	/**
 	 * Whether the requested feature is available or not.
