@@ -1998,10 +1998,17 @@ class USDComposer {
 
 		// Triangulate original data using consistent pattern
 		const { indices: origIndices, pattern: triPattern } = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
-		const origUvIndices = uvIndices ? this._applyTriangulationPattern( uvIndices, triPattern ) : null;
-		const origUv2Indices = uv2Indices ? this._applyTriangulationPattern( uv2Indices, triPattern ) : null;
-
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const faceVaryingIdentity = ( uvs && ! uvIndices && uvs.length / 2 === numFaceVertices ) ||
+			( uvs2 && ! uv2Indices && uvs2.length / 2 === numFaceVertices )
+			? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
+			: null;
+		const origUvIndices = uvIndices
+			? this._applyTriangulationPattern( uvIndices, triPattern )
+			: ( uvs && uvs.length / 2 === numFaceVertices ? faceVaryingIdentity : null );
+		const origUv2Indices = uv2Indices
+			? this._applyTriangulationPattern( uv2Indices, triPattern )
+			: ( uvs2 && uvs2.length / 2 === numFaceVertices ? faceVaryingIdentity : null );
 		const hasIndexedNormals = normals && normalIndicesRaw && normalIndicesRaw.length > 0;
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
 		const origNormalIndices = hasIndexedNormals
