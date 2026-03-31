@@ -368,6 +368,15 @@ class Texture extends EventDispatcher {
 		 */
 		this.pmremVersion = 0;
 
+		/**
+		 * Whether the texture should use one of the 16 bit integer formats which are normalized
+		 * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.normalized = false;
+
 	}
 
 	/**
@@ -483,6 +492,7 @@ class Texture extends EventDispatcher {
 		this.format = source.format;
 		this.internalFormat = source.internalFormat;
 		this.type = source.type;
+		this.normalized = source.normalized;
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
@@ -601,6 +611,7 @@ class Texture extends EventDispatcher {
 			format: this.format,
 			internalFormat: this.internalFormat,
 			type: this.type,
+			normalized: this.normalized,
 			colorSpace: this.colorSpace,
 
 			minFilter: this.minFilter,
