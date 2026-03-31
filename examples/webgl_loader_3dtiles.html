@@ -36,7 +36,8 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="https://github.com/NASA-AMMOS/3DTilesRendererJS" target="_blank" rel="noopener">3d-tiles-renderer</a> +
 			<a href="https://github.com/takram-design-engineering/three-geospatial" target="_blank" rel="noopener">three-clouds</a><br/>
-			<a href="https://developers.google.com/maps/documentation/tile/3d-tiles" target="_blank" rel="noopener">Google Photorealistic Tiles</a> token courtesy of <a href="https://ion.cesium.com/" target="_blank" rel="noopener">Cesium Ion</a>.
+			<a href="https://developers.google.com/maps/documentation/tile/3d-tiles" target="_blank" rel="noopener">Google Photorealistic Tiles</a> token courtesy of <a href="https://ion.cesium.com/" target="_blank" rel="noopener">Cesium Ion</a>.<br/>
+			<label>time of day: <input id="hour" type="range" min="0" max="24" value="0" step="0.01" style="pointer-events: all; vertical-align: middle;"></label>
 		</div>
 
 		<div id="credits">
@@ -179,16 +180,25 @@
 				renderer.domElement.addEventListener( 'pointerdown', enableAdjustHeight );
 				renderer.domElement.addEventListener( 'wheel', enableAdjustHeight );
 
-				// sun direction (9AM Tokyo, March 1)
+				// sun direction
 				const sunDirection = new THREE.Vector3();
-				getSunDirectionECEF( new Date( '2024-03-01T00:00:00Z' ), sunDirection );
+				const params = { hourUTC: 0 }; // 0:00 UTC = 9:00 AM Tokyo
+
+				function updateSunDirection() {
+
+					const ms = params.hourUTC * 3600000;
+					const date = new Date( Date.UTC( 2024, 2, 1 ) + ms );
+					getSunDirectionECEF( date, sunDirection );
+					aerialPerspective.sunDirection.copy( sunDirection );
+					clouds.sunDirection.copy( sunDirection );
+
+				}
 
 				// aerial perspective (sky + atmosphere + deferred lighting)
 				aerialPerspective = new AerialPerspectiveEffect( camera );
 				aerialPerspective.sky = true;
 				aerialPerspective.sunLight = true;
 				aerialPerspective.skyLight = true;
-				aerialPerspective.sunDirection.copy( sunDirection );
 
 				const normalPass = new NormalPass( scene, camera );
 				aerialPerspective.normalBuffer = normalPass.texture;
@@ -196,7 +206,6 @@
 				// clouds
 				clouds = new CloudsEffect( camera );
 				clouds.coverage = 0.3;
-				clouds.sunDirection.copy( sunDirection );
 				clouds.localWeatherVelocity.set( 0.001, 0 );
 				clouds.shadow.farScale = 0.25;
 				clouds.shadow.maxFar = 1e5;
@@ -338,6 +347,16 @@
 
 					clouds.stbnTexture = texture;
 					aerialPerspective.stbnTexture = texture;
+
+				} );
+
+				// initial sun position
+				updateSunDirection();
+
+				document.getElementById( 'hour' ).addEventListener( 'input', ( e ) => {
+
+					params.hourUTC = parseFloat( e.target.value );
+					updateSunDirection();
 
 				} );
 
