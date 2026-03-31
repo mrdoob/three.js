@@ -295,27 +295,28 @@
 				loadCloudTexture( DEFAULT_LOCAL_WEATHER_URL, 'localWeatherTexture' );
 				loadCloudTexture( DEFAULT_TURBULENCE_URL, 'turbulenceTexture' );
 
-				async function loadData3DTexture( url, size ) {
+				function loadData3DTexture( url, size, property ) {
 
-					const response = await fetch( url );
-					const data = new Uint8Array( await response.arrayBuffer() );
-					const texture = new THREE.Data3DTexture( data, size, size, size );
-					texture.format = THREE.RedFormat;
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
-					texture.wrapR = THREE.RepeatWrapping;
-					texture.colorSpace = THREE.NoColorSpace;
-					texture.needsUpdate = true;
-					return texture;
+					fetch( url ).then( res => res.arrayBuffer() ).then( buffer => {
+
+						const data = new Uint8Array( buffer );
+						const texture = new THREE.Data3DTexture( data, size, size, size );
+						texture.format = THREE.RedFormat;
+						texture.minFilter = THREE.LinearFilter;
+						texture.magFilter = THREE.LinearFilter;
+						texture.wrapS = THREE.RepeatWrapping;
+						texture.wrapT = THREE.RepeatWrapping;
+						texture.wrapR = THREE.RepeatWrapping;
+						texture.colorSpace = THREE.NoColorSpace;
+						texture.needsUpdate = true;
+						clouds[ property ] = texture;
+
+					} );
 
 				}
 
-				[ clouds.shapeTexture, clouds.shapeDetailTexture ] = await Promise.all( [
-					loadData3DTexture( DEFAULT_SHAPE_URL, CLOUD_SHAPE_TEXTURE_SIZE ),
-					loadData3DTexture( DEFAULT_SHAPE_DETAIL_URL, CLOUD_SHAPE_DETAIL_TEXTURE_SIZE )
-				] );
+				loadData3DTexture( DEFAULT_SHAPE_URL, CLOUD_SHAPE_TEXTURE_SIZE, 'shapeTexture' );
+				loadData3DTexture( DEFAULT_SHAPE_DETAIL_URL, CLOUD_SHAPE_DETAIL_TEXTURE_SIZE, 'shapeDetailTexture' );
 
 				new STBNLoader().load( DEFAULT_STBN_URL, ( texture ) => {
 
