@@ -15,6 +15,7 @@ import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { RawShaderMaterial } from '../../materials/RawShaderMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
@@ -34,7 +35,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
-		stencilBuffer: stencil
+		stencilBuffer: stencil,
+		depthTexture: depth ? new DepthTexture( width, height ) : undefined
 	} );
 
 	const targetB = new WebGLRenderTarget( width, height, {
@@ -255,6 +257,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	this.dispose = function () {
 
+		if ( targetA.depthTexture ) targetA.depthTexture.dispose();
 		targetA.dispose();
 		targetB.dispose();
 		geometry.dispose();
