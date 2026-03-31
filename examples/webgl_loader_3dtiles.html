@@ -199,18 +199,31 @@
 				} );
 
 				// adapter: bridges pmndrs postprocessing passes to renderer.setEffects()
+				let _prevTime = performance.now();
+				let _deltaTime = 0;
+
 				class EffectPassAdapter {
 
-					constructor( pass ) {
+					constructor( pass, isFirst ) {
 
 						this.pass = pass;
 						this.needsSwap = pass.needsSwap !== false;
 						this.enabled = true;
 						this._initialized = false;
+						this._isFirst = isFirst === true;
 
 					}
 
-					render( renderer, writeBuffer, readBuffer, deltaTime ) {
+					render( renderer, writeBuffer, readBuffer ) {
+
+						// WebGLOutput does not pass deltaTime, compute it on the first adapter per frame
+						if ( this._isFirst ) {
+
+							const now = performance.now();
+							_deltaTime = ( now - _prevTime ) / 1000;
+							_prevTime = now;
+
+						}
 
 						if ( ! this._initialized ) {
 
@@ -233,7 +246,7 @@
 
 						}
 
-						this.pass.render( renderer, readBuffer, writeBuffer, deltaTime );
+						this.pass.render( renderer, readBuffer, writeBuffer, _deltaTime );
 
 					}
 
@@ -247,7 +260,7 @@
 
 				// postprocessing
 				renderer.setEffects( [
-					new EffectPassAdapter( normalPass ),
+					new EffectPassAdapter( normalPass, true ),
 					new EffectPassAdapter( new EffectPass( camera, clouds, aerialPerspective ) ),
 					new EffectPassAdapter( new EffectPass( camera, new LensFlareEffect() ) ),
 					new EffectPassAdapter( new EffectPass( camera, new SMAAEffect() ) ),
