@@ -58,7 +58,9 @@
 
 				renderer.compute( computeNode );
 
-				const mappedData = await renderer.getArrayBufferAsync( waveArray.value );\n\t\t\t\tconst wave = new Float32Array( mappedData.array.slice( 0 ) );\n\t\t\t\tmappedData.destroy();
+				const mappedData = await renderer.getArrayBufferAsync( waveArray.value );
+				const wave = new Float32Array( mappedData.array.slice( 0 ) );
+				mappedData.destroy();
 
 				// play result
 
