@@ -74,6 +74,7 @@
 
 			import * as THREE from 'three';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 			import { TilesRenderer, GlobeControls, CAMERA_FRAME } from '3d-tiles-renderer';
 			import { CesiumIonAuthPlugin } from '3d-tiles-renderer/core/plugins';
 			import { GLTFExtensionsPlugin, TilesFadePlugin, UpdateOnChangePlugin } from '3d-tiles-renderer/three/plugins';
@@ -123,10 +124,31 @@
 				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
 				dracoLoader.setDecoderConfig( { type: 'js' } );
 
+				const DEG2RAD = Math.PI / 180;
+
 				// tiles
+				class TileCreasedNormalsPlugin {
+
+					processTileModel( scene ) {
+
+						scene.traverse( ( mesh ) => {
+
+							if ( mesh.geometry ) {
+
+								mesh.geometry = toCreasedNormals( mesh.geometry, 30 * DEG2RAD );
+
+							}
+
+						} );
+
+					}
+
+				}
+
 				tiles = new TilesRenderer();
 				tiles.registerPlugin( new CesiumIonAuthPlugin( { apiToken: ION_KEY, assetId: '2275207', autoRefreshToken: true } ) );
 				tiles.registerPlugin( new GLTFExtensionsPlugin( { dracoLoader } ) );
+				tiles.registerPlugin( new TileCreasedNormalsPlugin() );
 				tiles.registerPlugin( new TilesFadePlugin() );
 				tiles.registerPlugin( new UpdateOnChangePlugin() );
 				tiles.setCamera( camera );
@@ -135,7 +157,6 @@
 				scene.add( tiles.group );
 
 				// position camera above Tokyo
-				const DEG2RAD = Math.PI / 180;
 				tiles.ellipsoid.getObjectFrame(
 					35.6812 * DEG2RAD, 139.80 * DEG2RAD, 500,
 					- 90 * DEG2RAD, - 10 * DEG2RAD, 0,
@@ -174,7 +195,6 @@
 				aerialPerspective.sky = true;
 				aerialPerspective.sunLight = true;
 				aerialPerspective.skyLight = true;
-				aerialPerspective.reconstructNormal = true;
 				aerialPerspective.sunDirection.copy( sunDirection );
 
 				const normalPass = new NormalPass( scene, camera );
