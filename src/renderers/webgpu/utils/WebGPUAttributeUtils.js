@@ -330,11 +330,47 @@ class WebGPUAttributeUtils {
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
-		const readBufferGPU = device.createBuffer( {
-			label: `${ attribute.name }_readback`,
-			size,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-		} );
+		let readBufferData = data.readBufferData;
+
+		if ( readBufferData === undefined ) {
+
+			const readBufferGPU = device.createBuffer( {
+				label: `${ attribute.name }_readback`,
+				size,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			} );
+
+			const arrayBuffer = new attribute.array.constructor( size / attribute.array.BYTES_PER_ELEMENT );
+
+			const dispose = () => {
+
+				readBufferGPU.destroy();
+
+				backend.renderer.info.memory.total -= size;
+
+				delete data.readBufferData;
+
+				attribute.removeEventListener( 'dispose', dispose );
+
+			};
+
+			attribute.addEventListener( 'dispose', dispose );
+
+			backend.renderer.info.memory.total += size;
+
+			//
+
+			readBufferData = {
+				readBufferGPU,
+				arrayBuffer,
+				dispose
+			};
+
+			data.readBufferData = readBufferData;
+
+		}
+
+		const { readBufferGPU, arrayBuffer } = readBufferData;
 
 		const cmdEncoder = device.createCommandEncoder( {
 			label: `readback_encoder_${ attribute.name }`
@@ -353,13 +389,14 @@ class WebGPUAttributeUtils {
 
 		await readBufferGPU.mapAsync( GPUMapMode.READ );
 
-		const arrayBuffer = readBufferGPU.getMappedRange();
+		const mappedRange = readBufferGPU.getMappedRange();
 
-		const dstBuffer = new attribute.array.constructor( arrayBuffer.slice( 0 ) );
+		// Adds a view to the ArrayBuffer and reuse the underlying memory.
+		arrayBuffer.set( new attribute.array.constructor( mappedRange ) );
 
 		readBufferGPU.unmap();
 
-		return dstBuffer.buffer;
+		return arrayBuffer.buffer;
 
 	}
 
