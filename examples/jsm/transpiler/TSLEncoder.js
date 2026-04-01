@@ -484,13 +484,20 @@ ${ this.tab }} )`;
 		const start = this.emitExpression( node.initialization.value );
 		const end = this.emitExpression( node.condition.right );
 
-		const name = node.initialization.name;
-		const type = node.initialization.type;
-		const condition = node.condition.type;
+		const rawName = node.initialization.name;
+		const rawType = node.initialization.type;
+		const rawCondition = node.condition.type;
 
-		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
-		const typeParam = type !== 'int' ? `, type: '${ type }'` : '';
-		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
+		const identifierPattern = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+		const allowedConditions = new Set( [ '<', '<=', '>', '>=', '===', '!==', '==', '!=' ] );
+
+		const name = identifierPattern.test( rawName ) ? rawName : 'i';
+		const type = identifierPattern.test( rawType ) ? rawType : 'int';
+		const condition = allowedConditions.has( rawCondition ) ? rawCondition : '<';
+
+		const nameParam = name !== 'i' ? ', name: \'' + name + '\'' : '';
+		const typeParam = type !== 'int' ? ', type: \'' + type + '\'' : '';
+		const conditionParam = condition !== '<' ? ', condition: \'' + condition + '\'' : '';
 
 		let updateParam = '';
 
@@ -498,7 +505,7 @@ ${ this.tab }} )`;
 
 			if ( node.afterthought.type !== '++' ) {
 
-				updateParam = `, update: '${ node.afterthought.type }'`;
+				updateParam = ', update: \'' + node.afterthought.type + '\'';
 
 			}
 
@@ -506,17 +513,17 @@ ${ this.tab }} )`;
 
 			if ( node.afterthought.right.isAccessor || node.afterthought.right.isNumber ) {
 
-				updateParam = `, update: ${ this.emitExpression( node.afterthought.right ) }`;
+				updateParam = ', update: ' + this.emitExpression( node.afterthought.right );
 
 			} else {
 
-				updateParam = `, update: ( { i } ) => ${ this.emitExpression( node.afterthought ) }`;
+				updateParam = ', update: ( { i } ) => ' + this.emitExpression( node.afterthought );
 
 			}
 
 		}
 
-		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
+		let loopStr = 'Loop( { start: ' + start + ', end: ' + ( end + nameParam + typeParam + conditionParam + updateParam ) + ' }, ( { ' + name + ' } ) => {\n\n';
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
