@@ -25,8 +25,9 @@ let _rendererState;
  * const scenePassDepth = scenePass.getTextureNode( 'depth' );
  *
  * const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+ * const aoPassOutput = aoPass.getTextureNode();
  *
- * renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPass.r ), 1 ) );
+ * renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
  * ```
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
