@@ -116,7 +116,9 @@ export const GPUTextureFormat = {
 	BGRA8UnormSRGB: 'bgra8unorm-srgb',
 	RG16Unorm: 'rg16unorm',
 	RG16Snorm: 'rg16snorm',
+
 	// Packed 32-bit formats
+
 	RGB9E5UFloat: 'rgb9e5ufloat',
 	RGB10A2Unorm: 'rgb10a2unorm',
 	RG11B10UFloat: 'rg11b10ufloat',
