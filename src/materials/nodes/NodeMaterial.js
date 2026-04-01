@@ -25,7 +25,6 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
-import { error } from '../../utils.js';
 
 /**
  * Base class for all node materials.
@@ -484,32 +483,6 @@ class NodeMaterial extends Material {
 
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
-
-		// < CONTEXT >
-
-		if ( renderer.contextNode.isContextNode === true ) {
-
-			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
-
-		} else {
-
-			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
-
-		}
-
-		if ( this.contextNode !== null ) {
-
-			if ( this.contextNode.isContextNode === true ) {
-
-				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
-
-			} else {
-
-				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
-
-			}
-
-		}
 
 		// < VERTEX STAGE >
 

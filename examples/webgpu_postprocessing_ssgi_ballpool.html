@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - SSGI Ball Pool</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			canvas {
+				touch-action: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSGI Ball Pool</span>
+			</div>
+
+			<small>Real-time indirect illumination with interactive physics ball pool.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"monomorph": "https://cdn.jsdelivr.net/npm/monomorph@2.3.1/build/monomorph.js",
+					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.0/build/bounce.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { World } from '@perplexdotgg/bounce';
+
+			const BALL_RADIUS = 0.4;
+			const FILL_RATIO = 0.4;
+			const PACKING = 0.6;
+			const BOX_HEIGHT = 6;
+			const BOX_DEPTH = 8;
+			const WALL_THICKNESS = 0.5;
+			const CAM_FOV = 45;
+			const EASE_SPEED = 8;
+
+			let camera, scene, renderer, renderPipeline;
+			let raycaster, pointer;
+			let mouseLight;
+
+			let world;
+			let ballCount = 0;
+			let bodies = [];
+			let ballsMesh = null;
+			let wallMeshes = [];
+			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
+
+			let mouseRayOrigin = new THREE.Vector3();
+			let mouseRayDir = new THREE.Vector3();
+			let mouseMoving = false;
+			let mouseStopTimer = 0;
+			let pointerDown = false;
+			const activePointers = new Set();
+			const mouseLightTarget = new THREE.Vector3( 0, BOX_HEIGHT / 2, BOX_DEPTH / 2 );
+			const mouseRayOriginTarget = new THREE.Vector3();
+			const mouseRayDirTarget = new THREE.Vector3();
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( CAM_FOV, window.innerWidth / window.innerHeight, 0.1, 100 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: output,
+					diffuseColor: diffuseColor,
+					normal: directionToColor( normalView ),
+					velocity: velocity
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+
+				// bandwidth optimization
+
+				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+				diffuseTexture.type = THREE.UnsignedByteType;
+
+				const normalTexture = scenePass.getTexture( 'normal' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				const sceneNormal = sample( ( uv ) => {
+
+					return colorToDirection( scenePassNormal.sample( uv ) );
+
+				} );
+
+				// gi
+
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
+				giPass.sliceCount.value = 2;
+				giPass.stepCount.value = 8;
+
+				// composite
+
+				const gi = giPass.rgb;
+				const ao = giPass.a;
+
+				const compositePass = vec4(
+					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),
+					scenePassColor.a
+				);
+
+				// traa
+
+				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
+				renderPipeline.outputNode = traaPass;
+
+				// light
+
+				mouseLight = new THREE.PointLight( 0xffffff, 80 );
+				mouseLight.position.set( 0, BOX_HEIGHT / 2, BOX_DEPTH / 2 );
+				mouseLight.castShadow = true;
+				mouseLight.shadow.mapSize.set( 1024, 1024 );
+				mouseLight.shadow.radius = 20;
+				scene.add( mouseLight );
+
+				//
+
+				raycaster = new THREE.Raycaster();
+				pointer = new THREE.Vector2();
+
+				rebuildScene();
+
+				//
+
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
+				renderer.domElement.addEventListener( 'pointerup', onPointerUp );
+				renderer.domElement.addEventListener( 'pointercancel', onPointerUp );
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function getBoxWidth() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				const vFov = THREE.MathUtils.degToRad( CAM_FOV / 2 );
+				const dist = ( BOX_HEIGHT / 2 ) / Math.tan( vFov );
+				return Math.tan( vFov ) * aspect * dist * 2;
+
+			}
+
+			function getBallCount() {
+
+				const roomVolume = boxSize.w * boxSize.h * boxSize.d;
+				const ballVolume = ( 4 / 3 ) * Math.PI * Math.pow( BALL_RADIUS, 3 );
+				return Math.floor( roomVolume * FILL_RATIO * PACKING / ballVolume );
+
+			}
+
+			function rebuildScene() {
+
+				for ( const mesh of wallMeshes ) {
+
+					scene.remove( mesh );
+					mesh.geometry.dispose();
+
+				}
+
+				wallMeshes = [];
+
+				if ( ballsMesh ) {
+
+					scene.remove( ballsMesh );
+					ballsMesh.dispose();
+					ballsMesh = null;
+
+				}
+
+				bodies = [];
+
+				boxSize.w = getBoxWidth();
+				ballCount = getBallCount();
+
+				world = new World( {
+					gravity: [ 0, - 9.81, 0 ],
+					solveVelocityIterations: 6,
+					solvePositionIterations: 2,
+					linearDamping: 0.1,
+					angularDamping: 0.1,
+					restitution: 0.4,
+					friction: 0.5
+				} );
+
+				fitCameraToBox();
+				createBox();
+				createBalls();
+
+			}
+
+			function createBox() {
+
+				const hw = boxSize.w / 2;
+				const hh = boxSize.h / 2;
+				const hd = boxSize.d / 2;
+				const t = WALL_THICKNESS;
+
+				const whiteMaterial = new THREE.MeshPhysicalMaterial( {
+					color: 0xeeeeee,
+					roughness: 0.7,
+					metalness: 0.0
+				} );
+
+				const redMaterial = new THREE.MeshPhysicalMaterial( {
+					color: 0xff2222,
+					roughness: 0.7,
+					metalness: 0.0
+				} );
+
+				const greenMaterial = new THREE.MeshPhysicalMaterial( {
+					color: 0x22ff22,
+					roughness: 0.7,
+					metalness: 0.0
+				} );
+
+				const walls = [
+					{ size: [ boxSize.w, t, boxSize.d ], pos: [ 0, - t / 2, 0 ], mat: whiteMaterial },
+					{ size: [ boxSize.w, t, boxSize.d ], pos: [ 0, boxSize.h + t / 2, 0 ], mat: whiteMaterial },
+					{ size: [ boxSize.w, boxSize.h, t ], pos: [ 0, hh, - hd - t / 2 ], mat: whiteMaterial },
+					{ size: [ boxSize.w, boxSize.h, t ], pos: [ 0, hh, hd + t / 2 ], noMesh: true },
+					{ size: [ t, boxSize.h, boxSize.d ], pos: [ - hw - t / 2, hh, 0 ], mat: redMaterial },
+					{ size: [ t, boxSize.h, boxSize.d ], pos: [ hw + t / 2, hh, 0 ], mat: greenMaterial }
+				];
+
+				for ( const w of walls ) {
+
+					const shape = world.createBox( { width: w.size[ 0 ], height: w.size[ 1 ], depth: w.size[ 2 ] } );
+					world.createStaticBody( { shape, position: w.pos } );
+
+					if ( ! w.noMesh ) {
+
+						const geo = new THREE.BoxGeometry( w.size[ 0 ], w.size[ 1 ], w.size[ 2 ] );
+						const mesh = new THREE.Mesh( geo, w.mat );
+						mesh.position.set( ...w.pos );
+						mesh.receiveShadow = true;
+						scene.add( mesh );
+						wallMeshes.push( mesh );
+
+					}
+
+				}
+
+			}
+
+			function createBalls() {
+
+				const sphereGeo = new THREE.SphereGeometry( BALL_RADIUS, 32, 16 );
+				const sphereShape = world.createSphere( { radius: BALL_RADIUS } );
+
+				const material = new THREE.MeshPhysicalMaterial( {
+					roughness: 0.3,
+					metalness: 0.1
+				} );
+
+				ballsMesh = new THREE.InstancedMesh( sphereGeo, material, ballCount );
+				ballsMesh.castShadow = true;
+				ballsMesh.receiveShadow = true;
+				scene.add( ballsMesh );
+
+				const colors = [
+					0xff4444, 0x44ff44, 0x4488ff, 0xffaa00, 0xff44ff,
+					0x44ffff, 0xffff44, 0xff8844, 0x8844ff, 0x44ff88
+				];
+
+				const color = new THREE.Color();
+				const hw = boxSize.w / 2 - BALL_RADIUS - 0.1;
+				const hd = boxSize.d / 2 - BALL_RADIUS - 0.1;
+
+				for ( let i = 0; i < ballCount; i ++ ) {
+
+					color.set( colors[ i % colors.length ] );
+					ballsMesh.setColorAt( i, color );
+
+					const x = ( Math.random() - 0.5 ) * 2 * hw;
+					const y = BALL_RADIUS + Math.random() * ( boxSize.h - BALL_RADIUS * 2 );
+					const z = ( Math.random() - 0.5 ) * 2 * hd;
+
+					const body = world.createDynamicBody( {
+						shape: sphereShape,
+						position: [ x, y, z ],
+						mass: 1,
+						restitution: 0.5,
+						friction: 0.4
+					} );
+
+					bodies.push( body );
+
+				}
+
+			}
+
+			function onPointerDown( event ) {
+
+				activePointers.add( event.pointerId );
+
+				if ( event.pointerType === 'touch' ) {
+
+					pointerDown = activePointers.size >= 2;
+
+				} else {
+
+					pointerDown = true;
+
+				}
+
+			}
+
+			function onPointerUp( event ) {
+
+				activePointers.delete( event.pointerId );
+
+				if ( event.pointerType === 'touch' ) {
+
+					pointerDown = activePointers.size >= 2;
+
+				} else {
+
+					pointerDown = false;
+
+				}
+
+			}
+
+			function onPointerMove( event ) {
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				mouseRayOriginTarget.copy( raycaster.ray.origin );
+				mouseRayDirTarget.copy( raycaster.ray.direction );
+				mouseMoving = true;
+				clearTimeout( mouseStopTimer );
+				mouseStopTimer = setTimeout( () => mouseMoving = false, 50 );
+
+				const frontPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - boxSize.d / 2 );
+				const hit = new THREE.Vector3();
+				if ( raycaster.ray.intersectPlane( frontPlane, hit ) ) {
+
+					mouseLightTarget.copy( hit );
+
+				}
+
+			}
+
+			function respawnBalls() {
+
+				const hw = boxSize.w / 2 - BALL_RADIUS - 0.1;
+				const hd = boxSize.d / 2 - BALL_RADIUS - 0.1;
+				const count = 5;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const body = bodies[ Math.floor( Math.random() * bodies.length ) ];
+
+					body.position.set( [
+						( Math.random() - 0.5 ) * 2 * hw,
+						boxSize.h - BALL_RADIUS - Math.random() * 1,
+						( Math.random() - 0.5 ) * 2 * hd
+					] );
+					body.linearVelocity.set( [ 0, 0, 0 ] );
+					body.angularVelocity.set( [ 0, 0, 0 ] );
+					body.commitChanges();
+
+				}
+
+			}
+
+			function fitCameraToBox() {
+
+				const vFov = THREE.MathUtils.degToRad( CAM_FOV / 2 );
+				const dist = ( boxSize.h / 2 ) / Math.tan( vFov );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.position.set( 0, boxSize.h / 2, dist + boxSize.d / 2 );
+				camera.lookAt( 0, boxSize.h / 2, 0 );
+				camera.updateProjectionMatrix();
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				rebuildScene();
+
+			}
+
+			const timer = new THREE.Timer();
+			const _dummy = new THREE.Object3D();
+
+			function animate() {
+
+				timer.update();
+				const dt = Math.min( timer.getDelta(), 1 / 30 );
+
+				const easeFactor = 1 - Math.exp( - EASE_SPEED * dt );
+				mouseRayOrigin.lerp( mouseRayOriginTarget, easeFactor );
+				mouseRayDir.lerp( mouseRayDirTarget, easeFactor );
+				mouseLight.position.lerp( mouseLightTarget, easeFactor );
+
+				if ( pointerDown ) {
+
+					respawnBalls();
+
+				}
+
+				if ( mouseMoving ) {
+
+					const pushRadius = 1.5;
+					const pushStrength = 15;
+					const _closest = new THREE.Vector3();
+					const _ballPos = new THREE.Vector3();
+					const _pushDir = new THREE.Vector3();
+
+					for ( const body of bodies ) {
+
+						const bp = body.position;
+						_ballPos.set( bp.x, bp.y, bp.z );
+
+						const ray = new THREE.Ray( mouseRayOrigin, mouseRayDir );
+						ray.closestPointToPoint( _ballPos, _closest );
+
+						const dist = _closest.distanceTo( _ballPos );
+
+						if ( dist < pushRadius ) {
+
+							_pushDir.subVectors( _ballPos, _closest );
+							if ( _pushDir.lengthSq() < 0.001 ) _pushDir.set( 0, 1, 0 );
+							_pushDir.normalize();
+
+							const strength = pushStrength * ( 1 - dist / pushRadius );
+							body.applyLinearImpulse( {
+								x: _pushDir.x * strength,
+								y: _pushDir.y * strength,
+								z: _pushDir.z * strength
+							} );
+
+						}
+
+					}
+
+				}
+
+				if ( world ) {
+
+					world.advanceTime( 1 / 60, dt );
+
+				}
+
+				for ( let i = 0; i < bodies.length; i ++ ) {
+
+					const body = bodies[ i ];
+					const p = body.position;
+					const q = body.orientation;
+
+					_dummy.position.set( p.x, p.y, p.z );
+					_dummy.quaternion.set( q.x, q.y, q.z, q.w );
+					_dummy.updateMatrix();
+
+					ballsMesh.setMatrixAt( i, _dummy.matrix );
+
+				}
+
+				ballsMesh.instanceMatrix.needsUpdate = true;
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

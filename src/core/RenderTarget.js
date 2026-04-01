@@ -369,6 +369,7 @@ class RenderTarget extends EventDispatcher {
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
 		this.samples = source.samples;
+		this.multiview = source.multiview;
 
 		return this;
 

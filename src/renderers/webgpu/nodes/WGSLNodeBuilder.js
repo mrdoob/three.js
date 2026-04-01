@@ -1876,6 +1876,7 @@ ${ flowData.code }
 	 */
 	getUniforms( shaderStage ) {
 
+		const backend = this.renderer.backend;
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
@@ -1913,7 +1914,7 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+				const { primarySamples } = backend.utils.getTextureSampleData( texture );
 
 				if ( primarySamples > 1 ) {
 
@@ -1931,7 +1932,7 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
+					if ( backend.compatibilityMode && texture.compareFunction === null ) {
 
 						textureType = `texture${ multisampled }_2d<f32>`;
 
@@ -1943,7 +1944,7 @@ ${ flowData.code }
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
-					const format = getFormat( texture );
+					const format = getFormat( texture, backend.device );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
 					const is3D = uniform.node.value.is3DTexture;

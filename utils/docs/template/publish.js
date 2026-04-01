@@ -191,7 +191,7 @@ function buildSearchListForData() {
 
 					const category = categoryMap[ className ];
 					const entry = {
-						title: item.longname,
+						title: item.longname.replace( 'module:', 'module-' ),
 						kind: item.kind
 					};
 
@@ -228,7 +228,7 @@ function buildSearchListForData() {
 					}
 
 					const entry = {
-						title: item.longname,
+						title: item.longname.replace( 'module:', 'module-' ),
 						kind: item.kind
 					};
 

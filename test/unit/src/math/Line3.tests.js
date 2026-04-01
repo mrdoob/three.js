@@ -161,6 +161,12 @@ export default QUnit.module( 'Maths', () => {
 			a.closestPointToPoint( one3.clone(), true, point );
 			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
 
+			// degenerate line (zero-length)
+			const b = new Line3( one3.clone(), one3.clone() );
+			assert.ok( b.closestPointToPointParameter( zero3.clone(), true ) == 0, 'Passed!' );
+			b.closestPointToPoint( zero3.clone(), true, point );
+			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'applyMatrix4', ( assert ) => {
