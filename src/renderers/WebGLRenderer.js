@@ -2219,6 +2219,11 @@ class WebGLRenderer {
 			if ( ( ! material.isShaderMaterial && ! material.isRawShaderMaterial ) || material.clipping === true ) {
 
 				uniforms.clippingPlanes = clipping.uniform;
+				uniforms.clippingVolumePlaneStart = clipping.volumePlaneStartUniform;
+				uniforms.clippingVolumePlaneCount = clipping.volumePlaneCountUniform;
+				uniforms.clippingVolumeMode = clipping.volumeModeUniform;
+				uniforms.clippingNumVolumes = clipping.numVolumesUniform;
+				uniforms.clippingNumIncludeVolumes = clipping.numIncludeVolumesUniform;
 
 			}
 
@@ -2293,6 +2298,9 @@ class WebGLRenderer {
 			materialProperties.morphTargetsCount = parameters.morphTargetsCount;
 			materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 			materialProperties.numIntersection = parameters.numClipIntersection;
+			materialProperties.numGlobalClippingPlanes = parameters.numGlobalClippingPlanes;
+			materialProperties.numClippingVolumes = parameters.numClippingVolumes;
+			materialProperties.useClippingVolumes = parameters.useClippingVolumes;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
 			materialProperties.toneMapping = parameters.toneMapping;
@@ -2447,7 +2455,10 @@ class WebGLRenderer {
 
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
 					( materialProperties.numClippingPlanes !== clipping.numPlanes ||
-					materialProperties.numIntersection !== clipping.numIntersection ) ) {
+					materialProperties.numIntersection !== clipping.numIntersection ||
+					materialProperties.numGlobalClippingPlanes !== clipping.numGlobalPlanes ||
+					materialProperties.numClippingVolumes !== clipping.numVolumes ||
+					materialProperties.useClippingVolumes !== clipping.useClippingVolumes ) ) {
 
 					needsProgramChange = true;
 

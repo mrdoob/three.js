@@ -116,6 +116,54 @@ User-defined clipping planes specified as THREE.Plane objects in world space. Th
 
 Default is `null`.
 
+### .clippingVolumes : Array.<Object>
+
+Optional local clipping volumes. Each volume is an object with:
+
+- `planes`: `Array.<Plane>` (convex volume boundary planes, e.g. a box uses 6 planes).
+- `mode`: `'include' | 'exclude'`.
+  - `'include'`: keep-region. Fragments inside this volume are candidates to be rendered.
+  - `'exclude'`: cutout-region. Fragments inside this volume are removed.
+
+When set, volume clipping is used for this material and legacy local clipping combine semantics (`clippingPlanes` + `clipIntersection`) are ignored for that material.
+
+Visibility is evaluated as:
+
+- A fragment is **inside a volume** only if it is inside all planes of that volume.
+- All include volumes are unioned (`insideAnyInclude`).
+- All exclude volumes are unioned (`insideAnyExclude`).
+- Final rule:
+
+```txt
+visible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude
+```
+
+So: if include volumes exist, a fragment must be inside at least one include volume. Regardless of that, being inside any exclude volume removes the fragment (`exclude` wins on overlap).
+
+This API is additive; legacy clipping APIs remain fully supported.
+
+This feature is unrelated to [ClippingGroup](ClippingGroup.html), which is a scene-graph clipping feature.
+
+Example: clipping box from 6 planes:
+
+```js
+const material = new THREE.MeshStandardMaterial();
+
+material.clippingVolumes = [ {
+	mode: 'include',
+	planes: [
+		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), box.max.x ),
+		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), - box.min.x ),
+		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), box.max.y ),
+		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), - box.min.y ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), box.max.z ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), - box.min.z )
+	]
+} ];
+```
+
+Default is `undefined`.
+
 ### .colorWrite : boolean
 
 Whether to render the material's color.

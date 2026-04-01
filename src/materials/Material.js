@@ -327,6 +327,22 @@ class Material extends EventDispatcher {
 		this.clipShadows = false;
 
 		/**
+		 * User-defined clipping volumes for local clipping. Each volume is a convex
+		 * region expressed by a set of planes and a mode:
+		 *
+		 * - `include`: keep fragments inside the volume.
+		 * - `exclude`: remove fragments inside the volume.
+		 *
+		 * If this property is `undefined`, legacy clipping behavior based on
+		 * {@link Material#clippingPlanes} and {@link Material#clipIntersection} is used.
+		 * This requires {@link WebGLRenderer#localClippingEnabled} to be `true`.
+		 *
+		 * @type {?(Array<{planes:Array<Plane>,mode:('include'|'exclude')}>)}
+		 * @default undefined
+		 */
+		this.clippingVolumes = undefined;
+
+		/**
 		 * Defines which side of faces cast shadows. If `null`, the side casting shadows
 		 * is determined as follows:
 		 *
@@ -950,6 +966,10 @@ class Material extends EventDispatcher {
 		this.clippingPlanes = dstPlanes;
 		this.clipIntersection = source.clipIntersection;
 		this.clipShadows = source.clipShadows;
+		this.clippingVolumes = source.clippingVolumes !== undefined ? source.clippingVolumes.map( ( clippingVolume ) => ( {
+			planes: clippingVolume && Array.isArray( clippingVolume.planes ) ? clippingVolume.planes.map( ( clippingPlane ) => clippingPlane.clone() ) : [],
+			mode: clippingVolume && clippingVolume.mode === 'exclude' ? 'exclude' : 'include'
+		} ) ) : undefined;
 
 		this.shadowSide = source.shadowSide;
 

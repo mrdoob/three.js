@@ -234,7 +234,9 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 	return string
 		.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes )
-		.replace( /UNION_CLIPPING_PLANES/g, ( parameters.numClippingPlanes - parameters.numClipIntersection ) );
+		.replace( /UNION_CLIPPING_PLANES/g, ( parameters.numClippingPlanes - parameters.numClipIntersection ) )
+		.replace( /NUM_GLOBAL_CLIPPING_PLANES/g, parameters.numGlobalClippingPlanes )
+		.replace( /NUM_CLIPPING_VOLUMES/g, parameters.numClippingVolumes );
 
 }
 
@@ -682,6 +684,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '',
 
 			parameters.alphaToCoverage ? '#define ALPHA_TO_COVERAGE' : '',
+			parameters.useClippingVolumes ? '#define USE_CLIPPING_VOLUMES' : '',
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',

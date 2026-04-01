@@ -324,6 +324,7 @@ class OutlineEffect {
 				material.clippingPlanes = originalMaterial.clippingPlanes;
 				material.clipIntersection = originalMaterial.clipIntersection;
 				material.clipShadows = originalMaterial.clipShadows;
+				material.clippingVolumes = originalMaterial.clippingVolumes;
 
 			}
 

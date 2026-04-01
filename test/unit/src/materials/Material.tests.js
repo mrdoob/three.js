@@ -1,4 +1,6 @@
 import { Material } from '../../../../src/materials/Material.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
@@ -54,6 +56,35 @@ export default QUnit.module( 'Materials', () => {
 
 			const object = new Material();
 			object.dispose();
+
+		} );
+
+		QUnit.test( 'clippingVolumes', ( assert ) => {
+
+			const source = new Material();
+			source.clippingVolumes = [
+				{
+					mode: 'include',
+					planes: [ new Plane( new Vector3( 1, 0, 0 ), 2 ) ]
+				},
+				{
+					mode: 'exclude',
+					planes: [ new Plane( new Vector3( 0, 1, 0 ), 3 ) ]
+				}
+			];
+
+			const copy = new Material().copy( source );
+
+			assert.strictEqual( ( new Material() ).clippingVolumes, undefined, 'Default clippingVolumes is undefined.' );
+			assert.notStrictEqual( copy.clippingVolumes, source.clippingVolumes, 'Clipping volumes are deep copied.' );
+			assert.strictEqual( copy.clippingVolumes.length, 2, 'Clipping volume count is preserved.' );
+			assert.notStrictEqual( copy.clippingVolumes[ 0 ].planes, source.clippingVolumes[ 0 ].planes, 'Volume planes array is deep copied.' );
+			assert.notStrictEqual( copy.clippingVolumes[ 0 ].planes[ 0 ], source.clippingVolumes[ 0 ].planes[ 0 ], 'Volume planes are cloned.' );
+			assert.strictEqual( copy.clippingVolumes[ 1 ].mode, 'exclude', 'Volume mode is copied.' );
+
+			source.clippingVolumes[ 0 ].planes[ 0 ].constant = 100;
+
+			assert.strictEqual( copy.clippingVolumes[ 0 ].planes[ 0 ].constant, 2, 'Mutating source planes does not affect copied planes.' );
 
 		} );
 
