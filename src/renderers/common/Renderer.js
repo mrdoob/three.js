@@ -1955,6 +1955,22 @@ class Renderer {
 
 		}
 
+		if ( this.info.memoryMap.has( readbackBuffer ) === false ) {
+
+			this.info.createReadbackBuffer( readbackBuffer );
+
+			const disposeInfo = () => {
+
+				readbackBuffer.removeEventListener( 'dispose', disposeInfo );
+
+				this.info.destroyReadbackBuffer( readbackBuffer );
+
+			};
+
+			readbackBuffer.addEventListener( 'dispose', disposeInfo );
+
+		}
+
 		readbackBuffer.release();
 
 		return await this.backend.getArrayBufferAsync( readbackBuffer );
