@@ -198,7 +198,7 @@ class WebGPUTextureUtils {
 
 		let textureGPU;
 
-		const format = getFormat( texture );
+		const format = getFormat( texture, this.backend.device );
 
 		if ( texture.isCubeTexture ) {
 
@@ -1213,11 +1213,10 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {?GPUDevice} [device=null] - The GPU device which is used for feature detection.
- * It is not necessary to apply the device for most formats.
+ * @param {GPUDevice} [device] - The GPU device which is used for feature detection.
  * @return {string} The GPU format.
  */
-export function getFormat( texture, device = null ) {
+export function getFormat( texture, device ) {
 
 	const format = texture.format;
 	const type = texture.type;
@@ -1227,13 +1226,13 @@ export function getFormat( texture, device = null ) {
 
 	let formatGPU;
 
-	let texture_formats_tier1;
+	let textureFormatsTier1 = false;
 
 	if ( normalized ) {
 
-		texture_formats_tier1 = device && device.features.has( GPUFeatureName.TextureFormatsTier1 );
+		textureFormatsTier1 = device.features.has( GPUFeatureName.TextureFormatsTier1 );
 
-		if ( texture_formats_tier1 === false ) {
+		if ( textureFormatsTier1 === false ) {
 
 			warn( 'WebGPURenderer: Unable to use normalized textures without texture-formats-tier1 feature.' );
 
@@ -1381,11 +1380,11 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.RGBA16Snorm : GPUTextureFormat.RGBA16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RGBA16Snorm : GPUTextureFormat.RGBA16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.RGBA16Unorm : GPUTextureFormat.RGBA16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RGBA16Unorm : GPUTextureFormat.RGBA16Uint;
 						break;
 
 					case UnsignedIntType:
@@ -1443,11 +1442,11 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.R16Snorm : GPUTextureFormat.R16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.R16Snorm : GPUTextureFormat.R16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.R16Unorm : GPUTextureFormat.R16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.R16Unorm : GPUTextureFormat.R16Uint;
 						break;
 
 					case UnsignedIntType:
@@ -1486,11 +1485,11 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.RG16Snorm : GPUTextureFormat.RG16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RG16Snorm : GPUTextureFormat.RG16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = texture_formats_tier1 ? GPUTextureFormat.RG16Unorm : GPUTextureFormat.RG16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RG16Unorm : GPUTextureFormat.RG16Uint;
 						break;
 
 					case UnsignedIntType:
