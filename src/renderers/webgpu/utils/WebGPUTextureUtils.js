@@ -1231,7 +1231,7 @@ export function getFormat( texture, device = null ) {
 
 	if ( normalized ) {
 
-		texture_formats_tier1 = !! device && device.features.has( GPUFeatureName.TextureFormatsTier1 );
+		texture_formats_tier1 = device && device.features.has( GPUFeatureName.TextureFormatsTier1 );
 
 		if ( texture_formats_tier1 === false ) {
 
