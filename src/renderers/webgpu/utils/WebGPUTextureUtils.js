@@ -198,7 +198,7 @@ class WebGPUTextureUtils {
 
 		let textureGPU;
 
-		const format = getFormat( texture );
+		const format = getFormat( texture, this.backend.device );
 
 		if ( texture.isCubeTexture ) {
 
@@ -1213,11 +1213,10 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {?GPUDevice} [device=null] - The GPU device which is used for feature detection.
- * It is not necessary to apply the device for most formats.
+ * @param {GPUDevice} [device] - The GPU device which is used for feature detection.
  * @return {string} The GPU format.
  */
-export function getFormat( texture, device = null ) {
+export function getFormat( texture, device ) {
 
 	const format = texture.format;
 	const type = texture.type;
@@ -1231,7 +1230,7 @@ export function getFormat( texture, device = null ) {
 
 	if ( normalized ) {
 
-		textureFormatsTier1 = device && device.features.has( GPUFeatureName.TextureFormatsTier1 );
+		textureFormatsTier1 = device.features.has( GPUFeatureName.TextureFormatsTier1 );
 
 		if ( textureFormatsTier1 === false ) {
 
