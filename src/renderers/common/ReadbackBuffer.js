@@ -37,7 +37,10 @@ class ReadbackBuffer extends EventDispatcher {
 
 	/**
 	 * Releases the mapped buffer data so the GPU buffer can be
-	 * used by the GPU again. The `ArrayBuffer` data are also removed.
+	 * used by the GPU again.
+	 *
+	 * Note: Any `ArrayBuffer` data associated with this readback buffer
+	 * are removed and no longer accessible after calling this method.
 	 */
 	release() {
 
