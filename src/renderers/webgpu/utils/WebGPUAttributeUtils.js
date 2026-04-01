@@ -318,59 +318,58 @@ class WebGPUAttributeUtils {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( readbackBuffer ) {
 
 		const backend = this.backend;
 		const device = backend.device;
+		const attribute = readbackBuffer.attribute;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
-		let readBufferData = data.readBufferData;
+		const readbackBufferData = backend.get( readbackBuffer );
 
-		if ( readBufferData === undefined ) {
+		let { readBufferGPU } = readbackBufferData;
 
-			const readBufferGPU = device.createBuffer( {
+		if ( readBufferGPU === undefined ) {
+
+			readBufferGPU = device.createBuffer( {
 				label: `${ attribute.name }_readback`,
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
 
-			const arrayBuffer = new attribute.array.constructor( size / attribute.array.BYTES_PER_ELEMENT );
+			// release / dispose
+
+			const release = () => {
+
+				readBufferGPU.unmap();
+
+			};
 
 			const dispose = () => {
 
 				readBufferGPU.destroy();
 
-				backend.renderer.info.memory.total -= size;
+				backend.delete( readbackBuffer );
 
-				delete data.readBufferData;
-
-				attribute.removeEventListener( 'dispose', dispose );
+				readbackBuffer.removeEventListener( 'release', release );
+				readbackBuffer.removeEventListener( 'dispose', dispose );
 
 			};
 
-			attribute.addEventListener( 'dispose', dispose );
+			readbackBuffer.addEventListener( 'release', release );
+			readbackBuffer.addEventListener( 'dispose', dispose );
 
-			backend.renderer.info.memory.total += size;
+			// register
 
-			//
-
-			readBufferData = {
-				readBufferGPU,
-				arrayBuffer,
-				dispose
-			};
-
-			data.readBufferData = readBufferData;
+			readbackBufferData.readBufferGPU = readBufferGPU;
 
 		}
-
-		const { readBufferGPU, arrayBuffer } = readBufferData;
 
 		const cmdEncoder = device.createCommandEncoder( {
 			label: `readback_encoder_${ attribute.name }`
@@ -389,14 +388,9 @@ class WebGPUAttributeUtils {
 
 		await readBufferGPU.mapAsync( GPUMapMode.READ );
 
-		const mappedRange = readBufferGPU.getMappedRange();
+		const arrayBuffer = readBufferGPU.getMappedRange();
 
-		// Adds a view to the ArrayBuffer and reuse the underlying memory.
-		arrayBuffer.set( new attribute.array.constructor( mappedRange ) );
-
-		readBufferGPU.unmap();
-
-		return arrayBuffer.buffer;
+		return arrayBuffer;
 
 	}
 

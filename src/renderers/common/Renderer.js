@@ -19,6 +19,7 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import ReadbackBuffer from './ReadbackBuffer.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -1918,12 +1919,45 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @param {StorageBufferAttribute|ReadbackBuffer} buffer - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( buffer ) {
 
-		return await this.backend.getArrayBufferAsync( attribute );
+		let readbackBuffer = buffer;
+
+		if ( readbackBuffer.isReadbackBuffer !== true ) {
+
+			const attribute = buffer;
+			const attributeData = this.backend.get( attribute );
+
+			readbackBuffer = attributeData.readbackBuffer;
+
+			if ( readbackBuffer === undefined ) {
+
+				readbackBuffer = new ReadbackBuffer( attribute );
+
+				const dispose = () => {
+
+					attribute.removeEventListener( 'dispose', dispose );
+
+					readbackBuffer.dispose();
+
+					delete attributeData.readbackBuffer;
+
+				};
+
+				attribute.addEventListener( 'dispose', dispose );
+
+				attributeData.readbackBuffer = readbackBuffer;
+
+			}
+
+		}
+
+		readbackBuffer.release();
+
+		return await this.backend.getArrayBufferAsync( readbackBuffer );
 
 	}
 
