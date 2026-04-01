@@ -108,7 +108,7 @@ class ChromaticAberrationNode extends TempNode {
 		const textureNode = this.textureNode;
 		const uvNode = textureNode.uvNode || uv();
 
-		const ApplyChromaticAberration = Fn( ( [ uv, strength, center, scale ] ) => {
+		const ApplyChromaticAberration = Fn( ( [ uv, strength, center, scale, invSize ] ) => {
 
 			// Calculate distance from center
 			const offset = uv.sub( center );
