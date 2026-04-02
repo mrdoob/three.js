@@ -321,8 +321,8 @@ class WebGPUAttributeUtils {
 	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
 	 * @param {number} count - The offset from which to start reading the
 	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadBackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer|ReadBackBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
 
@@ -334,12 +334,12 @@ class WebGPUAttributeUtils {
 		const size = count === - 1 ? bufferGPU.size : count;
 
 		let readBufferGPU;
-		if ( target.isReadBackBuffer ) {
+		if ( target !== null && target.isReadbackBuffer ) {
 
 			readBufferGPU = backend.get( attribute );
 
 			// initialize the GPU-side read copy buffer if it is not present
-			if ( attribute === undefined ) {
+			if ( readBufferGPU === undefined ) {
 
 				// unmap the target in case it's been used by another context
 				backend.unmap();
@@ -415,7 +415,7 @@ class WebGPUAttributeUtils {
 			readBufferGPU.destroy();
 			return result;
 
-		} else if ( target.isReadBackBuffer ) {
+		} else if ( target.isReadbackBuffer ) {
 
 			// assign the data to the read back handle
 			target.buffer = readBufferGPU.getMappedRange( 0, size );

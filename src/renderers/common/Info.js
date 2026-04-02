@@ -340,7 +340,7 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const size = this._getAttributeMemorySize( readbackBuffer.attribute );
+		const size = readbackBuffer.size;
 		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
 
 		this.memory.readbackBuffers ++;
@@ -356,7 +356,12 @@ class Info {
 	 */
 	destroyReadbackBuffer( readbackBuffer ) {
 
-		this.destroyAttribute( readbackBuffer );
+		const { size } = this.memoryMap.get( readbackBuffer );
+		this.memoryMap.delete( readbackBuffer );
+
+		this.memory.readbackBuffers --;
+		this.memory.total -= size;
+		this.memory.readbackBuffersSize -= size;
 
 	}
 
