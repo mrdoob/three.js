@@ -824,8 +824,6 @@ class FBXTreeParser {
 				indices: [],
 				weights: [],
 				transformLink: new Matrix4().fromArray( boneNode.TransformLink.a ),
-				// transform: new Matrix4().fromArray( boneNode.Transform.a ),
-				// linkMode: boneNode.Mode,
 
 			};
 
@@ -918,8 +916,6 @@ class FBXTreeParser {
 
 		} );
 
-		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
-
 		this.addGlobalSceneSettings();
 
 		sceneGraph.traverse( function ( node ) {
@@ -941,6 +937,13 @@ class FBXTreeParser {
 			}
 
 		} );
+
+		// Bind skeletons after transforms are applied so that bind matrices
+		// are computed from the final scene state. This ensures the rest pose
+		// is correct even when the FBX file's Cluster TransformLink matrices
+		// differ from the reconstructed bone transforms (common in files
+		// without a BindPose section).
+		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 
 		const animations = new AnimationParser().parse();
 
@@ -1466,6 +1469,26 @@ class FBXTreeParser {
 
 			const skeleton = skeletons[ ID ];
 
+			// Compute bone inverses from TransformLink rather than from the
+			// bones' current matrixWorld. The TransformLink matrices represent
+			// each bone's global transform at the time the skin weights were
+			// painted, which may differ from the scene-reconstructed transforms.
+			const boneInverses = [];
+
+			for ( let i = 0, l = skeleton.bones.length; i < l; i ++ ) {
+
+				const inverse = new Matrix4();
+
+				if ( skeleton.bones[ i ] && skeleton.rawBones[ i ] ) {
+
+					inverse.copy( skeleton.rawBones[ i ].transformLink ).invert();
+
+				}
+
+				boneInverses.push( inverse );
+
+			}
+
 			const parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
 			parents.forEach( function ( parent ) {
@@ -1481,7 +1504,19 @@ class FBXTreeParser {
 
 							const model = modelMap.get( geoConnParent.ID );
 
-							model.bind( new Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
+							// Always provide a bind matrix to prevent bind() from
+							// calling calculateInverses() which would overwrite the
+							// TransformLink-based bone inverses computed above.
+							let bindMatrix = bindMatrices[ geoConnParent.ID ];
+
+							if ( bindMatrix === undefined ) {
+
+								model.updateMatrixWorld( true );
+								bindMatrix = model.matrixWorld;
+
+							}
+
+							model.bind( new Skeleton( skeleton.bones, boneInverses ), bindMatrix );
 
 						}
 
