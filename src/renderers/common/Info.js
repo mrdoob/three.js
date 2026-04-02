@@ -100,6 +100,7 @@ class Info {
 		 * @property {number} indexAttributes - The number of active index attributes.
 		 * @property {number} storageAttributes - The number of active storage attributes.
 		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
+		 * @property {number} readbackBuffers - The number of active readback buffers.
 		 * @property {number} programs - The number of active programs.
 		 * @property {number} renderTargets - The number of active renderTargets.
 		 * @property {number} total - The total memory size in bytes.
@@ -108,6 +109,7 @@ class Info {
 		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
 		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
+		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
 		 * @property {number} programsSize - The memory size of active programs in bytes.
 		 */
 		this.memory = {
@@ -117,6 +119,7 @@ class Info {
 			indexAttributes: 0,
 			storageAttributes: 0,
 			indirectStorageAttributes: 0,
+			readbackBuffers: 0,
 			programs: 0,
 			renderTargets: 0,
 			total: 0,
@@ -125,6 +128,7 @@ class Info {
 			indexAttributesSize: 0,
 			storageAttributesSize: 0,
 			indirectStorageAttributesSize: 0,
+			readbackBuffersSize: 0,
 			programsSize: 0
 		};
 
@@ -326,6 +330,33 @@ class Info {
 			this.memory[ data.type + 'Size' ] -= data.size;
 
 		}
+
+	}
+
+	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	createReadbackBuffer( readbackBuffer ) {
+
+		const size = this._getAttributeMemorySize( readbackBuffer.attribute );
+		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
+
+		this.memory.readbackBuffers ++;
+		this.memory.total += size;
+		this.memory.readbackBuffersSize += size;
+
+	}
+
+	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	destroyReadbackBuffer( readbackBuffer ) {
+
+		this.destroyAttribute( readbackBuffer );
 
 	}
 

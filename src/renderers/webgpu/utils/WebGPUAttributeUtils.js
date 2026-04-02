@@ -318,23 +318,58 @@ class WebGPUAttributeUtils {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( readbackBuffer ) {
 
 		const backend = this.backend;
 		const device = backend.device;
+		const attribute = readbackBuffer.attribute;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
-		const readBufferGPU = device.createBuffer( {
-			label: `${ attribute.name }_readback`,
-			size,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-		} );
+		const readbackBufferData = backend.get( readbackBuffer );
+
+		let { readBufferGPU } = readbackBufferData;
+
+		if ( readBufferGPU === undefined ) {
+
+			readBufferGPU = device.createBuffer( {
+				label: `${ attribute.name }_readback`,
+				size,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			} );
+
+			// release / dispose
+
+			const release = () => {
+
+				readBufferGPU.unmap();
+
+			};
+
+			const dispose = () => {
+
+				readBufferGPU.destroy();
+
+				backend.delete( readbackBuffer );
+
+				readbackBuffer.removeEventListener( 'release', release );
+				readbackBuffer.removeEventListener( 'dispose', dispose );
+
+			};
+
+			readbackBuffer.addEventListener( 'release', release );
+			readbackBuffer.addEventListener( 'dispose', dispose );
+
+			// register
+
+			readbackBufferData.readBufferGPU = readBufferGPU;
+
+		}
 
 		const cmdEncoder = device.createCommandEncoder( {
 			label: `readback_encoder_${ attribute.name }`
@@ -355,11 +390,7 @@ class WebGPUAttributeUtils {
 
 		const arrayBuffer = readBufferGPU.getMappedRange();
 
-		const dstBuffer = new attribute.array.constructor( arrayBuffer.slice( 0 ) );
-
-		readBufferGPU.unmap();
-
-		return dstBuffer.buffer;
+		return arrayBuffer;
 
 	}
 

@@ -58,6 +58,9 @@ class Memory extends Tab {
 		this.programs = new Item( 'Programs', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.programs );
 
+		this.readbackBuffers = new Item( 'Readback Buffers', createValueSpan(), createValueSpan() );
+		this.memoryStats.add( this.readbackBuffers );
+
 		this.renderTargets = new Item( 'Render Targets', createValueSpan(), 'N/A' );
 		this.memoryStats.add( this.renderTargets );
 
@@ -107,6 +110,9 @@ class Memory extends Tab {
 
 		setText( this.programs.data[ 1 ], memory.programs.toString() );
 		setText( this.programs.data[ 2 ], formatBytes( memory.programsSize ) );
+
+		setText( this.readbackBuffers.data[ 1 ], memory.readbackBuffers.toString() );
+		setText( this.readbackBuffers.data[ 2 ], formatBytes( memory.readbackBuffersSize ) );
 
 		setText( this.renderTargets.data[ 1 ], memory.renderTargets.toString() );
 
