@@ -169,9 +169,21 @@ class Image {
 
 			buffer = await fs.readFile( input );
 
-		} else {
+		} else if ( Buffer.isBuffer( input ) ) {
 
 			buffer = input;
+
+		} else if ( ArrayBuffer.isView( input ) ) {
+
+			buffer = Buffer.from( input.buffer, input.byteOffset, input.byteLength );
+
+		} else if ( input instanceof ArrayBuffer ) {
+
+			buffer = Buffer.from( input );
+
+		} else {
+
+			buffer = Buffer.from( input );
 
 		}
 
