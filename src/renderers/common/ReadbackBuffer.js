@@ -11,18 +11,32 @@ class ReadbackBuffer extends EventDispatcher {
 	/**
 	 * Constructs a new readback buffer.
 	 *
-	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {number} maxByteSize - The maximum size of the buffer to be read back.
 	 */
-	constructor( attribute ) {
+	constructor( maxByteSize ) {
 
 		super();
 
 		/**
-		 * The buffer attribute.
+		 * Name used for debugging purposes.
 		 *
-		 * @type {BufferAttribute}
+		 * @type {string}
 		 */
-		this.attribute = attribute;
+		this.name = '';
+
+		/**
+		 * The mapped, read back array buffer.
+		 *
+		 * @type {ArrayBuffer}
+		 */
+		this.buffer = null;
+
+		/**
+		 * The maximum size of the buffer to be read back.
+		 *
+		 * @type {number}
+		 */
+		this.maxByteSize = maxByteSize;
 
 		/**
 		 * This flag can be used for type testing.

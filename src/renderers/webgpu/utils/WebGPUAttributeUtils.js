@@ -318,79 +318,118 @@ class WebGPUAttributeUtils {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadBackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadBackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
 
 		const backend = this.backend;
 		const device = backend.device;
-		const attribute = readbackBuffer.attribute;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
-		const size = bufferGPU.size;
+		const size = count === - 1 ? bufferGPU.size : count;
 
-		const readbackBufferData = backend.get( readbackBuffer );
+		let readBufferGPU;
+		if ( target.isReadBackBuffer ) {
 
-		let { readBufferGPU } = readbackBufferData;
+			readBufferGPU = backend.get( attribute );
 
-		if ( readBufferGPU === undefined ) {
+			// initialize the GPU-side read copy buffer if it is not present
+			if ( attribute === undefined ) {
 
+				// unmap the target in case it's been used by another context
+				backend.unmap();
+
+				readBufferGPU = device.createBuffer( {
+					label: `${ attribute.name }_readback`,
+					size: target.size,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+				} );
+
+				// release / dispose
+				const releaseCallback = () => {
+
+					target.buffer = null;
+					readBufferGPU.unmap();
+
+				};
+
+				const disposeCallback = () => {
+
+					target.buffer = null;
+					readBufferGPU.destroy();
+
+					backend.delete( attribute );
+
+					attribute.removeEventListener( 'release', releaseCallback );
+					attribute.removeEventListener( 'dispose', disposeCallback );
+
+				};
+
+				target.addEventListener( 'release', releaseCallback );
+				target.addEventListener( 'dispose', disposeCallback );
+
+				// register
+				backend.set( target, readBufferGPU );
+
+			}
+
+		} else {
+
+			// create a new temp buffer for array buffers otherwise
 			readBufferGPU = device.createBuffer( {
 				label: `${ attribute.name }_readback`,
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
 
-			// release / dispose
-
-			const release = () => {
-
-				readBufferGPU.unmap();
-
-			};
-
-			const dispose = () => {
-
-				readBufferGPU.destroy();
-
-				backend.delete( readbackBuffer );
-
-				readbackBuffer.removeEventListener( 'release', release );
-				readbackBuffer.removeEventListener( 'dispose', dispose );
-
-			};
-
-			readbackBuffer.addEventListener( 'release', release );
-			readbackBuffer.addEventListener( 'dispose', dispose );
-
-			// register
-
-			readbackBufferData.readBufferGPU = readBufferGPU;
-
 		}
 
+		// copy the data
 		const cmdEncoder = device.createCommandEncoder( {
 			label: `readback_encoder_${ attribute.name }`
 		} );
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
-			0,
+			offset,
 			readBufferGPU,
-			0,
-			size
+			count === - 1 ? 0 : count,
 		);
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
 
-		await readBufferGPU.mapAsync( GPUMapMode.READ );
+		// map the data to the CPU
+		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, size );
 
-		const arrayBuffer = readBufferGPU.getMappedRange();
+		if ( target === null ) {
 
-		return arrayBuffer;
+			// return a new array buffer and clean up the gpu handles
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, size );
+			const result = arrayBuffer.slice();
+			readBufferGPU.destroy();
+			return result;
+
+		} else if ( target.isReadBackBuffer ) {
+
+			// assign the data to the read back handle
+			target.buffer = readBufferGPU.getMappedRange( 0, size );
+			return target;
+
+		} else {
+
+			// copy the data into the target array buffer
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, size );
+			new Uint8Array( target ).set( new Uint8Array( arrayBuffer ) );
+			readBufferGPU.destroy();
+			return target;
+
+		}
 
 	}
 
