@@ -963,9 +963,9 @@
 				functionObj[ logFunctionName ] = async() => {
 
 					const selectedBuffer = buffers[ unifiedEffectController.loggedBuffer ];
-					const readbackBuffer = new THREE.ReadbackBuffer( selectedBuffer.value );
+					const readbackBuffer = new THREE.ReadbackBuffer( selectedBuffer.value.array.length );
 
-					const result = new Uint32Array( await renderer.getArrayBufferAsync( readbackBuffer ) );
+					const result = new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value, readbackBuffer ) );
 
 					console.log( result );
 
