@@ -177,10 +177,6 @@ class Image {
 
 			buffer = Buffer.from( input.buffer, input.byteOffset, input.byteLength );
 
-		} else if ( input instanceof ArrayBuffer ) {
-
-			buffer = Buffer.from( input );
-
 		} else {
 
 			buffer = Buffer.from( input );
