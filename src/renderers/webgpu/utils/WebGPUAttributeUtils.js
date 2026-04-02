@@ -355,6 +355,7 @@ class WebGPUAttributeUtils {
 
 					target.buffer = null;
 					readBufferGPU.unmap();
+					attribute.removeEventListener( 'release', releaseCallback );
 
 				};
 
