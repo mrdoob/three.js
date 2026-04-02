@@ -331,22 +331,22 @@ class WebGPUAttributeUtils {
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
-		const size = count === - 1 ? bufferGPU.size : count;
+		const size = count === - 1 ? bufferGPU.size - offset : count;
 
 		let readBufferGPU;
 		if ( target !== null && target.isReadbackBuffer ) {
 
-			readBufferGPU = backend.get( attribute );
+			const readbackInfo = backend.get( target );
 
 			// initialize the GPU-side read copy buffer if it is not present
-			if ( readBufferGPU === undefined ) {
+			if ( readbackInfo.readBufferGPU === undefined ) {
 
 				// unmap the target in case it's been used by another context
-				backend.unmap();
+				target.release();
 
 				readBufferGPU = device.createBuffer( {
 					label: `${ attribute.name }_readback`,
-					size: target.size,
+					size: target.maxByteSize,
 					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 				} );
 
@@ -374,7 +374,12 @@ class WebGPUAttributeUtils {
 				target.addEventListener( 'dispose', disposeCallback );
 
 				// register
+				readbackInfo.readBufferGPU = readBufferGPU;
 				backend.set( target, readBufferGPU );
+
+			} else {
+
+				readBufferGPU = readbackInfo.readBufferGPU;
 
 			}
 
@@ -398,7 +403,8 @@ class WebGPUAttributeUtils {
 			bufferGPU,
 			offset,
 			readBufferGPU,
-			count === - 1 ? 0 : count,
+			0,
+			size,
 		);
 
 		const gpuCommands = cmdEncoder.finish();

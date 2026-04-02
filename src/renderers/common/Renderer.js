@@ -1919,61 +1919,36 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute|ReadbackBuffer} buffer - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( buffer ) {
+	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
 
-		let readbackBuffer = buffer;
+		// tally the memory for this readback buffer
+		if ( target !== null && target.isReadbackBuffer ) {
 
-		if ( readbackBuffer.isReadbackBuffer !== true ) {
+			if ( this.info.memoryMap.has( target ) === false ) {
 
-			const attribute = buffer;
-			const attributeData = this.backend.get( attribute );
+				this.info.createReadbackBuffer( target );
 
-			readbackBuffer = attributeData.readbackBuffer;
+				const disposeInfo = () => {
 
-			if ( readbackBuffer === undefined ) {
+					target.removeEventListener( 'dispose', disposeInfo );
 
-				readbackBuffer = new ReadbackBuffer( attribute );
-
-				const dispose = () => {
-
-					attribute.removeEventListener( 'dispose', dispose );
-
-					readbackBuffer.dispose();
-
-					delete attributeData.readbackBuffer;
+					this.info.destroyReadbackBuffer( target );
 
 				};
 
-				attribute.addEventListener( 'dispose', dispose );
-
-				attributeData.readbackBuffer = readbackBuffer;
+				target.addEventListener( 'dispose', disposeInfo );
 
 			}
 
 		}
 
-		if ( this.info.memoryMap.has( readbackBuffer ) === false ) {
-
-			this.info.createReadbackBuffer( readbackBuffer );
-
-			const disposeInfo = () => {
-
-				readbackBuffer.removeEventListener( 'dispose', disposeInfo );
-
-				this.info.destroyReadbackBuffer( readbackBuffer );
-
-			};
-
-			readbackBuffer.addEventListener( 'dispose', disposeInfo );
-
-		}
-
-		readbackBuffer.release();
-
-		return await this.backend.getArrayBufferAsync( readbackBuffer );
+		return await this.backend.getArrayBufferAsync( attribute, count, offset, target );
 
 	}
 
