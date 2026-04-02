@@ -340,7 +340,7 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const size = this._getAttributeMemorySize( readbackBuffer.attribute );
+		const size = readbackBuffer.size;
 		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
 
 		this.memory.readbackBuffers ++;

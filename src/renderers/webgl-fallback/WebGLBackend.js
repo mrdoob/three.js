@@ -312,12 +312,13 @@ class WebGLBackend extends Backend {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, readbackBuffer );
 
 	}
 

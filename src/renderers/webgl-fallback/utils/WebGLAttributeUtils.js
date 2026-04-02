@@ -257,20 +257,17 @@ class WebGLAttributeUtils {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const attribute = readbackBuffer.attribute;
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 		const { bufferGPU } = backend.get( bufferAttribute );
-
-		const array = attribute.array;
-		const byteLength = array.byteLength;
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
 
@@ -279,6 +276,8 @@ class WebGLAttributeUtils {
 		let { writeBuffer } = readbackBufferData;
 
 		if ( writeBuffer === undefined ) {
+
+			const byteLength = readbackBuffer.size * 4;
 
 			writeBuffer = gl.createBuffer();
 
@@ -308,6 +307,9 @@ class WebGLAttributeUtils {
 			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
 
 		}
+
+		const array = attribute.array;
+		const byteLength = array.byteLength;
 
 		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
 

@@ -1,5 +1,7 @@
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
+let _id = 0;
+
 /**
  * A readback buffer is used to transfer data from the GPU to the CPU.
  * It is primarily used to read back compute shader results.
@@ -11,9 +13,9 @@ class ReadbackBuffer extends EventDispatcher {
 	/**
 	 * Constructs a new readback buffer.
 	 *
-	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @param {BufferAttribute} size - The buffer attribute.
 	 */
-	constructor( attribute ) {
+	constructor( size ) {
 
 		super();
 
@@ -22,7 +24,21 @@ class ReadbackBuffer extends EventDispatcher {
 		 *
 		 * @type {BufferAttribute}
 		 */
-		this.attribute = attribute;
+		this.size = size;
+
+		/**
+		 * A unique identifier for this readback buffer.
+		 *
+		 * @type {number}
+		 */
+		this.id = _id ++;
+
+		/**
+		 * A name for this readback buffer.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
 
 		/**
 		 * This flag can be used for type testing.

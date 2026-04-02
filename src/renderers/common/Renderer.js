@@ -1919,23 +1919,23 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute|ReadbackBuffer} buffer - The storage buffer attribute.
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
+	 * @param {ReadbackBuffer} [readbackBuffer=null] - The readback buffer.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( buffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer = null ) {
 
-		let readbackBuffer = buffer;
+		if ( readbackBuffer === null ) {
 
-		if ( readbackBuffer.isReadbackBuffer !== true ) {
-
-			const attribute = buffer;
 			const attributeData = this.backend.get( attribute );
 
 			readbackBuffer = attributeData.readbackBuffer;
 
 			if ( readbackBuffer === undefined ) {
 
-				readbackBuffer = new ReadbackBuffer( attribute );
+				const size = attribute.array.byteLength;
+
+				readbackBuffer = new ReadbackBuffer( size );
 
 				const dispose = () => {
 
@@ -1973,7 +1973,7 @@ class Renderer {
 
 		readbackBuffer.release();
 
-		return await this.backend.getArrayBufferAsync( readbackBuffer );
+		return await this.backend.getArrayBufferAsync( attribute, readbackBuffer );
 
 	}
 

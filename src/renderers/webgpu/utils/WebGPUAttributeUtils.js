@@ -318,27 +318,30 @@ class WebGPUAttributeUtils {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
+	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer ) {
 
 		const backend = this.backend;
 		const device = backend.device;
-		const attribute = readbackBuffer.attribute;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
-		const size = bufferGPU.size;
 
 		const readbackBufferData = backend.get( readbackBuffer );
+
+		const name = `readback_${ readbackBuffer.id || readbackBuffer.name }`;
 
 		let { readBufferGPU } = readbackBufferData;
 
 		if ( readBufferGPU === undefined ) {
 
+			const size = readbackBuffer.size;
+
 			readBufferGPU = device.createBuffer( {
-				label: `${ attribute.name }_readback`,
+				label: `${ name }_readback`,
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
@@ -372,8 +375,10 @@ class WebGPUAttributeUtils {
 		}
 
 		const cmdEncoder = device.createCommandEncoder( {
-			label: `readback_encoder_${ attribute.name }`
+			label: `readback_encoder_${ name }`
 		} );
+
+		const size = readbackBuffer.size;
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
