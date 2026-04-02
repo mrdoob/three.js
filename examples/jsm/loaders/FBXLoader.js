@@ -938,6 +938,57 @@ class FBXTreeParser {
 
 		} );
 
+		// Like Blender's FBX importer, use the BindPose section to set the
+		// rest pose for bones that are not part of a skin cluster. The BindPose
+		// provides a more authoritative rest pose than the Lcl properties which
+		// may represent an animation frame rather than the true rest state.
+		// Bones WITH clusters will get their bind pose from TransformLink
+		// (set via bindSkeleton below), which takes priority.
+		const bindPoseMatrices = this.parsePoseNodes();
+		const clusterBoneIDs = new Set();
+
+		for ( const ID in deformers.skeletons ) {
+
+			deformers.skeletons[ ID ].rawBones.forEach( function ( _, i ) {
+
+				const bone = deformers.skeletons[ ID ].bones[ i ];
+				if ( bone ) clusterBoneIDs.add( bone.ID );
+
+			} );
+
+		}
+
+		const tempMatrix = new Matrix4();
+
+		sceneGraph.traverse( function ( node ) {
+
+			if ( node.isBone && node.ID !== undefined && ! clusterBoneIDs.has( node.ID ) ) {
+
+				const bindPose = bindPoseMatrices[ node.ID ];
+
+				if ( bindPose !== undefined ) {
+
+					if ( node.parent ) {
+
+						tempMatrix.copy( node.parent.matrixWorld ).invert();
+						tempMatrix.multiply( bindPose );
+
+					} else {
+
+						tempMatrix.copy( bindPose );
+
+					}
+
+					tempMatrix.decompose( node.position, node.quaternion, node.scale );
+					node.updateMatrix();
+					node.matrixWorld.copy( bindPose );
+
+				}
+
+			}
+
+		} );
+
 		// Bind skeletons after transforms are applied so that bind matrices
 		// are computed from the final scene state. This ensures the rest pose
 		// is correct even when the FBX file's Cluster TransformLink matrices
@@ -1463,8 +1514,6 @@ class FBXTreeParser {
 
 	bindSkeleton( skeletons, geometryMap, modelMap ) {
 
-		const bindMatrices = this.parsePoseNodes();
-
 		for ( const ID in skeletons ) {
 
 			const skeleton = skeletons[ ID ];
@@ -1504,19 +1553,16 @@ class FBXTreeParser {
 
 							const model = modelMap.get( geoConnParent.ID );
 
-							// Always provide a bind matrix to prevent bind() from
-							// calling calculateInverses() which would overwrite the
-							// TransformLink-based bone inverses computed above.
-							let bindMatrix = bindMatrices[ geoConnParent.ID ];
+							// Use the mesh's current matrixWorld as bind matrix.
+							// The BindPose section is intentionally not used here
+							// since it may contain scale/rotation from the model
+							// hierarchy that is inconsistent with the TransformLink-
+							// based bone inverses. Always provide a bind matrix to
+							// prevent bind() from calling calculateInverses() which
+							// would overwrite the bone inverses computed above.
+							model.updateMatrixWorld( true );
 
-							if ( bindMatrix === undefined ) {
-
-								model.updateMatrixWorld( true );
-								bindMatrix = model.matrixWorld;
-
-							}
-
-							model.bind( new Skeleton( skeleton.bones, boneInverses ), bindMatrix );
+							model.bind( new Skeleton( skeleton.bones, boneInverses ), model.matrixWorld );
 
 						}
 
@@ -1530,6 +1576,7 @@ class FBXTreeParser {
 
 	}
 
+	// Parse BindPose nodes and return a map of node ID to bind matrix.
 	parsePoseNodes() {
 
 		const bindMatrices = {};
