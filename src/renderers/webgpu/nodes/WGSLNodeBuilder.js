@@ -436,7 +436,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
-		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
+		const textureData = this.getDataFromNode( texture, this.shaderStage, this.cache );
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
