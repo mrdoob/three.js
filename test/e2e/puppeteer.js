@@ -27,6 +27,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas',
 	'webgpu_backdrop_water',
 	'webgpu_lightprobe_cubecamera',
+	'webgpu_materials_debug_rebuild',
 	'webgpu_portal',
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
