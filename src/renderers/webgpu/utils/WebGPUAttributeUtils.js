@@ -333,7 +333,7 @@ class WebGPUAttributeUtils {
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
-		const size = count === - 1 ? bufferGPU.size - offset : count;
+		const byteLength = count === - 1 ? bufferGPU.size - offset : count;
 
 		let readBufferGPU;
 		if ( target !== null && target.isReadbackBuffer ) {
@@ -378,7 +378,6 @@ class WebGPUAttributeUtils {
 
 				// register
 				readbackInfo.readBufferGPU = readBufferGPU;
-				backend.set( target, readBufferGPU );
 
 			} else {
 
@@ -391,7 +390,7 @@ class WebGPUAttributeUtils {
 			// create a new temp buffer for array buffers otherwise
 			readBufferGPU = device.createBuffer( {
 				label: `${ attribute.name }_readback`,
-				size,
+				size: byteLength,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
 
@@ -407,19 +406,19 @@ class WebGPUAttributeUtils {
 			offset,
 			readBufferGPU,
 			0,
-			size,
+			byteLength,
 		);
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
 
 		// map the data to the CPU
-		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, size );
+		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );
 
 		if ( target === null ) {
 
 			// return a new array buffer and clean up the gpu handles
-			const arrayBuffer = readBufferGPU.getMappedRange( 0, size );
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, byteLength );
 			const result = arrayBuffer.slice();
 			readBufferGPU.destroy();
 			return result;
@@ -427,13 +426,13 @@ class WebGPUAttributeUtils {
 		} else if ( target.isReadbackBuffer ) {
 
 			// assign the data to the read back handle
-			target.buffer = readBufferGPU.getMappedRange( 0, size );
+			target.buffer = readBufferGPU.getMappedRange( 0, byteLength );
 			return target;
 
 		} else {
 
 			// copy the data into the target array buffer
-			const arrayBuffer = readBufferGPU.getMappedRange( 0, size );
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, byteLength );
 			new Uint8Array( target ).set( new Uint8Array( arrayBuffer ) );
 			readBufferGPU.destroy();
 			return target;
