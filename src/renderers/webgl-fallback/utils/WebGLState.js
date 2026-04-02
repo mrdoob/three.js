@@ -67,13 +67,21 @@ class WebGLState {
 		this.currentDepthReversed = false;
 		this.currentDepthFunc = null;
 		this.currentDepthMask = null;
+		this.currentStencilSeparate = false;
 		this.currentStencilFunc = null;
 		this.currentStencilRef = null;
 		this.currentStencilFuncMask = null;
+		this.currentStencilFuncBack = null;
+		this.currentStencilRefBack = null;
+		this.currentStencilFuncMaskBack = null;
 		this.currentStencilFail = null;
 		this.currentStencilZFail = null;
 		this.currentStencilZPass = null;
+		this.currentStencilFailBack = null;
+		this.currentStencilZFailBack = null;
+		this.currentStencilZPassBack = null;
 		this.currentStencilMask = null;
+		this.currentStencilMaskBack = null;
 		this.currentLineWidth = null;
 		this.currentClippingPlanes = 0;
 
@@ -829,10 +837,30 @@ class WebGLState {
 	 */
 	setStencilMask( stencilMask ) {
 
-		if ( this.currentStencilMask !== stencilMask ) {
+		if ( this.currentStencilSeparate === true || this.currentStencilMask !== stencilMask ) {
 
 			this.gl.stencilMask( stencilMask );
 			this.currentStencilMask = stencilMask;
+			this.currentStencilMaskBack = stencilMask;
+			this.currentStencilSeparate = false;
+
+		}
+
+	}
+
+	setStencilMaskSeparate( stencilMask, stencilMaskBack ) {
+
+		if (
+			this.currentStencilSeparate === false ||
+			this.currentStencilMask !== stencilMask ||
+			this.currentStencilMaskBack !== stencilMaskBack
+		) {
+
+			this.gl.stencilMaskSeparate( this.gl.FRONT, stencilMask );
+			this.gl.stencilMaskSeparate( this.gl.BACK, stencilMaskBack );
+			this.currentStencilMask = stencilMask;
+			this.currentStencilMaskBack = stencilMaskBack;
+			this.currentStencilSeparate = true;
 
 		}
 
@@ -850,7 +878,8 @@ class WebGLState {
 	 */
 	setStencilFunc( stencilFunc, stencilRef, stencilMask ) {
 
-		if ( this.currentStencilFunc !== stencilFunc ||
+		if ( this.currentStencilSeparate === true ||
+			 this.currentStencilFunc !== stencilFunc ||
 			 this.currentStencilRef !== stencilRef ||
 			 this.currentStencilFuncMask !== stencilMask ) {
 
@@ -859,6 +888,37 @@ class WebGLState {
 			this.currentStencilFunc = stencilFunc;
 			this.currentStencilRef = stencilRef;
 			this.currentStencilFuncMask = stencilMask;
+			this.currentStencilFuncBack = stencilFunc;
+			this.currentStencilRefBack = stencilRef;
+			this.currentStencilFuncMaskBack = stencilMask;
+			this.currentStencilSeparate = false;
+
+		}
+
+	}
+
+	setStencilFuncSeparate( stencilFunc, stencilRef, stencilMask, stencilFuncBack, stencilRefBack, stencilMaskBack ) {
+
+		if (
+			this.currentStencilSeparate === false ||
+			this.currentStencilFunc !== stencilFunc ||
+			this.currentStencilRef !== stencilRef ||
+			this.currentStencilFuncMask !== stencilMask ||
+			this.currentStencilFuncBack !== stencilFuncBack ||
+			this.currentStencilRefBack !== stencilRefBack ||
+			this.currentStencilFuncMaskBack !== stencilMaskBack
+		) {
+
+			this.gl.stencilFuncSeparate( this.gl.FRONT, stencilFunc, stencilRef, stencilMask );
+			this.gl.stencilFuncSeparate( this.gl.BACK, stencilFuncBack, stencilRefBack, stencilMaskBack );
+
+			this.currentStencilFunc = stencilFunc;
+			this.currentStencilRef = stencilRef;
+			this.currentStencilFuncMask = stencilMask;
+			this.currentStencilFuncBack = stencilFuncBack;
+			this.currentStencilRefBack = stencilRefBack;
+			this.currentStencilFuncMaskBack = stencilMaskBack;
+			this.currentStencilSeparate = true;
 
 		}
 
@@ -877,7 +937,8 @@ class WebGLState {
 	 */
 	setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
 
-		if ( this.currentStencilFail !== stencilFail ||
+		if ( this.currentStencilSeparate === true ||
+			 this.currentStencilFail !== stencilFail ||
 			 this.currentStencilZFail !== stencilZFail ||
 			 this.currentStencilZPass !== stencilZPass ) {
 
@@ -886,6 +947,37 @@ class WebGLState {
 			this.currentStencilFail = stencilFail;
 			this.currentStencilZFail = stencilZFail;
 			this.currentStencilZPass = stencilZPass;
+			this.currentStencilFailBack = stencilFail;
+			this.currentStencilZFailBack = stencilZFail;
+			this.currentStencilZPassBack = stencilZPass;
+			this.currentStencilSeparate = false;
+
+		}
+
+	}
+
+	setStencilOpSeparate( stencilFail, stencilZFail, stencilZPass, stencilFailBack, stencilZFailBack, stencilZPassBack ) {
+
+		if (
+			this.currentStencilSeparate === false ||
+			this.currentStencilFail !== stencilFail ||
+			this.currentStencilZFail !== stencilZFail ||
+			this.currentStencilZPass !== stencilZPass ||
+			this.currentStencilFailBack !== stencilFailBack ||
+			this.currentStencilZFailBack !== stencilZFailBack ||
+			this.currentStencilZPassBack !== stencilZPassBack
+		) {
+
+			this.gl.stencilOpSeparate( this.gl.FRONT, stencilFail, stencilZFail, stencilZPass );
+			this.gl.stencilOpSeparate( this.gl.BACK, stencilFailBack, stencilZFailBack, stencilZPassBack );
+
+			this.currentStencilFail = stencilFail;
+			this.currentStencilZFail = stencilZFail;
+			this.currentStencilZPass = stencilZPass;
+			this.currentStencilFailBack = stencilFailBack;
+			this.currentStencilZFailBack = stencilZFailBack;
+			this.currentStencilZPassBack = stencilZPassBack;
+			this.currentStencilSeparate = true;
 
 		}
 
@@ -924,9 +1016,38 @@ class WebGLState {
 		this.setStencilTest( stencilWrite );
 		if ( stencilWrite ) {
 
-			this.setStencilMask( material.stencilWriteMask );
-			this.setStencilFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
-			this.setStencilOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+			const hasSeparateBack =
+				material.stencilBackFunc !== null ||
+				material.stencilBackFail !== null ||
+				material.stencilBackZFail !== null ||
+				material.stencilBackZPass !== null ||
+				material.stencilBackRef !== null;
+
+			if ( hasSeparateBack ) {
+
+				this.setStencilMaskSeparate( material.stencilWriteMask, material.stencilWriteMask );
+
+				this.setStencilFuncSeparate(
+					material.stencilFunc, material.stencilRef, material.stencilFuncMask,
+					material.stencilBackFunc !== null ? material.stencilBackFunc : material.stencilFunc,
+					material.stencilBackRef !== null ? material.stencilBackRef : material.stencilRef,
+					material.stencilFuncMask
+				);
+
+				this.setStencilOpSeparate(
+					material.stencilFail, material.stencilZFail, material.stencilZPass,
+					material.stencilBackFail !== null ? material.stencilBackFail : material.stencilFail,
+					material.stencilBackZFail !== null ? material.stencilBackZFail : material.stencilZFail,
+					material.stencilBackZPass !== null ? material.stencilBackZPass : material.stencilZPass
+				);
+
+			} else {
+
+				this.setStencilMask( material.stencilWriteMask );
+				this.setStencilFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
+				this.setStencilOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+
+			}
 
 		}
 

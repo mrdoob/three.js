@@ -297,6 +297,53 @@ class Material extends EventDispatcher {
 		this.stencilWrite = false;
 
 		/**
+		 * The stencil comparison function for back faces, or `null` to use
+		 * {@link Material#stencilFunc} for both faces.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.stencilBackFunc = null;
+
+		/**
+		 * The stencil reference value for back faces, or `null` to use
+		 * {@link Material#stencilRef} for both faces.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.stencilBackRef = null;
+
+		/**
+		 * Which stencil operation to perform on back faces when the comparison
+		 * function returns `false`, or `null` to use {@link Material#stencilFail}.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.stencilBackFail = null;
+
+		/**
+		 * Which stencil operation to perform on back faces when the comparison
+		 * function returns `true` but the depth test fails, or `null` to use
+		 * {@link Material#stencilZFail}.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.stencilBackZFail = null;
+
+		/**
+		 * Which stencil operation to perform on back faces when the comparison
+		 * function returns `true` and the depth test passes, or `null` to use
+		 * {@link Material#stencilZPass}.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.stencilBackZPass = null;
+
+		/**
 		 * User-defined clipping planes specified as THREE.Plane objects in world
 		 * space. These planes apply to the objects this material is attached to.
 		 * Points in space whose signed distance to the plane is negative are clipped
@@ -813,6 +860,12 @@ class Material extends EventDispatcher {
 		if ( this.stencilZPass !== KeepStencilOp ) data.stencilZPass = this.stencilZPass;
 		if ( this.stencilWrite === true ) data.stencilWrite = this.stencilWrite;
 
+		if ( this.stencilBackFunc !== null ) data.stencilBackFunc = this.stencilBackFunc;
+		if ( this.stencilBackRef !== null ) data.stencilBackRef = this.stencilBackRef;
+		if ( this.stencilBackFail !== null ) data.stencilBackFail = this.stencilBackFail;
+		if ( this.stencilBackZFail !== null ) data.stencilBackZFail = this.stencilBackZFail;
+		if ( this.stencilBackZPass !== null ) data.stencilBackZPass = this.stencilBackZPass;
+
 		// rotation (SpriteMaterial)
 		if ( this.rotation !== undefined && this.rotation !== 0 ) data.rotation = this.rotation;
 
@@ -930,6 +983,12 @@ class Material extends EventDispatcher {
 		this.stencilZFail = source.stencilZFail;
 		this.stencilZPass = source.stencilZPass;
 		this.stencilWrite = source.stencilWrite;
+
+		this.stencilBackFunc = source.stencilBackFunc;
+		this.stencilBackRef = source.stencilBackRef;
+		this.stencilBackFail = source.stencilBackFail;
+		this.stencilBackZFail = source.stencilBackZFail;
+		this.stencilBackZPass = source.stencilBackZPass;
 
 		const srcPlanes = source.clippingPlanes;
 		let dstPlanes = null;

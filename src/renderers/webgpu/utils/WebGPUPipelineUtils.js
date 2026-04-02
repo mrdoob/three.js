@@ -133,7 +133,7 @@ class WebGPUPipelineUtils {
 		if ( material.stencilWrite === true ) {
 
 			stencilFront = {
-				compare: this._getStencilCompare( material ),
+				compare: this._getStencilCompare( material.stencilFunc ),
 				failOp: this._getStencilOperation( material.stencilFail ),
 				depthFailOp: this._getStencilOperation( material.stencilZFail ),
 				passOp: this._getStencilOperation( material.stencilZPass )
@@ -250,7 +250,13 @@ class WebGPUPipelineUtils {
 			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = stencilFront; // apply the same stencil ops to both faces, matching gl.stencilOp() which is not face-separated
+				depthStencil.stencilBack = material.stencilWrite === true ? {
+					compare: material.stencilBackFunc !== null ? this._getStencilCompare( material.stencilBackFunc ) : stencilFront.compare,
+					failOp: material.stencilBackFail !== null ? this._getStencilOperation( material.stencilBackFail ) : stencilFront.failOp,
+					depthFailOp: material.stencilBackZFail !== null ? this._getStencilOperation( material.stencilBackZFail ) : stencilFront.depthFailOp,
+					passOp: material.stencilBackZPass !== null ? this._getStencilOperation( material.stencilBackZPass ) : stencilFront.passOp
+				} : stencilFront;
+
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
@@ -575,14 +581,12 @@ class WebGPUPipelineUtils {
 	 * Returns the GPU stencil compare function which is required for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Material} material - The material.
+	 * @param {number} stencilFunc - The stencil comparison function constant.
 	 * @return {string} The GPU stencil compare function.
 	 */
-	_getStencilCompare( material ) {
+	_getStencilCompare( stencilFunc ) {
 
 		let stencilCompare;
-
-		const stencilFunc = material.stencilFunc;
 
 		switch ( stencilFunc ) {
 

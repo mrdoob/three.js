@@ -1858,6 +1858,8 @@ class WebGPUBackend extends Backend {
 			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
 			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
 			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
+			data.stencilBackFunc !== material.stencilBackFunc || data.stencilBackRef !== material.stencilBackRef ||
+			data.stencilBackFail !== material.stencilBackFail || data.stencilBackZFail !== material.stencilBackZFail || data.stencilBackZPass !== material.stencilBackZPass ||
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
@@ -1874,6 +1876,8 @@ class WebGPUBackend extends Backend {
 			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
 			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
 			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
+			data.stencilBackFunc = material.stencilBackFunc; data.stencilBackRef = material.stencilBackRef;
+			data.stencilBackFail = material.stencilBackFail; data.stencilBackZFail = material.stencilBackZFail; data.stencilBackZPass = material.stencilBackZPass;
 			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
 			data.sampleCount = sampleCount;
 			data.colorSpace = colorSpace;
@@ -1917,6 +1921,8 @@ class WebGPUBackend extends Backend {
 			material.stencilWrite, material.stencilFunc,
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
+			material.stencilBackFunc, material.stencilBackRef,
+			material.stencilBackFail, material.stencilBackZFail, material.stencilBackZPass,
 			material.side,
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),

@@ -235,13 +235,21 @@ function WebGLState( gl, extensions ) {
 
 		let locked = false;
 
+		let currentStencilSeparate = false;
 		let currentStencilMask = null;
+		let currentStencilMaskBack = null;
 		let currentStencilFunc = null;
 		let currentStencilRef = null;
 		let currentStencilFuncMask = null;
+		let currentStencilFuncBack = null;
+		let currentStencilRefBack = null;
+		let currentStencilFuncMaskBack = null;
 		let currentStencilFail = null;
 		let currentStencilZFail = null;
 		let currentStencilZPass = null;
+		let currentStencilFailBack = null;
+		let currentStencilZFailBack = null;
+		let currentStencilZPassBack = null;
 		let currentStencilClear = null;
 
 		return {
@@ -266,10 +274,28 @@ function WebGLState( gl, extensions ) {
 
 			setMask: function ( stencilMask ) {
 
-				if ( currentStencilMask !== stencilMask && ! locked ) {
+				if ( ( currentStencilSeparate === true || currentStencilMask !== stencilMask ) && ! locked ) {
 
 					gl.stencilMask( stencilMask );
 					currentStencilMask = stencilMask;
+					currentStencilMaskBack = stencilMask;
+					currentStencilSeparate = false;
+
+				}
+
+			},
+
+			setMaskSeparate: function ( stencilMask, stencilMaskBack ) {
+
+				if ( ! locked && ( currentStencilSeparate === false ||
+					currentStencilMask !== stencilMask ||
+					currentStencilMaskBack !== stencilMaskBack ) ) {
+
+					gl.stencilMaskSeparate( gl.FRONT, stencilMask );
+					gl.stencilMaskSeparate( gl.BACK, stencilMaskBack );
+					currentStencilMask = stencilMask;
+					currentStencilMaskBack = stencilMaskBack;
+					currentStencilSeparate = true;
 
 				}
 
@@ -277,7 +303,8 @@ function WebGLState( gl, extensions ) {
 
 			setFunc: function ( stencilFunc, stencilRef, stencilMask ) {
 
-				if ( currentStencilFunc !== stencilFunc ||
+				if ( currentStencilSeparate === true ||
+				     currentStencilFunc !== stencilFunc ||
 				     currentStencilRef !== stencilRef ||
 				     currentStencilFuncMask !== stencilMask ) {
 
@@ -286,6 +313,35 @@ function WebGLState( gl, extensions ) {
 					currentStencilFunc = stencilFunc;
 					currentStencilRef = stencilRef;
 					currentStencilFuncMask = stencilMask;
+					currentStencilFuncBack = stencilFunc;
+					currentStencilRefBack = stencilRef;
+					currentStencilFuncMaskBack = stencilMask;
+					currentStencilSeparate = false;
+
+				}
+
+			},
+
+			setFuncSeparate: function ( stencilFunc, stencilRef, stencilMask, stencilFuncBack, stencilRefBack, stencilMaskBack ) {
+
+				if ( currentStencilSeparate === false ||
+				     currentStencilFunc !== stencilFunc ||
+				     currentStencilRef !== stencilRef ||
+				     currentStencilFuncMask !== stencilMask ||
+				     currentStencilFuncBack !== stencilFuncBack ||
+				     currentStencilRefBack !== stencilRefBack ||
+				     currentStencilFuncMaskBack !== stencilMaskBack ) {
+
+					gl.stencilFuncSeparate( gl.FRONT, stencilFunc, stencilRef, stencilMask );
+					gl.stencilFuncSeparate( gl.BACK, stencilFuncBack, stencilRefBack, stencilMaskBack );
+
+					currentStencilFunc = stencilFunc;
+					currentStencilRef = stencilRef;
+					currentStencilFuncMask = stencilMask;
+					currentStencilFuncBack = stencilFuncBack;
+					currentStencilRefBack = stencilRefBack;
+					currentStencilFuncMaskBack = stencilMaskBack;
+					currentStencilSeparate = true;
 
 				}
 
@@ -293,7 +349,8 @@ function WebGLState( gl, extensions ) {
 
 			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
 
-				if ( currentStencilFail !== stencilFail ||
+				if ( currentStencilSeparate === true ||
+				     currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 
@@ -302,6 +359,35 @@ function WebGLState( gl, extensions ) {
 					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
 					currentStencilZPass = stencilZPass;
+					currentStencilFailBack = stencilFail;
+					currentStencilZFailBack = stencilZFail;
+					currentStencilZPassBack = stencilZPass;
+					currentStencilSeparate = false;
+
+				}
+
+			},
+
+			setOpSeparate: function ( stencilFail, stencilZFail, stencilZPass, stencilFailBack, stencilZFailBack, stencilZPassBack ) {
+
+				if ( currentStencilSeparate === false ||
+				     currentStencilFail !== stencilFail ||
+				     currentStencilZFail !== stencilZFail ||
+				     currentStencilZPass !== stencilZPass ||
+				     currentStencilFailBack !== stencilFailBack ||
+				     currentStencilZFailBack !== stencilZFailBack ||
+				     currentStencilZPassBack !== stencilZPassBack ) {
+
+					gl.stencilOpSeparate( gl.FRONT, stencilFail, stencilZFail, stencilZPass );
+					gl.stencilOpSeparate( gl.BACK, stencilFailBack, stencilZFailBack, stencilZPassBack );
+
+					currentStencilFail = stencilFail;
+					currentStencilZFail = stencilZFail;
+					currentStencilZPass = stencilZPass;
+					currentStencilFailBack = stencilFailBack;
+					currentStencilZFailBack = stencilZFailBack;
+					currentStencilZPassBack = stencilZPassBack;
+					currentStencilSeparate = true;
 
 				}
 
@@ -328,13 +414,21 @@ function WebGLState( gl, extensions ) {
 
 				locked = false;
 
+				currentStencilSeparate = false;
 				currentStencilMask = null;
+				currentStencilMaskBack = null;
 				currentStencilFunc = null;
 				currentStencilRef = null;
 				currentStencilFuncMask = null;
+				currentStencilFuncBack = null;
+				currentStencilRefBack = null;
+				currentStencilFuncMaskBack = null;
 				currentStencilFail = null;
 				currentStencilZFail = null;
 				currentStencilZPass = null;
+				currentStencilFailBack = null;
+				currentStencilZFailBack = null;
+				currentStencilZPassBack = null;
 				currentStencilClear = null;
 
 			}
@@ -775,9 +869,38 @@ function WebGLState( gl, extensions ) {
 		stencilBuffer.setTest( stencilWrite );
 		if ( stencilWrite ) {
 
-			stencilBuffer.setMask( material.stencilWriteMask );
-			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
-			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+			const hasSeparateBack =
+				material.stencilBackFunc !== null ||
+				material.stencilBackFail !== null ||
+				material.stencilBackZFail !== null ||
+				material.stencilBackZPass !== null ||
+				material.stencilBackRef !== null;
+
+			if ( hasSeparateBack ) {
+
+				stencilBuffer.setMaskSeparate( material.stencilWriteMask, material.stencilWriteMask );
+
+				stencilBuffer.setFuncSeparate(
+					material.stencilFunc, material.stencilRef, material.stencilFuncMask,
+					material.stencilBackFunc !== null ? material.stencilBackFunc : material.stencilFunc,
+					material.stencilBackRef !== null ? material.stencilBackRef : material.stencilRef,
+					material.stencilFuncMask
+				);
+
+				stencilBuffer.setOpSeparate(
+					material.stencilFail, material.stencilZFail, material.stencilZPass,
+					material.stencilBackFail !== null ? material.stencilBackFail : material.stencilFail,
+					material.stencilBackZFail !== null ? material.stencilBackZFail : material.stencilZFail,
+					material.stencilBackZPass !== null ? material.stencilBackZPass : material.stencilZPass
+				);
+
+			} else {
+
+				stencilBuffer.setMask( material.stencilWriteMask );
+				stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
+				stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+
+			}
 
 		}
 
