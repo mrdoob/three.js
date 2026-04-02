@@ -1,13 +1,11 @@
-import { Vector2, TempNode } from 'three/webgpu';
+import { TempNode } from 'three/webgpu';
 import {
 	nodeObject,
 	Fn,
-	uniform,
 	convertToTexture,
 	float,
 	vec4,
 	uv,
-	NodeUpdateType,
 } from 'three/tsl';
 
 /**
@@ -46,15 +44,6 @@ class ChromaticAberrationNode extends TempNode {
 		this.textureNode = textureNode;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
-		 * its internal uniforms once per frame in `updateBefore()`.
-		 *
-		 * @type {string}
-		 * @default 'frame'
-		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
-
-		/**
 		 * A node holding the strength of the effect.
 		 *
 		 * @type {Node}
@@ -74,26 +63,6 @@ class ChromaticAberrationNode extends TempNode {
 		 * @type {Node}
 		 */
 		this.scaleNode = scaleNode;
-
-		/**
-		 * A uniform node holding the inverse resolution value.
-		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
-		 */
-		this._invSize = uniform( new Vector2() );
-
-	}
-
-	/**
-	 * This method is used to update the effect's uniforms once per frame.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	updateBefore( /* frame */ ) {
-
-		const map = this.textureNode.value;
-		this._invSize.value.set( 1 / map.image.width, 1 / map.image.height );
 
 	}
 
@@ -155,8 +124,7 @@ class ChromaticAberrationNode extends TempNode {
 				{ name: 'uv', type: 'vec2' },
 				{ name: 'strength', type: 'float' },
 				{ name: 'center', type: 'vec2' },
-				{ name: 'scale', type: 'float' },
-				{ name: 'invSize', type: 'vec2' }
+				{ name: 'scale', type: 'float' }
 			]
 		} );
 
@@ -166,8 +134,7 @@ class ChromaticAberrationNode extends TempNode {
 				uvNode,
 				this.strengthNode,
 				this.centerNode,
-				this.scaleNode,
-				this._invSize
+				this.scaleNode
 			);
 
 		} );
