@@ -313,26 +313,10 @@ is determined as follows:</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="stencilBackFail" translate="no">.<a href="#stencilBackFail">stencilBackFail</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a> | null</span> </h3>
-					<div class="description">
-						<p>Which stencil operation to perform for back faces when the comparison function returns <code>false</code>.</p>
-						<p>Set this property to <code>null</code> to use <a href="Material.html#stencilFail">Material#stencilFail</a> for both faces.</p>
-						<p>Default is <code>null</code>.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="stencilFunc" translate="no">.<a href="#stencilFunc">stencilFunc</a><span class="type-signature"> : <a href="global.html#NeverStencilFunc">NeverStencilFunc</a> | <a href="global.html#LessStencilFunc">LessStencilFunc</a> | <a href="global.html#EqualStencilFunc">EqualStencilFunc</a> | <a href="global.html#LessEqualStencilFunc">LessEqualStencilFunc</a> | <a href="global.html#GreaterStencilFunc">GreaterStencilFunc</a> | <a href="global.html#NotEqualStencilFunc">NotEqualStencilFunc</a> | <a href="global.html#GreaterEqualStencilFunc">GreaterEqualStencilFunc</a> | <a href="global.html#AlwaysStencilFunc">AlwaysStencilFunc</a></span> </h3>
 					<div class="description">
 						<p>The stencil comparison function to use.</p>
 						<p>Default is <code>AlwaysStencilFunc</code>.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="stencilBackFunc" translate="no">.<a href="#stencilBackFunc">stencilBackFunc</a><span class="type-signature"> : <a href="global.html#NeverStencilFunc">NeverStencilFunc</a> | <a href="global.html#LessStencilFunc">LessStencilFunc</a> | <a href="global.html#EqualStencilFunc">EqualStencilFunc</a> | <a href="global.html#LessEqualStencilFunc">LessEqualStencilFunc</a> | <a href="global.html#GreaterStencilFunc">GreaterStencilFunc</a> | <a href="global.html#NotEqualStencilFunc">NotEqualStencilFunc</a> | <a href="global.html#GreaterEqualStencilFunc">GreaterEqualStencilFunc</a> | <a href="global.html#AlwaysStencilFunc">AlwaysStencilFunc</a> | null</span> </h3>
-					<div class="description">
-						<p>The stencil comparison function to use for back faces.</p>
-						<p>Set this property to <code>null</code> to use <a href="Material.html#stencilFunc">Material#stencilFunc</a> for both faces.</p>
-						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -347,14 +331,6 @@ is determined as follows:</p>
 					<div class="description">
 						<p>The value to use when performing stencil comparisons or stencil operations.</p>
 						<p>Default is <code>0</code>.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="stencilBackRef" translate="no">.<a href="#stencilBackRef">stencilBackRef</a><span class="type-signature"> : number | null</span> </h3>
-					<div class="description">
-						<p>The value to use when performing stencil comparisons or stencil operations for back faces.</p>
-						<p>Set this property to <code>null</code> to use <a href="Material.html#stencilRef">Material#stencilRef</a> for both faces.</p>
-						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -382,27 +358,11 @@ value must be <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="stencilBackZFail" translate="no">.<a href="#stencilBackZFail">stencilBackZFail</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a> | null</span> </h3>
-					<div class="description">
-						<p>Which stencil operation to perform for back faces when the comparison function returns <code>true</code> but the depth test fails.</p>
-						<p>Set this property to <code>null</code> to use <a href="Material.html#stencilZFail">Material#stencilZFail</a> for both faces.</p>
-						<p>Default is <code>null</code>.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="stencilZPass" translate="no">.<a href="#stencilZPass">stencilZPass</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a></span> </h3>
 					<div class="description">
 						<p>Which stencil operation to perform when the comparison function returns
 <code>true</code> and the depth test passes.</p>
 						<p>Default is <code>KeepStencilOp</code>.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="stencilBackZPass" translate="no">.<a href="#stencilBackZPass">stencilBackZPass</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a> | null</span> </h3>
-					<div class="description">
-						<p>Which stencil operation to perform for back faces when the comparison function returns <code>true</code> and the depth test passes.</p>
-						<p>Set this property to <code>null</code> to use <a href="Material.html#stencilZPass">Material#stencilZPass</a> for both faces.</p>
-						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
