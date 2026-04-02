@@ -1,0 +1,600 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Compute Ping/Pong Textures Fluid simulation with TSL</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Textures Fluid simulation with TSL
+			<br />Based on shaders by <a href="https://github.com/PavelDoGreat/WebGL-Fluid-Simulation?tab=readme-ov-file" target="_blank" rel="noopener">Pavel Dobryakov</a> and <a href="https://oframe.github.io/ogl/examples/?src=post-fluid-distortion.html" target="_blank" rel="noopener">OGL Fluid Distortion example</a>
+			<br />By <a href="https://mathis-biabiany.fr/" target="_blank" rel="noopener">Mathis Biabiany</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import { PlaneGeometry, Mesh, MeshBasicNodeMaterial, Vector2, Vector3, LinearFilter, NearestFilter, ClampToEdgeWrapping, OrthographicCamera, NoColorSpace, RGBAFormat, HalfFloatType, StorageTexture, Scene, WebGPURenderer } from "three/webgpu"
+			import { abs, length, Fn, instanceIndex, If, mul, textureStore, uniform, vec4, texture, uvec2, vec2, exp, dot, uv, clamp, float } from "three/tsl"
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			class StorageTexture2 {
+				constructor({
+					width = 1,
+					height = 1,
+					colorSpace = NoColorSpace,
+					format = RGBAFormat,
+					generateMipmaps = true,
+					internalFormat = null,
+					type = HalfFloatType,
+					minFilter = NearestFilter,
+					magFilter = NearestFilter,
+					wrapS = ClampToEdgeWrapping,
+					wrapT = ClampToEdgeWrapping,
+					phase = false
+				}) {
+					this.phase = phase
+					this.size = width * height
+					this.width = width
+					this.height = height
+
+					// Two GPU textures
+					this.read = new StorageTexture(width, height)
+					this.write = new StorageTexture(width, height)
+
+					// Texture params
+					Object.assign(this.read,  { colorSpace, generateMipmaps, type, minFilter, magFilter, format, internalFormat, wrapS, wrapT })
+					Object.assign(this.write, { colorSpace, generateMipmaps, type, minFilter, magFilter, format, internalFormat, wrapS, wrapT })
+				}
+
+				swap() {
+					this.phase = !this.phase
+				}
+			}
+
+			let camera, scene, renderer, mesh;
+
+			// Params -----
+
+			const params = {
+				deltaX: 2,
+				deltaY: -2,
+				curlStrength: 20,
+				densityDissipation: 0.97,
+				pressureDissipation: 0.8,
+				velocityDissipation: 0.98,
+				iterations: 3,
+				pressureFactor: 0.25,
+				radius: 0.2
+			}
+
+			const simRes = 128;
+			const dyeRes = 512;
+			const rendererSize = new Vector2(window.innerWidth, window.innerHeight);
+			const lastMouse = new Vector2();
+			const splats = [];
+
+			const point = uniform(new Vector2());
+			const color = uniform(new Vector3());
+			const aspectRatio = uniform(1);
+			const curlStrength = uniform(params.curlStrength);
+			const densityDissipation = uniform(params.densityDissipation);
+			const pressureDissipation = uniform(params.pressureDissipation);
+			const pressureFactor = uniform(params.pressureFactor);
+			const radius = uniform(params.radius);
+			const velocityDissipation = uniform(params.velocityDissipation);
+			const dt = uniform(0.016);
+			const texelSize = uniform(new Vector2(1 / simRes, 1 / simRes));
+
+			// Textures -----
+
+			const velocity = new StorageTexture2({
+				width: simRes,
+				height: simRes,
+				minFilter: LinearFilter,
+				magFilter: LinearFilter,
+				generateMipmaps: false,
+				wrapS: ClampToEdgeWrapping,
+				wrapT: ClampToEdgeWrapping
+			})
+
+			const density = new StorageTexture2({
+				width: dyeRes,
+				height: dyeRes,
+				minFilter: LinearFilter,
+				magFilter: LinearFilter,
+				generateMipmaps: false,
+				wrapS: ClampToEdgeWrapping,
+				wrapT: ClampToEdgeWrapping
+			})
+
+			const curl = new StorageTexture(simRes, simRes)
+			curl.minFilter = NearestFilter
+			curl.magFilter = NearestFilter
+			curl.type = HalfFloatType
+			curl.generateMipmaps = false
+
+			const divergence = new StorageTexture(simRes, simRes)
+			divergence.minFilter = NearestFilter
+			divergence.magFilter = NearestFilter
+			divergence.type = HalfFloatType
+			divergence.generateMipmaps = false
+
+			const pressure = new StorageTexture2({
+				width: simRes,
+				height: simRes,
+				minFilter: NearestFilter,
+				magFilter: NearestFilter,
+				generateMipmaps: false
+			})
+
+			// Nodes -----
+
+			const getUVs = Fn(({ width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+
+				const size  = vec2(width, height)
+			
+				// center-of-texel for this cell
+				return (vec2(posX, posY).add(0.5)).div(size)
+			})
+
+			// ----- Splats -----
+			const computeSplat = Fn(({ readTex, writeTex, width, height, blueFactor }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+				const uvC = getUVs({ width, height })
+
+				const p = vec2(uvC.sub(point)).toVar()
+				p.x.mulAssign(aspectRatio)
+				const splat = exp(dot(p, p).negate().div(float(radius).div(100))).mul(color).toVar()
+				
+				const base = texture(readTex, uvC).rgb.toVar()
+				const final = vec4(base.add(splat), 1)
+				final.mulAssign(vec4(1, 1, blueFactor, 1))
+
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeSplatVelocityRead = computeSplat({ readTex: velocity.read, writeTex: velocity.write, width: velocity.width, height: velocity.height, blueFactor: 0 }).compute(velocity.size)
+			const computeSplatVelocityWrite = computeSplat({ readTex: velocity.write, writeTex: velocity.read, width: velocity.width, height: velocity.height, blueFactor: 0 }).compute(velocity.size)
+			const computeSplatDensityRead = computeSplat({ readTex: density.read, writeTex: density.write, width: density.width, height: density.height, blueFactor: 1 }).compute(density.size)
+			const computeSplatDensityWrite = computeSplat({ readTex: density.write, writeTex: density.read, width: density.width, height: density.height, blueFactor: 1 }).compute(density.size)
+
+			// ----- Curl -----
+			const computeCurl = Fn(({ tVelocity, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+			
+				// neighbor centers, clamped inside [half, 1-half]
+				const size  = vec2(width, height);
+				const texel = vec2(1.0).div(size);
+				const half  = vec2(0.5).div(size);
+				const lUV = clamp(uvC.sub(vec2(texel.y, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const rUV = clamp(uvC.add(vec2(texel.x, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const bUV = clamp(uvC.sub(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+				const tUV = clamp(uvC.add(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+
+				const L = texture(tVelocity, lUV).y.toVar()
+				const R = texture(tVelocity, rUV).y.toVar()
+				const T = texture(tVelocity, tUV).x.toVar()
+				const B = texture(tVelocity, bUV).x.toVar()
+				const vorticity = R.sub(L).sub(T).add(B)
+				vorticity.mulAssign(0.5)
+
+				textureStore(curl, indexUV, vec4(vorticity, 0, 0, 1)).toWriteOnly()
+			})({ tVelocity: velocity.read, width: curl.width, height: curl.height }).compute(curl.width * curl.height)
+
+			// ----- Vorticity -----
+			const computeVorticity = Fn(({ tCurl, readTex, writeTex, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+			
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				// neighbor centers, clamped inside [half, 1-half]
+				const size  = vec2(width, height);
+				const texel = vec2(1.0).div(size);
+				const half  = vec2(0.5).div(size);
+				const lUV = clamp(uvC.sub(vec2(texel.y, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const rUV = clamp(uvC.add(vec2(texel.x, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const bUV = clamp(uvC.sub(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+				const tUV = clamp(uvC.add(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+
+				const L = texture(tCurl, lUV).x.toVar()
+				const R = texture(tCurl, rUV).x.toVar()
+				const T = texture(tCurl, tUV).x.toVar()
+				const B = texture(tCurl, bUV).x.toVar()
+				const C = texture(tCurl, uvC).x.toVar()
+
+				const force = vec2(abs(T).sub(abs(B)), abs(R).sub(abs(L))).mul(0.5)
+				force.divAssign(length(force).add(0.0001))
+				force.mulAssign(curlStrength.mul(C))
+				force.y.negate()
+
+				const vel = texture(readTex, uvC).xy
+				const final = vec4(vel.add(force.mul(dt)), 0, 1)
+
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeVorticityRead = computeVorticity({ tCurl: curl, readTex: velocity.read, writeTex: velocity.write, width: velocity.width, height: velocity.height }).compute(velocity.size)
+			const computeVorticityWrite = computeVorticity({ tCurl: curl, readTex: velocity.write, writeTex: velocity.read, width: velocity.width, height: velocity.height }).compute(velocity.size)
+
+			// ----- Divergence -----
+			const computeDivergence = Fn(({ tVelocity, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				// neighbor centers, clamped inside [half, 1-half]
+				const size  = vec2(width, height);
+				const texel = vec2(1.0).div(size);
+				const half  = vec2(0.5).div(size);
+				const lUV = clamp(uvC.sub(vec2(texel.y, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const rUV = clamp(uvC.add(vec2(texel.x, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const bUV = clamp(uvC.sub(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+				const tUV = clamp(uvC.add(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+
+				const L = texture(tVelocity, lUV).x.toVar()
+				const R = texture(tVelocity, rUV).x.toVar()
+				const T = texture(tVelocity, tUV).y.toVar()
+				const B = texture(tVelocity, bUV).y.toVar()
+				const C = texture(tVelocity, uvC).xy.toVar()
+
+				const min = float(1).div(size)
+				const max = float(1).sub(min)
+				If(lUV.x.lessThan(min), () => { L.assign(C.x.negate())})
+				If(rUV.x.greaterThan(max), () => { R.assign(C.x.negate())})
+				If(tUV.y.greaterThan(max), () => { T.assign(C.y.negate())})
+				If(bUV.y.lessThan(min), () => { B.assign(C.y.negate())})
+
+				const div = mul(0.5, R.sub(L).add(T).sub(B))
+
+				textureStore(divergence, indexUV, vec4(div, 0, 0, 1)).toWriteOnly()
+			})({ tVelocity: velocity.read, width: divergence.width, height: divergence.height }).compute(divergence.width * divergence.height)
+
+			// ----- Clear -----
+			const computeClear = Fn(({ readTex, writeTex, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				const tex = texture(readTex, uvC)
+				const final = tex.mul(pressureDissipation)
+
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeClearRead = computeClear({ readTex: pressure.read, writeTex: pressure.write, width: pressure.width, height: pressure.height }).compute(pressure.size)
+			const computeClearWrite = computeClear({ readTex: pressure.write, writeTex: pressure.read, width: pressure.width, height: pressure.height }).compute(pressure.size)
+
+			// ----- Pressure -----
+			const computePressure = Fn(({ tDivergence, readTex, writeTex, width, height}) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( height )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				// neighbor centers, clamped inside [half, 1-half]
+				const size  = vec2(width, height);
+				const texel = vec2(1.0).div(size);
+				const half  = vec2(0.5).div(size);
+				const lUV = clamp(uvC.sub(vec2(texel.y, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const rUV = clamp(uvC.add(vec2(texel.x, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const bUV = clamp(uvC.sub(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+				const tUV = clamp(uvC.add(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+
+				const L = texture(readTex, lUV).x.toVar()
+				const R = texture(readTex, rUV).x.toVar()
+				const T = texture(readTex, tUV).x.toVar()
+				const B = texture(readTex, bUV).x.toVar()
+
+				const divergence = texture(tDivergence, uvC).x.toVar()
+				const pressure = mul(pressureFactor, L.add(R).add(B).add(T).sub(divergence))
+				const final = vec4(pressure, 0, 0, 1)
+
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computePressureRead = computePressure({ tDivergence: divergence, readTex: pressure.read, writeTex: pressure.write, width: pressure.width, height: pressure.height }).compute(pressure.size)
+			const computePressureWrite = computePressure({ tDivergence: divergence, readTex: pressure.write, writeTex: pressure.read, width: pressure.width, height: pressure.height }).compute(pressure.size)
+
+			// ----- Gradient -----
+			const computeGradient = Fn(({ tPressure, readTex, writeTex, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				// neighbor centers, clamped inside [half, 1-half]
+				const size  = vec2(width, height);
+				const texel = vec2(1.0).div(size);
+				const half  = vec2(0.5).div(size);
+				const lUV = clamp(uvC.sub(vec2(texel.y, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const rUV = clamp(uvC.add(vec2(texel.x, 0.0)), half, vec2(1.0).sub(half)).toVar()
+				const bUV = clamp(uvC.sub(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+				const tUV = clamp(uvC.add(vec2(0.0, texel.y)), half, vec2(1.0).sub(half)).toVar()
+
+				const L = texture(tPressure, lUV).x.toVar()
+				const R = texture(tPressure, rUV).x.toVar()
+				const T = texture(tPressure, tUV).x.toVar()
+				const B = texture(tPressure, bUV).x.toVar()
+				const velocity = texture(readTex, uvC).xy.toVar()
+				velocity.subAssign(vec2(R.sub(L), T.sub(B)))
+
+				const final = vec4(velocity, 0, 1)
+
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeGradientRead = computeGradient({ tPressure: pressure.read, readTex: velocity.read, writeTex: velocity.write, width: velocity.width, height: velocity.height }).compute(velocity.size)
+			const computeGradientWrite = computeGradient({ tPressure: pressure.read, readTex: velocity.write, writeTex: velocity.read, width: velocity.width, height: velocity.height }).compute(velocity.size)
+
+			// ----- Advection -----
+			const computeAdvectionVelocity = Fn(({ readTex, writeTex, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				const velocity = texture(readTex, uvC).xy.toVar()
+
+				const coord = uvC.sub(dt.mul(velocity).mul(texelSize))
+				const source = texture(readTex, coord).toVar()
+				source.mulAssign(velocityDissipation)
+
+				const final = vec4(source.rg, 0, 1)
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeAdvectionVelocityRead = computeAdvectionVelocity({ readTex: velocity.read, writeTex: velocity.write, width: velocity.width, height: velocity.height }).compute(velocity.size)
+			const computeAdvectionVelocityWrite = computeAdvectionVelocity({ readTex: velocity.write, writeTex: velocity.read, width: velocity.width, height: velocity.height }).compute(velocity.size)
+
+			const computeAdvectionDensity = Fn(({ tVelocity, readTex, writeTex, width, height }) => {
+				const posX = instanceIndex.mod( width )
+				const posY = instanceIndex.div( width )
+				const indexUV = uvec2(posX, posY)
+
+				// center-of-texel for this cell
+				const uvC = getUVs({ width, height })
+
+				const velocity = texture(tVelocity, uvC).xy.toVar()
+
+				const coord = uvC.sub(dt.mul(velocity).mul(texelSize))
+				const source = texture(readTex, coord).toVar()
+				source.mulAssign(densityDissipation)
+
+				const final = vec4(source.rgb, 1)
+				textureStore(writeTex, indexUV, final).toWriteOnly()
+			})
+			const computeAdvectionDensityRead = computeAdvectionDensity({ tVelocity: velocity.read, readTex: density.read, writeTex: density.write, width: density.width, height: density.height }).compute(density.size)
+			const computeAdvectionDensityWrite = computeAdvectionDensity({ tVelocity: velocity.read, readTex: density.write, writeTex: density.read, width: density.width, height: density.height }).compute(density.size)
+
+			init();
+
+			function init() {
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				//
+
+				camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0, 10 );
+
+				scene = new Scene();
+
+				//
+
+				const geometry = new PlaneGeometry(1, 1)
+
+				const colorNode = Fn(([ tFluid ]) => {
+					const fluid = texture(tFluid, uv()).toVar()
+					const fluidColor = fluid.rgb
+					const final = vec4(fluidColor.mul(0.1).add(0.5), 1)
+
+					return final
+				})
+				
+				const material = new MeshBasicNodeMaterial()
+				material.colorNode = colorNode(density.read)
+
+				mesh = new Mesh(geometry, material)
+				mesh.scale.set(window.innerWidth, window.innerHeight, 1)
+				scene.add(mesh)
+
+				//
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				const gui = new GUI();
+
+				const fluidFolder = gui.addFolder( 'Fluid' );
+
+				fluidFolder.add( params, 'deltaX', -10, 10 )
+
+				fluidFolder.add( params, 'deltaY', -10, 10 )
+
+				fluidFolder.add( params, 'curlStrength', 0, 40 ).onChange( function ( value ) {
+					curlStrength.value = value;
+				} );
+
+				fluidFolder.add( params, 'densityDissipation', 0.85, 1 ).onChange( function ( value ) {
+					densityDissipation.value = value;
+				} );
+
+				fluidFolder.add( params, 'pressureDissipation', 0, 0.99 ).onChange( function ( value ) {
+					pressureDissipation.value = value;
+				} );
+
+				fluidFolder.add( params, 'pressureFactor', 0, 0.25 ).onChange( function ( value ) {
+					pressureFactor.value = value;
+				} );
+
+				fluidFolder.add( params, 'radius', 0.1, 1 ).onChange( function ( value ) {
+					radius.value = value;
+				} );
+
+				fluidFolder.add( params, 'velocityDissipation', 0.9, 1 ).onChange( function ( value ) {
+					velocityDissipation.value = value;
+				} );
+
+				fluidFolder.add( params, 'iterations', 1, 20 );
+
+				//
+
+				const isTouchCapable = 'ontouchstart' in window;
+				if (isTouchCapable) {
+					window.addEventListener('touchstart', updateMouse, false);
+					window.addEventListener('touchmove', updateMouse, false);
+				} else {
+					window.addEventListener('mousemove', updateMouse, false);
+				}
+
+				window.addEventListener('resize', onWindowResize)
+				onWindowResize()
+			}
+
+			function updateMouse(e) {
+				if (e.changedTouches && e.changedTouches.length) {
+					e.x = e.changedTouches[0].pageX;
+					e.y = e.changedTouches[0].pageY;
+				}
+				if (e.x === undefined) {
+					e.x = e.pageX;
+					e.y = e.pageY;
+				}
+
+				if (!lastMouse.isInit) {
+					lastMouse.isInit = true;
+
+					// First input
+					lastMouse.set(e.x, e.y);
+				}
+
+				const deltaX = e.x - lastMouse.x;
+				const deltaY = e.y - lastMouse.y;
+
+				lastMouse.set(e.x, e.y);
+
+				// Add if the mouse is moving
+				if (Math.abs(deltaX) || Math.abs(deltaY)) {
+					splats.push({
+						// Get mouse value in 0 to 1 range, with y flipped
+						x: e.x / rendererSize.x,
+						y: 1 - e.y / rendererSize.y,
+						dx: deltaX * params.deltaX,
+						dy: deltaY * params.deltaY
+					});
+				}
+			}
+
+			function onWindowResize() {
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.getSize(rendererSize)
+
+				camera.left = - window.innerWidth / 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = - window.innerHeight / 2;
+				camera.updateProjectionMatrix();
+
+				mesh.scale.set(window.innerWidth, window.innerHeight, 1)
+			}
+
+			function render() {
+				renderer.autoClear = false
+
+				for (let i = splats.length - 1; i >= 0; i--) {
+					updateSplat(splats.splice(i, 1)[0])
+				}
+
+				// Curl -----
+				renderer.computeAsync(computeCurl)
+
+				// Vorticity -----
+				renderer.computeAsync(velocity.phase ? computeVorticityRead : computeVorticityWrite)
+				velocity.swap()
+
+				// Divergence -----
+				renderer.computeAsync(computeDivergence)
+
+
+				// Clear -----
+				renderer.computeAsync(pressure.phase ? computeClearRead : computeClearWrite)
+				pressure.swap()
+
+				// Pressure -----
+				for (let i = 0; i < params.iterations; i++) {
+					renderer.computeAsync(pressure.phase ? computePressureRead : computePressureWrite)
+					pressure.swap()
+				}
+
+				// Gradient -----
+				renderer.computeAsync(velocity.phase ? computeGradientRead : computeGradientWrite)
+				velocity.swap()
+
+				// Advection -----
+				renderer.computeAsync(velocity.phase ? computeAdvectionVelocityRead : computeAdvectionVelocityWrite)
+				velocity.swap()
+
+				renderer.computeAsync(density.phase ? computeAdvectionDensityRead : computeAdvectionDensityWrite)
+				density.swap()
+
+				renderer.autoClear = true
+				renderer.renderAsync(scene, camera)
+			}
+
+			function updateSplat({ x, y, dx, dy }) {
+				aspectRatio.value = rendererSize.x / rendererSize.y
+				point.value.set(x, y)
+				color.value.set(dx, dy, 1)
+
+				// Splat Velocity -----
+				renderer.computeAsync(velocity.phase ? computeSplatVelocityRead : computeSplatVelocityWrite)
+				velocity.swap()
+
+				// Splat Density -----
+				renderer.computeAsync(density.phase ? computeSplatDensityRead : computeSplatDensityWrite)
+				density.swap()
+			}
+		</script>
+	</body>
+</html>
