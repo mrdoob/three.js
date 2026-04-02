@@ -254,76 +254,109 @@ class WebGLAttributeUtils {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const attribute = readbackBuffer.attribute;
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 		const { bufferGPU } = backend.get( bufferAttribute );
 
 		const array = attribute.array;
-		const byteLength = array.byteLength;
+		const byteLength = count === - 1 ? array.byteLength - offset : count;
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
 
-		const readbackBufferData = backend.get( readbackBuffer );
+		let writeBuffer;
+		if ( target !== null && target.isReadbackBuffer ) {
 
-		let { writeBuffer } = readbackBufferData;
+			const readbackInfo = backend.get( target );
+			if ( readbackInfo.writeBuffer === undefined ) {
 
-		if ( writeBuffer === undefined ) {
+				writeBuffer = gl.createBuffer();
+				gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+				gl.bufferData( gl.COPY_WRITE_BUFFER, target.maxByteSize, gl.STREAM_READ );
 
-			writeBuffer = gl.createBuffer();
+				// dispose
+				const disposeCallback = () => {
 
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-			gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
+					target.buffer = null;
+					gl.deleteBuffer( writeBuffer );
+					backend.delete( target );
+					target.removeEventListener( 'dispose', disposeCallback );
 
-			// dispose
+				};
 
-			const dispose = () => {
+				target.addEventListener( 'dispose', disposeCallback );
 
-				gl.deleteBuffer( writeBuffer );
+				// register
+				readbackInfo.writeBuffer = writeBuffer;
 
-				backend.delete( readbackBuffer );
+			} else {
 
-				readbackBuffer.removeEventListener( 'dispose', dispose );
+				writeBuffer = readbackInfo.writeBuffer;
 
-			};
-
-			readbackBuffer.addEventListener( 'dispose', dispose );
-
-			// register
-
-			readbackBufferData.writeBuffer = writeBuffer;
+			}
 
 		} else {
 
+			writeBuffer = gl.createBuffer();
 			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+			gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
 
 		}
 
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
+		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, offset, 0, byteLength );
+		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new attribute.array.constructor( array.length );
+		// read the data back
+		let dstBuffer;
+		if ( target === null ) {
+
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
+
+		} else if ( target.isReadbackBuffer ) {
+
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
+			target.buffer = dstBuffer.buffer;
+
+		} else {
+
+			dstBuffer = new Uint8Array( target );
+
+		}
 
 		// Ensure the buffer is bound before reading
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-
 		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer;
+		// return the appropriate type
+		if ( target && target.isReadbackBuffer ) {
+
+			return target;
+
+		} else {
+
+			return dstBuffer.buffer;
+
+		}
 
 	}
 
