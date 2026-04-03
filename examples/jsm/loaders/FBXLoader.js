@@ -2779,7 +2779,13 @@ class AnimationParser {
 
 											node.transform = child.matrix;
 
-											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
+											if ( child.userData.transformData ) {
+
+												node.eulerOrder = child.userData.transformData.eulerOrder;
+
+												if ( child.userData.transformData.rotation ) node.initialRotation = child.userData.transformData.rotation;
+
+											}
 
 										}
 
@@ -2919,7 +2925,7 @@ class AnimationParser {
 
 		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
+			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder, rawTracks.initialRotation );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
@@ -2951,17 +2957,33 @@ class AnimationParser {
 
 	}
 
-	generateRotationTrack( modelName, curves, preRotation, postRotation, eulerOrder ) {
+	generateRotationTrack( modelName, curves, preRotation, postRotation, eulerOrder, initialRotation ) {
 
 		let times;
 		let values;
 
-		if ( curves.x !== undefined && curves.y !== undefined && curves.z !== undefined ) {
+		if ( curves.x !== undefined || curves.y !== undefined || curves.z !== undefined ) {
 
-			const result = this.interpolateRotations( curves.x, curves.y, curves.z, eulerOrder );
+			// Get merged, sorted, unique times from all available curves
+			const mergedTimes = this.getTimesForAllAxes( curves );
 
-			times = result[ 0 ];
-			values = result[ 1 ];
+			if ( mergedTimes.length > 0 ) {
+
+				const initialRot = initialRotation || [ 0, 0, 0 ];
+
+				// Synchronize all curves to the merged time array.
+				// Missing axes are filled with constant values from the initial rotation (Lcl Rotation).
+				// Existing curves at different times are linearly interpolated.
+				const syncX = this.synchronizeCurve( curves.x, mergedTimes, initialRot[ 0 ] );
+				const syncY = this.synchronizeCurve( curves.y, mergedTimes, initialRot[ 1 ] );
+				const syncZ = this.synchronizeCurve( curves.z, mergedTimes, initialRot[ 2 ] );
+
+				const result = this.interpolateRotations( syncX, syncY, syncZ, eulerOrder );
+
+				times = result[ 0 ];
+				values = result[ 1 ];
+
+			}
 
 		}
 
@@ -2993,7 +3015,7 @@ class AnimationParser {
 
 		const quaternionValues = [];
 
-		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [ 0 ], [ 0 ] );
+		if ( ! values || ! times ) return undefined;
 
 		for ( let i = 0; i < values.length; i += 3 ) {
 
@@ -3146,6 +3168,62 @@ class AnimationParser {
 
 	}
 
+	// Synchronize a curve to a target time array using linear interpolation.
+	// If the curve is undefined (axis not animated), returns constant values from initialValue.
+	synchronizeCurve( curve, targetTimes, initialValue ) {
+
+		if ( curve === undefined ) {
+
+			return { times: targetTimes, values: targetTimes.map( () => initialValue ) };
+
+		}
+
+		// If the curve already has the same number of keyframes as the target, assume times match
+		if ( curve.times.length === targetTimes.length ) return curve;
+
+		// Linearly interpolate curve values at each target time
+		const values = [];
+
+		for ( let i = 0; i < targetTimes.length; i ++ ) {
+
+			values.push( this.sampleCurveValue( curve, targetTimes[ i ], initialValue ) );
+
+		}
+
+		return { times: targetTimes, values: values };
+
+	}
+
+	// Sample a single value from a curve at a given time using linear interpolation
+	sampleCurveValue( curve, time, initialValue ) {
+
+		const times = curve.times;
+		const values = curve.values;
+
+		// Before first keyframe
+		if ( time <= times[ 0 ] ) return values[ 0 ];
+
+		// After last keyframe
+		if ( time >= times[ times.length - 1 ] ) return values[ values.length - 1 ];
+
+		// Find surrounding keyframes and linearly interpolate
+		for ( let i = 0; i < times.length - 1; i ++ ) {
+
+			if ( time >= times[ i ] && time <= times[ i + 1 ] ) {
+
+				if ( times[ i ] === time ) return values[ i ];
+
+				const alpha = ( time - times[ i ] ) / ( times[ i + 1 ] - times[ i ] );
+				return values[ i ] * ( 1 - alpha ) + values[ i + 1 ] * alpha;
+
+			}
+
+		}
+
+		return initialValue;
+
+	}
+
 	// Rotations are defined as Euler angles which can have values  of any size
 	// These will be converted to quaternions which don't support values greater than
 	// PI, so we'll interpolate large rotations
@@ -3215,7 +3293,7 @@ class AnimationParser {
 				const Q2 = new Quaternion().setFromEuler( E2 );
 
 				// Check unroll
-				if ( Q1.dot( Q2 ) ) {
+				if ( Q1.dot( Q2 ) < 0 ) {
 
 					Q2.set( - Q2.x, - Q2.y, - Q2.z, - Q2.w );
 
