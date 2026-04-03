@@ -340,12 +340,12 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const size = readbackBuffer.size;
-		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
+		const maxByteLength = readbackBuffer.size;
+		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
 
 		this.memory.readbackBuffers ++;
-		this.memory.total += size;
-		this.memory.readbackBuffersSize += size;
+		this.memory.total += maxByteLength;
+		this.memory.readbackBuffersSize += maxByteLength;
 
 	}
 
