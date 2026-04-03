@@ -27,14 +27,14 @@ class EventDispatcher {
 		/**
 		 * A collection of event listener functions, organized by event type.
 		 *
-		 * @type {Map<string, Function>}
+		 * @type {Map<string, Set<Function>>}
 		 */
 		this._listenerFunctions = new Map();
 
 		/**
 		 * A collection of event listener objects, organized by event type.
 		 *
-		 * @type {Map<string, object>}
+		 * @type {Map<string, Set<object>>}
 		 */
 		this._listenerObjects = new Map();
 
@@ -44,7 +44,7 @@ class EventDispatcher {
 	 * Adds the given event listener to the given event type.
 	 *
 	 * @param {string} type - The type of event to listen to.
-	 * @param {Function|object} listener - The function that gets called when the event is fired.
+	 * @param {Function|object} listener - The listener that gets called when the event is fired.
 	 */
 	addEventListener( type, listener ) {
 
