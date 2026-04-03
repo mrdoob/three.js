@@ -271,57 +271,10 @@ class WebGLAttributeUtils {
 		const { gl } = backend;
 
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const { bufferGPU } = backend.get( bufferAttribute );
+		const attributeInfo = backend.get( bufferAttribute );
+		const { bufferGPU } = attributeInfo;
 
-		const array = attribute.array;
-		const byteLength = count === - 1 ? array.byteLength - offset : count;
-
-		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
-
-		let writeBuffer;
-		if ( target !== null && target.isReadbackBuffer ) {
-
-			const readbackInfo = backend.get( target );
-			if ( readbackInfo.writeBuffer === undefined ) {
-
-				writeBuffer = gl.createBuffer();
-				gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-				gl.bufferData( gl.COPY_WRITE_BUFFER, target.maxByteSize, gl.STREAM_READ );
-
-				// dispose
-				const disposeCallback = () => {
-
-					target.buffer = null;
-					gl.deleteBuffer( writeBuffer );
-					backend.delete( target );
-					target.removeEventListener( 'dispose', disposeCallback );
-
-				};
-
-				target.addEventListener( 'dispose', disposeCallback );
-
-				// register
-				readbackInfo.writeBuffer = writeBuffer;
-
-			} else {
-
-				writeBuffer = readbackInfo.writeBuffer;
-
-			}
-
-		} else {
-
-			writeBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-			gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
-
-		}
-
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, offset, 0, byteLength );
-		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
-
-		await backend.utils._clientWaitAsync();
+		const byteLength = count === - 1 ? attributeInfo.byteLength - offset : count;
 
 		// read the data back
 		let dstBuffer;
@@ -331,6 +284,7 @@ class WebGLAttributeUtils {
 
 		} else if ( target.isReadbackBuffer ) {
 
+			// WebGL has no concept of a "mapped" data buffer so we create a new buffer, instead.
 			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
 			target.buffer = dstBuffer.buffer;
 
@@ -341,8 +295,8 @@ class WebGLAttributeUtils {
 		}
 
 		// Ensure the buffer is bound before reading
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
+		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		gl.getBufferSubData( gl.COPY_READ_BUFFER, offset, dstBuffer );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
