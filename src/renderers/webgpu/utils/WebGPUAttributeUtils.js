@@ -347,7 +347,7 @@ class WebGPUAttributeUtils {
 				target.release();
 
 				readBufferGPU = device.createBuffer( {
-					label: `${ attribute.name }_readback`,
+					label: `${ target.name }_readback`,
 					size: target.maxByteLength,
 					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 				} );
