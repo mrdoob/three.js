@@ -1,10 +1,11 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, mat3, nodeObject, vec4 } from '../tsl/TSLCore.js';
+import { addMethodChaining, mat3, nodeObject, vec3, vec4 } from '../tsl/TSLCore.js';
 
 import { SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { sRGBTransferEOTF, sRGBTransferOETF } from './ColorSpaceFunctions.js';
 import { Matrix3 } from '../../math/Matrix3.js';
+import { clamp } from '../math/MathNode.js';
 
 const WORKING_COLOR_SPACE = 'WorkingColorSpace';
 const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
@@ -114,7 +115,19 @@ class ColorSpaceNode extends TempNode {
 
 		if ( ColorManagement.getTransfer( target ) === SRGBTransfer ) {
 
+			// premultiply in sRGB color space for the HTML compositor #33104
+
+			// un-premultiply in linear space
+			outputNode = vec4( outputNode.a.greaterThan( 0.0 ).select( outputNode.rgb.div( outputNode.a ), vec3( 0.0 ) ), outputNode.a );
+
+			// clamp RGB to [ 0,1 ]
+			outputNode = vec4( clamp( outputNode.rgb, 0.0, 1.0 ), outputNode.a );
+
+			// encode to sRGB
 			outputNode = vec4( sRGBTransferOETF( outputNode.rgb ), outputNode.a );
+
+			// premultiply in sRGB color space
+			outputNode = vec4( outputNode.rgb.mul( outputNode.a ), outputNode.a );
 
 		}
 
