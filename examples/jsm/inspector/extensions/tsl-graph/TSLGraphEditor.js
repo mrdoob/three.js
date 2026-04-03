@@ -5,7 +5,7 @@ import { TSLGraphLoader } from './TSLGraphLoader.js';
 const HOST_SOURCE = 'tsl-graph-host';
 const EDITOR_SOURCE = 'tsl-graph-editor';
 
-const _resposeByCommand = {
+const _responseByCommand = {
 	'tsl:command:get-code': 'tsl:response:get-code',
 	'tsl:command:set-root-material': 'tsl:response:set-root-material',
 	'tsl:command:get-graph': 'tsl:response:get-graph',
@@ -298,7 +298,7 @@ class TSLGraphEditor extends Extension {
 		await this._editorReady;
 
 		const requestId = this._makeRequestId();
-		const expectedType = _resposeByCommand[ type ];
+		const expectedType = _responseByCommand[ type ];
 
 		return new Promise( ( resolve, reject ) => {
 

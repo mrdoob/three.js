@@ -2497,7 +2497,7 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
-		// mipmaps must be genereated with the same encoder otherwise the copied texture data
+		// mipmaps must be generated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
 
 		if ( texture.generateMipmaps ) {

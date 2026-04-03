@@ -18,7 +18,7 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"postprocessing": "https://unpkg.com/postprocessing@6.38.2/build/index.js",
-					"goodrays": "https://unpkg.com/three-good-godrays@0.8.1/build/three-good-godrays.esm.js"
+					"godrays": "https://unpkg.com/three-good-godrays@0.8.1/build/three-good-godrays.esm.js"
 				}
 			}
 		</script>
@@ -33,7 +33,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { EffectComposer, RenderPass } from 'postprocessing';
-			import { GodraysPass } from 'goodrays';
+			import { GodraysPass } from 'godrays';
 
 			let camera, scene, renderer, composer;
 			let controls, stats;
@@ -180,20 +180,20 @@
 				backdropLeft.position.set( - backdropDistance, 100, 0 );
 				backdropLeft.rotateY( Math.PI / 2 );
 				scene.add( backdropLeft );
-			
+
 				const backdropRight = new THREE.Mesh( backdropGeometry, backdropMaterial );
 				backdropRight.position.set( backdropDistance, 100, 0 );
 				backdropRight.rotateY( Math.PI / 2 );
 				scene.add( backdropRight );
-			
+
 				const backdropFront = new THREE.Mesh( backdropGeometry, backdropMaterial );
 				backdropFront.position.set( 0, 100, - backdropDistance );
 				scene.add( backdropFront );
-			
+
 				const backdropBack = new THREE.Mesh( backdropGeometry, backdropMaterial );
 				backdropBack.position.set( 0, 100, backdropDistance );
 				scene.add( backdropBack );
-			
+
 				const backdropTop = new THREE.Mesh( backdropGeometry, backdropMaterial );
 				backdropTop.position.set( 0, 200, 0 );
 				backdropTop.rotateX( Math.PI / 2 );
@@ -211,7 +211,7 @@
 				composer.render();
 
 				//renderer.render( scene, camera );
-			
+
 				stats.end();
 
 			}

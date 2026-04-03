@@ -141,7 +141,7 @@ class Texture3DNode extends TextureNode {
 	}
 
 	/**
-	 * Computes the normal for the given uv. These texture coordiantes represent a
+	 * Computes the normal for the given uv. These texture coordinates represent a
 	 * position inside the 3D texture. Unlike geometric normals, this normal
 	 * represents a slope or gradient of scalar data inside the 3D texture.
 	 *

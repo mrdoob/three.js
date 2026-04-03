@@ -139,7 +139,7 @@ The build process is based on three pillars: `setup`, `analyze` and `generate`.
 | | |
 | -- | -- |
 | `setup` | Use `TSL` to create a completely customized code for the `Node` output. The `Node` can use many others within itself, have countless inputs, but there will always be a single output. |
-| `analyze` | This proccess will check the `nodes` that were created in order to create useful information for `generate` the snippet, such as the need to create or not a cache/variable for optimizing a node. |
+| `analyze` | This process will check the `nodes` that were created in order to create useful information for `generate` the snippet, such as the need to create or not a cache/variable for optimizing a node. |
 | `generate` | An output of `string` will be returned from each `node`. Any node will also be able to create code in the flow of shader, supporting multiple lines. |
 
 `Node` also have a native update process invoked by the `update()` function, these events be called by `frame`, `render call` and `object draw`.
@@ -164,7 +164,7 @@ TSL is a Node-based shader abstraction, written in JavaScript. TSL's functions a
 ### Shader-Graph Inspired Structure
 
 - Focus on Intent
-  - Build materials by connecting nodes through: [positionWorld](#position), [normalWorld](#normal), [screenUV](#screen), [attribute()](#attributes), etc. 
+  - Build materials by connecting nodes through: [positionWorld](#position), [normalWorld](#normal), [screenUV](#screen), [attribute()](#attributes), etc.
 More declarative("what") vs. imperative("how").
 - Composition & High-Level Concepts
   - Work with high-level concepts for Node Material like [colorNode](#basic), [roughnessNode](#standard), [metalnessNode](#standard), [positionNode](#basic), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
@@ -178,7 +178,7 @@ More declarative("what") vs. imperative("how").
 - Control rendering steps and create new render-passes per individual TSL functions.
   - Implement complex effects is easily with nodes using a single function call either in post-processing and in materials allowing the node itself to manage the rendering process as it needs.
     - `gaussianBlur()`: Double render-pass gaussian blur node. It can be used in the material or in post-processing through a single function.
-  - Easy access to renderer buffers using TSL functions like: 
+  - Easy access to renderer buffers using TSL functions like:
     - `viewportSharedTexture()`: Accesses the beauty what has already been rendered, preserving the render-order.
     - `viewportLinearDepth()`: Accesses the depth what has already been rendered, preserving the render-order.
   - Integrated Compute Shaders
@@ -228,7 +228,7 @@ materialC.colorNode = sharedColor.add( .5 );
 Access **material**, **geometry**, **object**, **camera**, **scene**, **renderer** and more directly from a TSL function. Function calls are only performed at the time of building the shader allowing you to customize the function according to the object's setup.
 
 ```js
-// Returns an uniform of the material's custom color if it exists 
+// Returns an uniform of the material's custom color if it exists
 
 const customColor = Fn( ( { material, geometry, object } ) => {
 
@@ -316,7 +316,7 @@ material.colorNode = mainTask();
 
 #### Simplification
 
-Double render-pass `gaussianBlur()` node. It can be used in the material or in post-processing through a single function. 
+Double render-pass `gaussianBlur()` node. It can be used in the material or in post-processing through a single function.
 
 ```js
 // Applies a double render-pass gaussianBlur and then a grayscale filter before the object with the material is rendered.
@@ -358,10 +358,10 @@ material.colorNode = simplexNoise ( {
 
 ## Constants and explicit conversions
 
-Input functions can be used to create contants and do explicit conversions.
+Input functions can be used to create constants and do explicit conversions.
 > Conversions are also performed automatically if the output and input are of different types.
 
-| Name | Returns a constant or convertion of type: |
+| Name | Returns a constant or conversion of type: |
 | -- | -- |
 | `float( node\|number )` | `float` |
 | `int( node\|number )` | `int` |
@@ -490,7 +490,7 @@ It's possible use `xyzw`, `rgba` or `stpq`.
 | Name | Description |
 | -- | -- |
 | `.add( node \| value, ... )` | Return the addition of two or more value. |
-| `.sub( node \| value )` | Return the subraction of two or more value. |
+| `.sub( node \| value )` | Return the subtraction of two or more value. |
 | `.mul( node \| value )` | Return the multiplication of two or more value. |
 | `.div( node \| value )` | Return the division of two or more value. |
 | `.mod( node \| value )` | Computes the remainder of dividing the first node by the second. |
@@ -595,7 +595,7 @@ Functions used to declare variables.
 | `.toConst( node, name = null )` or `Const( node, name = null )` | Converts a node into an inline constant. |
 | `property( type, name = null )` | Declares an property but does not assign an initial value. |
 
-The name is optional; if set to `null`, the node system will generate one automatically.  
+The name is optional; if set to `null`, the node system will generate one automatically.
 Creating a variable, constant, or property can help optimize the shader graph manually or assist in debugging.
 
 ```js
@@ -635,7 +635,7 @@ const a = array( 'vec3', 2 );
 #### Fill with a default value
 
 ```js
-const a = vec3( 0, 0, 1 ).toArray( 2 ); 
+const a = vec3( 0, 0, 1 ).toArray( 2 );
 
 // a: [ vec3( 0, 0, 1 ), vec3( 0, 0, 1 ) ]
 ```
@@ -793,7 +793,7 @@ Switch( 0 )
 Notice that there are some rules when using this syntax which differentiate TSL from JavaScript:
 
 - There is no fallthrough support. So each `Case()` statement has an implicit break.
-- A `Case()` statement can hold multiple values (selectors) for testing. 
+- A `Case()` statement can hold multiple values (selectors) for testing.
 
 ### Ternary
 

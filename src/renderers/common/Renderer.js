@@ -2929,7 +2929,7 @@ class Renderer {
 	/**
 	 * Initializes the given render target.
 	 *
-	 * @param {RenderTarget} renderTarget - The render target to intialize.
+	 * @param {RenderTarget} renderTarget - The render target to initialize.
 	 */
 	initRenderTarget( renderTarget ) {
 

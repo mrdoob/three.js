@@ -468,7 +468,7 @@ class NodeMaterialObserver {
 
 		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		// check the geoemtry for the "equal" state just once per render for all render objects
+		// check the geometry for the "equal" state just once per render for all render objects
 
 		if ( geometryData._renderId !== renderId ) {
 

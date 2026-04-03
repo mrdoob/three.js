@@ -4,7 +4,7 @@
 
 Post-Processing node for apply Screen-space raymarched godrays to a scene.
 
-After the godrays have been computed, it's recommened to apply a Bilateral Blur to the result to mitigate raymarching and noise artifacts.
+After the godrays have been computed, it's recommended to apply a Bilateral Blur to the result to mitigate raymarching and noise artifacts.
 
 The composite with the scene pass is ideally done with `depthAwareBlend()`, which mitigates aliasing and light leaking.
 

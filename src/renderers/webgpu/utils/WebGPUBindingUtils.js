@@ -97,7 +97,7 @@ class WebGPUBindingUtils {
 
 		}
 
-		// if not, assing one
+		// if not, adding one
 
 		const entries = this._createLayoutEntries( bindGroup );
 		const bindGroupLayoutKey = hashString( JSON.stringify( entries ) );

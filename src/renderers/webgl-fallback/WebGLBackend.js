@@ -990,7 +990,7 @@ class WebGLBackend extends Backend {
 	 * @param {WebGLBufferRenderer} renderer - The internal renderer.
 	 * @param {number} firstVertex - The first vertex to render.
 	 * @param {number} vertexCount - The vertex count.
-	 * @param {number} instanceCount - The intance count.
+	 * @param {number} instanceCount - The instance count.
 	 * @param {WebGLProgram} programGPU - The raw WebGL shader program.
 	 */
 	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU ) {

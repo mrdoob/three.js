@@ -30,7 +30,7 @@ let _rendererState;
  *
  * - Ideally the maximum shadow length should not exceed `1` meter. Otherwise the effect gets
  * computationally very expensive since more samples during the ray marching process are evaluated.
- * You can mitigate this issue by reducing the `quality` paramter.
+ * You can mitigate this issue by reducing the `quality` parameter.
  * - The effect can only be used with a single directional light, the main light of your scene.
  * This main light usually represents the sun or daylight.
  * - Like other Screen-Space techniques SSS can only honor objects in the shadowing computation that

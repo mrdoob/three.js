@@ -1465,15 +1465,15 @@ class Timeline extends Tab {
 
 				const call = frame.calls[ i ];
 				const isStructural = call.method.startsWith( 'begin' ) || call.method.startsWith( 'finish' );
-				const formatedDetails = call.details ? this.formatDetails( call.details ) : '';
+				const formattedDetails = call.details ? this.formatDetails( call.details ) : '';
 
-				if ( currentGroup && currentGroup.method === call.method && currentGroup.formatedDetails === formatedDetails && ! isStructural ) {
+				if ( currentGroup && currentGroup.method === call.method && currentGroup.formattedDetails === formattedDetails && ! isStructural ) {
 
 					currentGroup.count ++;
 
 				} else {
 
-					currentGroup = { method: call.method, count: 1, formatedDetails, target: call.target };
+					currentGroup = { method: call.method, count: 1, formattedDetails: formattedDetails, target: call.target };
 					groupedCalls.push( currentGroup );
 
 				}
@@ -1530,21 +1530,21 @@ class Timeline extends Tab {
 					block.arrow.style.display = 'inline-block';
 					block.arrow.textContent = isCollapsed ? '[ + ]' : '[ - ]';
 
-					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.titleSpan.innerHTML = call.method + ( call.formattedDetails ? call.formattedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent ++;
 					elementStack.push( { element: block, isCollapsed: currentParent.isCollapsed || isCollapsed, id: groupId, beginCount: 0 } );
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.titleSpan.innerHTML = call.method + ( call.formattedDetails ? call.formattedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
 
 				} else {
 
-					block.titleSpan.innerHTML = call.method + ( call.formatedDetails ? call.formatedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
+					block.titleSpan.innerHTML = call.method + ( call.formattedDetails ? call.formattedDetails : '' ) + ( call.count > 1 ? ` <span style="opacity: 0.5">( ${call.count} )</span>` : '' );
 
 				}
 

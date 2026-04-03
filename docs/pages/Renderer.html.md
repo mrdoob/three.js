@@ -56,7 +56,7 @@ A reference to the current backend.
 
 A global context node that stores override nodes for specific transformations or calculations. These nodes can be used to replace default behavior in the rendering pipeline.
 
-**value**  
+**value**
 Object
 
 The context value object.
@@ -641,7 +641,7 @@ Initializes the given render target.
 
 **renderTarget**
 
-The render target to intialize.
+The render target to initialize.
 
 ### .initTexture( texture : Texture )
 
@@ -1032,70 +1032,70 @@ Can be used to synchronize CPU operations with GPU tasks. So when this method is
 
 Renderer options.
 
-**logarithmicDepthBuffer**  
+**logarithmicDepthBuffer**
 boolean
 
 Whether logarithmic depth buffer is enabled or not.
 
 Default is `false`.
 
-**reversedDepthBuffer**  
+**reversedDepthBuffer**
 boolean
 
 Whether reversed depth buffer is enabled or not.
 
 Default is `false`.
 
-**alpha**  
+**alpha**
 boolean
 
 Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 
 Default is `true`.
 
-**depth**  
+**depth**
 boolean
 
 Whether the default framebuffer should have a depth buffer or not.
 
 Default is `true`.
 
-**stencil**  
+**stencil**
 boolean
 
 Whether the default framebuffer should have a stencil buffer or not.
 
 Default is `false`.
 
-**antialias**  
+**antialias**
 boolean
 
 Whether MSAA as the default anti-aliasing should be enabled or not.
 
 Default is `false`.
 
-**samples**  
+**samples**
 number
 
 When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0 to overwrite the default.
 
 Default is `0`.
 
-**getFallback**  
+**getFallback**
 function
 
 This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 
 Default is `null`.
 
-**outputBufferType**  
+**outputBufferType**
 number
 
 Defines the type of output buffers. The default `HalfFloatType` is recommend for best quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 
 Default is `HalfFloatType`.
 
-**multiview**  
+**multiview**
 boolean
 
 If set to `true`, the renderer will use multiview during WebXR rendering if supported.

@@ -37,7 +37,7 @@ Whether to automatically perform a clear before a render call or not.
 
 Default is `true`.
 
-### .domElement : SVGSVGElement
+### .domElement : SVGElement
 
 The DOM where the renderer appends its child-elements.
 

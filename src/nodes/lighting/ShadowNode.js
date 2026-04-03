@@ -784,7 +784,7 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 	/**
-	 * Resets the resouce state of this shadow node.
+	 * Resets the ressource state of this shadow node.
 	 *
 	 * @private
 	 */

@@ -26,16 +26,16 @@
         </div>
         <div class="lesson">
           <div class="lesson-main">
-            
+
             <p>
-              `WebGPURenderer` comes with a brand-new component for post-processing. This article shows how the new system 
+              `WebGPURenderer` comes with a brand-new component for post-processing. This article shows how the new system
               works and provides some basic guidelines about the usage.
             </p>
 
             <h2>Overview</h2>
 
              <p>
-              The previous post-processing for `WebGLRenderer` had many conceptual issues. Making use of Multiple Render Targets 
+              The previous post-processing for `WebGLRenderer` had many conceptual issues. Making use of Multiple Render Targets
               (MRT) was cumbersome due to the limited support in the renderer and there was no automatic pass/effect combination
               to improve the overall performance.
             </p>
@@ -61,8 +61,8 @@
             <h2>Basics</h2>
 
             <p>
-              First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your 
-              imports. After that, you can create an instance of the render pipleine module like so:
+              First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your
+              imports. After that, you can create an instance of the render pipeline module like so:
             </p>
 
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
@@ -80,7 +80,7 @@ const renderPipeline = new THREE.RenderPipeline( renderer );
 
             <p>
              Many post-processing setups start with a so called "scene pass" or "beauty pass" that represents the image of you rendered scene.
-             This image should be subsequently enhanced by different effects like Bloom, Depth-of-Field or SSR. Start by importing the `pass()` TSL 
+             This image should be subsequently enhanced by different effects like Bloom, Depth-of-Field or SSR. Start by importing the `pass()` TSL
              function from the TSL namespace and use it to create the pass.
             </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
@@ -91,7 +91,7 @@ import { pass } from 'three/tsl';
 const scenePass = pass( scene, camera );
 </pre>
             <p>
-             The basic idea of the node system is to represent materials or post-processing effects as node compositions. To configure a basic 
+             The basic idea of the node system is to represent materials or post-processing effects as node compositions. To configure a basic
              Dotscreen and RGB shift effect, you create effect nodes with TSL functions and compose them together.
             </p>
 
@@ -118,9 +118,9 @@ renderPipeline.outputNode = rgbShiftPass;
             <h2>Tone Mapping and Color Spaces</h2>
 
             <p>
-            When using post-processing, tone mapping and color space conversion are automatically applied at the end 
+            When using post-processing, tone mapping and color space conversion are automatically applied at the end
             of your effect chain. Sometimes you want full control over how and when these steps are executed though.
-            For example if you want to apply FXAA with `FXAANode` or color grading with `Lut3DNode`, you can disable automatic tone 
+            For example if you want to apply FXAA with `FXAANode` or color grading with `Lut3DNode`, you can disable automatic tone
             mapping and color space conversion and apply it via `renderOutput()` by yourself.
             </p>
 
@@ -151,7 +151,7 @@ renderPipeline.outputNode = fxaaPass;
 
           <p>
             The new post-processing stack has built-in Multiple Render Targets (MRT) support which is crucial for more advanced
-            setups. MRT allows you to produce multiple outputs in a single render pass. So for example when rendering your scene 
+            setups. MRT allows you to produce multiple outputs in a single render pass. So for example when rendering your scene
             with TRAA, you need below setup to prepare the inputs for the anti-aliasing.
           </p>
 
@@ -168,8 +168,8 @@ scenePass.setMRT( mrt( {
 </pre>
           <p>
             The configuration object you assign to the `mrt()` TSL function describes the different outputs of the pass. In this case,
-            we save the default output (the scene's beauty) and scene's velocity since we want to setup a TRAA. If you also require 
-            the scene's depth, there is no need to configure it as a MRT output. You get it for free in your default output pass if 
+            we save the default output (the scene's beauty) and scene's velocity since we want to setup a TRAA. If you also require
+            the scene's depth, there is no need to configure it as a MRT output. You get it for free in your default output pass if
             you request it in your app. If you know want to use these outputs in subsequent effects, you can query them as texture nodes.
           </p>
 
@@ -189,18 +189,18 @@ renderPipeline.outputNode = traaPass;
           <p>
            The MRT configuration varies depending on your setup. There are many different TSL objects like `output`, `velocity`,
            `normalView` or `emissive` than you can use to save per-fragment data in MRT attachments. To improve performance and avoid
-           hitting memory restrictions, it's important to pack and optimize your data in complex MRT setups. By default all attachments 
-           are RGBA16 (Half-Float) in precision which is not necessary for all types of data. As an example, below code queries the 
+           hitting memory restrictions, it's important to pack and optimize your data in complex MRT setups. By default all attachments
+           are RGBA16 (Half-Float) in precision which is not necessary for all types of data. As an example, below code queries the
            `diffuseColor` attachment and sets its format to RGBA8 which cuts down the memory and bandwidth by half.
           </p>
 
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
 const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
 diffuseTexture.type = THREE.UnsignedByteType;
-</pre> 
+</pre>
 
           <p>
-            Below setup for Scree-Space Reflections (SSR) converts the default FP16 normals into RGBA8 colors and packs metalness/roughness 
+            Below setup for Scree-Space Reflections (SSR) converts the default FP16 normals into RGBA8 colors and packs metalness/roughness
             into a single attachment. The usage of the `sample()` TSL functions allows to implement custom unpacking. In this instance, it
             converts the color back to a (normalized) direction vector.
           </p>

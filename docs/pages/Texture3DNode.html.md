@@ -90,7 +90,7 @@ The current node builder.
 
 ### .normal( uvNode : Node.<vec3> ) : Node.<vec3>
 
-Computes the normal for the given uv. These texture coordiantes represent a position inside the 3D texture. Unlike geometric normals, this normal represents a slope or gradient of scalar data inside the 3D texture.
+Computes the normal for the given uv. These texture coordinates represent a position inside the 3D texture. Unlike geometric normals, this normal represents a slope or gradient of scalar data inside the 3D texture.
 
 **uvNode**
 
