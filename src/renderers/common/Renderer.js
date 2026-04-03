@@ -19,7 +19,6 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
-import ReadbackBuffer from './ReadbackBuffer.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
