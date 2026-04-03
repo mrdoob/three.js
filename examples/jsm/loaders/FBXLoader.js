@@ -1290,21 +1290,24 @@ class FBXTreeParser {
 
 				case 2: // Spot
 					let angle = Math.PI / 3;
-
-					if ( lightAttribute.InnerAngle !== undefined ) {
-
-						angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
-
-					}
-
 					let penumbra = 0;
+
 					if ( lightAttribute.OuterAngle !== undefined ) {
 
-						// TODO: this is not correct - FBX calculates outer and inner angle in degrees
-						// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-						// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-						penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
-						penumbra = Math.max( penumbra, 1 );
+						angle = MathUtils.degToRad( lightAttribute.OuterAngle.value );
+
+						if ( lightAttribute.InnerAngle !== undefined ) {
+
+							penumbra = 1 - ( lightAttribute.InnerAngle.value / lightAttribute.OuterAngle.value );
+							penumbra = Math.max( 0, penumbra ); // penumbra must be in the range [0,1]
+
+						}
+
+					} else if ( lightAttribute.InnerAngle !== undefined ) {
+
+						// fallback if only InnerAngle is defined
+
+						angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 					}
 
