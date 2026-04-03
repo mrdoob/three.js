@@ -2750,13 +2750,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const childConnection = connections.get( child.ID );
-								const modelRelationship = childConnection ? childConnection.parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ] : undefined;
-								const modelID = modelRelationship ? modelRelationship.ID : undefined;
+								} );
+
+								if ( filteredParents.length === 0 ) return;
+
+								const modelID = filteredParents[ 0 ].ID;
 
 								if ( modelID !== undefined ) {
 
@@ -2816,15 +2818,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const childConnection = connections.get( child.ID );
-								const deformerRelationship = childConnection ? childConnection.parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ] : undefined;
-								const deformerID = deformerRelationship ? deformerRelationship.ID : undefined;
+								} );
 
-								if ( deformerID === undefined ) return;
+								if ( filteredParents.length === 0 ) return;
+
+								const deformerID = filteredParents[ 0 ].ID;
 
 								const morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 								const geoID = connections.get( morpherID ).parents[ 0 ].ID;
