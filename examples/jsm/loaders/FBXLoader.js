@@ -601,7 +601,8 @@ class FBXTreeParser {
 
 		}
 
-		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
+		// the transparency handling is implemented based on Blender's approach:
+		// https://github.com/blender/blender/blob/main/scripts/addons_core/io_scene_fbx/import_fbx.py
 
 		parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
 
@@ -611,7 +612,10 @@ class FBXTreeParser {
 
 			if ( parameters.opacity === null ) {
 
-				parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+				// Default to opaque. Some exporters (e.g. 3ds Max) define TransparentColor
+				// as white (1,1,1) without intending transparency, which makes the Unity-style
+				// fallback of `1 - TransparentColor.r` produce incorrect zero opacity.
+				parameters.opacity = 1;
 
 			}
 
