@@ -90,6 +90,12 @@
     "url": "https://github.com/mrdoob/three.js/issues"
   },
   "homepage": "https://threejs.org/",
+  "overrides": {
+    "@jsdoc/salty": "^0.2.11",
+    "lodash": "^4.18.1",
+    "brace-expansion": "^5.0.5",
+    "minimatch": "~10.2.5"
+  },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
