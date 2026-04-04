@@ -870,7 +870,7 @@ function cyrb53( value, seed = 0 ) {
 
 	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
 
-	if ( value instanceof Array ) {
+	if ( Array.isArray( value ) ) {
 
 		for ( let i = 0, val; i < value.length; i ++ ) {
 
@@ -16258,7 +16258,7 @@ class NormalMapNode extends TempNode {
 
 			} else if ( unpackNormalMode !== NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
+				error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
 
 			}
 
@@ -16266,7 +16266,7 @@ class NormalMapNode extends TempNode {
 
 			if ( unpackNormalMode !== NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
+				error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
 
 			}
 
@@ -21131,32 +21131,6 @@ class NodeMaterial extends Material {
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
 
-		// < CONTEXT >
-
-		if ( renderer.contextNode.isContextNode === true ) {
-
-			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
-
-		} else {
-
-			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
-
-		}
-
-		if ( this.contextNode !== null ) {
-
-			if ( this.contextNode.isContextNode === true ) {
-
-				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
-
-			} else {
-
-				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
-
-			}
-
-		}
-
 		// < VERTEX STAGE >
 
 		builder.addStack();
@@ -22684,6 +22658,33 @@ class Line2NodeMaterial extends NodeMaterial {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+	/**
+	 * Copies the properties of the given material to this instance.
+	 *
+	 * @param {Line2NodeMaterial} source - The material to copy.
+	 * @return {Line2NodeMaterial} A reference to this material.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.vertexColors = source.vertexColors;
+		this.dashOffset = source.dashOffset;
+
+		this.lineColorNode = source.lineColorNode;
+		this.offsetNode = source.offsetNode;
+		this.dashScaleNode = source.dashScaleNode;
+		this.dashSizeNode = source.dashSizeNode;
+		this.gapSizeNode = source.gapSizeNode;
+
+		this._useDash = source._useDash;
+		this._useAlphaToCoverage = source._useAlphaToCoverage;
+		this._useWorldUnits = source._useWorldUnits;
+
+		return this;
 
 	}
 
@@ -44247,7 +44248,27 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( normalWorld.mul( normalBias ) ) );
+		const shadowMatrix = lightShadowMatrix( light );
+		const shadowNormalBias = normalWorld.mul( normalBias );
+
+		let shadowPosition;
+
+		if ( ! renderer.highPrecision || builder.material.receivedShadowPositionNode || builder.context.shadowPositionWorld ) {
+
+			shadowPosition = shadowMatrix.mul( shadowPositionWorld.add( shadowNormalBias ) );
+
+		} else {
+
+			const highpShadowModelMatrix = uniform( 'mat4' ).onObjectUpdate( ( { object }, self ) => {
+
+				return self.value.multiplyMatrices( shadowMatrix.value, object.matrixWorld );
+
+			} );
+
+			shadowPosition = highpShadowModelMatrix.mul( positionLocal ).add( shadowMatrix.mul( vec4( shadowNormalBias, 0 ) ) );
+
+		}
+
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -52375,13 +52396,41 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Central build method which controls the build for the given object.
-	 *
-	 * @return {NodeBuilder} A reference to this node builder.
+	 * Prebuild the node builder.
 	 */
-	build() {
+	prebuild() {
 
-		const { object, material, renderer } = this;
+		const { object, renderer, material } = this;
+
+		// < renderer.contextNode >
+
+		if ( renderer.contextNode.isContextNode === true ) {
+
+			this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+
+		} else {
+
+			error( 'NodeBuilder: "renderer.contextNode" must be an instance of `context()`.' );
+
+		}
+
+		// < material.contextNode >
+
+		if ( material && material.contextNode ) {
+
+			if ( material.contextNode.isContextNode === true ) {
+
+				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+
+			} else {
+
+				error( 'NodeBuilder: "material.contextNode" must be an instance of `context()`.' );
+
+			}
+
+		}
+
+		// < nodeMaterial >
 
 		if ( material !== null ) {
 
@@ -52389,7 +52438,7 @@ class NodeBuilder {
 
 			if ( nodeMaterial === null ) {
 
-				error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+				error( `NodeBuilder: Material "${ material.type }" is not compatible.` );
 
 				nodeMaterial = new NodeMaterial();
 
@@ -52402,6 +52451,17 @@ class NodeBuilder {
 			this.addFlow( 'compute', object );
 
 		}
+
+	}
+
+	/**
+	 * Central build method which controls the build for the given object.
+	 *
+	 * @return {NodeBuilder} A reference to this node builder.
+	 */
+	build() {
+
+		this.prebuild();
 
 		// setup() -> stage 1: create possible new nodes and/or return an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
@@ -52461,27 +52521,7 @@ class NodeBuilder {
 	 */
 	async buildAsync() {
 
-		const { object, material, renderer } = this;
-
-		if ( material !== null ) {
-
-			let nodeMaterial = renderer.library.fromMaterial( material );
-
-			if ( nodeMaterial === null ) {
-
-				error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-				nodeMaterial = new NodeMaterial();
-
-			}
-
-			nodeMaterial.build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
+		this.prebuild();
 
 		// setup() -> stage 1: create possible new nodes and/or return an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
@@ -61910,7 +61950,7 @@ class UniformsGroup extends UniformBuffer {
 		const offset = uniform.offset;
 		const type = uniform.getType();
 
-		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
+		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 3 ] !== v.w ) {
 
 			const b = this._getBufferForType( type );
 
@@ -63625,9 +63665,11 @@ ${ flowData.code }
 
 			return 'uint( gl_DrawID )';
 
-		}
+		} else {
 
-		return null;
+			return 'nodeUniformDrawId'; // fallback to uniform
+
+		}
 
 	}
 
@@ -64035,6 +64077,20 @@ void main() {
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.transforms = this.getTransforms( shaderStage );
 			stageData.flow = flow;
+
+			// fallbacks
+
+			if ( shaderStage === 'vertex' ) {
+
+				const ext = this.renderer.backend.extensions;
+
+				if ( this.object.isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) === false ) {
+
+					stageData.uniforms += '\nuniform uint nodeUniformDrawId;\n';
+
+				}
+
+			}
 
 		}
 
@@ -70025,14 +70081,28 @@ class WebGLBackend extends Backend {
 	 * @param {number} firstVertex - The first vertex to render.
 	 * @param {number} vertexCount - The vertex count.
 	 * @param {number} instanceCount - The intance count.
+	 * @param {WebGLProgram} programGPU - The raw WebGL shader program.
 	 */
-	_draw( object, renderer, firstVertex, vertexCount, instanceCount ) {
+	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU ) {
 
 		if ( object.isBatchedMesh ) {
 
 			if ( this.hasFeature( 'WEBGL_multi_draw' ) === false ) {
 
-				warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
+				const { gl } = this;
+
+				const drawIdLocation = gl.getUniformLocation( programGPU, 'nodeUniformDrawId' );
+
+				const starts = object._multiDrawStarts;
+				const counts = object._multiDrawCounts;
+				const drawCount = object._multiDrawCount;
+
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					gl.uniform1ui( drawIdLocation, i );
+					renderer.render( starts[ i ], counts[ i ] );
+
+				}
 
 			} else {
 
@@ -70301,7 +70371,7 @@ class WebGLBackend extends Backend {
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
-					this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
+					this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
 
 				}
 
@@ -70312,7 +70382,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			this._draw( object, renderer, firstVertex, vertexCount, instanceCount );
+			this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
 
 		}
 

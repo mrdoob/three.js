@@ -3,6 +3,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
 import { StaticDrawUsage, FloatType } from '../constants.js';
 import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
+import { EventDispatcher } from './EventDispatcher.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
@@ -17,7 +18,7 @@ let _id = 0;
  * When working with vector-like data, the `fromBufferAttribute( attribute, index )`
  * helper methods on vector and color class might be helpful. E.g. {@link Vector3#fromBufferAttribute}.
  */
-class BufferAttribute {
+class BufferAttribute extends EventDispatcher {
 
 	/**
 	 * Constructs a new buffer attribute.
@@ -27,6 +28,8 @@ class BufferAttribute {
 	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
 	constructor( array, itemSize, normalized = false ) {
+
+		super();
 
 		if ( Array.isArray( array ) ) {
 
@@ -671,6 +674,15 @@ class BufferAttribute {
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
 
 		return data;
+
+	}
+
+	/**
+	 * Disposes of the buffer attribute. Available only in {@link WebGPURenderer}.
+	 */
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

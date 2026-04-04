@@ -9416,6 +9416,7 @@ class RenderTarget extends EventDispatcher {
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
 		this.samples = source.samples;
+		this.multiview = source.multiview;
 
 		return this;
 
@@ -31492,6 +31493,7 @@ function CubicPoly() {
 //
 
 const tmp = /*@__PURE__*/ new Vector3();
+const tmp2 = /*@__PURE__*/ new Vector3();
 const px = /*@__PURE__*/ new CubicPoly();
 const py = /*@__PURE__*/ new CubicPoly();
 const pz = /*@__PURE__*/ new CubicPoly();
@@ -31616,8 +31618,8 @@ class CatmullRomCurve3 extends Curve {
 		} else {
 
 			// extrapolate first point
-			tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
-			p0 = tmp;
+			tmp2.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
+			p0 = tmp2;
 
 		}
 
@@ -44806,9 +44808,10 @@ class DataTextureLoader extends Loader {
 				} else {
 
 					error( e );
-					return;
 
 				}
+
+				return;
 
 			}
 
@@ -48109,6 +48112,8 @@ class BufferGeometryLoader extends Loader {
 
 }
 
+const _customGeometries = {};
+
 /**
  * A loader for loading a JSON resource in the [JSON Object/Scene format](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4).
  * The files are internally loaded via {@link FileLoader}.
@@ -48165,11 +48170,11 @@ class ObjectLoader extends Loader {
 
 				json = JSON.parse( text );
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				if ( onError !== undefined ) onError( error );
+				if ( onError !== undefined ) onError( e );
 
-				error( 'ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				error( 'ObjectLoader: Can\'t parse ' + url + '.', e.message );
 
 				return;
 
@@ -48319,6 +48324,20 @@ class ObjectLoader extends Loader {
 
 	}
 
+	/**
+	 * Registers the given geometry at the internal
+	 * geometry library.
+	 *
+	 * @static
+	 * @param {string} type - The geometry type.
+	 * @param {BufferGeometry.constructor} geometryClass - The geometry class.
+	 */
+	static registerGeometry( type, geometryClass ) {
+
+		_customGeometries[ type ] = geometryClass;
+
+	}
+
 	// internals
 
 	parseShapes( json ) {
@@ -48399,9 +48418,13 @@ class ObjectLoader extends Loader {
 
 							geometry = Geometries[ data.type ].fromJSON( data, shapes );
 
+						} else if ( data.type in _customGeometries ) {
+
+							geometry = _customGeometries[ data.type ].fromJSON( data, shapes );
+
 						} else {
 
-							warn( `ObjectLoader: Unsupported geometry type "${ data.type }"` );
+							warn( `ObjectLoader: Unknown geometry type "${ data.type }". Use .registerGeometry() before starting the deserialization process.` );
 
 						}
 
@@ -56804,6 +56827,9 @@ class Line3 {
 		_startEnd.subVectors( this.end, this.start );
 
 		const startEnd2 = _startEnd.dot( _startEnd );
+
+		if ( startEnd2 === 0 ) return 0;
+
 		const startEnd_startP = _startEnd.dot( _startP );
 
 		let t = startEnd_startP / startEnd2;
@@ -64344,7 +64370,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
-		stencilBuffer: stencil
+		stencilBuffer: stencil,
+		depthTexture: depth ? new DepthTexture( width, height ) : undefined
 	} );
 
 	const targetB = new WebGLRenderTarget( width, height, {
@@ -64565,6 +64592,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	this.dispose = function () {
 
+		if ( targetA.depthTexture ) targetA.depthTexture.dispose();
 		targetA.dispose();
 		targetB.dispose();
 		geometry.dispose();
@@ -76108,7 +76136,7 @@ class WebGLRenderer {
 
 			if ( _outputBufferType === UnsignedByteType ) {
 
-				console.error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
+				error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
 				return;
 
 			}
@@ -76119,7 +76147,7 @@ class WebGLRenderer {
 
 					if ( effects[ i ].isOutputPass === true ) {
 
-						console.warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
+						warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
 						break;
 
 					}
@@ -76379,6 +76407,7 @@ class WebGLRenderer {
 			if ( depth ) {
 
 				bits |= _gl.DEPTH_BUFFER_BIT;
+				this.state.buffers.depth.setMask( true );
 
 			}
 

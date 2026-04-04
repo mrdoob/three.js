@@ -625,56 +625,71 @@ class USDComposer {
 			const typeName = spec.fields.typeName;
 
 			// Check for references/payloads
-			const refValue = this._getReference( spec );
-			if ( refValue ) {
+			const refValues = this._getReferences( spec );
+			if ( refValues.length > 0 ) {
 
 				// Get local variant selections from this prim
 				const localVariants = this._getLocalVariantSelections( spec.fields );
 
-				// Resolve the reference
-				const referencedGroup = this._resolveReference( refValue, localVariants );
-				if ( referencedGroup ) {
+				// Resolve all references
+				const resolvedGroups = [];
+				for ( const refValue of refValues ) {
+
+					const referencedGroup = this._resolveReference( refValue, localVariants );
+					if ( referencedGroup ) resolvedGroups.push( referencedGroup );
+
+				}
+
+				if ( resolvedGroups.length > 0 ) {
 
 					const attrs = this._getAttributes( path );
 
-					// Check if the referenced content is a single mesh (or container with single mesh)
+					// Single reference with single mesh: use optimized path
 					// This handles the USDZExporter pattern: Xform references geometry file
-					const singleMesh = this._findSingleMesh( referencedGroup );
+					if ( resolvedGroups.length === 1 ) {
 
-					if ( singleMesh && ( typeName === 'Xform' || ! typeName ) ) {
+						const singleMesh = this._findSingleMesh( resolvedGroups[ 0 ] );
 
-						// Merge the mesh into this prim
-						singleMesh.name = name;
-						this.applyTransform( singleMesh, spec.fields, attrs );
+						if ( singleMesh && ( typeName === 'Xform' || ! typeName ) ) {
 
-						// Apply material binding from the referencing prim if present
-						this._applyMaterialBinding( singleMesh, path );
+							// Merge the mesh into this prim
+							singleMesh.name = name;
+							this.applyTransform( singleMesh, spec.fields, attrs );
 
-						parent.add( singleMesh );
+							// Apply material binding from the referencing prim if present
+							this._applyMaterialBinding( singleMesh, path );
 
-						// Still build local children (overrides)
-						this._buildHierarchy( singleMesh, path );
+							parent.add( singleMesh );
 
-					} else {
+							// Still build local children (overrides)
+							this._buildHierarchy( singleMesh, path );
 
-						// Create a container for the referenced content
-						const obj = new Object3D();
-						obj.name = name;
-						this.applyTransform( obj, spec.fields, attrs );
+							continue;
 
-						// Add all children from the referenced group
+						}
+
+					}
+
+					// Create a container for the referenced content
+					const obj = new Object3D();
+					obj.name = name;
+					this.applyTransform( obj, spec.fields, attrs );
+
+					// Add all children from all resolved references
+					for ( const referencedGroup of resolvedGroups ) {
+
 						while ( referencedGroup.children.length > 0 ) {
 
 							obj.add( referencedGroup.children[ 0 ] );
 
 						}
 
-						parent.add( obj );
-
-						// Still build local children (overrides)
-						this._buildHierarchy( obj, path );
-
 					}
+
+					parent.add( obj );
+
+					// Still build local children (overrides)
+					this._buildHierarchy( obj, path );
 
 					continue;
 
@@ -1023,27 +1038,44 @@ class USDComposer {
 	}
 
 	/**
-	 * Get reference value from a prim spec.
+	 * Get all reference values from a prim spec.
+	 * @returns {string[]} Array of reference strings like "@path@" or "@path@<prim>"
 	 */
-	_getReference( spec ) {
+	_getReferences( spec ) {
+
+		const results = [];
 
 		if ( spec.fields.references && spec.fields.references.length > 0 ) {
 
 			const ref = spec.fields.references[ 0 ];
-			if ( typeof ref === 'string' ) return ref;
-			if ( ref.assetPath ) return '@' + ref.assetPath + '@';
+
+			if ( typeof ref === 'string' ) {
+
+				// Extract all @...@ references (handles both single and array values)
+				const matches = ref.matchAll( /@([^@]+)@(?:<([^>]+)>)?/g );
+				for ( const match of matches ) {
+
+					results.push( match[ 0 ] );
+
+				}
+
+			} else if ( ref.assetPath ) {
+
+				results.push( '@' + ref.assetPath + '@' );
+
+			}
 
 		}
 
-		if ( spec.fields.payload ) {
+		if ( results.length === 0 && spec.fields.payload ) {
 
 			const payload = spec.fields.payload;
-			if ( typeof payload === 'string' ) return payload;
-			if ( payload.assetPath ) return '@' + payload.assetPath + '@';
+			if ( typeof payload === 'string' ) results.push( payload );
+			else if ( payload.assetPath ) results.push( '@' + payload.assetPath + '@' );
 
 		}
 
-		return null;
+		return results;
 
 	}
 
@@ -1585,7 +1617,7 @@ class USDComposer {
 			if ( ! indices || indices.length === 0 ) continue;
 
 			// Get material binding - check direct path and variant paths
-			let materialPath = this._getMaterialBindingTarget( p );
+			const materialPath = this._getMaterialBindingTarget( p );
 
 			subsets.push( {
 				name: p.split( '/' ).pop(),
@@ -1966,10 +1998,17 @@ class USDComposer {
 
 		// Triangulate original data using consistent pattern
 		const { indices: origIndices, pattern: triPattern } = this._triangulateIndicesWithPattern( faceVertexIndices, faceVertexCounts, points, holeMap );
-		const origUvIndices = uvIndices ? this._applyTriangulationPattern( uvIndices, triPattern ) : null;
-		const origUv2Indices = uv2Indices ? this._applyTriangulationPattern( uv2Indices, triPattern ) : null;
-
 		const numFaceVertices = faceVertexCounts.reduce( ( a, b ) => a + b, 0 );
+		const faceVaryingIdentity = ( uvs && ! uvIndices && uvs.length / 2 === numFaceVertices ) ||
+			( uvs2 && ! uv2Indices && uvs2.length / 2 === numFaceVertices )
+			? this._applyTriangulationPattern( Array.from( { length: numFaceVertices }, ( _, i ) => i ), triPattern )
+			: null;
+		const origUvIndices = uvIndices
+			? this._applyTriangulationPattern( uvIndices, triPattern )
+			: ( uvs && uvs.length / 2 === numFaceVertices ? faceVaryingIdentity : null );
+		const origUv2Indices = uv2Indices
+			? this._applyTriangulationPattern( uv2Indices, triPattern )
+			: ( uvs2 && uvs2.length / 2 === numFaceVertices ? faceVaryingIdentity : null );
 		const hasIndexedNormals = normals && normalIndicesRaw && normalIndicesRaw.length > 0;
 		const hasFaceVaryingNormals = normals && normals.length / 3 === numFaceVertices;
 		const origNormalIndices = hasIndexedNormals
@@ -2751,7 +2790,7 @@ class USDComposer {
 	_getMaterialPath( meshPath, fields ) {
 
 		let materialPath = null;
-		let materialBinding = fields[ 'material:binding' ];
+		const materialBinding = fields[ 'material:binding' ];
 
 		if ( materialBinding ) {
 
@@ -2775,7 +2814,7 @@ class USDComposer {
 		const material = new MeshPhysicalMaterial();
 
 		let materialPath = null;
-		let materialBinding = fields[ 'material:binding' ];
+		const materialBinding = fields[ 'material:binding' ];
 
 		if ( materialBinding ) {
 
@@ -3846,6 +3885,7 @@ class USDComposer {
 			}
 
 		};
+
 		image.src = url;
 
 		return texture;
@@ -4075,7 +4115,7 @@ class USDComposer {
 			// Use geomBindTransform if available, otherwise fall back to identity.
 			// Estimating bind transforms from vertex/joint samples is not robust and can
 			// produce severe skinning distortion for valid assets.
-			let bindMatrix = new Matrix4();
+			const bindMatrix = new Matrix4();
 
 			if ( geomBindTransform && geomBindTransform.length === 16 ) {
 

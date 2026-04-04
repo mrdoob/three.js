@@ -339,6 +339,8 @@ class GPUComputationRenderer {
 
 				}
 
+				variable.material.dispose();
+
 			}
 
 		};

@@ -666,32 +666,6 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the variables of the given shader stage as a GLSL string.
-	 *
-	 * @param {string} shaderStage - The shader stage.
-	 * @return {string} The GLSL snippet that defines the variables.
-	 */
-	getVars( shaderStage ) {
-
-		const snippets = [];
-
-		const vars = this.vars[ shaderStage ];
-
-		if ( vars !== undefined ) {
-
-			for ( const variable of vars ) {
-
-				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count ) };` );
-
-			}
-
-		}
-
-		return snippets.join( '\n\t' );
-
-	}
-
-	/**
 	 * Returns the uniforms of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -1425,13 +1399,13 @@ ${shaderData.varyings}
 // attributes
 ${shaderData.attributes}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 void main() {
-
-	// vars
-	${shaderData.vars}
 
 	// transforms
 	${shaderData.transforms}
@@ -1474,13 +1448,13 @@ ${shaderData.uniforms}
 // varyings
 ${shaderData.varyings}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 void main() {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -1552,7 +1526,7 @@ void main() {
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
-			stageData.vars = this.getVars( shaderStage );
+			stageData.vars = this.getVars( shaderStage, true );
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.transforms = this.getTransforms( shaderStage );

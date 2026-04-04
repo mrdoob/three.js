@@ -2672,11 +2672,12 @@ class NodeBuilder {
 	 * Returns the variable definitions as a shader string for the given shader stage.
 	 *
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
+	 * @param {boolean} [global=false] - Whether the variables are global.
 	 * @return {string} The variable code section.
 	 */
-	getVars( shaderStage ) {
+	getVars( shaderStage, global = false ) {
 
-		let snippet = '';
+		const snippets = [];
 
 		const vars = this.vars[ shaderStage ];
 
@@ -2684,13 +2685,13 @@ class NodeBuilder {
 
 			for ( const variable of vars ) {
 
-				snippet += `${ this.getVar( variable.type, variable.name ) }; `;
+				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count ) };` );
 
 			}
 
 		}
 
-		return snippet;
+		return snippets.join( global ? '\n' : '\n\t' );
 
 	}
 
