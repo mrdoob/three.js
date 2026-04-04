@@ -1,5 +1,6 @@
 import { BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from '../../constants.js';
 import { warn } from '../../utils.js';
+import ChainMap from './ChainMap.js';
 
 function getKeys( obj ) {
 
@@ -82,18 +83,181 @@ function getNodeValue( node ) {
 
 }
 
-function getLightValueKey( light ) {
+function getPath( basePath, property, index = undefined ) {
 
-	let valueKey = `${ light.type }:${ light.id }:${ light.castShadow === true ? 1 : 0 }`;
+	let path = `${ basePath }.${ property }`;
 
-	if ( light.isSpotLight === true ) {
+	if ( index !== undefined ) {
 
-		valueKey += `:${ light.map !== null ? light.map.id : - 1 }`;
-		valueKey += `:${ light.colorNode ? light.colorNode.getCacheKey() : - 1 }`;
+		path += Number.isInteger( index ) ? `[${ index }]` : `.${ index }`;
 
 	}
 
-	return valueKey;
+	return path;
+
+}
+
+function getNodeCustomCacheStateComponents( node, path ) {
+
+	const cacheKeyComponents = [];
+
+	if ( node.type === 'ToneMappingNode' && typeof node.getToneMapping === 'function' ) {
+
+		const toneMapping = node.getToneMapping();
+
+		cacheKeyComponents.push( {
+			property: `${ path }.toneMapping`,
+			valueKey: String( toneMapping ),
+			value: String( toneMapping )
+		} );
+
+	} else if ( node.isPropertyNode === true ) {
+
+		cacheKeyComponents.push( {
+			property: `${ path }.name`,
+			valueKey: String( node.name ),
+			value: getDebugValue( node.name )
+		}, {
+			property: `${ path }.varying`,
+			valueKey: String( node.varying ),
+			value: String( node.varying )
+		} );
+
+	} else if ( typeof node.getLights === 'function' ) {
+
+		cacheKeyComponents.push( {
+			property: `${ path }.lights`,
+			valueKey: getLightsNodeValueKey( node ),
+			value: getLightsNodeValue( node )
+		} );
+
+	}
+
+	return cacheKeyComponents;
+
+}
+
+function getNodeComponent( node, path, withSnapshot = false ) {
+
+	const component = {
+		node,
+		property: path,
+		valueKey: node.getCacheKey(),
+		value: getNodeValue( node ),
+		nodeId: node.id,
+		nodeType: node.type || node.constructor.name,
+		customCacheKey: node.customCacheKey(),
+		customCacheState: getNodeCustomCacheStateComponents( node, path )
+	};
+
+	if ( withSnapshot === true ) {
+
+		component.snapshot = getNodeSnapshot( node, path );
+
+	}
+
+	return component;
+
+}
+
+function getComponentByProperty( components, property ) {
+
+	for ( const component of components ) {
+
+		if ( component.property === property ) return component;
+
+	}
+
+	return null;
+
+}
+
+function getNodeSnapshot( node, path, ignores = new Set() ) {
+
+	const component = getNodeComponent( node, path );
+
+	const nextIgnores = new Set( ignores );
+	nextIgnores.add( node );
+
+	const children = [];
+
+	for ( const { property, index, childNode } of node._getChildren( new Set( ignores ) ) ) {
+
+		const childPath = getPath( path, property, index );
+
+		children.push( {
+			property: childPath,
+			valueKey: childNode.getCacheKey(),
+			value: getNodeValue( childNode ),
+			snapshot: getNodeSnapshot( childNode, childPath, nextIgnores )
+		} );
+
+	}
+
+	return {
+		path,
+		value: component.value,
+		valueKey: component.valueKey,
+		nodeId: component.nodeId,
+		nodeType: component.nodeType,
+		customCacheKey: component.customCacheKey,
+		customCacheState: component.customCacheState,
+		children
+	};
+
+}
+
+function getMaterialNodeComponents( material, withSnapshots = false ) {
+
+	if ( material.isNodeMaterial !== true || typeof material._getNodeChildren !== 'function' ) return [];
+
+	const cacheKeyComponents = [];
+
+	for ( const { property, childNode } of material._getNodeChildren() ) {
+
+		const path = `material.${ property }`;
+
+		cacheKeyComponents.push( getNodeComponent( childNode, path, withSnapshots ) );
+
+	}
+
+	return cacheKeyComponents;
+
+}
+
+function getTraceMaterialNodeComponents( previousComponents, currentComponents ) {
+
+	const previousMap = new Map();
+
+	for ( const component of previousComponents ) {
+
+		previousMap.set( component.property, component );
+
+	}
+
+	for ( const component of currentComponents ) {
+
+		const previousComponent = previousMap.get( component.property );
+
+		if (
+			previousComponent !== undefined &&
+			previousComponent.valueKey === component.valueKey &&
+			previousComponent.nodeId === component.nodeId &&
+			previousComponent.nodeType === component.nodeType &&
+			previousComponent.snapshot !== undefined
+		) {
+
+			component.snapshot = previousComponent.snapshot;
+
+		} else {
+
+			component.snapshot = getNodeSnapshot( component.node, component.property );
+
+		}
+
+	}
+
+	return currentComponents;
 
 }
 
@@ -126,15 +290,25 @@ function getLightsValue( lightsNode ) {
 
 }
 
-function getLightsValueKey( lightsNode ) {
+function getLightsNodeValue( lightsNode ) {
 
-	if ( lightsNode === null ) return '';
+	if ( lightsNode === null ) return 'none';
 
-	return lightsNode.getLights().slice().sort( ( a, b ) => a.id - b.id ).map( getLightValueKey ).join( ',' );
+	const lightsNodeType = lightsNode.type || lightsNode.constructor.name;
+
+	return `${ lightsNodeType } ${ getLightsValue( lightsNode ) }`;
 
 }
 
-function getCacheKeyDifference( previousComponents, currentComponents ) {
+function getLightsNodeValueKey( lightsNode ) {
+
+	if ( lightsNode === null ) return 'null';
+
+	return String( lightsNode.getCacheKey( true ) );
+
+}
+
+function getCacheKeyDifference( previousComponents, currentComponents, resolveDifference = null ) {
 
 	const currentMap = new Map();
 
@@ -155,6 +329,14 @@ function getCacheKeyDifference( previousComponents, currentComponents ) {
 		}
 
 		if ( component.valueKey !== current.valueKey ) {
+
+			if ( resolveDifference !== null ) {
+
+				const resolvedDifference = resolveDifference( component, current );
+
+				if ( resolvedDifference !== null ) return resolvedDifference;
+
+			}
 
 			return { property: component.property, previousValue: component.value, value: current.value };
 
@@ -181,6 +363,86 @@ function getCacheKeyDifference( previousComponents, currentComponents ) {
 	}
 
 	return null;
+
+}
+
+function getNodeSnapshotDifference( previousSnapshot, currentSnapshot ) {
+
+	if ( previousSnapshot.valueKey === currentSnapshot.valueKey ) return null;
+
+	if ( previousSnapshot.nodeId !== currentSnapshot.nodeId || previousSnapshot.nodeType !== currentSnapshot.nodeType ) {
+
+		return {
+			property: previousSnapshot.path,
+			previousValue: previousSnapshot.value,
+			value: currentSnapshot.value
+		};
+
+	}
+
+	const childDifference = getCacheKeyDifference(
+		previousSnapshot.children,
+		currentSnapshot.children,
+		( previousComponent, currentComponent ) => getNodeSnapshotDifference( previousComponent.snapshot, currentComponent.snapshot )
+	);
+
+	if ( childDifference !== null ) return childDifference;
+
+	if ( previousSnapshot.customCacheKey !== currentSnapshot.customCacheKey ) {
+
+		const customCacheStateDifference = getCacheKeyDifference( previousSnapshot.customCacheState, currentSnapshot.customCacheState );
+
+		if ( customCacheStateDifference !== null ) return customCacheStateDifference;
+
+		return {
+			property: `${ previousSnapshot.path }.customCacheKey()`,
+			previousValue: String( previousSnapshot.customCacheKey ),
+			value: String( currentSnapshot.customCacheKey )
+		};
+
+	}
+
+	return {
+		property: previousSnapshot.path,
+		previousValue: `${ previousSnapshot.value } cacheKey:${ previousSnapshot.valueKey }`,
+		value: `${ currentSnapshot.value } cacheKey:${ currentSnapshot.valueKey }`
+	};
+
+}
+
+function getNodeComponentDifference( previousComponent, currentComponent ) {
+
+	if ( previousComponent.valueKey === currentComponent.valueKey ) return null;
+
+	if ( previousComponent.nodeId !== currentComponent.nodeId || previousComponent.nodeType !== currentComponent.nodeType ) {
+
+		return {
+			property: previousComponent.property,
+			previousValue: previousComponent.value,
+			value: currentComponent.value
+		};
+
+	}
+
+	if ( previousComponent.customCacheKey !== currentComponent.customCacheKey ) {
+
+		const customCacheStateDifference = getCacheKeyDifference( previousComponent.customCacheState, currentComponent.customCacheState );
+
+		if ( customCacheStateDifference !== null ) return customCacheStateDifference;
+
+		return {
+			property: `${ previousComponent.property }.customCacheKey()`,
+			previousValue: String( previousComponent.customCacheKey ),
+			value: String( currentComponent.customCacheKey )
+		};
+
+	}
+
+	return {
+		property: previousComponent.property,
+		previousValue: `${ previousComponent.value } cacheKey:${ previousComponent.valueKey }`,
+		value: `${ currentComponent.value } cacheKey:${ currentComponent.valueKey }`
+	};
 
 }
 
@@ -330,9 +592,9 @@ function getMaterialCacheKeyComponents( renderObject ) {
 function getDynamicCacheKeyComponents( renderObject ) {
 
 	const cacheKeyComponents = [ {
-		property: 'scene.lights',
-		valueKey: getLightsValueKey( renderObject.lightsNode ),
-		value: getLightsValue( renderObject.lightsNode )
+		property: 'scene.lightsNode',
+		valueKey: getLightsNodeValueKey( renderObject.lightsNode ),
+		value: getLightsNodeValue( renderObject.lightsNode )
 	}, {
 		property: 'object.receiveShadow',
 		valueKey: String( renderObject.object.receiveShadow ),
@@ -387,6 +649,20 @@ function getDynamicCacheKeyComponents( renderObject ) {
 
 }
 
+function getNodesCacheKey( renderObject ) {
+
+	let cacheKey = 0;
+
+	if ( renderObject.material.isShadowPassMaterial !== true ) {
+
+		cacheKey = renderObject._nodes.getCacheKey( renderObject.scene, renderObject.lightsNode );
+
+	}
+
+	return String( cacheKey );
+
+}
+
 /**
  * Renderer component for node material invalidation debugging.
  *
@@ -415,6 +691,13 @@ class NodeMaterialDebug {
 		 */
 		this.cache = new WeakMap();
 
+		/**
+		 * Cache snapshots handed off to replacement render objects after a rebuild.
+		 *
+		 * @type {ChainMap}
+		 */
+		this.handoffs = new ChainMap();
+
 	}
 
 	/**
@@ -430,6 +713,18 @@ class NodeMaterialDebug {
 	}
 
 	/**
+	 * Whether detailed material-node tracing is enabled.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get traceEnabled() {
+
+		return this.renderer.debug.traceNodeMaterialInvalidation === true;
+
+	}
+
+	/**
 	 * Updates the cached debug data for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -438,10 +733,54 @@ class NodeMaterialDebug {
 
 		if ( this.enabled === false ) return;
 
-		this.cache.set( renderObject, {
+		const previousData = this.cache.get( renderObject );
+		const geometryId = renderObject.geometry !== null ? renderObject.geometry.id : null;
+
+		if ( previousData === undefined ) {
+
+			const handoffData = this.handoffs.get( renderObject.getChainArray() );
+
+			if ( handoffData !== undefined ) {
+
+				this.handoffs.delete( renderObject.getChainArray() );
+				this.cache.set( renderObject, handoffData );
+				return;
+
+			}
+
+		}
+
+		if ( previousData !== undefined ) {
+
+			// Callback mode only needs the baseline captured when the render object became current.
+			if ( this.traceEnabled === false ) return;
+
+			if (
+				previousData.materialNodes !== undefined &&
+				previousData.version === renderObject.version &&
+				previousData.geometryId === geometryId &&
+				previousData.clippingContextCacheKey === renderObject.clippingContextCacheKey
+			) {
+
+				return;
+
+			}
+
+		}
+
+		const data = {
+			version: renderObject.version,
+			geometryId,
+			clippingContextCacheKey: renderObject.clippingContextCacheKey,
 			material: getMaterialCacheKeyComponents( renderObject ),
-			dynamic: getDynamicCacheKeyComponents( renderObject )
-		} );
+			materialNodes: getMaterialNodeComponents( renderObject.material, this.traceEnabled ),
+			materialNodesTrace: this.traceEnabled,
+			dynamic: getDynamicCacheKeyComponents( renderObject ),
+			dynamicCacheKey: String( renderObject.getDynamicCacheKey() ),
+			nodesCacheKey: getNodesCacheKey( renderObject )
+		};
+
+		this.cache.set( renderObject, data );
 
 	}
 
@@ -458,15 +797,114 @@ class NodeMaterialDebug {
 
 		if ( previousData === undefined ) return;
 
-		const materialCacheDifference = getCacheKeyDifference( previousData.material, getMaterialCacheKeyComponents( renderObject ) );
+		let material = null;
+		let materialNodes = null;
+		let traceMaterialNodes = null;
+		let dynamic = null;
+		let dynamicCacheKey = null;
+		let nodesCacheKey = null;
+		const currentMaterial = () => material || ( material = getMaterialCacheKeyComponents( renderObject ) );
+		const currentMaterialNodes = () => materialNodes || ( materialNodes = getMaterialNodeComponents( renderObject.material ) );
+		const currentTraceMaterialNodes = () => {
+
+			if ( traceMaterialNodes === null ) {
+
+				traceMaterialNodes = getTraceMaterialNodeComponents( previousData.materialNodes, currentMaterialNodes() );
+
+			}
+
+			return traceMaterialNodes;
+
+		};
+
+		const currentDynamic = () => dynamic || ( dynamic = getDynamicCacheKeyComponents( renderObject ) );
+		const currentDynamicCacheKey = () => dynamicCacheKey || ( dynamicCacheKey = String( renderObject.getDynamicCacheKey() ) );
+		const currentNodesCacheKey = () => nodesCacheKey || ( nodesCacheKey = getNodesCacheKey( renderObject ) );
+		const createCurrentData = () => {
+
+			const data = {
+				version: renderObject.version,
+				geometryId: renderObject.geometry !== null ? renderObject.geometry.id : null,
+				clippingContextCacheKey: renderObject.clippingContextCacheKey,
+				material: currentMaterial(),
+				dynamic: currentDynamic(),
+				dynamicCacheKey: currentDynamicCacheKey(),
+				nodesCacheKey: currentNodesCacheKey()
+			};
+
+			if ( previousData.materialNodes !== undefined ) {
+
+				data.materialNodes = previousData.materialNodesTrace === true ? currentTraceMaterialNodes() : currentMaterialNodes();
+				data.materialNodesTrace = previousData.materialNodesTrace;
+
+			}
+
+			return data;
+
+		};
+
+		const materialCacheDifference = getCacheKeyDifference(
+			previousData.material,
+			currentMaterial(),
+			( previousComponent, currentComponent ) => {
+
+				if ( previousData.materialNodes === undefined ) return null;
+				if ( previousComponent.property !== 'material.customProgramCacheKey' ) return null;
+
+				let nodeDifference = null;
+
+				nodeDifference = getCacheKeyDifference( previousData.materialNodes, currentMaterialNodes(), getNodeComponentDifference );
+
+				if ( nodeDifference === null ) return null;
+
+				if ( previousData.materialNodesTrace === true ) {
+
+					const previousNode = getComponentByProperty( previousData.materialNodes, nodeDifference.property );
+
+					if (
+						previousNode !== null &&
+						previousNode.snapshot !== undefined &&
+						previousNode.property === nodeDifference.property
+					) {
+
+						const currentNode = getComponentByProperty( currentTraceMaterialNodes(), nodeDifference.property );
+
+						if ( currentNode !== null && currentNode.snapshot !== undefined ) {
+
+							const snapshotDifference = getNodeSnapshotDifference( previousNode.snapshot, currentNode.snapshot );
+
+							if ( snapshotDifference !== null ) nodeDifference = snapshotDifference;
+
+						}
+
+					}
+
+				}
+
+				return {
+					property: nodeDifference.property,
+					previousValue: nodeDifference.previousValue,
+					value: nodeDifference.value,
+					sourceProperty: previousComponent.property,
+					sourcePreviousValue: previousComponent.value,
+					sourceValue: currentComponent.value
+				};
+
+			}
+		);
 
 		if ( materialCacheDifference !== null ) {
+
+			this.handoffs.set( renderObject.getChainArray(), createCurrentData() );
 
 			this._dispatch( {
 				stage: 'material-cache',
 				property: materialCacheDifference.property,
 				previousValue: materialCacheDifference.previousValue,
 				value: materialCacheDifference.value,
+				sourceProperty: materialCacheDifference.sourceProperty,
+				sourcePreviousValue: materialCacheDifference.sourcePreviousValue,
+				sourceValue: materialCacheDifference.sourceValue,
 				rebuild: true,
 				needsRefresh: true,
 				material: renderObject.material,
@@ -481,6 +919,8 @@ class NodeMaterialDebug {
 
 		if ( dynamicCacheDifference !== null ) {
 
+			this.handoffs.set( renderObject.getChainArray(), createCurrentData() );
+
 			this._dispatch( {
 				stage: 'dynamic-cache',
 				property: dynamicCacheDifference.property,
@@ -488,6 +928,10 @@ class NodeMaterialDebug {
 				value: dynamicCacheDifference.value,
 				rebuild: true,
 				needsRefresh: true,
+				dynamicCacheKeyPrevious: previousData.dynamicCacheKey,
+				dynamicCacheKey: currentDynamicCacheKey(),
+				nodesCacheKeyPrevious: previousData.nodesCacheKey,
+				nodesCacheKey: currentNodesCacheKey(),
 				material: renderObject.material,
 				renderObject
 			} );
@@ -500,7 +944,9 @@ class NodeMaterialDebug {
 
 		const callback = this.renderer.debug.onNodeMaterialInvalidation;
 		const materialLabel = data.material.name !== '' ? data.material.name : data.material.type;
-		const event = { ...data, materialLabel };
+		const event = Object.assign( {}, data );
+
+		event.materialLabel = materialLabel;
 
 		if ( typeof callback === 'function' ) {
 
@@ -513,8 +959,9 @@ class NodeMaterialDebug {
 
 		const property = event.property !== undefined ? ` via ${ event.property }` : '';
 		const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
+		const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
 
-		warn( `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }.` );
+		warn( `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }${ source }.` );
 
 	}
 
