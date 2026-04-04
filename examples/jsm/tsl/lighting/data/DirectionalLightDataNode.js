@@ -1,5 +1,5 @@
 import { Color, Node, Vector3 } from 'three/webgpu';
-import { Loop, NodeUpdateType, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
+import { Loop, NodeUpdateType, normalView, positionViewDirection, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
 
 const _lightPosition = /*@__PURE__*/ new Vector3();
 const _targetPosition = /*@__PURE__*/ new Vector3();
@@ -86,6 +86,9 @@ class DirectionalLightDataNode extends Node {
 		const { lightingModel, reflectedLight } = builder.context;
 		const dynDiffuse = vec3( 0 ).toVar( 'dynDirectionalDiffuse' );
 		const dynSpecular = vec3( 0 ).toVar( 'dynDirectionalSpecular' );
+
+		normalView.toStack();
+		positionViewDirection.toStack();
 
 		Loop( this.countNode, ( { i } ) => {
 

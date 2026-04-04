@@ -1,5 +1,5 @@
 import { LightsNode, NodeUtils, warn } from 'three/webgpu';
-import { nodeObject } from 'three/tsl';
+import { clearcoatNormalView, nodeObject, normalView, positionViewDirection } from 'three/tsl';
 
 import AmbientLightDataNode from './data/AmbientLightDataNode.js';
 import DirectionalLightDataNode from './data/DirectionalLightDataNode.js';
@@ -25,20 +25,42 @@ const _lightTypeToMaxProp = {
 	HemisphereLight: 'maxHemisphereLights'
 };
 
+const _persistentBatchLightTypes = [
+	'PointLight',
+	'SpotLight'
+];
+
+const _batchLightTypes = [
+	'AmbientLight',
+	'DirectionalLight',
+	'PointLight',
+	'SpotLight',
+	'HemisphereLight'
+];
+
 const sortLights = ( lights ) => lights.sort( ( a, b ) => a.id - b.id );
 
 const isSpecialSpotLight = ( light ) => {
 
-	return light.isSpotLight === true && ( light.map !== null || light.colorNode !== undefined );
+	return light.isSpotLight === true && (
+		light.map !== null ||
+		light.colorNode !== undefined ||
+		( light.iesMap && light.iesMap.isTexture === true )
+	);
 
 };
 
-const canBatchLight = ( light ) => {
+const getBatchLightType = ( light ) => {
 
-	return light.isNode !== true &&
-		light.castShadow !== true &&
-		isSpecialSpotLight( light ) === false &&
-		_lightTypeToDataNode[ light.constructor.name ] !== undefined;
+	if ( light.isNode === true || light.castShadow === true || isSpecialSpotLight( light ) === true ) return null;
+
+	if ( light.isAmbientLight === true ) return 'AmbientLight';
+	if ( light.isDirectionalLight === true ) return 'DirectionalLight';
+	if ( light.isPointLight === true && light.isSpotLight !== true ) return 'PointLight';
+	if ( light.isSpotLight === true ) return 'SpotLight';
+	if ( light.isHemisphereLight === true ) return 'HemisphereLight';
+
+	return null;
 
 };
 
@@ -100,6 +122,7 @@ class DynamicLightsNode extends LightsNode {
 		this.maxHemisphereLights = options.maxHemisphereLights !== undefined ? options.maxHemisphereLights : 4;
 
 		this._dataNodes = new Map();
+		this._initPersistentDataNodes();
 
 	}
 
@@ -110,10 +133,11 @@ class DynamicLightsNode extends LightsNode {
 		for ( let i = 0; i < this._lights.length; i ++ ) {
 
 			const light = this._lights[ i ];
+			const typeName = getBatchLightType( light );
 
-			if ( canBatchLight( light ) ) {
+			if ( typeName !== null ) {
 
-				typeSet.add( light.constructor.name );
+				typeSet.add( typeName );
 
 			} else {
 
@@ -124,8 +148,9 @@ class DynamicLightsNode extends LightsNode {
 
 					const hashMap = light.map !== null ? light.map.id : - 1;
 					const hashColorNode = light.colorNode ? light.colorNode.getCacheKey() : - 1;
+					const hashIESMap = light.iesMap && light.iesMap.isTexture === true ? light.iesMap.id : - 1;
 
-					_hashData.push( hashMap, hashColorNode );
+					_hashData.push( hashMap, hashColorNode, hashIESMap );
 
 				}
 
@@ -169,9 +194,10 @@ class DynamicLightsNode extends LightsNode {
 
 			}
 
-			if ( canBatchLight( light ) ) {
+			const typeName = getBatchLightType( light );
 
-				const typeName = light.constructor.name;
+			if ( typeName !== null ) {
+
 				const typeLights = lightsByType.get( typeName );
 
 				if ( typeLights === undefined ) {
@@ -198,39 +224,29 @@ class DynamicLightsNode extends LightsNode {
 
 		}
 
-		for ( const [ typeName, typeLights ] of lightsByType ) {
+		for ( const typeName of _batchLightTypes ) {
 
-			let dataNode = this._dataNodes.get( typeName );
+			const typeLights = lightsByType.get( typeName );
+			const hasType = typeLights !== undefined || this._dataNodes.has( typeName ) === true;
 
-			if ( dataNode === undefined ) {
+			if ( hasType === false ) continue;
 
-				const DataNodeClass = _lightTypeToDataNode[ typeName ];
-				const maxProp = _lightTypeToMaxProp[ typeName ];
-				const maxCount = maxProp !== undefined ? this[ maxProp ] : undefined;
+			const dataNode = this._getDataNode( typeName );
 
-				dataNode = maxCount !== undefined ? new DataNodeClass( maxCount ) : new DataNodeClass();
-
-				this._dataNodes.set( typeName, dataNode );
-
-			}
-
-			dataNode.setLights( typeLights );
+			dataNode.setLights( typeLights || [] );
 			lightNodes.push( dataNode );
 
 		}
 
-		for ( const [ typeName, dataNode ] of this._dataNodes ) {
-
-			if ( lightsByType.has( typeName ) === false ) {
-
-				dataNode.setLights( [] );
-				lightNodes.push( dataNode );
-
-			}
-
-		}
-
 		this._lightNodes = lightNodes;
+
+	}
+
+	setupLights( builder, lightNodes ) {
+
+		this._setupSharedLightingInputs( builder );
+
+		super.setupLights( builder, lightNodes );
 
 	}
 
@@ -248,15 +264,63 @@ class DynamicLightsNode extends LightsNode {
 
 	}
 
+	_setupSharedLightingInputs( builder ) {
+
+		normalView.toStack();
+		positionViewDirection.toStack();
+
+		if ( builder.context.lightingModel?.clearcoat === true ) {
+
+			clearcoatNormalView.toStack();
+
+		}
+
+	}
+
+	_initPersistentDataNodes() {
+
+		for ( const typeName of _persistentBatchLightTypes ) {
+
+			const maxProp = _lightTypeToMaxProp[ typeName ];
+			const maxCount = maxProp !== undefined ? this[ maxProp ] : undefined;
+
+			if ( maxCount !== undefined && maxCount <= 0 ) continue;
+
+			this._getDataNode( typeName );
+
+		}
+
+	}
+
+	_getDataNode( typeName ) {
+
+		let dataNode = this._dataNodes.get( typeName );
+
+		if ( dataNode === undefined ) {
+
+			const DataNodeClass = _lightTypeToDataNode[ typeName ];
+			const maxProp = _lightTypeToMaxProp[ typeName ];
+			const maxCount = maxProp !== undefined ? this[ maxProp ] : undefined;
+
+			dataNode = maxCount !== undefined ? new DataNodeClass( maxCount ) : new DataNodeClass();
+
+			this._dataNodes.set( typeName, dataNode );
+
+		}
+
+		return dataNode;
+
+	}
+
 	_updateDataNodeLights( lights ) {
 
 		const lightsByType = new Map();
 
 		for ( const light of lights ) {
 
-			if ( canBatchLight( light ) === false ) continue;
+			const typeName = getBatchLightType( light );
 
-			const typeName = light.constructor.name;
+			if ( typeName === null ) continue;
 			const typeLights = lightsByType.get( typeName );
 
 			if ( typeLights === undefined ) {

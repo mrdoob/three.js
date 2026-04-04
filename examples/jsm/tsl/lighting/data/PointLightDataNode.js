@@ -1,5 +1,5 @@
 import { Color, Node, Vector3, Vector4 } from 'three/webgpu';
-import { Loop, NodeUpdateType, getDistanceAttenuation, positionView, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
+import { Loop, NodeUpdateType, getDistanceAttenuation, normalView, positionView, positionViewDirection, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
 
 const _position = /*@__PURE__*/ new Vector3();
 
@@ -95,6 +95,9 @@ class PointLightDataNode extends Node {
 		const { lightingModel, reflectedLight } = builder.context;
 		const dynDiffuse = vec3( 0 ).toVar( 'dynPointDiffuse' );
 		const dynSpecular = vec3( 0 ).toVar( 'dynPointSpecular' );
+
+		normalView.toStack();
+		positionViewDirection.toStack();
 
 		Loop( this.countNode, ( { i } ) => {
 
