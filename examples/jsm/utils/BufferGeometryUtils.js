@@ -286,8 +286,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 	for ( const name in morphAttributes ) {
 
 		const numMorphTargets = morphAttributes[ name ][ 0 ].length;
-
-		if ( numMorphTargets === 0 ) break;
+		if ( numMorphTargets === 0 ) continue;
 
 		mergedGeometry.morphAttributes = mergedGeometry.morphAttributes || {};
 		mergedGeometry.morphAttributes[ name ] = [];
@@ -1021,7 +1020,7 @@ function computeMorphedAttributes( object ) {
 	const morphPosition = geometry.morphAttributes.position;
 	const morphTargetsRelative = geometry.morphTargetsRelative;
 	const normalAttribute = geometry.attributes.normal;
-	const morphNormal = geometry.morphAttributes.position;
+	const morphNormal = geometry.morphAttributes.normal;
 
 	const groups = geometry.groups;
 	const drawRange = geometry.drawRange;
