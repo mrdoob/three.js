@@ -54,14 +54,14 @@ class FSR1Node extends TempNode {
 		/**
 		 * RCAS sharpening strength. 0 = maximum, 2 = none.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
 		this.sharpness = nodeObject( sharpness );
 
 		/**
 		 * Whether to attenuate RCAS sharpening in noisy areas.
 		 *
-		 * @type {boolean}
+		 * @type {Node<bool>}
 		 */
 		this.denoise = nodeObject( denoise );
 
@@ -469,7 +469,7 @@ export default FSR1Node;
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [sharpness=0.2] - RCAS sharpening strength. 0 = maximum, 2 = none.
+ * @param {(number|Node<float>)} [sharpness=0.2] - RCAS sharpening strength. 0 = maximum, 2 = none.
  * @returns {FSR1Node}
  */
 export const fsr1 = ( node, sharpness ) => new FSR1Node( convertToTexture( node ), sharpness );
