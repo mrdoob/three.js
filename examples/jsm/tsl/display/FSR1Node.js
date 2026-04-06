@@ -470,6 +470,7 @@ export default FSR1Node;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {(number|Node<float>)} [sharpness=0.2] - RCAS sharpening strength. 0 = maximum, 2 = none.
+ * @param {(boolean|Node<bool>)} [denoise=false] - Whether to attenuate RCAS sharpening in noisy areas.
  * @returns {FSR1Node}
  */
-export const fsr1 = ( node, sharpness ) => new FSR1Node( convertToTexture( node ), sharpness );
+export const fsr1 = ( node, sharpness, denoise ) => new FSR1Node( convertToTexture( node ), sharpness, denoise );
