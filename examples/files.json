@@ -490,6 +490,7 @@
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
 		"webgpu_tsl_wood",
+		"webgpu_upscaling_fsr1",
 		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_caustics",
