@@ -322,7 +322,7 @@ class DRACOLoader extends Loader {
 
 			_color.fromBufferAttribute( attribute, i );
 			ColorManagement.colorSpaceToWorking( _color, SRGBColorSpace );
-			attribute.setXYZ( i, _color.r, _color.g, _color.b );
+			attribute.setFromColor( i, _color );
 
 		}
 

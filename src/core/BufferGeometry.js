@@ -1040,9 +1040,9 @@ class BufferGeometry extends EventDispatcher {
 					nB.add( cb );
 					nC.add( cb );
 
-					normalAttribute.setXYZ( vA, nA.x, nA.y, nA.z );
-					normalAttribute.setXYZ( vB, nB.x, nB.y, nB.z );
-					normalAttribute.setXYZ( vC, nC.x, nC.y, nC.z );
+					normalAttribute.setFromVector3( vA, nA );
+					normalAttribute.setFromVector3( vB, nB );
+					normalAttribute.setFromVector3( vC, nC );
 
 				}
 
@@ -1060,9 +1060,9 @@ class BufferGeometry extends EventDispatcher {
 					ab.subVectors( pA, pB );
 					cb.cross( ab );
 
-					normalAttribute.setXYZ( i + 0, cb.x, cb.y, cb.z );
-					normalAttribute.setXYZ( i + 1, cb.x, cb.y, cb.z );
-					normalAttribute.setXYZ( i + 2, cb.x, cb.y, cb.z );
+					normalAttribute.setFromVector3( i + 0, cb );
+					normalAttribute.setFromVector3( i + 1, cb );
+					normalAttribute.setFromVector3( i + 2, cb );
 
 				}
 
@@ -1090,7 +1090,7 @@ class BufferGeometry extends EventDispatcher {
 
 			_vector.normalize();
 
-			normals.setXYZ( i, _vector.x, _vector.y, _vector.z );
+			normals.setFromVector3( i, _vector );
 
 		}
 

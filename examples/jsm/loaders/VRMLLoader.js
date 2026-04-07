@@ -3220,7 +3220,7 @@ class VRMLLoader extends Loader {
 
 				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
-				attribute.setXYZ( i, color.r, color.g, color.b );
+				attribute.setFromColor( i, color );
 
 			}
 
@@ -3327,7 +3327,7 @@ class VRMLLoader extends Loader {
 
 				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
-				colorAttribute.setXYZ( index, color.r, color.g, color.b );
+				colorAttribute.setFromColor( index, color );
 
 			}
 

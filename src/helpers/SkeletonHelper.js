@@ -113,11 +113,11 @@ class SkeletonHelper extends LineSegments {
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
 				_vector.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j, _vector.x, _vector.y, _vector.z );
+				position.setFromVector3( j, _vector );
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
 				_vector.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j + 1, _vector.x, _vector.y, _vector.z );
+				position.setFromVector3( j + 1, _vector );
 
 				j += 2;
 
@@ -145,8 +145,8 @@ class SkeletonHelper extends LineSegments {
 
 		for ( let i = 0; i < colorAttribute.count; i += 2 ) {
 
-			colorAttribute.setXYZ( i, color1.r, color1.g, color1.b );
-			colorAttribute.setXYZ( i + 1, color2.r, color2.g, color2.b );
+			colorAttribute.setFromColor( i, color1 );
+			colorAttribute.setFromColor( i + 1, color2 );
 
 		}
 

@@ -269,7 +269,7 @@ class BufferAttribute extends EventDispatcher {
 				_vector2.fromBufferAttribute( this, i );
 				_vector2.applyMatrix3( m );
 
-				this.setXY( i, _vector2.x, _vector2.y );
+				this.setFromVector2( i, _vector2 );
 
 			}
 
@@ -280,7 +280,7 @@ class BufferAttribute extends EventDispatcher {
 				_vector.fromBufferAttribute( this, i );
 				_vector.applyMatrix3( m );
 
-				this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+				this.setFromVector3( i, _vector );
 
 			}
 
@@ -305,7 +305,7 @@ class BufferAttribute extends EventDispatcher {
 
 			_vector.applyMatrix4( m );
 
-			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+			this.setFromVector3( i, _vector );
 
 		}
 
@@ -328,7 +328,7 @@ class BufferAttribute extends EventDispatcher {
 
 			_vector.applyNormalMatrix( m );
 
-			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+			this.setFromVector3( i, _vector );
 
 		}
 
@@ -351,7 +351,7 @@ class BufferAttribute extends EventDispatcher {
 
 			_vector.transformDirection( m );
 
-			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+			this.setFromVector3( i, _vector );
 
 		}
 
@@ -626,6 +626,58 @@ class BufferAttribute extends EventDispatcher {
 		this.array[ index + 3 ] = w;
 
 		return this;
+
+	}
+
+	/**
+	 * Sets the x and y component of the vector at the given index based on the values of the given vector.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {Vector2} vector - The vector to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setFromVector2( index, vector ) {
+
+		return this.setXY( index, vector.x, vector.y );
+
+	}
+
+	/**
+	 * Sets the x, y and z component of the vector at the given index based on the values of the given vector.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {Vector3} vector - The vector to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setFromVector3( index, vector ) {
+
+		return this.setXYZ( index, vector.x, vector.y, vector.z );
+
+	}
+
+	/**
+	 * Sets the x, y, z and w component of the vector at the given index based on the values of the given vector.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {Vector4} vector - The vector to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setFromVector4( index, vector ) {
+
+		return this.setXYZW( index, vector.x, vector.y, vector.z, vector.w );
+
+	}
+
+	/**
+	 * Sets the x, y and z component of the vector at the given index based on the r, g and b values of the given color.
+	 *
+	 * @param {number} index - The index into the buffer attribute.
+	 * @param {Color} color - The color to set.
+	 * @return {BufferAttribute} A reference to this instance.
+	 */
+	setFromColor( index, color ) {
+
+		return this.setXYZ( index, color.r, color.g, color.b );
 
 	}
 

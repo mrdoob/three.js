@@ -884,7 +884,7 @@ class GLTFWriter {
 
 			}
 
-			attribute.setXYZ( i, v.x, v.y, v.z );
+			attribute.setFromVector3( i, v );
 
 		}
 

@@ -1406,7 +1406,7 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 			}
 
 			tempNorm2.normalize();
-			normAttr.setXYZ( i3 + n, tempNorm2.x, tempNorm2.y, tempNorm2.z );
+			normAttr.setFromVector3( i3 + n, tempNorm2 );
 
 		}
 

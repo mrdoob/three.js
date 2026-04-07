@@ -172,50 +172,50 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		colorAttribute.setXYZ( 0, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 1, frustum.r, frustum.g, frustum.b ); // n1, n2
-		colorAttribute.setXYZ( 2, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 3, frustum.r, frustum.g, frustum.b ); // n2, n4
-		colorAttribute.setXYZ( 4, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 5, frustum.r, frustum.g, frustum.b ); // n4, n3
-		colorAttribute.setXYZ( 6, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 7, frustum.r, frustum.g, frustum.b ); // n3, n1
+		colorAttribute.setFromColor( 0, frustum ); colorAttribute.setFromColor( 1, frustum ); // n1, n2
+		colorAttribute.setFromColor( 2, frustum ); colorAttribute.setFromColor( 3, frustum ); // n2, n4
+		colorAttribute.setFromColor( 4, frustum ); colorAttribute.setFromColor( 5, frustum ); // n4, n3
+		colorAttribute.setFromColor( 6, frustum ); colorAttribute.setFromColor( 7, frustum ); // n3, n1
 
 		// far
 
-		colorAttribute.setXYZ( 8, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 9, frustum.r, frustum.g, frustum.b ); // f1, f2
-		colorAttribute.setXYZ( 10, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 11, frustum.r, frustum.g, frustum.b ); // f2, f4
-		colorAttribute.setXYZ( 12, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 13, frustum.r, frustum.g, frustum.b ); // f4, f3
-		colorAttribute.setXYZ( 14, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 15, frustum.r, frustum.g, frustum.b ); // f3, f1
+		colorAttribute.setFromColor( 8, frustum ); colorAttribute.setFromColor( 9, frustum ); // f1, f2
+		colorAttribute.setFromColor( 10, frustum ); colorAttribute.setFromColor( 11, frustum ); // f2, f4
+		colorAttribute.setFromColor( 12, frustum ); colorAttribute.setFromColor( 13, frustum ); // f4, f3
+		colorAttribute.setFromColor( 14, frustum ); colorAttribute.setFromColor( 15, frustum ); // f3, f1
 
 		// sides
 
-		colorAttribute.setXYZ( 16, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 17, frustum.r, frustum.g, frustum.b ); // n1, f1
-		colorAttribute.setXYZ( 18, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 19, frustum.r, frustum.g, frustum.b ); // n2, f2
-		colorAttribute.setXYZ( 20, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 21, frustum.r, frustum.g, frustum.b ); // n3, f3
-		colorAttribute.setXYZ( 22, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 23, frustum.r, frustum.g, frustum.b ); // n4, f4
+		colorAttribute.setFromColor( 16, frustum ); colorAttribute.setFromColor( 17, frustum ); // n1, f1
+		colorAttribute.setFromColor( 18, frustum ); colorAttribute.setFromColor( 19, frustum ); // n2, f2
+		colorAttribute.setFromColor( 20, frustum ); colorAttribute.setFromColor( 21, frustum ); // n3, f3
+		colorAttribute.setFromColor( 22, frustum ); colorAttribute.setFromColor( 23, frustum ); // n4, f4
 
 		// cone
 
-		colorAttribute.setXYZ( 24, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 25, cone.r, cone.g, cone.b ); // p, n1
-		colorAttribute.setXYZ( 26, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 27, cone.r, cone.g, cone.b ); // p, n2
-		colorAttribute.setXYZ( 28, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 29, cone.r, cone.g, cone.b ); // p, n3
-		colorAttribute.setXYZ( 30, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 31, cone.r, cone.g, cone.b ); // p, n4
+		colorAttribute.setFromColor( 24, cone ); colorAttribute.setFromColor( 25, cone ); // p, n1
+		colorAttribute.setFromColor( 26, cone ); colorAttribute.setFromColor( 27, cone ); // p, n2
+		colorAttribute.setFromColor( 28, cone ); colorAttribute.setFromColor( 29, cone ); // p, n3
+		colorAttribute.setFromColor( 30, cone ); colorAttribute.setFromColor( 31, cone ); // p, n4
 
 		// up
 
-		colorAttribute.setXYZ( 32, up.r, up.g, up.b ); colorAttribute.setXYZ( 33, up.r, up.g, up.b ); // u1, u2
-		colorAttribute.setXYZ( 34, up.r, up.g, up.b ); colorAttribute.setXYZ( 35, up.r, up.g, up.b ); // u2, u3
-		colorAttribute.setXYZ( 36, up.r, up.g, up.b ); colorAttribute.setXYZ( 37, up.r, up.g, up.b ); // u3, u1
+		colorAttribute.setFromColor( 32, up ); colorAttribute.setFromColor( 33, up ); // u1, u2
+		colorAttribute.setFromColor( 34, up ); colorAttribute.setFromColor( 35, up ); // u2, u3
+		colorAttribute.setFromColor( 36, up ); colorAttribute.setFromColor( 37, up ); // u3, u1
 
 		// target
 
-		colorAttribute.setXYZ( 38, target.r, target.g, target.b ); colorAttribute.setXYZ( 39, target.r, target.g, target.b ); // c, t
-		colorAttribute.setXYZ( 40, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 41, cross.r, cross.g, cross.b ); // p, c
+		colorAttribute.setFromColor( 38, target ); colorAttribute.setFromColor( 39, target ); // c, t
+		colorAttribute.setFromColor( 40, cross ); colorAttribute.setFromColor( 41, cross ); // p, c
 
 		// cross
 
-		colorAttribute.setXYZ( 42, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 43, cross.r, cross.g, cross.b ); // cn1, cn2
-		colorAttribute.setXYZ( 44, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 45, cross.r, cross.g, cross.b ); // cn3, cn4
+		colorAttribute.setFromColor( 42, cross ); colorAttribute.setFromColor( 43, cross ); // cn1, cn2
+		colorAttribute.setFromColor( 44, cross ); colorAttribute.setFromColor( 45, cross ); // cn3, cn4
 
-		colorAttribute.setXYZ( 46, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 47, cross.r, cross.g, cross.b ); // cf1, cf2
-		colorAttribute.setXYZ( 48, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 49, cross.r, cross.g, cross.b ); // cf3, cf4
+		colorAttribute.setFromColor( 46, cross ); colorAttribute.setFromColor( 47, cross ); // cf1, cf2
+		colorAttribute.setFromColor( 48, cross ); colorAttribute.setFromColor( 49, cross ); // cf3, cf4
 
 		colorAttribute.needsUpdate = true;
 
@@ -334,7 +334,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			position.setXYZ( points[ i ], _vector.x, _vector.y, _vector.z );
+			position.setFromVector3( points[ i ], _vector );
 
 		}
 

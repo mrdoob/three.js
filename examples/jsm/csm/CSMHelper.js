@@ -191,15 +191,15 @@ class CSMHelper extends Group {
 
 		const nearVerts = mainFrustum.vertices.near;
 		const farVerts = mainFrustum.vertices.far;
-		frustumLinePositions.setXYZ( 0, farVerts[ 0 ].x, farVerts[ 0 ].y, farVerts[ 0 ].z );
-		frustumLinePositions.setXYZ( 1, farVerts[ 3 ].x, farVerts[ 3 ].y, farVerts[ 3 ].z );
-		frustumLinePositions.setXYZ( 2, farVerts[ 2 ].x, farVerts[ 2 ].y, farVerts[ 2 ].z );
-		frustumLinePositions.setXYZ( 3, farVerts[ 1 ].x, farVerts[ 1 ].y, farVerts[ 1 ].z );
+		frustumLinePositions.setFromVector3( 0, farVerts[ 0 ] );
+		frustumLinePositions.setFromVector3( 1, farVerts[ 3 ] );
+		frustumLinePositions.setFromVector3( 2, farVerts[ 2 ] );
+		frustumLinePositions.setFromVector3( 3, farVerts[ 1 ] );
 
-		frustumLinePositions.setXYZ( 4, nearVerts[ 0 ].x, nearVerts[ 0 ].y, nearVerts[ 0 ].z );
-		frustumLinePositions.setXYZ( 5, nearVerts[ 3 ].x, nearVerts[ 3 ].y, nearVerts[ 3 ].z );
-		frustumLinePositions.setXYZ( 6, nearVerts[ 2 ].x, nearVerts[ 2 ].y, nearVerts[ 2 ].z );
-		frustumLinePositions.setXYZ( 7, nearVerts[ 1 ].x, nearVerts[ 1 ].y, nearVerts[ 1 ].z );
+		frustumLinePositions.setFromVector3( 4, nearVerts[ 0 ] );
+		frustumLinePositions.setFromVector3( 5, nearVerts[ 3 ] );
+		frustumLinePositions.setFromVector3( 6, nearVerts[ 2 ] );
+		frustumLinePositions.setFromVector3( 7, nearVerts[ 1 ] );
 		frustumLinePositions.needsUpdate = true;
 
 	}

@@ -13,6 +13,10 @@ import {
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
 import { toHalfFloat, fromHalfFloat } from '../../../../src/extras/DataUtils.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Color } from '../../../../src/math/Color.js';
 
 export default QUnit.module( 'Core', () => {
 
@@ -157,6 +161,54 @@ export default QUnit.module( 'Core', () => {
 			const expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
 
 			a.setXYZW( 0, - 1, - 2, - 3, - 4 );
+
+			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector2', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new BufferAttribute( f32a, 2, false );
+			const expected = new Float32Array( [ - 1, - 2, 3, 4 ] );
+
+			a.setFromVector2( 0, new Vector2( - 1, - 2 ) );
+
+			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector3', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+			const a = new BufferAttribute( f32a, 3, false );
+			const expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+			a.setFromVector3( 1, new Vector3( - 4, - 5, - 6 ) );
+
+			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector4', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new BufferAttribute( f32a, 4, false );
+			const expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
+
+			a.setFromVector4( 0, new Vector4( - 1, - 2, - 3, - 4 ) );
+
+			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromColor', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+			const a = new BufferAttribute( f32a, 3, false );
+			const expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+			a.setFromColor( 1, new Color( - 4, - 5, - 6 ) );
 
 			assert.deepEqual( a.array, expected, 'Check for the correct values' );
 
@@ -478,6 +530,54 @@ export default QUnit.module( 'Core', () => {
 			const expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
 
 			a.setXYZW( 0, - 1, - 2, - 3, - 4 );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector2', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 2, false );
+			const expected = new Float32Array( [ - 1, - 2, 3, 4 ] );
+
+			a.setFromVector2( 0, new Vector2( - 1, - 2 ) );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector3', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 3, false );
+			const expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+			a.setFromVector3( 1, new Vector3( - 4, - 5, - 6 ) );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromVector4', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 4, false );
+			const expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
+
+			a.setFromVector4( 0, new Vector4( - 1, - 2, - 3, - 4 ) );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setFromColor', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 3, false );
+			const expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+			a.setFromColor( 1, new Color( - 4, - 5, - 6 ) );
 
 			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
 

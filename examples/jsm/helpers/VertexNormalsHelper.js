@@ -123,11 +123,11 @@ class VertexNormalsHelper extends LineSegments {
 
 				_v2.applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
 
-				position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
+				position.setFromVector3( idx, _v1 );
 
 				idx = idx + 1;
 
-				position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
+				position.setFromVector3( idx, _v2 );
 
 				idx = idx + 1;
 

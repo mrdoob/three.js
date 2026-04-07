@@ -293,7 +293,7 @@
 
 						const t = i / ( ARC_SEGMENTS - 1 );
 						spline.getPoint( t, point );
-						position.setXYZ( i, point.x, point.y, point.z );
+						position.setFromVector3( i, point );
 
 					}
 

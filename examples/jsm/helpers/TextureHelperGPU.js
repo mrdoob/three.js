@@ -152,11 +152,7 @@ function createCubeGeometry( width, height, depth ) {
 
 		_direction.fromBufferAttribute( position, j ).normalize();
 
-		const u = _direction.x;
-		const v = _direction.y;
-		const w = _direction.z;
-
-		uvw.setXYZ( j, u, v, w );
+		uvw.setFromVector3( j, _direction );
 
 	}
 

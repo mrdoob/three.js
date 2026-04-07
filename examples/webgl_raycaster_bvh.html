@@ -234,13 +234,13 @@
 						_matrix.compose( point, _quaternion, _scale );
 						sphereInstance.setMatrixAt( i * 2 + 1, _matrix );
 
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, _position.x, _position.y, _position.z );
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, point.x, point.y, point.z );
+						lineSegments.geometry.attributes.position.setFromVector3( lineNum ++, _position );
+						lineSegments.geometry.attributes.position.setFromVector3( lineNum ++, point );
 
 					} else {
 
 						sphereInstance.setMatrixAt( i * 2 + 1, _matrix );
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, _position.x, _position.y, _position.z );
+						lineSegments.geometry.attributes.position.setFromVector3( lineNum ++, _position );
 						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, 0, 0, 0 );
 
 					}
