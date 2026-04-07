@@ -147,6 +147,11 @@ function requestObjectUnhighlight() {
 // Store renderer collapse states
 const rendererCollapsedState = new Map();
 
+// Static DOM elements (created once in initUI)
+let renderersSection = null;
+let scenesSection = null;
+let sceneDirty = true;
+
 // Helper function to create properties column for renderer
 function createRendererPropertiesColumn( props ) {
 
@@ -249,19 +254,18 @@ function processSceneBatch( sceneUuid, batchObjects ) {
 	// 5. Process the new batch: Add/Update objects and mark their scene association
 	batchObjects.forEach( objData => {
 
-		// Add a private property to track which scene this object belongs to
 		objData._sceneUuid = sceneUuid;
 		state.objects.set( objData.uuid, objData );
 
-		// Ensure the scene root is in the scenes map
 		if ( objData.isScene && objData.uuid === sceneUuid ) {
 
 			state.scenes.set( objData.uuid, objData );
 
 		}
-		// Note: Renderers are handled separately by 'renderer' events and shouldn't appear in scene batches.
 
 	} );
+
+	sceneDirty = true;
 
 }
 
@@ -272,12 +276,7 @@ function clearState() {
 	state.scenes.clear();
 	state.renderers.clear();
 	state.objects.clear();
-	const container = document.getElementById( 'scene-tree' );
-	if ( container ) {
-
-		container.innerHTML = '';
-
-	}
+	sceneDirty = true;
 
 	// Hide floating panel
 	if ( floatingPanel ) {
@@ -305,37 +304,30 @@ function handleThreeEvent( message ) {
 
 		case EVENT_REGISTER:
 			state.revision = message.detail.revision;
-			updateUI();
 			break;
 
-		// Handle individual renderer observation
 		case EVENT_RENDERER:
 			const detail = message.detail;
-
-			// Update or add the renderer in the state maps (always use latest data)
 			state.renderers.set( detail.uuid, detail );
 			state.objects.set( detail.uuid, detail );
-			updateUI();
+			updateRenderers();
 			break;
 
-		// Handle object details response
 		case EVENT_OBJECT_DETAILS:
 			state.selectedObject = message.detail;
 			showFloatingDetails( message.detail );
-			// Don't call updateUI() - this doesn't change the tree structure
 			break;
 
-		// Handle a batch of objects for a specific scene
 		case EVENT_SCENE:
 			const { sceneUuid, objects: batchObjects } = message.detail;
 			processSceneBatch( sceneUuid, batchObjects );
-			updateUI();
+			updateSceneTree();
 			break;
 
 		case EVENT_COMMITTED:
-			// Page was reloaded, clear state
 			clearState();
-			updateUI();
+			updateRenderers();
+			updateSceneTree();
 			break;
 
 	}
@@ -540,16 +532,15 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 
 }
 
-// Function to update the UI
-function updateUI() {
+// Build the static DOM shell (called once)
+function initUI() {
 
 	const container = document.getElementById( 'scene-tree' );
-	container.innerHTML = '';
 
 	const header = document.createElement( 'div' );
 	header.className = 'header';
-	header.style.display = 'flex'; // Use flexbox
-	header.style.justifyContent = 'space-between'; // Align items left and right
+	header.style.display = 'flex';
+	header.style.justifyContent = 'space-between';
 
 	const miscSpan = document.createElement( 'span' );
 	miscSpan.innerHTML = '<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>';
@@ -558,31 +549,34 @@ function updateUI() {
 
 	const manifestVersionSpan = document.createElement( 'span' );
 	manifestVersionSpan.textContent = `${manifest.version}`;
-	manifestVersionSpan.style.opacity = '0.5'; // Make it less prominent
+	manifestVersionSpan.style.opacity = '0.5';
 
 	header.appendChild( miscSpan );
 	header.appendChild( manifestVersionSpan );
-
 	container.appendChild( header );
 
-	const hasRenderers = state.renderers.size > 0;
-	const hasScenes = state.scenes.size > 0;
+	const sectionsContainer = document.createElement( 'div' );
+	sectionsContainer.className = 'sections-container';
+	container.appendChild( sectionsContainer );
 
-	// Create sections container if both renderers and scenes exist (for responsive layout)
-	let sectionsContainer = container;
-	if ( hasRenderers && hasScenes ) {
+	renderersSection = document.createElement( 'div' );
+	renderersSection.className = 'section';
+	renderersSection.style.display = 'none';
+	sectionsContainer.appendChild( renderersSection );
 
-		sectionsContainer = document.createElement( 'div' );
-		sectionsContainer.className = 'sections-container';
-		container.appendChild( sectionsContainer );
+	scenesSection = document.createElement( 'div' );
+	scenesSection.className = 'section';
+	scenesSection.style.display = 'none';
+	sectionsContainer.appendChild( scenesSection );
 
-	}
+}
 
-	// Add renderers section
-	if ( hasRenderers ) {
+// Update only the renderers section
+function updateRenderers() {
 
-		const renderersSection = document.createElement( 'div' );
-		renderersSection.className = 'section';
+	if ( state.renderers.size > 0 ) {
+
+		renderersSection.style.display = '';
 		renderersSection.innerHTML = '<h3>Renderers</h3>';
 
 		state.renderers.forEach( renderer => {
@@ -591,15 +585,24 @@ function updateUI() {
 
 		} );
 
-		sectionsContainer.appendChild( renderersSection );
+	} else {
+
+		renderersSection.style.display = 'none';
 
 	}
 
-	// Add scenes section
-	if ( hasScenes ) {
+}
 
-		const scenesSection = document.createElement( 'div' );
-		scenesSection.className = 'section';
+// Rebuild the scene tree only when dirty
+function updateSceneTree() {
+
+	if ( ! sceneDirty ) return;
+
+	sceneDirty = false;
+
+	if ( state.scenes.size > 0 ) {
+
+		scenesSection.style.display = '';
 		scenesSection.innerHTML = '<h3>Scenes</h3>';
 
 		state.scenes.forEach( scene => {
@@ -608,10 +611,11 @@ function updateUI() {
 
 		} );
 
-		sectionsContainer.appendChild( scenesSection );
+	} else {
+
+		scenesSection.style.display = 'none';
 
 	}
-
 
 }
 
@@ -704,6 +708,5 @@ document.addEventListener( 'mouseover', ( event ) => {
 
 } );
 
-// Initial UI update
-clearState();
-updateUI();
+// Initial UI setup
+initUI();
