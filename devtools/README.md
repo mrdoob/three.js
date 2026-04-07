@@ -25,11 +25,11 @@ The extension follows a standard Chrome DevTools extension architecture:
 2. **DevTools Script** (`devtools.js`): Creates the panel when the DevTools window opens.
 3. **Panel UI** (`panel/panel.html`, `panel/panel.js`, `panel/panel.css`): The DevTools panel interface that displays the data.
 4. **Content Script** (`content-script.js`): Injected into the web page. Relays messages between the background script and the bridge script.
-5. **Bridge Script** (`bridge.js`): Injected into the page's context by the content script. Directly interacts with the Three.js instance, detects objects, gathers data, and communicates back via the content script.
+5. **Bridge Script** (`bridge.js`): Injected into the page's main world via the manifest. Directly interacts with the Three.js instance, detects objects, gathers data, and communicates back via the content script.
 
 ### Initialization Flow
 
-1. When a page loads, `content-script.js` injects `bridge.js` into the page.
+1. When a page loads, Chrome injects `bridge.js` into the page's main world (including iframes).
 2. `bridge.js` creates the `window.__THREE_DEVTOOLS__` global object.
 3. When the DevTools panel is opened, `panel.js` connects to `background.js` (`init`) and immediately requests the current state (`request-state`).
 4. `background.js` relays the state request to `content-script.js`, which posts it to `bridge.js`.

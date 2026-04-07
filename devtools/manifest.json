@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Three.js DevTools",
-	"version": "1.13",
+	"version": "1.14",
 	"description": "Developer tools extension for Three.js",
 	"icons": {
 		"128": "icons/128-light.png"
@@ -14,13 +14,17 @@
 	},
 	"content_scripts": [{
 		"matches": ["<all_urls>"],
+		"js": ["bridge.js", "highlight.js"],
+		"all_frames": true,
+		"run_at": "document_start",
+		"world": "MAIN",
+		"match_about_blank": true
+	}, {
+		"matches": ["<all_urls>"],
 		"js": ["content-script.js"],
 		"all_frames": true,
-		"run_at": "document_start"
-	}],
-	"web_accessible_resources": [{
-		"resources": ["bridge.js", "highlight.js"],
-		"matches": ["<all_urls>"]
+		"run_at": "document_start",
+		"match_about_blank": true
 	}],
 	"permissions": [
 		"activeTab",
