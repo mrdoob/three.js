@@ -327,7 +327,7 @@
 				info: {
 					render: {
 						frame: renderer.info.render.frame,
-						calls: renderer.info.render.calls,
+						calls: renderer.isWebGPURenderer ? renderer.info.render.drawCalls : renderer.info.render.calls,
 						triangles: renderer.info.render.triangles,
 						points: renderer.info.render.points,
 						lines: renderer.info.render.lines,
