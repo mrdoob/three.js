@@ -64,12 +64,11 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
-vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
-	// dir can be either a direction vector or a normal vector
-	// upper-left 3x3 of matrix is assumed to be orthogonal
+	// upper-left 3x3 of view matrix is assumed to be orthogonal
 
-	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+	return normalize( ( vec4( normal, 0.0 ) * viewMatrix ).xyz );
 
 }
 
