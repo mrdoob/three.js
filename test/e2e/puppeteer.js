@@ -194,6 +194,7 @@ async function main() {
 		'--enable-features=Vulkan',
 		'--disable-vulkan-surface',
 		'--enable-unsafe-webgpu',
+		'--use-webgpu-adapter=swiftshader',
 		'--ignore-gpu-blocklist',
 		'--no-sandbox'
 	];
