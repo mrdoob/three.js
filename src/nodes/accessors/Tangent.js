@@ -1,5 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { cameraWorldMatrix } from './Camera.js';
+import { cameraViewMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { tangentViewFrame } from './TangentUtils.js';
@@ -57,4 +57,4 @@ export const tangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraWorldMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
+export const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).toVarying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
