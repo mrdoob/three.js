@@ -72,6 +72,14 @@ vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
 }
 
+vec3 transformDirectionByInverseViewMatrix( in vec3 dir, in mat4 viewMatrix ) {
+
+	// upper-left 3x3 of view matrix is assumed to be orthogonal
+
+	return normalize( ( vec4( dir, 0.0 ) * viewMatrix ).xyz );
+
+}
+
 bool isPerspectiveMatrix( mat4 m ) {
 
 	return m[ 2 ][ 3 ] == - 1.0;

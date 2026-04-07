@@ -28,7 +28,7 @@ export default /* glsl */`
 			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
 			reflectVec = normalize( mix( reflectVec, normal, pow4( roughness ) ) );
 
-			reflectVec = transformNormalByInverseViewMatrix( reflectVec, viewMatrix );
+			reflectVec = transformDirectionByInverseViewMatrix( reflectVec, viewMatrix );
 
 			vec4 envMapColor = textureCubeUV( envMap, envMapRotation * reflectVec, roughness );
 
