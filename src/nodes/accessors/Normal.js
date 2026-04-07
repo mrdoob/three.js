@@ -1,5 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { cameraViewMatrix, cameraWorldMatrix } from './Camera.js';
+import { cameraViewMatrix } from './Camera.js';
 import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 import { mat3, vec3, Fn } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
@@ -74,7 +74,7 @@ export const normalViewGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	let normal = normalViewGeometry.transformDirection( cameraWorldMatrix );
+	let normal = normalViewGeometry.transformDirection( cameraViewMatrix );
 
 	if ( builder.isFlatShading() !== true ) {
 
@@ -124,7 +124,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<vec3>}
  */
-export const normalWorld = /*@__PURE__*/ normalView.transformDirection( cameraWorldMatrix ).toVar( 'normalWorld' );
+export const normalWorld = /*@__PURE__*/ normalView.transformDirection( cameraViewMatrix ).toVar( 'normalWorld' );
 
 /**
  * TSL object that represents the clearcoat vertex normal of the current rendered object in view space.

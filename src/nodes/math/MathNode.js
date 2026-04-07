@@ -184,21 +184,22 @@ class MathNode extends TempNode {
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
 
-			let matrixNode, dirNode;
+			let tA = aNode;
+			let tB = bNode;
 
-			if ( builder.isMatrix( aNode.getNodeType( builder ) ) ) {
+			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
-				matrixNode = aNode;
-				dirNode = vec4( vec3( bNode ), 0.0 );
+				tB = vec4( vec3( tB ), 0.0 );
 
 			} else {
 
-				matrixNode = bNode;
-				dirNode = vec4( vec3( aNode ), 0.0 );
+				tA = vec4( vec3( tA ), 0.0 );
 
 			}
 
-			outputNode = normalize( mul( matrixNode, dirNode ).xyz );
+			const mulNode = mul( tA, tB ).xyz;
+
+			outputNode = normalize( mulNode );
 
 		}
 
