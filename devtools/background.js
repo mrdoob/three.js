@@ -1,15 +1,6 @@
 /* global chrome */
 
-// Constants
-const MESSAGE_ID = 'three-devtools';
-const MESSAGE_INIT = 'init';
-const MESSAGE_REQUEST_STATE = 'request-state';
-const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
-const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
-const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
-const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
-const MESSAGE_REGISTER = 'register';
-const MESSAGE_COMMITTED = 'committed';
+importScripts( 'constants.js' );
 
 // Map tab IDs to connections
 const connections = new Map();

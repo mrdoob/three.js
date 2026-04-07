@@ -9,12 +9,11 @@
 	"action": {},
 	"devtools_page": "index.html",
 	"background": {
-		"service_worker": "background.js",
-		"type": "module"
+		"service_worker": "background.js"
 	},
 	"content_scripts": [{
 		"matches": ["<all_urls>"],
-		"js": ["bridge.js", "highlight.js"],
+		"js": ["constants.js", "bridge.js", "highlight.js"],
 		"all_frames": true,
 		"run_at": "document_start",
 		"world": "MAIN",

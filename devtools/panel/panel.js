@@ -1,19 +1,6 @@
 /* global chrome */
 
-// Constants
-const MESSAGE_ID = 'three-devtools';
 const CONNECTION_NAME = 'three-devtools';
-const MESSAGE_INIT = 'init';
-const MESSAGE_REQUEST_STATE = 'request-state';
-const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
-const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
-const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
-const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
-const EVENT_REGISTER = 'register';
-const EVENT_RENDERER = 'renderer';
-const EVENT_OBJECT_DETAILS = 'object-details';
-const EVENT_SCENE = 'scene';
-const EVENT_COMMITTED = 'committed';
 const STATE_POLLING_INTERVAL = 1000;
 
 // --- Utility Functions ---

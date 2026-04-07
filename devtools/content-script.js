@@ -1,7 +1,5 @@
 /* global chrome */
 
-// This script runs in the context of the web page
-
 // Constants
 const MESSAGE_ID = 'three-devtools';
 const MESSAGE_REQUEST_STATE = 'request-state';

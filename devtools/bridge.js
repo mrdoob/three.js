@@ -5,19 +5,6 @@
 
 ( function () {
 
-	// Constants
-	const MESSAGE_ID = 'three-devtools';
-	const EVENT_REGISTER = 'register';
-	const EVENT_OBSERVE = 'observe';
-	const EVENT_RENDERER = 'renderer';
-	const EVENT_SCENE = 'scene';
-	const EVENT_OBJECT_DETAILS = 'object-details';
-	const EVENT_DEVTOOLS_READY = 'devtools-ready';
-	const MESSAGE_REQUEST_STATE = 'request-state';
-	const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
-	const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
-	const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
-	const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 	const HIGHLIGHT_OVERLAY_DURATION = 1000;
 
 	// Only initialize if not already initialized
