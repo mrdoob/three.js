@@ -58,33 +58,6 @@ const exceptionList = [
 	'webgl_materials_video_webcam',
 	'webgl_morphtargets_webcam',
 
-	// WebGL device lost
-	'webgpu_materialx_noise',
-	'webgpu_portal',
-	'webgpu_shadowmap',
-
-	// WebGPU needed
-	'webgpu_compile_async',
-	'webgpu_compute_audio',
-	'webgpu_compute_birds',
-	'webgpu_compute_cloth',
-	'webgpu_compute_particles_fluid',
-	'webgpu_compute_reduce',
-	'webgpu_compute_sort_bitonic',
-	'webgpu_compute_texture',
-	'webgpu_compute_texture_3d',
-	'webgpu_compute_texture_pingpong',
-	'webgpu_compute_water',
-	'webgpu_hdr',
-	'webgpu_lights_tiled',
-	'webgpu_materials',
-	'webgpu_multiple_canvas',
-	'webgpu_particles',
-	'webgpu_struct_drawindirect',
-	'webgpu_tsl_editor',
-	'webgpu_tsl_interoperability',
-	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_tsl_wood'
 
 ];
 
