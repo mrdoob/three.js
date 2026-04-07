@@ -56,6 +56,10 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
+      - name: Install Vulkan drivers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers
       - name: Install dependencies
         run: npm ci
       - name: Build

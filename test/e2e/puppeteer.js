@@ -216,8 +216,12 @@ async function main() {
 
 	const flags = [
 		'--hide-scrollbars',
-		'--use-angle=swiftshader',
-		'--enable-unsafe-swiftshader',
+		'--use-gl=angle',
+		'--use-angle=vulkan',
+		'--enable-features=Vulkan',
+		'--disable-vulkan-surface',
+		'--enable-unsafe-webgpu',
+		'--ignore-gpu-blocklist',
 		'--no-sandbox'
 	];
 
