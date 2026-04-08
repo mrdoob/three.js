@@ -146,11 +146,6 @@
 
 				// Bake light probe volume
 
-				const bounds = new THREE.Box3(
-					new THREE.Vector3( - 2.8, 0.1, - 2.8 ),
-					new THREE.Vector3( 2.8, 4.8, 2.8 )
-				);
-
 				async function bakeWithResolution( resolution ) {
 
 					if ( probeGrid ) {
@@ -160,7 +155,8 @@
 
 					}
 
-					probeGrid = new LightProbeVolume( bounds, new THREE.Vector3( resolution, resolution, resolution ) );
+					probeGrid = new LightProbeVolume( 5.6, 4.7, 5.6, resolution, resolution, resolution );
+					probeGrid.position.set( 0, 2.45, 0 );
 					probeGrid.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					probeGrid.visible = params.enabled;
 					scene.add( probeGrid );

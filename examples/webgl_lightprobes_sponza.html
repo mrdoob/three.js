@@ -114,7 +114,6 @@
 				const modelCenter = _box.getCenter( _center ).clone();
 				const targetY = modelCenter.y + modelSize.y * 0.2;
 				const lightBaseDistance = Math.max( modelSize.x, modelSize.z );
-				const probeBounds = new THREE.Box3();
 				const probeFar = Math.max( modelSize.x, modelSize.y, modelSize.z ) * 2.0;
 				let rebakeTimer = null;
 				let isBaking = false;
@@ -210,15 +209,11 @@
 
 						}
 
-						const halfSize = new THREE.Vector3( params.sizeX / 2, params.sizeY / 2, params.sizeZ / 2 );
-						const center = new THREE.Vector3( params.boundsX, params.boundsY, params.boundsZ );
-						probeBounds.min.copy( center ).sub( halfSize );
-						probeBounds.max.copy( center ).add( halfSize );
-
 						probeGrid = new LightProbeVolume(
-							probeBounds,
-							new THREE.Vector3( params.countX, params.countY, params.countZ )
+							params.sizeX, params.sizeY, params.sizeZ,
+							params.countX, params.countY, params.countZ
 						);
+						probeGrid.position.set( params.boundsX, params.boundsY, params.boundsZ );
 						probeGrid.bake( renderer, scene, {
 							cubemapSize: 32,
 							near: 0.05,

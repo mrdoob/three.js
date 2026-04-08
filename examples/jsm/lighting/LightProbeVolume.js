@@ -1,4 +1,5 @@
 import {
+	Box3,
 	CubeCamera,
 	FloatType,
 	HalfFloatType,
@@ -43,6 +44,7 @@ let _batchTargetProbes = 0;
 
 // Reusable temp objects
 const _position = /*@__PURE__*/ new Vector3();
+const _size = /*@__PURE__*/ new Vector3();
 const _savedViewport = /*@__PURE__*/ new Vector4();
 const _savedScissor = /*@__PURE__*/ new Vector4();
 
@@ -80,10 +82,16 @@ class LightProbeVolume extends Object3D {
 	/**
 	 * Constructs a new irradiance probe grid.
 	 *
-	 * @param {Box3} boundingBox - The world-space bounding box for the grid.
-	 * @param {Vector3} resolution - The number of probes along each axis (x, y, z).
+	 * The volume is centered at the object's position.
+	 *
+	 * @param {number} [width=1] - Full width of the volume along X.
+	 * @param {number} [height=1] - Full height of the volume along Y.
+	 * @param {number} [depth=1] - Full depth of the volume along Z.
+	 * @param {number} [widthProbes] - Number of probes along X. Defaults to `Math.max( 2, Math.round( width ) + 1 )`.
+	 * @param {number} [heightProbes] - Number of probes along Y. Defaults to `Math.max( 2, Math.round( height ) + 1 )`.
+	 * @param {number} [depthProbes] - Number of probes along Z. Defaults to `Math.max( 2, Math.round( depth ) + 1 )`.
 	 */
-	constructor( boundingBox, resolution ) {
+	constructor( width = 1, height = 1, depth = 1, widthProbes, heightProbes, depthProbes ) {
 
 		super();
 
@@ -97,18 +105,44 @@ class LightProbeVolume extends Object3D {
 		this.isLightProbeVolume = true;
 
 		/**
-		 * The world-space bounding box for the grid.
+		 * The full width of the volume along X.
 		 *
-		 * @type {Box3}
+		 * @type {number}
 		 */
-		this.boundingBox = boundingBox;
+		this.width = width;
+
+		/**
+		 * The full height of the volume along Y.
+		 *
+		 * @type {number}
+		 */
+		this.height = height;
+
+		/**
+		 * The full depth of the volume along Z.
+		 *
+		 * @type {number}
+		 */
+		this.depth = depth;
 
 		/**
 		 * The number of probes along each axis.
 		 *
 		 * @type {Vector3}
 		 */
-		this.resolution = resolution;
+		this.resolution = new Vector3(
+			widthProbes !== undefined ? widthProbes : Math.max( 2, Math.round( width ) + 1 ),
+			heightProbes !== undefined ? heightProbes : Math.max( 2, Math.round( height ) + 1 ),
+			depthProbes !== undefined ? depthProbes : Math.max( 2, Math.round( depth ) + 1 )
+		);
+
+		/**
+		 * The world-space bounding box for the grid. Updated automatically
+		 * by {@link LightProbeVolume#bake}.
+		 *
+		 * @type {Box3}
+		 */
+		this.boundingBox = new Box3();
 
 		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
@@ -127,6 +161,8 @@ class LightProbeVolume extends Object3D {
 		 */
 		this._renderTarget = null;
 
+		this.updateBoundingBox();
+
 	}
 
 	/**
@@ -140,17 +176,27 @@ class LightProbeVolume extends Object3D {
 	 */
 	getProbePosition( ix, iy, iz, target ) {
 
-		const min = this.boundingBox.min;
-		const max = this.boundingBox.max;
+		const pos = this.position;
 		const res = this.resolution;
+		const w = this.width, h = this.height, d = this.depth;
 
 		target.set(
-			res.x > 1 ? min.x + ix * ( max.x - min.x ) / ( res.x - 1 ) : ( min.x + max.x ) * 0.5,
-			res.y > 1 ? min.y + iy * ( max.y - min.y ) / ( res.y - 1 ) : ( min.y + max.y ) * 0.5,
-			res.z > 1 ? min.z + iz * ( max.z - min.z ) / ( res.z - 1 ) : ( min.z + max.z ) * 0.5
+			res.x > 1 ? pos.x - w / 2 + ix * w / ( res.x - 1 ) : pos.x,
+			res.y > 1 ? pos.y - h / 2 + iy * h / ( res.y - 1 ) : pos.y,
+			res.z > 1 ? pos.z - d / 2 + iz * d / ( res.z - 1 ) : pos.z
 		);
 
 		return target;
+
+	}
+
+	/**
+	 * Updates the world-space bounding box from the current position and size.
+	 */
+	updateBoundingBox() {
+
+		_size.set( this.width, this.height, this.depth );
+		this.boundingBox.setFromCenterAndSize( this.position, _size );
 
 	}
 
@@ -170,6 +216,7 @@ class LightProbeVolume extends Object3D {
 		const { cubeRenderTarget, cubeCamera } = _ensureBakeResources( options );
 
 		this._ensureTextures();
+		this.updateBoundingBox();
 
 		// Prevent feedback: temporarily hide the volume during baking
 		this.visible = false;
