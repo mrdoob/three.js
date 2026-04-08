@@ -41,7 +41,7 @@
 				// Camera
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 3, 8 );
+				camera.position.set( 0, 2.5, 8 );
 
 				// Scene
 
@@ -55,23 +55,30 @@
 				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
 
 				// Floor
-				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial.clone() );
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
 				// Ceiling
-				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial.clone() );
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				ceiling.rotation.x = Math.PI / 2;
 				ceiling.position.y = 5;
 				ceiling.receiveShadow = true;
 				scene.add( ceiling );
 
 				// Back wall
-				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial.clone() );
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				backWall.position.set( 0, 2.5, - 3 );
 				backWall.receiveShadow = true;
 				scene.add( backWall );
+
+				// Front wall
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, 2.5, 3 );
+				frontWall.receiveShadow = true;
+				scene.add( frontWall );
 
 				// Left wall (red)
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
@@ -141,7 +148,7 @@
 				// Controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2, 0 );
+				controls.target.set( 0, 2.5, 0 );
 				controls.update();
 
 				// Bake light probe volume
