@@ -13,6 +13,8 @@
 			WASD to move, mouse to look
 		</div>
 
+		<progress id="progressBar" value="0" max="100" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></progress>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -80,7 +82,21 @@
 				controls.movementSpeed = 2.0;
 				controls.lookSpeed = 0.16;
 
-				const loader = new GLTFLoader();
+				const progressBar = document.getElementById( 'progressBar' );
+
+				const manager = new THREE.LoadingManager();
+				manager.onProgress = function ( url, loaded, total ) {
+
+					progressBar.value = loaded / total * 100;
+
+				};
+				manager.onLoad = function () {
+
+					progressBar.remove();
+
+				};
+
+				const loader = new GLTFLoader( manager );
 				const modelURL = await getSponzaModelURL();
 				const gltf = await loader.loadAsync( modelURL );
 				const model = gltf.scene;
