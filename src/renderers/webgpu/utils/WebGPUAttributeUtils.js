@@ -320,9 +320,11 @@ class WebGPUAttributeUtils {
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
+	 * @param {number} offset - The offset in bytes.
+	 * @param {number} size - The size in bytes.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer, offset, size ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -338,21 +340,16 @@ class WebGPUAttributeUtils {
 
 		if ( readBufferGPU === undefined ) {
 
-			const size = readbackBuffer.size;
+			const bufferSize = readbackBuffer.size + 4; // 4 extra bytes to accommodate unaligned offsets
+			const alignedBufferSize = bufferSize + ( ( 4 - ( bufferSize % 4 ) ) % 4 );
 
 			readBufferGPU = device.createBuffer( {
 				label: `${ name }_readback`,
-				size,
+				size: alignedBufferSize,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
 
 			// release / dispose
-
-			const release = () => {
-
-				readBufferGPU.unmap();
-
-			};
 
 			const dispose = () => {
 
@@ -360,12 +357,10 @@ class WebGPUAttributeUtils {
 
 				backend.delete( readbackBuffer );
 
-				readbackBuffer.removeEventListener( 'release', release );
 				readbackBuffer.removeEventListener( 'dispose', dispose );
 
 			};
 
-			readbackBuffer.addEventListener( 'release', release );
 			readbackBuffer.addEventListener( 'dispose', dispose );
 
 			// register
@@ -378,14 +373,16 @@ class WebGPUAttributeUtils {
 			label: `readback_encoder_${ name }`
 		} );
 
-		const size = readbackBuffer.size;
+		const diff = offset % 4;
+		const alignedOffset = offset - diff;
+		const alignedCopySize = ( size + diff ) + ( ( 4 - ( ( size + diff ) % 4 ) ) % 4 );
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
-			0,
+			alignedOffset,
 			readBufferGPU,
 			0,
-			size
+			alignedCopySize
 		);
 
 		const gpuCommands = cmdEncoder.finish();
@@ -393,7 +390,9 @@ class WebGPUAttributeUtils {
 
 		await readBufferGPU.mapAsync( GPUMapMode.READ );
 
-		const arrayBuffer = readBufferGPU.getMappedRange();
+		const arrayBuffer = readBufferGPU.getMappedRange().slice( diff, diff + size );
+
+		readBufferGPU.unmap();
 
 		return arrayBuffer;
 

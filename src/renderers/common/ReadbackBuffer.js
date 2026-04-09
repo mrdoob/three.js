@@ -20,9 +20,9 @@ class ReadbackBuffer extends EventDispatcher {
 		super();
 
 		/**
-		 * The buffer attribute.
+		 * The size of the buffer in bytes.
 		 *
-		 * @type {BufferAttribute}
+		 * @type {number}
 		 */
 		this.size = size;
 
@@ -48,19 +48,6 @@ class ReadbackBuffer extends EventDispatcher {
 		 * @default true
 		 */
 		this.isReadbackBuffer = true;
-
-	}
-
-	/**
-	 * Releases the mapped buffer data so the GPU buffer can be
-	 * used by the GPU again.
-	 *
-	 * Note: Any `ArrayBuffer` data associated with this readback buffer
-	 * are removed and no longer accessible after calling this method.
-	 */
-	release() {
-
-		this.dispatchEvent( { type: 'release' } );
 
 	}
 

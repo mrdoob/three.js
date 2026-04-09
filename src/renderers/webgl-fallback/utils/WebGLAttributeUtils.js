@@ -259,9 +259,11 @@ class WebGLAttributeUtils {
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
+	 * @param {number} offset - The offset in bytes.
+	 * @param {number} size - The size in bytes.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer, offset, size ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
@@ -277,7 +279,7 @@ class WebGLAttributeUtils {
 
 		if ( writeBuffer === undefined ) {
 
-			const byteLength = readbackBuffer.size * 4;
+			const byteLength = readbackBuffer.size;
 
 			writeBuffer = gl.createBuffer();
 
@@ -308,14 +310,11 @@ class WebGLAttributeUtils {
 
 		}
 
-		const array = attribute.array;
-		const byteLength = array.byteLength;
-
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
+		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, offset, 0, size );
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new attribute.array.constructor( array.length );
+		const dstBuffer = new Uint8Array( size );
 
 		// Ensure the buffer is bound before reading
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
@@ -325,7 +324,7 @@ class WebGLAttributeUtils {
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer;
+		return dstBuffer.buffer;
 
 	}
 

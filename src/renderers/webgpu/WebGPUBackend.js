@@ -330,11 +330,13 @@ class WebGPUBackend extends Backend {
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
+	 * @param {number} offset - The offset in bytes.
+	 * @param {number} size - The size in bytes.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, readbackBuffer ) {
+	async getArrayBufferAsync( attribute, readbackBuffer, offset, size ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( attribute, readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, readbackBuffer, offset, size );
 
 	}
 

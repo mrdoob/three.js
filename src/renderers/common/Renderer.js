@@ -1921,9 +1921,11 @@ class Renderer {
 	 * @async
 	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
 	 * @param {ReadbackBuffer} [readbackBuffer=null] - The readback buffer.
+	 * @param {number} [offset=0] - The offset in bytes.
+	 * @param {number} [size=null] - The size in bytes.
 	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, readbackBuffer = null ) {
+	async getArrayBufferAsync( attribute, readbackBuffer = null, offset = 0, size = null ) {
 
 		if ( readbackBuffer === null ) {
 
@@ -1933,9 +1935,10 @@ class Renderer {
 
 			if ( readbackBuffer === undefined ) {
 
-				const size = attribute.array.byteLength;
+				const byteLength = attribute.array.byteLength;
 
-				readbackBuffer = new ReadbackBuffer( size );
+				readbackBuffer = new ReadbackBuffer( byteLength );
+				readbackBuffer.name = attribute.name;
 
 				const dispose = () => {
 
@@ -1971,9 +1974,45 @@ class Renderer {
 
 		}
 
-		readbackBuffer.release();
+		if ( size === null ) {
 
-		return await this.backend.getArrayBufferAsync( attribute, readbackBuffer );
+			size = attribute.array.byteLength - offset;
+
+		}
+
+		const readbackBufferData = this.backend.get( readbackBuffer );
+
+		if ( readbackBufferData.running ) {
+
+			warn( 'Renderer: "ReadbackBuffer" is already in use. To obtain multiple acquisitions in parallel of the same attribute, use instances of "ReadbackBuffer".' );
+
+			return new ArrayBuffer();
+
+		}
+
+		readbackBufferData.running = true;
+
+		const attributeByteLength = attribute.array.byteLength;
+
+		if ( offset + size > attributeByteLength ) {
+
+			warn( 'Renderer: The given offset and size exceed the attribute size.' );
+			size = attributeByteLength - offset;
+
+		}
+
+		if ( size > readbackBuffer.size ) {
+
+			warn( 'Renderer: "ReadbackBuffer" size is not compatible with the selected attribute range.' );
+			size = readbackBuffer.size;
+
+		}
+
+		const arrayBuffer = await this.backend.getArrayBufferAsync( attribute, readbackBuffer, offset, size );
+
+		readbackBufferData.running = false;
+
+		return arrayBuffer;
 
 	}
 
