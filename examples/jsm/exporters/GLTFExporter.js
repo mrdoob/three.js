@@ -1848,7 +1848,7 @@ class GLTFWriter {
 			const validVertexAttributes =
 					/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
 
-			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
+			if ( ! validVertexAttributes.test( attributeName ) && ! attributeName.startsWith( '_' ) ) attributeName = '_' + attributeName;
 
 			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
