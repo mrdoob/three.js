@@ -326,10 +326,8 @@ class TAAUNode extends TempNode {
 	 *
 	 * @param {number} inputWidth - The width of the input buffers the camera renders into.
 	 * @param {number} inputHeight - The height of the input buffers the camera renders into.
-	 * @param {number} outputWidth - The output width (drawing buffer width).
-	 * @param {number} outputHeight - The output height (drawing buffer height).
 	 */
-	setViewOffset( inputWidth, inputHeight, outputWidth, outputHeight ) {
+	setViewOffset( inputWidth, inputHeight ) {
 
 		// save original/unjittered projection matrix for velocity pass
 
@@ -342,12 +340,9 @@ class TAAUNode extends TempNode {
 		// so we shrink the input-pixel-unit offset by the ratio of input to
 		// output resolution.
 
-		const scaleX = inputWidth / outputWidth;
-		const scaleY = inputHeight / outputHeight;
-
 		const haltonOffset = _haltonOffsets[ this._jitterIndex ];
-		const jitterX = ( haltonOffset[ 0 ] - 0.5 ) * scaleX;
-		const jitterY = ( haltonOffset[ 1 ] - 0.5 ) * scaleY;
+		const jitterX = ( haltonOffset[ 0 ] - 0.5 );
+		const jitterY = ( haltonOffset[ 1 ] - 0.5 );
 
 		this._jitterOffset.value.set( jitterX, jitterY );
 
@@ -416,7 +411,7 @@ class TAAUNode extends TempNode {
 
 		if ( this._needsPostProcessingSync === true ) {
 
-			this.setViewOffset( inputWidth, inputHeight, outputWidth, outputHeight );
+			this.setViewOffset( inputWidth, inputHeight );
 
 			this._needsPostProcessingSync = false;
 
@@ -515,14 +510,12 @@ class TAAUNode extends TempNode {
 
 			renderPipeline.context.onBeforeRenderPipeline = () => {
 
-				const drawingBufferSize = builder.renderer.getDrawingBufferSize( _size );
-
 				const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
 
 				const inputWidth = beautyRenderTarget.texture.width;
 				const inputHeight = beautyRenderTarget.texture.height;
 
-				this.setViewOffset( inputWidth, inputHeight, drawingBufferSize.width, drawingBufferSize.height );
+				this.setViewOffset( inputWidth, inputHeight );
 
 			};
 
