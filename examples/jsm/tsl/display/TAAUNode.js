@@ -131,9 +131,9 @@ class TAAUNode extends TempNode {
 		 * top, so fast-moving pixels still respond quickly.
 		 *
 		 * @type {number}
-		 * @default 0.1
+		 * @default 0.025
 		 */
-		this.currentFrameWeight = 0.1;
+		this.currentFrameWeight = 0.025;
 
 		/**
 		 * The jitter index selects the current camera offset value.
