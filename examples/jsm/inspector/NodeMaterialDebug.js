@@ -10,6 +10,8 @@ class NodeMaterialDebug {
 
 		this._objects = null;
 		this._originalGet = null;
+		this._nodes = null;
+		this._originalUpdateBefore = null;
 
 		this.updateRenderer();
 
@@ -18,10 +20,21 @@ class NodeMaterialDebug {
 	updateRenderer() {
 
 		const renderObjects = this.renderer._objects;
+		const nodes = this.renderer._nodes;
 
-		if ( renderObjects === null || renderObjects === undefined || this._objects === renderObjects ) return this;
+		if ( renderObjects === null || renderObjects === undefined || nodes === null || nodes === undefined ) return this;
+		if ( this._objects === renderObjects && this._nodes === nodes ) return this;
 
 		this.dispose();
+
+		this._patchRenderObjects( renderObjects );
+		this._patchNodeManager( nodes );
+
+		return this;
+
+	}
+
+	_patchRenderObjects( renderObjects ) {
 
 		const originalGet = renderObjects.get;
 		const nodeMaterialDebug = this;
@@ -57,7 +70,29 @@ class NodeMaterialDebug {
 		this._objects = renderObjects;
 		this._originalGet = originalGet;
 
-		return this;
+	}
+
+	_patchNodeManager( nodes ) {
+
+		const originalUpdateBefore = nodes.updateBefore;
+		const nodeMaterialDebug = this;
+
+		nodes.updateBefore = function ( renderObject ) {
+
+			const previousCacheKey = renderObject.getCacheKey();
+
+			originalUpdateBefore.call( this, renderObject );
+
+			if ( previousCacheKey !== renderObject.getCacheKey() ) {
+
+				nodeMaterialDebug.report( renderObject );
+
+			}
+
+		};
+
+		this._nodes = nodes;
+		this._originalUpdateBefore = originalUpdateBefore;
 
 	}
 
@@ -72,6 +107,7 @@ class NodeMaterialDebug {
 		};
 
 		this.analyzer.report( renderObject );
+		this.analyzer.update( renderObject );
 		this.analyzer.onNodeMaterialInvalidation = previousCallback;
 
 	}
@@ -84,8 +120,16 @@ class NodeMaterialDebug {
 
 		}
 
+		if ( this._nodes !== null && this._originalUpdateBefore !== null ) {
+
+			this._nodes.updateBefore = this._originalUpdateBefore;
+
+		}
+
 		this._objects = null;
 		this._originalGet = null;
+		this._nodes = null;
+		this._originalUpdateBefore = null;
 
 	}
 
