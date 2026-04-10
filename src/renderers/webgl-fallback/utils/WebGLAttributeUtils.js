@@ -284,6 +284,24 @@ class WebGLAttributeUtils {
 
 		} else if ( target.isReadbackBuffer ) {
 
+			if ( target._mapped === true ) {
+
+				throw new Error( 'WebGPURenderer: ReadbackBuffer must be released before being used again.' );
+
+			}
+
+			const releaseCallback = () => {
+
+				target.buffer = null;
+				target._mapped = false;
+				target.removeEventListener( 'release', releaseCallback );
+				target.removeEventListener( 'dispose', releaseCallback );
+
+			};
+
+			target.addEventListener( 'release', releaseCallback );
+			target.addEventListener( 'dispose', releaseCallback );
+
 			// WebGL has no concept of a "mapped" data buffer so we create a new buffer, instead.
 			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
 			target.buffer = dstBuffer.buffer;

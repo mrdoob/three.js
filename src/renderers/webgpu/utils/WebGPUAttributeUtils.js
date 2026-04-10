@@ -363,7 +363,7 @@ class WebGPUAttributeUtils {
 					target.buffer = null;
 					target._mapped = false;
 					readBufferGPU.unmap();
-					attribute.removeEventListener( 'release', releaseCallback );
+					target.removeEventListener( 'release', releaseCallback );
 
 				};
 
@@ -372,10 +372,10 @@ class WebGPUAttributeUtils {
 					target.buffer = null;
 					readBufferGPU.destroy();
 
-					backend.delete( attribute );
+					backend.delete( target );
 
-					attribute.removeEventListener( 'release', releaseCallback );
-					attribute.removeEventListener( 'dispose', disposeCallback );
+					target.removeEventListener( 'release', releaseCallback );
+					target.removeEventListener( 'dispose', disposeCallback );
 
 				};
 
