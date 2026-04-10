@@ -1941,6 +1941,12 @@ class Renderer {
 
 		}
 
+		if ( offset % 4 !== 0 || ( count > 0 && count % 4 !== 0 ) ) {
+
+			throw new Error( 'THREE.Renderer: "getArrayBufferAsync()" offset and count must be a multiple of 4.' );
+
+		}
+
 		return await this.backend.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
