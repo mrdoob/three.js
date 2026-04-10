@@ -11,6 +11,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
+	const _htmlTextures = new Set();
 	let _canvas;
 
 	const _sources = new WeakMap(); // maps WebglTexture objects to instances of Source
@@ -309,6 +310,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( texture.isVideoTexture ) {
 
 			_videoTextures.delete( texture );
+
+		}
+
+		if ( texture.isHTMLTexture ) {
+
+			_htmlTextures.delete( texture );
 
 		}
 
@@ -1230,10 +1237,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						canvas.appendChild( image );
 
-						// Wait for the browser to paint the element before uploading.
-						canvas.onpaint = () => {
+						// Register and set up a shared paint callback for all HTMLTextures.
+						_htmlTextures.add( texture );
 
-							texture.needsUpdate = true;
+						canvas.onpaint = ( event ) => {
+
+							const changed = event.changedElements;
+
+							for ( const t of _htmlTextures ) {
+
+								if ( changed.includes( t.image ) ) {
+
+									t.needsUpdate = true;
+
+								}
+
+							}
 
 						};
 
