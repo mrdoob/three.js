@@ -496,7 +496,7 @@ class TRAANode extends TempNode {
 		} );
 
 		// Samples 3×3 neighborhood pixels and returns the closest and farthest depths.
-		const sampleCurrentDepth = Fn( ( [ positionTexel ], builder ) => {
+		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
 
 			const closestDepth = float( 2 ).toVar();
 			const closestPositionTexel = vec2( 0 ).toVar();
