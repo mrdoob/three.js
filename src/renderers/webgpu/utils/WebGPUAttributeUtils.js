@@ -362,6 +362,7 @@ class WebGPUAttributeUtils {
 
 					target.buffer = null;
 					target._mapped = false;
+
 					readBufferGPU.unmap();
 
 				};
@@ -369,6 +370,8 @@ class WebGPUAttributeUtils {
 				const disposeCallback = () => {
 
 					target.buffer = null;
+					target._mapped = false;
+
 					readBufferGPU.destroy();
 
 					backend.delete( target );
