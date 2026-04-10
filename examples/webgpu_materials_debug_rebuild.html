@@ -85,7 +85,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, NodeUpdateType } from 'three/tsl';
+			import { Fn, OnBeforeObjectUpdate, color } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -97,23 +97,12 @@
 					super( 'color' );
 
 					this.enabled = false;
-					this.pendingUpdate = false;
-					this.updateBeforeType = NodeUpdateType.OBJECT;
 
 				}
 
 				customCacheKey() {
 
 					return this.enabled === true ? 1 : 0;
-
-				}
-
-				updateBefore() {
-
-					if ( this.pendingUpdate === false ) return false;
-
-					this.pendingUpdate = false;
-					this.needsUpdate = true;
 
 				}
 
@@ -128,7 +117,7 @@
 			}
 
 			let camera, scene, renderer, controls;
-			let material, accentLight, sphere, rebuildColorNode;
+			let material, accentLight, sphere, rebuildColorNode, nodeUpdatePending;
 			let autoDemoInterval = null;
 			let autoDemoStep = 0;
 
@@ -183,7 +172,22 @@
 				} );
 				material.name = 'DebugPhysicalMaterial';
 				rebuildColorNode = new RebuildColorNode();
-				material.colorNode = rebuildColorNode;
+				nodeUpdatePending = false;
+				material.colorNode = Fn( () => {
+
+					OnBeforeObjectUpdate( () => {
+
+						if ( nodeUpdatePending === false ) return false;
+
+						nodeUpdatePending = false;
+						rebuildColorNode.needsUpdate = true;
+						updateActions();
+
+					} );
+
+					return rebuildColorNode;
+
+				} )();
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 64, 32 ), material );
 				sphere.position.y = 1;
@@ -238,7 +242,7 @@
 			function toggleNode() {
 
 				rebuildColorNode.enabled = ! rebuildColorNode.enabled;
-				rebuildColorNode.pendingUpdate = true;
+				nodeUpdatePending = true;
 
 				updateActions();
 
