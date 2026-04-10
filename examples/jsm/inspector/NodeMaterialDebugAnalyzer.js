@@ -769,6 +769,23 @@ class NodeMaterialDebugAnalyzer {
 
 	}
 
+	getCurrentDebugData( renderObject ) {
+
+		const geometryId = renderObject.geometry !== null ? renderObject.geometry.id : null;
+
+		return {
+			version: renderObject.version,
+			geometryId,
+			clippingContextCacheKey: renderObject.clippingContextCacheKey,
+			material: getMaterialCacheKeyComponents( renderObject ),
+			materialNodes: getMaterialNodeComponents( renderObject.material, this.traceEnabled ),
+			dynamic: getDynamicCacheKeyComponents( renderObject ),
+			dynamicCacheKey: String( renderObject.getDynamicCacheKey() ),
+			nodesCacheKey: getNodesCacheKey( renderObject )
+		};
+
+	}
+
 	/**
 	 * Reports cache invalidation for the given render object.
 	 *

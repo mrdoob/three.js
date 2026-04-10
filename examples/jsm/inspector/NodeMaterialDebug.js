@@ -101,11 +101,34 @@ class NodeMaterialDebug {
 
 	reportRefresh( renderObject, previousCacheKey, cacheKey ) {
 
+		const previousCallback = this.analyzer.onNodeMaterialInvalidation;
+		let dispatched = false;
+
+		this.analyzer.onNodeMaterialInvalidation = ( event ) => {
+
+			dispatched = true;
+			event.stage = event.stage || 'node-refresh';
+			event.needsRefresh = true;
+			event.refreshCacheKeyPrevious = String( previousCacheKey );
+			event.refreshCacheKey = String( cacheKey );
+			this.dispatch( event );
+
+		};
+
+		this.analyzer.report( renderObject );
+		this.analyzer.update( renderObject );
+		this.analyzer.onNodeMaterialInvalidation = previousCallback;
+
+		if ( dispatched === true ) return;
+
 		this.dispatch( {
 			stage: 'node-refresh',
 			property: 'NodeMaterialObserver.needsRefresh',
 			previousValue: String( previousCacheKey ),
 			value: String( cacheKey ),
+			refreshCacheKeyPrevious: String( previousCacheKey ),
+			refreshCacheKey: String( cacheKey ),
+			currentDebugData: typeof this.analyzer.getCurrentDebugData === 'function' ? this.analyzer.getCurrentDebugData( renderObject ) : null,
 			rebuild: false,
 			needsRefresh: true,
 			material: renderObject.material,
