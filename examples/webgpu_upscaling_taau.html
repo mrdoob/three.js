@@ -89,7 +89,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -129,7 +129,7 @@
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 				const taauNode = taau( scenePassColor, scenePassDepth, scenePassVelocity, camera );
-				const sharpenNode = sharpen( taauNode, params.sharpness );
+				const sharpenNode = sharpen( taauNode.getTextureNode(), params.sharpness );
 
 				function updatePipeline() {
 
