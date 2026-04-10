@@ -104,6 +104,13 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+
+				if ( renderer.getContext().texElementImage2D === undefined ) {
+
+					info.innerHTML += '<br>This browser does not support the <a href="https://github.com/WICG/html-in-canvas" target="_blank">HTML-in-Canvas API</a>.';
+
+				}
+
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
