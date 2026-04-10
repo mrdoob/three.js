@@ -37,6 +37,7 @@
 			import * as THREE from 'three/webgpu';
 			import { mrt, output, pass, velocity } from 'three/tsl';
 			import { taau } from 'three/addons/tsl/display/TAAUNode.js';
+			import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -47,6 +48,8 @@
 			const params = {
 				upscaleMethod: 'TAAU',
 				resolutionScale: 0.5,
+				sharpening: true,
+				sharpness: 0.2,
 			};
 
 			let camera, scene, renderer, renderPipeline, controls, mixer, timer;
@@ -126,12 +129,13 @@
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 				const taauNode = taau( scenePassColor, scenePassDepth, scenePassVelocity, camera );
-			
+				const sharpenNode = sharpen( taauNode, params.sharpness );
+
 				function updatePipeline() {
 
 					if ( params.upscaleMethod === 'TAAU' ) {
 
-						renderPipeline.outputNode = taauNode;
+						renderPipeline.outputNode = params.sharpening ? sharpenNode : taauNode;
 
 					} else {
 
@@ -150,6 +154,12 @@
 				gui.add( params, 'resolutionScale', 0.25, 1.0, 0.25 ).onChange( ( value ) => {
 
 					scenePass.setResolutionScale( value );
+
+				} );
+				gui.add( params, 'sharpening' ).onChange( updatePipeline );
+				gui.add( params, 'sharpness', 0, 2, 0.05 ).onChange( ( value ) => {
+
+					sharpenNode.sharpness.value = value;
 
 				} );
 
