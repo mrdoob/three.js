@@ -11,7 +11,7 @@ class NodeMaterialDebug {
 		this._objects = null;
 		this._originalGet = null;
 		this._nodes = null;
-		this._originalUpdateBefore = null;
+		this._originalNeedsRefresh = null;
 
 		this.updateRenderer();
 
@@ -74,25 +74,42 @@ class NodeMaterialDebug {
 
 	_patchNodeManager( nodes ) {
 
-		const originalUpdateBefore = nodes.updateBefore;
+		const originalNeedsRefresh = nodes.needsRefresh;
 		const nodeMaterialDebug = this;
 
-		nodes.updateBefore = function ( renderObject ) {
+		nodes.needsRefresh = function ( renderObject ) {
 
 			const previousCacheKey = renderObject.getCacheKey();
+			const needsRefresh = originalNeedsRefresh.call( this, renderObject );
+			const cacheKey = renderObject.getCacheKey();
 
-			originalUpdateBefore.call( this, renderObject );
+			if ( needsRefresh === true && previousCacheKey !== cacheKey ) {
 
-			if ( previousCacheKey !== renderObject.getCacheKey() ) {
-
-				nodeMaterialDebug.report( renderObject );
+				nodeMaterialDebug.reportRefresh( renderObject, previousCacheKey, cacheKey );
 
 			}
+
+			return needsRefresh;
 
 		};
 
 		this._nodes = nodes;
-		this._originalUpdateBefore = originalUpdateBefore;
+		this._originalNeedsRefresh = originalNeedsRefresh;
+
+	}
+
+	reportRefresh( renderObject, previousCacheKey, cacheKey ) {
+
+		this.dispatch( {
+			stage: 'node-refresh',
+			property: 'NodeMaterialObserver.needsRefresh',
+			previousValue: String( previousCacheKey ),
+			value: String( cacheKey ),
+			rebuild: false,
+			needsRefresh: true,
+			material: renderObject.material,
+			renderObject
+		} );
 
 	}
 
@@ -100,15 +117,17 @@ class NodeMaterialDebug {
 
 		const previousCallback = this.analyzer.onNodeMaterialInvalidation;
 
-		this.analyzer.onNodeMaterialInvalidation = ( event ) => {
-
-			if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
-
-		};
+		this.analyzer.onNodeMaterialInvalidation = ( event ) => this.dispatch( event );
 
 		this.analyzer.report( renderObject );
 		this.analyzer.update( renderObject );
 		this.analyzer.onNodeMaterialInvalidation = previousCallback;
+
+	}
+
+	dispatch( event ) {
+
+		if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 
 	}
 
@@ -120,16 +139,16 @@ class NodeMaterialDebug {
 
 		}
 
-		if ( this._nodes !== null && this._originalUpdateBefore !== null ) {
+		if ( this._nodes !== null && this._originalNeedsRefresh !== null ) {
 
-			this._nodes.updateBefore = this._originalUpdateBefore;
+			this._nodes.needsRefresh = this._originalNeedsRefresh;
 
 		}
 
 		this._objects = null;
 		this._originalGet = null;
 		this._nodes = null;
-		this._originalUpdateBefore = null;
+		this._originalNeedsRefresh = null;
 
 	}
 

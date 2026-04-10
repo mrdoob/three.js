@@ -111,6 +111,14 @@ function getNodeCustomCacheStateComponents( node, path ) {
 			value: String( toneMapping )
 		} );
 
+	} else if ( Object.prototype.hasOwnProperty.call( node, 'enabled' ) && typeof node.enabled === 'boolean' ) {
+
+		cacheKeyComponents.push( {
+			property: `${ path }.enabled`,
+			valueKey: String( node.enabled ),
+			value: node.enabled ? 'enabled' : 'disabled'
+		} );
+
 	} else if ( node.isPropertyNode === true ) {
 
 		cacheKeyComponents.push( {

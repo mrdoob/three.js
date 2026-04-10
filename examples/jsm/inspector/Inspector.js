@@ -330,11 +330,12 @@ class Inspector extends RendererInspector {
 			if ( this.nodeMaterialDebug === null ) this.nodeMaterialDebug = new NodeMaterialDebug( renderer );
 			this.nodeMaterialDebug.onNodeMaterialInvalidation = ( event ) => {
 
+				const materialLabel = event.materialLabel || ( event.material ? event.material.name || event.material.type : 'unknown material' );
 				const property = event.property !== undefined ? ` via ${ event.property }` : '';
 				const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
 				const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
 
-				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ event.materialLabel }"${ property }${ values }${ source }.` );
+				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }${ source }.` );
 
 				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 
