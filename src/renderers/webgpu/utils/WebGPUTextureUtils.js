@@ -581,6 +581,8 @@ class WebGPUTextureUtils {
 			const canvas = this.backend.renderer.domElement;
 			const image = texture.image;
 
+			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
+
 			// Set up paint callback if not already done.
 			if ( ! textureData.hasPaintCallback ) {
 

@@ -226,15 +226,19 @@ class Textures extends DataMap {
 
 			const canvas = this.renderer.domElement;
 
-			if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+			if ( 'requestPaint' in canvas ) {
 
-				canvas.setAttribute( 'layoutsubtree', 'true' );
+				if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
 
-			}
+					canvas.setAttribute( 'layoutsubtree', 'true' );
 
-			if ( texture.image.parentNode !== canvas ) {
+				}
 
-				canvas.appendChild( texture.image );
+				if ( texture.image.parentNode !== canvas ) {
+
+					canvas.appendChild( texture.image );
+
+				}
 
 			}
 
