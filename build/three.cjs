@@ -28813,6 +28813,77 @@ class CanvasTexture extends Texture {
 }
 
 /**
+ * Creates a texture from an HTML element.
+ *
+ * This is almost the same as the base texture class, except that it sets {@link Texture#needsUpdate}
+ * to `true` immediately and listens for the parent canvas's paint events to trigger updates.
+ *
+ * @augments Texture
+ */
+class HTMLTexture extends Texture {
+
+	/**
+	 * Constructs a new texture.
+	 *
+	 * @param {HTMLElement} [element] - The HTML element.
+	 * @param {number} [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
+	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
+	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
+	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
+	 * @param {number} [minFilter=LinearMipmapLinearFilter] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The texture format.
+	 * @param {number} [type=UnsignedByteType] - The texture type.
+	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
+	 */
+	constructor( element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+		super( element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHTMLTexture = true;
+		this.generateMipmaps = false;
+
+		this.needsUpdate = true;
+
+		const parent = element ? element.parentNode : null;
+
+		if ( parent !== null && 'requestPaint' in parent ) {
+
+			parent.onpaint = () => {
+
+				this.needsUpdate = true;
+
+			};
+
+			parent.requestPaint();
+
+		}
+
+	}
+
+	dispose() {
+
+		const parent = this.image ? this.image.parentNode : null;
+
+		if ( parent !== null && 'onpaint' in parent ) {
+
+			parent.onpaint = null;
+
+		}
+
+		super.dispose();
+
+	}
+
+}
+
+/**
  * This class can be used to automatically save the depth information of a
  * rendering into a texture.
  *
@@ -70520,6 +70591,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
+	const _htmlTextures = new Set();
 	let _canvas;
 
 	const _sources = new WeakMap(); // maps WebglTexture objects to instances of Source
@@ -70818,6 +70890,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( texture.isVideoTexture ) {
 
 			_videoTextures.delete( texture );
+
+		}
+
+		if ( texture.isHTMLTexture ) {
+
+			_htmlTextures.delete( texture );
 
 		}
 
@@ -71719,6 +71797,59 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						}
 
 					}
+
+				}
+
+			} else if ( texture.isHTMLTexture ) {
+
+				if ( 'texElement2D' in _gl ) {
+
+					const canvas = _gl.canvas;
+
+					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
+					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+						canvas.setAttribute( 'layoutsubtree', 'true' );
+
+					}
+
+					if ( image.parentNode !== canvas ) {
+
+						canvas.appendChild( image );
+
+						// Register and set up a shared paint callback for all HTMLTextures.
+						_htmlTextures.add( texture );
+
+						canvas.onpaint = ( event ) => {
+
+							const changed = event.changedElements;
+
+							for ( const t of _htmlTextures ) {
+
+								if ( changed.includes( t.image ) ) {
+
+									t.needsUpdate = true;
+
+								}
+
+							}
+
+						};
+
+						canvas.requestPaint();
+						return;
+
+					}
+
+					const level = 0;
+					const internalFormat = _gl.RGBA;
+					const srcFormat = _gl.RGBA;
+					const srcType = _gl.UNSIGNED_BYTE;
+
+					_gl.texElementImage2D( _gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 
 				}
 
@@ -78986,6 +79117,7 @@ exports.GreaterEqualStencilFunc = GreaterEqualStencilFunc;
 exports.GreaterStencilFunc = GreaterStencilFunc;
 exports.GridHelper = GridHelper;
 exports.Group = Group;
+exports.HTMLTexture = HTMLTexture;
 exports.HalfFloatType = HalfFloatType;
 exports.HemisphereLight = HemisphereLight;
 exports.HemisphereLightHelper = HemisphereLightHelper;
