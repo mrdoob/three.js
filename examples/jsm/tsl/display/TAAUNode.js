@@ -739,8 +739,16 @@ class TAAUNode extends TempNode {
 			const meanLuma = luminance( mean.rgb ).toConst();
 			const thinFeature = currentLuma.sub( meanLuma ).abs().div( meanLuma ).smoothstep( 0, 0.2 );
 
+			// Gate the lock by a two-sided depth change check. The
+			// existing `isDisocclusion` is one-sided (only fires when
+			// the scene moves farther), but new geometry appearing
+			// closer also makes the history stale.
+			const isDepthChanged = closestDepth.sub( previousDepth ).abs().greaterThan( this.depthThreshold );
+			const canLock = isValidUV.and( isDepthChanged.not() );
+			const gatedThinFeature = canLock.select( thinFeature, float( 0 ) );
+
 			const decay = isDisocclusion.select( 0, 0.5 );
-			const lock = max( thinFeature, lockNode.r.mul( decay ) ).saturate();
+			const lock = max( gatedThinFeature, lockNode.r.mul( decay ) ).saturate();
 			const lockedHistoryColor = mix( clippedHistoryColor, historyColor, lock );
 
 			const currentWeight = float( this.currentFrameWeight ).toVar();
