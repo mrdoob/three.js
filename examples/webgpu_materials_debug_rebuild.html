@@ -65,6 +65,7 @@
 		<div id="actions">
 			<button id="clearcoatButton">Clearcoat</button>
 			<button id="transmissionButton">Transmission</button>
+			<button id="nodeButton">Node</button>
 			<button id="lightButton">Point Light</button>
 			<button id="autoDemoButton">Auto Demo</button>
 		</div>
@@ -84,12 +85,51 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { color, NodeUpdateType } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
+			class RebuildColorNode extends THREE.Node {
+
+				constructor() {
+
+					super( 'color' );
+
+					this.enabled = false;
+					this.pendingUpdate = false;
+					this.updateBeforeType = NodeUpdateType.RENDER;
+
+				}
+
+				customCacheKey() {
+
+					return this.enabled === true ? 1 : 0;
+
+				}
+
+				updateBefore() {
+
+					if ( this.pendingUpdate === false ) return false;
+
+					this.pendingUpdate = false;
+					this.enabled = ! this.enabled;
+					this.needsUpdate = true;
+
+				}
+
+				generate( builder, output ) {
+
+					const value = this.enabled === true ? color( 0xff8f40 ) : color( 0x8aa4ff );
+
+					return value.build( builder, output );
+
+				}
+
+			}
+
 			let camera, scene, renderer, controls;
-			let material, accentLight, sphere;
+			let material, accentLight, sphere, rebuildColorNode;
 			let autoDemoInterval = null;
 			let autoDemoStep = 0;
 
@@ -134,7 +174,6 @@
 				scene.add( floor );
 
 				material = new THREE.MeshPhysicalMaterial( {
-					color: 0x8aa4ff,
 					roughness: 0.12,
 					metalness: 0.05,
 					clearcoat: 0,
@@ -144,6 +183,8 @@
 					ior: 1.5
 				} );
 				material.name = 'DebugPhysicalMaterial';
+				rebuildColorNode = new RebuildColorNode();
+				material.colorNode = rebuildColorNode;
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 64, 32 ), material );
 				sphere.position.y = 1;
@@ -151,6 +192,7 @@
 
 				document.getElementById( 'clearcoatButton' ).addEventListener( 'click', toggleClearcoat );
 				document.getElementById( 'transmissionButton' ).addEventListener( 'click', toggleTransmission );
+				document.getElementById( 'nodeButton' ).addEventListener( 'click', toggleNode );
 				document.getElementById( 'lightButton' ).addEventListener( 'click', toggleAccentLight );
 				autoDemoButton.addEventListener( 'click', toggleAutoDemo );
 
@@ -194,10 +236,19 @@
 
 			}
 
+			function toggleNode() {
+
+				rebuildColorNode.pendingUpdate = true;
+
+				updateActions();
+
+			}
+
 			function updateActions() {
 
 				document.getElementById( 'clearcoatButton' ).classList.toggle( 'active', material.clearcoat > 0 );
 				document.getElementById( 'transmissionButton' ).classList.toggle( 'active', material.transmission > 0 );
+				document.getElementById( 'nodeButton' ).classList.toggle( 'active', rebuildColorNode.enabled || rebuildColorNode.pendingUpdate );
 				document.getElementById( 'lightButton' ).classList.toggle( 'active', accentLight.parent !== null );
 				autoDemoButton.classList.toggle( 'active', autoDemoInterval !== null );
 
@@ -212,7 +263,7 @@
 
 				} else {
 
-					const actions = [ toggleClearcoat, toggleTransmission, toggleAccentLight ];
+					const actions = [ toggleClearcoat, toggleTransmission, toggleNode, toggleAccentLight ];
 
 					actions[ autoDemoStep % actions.length ]();
 					autoDemoStep ++;
