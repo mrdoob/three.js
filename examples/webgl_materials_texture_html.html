@@ -9,9 +9,6 @@
 			body {
 				background-color: #ffffff;
 			}
-			#canvas {
-				display: block;
-			}
 			#draw_element {
 				width: 600px;
 				background-color: #aaaaaa;
@@ -59,28 +56,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - HTMLTexture
 		</div>
 
-		<canvas id="canvas" width="600" height="600" layoutsubtree="true">
-			<div id="draw_element">
-				Hello world!<br>I'm multi-line, <b>formatted</b>,
-				rotated text with emoji (&#128512;), RTL text
-				<span dir=rtl>من فارسی صحبت میکنم</span>,
-				vertical text,
-				<p style="writing-mode: vertical-rl;">
-				这是垂直文本
-				</p>
-				an inline image (<img width="150" src="textures/758px-Canestra_di_frutta_(Caravaggio).jpg">), and
-				<svg width="50" height="50">
-				<circle cx="25" cy="25" r="20" fill="green" />
-				<text x="25" y="30" font-size="15" text-anchor="middle" fill="#fff">
-					SVG
-				</text>
-				</svg>!
-				<br>
-				<input type="text" placeholder="Type here...">
-				<button>Click me</button>
-			</div>
-		</canvas>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -103,7 +78,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 				if ( renderer.getContext().texElementImage2D === undefined ) {
 
@@ -115,6 +90,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
@@ -123,10 +99,34 @@
 				scene.background = new THREE.Color( 0xaaaaaa );
 				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.02 ).texture;
 
+				// HTML element
+
+				const element = document.createElement( 'div' );
+				element.id = 'draw_element';
+				element.innerHTML = `
+					Hello world!<br>I'm multi-line, <b>formatted</b>,
+					rotated text with emoji (&#128512;), RTL text
+					<span dir=rtl>من فارسی صحبت میکنم</span>,
+					vertical text,
+					<p style="writing-mode: vertical-rl;">
+					这是垂直文本
+					</p>
+					an inline image (<img width="150" src="textures/758px-Canestra_di_frutta_(Caravaggio).jpg">), and
+					<svg width="50" height="50">
+					<circle cx="25" cy="25" r="20" fill="green" />
+					<text x="25" y="30" font-size="15" text-anchor="middle" fill="#fff">
+						SVG
+					</text>
+					</svg>!
+					<br>
+					<input type="text" placeholder="Type here...">
+					<button>Click me</button>
+				`;
+
 				const geometry = new RoundedBoxGeometry( 200, 200, 200, 10, 10 );
 
 				const material = new THREE.MeshStandardMaterial( { roughness: 0, metalness: 0.5 } );
-				material.map = new THREE.HTMLTexture( draw_element );
+				material.map = new THREE.HTMLTexture( element );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -139,7 +139,7 @@
 
 				// Button click handler
 
-				draw_element.querySelector( 'button' ).addEventListener( 'click', function () {
+				element.querySelector( 'button' ).addEventListener( 'click', function () {
 
 					this.textContent = 'Clicked!';
 

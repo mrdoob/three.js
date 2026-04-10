@@ -1217,6 +1217,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( 'texElement2D' in _gl ) {
 
+					const canvas = _gl.canvas;
+
+					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
+					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+						canvas.setAttribute( 'layoutsubtree', 'true' );
+
+					}
+
+					if ( image.parentNode !== canvas ) {
+
+						canvas.appendChild( image );
+
+						// Wait for the browser to paint the element before uploading.
+						canvas.onpaint = () => {
+
+							texture.needsUpdate = true;
+
+						};
+
+						canvas.requestPaint();
+						return;
+
+					}
+
 					const level = 0;
 					const internalFormat = _gl.RGBA;
 					const srcFormat = _gl.RGBA;
