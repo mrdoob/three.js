@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
 import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -463,6 +463,12 @@ class TRAANode extends TempNode {
 
 		}
 
+		if ( builder.renderer.reversedDepthBuffer === true ) {
+
+			this._historyRenderTarget.depthTexture.type = FloatType;
+
+		}
+
 		if ( builder.context.velocity !== undefined ) {
 
 			this._velocityNode = builder.context.velocity;
@@ -473,6 +479,16 @@ class TRAANode extends TempNode {
 
 		}
 
+		const logarithmicToPerspectiveDepth = ( depth ) => {
+
+			// r = (far / near) ^ depth
+			// far * (r - 1) / (r * (far - near))
+			const { x: near, y: far } = this._cameraNearFar;
+			const r = far.div( near ).pow( depth );
+			return far.mul( r.sub( 1 ) ).div( r.mul( far.sub( near ) ) );
+
+		};
+
 		const currentDepthStruct = struct( {
 
 			closestDepth: 'float',
@@ -482,7 +498,7 @@ class TRAANode extends TempNode {
 		} );
 
 		// Samples 3×3 neighborhood pixels and returns the closest and farthest depths.
-		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
+		const sampleCurrentDepth = Fn( ( [ positionTexel ], builder ) => {
 
 			const closestDepth = float( 2 ).toVar();
 			const closestPositionTexel = vec2( 0 ).toVar();
@@ -493,7 +509,10 @@ class TRAANode extends TempNode {
 				for ( let y = - 1; y <= 1; ++ y ) {
 
 					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
-					const depth = this.depthNode.load( neighbor ).r.toVar();
+					let depth = this.depthNode.load( neighbor ).r;
+					if ( builder.renderer.reversedDepthBuffer ) depth = depth.oneMinus();
+					if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth );
+					depth = depth.toVar();
 
 					If( depth.lessThan( closestDepth ), () => {
 
@@ -519,7 +538,8 @@ class TRAANode extends TempNode {
 		// Samples a previous depth and reproject it using the current camera matrices.
 		const samplePreviousDepth = ( uv ) => {
 
-			const depth = this._previousDepthNode.sample( uv ).r;
+			let depth = this._previousDepthNode.sample( uv ).r;
+			if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth );
 			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
 			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
 			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
