@@ -14,6 +14,8 @@ let _rendererState;
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
+ * Note: MSAA must be disabled when TRAA is in use.
+ *
  * @augments TempNode
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
  */
