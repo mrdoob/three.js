@@ -1913,12 +1913,12 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
 	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
 		// tally the memory for this readback buffer
 		if ( target !== null && target.isReadbackBuffer ) {
@@ -1941,7 +1941,7 @@ class Renderer {
 
 		}
 
-		return await this.backend.getArrayBufferAsync( attribute, count, offset, target );
+		return await this.backend.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 

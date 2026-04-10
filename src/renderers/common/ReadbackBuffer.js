@@ -47,6 +47,8 @@ class ReadbackBuffer extends EventDispatcher {
 		 */
 		this.isReadbackBuffer = true;
 
+		this._mapped = false;
+
 	}
 
 	/**

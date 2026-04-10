@@ -326,7 +326,7 @@ class WebGPUAttributeUtils {
 	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute, count = - 1, offset = 0, target = null ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -340,11 +340,16 @@ class WebGPUAttributeUtils {
 
 			const readbackInfo = backend.get( target );
 
+			if ( target._mapped === true ) {
+
+				throw new Error( 'WebGPURenderer: ReadbackBuffer must be released before being used again.' );
+
+			}
+
+			target._mapped = true;
+
 			// initialize the GPU-side read copy buffer if it is not present
 			if ( readbackInfo.readBufferGPU === undefined ) {
-
-				// unmap the target in case it's been used by another context
-				target.release();
 
 				readBufferGPU = device.createBuffer( {
 					label: `${ target.name }_readback`,
@@ -356,6 +361,7 @@ class WebGPUAttributeUtils {
 				const releaseCallback = () => {
 
 					target.buffer = null;
+					target._mapped = false;
 					readBufferGPU.unmap();
 					attribute.removeEventListener( 'release', releaseCallback );
 
