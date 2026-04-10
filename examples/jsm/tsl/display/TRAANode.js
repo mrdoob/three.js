@@ -237,10 +237,19 @@ class TRAANode extends TempNode {
 
 		/**
 		 * Sync the post processing stack with the TRAA node.
+		 *
 		 * @private
 		 * @type {boolean}
 		 */
 		this._needsPostProcessingSync = false;
+
+		/**
+		 * The node used to render the scene's velocity.
+		 *
+		 * @private
+		 * @type {?VelocityNode}
+		 */
+		this._velocityNode = null;
 
 	}
 
@@ -284,7 +293,7 @@ class TRAANode extends TempNode {
 		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 
-		velocity.setProjectionMatrix( this._originalProjectionMatrix );
+		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
@@ -320,7 +329,7 @@ class TRAANode extends TempNode {
 
 		this.camera.clearViewOffset();
 
-		velocity.setProjectionMatrix( null );
+		this._velocityNode.setProjectionMatrix( null );
 
 		// update jitter index
 
@@ -451,6 +460,16 @@ class TRAANode extends TempNode {
 				this.clearViewOffset();
 
 			};
+
+		}
+
+		if ( builder.context.velocity !== undefined ) {
+
+			this._velocityNode = builder.context.velocity;
+
+		} else {
+
+			this._velocityNode = velocity;
 
 		}
 
