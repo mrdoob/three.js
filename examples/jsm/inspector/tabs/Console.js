@@ -8,12 +8,20 @@ class Console extends Tab {
 
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
+		this.traceNodeMaterialInvalidation = false;
 
 		this.buildHeader();
 
 		this.logContainer = document.createElement( 'div' );
 		this.logContainer.id = 'console-log';
 		this.content.appendChild( this.logContainer );
+
+		if ( options.traceNodeMaterialInvalidation === true ) {
+
+			this.traceNodeMaterialInvalidation = true;
+			this.nodeMaterialCheckbox.checked = true;
+
+		}
 
 	}
 
@@ -42,6 +50,23 @@ class Console extends Tab {
 		const buttonsGroup = document.createElement( 'div' );
 		buttonsGroup.className = 'console-buttons-group';
 
+		const nodeMaterialLabel = document.createElement( 'label' );
+		nodeMaterialLabel.className = 'custom-checkbox';
+		nodeMaterialLabel.title = 'Trace node material rebuild reasons';
+
+		const nodeMaterialCheckbox = document.createElement( 'input' );
+		nodeMaterialCheckbox.type = 'checkbox';
+		nodeMaterialCheckbox.dataset.action = 'trace-node-material-invalidation';
+		this.nodeMaterialCheckbox = nodeMaterialCheckbox;
+
+		const nodeMaterialCheckmark = document.createElement( 'span' );
+		nodeMaterialCheckmark.className = 'checkmark';
+
+		nodeMaterialLabel.appendChild( nodeMaterialCheckbox );
+		nodeMaterialLabel.appendChild( nodeMaterialCheckmark );
+		nodeMaterialLabel.append( 'Materials' );
+		buttonsGroup.appendChild( nodeMaterialLabel );
+
 		Object.keys( this.filters ).forEach( type => {
 
 			const label = document.createElement( 'label' );
@@ -64,6 +89,16 @@ class Console extends Tab {
 		} );
 
 		buttonsGroup.addEventListener( 'change', ( e ) => {
+
+			const action = e.target.dataset.action;
+
+			if ( action === 'trace-node-material-invalidation' ) {
+
+				this.traceNodeMaterialInvalidation = e.target.checked;
+				this.dispatchEvent( { type: 'trace-node-material-invalidation', enabled: this.traceNodeMaterialInvalidation } );
+				return;
+
+			}
 
 			const type = e.target.dataset.type;
 			if ( type in this.filters ) {

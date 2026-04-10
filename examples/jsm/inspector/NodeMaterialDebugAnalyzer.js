@@ -1,6 +1,6 @@
-import { BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from '../../constants.js';
-import { warn } from '../../utils.js';
-import ChainMap from './ChainMap.js';
+import { BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from 'three/webgpu';
+import { warn } from 'three/webgpu';
+
 
 function getKeys( obj ) {
 
@@ -668,7 +668,7 @@ function getNodesCacheKey( renderObject ) {
  *
  * @private
  */
-class NodeMaterialDebug {
+class NodeMaterialDebugAnalyzer {
 
 	/**
 	 * Constructs a new node material debug component.
@@ -691,12 +691,6 @@ class NodeMaterialDebug {
 		 */
 		this.cache = new WeakMap();
 
-		/**
-		 * Cache snapshots handed off to replacement render objects after a rebuild.
-		 *
-		 * @type {ChainMap}
-		 */
-		this.handoffs = new ChainMap();
 
 	}
 
@@ -708,7 +702,7 @@ class NodeMaterialDebug {
 	 */
 	get enabled() {
 
-		return this.renderer.debug.traceNodeMaterialInvalidation === true || typeof this.renderer.debug.onNodeMaterialInvalidation === 'function';
+		return true;
 
 	}
 
@@ -720,7 +714,7 @@ class NodeMaterialDebug {
 	 */
 	get traceEnabled() {
 
-		return this.renderer.debug.traceNodeMaterialInvalidation === true;
+		return true;
 
 	}
 
@@ -735,20 +729,6 @@ class NodeMaterialDebug {
 
 		const previousData = this.cache.get( renderObject );
 		const geometryId = renderObject.geometry !== null ? renderObject.geometry.id : null;
-
-		if ( previousData === undefined ) {
-
-			const handoffData = this.handoffs.get( renderObject.getChainArray() );
-
-			if ( handoffData !== undefined ) {
-
-				this.handoffs.delete( renderObject.getChainArray() );
-				this.cache.set( renderObject, handoffData );
-				return;
-
-			}
-
-		}
 
 		if ( previousData !== undefined ) {
 
@@ -895,8 +875,6 @@ class NodeMaterialDebug {
 
 		if ( materialCacheDifference !== null ) {
 
-			this.handoffs.set( renderObject.getChainArray(), createCurrentData() );
-
 			this._dispatch( {
 				stage: 'material-cache',
 				property: materialCacheDifference.property,
@@ -919,8 +897,6 @@ class NodeMaterialDebug {
 
 		if ( dynamicCacheDifference !== null ) {
 
-			this.handoffs.set( renderObject.getChainArray(), createCurrentData() );
-
 			this._dispatch( {
 				stage: 'dynamic-cache',
 				property: dynamicCacheDifference.property,
@@ -942,7 +918,7 @@ class NodeMaterialDebug {
 
 	_dispatch( data ) {
 
-		const callback = this.renderer.debug.onNodeMaterialInvalidation;
+		const callback = this.onNodeMaterialInvalidation;
 		const materialLabel = data.material.name !== '' ? data.material.name : data.material.type;
 		const event = Object.assign( {}, data );
 
@@ -955,7 +931,6 @@ class NodeMaterialDebug {
 
 		}
 
-		if ( this.renderer.debug.traceNodeMaterialInvalidation !== true ) return;
 
 		const property = event.property !== undefined ? ` via ${ event.property }` : '';
 		const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
@@ -967,4 +942,4 @@ class NodeMaterialDebug {
 
 }
 
-export default NodeMaterialDebug;
+export default NodeMaterialDebugAnalyzer;

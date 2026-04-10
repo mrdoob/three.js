@@ -9,12 +9,13 @@ import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
+import NodeMaterialDebug from './NodeMaterialDebug.js';
 
 import { setConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
-	constructor() {
+	constructor( options = {} ) {
 
 		super();
 
@@ -43,7 +44,12 @@ class Inspector extends RendererInspector {
 		const timeline = new Timeline();
 		profiler.addTab( timeline );
 
-		const consoleTab = new Console();
+		const consoleTab = new Console( { traceNodeMaterialInvalidation: options.traceNodeMaterialInvalidation } );
+		consoleTab.addEventListener( 'trace-node-material-invalidation', ( event ) => {
+
+			this.setTraceNodeMaterialInvalidation( event.enabled );
+
+		} );
 		profiler.addTab( consoleTab );
 
 		const settings = new Settings();
@@ -68,6 +74,9 @@ class Inspector extends RendererInspector {
 		this.settings = settings;
 		this.once = {};
 		this.extensionsData = new WeakMap();
+		this.nodeMaterialDebug = null;
+		this.onNodeMaterialInvalidation = null;
+		this.traceNodeMaterialInvalidation = options.traceNodeMaterialInvalidation === true;
 
 		this.displayCycle = {
 			text: {
@@ -257,21 +266,32 @@ class Inspector extends RendererInspector {
 
 		}
 
+		this.updateNodeMaterialDebug();
+
 	}
 
 	setRenderer( renderer ) {
+
+		if ( this.nodeMaterialDebug !== null ) {
+
+			this.nodeMaterialDebug.dispose();
+			this.nodeMaterialDebug = null;
+
+		}
 
 		super.setRenderer( renderer );
 
 		if ( renderer !== null ) {
 
 			setConsoleFunction( this.resolveConsole.bind( this ) );
+			this.setTraceNodeMaterialInvalidation( this.traceNodeMaterialInvalidation );
 
 			if ( this.isAvailable ) {
 
 				renderer.init().then( () => {
 
 					renderer.backend.trackTimestamp = true;
+					this.updateNodeMaterialDebug();
 
 					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 
@@ -284,6 +304,47 @@ class Inspector extends RendererInspector {
 				this.timeline.setRenderer( renderer );
 
 			}
+
+		}
+
+		return this;
+
+	}
+
+	updateNodeMaterialDebug() {
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.updateRenderer();
+
+		return this;
+
+	}
+
+	setTraceNodeMaterialInvalidation( enabled ) {
+
+		this.traceNodeMaterialInvalidation = enabled === true;
+
+		const renderer = this.getRenderer();
+
+		if ( this.traceNodeMaterialInvalidation === true && renderer !== null ) {
+
+			if ( this.nodeMaterialDebug === null ) this.nodeMaterialDebug = new NodeMaterialDebug( renderer );
+			this.nodeMaterialDebug.onNodeMaterialInvalidation = ( event ) => {
+
+				const property = event.property !== undefined ? ` via ${ event.property }` : '';
+				const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
+				const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
+
+				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ event.materialLabel }"${ property }${ values }${ source }.` );
+
+				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
+
+			};
+			this.nodeMaterialDebug.updateRenderer();
+
+		} else if ( this.nodeMaterialDebug !== null ) {
+
+			this.nodeMaterialDebug.dispose();
+			this.nodeMaterialDebug = null;
 
 		}
 

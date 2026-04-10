@@ -90,7 +90,6 @@ class RenderObjects {
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
-		const nodeMaterialDebug = this.renderer._getNodeMaterialDebug();
 
 		// set chain keys
 
@@ -128,8 +127,6 @@ class RenderObjects {
 			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
-
-					if ( nodeMaterialDebug !== null ) nodeMaterialDebug.report( renderObject );
 
 					renderObject.dispose();
 

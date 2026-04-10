@@ -10,7 +10,6 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import NodeManager from './nodes/NodeManager.js';
-import NodeMaterialDebug from './NodeMaterialDebug.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
 import QuadMesh from './QuadMesh.js';
@@ -704,8 +703,6 @@ class Renderer {
 		 * @typedef {Object} DebugConfig
 		 * @property {boolean} checkShaderErrors - Whether shader errors should be checked or not.
 		 * @property {?Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
-		 * @property {boolean} traceNodeMaterialInvalidation - Whether node material invalidations that trigger render object cache misses should be reported.
-		 * @property {?Function} onNodeMaterialInvalidation - A callback function that receives node material invalidation data. Assigning a custom function disables default reporting.
 		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camera and 3D object.
 		 */
 
@@ -714,13 +711,9 @@ class Renderer {
 		 *
 		 * @type {DebugConfig}
 		 */
-		this._nodeMaterialDebug = null;
-
 		this.debug = {
 			checkShaderErrors: true,
 			onShaderError: null,
-			traceNodeMaterialInvalidation: false,
-			onNodeMaterialInvalidation: null,
 			getShaderAsync: async ( scene, camera, object ) => {
 
 				await this.compileAsync( scene, camera );
@@ -738,37 +731,6 @@ class Renderer {
 
 			}
 		};
-
-	}
-
-	/**
-	 * Returns the node material debug helper when the feature is enabled.
-	 *
-	 * @private
-	 * @return {?NodeMaterialDebug} The debug helper.
-	 */
-	_getNodeMaterialDebug() {
-
-		const debug = this.debug;
-		let nodeMaterialDebug = this._nodeMaterialDebug;
-
-		if ( debug.traceNodeMaterialInvalidation === true || typeof debug.onNodeMaterialInvalidation === 'function' ) {
-
-			if ( nodeMaterialDebug === null ) {
-
-				nodeMaterialDebug = new NodeMaterialDebug( this );
-				this._nodeMaterialDebug = nodeMaterialDebug;
-
-			}
-
-		} else if ( nodeMaterialDebug !== null ) {
-
-			this._nodeMaterialDebug = null;
-			nodeMaterialDebug = null;
-
-		}
-
-		return nodeMaterialDebug;
 
 	}
 

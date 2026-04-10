@@ -11,26 +11,21 @@
 				height: 100%;
 			}
 
-			#panel {
+			#actions {
 				position: absolute;
 				left: 12px;
 				bottom: 12px;
-				width: min( 720px, calc( 100% - 24px ) );
-				padding: 12px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				max-width: calc( 100% - 24px );
+				padding: 10px;
 				box-sizing: border-box;
 				border: 1px solid rgba( 255, 255, 255, 0.12 );
 				border-radius: 6px;
 				background: rgba( 0, 0, 0, 0.55 );
 				color: #e8e8e8;
-				font: 400 12px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 				pointer-events: auto;
-			}
-
-			#actions {
-				display: grid;
-				grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
-				gap: 8px;
-				margin-bottom: 10px;
 			}
 
 			#actions button {
@@ -48,133 +43,6 @@
 				background: rgba( 255, 255, 255, 0.2 );
 			}
 
-			#stateBar,
-			#status,
-			#log {
-				font-family: monospace;
-				font-size: 11px;
-				line-height: 1.5;
-			}
-
-			#stateBar {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 6px;
-				margin-bottom: 8px;
-			}
-
-			.badge {
-				padding: 4px 8px;
-				border: 1px solid rgba( 255, 255, 255, 0.14 );
-				border-radius: 999px;
-				background: rgba( 255, 255, 255, 0.06 );
-				color: #dddddd;
-			}
-
-			.badge.on {
-				background: rgba( 140, 220, 255, 0.18 );
-				color: #ffffff;
-			}
-
-			#recentEvent {
-				margin-bottom: 10px;
-				padding: 8px 10px;
-				border-left: 4px solid var( --recent-color, #8ce0ff );
-				border-radius: 4px;
-				background: rgba( 255, 255, 255, 0.04 );
-				font: 700 12px/1.4 monospace;
-				color: #eef4fb;
-			}
-
-			#status {
-				margin-bottom: 10px;
-				color: #c7c7c7;
-			}
-
-			#log {
-				max-height: 170px;
-				overflow-y: auto;
-				color: #ffffff;
-			}
-
-			.log-entry {
-				padding: 6px 8px;
-				border-left: 4px solid var( --entry-color, #8ce0ff );
-				border-radius: 4px;
-				background: rgba( 255, 255, 255, 0.04 );
-			}
-
-			.log-entry + .log-entry {
-				margin-top: 6px;
-			}
-
-			.log-entry .time {
-				color: #95a3b8;
-			}
-
-			.log-entry .reason {
-				color: var( --entry-color, #8ce0ff );
-			}
-
-			.log-entry .values {
-				color: #d5deea;
-			}
-
-			#eventBanner {
-				position: absolute;
-				top: 104px;
-				right: 12px;
-				width: min( 620px, calc( 100% - 24px ) );
-				padding: 14px 16px;
-				box-sizing: border-box;
-				border: 1px solid rgba( 255, 255, 255, 0.14 );
-				border-radius: 10px;
-				background: rgba( 10, 12, 16, 0.78 );
-				backdrop-filter: blur( 10px );
-				color: #f1f5f9;
-				opacity: 0;
-				transform: translateY( - 12px ) scale( 0.98 );
-				pointer-events: none;
-			}
-
-			#eventBannerTitle {
-				font: 700 18px/1.15 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-				letter-spacing: 0.02em;
-				text-transform: uppercase;
-			}
-
-			#eventBannerReason {
-				margin-top: 8px;
-				font: 700 14px/1.3 monospace;
-				color: var( --event-color, #8ce0ff );
-			}
-
-			#eventBannerValues {
-				margin-top: 6px;
-				font: 400 12px/1.45 monospace;
-				color: #d4dbe3;
-				word-break: break-word;
-			}
-
-			#hint {
-				margin-top: 8px;
-				font: 400 11px/1.5 monospace;
-				color: #96a3b3;
-			}
-
-			@media ( max-width: 900px ) {
-
-				#eventBanner {
-					top: auto;
-					right: 12px;
-					bottom: 226px;
-				}
-
-				#actions {
-					grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
-				}
-
-			}
 		</style>
 	</head>
 	<body>
@@ -189,31 +57,18 @@
 			</div>
 
 			<small>
-				Uses <code>renderer.debug.onNodeMaterialInvalidation</code> to report why a material makes the node material rebuild.<br />
-				Toggle clearcoat/transmission, or add/remove the accent light to trigger rebuilds from material or scene changes.
+				Open the Inspector Console tab to see material rebuild reasons.<br />
+				The <code>Materials</code> trace option is enabled when this example starts.
 			</small>
 		</div>
 
-		<div id="panel">
-			<div id="actions">
-				<button id="clearcoatButton">Clearcoat</button>
-				<button id="transmissionButton">Transmission</button>
-				<button id="lightButton">Point Light</button>
-				<button id="autoDemoButton">Auto Demo</button>
-				<button id="clearLogButton">Clear</button>
-			</div>
-			<div id="stateBar"></div>
-			<div id="recentEvent">Waiting for the next rebuild event.</div>
-			<div id="status"></div>
-			<div id="log"></div>
+		<div id="actions">
+			<button id="clearcoatButton">Clearcoat</button>
+			<button id="transmissionButton">Transmission</button>
+			<button id="lightButton">Point Light</button>
+			<button id="autoDemoButton">Auto Demo</button>
 		</div>
 
-		<div id="eventBanner">
-			<div id="eventBannerTitle">NodeMaterial needs rebuild</div>
-			<div id="eventBannerReason">Waiting for a rebuild event</div>
-			<div id="eventBannerValues">Use the buttons or start the auto demo.</div>
-			<div id="hint">This banner is driven directly by the debug callback.</div>
-		</div>
 
 		<script type="importmap">
 			{
@@ -231,21 +86,14 @@
 			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
 			let material, accentLight, sphere;
 			let autoDemoInterval = null;
 			let autoDemoStep = 0;
-			let feedbackTime = - Infinity;
 
 			const container = document.getElementById( 'container' );
-			const stateBarElement = document.getElementById( 'stateBar' );
-			const recentEventElement = document.getElementById( 'recentEvent' );
-			const statusElement = document.getElementById( 'status' );
-			const logElement = document.getElementById( 'log' );
-			const eventBannerElement = document.getElementById( 'eventBanner' );
-			const eventBannerReasonElement = document.getElementById( 'eventBannerReason' );
-			const eventBannerValuesElement = document.getElementById( 'eventBannerValues' );
 			const autoDemoButton = document.getElementById( 'autoDemoButton' );
 
 			init();
@@ -262,15 +110,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector( { traceNodeMaterialInvalidation: true } );
 				container.appendChild( renderer.domElement );
-
-				renderer.debug.onNodeMaterialInvalidation = function ( event ) {
-
-					addLog( event );
-					console.log( 'NodeMaterial needs rebuild', event );
-					showEvent( event );
-
-				};
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -312,14 +153,10 @@
 				document.getElementById( 'transmissionButton' ).addEventListener( 'click', toggleTransmission );
 				document.getElementById( 'lightButton' ).addEventListener( 'click', toggleAccentLight );
 				autoDemoButton.addEventListener( 'click', toggleAutoDemo );
-				document.getElementById( 'clearLogButton' ).addEventListener( 'click', clearLog );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				addLog( 'Press a button or start the auto demo to trigger a node material rebuild.' );
-				addLog( 'Expected rebuild reasons include material.clearcoat, material.transmission or scene.lights.' );
-
-				updateStatus();
+				updateActions();
 
 			}
 
@@ -328,7 +165,7 @@
 				material.clearcoat = material.clearcoat === 0 ? 1 : 0;
 				material.needsUpdate = true;
 
-				updateStatus();
+				updateActions();
 
 			}
 
@@ -337,7 +174,7 @@
 				material.transmission = material.transmission === 0 ? 0.95 : 0;
 				material.needsUpdate = true;
 
-				updateStatus();
+				updateActions();
 
 			}
 
@@ -353,51 +190,16 @@
 
 				}
 
-				updateStatus();
+				updateActions();
 
 			}
 
-			function updateStatus() {
+			function updateActions() {
 
-				stateBarElement.innerHTML =
-					getBadgeHTML( 'clearcoat', material.clearcoat > 0 ) +
-					getBadgeHTML( 'transmission', material.transmission > 0 ) +
-					getBadgeHTML( 'point light', accentLight.parent !== null ) +
-					getBadgeHTML( 'auto demo', autoDemoInterval !== null );
-
-				statusElement.textContent = 'The banner and log update every time the debug callback reports a rebuild.';
+				document.getElementById( 'clearcoatButton' ).classList.toggle( 'active', material.clearcoat > 0 );
+				document.getElementById( 'transmissionButton' ).classList.toggle( 'active', material.transmission > 0 );
+				document.getElementById( 'lightButton' ).classList.toggle( 'active', accentLight.parent !== null );
 				autoDemoButton.classList.toggle( 'active', autoDemoInterval !== null );
-
-			}
-
-			function getBadgeHTML( label, active ) {
-
-				return `<span class="badge ${ active ? 'on' : '' }">${ label }: ${ active ? 'on' : 'off' }</span>`;
-
-			}
-
-			function getFeedbackMeta( property ) {
-
-				if ( property.startsWith( 'material.' ) ) return { color: 0x8ce0ff, cssColor: '#8ce0ff', label: 'Material rebuild' };
-				if ( property.startsWith( 'scene.' ) ) return { color: 0xffbe78, cssColor: '#ffbe78', label: 'Scene rebuild' };
-				if ( property.startsWith( 'renderer.' ) ) return { color: 0xff8fb1, cssColor: '#ff8fb1', label: 'Renderer rebuild' };
-
-				return { color: 0xffffff, cssColor: '#ffffff', label: 'Rebuild' };
-
-			}
-
-			function showEvent( event ) {
-
-				const feedback = getFeedbackMeta( event.property );
-
-				feedbackTime = performance.now();
-
-				eventBannerElement.style.setProperty( '--event-color', feedback.cssColor );
-				eventBannerReasonElement.textContent = event.property;
-				eventBannerValuesElement.textContent = `${ event.previousValue } -> ${ event.value }`;
-
-				recentEventElement.style.setProperty( '--recent-color', feedback.cssColor );
-				recentEventElement.innerHTML = `${ feedback.label }<br><span style="color:${ feedback.cssColor }">${ event.property }</span><br><span style="color:#d5deea">${ event.previousValue } -> ${ event.value }</span>`;
 
 			}
 
@@ -424,43 +226,7 @@
 
 				}
 
-				updateStatus();
-
-			}
-
-			function addLog( event ) {
-
-				const entry = document.createElement( 'div' );
-				entry.className = 'log-entry';
-
-				if ( typeof event === 'string' ) {
-
-					entry.style.setProperty( '--entry-color', '#8ce0ff' );
-					entry.innerHTML = `<span class="time">[${ new Date().toLocaleTimeString() }]</span> <span class="values">${ event }</span>`;
-
-				} else {
-
-					const feedback = getFeedbackMeta( event.property );
-					entry.style.setProperty( '--entry-color', feedback.cssColor );
-					entry.innerHTML = `<span class="time">[${ new Date().toLocaleTimeString() }]</span> <span class="reason">${ event.property }</span><br><span class="values">${ event.previousValue } -> ${ event.value }</span>`;
-
-				}
-
-				logElement.prepend( entry );
-
-				while ( logElement.childElementCount > 8 ) {
-
-					logElement.lastElementChild.remove();
-
-				}
-
-			}
-
-			function clearLog() {
-
-				logElement.innerHTML = '';
-				recentEventElement.style.setProperty( '--recent-color', '#8ce0ff' );
-				recentEventElement.textContent = 'Waiting for the next rebuild event.';
+				updateActions();
 
 			}
 
@@ -475,21 +241,8 @@
 
 			function animate() {
 
-				const pulse = Math.max( 0, 1 - ( performance.now() - feedbackTime ) / 1400 );
-
 				sphere.rotation.y += 0.0035;
 
-				if ( pulse > 0 ) {
-
-					eventBannerElement.style.opacity = String( Math.min( 1, pulse * 2.1 ) );
-					eventBannerElement.style.transform = `translateY( ${ - 12 * ( 1 - pulse ) }px ) scale( ${ 1 - pulse * 0.02 } )`;
-
-				} else {
-
-					eventBannerElement.style.opacity = '0';
-					eventBannerElement.style.transform = 'translateY( -12px ) scale( 0.98 )';
-
-				}
 
 				controls.update();
 				renderer.render( scene, camera );
