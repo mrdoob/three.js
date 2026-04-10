@@ -340,12 +340,12 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const size = this._getAttributeMemorySize( readbackBuffer.attribute );
-		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
+		const maxByteLength = readbackBuffer.maxByteLength;
+		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
 
 		this.memory.readbackBuffers ++;
-		this.memory.total += size;
-		this.memory.readbackBuffersSize += size;
+		this.memory.total += maxByteLength;
+		this.memory.readbackBuffersSize += maxByteLength;
 
 	}
 
@@ -356,7 +356,12 @@ class Info {
 	 */
 	destroyReadbackBuffer( readbackBuffer ) {
 
-		this.destroyAttribute( readbackBuffer );
+		const { size } = this.memoryMap.get( readbackBuffer );
+		this.memoryMap.delete( readbackBuffer );
+
+		this.memory.readbackBuffers --;
+		this.memory.total -= size;
+		this.memory.readbackBuffersSize -= size;
 
 	}
 
