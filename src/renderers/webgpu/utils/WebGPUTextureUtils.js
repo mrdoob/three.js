@@ -95,6 +95,13 @@ class WebGPUTextureUtils {
 		 */
 		this._samplerCache = new Map();
 
+		/**
+		 * A set of HTMLTextures that need paint updates.
+		 *
+		 * @type {Set<HTMLTexture>}
+		 */
+		this._htmlTextures = new Set();
+
 	}
 
 	/**
@@ -357,6 +364,8 @@ class WebGPUTextureUtils {
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
+		this._htmlTextures.delete( texture );
+
 		backend.delete( texture );
 
 	}
@@ -566,6 +575,39 @@ class WebGPUTextureUtils {
 
 			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
 
+		} else if ( texture.isHTMLTexture ) {
+
+			const device = this.backend.device;
+			const canvas = this.backend.renderer.domElement;
+			const image = texture.image;
+
+			// Set up paint callback if not already done.
+			if ( ! textureData.hasPaintCallback ) {
+
+				textureData.hasPaintCallback = true;
+
+				this._addHTMLTexture( texture );
+
+				// Wait for the browser to paint the element before uploading.
+				canvas.requestPaint();
+				return;
+
+			}
+
+			const width = textureDescriptorGPU.size.width;
+			const height = textureDescriptorGPU.size.height;
+
+			device.queue.copyElementImageToTexture(
+				image, width, height,
+				{ texture: textureData.texture }
+			);
+
+			if ( texture.flipY ) {
+
+				this._flipY( textureData.texture, textureDescriptorGPU );
+
+			}
+
 		} else {
 
 			if ( mipmaps.length > 0 ) {
@@ -655,11 +697,45 @@ class WebGPUTextureUtils {
 	}
 
 	/**
+	 * Registers an HTMLTexture for paint updates.
+	 * Sets up a single shared `onpaint` handler on the canvas
+	 * that notifies all registered HTMLTextures.
+	 *
+	 * @private
+	 * @param {HTMLTexture} texture - The HTMLTexture to register.
+	 */
+	_addHTMLTexture( texture ) {
+
+		this._htmlTextures.add( texture );
+
+		const canvas = this.backend.renderer.domElement;
+		const htmlTextures = this._htmlTextures;
+
+		canvas.onpaint = ( event ) => {
+
+			const changed = event.changedElements;
+
+			for ( const t of htmlTextures ) {
+
+				if ( changed.includes( t.image ) ) {
+
+					t.needsUpdate = true;
+
+				}
+
+			}
+
+		};
+
+	}
+
+	/**
 	 * Frees all internal resources.
 	 */
 	dispose() {
 
 		this._samplerCache.clear();
+		this._htmlTextures.clear();
 
 	}
 
