@@ -113,7 +113,6 @@
 					if ( this.pendingUpdate === false ) return false;
 
 					this.pendingUpdate = false;
-					this.enabled = ! this.enabled;
 					this.needsUpdate = true;
 
 				}
@@ -238,6 +237,7 @@
 
 			function toggleNode() {
 
+				rebuildColorNode.enabled = ! rebuildColorNode.enabled;
 				rebuildColorNode.pendingUpdate = true;
 
 				updateActions();
@@ -248,7 +248,7 @@
 
 				document.getElementById( 'clearcoatButton' ).classList.toggle( 'active', material.clearcoat > 0 );
 				document.getElementById( 'transmissionButton' ).classList.toggle( 'active', material.transmission > 0 );
-				document.getElementById( 'nodeButton' ).classList.toggle( 'active', rebuildColorNode.enabled || rebuildColorNode.pendingUpdate );
+				document.getElementById( 'nodeButton' ).classList.toggle( 'active', rebuildColorNode.enabled );
 				document.getElementById( 'lightButton' ).classList.toggle( 'active', accentLight.parent !== null );
 				autoDemoButton.classList.toggle( 'active', autoDemoInterval !== null );
 
