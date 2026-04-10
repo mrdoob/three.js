@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
+import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, property, outputStruct } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -161,8 +161,9 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {?RenderTarget}
 		 */
-		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._historyRenderTarget.texture.name = 'TAAUNode.history';
+		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 2 } );
+		this._historyRenderTarget.textures[ 0 ].name = 'TAAUNode.history.color';
+		this._historyRenderTarget.textures[ 1 ].name = 'TAAUNode.history.lock';
 
 		/**
 		 * The render target for the resolve. Sized to the renderer's drawing
@@ -624,7 +625,8 @@ class TAAUNode extends TempNode {
 
 		} );
 
-		const historyNode = texture( this._historyRenderTarget.texture );
+		const historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
+		const lockNode = texture( this._historyRenderTarget.textures[ 1 ] );
 
 		// --- TAAU resolve ---
 		//
@@ -636,6 +638,11 @@ class TAAUNode extends TempNode {
 		// sample center and the output pixel center. The same neighborhood
 		// also supplies the moments used for variance clipping of the
 		// reprojected history, so no second neighborhood read is needed.
+
+		const colorOutput = property( 'vec4' );
+		const lockOutput = property( 'vec4' );
+
+		const outputNode = outputStruct( colorOutput, lockOutput );
 
 		const resolve = Fn( () => {
 
@@ -728,19 +735,41 @@ class TAAUNode extends TempNode {
 			// in sub-pixel detail. Motion still biases toward the current
 			// frame to keep disoccluded and fast-moving pixels responsive.
 
+			const currentLuma = luminance( currentColor.rgb );
+			const meanLuma = luminance( mean.rgb ).toConst();
+			const thinFeature = currentLuma.sub( meanLuma ).abs().div( meanLuma ).smoothstep( 0, 0.2 );
+
+			const decay = isDisocclusion.select( 0, 0.5 );
+			const lock = max( thinFeature, lockNode.r.mul( decay ) ).saturate();
+			const lockedHistoryColor = mix( clippedHistoryColor, historyColor, lock );
+
 			const currentWeight = float( this.currentFrameWeight ).toVar();
 			currentWeight.assign( hasValidHistory.select( currentWeight.add( motionFactor ).saturate(), 1 ) );
 
-			const output = flickerReduction( currentColor, clippedHistoryColor, currentWeight );
+			const output = flickerReduction( currentColor, lockedHistoryColor, currentWeight );
 
-			return output;
+			colorOutput.assign( output );
+			lockOutput.assign( lock );
+
+			return vec4( 0 ); // temporary solution until TSL does not complain anymore
 
 		} );
 
 		// materials
 
 		this._resolveMaterial.colorNode = resolve();
-		this._seedMaterial.colorNode = this.beautyNode.sample( uv() );
+		this._resolveMaterial.outputNode = outputNode;
+
+		this._seedMaterial.colorNode = Fn( () => {
+
+			colorOutput.assign( this.beautyNode.sample( uv() ) );
+			lockOutput.assign( 0 );
+
+			return vec4( 0 );
+
+		} )();
+
+		this._seedMaterial.outputNode = outputNode;
 
 		return this._textureNode;
 
