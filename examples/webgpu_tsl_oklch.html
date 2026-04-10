@@ -38,11 +38,12 @@
 			import {
 				Fn, uv, uniform, vec3, float,
 				abs, atan, clamp, fract, mix, sqrt,
-				oklchToLinearSRGB, linearSRGBToOKLCH, sRGBTransferEOTF
+				OKLCHToWorking, workingToOKLCH, sRGBTransferEOTF
 			} from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { ColorConverter } from 'three/addons/math/ColorConverter.js';
 
 			let renderer, camera, scene, controls;
 
@@ -114,7 +115,7 @@
 					const angle = fract( atan( p.y, p.x ).div( 2 * Math.PI ) );
 
 					const lch = vec3( lightnessUniform, radius.mul( chromaMaxUniform ), angle );
-					const rgb = clamp( oklchToLinearSRGB( lch ), 0.0, 1.0 );
+					const rgb = OKLCHToWorking( lch );
 
 					const mask = clamp( float( 1.0 ).sub( radius ).mul( 100.0 ), 0.0, 1.0 );
 
@@ -163,8 +164,8 @@
 
 					const t = uv().x;
 
-					const redLCH = linearSRGBToOKLCH( redLinear );
-					const blueLCH = linearSRGBToOKLCH( blueLinear );
+					const redLCH = workingToOKLCH( redLinear );
+					const blueLCH = workingToOKLCH( blueLinear );
 
 					const L = mix( redLCH.x, blueLCH.x, t );
 					const C = mix( redLCH.y, blueLCH.y, t );
@@ -172,7 +173,7 @@
 					const dh = fract( blueLCH.z.sub( redLCH.z ).add( 0.5 ) ).sub( 0.5 );
 					const H = redLCH.z.add( dh.mul( t ) );
 
-					return clamp( oklchToLinearSRGB( vec3( L, C, H ) ), 0.0, 1.0 );
+					return OKLCHToWorking( vec3( L, C, H ) );
 
 				} );
 
@@ -219,10 +220,10 @@
 					hslSphere.position.set( x, - 0.5, 0 );
 					scene.add( hslSphere );
 
-					// OKLCH sphere — uses Color.setOKLCH()
+					// OKLCH sphere — uses ColorConverter.setOKLCH()
 
 					const oklchSphereMat = new THREE.MeshStandardMaterial( { roughness: 0.35 } );
-					oklchSphereMat.color.setOKLCH( 0.7, 0.15, hue );
+					ColorConverter.setOKLCH( oklchSphereMat.color, 0.7, 0.15, hue );
 					oklchSphereMaterials.push( { material: oklchSphereMat, hue: hue } );
 
 					const oklchSphere = new THREE.Mesh( sphereGeometry, oklchSphereMat );
@@ -268,7 +269,7 @@
 					entry.material.color.setHSL( entry.hue, 1.0, L, THREE.SRGBColorSpace );
 
 					const oklchEntry = oklchSphereMaterials[ i ];
-					oklchEntry.material.color.setOKLCH( L, C, oklchEntry.hue );
+					ColorConverter.setOKLCH( oklchEntry.material.color, L, C, oklchEntry.hue );
 
 				}
 

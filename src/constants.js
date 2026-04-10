@@ -1316,6 +1316,22 @@ export const SRGBColorSpace = 'srgb';
 export const LinearSRGBColorSpace = 'srgb-linear';
 
 /**
+ * Display-P3 color space.
+ *
+ * @type {string}
+ * @constant
+ */
+export const DisplayP3ColorSpace = 'display-p3';
+
+/**
+ * Display-P3-linear color space.
+ *
+ * @type {string}
+ * @constant
+ */
+export const LinearDisplayP3ColorSpace = 'display-p3-linear';
+
+/**
  * Linear transfer function.
  *
  * @type {string}

@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 import { warnOnce } from '../utils.js';
 
@@ -12,6 +12,18 @@ const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
 	3.2409699, - 1.5373832, - 0.4986108,
 	- 0.9692436, 1.8759675, 0.0415551,
 	0.0556301, - 0.2039770, 1.0569715
+);
+
+const LINEAR_DISPLAY_P3_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+	0.4865709, 0.2656677, 0.1982173,
+	0.2289746, 0.6917385, 0.0792869,
+	0.0000000, 0.0451134, 1.0439444
+);
+
+const XYZ_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().set(
+	2.4934969, - 0.9313836, - 0.4027108,
+	- 0.8294890, 1.7626641, 0.0236247,
+	0.0358458, - 0.0761724, 0.9568845
 );
 
 function createColorManagement() {
@@ -169,6 +181,8 @@ function createColorManagement() {
 
 	const REC709_PRIMARIES = [ 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 ];
 	const REC709_LUMINANCE_COEFFICIENTS = [ 0.2126, 0.7152, 0.0722 ];
+	const P3_PRIMARIES = [ 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 ];
+	const P3_LUMINANCE_COEFFICIENTS = [ 0.2289, 0.6917, 0.0793 ];
 	const D65 = [ 0.3127, 0.3290 ];
 
 	ColorManagement.define( {
@@ -192,6 +206,27 @@ function createColorManagement() {
 			fromXYZ: XYZ_TO_LINEAR_REC709,
 			luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
 			outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
+		},
+
+		[ LinearDisplayP3ColorSpace ]: {
+			primaries: P3_PRIMARIES,
+			whitePoint: D65,
+			transfer: LinearTransfer,
+			toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
+			fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
+			luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
+			workingColorSpaceConfig: { unpackColorSpace: DisplayP3ColorSpace },
+			outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
+		},
+
+		[ DisplayP3ColorSpace ]: {
+			primaries: P3_PRIMARIES,
+			whitePoint: D65,
+			transfer: SRGBTransfer,
+			toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
+			fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
+			luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
+			outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
 		},
 
 	} );

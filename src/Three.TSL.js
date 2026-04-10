@@ -255,9 +255,11 @@ export const lightTargetPosition = TSL.lightTargetPosition;
 export const lightViewPosition = TSL.lightViewPosition;
 export const lightingContext = TSL.lightingContext;
 export const lights = TSL.lights;
+export const lerpOKLCH = TSL.lerpOKLCH;
 export const linearDepth = TSL.linearDepth;
 export const linearSRGBToOKLab = TSL.linearSRGBToOKLab;
 export const linearSRGBToOKLCH = TSL.linearSRGBToOKLCH;
+export const linearRGBToRGBGamut = TSL.linearRGBToRGBGamut;
 export const linearToneMapping = TSL.linearToneMapping;
 export const localId = TSL.localId;
 export const log = TSL.log;
@@ -405,6 +407,7 @@ export const objectViewPosition = TSL.objectViewPosition;
 export const objectWorldMatrix = TSL.objectWorldMatrix;
 export const okLabToLinearSRGB = TSL.okLabToLinearSRGB;
 export const oklchToLinearSRGB = TSL.oklchToLinearSRGB;
+export const OKLCHToWorking = TSL.OKLCHToWorking;
 export const OnBeforeObjectUpdate = TSL.OnBeforeObjectUpdate;
 export const OnBeforeMaterialUpdate = TSL.OnBeforeMaterialUpdate;
 export const OnObjectUpdate = TSL.OnObjectUpdate;
@@ -628,6 +631,7 @@ export const workgroupArray = TSL.workgroupArray;
 export const workgroupBarrier = TSL.workgroupBarrier;
 export const workgroupId = TSL.workgroupId;
 export const workingToColorSpace = TSL.workingToColorSpace;
+export const workingToOKLCH = TSL.workingToOKLCH;
 export const xor = TSL.xor;
 
 /*

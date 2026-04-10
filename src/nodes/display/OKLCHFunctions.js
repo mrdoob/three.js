@@ -1,5 +1,7 @@
 import { Fn, vec3 } from '../tsl/TSLCore.js';
-import { atan, cbrt, cos, fract, sin, sqrt } from '../math/MathNode.js';
+import { atan, cbrt, cos, fract, max, mix, sin, sqrt } from '../math/MathNode.js';
+import { colorSpaceToWorking, workingToColorSpace } from './ColorSpaceNode.js';
+import { LinearSRGBColorSpace } from '../../constants.js';
 
 const TWO_PI = 2 * Math.PI;
 
@@ -125,5 +127,82 @@ export const oklchToLinearSRGB = /*@__PURE__*/ Fn( ( [ lch ] ) => {
 	type: 'vec3',
 	inputs: [
 		{ name: 'lch', type: 'vec3' }
+	]
+} );
+
+/**
+ * Gamut maps a linear RGB color by clipping negative values and scaling values above one.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} color - The linear RGB color.
+ * @return {Node<vec3>} The gamut mapped color.
+ */
+export const linearRGBToRGBGamut = /*@__PURE__*/ Fn( ( [ color ] ) => {
+
+	const clipped = max( color, 0.0 );
+	const maxComponent = max( max( clipped.x, clipped.y ), max( clipped.z, 1.0 ) );
+
+	return clipped.div( maxComponent );
+
+} ).setLayout( {
+	name: 'linearRGBToRGBGamut',
+	type: 'vec3',
+	inputs: [
+		{ name: 'color', type: 'vec3' }
+	]
+} );
+
+/**
+ * Converts an OKLCH color to the current working color space.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} lch - The OKLCH color (L, C, H) where H is normalized 0-1.
+ * @return {Node<vec3>} The working color.
+ */
+export const OKLCHToWorking = ( lch ) => colorSpaceToWorking( linearRGBToRGBGamut( oklchToLinearSRGB( lch ) ), LinearSRGBColorSpace ).rgb;
+
+/**
+ * Converts a color from the current working color space to OKLCH.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} color - The working color.
+ * @return {Node<vec3>} The OKLCH color (L, C, H) where H is normalized 0-1.
+ */
+export const workingToOKLCH = ( color ) => linearSRGBToOKLCH( workingToColorSpace( color, LinearSRGBColorSpace ).rgb );
+
+/**
+ * Interpolates two working colors in OKLCH color space.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} colorA - The first working color.
+ * @param {Node<vec3>} colorB - The second working color.
+ * @param {Node<float>} alpha - The interpolation factor.
+ * @return {Node<vec3>} The interpolated working color.
+ */
+export const lerpOKLCH = /*@__PURE__*/ Fn( ( [ colorA, colorB, alpha ] ) => {
+
+	const a = workingToOKLCH( colorA );
+	const b = workingToOKLCH( colorB );
+
+	const hueDelta = fract( b.z.sub( a.z ).add( 0.5 ) ).sub( 0.5 );
+	const lch = vec3(
+		mix( a.x, b.x, alpha ),
+		mix( a.y, b.y, alpha ),
+		fract( a.z.add( hueDelta.mul( alpha ) ) )
+	);
+
+	return OKLCHToWorking( lch );
+
+} ).setLayout( {
+	name: 'lerpOKLCH',
+	type: 'vec3',
+	inputs: [
+		{ name: 'colorA', type: 'vec3' },
+		{ name: 'colorB', type: 'vec3' },
+		{ name: 'alpha', type: 'float' }
 	]
 } );
