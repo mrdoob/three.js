@@ -1,5 +1,4 @@
-import { BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from 'three/webgpu';
-import { warn } from 'three/webgpu';
+import { BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, warn } from 'three/webgpu';
 
 
 function getKeys( obj ) {
@@ -786,7 +785,6 @@ class NodeMaterialDebugAnalyzer {
 		let material = null;
 		let materialNodes = null;
 		let traceMaterialNodes = null;
-		let dynamic = null;
 		let dynamicCacheKey = null;
 		let nodesCacheKey = null;
 		const currentMaterial = () => material || ( material = getMaterialCacheKeyComponents( renderObject ) );
@@ -803,7 +801,6 @@ class NodeMaterialDebugAnalyzer {
 
 		};
 
-		const currentDynamic = () => dynamic || ( dynamic = getDynamicCacheKeyComponents( renderObject ) );
 		const currentDynamicCacheKey = () => dynamicCacheKey || ( dynamicCacheKey = String( renderObject.getDynamicCacheKey() ) );
 		const currentNodesCacheKey = () => nodesCacheKey || ( nodesCacheKey = getNodesCacheKey( renderObject ) );
 
