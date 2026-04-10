@@ -151,8 +151,6 @@ class RenderObjects {
 
 		//
 
-		if ( nodeMaterialDebug !== null ) nodeMaterialDebug.update( renderObject );
-
 		return renderObject;
 
 	}
