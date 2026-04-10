@@ -280,8 +280,6 @@ function getLightValue( light ) {
 
 function getLightsValue( lightsNode ) {
 
-	if ( lightsNode === null ) return '0 lights';
-
 	const lights = lightsNode.getLights().slice().sort( ( a, b ) => a.id - b.id );
 	const values = lights.map( getLightValue );
 	const label = `${ lights.length } light${ lights.length === 1 ? '' : 's' }`;
@@ -800,28 +798,6 @@ class NodeMaterialDebugAnalyzer {
 		const currentDynamic = () => dynamic || ( dynamic = getDynamicCacheKeyComponents( renderObject ) );
 		const currentDynamicCacheKey = () => dynamicCacheKey || ( dynamicCacheKey = String( renderObject.getDynamicCacheKey() ) );
 		const currentNodesCacheKey = () => nodesCacheKey || ( nodesCacheKey = getNodesCacheKey( renderObject ) );
-		const createCurrentData = () => {
-
-			const data = {
-				version: renderObject.version,
-				geometryId: renderObject.geometry !== null ? renderObject.geometry.id : null,
-				clippingContextCacheKey: renderObject.clippingContextCacheKey,
-				material: currentMaterial(),
-				dynamic: currentDynamic(),
-				dynamicCacheKey: currentDynamicCacheKey(),
-				nodesCacheKey: currentNodesCacheKey()
-			};
-
-			if ( previousData.materialNodes !== undefined ) {
-
-				data.materialNodes = previousData.materialNodesTrace === true ? currentTraceMaterialNodes() : currentMaterialNodes();
-				data.materialNodesTrace = previousData.materialNodesTrace;
-
-			}
-
-			return data;
-
-		};
 
 		const materialCacheDifference = getCacheKeyDifference(
 			previousData.material,
