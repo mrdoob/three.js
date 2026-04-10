@@ -363,7 +363,6 @@ class WebGPUAttributeUtils {
 					target.buffer = null;
 					target._mapped = false;
 					readBufferGPU.unmap();
-					target.removeEventListener( 'release', releaseCallback );
 
 				};
 
