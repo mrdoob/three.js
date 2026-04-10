@@ -888,7 +888,23 @@ class NodeMaterialDebugAnalyzer {
 				renderObject
 			} );
 
+			return;
+
 		}
+
+		const previousCustomProgramCacheKey = previousData.material.find( ( component ) => component.property === 'material.customProgramCacheKey' );
+		const currentCustomProgramCacheKey = currentMaterial().find( ( component ) => component.property === 'material.customProgramCacheKey' );
+
+		this._dispatch( {
+			stage: 'node-cache',
+			property: 'material.customProgramCacheKey',
+			previousValue: previousCustomProgramCacheKey ? previousCustomProgramCacheKey.value : previousData.materialCacheKey,
+			value: currentCustomProgramCacheKey ? currentCustomProgramCacheKey.value : renderObject.getMaterialCacheKey(),
+			rebuild: true,
+			needsRefresh: true,
+			material: renderObject.material,
+			renderObject
+		} );
 
 	}
 
