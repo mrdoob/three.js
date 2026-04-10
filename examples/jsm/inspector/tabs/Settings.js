@@ -43,6 +43,7 @@ function _loadState() {
 	_state = {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
+		nodeMaterialDebugEnabled: settings.nodeMaterialDebugEnabled !== undefined ? settings.nodeMaterialDebugEnabled : settings.traceNodeMaterialInvalidation === true,
 		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {}
 	};
 
@@ -67,8 +68,18 @@ function _saveState() {
 	setItem( 'settings', {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
+		nodeMaterialDebugEnabled: _state.nodeMaterialDebugEnabled,
 		activeExtensions: _state.activeExtensions
 	} );
+
+}
+
+function setNodeMaterialDebug( enabled ) {
+
+	_loadState();
+
+	_state.nodeMaterialDebugEnabled = enabled === true;
+	_saveState();
 
 }
 
@@ -261,4 +272,4 @@ class Settings extends Parameters {
 
 }
 
-export { Settings };
+export { Settings, _loadState as loadSettingsState, setNodeMaterialDebug };

@@ -12,6 +12,7 @@ class NodeMaterialDebug {
 		this._originalGet = null;
 		this._nodes = null;
 		this._originalNeedsRefresh = null;
+		this._pendingInvalidations = new WeakMap();
 
 		this.updateRenderer();
 
@@ -125,7 +126,60 @@ class NodeMaterialDebug {
 
 	}
 
+	updatePendingBuildInfo( info ) {
+
+		const pendingInvalidations = this._pendingInvalidations.get( info.material );
+
+		if ( pendingInvalidations !== undefined ) {
+
+			for ( const event of pendingInvalidations ) {
+
+				event.buildInfo = info;
+
+			}
+
+		}
+
+	}
+
+	flushPendingInvalidations( info ) {
+
+		const material = info.material;
+		const pendingInvalidations = this._pendingInvalidations.get( material );
+
+		if ( pendingInvalidations !== undefined ) {
+
+			this._pendingInvalidations.delete( material );
+
+			for ( const event of pendingInvalidations ) {
+
+				event.buildInfo = info;
+				this.dispatch( event );
+
+			}
+
+		}
+
+	}
+
 	dispatch( event ) {
+
+		if ( event.rebuild === true && event.material && event.buildInfo === undefined ) {
+
+			let pendingInvalidations = this._pendingInvalidations.get( event.material );
+
+			if ( pendingInvalidations === undefined ) {
+
+				pendingInvalidations = [];
+				this._pendingInvalidations.set( event.material, pendingInvalidations );
+
+			}
+
+			pendingInvalidations.push( event );
+
+			return;
+
+		}
 
 		if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 
@@ -149,6 +203,7 @@ class NodeMaterialDebug {
 		this._originalGet = null;
 		this._nodes = null;
 		this._originalNeedsRefresh = null;
+		this._pendingInvalidations = new WeakMap();
 
 	}
 

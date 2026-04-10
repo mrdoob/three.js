@@ -1,4 +1,5 @@
 import { Tab } from '../ui/Tab.js';
+import { loadSettingsState, setNodeMaterialDebug } from './Settings.js';
 
 class Console extends Tab {
 
@@ -6,9 +7,11 @@ class Console extends Tab {
 
 		super( 'Console', options );
 
+		const settingsState = loadSettingsState();
+
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
-		this.traceNodeMaterialInvalidation = false;
+		this.nodeMaterialDebugEnabled = settingsState.nodeMaterialDebugEnabled === true || options.nodeMaterialDebugEnabled === true;
 
 		this.buildHeader();
 
@@ -16,9 +19,8 @@ class Console extends Tab {
 		this.logContainer.id = 'console-log';
 		this.content.appendChild( this.logContainer );
 
-		if ( options.traceNodeMaterialInvalidation === true ) {
+		if ( this.nodeMaterialDebugEnabled === true ) {
 
-			this.traceNodeMaterialInvalidation = true;
 			this.nodeMaterialCheckbox.checked = true;
 
 		}
@@ -56,7 +58,7 @@ class Console extends Tab {
 
 		const nodeMaterialCheckbox = document.createElement( 'input' );
 		nodeMaterialCheckbox.type = 'checkbox';
-		nodeMaterialCheckbox.dataset.action = 'trace-node-material-invalidation';
+		nodeMaterialCheckbox.dataset.action = 'node-material-debug';
 		this.nodeMaterialCheckbox = nodeMaterialCheckbox;
 
 		const nodeMaterialCheckmark = document.createElement( 'span' );
@@ -92,10 +94,11 @@ class Console extends Tab {
 
 			const action = e.target.dataset.action;
 
-			if ( action === 'trace-node-material-invalidation' ) {
+			if ( action === 'node-material-debug' ) {
 
-				this.traceNodeMaterialInvalidation = e.target.checked;
-				this.dispatchEvent( { type: 'trace-node-material-invalidation', enabled: this.traceNodeMaterialInvalidation } );
+				this.nodeMaterialDebugEnabled = e.target.checked;
+				setNodeMaterialDebug( this.nodeMaterialDebugEnabled );
+				this.dispatchEvent( { type: 'node-material-debug', enabled: this.nodeMaterialDebugEnabled } );
 				return;
 
 			}
@@ -219,11 +222,17 @@ class Console extends Tab {
 
 		}
 
-		const parts = content.split( /(".*?"|'.*?'|`.*?`)/g ).map( p => p.trim() ).filter( Boolean );
+		const parts = content.split( /(<strong>.*?<\/strong>|".*?"|'.*?'|`.*?`)/g ).map( p => p.trim() ).filter( Boolean );
 
 		parts.forEach( ( part, index ) => {
 
-			if ( /^("|'|`)/.test( part ) ) {
+			if ( part.startsWith( '<strong>' ) ) {
+
+				const strong = document.createElement( 'strong' );
+				strong.textContent = part.slice( 8, - 9 );
+				fragment.appendChild( strong );
+
+			} else if ( /^("|'|`)/.test( part ) ) {
 
 				const codeSpan = document.createElement( 'span' );
 				codeSpan.className = 'log-code';

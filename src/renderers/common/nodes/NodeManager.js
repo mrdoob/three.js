@@ -14,6 +14,34 @@ import { error } from '../../../utils.js';
 const _chainKeys = [];
 const _cacheKeyValues = [];
 
+function getNodeBuildInfo( renderer, renderObject, useAsync, cacheKey ) {
+
+	const object = renderObject.object || null;
+	const material = renderObject.material || null;
+	const geometry = renderObject.geometry || object && object.geometry || null;
+
+	return {
+		renderer,
+		renderObject,
+		object,
+		material,
+		geometry,
+		lightsNode: renderObject.lightsNode || null,
+		scene: renderObject.scene || null,
+		camera: renderObject.camera || null,
+		useAsync,
+		cacheKey: cacheKey || null,
+		materialVersion: material ? material.version : null,
+		materialUuid: material ? material.uuid : null,
+		geometryUuid: geometry ? geometry.uuid : null,
+		objectUuid: object ? object.uuid : null,
+		reason: 'missing-node-builder-state',
+		durationMs: 0,
+		result: null
+	};
+
+}
+
 /**
  * This renderer module manages node-related objects and is the
  * primary interface between the renderer and the node system.
@@ -197,6 +225,19 @@ class NodeManager extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
+				const renderer = this.renderer;
+				const inspector = renderer.inspector;
+				const nodeBuildInfo = inspector !== null ? getNodeBuildInfo( renderer, renderObject, useAsync, cacheKey ) : null;
+				let startTime = 0;
+
+				if ( inspector !== null ) {
+
+					startTime = performance.now();
+
+					inspector.beginNodeBuild( nodeBuildInfo );
+
+				}
+
 				const buildNodeBuilder = async () => {
 
 					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
@@ -244,6 +285,15 @@ class NodeManager extends DataMap {
 						nodeBuilderState.usedTimes ++;
 						renderObjectData.nodeBuilderState = nodeBuilderState;
 
+						if ( inspector !== null ) {
+
+							nodeBuildInfo.durationMs = performance.now() - startTime;
+							nodeBuildInfo.result = nodeBuilderState;
+
+							inspector.finishNodeBuild( nodeBuildInfo );
+
+						}
+
 						return nodeBuilderState;
 
 					} );
@@ -279,6 +329,15 @@ class NodeManager extends DataMap {
 					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
 					nodeBuilderCache.set( cacheKey, nodeBuilderState );
+
+					if ( inspector !== null ) {
+
+						nodeBuildInfo.durationMs = performance.now() - startTime;
+						nodeBuildInfo.result = nodeBuilderState;
+
+						inspector.finishNodeBuild( nodeBuildInfo );
+
+					}
 
 				}
 

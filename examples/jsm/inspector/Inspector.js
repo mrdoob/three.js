@@ -44,10 +44,10 @@ class Inspector extends RendererInspector {
 		const timeline = new Timeline();
 		profiler.addTab( timeline );
 
-		const consoleTab = new Console( { traceNodeMaterialInvalidation: options.traceNodeMaterialInvalidation } );
-		consoleTab.addEventListener( 'trace-node-material-invalidation', ( event ) => {
+		const consoleTab = new Console( { nodeMaterialDebugEnabled: options.nodeMaterialDebugEnabled } );
+		consoleTab.addEventListener( 'node-material-debug', ( event ) => {
 
-			this.setTraceNodeMaterialInvalidation( event.enabled );
+			this.setNodeMaterialDebug( event.enabled );
 
 		} );
 		profiler.addTab( consoleTab );
@@ -76,7 +76,7 @@ class Inspector extends RendererInspector {
 		this.extensionsData = new WeakMap();
 		this.nodeMaterialDebug = null;
 		this.onNodeMaterialInvalidation = null;
-		this.traceNodeMaterialInvalidation = options.traceNodeMaterialInvalidation === true;
+		this.nodeMaterialDebugEnabled = consoleTab.nodeMaterialDebugEnabled === true;
 
 		this.displayCycle = {
 			text: {
@@ -284,7 +284,7 @@ class Inspector extends RendererInspector {
 		if ( renderer !== null ) {
 
 			setConsoleFunction( this.resolveConsole.bind( this ) );
-			this.setTraceNodeMaterialInvalidation( this.traceNodeMaterialInvalidation );
+			this.setNodeMaterialDebug( this.nodeMaterialDebugEnabled );
 
 			if ( this.isAvailable ) {
 
@@ -311,6 +311,22 @@ class Inspector extends RendererInspector {
 
 	}
 
+	beginNodeBuild( info ) {
+
+		super.beginNodeBuild( info );
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.updatePendingBuildInfo( info );
+
+	}
+
+	finishNodeBuild( info ) {
+
+		super.finishNodeBuild( info );
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.flushPendingInvalidations( info );
+
+	}
+
 	updateNodeMaterialDebug() {
 
 		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.updateRenderer();
@@ -319,27 +335,31 @@ class Inspector extends RendererInspector {
 
 	}
 
-	setTraceNodeMaterialInvalidation( enabled ) {
+	setNodeMaterialDebug( enabled ) {
 
-		this.traceNodeMaterialInvalidation = enabled === true;
+		this.nodeMaterialDebugEnabled = enabled === true;
 
 		const renderer = this.getRenderer();
 
-		if ( this.traceNodeMaterialInvalidation === true && renderer !== null ) {
+		if ( this.nodeMaterialDebugEnabled === true && renderer !== null ) {
 
 			if ( this.nodeMaterialDebug === null ) this.nodeMaterialDebug = new NodeMaterialDebug( renderer );
 			this.nodeMaterialDebug.onNodeMaterialInvalidation = ( event ) => {
 
 				const materialLabel = event.materialLabel || ( event.material ? event.material.name || event.material.type : 'unknown material' );
+
 				const property = event.property !== undefined ? ` via ${ event.property }` : '';
 				const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
 				const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
+				const buildInfo = event.buildInfo;
+				const timing = buildInfo && buildInfo.durationMs !== undefined ? ` in <strong>${ buildInfo.durationMs.toFixed( 3 ) } ms</strong>` : '';
 
-				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }${ source }.` );
+				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }${ source }${ timing }.` );
 
 				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 
 			};
+
 			this.nodeMaterialDebug.updateRenderer();
 
 		} else if ( this.nodeMaterialDebug !== null ) {
