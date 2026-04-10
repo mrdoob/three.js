@@ -245,9 +245,9 @@ class TRAANode extends TempNode {
 		 * The node used to render the scene's velocity.
 		 *
 		 * @private
-		 * @type {VelocityNode}
+		 * @type {?VelocityNode}
 		 */
-		this._velocityNode = velocity;
+		this._velocityNode = null;
 
 	}
 
@@ -464,6 +464,10 @@ class TRAANode extends TempNode {
 		if ( builder.context.velocity !== undefined ) {
 
 			this._velocityNode = builder.context.velocity;
+
+		} else {
+
+			this._velocityNode = velocity;
 
 		}
 
