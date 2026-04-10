@@ -26,6 +26,27 @@
 			#draw_element img {
 			  animation: swing 1s ease-in-out infinite alternate;
 			}
+			#draw_element input[type="text"] {
+				font-size: 24px;
+				padding: 8px 12px;
+				border: 2px solid #888;
+				border-radius: 6px;
+				width: 80%;
+				margin-top: 10px;
+			}
+			#draw_element button {
+				font-size: 24px;
+				padding: 8px 20px;
+				margin-top: 10px;
+				border: none;
+				border-radius: 6px;
+				background-color: #4CAF50;
+				color: white;
+				cursor: pointer;
+			}
+			#draw_element button:hover {
+				background-color: #45a049;
+			}
 			@keyframes swing {
 				from { transform: rotate(-15deg); }
 				to { transform: rotate(15deg); }
@@ -39,8 +60,7 @@
 		</div>
 
 		<canvas id="canvas" width="600" height="600" layoutsubtree="true">
-			<!-- inert to prevent hit testing in this example. -->
-			<div id="draw_element" inert>
+			<div id="draw_element">
 				Hello world!<br>I'm multi-line, <b>formatted</b>,
 				rotated text with emoji (&#128512;), RTL text
 				<span dir=rtl>من فارسی صحبت میکنم</span>,
@@ -55,6 +75,9 @@
 					SVG
 				</text>
 				</svg>!
+				<br>
+				<input type="text" placeholder="Type here...">
+				<button>Click me</button>
 			</div>
 		</canvas>
 
@@ -72,8 +95,9 @@
 			import * as THREE from 'three';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { InteractionManager } from 'three/addons/interaction/InteractionManager.js';
 
-			let camera, scene, renderer, mesh;
+			let camera, scene, renderer, mesh, interactions;
 
 			init();
 
@@ -84,7 +108,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				// document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
@@ -100,6 +123,20 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
+
+				// Interaction
+
+				interactions = new InteractionManager();
+				interactions.connect( renderer, camera );
+				interactions.add( mesh );
+
+				// Button click handler
+
+				draw_element.querySelector( 'button' ).addEventListener( 'click', function () {
+
+					this.textContent = 'Clicked!';
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -118,6 +155,8 @@
 
 				mesh.rotation.x = Math.sin( time * 0.0005 ) * 0.5;
 				mesh.rotation.y = Math.cos( time * 0.0008 ) * 0.5;
+
+				interactions.update();
 
 				renderer.render( scene, camera );
 
