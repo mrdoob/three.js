@@ -66,6 +66,7 @@
 			<button id="clearcoatButton">Clearcoat</button>
 			<button id="transmissionButton">Transmission</button>
 			<button id="nodeButton">Node</button>
+			<button id="computeButton">Compute</button>
 			<button id="lightButton">Point Light</button>
 			<button id="autoDemoButton">Auto Demo</button>
 		</div>
@@ -85,7 +86,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color } from 'three/tsl';
+			import { Fn, color, float, instanceIndex, instancedArray } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -117,7 +118,8 @@
 			}
 
 			let camera, scene, renderer, controls;
-			let material, accentLight, sphere, rebuildColorNode;
+			let material, accentLight, sphere, rebuildColorNode, computeNode;
+			let computeVersion = 1;
 			let autoDemoInterval = null;
 			let autoDemoStep = 0;
 
@@ -174,6 +176,8 @@
 				rebuildColorNode = new RebuildColorNode();
 				material.colorNode = rebuildColorNode;
 
+				createComputeNode();
+
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 64, 32 ), material );
 				sphere.position.y = 1;
 				scene.add( sphere );
@@ -181,12 +185,26 @@
 				document.getElementById( 'clearcoatButton' ).addEventListener( 'click', toggleClearcoat );
 				document.getElementById( 'transmissionButton' ).addEventListener( 'click', toggleTransmission );
 				document.getElementById( 'nodeButton' ).addEventListener( 'click', toggleNode );
+				document.getElementById( 'computeButton' ).addEventListener( 'click', rebuildCompute );
 				document.getElementById( 'lightButton' ).addEventListener( 'click', toggleAccentLight );
 				autoDemoButton.addEventListener( 'click', toggleAutoDemo );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				updateActions();
+
+			}
+
+			function createComputeNode() {
+
+				const computeBuffer = instancedArray( 1, 'float' );
+				const computeTest = Fn( () => {
+
+					computeBuffer.element( instanceIndex ).assign( float( computeVersion ) );
+
+				} );
+
+				computeNode = computeTest().compute( 1 ).setName( 'Debug Compute' );
 
 			}
 
@@ -234,6 +252,23 @@
 
 			}
 
+			function rebuildCompute() {
+
+				computeVersion ++;
+
+				if ( computeNode !== undefined ) {
+
+					renderer.inspector.nodeMaterialDebug.markComputeDisposed( computeNode );
+					computeNode.dispose();
+
+				}
+
+				renderer.compute( computeNode );
+
+				updateActions();
+
+			}
+
 			function updateActions() {
 
 				document.getElementById( 'clearcoatButton' ).classList.toggle( 'active', material.clearcoat > 0 );
@@ -253,7 +288,7 @@
 
 				} else {
 
-					const actions = [ toggleClearcoat, toggleTransmission, toggleNode, toggleAccentLight ];
+					const actions = [ toggleClearcoat, toggleTransmission, toggleNode, rebuildCompute, toggleAccentLight ];
 
 					actions[ autoDemoStep % actions.length ]();
 					autoDemoStep ++;

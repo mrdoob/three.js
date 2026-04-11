@@ -346,15 +346,17 @@ class Inspector extends RendererInspector {
 			if ( this.nodeMaterialDebug === null ) this.nodeMaterialDebug = new NodeMaterialDebug( renderer );
 			this.nodeMaterialDebug.onNodeMaterialInvalidation = ( event ) => {
 
-				const materialLabel = event.materialLabel || ( event.material ? event.material.name || event.material.type : 'unknown material' );
+				const label = event.compute === true ? ( event.computeLabel || 'unknown compute node' ) : ( event.materialLabel || ( event.material ? event.material.name || event.material.type : 'unknown material' ) );
+				const type = event.compute === true ? 'Compute node' : 'NodeMaterial';
 
 				const property = event.property !== undefined ? ` via ${ event.property }` : '';
 				const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
 				const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
+				const reason = event.reason !== undefined ? ` because ${ event.reason }` : '';
 				const buildInfo = event.buildInfo;
 				const timing = buildInfo && buildInfo.durationMs !== undefined ? ` in <strong>${ buildInfo.durationMs.toFixed( 3 ) } ms</strong>` : '';
 
-				this.console.addMessage( 'warn', `Renderer: NodeMaterial needs rebuild for "${ materialLabel }"${ property }${ values }${ source }${ timing }.` );
+				this.console.addMessage( 'warn', `Renderer: ${ type } needs rebuild for "${ label }"${ property }${ values }${ source }${ reason }${ timing }.` );
 
 				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 

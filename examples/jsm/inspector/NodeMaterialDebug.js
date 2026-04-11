@@ -12,6 +12,9 @@ class NodeMaterialDebug {
 		this._originalGet = null;
 		this._nodes = null;
 		this._originalNeedsRefresh = null;
+		this._originalGetForCompute = null;
+		this._computeBuilds = new WeakMap();
+		this._computeInvalidations = new WeakMap();
 		this._pendingInvalidations = new WeakMap();
 
 		this.updateRenderer();
@@ -76,6 +79,7 @@ class NodeMaterialDebug {
 	_patchNodeManager( nodes ) {
 
 		const originalNeedsRefresh = nodes.needsRefresh;
+		const originalGetForCompute = nodes.getForCompute;
 		const nodeMaterialDebug = this;
 
 		nodes.needsRefresh = function ( renderObject ) {
@@ -94,8 +98,79 @@ class NodeMaterialDebug {
 
 		};
 
+		nodes.getForCompute = function ( computeNode ) {
+
+			const computeData = this.get( computeNode );
+			const previousNodeBuilderState = computeData.nodeBuilderState;
+			const invalidation = nodeMaterialDebug._computeInvalidations.get( computeNode );
+			const startTime = previousNodeBuilderState === undefined ? performance.now() : 0;
+			const nodeBuilderState = originalGetForCompute.call( this, computeNode );
+
+			if ( previousNodeBuilderState === undefined && nodeBuilderState !== undefined ) {
+
+				nodeMaterialDebug.reportComputeBuild( computeNode, nodeBuilderState, invalidation, performance.now() - startTime );
+
+			}
+
+			return nodeBuilderState;
+
+		};
+
 		this._nodes = nodes;
 		this._originalNeedsRefresh = originalNeedsRefresh;
+		this._originalGetForCompute = originalGetForCompute;
+
+	}
+
+	reportComputeBuild( computeNode, nodeBuilderState, invalidation, durationMs ) {
+
+		const computeShader = nodeBuilderState.computeShader;
+		const computeLabel = computeNode.name || computeNode.type || 'ComputeNode';
+		const previousBuild = invalidation !== undefined ? invalidation.previousBuild : undefined;
+		const reason = invalidation !== undefined ? invalidation.reason : 'initial compute build';
+		const difference = previousBuild !== undefined ? getComputeBuildDifference( previousBuild, computeShader ) : null;
+		const event = {
+			stage: invalidation !== undefined ? 'compute-cache' : 'compute-build',
+			property: invalidation !== undefined ? invalidation.property : 'NodeManager.getForCompute',
+			reason,
+			rebuild: true,
+			needsRefresh: true,
+			compute: true,
+			buildInfo: {
+				durationMs,
+				result: nodeBuilderState
+			},
+			computeNode,
+			computeLabel
+		};
+
+		if ( difference !== null ) {
+
+			event.property = difference.property;
+			event.previousValue = difference.previousValue;
+			event.value = difference.value;
+			event.previousComputeShader = difference.previousComputeShader;
+			event.computeShader = difference.computeShader;
+
+		}
+
+		this._computeBuilds.set( computeNode, {
+			computeShader
+		} );
+
+		this.dispatch( event );
+
+		this._computeInvalidations.delete( computeNode );
+
+	}
+
+	markComputeDisposed( computeNode, reason = 'computeNode.dispose() cleared cached compute state', property = 'computeNode.dispose' ) {
+
+		this._computeInvalidations.set( computeNode, {
+			property,
+			reason,
+			previousBuild: this._computeBuilds.get( computeNode )
+		} );
 
 	}
 
@@ -151,6 +226,8 @@ class NodeMaterialDebug {
 
 	updatePendingBuildInfo( info ) {
 
+		if ( info.material === undefined ) return;
+
 		const pendingInvalidations = this._pendingInvalidations.get( info.material );
 
 		if ( pendingInvalidations !== undefined ) {
@@ -166,6 +243,8 @@ class NodeMaterialDebug {
 	}
 
 	flushPendingInvalidations( info ) {
+
+		if ( info.material === undefined ) return;
 
 		const material = info.material;
 		const pendingInvalidations = this._pendingInvalidations.get( material );
@@ -222,13 +301,40 @@ class NodeMaterialDebug {
 
 		}
 
+		if ( this._nodes !== null && this._originalGetForCompute !== null ) {
+
+			this._nodes.getForCompute = this._originalGetForCompute;
+
+		}
+
 		this._objects = null;
 		this._originalGet = null;
 		this._nodes = null;
 		this._originalNeedsRefresh = null;
+		this._originalGetForCompute = null;
+		this._computeBuilds = new WeakMap();
+		this._computeInvalidations = new WeakMap();
 		this._pendingInvalidations = new WeakMap();
 
 	}
+
+}
+
+function getComputeBuildDifference( previousBuild, computeShader ) {
+
+	if ( previousBuild.computeShader !== computeShader ) {
+
+		return {
+			property: 'computeShader',
+			previousValue: 'previous compute shader',
+			value: 'changed compute shader',
+			previousComputeShader: previousBuild.computeShader,
+			computeShader
+		};
+
+	}
+
+	return null;
 
 }
 
