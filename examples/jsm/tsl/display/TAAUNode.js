@@ -406,14 +406,6 @@ class TAAUNode extends TempNode {
 
 		//
 
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( inputWidth, inputHeight );
-
-			this._needsPostProcessingSync = false;
-
-		}
-
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
@@ -444,6 +436,16 @@ class TAAUNode extends TempNode {
 			_quadMesh.name = 'TAAU.seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
+
+		}
+
+		// must run after needsRestart so it does not affect the seed reset
+
+		if ( this._needsPostProcessingSync === true ) {
+
+			this.setViewOffset( inputWidth, inputHeight );
+
+			this._needsPostProcessingSync = false;
 
 		}
 
