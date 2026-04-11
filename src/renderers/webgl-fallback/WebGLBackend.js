@@ -1834,24 +1834,9 @@ class WebGLBackend extends Backend {
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const array = binding.buffer;
-				let { bufferGPU } = this.get( array );
+				const bufferGPU = this.get( array ).bufferGPU;
 
-				if ( bufferGPU === undefined ) {
-
-					// create
-
-					bufferGPU = gl.createBuffer();
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
-
-					this.set( array, { bufferGPU } );
-
-				} else {
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-
-				}
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
 				// update
 
@@ -1950,6 +1935,31 @@ class WebGLBackend extends Backend {
 	}
 
 	// attributes
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} binding - The buffer binding.
+	 */
+	createUniformBuffer( binding ) {
+
+		const array = binding.buffer;
+		let { bufferGPU } = this.get( array );
+
+		if ( bufferGPU === undefined ) {
+
+			const gl = this.gl;
+
+			bufferGPU = gl.createBuffer();
+
+			gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+			gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
+
+			this.set( array, { bufferGPU } );
+
+		}
+
+	}
 
 	/**
 	 * Creates the GPU buffer of an indexed shader attribute.

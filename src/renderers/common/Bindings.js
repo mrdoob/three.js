@@ -213,7 +213,11 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isSampledTexture ) {
+			if ( binding.isUniformBuffer ) {
+
+				this.backend.createUniformBuffer( binding );
+
+			} else if ( binding.isSampledTexture ) {
 
 				this.textures.updateTexture( binding.texture );
 

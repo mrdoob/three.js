@@ -2,7 +2,7 @@
 import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 //*/
 
-import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap, GPUShaderStage } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -2180,6 +2180,55 @@ class WebGPUBackend extends Backend {
 	}
 
 	// bindings
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} binding - The buffer binding.
+	 */
+	createUniformBuffer( binding ) {
+
+		const bindingData = this.get( binding );
+
+		if ( bindingData.buffer === undefined ) {
+
+			const byteLength = binding.byteLength;
+
+			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+			const visibilities = [];
+
+			if ( binding.visibility & GPUShaderStage.VERTEX ) {
+
+				visibilities.push( 'vertex' );
+
+			}
+
+			if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
+
+				visibilities.push( 'fragment' );
+
+			}
+
+			if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+				visibilities.push( 'compute' );
+
+			}
+
+			const bufferVisibility = `(${visibilities.join( ',' )})`;
+
+			const bufferGPU = this.device.createBuffer( {
+				label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
+				size: byteLength,
+				usage: usage
+			} );
+
+			bindingData.buffer = bufferGPU;
+
+		}
+
+	}
 
 	/**
 	 * Creates bindings from the given bind group definition.

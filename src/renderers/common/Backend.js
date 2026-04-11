@@ -390,6 +390,14 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} binding - The buffer binding.
+	 */
+	createUniformBuffer( /*binding*/ ) { }
+
+	/**
 	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
