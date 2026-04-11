@@ -133,7 +133,7 @@
 
 					if ( params.upscaleMethod === 'TAAU' ) {
 
-						renderPipeline.outputNode = taauNode;
+						renderPipeline.outputNode = params.sharpening ? sharpenNode : taauNode;
 
 					} else {
 
