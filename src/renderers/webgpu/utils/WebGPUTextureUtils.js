@@ -692,7 +692,9 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange();
+		const buffer = readBuffer.getMappedRange().slice();
+
+		readBuffer.destroy();
 
 		return new typedArrayType( buffer );
 
