@@ -20,13 +20,9 @@ let _rendererState;
  * is an alternative to FSR2/3 that does anti-aliasing and upscaling in a
  * single pass.
  *
- * The internal scale factor is derived each frame from the input texture's
- * dimensions and the renderer's drawing buffer size, so the user does not
- * need to configure the upscale ratio explicitly — adjusting the upstream
- * pass's resolution scale is sufficient.
- *
  * References:
- * - Karis, "High Quality Temporal Supersampling", SIGGRAPH 2014.
+ * - Karis, "High Quality Temporal Supersampling", SIGGRAPH 2014, {@link https://advances.realtimerendering.com/s2014/}
+ * - Riley/Arcila, FidelityFX Super Resolution 2, GDC 2022, {@link https://gpuopen.com/download/GDC_FidelityFX_Super_Resolution_2_0.pdf}
  *
  * Note: MSAA must be disabled when TAAU is in use.
  *
@@ -825,12 +821,6 @@ const _haltonOffsets = /*@__PURE__*/ Array.from(
 
 /**
  * TSL function for creating a TAAU node for Temporal Anti-Aliasing Upscaling.
- *
- * The input beauty/depth/velocity nodes are expected to come from a pass that
- * is rendering at a lower resolution than the renderer's drawing buffer (set
- * via {@link PassNode#setResolutionScale}). The internal scale factor is
- * computed each frame from the input texture dimensions and the renderer's
- * drawing buffer size.
  *
  * @tsl
  * @function
