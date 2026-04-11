@@ -83,7 +83,6 @@
 					mixer = new THREE.AnimationMixer( model );
 					mixer.clipAction( gltf.animations[ 0 ] ).play();
 
-					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -135,7 +134,7 @@
 
 					if ( params.upscaleMethod === 'TAAU' ) {
 
-						renderPipeline.outputNode = params.sharpening ? sharpenNode : taauNode;
+						renderPipeline.outputNode = taauNode;
 
 					} else {
 
