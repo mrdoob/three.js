@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - fsr1</title>
+		<title>three.js webgpu - postprocessing taau</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -12,11 +12,11 @@
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>FSR 1</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>TAAU</span>
 			</div>
 
 			<small>
-				Web Port of <a href="https://gpuopen.com/fidelityfx-superresolution/" target="_blank" rel="noopener">AMD FidelityFX Super Resolution 1</a>.<br />
+				Temporal Reprojection Anti-Aliasing with Upsampling.<br />
 				Model: <a href="https://artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by <a href="https://artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
 			</small>
 		</div>
@@ -35,8 +35,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass } from 'three/tsl';
-			import { fsr1 } from 'three/addons/tsl/display/FSR1Node.js';
+			import { mrt, output, pass, velocity } from 'three/tsl';
+			import { taau } from 'three/addons/tsl/display/TAAUNode.js';
+			import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -45,8 +46,10 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			const params = {
-				upscaleMethod: 'FSR1',
+				upscaleMethod: 'TAAU',
 				resolutionScale: 0.5,
+				sharpening: true,
+				sharpness: 0.2,
 			};
 
 			let camera, scene, renderer, renderPipeline, controls, mixer, timer;
@@ -84,7 +87,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -108,21 +111,29 @@
 				// render pipeline
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
-
-				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+				const scenePass = pass( scene, camera );
 				scenePass.setResolutionScale( params.resolutionScale );
+				scenePass.setMRT( mrt( {
+					output: output,
+					velocity: velocity
+				} ) );
 
-				// FSR 1
+				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
-				const fsr1Node = fsr1( scenePass ).toInspector( 'FSR1' );
+					return scenePass.getLinearDepthNode();
 
-				//
+				} );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				const taauNode = taau( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+				const sharpenNode = sharpen( taauNode.getTextureNode(), params.sharpness );
 
 				function updatePipeline() {
 
-					if ( params.upscaleMethod === 'FSR1' ) {
+					if ( params.upscaleMethod === 'TAAU' ) {
 
-						renderPipeline.outputNode = fsr1Node;
+						renderPipeline.outputNode = params.sharpening ? sharpenNode : taauNode;
 
 					} else {
 
@@ -137,14 +148,23 @@
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'upscaleMethod', [ 'Bilinear', 'FSR1' ] ).onChange( updatePipeline );
+				gui.add( params, 'upscaleMethod', [ 'Bilinear', 'TAAU' ] ).onChange( updatePipeline );
 				gui.add( params, 'resolutionScale', 0.25, 1.0, 0.25 ).onChange( ( value ) => {
 
 					scenePass.setResolutionScale( value );
 
 				} );
+				gui.add( params, 'sharpening' ).onChange( updatePipeline );
+				gui.add( params, 'sharpness', 0, 2, 0.05 ).onChange( ( value ) => {
+
+					sharpenNode.sharpness.value = value;
+
+				} );
 
 				updatePipeline();
+
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -152,10 +172,13 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 
 			}
 
