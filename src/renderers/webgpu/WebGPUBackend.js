@@ -2231,6 +2231,21 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} binding - The buffer binding.
+	 */
+	destroyUniformBuffer( binding ) {
+
+		const bindingData = this.get( binding );
+
+		bindingData.buffer.destroy();
+
+		this.delete( binding );
+
+	}
+
+	/**
 	 * Creates bindings from the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.

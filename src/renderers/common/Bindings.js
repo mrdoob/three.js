@@ -77,27 +77,7 @@ class Bindings extends DataMap {
 	 */
 	getForRender( renderObject ) {
 
-		const bindings = renderObject.getBindings();
-
-		for ( const bindGroup of bindings ) {
-
-			const groupData = this.get( bindGroup );
-
-			if ( groupData.bindGroup === undefined ) {
-
-				// each object defines an array of bindings (ubos, textures, samplers etc.)
-
-				this._init( bindGroup );
-
-				this.backend.createBindings( bindGroup, bindings, 0 );
-
-				groupData.bindGroup = bindGroup;
-
-			}
-
-		}
-
-		return bindings;
+		return this._getBindings( renderObject, renderObject.getBindings() );
 
 	}
 
@@ -109,7 +89,27 @@ class Bindings extends DataMap {
 	 */
 	getForCompute( computeNode ) {
 
-		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+		return this._getBindings( computeNode, this.nodes.getForCompute( computeNode ).bindings );
+
+	}
+
+	_getBindings( object, bindings ) {
+
+		const data = this.get( object );
+
+		if ( data.bindings !== bindings ) {
+
+			if ( data.bindings !== undefined ) {
+
+				this._updateReferenceBindings( data.bindings, - 1 );
+
+			}
+
+			this._updateReferenceBindings( bindings, 1 );
+
+			data.bindings = bindings;
+
+		}
 
 		for ( const bindGroup of bindings ) {
 
@@ -160,14 +160,7 @@ class Bindings extends DataMap {
 	 */
 	deleteForCompute( computeNode ) {
 
-		const bindings = this.nodes.getForCompute( computeNode ).bindings;
-
-		for ( const bindGroup of bindings ) {
-
-			this.backend.deleteBindGroupData( bindGroup );
-			this.delete( bindGroup );
-
-		}
+		this._deleteBindings( computeNode );
 
 	}
 
@@ -178,12 +171,57 @@ class Bindings extends DataMap {
 	 */
 	deleteForRender( renderObject ) {
 
-		const bindings = renderObject.getBindings();
+		this._deleteBindings( renderObject );
+
+	}
+
+	_deleteBindings( object ) {
+
+		const data = this.get( object );
+
+		if ( data.bindings !== undefined ) {
+
+			this._updateReferenceBindings( data.bindings, - 1 );
+
+			data.bindings = undefined;
+
+		}
+
+	}
+
+	_updateReferenceBindings( bindings, delta ) {
 
 		for ( const bindGroup of bindings ) {
 
-			this.backend.deleteBindGroupData( bindGroup );
-			this.delete( bindGroup );
+			const groupData = this.get( bindGroup );
+
+			groupData.usedTimes = ( groupData.usedTimes || 0 ) + delta;
+
+			for ( const binding of bindGroup.bindings ) {
+
+				if ( binding.isUniformBuffer ) {
+
+					const bindingData = this.get( binding );
+
+					bindingData.usedTimes = ( bindingData.usedTimes || 0 ) + delta;
+
+					if ( bindingData.usedTimes === 0 ) {
+
+						this.backend.destroyUniformBuffer( binding );
+						this.delete( binding );
+
+					}
+
+				}
+
+			}
+
+			if ( groupData.usedTimes === 0 ) {
+
+				this.backend.deleteBindGroupData( bindGroup );
+				this.delete( bindGroup );
+
+			}
 
 		}
 

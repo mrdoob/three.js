@@ -1834,7 +1834,7 @@ class WebGLBackend extends Backend {
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const array = binding.buffer;
-				const bufferGPU = this.get( array ).bufferGPU;
+				const bufferGPU = map.bufferGPU;
 
 				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
@@ -1867,8 +1867,6 @@ class WebGLBackend extends Backend {
 					}
 
 				}
-
-				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
 
@@ -1943,21 +1941,34 @@ class WebGLBackend extends Backend {
 	 */
 	createUniformBuffer( binding ) {
 
-		const array = binding.buffer;
-		let { bufferGPU } = this.get( array );
+		const bindingData = this.get( binding );
 
-		if ( bufferGPU === undefined ) {
+		if ( bindingData.bufferGPU === undefined ) {
 
 			const gl = this.gl;
+			const array = binding.buffer;
 
-			bufferGPU = gl.createBuffer();
+			bindingData.bufferGPU = gl.createBuffer();
 
-			gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+			gl.bindBuffer( gl.UNIFORM_BUFFER, bindingData.bufferGPU );
 			gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
 
-			this.set( array, { bufferGPU } );
-
 		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} binding - The buffer binding.
+	 */
+	destroyUniformBuffer( binding ) {
+
+		const bindingData = this.get( binding );
+
+		this.gl.deleteBuffer( bindingData.bufferGPU );
+
+		this.delete( binding );
 
 	}
 
