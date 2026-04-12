@@ -101,11 +101,11 @@ class Bindings extends DataMap {
 
 			if ( data.bindings !== undefined ) {
 
-				this._updateReferenceBindings( data.bindings, - 1 );
+				this._updateBindingsUsage( data.bindings, - 1 );
 
 			}
 
-			this._updateReferenceBindings( bindings, 1 );
+			this._updateBindingsUsage( bindings, 1 );
 
 			data.bindings = bindings;
 
@@ -181,7 +181,7 @@ class Bindings extends DataMap {
 
 		if ( data.bindings !== undefined ) {
 
-			this._updateReferenceBindings( data.bindings, - 1 );
+			this._updateBindingsUsage( data.bindings, - 1 );
 
 			data.bindings = undefined;
 
@@ -189,7 +189,7 @@ class Bindings extends DataMap {
 
 	}
 
-	_updateReferenceBindings( bindings, delta ) {
+	_updateBindingsUsage( bindings, delta ) {
 
 		for ( const bindGroup of bindings ) {
 
