@@ -191,6 +191,7 @@ class ThreeMFLoader extends Loader {
 				}
 
 				const modelData = parseModelNode( modelNode );
+				modelData[ 'path' ] = modelPart;
 				modelData[ 'xml' ] = modelNode;
 
 				if ( 0 < Object.keys( extensions ).length ) {
@@ -520,6 +521,14 @@ class ThreeMFLoader extends Loader {
 			const componentData = {};
 
 			componentData[ 'objectId' ] = componentNode.getAttribute( 'objectid' ); // required
+
+			const path = componentNode.getAttribute( 'p:path' ) || componentNode.getAttribute( 'path' );
+
+			if ( path ) {
+
+				componentData[ 'path' ] = path;
+
+			}
 
 			const transform = componentNode.getAttribute( 'transform' );
 
@@ -1245,13 +1254,27 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function getBuild( data, objects, modelData, textureData, objectData, builder ) {
+		function getBuild( data, objects, modelData, textureData, objectData, builder, modelPath, modelParts ) {
 
 			if ( data.build !== undefined ) return data.build;
 
-			data.build = builder( data, objects, modelData, textureData, objectData );
+			data.build = builder( data, objects, modelData, textureData, objectData, modelPath, modelParts );
 
 			return data.build;
+
+		}
+
+		function normalizeModelPath( path ) {
+
+			if ( ! path ) return path;
+
+			return path.charAt( 0 ) === '/' ? path.substring( 1 ) : path;
+
+		}
+
+		function getObjectKey( modelPath, objectId ) {
+
+			return `${ normalizeModelPath( modelPath ) }#${ objectId }`;
 
 		}
 
@@ -1300,19 +1323,28 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function buildComposite( compositeData, objects, modelData, textureData ) {
+		function buildComposite( compositeData, objects, modelData, textureData, objectData, modelPath, modelParts ) {
 
 			const composite = new Group();
 
 			for ( let j = 0; j < compositeData.length; j ++ ) {
 
 				const component = compositeData[ j ];
-				let build = objects[ component.objectId ];
+				const componentModelPath = normalizeModelPath( component.path || modelPath );
+				const componentModelData = modelParts[ componentModelPath ];
+				const componentKey = getObjectKey( componentModelPath, component.objectId );
+				let build = objects[ componentKey ];
+
+				if ( componentModelData === undefined ) {
+
+					throw new Error( `THREE.3MFLoader: Missing component model part: ${ componentModelPath }` );
+
+				}
 
 				if ( build === undefined ) {
 
-					buildObject( component.objectId, objects, modelData, textureData );
-					build = objects[ component.objectId ];
+					buildObject( component.objectId, objects, componentModelData, textureData, componentModelPath, modelParts );
+					build = objects[ componentKey ];
 
 				}
 
@@ -1336,9 +1368,16 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function buildObject( objectId, objects, modelData, textureData ) {
+		function buildObject( objectId, objects, modelData, textureData, modelPath, modelParts ) {
 
 			const objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
+			const objectKey = getObjectKey( modelPath, objectId );
+
+			if ( objectData === undefined ) {
+
+				throw new Error( `THREE.3MFLoader: Missing object resource ${ objectId } in model part ${ modelPath }` );
+
+			}
 
 			if ( objectData[ 'mesh' ] ) {
 
@@ -1349,19 +1388,19 @@ class ThreeMFLoader extends Loader {
 
 				applyExtensions( extensions, meshData, modelXml );
 
-				objects[ objectData.id ] = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
+				objects[ objectKey ] = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
 
 			} else {
 
 				const compositeData = objectData[ 'components' ];
 
-				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
+				objects[ objectKey ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite, modelPath, modelParts );
 
 			}
 
 			if ( objectData.name ) {
 
-				objects[ objectData.id ].name = objectData.name;
+				objects[ objectKey ].name = objectData.name;
 
 			}
 
@@ -1407,7 +1446,7 @@ class ThreeMFLoader extends Loader {
 
 					const objectId = objectIds[ j ];
 
-					buildObject( objectId, objects, modelData, textureData );
+					buildObject( objectId, objects, modelData, textureData, modelsKey, modelsData );
 
 				}
 
@@ -1435,12 +1474,13 @@ class ThreeMFLoader extends Loader {
 			const group = new Group();
 
 			const relationship = fetch3DModelPart( data3mf[ 'rels' ] );
-			const buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
+			const modelPath = normalizeModelPath( relationship[ 'target' ] );
+			const buildData = data3mf.model[ modelPath ][ 'build' ];
 
 			for ( let i = 0; i < buildData.length; i ++ ) {
 
 				const buildItem = buildData[ i ];
-				const object3D = objects[ buildItem[ 'objectId' ] ].clone();
+				const object3D = objects[ getObjectKey( modelPath, buildItem[ 'objectId' ] ) ].clone();
 
 				// apply transform
 
