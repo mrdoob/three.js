@@ -86,6 +86,9 @@ class ImageBitmapLoader extends Loader {
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
 	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
 	 *
+	 * Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
+	 * different options will return the cached result of the first request.
+	 *
 	 * @param {Object} options - The loader options to set.
 	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
 	 */
