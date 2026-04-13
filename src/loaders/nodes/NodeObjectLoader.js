@@ -90,6 +90,24 @@ class NodeObjectLoader extends ObjectLoader {
 	}
 
 	/**
+	 * Async version of {@link NodeObjectLoader#parse}.
+	 *
+	 * @param {Object} json - The JSON definition
+	 * @return {Promise<Object3D>} A Promise that resolves with the parsed 3D object.
+	 */
+	async parseAsync( json ) {
+
+		this._nodesJSON = json.nodes;
+
+		const data = await super.parseAsync( json );
+
+		this._nodesJSON = null; // dispose
+
+		return data;
+
+	}
+
+	/**
 	 * Parses the node objects from the given JSON and textures.
 	 *
 	 * @param {Object[]} json - The JSON definition
