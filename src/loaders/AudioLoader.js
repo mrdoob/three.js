@@ -62,7 +62,7 @@ class AudioLoader extends Loader {
 				const context = AudioContext.getContext();
 
 				const decodeUrl = url + '#decode';
-				scope.manager.itemStart( decodeUrl );
+				scope.manager.itemStart( decodeUrl ); // prevent loading manager from completing too early, see #33378
 
 				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
