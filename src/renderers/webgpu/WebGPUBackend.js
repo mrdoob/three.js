@@ -2184,33 +2184,33 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Creates a uniform buffer.
 	 *
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	createUniformBuffer( binding ) {
+	createUniformBuffer( uniformBuffer ) {
 
-		const bindingData = this.get( binding );
+		const uniformBufferData = this.get( uniformBuffer );
 
-		if ( bindingData.buffer === undefined ) {
+		if ( uniformBufferData.buffer === undefined ) {
 
-			const byteLength = binding.byteLength;
+			const byteLength = uniformBuffer.byteLength;
 
 			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
 			const visibilities = [];
 
-			if ( binding.visibility & GPUShaderStage.VERTEX ) {
+			if ( uniformBuffer.visibility & GPUShaderStage.VERTEX ) {
 
 				visibilities.push( 'vertex' );
 
 			}
 
-			if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
+			if ( uniformBuffer.visibility & GPUShaderStage.FRAGMENT ) {
 
 				visibilities.push( 'fragment' );
 
 			}
 
-			if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+			if ( uniformBuffer.visibility & GPUShaderStage.COMPUTE ) {
 
 				visibilities.push( 'compute' );
 
@@ -2219,12 +2219,12 @@ class WebGPUBackend extends Backend {
 			const bufferVisibility = `(${visibilities.join( ',' )})`;
 
 			const bufferGPU = this.device.createBuffer( {
-				label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
+				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
 				size: byteLength,
 				usage: usage
 			} );
 
-			bindingData.buffer = bufferGPU;
+			uniformBufferData.buffer = bufferGPU;
 
 		}
 
@@ -2233,15 +2233,15 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Destroys the GPU data for the given uniform buffer.
 	 *
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	destroyUniformBuffer( binding ) {
+	destroyUniformBuffer( uniformBuffer ) {
 
-		const bindingData = this.get( binding );
+		const uniformBufferData = this.get( uniformBuffer );
 
-		bindingData.buffer.destroy();
+		uniformBufferData.buffer.destroy();
 
-		this.delete( binding );
+		this.delete( uniformBuffer );
 
 	}
 

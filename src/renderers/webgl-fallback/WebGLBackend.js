@@ -1937,20 +1937,20 @@ class WebGLBackend extends Backend {
 	/**
 	 * Creates a uniform buffer.
 	 *
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	createUniformBuffer( binding ) {
+	createUniformBuffer( uniformBuffer ) {
 
-		const bindingData = this.get( binding );
+		const uniformBufferData = this.get( uniformBuffer );
 
-		if ( bindingData.bufferGPU === undefined ) {
+		if ( uniformBufferData.bufferGPU === undefined ) {
 
 			const gl = this.gl;
-			const array = binding.buffer;
+			const array = uniformBuffer.buffer;
 
-			bindingData.bufferGPU = gl.createBuffer();
+			uniformBufferData.bufferGPU = gl.createBuffer();
 
-			gl.bindBuffer( gl.UNIFORM_BUFFER, bindingData.bufferGPU );
+			gl.bindBuffer( gl.UNIFORM_BUFFER, uniformBufferData.bufferGPU );
 			gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
 
 		}
@@ -1960,15 +1960,15 @@ class WebGLBackend extends Backend {
 	/**
 	 * Destroys the GPU data for the given uniform buffer.
 	 *
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	destroyUniformBuffer( binding ) {
+	destroyUniformBuffer( uniformBuffer ) {
 
-		const bindingData = this.get( binding );
+		const uniformBufferData = this.get( uniformBuffer );
 
-		this.gl.deleteBuffer( bindingData.bufferGPU );
+		this.gl.deleteBuffer( uniformBufferData.bufferGPU );
 
-		this.delete( binding );
+		this.delete( uniformBuffer );
 
 	}
 

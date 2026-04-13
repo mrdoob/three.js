@@ -393,17 +393,17 @@ class Backend {
 	 * Creates a uniform buffer.
 	 *
 	 * @abstract
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	createUniformBuffer( /*binding*/ ) { }
+	createUniformBuffer( /*uniformBuffer*/ ) { }
 
 	/**
 	 * Destroys a uniform buffer.
 	 *
 	 * @abstract
-	 * @param {Buffer} binding - The buffer binding.
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
 	 */
-	destroyUniformBuffer( /*binding*/ ) { }
+	destroyUniformBuffer( /*uniformBuffer*/ ) { }
 
 	/**
 	 * Updates the GPU buffer of a shader attribute.
