@@ -194,6 +194,7 @@ async function main() {
 		'--enable-dawn-features=allow_unsafe_apis',
 		'--ignore-gpu-blocklist',
 		'--disable-gpu-driver-bug-workarounds',
+		'--disable-gpu-sandbox',
 		'--no-sandbox'
 	];
 
