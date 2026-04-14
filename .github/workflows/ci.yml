@@ -57,6 +57,7 @@ jobs:
           node-version: 24
           cache: 'npm'
       - name: Install Vulkan drivers and xvfb
+        run: |
           sudo apt-get update
           sudo apt-get install -y mesa-vulkan-drivers xvfb
       - name: Install dependencies
