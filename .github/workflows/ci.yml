@@ -66,7 +66,7 @@ jobs:
         run: npm run build-module
 
       - name: === E2E testing ===
-        run: xvfb-run -a npm run test-e2e
+        run: VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json xvfb-run -a npm run test-e2e
       - name: Upload output screenshots
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: always()
