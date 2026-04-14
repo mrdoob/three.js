@@ -189,20 +189,19 @@ async function main() {
 
 	const flags = [
 		'--hide-scrollbars',
-		'--use-gl=angle',
-		'--use-angle=vulkan',
+		'--enable-unsafe-webgpu',
 		'--enable-features=Vulkan',
 		'--disable-vulkan-surface',
-		'--enable-unsafe-webgpu',
-		'--use-webgpu-adapter=swiftshader',
+		'--enable-dawn-features=allow_unsafe_apis',
 		'--ignore-gpu-blocklist',
+		'--disable-gpu-driver-bug-workarounds',
 		'--no-sandbox'
 	];
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
-		headless: process.env.VISIBLE ? false : 'new',
+		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
