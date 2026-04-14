@@ -140,7 +140,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.inspector = new Inspector( { traceNodeMaterialInvalidation: true } );
+				renderer.inspector = new Inspector( { nodeMaterialDebugEnabled: true } );
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
