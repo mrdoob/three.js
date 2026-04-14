@@ -347,10 +347,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			numLightProbeGrids: lightProbeGrids.length,
 
 			numClippingPlanes: clipping.numPlanes,
-			numClipIntersection: clipping.numIntersection,
 			numGlobalClippingPlanes: clipping.numGlobalPlanes,
 			numClippingVolumes: clipping.numVolumes,
-			useClippingVolumes: clipping.useClippingVolumes,
 
 			dithering: material.dithering,
 
@@ -481,10 +479,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.shadowMapType );
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
-		array.push( parameters.numClipIntersection );
 		array.push( parameters.numGlobalClippingPlanes );
 		array.push( parameters.numClippingVolumes );
-		array.push( parameters.useClippingVolumes );
 		array.push( parameters.depthPacking );
 
 	}

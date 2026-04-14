@@ -95,44 +95,121 @@ function WebGLClipping( properties ) {
 
 			}
 
-		} else if ( clippingVolumes !== undefined ) {
-
-			setVolumeState( Array.isArray( clippingVolumes ) ? clippingVolumes : [], camera, useCache, materialProperties );
-
-		} else if ( planes === null || planes.length === 0 ) {
-
-			resetGlobalState();
-
 		} else {
 
-			const nGlobal = renderingShadows ? 0 : numGlobalPlanes,
-				lGlobal = nGlobal * 4;
+			const hasClippingPlanes = planes !== null && planes.length > 0;
+			const hasClippingVolumes = clippingVolumes !== undefined;
 
-			let dstArray = materialProperties.clippingState || null;
+			if ( ! hasClippingPlanes && ! hasClippingVolumes ) {
 
-			uniform.value = dstArray; // ensure unique state
+				resetGlobalState();
 
-			dstArray = projectPlanes( planes, camera, lGlobal, useCache );
+			} else {
 
-			for ( let i = 0; i !== lGlobal; ++ i ) {
-
-				dstArray[ i ] = globalState[ i ];
+				setVolumeState( getLocalClippingVolumes( planes, clipIntersection, clippingVolumes, materialProperties ), camera, useCache, materialProperties );
 
 			}
-
-			materialProperties.clippingState = dstArray;
-			this.numIntersection = clipIntersection ? this.numPlanes : 0;
-			this.numPlanes += nGlobal;
-			this.numGlobalPlanes = 0;
-			this.numVolumes = 0;
-			this.useClippingVolumes = false;
-
-			resetVolumeUniforms();
 
 		}
 
 
 	};
+
+	function getLocalClippingVolumes( planes, clipIntersection, clippingVolumes, materialProperties ) {
+
+		const hasClippingPlanes = planes !== null && planes.length > 0;
+		const hasClippingVolumes = clippingVolumes !== undefined;
+
+		if ( ! hasClippingVolumes ) {
+
+			return getClippingPlaneVolumes( planes, clipIntersection, materialProperties );
+
+		}
+
+		const materialClippingVolumes = Array.isArray( clippingVolumes ) ? clippingVolumes : [];
+
+		if ( ! hasClippingPlanes ) {
+
+			return materialClippingVolumes;
+
+		}
+
+		const clippingPlaneVolume = getClippingPlaneVolumes( planes, clipIntersection, materialProperties )[ 0 ];
+
+		let combinedClippingVolumes = materialProperties.combinedClippingVolumes;
+
+		if ( combinedClippingVolumes === undefined ) {
+
+			combinedClippingVolumes = [];
+			materialProperties.combinedClippingVolumes = combinedClippingVolumes;
+
+		}
+
+		combinedClippingVolumes.length = 0;
+		combinedClippingVolumes.push( clippingPlaneVolume );
+
+		for ( let i = 0, l = materialClippingVolumes.length; i < l; i ++ ) {
+
+			combinedClippingVolumes.push( materialClippingVolumes[ i ] );
+
+		}
+
+		return combinedClippingVolumes;
+
+	}
+
+	function getClippingPlaneVolumes( planes, clipIntersection, materialProperties ) {
+
+		let volumes = materialProperties.clippingPlaneVolumes;
+
+		if ( volumes === undefined ) {
+
+			volumes = [ { planes: planes, mode: 'include' } ];
+			materialProperties.clippingPlaneVolumes = volumes;
+
+		}
+
+		const volume = volumes[ 0 ];
+
+		if ( clipIntersection ) {
+
+			const nPlanes = planes.length;
+
+			let invertedPlanes = materialProperties.clippingPlaneIntersectionPlanes;
+
+			if ( invertedPlanes === undefined || invertedPlanes.length !== nPlanes ) {
+
+				invertedPlanes = new Array( nPlanes );
+
+				for ( let i = 0; i < nPlanes; i ++ ) {
+
+					invertedPlanes[ i ] = new Plane();
+
+				}
+
+				materialProperties.clippingPlaneIntersectionPlanes = invertedPlanes;
+
+			}
+
+			for ( let i = 0; i < nPlanes; i ++ ) {
+
+				invertedPlanes[ i ].copy( planes[ i ] ).negate();
+
+			}
+
+			volume.mode = 'exclude';
+			volume.planes = invertedPlanes;
+
+		} else {
+
+			volume.mode = 'include';
+			volume.planes = planes;
+
+		}
+
+		return volumes;
+
+	}
 
 	function setVolumeState( volumes, camera, useCache, materialProperties ) {
 
@@ -274,7 +351,7 @@ function WebGLClipping( properties ) {
 
 		scope.numPlanes = numGlobalPlanes;
 		scope.numIntersection = 0;
-		scope.numGlobalPlanes = 0;
+		scope.numGlobalPlanes = numGlobalPlanes;
 		scope.numVolumes = 0;
 		scope.useClippingVolumes = false;
 

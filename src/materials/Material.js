@@ -333,8 +333,11 @@ class Material extends EventDispatcher {
 		 * - `include`: keep fragments inside the volume.
 		 * - `exclude`: remove fragments inside the volume.
 		 *
-		 * If this property is `undefined`, legacy clipping behavior based on
+		 * If this property is `undefined`, clipping behavior based on
 		 * {@link Material#clippingPlanes} and {@link Material#clipIntersection} is used.
+		 * If {@link Material#clippingPlanes} is set, clipping planes are internally
+		 * represented as one clipping volume. If this property is also defined, that
+		 * synthetic clipping volume is combined with these user-defined volumes.
 		 * This requires {@link WebGLRenderer#localClippingEnabled} to be `true`.
 		 *
 		 * @type {?(Array<{planes:Array<Plane>,mode:('include'|'exclude')}>)}
@@ -966,9 +969,9 @@ class Material extends EventDispatcher {
 		this.clippingPlanes = dstPlanes;
 		this.clipIntersection = source.clipIntersection;
 		this.clipShadows = source.clipShadows;
-		this.clippingVolumes = source.clippingVolumes !== undefined ? source.clippingVolumes.map( ( clippingVolume ) => ( {
-			planes: clippingVolume && Array.isArray( clippingVolume.planes ) ? clippingVolume.planes.map( ( clippingPlane ) => clippingPlane.clone() ) : [],
-			mode: clippingVolume && clippingVolume.mode === 'exclude' ? 'exclude' : 'include'
+		this.clippingVolumes = Array.isArray( source.clippingVolumes ) ? source.clippingVolumes.map( ( clippingVolume ) => ( {
+			planes: clippingVolume.planes.map( ( clippingPlane ) => clippingPlane.clone() ),
+			mode: clippingVolume.mode
 		} ) ) : undefined;
 
 		this.shadowSide = source.shadowSide;
