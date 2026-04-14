@@ -192,7 +192,6 @@ async function main() {
 		'--enable-unsafe-webgpu',
 		'--enable-features=Vulkan',
 		'--disable-vulkan-surface',
-		'--enable-dawn-features=allow_unsafe_apis',
 		'--ignore-gpu-blocklist',
 		'--disable-gpu-driver-bug-workarounds',
 		'--disable-gpu-sandbox',
