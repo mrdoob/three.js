@@ -1,5 +1,23 @@
 import { Tab } from '../ui/Tab.js';
-import { loadSettingsState, setNodeMaterialDebug } from './Settings.js';
+import { getItem, setItem } from '../Inspector.js';
+
+function loadConsoleState() {
+
+	const consoleSettings = getItem( 'console' );
+
+	return {
+		nodeMaterialDebugEnabled: consoleSettings.nodeMaterialDebugEnabled !== undefined ? consoleSettings.nodeMaterialDebugEnabled : false
+	};
+
+}
+
+function setNodeMaterialDebug( enabled ) {
+
+	const consoleSettings = getItem( 'console' );
+	consoleSettings.nodeMaterialDebugEnabled = enabled === true;
+	setItem( 'console', consoleSettings );
+
+}
 
 class Console extends Tab {
 
@@ -7,11 +25,11 @@ class Console extends Tab {
 
 		super( 'Console', options );
 
-		const settingsState = loadSettingsState();
+		const consoleState = loadConsoleState();
 
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
-		this.nodeMaterialDebugEnabled = settingsState.nodeMaterialDebugEnabled === true || options.nodeMaterialDebugEnabled === true;
+		this.nodeMaterialDebugEnabled = consoleState.nodeMaterialDebugEnabled === true || options.nodeMaterialDebugEnabled === true;
 
 		this.buildHeader();
 
