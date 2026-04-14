@@ -5,6 +5,14 @@ export default /* glsl */`
 
 	uniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];
 
+	float clippingPlaneOpacity( const in vec4 clippingPlane ) {
+
+		float distanceToPlane = - dot( vClipPosition, clippingPlane.xyz ) + clippingPlane.w;
+		float distanceGradient = fwidth( distanceToPlane ) / 2.0;
+		return smoothstep( - distanceGradient, distanceGradient, distanceToPlane );
+
+	}
+
 	uniform int clippingNumVolumes;
 	uniform int clippingNumIncludeVolumes;
 

@@ -3,14 +3,6 @@ export default /* glsl */`
 
 	vec4 plane;
 
-	float clippingPlaneOpacity( const in vec4 clippingPlane ) {
-
-		float distanceToPlane = - dot( vClipPosition, clippingPlane.xyz ) + clippingPlane.w;
-		float distanceGradient = fwidth( distanceToPlane ) / 2.0;
-		return smoothstep( - distanceGradient, distanceGradient, distanceToPlane );
-
-	}
-
 	#ifdef ALPHA_TO_COVERAGE
 
 		float clipOpacity = 1.0;
