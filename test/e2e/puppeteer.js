@@ -405,43 +405,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 		}
 
-		if ( file.startsWith( 'webgpu_' ) && attemptID === 0 ) {
 
-			await page.evaluate( async () => {
-
-				console.log( '--- WEBGPU DIAGNOSTIC ---' );
-				if ( ! navigator.gpu ) {
-
-					console.log( 'navigator.gpu is undefined!' );
-
-				} else {
-
-					try {
-
-						const adapter = await navigator.gpu.requestAdapter();
-						if ( ! adapter ) {
-
-							console.log( 'requestAdapter() returned null.' );
-
-						} else {
-
-							const info = adapter.info;
-							console.log( `Adapter: ${info.vendor} / ${info.architecture} / ${info.device}` );
-
-						}
-
-					} catch ( err ) {
-
-						console.log( 'WebGPU Error: ' + err.message );
-
-					}
-
-				}
-				console.log( '-------------------------' );
-
-			} );
-
-		}
 
 		try {
 
