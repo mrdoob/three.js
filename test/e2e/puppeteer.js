@@ -218,7 +218,8 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	// Disable WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
-	const buildInjectionWebGPU = ( code ) => buildInjection( code ).replace( /'timestamp-query'/g, "'disabled-timestamp-query'" );
+	const buildInjectionWebGPU = ( code ) => buildInjection( code )
+		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, "Object.defineProperty(this, 'trackTimestamp', { get: () => false, set: () => {} });" );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
