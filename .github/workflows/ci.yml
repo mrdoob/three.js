@@ -56,17 +56,17 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-      - name: Install Vulkan drivers and xvfb
+      - name: Install Vulkan drivers
         run: |
           sudo apt-get update
-          sudo apt-get install -y mesa-vulkan-drivers xvfb
+          sudo apt-get install -y mesa-vulkan-drivers
       - name: Install dependencies
         run: npm ci
       - name: Build
         run: npm run build-module
 
       - name: === E2E testing ===
-        run: xvfb-run -a npm run test-e2e
+        run: npm run test-e2e
       - name: Upload output screenshots
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: always()
