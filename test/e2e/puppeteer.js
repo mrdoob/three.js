@@ -203,6 +203,7 @@ async function main() {
 
 	browser = await puppeteer.launch( {
 		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
+		env: { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' },
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
