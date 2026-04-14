@@ -1,4 +1,23 @@
 import { Tab } from '../ui/Tab.js';
+import { getItem, setItem } from '../Inspector.js';
+
+function loadConsoleState() {
+
+	const consoleSettings = getItem( 'console' );
+
+	return {
+		nodeMaterialDebugEnabled: consoleSettings.nodeMaterialDebugEnabled !== undefined ? consoleSettings.nodeMaterialDebugEnabled : false
+	};
+
+}
+
+function setNodeMaterialDebug( enabled ) {
+
+	const consoleSettings = getItem( 'console' );
+	consoleSettings.nodeMaterialDebugEnabled = enabled === true;
+	setItem( 'console', consoleSettings );
+
+}
 
 class Console extends Tab {
 
@@ -6,14 +25,23 @@ class Console extends Tab {
 
 		super( 'Console', options );
 
+		const consoleState = loadConsoleState();
+
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
+		this.nodeMaterialDebugEnabled = consoleState.nodeMaterialDebugEnabled === true || options.nodeMaterialDebugEnabled === true;
 
 		this.buildHeader();
 
 		this.logContainer = document.createElement( 'div' );
 		this.logContainer.id = 'console-log';
 		this.content.appendChild( this.logContainer );
+
+		if ( this.nodeMaterialDebugEnabled === true ) {
+
+			this.nodeMaterialCheckbox.checked = true;
+
+		}
 
 	}
 
@@ -39,8 +67,31 @@ class Console extends Tab {
 		copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
 		copyButton.addEventListener( 'click', () => this.copyAll( copyButton ) );
 
+		const clearButton = document.createElement( 'button' );
+		clearButton.className = 'console-copy-button';
+		clearButton.title = 'Clear console';
+		clearButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"></line></svg>';
+		clearButton.addEventListener( 'click', () => this.clear() );
+
 		const buttonsGroup = document.createElement( 'div' );
 		buttonsGroup.className = 'console-buttons-group';
+
+		const nodeMaterialLabel = document.createElement( 'label' );
+		nodeMaterialLabel.className = 'custom-checkbox';
+		nodeMaterialLabel.title = 'Trace node material rebuild reasons';
+
+		const nodeMaterialCheckbox = document.createElement( 'input' );
+		nodeMaterialCheckbox.type = 'checkbox';
+		nodeMaterialCheckbox.dataset.action = 'node-material-debug';
+		this.nodeMaterialCheckbox = nodeMaterialCheckbox;
+
+		const nodeMaterialCheckmark = document.createElement( 'span' );
+		nodeMaterialCheckmark.className = 'checkmark';
+
+		nodeMaterialLabel.appendChild( nodeMaterialCheckbox );
+		nodeMaterialLabel.appendChild( nodeMaterialCheckmark );
+		nodeMaterialLabel.append( 'Materials' );
+		buttonsGroup.appendChild( nodeMaterialLabel );
 
 		Object.keys( this.filters ).forEach( type => {
 
@@ -65,6 +116,17 @@ class Console extends Tab {
 
 		buttonsGroup.addEventListener( 'change', ( e ) => {
 
+			const action = e.target.dataset.action;
+
+			if ( action === 'node-material-debug' ) {
+
+				this.nodeMaterialDebugEnabled = e.target.checked;
+				setNodeMaterialDebug( this.nodeMaterialDebugEnabled );
+				this.dispatchEvent( { type: 'node-material-debug', enabled: this.nodeMaterialDebugEnabled } );
+				return;
+
+			}
+
 			const type = e.target.dataset.type;
 			if ( type in this.filters ) {
 
@@ -75,6 +137,7 @@ class Console extends Tab {
 
 		} );
 
+		buttonsGroup.appendChild( clearButton );
 		buttonsGroup.appendChild( copyButton );
 
 		header.appendChild( filterInput );
@@ -123,6 +186,12 @@ class Console extends Tab {
 
 		button.classList.add( 'copied' );
 		setTimeout( () => button.classList.remove( 'copied' ), 350 );
+
+	}
+
+	clear() {
+
+		this.logContainer.replaceChildren();
 
 	}
 
@@ -184,11 +253,17 @@ class Console extends Tab {
 
 		}
 
-		const parts = content.split( /(".*?"|'.*?'|`.*?`)/g ).map( p => p.trim() ).filter( Boolean );
+		const parts = content.split( /(<strong>.*?<\/strong>|".*?"|'.*?'|`.*?`)/g ).map( p => p.trim() ).filter( Boolean );
 
 		parts.forEach( ( part, index ) => {
 
-			if ( /^("|'|`)/.test( part ) ) {
+			if ( part.startsWith( '<strong>' ) ) {
+
+				const strong = document.createElement( 'strong' );
+				strong.textContent = part.slice( 8, - 9 );
+				fragment.appendChild( strong );
+
+			} else if ( /^("|'|`)/.test( part ) ) {
 
 				const codeSpan = document.createElement( 'span' );
 				codeSpan.className = 'log-code';

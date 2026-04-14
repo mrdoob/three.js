@@ -9,12 +9,13 @@ import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
+import NodeMaterialDebug from './NodeMaterialDebug.js';
 
 import { setConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
-	constructor() {
+	constructor( options = {} ) {
 
 		super();
 
@@ -43,7 +44,12 @@ class Inspector extends RendererInspector {
 		const timeline = new Timeline();
 		profiler.addTab( timeline );
 
-		const consoleTab = new Console();
+		const consoleTab = new Console( { nodeMaterialDebugEnabled: options.nodeMaterialDebugEnabled } );
+		consoleTab.addEventListener( 'node-material-debug', ( event ) => {
+
+			this.setNodeMaterialDebug( event.enabled );
+
+		} );
 		profiler.addTab( consoleTab );
 
 		const settings = new Settings();
@@ -68,6 +74,9 @@ class Inspector extends RendererInspector {
 		this.settings = settings;
 		this.once = {};
 		this.extensionsData = new WeakMap();
+		this.nodeMaterialDebug = null;
+		this.onNodeMaterialInvalidation = null;
+		this.nodeMaterialDebugEnabled = consoleTab.nodeMaterialDebugEnabled === true;
 
 		this.displayCycle = {
 			text: {
@@ -257,21 +266,32 @@ class Inspector extends RendererInspector {
 
 		}
 
+		this.updateNodeMaterialDebug();
+
 	}
 
 	setRenderer( renderer ) {
+
+		if ( this.nodeMaterialDebug !== null ) {
+
+			this.nodeMaterialDebug.dispose();
+			this.nodeMaterialDebug = null;
+
+		}
 
 		super.setRenderer( renderer );
 
 		if ( renderer !== null ) {
 
 			setConsoleFunction( this.resolveConsole.bind( this ) );
+			this.setNodeMaterialDebug( this.nodeMaterialDebugEnabled );
 
 			if ( this.isAvailable ) {
 
 				renderer.init().then( () => {
 
 					renderer.backend.trackTimestamp = true;
+					this.updateNodeMaterialDebug();
 
 					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 
@@ -284,6 +304,73 @@ class Inspector extends RendererInspector {
 				this.timeline.setRenderer( renderer );
 
 			}
+
+		}
+
+		return this;
+
+	}
+
+	beginNodeBuild( info ) {
+
+		super.beginNodeBuild( info );
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.updatePendingBuildInfo( info );
+
+	}
+
+	finishNodeBuild( info ) {
+
+		super.finishNodeBuild( info );
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.flushPendingInvalidations( info );
+
+	}
+
+	updateNodeMaterialDebug() {
+
+		if ( this.nodeMaterialDebug !== null ) this.nodeMaterialDebug.updateRenderer();
+
+		return this;
+
+	}
+
+	setNodeMaterialDebug( enabled ) {
+
+		this.nodeMaterialDebugEnabled = enabled === true;
+
+		const renderer = this.getRenderer();
+
+		if ( this.nodeMaterialDebugEnabled === true && renderer !== null ) {
+
+			if ( this.nodeMaterialDebug === null ) this.nodeMaterialDebug = new NodeMaterialDebug( renderer );
+			this.nodeMaterialDebug.onNodeMaterialInvalidation = ( event ) => {
+
+				const label = event.compute === true ? ( event.computeLabel || 'unknown compute node' ) : ( event.materialLabel || ( event.material ? event.material.name || event.material.type : 'unknown material' ) );
+				const type = event.compute === true ? 'Compute node' : 'NodeMaterial';
+
+				const property = event.property !== undefined ? ` via ${ event.property }` : '';
+				const values = event.previousValue !== undefined && event.value !== undefined ? ` (${ event.previousValue } -> ${ event.value })` : '';
+				const source = event.sourceProperty !== undefined && event.sourceProperty !== event.property ? ` [${ event.sourceProperty }]` : '';
+				const reason = event.reason !== undefined ? ` because ${ event.reason }` : '';
+				const buildInfo = event.buildInfo;
+				const timing = buildInfo && buildInfo.durationMs !== undefined ? ` in <strong>${ buildInfo.durationMs.toFixed( 3 ) } ms</strong>` : '';
+
+				const level = event.rebuild === true || event.needsRefresh === true ? 'warn' : 'info';
+				const action = event.action || ( level === 'warn' ? 'needs rebuild' : 'debug event' );
+
+				this.console.addMessage( level, `Renderer: ${ type } ${ action } for "${ label }"${ property }${ values }${ source }${ reason }${ timing }.` );
+
+				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
+
+			};
+
+			this.nodeMaterialDebug.updateRenderer();
+
+		} else if ( this.nodeMaterialDebug !== null ) {
+
+			this.nodeMaterialDebug.dispose();
+			this.nodeMaterialDebug = null;
 
 		}
 

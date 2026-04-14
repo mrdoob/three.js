@@ -58,6 +58,20 @@ class InspectorBase extends EventDispatcher {
 	}
 
 	/**
+	 * Called before a missing node builder state is built.
+	 *
+	 * @param {Object} info - Information about the node build.
+	 */
+	beginNodeBuild( /*info*/ ) { }
+
+	/**
+	 * Called after a missing node builder state has been built.
+	 *
+	 * @param {Object} info - Information about the node build.
+	 */
+	finishNodeBuild( /*info*/ ) { }
+
+	/**
 	 * Returns the renderer associated with this inspector.
 	 *
 	 * @return {WebGLRenderer} The associated renderer.

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - node material rebuild debug</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#container {
+				width: 100%;
+				height: 100%;
+			}
+
+			#actions {
+				position: absolute;
+				left: 12px;
+				bottom: 12px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				max-width: calc( 100% - 24px );
+				padding: 10px;
+				box-sizing: border-box;
+				border: 1px solid rgba( 255, 255, 255, 0.12 );
+				border-radius: 6px;
+				background: rgba( 0, 0, 0, 0.55 );
+				color: #e8e8e8;
+				pointer-events: auto;
+			}
+
+			#actions button {
+				padding: 7px 8px;
+				border: 1px solid rgba( 255, 255, 255, 0.18 );
+				border-radius: 4px;
+				background: rgba( 255, 255, 255, 0.08 );
+				color: inherit;
+				font: 600 11px/1.2 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				cursor: pointer;
+				white-space: nowrap;
+			}
+
+			#actions button.active {
+				background: rgba( 255, 255, 255, 0.2 );
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Node Material Rebuild Debug</span>
+			</div>
+
+			<small>
+				Open the Inspector Console tab to see material rebuild reasons.<br />
+				The <code>Materials</code> trace option is enabled when this example starts.
+			</small>
+		</div>
+
+		<div id="actions">
+			<button id="clearcoatButton">Clearcoat</button>
+			<button id="transmissionButton">Transmission</button>
+			<button id="nodeButton">Node</button>
+			<button id="computeButton">Compute</button>
+			<button id="lightButton">Point Light</button>
+			<button id="autoDemoButton">Auto Demo</button>
+		</div>
+
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, color, float, instanceIndex, instancedArray } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			class RebuildColorNode extends THREE.Node {
+
+				constructor() {
+
+					super( 'color' );
+
+					this.enabled = false;
+
+				}
+
+				customCacheKey() {
+
+					return this.enabled === true ? 1 : 0;
+
+				}
+
+				generate( builder, output ) {
+
+					const value = this.enabled === true ? color( 0xff8f40 ) : color( 0x8aa4ff );
+
+					return value.build( builder, output );
+
+				}
+
+			}
+
+			let camera, scene, renderer, controls;
+			let material, accentLight, sphere, rebuildColorNode, computeNode;
+			let computeVersion = 1;
+			let autoDemoInterval = null;
+			let autoDemoStep = 0;
+
+			const container = document.getElementById( 'container' );
+			const autoDemoButton = document.getElementById( 'autoDemoButton' );
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 3, 2.2, 5.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111114 );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector( { nodeMaterialDebugEnabled: true } );
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 1, 0 );
+
+				scene.add( new THREE.HemisphereLight( 0x99aaff, 0x101010, 0.9 ) );
+
+				const mainLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				mainLight.position.set( 4, 7, 3 );
+				scene.add( mainLight );
+
+				accentLight = new THREE.PointLight( 0x66aaff, 20, 12, 2 );
+				accentLight.position.set( - 2.5, 1.8, 2.2 );
+
+				const floor = new THREE.Mesh(
+					new THREE.CylinderGeometry( 2.2, 2.4, 0.25, 64 ),
+					new THREE.MeshStandardMaterial( { color: 0x1a1c20, roughness: 0.85, metalness: 0.1 } )
+				);
+				floor.position.y = - 0.15;
+				scene.add( floor );
+
+				material = new THREE.MeshPhysicalNodeMaterial( {
+					roughness: 0.12,
+					metalness: 0.05,
+					clearcoat: 0,
+					clearcoatRoughness: 0.05,
+					transmission: 0,
+					thickness: 0.9,
+					ior: 1.5
+				} );
+				material.name = 'DebugPhysicalMaterial';
+				rebuildColorNode = new RebuildColorNode();
+				material.colorNode = rebuildColorNode;
+
+				createComputeNode();
+
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 64, 32 ), material );
+				sphere.position.y = 1;
+				scene.add( sphere );
+
+				document.getElementById( 'clearcoatButton' ).addEventListener( 'click', toggleClearcoat );
+				document.getElementById( 'transmissionButton' ).addEventListener( 'click', toggleTransmission );
+				document.getElementById( 'nodeButton' ).addEventListener( 'click', toggleNode );
+				document.getElementById( 'computeButton' ).addEventListener( 'click', rebuildCompute );
+				document.getElementById( 'lightButton' ).addEventListener( 'click', toggleAccentLight );
+				autoDemoButton.addEventListener( 'click', toggleAutoDemo );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				updateActions();
+
+			}
+
+			function createComputeNode() {
+
+				const computeBuffer = instancedArray( 1, 'float' );
+				const computeTest = Fn( () => {
+
+					computeBuffer.element( instanceIndex ).assign( float( computeVersion ) );
+
+				} );
+
+				computeNode = computeTest().compute( 1 ).setName( 'Debug Compute' );
+
+			}
+
+			function toggleClearcoat() {
+
+				material.clearcoat = material.clearcoat === 0 ? 1 : 0;
+				material.needsUpdate = true;
+
+				updateActions();
+
+			}
+
+			function toggleTransmission() {
+
+				material.transmission = material.transmission === 0 ? 0.95 : 0;
+				material.needsUpdate = true;
+
+				updateActions();
+
+			}
+
+			function toggleAccentLight() {
+
+				if ( accentLight.parent === null ) {
+
+					scene.add( accentLight );
+
+				} else {
+
+					scene.remove( accentLight );
+
+				}
+
+				updateActions();
+
+			}
+
+			function toggleNode() {
+
+				rebuildColorNode.enabled = ! rebuildColorNode.enabled;
+				rebuildColorNode.needsUpdate = true;
+				material.needsUpdate = true;
+
+				updateActions();
+
+			}
+
+			function rebuildCompute() {
+
+				computeVersion ++;
+
+				if ( computeNode !== undefined ) {
+
+					renderer.inspector.nodeMaterialDebug.markComputeDisposed( computeNode );
+					computeNode.dispose();
+
+				}
+
+				renderer.compute( computeNode );
+
+				updateActions();
+
+			}
+
+			function updateActions() {
+
+				document.getElementById( 'clearcoatButton' ).classList.toggle( 'active', material.clearcoat > 0 );
+				document.getElementById( 'transmissionButton' ).classList.toggle( 'active', material.transmission > 0 );
+				document.getElementById( 'nodeButton' ).classList.toggle( 'active', rebuildColorNode.enabled );
+				document.getElementById( 'lightButton' ).classList.toggle( 'active', accentLight.parent !== null );
+				autoDemoButton.classList.toggle( 'active', autoDemoInterval !== null );
+
+			}
+
+			function toggleAutoDemo() {
+
+				if ( autoDemoInterval !== null ) {
+
+					clearInterval( autoDemoInterval );
+					autoDemoInterval = null;
+
+				} else {
+
+					const actions = [ toggleClearcoat, toggleTransmission, toggleNode, rebuildCompute, toggleAccentLight ];
+
+					actions[ autoDemoStep % actions.length ]();
+					autoDemoStep ++;
+
+					autoDemoInterval = setInterval( function () {
+
+						actions[ autoDemoStep % actions.length ]();
+						autoDemoStep ++;
+
+					}, 1800 );
+
+				}
+
+				updateActions();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				sphere.rotation.y += 0.0035;
+
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
