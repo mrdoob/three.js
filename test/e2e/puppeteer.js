@@ -202,7 +202,7 @@ async function main() {
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
-		headless: process.env.VISIBLE ? false : 'new',
+		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
