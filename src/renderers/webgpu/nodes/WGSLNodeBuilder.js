@@ -230,6 +230,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 */
 		this.scopedArrays = new Map();
 
+		/**
+		 * A flag that indicates that early returns are allowed.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowEarlyReturns = true;
+
+		/**
+		 * A flag that indicates that global variables are allowed.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowGlobalVariables = true;
+
 	}
 
 	/**
@@ -428,7 +444,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
-		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
+		const textureData = this.getDataFromNode( texture, this.shaderStage, this.cache );
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
@@ -1733,11 +1749,12 @@ ${ flowData.code }
 	 * @param {string} type - The variable's type.
 	 * @param {string} name - The variable's name.
 	 * @param {?number} [count=null] - The array length.
+	 * @param {string} [qualifier=''] - The variable's qualifier.
 	 * @return {string} The WGSL snippet that defines a variable.
 	 */
-	getVar( type, name, count = null ) {
+	getVar( type, name, count = null, qualifier = '' ) {
 
-		let snippet = `var ${ name } : `;
+		let snippet = `var${ qualifier } ${ name } : `;
 
 		if ( count !== null ) {
 
@@ -1759,7 +1776,15 @@ ${ flowData.code }
 	 * @param {string} shaderStage - The shader stage.
 	 * @return {string} The WGSL snippet that defines the variables.
 	 */
-	getVars( shaderStage ) {
+	getVars( shaderStage, global = false ) {
+
+		let qualifier = '';
+
+		if ( global ) {
+
+			qualifier = '<private>';
+
+		}
 
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
@@ -1768,13 +1793,13 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				snippets.push( `\t${ this.getVar( variable.type, variable.name, variable.count ) };` );
+				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count, qualifier ) };` );
 
 			}
 
 		}
 
-		return `\n${ snippets.join( '\n' ) }\n`;
+		return global ? snippets.join( '\n' ) : `\n\t${ snippets.join( '\n\t' ) }\n`;
 
 	}
 
@@ -1799,13 +1824,15 @@ ${ flowData.code }
 			const varyings = this.varyings;
 			const vars = this.vars[ shaderStage ];
 
+			let varyingIndex = 0;
+
 			for ( let index = 0; index < varyings.length; index ++ ) {
 
 				const varying = varyings[ index ];
 
 				if ( varying.needsInterpolation ) {
 
-					let attributesSnippet = `@location( ${index} )`;
+					let attributesSnippet = `@location( ${ varyingIndex ++ } )`;
 
 					if ( varying.interpolationType ) {
 
@@ -1866,6 +1893,7 @@ ${ flowData.code }
 	 */
 	getUniforms( shaderStage ) {
 
+		const backend = this.renderer.backend;
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
@@ -1903,7 +1931,7 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+				const { primarySamples } = backend.utils.getTextureSampleData( texture );
 
 				if ( primarySamples > 1 ) {
 
@@ -1921,7 +1949,7 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
+					if ( backend.compatibilityMode && texture.compareFunction === null ) {
 
 						textureType = `texture${ multisampled }_2d<f32>`;
 
@@ -1933,7 +1961,7 @@ ${ flowData.code }
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
-					const format = getFormat( texture );
+					const format = getFormat( texture, backend.device );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
 					const is3D = uniform.node.value.is3DTexture;
@@ -2061,12 +2089,14 @@ ${ flowData.code }
 
 			this.shaderStage = shaderStage;
 
+			const allowGlobal = this.allowGlobalVariables;
+
 			const stageData = shadersData[ shaderStage ];
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
 			stageData.structs = this.getStructs( shaderStage );
-			stageData.vars = this.getVars( shaderStage );
+			stageData.vars = this.getVars( shaderStage, allowGlobal );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
 			stageData.scopedArrays = this.getScopedArrays( shaderStage );
@@ -2116,7 +2146,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = '\t@location(0) color: vec4<f32>';
+							let structSnippet = '\t@location( 0 ) color: vec4<f32>';
 
 							const builtins = this.getBuiltins( 'output' );
 
@@ -2341,14 +2371,14 @@ ${shaderData.uniforms}
 ${shaderData.varyings}
 var<private> varyings : VaryingsStruct;
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 @vertex
 fn main( ${shaderData.attributes} ) -> VaryingsStruct {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -2379,14 +2409,14 @@ ${shaderData.structs}
 // uniforms
 ${shaderData.uniforms}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 @fragment
 fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -2424,19 +2454,22 @@ ${ shaderData.structs }
 // uniforms
 ${ shaderData.uniforms }
 
+// vars
+${ this.allowGlobalVariables ? shaderData.vars : '' }
+
 // codes
 ${ shaderData.codes }
 
 @compute @workgroup_size( ${ workgroupSizeX }, ${ workgroupSizeY }, ${ workgroupSizeZ } )
 fn main( ${ shaderData.attributes } ) {
 
+	// local vars
+	${ this.allowGlobalVariables ? '' : shaderData.vars }
+
 	// system
 	instanceIndex = globalId.x
 		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
 		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
-
-	// vars
-	${ shaderData.vars }
 
 	// flow
 	${ shaderData.flow }

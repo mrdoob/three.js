@@ -16,7 +16,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
-import { warnOnce, error } from '../../utils.js';
+import { error } from '../../utils.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 
@@ -325,15 +325,20 @@ class WebGPUBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( attribute );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -1425,13 +1430,13 @@ class WebGPUBackend extends Backend {
 
 		if ( dispatchSize === null ) {
 
-			dispatchSize = computeNode.count;
+			dispatchSize = computeNode.dispatchSize || computeNode.count;
 
 		}
 
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
-		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+		if ( dispatchSize && dispatchSize.isIndirectStorageBufferAttribute ) {
 
 			const dispatchBuffer = this.get( dispatchSize ).buffer;
 
@@ -1597,14 +1602,6 @@ class WebGPUBackend extends Backend {
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
-			const drawInstances = object._multiDrawInstances;
-
-			if ( drawInstances !== null ) {
-
-				// @deprecated, r174
-				warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-
-			}
 
 			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
 
@@ -1616,7 +1613,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				const count = drawInstances ? drawInstances[ i ] : 1;
+				const count = 1;
 				const firstInstance = count > 1 ? 0 : i;
 
 				if ( hasIndex === true ) {

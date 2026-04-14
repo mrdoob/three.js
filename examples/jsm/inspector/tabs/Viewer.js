@@ -1,8 +1,32 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
+import { splitPath, splitCamelCase } from '../ui/utils.js';
 
-import { RendererUtils, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
+import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget } from 'three/webgpu';
+import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform } from 'three/tsl';
+
+const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode ] ) => {
+
+	const aspect = uniform( 0 );
+
+	OnMaterialUpdate( () => {
+
+		const { width, height } = textureNode.value;
+
+		aspect.value = width / height;
+
+	} );
+
+	const centered = uv.sub( 0.5 );
+	const corrected = vec2( centered.x.div( aspect ), centered.y );
+	const finalUV = corrected.add( 0.5 );
+
+	const inBounds = step( 0.0, finalUV.x ).mul( step( finalUV.x, 1.0 ) ).mul( step( 0.0, finalUV.y ) ).mul( step( finalUV.y, 1.0 ) );
+
+	return vec3( finalUV, inBounds );
+
+} );
 
 class Viewer extends Tab {
 
@@ -26,6 +50,7 @@ class Viewer extends Tab {
 
 		this.itemLibrary = new Map();
 		this.folderLibrary = new Map();
+		this.canvasNodes = new Map();
 		this.currentDataList = [];
 		this.nodeList = nodeList;
 		this.nodes = nodes;
@@ -68,9 +93,86 @@ class Viewer extends Tab {
 
 	}
 
-	update( renderer, canvasDataList ) {
+	getCanvasDataByNode( renderer, node ) {
 
-		if ( ! this.isActive && ! this.isDetached ) return;
+		let canvasData = this.canvasNodes.get( node );
+
+		if ( canvasData === undefined ) {
+
+			const canvas = document.createElement( 'canvas' );
+
+			const canvasTarget = new CanvasTarget( canvas );
+			canvasTarget.setPixelRatio( window.devicePixelRatio );
+			canvasTarget.setSize( 140, 140 );
+
+			const id = node.id;
+
+			const { path, name } = splitPath( splitCamelCase( node.getName() || '(unnamed)' ) );
+
+			const target = node.context( { getUV: ( textureNode ) => {
+
+				const uvData = aspectRatioUV( screenUV, textureNode );
+				const correctedUV = uvData.xy;
+				const mask = uvData.z;
+
+				return correctedUV.mul( mask );
+
+			} } );
+
+			let output = vec4( vec3( target ), 1 );
+			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
+			output = output.context( { inspector: true } );
+
+			const material = new NodeMaterial();
+			material.outputNode = output;
+
+			const quad = new QuadMesh( material );
+			quad.name = 'Viewer - ' + name;
+
+			canvasData = {
+				id,
+				name,
+				path,
+				node,
+				quad,
+				canvasTarget,
+				material
+			};
+
+			this.canvasNodes.set( node, canvasData );
+
+		}
+
+		return canvasData;
+
+	}
+
+	update( inspector ) {
+
+		const renderer = inspector.getRenderer();
+		const nodes = inspector.getNodes();
+
+		if ( nodes.length > 0 ) {
+
+			if ( ! renderer.backend.isWebGPUBackend ) {
+
+				inspector.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
+
+				return;
+
+			}
+
+			if ( ! this.isVisible ) {
+
+				this.show();
+
+			}
+
+		}
+
+		if ( ! this.isActive ) return;
+
+		const canvasDataList = nodes.map( node => this.getCanvasDataByNode( renderer, node ) );
 
 		//
 

@@ -65,6 +65,8 @@ import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 
+const _customGeometries = {};
+
 /**
  * A loader for loading a JSON resource in the [JSON Object/Scene format](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4).
  * The files are internally loaded via {@link FileLoader}.
@@ -121,11 +123,11 @@ class ObjectLoader extends Loader {
 
 				json = JSON.parse( text );
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				if ( onError !== undefined ) onError( error );
+				if ( onError !== undefined ) onError( e );
 
-				error( 'ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				error( 'ObjectLoader: Can\'t parse ' + url + '.', e.message );
 
 				return;
 
@@ -275,6 +277,20 @@ class ObjectLoader extends Loader {
 
 	}
 
+	/**
+	 * Registers the given geometry at the internal
+	 * geometry library.
+	 *
+	 * @static
+	 * @param {string} type - The geometry type.
+	 * @param {BufferGeometry.constructor} geometryClass - The geometry class.
+	 */
+	static registerGeometry( type, geometryClass ) {
+
+		_customGeometries[ type ] = geometryClass;
+
+	}
+
 	// internals
 
 	parseShapes( json ) {
@@ -355,9 +371,13 @@ class ObjectLoader extends Loader {
 
 							geometry = Geometries[ data.type ].fromJSON( data, shapes );
 
+						} else if ( data.type in _customGeometries ) {
+
+							geometry = _customGeometries[ data.type ].fromJSON( data, shapes );
+
 						} else {
 
-							warn( `ObjectLoader: Unsupported geometry type "${ data.type }"` );
+							warn( `ObjectLoader: Unknown geometry type "${ data.type }". Use .registerGeometry() before starting the deserialization process.` );
 
 						}
 
@@ -737,6 +757,7 @@ class ObjectLoader extends Loader {
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
+				if ( data.normalized !== undefined ) texture.normalized = data.normalized;
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 

@@ -1,5 +1,5 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, logarithmicDepthToViewZ, viewZToOrthographicDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -13,6 +13,8 @@ let _rendererState;
  * References:
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
+ *
+ * Note: MSAA must be disabled when TRAA is in use.
  *
  * @augments TempNode
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -235,10 +237,19 @@ class TRAANode extends TempNode {
 
 		/**
 		 * Sync the post processing stack with the TRAA node.
+		 *
 		 * @private
 		 * @type {boolean}
 		 */
 		this._needsPostProcessingSync = false;
+
+		/**
+		 * The node used to render the scene's velocity.
+		 *
+		 * @private
+		 * @type {?VelocityNode}
+		 */
+		this._velocityNode = null;
 
 	}
 
@@ -282,7 +293,7 @@ class TRAANode extends TempNode {
 		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 
-		velocity.setProjectionMatrix( this._originalProjectionMatrix );
+		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
@@ -318,7 +329,7 @@ class TRAANode extends TempNode {
 
 		this.camera.clearViewOffset();
 
-		velocity.setProjectionMatrix( null );
+		this._velocityNode.setProjectionMatrix( null );
 
 		// update jitter index
 
@@ -452,6 +463,30 @@ class TRAANode extends TempNode {
 
 		}
 
+		if ( builder.renderer.reversedDepthBuffer === true ) {
+
+			this._historyRenderTarget.depthTexture.type = FloatType;
+
+		}
+
+		if ( builder.context.velocity !== undefined ) {
+
+			this._velocityNode = builder.context.velocity;
+
+		} else {
+
+			this._velocityNode = velocity;
+
+		}
+
+		const logarithmicToPerspectiveDepth = ( depth ) => {
+
+			const { x: near, y: far } = this._cameraNearFar;
+			const viewZ = logarithmicDepthToViewZ( depth, near, far );
+			return viewZToPerspectiveDepth( viewZ, near, far );
+
+		};
+
 		const currentDepthStruct = struct( {
 
 			closestDepth: 'float',
@@ -472,7 +507,10 @@ class TRAANode extends TempNode {
 				for ( let y = - 1; y <= 1; ++ y ) {
 
 					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
-					const depth = this.depthNode.load( neighbor ).r.toVar();
+					let depth = this.depthNode.load( neighbor ).r;
+					if ( builder.renderer.reversedDepthBuffer ) depth = depth.oneMinus();
+					if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth );
+					depth = depth.toVar();
 
 					If( depth.lessThan( closestDepth ), () => {
 
@@ -498,11 +536,14 @@ class TRAANode extends TempNode {
 		// Samples a previous depth and reproject it using the current camera matrices.
 		const samplePreviousDepth = ( uv ) => {
 
-			const depth = this._previousDepthNode.sample( uv ).r;
+			let depth = this._previousDepthNode.sample( uv ).r;
+			if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth );
 			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
 			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
 			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-			return viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
+			return this.camera.isOrthographicCamera
+				? viewZToOrthographicDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y )
+				: viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
 
 		};
 

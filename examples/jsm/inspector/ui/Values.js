@@ -204,7 +204,7 @@ class ValueCheckbox extends Value {
 
 	setValue( val ) {
 
-		this.checkbox.value = val;
+		this.checkbox.checked = val;
 
 		return super.setValue( val );
 

@@ -232,6 +232,7 @@ export class Style {
 	max-height: calc(100vh - 120px);
 	overflow-y: auto;
 	overflow-x: hidden;
+	width: 100%;
 }
 
 .mini-panel-content .list-scroll-wrapper::-webkit-scrollbar {
@@ -672,7 +673,7 @@ export class Style {
 }
 
 /* Hide drag indicator on mobile devices */
-#profiler-panel.hide-position-toggle .tab-btn.active::before {
+#profiler-panel.is-mobile .tab-btn.active::before {
 	display: none;
 }
 
@@ -765,7 +766,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
-	touch-action: none;
+	touch-action: pan-x;
 }
 
 .tab-btn.active {
@@ -1041,10 +1042,11 @@ export class Style {
 }
 
 .list-scroll-wrapper {
-	overflow-x: auto;
-	width: 100%;
-	user-select: none;
-	-webkit-user-select: none;
+	width: max-content;
+	min-width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {

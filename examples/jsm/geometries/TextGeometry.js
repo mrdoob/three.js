@@ -2,6 +2,8 @@ import {
 	ExtrudeGeometry
 } from 'three';
 
+import { Font } from '../loaders/FontLoader.js';
+
 /**
  * A class for generating text as a single geometry. It is constructed by providing a string of text, and a set of
  * parameters consisting of a loaded font and extrude settings.
@@ -57,6 +59,22 @@ class TextGeometry extends ExtrudeGeometry {
 		}
 
 		this.type = 'TextGeometry';
+
+	}
+
+	toJSON() {
+
+		const data = super.toJSON();
+		return data;
+
+	}
+
+	static fromJSON( data ) {
+
+		const options = data.options;
+
+		options.font = new Font( options.font.data );
+		return new TextGeometry( options.text, options );
 
 	}
 

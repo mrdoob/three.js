@@ -116,6 +116,7 @@ class Pipelines extends DataMap {
 				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
+				this.info.createProgram( stageCompute );
 
 			}
 
@@ -192,6 +193,7 @@ class Pipelines extends DataMap {
 				this.programs.vertex.set( nodeBuilderState.vertexShader, stageVertex );
 
 				backend.createProgram( stageVertex );
+				this.info.createProgram( stageVertex );
 
 			}
 
@@ -205,6 +207,7 @@ class Pipelines extends DataMap {
 				this.programs.fragment.set( nodeBuilderState.fragmentShader, stageFragment );
 
 				backend.createProgram( stageFragment );
+				this.info.createProgram( stageFragment );
 
 			}
 
@@ -357,8 +360,6 @@ class Pipelines extends DataMap {
 
 			this.backend.createComputePipeline( pipeline, bindings );
 
-			this.info.memory.programs ++;
-
 		}
 
 		return pipeline;
@@ -397,8 +398,6 @@ class Pipelines extends DataMap {
 			// pending promises that resolve when the render pipelines are ready for rendering.
 
 			this.backend.createRenderPipeline( renderObject, promises );
-
-			this.info.memory.programs ++;
 
 		}
 
@@ -445,8 +444,6 @@ class Pipelines extends DataMap {
 
 		this.caches.delete( pipeline.cacheKey );
 
-		this.info.memory.programs --;
-
 	}
 
 	/**
@@ -461,6 +458,8 @@ class Pipelines extends DataMap {
 		const stage = program.stage;
 
 		this.programs[ stage ].delete( code );
+
+		this.info.destroyProgram( program );
 
 	}
 

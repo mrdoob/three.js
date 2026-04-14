@@ -800,32 +800,6 @@ function Loader( editor ) {
 
 			}
 
-			case 'vtk':
-			case 'vtp':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const contents = event.target.result;
-
-					const { VTKLoader } = await import( 'three/addons/loaders/VTKLoader.js' );
-
-					const geometry = new VTKLoader().parse( contents );
-					const material = new THREE.MeshStandardMaterial();
-
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, mesh ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
 			case 'wrl':
 
 			{
