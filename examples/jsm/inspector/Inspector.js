@@ -356,7 +356,10 @@ class Inspector extends RendererInspector {
 				const buildInfo = event.buildInfo;
 				const timing = buildInfo && buildInfo.durationMs !== undefined ? ` in <strong>${ buildInfo.durationMs.toFixed( 3 ) } ms</strong>` : '';
 
-				this.console.addMessage( 'warn', `Renderer: ${ type } needs rebuild for "${ label }"${ property }${ values }${ source }${ reason }${ timing }.` );
+				const level = event.rebuild === true || event.needsRefresh === true ? 'warn' : 'info';
+				const action = event.action || ( level === 'warn' ? 'needs rebuild' : 'debug event' );
+
+				this.console.addMessage( level, `Renderer: ${ type } ${ action } for "${ label }"${ property }${ values }${ source }${ reason }${ timing }.` );
 
 				if ( typeof this.onNodeMaterialInvalidation === 'function' ) this.onNodeMaterialInvalidation( event );
 

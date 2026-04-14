@@ -67,6 +67,12 @@ class Console extends Tab {
 		copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
 		copyButton.addEventListener( 'click', () => this.copyAll( copyButton ) );
 
+		const clearButton = document.createElement( 'button' );
+		clearButton.className = 'console-copy-button';
+		clearButton.title = 'Clear console';
+		clearButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"></line></svg>';
+		clearButton.addEventListener( 'click', () => this.clear() );
+
 		const buttonsGroup = document.createElement( 'div' );
 		buttonsGroup.className = 'console-buttons-group';
 
@@ -131,6 +137,7 @@ class Console extends Tab {
 
 		} );
 
+		buttonsGroup.appendChild( clearButton );
 		buttonsGroup.appendChild( copyButton );
 
 		header.appendChild( filterInput );
@@ -179,6 +186,12 @@ class Console extends Tab {
 
 		button.classList.add( 'copied' );
 		setTimeout( () => button.classList.remove( 'copied' ), 350 );
+
+	}
+
+	clear() {
+
+		this.logContainer.replaceChildren();
 
 	}
 
