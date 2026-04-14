@@ -423,7 +423,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 						} else {
 
-							const info = adapter.info || await adapter.requestAdapterInfo();
+							const info = adapter.info;
 							console.log( `Adapter: ${info.vendor} / ${info.architecture} / ${info.device}` );
 
 						}
