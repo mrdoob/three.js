@@ -67,6 +67,35 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'lerpAngle', ( assert ) => {
+
+			const PI = Math.PI;
+			const TWO_PI = Math.PI * 2;
+			const eps = 1e-10;
+
+			// Basic endpoints
+			assert.strictEqual( MathUtils.lerpAngle( 0, PI / 2, 0 ), 0, 't=0 returns start angle' );
+			assert.strictEqual( MathUtils.lerpAngle( 0, PI / 2, 1 ), PI / 2, 't=1 returns end angle' );
+
+			// Midpoint of a simple range
+			assert.ok( Math.abs( MathUtils.lerpAngle( 0, PI / 2, 0.5 ) - PI / 4 ) < eps, 'Midpoint of 0 → π/2 is π/4' );
+
+			// Shortest path: 350° → 10° should pass through 0°, not through 180°
+			// In radians: ~6.109 → ~0.175. Midpoint should be near 0 (or 2π), not near π.
+			const a = MathUtils.degToRad( 350 );
+			const b = MathUtils.degToRad( 10 );
+			const mid = MathUtils.lerpAngle( a, b, 0.5 );
+			assert.ok( mid < 0.2 || mid > TWO_PI - 0.2, 'Shortest path: 350°→10° midpoint is near 0°, not 180°' );
+
+			// t is clamped — values outside [0,1] should not overshoot
+			assert.strictEqual( MathUtils.lerpAngle( 0, 1, - 0.5 ), 0, 't < 0 clamps to start' );
+			assert.strictEqual( MathUtils.lerpAngle( 0, 1, 1.5 ), 1, 't > 1 clamps to end' );
+
+			// Same angle — result should equal input regardless of t
+			assert.ok( Math.abs( MathUtils.lerpAngle( PI / 3, PI / 3, 0.5 ) - PI / 3 ) < eps, 'Same start and end returns that angle' );
+
+		} );
+
 		QUnit.test( 'pingpong', ( assert ) => {
 
 			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );

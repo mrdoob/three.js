@@ -138,6 +138,24 @@ function damp( x, y, lambda, dt ) {
 }
 
 /**
+ * Linearly interpolates between two angles (in radians), taking the shortest
+ * path around the circle. For example, lerping from `5.8` rad to `0.5` rad
+ * goes forward through `0`/`2π` rather than the long way round through `π`.
+ *
+ * @param {number} a - The start angle in radians.
+ * @param {number} b - The end angle in radians.
+ * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
+ * @return {number} The interpolated angle in radians.
+ */
+function lerpAngle( a, b, t ) {
+
+	// Wrap the angular delta into (-π, π] so we always take the shorter arc.
+	const delta = euclideanModulo( b - a + Math.PI, Math.PI * 2 ) - Math.PI;
+	return a + delta * clamp( t, 0, 1 );
+
+}
+
+/**
  * Returns a value that alternates between `0` and the given `length` parameter.
  *
  * @param {number} x - The value to pingpong.
@@ -565,6 +583,19 @@ const MathUtils = {
 	 */
 	damp: damp,
 	/**
+	 * Linearly interpolates between two angles (in radians), taking the shortest
+	 * path around the circle. For example, lerping from `5.8` rad to `0.5` rad
+	 * goes forward through `0`/`2π` rather than the long way round through `π`.
+	 *
+	 * @static
+	 * @method
+	 * @param {number} a - The start angle in radians.
+	 * @param {number} b - The end angle in radians.
+	 * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
+	 * @return {number} The interpolated angle in radians.
+	 */
+	lerpAngle: lerpAngle,
+	/**
 	 * Returns a value that alternates between `0` and the given `length` parameter.
 	 *
 	 * @static
@@ -732,6 +763,7 @@ export {
 	inverseLerp,
 	lerp,
 	damp,
+	lerpAngle,
 	pingpong,
 	smoothstep,
 	smootherstep,
