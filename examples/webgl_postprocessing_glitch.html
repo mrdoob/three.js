@@ -33,12 +33,9 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, scene, renderer, composer;
+			let camera, scene, renderer;
 			let object, light;
 
 			let glitchPass;
@@ -62,7 +59,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -113,14 +110,8 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
-
 				glitchPass = new GlitchPass();
-				composer.addPass( glitchPass );
-
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderer.setEffects( [ glitchPass ] );
 
 
 				//
@@ -140,8 +131,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
 
 			}
 
@@ -150,7 +139,7 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

@@ -32,12 +32,9 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, scene, renderer, composer, taaRenderPass, renderPass;
+			let camera, scene, renderer, taaRenderPass;
 			let gui, stats;
 			let index = 0;
 
@@ -60,8 +57,7 @@
 
 					if ( taaRenderPass ) {
 
-						taaRenderPass.enabled = ( param.TAAEnabled === '1' );
-						renderPass.enabled = ( param.TAAEnabled !== '1' );
+						renderer.setEffects( param.TAAEnabled === '1' ? [ taaRenderPass ] : null );
 
 					}
 
@@ -92,7 +88,7 @@
 
 				const container = document.getElementById( 'container' );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -130,18 +126,10 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-
 				taaRenderPass = new TAARenderPass( scene, camera );
 				taaRenderPass.unbiased = false;
-				composer.addPass( taaRenderPass );
 
-				renderPass = new RenderPass( scene, camera );
-				renderPass.enabled = false;
-				composer.addPass( renderPass );
-
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderer.setEffects( [ taaRenderPass ] );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -156,7 +144,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -183,7 +170,7 @@
 
 				}
 
-				composer.render();
+				renderer.render( scene, camera );
 
 				stats.update();
 

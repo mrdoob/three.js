@@ -30,16 +30,14 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 			import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 			import { SobelOperatorShader } from 'three/addons/shaders/SobelOperatorShader.js';
 
-			let camera, scene, renderer, composer;
+			let camera, scene, renderer;
 
-			let effectSobel;
+			let effectGrayScale, effectSobel;
 
 			const params = {
 				enable: true
@@ -76,7 +74,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -84,14 +82,9 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
-
 				// color to grayscale conversion
 
-				const effectGrayScale = new ShaderPass( LuminosityShader );
-				composer.addPass( effectGrayScale );
+				effectGrayScale = new ShaderPass( LuminosityShader );
 
 				// you might want to use a gaussian blur filter before
 				// the next pass to improve the result of the Sobel operator
@@ -101,7 +94,8 @@
 				effectSobel = new ShaderPass( SobelOperatorShader );
 				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
 				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
-				composer.addPass( effectSobel );
+
+				renderer.setEffects( [ effectGrayScale, effectSobel ] );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
@@ -110,7 +104,11 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'enable' );
+				gui.add( params, 'enable' ).onChange( ( value ) => {
+
+					renderer.setEffects( value ? [ effectGrayScale, effectSobel ] : null );
+
+				} );
 				gui.open();
 
 				//
@@ -125,7 +123,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
 				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
@@ -134,15 +131,7 @@
 
 			function animate() {
 
-				if ( params.enable === true ) {
-
-					composer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				renderer.render( scene, camera );
 
 			}
 

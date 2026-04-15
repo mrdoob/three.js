@@ -87,12 +87,9 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, renderer, composer, timer;
+			let camera, scene, renderer, timer;
 
 			let uniforms, mesh;
 
@@ -105,7 +102,7 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				const scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
 				timer = new THREE.Timer();
 				timer.connect( document );
@@ -147,24 +144,16 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				//
 
-				const renderModel = new RenderPass( scene, camera );
 				const effectBloom = new BloomPass( 1.25 );
-				const outputPass = new OutputPass();
-
-				composer = new EffectComposer( renderer );
-
-				composer.addPass( renderModel );
-				composer.addPass( effectBloom );
-				composer.addPass( outputPass );
+				renderer.setEffects( [ effectBloom ] );
 
 				//
 
@@ -178,7 +167,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -195,8 +183,7 @@
 				mesh.rotation.y += 0.0125 * delta;
 				mesh.rotation.x += 0.05 * delta;
 
-				renderer.clear();
-				composer.render( 0.01 );
+				renderer.render( scene, camera );
 
 			}
 

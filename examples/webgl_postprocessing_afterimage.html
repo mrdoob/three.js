@@ -22,12 +22,9 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, scene, renderer, composer;
+			let camera, scene, renderer;
 			let mesh;
 
 			let afterimagePass;
@@ -42,7 +39,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -61,14 +58,8 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
-
 				afterimagePass = new AfterimagePass();
-				composer.addPass( afterimagePass );
-
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderer.setEffects( [ afterimagePass ] );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -84,7 +75,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -95,8 +85,7 @@
 
 				afterimagePass.enabled = params.enable;
 
-				composer.render();
-
+				renderer.render( scene, camera );
 
 			}
 
