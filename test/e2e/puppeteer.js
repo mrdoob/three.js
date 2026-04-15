@@ -69,16 +69,21 @@ const exceptionList = [
 	'webgpu_loader_gltf_anisotropy',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_loader_gltf_transmission',
+	'webgpu_loader_materialxr',
+	'webgpu_materials_displacementmap',
 	'webgpu_pmrem_equirectangular',
 	'webgpu_postprocessing_dof_basic',
 	'webgpu_postprocessing_lensflare',
 	'webgpu_postprocessing_ssr',
 	'webgpu_reflection_roughness',
+	'webgpu_shadowmap',
 	'webgpu_tsl_angular_slicing',
 	'webgpu_tsl_graph',
 	'webgpu_tsl_raging_sea',
 	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_shadowmap'
+	'webgpu_tsl_wood',
+	'webgpu_tonemapping',
+	'webgpu_upscaling_taau'
 
 ];
 
