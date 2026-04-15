@@ -19,7 +19,6 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
-import ReadbackBuffer from './ReadbackBuffer.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -1913,61 +1912,42 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute|ReadbackBuffer} buffer - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( buffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		let readbackBuffer = buffer;
+		// tally the memory for this readback buffer
+		if ( target !== null && target.isReadbackBuffer ) {
 
-		if ( readbackBuffer.isReadbackBuffer !== true ) {
+			if ( this.info.memoryMap.has( target ) === false ) {
 
-			const attribute = buffer;
-			const attributeData = this.backend.get( attribute );
+				this.info.createReadbackBuffer( target );
 
-			readbackBuffer = attributeData.readbackBuffer;
+				const disposeInfo = () => {
 
-			if ( readbackBuffer === undefined ) {
+					target.removeEventListener( 'dispose', disposeInfo );
 
-				readbackBuffer = new ReadbackBuffer( attribute );
-
-				const dispose = () => {
-
-					attribute.removeEventListener( 'dispose', dispose );
-
-					readbackBuffer.dispose();
-
-					delete attributeData.readbackBuffer;
+					this.info.destroyReadbackBuffer( target );
 
 				};
 
-				attribute.addEventListener( 'dispose', dispose );
-
-				attributeData.readbackBuffer = readbackBuffer;
+				target.addEventListener( 'dispose', disposeInfo );
 
 			}
 
 		}
 
-		if ( this.info.memoryMap.has( readbackBuffer ) === false ) {
+		if ( offset % 4 !== 0 || ( count > 0 && count % 4 !== 0 ) ) {
 
-			this.info.createReadbackBuffer( readbackBuffer );
-
-			const disposeInfo = () => {
-
-				readbackBuffer.removeEventListener( 'dispose', disposeInfo );
-
-				this.info.destroyReadbackBuffer( readbackBuffer );
-
-			};
-
-			readbackBuffer.addEventListener( 'dispose', disposeInfo );
+			throw new Error( 'THREE.Renderer: "getArrayBufferAsync()" offset and count must be a multiple of 4.' );
 
 		}
 
-		readbackBuffer.release();
-
-		return await this.backend.getArrayBufferAsync( readbackBuffer );
+		return await this.backend.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 

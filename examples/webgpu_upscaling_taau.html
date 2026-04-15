@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing taau</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>TAAU</span>
+			</div>
+
+			<small>
+				Temporal Reprojection Anti-Aliasing with Upsampling.<br />
+				Model: <a href="https://artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by <a href="https://artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { mrt, output, pass, velocity } from 'three/tsl';
+			import { taau } from 'three/addons/tsl/display/TAAUNode.js';
+			import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+			const params = {
+				upscaleMethod: 'TAAU',
+				resolutionScale: 0.5,
+				sharpening: true,
+				sharpness: 0.2,
+			};
+
+			let camera, scene, renderer, renderPipeline, controls, mixer, timer;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( - 0.5, 0, 12 );
+
+				scene = new THREE.Scene();
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+			
+				// model
+
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
+				dracoLoader.setDecoderConfig( { type: 'js' } );
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+
+				loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
+
+					const model = gltf.scene;
+					model.scale.set( 0.01, 0.01, 0.01 );
+					scene.add( model );
+
+					mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+				} );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfe3dd );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( - 0.5, 0, 0 );
+
+				// render pipeline
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				const scenePass = pass( scene, camera );
+				scenePass.setResolutionScale( params.resolutionScale );
+				scenePass.setMRT( mrt( {
+					output: output,
+					velocity: velocity
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+					return scenePass.getLinearDepthNode();
+
+				} );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				const taauNode = taau( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+				const sharpenNode = sharpen( taauNode.getTextureNode(), params.sharpness );
+
+				function updatePipeline() {
+
+					if ( params.upscaleMethod === 'TAAU' ) {
+
+						renderPipeline.outputNode = params.sharpening ? sharpenNode : taauNode;
+
+					} else {
+
+						renderPipeline.outputNode = scenePass;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'upscaleMethod', [ 'Bilinear', 'TAAU' ] ).onChange( updatePipeline );
+				gui.add( params, 'resolutionScale', 0.25, 1.0, 0.25 ).onChange( ( value ) => {
+
+					scenePass.setResolutionScale( value );
+
+				} );
+				gui.add( params, 'sharpening' ).onChange( updatePipeline );
+				gui.add( params, 'sharpness', 0, 2, 0.05 ).onChange( ( value ) => {
+
+					sharpenNode.sharpness.value = value;
+
+				} );
+
+				updatePipeline();
+
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( mixer ) {
+			
+					mixer.update( delta );
+			
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
