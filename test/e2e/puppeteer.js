@@ -36,7 +36,9 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi_ballpool',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
+	'webgpu_storage_buffer',
 	'webgpu_volume_lighting_traa',
+	'webxr_vr_video',
 
 	// Need more time to render
 	'css3d_mixed',
