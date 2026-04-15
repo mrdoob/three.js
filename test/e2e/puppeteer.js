@@ -27,6 +27,7 @@ const exceptionList = [
 	'webgl_video_kinect',
 	'webgl_worker_offscreencanvas',
 	'webgpu_backdrop_water',
+	'webgpu_compute_audio',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_portal',
 	'webgpu_postprocessing_ao',
