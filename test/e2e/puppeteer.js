@@ -49,6 +49,7 @@ const exceptionList = [
 	// Video hangs the CI?
 	'css3d_youtube',
 	'webgpu_materials_video',
+	'webgl_video_kinect',
 
 	// Timeout
 	'webgl_test_memory2',
