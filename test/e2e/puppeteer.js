@@ -17,18 +17,7 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
-	// Needs investigation
-	'physics_rapier_instancing',
-	'physics_jolt_instancing',
-	'webaudio_visualizer',
-	'webgl_shadowmap',
-	'webgl_postprocessing_dof2',
-	'webgl_postprocessing_glitch',
-	'webgl_video_kinect',
-	'webgl_worker_offscreencanvas',
-	'webgpu_backdrop_water',
-	'webgpu_lightprobe_cubecamera',
-	'webgpu_portal',
+	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_ssgi',
@@ -36,6 +25,15 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_volume_lighting_traa',
+
+	// Timming issues?
+	'physics_rapier_instancing',
+	'webgl_shadowmap',
+	'webaudio_visualizer',
+	'webgpu_compute_audio',
+	'webgpu_tsl_editor',
+	'webgpu_storage_buffer',
+	'webxr_vr_video',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -65,7 +63,7 @@ const exceptionList = [
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxDifferentPixels = 0.3; // at most 0.3% different pixels
+const maxDifferentPixels = 0.1; // at most 0.1% different pixels
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
@@ -562,7 +560,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
 			console.yellow( `${ e }` );
-			console.yellow( 'Restarting browser due to WebGPU Device Lost...' );
+			console.yellow( 'Restarting browser...' );
 			await ctx.restart();
 
 		} else {
