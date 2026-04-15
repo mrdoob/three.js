@@ -59,6 +59,15 @@ const exceptionList = [
 	'webgl_materials_video_webcam',
 	'webgl_morphtargets_webcam',
 
+	// Device Lost
+
+	'webgpu_compute_cloth',
+	'webgpu_compute_particles_fluid',
+	'webgpu_cubemap_adjustments',
+	'webgpu_postprocessing_dof_basic',
+	'webgpu_postprocessing_lensflare',
+	'webgpu_reflection_roughness',
+
 ];
 
 /* Configuration */
