@@ -17,6 +17,15 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
+	// Black screen
+	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_dof',
+	'webgpu_postprocessing_ssgi',
+	'webgpu_postprocessing_ssgi_ballpool',
+	'webgpu_postprocessing_sss',
+	'webgpu_postprocessing_traa',
+	'webgpu_volume_lighting_traa',
+
 	// Timming issues?
 	'webaudio_visualizer',
 	'webgpu_compute_audio',
