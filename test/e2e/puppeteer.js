@@ -64,9 +64,13 @@ const exceptionList = [
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
 	'webgpu_cubemap_adjustments',
+	'webgpu_cubemap_dynamic',
+	'webgpu_custom_fog_background',
 	'webgpu_postprocessing_dof_basic',
 	'webgpu_postprocessing_lensflare',
+	'webgpu_postprocessing_ssr',
 	'webgpu_reflection_roughness',
+	'webgpu_shadowmap'
 
 ];
 
