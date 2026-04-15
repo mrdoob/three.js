@@ -317,7 +317,7 @@ class OutlineEffect {
 
 			if ( originalMaterial.wireframe === true || originalMaterial.depthTest === false ) material.visible = false;
 
-			if ( originalMaterial.clippingPlanes ) {
+			if ( originalMaterial.clippingPlanes || originalMaterial.clippingVolumes !== undefined ) {
 
 				material.clipping = true;
 
