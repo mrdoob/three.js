@@ -321,6 +321,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		text = text.trim();
 		if ( text === '' ) return;
+		if ( text.includes( 'Timestamp tracking is disabled' ) ) return;
 
 		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
