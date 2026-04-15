@@ -410,17 +410,19 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
 
+	const page = ctx.page;
+
 	try {
 
-		ctx.page.file = file;
-		ctx.page.pageSize = 0;
-		ctx.page.error = undefined;
+		page.file = file;
+		page.pageSize = 0;
+		page.error = undefined;
 
 		/* Load target page */
 
 		try {
 
-			await ctx.page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
+			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
 				timeout: networkTimeout * 60000
 			} );
@@ -435,14 +437,14 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			/* Render page */
 
-			await ctx.page.evaluate( cleanPage );
+			await page.evaluate( cleanPage );
 
-			await ctx.page.waitForNetworkIdle( {
+			await page.waitForNetworkIdle( {
 				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
 			} );
 
-			await ctx.page.evaluate( async ( renderTimeout, parseTime ) => {
+			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -474,7 +476,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 				} );
 
-			}, renderTimeout, ctx.page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
@@ -490,9 +492,9 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		}
 
-		const screenshot = ( await Image.read( await ctx.page.screenshot() ) ).scale( 1 / viewScale );
+		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
 
-		if ( ctx.page.error !== undefined ) throw new Error( ctx.page.error );
+		if ( page.error !== undefined ) throw new Error( page.error );
 
 		if ( isMakeScreenshot ) {
 
@@ -569,7 +571,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 	} finally {
 
-		ctx.page.file = undefined; // release lock
+		page.file = undefined; // release lock
 
 	}
 
