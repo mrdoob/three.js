@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - clipping stencil volumes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - clipping volumes with stencil caps (green: include, red: exclude)</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			let camera, scene, renderer, object, clippedMesh, stats;
+			let capPlaneGeometry, timer;
+
+			const volumes = [];
+
+			const INCLUDE_COLOR = 0x66BB6A;
+			const EXCLUDE_COLOR = 0xEF5350;
+
+			const params = {
+
+				animate: true,
+				pyramid: {
+
+					enabled: true,
+					mode: 'include',
+					displayHelper: true
+
+				},
+				box: {
+
+					enabled: true,
+					mode: 'include',
+					displayHelper: true
+
+				}
+
+			};
+
+			function createPlaneStencilGroup( geometry, plane, renderOrder ) {
+
+				const group = new THREE.Group();
+				const baseMat = new THREE.MeshBasicMaterial();
+				baseMat.depthWrite = false;
+				baseMat.depthTest = false;
+				baseMat.colorWrite = false;
+				baseMat.stencilWrite = true;
+				baseMat.stencilFunc = THREE.AlwaysStencilFunc;
+
+				const mat0 = baseMat.clone();
+				mat0.side = THREE.BackSide;
+				mat0.clippingPlanes = [ plane ];
+				mat0.stencilFail = THREE.IncrementWrapStencilOp;
+				mat0.stencilZFail = THREE.IncrementWrapStencilOp;
+				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+
+				const mesh0 = new THREE.Mesh( geometry, mat0 );
+				mesh0.renderOrder = renderOrder;
+				group.add( mesh0 );
+
+				const mat1 = baseMat.clone();
+				mat1.side = THREE.FrontSide;
+				mat1.clippingPlanes = [ plane ];
+				mat1.stencilFail = THREE.DecrementWrapStencilOp;
+				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
+				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+
+				const mesh1 = new THREE.Mesh( geometry, mat1 );
+				mesh1.renderOrder = renderOrder;
+				group.add( mesh1 );
+
+				return group;
+
+			}
+
+			function createConvexPlane( a, b, c, insidePoint ) {
+
+				const plane = new THREE.Plane().setFromCoplanarPoints( a, b, c );
+
+				if ( plane.distanceToPoint( insidePoint ) < 0 ) {
+
+					plane.negate();
+
+				}
+
+				return plane;
+
+			}
+
+			const planeToMatrix = ( function () {
+
+				const xAxis = new THREE.Vector3();
+				const yAxis = new THREE.Vector3();
+				const translation = new THREE.Vector3();
+
+				return function planeToMatrix( plane, point = null ) {
+
+					const zAxis = plane.normal;
+					const matrix = new THREE.Matrix4();
+
+					if ( Math.abs( zAxis.x ) > Math.abs( zAxis.z ) ) {
+
+						yAxis.set( - zAxis.y, zAxis.x, 0 );
+
+					} else {
+
+						yAxis.set( 0, - zAxis.z, zAxis.y );
+
+					}
+
+					xAxis.crossVectors( yAxis.normalize(), zAxis );
+					if ( point !== null ) {
+
+						translation.copy( point );
+
+					} else {
+
+						plane.coplanarPoint( translation );
+
+					}
+
+					return matrix.set(
+						xAxis.x, yAxis.x, zAxis.x, translation.x,
+						xAxis.y, yAxis.y, zAxis.y, translation.y,
+						xAxis.z, yAxis.z, zAxis.z, translation.z,
+						0, 0, 0, 1
+					);
+
+				};
+
+			} )();
+
+			function applyPlaneTransform( mesh, plane, point = null ) {
+
+				planeToMatrix( plane, point ).decompose( mesh.position, mesh.quaternion, mesh.scale );
+
+			}
+
+			function createVolumeHelper( geometry, color ) {
+
+				const group = new THREE.Group();
+
+				const fillMaterial = new THREE.MeshBasicMaterial( {
+					color,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0.15,
+					depthWrite: false
+				} );
+
+				const lineMaterial = new THREE.LineBasicMaterial( {
+					color,
+					transparent: true,
+					opacity: 0.7
+				} );
+
+				const fill = new THREE.Mesh( geometry, fillMaterial );
+				const edges = new THREE.LineSegments( new THREE.EdgesGeometry( geometry ), lineMaterial );
+
+				group.add( fill );
+				group.add( edges );
+
+				return { group, fillMaterial, lineMaterial };
+
+			}
+
+			function createPyramidGeometry( baseSize, height ) {
+
+				const half = baseSize * 0.5;
+				const positions = new Float32Array( [
+					- half, 0, - half,
+					half, 0, - half,
+					half, 0, half,
+
+					- half, 0, - half,
+					half, 0, half,
+					- half, 0, half,
+
+					- half, 0, - half,
+					half, 0, - half,
+					0, height, 0,
+
+					half, 0, - half,
+					half, 0, half,
+					0, height, 0,
+
+					half, 0, half,
+					- half, 0, half,
+					0, height, 0,
+
+					- half, 0, half,
+					- half, 0, - half,
+					0, height, 0
+				] );
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.computeVertexNormals();
+
+				return geometry;
+
+			}
+
+			function buildPyramidVolume( assetBox, size ) {
+
+				const baseSize = size * 1.15;
+				const height = size * 1.35;
+				const half = baseSize * 0.5;
+				const baseCenter = new THREE.Vector3( - size * 0.6, assetBox.min.y + size * 0.35, 0 );
+				const apex = new THREE.Vector3( baseCenter.x, baseCenter.y + height, baseCenter.z );
+
+				const corners = [
+					new THREE.Vector3( baseCenter.x - half, baseCenter.y, baseCenter.z - half ),
+					new THREE.Vector3( baseCenter.x + half, baseCenter.y, baseCenter.z - half ),
+					new THREE.Vector3( baseCenter.x + half, baseCenter.y, baseCenter.z + half ),
+					new THREE.Vector3( baseCenter.x - half, baseCenter.y, baseCenter.z + half )
+				];
+
+				const insidePoint = new THREE.Vector3( baseCenter.x, baseCenter.y + height * 0.35, baseCenter.z );
+
+				const planes = [
+					createConvexPlane( corners[ 0 ], corners[ 3 ], corners[ 2 ], insidePoint ),
+					createConvexPlane( corners[ 0 ], corners[ 1 ], apex, insidePoint ),
+					createConvexPlane( corners[ 1 ], corners[ 2 ], apex, insidePoint ),
+					createConvexPlane( corners[ 2 ], corners[ 3 ], apex, insidePoint ),
+					createConvexPlane( corners[ 3 ], corners[ 0 ], apex, insidePoint )
+				];
+
+				const faceCenters = [
+					baseCenter.clone(),
+					corners[ 0 ].clone().add( corners[ 1 ] ).add( apex ).multiplyScalar( 1 / 3 ),
+					corners[ 1 ].clone().add( corners[ 2 ] ).add( apex ).multiplyScalar( 1 / 3 ),
+					corners[ 2 ].clone().add( corners[ 3 ] ).add( apex ).multiplyScalar( 1 / 3 ),
+					corners[ 3 ].clone().add( corners[ 0 ] ).add( apex ).multiplyScalar( 1 / 3 )
+				];
+
+				const helper = createVolumeHelper( createPyramidGeometry( baseSize, height ), EXCLUDE_COLOR );
+				helper.group.position.copy( baseCenter );
+
+				return {
+					name: 'pyramid',
+					paramKey: 'pyramid',
+					planes,
+					faceCenters,
+					helper,
+					caps: [],
+					stencilGroups: []
+				};
+
+			}
+
+			function buildBoxVolume( assetBox, size ) {
+
+				const width = size;
+				const height = size;
+				const depth = size;
+				const halfExtents = new THREE.Vector3( width * 0.5, height * 0.5, depth * 0.5 );
+				const center = new THREE.Vector3( size * 0.6, assetBox.max.y - halfExtents.y - size * 0.05, 0 );
+
+				const min = center.clone().sub( halfExtents );
+				const max = center.clone().add( halfExtents );
+
+				const planes = [
+					new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), - min.x ),
+					new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), max.x ),
+					new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), - min.y ),
+					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), max.y ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - min.z ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), max.z )
+				];
+
+				const faceCenters = [
+					new THREE.Vector3( min.x, center.y, center.z ),
+					new THREE.Vector3( max.x, center.y, center.z ),
+					new THREE.Vector3( center.x, min.y, center.z ),
+					new THREE.Vector3( center.x, max.y, center.z ),
+					new THREE.Vector3( center.x, center.y, min.z ),
+					new THREE.Vector3( center.x, center.y, max.z )
+				];
+
+				const helper = createVolumeHelper( new THREE.BoxGeometry( width, height, depth ), EXCLUDE_COLOR );
+				helper.group.position.copy( center );
+
+				return {
+					name: 'box',
+					paramKey: 'box',
+					planes,
+					faceCenters,
+					helper,
+					caps: [],
+					stencilGroups: []
+				};
+
+			}
+
+			function getColorForMode( mode ) {
+
+				return mode === 'include' ? INCLUDE_COLOR : EXCLUDE_COLOR;
+
+			}
+
+			function getActiveClippingVolumes() {
+
+				return volumes.filter( ( volume ) => params[ volume.paramKey ].enabled ).map( ( volume ) => ( {
+					mode: params[ volume.paramKey ].mode,
+					planes: volume.planes
+				} ) );
+
+			}
+
+			function getCapClippingVolumes( volume, plane ) {
+
+				const facePlanes = volume.planes.filter( ( currentPlane ) => currentPlane !== plane );
+				const currentMode = params[ volume.paramKey ].mode;
+				const otherIncludes = [];
+				const otherExcludes = [];
+
+				for ( const otherVolume of volumes ) {
+
+					if ( otherVolume === volume || params[ otherVolume.paramKey ].enabled === false ) continue;
+
+					const otherDefinition = {
+						mode: params[ otherVolume.paramKey ].mode,
+						planes: otherVolume.planes
+					};
+
+					if ( otherDefinition.mode === 'include' ) {
+
+						otherIncludes.push( otherDefinition );
+
+					} else {
+
+						otherExcludes.push( otherDefinition );
+
+					}
+
+				}
+
+				const clippingVolumes = [];
+
+				if ( currentMode === 'include' || otherIncludes.length === 0 ) {
+
+					clippingVolumes.push( { mode: 'include', planes: facePlanes } );
+
+				} else {
+
+					for ( const includeVolume of otherIncludes ) {
+
+						clippingVolumes.push( { mode: 'include', planes: facePlanes.concat( includeVolume.planes ) } );
+
+					}
+
+				}
+
+				for ( const excludeVolume of otherExcludes ) {
+
+					clippingVolumes.push( excludeVolume );
+
+				}
+
+				return clippingVolumes;
+
+			}
+
+			function updateVolumeState() {
+
+				clippedMesh.material.clippingVolumes = getActiveClippingVolumes();
+				clippedMesh.material.needsUpdate = true;
+
+				for ( const volume of volumes ) {
+
+					const enabled = params[ volume.paramKey ].enabled;
+					const mode = params[ volume.paramKey ].mode;
+					const color = getColorForMode( mode );
+
+					volume.helper.group.visible = enabled && params[ volume.paramKey ].displayHelper;
+					volume.helper.fillMaterial.color.setHex( color );
+					volume.helper.lineMaterial.color.setHex( color );
+
+					for ( const stencilGroup of volume.stencilGroups ) {
+
+						stencilGroup.visible = enabled;
+
+					}
+
+					for ( const cap of volume.caps ) {
+
+						cap.mesh.visible = enabled;
+						cap.material.color.setHex( color );
+						cap.material.emissive.setHex( color ).multiplyScalar( 0.12 );
+						cap.material.clippingVolumes = getCapClippingVolumes( volume, cap.plane );
+						cap.material.needsUpdate = true;
+
+					}
+
+				}
+
+			}
+
+			function init() {
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( 2.7, 2.15, 3.4 );
+
+				scene.add( new THREE.AmbientLight( 0xffffff, 1.5 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 4, 5, 3 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.right = 2;
+				dirLight.shadow.camera.left = - 2;
+				dirLight.shadow.camera.top = 2;
+				dirLight.shadow.camera.bottom = - 2;
+				dirLight.shadow.camera.near = 0.5;
+				dirLight.shadow.camera.far = 12;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+				const geometry = new THREE.TorusKnotGeometry( 0.6, 0.22, 256, 32 );
+				geometry.computeBoundingBox();
+
+				const localBox = geometry.boundingBox.clone();
+				const assetLift = - localBox.min.y;
+				const assetBox = localBox.clone().translate( new THREE.Vector3( 0, assetLift, 0 ) );
+				const assetSize = assetBox.getSize( new THREE.Vector3() );
+				const maxExtent = Math.max( assetSize.x, assetSize.y, assetSize.z );
+				const volumeSize = maxExtent * 0.3;
+
+				object = new THREE.Group();
+				object.position.y = assetLift;
+				scene.add( object );
+
+				volumes.push( buildPyramidVolume( assetBox, volumeSize ) );
+				volumes.push( buildBoxVolume( assetBox, volumeSize ) );
+
+				capPlaneGeometry = new THREE.PlaneGeometry( maxExtent * 0.65, maxExtent * 0.65 );
+
+				let renderOrder = 1;
+
+				for ( const volume of volumes ) {
+
+					scene.add( volume.helper.group );
+
+					for ( let i = 0; i < volume.planes.length; i ++ ) {
+
+						const plane = volume.planes[ i ];
+						const faceCenter = volume.faceCenters[ i ];
+
+						const stencilGroup = createPlaneStencilGroup( geometry, plane, renderOrder );
+						object.add( stencilGroup );
+						volume.stencilGroups.push( stencilGroup );
+
+						const capMaterial = new THREE.MeshStandardMaterial( {
+							color: EXCLUDE_COLOR,
+							emissive: new THREE.Color( EXCLUDE_COLOR ).multiplyScalar( 0.12 ),
+							metalness: 0.05,
+							roughness: 0.7,
+							side: THREE.DoubleSide,
+							stencilWrite: true,
+							stencilRef: 0,
+							stencilFunc: THREE.NotEqualStencilFunc,
+							stencilFail: THREE.ReplaceStencilOp,
+							stencilZFail: THREE.ReplaceStencilOp,
+							stencilZPass: THREE.ReplaceStencilOp
+						} );
+
+						const capMesh = new THREE.Mesh( capPlaneGeometry, capMaterial );
+						applyPlaneTransform( capMesh, plane, faceCenter );
+						capMesh.renderOrder = renderOrder + 0.1;
+						capMesh.onAfterRender = function ( renderer ) {
+
+							renderer.clearStencil();
+
+						};
+
+						scene.add( capMesh );
+						volume.caps.push( { plane, mesh: capMesh, material: capMaterial } );
+
+						renderOrder += 1;
+
+					}
+
+				}
+
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xFFC107,
+					metalness: 0.1,
+					roughness: 0.75,
+					clipShadows: true,
+					shadowSide: THREE.DoubleSide
+				} );
+
+				clippedMesh = new THREE.Mesh( geometry, material );
+				clippedMesh.castShadow = true;
+				clippedMesh.renderOrder = renderOrder + 1;
+				object.add( clippedMesh );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 9, 9 ),
+					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.25, side: THREE.DoubleSide } )
+				);
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, stencil: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x263238 );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.localClippingEnabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, assetBox.getCenter( new THREE.Vector3() ).y, 0 );
+				controls.minDistance = 2;
+				controls.maxDistance = 12;
+				controls.update();
+
+				const gui = new GUI();
+				gui.add( params, 'animate' );
+
+				const pyramidFolder = gui.addFolder( 'pyramid' );
+				pyramidFolder.add( params.pyramid, 'enabled' ).onChange( updateVolumeState );
+				pyramidFolder.add( params.pyramid, 'mode', [ 'exclude', 'include' ] ).onChange( updateVolumeState );
+				pyramidFolder.add( params.pyramid, 'displayHelper' ).onChange( updateVolumeState );
+				pyramidFolder.open();
+
+				const boxFolder = gui.addFolder( 'box' );
+				boxFolder.add( params.box, 'enabled' ).onChange( updateVolumeState );
+				boxFolder.add( params.box, 'mode', [ 'exclude', 'include' ] ).onChange( updateVolumeState );
+				boxFolder.add( params.box, 'displayHelper' ).onChange( updateVolumeState );
+				boxFolder.open();
+
+				updateVolumeState();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( params.animate ) {
+
+					const delta = timer.getDelta();
+					object.rotation.x += delta * 0.4;
+					object.rotation.y += delta * 0.2;
+
+				}
+
+				stats.begin();
+				renderer.render( scene, camera );
+				stats.end();
+
+			}
+
+			init();
+
+		</script>
+
+	</body>
+</html>

@@ -24,6 +24,7 @@
 	"webgl_clipping_advanced": [ "solid" ],
 	"webgl_clipping_intersection": [ "solid" ],
 	"webgl_clipping_stencil": [ "solid" ],
+	"webgl_clipping_stencil_volumes": [ "solid", "volumes", "stencil" ],
 	"webgl_decals": [ "normals" ],
 	"webgl_depth_texture": [ "renderTarget" ],
 	"webgl_framebuffer_texture": [ "renderTarget" ],
