@@ -31477,12 +31477,12 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const size = this._getAttributeMemorySize( readbackBuffer.attribute );
-		this.memoryMap.set( readbackBuffer, { size, type: 'readbackBuffers' } );
+		const maxByteLength = readbackBuffer.maxByteLength;
+		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
 
 		this.memory.readbackBuffers ++;
-		this.memory.total += size;
-		this.memory.readbackBuffersSize += size;
+		this.memory.total += maxByteLength;
+		this.memory.readbackBuffersSize += maxByteLength;
 
 	}
 
@@ -31493,7 +31493,12 @@ class Info {
 	 */
 	destroyReadbackBuffer( readbackBuffer ) {
 
-		this.destroyAttribute( readbackBuffer );
+		const { size } = this.memoryMap.get( readbackBuffer );
+		this.memoryMap.delete( readbackBuffer );
+
+		this.memory.readbackBuffers --;
+		this.memory.total -= size;
+		this.memory.readbackBuffersSize -= size;
 
 	}
 
@@ -38057,6 +38062,10 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.FRAME ) {
+
+			this.updateType = NodeUpdateType.FRAME;
+
 		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
 
 			this.updateBeforeType = NodeUpdateType.OBJECT;
@@ -38064,6 +38073,10 @@ class EventNode extends Node {
 		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
 
 			this.updateBeforeType = NodeUpdateType.RENDER;
+
+		} else if ( eventType === EventNode.BEFORE_FRAME ) {
+
+			this.updateBeforeType = NodeUpdateType.FRAME;
 
 		}
 
@@ -38085,8 +38098,10 @@ class EventNode extends Node {
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.FRAME = 'frame';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
+EventNode.BEFORE_FRAME = 'beforeFrame';
 
 /**
  * Helper to create an EventNode and add it to the stack.
@@ -38118,6 +38133,16 @@ const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback )
 const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
 
 /**
+ * Creates an event that triggers a function every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
+
+/**
  * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
  *
  * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
@@ -38136,6 +38161,16 @@ const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFORE_OBJEC
  * @returns {EventNode}
  */
 const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
 
 /**
  * This special type of instanced buffer attribute is intended for compute shaders.
@@ -47363,8 +47398,10 @@ var TSL = /*#__PURE__*/Object.freeze({
 	NodeShaderStage: NodeShaderStage,
 	NodeType: NodeType,
 	NodeUpdateType: NodeUpdateType,
+	OnBeforeFrameUpdate: OnBeforeFrameUpdate,
 	OnBeforeMaterialUpdate: OnBeforeMaterialUpdate,
 	OnBeforeObjectUpdate: OnBeforeObjectUpdate,
+	OnFrameUpdate: OnFrameUpdate,
 	OnMaterialUpdate: OnMaterialUpdate,
 	OnObjectUpdate: OnObjectUpdate,
 	PCFShadowFilter: PCFShadowFilter,
@@ -57733,65 +57770,6 @@ class CanvasTarget extends EventDispatcher {
 
 }
 
-/**
- * A readback buffer is used to transfer data from the GPU to the CPU.
- * It is primarily used to read back compute shader results.
- *
- * @augments EventDispatcher
- */
-class ReadbackBuffer extends EventDispatcher {
-
-	/**
-	 * Constructs a new readback buffer.
-	 *
-	 * @param {BufferAttribute} attribute - The buffer attribute.
-	 */
-	constructor( attribute ) {
-
-		super();
-
-		/**
-		 * The buffer attribute.
-		 *
-		 * @type {BufferAttribute}
-		 */
-		this.attribute = attribute;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isReadbackBuffer = true;
-
-	}
-
-	/**
-	 * Releases the mapped buffer data so the GPU buffer can be
-	 * used by the GPU again.
-	 *
-	 * Note: Any `ArrayBuffer` data associated with this readback buffer
-	 * are removed and no longer accessible after calling this method.
-	 */
-	release() {
-
-		this.dispatchEvent( { type: 'release' } );
-
-	}
-
-	/**
-	 * Frees internal resources.
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
-	}
-
-}
-
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
@@ -59666,61 +59644,42 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute|ReadbackBuffer} buffer - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( buffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
 
-		let readbackBuffer = buffer;
+		// tally the memory for this readback buffer
+		if ( target !== null && target.isReadbackBuffer ) {
 
-		if ( readbackBuffer.isReadbackBuffer !== true ) {
+			if ( this.info.memoryMap.has( target ) === false ) {
 
-			const attribute = buffer;
-			const attributeData = this.backend.get( attribute );
+				this.info.createReadbackBuffer( target );
 
-			readbackBuffer = attributeData.readbackBuffer;
+				const disposeInfo = () => {
 
-			if ( readbackBuffer === undefined ) {
+					target.removeEventListener( 'dispose', disposeInfo );
 
-				readbackBuffer = new ReadbackBuffer( attribute );
-
-				const dispose = () => {
-
-					attribute.removeEventListener( 'dispose', dispose );
-
-					readbackBuffer.dispose();
-
-					delete attributeData.readbackBuffer;
+					this.info.destroyReadbackBuffer( target );
 
 				};
 
-				attribute.addEventListener( 'dispose', dispose );
-
-				attributeData.readbackBuffer = readbackBuffer;
+				target.addEventListener( 'dispose', disposeInfo );
 
 			}
 
 		}
 
-		if ( this.info.memoryMap.has( readbackBuffer ) === false ) {
+		if ( offset % 4 !== 0 || ( count > 0 && count % 4 !== 0 ) ) {
 
-			this.info.createReadbackBuffer( readbackBuffer );
-
-			const disposeInfo = () => {
-
-				readbackBuffer.removeEventListener( 'dispose', disposeInfo );
-
-				this.info.destroyReadbackBuffer( readbackBuffer );
-
-			};
-
-			readbackBuffer.addEventListener( 'dispose', disposeInfo );
+			throw new Error( 'THREE.Renderer: "getArrayBufferAsync()" offset and count must be a multiple of 4.' );
 
 		}
 
-		readbackBuffer.release();
-
-		return await this.backend.getArrayBufferAsync( readbackBuffer );
+		return await this.backend.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -65385,76 +65344,81 @@ class WebGLAttributeUtils {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const attribute = readbackBuffer.attribute;
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const { bufferGPU } = backend.get( bufferAttribute );
+		const attributeInfo = backend.get( bufferAttribute );
+		const { bufferGPU } = attributeInfo;
 
-		const array = attribute.array;
-		const byteLength = array.byteLength;
+		const byteLength = count === -1 ? attributeInfo.byteLength - offset : count;
 
-		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		// read the data back
+		let dstBuffer;
+		if ( target === null ) {
 
-		const readbackBufferData = backend.get( readbackBuffer );
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
 
-		let { writeBuffer } = readbackBufferData;
+		} else if ( target.isReadbackBuffer ) {
 
-		if ( writeBuffer === undefined ) {
+			if ( target._mapped === true ) {
 
-			writeBuffer = gl.createBuffer();
+				throw new Error( 'WebGPURenderer: ReadbackBuffer must be released before being used again.' );
 
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-			gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
+			}
 
-			// dispose
+			const releaseCallback = () => {
 
-			const dispose = () => {
-
-				gl.deleteBuffer( writeBuffer );
-
-				backend.delete( readbackBuffer );
-
-				readbackBuffer.removeEventListener( 'dispose', dispose );
+				target.buffer = null;
+				target._mapped = false;
+				target.removeEventListener( 'release', releaseCallback );
+				target.removeEventListener( 'dispose', releaseCallback );
 
 			};
 
-			readbackBuffer.addEventListener( 'dispose', dispose );
+			target.addEventListener( 'release', releaseCallback );
+			target.addEventListener( 'dispose', releaseCallback );
 
-			// register
-
-			readbackBufferData.writeBuffer = writeBuffer;
+			// WebGL has no concept of a "mapped" data buffer so we create a new buffer, instead.
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
+			target.buffer = dstBuffer.buffer;
 
 		} else {
 
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+			dstBuffer = new Uint8Array( target );
 
 		}
 
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
-
-		await backend.utils._clientWaitAsync();
-
-		const dstBuffer = new attribute.array.constructor( array.length );
-
 		// Ensure the buffer is bound before reading
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-
-		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
+		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		gl.getBufferSubData( gl.COPY_READ_BUFFER, offset, dstBuffer );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer;
+		// return the appropriate type
+		if ( target && target.isReadbackBuffer ) {
+
+			return target;
+
+		} else {
+
+			return dstBuffer.buffer;
+
+		}
 
 	}
 
@@ -69581,15 +69545,20 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -73581,7 +73550,9 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange();
+		const buffer = readBuffer.getMappedRange().slice();
+
+		readBuffer.destroy();
 
 		return new typedArrayType( buffer );
 
@@ -77884,82 +77855,137 @@ class WebGPUAttributeUtils {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
 
 		const backend = this.backend;
 		const device = backend.device;
-		const attribute = readbackBuffer.attribute;
 
 		const data = backend.get( this._getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
-		const size = bufferGPU.size;
+		const byteLength = count === -1 ? bufferGPU.size - offset : count;
 
-		const readbackBufferData = backend.get( readbackBuffer );
+		let readBufferGPU;
+		if ( target !== null && target.isReadbackBuffer ) {
 
-		let { readBufferGPU } = readbackBufferData;
+			const readbackInfo = backend.get( target );
 
-		if ( readBufferGPU === undefined ) {
+			if ( target._mapped === true ) {
 
+				throw new Error( 'WebGPURenderer: ReadbackBuffer must be released before being used again.' );
+
+			}
+
+			target._mapped = true;
+
+			// initialize the GPU-side read copy buffer if it is not present
+			if ( readbackInfo.readBufferGPU === undefined ) {
+
+				readBufferGPU = device.createBuffer( {
+					label: `${ target.name }_readback`,
+					size: target.maxByteLength,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+				} );
+
+				// release / dispose
+				const releaseCallback = () => {
+
+					target.buffer = null;
+					target._mapped = false;
+
+					readBufferGPU.unmap();
+
+				};
+
+				const disposeCallback = () => {
+
+					target.buffer = null;
+					target._mapped = false;
+
+					readBufferGPU.destroy();
+
+					backend.delete( target );
+
+					target.removeEventListener( 'release', releaseCallback );
+					target.removeEventListener( 'dispose', disposeCallback );
+
+				};
+
+				target.addEventListener( 'release', releaseCallback );
+				target.addEventListener( 'dispose', disposeCallback );
+
+				// register
+				readbackInfo.readBufferGPU = readBufferGPU;
+
+			} else {
+
+				readBufferGPU = readbackInfo.readBufferGPU;
+
+			}
+
+		} else {
+
+			// create a new temp buffer for array buffers otherwise
 			readBufferGPU = device.createBuffer( {
 				label: `${ attribute.name }_readback`,
-				size,
+				size: byteLength,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
 
-			// release / dispose
-
-			const release = () => {
-
-				readBufferGPU.unmap();
-
-			};
-
-			const dispose = () => {
-
-				readBufferGPU.destroy();
-
-				backend.delete( readbackBuffer );
-
-				readbackBuffer.removeEventListener( 'release', release );
-				readbackBuffer.removeEventListener( 'dispose', dispose );
-
-			};
-
-			readbackBuffer.addEventListener( 'release', release );
-			readbackBuffer.addEventListener( 'dispose', dispose );
-
-			// register
-
-			readbackBufferData.readBufferGPU = readBufferGPU;
-
 		}
 
+		// copy the data
 		const cmdEncoder = device.createCommandEncoder( {
 			label: `readback_encoder_${ attribute.name }`
 		} );
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
-			0,
+			offset,
 			readBufferGPU,
 			0,
-			size
+			byteLength,
 		);
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
 
-		await readBufferGPU.mapAsync( GPUMapMode.READ );
+		// map the data to the CPU
+		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );
 
-		const arrayBuffer = readBufferGPU.getMappedRange();
+		if ( target === null ) {
 
-		return arrayBuffer;
+			// return a new array buffer and clean up the gpu handles
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, byteLength );
+			const result = arrayBuffer.slice();
+			readBufferGPU.destroy();
+			return result;
+
+		} else if ( target.isReadbackBuffer ) {
+
+			// assign the data to the read back handle
+			target.buffer = readBufferGPU.getMappedRange( 0, byteLength );
+			return target;
+
+		} else {
+
+			// copy the data into the target array buffer
+			const arrayBuffer = readBufferGPU.getMappedRange( 0, byteLength );
+			new Uint8Array( target ).set( new Uint8Array( arrayBuffer ) );
+			readBufferGPU.destroy();
+			return target;
+
+		}
 
 	}
 
@@ -80155,15 +80181,20 @@ class WebGPUBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -81438,20 +81469,17 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				const count = 1;
-				const firstInstance = i;
-
 				if ( hasIndex === true ) {
 
-					passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
+					passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
 
 				} else {
 
-					passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+					passEncoderGPU.draw( counts[ i ], 1, starts[ i ], i );
 
 				}
 
-				info.update( object, counts[ i ], count );
+				info.update( object, counts[ i ], 1 );
 
 			}
 
@@ -82965,6 +82993,81 @@ class PostProcessing extends RenderPipeline {
 }
 
 /**
+ * A readback buffer is used to transfer data from the GPU to the CPU.
+ * It is primarily used to read back compute shader results.
+ *
+ * @augments EventDispatcher
+ */
+class ReadbackBuffer extends EventDispatcher {
+
+	/**
+	 * Constructs a new readback buffer.
+	 *
+	 * @param {number} maxByteLength - The maximum size of the buffer to be read back.
+	 */
+	constructor( maxByteLength ) {
+
+		super();
+
+		/**
+		 * Name used for debugging purposes.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+
+		/**
+		 * The mapped, read back array buffer.
+		 *
+		 * @type {ArrayBuffer|null}
+		 */
+		this.buffer = null;
+
+		/**
+		 * The maximum size of the buffer to be read back.
+		 *
+		 * @type {number}
+		 */
+		this.maxByteLength = maxByteLength;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isReadbackBuffer = true;
+
+		this._mapped = false;
+
+	}
+
+	/**
+	 * Releases the mapped buffer data so the GPU buffer can be
+	 * used by the GPU again.
+	 *
+	 * Note: Any `ArrayBuffer` data associated with this readback buffer
+	 * are removed and no longer accessible after calling this method.
+	 */
+	release() {
+
+		this.dispatchEvent( { type: 'release' } );
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+}
+
+/**
  * This special type of texture is intended for compute shaders.
  * It can be used to compute the data of a texture with a compute shader.
  *
@@ -83452,6 +83555,24 @@ class NodeObjectLoader extends ObjectLoader {
 		this._nodesJSON = json.nodes;
 
 		const data = super.parse( json, onLoad );
+
+		this._nodesJSON = null; // dispose
+
+		return data;
+
+	}
+
+	/**
+	 * Async version of {@link NodeObjectLoader#parse}.
+	 *
+	 * @param {Object} json - The JSON definition
+	 * @return {Promise<Object3D>} A Promise that resolves with the parsed 3D object.
+	 */
+	async parseAsync( json ) {
+
+		this._nodesJSON = json.nodes;
+
+		const data = await super.parseAsync( json );
 
 		this._nodesJSON = null; // dispose
 

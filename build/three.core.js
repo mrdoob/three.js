@@ -37315,10 +37315,7 @@ function cloneUniforms( src ) {
 
 			const property = src[ u ][ p ];
 
-			if ( property && ( property.isColor ||
-				property.isMatrix3 || property.isMatrix4 ||
-				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture || property.isQuaternion ) ) {
+			if ( isThreeObject( property ) ) {
 
 				if ( property.isRenderTargetTexture ) {
 
@@ -37333,7 +37330,23 @@ function cloneUniforms( src ) {
 
 			} else if ( Array.isArray( property ) ) {
 
-				dst[ u ][ p ] = property.slice();
+				if ( isThreeObject( property[ 0 ] ) ) {
+
+					const clonedProperty = [];
+
+					for ( let i = 0, l = property.length; i < l; i ++ ) {
+
+						clonedProperty[ i ] = property[ i ].clone();
+
+					}
+
+					dst[ u ][ p ] = clonedProperty;
+
+				} else {
+
+					dst[ u ][ p ] = property.slice();
+
+				}
 
 			} else {
 
@@ -37374,6 +37387,15 @@ function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+function isThreeObject( property ) {
+
+	return ( property && ( property.isColor ||
+		property.isMatrix3 || property.isMatrix4 ||
+		property.isVector2 || property.isVector3 || property.isVector4 ||
+		property.isTexture || property.isQuaternion ) );
 
 }
 
@@ -44071,7 +44093,6 @@ class FileLoader extends Loader {
 	 * @param {function(any)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
 	 * @param {onErrorCallback} [onError] - Executed when errors occur.
-	 * @return {any|undefined} The cached resource if available.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
@@ -44095,7 +44116,7 @@ class FileLoader extends Loader {
 
 			}, 0 );
 
-			return cached;
+			return;
 
 		}
 
@@ -49545,6 +49566,9 @@ class ImageBitmapLoader extends Loader {
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
 	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
 	 *
+	 * Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
+	 * different options will return the cached result of the first request.
+	 *
 	 * @param {Object} options - The loader options to set.
 	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
 	 */
@@ -49563,7 +49587,6 @@ class ImageBitmapLoader extends Loader {
 	 * @param {function(ImageBitmap)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
-	 * @return {ImageBitmap|undefined} The image bitmap.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
@@ -49601,8 +49624,6 @@ class ImageBitmapLoader extends Loader {
 
 						scope.manager.itemEnd( url );
 
-						return imageBitmap;
-
 					}
 
 				} );
@@ -49620,7 +49641,7 @@ class ImageBitmapLoader extends Loader {
 
 			}, 0 );
 
-			return cached;
+			return;
 
 		}
 
@@ -49644,8 +49665,6 @@ class ImageBitmapLoader extends Loader {
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
-
-			return imageBitmap;
 
 		} ).catch( function ( e ) {
 
@@ -49777,11 +49796,21 @@ class AudioLoader extends Loader {
 				const bufferCopy = buffer.slice( 0 );
 
 				const context = AudioContext.getContext();
+
+				const decodeUrl = url + '#decode';
+				scope.manager.itemStart( decodeUrl ); // prevent loading manager from completing too early, see #33378
+
 				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
 					onLoad( audioBuffer );
+					scope.manager.itemEnd( decodeUrl );
 
-				} ).catch( handleError );
+				} ).catch( function ( e ) {
+
+					handleError( e );
+					scope.manager.itemEnd( decodeUrl );
+
+				} );
 
 			} catch ( e ) {
 
