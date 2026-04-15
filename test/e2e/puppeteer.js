@@ -98,7 +98,6 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
-const numAttempts = 2; // perform 2 attempts before failing
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -282,7 +281,7 @@ async function main() {
 
 	for ( const file of files ) {
 
-		await makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
+		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
 
 	}
 
@@ -428,7 +427,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
 
 	try {
 
@@ -577,23 +576,13 @@ async function makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot,
 
 	} catch ( e ) {
 
-		if ( attemptID === numAttempts - 1 ) {
+		console.red( e );
+		failedScreenshots.push( file );
 
-			console.red( e );
-			failedScreenshots.push( file );
+		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
-		} else {
-
-			console.yellow( `${ e }, another attempt...` );
-
-			if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
-
-				console.yellow( 'Restarting browser due to WebGPU Device Lost...' );
-				await ctx.restart();
-
-			}
-
-			await makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+			console.yellow( 'Restarting browser due to WebGPU Device Lost...' );
+			await ctx.restart();
 
 		}
 
