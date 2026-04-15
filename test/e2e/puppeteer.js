@@ -20,6 +20,7 @@ const exceptionList = [
 	// Needs investigation
 	'physics_rapier_instancing',
 	'physics_jolt_instancing',
+	'webaudio_visualizer',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
 	'webgl_postprocessing_glitch',
@@ -57,7 +58,6 @@ const exceptionList = [
 	// Webcam
 	'webgl_materials_video_webcam',
 	'webgl_morphtargets_webcam',
-
 
 ];
 
