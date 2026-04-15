@@ -128,6 +128,9 @@ class BloomPass extends Pass {
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
 
+		const oldAutoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
 		// Render quad with blurred scene into texture (convolution pass 1)
 
 		this._fsQuad.material = this.materialConvolution;
@@ -160,6 +163,8 @@ class BloomPass extends Pass {
 		renderer.setRenderTarget( readBuffer );
 		if ( this.clear ) renderer.clear();
 		this._fsQuad.render( renderer );
+
+		renderer.autoClear = oldAutoClear;
 
 	}
 
