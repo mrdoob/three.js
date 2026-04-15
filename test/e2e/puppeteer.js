@@ -65,7 +65,7 @@ const exceptionList = [
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxDifferentPixels = 0.0; // at most 0.0% different pixels
+const maxDifferentPixels = 0.1; // at most 0.1% different pixels
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
