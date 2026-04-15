@@ -430,7 +430,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
 
 			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
-				( renderer.localClippingEnabled && material.clipShadows === true && material.clippingVolumes !== undefined ) ||
+				( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingVolumes ) && material.clippingVolumes.length !== 0 ) ||
 				( material.displacementMap && material.displacementScale !== 0 ) ||
 				( material.alphaMap && material.alphaTest > 0 ) ||
 				( material.map && material.alphaTest > 0 ) ||
