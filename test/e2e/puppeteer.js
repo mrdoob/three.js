@@ -562,7 +562,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
 			console.yellow( `${ e }` );
-			console.yellow( 'Restarting browser due to WebGPU Device Lost...' );
+			console.yellow( 'Restarting browser...' );
 			await ctx.restart();
 
 		} else {
