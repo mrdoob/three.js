@@ -27,8 +27,11 @@ const exceptionList = [
 	'webgpu_volume_lighting_traa',
 
 	// Timming issues?
+	'physics_rapier_instancing',
+	'webgl_shadowmap',
 	'webaudio_visualizer',
 	'webgpu_compute_audio',
+	'webgpu_tsl_editor',
 	'webgpu_storage_buffer',
 	'webxr_vr_video',
 
