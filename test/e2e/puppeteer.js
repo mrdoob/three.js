@@ -57,33 +57,7 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam',
-
-	// WebGPU Device Lost
-	'webgpu_compute_cloth',
-	'webgpu_compute_particles_fluid',
-	'webgpu_cubemap_adjustments',
-	'webgpu_cubemap_dynamic',
-	'webgpu_custom_fog_background',
-	'webgpu_loader_gltf',
-	'webgpu_loader_gltf_anisotropy',
-	'webgpu_loader_gltf_sheen',
-	'webgpu_loader_gltf_transmission',
-	'webgpu_loader_materialxr',
-	'webgpu_materials_displacementmap',
-	'webgpu_pmrem_equirectangular',
-	'webgpu_postprocessing_dof_basic',
-	'webgpu_postprocessing_lensflare',
-	'webgpu_postprocessing_ssr',
-	'webgpu_reflection_roughness',
-	'webgpu_shadowmap',
-	'webgpu_tsl_angular_slicing',
-	'webgpu_tsl_graph',
-	'webgpu_tsl_raging_sea',
-	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_tsl_wood',
-	'webgpu_tonemapping',
-	'webgpu_upscaling_taau'
+	'webgl_morphtargets_webcam'
 
 ];
 
