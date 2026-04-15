@@ -241,7 +241,15 @@ async function main() {
 		page: await launchPage(),
 		async restart() {
 
-			try { await browser.close(); } catch ( e ) {}
+			// SIGKILL the whole Chrome process tree; browser.close() can hang after a wedged GPU process
+			const proc = browser.process();
+			if ( proc ) {
+
+				proc.kill( 'SIGKILL' );
+				await new Promise( resolve => proc.once( 'exit', resolve ) );
+
+			}
+
 			errorMessagesCache.length = 0;
 			ctx.page = await launchPage();
 
