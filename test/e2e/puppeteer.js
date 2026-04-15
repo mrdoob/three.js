@@ -225,7 +225,7 @@ async function main() {
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
-	browser = await puppeteer.launch( {
+	const launchOptions = {
 		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
 		env: { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' },
 		args: flags,
@@ -233,7 +233,7 @@ async function main() {
 		handleSIGINT: false,
 		protocolTimeout: 0,
 		userDataDir: './.puppeteer_profile'
-	} );
+	};
 
 	/* Prepare injections */
 
@@ -256,8 +256,25 @@ async function main() {
 
 	const errorMessagesCache = [];
 
-	const page = await browser.newPage();
-	await preparePage( page, injection, builds, errorMessagesCache );
+	const launchPage = async () => {
+
+		browser = await puppeteer.launch( launchOptions );
+		const page = await browser.newPage();
+		await preparePage( page, injection, builds, errorMessagesCache );
+		return page;
+
+	};
+
+	const ctx = {
+		page: await launchPage(),
+		async restart() {
+
+			try { await browser.close(); } catch ( e ) {}
+			errorMessagesCache.length = 0;
+			ctx.page = await launchPage();
+
+		}
+	};
 
 	/* Loop for each file */
 
@@ -265,7 +282,7 @@ async function main() {
 
 	for ( const file of files ) {
 
-		await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+		await makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
 
 	}
 
@@ -411,19 +428,19 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
 	try {
 
-		page.file = file;
-		page.pageSize = 0;
-		page.error = undefined;
+		ctx.page.file = file;
+		ctx.page.pageSize = 0;
+		ctx.page.error = undefined;
 
 		/* Load target page */
 
 		try {
 
-			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
+			await ctx.page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
 				timeout: networkTimeout * 60000
 			} );
@@ -438,14 +455,14 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 			/* Render page */
 
-			await page.evaluate( cleanPage );
+			await ctx.page.evaluate( cleanPage );
 
-			await page.waitForNetworkIdle( {
+			await ctx.page.waitForNetworkIdle( {
 				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
+			await ctx.page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -477,7 +494,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 				} );
 
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, renderTimeout, ctx.page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
@@ -493,9 +510,9 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 		}
 
-		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
+		const screenshot = ( await Image.read( await ctx.page.screenshot() ) ).scale( 1 / viewScale );
 
-		if ( page.error !== undefined ) throw new Error( page.error );
+		if ( ctx.page.error !== undefined ) throw new Error( ctx.page.error );
 
 		if ( isMakeScreenshot ) {
 
@@ -568,13 +585,21 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+
+			if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
+
+				console.yellow( 'Restarting browser due to WebGPU Device Lost...' );
+				await ctx.restart();
+
+			}
+
+			await makeAttempt( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
 
 		}
 
 	} finally {
 
-		page.file = undefined; // release lock
+		ctx.page.file = undefined; // release lock
 
 	}
 
