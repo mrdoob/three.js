@@ -110,7 +110,7 @@ export default /* glsl */`
 					if ( ( UNROLLED_LOOP_INDEX >= planeStart ) && ( UNROLLED_LOOP_INDEX < planeEnd ) ) {
 
 						plane = clippingPlanes[ UNROLLED_LOOP_INDEX ];
-						insideVolume = ( dot( vClipPosition, plane.xyz ) <= plane.w ) && insideVolume;
+						insideVolume = ( dot( vClipPosition, plane.xyz ) < plane.w ) && insideVolume;
 
 					}
 
