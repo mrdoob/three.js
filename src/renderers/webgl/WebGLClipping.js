@@ -298,9 +298,27 @@ function WebGLClipping( properties ) {
 
 		}
 
-		const volumePlaneStartArray = new Int32Array( nVolumes );
-		const volumePlaneCountArray = new Int32Array( nVolumes );
-		const volumeModeArray = new Int32Array( nVolumes );
+		let volumePlaneStartArray = globalVolumePlaneStartState;
+		let volumePlaneCountArray = globalVolumePlaneCountState;
+		let volumeModeArray = globalVolumeModeState;
+
+		if ( volumePlaneStartArray === null || volumePlaneStartArray.length !== nVolumes ) {
+
+			volumePlaneStartArray = new Int32Array( nVolumes );
+
+		}
+
+		if ( volumePlaneCountArray === null || volumePlaneCountArray.length !== nVolumes ) {
+
+			volumePlaneCountArray = new Int32Array( nVolumes );
+
+		}
+
+		if ( volumeModeArray === null || volumeModeArray.length !== nVolumes ) {
+
+			volumeModeArray = new Int32Array( nVolumes );
+
+		}
 
 		let planeIndex = 0;
 		let nIncludeVolumes = 0;
@@ -321,7 +339,15 @@ function WebGLClipping( properties ) {
 
 		}
 
-		const dstArray = new Float32Array( planeIndex * 4 );
+		let dstArray = globalState;
+		const flatSize = planeIndex * 4;
+
+		if ( dstArray === null || dstArray.length !== flatSize ) {
+
+			dstArray = new Float32Array( flatSize );
+
+		}
+
 		const viewMatrix = camera.matrixWorldInverse;
 
 		viewNormalMatrix.getNormalMatrix( viewMatrix );
@@ -386,9 +412,23 @@ function WebGLClipping( properties ) {
 			nVolumes = nGlobalVolumes + nLocalVolumes;
 			nLocalIncludeVolumes = 0;
 
-			volumePlaneStartArray = new Int32Array( nVolumes );
-			volumePlaneCountArray = new Int32Array( nVolumes );
-			volumeModeArray = new Int32Array( nVolumes );
+			if ( volumePlaneStartArray === null || volumePlaneStartArray.length !== nVolumes ) {
+
+				volumePlaneStartArray = new Int32Array( nVolumes );
+
+			}
+
+			if ( volumePlaneCountArray === null || volumePlaneCountArray.length !== nVolumes ) {
+
+				volumePlaneCountArray = new Int32Array( nVolumes );
+
+			}
+
+			if ( volumeModeArray === null || volumeModeArray.length !== nVolumes ) {
+
+				volumeModeArray = new Int32Array( nVolumes );
+
+			}
 
 			if ( nGlobalVolumes !== 0 ) {
 
@@ -428,7 +468,7 @@ function WebGLClipping( properties ) {
 
 			viewNormalMatrix.getNormalMatrix( viewMatrix );
 
-			if ( dstArray === null || dstArray.length < flatSize ) {
+			if ( dstArray === null || dstArray.length !== flatSize ) {
 
 				dstArray = new Float32Array( flatSize );
 
