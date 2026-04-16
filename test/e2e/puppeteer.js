@@ -17,6 +17,10 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
+	// Requires HTML-in-Canvas API
+	'webgl_materials_texture_html',
+	'webgpu_materials_texture_html',
+
 	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
