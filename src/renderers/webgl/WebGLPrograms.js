@@ -53,7 +53,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 	}
 
-	function getParameters( material, lights, shadows, scene, object ) {
+	function getParameters( material, lights, shadows, scene, object, lightProbeGrids ) {
 
 		const fog = scene.fog;
 		const geometry = object.geometry;
@@ -344,6 +344,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			numLightProbes: lights.numLightProbes,
 
+			numLightProbeGrids: lightProbeGrids.length,
+
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
 
@@ -581,6 +583,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 20 );
 		if ( parameters.alphaToCoverage )
 			_programLayers.enable( 21 );
+		if ( parameters.numLightProbeGrids > 0 )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 

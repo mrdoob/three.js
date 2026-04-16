@@ -1,5 +1,6 @@
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { Vector3 } from '../../math/Vector3.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
 // Uniforms library for shared webgl shaders
@@ -191,7 +192,12 @@ const UniformsLib = {
 		} },
 
 		ltc_1: { value: null },
-		ltc_2: { value: null }
+		ltc_2: { value: null },
+
+		probesSH: { value: null },
+		probesMin: { value: /*@__PURE__*/ new Vector3() },
+		probesMax: { value: /*@__PURE__*/ new Vector3() },
+		probesResolution: { value: /*@__PURE__*/ new Vector3() }
 
 	},
 
