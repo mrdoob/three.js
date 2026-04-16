@@ -1,6 +1,7 @@
 import { error } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 import PropertyNode from './PropertyNode.js';
+import { structTypeNodeRegistry } from './StructNode.js';
 
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
@@ -46,7 +47,12 @@ class ParameterNode extends PropertyNode {
 	getMemberType( builder, name ) {
 
 		const type = this.getNodeType( builder );
-		const struct = builder.getStructTypeNode( type );
+
+		// First try the builder registry (populated after setup() runs).
+		// Fall back to the global struct registry for named structs — this handles
+		// cases where the struct type hasn't been built in the current shader stage
+		// yet (e.g. accessing s.get('v').x inside a layout function before setup).
+		const struct = builder.getStructTypeNode( type ) ?? structTypeNodeRegistry.get( type ) ?? null;
 
 		let memberType;
 

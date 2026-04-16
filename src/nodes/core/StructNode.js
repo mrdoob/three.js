@@ -84,6 +84,16 @@ class StructNode extends Node {
 export default StructNode;
 
 /**
+ * A global registry that maps struct type names to their StructTypeNode.
+ * Populated when a named struct is created via `struct()`. Used by
+ * ParameterNode to resolve member types before the struct has been built
+ * in the current shader stage.
+ *
+ * @type {Map<string, StructTypeNode>}
+ */
+export const structTypeNodeRegistry = new Map();
+
+/**
  * TSL function for creating a struct node.
  *
  * @tsl
@@ -128,6 +138,10 @@ export const struct = ( membersLayout, name = null ) => {
 
 	struct.layout = structLayout;
 	struct.isStruct = true;
+
+	// Register named structs globally so ParameterNode can resolve member
+	// types before the struct has been built in the current shader stage.
+	if ( name !== null ) structTypeNodeRegistry.set( name, structLayout );
 
 	return struct;
 
