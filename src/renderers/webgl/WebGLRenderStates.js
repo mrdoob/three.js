@@ -6,7 +6,7 @@ function WebGLRenderState( extensions ) {
 
 	const lightsArray = [];
 	const shadowsArray = [];
-	const lightProbeVolumesArray = [];
+	const lightProbeGridArray = [];
 
 	function init( camera ) {
 
@@ -14,7 +14,7 @@ function WebGLRenderState( extensions ) {
 
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
-		lightProbeVolumesArray.length = 0;
+		lightProbeGridArray.length = 0;
 
 	}
 
@@ -30,9 +30,9 @@ function WebGLRenderState( extensions ) {
 
 	}
 
-	function pushLightProbeVolume( volume ) {
+	function pushLightProbeGrid( volume ) {
 
-		lightProbeVolumesArray.push( volume );
+		lightProbeGridArray.push( volume );
 
 	}
 
@@ -51,7 +51,7 @@ function WebGLRenderState( extensions ) {
 	const state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
-		lightProbeVolumesArray: lightProbeVolumesArray,
+		lightProbeGridArray: lightProbeGridArray,
 
 		camera: null,
 
@@ -68,7 +68,7 @@ function WebGLRenderState( extensions ) {
 
 		pushLight: pushLight,
 		pushShadow: pushShadow,
-		pushLightProbeVolume: pushLightProbeVolume
+		pushLightProbeGrid: pushLightProbeGrid
 	};
 
 }

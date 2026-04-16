@@ -1814,9 +1814,9 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
-				} else if ( object.isLightProbeVolume ) {
+				} else if ( object.isLightProbeGrid ) {
 
-					currentRenderState.pushLightProbeVolume( object );
+					currentRenderState.pushLightProbeGrid( object );
 
 				} else if ( object.isLight ) {
 
@@ -2133,7 +2133,7 @@ class WebGLRenderer {
 
 			const lightsStateVersion = lights.state.version;
 
-			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeVolumesArray );
+			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeGridArray );
 			const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 			let programs = materialProperties.programs;
@@ -2225,7 +2225,7 @@ class WebGLRenderer {
 
 			}
 
-			materialProperties.lightProbeVolume = currentRenderState.state.lightProbeVolumesArray.length > 0;
+			materialProperties.lightProbeGrid = currentRenderState.state.lightProbeGridArray.length > 0;
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
@@ -2270,7 +2270,7 @@ class WebGLRenderer {
 
 		}
 
-		function findLightProbeVolume( volumes, object ) {
+		function findLightProbeGrid( volumes, object ) {
 
 			if ( volumes.length === 0 ) return null;
 
@@ -2450,7 +2450,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( !! materialProperties.lightProbeVolume !== ( currentRenderState.state.lightProbeVolumesArray.length > 0 ) ) {
+				} else if ( !! materialProperties.lightProbeGrid !== ( currentRenderState.state.lightProbeGridArray.length > 0 ) ) {
 
 					needsProgramChange = true;
 
@@ -2498,11 +2498,11 @@ class WebGLRenderer {
 
 			if ( materialProperties.needsLights ) {
 
-				const objectVolume = findLightProbeVolume( currentRenderState.state.lightProbeVolumesArray, object );
+				const objectVolume = findLightProbeGrid( currentRenderState.state.lightProbeGridArray, object );
 
-				if ( materialProperties.lightProbeVolume !== objectVolume ) {
+				if ( materialProperties.lightProbeGrid !== objectVolume ) {
 
-					materialProperties.lightProbeVolume = objectVolume;
+					materialProperties.lightProbeGrid = objectVolume;
 					refreshMaterial = true;
 
 				}
@@ -2690,14 +2690,14 @@ class WebGLRenderer {
 
 				// light probe volume
 
-				if ( materialProperties.needsLights && materialProperties.lightProbeVolume ) {
+				if ( materialProperties.needsLights && materialProperties.lightProbeGrid ) {
 
-					const volume = materialProperties.lightProbeVolume;
+					const volume = materialProperties.lightProbeGrid;
 
-					m_uniforms.probeGridSH.value = volume.texture;
-					m_uniforms.probeGridMin.value.copy( volume.boundingBox.min );
-					m_uniforms.probeGridMax.value.copy( volume.boundingBox.max );
-					m_uniforms.probeGridResolution.value.copy( volume.resolution );
+					m_uniforms.probesSH.value = volume.texture;
+					m_uniforms.probesMin.value.copy( volume.boundingBox.min );
+					m_uniforms.probesMax.value.copy( volume.boundingBox.max );
+					m_uniforms.probesResolution.value.copy( volume.resolution );
 
 				}
 

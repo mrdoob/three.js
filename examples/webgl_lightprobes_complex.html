@@ -28,12 +28,12 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
-			import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls;
-			let probeGridLeft, probeGridRight;
-			let probeGridHelperLeft, probeGridHelperRight;
+			let probesLeft, probesRight;
+			let probesHelperLeft, probesHelperRight;
 
 			init();
 
@@ -286,53 +286,53 @@
 
 					// Left volume
 
-					if ( probeGridLeft ) {
+					if ( probesLeft ) {
 
-						scene.remove( probeGridLeft );
-						probeGridLeft.dispose();
+						scene.remove( probesLeft );
+						probesLeft.dispose();
 
 					}
 
-					probeGridLeft = new LightProbeVolume( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probeGridLeft.position.set( - 3.9, 2.45, 0 );
-					probeGridLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probeGridLeft.visible = params.enabled;
-					scene.add( probeGridLeft );
+					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
+					probesLeft.position.set( - 3.9, 2.45, 0 );
+					probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probesLeft.visible = params.enabled;
+					scene.add( probesLeft );
 
 					// Right volume
 
-					if ( probeGridRight ) {
+					if ( probesRight ) {
 
-						scene.remove( probeGridRight );
-						probeGridRight.dispose();
+						scene.remove( probesRight );
+						probesRight.dispose();
 
 					}
 
-					probeGridRight = new LightProbeVolume( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probeGridRight.position.set( 3.9, 2.45, 0 );
-					probeGridRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probeGridRight.visible = params.enabled;
-					scene.add( probeGridRight );
+					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
+					probesRight.position.set( 3.9, 2.45, 0 );
+					probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probesRight.visible = params.enabled;
+					scene.add( probesRight );
 
 					// Update debug visualization
 
-					if ( ! probeGridHelperLeft ) {
+					if ( ! probesHelperLeft ) {
 
-						probeGridHelperLeft = new LightProbeVolumeHelper( probeGridLeft );
-						probeGridHelperLeft.visible = params.showProbes;
-						scene.add( probeGridHelperLeft );
+						probesHelperLeft = new LightProbeGridHelper( probesLeft );
+						probesHelperLeft.visible = params.showProbes;
+						scene.add( probesHelperLeft );
 
-						probeGridHelperRight = new LightProbeVolumeHelper( probeGridRight );
-						probeGridHelperRight.visible = params.showProbes;
-						scene.add( probeGridHelperRight );
+						probesHelperRight = new LightProbeGridHelper( probesRight );
+						probesHelperRight.visible = params.showProbes;
+						scene.add( probesHelperRight );
 
 					} else {
 
-						probeGridHelperLeft.probeGrid = probeGridLeft;
-						probeGridHelperLeft.update();
+						probesHelperLeft.probes = probesLeft;
+						probesHelperLeft.update();
 
-						probeGridHelperRight.probeGrid = probeGridRight;
-						probeGridHelperRight.update();
+						probesHelperRight.probes = probesRight;
+						probesHelperRight.update();
 
 					}
 
@@ -345,8 +345,8 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					probeGridLeft.visible = value;
-					probeGridRight.visible = value;
+					probesLeft.visible = value;
+					probesRight.visible = value;
 
 				} );
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onFinishChange( ( value ) => {
@@ -356,8 +356,8 @@
 				} );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					probeGridHelperLeft.visible = value;
-					probeGridHelperRight.visible = value;
+					probesHelperLeft.visible = value;
+					probesHelperRight.visible = value;
 
 				} );
 

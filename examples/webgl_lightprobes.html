@@ -28,11 +28,11 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
-			import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls;
-			let probeGrid, probeGridHelper;
+			let probes, probesHelper;
 
 			init();
 
@@ -155,31 +155,31 @@
 
 				async function bakeWithResolution( resolution ) {
 
-					if ( probeGrid ) {
+					if ( probes ) {
 
-						scene.remove( probeGrid );
-						probeGrid.dispose();
+						scene.remove( probes );
+						probes.dispose();
 
 					}
 
-					probeGrid = new LightProbeVolume( 5.6, 4.7, 5.6, resolution, resolution, resolution );
-					probeGrid.position.set( 0, 2.45, 0 );
-					probeGrid.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probeGrid.visible = params.enabled;
-					scene.add( probeGrid );
+					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
+					probes.position.set( 0, 2.45, 0 );
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probes.visible = params.enabled;
+					scene.add( probes );
 
 					// Update debug visualization
 
-					if ( ! probeGridHelper ) {
+					if ( ! probesHelper ) {
 
-						probeGridHelper = new LightProbeVolumeHelper( probeGrid );
-						probeGridHelper.visible = params.showProbes;
-						scene.add( probeGridHelper );
+						probesHelper = new LightProbeGridHelper( probes );
+						probesHelper.visible = params.showProbes;
+						scene.add( probesHelper );
 
 					} else {
 
-						probeGridHelper.probeGrid = probeGrid;
-						probeGridHelper.update();
+						probesHelper.probes = probes;
+						probesHelper.update();
 
 					}
 
@@ -198,7 +198,7 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					probeGrid.visible = value;
+					probes.visible = value;
 
 				} );
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onFinishChange( ( value ) => {
@@ -208,7 +208,7 @@
 				} );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					probeGridHelper.visible = value;
+					probesHelper.visible = value;
 
 				} );
 

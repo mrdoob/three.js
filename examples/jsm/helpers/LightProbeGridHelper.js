@@ -8,28 +8,28 @@ import {
 } from 'three';
 
 /**
- * Visualizes an {@link LightProbeVolume} by rendering a sphere at each
+ * Visualizes an {@link LightProbeGrid} by rendering a sphere at each
  * probe position, shaded with the probe's L1 spherical harmonics.
  *
  * Uses a single `InstancedMesh` draw call for all probes.
  *
  * ```js
- * const helper = new LightProbeVolumeHelper( probeGrid );
+ * const helper = new LightProbeGridHelper( probes );
  * scene.add( helper );
  * ```
  *
  * @augments InstancedMesh
- * @three_import import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
+ * @three_import import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
  */
-class LightProbeVolumeHelper extends InstancedMesh {
+class LightProbeGridHelper extends InstancedMesh {
 
 	/**
 	 * Constructs a new irradiance probe grid helper.
 	 *
-	 * @param {LightProbeVolume} probeGrid - The probe grid to visualize.
+	 * @param {LightProbeGrid} probes - The probe grid to visualize.
 	 * @param {number} [sphereSize=0.12] - The radius of each probe sphere.
 	 */
-	constructor( probeGrid, sphereSize = 0.12 ) {
+	constructor( probes, sphereSize = 0.12 ) {
 
 		const geometry = new SphereGeometry( sphereSize, 16, 16 );
 
@@ -37,8 +37,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 			uniforms: {
 
-				probeGridSH: { value: null },
-				probeGridResolution: { value: new Vector3() },
+				probesSH: { value: null },
+				probesResolution: { value: new Vector3() },
 
 			},
 
@@ -63,27 +63,27 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 				precision highp sampler3D;
 
-				uniform sampler3D probeGridSH;
-				uniform vec3 probeGridResolution;
+				uniform sampler3D probesSH;
+				uniform vec3 probesResolution;
 
 				varying vec3 vWorldNormal;
 				varying vec3 vUVW;
 
 				void main() {
 
-					// Atlas UV mapping — must match light_probe_volume_pars_fragment.glsl.js
-					float nz          = probeGridResolution.z;
+					// Atlas UV mapping — must match lightprobes_pars_fragment.glsl.js
+					float nz          = probesResolution.z;
 					float paddedSlices = nz + 2.0;
 					float atlasDepth  = 7.0 * paddedSlices;
 					float uvZBase     = vUVW.z * nz + 1.0;
 
-					vec4 s0 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ) );
-					vec4 s1 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
-					vec4 s2 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s3 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s4 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s5 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s6 = texture( probeGridSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s0 = texture( probesSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ) );
+					vec4 s1 = texture( probesSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
+					vec4 s2 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s3 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s4 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s5 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s6 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
 
 					// Unpack 9 vec3 SH L2 coefficients
 
@@ -127,7 +127,7 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 		} );
 
-		const res = probeGrid.resolution;
+		const res = probes.resolution;
 		const count = res.x * res.y * res.z;
 
 		super( geometry, material, count );
@@ -135,11 +135,11 @@ class LightProbeVolumeHelper extends InstancedMesh {
 		/**
 		 * The probe grid to visualize.
 		 *
-		 * @type {LightProbeVolume}
+		 * @type {LightProbeGrid}
 		 */
-		this.probeGrid = probeGrid;
+		this.probes = probes;
 
-		this.type = 'LightProbeVolumeHelper';
+		this.type = 'LightProbeGridHelper';
 
 		this.update();
 
@@ -147,12 +147,12 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 	/**
 	 * Rebuilds instance matrices and UVW attributes from the current probe grid.
-	 * Call this after changing `probeGrid` or after re-baking.
+	 * Call this after changing `probes` or after re-baking.
 	 */
 	update() {
 
-		const probeGrid = this.probeGrid;
-		const res = probeGrid.resolution;
+		const probes = this.probes;
+		const res = probes.resolution;
 		const count = res.x * res.y * res.z;
 
 		// Resize instance matrix buffer if needed
@@ -177,12 +177,12 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 				for ( let ix = 0; ix < res.x; ix ++ ) {
 
-					// Remap to texel centers (must match light_probe_volume_pars_fragment.glsl.js)
+					// Remap to texel centers (must match lightprobes_pars_fragment.glsl.js)
 					uvwArray[ i * 3 ] = ( ix + 0.5 ) / res.x;
 					uvwArray[ i * 3 + 1 ] = ( iy + 0.5 ) / res.y;
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
 
-					probeGrid.getProbePosition( ix, iy, iz, probePos );
+					probes.getProbePosition( ix, iy, iz, probePos );
 					matrix.makeTranslation( probePos.x, probePos.y, probePos.z );
 					this.setMatrixAt( i, matrix );
 
@@ -200,8 +200,8 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 		// Update texture uniforms
 
-		this.material.uniforms.probeGridSH.value = probeGrid.texture;
-		this.material.uniforms.probeGridResolution.value.copy( probeGrid.resolution );
+		this.material.uniforms.probesSH.value = probes.texture;
+		this.material.uniforms.probesResolution.value.copy( probes.resolution );
 
 	}
 
@@ -218,4 +218,4 @@ class LightProbeVolumeHelper extends InstancedMesh {
 
 }
 
-export { LightProbeVolumeHelper };
+export { LightProbeGridHelper };

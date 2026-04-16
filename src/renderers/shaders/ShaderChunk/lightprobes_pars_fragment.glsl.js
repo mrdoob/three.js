@@ -1,27 +1,27 @@
 export default /* glsl */`
-#ifdef USE_LIGHT_PROBE_VOLUME
+#ifdef USE_LIGHT_PROBES_GRID
 
 // Single atlas 3D texture that stores all 7 SH sub-volumes stacked along Z.
-// Atlas depth = 7 * ( nz + 2 ) where nz = probeGridResolution.z.
+// Atlas depth = 7 * ( nz + 2 ) where nz = probesResolution.z.
 // Each sub-volume occupies ( nz + 2 ) slices: 1 padding + nz data + 1 padding.
 // Padding is a copy of the first / last data slice and prevents color bleeding
 // when the hardware linear filter reads across a sub-volume boundary.
-uniform highp sampler3D probeGridSH;
+uniform highp sampler3D probesSH;
 
-uniform vec3 probeGridMin;
-uniform vec3 probeGridMax;
-uniform vec3 probeGridResolution;
+uniform vec3 probesMin;
+uniform vec3 probesMax;
+uniform vec3 probesResolution;
 
-vec3 getLightProbeVolumeIrradiance( vec3 worldPos, vec3 worldNormal ) {
+vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
 
-	vec3 res = probeGridResolution;
-	vec3 gridRange = probeGridMax - probeGridMin;
+	vec3 res = probesResolution;
+	vec3 gridRange = probesMax - probesMin;
 	vec3 resMinusOne = res - 1.0;
 	vec3 probeSpacing = gridRange / resMinusOne;
 
 	// Offset sample position along normal by half a probe spacing
 	vec3 samplePos = worldPos + worldNormal * probeSpacing * 0.5;
-	vec3 uvw = clamp( ( samplePos - probeGridMin ) / gridRange, 0.0, 1.0 );
+	vec3 uvw = clamp( ( samplePos - probesMin ) / gridRange, 0.0, 1.0 );
 
 	// Remap to texel centers of the probe grid (XY and Z)
 	uvw = uvw * resMinusOne / res + 0.5 / res;
@@ -40,13 +40,13 @@ vec3 getLightProbeVolumeIrradiance( vec3 worldPos, vec3 worldNormal ) {
 	float atlasDepth  = 7.0 * paddedSlices;
 	float uvZBase     = uvw.z * nz + 1.0;
 
-	vec4 s0 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase                       ) / atlasDepth ) );
-	vec4 s1 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
-	vec4 s2 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s3 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s4 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s5 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s6 = texture( probeGridSH, vec3( uvw.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s0 = texture( probesSH, vec3( uvw.xy, ( uvZBase                       ) / atlasDepth ) );
+	vec4 s1 = texture( probesSH, vec3( uvw.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
+	vec4 s2 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s3 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s4 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s5 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s6 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
 
 	// Unpack 9 vec3 SH L2 coefficients
 	vec3 c0 = s0.xyz;

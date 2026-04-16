@@ -32,14 +32,14 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
-			import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
-			import { LightProbeVolumeHelper } from 'three/addons/helpers/LightProbeVolumeHelper.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
 			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
 
 			let camera, scene, renderer, controls, timer;
-			let probeGrid = null, probeGridHelper = null;
+			let probes = null, probesHelper = null;
 			let modelSize = null;
 			let dirLight = null, sky = null, sun = new THREE.Vector3();
 
@@ -218,37 +218,37 @@
 
 						bakeQueued = false;
 
-						if ( probeGrid ) {
+						if ( probes ) {
 
-							scene.remove( probeGrid );
-							probeGrid.dispose();
+							scene.remove( probes );
+							probes.dispose();
 
 						}
 
-						probeGrid = new LightProbeVolume(
+						probes = new LightProbeGrid(
 							params.sizeX, params.sizeY, params.sizeZ,
 							params.countX, params.countY, params.countZ
 						);
-						probeGrid.position.set( params.boundsX, params.boundsY, params.boundsZ );
-						probeGrid.bake( renderer, scene, {
+						probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
+						probes.bake( renderer, scene, {
 							cubemapSize: 32,
 							near: 0.05,
 							far: probeFar
 						} );
-						probeGrid.visible = params.enabled;
-						scene.add( probeGrid );
+						probes.visible = params.enabled;
+						scene.add( probes );
 
-						if ( ! probeGridHelper ) {
+						if ( ! probesHelper ) {
 
-							probeGridHelper = new LightProbeVolumeHelper( probeGrid, params.probeSize );
-							probeGridHelper.visible = params.showProbes;
-							scene.add( probeGridHelper );
+							probesHelper = new LightProbeGridHelper( probes, params.probeSize );
+							probesHelper.visible = params.showProbes;
+							scene.add( probesHelper );
 
 						} else {
 
-							probeGridHelper.probeGrid = probeGrid;
-							probeGridHelper.update();
-							probeGridHelper.visible = params.showProbes;
+							probesHelper.probes = probes;
+							probesHelper.update();
+							probesHelper.visible = params.showProbes;
 
 						}
 
@@ -263,7 +263,7 @@
 				const gui = new GUI();
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					if ( probeGrid ) probeGrid.visible = value;
+					if ( probes ) probes.visible = value;
 
 				} );
 
@@ -294,18 +294,18 @@
 
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					if ( probeGridHelper ) probeGridHelper.visible = value;
+					if ( probesHelper ) probesHelper.visible = value;
 
 				} );
 				gui.add( params, 'probeSize', 0.05, 2.0, 0.05 ).name( 'Probe Size' ).onChange( ( value ) => {
 
-					if ( probeGridHelper ) {
+					if ( probesHelper ) {
 
-						scene.remove( probeGridHelper );
-						probeGridHelper.dispose();
-						probeGridHelper = new LightProbeVolumeHelper( probeGrid, value );
-						probeGridHelper.visible = params.showProbes;
-						scene.add( probeGridHelper );
+						scene.remove( probesHelper );
+						probesHelper.dispose();
+						probesHelper = new LightProbeGridHelper( probes, value );
+						probesHelper.visible = params.showProbes;
+						scene.add( probesHelper );
 
 					}
 

@@ -75,9 +75,9 @@ const ATLAS_PADDING = 1;
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
  *
- * @three_import import { LightProbeVolume } from 'three/addons/lighting/LightProbeVolume.js';
+ * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
  */
-class LightProbeVolume extends Object3D {
+class LightProbeGrid extends Object3D {
 
 	/**
 	 * Constructs a new irradiance probe grid.
@@ -102,7 +102,7 @@ class LightProbeVolume extends Object3D {
 		 * @readonly
 		 * @default true
 		 */
-		this.isLightProbeVolume = true;
+		this.isLightProbeGrid = true;
 
 		/**
 		 * The full width of the volume along X.
@@ -138,7 +138,7 @@ class LightProbeVolume extends Object3D {
 
 		/**
 		 * The world-space bounding box for the grid. Updated automatically
-		 * by {@link LightProbeVolume#bake}.
+		 * by {@link LightProbeGrid#bake}.
 		 *
 		 * @type {Box3}
 		 */
@@ -332,7 +332,7 @@ class LightProbeVolume extends Object3D {
 		renderer.setScissor( _savedScissor );
 		renderer.setScissorTest( savedScissorTest );
 
-		// console.log( `LightProbeVolume: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
+		// console.log( `LightProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
 		this.visible = true;
 
@@ -648,4 +648,4 @@ function _ensureBatchTarget( totalProbes ) {
 
 }
 
-export { LightProbeVolume };
+export { LightProbeGrid };

@@ -194,10 +194,10 @@ const UniformsLib = {
 		ltc_1: { value: null },
 		ltc_2: { value: null },
 
-		probeGridSH: { value: null },
-		probeGridMin: { value: /*@__PURE__*/ new Vector3() },
-		probeGridMax: { value: /*@__PURE__*/ new Vector3() },
-		probeGridResolution: { value: /*@__PURE__*/ new Vector3() }
+		probesSH: { value: null },
+		probesMin: { value: /*@__PURE__*/ new Vector3() },
+		probesMax: { value: /*@__PURE__*/ new Vector3() },
+		probesResolution: { value: /*@__PURE__*/ new Vector3() }
 
 	},
 
