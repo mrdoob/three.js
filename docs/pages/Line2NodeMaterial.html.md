@@ -98,6 +98,18 @@ Default is `false`.
 
 ## Methods
 
+### .copy( source : Line2NodeMaterial ) : Line2NodeMaterial
+
+Copies the properties of the given material to this instance.
+
+**source**
+
+The material to copy.
+
+**Overrides:** [NodeMaterial#copy](NodeMaterial.html#copy)
+
+**Returns:** A reference to this material.
+
 ### .setup( builder : NodeBuilder )
 
 Setups the vertex and fragment stage of this node material.

@@ -84,7 +84,7 @@ Computes the bounding sphere of the instanced mesh, and updates [InstancedMesh#b
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
-### .getColorAt( index : number, color : Color )
+### .getColorAt( index : number, color : Color ) : Color
 
 Gets the color of the defined instance.
 
@@ -96,7 +96,9 @@ The instance index.
 
 The target object that is used to store the method's result.
 
-### .getMatrixAt( index : number, matrix : Matrix4 )
+**Returns:** A reference to the target color.
+
+### .getMatrixAt( index : number, matrix : Matrix4 ) : Matrix4
 
 Gets the local transformation matrix of the defined instance.
 
@@ -107,6 +109,8 @@ The instance index.
 **matrix**
 
 The target object that is used to store the method's result.
+
+**Returns:** A reference to the target matrix.
 
 ### .getMorphAt( index : number, object : Mesh )
 
@@ -120,7 +124,7 @@ The instance index.
 
 The target object that is used to store the method's result.
 
-### .setColorAt( index : number, color : Color )
+### .setColorAt( index : number, color : Color ) : InstancedMesh
 
 Sets the given color to the defined instance. Make sure you set the `needsUpdate` flag of [InstancedMesh#instanceColor](InstancedMesh.html#instanceColor) to `true` after updating all the colors.
 
@@ -132,9 +136,11 @@ The instance index.
 
 The instance color.
 
-### .setMatrixAt( index : number, matrix : Matrix4 )
+**Returns:** A reference to this instanced mesh.
 
-Sets the given local transformation matrix to the defined instance. Make sure you set the `needsUpdate` flag of [InstancedMesh#instanceMatrix](InstancedMesh.html#instanceMatrix) to `true` after updating all the colors.
+### .setMatrixAt( index : number, matrix : Matrix4 ) : InstancedMesh
+
+Sets the given local transformation matrix to the defined instance. Make sure you set the `needsUpdate` flag of [InstancedMesh#instanceMatrix](InstancedMesh.html#instanceMatrix) to `true` after updating all the matrices.
 
 **index**
 
@@ -144,7 +150,9 @@ The instance index.
 
 The local transformation.
 
-### .setMorphAt( index : number, object : Mesh )
+**Returns:** A reference to this instanced mesh.
+
+### .setMorphAt( index : number, object : Mesh ) : InstancedMesh
 
 Sets the morph target weights to the defined instance. Make sure you set the `needsUpdate` flag of [InstancedMesh#morphTexture](InstancedMesh.html#morphTexture) to `true` after updating all the influences.
 
@@ -155,6 +163,8 @@ The instance index.
 **object**
 
 A mesh which `morphTargetInfluences` property containing the morph target weights of a single instance.
+
+**Returns:** A reference to this instanced mesh.
 
 ## Source
 

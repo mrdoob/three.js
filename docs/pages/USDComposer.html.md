@@ -18,6 +18,14 @@ Apply material binding from a prim path to a mesh. Used when merging referenced 
 
 Shared helper for applying texture or value from shader attribute. Reduces duplication between \_applyPreviewSurface and \_applyOpenPBRSurface.
 
+### ._buildCamera()
+
+Build a camera from a Camera spec.
+
+### ._buildGeomPrimitive()
+
+Build a mesh from a USD geometric primitive (Cube, Sphere, Cylinder, Cone, Capsule).
+
 ### ._buildHierarchy()
 
 Build the scene hierarchy recursively. Uses childrenByPath index for O(1) child lookup instead of O(n) iteration.
@@ -26,9 +34,21 @@ Build the scene hierarchy recursively. Uses childrenByPath index for O(1) child 
 
 Build indexes for efficient lookups. Called once during compose() to avoid O(n) scans per lookup.
 
+### ._buildLight()
+
+Build a light from a UsdLux light spec.
+
 ### ._buildMesh()
 
 Build a mesh from a Mesh spec.
+
+### ._colorTemperature()
+
+Convert a color temperature in Kelvin to an RGB Color. Based on Tanner Helland's algorithm.
+
+### ._computeVertexNormals()
+
+Compute per-vertex normals from indexed triangle data. Accumulates area-weighted face normals at each shared vertex and normalizes.
 
 ### ._findSingleMesh()
 
@@ -54,9 +74,11 @@ Get material binding target path, checking variant paths if needed.
 
 Get the material path for a mesh, checking various binding sources.
 
-### ._getReference()
+### ._getReferences() : Array.<string>
 
-Get reference value from a prim spec.
+Get all reference values from a prim spec.
+
+**Returns:** Array of reference strings like "@path@" or "@path@"
 
 ### ._getVariantPaths()
 

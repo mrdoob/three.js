@@ -1,3 +1,5 @@
+*Inheritance: EventDispatcher →*
+
 # InspectorBase
 
 ### new InspectorBase()
