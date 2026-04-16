@@ -79,6 +79,15 @@ class StackNode extends Node {
 		this._currentNode = null;
 
 		/**
+		 * The tracking insert index for newly added nodes during build.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._currentInsertIndex = 0;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -111,15 +120,30 @@ class StackNode extends Node {
 	 * Adds a node to this stack.
 	 *
 	 * @param {Node} node - The node to add.
-	 * @param {number} [index=this.nodes.length] - The index where the node should be added.
+	 * @param {number} [index=-1] - The index where the node should be added. If -1, it automatically appends sequentially based on current context.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStack( node, index = this.nodes.length ) {
+	addToStack( node, index = - 1 ) {
 
 		if ( node.isNode !== true ) {
 
 			error( 'TSL: Invalid node added to stack.', new StackTrace() );
 			return this;
+
+		}
+
+		if ( index === - 1 ) {
+
+			if ( this._currentNode !== null ) {
+
+				index = this._currentInsertIndex;
+				this._currentInsertIndex ++;
+
+			} else {
+
+				index = this.nodes.length;
+
+			}
 
 		}
 
@@ -137,7 +161,7 @@ class StackNode extends Node {
 	 */
 	addToStackBefore( node ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = this._currentNode !== null ? this.nodes.indexOf( this._currentNode ) : - 1;
 
 		return this.addToStack( node, index );
 
@@ -328,11 +352,10 @@ class StackNode extends Node {
 
 		builder.setActiveStack( this );
 
-		//
-
 		const buildNode = ( node ) => {
 
 			this._currentNode = node;
+			this._currentInsertIndex = this.nodes.indexOf( node );
 
 			if ( node.isVarNode && node.isIntent( builder ) ) {
 
@@ -380,6 +403,7 @@ class StackNode extends Node {
 		}
 
 		this._currentNode = null;
+		this._currentInsertIndex = 0;
 
 		const newNodes = this.nodes.filter( ( node ) => nodes.indexOf( node ) === - 1 );
 
