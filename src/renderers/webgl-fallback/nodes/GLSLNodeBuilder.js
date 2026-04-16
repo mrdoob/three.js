@@ -470,7 +470,12 @@ ${ flowData.code }
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
+		// texelFetch() in GLSL2 requires the LOD argument to be an int.
+		// When textureLoad() is called from TSL with e.g. int(0), the GLSL codegen
+		// may emit a float literal (0.0) for the level — wrapping in int() ensures
+		// the correct type regardless of what the TSL node resolves to.
 		if ( levelSnippet === null ) levelSnippet = '0';
+		else levelSnippet = `int( ${ levelSnippet } )`;
 
 		let snippet;
 
