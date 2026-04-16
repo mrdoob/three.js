@@ -18,13 +18,9 @@ export default /* glsl */`
 	uniform int clippingNumGlobalIncludeVolumes;
 	uniform int clippingNumLocalIncludeVolumes;
 
-	#if NUM_CLIPPING_VOLUMES > 0
-
-		uniform int clippingVolumePlaneStart[ NUM_CLIPPING_VOLUMES ];
-		uniform int clippingVolumePlaneCount[ NUM_CLIPPING_VOLUMES ];
-		uniform int clippingVolumeMode[ NUM_CLIPPING_VOLUMES ];
-
-	#endif
+	uniform int clippingVolumePlaneStart[ NUM_CLIPPING_VOLUMES ];
+	uniform int clippingVolumePlaneCount[ NUM_CLIPPING_VOLUMES ];
+	uniform int clippingVolumeMode[ NUM_CLIPPING_VOLUMES ];
 
 #endif
 `;
