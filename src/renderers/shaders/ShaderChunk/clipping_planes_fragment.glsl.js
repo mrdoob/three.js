@@ -104,6 +104,7 @@ export default /* glsl */`
 				if ( volumeIndex >= clippingNumVolumes ) continue;
 
 				bool insideVolume = true;
+				bool isExcludeVolume = clippingVolumeMode[ volumeIndex ] == 1;
 				bool isGlobalVolume = volumeIndex < clippingNumGlobalVolumes;
 				int planeStart = clippingVolumePlaneStart[ volumeIndex ];
 				int planeEnd = planeStart + clippingVolumePlaneCount[ volumeIndex ];
@@ -114,14 +115,16 @@ export default /* glsl */`
 					if ( ( UNROLLED_LOOP_INDEX >= planeStart ) && ( UNROLLED_LOOP_INDEX < planeEnd ) ) {
 
 						plane = clippingPlanes[ UNROLLED_LOOP_INDEX ];
-						insideVolume = ( dot( vClipPosition, plane.xyz ) < plane.w ) && insideVolume;
+						float planeDistance = dot( vClipPosition, plane.xyz );
+						bool insidePlane = isExcludeVolume ? ( planeDistance < plane.w ) : ( planeDistance <= plane.w );
+						insideVolume = insidePlane && insideVolume;
 
 					}
 
 				}
 				#pragma unroll_loop_end
 
-				if ( clippingVolumeMode[ volumeIndex ] == 0 ) {
+				if ( ! isExcludeVolume ) {
 
 					if ( isGlobalVolume ) {
 
