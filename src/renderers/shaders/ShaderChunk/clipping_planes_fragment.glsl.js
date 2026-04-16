@@ -6,24 +6,10 @@ export default /* glsl */`
 	#ifdef ALPHA_TO_COVERAGE
 
 		float clipOpacity = 1.0;
-
-		#if NUM_GLOBAL_CLIPPING_PLANES > 0
-
-			#pragma unroll_loop_start
-			for ( int i = 0; i < NUM_GLOBAL_CLIPPING_PLANES; i ++ ) {
-
-				plane = clippingPlanes[ i ];
-				clipOpacity *= clippingPlaneOpacity( plane );
-
-				if ( clipOpacity == 0.0 ) discard;
-
-			}
-			#pragma unroll_loop_end
-
-		#endif
-
-		float includeClipOpacity = 0.0;
-		float excludeClipOpacity = 0.0;
+		float globalIncludeClipOpacity = 0.0;
+		float globalExcludeClipOpacity = 0.0;
+		float localIncludeClipOpacity = 0.0;
+		float localExcludeClipOpacity = 0.0;
 
 		#if NUM_CLIPPING_VOLUMES > 0
 
@@ -32,6 +18,7 @@ export default /* glsl */`
 				if ( volumeIndex >= clippingNumVolumes ) continue;
 
 				float volumeClipOpacity = 1.0;
+				bool isGlobalVolume = volumeIndex < clippingNumGlobalVolumes;
 				int planeStart = clippingVolumePlaneStart[ volumeIndex ];
 				int planeEnd = planeStart + clippingVolumePlaneCount[ volumeIndex ];
 
@@ -50,11 +37,27 @@ export default /* glsl */`
 
 				if ( clippingVolumeMode[ volumeIndex ] == 0 ) {
 
-					includeClipOpacity = max( includeClipOpacity, volumeClipOpacity );
+					if ( isGlobalVolume ) {
+
+						globalIncludeClipOpacity = max( globalIncludeClipOpacity, volumeClipOpacity );
+
+					} else {
+
+						localIncludeClipOpacity = max( localIncludeClipOpacity, volumeClipOpacity );
+
+					}
 
 				} else {
 
-					excludeClipOpacity = max( excludeClipOpacity, volumeClipOpacity );
+					if ( isGlobalVolume ) {
+
+						globalExcludeClipOpacity = max( globalExcludeClipOpacity, volumeClipOpacity );
+
+					} else {
+
+						localExcludeClipOpacity = max( localExcludeClipOpacity, volumeClipOpacity );
+
+					}
 
 				}
 
@@ -62,37 +65,37 @@ export default /* glsl */`
 
 		#endif
 
-		bool hasIncludeVolumes = clippingNumIncludeVolumes > 0;
+		bool hasGlobalIncludeVolumes = clippingNumGlobalIncludeVolumes > 0;
+		bool hasLocalIncludeVolumes = clippingNumLocalIncludeVolumes > 0;
+		float globalClipOpacity = 1.0;
+		float localClipOpacity = 1.0;
 
-		if ( hasIncludeVolumes ) {
+		if ( hasGlobalIncludeVolumes ) {
 
-			clipOpacity *= includeClipOpacity;
+			globalClipOpacity *= globalIncludeClipOpacity;
 
 		}
 
-		clipOpacity *= 1.0 - excludeClipOpacity;
+		globalClipOpacity *= 1.0 - globalExcludeClipOpacity;
 
+		if ( hasLocalIncludeVolumes ) {
+
+			localClipOpacity *= localIncludeClipOpacity;
+
+		}
+
+		localClipOpacity *= 1.0 - localExcludeClipOpacity;
+		clipOpacity *= globalClipOpacity * localClipOpacity;
 		diffuseColor.a *= clipOpacity;
 
 		if ( diffuseColor.a == 0.0 ) discard;
 
 	#else
 
-		#if NUM_GLOBAL_CLIPPING_PLANES > 0
-
-			#pragma unroll_loop_start
-			for ( int i = 0; i < NUM_GLOBAL_CLIPPING_PLANES; i ++ ) {
-
-				plane = clippingPlanes[ i ];
-				if ( dot( vClipPosition, plane.xyz ) > plane.w ) discard;
-
-			}
-			#pragma unroll_loop_end
-
-		#endif
-
-		bool insideIncludeAny = false;
-		bool insideExcludeAny = false;
+		bool insideGlobalIncludeAny = false;
+		bool insideGlobalExcludeAny = false;
+		bool insideLocalIncludeAny = false;
+		bool insideLocalExcludeAny = false;
 
 		#if NUM_CLIPPING_VOLUMES > 0
 
@@ -101,6 +104,7 @@ export default /* glsl */`
 				if ( volumeIndex >= clippingNumVolumes ) continue;
 
 				bool insideVolume = true;
+				bool isGlobalVolume = volumeIndex < clippingNumGlobalVolumes;
 				int planeStart = clippingVolumePlaneStart[ volumeIndex ];
 				int planeEnd = planeStart + clippingVolumePlaneCount[ volumeIndex ];
 
@@ -119,11 +123,27 @@ export default /* glsl */`
 
 				if ( clippingVolumeMode[ volumeIndex ] == 0 ) {
 
-					insideIncludeAny = insideIncludeAny || insideVolume;
+					if ( isGlobalVolume ) {
+
+						insideGlobalIncludeAny = insideGlobalIncludeAny || insideVolume;
+
+					} else {
+
+						insideLocalIncludeAny = insideLocalIncludeAny || insideVolume;
+
+					}
 
 				} else {
 
-					insideExcludeAny = insideExcludeAny || insideVolume;
+					if ( isGlobalVolume ) {
+
+						insideGlobalExcludeAny = insideGlobalExcludeAny || insideVolume;
+
+					} else {
+
+						insideLocalExcludeAny = insideLocalExcludeAny || insideVolume;
+
+					}
 
 				}
 
@@ -131,9 +151,12 @@ export default /* glsl */`
 
 		#endif
 
-		bool hasIncludeVolumes = clippingNumIncludeVolumes > 0;
+		bool hasGlobalIncludeVolumes = clippingNumGlobalIncludeVolumes > 0;
+		bool hasLocalIncludeVolumes = clippingNumLocalIncludeVolumes > 0;
+		bool globalVisible = ( ! hasGlobalIncludeVolumes || insideGlobalIncludeAny ) && ! insideGlobalExcludeAny;
+		bool localVisible = ( ! hasLocalIncludeVolumes || insideLocalIncludeAny ) && ! insideLocalExcludeAny;
 
-		if ( ( hasIncludeVolumes && ! insideIncludeAny ) || insideExcludeAny ) discard;
+		if ( ! globalVisible || ! localVisible ) discard;
 
 	#endif
 

@@ -251,7 +251,19 @@ class WebGLRenderer {
 		this.clippingPlanes = [];
 
 		/**
-		 * Whether the renderer respects object-level clipping planes or not.
+		 * Optional global clipping volumes. Each volume is an object with:
+		 *
+		 * - `planes`: `Array<Plane>`
+		 * - `mode`: `'include' | 'exclude'`
+		 *
+		 * @type {?(Array<{planes:Array<Plane>,mode:('include'|'exclude')}>)}
+		 * @default undefined
+		 */
+		this.clippingVolumes = undefined;
+
+		/**
+		 * Whether the renderer respects object-level clipping data
+		 * (`material.clippingPlanes` / `material.clippingVolumes`) or not.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -1651,7 +1663,7 @@ class WebGLRenderer {
 			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
 
 			_localClippingEnabled = this.localClippingEnabled;
-			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
+			_clippingEnabled = clipping.init( this.clippingPlanes, this.clippingVolumes, _localClippingEnabled );
 
 			currentRenderList = renderLists.get( scene, renderListStack.length );
 			currentRenderList.init();
@@ -1792,7 +1804,7 @@ class WebGLRenderer {
 
 				textures.setTextureUnits( currentRenderState.state.textureUnits );
 
-				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
+				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, _this.clippingVolumes, currentRenderState.state.camera );
 
 			} else {
 
@@ -1944,7 +1956,7 @@ class WebGLRenderer {
 
 			currentRenderState.setupLightsView( camera );
 
-			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
+			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, _this.clippingVolumes, camera );
 
 			if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
@@ -2032,7 +2044,7 @@ class WebGLRenderer {
 
 			currentRenderState.setupLightsView( camera );
 
-			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
+			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, _this.clippingVolumes, camera );
 
 			renderObjects( opaqueObjects, scene, camera );
 
@@ -2223,7 +2235,9 @@ class WebGLRenderer {
 				uniforms.clippingVolumePlaneCount = clipping.volumePlaneCountUniform;
 				uniforms.clippingVolumeMode = clipping.volumeModeUniform;
 				uniforms.clippingNumVolumes = clipping.numVolumesUniform;
-				uniforms.clippingNumIncludeVolumes = clipping.numIncludeVolumesUniform;
+				uniforms.clippingNumGlobalVolumes = clipping.numGlobalVolumesUniform;
+				uniforms.clippingNumGlobalIncludeVolumes = clipping.numGlobalIncludeVolumesUniform;
+				uniforms.clippingNumLocalIncludeVolumes = clipping.numLocalIncludeVolumesUniform;
 
 			}
 
@@ -2297,7 +2311,6 @@ class WebGLRenderer {
 			materialProperties.morphColors = parameters.morphColors;
 			materialProperties.morphTargetsCount = parameters.morphTargetsCount;
 			materialProperties.numClippingPlanes = parameters.numClippingPlanes;
-			materialProperties.numGlobalClippingPlanes = parameters.numGlobalClippingPlanes;
 			materialProperties.numClippingVolumes = parameters.numClippingVolumes;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
@@ -2453,7 +2466,6 @@ class WebGLRenderer {
 
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
 					( materialProperties.numClippingPlanes !== clipping.numPlanes ||
-					materialProperties.numGlobalClippingPlanes !== clipping.numGlobalPlanes ||
 					materialProperties.numClippingVolumes !== clipping.numVolumes ) ) {
 
 					needsProgramChange = true;

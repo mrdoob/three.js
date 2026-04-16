@@ -48,6 +48,36 @@ Holds details about the capabilities of the current rendering context.
 
 User-defined clipping planes specified in world space. These planes apply globally. Points in space whose dot product with the plane is negative are cut away.
 
+### .clippingVolumes : Array.<Object>
+
+Optional global clipping volumes. Each volume is an object with:
+
+- `planes`: `Array.<Plane>` (convex volume boundary planes).
+- `mode`: `'include' | 'exclude'`.
+  - `'include'`: keep-region. Fragments inside this volume are candidates to be rendered.
+  - `'exclude'`: cutout-region. Fragments inside this volume are removed.
+
+Global visibility is evaluated as:
+
+- A fragment is **inside a volume** only if it is inside all planes of that volume.
+- Include volumes are unioned (`insideAnyInclude`).
+- Exclude volumes are unioned (`insideAnyExclude`).
+- Final global rule:
+
+```txt
+globalVisible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude
+```
+
+If `.clippingPlanes` are also set, they are internally added as one additional global include volume.
+
+Global clipping and local material clipping are combined by conjunction:
+
+```txt
+visible = globalVisible && localVisible
+```
+
+Default is `undefined`.
+
 ### .coordinateSystem : WebGLCoordinateSystem | WebGPUCoordinateSystem (readonly)
 
 Defines the coordinate system of the renderer.
@@ -102,7 +132,7 @@ Default is `true`.
 
 ### .localClippingEnabled : boolean
 
-Whether the renderer respects object-level clipping planes or not.
+Whether the renderer respects object-level clipping data (`material.clippingPlanes` / `material.clippingVolumes`) or not.
 
 Default is `false`.
 

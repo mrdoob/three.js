@@ -6,7 +6,12 @@ function WebGLClipping( properties ) {
 	const scope = this;
 
 	let globalState = null,
-		numGlobalPlanes = 0,
+		globalVolumePlaneStartState = null,
+		globalVolumePlaneCountState = null,
+		globalVolumeModeState = null,
+		globalPlaneCount = 0,
+		globalVolumeCount = 0,
+		globalIncludeVolumeCount = 0,
 		localClippingEnabled = false,
 		renderingShadows = false;
 
@@ -18,34 +23,42 @@ function WebGLClipping( properties ) {
 		volumePlaneCountUniform = { value: null, needsUpdate: false },
 		volumeModeUniform = { value: null, needsUpdate: false },
 		numVolumesUniform = { value: 0, needsUpdate: false },
-		numIncludeVolumesUniform = { value: 0, needsUpdate: false };
+		numGlobalVolumesUniform = { value: 0, needsUpdate: false },
+		numGlobalIncludeVolumesUniform = { value: 0, needsUpdate: false },
+		numLocalIncludeVolumesUniform = { value: 0, needsUpdate: false };
+
+	const globalClippingPlaneVolume = { planes: null, mode: 'include' },
+		globalClippingPlaneVolumes = [ globalClippingPlaneVolume ];
+
+	const combinedGlobalClippingVolumes = [];
 
 	this.uniform = uniform;
 	this.volumePlaneStartUniform = volumePlaneStartUniform;
 	this.volumePlaneCountUniform = volumePlaneCountUniform;
 	this.volumeModeUniform = volumeModeUniform;
 	this.numVolumesUniform = numVolumesUniform;
-	this.numIncludeVolumesUniform = numIncludeVolumesUniform;
+	this.numGlobalVolumesUniform = numGlobalVolumesUniform;
+	this.numGlobalIncludeVolumesUniform = numGlobalIncludeVolumesUniform;
+	this.numLocalIncludeVolumesUniform = numLocalIncludeVolumesUniform;
 
 	this.numPlanes = 0;
 	this.numIntersection = 0;
-	this.numGlobalPlanes = 0;
 	this.numVolumes = 0;
 	this.useClippingVolumes = false;
 
-	this.init = function ( planes, enableLocalClipping ) {
+	this.init = function ( planes, clippingVolumes, enableLocalClipping ) {
+
+		const globalVolumes = getGlobalClippingVolumes( planes, clippingVolumes );
 
 		const enabled =
-			planes.length !== 0 ||
+			globalVolumes.length !== 0 ||
 			enableLocalClipping ||
 			// enable state of previous frame - the clipping code has to
 			// run another frame in order to reset the state:
-			numGlobalPlanes !== 0 ||
+			globalVolumeCount !== 0 ||
 			localClippingEnabled;
 
 		localClippingEnabled = enableLocalClipping;
-
-		numGlobalPlanes = planes.length;
 
 		return enabled;
 
@@ -54,7 +67,7 @@ function WebGLClipping( properties ) {
 	this.beginShadows = function () {
 
 		renderingShadows = true;
-		projectPlanes( null );
+		resetShadowState();
 
 	};
 
@@ -64,9 +77,11 @@ function WebGLClipping( properties ) {
 
 	};
 
-	this.setGlobalState = function ( planes, camera ) {
+	this.setGlobalState = function ( planes, clippingVolumes, camera ) {
 
-		globalState = projectPlanes( planes, camera, 0 );
+		const globalVolumes = getGlobalClippingVolumes( planes, clippingVolumes );
+
+		setGlobalVolumeState( globalVolumes, camera );
 
 	};
 
@@ -85,13 +100,13 @@ function WebGLClipping( properties ) {
 
 			if ( renderingShadows ) {
 
-				// there's no global clipping
+				// there's no global clipping in shadow rendering
 
-				projectPlanes( null );
+				resetShadowState();
 
 			} else {
 
-				resetGlobalState();
+				applyGlobalState();
 
 			}
 
@@ -102,18 +117,70 @@ function WebGLClipping( properties ) {
 
 			if ( ! hasClippingPlanes && ! hasClippingVolumes ) {
 
-				resetGlobalState();
+				if ( renderingShadows ) {
+
+					resetShadowState();
+
+				} else {
+
+					applyGlobalState();
+
+				}
 
 			} else {
 
-				setVolumeState( getLocalClippingVolumes( planes, clipIntersection, clippingVolumes, materialProperties ), camera, useCache, materialProperties );
+				setVolumeState(
+					getLocalClippingVolumes( planes, clipIntersection, clippingVolumes, materialProperties ),
+					camera,
+					useCache,
+					materialProperties,
+					renderingShadows === false
+				);
 
 			}
 
 		}
 
-
 	};
+
+	function getGlobalClippingVolumes( planes, clippingVolumes ) {
+
+		const hasClippingPlanes = planes.length > 0;
+		const rendererClippingVolumes = Array.isArray( clippingVolumes ) ? clippingVolumes : [];
+
+		if ( hasClippingPlanes === false && rendererClippingVolumes.length === 0 ) {
+
+			return [];
+
+		}
+
+		if ( rendererClippingVolumes.length === 0 ) {
+
+			globalClippingPlaneVolume.planes = planes;
+
+			return globalClippingPlaneVolumes;
+
+		}
+
+		if ( hasClippingPlanes === false ) {
+
+			return rendererClippingVolumes;
+
+		}
+
+		combinedGlobalClippingVolumes.length = 0;
+		globalClippingPlaneVolume.planes = planes;
+		combinedGlobalClippingVolumes.push( globalClippingPlaneVolume );
+
+		for ( let i = 0, l = rendererClippingVolumes.length; i < l; i ++ ) {
+
+			combinedGlobalClippingVolumes.push( rendererClippingVolumes[ i ] );
+
+		}
+
+		return combinedGlobalClippingVolumes;
+
+	}
 
 	function getLocalClippingVolumes( planes, clipIntersection, clippingVolumes, materialProperties ) {
 
@@ -211,49 +278,150 @@ function WebGLClipping( properties ) {
 
 	}
 
-	function setVolumeState( volumes, camera, useCache, materialProperties ) {
+	function setGlobalVolumeState( volumes, camera ) {
 
-		const nGlobal = renderingShadows ? 0 : numGlobalPlanes;
+		const nVolumes = volumes.length;
 
+		if ( nVolumes === 0 ) {
+
+			globalState = null;
+			globalVolumePlaneStartState = null;
+			globalVolumePlaneCountState = null;
+			globalVolumeModeState = null;
+			globalPlaneCount = 0;
+			globalVolumeCount = 0;
+			globalIncludeVolumeCount = 0;
+
+			applyGlobalState();
+
+			return;
+
+		}
+
+		const volumePlaneStartArray = new Int32Array( nVolumes );
+		const volumePlaneCountArray = new Int32Array( nVolumes );
+		const volumeModeArray = new Int32Array( nVolumes );
+
+		let planeIndex = 0;
+		let nIncludeVolumes = 0;
+
+		for ( let i = 0; i < nVolumes; i ++ ) {
+
+			const clippingVolume = volumes[ i ];
+			const volumePlanes = Array.isArray( clippingVolume.planes ) ? clippingVolume.planes : [];
+			const volumeMode = clippingVolume.mode === 'exclude' ? 1 : 0;
+
+			volumePlaneStartArray[ i ] = planeIndex;
+			volumePlaneCountArray[ i ] = volumePlanes.length;
+			volumeModeArray[ i ] = volumeMode;
+
+			if ( volumeMode === 0 ) nIncludeVolumes ++;
+
+			planeIndex += volumePlanes.length;
+
+		}
+
+		const dstArray = new Float32Array( planeIndex * 4 );
+		const viewMatrix = camera.matrixWorldInverse;
+
+		viewNormalMatrix.getNormalMatrix( viewMatrix );
+
+		for ( let i = 0, i4 = 0; i < nVolumes; i ++ ) {
+
+			const clippingVolume = volumes[ i ];
+			const volumePlanes = Array.isArray( clippingVolume.planes ) ? clippingVolume.planes : [];
+
+			for ( let j = 0, jl = volumePlanes.length; j < jl; j ++, i4 += 4 ) {
+
+				plane.copy( volumePlanes[ j ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
+
+				plane.normal.toArray( dstArray, i4 );
+				dstArray[ i4 + 3 ] = plane.constant;
+
+			}
+
+		}
+
+		globalState = dstArray;
+		globalVolumePlaneStartState = volumePlaneStartArray;
+		globalVolumePlaneCountState = volumePlaneCountArray;
+		globalVolumeModeState = volumeModeArray;
+		globalPlaneCount = planeIndex;
+		globalVolumeCount = nVolumes;
+		globalIncludeVolumeCount = nIncludeVolumes;
+
+		applyGlobalState();
+
+	}
+
+	function setVolumeState( volumes, camera, useCache, materialProperties, useGlobalState ) {
+
+		const nGlobalPlanes = useGlobalState ? globalPlaneCount : 0;
+		const nGlobalVolumes = useGlobalState ? globalVolumeCount : 0;
+		const nGlobalIncludeVolumes = useGlobalState ? globalIncludeVolumeCount : 0;
+
+		const clippingGlobalPlaneCount = materialProperties.clippingGlobalPlaneCount;
+		const clippingGlobalVolumeCount = materialProperties.clippingGlobalVolumeCount;
+		const clippingGlobalIncludeVolumeCount = materialProperties.clippingGlobalIncludeVolumeCount;
+
+		const globalStateChanged =
+			clippingGlobalPlaneCount !== nGlobalPlanes ||
+			clippingGlobalVolumeCount !== nGlobalVolumes ||
+			clippingGlobalIncludeVolumeCount !== nGlobalIncludeVolumes;
+
+		const nLocalVolumes = volumes.length;
 		let dstArray = materialProperties.clippingState || null;
 		let volumePlaneStartArray = materialProperties.clippingVolumePlaneStartState || null;
 		let volumePlaneCountArray = materialProperties.clippingVolumePlaneCountState || null;
 		let volumeModeArray = materialProperties.clippingVolumeModeState || null;
 
 		let nVolumes = materialProperties.clippingVolumeCount || 0;
-		let nIncludeVolumes = materialProperties.clippingIncludeVolumeCount || 0;
-		let nVolumePlanes = materialProperties.clippingVolumePlaneCount || 0;
+		let nLocalIncludeVolumes = materialProperties.clippingLocalIncludeVolumeCount || 0;
+		let nLocalPlanes = materialProperties.clippingLocalPlaneCount || 0;
 
 		uniform.value = dstArray; // ensure unique state
 
-		if ( useCache !== true || dstArray === null || volumePlaneStartArray === null || volumePlaneCountArray === null || volumeModeArray === null ) {
+		if ( useCache !== true || globalStateChanged || dstArray === null || volumePlaneStartArray === null || volumePlaneCountArray === null || volumeModeArray === null ) {
 
-			nVolumes = volumes.length;
-			nIncludeVolumes = 0;
+			nVolumes = nGlobalVolumes + nLocalVolumes;
+			nLocalIncludeVolumes = 0;
 
 			volumePlaneStartArray = new Int32Array( nVolumes );
 			volumePlaneCountArray = new Int32Array( nVolumes );
 			volumeModeArray = new Int32Array( nVolumes );
 
-			let planeIndex = nGlobal;
+			if ( nGlobalVolumes !== 0 ) {
 
-			for ( let i = 0; i < nVolumes; i ++ ) {
+				for ( let i = 0; i < nGlobalVolumes; i ++ ) {
 
+					volumePlaneStartArray[ i ] = globalVolumePlaneStartState[ i ];
+					volumePlaneCountArray[ i ] = globalVolumePlaneCountState[ i ];
+					volumeModeArray[ i ] = globalVolumeModeState[ i ];
+
+				}
+
+			}
+
+			let planeIndex = nGlobalPlanes;
+
+			for ( let i = 0; i < nLocalVolumes; i ++ ) {
+
+				const stateIndex = nGlobalVolumes + i;
 				const clippingVolume = volumes[ i ];
 				const volumePlanes = Array.isArray( clippingVolume.planes ) ? clippingVolume.planes : [];
 				const volumeMode = clippingVolume.mode === 'exclude' ? 1 : 0;
 
-				volumePlaneStartArray[ i ] = planeIndex;
-				volumePlaneCountArray[ i ] = volumePlanes.length;
-				volumeModeArray[ i ] = volumeMode;
+				volumePlaneStartArray[ stateIndex ] = planeIndex;
+				volumePlaneCountArray[ stateIndex ] = volumePlanes.length;
+				volumeModeArray[ stateIndex ] = volumeMode;
 
-				if ( volumeMode === 0 ) nIncludeVolumes ++;
+				if ( volumeMode === 0 ) nLocalIncludeVolumes ++;
 
 				planeIndex += volumePlanes.length;
 
 			}
 
-			nVolumePlanes = planeIndex - nGlobal;
+			nLocalPlanes = planeIndex - nGlobalPlanes;
 
 			const flatSize = planeIndex * 4;
 			const viewMatrix = camera.matrixWorldInverse;
@@ -266,9 +434,9 @@ function WebGLClipping( properties ) {
 
 			}
 
-			if ( nGlobal !== 0 ) {
+			if ( nGlobalPlanes !== 0 ) {
 
-				for ( let i = 0, l = nGlobal * 4; i < l; i ++ ) {
+				for ( let i = 0, l = nGlobalPlanes * 4; i < l; i ++ ) {
 
 					dstArray[ i ] = globalState[ i ];
 
@@ -276,7 +444,7 @@ function WebGLClipping( properties ) {
 
 			}
 
-			for ( let i = 0, i4 = nGlobal * 4; i < nVolumes; i ++ ) {
+			for ( let i = 0, i4 = nGlobalPlanes * 4; i < nLocalVolumes; i ++ ) {
 
 				const clippingVolume = volumes[ i ];
 				const volumePlanes = Array.isArray( clippingVolume.planes ) ? clippingVolume.planes : [];
@@ -297,15 +465,20 @@ function WebGLClipping( properties ) {
 			volumePlaneCountUniform.needsUpdate = true;
 			volumeModeUniform.needsUpdate = true;
 			numVolumesUniform.needsUpdate = true;
-			numIncludeVolumesUniform.needsUpdate = true;
+			numGlobalVolumesUniform.needsUpdate = true;
+			numGlobalIncludeVolumesUniform.needsUpdate = true;
+			numLocalIncludeVolumesUniform.needsUpdate = true;
 
 			materialProperties.clippingState = dstArray;
 			materialProperties.clippingVolumePlaneStartState = volumePlaneStartArray;
 			materialProperties.clippingVolumePlaneCountState = volumePlaneCountArray;
 			materialProperties.clippingVolumeModeState = volumeModeArray;
 			materialProperties.clippingVolumeCount = nVolumes;
-			materialProperties.clippingIncludeVolumeCount = nIncludeVolumes;
-			materialProperties.clippingVolumePlaneCount = nVolumePlanes;
+			materialProperties.clippingLocalIncludeVolumeCount = nLocalIncludeVolumes;
+			materialProperties.clippingLocalPlaneCount = nLocalPlanes;
+			materialProperties.clippingGlobalPlaneCount = nGlobalPlanes;
+			materialProperties.clippingGlobalVolumeCount = nGlobalVolumes;
+			materialProperties.clippingGlobalIncludeVolumeCount = nGlobalIncludeVolumes;
 
 		}
 
@@ -314,96 +487,69 @@ function WebGLClipping( properties ) {
 		volumePlaneCountUniform.value = volumePlaneCountArray;
 		volumeModeUniform.value = volumeModeArray;
 		numVolumesUniform.value = nVolumes;
-		numIncludeVolumesUniform.value = nIncludeVolumes;
+		numGlobalVolumesUniform.value = nGlobalVolumes;
+		numGlobalIncludeVolumesUniform.value = nGlobalIncludeVolumes;
+		numLocalIncludeVolumesUniform.value = nLocalIncludeVolumes;
 
-		scope.numPlanes = nGlobal + nVolumePlanes;
+		scope.numPlanes = nGlobalPlanes + nLocalPlanes;
 		scope.numIntersection = 0;
-		scope.numGlobalPlanes = nGlobal;
 		scope.numVolumes = nVolumes;
-		scope.useClippingVolumes = true;
+		scope.useClippingVolumes = nVolumes > 0;
 
 	}
 
-	function resetVolumeUniforms() {
+	function applyGlobalState() {
 
+		uniform.value = globalState;
+		uniform.needsUpdate = globalPlaneCount > 0;
+
+		volumePlaneStartUniform.value = globalVolumePlaneStartState;
+		volumePlaneCountUniform.value = globalVolumePlaneCountState;
+		volumeModeUniform.value = globalVolumeModeState;
+		volumePlaneStartUniform.needsUpdate = globalVolumeCount > 0;
+		volumePlaneCountUniform.needsUpdate = globalVolumeCount > 0;
+		volumeModeUniform.needsUpdate = globalVolumeCount > 0;
+
+		numVolumesUniform.value = globalVolumeCount;
+		numGlobalVolumesUniform.value = globalVolumeCount;
+		numGlobalIncludeVolumesUniform.value = globalIncludeVolumeCount;
+		numLocalIncludeVolumesUniform.value = 0;
+		numVolumesUniform.needsUpdate = true;
+		numGlobalVolumesUniform.needsUpdate = true;
+		numGlobalIncludeVolumesUniform.needsUpdate = true;
+		numLocalIncludeVolumesUniform.needsUpdate = true;
+
+		scope.numPlanes = globalPlaneCount;
+		scope.numIntersection = 0;
+		scope.numVolumes = globalVolumeCount;
+		scope.useClippingVolumes = globalVolumeCount > 0;
+
+	}
+
+	function resetShadowState() {
+
+		uniform.value = null;
+		uniform.needsUpdate = false;
 		volumePlaneStartUniform.value = null;
 		volumePlaneCountUniform.value = null;
 		volumeModeUniform.value = null;
 		numVolumesUniform.value = 0;
-		numIncludeVolumesUniform.value = 0;
+		numGlobalVolumesUniform.value = 0;
+		numGlobalIncludeVolumesUniform.value = 0;
+		numLocalIncludeVolumesUniform.value = 0;
 
 		volumePlaneStartUniform.needsUpdate = false;
 		volumePlaneCountUniform.needsUpdate = false;
 		volumeModeUniform.needsUpdate = false;
 		numVolumesUniform.needsUpdate = false;
-		numIncludeVolumesUniform.needsUpdate = false;
+		numGlobalVolumesUniform.needsUpdate = false;
+		numGlobalIncludeVolumesUniform.needsUpdate = false;
+		numLocalIncludeVolumesUniform.needsUpdate = false;
 
-	}
-
-	function resetGlobalState() {
-
-		if ( uniform.value !== globalState ) {
-
-			uniform.value = globalState;
-			uniform.needsUpdate = numGlobalPlanes > 0;
-
-		}
-
-		scope.numPlanes = numGlobalPlanes;
 		scope.numIntersection = 0;
-		scope.numGlobalPlanes = numGlobalPlanes;
 		scope.numVolumes = 0;
 		scope.useClippingVolumes = false;
-
-		resetVolumeUniforms();
-
-	}
-
-	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
-
-		const nPlanes = planes !== null ? planes.length : 0;
-		let dstArray = null;
-
-		if ( nPlanes !== 0 ) {
-
-			dstArray = uniform.value;
-
-			if ( skipTransform !== true || dstArray === null ) {
-
-				const flatSize = dstOffset + nPlanes * 4,
-					viewMatrix = camera.matrixWorldInverse;
-
-				viewNormalMatrix.getNormalMatrix( viewMatrix );
-
-				if ( dstArray === null || dstArray.length < flatSize ) {
-
-					dstArray = new Float32Array( flatSize );
-
-				}
-
-				for ( let i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
-
-					plane.copy( planes[ i ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
-
-					plane.normal.toArray( dstArray, i4 );
-					dstArray[ i4 + 3 ] = plane.constant;
-
-				}
-
-			}
-
-			uniform.value = dstArray;
-			uniform.needsUpdate = true;
-
-		}
-
-		scope.numPlanes = nPlanes;
-		scope.numIntersection = 0;
-		scope.numGlobalPlanes = 0;
-		scope.numVolumes = 0;
-		scope.useClippingVolumes = false;
-
-		return dstArray;
+		scope.numPlanes = 0;
 
 	}
 

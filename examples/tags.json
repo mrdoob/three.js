@@ -21,6 +21,7 @@
 	"physics_rapier_vehicle_controller": [ "community" ],
 	"webgl_batch_lod_bvh": [ "community", "accelerate", "performance", "extension", "plugin", "library", "three.ez" ],
 	"webgl_clipping": [ "solid" ],
+	"webgl_clipping_volumes": [ "solid", "volumes" ],
 	"webgl_clipping_advanced": [ "solid" ],
 	"webgl_clipping_intersection": [ "solid" ],
 	"webgl_clipping_stencil": [ "solid" ],

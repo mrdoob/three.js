@@ -234,7 +234,6 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 	return string
 		.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes )
-		.replace( /NUM_GLOBAL_CLIPPING_PLANES/g, parameters.numGlobalClippingPlanes )
 		.replace( /NUM_CLIPPING_VOLUMES/g, parameters.numClippingVolumes );
 
 }

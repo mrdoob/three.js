@@ -14,7 +14,9 @@ export default /* glsl */`
 	}
 
 	uniform int clippingNumVolumes;
-	uniform int clippingNumIncludeVolumes;
+	uniform int clippingNumGlobalVolumes;
+	uniform int clippingNumGlobalIncludeVolumes;
+	uniform int clippingNumLocalIncludeVolumes;
 
 	#if NUM_CLIPPING_VOLUMES > 0
 

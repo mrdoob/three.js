@@ -173,6 +173,9 @@ unioned (<code>insideAnyExclude</code>).</p>
 volume. Regardless of that, being inside any exclude volume removes the
 fragment (exclude wins on overlap).</p>
 						<p>This API is additive; <code>clippingPlanes</code> and <code>clipIntersection</code> remain fully supported.</p>
+						<p>Global clipping configured on <code>WebGLRenderer</code> (<code>clippingPlanes</code> / <code>clippingVolumes</code>)
+is evaluated independently and combined with this local result via
+<code>visible = globalVisible &amp;&amp; localVisible</code>.</p>
 						<p>Mixing <code>clippingPlanes</code> with <code>clippingVolumes</code>:</p>
 <ul>
 <li>If <code>clippingPlanes</code> are also set, they are internally added as one additional volume.</li>
@@ -188,12 +191,12 @@ scene-graph clipping feature.</p>
 material.clippingVolumes = [ {
 	mode: 'include',
 	planes: [
-		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), box.max.x ),
-		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), - box.min.x ),
-		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), box.max.y ),
-		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), - box.min.y ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), box.max.z ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), - box.min.z )
+		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), - box.min.x ),
+		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), box.max.x ),
+		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), - box.min.y ),
+		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), box.max.y ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - box.min.z ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), box.max.z )
 	]
 } ];</code></pre>
 						<p>Default is <code>undefined</code>.</p>

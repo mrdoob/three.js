@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - clipping volumes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - clipping volumes (global + local)<br>
+			Local = `material.clippingVolumes`, Global = `renderer.clippingVolumes`
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, startTime, object, stats;
+			let material;
+
+			const localIncludeCenter = new THREE.Vector3( 0, 0.8, 0 );
+			const localExcludeCenter = new THREE.Vector3( 0, 0.8, 0 );
+			const globalIncludeCenter = new THREE.Vector3( 0, 0.8, 0 );
+			const globalExcludeCenter = new THREE.Vector3( 0, 0.8, 0 );
+
+			const localIncludePlanes = createBoxPlanes();
+			const localExcludePlanes = createBoxPlanes();
+			const globalIncludePlanes = createBoxPlanes();
+			const globalExcludePlanes = createBoxPlanes();
+
+			const localIncludeVolume = { mode: 'include', planes: localIncludePlanes };
+			const localExcludeVolume = { mode: 'exclude', planes: localExcludePlanes };
+			const globalIncludeBoxVolume = { mode: 'include', planes: globalIncludePlanes };
+			const globalExcludeBoxVolume = { mode: 'exclude', planes: globalExcludePlanes };
+
+			const activeLocalVolumes = [];
+			const activeGlobalVolumes = [];
+			const emptyPlanes = Object.freeze( [] );
+
+			const localIncludeHelper = createVolumeHelper( 0x2ecc71 );
+			const localExcludeHelper = createVolumeHelper( 0xe74c3c );
+			const globalIncludeHelper = createVolumeHelper( 0xf1c40f );
+			const globalExcludeHelper = createVolumeHelper( 0x3498db );
+
+			const params = {
+				alphaToCoverage: true,
+				clipShadows: true,
+				showVolumeHelpers: true,
+
+				localIncludeEnabled: false,
+				localIncludeOffsetX: 0.0,
+				localIncludeOffsetY: 0.8,
+				localIncludeOffsetZ: 0.0,
+				localIncludeSize: 0.7,
+
+				localExcludeEnabled: false,
+				localExcludeOffsetX: 0.0,
+				localExcludeOffsetY: 0.8,
+				localExcludeOffsetZ: 0.0,
+				localExcludeSize: 0.35,
+
+				globalIncludeBoxEnabled: false,
+				globalIncludeBoxOffsetX: 0.0,
+				globalIncludeBoxOffsetY: 0.8,
+				globalIncludeBoxOffsetZ: 0.0,
+				globalIncludeBoxSize: 1.4,
+
+				globalExcludeBoxEnabled: false,
+				globalExcludeBoxOffsetX: 0.0,
+				globalExcludeBoxOffsetY: 0.8,
+				globalExcludeBoxOffsetZ: 0.0,
+				globalExcludeBoxSize: 0.8
+			};
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 16 );
+				camera.position.set( 0, 1.3, 3 );
+
+				scene = new THREE.Scene();
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				const spotLight = new THREE.SpotLight( 0xffffff, 60 );
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.2;
+				spotLight.position.set( 2, 3, 3 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 3;
+				spotLight.shadow.camera.far = 10;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				scene.add( spotLight );
+
+				const dirLight = new THREE.DirectionalLight( 0x55505a, 3 );
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 1;
+				dirLight.shadow.camera.left = - 1;
+				dirLight.shadow.camera.top = 1;
+				dirLight.shadow.camera.bottom = - 1;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+				material = new THREE.MeshPhongMaterial( {
+					color: 0x80ee10,
+					shininess: 100,
+					side: THREE.DoubleSide,
+					alphaToCoverage: true,
+					clipShadows: true
+				} );
+
+				const geometry = new THREE.TorusKnotGeometry( 0.4, 0.08, 95, 20 );
+				object = new THREE.Mesh( geometry, material );
+				object.castShadow = true;
+				scene.add( object );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
+					new THREE.MeshPhongMaterial( {
+						color: 0xa0adaf,
+						shininess: 150,
+						alphaToCoverage: true
+					} )
+				);
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				scene.add( localIncludeHelper );
+				scene.add( localExcludeHelper );
+				scene.add( globalIncludeHelper );
+				scene.add( globalExcludeHelper );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				renderer.clippingPlanes = emptyPlanes;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+				setupGUI( ground.material );
+				updateClippingSetup();
+
+				startTime = Date.now();
+
+			}
+
+			function setupGUI( groundMaterial ) {
+
+				const gui = new GUI();
+				const localFolder = gui.addFolder( 'Local Clipping Volumes' );
+				const globalFolder = gui.addFolder( 'Global Clipping Volumes' );
+
+				gui.add( params, 'alphaToCoverage' ).name( 'Alpha to Coverage' ).onChange( ( value ) => {
+
+					groundMaterial.alphaToCoverage = value;
+					groundMaterial.needsUpdate = true;
+					material.alphaToCoverage = value;
+					material.needsUpdate = true;
+
+				} );
+
+				gui.add( params, 'showVolumeHelpers' ).name( 'Show Helpers' ).onChange( updateClippingSetup );
+
+				localFolder.add( params, 'clipShadows' ).name( 'Clip Shadows' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localIncludeEnabled' ).name( 'Include Box' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localIncludeOffsetX', - 1.5, 1.5 ).name( 'Include X' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localIncludeOffsetY', 0.0, 2.0 ).name( 'Include Y' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localIncludeOffsetZ', - 1.5, 1.5 ).name( 'Include Z' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localIncludeSize', 0.2, 2.0 ).name( 'Include Size' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localExcludeEnabled' ).name( 'Exclude Box' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localExcludeOffsetX', - 1.5, 1.5 ).name( 'Exclude X' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localExcludeOffsetY', 0.0, 2.0 ).name( 'Exclude Y' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localExcludeOffsetZ', - 1.5, 1.5 ).name( 'Exclude Z' ).onChange( updateClippingSetup );
+				localFolder.add( params, 'localExcludeSize', 0.1, 0.8 ).name( 'Exclude Size' ).onChange( updateClippingSetup );
+
+				globalFolder.add( params, 'globalIncludeBoxEnabled' ).name( 'Include Box' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalIncludeBoxOffsetX', - 1.5, 1.5 ).name( 'Include X' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalIncludeBoxOffsetY', 0.0, 2.0 ).name( 'Include Y' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalIncludeBoxOffsetZ', - 1.5, 1.5 ).name( 'Include Z' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalIncludeBoxSize', 0.2, 2.0 ).name( 'Include Size' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalExcludeBoxEnabled' ).name( 'Exclude Box' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalExcludeBoxOffsetX', - 1.5, 1.5 ).name( 'Exclude X' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalExcludeBoxOffsetY', 0.0, 2.0 ).name( 'Exclude Y' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalExcludeBoxOffsetZ', - 1.5, 1.5 ).name( 'Exclude Z' ).onChange( updateClippingSetup );
+				globalFolder.add( params, 'globalExcludeBoxSize', 0.2, 2.0 ).name( 'Exclude Size' ).onChange( updateClippingSetup );
+
+			}
+
+			function createVolumeHelper( color ) {
+
+				const helper = new THREE.Mesh(
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.MeshBasicMaterial( {
+						color,
+						wireframe: true,
+						transparent: true,
+						opacity: 0.75,
+						depthWrite: false
+					} )
+				);
+
+				return helper;
+
+			}
+
+			function createBoxPlanes() {
+
+				return [
+					new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+				];
+
+			}
+
+			function updateBoxPlanes( planes, center, halfSize ) {
+
+				const minX = center.x - halfSize.x;
+				const maxX = center.x + halfSize.x;
+				const minY = center.y - halfSize.y;
+				const maxY = center.y + halfSize.y;
+				const minZ = center.z - halfSize.z;
+				const maxZ = center.z + halfSize.z;
+
+				// Plane constants use n.dot( p ) + constant >= 0 for the kept side.
+				planes[ 0 ].constant = - minX;
+				planes[ 1 ].constant = maxX;
+				planes[ 2 ].constant = - minY;
+				planes[ 3 ].constant = maxY;
+				planes[ 4 ].constant = - minZ;
+				planes[ 5 ].constant = maxZ;
+
+			}
+
+			function updateHelper( helper, center, halfSize, visible ) {
+
+				helper.position.copy( center );
+				helper.scale.set( halfSize.x * 2, halfSize.y * 2, halfSize.z * 2 );
+				helper.visible = visible && params.showVolumeHelpers;
+
+			}
+
+			function updateClippingSetup() {
+
+				material.clipShadows = params.clipShadows;
+
+				localIncludeCenter.set( params.localIncludeOffsetX, params.localIncludeOffsetY, params.localIncludeOffsetZ );
+				localExcludeCenter.set( params.localExcludeOffsetX, params.localExcludeOffsetY, params.localExcludeOffsetZ );
+				const localIncludeHalfSize = new THREE.Vector3( params.localIncludeSize, params.localIncludeSize, params.localIncludeSize );
+				const localExcludeHalfSize = new THREE.Vector3( params.localExcludeSize, params.localExcludeSize, params.localExcludeSize );
+				globalIncludeCenter.set( params.globalIncludeBoxOffsetX, params.globalIncludeBoxOffsetY, params.globalIncludeBoxOffsetZ );
+				globalExcludeCenter.set( params.globalExcludeBoxOffsetX, params.globalExcludeBoxOffsetY, params.globalExcludeBoxOffsetZ );
+				const globalIncludeHalfSize = new THREE.Vector3( params.globalIncludeBoxSize, params.globalIncludeBoxSize, params.globalIncludeBoxSize );
+				const globalExcludeHalfSize = new THREE.Vector3( params.globalExcludeBoxSize, params.globalExcludeBoxSize, params.globalExcludeBoxSize );
+
+				updateBoxPlanes( localIncludePlanes, localIncludeCenter, localIncludeHalfSize );
+				updateBoxPlanes( localExcludePlanes, localExcludeCenter, localExcludeHalfSize );
+				updateBoxPlanes( globalIncludePlanes, globalIncludeCenter, globalIncludeHalfSize );
+				updateBoxPlanes( globalExcludePlanes, globalExcludeCenter, globalExcludeHalfSize );
+
+				updateHelper( localIncludeHelper, localIncludeCenter, localIncludeHalfSize, params.localIncludeEnabled );
+				updateHelper( localExcludeHelper, localExcludeCenter, localExcludeHalfSize, params.localExcludeEnabled );
+				updateHelper( globalIncludeHelper, globalIncludeCenter, globalIncludeHalfSize, params.globalIncludeBoxEnabled );
+				updateHelper( globalExcludeHelper, globalExcludeCenter, globalExcludeHalfSize, params.globalExcludeBoxEnabled );
+
+				activeLocalVolumes.length = 0;
+
+				if ( params.localIncludeEnabled ) activeLocalVolumes.push( localIncludeVolume );
+				if ( params.localExcludeEnabled ) activeLocalVolumes.push( localExcludeVolume );
+
+				material.clippingVolumes = activeLocalVolumes.length > 0 ? activeLocalVolumes : undefined;
+				renderer.localClippingEnabled = activeLocalVolumes.length > 0;
+
+				activeGlobalVolumes.length = 0;
+
+				if ( params.globalIncludeBoxEnabled ) activeGlobalVolumes.push( globalIncludeBoxVolume );
+				if ( params.globalExcludeBoxEnabled ) activeGlobalVolumes.push( globalExcludeBoxVolume );
+
+				renderer.clippingVolumes = activeGlobalVolumes.length > 0 ? activeGlobalVolumes : undefined;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const currentTime = Date.now();
+				const time = ( currentTime - startTime ) / 1000;
+
+				object.position.y = 0.8;
+				object.rotation.x = time * 0.5;
+				object.rotation.y = time * 0.2;
+				object.scale.setScalar( Math.cos( time ) * 0.125 + 0.875 );
+
+				stats.begin();
+				renderer.render( scene, camera );
+				stats.end();
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -141,6 +141,7 @@ visible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude
 So: if include volumes exist, a fragment must be inside at least one include volume. Regardless of that, being inside any exclude volume removes the fragment (`exclude` wins on overlap).
 
 This API is additive; `clippingPlanes` and `clipIntersection` remain fully supported.
+Global clipping configured on `WebGLRenderer` (`clippingPlanes` / `clippingVolumes`) is evaluated independently and combined with this local result via `visible = globalVisible && localVisible`.
 
 Mixing `clippingPlanes` with `clippingVolumes`:
 
@@ -163,12 +164,12 @@ const material = new THREE.MeshStandardMaterial();
 material.clippingVolumes = [ {
 	mode: 'include',
 	planes: [
-		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), box.max.x ),
-		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), - box.min.x ),
-		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), box.max.y ),
-		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), - box.min.y ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), box.max.z ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), - box.min.z )
+		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), - box.min.x ),
+		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), box.max.x ),
+		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), - box.min.y ),
+		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), box.max.y ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - box.min.z ),
+		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), box.max.z )
 	]
 } ];
 ```

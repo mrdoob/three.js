@@ -83,6 +83,25 @@ Points in space whose dot product with the plane is negative are cut away.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="clippingVolumes" translate="no">.<a href="#clippingVolumes">clippingVolumes</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>Optional global clipping volumes. Each volume is an object with <code>planes</code>
+(<code>Array.&lt;<a href="Plane.html">Plane</a>></code>) and <code>mode</code> (<code>'include'</code> or <code>'exclude'</code>).</p>
+						<p><code>'include'</code> means keep-region: fragments inside this volume are candidates
+to be rendered. <code>'exclude'</code> means cutout-region: fragments inside this
+volume are removed.</p>
+						<p>A fragment is inside a volume only if it is inside all planes of that volume.
+Include volumes are unioned (<code>insideAnyInclude</code>). Exclude volumes are
+unioned (<code>insideAnyExclude</code>).</p>
+						<p>Final global rule: <code>globalVisible = ( !hasIncludeVolumes || insideAnyInclude ) &amp;&amp; !insideAnyExclude</code>.</p>
+						<p>If <code>.clippingPlanes</code> are also set, they are internally added as one
+additional global include volume.</p>
+						<p>Global clipping and local material clipping are combined by conjunction:
+<code>visible = globalVisible &amp;&amp; localVisible</code>.</p>
+						<p>Default is <code>undefined</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : <a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a> | <a href="global.html#WebGPUCoordinateSystem">WebGPUCoordinateSystem</a></span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Defines the coordinate system of the renderer.</p>
@@ -153,7 +172,8 @@ be preferred to reset with a custom pattern. First, set <code>autoReset</code> t
 				<div class="member">
 					<h3 class="name" id="localClippingEnabled" translate="no">.<a href="#localClippingEnabled">localClippingEnabled</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the renderer respects object-level clipping planes or not.</p>
+						<p>Whether the renderer respects object-level clipping data
+(<code>material.clippingPlanes</code> / <code>material.clippingVolumes</code>) or not.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>

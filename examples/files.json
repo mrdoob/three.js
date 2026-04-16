@@ -12,6 +12,7 @@
 		"webgl_camera_array",
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_clipping",
+		"webgl_clipping_volumes",
 		"webgl_clipping_advanced",
 		"webgl_clipping_intersection",
 		"webgl_clipping_stencil",
