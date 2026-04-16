@@ -3,7 +3,7 @@ import {
 	ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType,
 	IntType, UnsignedIntType, FloatType,
 	AlphaFormat, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat,
-	RGBFormat,
+	RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat,
 	UnsignedShort4444Type, UnsignedShort5551Type,
 	UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type
 } from '../../constants.js';
@@ -100,6 +100,7 @@ class Info {
 		 * @property {number} indexAttributes - The number of active index attributes.
 		 * @property {number} storageAttributes - The number of active storage attributes.
 		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
+		 * @property {number} readbackBuffers - The number of active readback buffers.
 		 * @property {number} programs - The number of active programs.
 		 * @property {number} renderTargets - The number of active renderTargets.
 		 * @property {number} total - The total memory size in bytes.
@@ -108,6 +109,8 @@ class Info {
 		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
 		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
+		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} programsSize - The memory size of active programs in bytes.
 		 */
 		this.memory = {
 			geometries: 0,
@@ -116,6 +119,7 @@ class Info {
 			indexAttributes: 0,
 			storageAttributes: 0,
 			indirectStorageAttributes: 0,
+			readbackBuffers: 0,
 			programs: 0,
 			renderTargets: 0,
 			total: 0,
@@ -123,7 +127,9 @@ class Info {
 			attributesSize: 0,
 			indexAttributesSize: 0,
 			storageAttributesSize: 0,
-			indirectStorageAttributesSize: 0
+			indirectStorageAttributesSize: 0,
+			readbackBuffersSize: 0,
+			programsSize: 0
 		};
 
 		/**
@@ -328,6 +334,71 @@ class Info {
 	}
 
 	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	createReadbackBuffer( readbackBuffer ) {
+
+		const maxByteLength = readbackBuffer.maxByteLength;
+		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
+
+		this.memory.readbackBuffers ++;
+		this.memory.total += maxByteLength;
+		this.memory.readbackBuffersSize += maxByteLength;
+
+	}
+
+	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	destroyReadbackBuffer( readbackBuffer ) {
+
+		const { size } = this.memoryMap.get( readbackBuffer );
+		this.memoryMap.delete( readbackBuffer );
+
+		this.memory.readbackBuffers --;
+		this.memory.total -= size;
+		this.memory.readbackBuffersSize -= size;
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {ProgrammableStage} program - The program to track.
+	 */
+	createProgram( program ) {
+
+		const size = program.code.length; // Approx size
+
+		this.memoryMap.set( program, size );
+
+		this.memory.programs ++;
+		this.memory.total += size;
+		this.memory.programsSize += size;
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Object} program - The program to track.
+	 */
+	destroyProgram( program ) {
+
+		const size = this.memoryMap.get( program ) || 0;
+		this.memoryMap.delete( program );
+
+		this.memory.programs --;
+		this.memory.total -= size;
+		this.memory.programsSize -= size;
+
+	}
+
+	/**
 	 * Calculates the memory size of a texture in bytes.
 	 *
 	 * @param {Texture} texture - The texture to calculate the size for.
@@ -351,7 +422,8 @@ class Info {
 		let channels = 4; // RGBA default
 
 		if ( texture.format === AlphaFormat || texture.format === RedFormat || texture.format === RedIntegerFormat || texture.format === DepthFormat || texture.format === DepthStencilFormat ) channels = 1;
-		else if ( texture.format === RGBFormat ) channels = 3;
+		else if ( texture.format === RGFormat || texture.format === RGIntegerFormat ) channels = 2;
+		else if ( texture.format === RGBFormat || texture.format === RGBIntegerFormat ) channels = 3;
 
 		let bytesPerPixel = bytesPerChannel * channels;
 

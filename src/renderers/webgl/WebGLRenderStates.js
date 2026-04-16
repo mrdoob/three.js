@@ -57,7 +57,8 @@ function WebGLRenderState( extensions ) {
 
 		lights: lights,
 
-		transmissionRenderTarget: {}
+		transmissionRenderTarget: {},
+		textureUnits: 0
 	};
 
 	return {

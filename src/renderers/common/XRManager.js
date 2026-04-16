@@ -11,15 +11,16 @@ import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat,
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
-import QuadMesh from './QuadMesh.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { warn } from '../../utils.js';
+import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
+
+const _contextNodeLib = /*@__PURE__*/ new WeakMap();
 
 /**
  * The XR manager is built on top of the WebXR Device API to
@@ -181,8 +182,6 @@ class XRManager extends EventDispatcher {
 		 * @readonly
 		 */
 		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
-
-		this._frameBufferTargets = null;
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -830,18 +829,22 @@ class XRManager extends EventDispatcher {
 		const renderer = this._renderer;
 
 		const wasPresenting = this.isPresenting;
-		const rendererOutputTarget = renderer.getOutputRenderTarget();
-		const rendererFramebufferTarget = renderer._frameBufferTarget;
+
 		this.isPresenting = false;
 
 		const rendererSize = new Vector2();
 		renderer.getSize( rendererSize );
-		const rendererQuad = renderer._quad;
+
+		const currentRenderTarget = renderer.getRenderTarget();
 
 		for ( const layer of this._layers ) {
 
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget._hasExternalTextures = layer.renderTarget.isXRRenderTarget;
+
+			const currentContextNode = renderer.contextNode;
+
+			let contextNode;
 
 			if ( layer.renderTarget.isXRRenderTarget && this._sessionUsesLayers ) {
 
@@ -854,42 +857,46 @@ class XRManager extends EventDispatcher {
 					undefined );
 
 				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
-				renderer.setOutputRenderTarget( layer.renderTarget );
-				renderer.setRenderTarget( null );
-				renderer._frameBufferTarget = null;
 
-				this._frameBufferTargets || ( this._frameBufferTargets = new WeakMap() );
-				const { frameBufferTarget, quad } = this._frameBufferTargets.get( layer.renderTarget ) || { frameBufferTarget: null, quad: null };
-				if ( ! frameBufferTarget ) {
+				contextNode = _contextNodeLib.get( currentContextNode );
 
-					renderer._quad = new QuadMesh( new NodeMaterial() );
-					this._frameBufferTargets.set( layer.renderTarget, { frameBufferTarget: renderer._getFrameBufferTarget(), quad: renderer._quad } );
+				if ( contextNode === undefined ) {
 
-				} else {
+					// Apply ToneMapping and OutputColorSpace directly in the material shader
 
-					renderer._frameBufferTarget = frameBufferTarget;
-					renderer._quad = quad;
+					contextNode = currentContextNode.context( {
+
+						getOutput: ( outputNode ) => {
+
+							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+
+						}
+
+					} );
+
+					_contextNodeLib.set( currentContextNode, contextNode );
 
 				}
 
-				layer.rendercall();
-
-				renderer._frameBufferTarget = null;
-
 			} else {
 
-				renderer.setRenderTarget( layer.renderTarget );
-				layer.rendercall();
+				contextNode = currentContextNode;
 
 			}
 
+			renderer.contextNode = contextNode;
+
+			renderer.setRenderTarget( layer.renderTarget );
+
+			layer.rendercall();
+
+			renderer.contextNode = currentContextNode;
+
 		}
 
-		renderer.setRenderTarget( null );
-		renderer.setOutputRenderTarget( rendererOutputTarget );
-		renderer._frameBufferTarget = rendererFramebufferTarget;
+		renderer.setRenderTarget( currentRenderTarget );
 		renderer._setXRLayerSize( rendererSize.x, rendererSize.y );
-		renderer._quad = rendererQuad;
+
 		this.isPresenting = wasPresenting;
 
 	}

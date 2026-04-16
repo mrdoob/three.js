@@ -179,7 +179,7 @@ class FirstPersonControls extends Controls {
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -193,7 +193,7 @@ class FirstPersonControls extends Controls {
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 
-		this.domElement.style.touchAction = 'auto';
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 
@@ -308,11 +308,11 @@ class FirstPersonControls extends Controls {
 	}
 
 	/**
-	 * @deprecated, r184. The controls now handle resize internally.
+	 * @deprecated, r184. This method is no longer needed.
 	 */
 	handleResize() {
 
-		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed. The controls now handle resize internally.' );
+		console.warn( 'THREE.FirstPersonControls: handleResize() has been removed.' );
 
 	}
 

@@ -55,8 +55,11 @@ class Memory extends Tab {
 		this.indirectStorageAttributes = new Item( 'Indirect Storage Attributes', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.indirectStorageAttributes );
 
-		this.programs = new Item( 'Programs', createValueSpan(), 'N/A' );
+		this.programs = new Item( 'Programs', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.programs );
+
+		this.readbackBuffers = new Item( 'Readback Buffers', createValueSpan(), createValueSpan() );
+		this.memoryStats.add( this.readbackBuffers );
 
 		this.renderTargets = new Item( 'Render Targets', createValueSpan(), 'N/A' );
 		this.memoryStats.add( this.renderTargets );
@@ -79,7 +82,7 @@ class Memory extends Tab {
 		const memory = renderer.info.memory;
 
 		this.graph.addPoint( 'total', memory.total );
-		
+
 		if ( this.graph.limit === 0 ) this.graph.limit = 1;
 
 		this.graph.update();
@@ -98,17 +101,21 @@ class Memory extends Tab {
 		setText( this.attributes.data[ 1 ], memory.attributes.toString() );
 		setText( this.attributes.data[ 2 ], formatBytes( memory.attributesSize ) );
 		setText( this.geometries.data[ 1 ], memory.geometries.toString() );
-		
+
 		setText( this.indexAttributes.data[ 1 ], memory.indexAttributes.toString() );
 		setText( this.indexAttributes.data[ 2 ], formatBytes( memory.indexAttributesSize ) );
-		
+
 		setText( this.indirectStorageAttributes.data[ 1 ], memory.indirectStorageAttributes.toString() );
 		setText( this.indirectStorageAttributes.data[ 2 ], formatBytes( memory.indirectStorageAttributesSize ) );
 
 		setText( this.programs.data[ 1 ], memory.programs.toString() );
-		
+		setText( this.programs.data[ 2 ], formatBytes( memory.programsSize ) );
+
+		setText( this.readbackBuffers.data[ 1 ], memory.readbackBuffers.toString() );
+		setText( this.readbackBuffers.data[ 2 ], formatBytes( memory.readbackBuffersSize ) );
+
 		setText( this.renderTargets.data[ 1 ], memory.renderTargets.toString() );
-		
+
 		setText( this.storageAttributes.data[ 1 ], memory.storageAttributes.toString() );
 		setText( this.storageAttributes.data[ 2 ], formatBytes( memory.storageAttributesSize ) );
 		setText( this.textures.data[ 1 ], memory.textures.toString() );

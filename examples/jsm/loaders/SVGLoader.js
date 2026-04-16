@@ -3005,7 +3005,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			addVertex( tempV2_4, u, v );
+			addVertex( tempV2_3, u, v );
 			addVertex( p2, u, v );
 			addVertex( center, u, 0.5 );
 

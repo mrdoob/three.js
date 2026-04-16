@@ -1,8 +1,6 @@
-import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
 
-const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
 /**
@@ -44,9 +42,8 @@ export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onRefe
 
 	if ( rotation ) {
 
-		_e1.copy( rotation );
-
-		_m1.makeRotationFromEuler( _e1 );
+		// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
+		_m1.makeRotationFromEuler( rotation ).transpose();
 
 	} else {
 

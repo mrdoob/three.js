@@ -232,6 +232,7 @@ export class Style {
 	max-height: calc(100vh - 120px);
 	overflow-y: auto;
 	overflow-x: hidden;
+	width: 100%;
 }
 
 .mini-panel-content .list-scroll-wrapper::-webkit-scrollbar {
@@ -672,7 +673,7 @@ export class Style {
 }
 
 /* Hide drag indicator on mobile devices */
-#profiler-panel.hide-position-toggle .tab-btn.active::before {
+#profiler-panel.is-mobile .tab-btn.active::before {
 	display: none;
 }
 
@@ -765,7 +766,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
-	touch-action: none;
+	touch-action: pan-x;
 }
 
 .tab-btn.active {
@@ -1041,10 +1042,11 @@ export class Style {
 }
 
 .list-scroll-wrapper {
-	overflow-x: auto;
-	width: 100%;
-	user-select: none;
-	-webkit-user-select: none;
+	width: max-content;
+	min-width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {
@@ -1095,6 +1097,11 @@ export class Style {
 	flex-grow: 1;
 	max-width: 300px;
 	border-radius: 15px;
+}
+
+.console-filter-input:focus {
+	outline: none;
+	border-color: var(--text-secondary);
 }
 
 .console-copy-button {
@@ -1198,6 +1205,11 @@ export class Style {
 	font-family: var(--font-mono);
 	width: 100%;
 	box-sizing: border-box;
+}
+
+.param-control input:focus {
+	outline: none;
+	border-color: var(--accent-color);
 }
 
 .param-control select {
@@ -1624,6 +1636,25 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 #profiler-panel input[type="number"],
 .detached-tab-content input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+.panel-action-btn {
+	background: transparent;
+	color: var(--text-primary);
+	border: 1px solid var(--profiler-border);
+	border-radius: 4px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-family: var(--font-family);
+	font-size: 12px;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel-action-btn:hover {
+	background-color: rgba(255, 255, 255, 0.05);
 }
 `;
 		const styleElement = document.createElement( 'style' );
