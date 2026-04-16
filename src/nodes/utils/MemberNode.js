@@ -91,7 +91,17 @@ class MemberNode extends Node {
 		}
 
 		const type = this.getNodeType( builder );
-		const struct = builder.getStructTypeNode( type );
+		let struct = builder.getStructTypeNode( type );
+
+		if ( struct === null ) {
+
+			// The inner struct type may not yet be registered in the builder when
+			// getMemberType is called on a nested MemberNode (e.g. outer.get('inner').get('x')).
+			// Triggering build() on the structNode runs setup(), which registers the type.
+			this.structNode.build( builder );
+			struct = builder.getStructTypeNode( type );
+
+		}
 
 		return struct.getMemberType( builder, name );
 
