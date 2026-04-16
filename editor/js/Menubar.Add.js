@@ -4,6 +4,9 @@ import { UIPanel, UIRow } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 function MenubarAdd( editor ) {
 
 	const strings = editor.strings;
@@ -263,6 +266,43 @@ function MenubarAdd( editor ) {
 		mesh.name = 'Tetrahedron';
 
 		editor.execute( new AddObjectCommand( editor, mesh ) );
+
+	} );
+	meshSubmenu.add( option );
+
+	// Mesh / Text
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/text' ) );
+	option.onClick( function () {
+
+		const loader = new FontLoader();
+		loader.load( '../examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+			const text = 'THREE.JS';
+
+			const geometry = new TextGeometry( text, {
+				text: text,
+				font,
+				size: 1,
+				depth: 0.5,
+				curveSegments: 4,
+
+				bevelEnabled: false,
+				bevelThickness: 0.1,
+				bevelSize: 0.01,
+				bevelOffset: 0,
+				bevelSegments: 3
+
+			} );
+
+			const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+			mesh.name = 'Text';
+
+			editor.execute( new AddObjectCommand( editor, mesh ) );
+
+		} );
 
 	} );
 	meshSubmenu.add( option );

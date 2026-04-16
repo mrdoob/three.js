@@ -310,18 +310,18 @@ class Projector {
 				const v2 = _vertexPool[ b ];
 				const v3 = _vertexPool[ c ];
 
-				// Get homogeneous clip space positions (before perspective divide)
-				_clipPos1.copy( v1.positionWorld ).applyMatrix4( _viewProjectionMatrix );
-				_clipPos2.copy( v2.positionWorld ).applyMatrix4( _viewProjectionMatrix );
-				_clipPos3.copy( v3.positionWorld ).applyMatrix4( _viewProjectionMatrix );
+				// Derive near/far clip distances from NDC z and stored clip-space w
+				// (projectVertex already computed positionScreen = clipPos / w, with w preserved)
+				const w1 = v1.positionScreen.w;
+				const w2 = v2.positionScreen.w;
+				const w3 = v3.positionScreen.w;
 
-				// Check if triangle needs clipping
-				const nearDist1 = _clipPos1.z + _clipPos1.w;
-				const nearDist2 = _clipPos2.z + _clipPos2.w;
-				const nearDist3 = _clipPos3.z + _clipPos3.w;
-				const farDist1 = - _clipPos1.z + _clipPos1.w;
-				const farDist2 = - _clipPos2.z + _clipPos2.w;
-				const farDist3 = - _clipPos3.z + _clipPos3.w;
+				const nearDist1 = w1 * ( v1.positionScreen.z + 1 );
+				const nearDist2 = w2 * ( v2.positionScreen.z + 1 );
+				const nearDist3 = w3 * ( v3.positionScreen.z + 1 );
+				const farDist1 = w1 * ( 1 - v1.positionScreen.z );
+				const farDist2 = w2 * ( 1 - v2.positionScreen.z );
+				const farDist3 = w3 * ( 1 - v3.positionScreen.z );
 
 				// Check if completely outside
 				if ( ( nearDist1 < 0 && nearDist2 < 0 && nearDist3 < 0 ) ||
@@ -385,7 +385,10 @@ class Projector {
 
 				}
 
-				// Triangle needs clipping
+				// Triangle needs clipping - reconstruct clip-space positions from NDC + w
+				_clipPos1.set( v1.positionScreen.x * w1, v1.positionScreen.y * w1, v1.positionScreen.z * w1, w1 );
+				_clipPos2.set( v2.positionScreen.x * w2, v2.positionScreen.y * w2, v2.positionScreen.z * w2, w2 );
+				_clipPos3.set( v3.positionScreen.x * w3, v3.positionScreen.y * w3, v3.positionScreen.z * w3, w3 );
 				_clipInputVertices[ 0 ] = _clipPos1;
 				_clipInputVertices[ 1 ] = _clipPos2;
 				_clipInputVertices[ 2 ] = _clipPos3;
@@ -577,7 +580,7 @@ class Projector {
 
 			if ( sortObjects === true ) {
 
-				painterSortStable( _renderData.objects, 0, _renderData.objects.length );
+				_renderData.objects.sort( painterSort );
 
 			}
 
@@ -843,7 +846,7 @@ class Projector {
 
 			if ( sortElements === true ) {
 
-				painterSortStable( _renderData.elements, 0, _renderData.elements.length );
+				_renderData.elements.sort( painterSort );
 
 			}
 
@@ -982,29 +985,6 @@ class Projector {
 			} else {
 
 				return 0;
-
-			}
-
-		}
-
-		function painterSortStable( array, start, length ) {
-
-			// A stable insertion sort for sorting render items
-			// This avoids the GC overhead of Array.prototype.sort()
-
-			for ( let i = start + 1; i < start + length; i ++ ) {
-
-				const item = array[ i ];
-				let j = i - 1;
-
-				while ( j >= start && painterSort( array[ j ], item ) > 0 ) {
-
-					array[ j + 1 ] = array[ j ];
-					j --;
-
-				}
-
-				array[ j + 1 ] = item;
 
 			}
 

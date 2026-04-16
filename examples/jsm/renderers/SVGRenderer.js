@@ -300,29 +300,6 @@ class SVGRenderer {
 
 		}
 
-		function arraySortStable( array, start, length ) {
-
-			// A stable insertion sort for sorting the render list
-			// This avoids the GC overhead of Array.prototype.sort()
-
-			for ( let i = start + 1; i < start + length; i ++ ) {
-
-				const item = array[ i ];
-				let j = i - 1;
-
-				while ( j >= start && renderSort( array[ j ], item ) > 0 ) {
-
-					array[ j + 1 ] = array[ j ];
-					j --;
-
-				}
-
-				array[ j + 1 ] = item;
-
-			}
-
-		}
-
 		/**
 		 * Performs a manual clear with the defined clear color.
 		 */
@@ -416,9 +393,13 @@ class SVGRenderer {
 
 			} );
 
-			if ( this.sortElements ) {
+			_renderListPool.length = _renderListCount;
 
-				arraySortStable( _renderListPool, 0, _renderListCount );
+			if ( this.sortElements && _svgObjectCount > 0 ) {
+
+				// Elements are already sorted by the Projector.
+				// Only re-sort when SVGObjects need depth-interleaving.
+				_renderListPool.sort( renderSort );
 
 			}
 

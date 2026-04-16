@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DynamicLighting - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Lighting.html">Lighting</a> → </p>
+	<h1 translate="no">DynamicLighting</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A custom lighting implementation that batches supported analytic lights into
+uniform arrays so light count changes do not recompile materials.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lighting = new DynamicLighting( { maxPointLights: 64 } );
+renderer.lighting = lighting;
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DynamicLighting</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DynamicLighting } from 'three/addons/lighting/DynamicLighting.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DynamicLighting" translate="no">new <a href="#DynamicLighting">DynamicLighting</a><span class="signature">( options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new dynamic lighting system.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Dynamic lighting configuration.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxDirectionalLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched directional lights.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxPointLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched point lights.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxSpotLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched spot lights.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxHemisphereLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched hemisphere lights.</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Classes</h2>
+				<dl>
+					<dt><a href="DynamicLighting.html">DynamicLighting</a></dt>
+					<dd></dd>
+				</dl>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createNode" translate="no">.<a href="#createNode">createNode</a><span class="signature">( lights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : <a href="DynamicLightsNode.html">DynamicLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new dynamic lights node for the given array of lights.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lights</strong>
+									</td>
+									<td class="description last">
+										<p>The lights to bind to the node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#createNode">Lighting#createNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The dynamic lights node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNode" translate="no">.<a href="#getNode">getNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a lights node for the given scene.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#getNode">Lighting#getNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/DynamicLighting.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/DynamicLighting.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

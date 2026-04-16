@@ -51,6 +51,20 @@ for render objects.</p></div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
+					<h3 class="name" id="allowEarlyReturns" translate="no">.<a href="#allowEarlyReturns">allowEarlyReturns</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>A flag that indicates that early returns are allowed.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="allowGlobalVariables" translate="no">.<a href="#allowGlobalVariables">allowGlobalVariables</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>A flag that indicates that global variables are allowed.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="builtins" translate="no">.<a href="#builtins">builtins</a><span class="type-signature"> : Object.&lt;string, Map.&lt;string, Object>></span> </h3>
 					<div class="description">
 						<p>A dictionary that holds for each shader stage a Map of builtins.</p>
@@ -1548,18 +1562,6 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getUniformBufferLimit" translate="no">.<a href="#getUniformBufferLimit">getUniformBufferLimit</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Returns the maximum uniform buffer size limit.</p>
-						</div>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getUniformBufferLimit">NodeBuilder#getUniformBufferLimit</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The maximum uniform buffer size in bytes.</dt>
-						</dl>
-					</div>
 					<h3 class="name name-method" id="getUniformFromNode" translate="no">.<a href="#getUniformFromNode">getUniformFromNode</a><span class="signature">( node : <span class="param-type"><a href="UniformNode.html">UniformNode</a></span>, type : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeUniform.html">NodeUniform</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1636,7 +1638,7 @@ and layouts.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the uniforms.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getVar" translate="no">.<a href="#getVar">getVar</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getVar" translate="no">.<a href="#getVar">getVar</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span>, qualifier : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a WGSL string representing a variable.</p>
@@ -1666,6 +1668,15 @@ and layouts.</p>
 									<td class="description last">
 										<p>The array length.</p>
 										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">qualifier</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's qualifier.</p>
+										<p>Default is <code>''</code>.</p>
 									</td>
 								</tr>
 							</tbody>

@@ -601,7 +601,8 @@ class FBXTreeParser {
 
 		}
 
-		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
+		// the transparency handling is implemented based on Blender's approach:
+		// https://github.com/blender/blender/blob/main/scripts/addons_core/io_scene_fbx/import_fbx.py
 
 		parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
 
@@ -611,7 +612,10 @@ class FBXTreeParser {
 
 			if ( parameters.opacity === null ) {
 
-				parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+				// Default to opaque. Some exporters (e.g. 3ds Max) define TransparentColor
+				// as white (1,1,1) without intending transparency, which makes the Unity-style
+				// fallback of `1 - TransparentColor.r` produce incorrect zero opacity.
+				parameters.opacity = 1;
 
 			}
 
@@ -824,8 +828,6 @@ class FBXTreeParser {
 				indices: [],
 				weights: [],
 				transformLink: new Matrix4().fromArray( boneNode.TransformLink.a ),
-				// transform: new Matrix4().fromArray( boneNode.Transform.a ),
-				// linkMode: boneNode.Mode,
 
 			};
 
@@ -918,8 +920,6 @@ class FBXTreeParser {
 
 		} );
 
-		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
-
 		this.addGlobalSceneSettings();
 
 		sceneGraph.traverse( function ( node ) {
@@ -942,6 +942,64 @@ class FBXTreeParser {
 
 		} );
 
+		// Like Blender's FBX importer, use the BindPose section to set the
+		// rest pose for bones that are not part of a skin cluster. The BindPose
+		// provides a more authoritative rest pose than the Lcl properties which
+		// may represent an animation frame rather than the true rest state.
+		// Bones WITH clusters will get their bind pose from TransformLink
+		// (set via bindSkeleton below), which takes priority.
+		const bindPoseMatrices = this.parsePoseNodes();
+		const clusterBoneIDs = new Set();
+
+		for ( const ID in deformers.skeletons ) {
+
+			deformers.skeletons[ ID ].rawBones.forEach( function ( _, i ) {
+
+				const bone = deformers.skeletons[ ID ].bones[ i ];
+				if ( bone ) clusterBoneIDs.add( bone.ID );
+
+			} );
+
+		}
+
+		const tempMatrix = new Matrix4();
+
+		sceneGraph.traverse( function ( node ) {
+
+			if ( node.isBone && node.ID !== undefined && ! clusterBoneIDs.has( node.ID ) ) {
+
+				const bindPose = bindPoseMatrices[ node.ID ];
+
+				if ( bindPose !== undefined ) {
+
+					if ( node.parent ) {
+
+						tempMatrix.copy( node.parent.matrixWorld ).invert();
+						tempMatrix.multiply( bindPose );
+
+					} else {
+
+						tempMatrix.copy( bindPose );
+
+					}
+
+					tempMatrix.decompose( node.position, node.quaternion, node.scale );
+					node.updateMatrix();
+					node.matrixWorld.copy( bindPose );
+
+				}
+
+			}
+
+		} );
+
+		// Bind skeletons after transforms are applied so that bind matrices
+		// are computed from the final scene state. This ensures the rest pose
+		// is correct even when the FBX file's Cluster TransformLink matrices
+		// differ from the reconstructed bone transforms (common in files
+		// without a BindPose section).
+		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
+
 		const animations = new AnimationParser().parse();
 
 		// if all the models where already combined in a single group, just return that
@@ -953,6 +1011,24 @@ class FBXTreeParser {
 		}
 
 		sceneGraph.animations = animations;
+
+		// Apply coordinate system correction. FBX files can use different
+		// up-axis conventions (Y-up or Z-up). Three.js uses Y-up, so rotate
+		// the scene when the file uses Z-up (UpAxis === 2).
+
+		if ( 'GlobalSettings' in fbxTree && 'UpAxis' in fbxTree.GlobalSettings ) {
+
+			const upAxis = fbxTree.GlobalSettings.UpAxis.value;
+
+			if ( upAxis === 2 ) {
+
+				console.warn( 'THREE.FBXLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted.' );
+
+				sceneGraph.rotation.set( - Math.PI / 2, 0, 0 );
+
+			}
+
+		}
 
 	}
 
@@ -1236,21 +1312,24 @@ class FBXTreeParser {
 
 				case 2: // Spot
 					let angle = Math.PI / 3;
-
-					if ( lightAttribute.InnerAngle !== undefined ) {
-
-						angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
-
-					}
-
 					let penumbra = 0;
+
 					if ( lightAttribute.OuterAngle !== undefined ) {
 
-						// TODO: this is not correct - FBX calculates outer and inner angle in degrees
-						// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-						// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-						penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
-						penumbra = Math.max( penumbra, 1 );
+						angle = MathUtils.degToRad( lightAttribute.OuterAngle.value );
+
+						if ( lightAttribute.InnerAngle !== undefined ) {
+
+							penumbra = 1 - ( lightAttribute.InnerAngle.value / lightAttribute.OuterAngle.value );
+							penumbra = Math.max( 0, penumbra ); // penumbra must be in the range [0,1]
+
+						}
+
+					} else if ( lightAttribute.InnerAngle !== undefined ) {
+
+						// fallback if only InnerAngle is defined
+
+						angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 					}
 
@@ -1460,11 +1539,29 @@ class FBXTreeParser {
 
 	bindSkeleton( skeletons, geometryMap, modelMap ) {
 
-		const bindMatrices = this.parsePoseNodes();
-
 		for ( const ID in skeletons ) {
 
 			const skeleton = skeletons[ ID ];
+
+			// Compute bone inverses from TransformLink rather than from the
+			// bones' current matrixWorld. The TransformLink matrices represent
+			// each bone's global transform at the time the skin weights were
+			// painted, which may differ from the scene-reconstructed transforms.
+			const boneInverses = [];
+
+			for ( let i = 0, l = skeleton.bones.length; i < l; i ++ ) {
+
+				const inverse = new Matrix4();
+
+				if ( skeleton.bones[ i ] && skeleton.rawBones[ i ] ) {
+
+					inverse.copy( skeleton.rawBones[ i ].transformLink ).invert();
+
+				}
+
+				boneInverses.push( inverse );
+
+			}
 
 			const parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
@@ -1481,7 +1578,16 @@ class FBXTreeParser {
 
 							const model = modelMap.get( geoConnParent.ID );
 
-							model.bind( new Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
+							// Use the mesh's current matrixWorld as bind matrix.
+							// The BindPose section is intentionally not used here
+							// since it may contain scale/rotation from the model
+							// hierarchy that is inconsistent with the TransformLink-
+							// based bone inverses. Always provide a bind matrix to
+							// prevent bind() from calling calculateInverses() which
+							// would overwrite the bone inverses computed above.
+							model.updateMatrixWorld( true );
+
+							model.bind( new Skeleton( skeleton.bones, boneInverses ), model.matrixWorld );
 
 						}
 
@@ -1495,6 +1601,7 @@ class FBXTreeParser {
 
 	}
 
+	// Parse BindPose nodes and return a map of node ID to bind matrix.
 	parsePoseNodes() {
 
 		const bindMatrices = {};
@@ -2257,6 +2364,13 @@ class GeometryParser {
 		parentGeo.morphAttributes.position = [];
 		// parentGeo.morphAttributes.normal = []; // not implemented
 
+		// Morph attribute positions are stored as deltas (morphTargetsRelative = true), so the
+		// translation component of the geometric transform must not be applied to them — only the
+		// rotation/scale part. Otherwise every delta gets the geometric translation added, which
+		// shifts morphed vertices away from their intended position by `weight * translation` as
+		// the influence increases.
+		const morphPreTransform = preTransform.clone().setPosition( 0, 0, 0 );
+
 		const scope = this;
 		morphTargets.forEach( function ( morphTarget ) {
 
@@ -2266,7 +2380,7 @@ class GeometryParser {
 
 				if ( morphGeoNode !== undefined ) {
 
-					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, morphPreTransform, rawTarget.name );
 
 				}
 
@@ -2661,11 +2775,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ].ID;
+								} );
+
+								if ( filteredParents.length === 0 ) return;
+
+								const modelID = filteredParents[ 0 ].ID;
 
 								if ( modelID !== undefined ) {
 
@@ -2694,7 +2812,13 @@ class AnimationParser {
 
 											node.transform = child.matrix;
 
-											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
+											if ( child.userData.transformData ) {
+
+												node.eulerOrder = child.userData.transformData.eulerOrder;
+
+												if ( child.userData.transformData.rotation ) node.initialRotation = child.userData.transformData.rotation;
+
+											}
 
 										}
 
@@ -2719,11 +2843,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ].ID;
+								} );
+
+								if ( filteredParents.length === 0 ) return;
+
+								const deformerID = filteredParents[ 0 ].ID;
 
 								const morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 								const geoID = connections.get( morpherID ).parents[ 0 ].ID;
@@ -2834,7 +2962,7 @@ class AnimationParser {
 
 		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
+			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder, rawTracks.initialRotation );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
@@ -2866,17 +2994,33 @@ class AnimationParser {
 
 	}
 
-	generateRotationTrack( modelName, curves, preRotation, postRotation, eulerOrder ) {
+	generateRotationTrack( modelName, curves, preRotation, postRotation, eulerOrder, initialRotation ) {
 
 		let times;
 		let values;
 
-		if ( curves.x !== undefined && curves.y !== undefined && curves.z !== undefined ) {
+		if ( curves.x !== undefined || curves.y !== undefined || curves.z !== undefined ) {
 
-			const result = this.interpolateRotations( curves.x, curves.y, curves.z, eulerOrder );
+			// Get merged, sorted, unique times from all available curves
+			const mergedTimes = this.getTimesForAllAxes( curves );
 
-			times = result[ 0 ];
-			values = result[ 1 ];
+			if ( mergedTimes.length > 0 ) {
+
+				const initialRot = initialRotation || [ 0, 0, 0 ];
+
+				// Synchronize all curves to the merged time array.
+				// Missing axes are filled with constant values from the initial rotation (Lcl Rotation).
+				// Existing curves at different times are linearly interpolated.
+				const syncX = this.synchronizeCurve( curves.x, mergedTimes, initialRot[ 0 ] );
+				const syncY = this.synchronizeCurve( curves.y, mergedTimes, initialRot[ 1 ] );
+				const syncZ = this.synchronizeCurve( curves.z, mergedTimes, initialRot[ 2 ] );
+
+				const result = this.interpolateRotations( syncX, syncY, syncZ, eulerOrder );
+
+				times = result[ 0 ];
+				values = result[ 1 ];
+
+			}
 
 		}
 
@@ -2908,7 +3052,7 @@ class AnimationParser {
 
 		const quaternionValues = [];
 
-		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [ 0 ], [ 0 ] );
+		if ( ! values || ! times ) return undefined;
 
 		for ( let i = 0; i < values.length; i += 3 ) {
 
@@ -3061,6 +3205,62 @@ class AnimationParser {
 
 	}
 
+	// Synchronize a curve to a target time array using linear interpolation.
+	// If the curve is undefined (axis not animated), returns constant values from initialValue.
+	synchronizeCurve( curve, targetTimes, initialValue ) {
+
+		if ( curve === undefined ) {
+
+			return { times: targetTimes, values: targetTimes.map( () => initialValue ) };
+
+		}
+
+		// If the curve already has the same number of keyframes as the target, assume times match
+		if ( curve.times.length === targetTimes.length ) return curve;
+
+		// Linearly interpolate curve values at each target time
+		const values = [];
+
+		for ( let i = 0; i < targetTimes.length; i ++ ) {
+
+			values.push( this.sampleCurveValue( curve, targetTimes[ i ], initialValue ) );
+
+		}
+
+		return { times: targetTimes, values: values };
+
+	}
+
+	// Sample a single value from a curve at a given time using linear interpolation
+	sampleCurveValue( curve, time, initialValue ) {
+
+		const times = curve.times;
+		const values = curve.values;
+
+		// Before first keyframe
+		if ( time <= times[ 0 ] ) return values[ 0 ];
+
+		// After last keyframe
+		if ( time >= times[ times.length - 1 ] ) return values[ values.length - 1 ];
+
+		// Find surrounding keyframes and linearly interpolate
+		for ( let i = 0; i < times.length - 1; i ++ ) {
+
+			if ( time >= times[ i ] && time <= times[ i + 1 ] ) {
+
+				if ( times[ i ] === time ) return values[ i ];
+
+				const alpha = ( time - times[ i ] ) / ( times[ i + 1 ] - times[ i ] );
+				return values[ i ] * ( 1 - alpha ) + values[ i + 1 ] * alpha;
+
+			}
+
+		}
+
+		return initialValue;
+
+	}
+
 	// Rotations are defined as Euler angles which can have values  of any size
 	// These will be converted to quaternions which don't support values greater than
 	// PI, so we'll interpolate large rotations
@@ -3130,7 +3330,7 @@ class AnimationParser {
 				const Q2 = new Quaternion().setFromEuler( E2 );
 
 				// Check unroll
-				if ( Q1.dot( Q2 ) ) {
+				if ( Q1.dot( Q2 ) < 0 ) {
 
 					Q2.set( - Q2.x, - Q2.y, - Q2.z, - Q2.w );
 

@@ -25,8 +25,8 @@ class Performance extends Tab {
 		graphContainer.className = 'graph-container';
 
 		const graph = new Graph();
-		graph.addLine( 'fps', '--accent-color' );
-		//graph.addLine( 'gpu', '--color-yellow' );
+		graph.addLine( 'fps', 'var( --color-fps )' );
+		//graph.addLine( 'gpu', 'var( --color-yellow )' );
 		graphContainer.append( graph.domElement );
 
 		//

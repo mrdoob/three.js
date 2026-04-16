@@ -252,6 +252,33 @@ class TransformControls extends Controls {
 		defineProperty( 'showZ', true );
 
 		/**
+		 * Whether the xy-plane helper should be visible or not.
+		 *
+		 * @name TransformControls#showXY
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXY', true );
+
+		/**
+		 * Whether the yz-plane helper should be visible or not.
+		 *
+		 * @name TransformControls#showYZ
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showYZ', true );
+
+		/**
+		 * Whether the xz-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showXZ
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXZ', true );
+
+		/**
 		 * The minimum allowed X position during translation.
 		 *
 		 * @name TransformControls#minX
@@ -373,7 +400,7 @@ class TransformControls extends Controls {
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -384,7 +411,7 @@ class TransformControls extends Controls {
 		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'auto';
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 
@@ -1783,6 +1810,11 @@ class TransformControlsGizmo extends Object3D {
 			handle.visible = handle.visible && ( handle.name.indexOf( 'Y' ) === - 1 || this.showY );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'Z' ) === - 1 || this.showZ );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'E' ) === - 1 || ( this.showX && this.showY && this.showZ ) );
+
+			// Hide disabled plane helpers
+			handle.visible = handle.visible && ( handle.name.indexOf( 'XY' ) === - 1 || this.showXY );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'YZ' ) === - 1 || this.showYZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'XZ' ) === - 1 || this.showXZ );
 
 			// highlight selected axis
 

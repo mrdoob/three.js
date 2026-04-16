@@ -57,6 +57,9 @@
 		"webgl_lensflares",
 		"webgl_lightprobe",
 		"webgl_lightprobe_cubecamera",
+		"webgl_lightprobes",
+		"webgl_lightprobes_complex",
+		"webgl_lightprobes_sponza",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_spotlight",
@@ -122,7 +125,6 @@
 		"webgl_loader_usdz",
 		"webgl_loader_vox",
 		"webgl_loader_vrml",
-		"webgl_loader_vtk",
 		"webgl_loader_xyz",
 		"webgl_lod",
 		"webgl_marchingcubes",
@@ -153,6 +155,7 @@
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
+		"webgl_materials_texture_html",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
@@ -295,6 +298,12 @@
 		"webgl_worker_offscreencanvas",
 		"webgl_performance"
 	],
+	"webgl / tsl": [
+		"webgl_tsl_shadowmap",
+		"webgl_tsl_skinning",
+		"webgl_tsl_clearcoat",
+		"webgl_tsl_instancing"
+	],
 	"webgpu (wip)": [
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
@@ -308,6 +317,7 @@
 		"webgpu_centroid_sampling",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
+		"webgpu_compile_async",
 		"webgpu_compute_audio",
 		"webgpu_compute_birds",
 		"webgpu_compute_cloth",
@@ -345,6 +355,7 @@
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
 		"webgpu_lights_custom",
+		"webgpu_lights_dynamic",
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
 		"webgpu_lights_physical",
@@ -377,6 +388,7 @@
 		"webgpu_materials_lightmap",
 		"webgpu_materials_matcap",
 		"webgpu_materials_sss",
+		"webgpu_materials_texture_html",
 		"webgpu_materials_texture_manualmipmap",
 		"webgpu_materials_transmission",
 		"webgpu_materials_toon",
@@ -429,6 +441,7 @@
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_ssgi",
+		"webgpu_postprocessing_ssgi_ballpool",
 		"webgpu_postprocessing_ssr",
 		"webgpu_postprocessing_sss",
 		"webgpu_postprocessing_traa",
@@ -471,6 +484,7 @@
 		"webgpu_tsl_earth",
 		"webgpu_tsl_editor",
 		"webgpu_tsl_galaxy",
+		"webgpu_tsl_graph",
 		"webgpu_tsl_halftone",
 		"webgpu_tsl_interoperability",
 		"webgpu_tsl_procedural_terrain",
@@ -480,6 +494,8 @@
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
 		"webgpu_tsl_wood",
+		"webgpu_upscaling_fsr1",
+		"webgpu_upscaling_taau",
 		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_caustics",
@@ -524,8 +540,8 @@
 		"webxr_xr_dragging",
 		"webxr_xr_dragging_custom_depth",
 		"webxr_xr_haptics",
-		"webxr_xr_paint",
-		"webxr_xr_sculpt"
+		"webxr_xr_marchingcubes",
+		"webxr_xr_paint"
 	],
 	"games": [
 		"games_fps"
