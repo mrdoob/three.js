@@ -71951,7 +71951,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isHTMLTexture ) {
 
-				if ( 'texElement2D' in _gl ) {
+				if ( 'texElementImage2D' in _gl ) {
 
 					const canvas = _gl.canvas;
 
