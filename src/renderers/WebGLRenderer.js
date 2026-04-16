@@ -2231,11 +2231,7 @@ class WebGLRenderer {
 			if ( ( ! material.isShaderMaterial && ! material.isRawShaderMaterial ) || material.clipping === true ) {
 
 				uniforms.clippingPlanes = clipping.uniform;
-				uniforms.clippingVolumePlaneStart = clipping.volumePlaneStartUniform;
-				uniforms.clippingVolumePlaneCount = clipping.volumePlaneCountUniform;
-				uniforms.clippingVolumeMode = clipping.volumeModeUniform;
-				uniforms.clippingNumVolumes = clipping.numVolumesUniform;
-				uniforms.clippingNumGlobalVolumes = clipping.numGlobalVolumesUniform;
+				uniforms.clippingPlaneVolumeState = clipping.planeVolumeStateUniform;
 				uniforms.clippingNumGlobalIncludeVolumes = clipping.numGlobalIncludeVolumesUniform;
 				uniforms.clippingNumLocalIncludeVolumes = clipping.numLocalIncludeVolumesUniform;
 
@@ -2311,7 +2307,6 @@ class WebGLRenderer {
 			materialProperties.morphColors = parameters.morphColors;
 			materialProperties.morphTargetsCount = parameters.morphTargetsCount;
 			materialProperties.numClippingPlanes = parameters.numClippingPlanes;
-			materialProperties.numClippingVolumes = parameters.numClippingVolumes;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
 			materialProperties.toneMapping = parameters.toneMapping;
@@ -2465,8 +2460,7 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
-					( materialProperties.numClippingPlanes !== clipping.numPlanes ||
-					materialProperties.numClippingVolumes !== clipping.numVolumes ) ) {
+					materialProperties.numClippingPlanes !== clipping.numPlanes ) {
 
 					needsProgramChange = true;
 

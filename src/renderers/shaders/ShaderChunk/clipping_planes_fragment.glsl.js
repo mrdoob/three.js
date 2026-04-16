@@ -2,156 +2,88 @@ export default /* glsl */`
 #if NUM_CLIPPING_PLANES > 0
 
 	vec4 plane;
+	int volumeState;
+	bool isVolumeEnd;
+	float volumeClipOpacity = 1.0;
+	float planeClipOpacity;
+	float globalIncludeClipOpacity = 0.0;
+	float globalExcludeClipOpacity = 0.0;
+	float localIncludeClipOpacity = 0.0;
+	float localExcludeClipOpacity = 0.0;
+	float clipOpacity;
 
-	#ifdef ALPHA_TO_COVERAGE
+	#ifndef ALPHA_TO_COVERAGE
 
-		float clipOpacity = 1.0;
-		float globalIncludeClipOpacity = 0.0;
-		float globalExcludeClipOpacity = 0.0;
-		float localIncludeClipOpacity = 0.0;
-		float localExcludeClipOpacity = 0.0;
+		float planeDistance;
+		bool isExcludeVolume;
+		bool insidePlane;
 
-		for ( int volumeIndex = 0; volumeIndex < NUM_CLIPPING_VOLUMES; volumeIndex ++ ) {
+	#endif
 
-			if ( volumeIndex >= clippingNumVolumes ) continue;
+	#pragma unroll_loop_start
+	for ( int i = 0; i < NUM_CLIPPING_PLANES; i ++ ) {
 
-			float volumeClipOpacity = 1.0;
-			bool isGlobalVolume = volumeIndex < clippingNumGlobalVolumes;
-			int planeStart = clippingVolumePlaneStart[ volumeIndex ];
-			int planeEnd = planeStart + clippingVolumePlaneCount[ volumeIndex ];
+		plane = clippingPlanes[ UNROLLED_LOOP_INDEX ];
 
-			#pragma unroll_loop_start
-			for ( int i = 0; i < NUM_CLIPPING_PLANES; i ++ ) {
+		volumeState = clippingPlaneVolumeState[ UNROLLED_LOOP_INDEX ];
+		isVolumeEnd = volumeState >= CLIPPING_PLANE_VOLUME_END;
 
-				if ( ( UNROLLED_LOOP_INDEX >= planeStart ) && ( UNROLLED_LOOP_INDEX < planeEnd ) ) {
+		if ( isVolumeEnd ) volumeState -= CLIPPING_PLANE_VOLUME_END;
 
-					plane = clippingPlanes[ UNROLLED_LOOP_INDEX ];
-					volumeClipOpacity *= clippingPlaneOpacity( plane );
+		#ifdef ALPHA_TO_COVERAGE
 
-				}
+			planeClipOpacity = clippingPlaneOpacity( plane );
 
-			}
-			#pragma unroll_loop_end
+		#else
 
-			if ( clippingVolumeMode[ volumeIndex ] == 0 ) {
+			planeDistance = dot( vClipPosition, plane.xyz );
+			isExcludeVolume = volumeState == CLIPPING_PLANE_VOLUME_GLOBAL_EXCLUDE || volumeState == CLIPPING_PLANE_VOLUME_LOCAL_EXCLUDE;
+			insidePlane = isExcludeVolume ? ( planeDistance < plane.w ) : ( planeDistance <= plane.w );
+			planeClipOpacity = insidePlane ? 1.0 : 0.0;
 
-				if ( isGlobalVolume ) {
+		#endif
 
-					globalIncludeClipOpacity = max( globalIncludeClipOpacity, volumeClipOpacity );
+		volumeClipOpacity *= planeClipOpacity;
 
-				} else {
+		if ( isVolumeEnd ) {
 
-					localIncludeClipOpacity = max( localIncludeClipOpacity, volumeClipOpacity );
+			if ( volumeState == CLIPPING_PLANE_VOLUME_GLOBAL_INCLUDE ) {
 
-				}
+				globalIncludeClipOpacity = max( globalIncludeClipOpacity, volumeClipOpacity );
+
+			} else if ( volumeState == CLIPPING_PLANE_VOLUME_GLOBAL_EXCLUDE ) {
+
+				globalExcludeClipOpacity = max( globalExcludeClipOpacity, volumeClipOpacity );
+
+			} else if ( volumeState == CLIPPING_PLANE_VOLUME_LOCAL_INCLUDE ) {
+
+				localIncludeClipOpacity = max( localIncludeClipOpacity, volumeClipOpacity );
 
 			} else {
 
-				if ( isGlobalVolume ) {
-
-					globalExcludeClipOpacity = max( globalExcludeClipOpacity, volumeClipOpacity );
-
-				} else {
-
-					localExcludeClipOpacity = max( localExcludeClipOpacity, volumeClipOpacity );
-
-				}
+				localExcludeClipOpacity = max( localExcludeClipOpacity, volumeClipOpacity );
 
 			}
 
-		}
-
-		bool hasGlobalIncludeVolumes = clippingNumGlobalIncludeVolumes > 0;
-		bool hasLocalIncludeVolumes = clippingNumLocalIncludeVolumes > 0;
-		float globalClipOpacity = 1.0;
-		float localClipOpacity = 1.0;
-
-		if ( hasGlobalIncludeVolumes ) {
-
-			globalClipOpacity *= globalIncludeClipOpacity;
+			volumeClipOpacity = 1.0;
 
 		}
 
-		globalClipOpacity *= 1.0 - globalExcludeClipOpacity;
+	}
+	#pragma unroll_loop_end
 
-		if ( hasLocalIncludeVolumes ) {
+	clipOpacity = ( clippingNumGlobalIncludeVolumes > 0 ? globalIncludeClipOpacity : 1.0 ) * ( 1.0 - globalExcludeClipOpacity );
+	clipOpacity *= ( clippingNumLocalIncludeVolumes > 0 ? localIncludeClipOpacity : 1.0 ) * ( 1.0 - localExcludeClipOpacity );
 
-			localClipOpacity *= localIncludeClipOpacity;
+	#ifdef ALPHA_TO_COVERAGE
 
-		}
-
-		localClipOpacity *= 1.0 - localExcludeClipOpacity;
-		clipOpacity *= globalClipOpacity * localClipOpacity;
 		diffuseColor.a *= clipOpacity;
 
 		if ( diffuseColor.a == 0.0 ) discard;
 
 	#else
 
-		bool insideGlobalIncludeAny = false;
-		bool insideGlobalExcludeAny = false;
-		bool insideLocalIncludeAny = false;
-		bool insideLocalExcludeAny = false;
-
-		for ( int volumeIndex = 0; volumeIndex < NUM_CLIPPING_VOLUMES; volumeIndex ++ ) {
-
-			if ( volumeIndex >= clippingNumVolumes ) continue;
-
-			bool insideVolume = true;
-			bool isExcludeVolume = clippingVolumeMode[ volumeIndex ] == 1;
-			bool isGlobalVolume = volumeIndex < clippingNumGlobalVolumes;
-			int planeStart = clippingVolumePlaneStart[ volumeIndex ];
-			int planeEnd = planeStart + clippingVolumePlaneCount[ volumeIndex ];
-
-			#pragma unroll_loop_start
-			for ( int i = 0; i < NUM_CLIPPING_PLANES; i ++ ) {
-
-				if ( ( UNROLLED_LOOP_INDEX >= planeStart ) && ( UNROLLED_LOOP_INDEX < planeEnd ) ) {
-
-					plane = clippingPlanes[ UNROLLED_LOOP_INDEX ];
-					float planeDistance = dot( vClipPosition, plane.xyz );
-					bool insidePlane = isExcludeVolume ? ( planeDistance < plane.w ) : ( planeDistance <= plane.w );
-					insideVolume = insidePlane && insideVolume;
-
-				}
-
-			}
-			#pragma unroll_loop_end
-
-			if ( ! isExcludeVolume ) {
-
-				if ( isGlobalVolume ) {
-
-					insideGlobalIncludeAny = insideGlobalIncludeAny || insideVolume;
-
-				} else {
-
-					insideLocalIncludeAny = insideLocalIncludeAny || insideVolume;
-
-				}
-
-			} else {
-
-				if ( isGlobalVolume ) {
-
-					insideGlobalExcludeAny = insideGlobalExcludeAny || insideVolume;
-
-				} else {
-
-					insideLocalExcludeAny = insideLocalExcludeAny || insideVolume;
-
-				}
-
-			}
-
-		}
-
-		bool hasGlobalIncludeVolumes = clippingNumGlobalIncludeVolumes > 0;
-		bool hasLocalIncludeVolumes = clippingNumLocalIncludeVolumes > 0;
-		bool globalVisible = ( ! hasGlobalIncludeVolumes || insideGlobalIncludeAny ) && ! insideGlobalExcludeAny;
-		bool localVisible = ( ! hasLocalIncludeVolumes || insideLocalIncludeAny ) && ! insideLocalExcludeAny;
-
-		if ( ! globalVisible || ! localVisible ) discard;
+		if ( clipOpacity == 0.0 ) discard;
 
 	#endif
 

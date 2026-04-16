@@ -4,6 +4,13 @@ export default /* glsl */`
 	varying vec3 vClipPosition;
 
 	uniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];
+	uniform int clippingPlaneVolumeState[ NUM_CLIPPING_PLANES ];
+
+	const int CLIPPING_PLANE_VOLUME_GLOBAL_INCLUDE = 0;
+	const int CLIPPING_PLANE_VOLUME_GLOBAL_EXCLUDE = 1;
+	const int CLIPPING_PLANE_VOLUME_LOCAL_INCLUDE = 2;
+	const int CLIPPING_PLANE_VOLUME_LOCAL_EXCLUDE = 3;
+	const int CLIPPING_PLANE_VOLUME_END = 4;
 
 	float clippingPlaneOpacity( const in vec4 clippingPlane ) {
 
@@ -13,14 +20,8 @@ export default /* glsl */`
 
 	}
 
-	uniform int clippingNumVolumes;
-	uniform int clippingNumGlobalVolumes;
 	uniform int clippingNumGlobalIncludeVolumes;
 	uniform int clippingNumLocalIncludeVolumes;
-
-	uniform int clippingVolumePlaneStart[ NUM_CLIPPING_VOLUMES ];
-	uniform int clippingVolumePlaneCount[ NUM_CLIPPING_VOLUMES ];
-	uniform int clippingVolumeMode[ NUM_CLIPPING_VOLUMES ];
 
 #endif
 `;

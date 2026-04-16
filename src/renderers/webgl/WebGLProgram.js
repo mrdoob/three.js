@@ -232,9 +232,7 @@ function replaceLightNums( string, parameters ) {
 
 function replaceClippingPlaneNums( string, parameters ) {
 
-	return string
-		.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes )
-		.replace( /NUM_CLIPPING_VOLUMES/g, parameters.numClippingVolumes );
+	return string.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes );
 
 }
 
