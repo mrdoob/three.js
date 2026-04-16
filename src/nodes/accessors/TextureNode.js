@@ -352,35 +352,27 @@ class TextureNode extends UniformNode {
 
 		//
 
-		const uvNode = Fn( () => {
+		let uvNode = this.uvNode;
 
-			let uvNode = this.uvNode;
+		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+			uvNode = builder.context.getUV( this, builder );
 
-				uvNode = builder.context.getUV( this, builder );
+		}
 
-			}
+		if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-			if ( ! uvNode ) uvNode = this.getDefaultUV();
+		if ( this.updateMatrix === true ) {
 
-			if ( this.updateMatrix === true ) {
+			uvNode = this.getTransformedUV( uvNode );
 
-				uvNode = this.getTransformedUV( uvNode );
+		}
 
-			}
+		uvNode = this.setupUV( builder, uvNode );
 
-			uvNode = this.setupUV( builder, uvNode );
+		//
 
-			//
-
-			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
-
-			//
-
-			return uvNode;
-
-		} )();
+		this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
 
 		//
 
