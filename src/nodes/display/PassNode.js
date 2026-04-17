@@ -580,6 +580,12 @@ class PassNode extends TempNode {
 
 		if ( texture === undefined ) {
 
+			if ( name === 'depth' ) {
+
+				throw new Error( 'PassNode: Depth texture is not available for this pass.' );
+
+			}
+
 			const refTexture = this.renderTarget.texture;
 
 			texture = refTexture.clone();
