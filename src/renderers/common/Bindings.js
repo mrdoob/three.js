@@ -77,7 +77,21 @@ class Bindings extends DataMap {
 	 */
 	getForRender( renderObject ) {
 
-		return this._getBindings( renderObject, renderObject.getBindings() );
+		const bindings = renderObject.getBindings();
+
+		const renderObjectData = this.get( renderObject );
+
+		if ( renderObjectData.initialized === undefined ) {
+
+			// bind groups are created once per render object
+
+			this._createBindings( bindings );
+
+			renderObjectData.initialized = true;
+
+		}
+
+		return bindings;
 
 	}
 
@@ -89,41 +103,15 @@ class Bindings extends DataMap {
 	 */
 	getForCompute( computeNode ) {
 
-		return this._getBindings( computeNode, this.nodes.getForCompute( computeNode ).bindings );
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 
-	}
+		if ( computeNode.initialized === undefined ) {
 
-	_getBindings( object, bindings ) {
+			// bind groups are created once per render object
 
-		const data = this.get( object );
+			this._createBindings( bindings );
 
-		if ( data.bindings !== bindings ) {
-
-			if ( data.bindings !== undefined ) {
-
-				this._updateBindingsUsage( data.bindings, - 1 );
-
-			}
-
-			this._updateBindingsUsage( bindings, 1 );
-
-			data.bindings = bindings;
-
-		}
-
-		for ( const bindGroup of bindings ) {
-
-			const groupData = this.get( bindGroup );
-
-			if ( groupData.bindGroup === undefined ) {
-
-				this._init( bindGroup );
-
-				this.backend.createBindings( bindGroup, bindings, 0 );
-
-				groupData.bindGroup = bindGroup;
-
-			}
+			computeNode.initialized = true;
 
 		}
 
@@ -160,7 +148,11 @@ class Bindings extends DataMap {
 	 */
 	deleteForCompute( computeNode ) {
 
-		this._deleteBindings( computeNode );
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+
+		this._destroyBindings( bindings );
+
+		this.delete( computeNode );
 
 	}
 
@@ -171,50 +163,84 @@ class Bindings extends DataMap {
 	 */
 	deleteForRender( renderObject ) {
 
-		this._deleteBindings( renderObject );
+		const bindings = renderObject.getBindings();
+
+		this._destroyBindings( bindings );
+
+		this.delete( renderObject );
 
 	}
 
-	_deleteBindings( object ) {
-
-		const data = this.get( object );
-
-		if ( data.bindings !== undefined ) {
-
-			this._updateBindingsUsage( data.bindings, - 1 );
-
-			data.bindings = undefined;
-
-		}
-
-	}
-
-	_updateBindingsUsage( bindings, delta ) {
+	/**
+	 * Creates the bindings for the given array of bindings.
+	 *
+	 * @param {Array<BindGroup>} bindings - The bind groups.
+	 */
+	_createBindings( bindings ) {
 
 		for ( const bindGroup of bindings ) {
 
+			// binding group
+
 			const groupData = this.get( bindGroup );
 
-			groupData.usedTimes = ( groupData.usedTimes || 0 ) + delta;
+			if ( groupData.bindGroup === undefined ) {
 
-			for ( const binding of bindGroup.bindings ) {
+				// initialize
 
-				if ( binding.isUniformBuffer ) {
+				for ( const binding of bindGroup.bindings ) {
 
-					const bindingData = this.get( binding );
+					if ( binding.isUniformBuffer ) {
 
-					bindingData.usedTimes = ( bindingData.usedTimes || 0 ) + delta;
+						this.backend.createUniformBuffer( binding );
 
-					if ( bindingData.usedTimes === 0 ) {
+					} else if ( binding.isSampledTexture ) {
 
-						this.backend.destroyUniformBuffer( binding );
-						this.delete( binding );
+						this.textures.updateTexture( binding.texture );
+
+					} else if ( binding.isSampler ) {
+
+						this.textures.updateSampler( binding.texture );
+
+					} else if ( binding.isStorageBuffer ) {
+
+						const attribute = binding.attribute;
+						const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
+
+						this.attributes.update( attribute, attributeType );
 
 					}
 
 				}
 
+				// each object defines an array of bindings (ubos, textures, samplers etc.)
+
+				this.backend.createBindings( bindGroup, bindings, 0 );
+
+				groupData.bindGroup = bindGroup;
+				groupData.usedTimes = 1;
+
+			} else {
+
+				groupData.usedTimes ++;
+
 			}
+
+		}
+
+	}
+
+	/**
+	 * Deletes the given array of bindings.
+	 *
+	 * @param {Array<BindGroup>} bindings - The bind groups.
+	 */
+	_destroyBindings( bindings ) {
+
+		for ( const bindGroup of bindings ) {
+
+			const groupData = this.get( bindGroup );
+			groupData.usedTimes --;
 
 			if ( groupData.usedTimes === 0 ) {
 
@@ -237,40 +263,6 @@ class Bindings extends DataMap {
 		for ( const bindGroup of bindings ) {
 
 			this._update( bindGroup, bindings );
-
-		}
-
-	}
-
-	/**
-	 * Initializes the given bind group.
-	 *
-	 * @param {BindGroup} bindGroup - The bind group to initialize.
-	 */
-	_init( bindGroup ) {
-
-		for ( const binding of bindGroup.bindings ) {
-
-			if ( binding.isUniformBuffer ) {
-
-				this.backend.createUniformBuffer( binding );
-
-			} else if ( binding.isSampledTexture ) {
-
-				this.textures.updateTexture( binding.texture );
-
-			} else if ( binding.isSampler ) {
-
-				this.textures.updateSampler( binding.texture );
-
-			} else if ( binding.isStorageBuffer ) {
-
-				const attribute = binding.attribute;
-				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
-
-				this.attributes.update( attribute, attributeType );
-
-			}
 
 		}
 
