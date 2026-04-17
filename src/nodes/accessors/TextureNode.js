@@ -4,7 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
