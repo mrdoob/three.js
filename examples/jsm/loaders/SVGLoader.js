@@ -238,7 +238,10 @@ class SVGLoader extends Loader {
 
 				paths.push( path );
 
-				path.userData = { node: node, style: style };
+				const pathStyle = Object.assign( {}, style );
+				pathStyle.strokeWidth = style.strokeWidth * getTransformScale( currentTransform );
+
+				path.userData = { node: node, style: pathStyle };
 
 			}
 
@@ -1872,6 +1875,14 @@ class SVGLoader extends Loader {
 
 			const te = m.elements;
 			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] );
+
+		}
+
+		function getTransformScale( m ) {
+
+			const te = m.elements;
+			const det = te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ];
+			return Math.sqrt( Math.abs( det ) );
 
 		}
 
