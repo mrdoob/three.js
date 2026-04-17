@@ -4,7 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
@@ -352,27 +352,35 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = this.uvNode;
+		const uvNode = Fn( () => {
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+			let uvNode = this.uvNode;
 
-			uvNode = builder.context.getUV( this, builder );
+			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-		}
+				uvNode = builder.context.getUV( this, builder );
 
-		if ( ! uvNode ) uvNode = this.getDefaultUV();
+			}
 
-		if ( this.updateMatrix === true ) {
+			if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-			uvNode = this.getTransformedUV( uvNode );
+			if ( this.updateMatrix === true ) {
 
-		}
+				uvNode = this.getTransformedUV( uvNode );
 
-		uvNode = this.setupUV( builder, uvNode );
+			}
 
-		//
+			uvNode = this.setupUV( builder, uvNode );
 
-		this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+			//
+
+			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+
+			//
+
+			return uvNode;
+
+		} )();
 
 		//
 
