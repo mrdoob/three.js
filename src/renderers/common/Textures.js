@@ -71,7 +71,7 @@ class Textures extends DataMap {
 		const mipWidth = size.width >> activeMipmapLevel;
 		const mipHeight = size.height >> activeMipmapLevel;
 
-		const useDepthTexture = renderTarget.depthBuffer === true || renderTarget.stencilBuffer === true;
+		const useDepthTexture = renderTarget.depthTexture !== null || renderTarget.depthBuffer === true || renderTarget.stencilBuffer === true;
 		let depthTexture = null;
 
 		let textureNeedsUpdate = false;
