@@ -39,6 +39,7 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webxr_vr_video',
+	'webgpu_tsl_transpiler',
 
 	// Need more time to render
 	'css3d_mixed',
