@@ -244,6 +244,20 @@ class Bindings extends DataMap {
 
 			if ( groupData.usedTimes === 0 ) {
 
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding.isUniformBuffer ) {
+
+						this.backend.destroyUniformBuffer( binding );
+
+						// release arrays
+
+						binding.release();
+
+					}
+
+				}
+
 				this.backend.deleteBindGroupData( bindGroup );
 				this.delete( bindGroup );
 
