@@ -267,7 +267,6 @@ class PassNode extends TempNode {
 
 		}
 
-
 		/**
 		 * The pass's render target.
 		 *
