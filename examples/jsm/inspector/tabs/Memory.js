@@ -70,6 +70,9 @@ class Memory extends Tab {
 		this.textures = new Item( 'Textures', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.textures );
 
+		this.uniformBuffers = new Item( 'Uniform Buffers', createValueSpan(), createValueSpan() );
+		this.memoryStats.add( this.uniformBuffers );
+
 		this.graph = graph;
 
 	}
@@ -120,6 +123,8 @@ class Memory extends Tab {
 		setText( this.storageAttributes.data[ 2 ], formatBytes( memory.storageAttributesSize ) );
 		setText( this.textures.data[ 1 ], memory.textures.toString() );
 		setText( this.textures.data[ 2 ], formatBytes( memory.texturesSize ) );
+		setText( this.uniformBuffers.data[ 1 ], memory.uniformBuffers.toString() );
+		setText( this.uniformBuffers.data[ 2 ], formatBytes( memory.uniformBuffersSize ) );
 
 	}
 
