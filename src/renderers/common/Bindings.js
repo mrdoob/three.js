@@ -193,6 +193,7 @@ class Bindings extends DataMap {
 					if ( binding.isUniformBuffer ) {
 
 						this.backend.createUniformBuffer( binding );
+						this.info.createUniformBuffer( binding );
 
 					} else if ( binding.isSampledTexture ) {
 
@@ -249,6 +250,7 @@ class Bindings extends DataMap {
 					if ( binding.isUniformBuffer ) {
 
 						this.backend.destroyUniformBuffer( binding );
+						this.info.destroyUniformBuffer( binding );
 
 						// release arrays
 

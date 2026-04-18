@@ -101,6 +101,7 @@ class Info {
 		 * @property {number} storageAttributes - The number of active storage attributes.
 		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
 		 * @property {number} readbackBuffers - The number of active readback buffers.
+		 * @property {number} uniformBuffers - The number of active uniform buffers.
 		 * @property {number} programs - The number of active programs.
 		 * @property {number} renderTargets - The number of active renderTargets.
 		 * @property {number} total - The total memory size in bytes.
@@ -110,6 +111,7 @@ class Info {
 		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
 		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} uniformBuffersSize - The memory size of active uniform buffers in bytes.
 		 * @property {number} programsSize - The memory size of active programs in bytes.
 		 */
 		this.memory = {
@@ -120,6 +122,7 @@ class Info {
 			storageAttributes: 0,
 			indirectStorageAttributes: 0,
 			readbackBuffers: 0,
+			uniformBuffers: 0,
 			programs: 0,
 			renderTargets: 0,
 			total: 0,
@@ -129,6 +132,7 @@ class Info {
 			storageAttributesSize: 0,
 			indirectStorageAttributesSize: 0,
 			readbackBuffersSize: 0,
+			uniformBuffersSize: 0,
 			programsSize: 0
 		};
 
@@ -362,6 +366,43 @@ class Info {
 		this.memory.readbackBuffers --;
 		this.memory.total -= size;
 		this.memory.readbackBuffersSize -= size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const size = uniformBuffer.byteLength;
+		this.memoryMap.set( uniformBuffer, { size, type: 'uniformBuffers' } );
+
+		this.memory.uniformBuffers ++;
+		this.memory.total += size;
+		this.memory.uniformBuffersSize += size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const data = this.memoryMap.get( uniformBuffer );
+
+		if ( data ) {
+
+			this.memoryMap.delete( uniformBuffer );
+
+			this.memory.uniformBuffers --;
+			this.memory.total -= data.size;
+			this.memory.uniformBuffersSize -= data.size;
+
+		}
 
 	}
 
