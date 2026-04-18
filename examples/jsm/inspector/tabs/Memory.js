@@ -103,6 +103,7 @@ class Memory extends Tab {
 
 		setText( this.attributes.data[ 1 ], memory.attributes.toString() );
 		setText( this.attributes.data[ 2 ], formatBytes( memory.attributesSize ) );
+
 		setText( this.geometries.data[ 1 ], memory.geometries.toString() );
 
 		setText( this.indexAttributes.data[ 1 ], memory.indexAttributes.toString() );
@@ -121,8 +122,10 @@ class Memory extends Tab {
 
 		setText( this.storageAttributes.data[ 1 ], memory.storageAttributes.toString() );
 		setText( this.storageAttributes.data[ 2 ], formatBytes( memory.storageAttributesSize ) );
+
 		setText( this.textures.data[ 1 ], memory.textures.toString() );
 		setText( this.textures.data[ 2 ], formatBytes( memory.texturesSize ) );
+
 		setText( this.uniformBuffers.data[ 1 ], memory.uniformBuffers.toString() );
 		setText( this.uniformBuffers.data[ 2 ], formatBytes( memory.uniformBuffersSize ) );
 
