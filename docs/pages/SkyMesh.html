@@ -21,7 +21,14 @@ When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Sky.html
 <ul>
 <li><a href="http://simonwallner.at/project/atmospheric-scattering/" target="_blank" rel="noopener">http://simonwallner.at/project/atmospheric-scattering/</a></li>
 <li><a href="http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR" target="_blank" rel="noopener">http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR</a></li>
-</ul></div>
+</ul>
+<p>It can be useful to hide the sun disc when generating an environment map to avoid artifacts</p>
+<pre><code class="language-js">// disable before rendering environment map
+sky.showSunDisc.value = false;
+// ...
+// re-enable before scene sky box rendering
+sky.showSunDisc.value = true;
+</code></pre></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const sky = new SkyMesh();
 sky.scale.setScalar( 10000 );
@@ -105,6 +112,12 @@ scene.add( sky );
 					<h3 class="name" id="rayleigh" translate="no">.<a href="#rayleigh">rayleigh</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The rayleigh uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="showSunDisc" translate="no">.<a href="#showSunDisc">showSunDisc</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Whether to render the solar disc.</p>
 					</div>
 				</div>
 				<div class="member">

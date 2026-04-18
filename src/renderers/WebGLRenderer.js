@@ -130,6 +130,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
+		const objectPosition = new Vector3();
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -1835,6 +1836,10 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
+				} else if ( object.isLightProbeGrid ) {
+
+					currentRenderState.pushLightProbeGrid( object );
+
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
@@ -2150,7 +2155,7 @@ class WebGLRenderer {
 
 			const lightsStateVersion = lights.state.version;
 
-			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
+			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeGridArray );
 			const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 			let programs = materialProperties.programs;
@@ -2249,6 +2254,8 @@ class WebGLRenderer {
 
 			}
 
+			materialProperties.lightProbeGrid = currentRenderState.state.lightProbeGridArray.length > 0;
+
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
 
@@ -2289,6 +2296,30 @@ class WebGLRenderer {
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
 			materialProperties.toneMapping = parameters.toneMapping;
+
+		}
+
+		function findLightProbeGrid( volumes, object ) {
+
+			if ( volumes.length === 0 ) return null;
+
+			if ( volumes.length === 1 ) {
+
+				return volumes[ 0 ].texture !== null ? volumes[ 0 ] : null;
+
+			}
+
+			objectPosition.setFromMatrixPosition( object.matrixWorld );
+
+			for ( let i = 0, l = volumes.length; i < l; i ++ ) {
+
+				const v = volumes[ i ];
+
+				if ( v.texture !== null && v.boundingBox.containsPoint( objectPosition ) ) return v;
+
+			}
+
+			return null;
 
 		}
 
@@ -2448,6 +2479,10 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if ( !! materialProperties.lightProbeGrid !== ( currentRenderState.state.lightProbeGridArray.length > 0 ) ) {
+
+					needsProgramChange = true;
+
 				}
 
 			} else {
@@ -2495,6 +2530,19 @@ class WebGLRenderer {
 				_currentMaterialId = material.id;
 
 				refreshMaterial = true;
+
+			}
+
+			if ( materialProperties.needsLights ) {
+
+				const objectVolume = findLightProbeGrid( currentRenderState.state.lightProbeGridArray, object );
+
+				if ( materialProperties.lightProbeGrid !== objectVolume ) {
+
+					materialProperties.lightProbeGrid = objectVolume;
+					refreshMaterial = true;
+
+				}
 
 			}
 
@@ -2676,6 +2724,19 @@ class WebGLRenderer {
 				}
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
+
+				// light probe volume
+
+				if ( materialProperties.needsLights && materialProperties.lightProbeGrid ) {
+
+					const volume = materialProperties.lightProbeGrid;
+
+					m_uniforms.probesSH.value = volume.texture;
+					m_uniforms.probesMin.value.copy( volume.boundingBox.min );
+					m_uniforms.probesMax.value.copy( volume.boundingBox.max );
+					m_uniforms.probesResolution.value.copy( volume.resolution );
+
+				}
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 

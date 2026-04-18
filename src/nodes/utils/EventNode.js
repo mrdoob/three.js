@@ -35,6 +35,10 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.FRAME ) {
+
+			this.updateType = NodeUpdateType.FRAME;
+
 		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
 
 			this.updateBeforeType = NodeUpdateType.OBJECT;
@@ -42,6 +46,10 @@ class EventNode extends Node {
 		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
 
 			this.updateBeforeType = NodeUpdateType.RENDER;
+
+		} else if ( eventType === EventNode.BEFORE_FRAME ) {
+
+			this.updateBeforeType = NodeUpdateType.FRAME;
 
 		}
 
@@ -63,8 +71,10 @@ class EventNode extends Node {
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.FRAME = 'frame';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
+EventNode.BEFORE_FRAME = 'beforeFrame';
 
 export default EventNode;
 
@@ -98,6 +108,16 @@ export const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, cal
 export const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
 
 /**
+ * Creates an event that triggers a function every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
+
+/**
  * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
  *
  * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
@@ -116,3 +136,13 @@ export const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFOR
  * @returns {EventNode}
  */
 export const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );

@@ -566,6 +566,37 @@ class WebGPUTextureUtils {
 
 			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
 
+		} else if ( texture.isHTMLTexture ) {
+
+			const device = this.backend.device;
+			const canvas = this.backend.renderer.domElement;
+			const image = texture.image;
+
+			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
+
+			// Skip the first frame — the element needs a paint record first.
+			if ( ! textureData.hasPaintCallback ) {
+
+				textureData.hasPaintCallback = true;
+				canvas.requestPaint();
+				return;
+
+			}
+
+			const width = textureDescriptorGPU.size.width;
+			const height = textureDescriptorGPU.size.height;
+
+			device.queue.copyElementImageToTexture(
+				image, width, height,
+				{ texture: textureData.texture }
+			);
+
+			if ( texture.flipY ) {
+
+				this._flipY( textureData.texture, textureDescriptorGPU );
+
+			}
+
 		} else {
 
 			if ( mipmaps.length > 0 ) {
@@ -648,7 +679,9 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange();
+		const buffer = readBuffer.getMappedRange().slice();
+
+		readBuffer.destroy();
 
 		return new typedArrayType( buffer );
 

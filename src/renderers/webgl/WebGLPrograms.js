@@ -53,7 +53,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 	}
 
-	function getParameters( material, lights, shadows, scene, object ) {
+	function getParameters( material, lights, shadows, scene, object, lightProbeGrids ) {
 
 		const fog = scene.fog;
 		const geometry = object.geometry;
@@ -301,6 +301,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			//
 
 			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP || HAS_ANISOTROPY ),
+			vertexNormals: !! geometry.attributes.normal,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
 
@@ -342,6 +343,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			numSpotLightShadowsWithMaps: lights.numSpotLightShadowsWithMaps,
 
 			numLightProbes: lights.numLightProbes,
+
+			numLightProbeGrids: lightProbeGrids.length,
 
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
@@ -530,6 +533,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 21 );
 		if ( parameters.packedNormalMap )
 			_programLayers.enable( 22 );
+		if ( parameters.vertexNormals )
+			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -578,6 +583,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 20 );
 		if ( parameters.alphaToCoverage )
 			_programLayers.enable( 21 );
+		if ( parameters.numLightProbeGrids > 0 )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 

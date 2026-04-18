@@ -49,6 +49,12 @@ set this flag to <code>true</code> (a typical example is <a href="AttributeNode.
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The unique ID of the node.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isNode" translate="no">.<a href="#isNode">isNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
@@ -265,6 +271,36 @@ This state builds the output node and returns the resulting shader string.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated shader string.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the node's type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">output</strong>
+									</td>
+									<td class="description last">
+										<p>The output of the node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type of the node.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getArrayCount" translate="no">.<a href="#getArrayCount">getArrayCount</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -400,7 +436,7 @@ depending on their implementation.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The type of the node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the node's type.</p>
@@ -413,6 +449,15 @@ depending on their implementation.</p>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">output</strong>
+									</td>
+									<td class="description last">
+										<p>The output of the node.</p>
+										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
 							</tbody>

@@ -48,6 +48,13 @@ class Textures extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * A set of HTMLTextures that need paint updates.
+		 *
+		 * @type {Set<HTMLTexture>}
+		 */
+		this._htmlTextures = new Set();
+
 	}
 
 	/**
@@ -215,6 +222,56 @@ class Textures extends DataMap {
 			} else {
 
 				texture.type = UnsignedByteType;
+
+			}
+
+		}
+
+		// Ensure HTMLTexture elements are in the canvas before measuring size.
+
+		if ( texture.isHTMLTexture && texture.image ) {
+
+			const canvas = this.renderer.domElement;
+
+			if ( 'requestPaint' in canvas ) {
+
+				if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+					canvas.setAttribute( 'layoutsubtree', 'true' );
+
+				}
+
+				if ( texture.image.parentNode !== canvas ) {
+
+					canvas.appendChild( texture.image );
+
+				}
+
+				// Set up shared paint callback for all HTMLTextures.
+
+				if ( this._htmlTextures.size === 0 ) {
+
+					const htmlTextures = this._htmlTextures;
+
+					canvas.onpaint = ( event ) => {
+
+						const changed = event && event.changedElements;
+
+						for ( const t of htmlTextures ) {
+
+							if ( ! changed || changed.includes( t.image ) ) {
+
+								t.needsUpdate = true;
+
+							}
+
+						}
+
+					};
+
+				}
+
+				this._htmlTextures.add( texture );
 
 			}
 
@@ -390,7 +447,13 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
+			if ( texture.isHTMLTexture ) {
+
+				target.width = image.offsetWidth || 1;
+				target.height = image.offsetHeight || 1;
+				target.depth = 1;
+
+			} else if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
 
 				target.width = image.videoWidth || 1;
 				target.height = image.videoHeight || 1;
@@ -550,6 +613,8 @@ class Textures extends DataMap {
 				}
 
 			}
+
+			this._htmlTextures.delete( texture );
 
 			this.delete( texture );
 

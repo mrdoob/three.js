@@ -211,4 +211,6 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 	}
 
 #endif
+
+#include <lightprobes_pars_fragment>
 `;

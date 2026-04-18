@@ -43,12 +43,6 @@ Default is `0`.
 
 Alias for [Vector2#y](Vector2.html#y).
 
-### .isVector2 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
 ### .width : number
 
 Alias for [Vector2#x](Vector2.html#x).

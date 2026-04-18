@@ -18,7 +18,8 @@ let _rendererState;
  *
  * Note: Only use FSR 1 if your application is fragment-shader bound and cannot afford to render
  * at full resolution. FSR 1 adds its own overhead, so simply shaded scenes will render faster
- * at native resolution without it.
+ * at native resolution without it. Besides, FSR 1 should always be used with an anti-aliased
+ * source image.
  *
  * Reference: {@link https://gpuopen.com/fidelityfx-superresolution/}.
  *

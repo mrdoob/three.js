@@ -45,12 +45,6 @@ Default is `0`.
 
 ## Properties
 
-### .isVector3 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
 ### .x : number
 
 The x value of this vector.

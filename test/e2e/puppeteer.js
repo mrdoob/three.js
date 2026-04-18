@@ -17,17 +17,11 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
-	// Needs investigation
-	'physics_rapier_instancing',
-	'physics_jolt_instancing',
-	'webgl_shadowmap',
-	'webgl_postprocessing_dof2',
-	'webgl_postprocessing_glitch',
-	'webgl_video_kinect',
-	'webgl_worker_offscreencanvas',
-	'webgpu_backdrop_water',
-	'webgpu_lightprobe_cubecamera',
-	'webgpu_portal',
+	// Requires HTML-in-Canvas API
+	'webgl_materials_texture_html',
+	'webgpu_materials_texture_html',
+
+	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_ssgi',
@@ -35,6 +29,16 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_volume_lighting_traa',
+
+	// Timming issues?
+	'physics_rapier_instancing',
+	'webgl_shadowmap',
+	'webaudio_visualizer',
+	'webgpu_compute_audio',
+	'webgpu_compute_sort_bitonic',
+	'webgpu_storage_buffer',
+	'webgpu_tsl_editor',
+	'webxr_vr_video',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -50,41 +54,14 @@ const exceptionList = [
 	// Video hangs the CI?
 	'css3d_youtube',
 	'webgpu_materials_video',
+	'webgl_video_kinect',
 
 	// Timeout
 	'webgl_test_memory2',
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam',
-
-	// WebGL device lost
-	'webgpu_materialx_noise',
-	'webgpu_portal',
-	'webgpu_shadowmap',
-
-	// WebGPU needed
-	'webgpu_compile_async',
-	'webgpu_compute_audio',
-	'webgpu_compute_birds',
-	'webgpu_compute_cloth',
-	'webgpu_compute_particles_fluid',
-	'webgpu_compute_reduce',
-	'webgpu_compute_sort_bitonic',
-	'webgpu_compute_texture',
-	'webgpu_compute_texture_3d',
-	'webgpu_compute_texture_pingpong',
-	'webgpu_compute_water',
-	'webgpu_hdr',
-	'webgpu_lights_tiled',
-	'webgpu_materials',
-	'webgpu_multiple_canvas',
-	'webgpu_particles',
-	'webgpu_struct_drawindirect',
-	'webgpu_tsl_editor',
-	'webgpu_tsl_interoperability',
-	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_tsl_wood'
+	'webgl_morphtargets_webcam'
 
 ];
 
@@ -92,14 +69,13 @@ const exceptionList = [
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxDifferentPixels = 0.3; // at most 0.3% different pixels
+const maxDifferentPixels = 0.1; // at most 0.1% different pixels
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
-const numAttempts = 2; // perform 2 attempts before failing
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -216,25 +192,32 @@ async function main() {
 
 	const flags = [
 		'--hide-scrollbars',
-		'--use-angle=swiftshader',
-		'--enable-unsafe-swiftshader',
+		'--enable-unsafe-webgpu',
+		'--enable-features=Vulkan',
+		'--disable-vulkan-surface',
+		'--ignore-gpu-blocklist',
+		'--disable-gpu-driver-bug-workarounds',
 		'--no-sandbox'
 	];
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
-	browser = await puppeteer.launch( {
-		headless: process.env.VISIBLE ? false : 'new',
+	const launchOptions = {
+		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
+		env: { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' },
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
 		protocolTimeout: 0,
 		userDataDir: './.puppeteer_profile'
-	} );
+	};
 
 	/* Prepare injections */
 
-	const buildInjection = ( code ) => code.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+	const buildInjection = ( code ) => code
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
+		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
+		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, "Object.defineProperty(this, 'trackTimestamp', { get: () => false, set: () => {} });" );
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
@@ -249,8 +232,33 @@ async function main() {
 
 	const errorMessagesCache = [];
 
-	const page = await browser.newPage();
-	await preparePage( page, injection, builds, errorMessagesCache );
+	const launchPage = async () => {
+
+		browser = await puppeteer.launch( launchOptions );
+		const page = await browser.newPage();
+		await preparePage( page, injection, builds, errorMessagesCache );
+		return page;
+
+	};
+
+	const ctx = {
+		page: await launchPage(),
+		async restart() {
+
+			// SIGKILL the whole Chrome process tree; browser.close() can hang after a wedged GPU process
+			const proc = browser.process();
+			if ( proc ) {
+
+				proc.kill( 'SIGKILL' );
+				await new Promise( resolve => proc.once( 'exit', resolve ) );
+
+			}
+
+			errorMessagesCache.length = 0;
+			ctx.page = await launchPage();
+
+		}
+	};
 
 	/* Loop for each file */
 
@@ -258,7 +266,7 @@ async function main() {
 
 	for ( const file of files ) {
 
-		await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
 
 	}
 
@@ -330,6 +338,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		text = text.trim();
 		if ( text === '' ) return;
+		if ( text.includes( 'Timestamp tracking is disabled' ) ) return;
 
 		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
@@ -403,7 +412,9 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+
+	const page = ctx.page;
 
 	try {
 
@@ -552,15 +563,16 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 	} catch ( e ) {
 
-		if ( attemptID === numAttempts - 1 ) {
+		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
-			console.red( e );
-			failedScreenshots.push( file );
+			console.yellow( `${ e }` );
+			console.yellow( 'Restarting browser...' );
+			await ctx.restart();
 
 		} else {
 
-			console.yellow( `${ e }, another attempt...` );
-			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+			console.red( e );
+			failedScreenshots.push( file );
 
 		}
 
