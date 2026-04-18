@@ -64,6 +64,8 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
+#define inverseTransformDirection transformNormalByInverseViewMatrix // keeping this for backwards compatibility
+
 vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
 	// upper-left 3x3 of view matrix is assumed to be orthogonal
