@@ -2755,7 +2755,19 @@ class Renderer {
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+		let computeList;
+
+		if ( Array.isArray( computeNodes ) ) {
+
+			computeList = computeNodes;
+
+		} else {
+
+			if ( this._computeSingleton === undefined ) this._computeSingleton = [ null ];
+			this._computeSingleton[ 0 ] = computeNodes;
+			computeList = this._computeSingleton;
+
+		}
 
 		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
 
