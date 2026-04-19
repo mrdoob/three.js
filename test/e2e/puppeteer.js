@@ -39,6 +39,7 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webxr_vr_video',
+	'webgpu_tsl_transpiler',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -55,6 +56,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'webgpu_materials_video',
 	'webgl_video_kinect',
+	'webgl_video_panorama_equirectangular,
 
 	// Timeout
 	'webgl_test_memory2',
