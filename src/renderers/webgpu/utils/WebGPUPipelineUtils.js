@@ -15,7 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
+import { error, ReversedDepthFuncs, warn, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -272,6 +272,12 @@ class WebGPUPipelineUtils {
 
 		device.pushErrorScope( 'validation' );
 
+		const stages = [
+			{ program: vertexProgram, module: vertexModule.module },
+			{ program: fragmentProgram, module: fragmentModule.module }
+		];
+		const pipelineLabel = pipelineDescriptor.label;
+
 		if ( promises === null ) {
 
 			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
@@ -282,7 +288,9 @@ class WebGPUPipelineUtils {
 
 					pipelineData.error = true;
 
-					error( err.message );
+					error( `WebGPURenderer: Render pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
+
+					this._reportShaderDiagnostics( stages, pipelineLabel ).catch( () => {} );
 
 				}
 
@@ -292,19 +300,28 @@ class WebGPUPipelineUtils {
 
 			const p = new Promise( async ( resolve /*, reject*/ ) => {
 
+				let asyncError = null;
+
 				try {
 
 					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
 
-				} catch ( err ) { }
+				} catch ( err ) {
+
+					asyncError = err;
+
+				}
 
 				const errorScope = await device.popErrorScope();
 
-				if ( errorScope !== null ) {
+				if ( errorScope !== null || asyncError !== null ) {
 
 					pipelineData.error = true;
 
-					error( errorScope.message );
+					const reason = ( errorScope && errorScope.message ) || ( asyncError && asyncError.message ) || 'unknown';
+					error( `WebGPURenderer: Async render pipeline creation failed (${ pipelineLabel }): ${ reason }` );
+
+					await this._reportShaderDiagnostics( stages, pipelineLabel );
 
 				}
 
@@ -373,12 +390,106 @@ class WebGPUPipelineUtils {
 
 		}
 
+		const computeStage = pipeline.computeProgram;
+		const pipelineLabel = `computePipeline_${ computeStage.stage }${ computeStage.name ? `_${ computeStage.name }` : '' }`;
+
+		device.pushErrorScope( 'validation' );
+
 		pipelineGPU.pipeline = device.createComputePipeline( {
+			label: pipelineLabel,
 			compute: computeProgram,
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts
 			} )
 		} );
+
+		device.popErrorScope().then( ( err ) => {
+
+			if ( err !== null ) {
+
+				pipelineGPU.error = true;
+
+				error( `WebGPURenderer: Compute pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
+
+				this._reportShaderDiagnostics( [ { program: computeStage, module: computeProgram.module } ], pipelineLabel ).catch( () => {} );
+
+			}
+
+		} );
+
+	}
+
+	/**
+	 * Reads line-accurate diagnostics from shader modules and logs any
+	 * errors/warnings/info messages. Called from pipeline creation error paths
+	 * to turn opaque validation failures into actionable WGSL feedback.
+	 *
+	 * @private
+	 * @param {Array<{program: ProgrammableStage, module: GPUShaderModule}>} stages - Pairs of program + compiled shader module.
+	 * @param {string} pipelineLabel - Label of the owning pipeline, used as log prefix.
+	 * @return {Promise<void>}
+	 */
+	async _reportShaderDiagnostics( stages, pipelineLabel ) {
+
+		for ( const { program, module } of stages ) {
+
+			if ( ! module || typeof module.getCompilationInfo !== 'function' ) continue;
+
+			let info;
+
+			try {
+
+				info = await module.getCompilationInfo();
+
+			} catch ( _ ) {
+
+				continue;
+
+			}
+
+			if ( ! info || ! info.messages || info.messages.length === 0 ) continue;
+
+			const stageName = program ? program.stage : 'shader';
+			const sourceLines = program && program.code ? program.code.split( '\n' ) : null;
+
+			for ( const msg of info.messages ) {
+
+				const location = ( msg.lineNum > 0 )
+					? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
+					: '';
+
+				const header = `WebGPURenderer [${ pipelineLabel } / ${ stageName } ${ msg.type }]${ location }: ${ msg.message }`;
+
+				let excerpt = '';
+				if ( sourceLines && msg.lineNum > 0 ) {
+
+					const line = sourceLines[ msg.lineNum - 1 ];
+					if ( line !== undefined ) {
+
+						excerpt = `\n  ${ line }`;
+						if ( msg.linePos > 0 ) {
+
+							excerpt += `\n  ${ ' '.repeat( Math.max( 0, msg.linePos - 1 ) ) }^`;
+
+						}
+
+					}
+
+				}
+
+				if ( msg.type === 'error' ) {
+
+					error( header + excerpt );
+
+				} else {
+
+					warn( header + excerpt );
+
+				}
+
+			}
+
+		}
 
 	}
 

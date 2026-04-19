@@ -251,6 +251,21 @@ class WebGPUBackend extends Backend {
 
 		} );
 
+		device.onuncapturederror = ( event ) => {
+
+			const gpuError = event.error;
+			const type = gpuError && gpuError.constructor ? gpuError.constructor.name : 'GPUError';
+			const message = ( gpuError && gpuError.message ) || 'Unknown uncaptured GPU error';
+
+			renderer.onError( {
+				api: 'WebGPU',
+				type,
+				message,
+				originalEvent: event
+			} );
+
+		};
+
 		this.device = device;
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );

@@ -595,6 +595,17 @@ class Renderer {
 		this.onDeviceLost = this._onDeviceLost;
 
 		/**
+		 * A callback function that defines what should happen when an uncaptured
+		 * backend error is reported (e.g. a WebGPU validation/out-of-memory/internal
+		 * error raised outside an error scope). Applications can override this to
+		 * surface errors in their own UI without letting them escalate to a device
+		 * loss. The default implementation logs to the console.
+		 *
+		 * @type {Function}
+		 */
+		this.onError = this._onError;
+
+		/**
 		 * Defines the type of output buffers. The default `HalfFloatType` is recommend for
 		 * best quality. To save memory and bandwidth, `UnsignedByteType` might be used.
 		 * This will reduce rendering quality though.
@@ -1193,6 +1204,26 @@ class Renderer {
 		error( errorMessage );
 
 		this._isDeviceLost = true;
+
+	}
+
+	/**
+	 * Default implementation of the uncaptured backend error callback.
+	 *
+	 * @private
+	 * @param {Object} info - Information about the uncaptured error.
+	 */
+	_onError( info ) {
+
+		let errorMessage = `THREE.WebGPURenderer: Uncaptured ${ info.api } ${ info.type }`;
+
+		if ( info.message ) {
+
+			errorMessage += `: ${ info.message }`;
+
+		}
+
+		error( errorMessage );
 
 	}
 
