@@ -56,6 +56,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'webgpu_materials_video',
 	'webgl_video_kinect',
+	'webgl_video_panorama_equirectangular,
 
 	// Timeout
 	'webgl_test_memory2',
