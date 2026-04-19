@@ -290,7 +290,7 @@ class WebGPUPipelineUtils {
 
 					error( `WebGPURenderer: Render pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
 
-					this._reportShaderDiagnostics( stages, pipelineLabel ).catch( () => {} );
+					this._reportShaderDiagnostics( stages, pipelineLabel );
 
 				}
 
@@ -411,7 +411,7 @@ class WebGPUPipelineUtils {
 
 				error( `WebGPURenderer: Compute pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
 
-				this._reportShaderDiagnostics( [ { program: computeStage, module: computeProgram.module } ], pipelineLabel ).catch( () => {} );
+				this._reportShaderDiagnostics( [ { program: computeStage, module: computeProgram.module } ], pipelineLabel );
 
 			}
 
@@ -424,6 +424,11 @@ class WebGPUPipelineUtils {
 	 * errors/warnings/info messages. Called from pipeline creation error paths
 	 * to turn opaque validation failures into actionable WGSL feedback.
 	 *
+	 * Contract: this method is best-effort and must never propagate an error
+	 * to its caller. All failures (spec gaps, custom logger throwing, future
+	 * edits) are swallowed by the top-level try/catch. Callers can fire and
+	 * forget without a `.catch()` guard.
+	 *
 	 * @private
 	 * @param {Array<{program: ProgrammableStage, module: GPUShaderModule}>} stages - Pairs of program + compiled shader module.
 	 * @param {string} pipelineLabel - Label of the owning pipeline, used as log prefix.
@@ -431,63 +436,71 @@ class WebGPUPipelineUtils {
 	 */
 	async _reportShaderDiagnostics( stages, pipelineLabel ) {
 
-		for ( const { program, module } of stages ) {
+		try {
 
-			if ( ! module || typeof module.getCompilationInfo !== 'function' ) continue;
+			for ( const { program, module } of stages ) {
 
-			let info;
+				if ( ! module || typeof module.getCompilationInfo !== 'function' ) continue;
 
-			try {
+				let info;
 
-				info = await module.getCompilationInfo();
+				try {
 
-			} catch ( _ ) {
+					info = await module.getCompilationInfo();
 
-				continue;
+				} catch ( _ ) {
 
-			}
+					continue;
 
-			if ( ! info || ! info.messages || info.messages.length === 0 ) continue;
+				}
 
-			const stageName = program ? program.stage : 'shader';
-			const sourceLines = program && program.code ? program.code.split( '\n' ) : null;
+				if ( ! info || ! info.messages || info.messages.length === 0 ) continue;
 
-			for ( const msg of info.messages ) {
+				const stageName = program ? program.stage : 'shader';
+				const sourceLines = program && program.code ? program.code.split( '\n' ) : null;
 
-				const location = ( msg.lineNum > 0 )
-					? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
-					: '';
+				for ( const msg of info.messages ) {
 
-				const header = `WebGPURenderer [${ pipelineLabel } / ${ stageName } ${ msg.type }]${ location }: ${ msg.message }`;
+					const location = ( msg.lineNum > 0 )
+						? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
+						: '';
 
-				let excerpt = '';
-				if ( sourceLines && msg.lineNum > 0 ) {
+					const header = `WebGPURenderer [${ pipelineLabel } / ${ stageName } ${ msg.type }]${ location }: ${ msg.message }`;
 
-					const line = sourceLines[ msg.lineNum - 1 ];
-					if ( line !== undefined ) {
+					let excerpt = '';
+					if ( sourceLines && msg.lineNum > 0 ) {
 
-						excerpt = `\n  ${ line }`;
-						if ( msg.linePos > 0 ) {
+						const line = sourceLines[ msg.lineNum - 1 ];
+						if ( line !== undefined ) {
 
-							excerpt += `\n  ${ ' '.repeat( Math.max( 0, msg.linePos - 1 ) ) }^`;
+							excerpt = `\n  ${ line }`;
+							if ( msg.linePos > 0 ) {
+
+								excerpt += `\n  ${ ' '.repeat( Math.max( 0, msg.linePos - 1 ) ) }^`;
+
+							}
 
 						}
 
 					}
 
-				}
+					if ( msg.type === 'error' ) {
 
-				if ( msg.type === 'error' ) {
+						error( header + excerpt );
 
-					error( header + excerpt );
+					} else {
 
-				} else {
+						warn( header + excerpt );
 
-					warn( header + excerpt );
+					}
 
 				}
 
 			}
+
+		} catch ( _ ) {
+
+			// Diagnostics are best-effort; never propagate.
 
 		}
 
