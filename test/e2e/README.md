@@ -39,3 +39,22 @@ Merge only those commits that pass the tests, otherwise all next commits will al
 
 ### Status
 97% examples are covered with tests. Check exception list for more information.
+
+### Perf & VRAM regression
+
+`perf-regression.js` measures JS heap, GC, frame timing, and WebGPU resource deltas for a given example. Useful for catching VRAM leaks, GC churn increases, or frame-time regressions introduced by a renderer change. The WebGPU device is wrapped in a page-side interceptor; no external tooling required.
+
+```shell
+# capture a baseline on one branch
+node test/e2e/perf-regression.js baseline webgpu_backdrop_water
+
+# switch branches, capture the candidate
+node test/e2e/perf-regression.js candidate webgpu_backdrop_water
+
+# compare
+node test/e2e/perf-regression-compare.js baseline candidate webgpu_backdrop_water
+```
+
+Each run produces `test/e2e/perf-regression-<label>-<example>.json`. Optional args: `durationMs` (default 10000), `warmupMs` (default 3000).
+
+Single-run numbers have measurement noise — for regression signals below ~5%, average 3 runs per branch (different `<label>` each run, then average the fields manually). Frame `p50/p95/p99/max`, JS heap `mean`/`max`, `gc.totalFreedBytes`, and all WebGPU resource deltas are the most repeatable signals.
