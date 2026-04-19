@@ -42,7 +42,7 @@ The node which component(s) should be flipped.
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 This method is overwritten since the node type is inferred from the source node.
 
@@ -50,7 +50,7 @@ This method is overwritten since the node type is inferred from the source node.
 
 The current node builder.
 
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
 
 **Returns:** The node type.
 

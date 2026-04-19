@@ -2364,6 +2364,13 @@ class GeometryParser {
 		parentGeo.morphAttributes.position = [];
 		// parentGeo.morphAttributes.normal = []; // not implemented
 
+		// Morph attribute positions are stored as deltas (morphTargetsRelative = true), so the
+		// translation component of the geometric transform must not be applied to them — only the
+		// rotation/scale part. Otherwise every delta gets the geometric translation added, which
+		// shifts morphed vertices away from their intended position by `weight * translation` as
+		// the influence increases.
+		const morphPreTransform = preTransform.clone().setPosition( 0, 0, 0 );
+
 		const scope = this;
 		morphTargets.forEach( function ( morphTarget ) {
 
@@ -2373,7 +2380,7 @@ class GeometryParser {
 
 				if ( morphGeoNode !== undefined ) {
 
-					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, morphPreTransform, rawTarget.name );
 
 				}
 

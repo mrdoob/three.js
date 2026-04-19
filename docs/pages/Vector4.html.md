@@ -55,12 +55,6 @@ Default is `1`.
 
 Alias for [Vector4#w](Vector4.html#w).
 
-### .isVector4 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
 ### .w : number
 
 The w value of this vector.

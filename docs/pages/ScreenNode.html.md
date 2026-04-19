@@ -34,11 +34,11 @@ The node represents different metric depending on which scope is selected.
 
 ## Methods
 
-### .getNodeType() : 'float' | 'vec2' | 'vec4'
+### .generateNodeType() : 'float' | 'vec2' | 'vec4'
 
 This method is overwritten since the node type depends on the selected scope.
 
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

@@ -43,10 +43,6 @@ The configuration options.
 
 ## Properties
 
-### .camera : PerspectiveCamera
-
-The reflector's virtual camera. This is used to render the scene from the mirror's point of view.
-
 ### .forceUpdate : boolean
 
 Whether to force an update, no matter if the reflector is in view or not.

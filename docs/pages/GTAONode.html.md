@@ -19,7 +19,8 @@ const scenePassColor = scenePass.getTextureNode( 'output' );
 const scenePassNormal = scenePass.getTextureNode( 'normal' );
 const scenePassDepth = scenePass.getTextureNode( 'depth' );
 const aoPass = ao( scenePassDepth, scenePassNormal, camera );
-renderPipeline.outputNode = aoPass.getTextureNode().mul( scenePassColor );
+const aoPassOutput = aoPass.getTextureNode();
+renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
 ```
 
 ## Import

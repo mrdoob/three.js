@@ -22,6 +22,18 @@ The renderer.
 
 ## Properties
 
+### .allowEarlyReturns : boolean
+
+A flag that indicates that early returns are allowed.
+
+Default is `true`.
+
+### .allowGlobalVariables : boolean
+
+A flag that indicates that global variables are allowed.
+
+Default is `true`.
+
 ### .builtins : Object.<string, Map.<string, Object>>
 
 A dictionary that holds for each shader stage a Map of builtins.
@@ -800,14 +812,6 @@ The node data type.
 
 **Returns:** The WGSL type.
 
-### .getUniformBufferLimit() : number
-
-Returns the maximum uniform buffer size limit.
-
-**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
-
-**Returns:** The maximum uniform buffer size in bytes.
-
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.
@@ -848,7 +852,7 @@ The shader stage.
 
 **Returns:** The WGSL snippet that defines the uniforms.
 
-### .getVar( type : string, name : string, count : number ) : string
+### .getVar( type : string, name : string, count : number, qualifier : string ) : string
 
 Returns a WGSL string representing a variable.
 
@@ -865,6 +869,12 @@ The variable's name.
 The array length.
 
 Default is `null`.
+
+**qualifier**
+
+The variable's qualifier.
+
+Default is `''`.
 
 **Overrides:** [NodeBuilder#getVar](NodeBuilder.html#getVar)
 

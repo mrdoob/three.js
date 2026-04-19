@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.183.1",
+  "version": "0.184.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -104,7 +104,7 @@
     "jsdoc": "^4.0.5",
     "magic-string": "^0.30.0",
     "pngjs": "^7.0.0",
-    "puppeteer": "^24.25.0",
+    "puppeteer": "^24.40.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "turndown": "^7.2.2"

@@ -107,12 +107,6 @@ Constructs a new 4x4 matrix. The arguments are supposed to be in row-major order
 
 A column-major list of matrix values.
 
-### .isMatrix4 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
 ## Methods
 
 ### .clone() : Matrix4

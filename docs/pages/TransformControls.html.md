@@ -106,9 +106,27 @@ Whether the x-axis helper should be visible or not.
 
 Default is `true`.
 
+### .showXY : boolean
+
+Whether the xy-plane helper should be visible or not.
+
+Default is `true`.
+
+### .showXZ : boolean
+
+Whether the xz-axis helper should be visible or not.
+
+Default is `true`.
+
 ### .showY : boolean
 
 Whether the y-axis helper should be visible or not.
+
+Default is `true`.
+
+### .showYZ : boolean
+
+Whether the yz-plane helper should be visible or not.
 
 Default is `true`.
 
