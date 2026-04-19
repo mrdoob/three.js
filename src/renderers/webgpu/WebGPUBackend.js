@@ -20,6 +20,40 @@ import { error } from '../../utils.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 
+// Pre-allocated objects to avoid per-frame GC pressure.
+// WebGPU descriptors are consumed synchronously, so reuse is safe.
+
+const _submitArray = [ null ];
+
+const _copySrc = { texture: null, origin: [ 0, 0, 0 ] };
+const _copyDst = { texture: null };
+const _copySize = [ 0, 0 ];
+
+const _texCopyEncoderOptions = { label: '' };
+const _texCopySrc = { texture: null, mipLevel: 0, origin: { x: 0, y: 0, z: 0 } };
+const _texCopyDst = { texture: null, mipLevel: 0, origin: { x: 0, y: 0, z: 0 } };
+const _texCopySize = [ 0, 0, 0 ];
+
+const _clearEncoderOptions = { label: 'clear' };
+const _clearPassDescriptor = { colorAttachments: null, depthStencilAttachment: null };
+const _clearConfig = { loadOp: null, clearValue: null, depthLoadOp: undefined, depthClearValue: undefined, depthStoreOp: undefined, stencilLoadOp: undefined, stencilClearValue: undefined, stencilStoreOp: undefined };
+
+const _timestampWrites = { querySet: null, beginningOfPassWriteIndex: 0, endOfPassWriteIndex: 0 };
+
+const _indirectOffsets = [ 0 ];
+const _bundles = [];
+const _singleBundleArray = [ null ];
+
+function _resetCurrentSets( sets ) {
+
+	for ( const key in sets.attributes ) delete sets.attributes[ key ];
+	sets.bindingGroups.length = 0;
+	sets.pipeline = null;
+	sets.index = null;
+	return sets;
+
+}
+
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -251,6 +285,21 @@ class WebGPUBackend extends Backend {
 
 		} );
 
+		device.onuncapturederror = ( event ) => {
+
+			const gpuError = event.error;
+			const type = gpuError && gpuError.constructor ? gpuError.constructor.name : 'GPUError';
+			const message = ( gpuError && gpuError.message ) || 'Unknown uncaptured GPU error';
+
+			renderer.onError( {
+				api: 'WebGPU',
+				type,
+				message,
+				originalEvent: event
+			} );
+
+		};
+
 		this.device = device;
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
@@ -404,6 +453,10 @@ class WebGPUBackend extends Backend {
 			canvasData.samples = samples;
 
 		}
+
+		// Clear properties that may have been set externally (e.g. by beginRender)
+		descriptor.occlusionQuerySet = undefined;
+		descriptor.timestampWrites = undefined;
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
@@ -582,38 +635,58 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const descriptor = {
-			colorAttachments: []
-		};
+		// Reuse or create the descriptor object and its color attachment objects
+		let descriptor = descriptorBase.descriptor;
 
-		// Apply dynamic properties to cached views
-		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+		if ( descriptor === undefined ) {
 
-			const viewInfo = descriptorBase.textureViews[ i ];
+			descriptor = { colorAttachments: [] };
 
-			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
-			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
+			if ( descriptorBase.depthStencilView ) {
 
-				clearValue = colorAttachmentsConfig.clearValue;
+				descriptor.depthStencilAttachment = { view: null };
 
 			}
 
-			descriptor.colorAttachments.push( {
-				view: viewInfo.view,
-				depthSlice: viewInfo.depthSlice,
-				resolveTarget: viewInfo.resolveTarget,
-				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
-				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
-				clearValue: clearValue
-			} );
+			descriptorBase.descriptor = descriptor;
 
 		}
 
+		// Clear properties that may have been set externally (e.g. by beginRender)
+		descriptor.occlusionQuerySet = undefined;
+		descriptor.timestampWrites = undefined;
+
+		const colorAttachments = descriptor.colorAttachments;
+		const textureViews = descriptorBase.textureViews;
+
+		// Apply dynamic properties to cached views
+		for ( let i = 0; i < textureViews.length; i ++ ) {
+
+			const viewInfo = textureViews[ i ];
+
+			let attachment = colorAttachments[ i ];
+
+			if ( attachment === undefined ) {
+
+				attachment = { view: null, depthSlice: undefined, resolveTarget: undefined, loadOp: GPULoadOp.Load, storeOp: GPUStoreOp.Store, clearValue: _clearValue };
+				colorAttachments[ i ] = attachment;
+
+			}
+
+			attachment.view = viewInfo.view;
+			attachment.depthSlice = viewInfo.depthSlice;
+			attachment.resolveTarget = viewInfo.resolveTarget;
+			attachment.loadOp = colorAttachmentsConfig.loadOp || GPULoadOp.Load;
+			attachment.storeOp = colorAttachmentsConfig.storeOp || GPUStoreOp.Store;
+			attachment.clearValue = ( i === 0 && colorAttachmentsConfig.clearValue ) ? colorAttachmentsConfig.clearValue : _clearValue;
+
+		}
+
+		colorAttachments.length = textureViews.length;
+
 		if ( descriptorBase.depthStencilView ) {
 
-			descriptor.depthStencilAttachment = {
-				view: descriptorBase.depthStencilView
-			};
+			descriptor.depthStencilAttachment.view = descriptorBase.depthStencilView;
 
 		}
 
@@ -773,7 +846,13 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
+		if ( renderContextData.encoderOptions === undefined ) {
+
+			renderContextData.encoderOptions = { label: 'renderContext_' + renderContext.id };
+
+		}
+
+		const encoder = device.createCommandEncoder( renderContextData.encoderOptions );
 
 		// shadow arrays - prepare bundle encoders for each camera in an array camera
 
@@ -792,8 +871,17 @@ class WebGPUBackend extends Backend {
 			}
 
 			// Create bundle encoders for each layer
-			renderContextData.bundleEncoders = [];
-			renderContextData.bundleSets = [];
+
+			if ( renderContextData.bundleEncoders === undefined ) {
+
+				renderContextData.bundleEncoders = [];
+				renderContextData.bundleSets = [];
+
+			} else {
+
+				renderContextData.bundleEncoders.length = 0;
+
+			}
 
 			// Create separate bundle encoders for each camera in the array
 			for ( let i = 0; i < cameras.length; i ++ ) {
@@ -803,18 +891,25 @@ class WebGPUBackend extends Backend {
 					'renderBundleArrayCamera_' + i
 				);
 
-				// Initialize state tracking for this bundle
-				const bundleSets = {
-					attributes: {},
-					bindingGroups: [],
-					pipeline: null,
-					index: null
-				};
+				// Reuse or create state tracking for this bundle
+				let bundleSets = renderContextData.bundleSets[ i ];
+
+				if ( bundleSets !== undefined ) {
+
+					_resetCurrentSets( bundleSets );
+
+				} else {
+
+					bundleSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+					renderContextData.bundleSets[ i ] = bundleSets;
+
+				}
 
 				renderContextData.bundleEncoders.push( bundleEncoder );
-				renderContextData.bundleSets.push( bundleSets );
 
 			}
+
+			renderContextData.bundleSets.length = cameras.length;
 
 			// We'll complete the bundles in finishRender
 			renderContextData.currentPass = null;
@@ -842,8 +937,26 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
-		renderContextData.renderBundles = [];
+
+		if ( renderContextData.currentSets !== undefined ) {
+
+			_resetCurrentSets( renderContextData.currentSets );
+
+		} else {
+
+			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+		}
+
+		if ( renderContextData.renderBundles !== undefined ) {
+
+			renderContextData.renderBundles.length = 0;
+
+		} else {
+
+			renderContextData.renderBundles = [];
+
+		}
 
 	}
 
@@ -1005,18 +1118,18 @@ class WebGPUBackend extends Backend {
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
-		  const bundles = [];
+		  _bundles.length = 0;
 
 		  for ( let i = 0; i < renderContextData.bundleEncoders.length; i ++ ) {
 
 				const bundleEncoder = renderContextData.bundleEncoders[ i ];
-				bundles.push( bundleEncoder.finish() );
+				_bundles.push( bundleEncoder.finish() );
 
 			}
 
 		  for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
 
-				if ( i < bundles.length ) {
+				if ( i < _bundles.length ) {
 
 					const layerDescriptor = renderContextData.layerDescriptors[ i ];
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
@@ -1035,7 +1148,9 @@ class WebGPUBackend extends Backend {
 
 					}
 
-					renderPass.executeBundles( [ bundles[ i ] ] );
+					_singleBundleArray[ 0 ] = _bundles[ i ];
+					renderPass.executeBundles( _singleBundleArray );
+					_singleBundleArray[ 0 ] = null;
 
 					renderPass.end();
 
@@ -1091,7 +1206,9 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+		_submitArray[ 0 ] = renderContextData.encoder.finish();
+		this.device.queue.submit( _submitArray );
+		_submitArray[ 0 ] = null;
 
 
 		//
@@ -1290,28 +1407,32 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderTargetContext.depth;
 			supportsStencil = renderTargetContext.stencil;
 
-			const clearConfig = {
-				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
-				clearValue: color ? _clearValue : undefined
-			};
+			_clearConfig.loadOp = color ? GPULoadOp.Clear : GPULoadOp.Load;
+			_clearConfig.clearValue = color ? _clearValue : undefined;
+			_clearConfig.depthLoadOp = undefined;
+			_clearConfig.depthClearValue = undefined;
+			_clearConfig.depthStoreOp = undefined;
+			_clearConfig.stencilLoadOp = undefined;
+			_clearConfig.stencilClearValue = undefined;
+			_clearConfig.stencilStoreOp = undefined;
 
 			if ( supportsDepth ) {
 
-				clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
-				clearConfig.depthClearValue = depth ? renderer.getClearDepth() : undefined;
-				clearConfig.depthStoreOp = GPUStoreOp.Store;
+				_clearConfig.depthLoadOp = depth ? GPULoadOp.Clear : GPULoadOp.Load;
+				_clearConfig.depthClearValue = depth ? renderer.getClearDepth() : undefined;
+				_clearConfig.depthStoreOp = GPUStoreOp.Store;
 
 			}
 
 			if ( supportsStencil ) {
 
-				clearConfig.stencilLoadOp = stencil ? GPULoadOp.Clear : GPULoadOp.Load;
-				clearConfig.stencilClearValue = stencil ? renderer.getClearStencil() : undefined;
-				clearConfig.stencilStoreOp = GPUStoreOp.Store;
+				_clearConfig.stencilLoadOp = stencil ? GPULoadOp.Clear : GPULoadOp.Load;
+				_clearConfig.stencilClearValue = stencil ? renderer.getClearStencil() : undefined;
+				_clearConfig.stencilStoreOp = GPUStoreOp.Store;
 
 			}
 
-			const descriptor = this._getRenderPassDescriptor( renderTargetContext, clearConfig );
+			const descriptor = this._getRenderPassDescriptor( renderTargetContext, _clearConfig );
 
 			colorAttachments = descriptor.colorAttachments;
 			depthStencilAttachment = descriptor.depthStencilAttachment;
@@ -1356,15 +1477,18 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'clear' } );
-		const currentPass = encoder.beginRenderPass( {
-			colorAttachments,
-			depthStencilAttachment
-		} );
+		const encoder = device.createCommandEncoder( _clearEncoderOptions );
+		_clearPassDescriptor.colorAttachments = colorAttachments;
+		_clearPassDescriptor.depthStencilAttachment = depthStencilAttachment;
+		const currentPass = encoder.beginRenderPass( _clearPassDescriptor );
+		_clearPassDescriptor.colorAttachments = null;
+		_clearPassDescriptor.depthStencilAttachment = null;
 
 		currentPass.end();
 
-		device.queue.submit( [ encoder.finish() ] );
+		_submitArray[ 0 ] = encoder.finish();
+		device.queue.submit( _submitArray );
+		_submitArray[ 0 ] = null;
 
 	}
 
@@ -1379,18 +1503,30 @@ class WebGPUBackend extends Backend {
 	beginCompute( computeGroup ) {
 
 		const groupGPU = this.get( computeGroup );
+		const isComputeGroup = Array.isArray( computeGroup ) === true;
+		const computeGroupId = isComputeGroup ? computeGroup.map( computeNode => computeNode.id ).join( '_' ) : computeGroup.id;
+		const traceComputeSteps = groupGPU.traceComputeSteps === true;
 
-		//
+		if ( groupGPU.encoderOptions === undefined ) {
 
-		const descriptor = {
-			label: 'computeGroup_' + computeGroup.id
-		};
+			groupGPU.encoderOptions = { label: 'computeGroup_' + computeGroupId };
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
+		}
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( groupGPU.encoderOptions );
+		groupGPU.passEncoderGPU = null;
 
-		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+		if ( isComputeGroup === false || traceComputeSteps === false ) {
+
+			const descriptor = {
+				label: 'computeGroup_' + computeGroupId
+			};
+
+			this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
+
+			groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+
+		}
 
 	}
 
@@ -1509,9 +1645,16 @@ class WebGPUBackend extends Backend {
 
 		const groupData = this.get( computeGroup );
 
-		groupData.passEncoderGPU.end();
+		if ( groupData.passEncoderGPU !== null ) {
 
-		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+			groupData.passEncoderGPU.end();
+			groupData.passEncoderGPU = null;
+
+		}
+
+		_submitArray[ 0 ] = groupData.cmdEncoderGPU.finish();
+		this.device.queue.submit( _submitArray );
+		_submitArray[ 0 ] = null;
 
 	}
 
@@ -1637,7 +1780,18 @@ class WebGPUBackend extends Backend {
 
 				const buffer = this.get( indirect ).buffer;
 				const indirectOffset = renderObject.getIndirectOffset();
-				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+				let indirectOffsets;
+
+				if ( Array.isArray( indirectOffset ) ) {
+
+					indirectOffsets = indirectOffset;
+
+				} else {
+
+					_indirectOffsets[ 0 ] = indirectOffset;
+					indirectOffsets = _indirectOffsets;
+
+				}
 
 				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
@@ -1663,7 +1817,18 @@ class WebGPUBackend extends Backend {
 
 				const buffer = this.get( indirect ).buffer;
 				const indirectOffset = renderObject.getIndirectOffset();
-				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+				let indirectOffsets;
+
+				if ( Array.isArray( indirectOffset ) ) {
+
+					indirectOffsets = indirectOffset;
+
+				} else {
+
+					_indirectOffsets[ 0 ] = indirectOffset;
+					indirectOffsets = _indirectOffsets;
+
+				}
 
 				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
@@ -2044,11 +2209,14 @@ class WebGPUBackend extends Backend {
 
 		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
-		descriptor.timestampWrites = {
-			querySet: timestampQueryPool.querySet,
-			beginningOfPassWriteIndex: baseOffset,
-			endOfPassWriteIndex: baseOffset + 1,
-		};
+		if ( baseOffset !== null ) {
+
+			_timestampWrites.querySet = timestampQueryPool.querySet;
+			_timestampWrites.beginningOfPassWriteIndex = baseOffset;
+			_timestampWrites.endOfPassWriteIndex = baseOffset + 1;
+			descriptor.timestampWrites = _timestampWrites;
+
+		}
 
 	}
 
@@ -2135,7 +2303,17 @@ class WebGPUBackend extends Backend {
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		if ( renderContextData._bundleCurrentSets !== undefined ) {
+
+			_resetCurrentSets( renderContextData._bundleCurrentSets );
+
+		} else {
+
+			renderContextData._bundleCurrentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+		}
+
+		renderContextData.currentSets = renderContextData._bundleCurrentSets;
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -2389,30 +2567,34 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
+		_texCopyEncoderOptions.label = 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id;
+		const encoder = this.device.createCommandEncoder( _texCopyEncoderOptions );
 
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
 
-		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				mipLevel: srcLevel,
-				origin: { x: srcX, y: srcY, z: srcZ }
-			},
-			{
-				texture: destinationGPU,
-				mipLevel: dstLevel,
-				origin: { x: dstX, y: dstY, z: dstZ }
-			},
-			[
-				srcWidth,
-				srcHeight,
-				srcDepth
-			]
-		);
+		_texCopySrc.texture = sourceGPU;
+		_texCopySrc.mipLevel = srcLevel;
+		_texCopySrc.origin.x = srcX;
+		_texCopySrc.origin.y = srcY;
+		_texCopySrc.origin.z = srcZ;
+		_texCopyDst.texture = destinationGPU;
+		_texCopyDst.mipLevel = dstLevel;
+		_texCopyDst.origin.x = dstX;
+		_texCopyDst.origin.y = dstY;
+		_texCopyDst.origin.z = dstZ;
+		_texCopySize[ 0 ] = srcWidth;
+		_texCopySize[ 1 ] = srcHeight;
+		_texCopySize[ 2 ] = srcDepth;
 
-		this.device.queue.submit( [ encoder.finish() ] );
+		encoder.copyTextureToTexture( _texCopySrc, _texCopyDst, _texCopySize );
+
+		_texCopySrc.texture = null;
+		_texCopyDst.texture = null;
+
+		_submitArray[ 0 ] = encoder.finish();
+		this.device.queue.submit( _submitArray );
+		_submitArray[ 0 ] = null;
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
@@ -2481,23 +2663,30 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+			const textureData = this.get( texture );
+
+			if ( textureData.copyEncoderOptions === undefined ) {
+
+				textureData.copyEncoderOptions = { label: 'copyFramebufferToTexture_' + texture.id };
+
+			}
+
+			encoder = this.device.createCommandEncoder( textureData.copyEncoderOptions );
 
 		}
 
-		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				origin: [ rectangle.x, rectangle.y, 0 ],
-			},
-			{
-				texture: destinationGPU
-			},
-			[
-				rectangle.z,
-				rectangle.w
-			]
-		);
+		_copySrc.texture = sourceGPU;
+		_copySrc.origin[ 0 ] = rectangle.x;
+		_copySrc.origin[ 1 ] = rectangle.y;
+		_copySrc.origin[ 2 ] = 0;
+		_copyDst.texture = destinationGPU;
+		_copySize[ 0 ] = rectangle.z;
+		_copySize[ 1 ] = rectangle.w;
+
+		encoder.copyTextureToTexture( _copySrc, _copyDst, _copySize );
+
+		_copySrc.texture = null;
+		_copyDst.texture = null;
 
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
@@ -2522,7 +2711,7 @@ class WebGPUBackend extends Backend {
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+			_resetCurrentSets( renderContextData.currentSets );
 
 			if ( renderContext.viewport ) {
 
@@ -2538,7 +2727,9 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			this.device.queue.submit( [ encoder.finish() ] );
+			_submitArray[ 0 ] = encoder.finish();
+			this.device.queue.submit( _submitArray );
+			_submitArray[ 0 ] = null;
 
 		}
 
