@@ -300,32 +300,40 @@ class WebGPUPipelineUtils {
 
 			const p = new Promise( async ( resolve /*, reject*/ ) => {
 
-				let asyncError = null;
-
 				try {
 
-					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
+					let asyncError = null;
 
-				} catch ( err ) {
+					try {
 
-					asyncError = err;
+						pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
+
+					} catch ( err ) {
+
+						asyncError = err;
+
+					}
+
+					const errorScope = await device.popErrorScope();
+
+					if ( errorScope !== null || asyncError !== null ) {
+
+						pipelineData.error = true;
+
+						const reason = ( errorScope && errorScope.message ) || ( asyncError && asyncError.message ) || 'unknown';
+						error( `WebGPURenderer: Async render pipeline creation failed (${ pipelineLabel }): ${ reason }` );
+
+						await this._reportShaderDiagnostics( stages, pipelineLabel );
+
+					}
+
+				} finally {
+
+					// Guarantee resolution so `compileAsync`'s Promise.all cannot hang on an
+					// unexpected throw from any await above.
+					resolve();
 
 				}
-
-				const errorScope = await device.popErrorScope();
-
-				if ( errorScope !== null || asyncError !== null ) {
-
-					pipelineData.error = true;
-
-					const reason = ( errorScope && errorScope.message ) || ( asyncError && asyncError.message ) || 'unknown';
-					error( `WebGPURenderer: Async render pipeline creation failed (${ pipelineLabel }): ${ reason }` );
-
-					await this._reportShaderDiagnostics( stages, pipelineLabel );
-
-				}
-
-				resolve();
 
 			} );
 

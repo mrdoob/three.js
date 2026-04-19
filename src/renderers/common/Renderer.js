@@ -1215,7 +1215,7 @@ class Renderer {
 	 */
 	_onError( info ) {
 
-		let errorMessage = `THREE.WebGPURenderer: Uncaptured ${ info.api } ${ info.type }`;
+		let errorMessage = `WebGPURenderer: Uncaptured ${ info.api } ${ info.type }`;
 
 		if ( info.message ) {
 
