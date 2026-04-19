@@ -35,6 +35,29 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+
+	device.queue.writeTexture(
+		{
+			texture: textureGPU,
+			mipLevel,
+			origin: { x: 0, y: 0, z: layerIndex }
+		},
+		mipmap.data,
+		{
+			offset: layerIndex * bytesPerImage,
+			bytesPerRow,
+			rowsPerImage
+		},
+		{
+			width: textureWidth,
+			height: textureHeight,
+			depthOrArrayLayers: 1
+		}
+	);
+
+}
+
 /**
  * A WebGPU backend utility module for managing textures.
  *
@@ -950,34 +973,11 @@ class WebGPUTextureUtils {
 			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
 			const textureHeight = rowsPerImage * blockData.height;
 
-			const writeTextureLayer = ( layerIndex ) => {
-
-				device.queue.writeTexture(
-					{
-						texture: textureGPU,
-						mipLevel: i,
-						origin: { x: 0, y: 0, z: layerIndex }
-					},
-					mipmap.data,
-					{
-						offset: layerIndex * bytesPerImage,
-						bytesPerRow,
-						rowsPerImage
-					},
-					{
-						width: textureWidth,
-						height: textureHeight,
-						depthOrArrayLayers: 1
-					}
-				);
-
-			};
-
 			if ( activeLayerUpdates !== null ) {
 
 				for ( const layerIndex of activeLayerUpdates ) {
 
-					writeTextureLayer( layerIndex );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
@@ -985,7 +985,7 @@ class WebGPUTextureUtils {
 
 				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
 
-					writeTextureLayer( layerIndex );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
