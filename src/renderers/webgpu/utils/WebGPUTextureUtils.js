@@ -560,7 +560,17 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+
+			}
 
 		} else if ( texture.isCubeTexture ) {
 
@@ -914,8 +924,9 @@ class WebGPUTextureUtils {
 	 * @param {Array<Object>} mipmaps - An array with mipmap data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -923,6 +934,7 @@ class WebGPUTextureUtils {
 
 		const blockData = this._getBlockData( textureDescriptorGPU.format );
 		const isArrayTexture = textureDescriptorGPU.size.depthOrArrayLayers > 1;
+		const activeLayerUpdates = layerUpdates && layerUpdates.size > 0 ? layerUpdates : null;
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -933,28 +945,49 @@ class WebGPUTextureUtils {
 			const depth = isArrayTexture ? textureDescriptorGPU.size.depthOrArrayLayers : 1;
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
-			const bytesPerImage = bytesPerRow * Math.ceil( height / blockData.height );
+			const rowsPerImage = Math.ceil( height / blockData.height );
+			const bytesPerImage = bytesPerRow * rowsPerImage;
+			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
+			const textureHeight = rowsPerImage * blockData.height;
 
-			for ( let j = 0; j < depth; j ++ ) {
+			const writeTextureLayer = ( layerIndex ) => {
 
 				device.queue.writeTexture(
 					{
 						texture: textureGPU,
 						mipLevel: i,
-						origin: { x: 0, y: 0, z: j }
+						origin: { x: 0, y: 0, z: layerIndex }
 					},
 					mipmap.data,
 					{
-						offset: j * bytesPerImage,
+						offset: layerIndex * bytesPerImage,
 						bytesPerRow,
-						rowsPerImage: Math.ceil( height / blockData.height )
+						rowsPerImage
 					},
 					{
-						width: Math.ceil( width / blockData.width ) * blockData.width,
-						height: Math.ceil( height / blockData.height ) * blockData.height,
+						width: textureWidth,
+						height: textureHeight,
 						depthOrArrayLayers: 1
 					}
 				);
+
+			};
+
+			if ( activeLayerUpdates !== null ) {
+
+				for ( const layerIndex of activeLayerUpdates ) {
+
+					writeTextureLayer( layerIndex );
+
+				}
+
+			} else {
+
+				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
+
+					writeTextureLayer( layerIndex );
+
+				}
 
 			}
 
