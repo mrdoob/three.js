@@ -67,6 +67,8 @@ class ClusteredLightsNode extends LightsNode {
 		this._cameraViewMatrix = uniform( 'mat4' ).setName( 'clusteredCameraViewMatrix' ).setGroup( renderGroup );
 		this._cameraProjectionMatrix = uniform( 'mat4' ).setName( 'clusteredCameraProjectionMatrix' ).setGroup( renderGroup );
 
+		this._gridDimensions = uniform( new Vector2() );
+
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
@@ -170,6 +172,55 @@ class ClusteredLightsNode extends LightsNode {
 		const idx = this._screenClusterIndex.mul( int( this._chunksPerCluster ) ).add( chunkOffset );
 
 		return this._lightIndexes.element( idx ).element( element.mod( stride ) );
+
+	}
+
+	getClusterLightCount( zSliceNode ) {
+
+		const getCount = Fn( ( [ zSliceNode ] ) => {
+
+			const count = int( 0 ).toVar();
+
+			const debugClusterIndex = this._screenClusterIndex.toVar();
+
+			If( zSliceNode.greaterThanEqual( int( 0 ) ), () => {
+
+				const tileSize = int( this.tileSize );
+				const screenTile = screenCoordinate.div( tileSize ).floor();
+				const NX = int( this._gridDimensions.x );
+				const NY = int( this._gridDimensions.y );
+
+				debugClusterIndex.assign(
+					int( screenTile.x )
+						.add( int( screenTile.y ).mul( NX ) )
+						.add( zSliceNode.mul( NX.mul( NY ) ) )
+				);
+
+			} );
+
+			Loop( this.maxLightsPerCluster, ( { i } ) => {
+
+				const element = int( i );
+				const stride = int( 4 );
+				const chunkOffset = element.div( stride );
+				const idx = debugClusterIndex.mul( int( this._chunksPerCluster ) ).add( chunkOffset );
+				const lightIndex = this._lightIndexes.element( idx ).element( element.mod( stride ) );
+
+				If( lightIndex.equal( int( 0 ) ), () => {
+
+					Break();
+
+				} );
+
+				count.addAssign( int( 1 ) );
+
+			} );
+
+			return count;
+
+		} );
+
+		return getCount( zSliceNode );
 
 	}
 
@@ -288,6 +339,8 @@ class ClusteredLightsNode extends LightsNode {
 		const NY = Math.floor( bufferSize.height / tileSize );
 		const NZ = zSlices;
 		const clusterCount = NX * NY * NZ;
+
+		this._gridDimensions.value.set( NX, NY );
 
 		// Lights data texture (same layout as TiledLightsNode)
 
@@ -411,20 +464,25 @@ class ClusteredLightsNode extends LightsNode {
 
 		// shading-side: fragment → cluster index
 
-		const screenTile = screenCoordinate.div( tileSize ).floor().toVar();
+		const getScreenClusterIndex = Fn( () => {
 
-		// view-space depth from positionView (negative in front); take magnitude
-		const viewDepth = positionView.z.negate();
+			const screenTile = screenCoordinate.div( tileSize ).floor();
 
-		// exponential Z slice: tz = floor( log(depth/near) / log(far/near) * NZ )
-		const invLogFarOverNear = float( 1 ).div( log( this._cameraFar.div( this._cameraNear ) ) );
-		const sliceFloat = log( viewDepth.div( this._cameraNear ) ).mul( invLogFarOverNear ).mul( float( NZ ) );
-		const zSlice = clamp( sliceFloat.floor(), float( 0 ), float( NZ - 1 ) );
+			// view-space depth from positionView (negative in front); take magnitude
+			const viewDepth = positionView.z.negate();
 
-		const screenClusterIndex = int( screenTile.x )
-			.add( int( screenTile.y ).mul( int( NX ) ) )
-			.add( int( zSlice ).mul( int( NX * NY ) ) )
-			.toVar();
+			// exponential Z slice: tz = floor( log(depth/near) / log(far/near) * NZ )
+			const invLogFarOverNear = float( 1 ).div( log( this._cameraFar.div( this._cameraNear ) ) );
+			const sliceFloat = log( viewDepth.div( this._cameraNear ) ).mul( invLogFarOverNear ).mul( float( NZ ) );
+			const zSlice = clamp( sliceFloat.floor(), float( 0 ), float( NZ - 1 ) );
+
+			return int( screenTile.x )
+				.add( int( screenTile.y ).mul( int( NX ) ) )
+				.add( int( zSlice ).mul( int( NX * NY ) ) );
+
+		} );
+
+		const screenClusterIndex = getScreenClusterIndex().toVar();
 
 		// assigns
 

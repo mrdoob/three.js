@@ -34,7 +34,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, uniform } from 'three/tsl';
+			import { pass, uniform, vec3, float, mix, step } from 'three/tsl';
 
 			import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
 
@@ -51,7 +51,7 @@
 			let camera, scene, renderer,
 				lights, lightDummy,
 				controls,
-				scenePass, clusterInfluence,
+				scenePass, clusterInfluence, debugZSliceNode,
 				lighting,
 				count,
 				renderPipeline;
@@ -108,7 +108,7 @@
 				lights = new THREE.Group();
 				scene.add( lights );
 
-				const addLight = ( hexColor, power = 30, distance = 5 ) => {
+				const addLight = ( hexColor, power = 30, distance = 1 ) => {
 
 					const light = new THREE.PointLight( hexColor, 1, distance );
 					light.position.set(
@@ -128,7 +128,7 @@
 
 				for ( let i = 0; i < count; i ++ ) {
 
-					const hex = ( Math.random() * 0xffffff ) + 0x666666;
+					const hex = ( Math.random() * 0x888888 ) + 0x888888;
 
 					lightDummy.setColorAt( i, color.setHex( hex ) );
 
@@ -173,12 +173,15 @@
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
+				debugZSliceNode = uniform( 15, 'int' );
+
 				updatePostProcessing();
 
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( clusterInfluence, 'value', 0, 1 ).name( 'cluster light count' );
+				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'light count per tile' );
+				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
 
 			}
 
@@ -186,9 +189,21 @@
 
 				// cluster light count debug overlay; needs to be updated every time the renderer size changes
 
-				const debugBlockIndexes = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio ).getBlock().toColor().div( count * 2 );
+				const lightingNode = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 
-				renderPipeline.outputNode = scenePass.add( debugBlockIndexes.mul( clusterInfluence ) );
+				// Calculate a color mapping based on the actual number of lights directly affecting the cluster.
+				// We map between 0 and maxLightsPerCluster to a gradient
+				const lightCount = lightingNode.getClusterLightCount( debugZSliceNode );
+				const heatmap = float( lightCount ).div( float( lighting.maxLightsPerCluster ) );
+
+				// Gradient mapping: Blue (0.0) -> Green (0.5) -> Red (1.0)
+				let heatColor = mix( vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 1.0, 0.0 ), heatmap.mul( 2.0 ).saturate() );
+				heatColor = mix( heatColor, vec3( 1.0, 0.0, 0.0 ), heatmap.sub( 0.5 ).mul( 2.0 ).saturate() );
+
+				// Blend the heatmap over the original scene based on the slider value
+				// The `step` drops opacity to 0.0 if there are strictly no lights in the cluster
+				const finalInfluence = clusterInfluence.mul( step( 0.0001, heatmap ) );
+				renderPipeline.outputNode = mix( scenePass, heatColor, finalInfluence );
 				renderPipeline.needsUpdate = true;
 
 			}
