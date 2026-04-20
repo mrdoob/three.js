@@ -173,56 +173,50 @@
 
 					for ( const path of data.paths ) {
 
-						const fillColor = path.userData.style.fill;
+						if ( guiData.drawFillShapes ) {
 
-						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
+							const material = SVGLoader.createFillMaterial( path );
 
-							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( fillColor ),
-								opacity: path.userData.style.fillOpacity,
-								transparent: true,
-								side: THREE.DoubleSide,
-								depthWrite: false,
-								wireframe: guiData.fillShapesWireframe
-							} );
+							if ( material ) {
 
-							const shapes = SVGLoader.createShapes( path );
+								material.wireframe = guiData.fillShapesWireframe;
 
-							for ( const shape of shapes ) {
+								const shapes = SVGLoader.createShapes( path );
 
-								const geometry = new THREE.ShapeGeometry( shape );
-								const mesh = new THREE.Mesh( geometry, material );
-								mesh.renderOrder = renderOrder ++;
+								for ( const shape of shapes ) {
 
-								group.add( mesh );
+									const geometry = new THREE.ShapeGeometry( shape );
+									const mesh = new THREE.Mesh( geometry, material );
+									mesh.renderOrder = renderOrder ++;
+
+									group.add( mesh );
+
+								}
 
 							}
 
 						}
 
-						const strokeColor = path.userData.style.stroke;
+						if ( guiData.drawStrokes ) {
 
-						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
+							const material = SVGLoader.createStrokeMaterial( path );
 
-							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( strokeColor ),
-								opacity: path.userData.style.strokeOpacity,
-								transparent: true,
-								side: THREE.DoubleSide,
-								depthWrite: false,
-								wireframe: guiData.strokesWireframe
-							} );
+							if ( material ) {
 
-							for ( const subPath of path.subPaths ) {
+								material.wireframe = guiData.strokesWireframe;
 
-								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+								for ( const subPath of path.subPaths ) {
 
-								if ( geometry ) {
+									const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 
-									const mesh = new THREE.Mesh( geometry, material );
-									mesh.renderOrder = renderOrder ++;
+									if ( geometry ) {
 
-									group.add( mesh );
+										const mesh = new THREE.Mesh( geometry, material );
+										mesh.renderOrder = renderOrder ++;
+
+										group.add( mesh );
+
+									}
 
 								}
 

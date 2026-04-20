@@ -1,10 +1,13 @@
 import {
 	Box2,
 	BufferGeometry,
+	Color,
+	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
 	Matrix3,
+	MeshBasicMaterial,
 	Path,
 	Shape,
 	ShapePath,
@@ -1997,6 +2000,48 @@ class SVGLoader extends Loader {
 
 		// console.log( paths );
 		return data;
+
+	}
+
+	/**
+	 * Creates a material for rendering the fill of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The fill material. `null` if the path has no fill.
+	 */
+	static createFillMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+		if ( style.fill === undefined || style.fill === 'none' ) return null;
+
+		return new MeshBasicMaterial( {
+			color: shapePath.color,
+			opacity: style.fillOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
+
+	}
+
+	/**
+	 * Creates a material for rendering the stroke of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The stroke material. `null` if the path has no stroke.
+	 */
+	static createStrokeMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+		if ( style.stroke === undefined || style.stroke === 'none' ) return null;
+
+		return new MeshBasicMaterial( {
+			color: new Color().setStyle( style.stroke, COLOR_SPACE_SVG ),
+			opacity: style.strokeOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
 
 	}
 
