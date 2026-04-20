@@ -25,13 +25,58 @@ const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 
 const _submitArray = [ null ];
 
-const _copySrc = { texture: null, origin: [ 0, 0, 0 ] };
-const _copyDst = { texture: null };
+/**
+ * Reusable wrapper around `GPUTexelCopyTextureInfo`. Mutates in place to avoid
+ * per-frame GC pressure while keeping call sites readable via chainable setters.
+ */
+class TexelCopyTextureInfo {
+
+	constructor() {
+
+		this.texture = null;
+		this.mipLevel = 0;
+		this.origin = { x: 0, y: 0, z: 0 };
+
+	}
+
+	setTexture( texture ) {
+
+		this.texture = texture;
+		return this;
+
+	}
+
+	setMipLevel( mipLevel ) {
+
+		this.mipLevel = mipLevel;
+		return this;
+
+	}
+
+	setOrigin( x, y, z ) {
+
+		this.origin.x = x;
+		this.origin.y = y;
+		this.origin.z = z;
+		return this;
+
+	}
+
+	reset() {
+
+		this.texture = null;
+
+	}
+
+}
+
+const _copySrc = new TexelCopyTextureInfo();
+const _copyDst = new TexelCopyTextureInfo();
 const _copySize = [ 0, 0 ];
 
 const _texCopyEncoderOptions = { label: '' };
-const _texCopySrc = { texture: null, mipLevel: 0, origin: { x: 0, y: 0, z: 0 } };
-const _texCopyDst = { texture: null, mipLevel: 0, origin: { x: 0, y: 0, z: 0 } };
+const _texCopySrc = new TexelCopyTextureInfo();
+const _texCopyDst = new TexelCopyTextureInfo();
 const _texCopySize = [ 0, 0, 0 ];
 
 const _clearEncoderOptions = { label: 'clear' };
@@ -54,16 +99,6 @@ function _resetCurrentSets( sets ) {
 	sets.pipeline = null;
 	sets.index = null;
 	return sets;
-
-}
-
-function _setTexelCopyInfo( info, texture, mipLevel, x, y, z ) {
-
-	info.texture = texture;
-	info.mipLevel = mipLevel;
-	info.origin.x = x;
-	info.origin.y = y;
-	info.origin.z = z;
 
 }
 
@@ -2638,16 +2673,16 @@ class WebGPUBackend extends Backend {
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
 
-		_setTexelCopyInfo( _texCopySrc, sourceGPU, srcLevel, srcX, srcY, srcZ );
-		_setTexelCopyInfo( _texCopyDst, destinationGPU, dstLevel, dstX, dstY, dstZ );
+		_texCopySrc.setTexture( sourceGPU ).setMipLevel( srcLevel ).setOrigin( srcX, srcY, srcZ );
+		_texCopyDst.setTexture( destinationGPU ).setMipLevel( dstLevel ).setOrigin( dstX, dstY, dstZ );
 		_texCopySize[ 0 ] = srcWidth;
 		_texCopySize[ 1 ] = srcHeight;
 		_texCopySize[ 2 ] = srcDepth;
 
 		encoder.copyTextureToTexture( _texCopySrc, _texCopyDst, _texCopySize );
 
-		_texCopySrc.texture = null;
-		_texCopyDst.texture = null;
+		_texCopySrc.reset();
+		_texCopyDst.reset();
 
 		_submit( this.device.queue, encoder.finish() );
 
@@ -2730,18 +2765,15 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		_copySrc.texture = sourceGPU;
-		_copySrc.origin[ 0 ] = rectangle.x;
-		_copySrc.origin[ 1 ] = rectangle.y;
-		_copySrc.origin[ 2 ] = 0;
-		_copyDst.texture = destinationGPU;
+		_copySrc.setTexture( sourceGPU ).setOrigin( rectangle.x, rectangle.y, 0 );
+		_copyDst.setTexture( destinationGPU );
 		_copySize[ 0 ] = rectangle.z;
 		_copySize[ 1 ] = rectangle.w;
 
 		encoder.copyTextureToTexture( _copySrc, _copyDst, _copySize );
 
-		_copySrc.texture = null;
-		_copyDst.texture = null;
+		_copySrc.reset();
+		_copyDst.reset();
 
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
