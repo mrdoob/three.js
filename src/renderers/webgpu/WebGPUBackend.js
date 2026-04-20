@@ -1572,6 +1572,7 @@ class WebGPUBackend extends Backend {
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( groupGPU.encoderOptions );
 		groupGPU.passEncoderGPU = null;
+		groupGPU.currentPipeline = null;
 
 		if ( groupGPU.isComputeGroup === false || traceComputeSteps === false ) {
 
