@@ -1,4 +1,6 @@
-import BindGroup from '../BindGroup.js';
+import BindGroup from '../BindGroup.js'
+import UniformGroupNode from '../../../nodes/core/UniformGroupNode.js';
+import NodeUniformsGroup from './NodeUniformsGroup.js';
 
 /**
  * This module represents the state of a node builder after it was
@@ -113,10 +115,13 @@ class NodeBuilderState {
 	 * This method is used to create a array of bind groups based
 	 * on the existing bind groups of this state. Shared groups are
 	 * not cloned.
+	 * 
+	 * @param {} uniGroups TSL uniforms
+	 * @param {} _uniGroupCache cache object
 	 *
 	 * @return {Array<BindGroup>} A array of bind groups.
 	 */
-	createBindings() {
+	createBindings(uniGroups, uniGroupCache) {
 
 		const bindings = [];
 
@@ -130,9 +135,25 @@ class NodeBuilderState {
 				bindings.push( bindingsGroup );
 
 				for ( const instanceBinding of instanceGroup.bindings ) {
-
-					bindingsGroup.bindings.push( instanceBinding.clone() );
-
+					const name = instanceBinding.name
+					let overrideGroup = uniGroups?.[name]
+					if (overrideGroup) {
+						const cached = uniGroupCache[name]
+                        if (cached) {
+							bindingsGroup.bindings.push(cached)
+                        } else {
+                            const newNode = new UniformGroupNode(name)
+                            const newNug = new NodeUniformsGroup(name, newNode)
+                            for (let uni of instanceBinding.uniforms) {
+                                let overrideUni = overrideGroup[uni.name]
+								newNug.uniforms.push(overrideUni ? uni.cloneAndWrap(overrideUni) : uni )
+                            }
+                            uniGroupCache[name] = newNug
+                            bindingsGroup.bindings.push(newNug)
+                        }
+					} else {
+						bindingsGroup.bindings.push( instanceBinding.clone() );
+					}				
 				}
 
 			} else {

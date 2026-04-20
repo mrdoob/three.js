@@ -2,6 +2,7 @@ import {
 	NumberUniform, Vector2Uniform, Vector3Uniform, Vector4Uniform,
 	ColorUniform, Matrix2Uniform, Matrix3Uniform, Matrix4Uniform
 } from '../Uniform.js';
+import NodeUniform from '../../../nodes/core/NodeUniform.js';
 
 /**
  * A special form of Number uniform binding type.
@@ -52,6 +53,16 @@ class NumberNodeUniform extends NumberUniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {NumberNodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new NumberNodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -103,6 +114,16 @@ class Vector2NodeUniform extends Vector2Uniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Vector2NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Vector2NodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -154,6 +175,17 @@ class Vector3NodeUniform extends Vector3Uniform {
 
 	}
 
+
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Vector3NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Vector3NodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -205,6 +237,16 @@ class Vector4NodeUniform extends Vector4Uniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Vector4NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Vector4NodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -256,6 +298,16 @@ class ColorNodeUniform extends ColorUniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {ColorNodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new ColorNodeUniform(nodeUniform)
+	}
 }
 
 
@@ -308,6 +360,16 @@ class Matrix2NodeUniform extends Matrix2Uniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Matrix2NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Matrix2NodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -359,6 +421,16 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Matrix3NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Matrix3NodeUniform(nodeUniform)
+	}
 }
 
 /**
@@ -410,6 +482,16 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 	}
 
+	/**
+	 * Returns the node uniform data type.
+	 * @param {UniformNode} swappedNode - swapped uniform
+	 * @return {Matrix4NodeUniform} cloned obj
+	 */
+	cloneAndWrap(swappedNode) {
+		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
+			swappedNode)
+		return new Matrix4NodeUniform(nodeUniform)
+	}
 }
 
 export {

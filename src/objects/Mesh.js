@@ -95,6 +95,30 @@ class Mesh extends Object3D {
 		this.morphTargetInfluences = undefined;
 
 		/**
+		 * TSL override for uniform groups
+		 * Put uniforms here
+		 * 
+		 * this.uniGroups = {
+         *      uTintGroup: {
+         *          tintColor: uniform(new THREE.Color(1.0, 0.0, 0.0),
+         *          tintAlpha: uniform(.3).setName('tintAlpha')
+         *      }
+         *  };
+		 *
+		 * @type {Object|undefined}
+		 * @default undefined
+		 */
+		this.uniGroups = undefined;
+
+		/**
+		 * Cache for special objects in "uniGroups"
+		 *
+		 * @type {Object|undefined}
+		 * @default undefined
+		 */
+		this._uniGroupCache = undefined;
+
+		/**
 		 * The number of instances of this mesh.
 		 * Can only be used with {@link WebGPURenderer}.
 		 *

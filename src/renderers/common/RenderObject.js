@@ -397,9 +397,16 @@ class RenderObject {
 	 * @return {Array<BindGroup>} The bindings.
 	 */
 	getBindings() {
+		if (this._bindings) {
+            return this._bindings;
+        }
+    
+		if (this.object.uniGroups && !this.object._cacheUniGroups) {
+			this.object._cacheUniGroups = {}
+		}
 
-		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings() );
-
+        this._bindings = this.getNodeBuilderState().createBindings(this.object.uniGroups, this.object._cacheUniGroups)
+        return this._bindings;
 	}
 
 	/**
