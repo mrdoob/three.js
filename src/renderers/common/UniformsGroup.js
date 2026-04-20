@@ -239,6 +239,17 @@ class UniformsGroup extends UniformBuffer {
 	}
 
 	/**
+	 * Releases the buffer.
+	 */
+	release() {
+
+		super.release();
+
+		this._values = null;
+
+	}
+
+	/**
 	 * Updates a given uniform by calling an update method matching
 	 * the uniforms type.
 	 *
