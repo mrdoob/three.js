@@ -55,6 +55,9 @@ const ATLAS_PADDING = 1;
  * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
  * position-dependent diffuse global illumination.
  *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * A version for {@link WebGPURenderer} will be added at a later point.
+ *
  * All seven packed SH sub-volumes are stored in a **single** RGBA
  * `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis.
  * Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at
