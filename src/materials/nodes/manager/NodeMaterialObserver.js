@@ -333,7 +333,7 @@ class NodeMaterialObserver {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: value.version };
+						data[ property ] = { id: value.id, version: 0 };
 
 					} else {
 
