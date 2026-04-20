@@ -97,7 +97,7 @@ class Mesh extends Object3D {
 		/**
 		 * TSL override for uniform groups
 		 * Put uniforms here
-		 * 
+		 *
 		 * this.uniGroups = {
          *      uTintGroup: {
          *          tintColor: uniform(new THREE.Color(1.0, 0.0, 0.0),

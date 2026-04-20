@@ -58,11 +58,14 @@ class NumberNodeUniform extends NumberUniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {NumberNodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new NumberNodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new NumberNodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -119,11 +122,14 @@ class Vector2NodeUniform extends Vector2Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Vector2NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Vector2NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Vector2NodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -181,11 +187,14 @@ class Vector3NodeUniform extends Vector3Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Vector3NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Vector3NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Vector3NodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -242,11 +251,14 @@ class Vector4NodeUniform extends Vector4Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Vector4NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Vector4NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Vector4NodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -303,11 +315,14 @@ class ColorNodeUniform extends ColorUniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {ColorNodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new ColorNodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new ColorNodeUniform( nodeUniform );
+
 	}
+
 }
 
 
@@ -365,11 +380,14 @@ class Matrix2NodeUniform extends Matrix2Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Matrix2NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Matrix2NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Matrix2NodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -426,11 +444,14 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Matrix3NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Matrix3NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Matrix3NodeUniform( nodeUniform );
+
 	}
+
 }
 
 /**
@@ -487,11 +508,14 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 	 * @param {UniformNode} swappedNode - swapped uniform
 	 * @return {Matrix4NodeUniform} cloned obj
 	 */
-	cloneAndWrap(swappedNode) {
-		const nodeUniform = new NodeUniform(this.nodeUniform.name, this.nodeUniform.type, 
-			swappedNode)
-		return new Matrix4NodeUniform(nodeUniform)
+	cloneAndWrap( swappedNode ) {
+
+		const nodeUniform = new NodeUniform( this.nodeUniform.name, this.nodeUniform.type,
+			swappedNode );
+		return new Matrix4NodeUniform( nodeUniform );
+
 	}
+
 }
 
 export {
