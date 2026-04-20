@@ -466,28 +466,6 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					// 2.0
-
-					if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
-
-						const blob = new Blob( [ contents ], { type: 'text/javascript' } );
-						const url = URL.createObjectURL( blob );
-
-						const worker = new Worker( url );
-
-						worker.onmessage = function ( event ) {
-
-							event.data.metadata = { version: 2 };
-							handleJSON( event.data );
-
-						};
-
-						worker.postMessage( Date.now() );
-
-						return;
-
-					}
-
 					// >= 3.0
 
 					let data;
