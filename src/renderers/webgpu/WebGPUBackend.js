@@ -57,6 +57,24 @@ function _resetCurrentSets( sets ) {
 
 }
 
+function _setTexelCopyInfo( info, texture, mipLevel, x, y, z ) {
+
+	info.texture = texture;
+	info.mipLevel = mipLevel;
+	info.origin.x = x;
+	info.origin.y = y;
+	info.origin.z = z;
+
+}
+
+function _submit( queue, commandBuffer ) {
+
+	_submitArray[ 0 ] = commandBuffer;
+	queue.submit( _submitArray );
+	_submitArray[ 0 ] = null;
+
+}
+
 /**
  * A backend implementation targeting WebGPU.
  *
@@ -1254,9 +1272,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		_submitArray[ 0 ] = renderContextData.encoder.finish();
-		this.device.queue.submit( _submitArray );
-		_submitArray[ 0 ] = null;
+		_submit( this.device.queue, renderContextData.encoder.finish() );
 
 
 		//
@@ -1534,9 +1550,7 @@ class WebGPUBackend extends Backend {
 
 		currentPass.end();
 
-		_submitArray[ 0 ] = encoder.finish();
-		device.queue.submit( _submitArray );
-		_submitArray[ 0 ] = null;
+		_submit( device.queue, encoder.finish() );
 
 	}
 
@@ -1705,9 +1719,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		_submitArray[ 0 ] = groupData.cmdEncoderGPU.finish();
-		this.device.queue.submit( _submitArray );
-		_submitArray[ 0 ] = null;
+		_submit( this.device.queue, groupData.cmdEncoderGPU.finish() );
 
 	}
 
@@ -2626,16 +2638,8 @@ class WebGPUBackend extends Backend {
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
 
-		_texCopySrc.texture = sourceGPU;
-		_texCopySrc.mipLevel = srcLevel;
-		_texCopySrc.origin.x = srcX;
-		_texCopySrc.origin.y = srcY;
-		_texCopySrc.origin.z = srcZ;
-		_texCopyDst.texture = destinationGPU;
-		_texCopyDst.mipLevel = dstLevel;
-		_texCopyDst.origin.x = dstX;
-		_texCopyDst.origin.y = dstY;
-		_texCopyDst.origin.z = dstZ;
+		_setTexelCopyInfo( _texCopySrc, sourceGPU, srcLevel, srcX, srcY, srcZ );
+		_setTexelCopyInfo( _texCopyDst, destinationGPU, dstLevel, dstX, dstY, dstZ );
 		_texCopySize[ 0 ] = srcWidth;
 		_texCopySize[ 1 ] = srcHeight;
 		_texCopySize[ 2 ] = srcDepth;
@@ -2645,9 +2649,7 @@ class WebGPUBackend extends Backend {
 		_texCopySrc.texture = null;
 		_texCopyDst.texture = null;
 
-		_submitArray[ 0 ] = encoder.finish();
-		this.device.queue.submit( _submitArray );
-		_submitArray[ 0 ] = null;
+		_submit( this.device.queue, encoder.finish() );
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
@@ -2780,9 +2782,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			_submitArray[ 0 ] = encoder.finish();
-			this.device.queue.submit( _submitArray );
-			_submitArray[ 0 ] = null;
+			_submit( this.device.queue, encoder.finish() );
 
 		}
 

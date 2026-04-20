@@ -53,29 +53,8 @@ class RenderContexts {
 			const format = renderTarget.texture.format;
 			const type = renderTarget.texture.type;
 			const count = renderTarget.textures.length;
-			const samples = renderTarget.samples;
-			const depthBuffer = renderTarget.depthBuffer;
-			const stencilBuffer = renderTarget.stencilBuffer;
 
-			if ( renderTarget._attachmentState === undefined ||
-				renderTarget._attachmentStateFormat !== format ||
-				renderTarget._attachmentStateType !== type ||
-				renderTarget._attachmentStateSamples !== samples ||
-				renderTarget._attachmentStateCount !== count ||
-				renderTarget._attachmentStateDepth !== depthBuffer ||
-				renderTarget._attachmentStateStencil !== stencilBuffer ) {
-
-				renderTarget._attachmentState = `${ count }:${ format }:${ type }:${ samples }:${ depthBuffer }:${ stencilBuffer }`;
-				renderTarget._attachmentStateFormat = format;
-				renderTarget._attachmentStateType = type;
-				renderTarget._attachmentStateSamples = samples;
-				renderTarget._attachmentStateCount = count;
-				renderTarget._attachmentStateDepth = depthBuffer;
-				renderTarget._attachmentStateStencil = stencilBuffer;
-
-			}
-
-			attachmentState = renderTarget._attachmentState;
+			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
 		}
 
