@@ -365,10 +365,10 @@ class ClusteredLightsNode extends LightsNode {
 			const yMaxFar = ndcYmax.mul( scaleFarY );
 
 			// AABB of the 8 view-space corners (tile boundaries can straddle the view axis)
-			const aabbMinX = min( min( xMinNear, xMinFar ), min( xMaxNear, xMaxFar ) );
-			const aabbMaxX = max( max( xMinNear, xMinFar ), max( xMaxNear, xMaxFar ) );
-			const aabbMinY = min( min( yMinNear, yMinFar ), min( yMaxNear, yMaxFar ) );
-			const aabbMaxY = max( max( yMinNear, yMinFar ), max( yMaxNear, yMaxFar ) );
+			const aabbMinX = min( xMinNear, xMinFar );
+			const aabbMaxX = max( xMaxNear, xMaxFar );
+			const aabbMinY = min( yMinNear, yMinFar );
+			const aabbMaxY = max( yMaxNear, yMaxFar );
 
 			const aabbMin = vec3( aabbMinX, aabbMinY, zFarCluster );
 			const aabbMax = vec3( aabbMaxX, aabbMaxY, zNearCluster );
