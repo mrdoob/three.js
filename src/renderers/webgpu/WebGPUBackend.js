@@ -50,7 +50,7 @@ const _depthViewOptions = { dimension: undefined, arrayLayerCount: undefined, ba
 
 function _resetCurrentSets( sets ) {
 
-	for ( const key in sets.attributes ) delete sets.attributes[ key ];
+	sets.attributes.length = 0;
 	sets.bindingGroups.length = 0;
 	sets.pipeline = null;
 	sets.index = null;
@@ -908,7 +908,7 @@ class WebGPUBackend extends Backend {
 
 				} else {
 
-					bundleSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+					bundleSets = { attributes: [], bindingGroups: [], pipeline: null, index: null };
 					renderContextData.bundleSets[ i ] = bundleSets;
 
 				}
@@ -952,7 +952,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+			renderContextData.currentSets = { attributes: [], bindingGroups: [], pipeline: null, index: null };
 
 		}
 
@@ -1603,13 +1603,19 @@ class WebGPUBackend extends Backend {
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
 		const computeNodeData = this.get( computeNode );
-		const { passEncoderGPU } = this.get( computeGroup );
+		const groupData = this.get( computeGroup );
+		const { passEncoderGPU } = groupData;
 
 		// pipeline
 
 		const pipelineGPU = this.get( pipeline ).pipeline;
 
-		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
+		if ( groupData.currentPipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+			groupData.currentPipeline = pipelineGPU;
+
+		}
 
 		// bind groups
 
@@ -1736,8 +1742,12 @@ class WebGPUBackend extends Backend {
 		const hasIndex = ( index !== null );
 
 		// pipeline
-		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
-		currentSets.pipeline = pipelineGPU;
+		if ( currentSets.pipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+			currentSets.pipeline = pipelineGPU;
+
+		}
 
 		// bind groups
 		const currentBindingGroups = currentSets.bindingGroups;
@@ -2365,7 +2375,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			renderContextData._bundleCurrentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+			renderContextData._bundleCurrentSets = { attributes: [], bindingGroups: [], pipeline: null, index: null };
 
 		}
 
