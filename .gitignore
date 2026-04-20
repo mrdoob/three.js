@@ -11,7 +11,6 @@ npm-debug.log
 
 test/e2e/chromium
 test/e2e/output-screenshots
-test/e2e/perf-regression-*.json
 test/treeshake/index.bundle.js
 test/treeshake/index.bundle.min.js
 test/treeshake/index.webgpu.bundle.js
