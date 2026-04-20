@@ -24,6 +24,10 @@ Whether this node is global or not. This property is relevant for the internal n
 
 Default is `false`.
 
+### .id : number (readonly)
+
+The unique ID of the node.
+
 ### .isNode : boolean (readonly)
 
 This flag can be used for type testing.
@@ -166,6 +170,22 @@ Can be used to define the output type.
 
 **Returns:** The generated shader string.
 
+### .generateNodeType( builder : NodeBuilder, output : string ) : string
+
+Returns the node's type.
+
+**builder**
+
+The current node builder.
+
+**output**
+
+The output of the node.
+
+Default is `null`.
+
+**Returns:** The type of the node.
+
 ### .getArrayCount( builder : NodeBuilder ) : number
 
 Returns the number of elements in the node array.
@@ -236,13 +256,19 @@ The name of the member.
 
 **Returns:** The type of the node.
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .getNodeType( builder : NodeBuilder, output : string ) : string
 
 Returns the node's type.
 
 **builder**
 
 The current node builder.
+
+**output**
+
+The output of the node.
+
+Default is `null`.
 
 **Returns:** The type of the node.
 

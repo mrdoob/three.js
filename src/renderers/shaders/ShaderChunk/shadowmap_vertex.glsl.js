@@ -6,7 +6,7 @@ export default /* glsl */`
 
 		// Offsetting the position used for querying occlusion along the world normal can be used to reduce shadow acne.
 
-		vec3 shadowWorldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
+		vec3 shadowWorldNormal = transformNormalByInverseViewMatrix( transformedNormal, viewMatrix );
 
 	#else
 

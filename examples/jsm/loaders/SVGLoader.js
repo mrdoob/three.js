@@ -1,10 +1,13 @@
 import {
 	Box2,
 	BufferGeometry,
+	Color,
+	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
 	Matrix3,
+	MeshBasicMaterial,
 	Path,
 	Shape,
 	ShapePath,
@@ -238,7 +241,10 @@ class SVGLoader extends Loader {
 
 				paths.push( path );
 
-				path.userData = { node: node, style: style };
+				const pathStyle = Object.assign( {}, style );
+				pathStyle.strokeWidth = style.strokeWidth * getTransformScale( currentTransform );
+
+				path.userData = { node: node, style: pathStyle };
 
 			}
 
@@ -1875,6 +1881,14 @@ class SVGLoader extends Loader {
 
 		}
 
+		function getTransformScale( m ) {
+
+			const te = m.elements;
+			const det = te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ];
+			return Math.sqrt( Math.abs( det ) );
+
+		}
+
 		// Calculates the eigensystem of a real symmetric 2x2 matrix
 		//    [ A  B ]
 		//    [ B  C ]
@@ -1990,6 +2004,48 @@ class SVGLoader extends Loader {
 	}
 
 	/**
+	 * Creates a material for rendering the fill of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The fill material. `null` if the path has no fill.
+	 */
+	static createFillMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+		if ( style.fill === undefined || style.fill === 'none' ) return null;
+
+		return new MeshBasicMaterial( {
+			color: shapePath.color,
+			opacity: style.fillOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
+
+	}
+
+	/**
+	 * Creates a material for rendering the stroke of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The stroke material. `null` if the path has no stroke.
+	 */
+	static createStrokeMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+		if ( style.stroke === undefined || style.stroke === 'none' ) return null;
+
+		return new MeshBasicMaterial( {
+			color: new Color().setStyle( style.stroke, COLOR_SPACE_SVG ),
+			opacity: style.strokeOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
+
+	}
+
+	/**
 	 * Creates from the given shape path and array of shapes.
 	 *
 	 * @param {ShapePath} shapePath - The shape path.
@@ -1997,442 +2053,206 @@ class SVGLoader extends Loader {
 	 */
 	static createShapes( shapePath ) {
 
-		const BIGNUMBER = 999999999;
+		// Point-in-polygon test using the even-odd ray-casting rule. Valid for
+		// simple (non self-intersecting) polygons.
+		function pointInPolygon( p, polygon ) {
 
-		const IntersectionLocationType = {
-			ORIGIN: 0,
-			DESTINATION: 1,
-			BETWEEN: 2,
-			LEFT: 3,
-			RIGHT: 4,
-			BEHIND: 5,
-			BEYOND: 6
-		};
+			let inside = false;
+			const n = polygon.length;
 
-		const classifyResult = {
-			loc: IntersectionLocationType.ORIGIN,
-			t: 0
-		};
+			for ( let i = 0, j = n - 1; i < n; j = i ++ ) {
 
-		function findEdgeIntersection( a0, a1, b0, b1 ) {
+				const a = polygon[ i ];
+				const b = polygon[ j ];
 
-			const x1 = a0.x;
-			const x2 = a1.x;
-			const x3 = b0.x;
-			const x4 = b1.x;
-			const y1 = a0.y;
-			const y2 = a1.y;
-			const y3 = b0.y;
-			const y4 = b1.y;
-			const nom1 = ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 );
-			const nom2 = ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 );
-			const denom = ( y4 - y3 ) * ( x2 - x1 ) - ( x4 - x3 ) * ( y2 - y1 );
-			const t1 = nom1 / denom;
-			const t2 = nom2 / denom;
+				if ( ( a.y > p.y ) !== ( b.y > p.y ) &&
+					p.x < ( b.x - a.x ) * ( p.y - a.y ) / ( b.y - a.y ) + a.x ) {
 
-			if ( ( ( denom === 0 ) && ( nom1 !== 0 ) ) || ( t1 <= 0 ) || ( t1 >= 1 ) || ( t2 < 0 ) || ( t2 > 1 ) ) {
-
-				//1. lines are parallel or edges don't intersect
-
-				return null;
-
-			} else if ( ( nom1 === 0 ) && ( denom === 0 ) ) {
-
-				//2. lines are colinear
-
-				//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
-				for ( let i = 0; i < 2; i ++ ) {
-
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
-					//find position of this endpoints relatively to edge1
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
-
-						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
-
-					} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
-
-						const x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-						const y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-						return { x: x, y: y, t: classifyResult.t, };
-
-					}
+					inside = ! inside;
 
 				}
-
-				return null;
-
-			} else {
-
-				//3. edges intersect
-
-				for ( let i = 0; i < 2; i ++ ) {
-
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
-
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
-
-						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
-
-					}
-
-				}
-
-				const x = + ( ( x1 + t1 * ( x2 - x1 ) ).toPrecision( 10 ) );
-				const y = + ( ( y1 + t1 * ( y2 - y1 ) ).toPrecision( 10 ) );
-				return { x: x, y: y, t: t1 };
 
 			}
+
+			return inside;
 
 		}
 
-		function classifyPoint( p, edgeStart, edgeEnd ) {
+		// Returns a point guaranteed to be strictly inside the given simple
+		// polygon. First tries the bounding-box center; if that falls outside
+		// the polygon, casts a horizontal ray at the center's y and picks the
+		// midpoint between the first two sorted intercepts.
+		//
+		// Port of paper.js' Path#getInteriorPoint()
+		// https://github.com/paperjs/paper.js/blob/develop/src/path/PathItem.Boolean.js
+		function getInteriorPoint( polygon, boundingBox ) {
 
-			const ax = edgeEnd.x - edgeStart.x;
-			const ay = edgeEnd.y - edgeStart.y;
-			const bx = p.x - edgeStart.x;
-			const by = p.y - edgeStart.y;
-			const sa = ax * by - bx * ay;
+			const point = boundingBox.getCenter( new Vector2() );
 
-			if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
+			if ( pointInPolygon( point, polygon ) ) return point;
 
-				classifyResult.loc = IntersectionLocationType.ORIGIN;
-				classifyResult.t = 0;
-				return;
+			const y = point.y;
+			const intercepts = [];
+			const n = polygon.length;
 
-			}
+			for ( let i = 0; i < n; i ++ ) {
 
-			if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
+				const a = polygon[ i ];
+				const b = polygon[ ( i + 1 ) % n ];
 
-				classifyResult.loc = IntersectionLocationType.DESTINATION;
-				classifyResult.t = 1;
-				return;
+				// Half-open crossing rule — counts each vertex exactly once and
+				// skips horizontal edges.
+				if ( ( a.y > y ) !== ( b.y > y ) ) {
 
-			}
-
-			if ( sa < - Number.EPSILON ) {
-
-				classifyResult.loc = IntersectionLocationType.LEFT;
-				return;
-
-			}
-
-			if ( sa > Number.EPSILON ) {
-
-				classifyResult.loc = IntersectionLocationType.RIGHT;
-				return;
-
-
-			}
-
-			if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
-
-				classifyResult.loc = IntersectionLocationType.BEHIND;
-				return;
-
-			}
-
-			if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
-
-				classifyResult.loc = IntersectionLocationType.BEYOND;
-				return;
-
-			}
-
-			let t;
-
-			if ( ax !== 0 ) {
-
-				t = bx / ax;
-
-			} else {
-
-				t = by / ay;
-
-			}
-
-			classifyResult.loc = IntersectionLocationType.BETWEEN;
-			classifyResult.t = t;
-
-		}
-
-		function getIntersections( path1, path2 ) {
-
-			const intersectionsRaw = [];
-			const intersections = [];
-
-			for ( let index = 1; index < path1.length; index ++ ) {
-
-				const path1EdgeStart = path1[ index - 1 ];
-				const path1EdgeEnd = path1[ index ];
-
-				for ( let index2 = 1; index2 < path2.length; index2 ++ ) {
-
-					const path2EdgeStart = path2[ index2 - 1 ];
-					const path2EdgeEnd = path2[ index2 ];
-
-					const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
-
-					if ( intersection !== null && intersectionsRaw.find( i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON ) === undefined ) {
-
-						intersectionsRaw.push( intersection );
-						intersections.push( new Vector2( intersection.x, intersection.y ) );
-
-					}
+					const x = a.x + ( y - a.y ) * ( b.x - a.x ) / ( b.y - a.y );
+					intercepts.push( x );
 
 				}
 
 			}
 
-			return intersections;
+			if ( intercepts.length > 1 ) {
+
+				intercepts.sort( ( a, b ) => a - b );
+				point.x = ( intercepts[ 0 ] + intercepts[ 1 ] ) / 2;
+
+			}
+
+			return point;
 
 		}
 
-		function getScanlineIntersections( scanline, boundingBox, paths ) {
+		// Resolve fill-rule. SVG defaults to 'nonzero'.
+		let fillRule = ( shapePath.userData && shapePath.userData.style && shapePath.userData.style.fillRule ) || 'nonzero';
 
-			const center = new Vector2();
-			boundingBox.getCenter( center );
+		if ( fillRule !== 'nonzero' && fillRule !== 'evenodd' ) {
 
-			const allIntersections = [];
+			console.warn( 'THREE.SVGLoader: fill-rule "' + fillRule + '" is not supported, falling back to "nonzero".' );
+			fillRule = 'nonzero';
 
-			paths.forEach( path => {
+		}
 
-				// check if the center of the bounding box is in the bounding box of the paths.
-				// this is a pruning method to limit the search of intersections in paths that can't envelop of the current path.
-				// if a path envelops another path. The center of that other path, has to be inside the bounding box of the enveloping path.
-				if ( path.boundingBox.containsPoint( center ) ) {
+		// Predicate that decides whether a winding number falls inside the fill
+		// region, per the SVG fill-rule spec. Works for negative windings too,
+		// because JavaScript's bitwise AND preserves odd/even under two's
+		// complement.
+		const isInside = fillRule === 'nonzero'
+			? ( w => w !== 0 )
+			: ( w => ( w & 1 ) !== 0 );
 
-					const intersections = getIntersections( scanline, path.points );
+		// Build an entry per usable subpath. Self-winding follows the standard
+		// convention used by ShapeUtils: counter-clockwise (signed area > 0)
+		// contributes +1 to the winding number at an interior point,
+		// clockwise contributes -1.
+		const entries = [];
 
-					intersections.forEach( p => {
+		for ( const subPath of shapePath.subPaths ) {
 
-						allIntersections.push( { identifier: path.identifier, isCW: path.isCW, point: p } );
+			const points = subPath.getPoints();
+			if ( points.length < 3 ) continue;
 
-					} );
+			const area = ShapeUtils.area( points );
+			if ( area === 0 ) continue;
 
-				}
+			const boundingBox = new Box2();
+			for ( let i = 0; i < points.length; i ++ ) boundingBox.expandByPoint( points[ i ] );
 
+			entries.push( {
+				subPath: subPath,
+				points: points,
+				boundingBox: boundingBox,
+				interiorPoint: getInteriorPoint( points, boundingBox ),
+				absArea: Math.abs( area ),
+				winding: area < 0 ? - 1 : 1,
+				container: null,
+				exclude: false,
+				role: null
 			} );
 
-			allIntersections.sort( ( i1, i2 ) => {
-
-				return i1.point.x - i2.point.x;
-
-			} );
-
-			return allIntersections;
-
 		}
 
-		function isHoleTo( simplePath, allPaths, scanlineMinX, scanlineMaxX, _fillRule ) {
+		// Sort by area descending. This guarantees that any subpath that could
+		// contain `entries[i]` is located at a smaller index and has already
+		// been processed when it's entries[i]'s turn. Port of paper.js'
+		// reorientPaths() algorithm.
+		entries.sort( ( a, b ) => b.absArea - a.absArea );
 
-			if ( _fillRule === null || _fillRule === undefined || _fillRule === '' ) {
+		// Walk already-processed entries from closest-in-size to largest,
+		// stopping at the innermost container. Accumulate the container's
+		// cumulative winding into this entry's winding so that the final value
+		// equals the winding number at this entry's interior point.
+		//
+		// A subpath only contributes to the fill boundary when crossing it
+		// actually flips the "insideness" per the fill rule; otherwise it's a
+		// redundant overlap and gets excluded to avoid double-counting.
+		for ( let i = 0; i < entries.length; i ++ ) {
 
-				_fillRule = 'nonzero';
+			const entry = entries[ i ];
+			let containerWinding = 0;
 
-			}
+			for ( let j = i - 1; j >= 0; j -- ) {
 
-			const centerBoundingBox = new Vector2();
-			simplePath.boundingBox.getCenter( centerBoundingBox );
+				const candidate = entries[ j ];
+				if ( ! candidate.boundingBox.containsPoint( entry.interiorPoint ) ) continue;
+				if ( ! pointInPolygon( entry.interiorPoint, candidate.points ) ) continue;
 
-			const scanline = [ new Vector2( scanlineMinX, centerBoundingBox.y ), new Vector2( scanlineMaxX, centerBoundingBox.y ) ];
-
-			const scanlineIntersections = getScanlineIntersections( scanline, simplePath.boundingBox, allPaths );
-
-			scanlineIntersections.sort( ( i1, i2 ) => {
-
-				return i1.point.x - i2.point.x;
-
-			} );
-
-			const baseIntersections = [];
-			const otherIntersections = [];
-
-			scanlineIntersections.forEach( i => {
-
-				if ( i.identifier === simplePath.identifier ) {
-
-					baseIntersections.push( i );
-
-				} else {
-
-					otherIntersections.push( i );
-
-				}
-
-			} );
-
-			const firstXOfPath = baseIntersections[ 0 ].point.x;
-
-			// build up the path hierarchy
-			const stack = [];
-			let i = 0;
-
-			while ( i < otherIntersections.length && otherIntersections[ i ].point.x < firstXOfPath ) {
-
-				if ( stack.length > 0 && stack[ stack.length - 1 ] === otherIntersections[ i ].identifier ) {
-
-					stack.pop();
-
-				} else {
-
-					stack.push( otherIntersections[ i ].identifier );
-
-				}
-
-				i ++;
+				entry.container = candidate.exclude ? candidate.container : candidate;
+				containerWinding = candidate.winding;
+				entry.winding += containerWinding;
+				break;
 
 			}
 
-			stack.push( simplePath.identifier );
+			if ( isInside( entry.winding ) === isInside( containerWinding ) ) {
 
-			if ( _fillRule === 'evenodd' ) {
-
-				const isHole = stack.length % 2 === 0 ? true : false;
-				const isHoleFor = stack[ stack.length - 2 ];
-
-				return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
-
-			} else if ( _fillRule === 'nonzero' ) {
-
-				// check if path is a hole by counting the amount of paths with alternating rotations it has to cross.
-				let isHole = true;
-				let isHoleFor = null;
-				let lastCWValue = null;
-
-				for ( let i = 0; i < stack.length; i ++ ) {
-
-					const identifier = stack[ i ];
-					if ( isHole ) {
-
-						lastCWValue = allPaths[ identifier ].isCW;
-						isHole = false;
-						isHoleFor = identifier;
-
-					} else if ( lastCWValue !== allPaths[ identifier ].isCW ) {
-
-						lastCWValue = allPaths[ identifier ].isCW;
-						isHole = true;
-
-					}
-
-				}
-
-				return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
-
-			} else {
-
-				console.warn( 'fill-rule: "' + _fillRule + '" is currently not implemented.' );
+				entry.exclude = true;
 
 			}
 
 		}
 
-		// check for self intersecting paths
-		// TODO
+		// Classify retained entries. An entry is an outer shape if it has no
+		// container or if its container is itself a hole (a solid nested inside
+		// a hole becomes a new top-level shape); otherwise it's a hole in its
+		// container. Entries were already sorted outermost-first, so each
+		// container's role is known by the time we look at it.
+		for ( const entry of entries ) {
 
-		// check intersecting paths
-		// TODO
-
-		// prepare paths for hole detection
-		let scanlineMinX = BIGNUMBER;
-		let scanlineMaxX = - BIGNUMBER;
-
-		let simplePaths = shapePath.subPaths.map( p => {
-
-			const points = p.getPoints();
-			let maxY = - BIGNUMBER;
-			let minY = BIGNUMBER;
-			let maxX = - BIGNUMBER;
-			let minX = BIGNUMBER;
-
-	      	//points.forEach(p => p.y *= -1);
-
-			for ( let i = 0; i < points.length; i ++ ) {
-
-				const p = points[ i ];
-
-				if ( p.y > maxY ) {
-
-					maxY = p.y;
-
-				}
-
-				if ( p.y < minY ) {
-
-					minY = p.y;
-
-				}
-
-				if ( p.x > maxX ) {
-
-					maxX = p.x;
-
-				}
-
-				if ( p.x < minX ) {
-
-					minX = p.x;
-
-				}
-
-			}
-
-			//
-			if ( scanlineMaxX <= maxX ) {
-
-				scanlineMaxX = maxX + 1;
-
-			}
-
-			if ( scanlineMinX >= minX ) {
-
-				scanlineMinX = minX - 1;
-
-			}
-
-			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: - 1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
-
-		} );
-
-		simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
-
-		for ( let identifier = 0; identifier < simplePaths.length; identifier ++ ) {
-
-			simplePaths[ identifier ].identifier = identifier;
+			if ( entry.exclude ) continue;
+			entry.role = ( entry.container === null || entry.container.role === 'hole' ) ? 'outer' : 'hole';
 
 		}
 
-		// check if path is solid or a hole
-		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, ( shapePath.userData ? shapePath.userData.style.fillRule : undefined ) ) );
+		// Build Shapes for outers first, then attach holes to their container's
+		// Shape.
+		const shapes = [];
+		const shapeByEntry = new Map();
 
+		for ( const entry of entries ) {
 
-		const shapesToReturn = [];
-		simplePaths.forEach( p => {
+			if ( entry.exclude || entry.role !== 'outer' ) continue;
 
-			const amIAHole = isAHole[ p.identifier ];
+			const shape = new Shape();
+			shape.curves = entry.subPath.curves;
+			shapes.push( shape );
+			shapeByEntry.set( entry, shape );
 
-			if ( ! amIAHole.isHole ) {
+		}
 
-				const shape = new Shape();
-				shape.curves = p.curves;
-				const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
-				holes.forEach( h => {
+		for ( const entry of entries ) {
 
-					const hole = simplePaths[ h.identifier ];
-					const path = new Path();
-					path.curves = hole.curves;
-					shape.holes.push( path );
+			if ( entry.exclude || entry.role !== 'hole' ) continue;
 
-				} );
-				shapesToReturn.push( shape );
+			const shape = shapeByEntry.get( entry.container );
+			if ( ! shape ) continue;
 
-			}
+			const hole = new Path();
+			hole.curves = entry.subPath.curves;
+			shape.holes.push( hole );
 
-		} );
+		}
 
-		return shapesToReturn;
+		return shapes;
 
 	}
 

@@ -98,7 +98,7 @@ Default is `true`.
 
 ### .gradientMap : Texture
 
-Gradient map for toon shading. It's required to set [Texture#minFilter](Texture.html#minFilter) and [Texture#magFilter](Texture.html#magFilter) to {@linkNearestFilter} when using this type of texture.
+Gradient map for toon shading. It's required to set [Texture#minFilter](Texture.html#minFilter) and [Texture#magFilter](Texture.html#magFilter) to [NearestFilter](global.html#NearestFilter) when using this type of texture.
 
 Default is `null`.
 

@@ -116,6 +116,18 @@ The current node builder.
 
 **Returns:** The generated code snippet.
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is inferred from the buffer attribute.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [InputNode#generateNodeType](InputNode.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getHash( builder : NodeBuilder ) : string
 
 This method is overwritten since the attribute data might be shared and thus the hash should be shared as well.
@@ -139,18 +151,6 @@ The current node builder.
 **Overrides:** [InputNode#getInputType](InputNode.html#getInputType)
 
 **Returns:** The input type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is inferred from the buffer attribute.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [InputNode#getNodeType](InputNode.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .setInstanced( value : boolean ) : BufferAttributeNode
 

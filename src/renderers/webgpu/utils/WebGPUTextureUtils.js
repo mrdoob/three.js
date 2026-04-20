@@ -35,6 +35,29 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+
+	device.queue.writeTexture(
+		{
+			texture: textureGPU,
+			mipLevel,
+			origin: { x: 0, y: 0, z: layerIndex }
+		},
+		mipmap.data,
+		{
+			offset: layerIndex * bytesPerImage,
+			bytesPerRow,
+			rowsPerImage
+		},
+		{
+			width: textureWidth,
+			height: textureHeight,
+			depthOrArrayLayers: 1
+		}
+	);
+
+}
+
 /**
  * A WebGPU backend utility module for managing textures.
  *
@@ -94,13 +117,6 @@ class WebGPUTextureUtils {
 		 * @type {Map<string, Object>}
 		 */
 		this._samplerCache = new Map();
-
-		/**
-		 * A set of HTMLTextures that need paint updates.
-		 *
-		 * @type {Set<HTMLTexture>}
-		 */
-		this._htmlTextures = new Set();
 
 	}
 
@@ -364,8 +380,6 @@ class WebGPUTextureUtils {
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
-		this._htmlTextures.delete( texture );
-
 		backend.delete( texture );
 
 	}
@@ -569,7 +583,17 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+
+			}
 
 		} else if ( texture.isCubeTexture ) {
 
@@ -583,14 +607,10 @@ class WebGPUTextureUtils {
 
 			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
 
-			// Set up paint callback if not already done.
+			// Skip the first frame — the element needs a paint record first.
 			if ( ! textureData.hasPaintCallback ) {
 
 				textureData.hasPaintCallback = true;
-
-				this._addHTMLTexture( texture );
-
-				// Wait for the browser to paint the element before uploading.
 				canvas.requestPaint();
 				return;
 
@@ -701,45 +721,11 @@ class WebGPUTextureUtils {
 	}
 
 	/**
-	 * Registers an HTMLTexture for paint updates.
-	 * Sets up a single shared `onpaint` handler on the canvas
-	 * that notifies all registered HTMLTextures.
-	 *
-	 * @private
-	 * @param {HTMLTexture} texture - The HTMLTexture to register.
-	 */
-	_addHTMLTexture( texture ) {
-
-		this._htmlTextures.add( texture );
-
-		const canvas = this.backend.renderer.domElement;
-		const htmlTextures = this._htmlTextures;
-
-		canvas.onpaint = ( event ) => {
-
-			const changed = event.changedElements;
-
-			for ( const t of htmlTextures ) {
-
-				if ( changed.includes( t.image ) ) {
-
-					t.needsUpdate = true;
-
-				}
-
-			}
-
-		};
-
-	}
-
-	/**
 	 * Frees all internal resources.
 	 */
 	dispose() {
 
 		this._samplerCache.clear();
-		this._htmlTextures.clear();
 
 	}
 
@@ -994,8 +980,9 @@ class WebGPUTextureUtils {
 	 * @param {Array<Object>} mipmaps - An array with mipmap data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -1003,6 +990,7 @@ class WebGPUTextureUtils {
 
 		const blockData = this._getBlockData( textureDescriptorGPU.format );
 		const isArrayTexture = textureDescriptorGPU.size.depthOrArrayLayers > 1;
+		const activeLayerUpdates = layerUpdates && layerUpdates.size > 0 ? layerUpdates : null;
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -1013,28 +1001,26 @@ class WebGPUTextureUtils {
 			const depth = isArrayTexture ? textureDescriptorGPU.size.depthOrArrayLayers : 1;
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
-			const bytesPerImage = bytesPerRow * Math.ceil( height / blockData.height );
+			const rowsPerImage = Math.ceil( height / blockData.height );
+			const bytesPerImage = bytesPerRow * rowsPerImage;
+			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
+			const textureHeight = rowsPerImage * blockData.height;
 
-			for ( let j = 0; j < depth; j ++ ) {
+			if ( activeLayerUpdates !== null ) {
 
-				device.queue.writeTexture(
-					{
-						texture: textureGPU,
-						mipLevel: i,
-						origin: { x: 0, y: 0, z: j }
-					},
-					mipmap.data,
-					{
-						offset: j * bytesPerImage,
-						bytesPerRow,
-						rowsPerImage: Math.ceil( height / blockData.height )
-					},
-					{
-						width: Math.ceil( width / blockData.width ) * blockData.width,
-						height: Math.ceil( height / blockData.height ) * blockData.height,
-						depthOrArrayLayers: 1
-					}
-				);
+				for ( const layerIndex of activeLayerUpdates ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
+
+			} else {
+
+				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
 
 			}
 

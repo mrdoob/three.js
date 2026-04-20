@@ -54,12 +54,12 @@
 				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc, side: THREE.BackSide } );
 				const whiteMat = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
 
-				// Left room (warm/red): x=-8 to 0, z=-4 to 4, y=0 to 5
+				// Room shell: x=-8 to 8, z=-4 to 4, y=0 to 5
 
-				const leftRoom = new THREE.Mesh( new THREE.BoxGeometry( 8, 5, 8 ), wallMaterial );
-				leftRoom.position.set( - 4, 2.5, 0 );
-				leftRoom.receiveShadow = true;
-				scene.add( leftRoom );
+				const room = new THREE.Mesh( new THREE.BoxGeometry( 16, 5, 8 ), wallMaterial );
+				room.position.set( 0, 2.5, 0 );
+				room.receiveShadow = true;
+				scene.add( room );
 
 				const redWall = new THREE.Mesh(
 					new THREE.PlaneGeometry( 8, 5 ),
@@ -68,13 +68,6 @@
 				redWall.rotation.y = Math.PI / 2;
 				redWall.position.set( - 7.99, 2.5, 0 );
 				scene.add( redWall );
-
-				// Right room (cool/blue): x=0 to 8, z=-4 to 4, y=0 to 5
-
-				const rightRoom = new THREE.Mesh( new THREE.BoxGeometry( 8, 5, 8 ), wallMaterial.clone() );
-				rightRoom.position.set( 4, 2.5, 0 );
-				rightRoom.receiveShadow = true;
-				scene.add( rightRoom );
 
 				const blueWall = new THREE.Mesh(
 					new THREE.PlaneGeometry( 8, 5 ),
@@ -174,19 +167,19 @@
 
 				// Stepped blocks near red wall
 				const step1 = new THREE.Mesh( new THREE.BoxGeometry( 1.5, 0.5, 1 ), whiteMat );
-				step1.position.set( - 6.5, 0.25, 2 );
+				step1.position.set( - 7, 0.25, 0 );
 				step1.castShadow = true;
 				step1.receiveShadow = true;
 				scene.add( step1 );
 
 				const step2 = new THREE.Mesh( new THREE.BoxGeometry( 1.0, 1.0, 1 ), whiteMat );
-				step2.position.set( - 6.5, 0.5, 2 );
+				step2.position.set( - 7, 0.5, 0 );
 				step2.castShadow = true;
 				step2.receiveShadow = true;
 				scene.add( step2 );
 
 				const step3 = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 1.5, 1 ), whiteMat );
-				step3.position.set( - 6.5, 0.75, 2 );
+				step3.position.set( - 7, 0.75, 0 );
 				step3.castShadow = true;
 				step3.receiveShadow = true;
 				scene.add( step3 );
@@ -222,7 +215,7 @@
 					new THREE.TorusKnotGeometry( 0.3, 0.1, 64, 16 ),
 					new THREE.MeshStandardMaterial( { color: 0xff44aa, metalness: 0.2, roughness: 0.5 } )
 				);
-				torusKnot.position.set( 4, 1.5, 0 );
+				torusKnot.position.set( 4, 1.65, 0 );
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
@@ -230,7 +223,7 @@
 				// Tall cone sculpture
 				const sculpture = new THREE.Mesh(
 					new THREE.ConeGeometry( 0.4, 2.5, 5 ),
-					new THREE.MeshStandardMaterial( { color: 0xeeeeee } )
+					whiteMat
 				);
 				sculpture.position.set( 6.5, 1.25, - 1.5 );
 				sculpture.castShadow = true;
@@ -284,7 +277,7 @@
 
 				async function bakeWithResolution( resolution ) {
 
-					// Left volume
+					// Remove both volumes before baking to prevent feedback
 
 					if ( probesLeft ) {
 
@@ -293,14 +286,6 @@
 
 					}
 
-					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probesLeft.position.set( - 3.9, 2.45, 0 );
-					probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probesLeft.visible = params.enabled;
-					scene.add( probesLeft );
-
-					// Right volume
-
 					if ( probesRight ) {
 
 						scene.remove( probesRight );
@@ -308,10 +293,21 @@
 
 					}
 
+					// Bake both volumes
+
+					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
+					probesLeft.position.set( - 3.9, 2.45, 0 );
+					probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probesLeft.visible = params.enabled;
+
 					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 3.9, 2.45, 0 );
 					probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					probesRight.visible = params.enabled;
+
+					// Add both after baking
+
+					scene.add( probesLeft );
 					scene.add( probesRight );
 
 					// Update debug visualization

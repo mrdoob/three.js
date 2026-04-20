@@ -33593,6 +33593,13 @@ class Textures extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * A set of HTMLTextures that need paint updates.
+		 *
+		 * @type {Set<HTMLTexture>}
+		 */
+		this._htmlTextures = new Set();
+
 	}
 
 	/**
@@ -33784,6 +33791,32 @@ class Textures extends DataMap {
 					canvas.appendChild( texture.image );
 
 				}
+
+				// Set up shared paint callback for all HTMLTextures.
+
+				if ( this._htmlTextures.size === 0 ) {
+
+					const htmlTextures = this._htmlTextures;
+
+					canvas.onpaint = ( event ) => {
+
+						const changed = event && event.changedElements;
+
+						for ( const t of htmlTextures ) {
+
+							if ( ! changed || changed.includes( t.image ) ) {
+
+								t.needsUpdate = true;
+
+							}
+
+						}
+
+					};
+
+				}
+
+				this._htmlTextures.add( texture );
 
 			}
 
@@ -34125,6 +34158,8 @@ class Textures extends DataMap {
 				}
 
 			}
+
+			this._htmlTextures.delete( texture );
 
 			this.delete( texture );
 
@@ -67738,6 +67773,13 @@ class WebGLTextureUtils {
 
 			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
 
+		} else if ( texture.isHTMLTexture ) {
+
+			if ( typeof gl.texElementImage2D === 'function' ) {
+
+				gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
+
+			}
 
 		} else {
 
@@ -72953,13 +72995,6 @@ class WebGPUTextureUtils {
 		 */
 		this._samplerCache = new Map();
 
-		/**
-		 * A set of HTMLTextures that need paint updates.
-		 *
-		 * @type {Set<HTMLTexture>}
-		 */
-		this._htmlTextures = new Set();
-
 	}
 
 	/**
@@ -73222,8 +73257,6 @@ class WebGPUTextureUtils {
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
-		this._htmlTextures.delete( texture );
-
 		backend.delete( texture );
 
 	}
@@ -73441,14 +73474,10 @@ class WebGPUTextureUtils {
 
 			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
 
-			// Set up paint callback if not already done.
+			// Skip the first frame — the element needs a paint record first.
 			if ( ! textureData.hasPaintCallback ) {
 
 				textureData.hasPaintCallback = true;
-
-				this._addHTMLTexture( texture );
-
-				// Wait for the browser to paint the element before uploading.
 				canvas.requestPaint();
 				return;
 
@@ -73559,45 +73588,11 @@ class WebGPUTextureUtils {
 	}
 
 	/**
-	 * Registers an HTMLTexture for paint updates.
-	 * Sets up a single shared `onpaint` handler on the canvas
-	 * that notifies all registered HTMLTextures.
-	 *
-	 * @private
-	 * @param {HTMLTexture} texture - The HTMLTexture to register.
-	 */
-	_addHTMLTexture( texture ) {
-
-		this._htmlTextures.add( texture );
-
-		const canvas = this.backend.renderer.domElement;
-		const htmlTextures = this._htmlTextures;
-
-		canvas.onpaint = ( event ) => {
-
-			const changed = event.changedElements;
-
-			for ( const t of htmlTextures ) {
-
-				if ( changed.includes( t.image ) ) {
-
-					t.needsUpdate = true;
-
-				}
-
-			}
-
-		};
-
-	}
-
-	/**
 	 * Frees all internal resources.
 	 */
 	dispose() {
 
 		this._samplerCache.clear();
-		this._htmlTextures.clear();
 
 	}
 

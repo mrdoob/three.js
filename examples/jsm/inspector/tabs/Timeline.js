@@ -1044,11 +1044,29 @@ class Timeline extends Tab {
 			case 'updateBindings': {
 
 				const bindGroup = args[ 0 ];
-				const details = { group: bindGroup.name || 'unknown' };
 
-				if ( bindGroup.bindings ) {
+				const details = {
+					group: bindGroup.name || 'unknown',
+					count: bindGroup.bindings.length
+				};
 
-					details.count = bindGroup.bindings.length;
+				return details;
+
+			}
+
+			case 'createUniformBuffer':
+			case 'destroyUniformBuffer': {
+
+				const binding = args[ 0 ];
+
+				const details = {
+					group: binding.groupNode.name || 'unknown',
+					size: binding.byteLength + ' bytes'
+				};
+
+				if ( binding.name !== details.group ) {
+
+					details.name = binding.name;
 
 				}
 

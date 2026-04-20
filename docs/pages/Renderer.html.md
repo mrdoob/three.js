@@ -445,13 +445,29 @@ Returns the current animation loop callback.
 
 **Returns:** The current animation loop callback.
 
-### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<ArrayBuffer> (async)
+### .getArrayBufferAsync( attribute : BufferAttribute, target : ReadbackBuffer | ArrayBuffer, offset : number, count : number ) : Promise.<(ArrayBuffer|ReadbackBuffer)> (async)
 
 Can be used to transfer buffer data from a storage buffer attribute from the GPU to the CPU in context of compute shaders.
 
 **attribute**
 
+The storage buffer attribute to read frm.
+
+**target**
+
 The storage buffer attribute.
+
+Default is `null`.
+
+**offset**
+
+The storage buffer attribute.
+
+Default is `0`.
+
+**count**
+
+The offset from which to start reading the
 
 **Returns:** A promise that resolves with the buffer data when the data are ready.
 
@@ -593,7 +609,7 @@ The method writes the result in this target object.
 
 ### .hasCompatibility( name : string ) : boolean
 
-Checks if the given compatibility is supported by the selected backend. If the renderer has not been initialized, this method always returns `false`.
+Checks if the given compatibility is supported by the selected backend.
 
 **name**
 
@@ -884,7 +900,7 @@ Defines a manual sort function for the opaque render list. Pass `null` to use th
 
 The sort function.
 
-### .setOutputRenderTarget( renderTarget : Object )
+### .setOutputRenderTarget( renderTarget : RenderTarget )
 
 Sets the output render target for the renderer.
 
