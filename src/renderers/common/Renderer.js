@@ -651,6 +651,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * A reusable single-element array used by `compute()` when called with
+		 * a single compute node. Avoids allocating a fresh `[ computeNodes ]`
+		 * array on every call, which would otherwise churn the GC each frame.
+		 *
+		 * @private
+		 * @type {Array<?Node>}
+		 */
+		this._computeSingleton = [ null ];
+
+		/**
 		 * Whether the renderer should render transparent render objects or not.
 		 *
 		 * @type {boolean}
@@ -2732,7 +2742,6 @@ class Renderer {
 
 		} else {
 
-			if ( this._computeSingleton === undefined ) this._computeSingleton = [ null ];
 			this._computeSingleton[ 0 ] = computeNodes;
 			computeList = this._computeSingleton;
 
