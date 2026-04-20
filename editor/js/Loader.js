@@ -45,6 +45,14 @@ function Loader( editor ) {
 				while ( normalized.startsWith( '../' ) ) normalized = normalized.slice( 3 );
 				while ( normalized.startsWith( '/' ) ) normalized = normalized.slice( 1 );
 
+				try {
+
+					normalized = decodeURIComponent( normalized );
+
+				} catch ( e ) { /* malformed URI — keep as-is */ }
+
+				normalized = normalized.normalize( 'NFC' );
+
 				return normalized;
 
 			};
@@ -457,28 +465,6 @@ function Loader( editor ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					const contents = event.target.result;
-
-					// 2.0
-
-					if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
-
-						const blob = new Blob( [ contents ], { type: 'text/javascript' } );
-						const url = URL.createObjectURL( blob );
-
-						const worker = new Worker( url );
-
-						worker.onmessage = function ( event ) {
-
-							event.data.metadata = { version: 2 };
-							handleJSON( event.data );
-
-						};
-
-						worker.postMessage( Date.now() );
-
-						return;
-
-					}
 
 					// >= 3.0
 
@@ -956,10 +942,22 @@ function Loader( editor ) {
 
 		const zip = unzipSync( new Uint8Array( contents ) );
 
+		// Build a lookup map with NFC-normalized keys to handle
+		// unicode normalization differences (e.g. NFD vs NFC)
+
+		const zipLookup = {};
+
+		for ( const path in zip ) {
+
+			zipLookup[ path.normalize( 'NFC' ) ] = zip[ path ];
+
+		}
+
 		const manager = new THREE.LoadingManager();
 		manager.setURLModifier( function ( url ) {
 
-			const file = zip[ url ];
+			const normalized = decodeURIComponent( url ).normalize( 'NFC' );
+			const file = zipLookup[ normalized ];
 
 			if ( file ) {
 

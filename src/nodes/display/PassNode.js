@@ -267,7 +267,6 @@ class PassNode extends TempNode {
 
 		}
 
-
 		/**
 		 * The pass's render target.
 		 *
@@ -579,6 +578,12 @@ class PassNode extends TempNode {
 		let texture = this._textures[ name ];
 
 		if ( texture === undefined ) {
+
+			if ( name === 'depth' ) {
+
+				throw new Error( 'THREE.PassNode: Depth texture is not available for this pass.' );
+
+			}
 
 			const refTexture = this.renderTarget.texture;
 
