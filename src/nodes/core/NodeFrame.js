@@ -38,6 +38,17 @@ class NodeFrame {
 		this.frameId = 0;
 
 		/**
+		 * The timestamp of the previous `update()` call, used to derive `deltaTime`.
+		 * Initialized to `performance.now()` so the field starts as a double —
+		 * keeps V8 from transitioning the property's representation on first update
+		 * and boxing every write as a `HeapNumber`.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this.lastTime = performance.now();
+
+		/**
 		 * The render ID.
 		 *
 		 * @type {number}
@@ -299,12 +310,10 @@ class NodeFrame {
 
 		this.frameId ++;
 
-		if ( this.lastTime === undefined ) this.lastTime = performance.now();
+		const now = performance.now();
 
-		this.deltaTime = ( performance.now() - this.lastTime ) / 1000;
-
-		this.lastTime = performance.now();
-
+		this.deltaTime = ( now - this.lastTime ) / 1000;
+		this.lastTime = now;
 		this.time += this.deltaTime;
 
 	}
