@@ -12,7 +12,8 @@ import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
-import WebGPUTextureUtils, { TexelCopyTextureInfo } from './utils/WebGPUTextureUtils.js';
+import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
+import TexelCopyTextureInfo from './utils/TexelCopyTextureInfo.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
