@@ -81,9 +81,9 @@ class Bindings extends DataMap {
 
 		const renderObjectData = this.get( renderObject );
 
-		if ( renderObjectData.initialized === undefined ) {
+		if ( renderObjectData.initialized !== true ) {
 
-			// bind groups are created once per render object
+			// bind groups are created once per object
 
 			this._createBindings( bindings );
 
@@ -104,14 +104,15 @@ class Bindings extends DataMap {
 	getForCompute( computeNode ) {
 
 		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+		const computeNodeData = this.get( computeNode );
 
-		if ( computeNode.initialized === undefined ) {
+		if ( computeNodeData.initialized !== true ) {
 
-			// bind groups are created once per render object
+			// bind groups are created once per object
 
 			this._createBindings( bindings );
 
-			computeNode.initialized = true;
+			computeNodeData.initialized = true;
 
 		}
 
