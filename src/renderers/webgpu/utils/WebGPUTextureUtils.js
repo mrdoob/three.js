@@ -36,6 +36,51 @@ const _compareToWebGPU = {
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
 /**
+ * Reusable wrapper around `GPUTexelCopyTextureInfo`. Mutates in place to avoid
+ * per-frame GC pressure while keeping call sites readable via chainable setters.
+ */
+class TexelCopyTextureInfo {
+
+	constructor() {
+
+		this.texture = null;
+		this.mipLevel = 0;
+		this.origin = { x: 0, y: 0, z: 0 };
+
+	}
+
+	setTexture( texture ) {
+
+		this.texture = texture;
+		return this;
+
+	}
+
+	setMipLevel( mipLevel ) {
+
+		this.mipLevel = mipLevel;
+		return this;
+
+	}
+
+	setOrigin( x, y, z ) {
+
+		this.origin.x = x;
+		this.origin.y = y;
+		this.origin.z = z;
+		return this;
+
+	}
+
+	reset() {
+
+		this.texture = null;
+
+	}
+
+}
+
+/**
  * A WebGPU backend utility module for managing textures.
  *
  * @private
@@ -1670,4 +1715,5 @@ export function getFormat( texture, device ) {
 
 }
 
+export { TexelCopyTextureInfo };
 export default WebGPUTextureUtils;

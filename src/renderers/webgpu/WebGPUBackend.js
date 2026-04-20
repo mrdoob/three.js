@@ -12,7 +12,7 @@ import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
-import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
+import WebGPUTextureUtils, { TexelCopyTextureInfo } from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
@@ -24,51 +24,6 @@ const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 // WebGPU descriptors are consumed synchronously, so reuse is safe.
 
 const _submitArray = [ null ];
-
-/**
- * Reusable wrapper around `GPUTexelCopyTextureInfo`. Mutates in place to avoid
- * per-frame GC pressure while keeping call sites readable via chainable setters.
- */
-class TexelCopyTextureInfo {
-
-	constructor() {
-
-		this.texture = null;
-		this.mipLevel = 0;
-		this.origin = { x: 0, y: 0, z: 0 };
-
-	}
-
-	setTexture( texture ) {
-
-		this.texture = texture;
-		return this;
-
-	}
-
-	setMipLevel( mipLevel ) {
-
-		this.mipLevel = mipLevel;
-		return this;
-
-	}
-
-	setOrigin( x, y, z ) {
-
-		this.origin.x = x;
-		this.origin.y = y;
-		this.origin.z = z;
-		return this;
-
-	}
-
-	reset() {
-
-		this.texture = null;
-
-	}
-
-}
 
 const _copySrc = new TexelCopyTextureInfo();
 const _copyDst = new TexelCopyTextureInfo();
