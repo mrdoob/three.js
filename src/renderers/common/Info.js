@@ -94,42 +94,46 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
-		 * @property {number} geometries - The number of active geometries.
-		 * @property {number} textures - The number of active textures.
 		 * @property {number} attributes - The number of active attributes.
-		 * @property {number} indexAttributes - The number of active index attributes.
-		 * @property {number} storageAttributes - The number of active storage attributes.
-		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
-		 * @property {number} readbackBuffers - The number of active readback buffers.
-		 * @property {number} programs - The number of active programs.
-		 * @property {number} renderTargets - The number of active renderTargets.
-		 * @property {number} total - The total memory size in bytes.
-		 * @property {number} texturesSize - The memory size of active textures in bytes.
 		 * @property {number} attributesSize - The memory size of active attributes in bytes.
+		 * @property {number} geometries - The number of active geometries.
+		 * @property {number} indexAttributes - The number of active index attributes.
 		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
-		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
-		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} programs - The number of active programs.
 		 * @property {number} programsSize - The memory size of active programs in bytes.
+		 * @property {number} readbackBuffers - The number of active readback buffers.
+		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} renderTargets - The number of active renderTargets.
+		 * @property {number} storageAttributes - The number of active storage attributes.
+		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} textures - The number of active textures.
+		 * @property {number} texturesSize - The memory size of active textures in bytes.
+		 * @property {number} uniformBuffers - The number of active uniform buffers.
+		 * @property {number} uniformBuffersSize - The memory size of active uniform buffers in bytes.
+		 * @property {number} total - The total memory size in bytes.
 		 */
 		this.memory = {
-			geometries: 0,
-			textures: 0,
 			attributes: 0,
-			indexAttributes: 0,
-			storageAttributes: 0,
-			indirectStorageAttributes: 0,
-			readbackBuffers: 0,
-			programs: 0,
-			renderTargets: 0,
-			total: 0,
-			texturesSize: 0,
 			attributesSize: 0,
+			geometries: 0,
+			indexAttributes: 0,
 			indexAttributesSize: 0,
-			storageAttributesSize: 0,
+			indirectStorageAttributes: 0,
 			indirectStorageAttributesSize: 0,
+			programs: 0,
+			programsSize: 0,
+			readbackBuffers: 0,
 			readbackBuffersSize: 0,
-			programsSize: 0
+			renderTargets: 0,
+			storageAttributes: 0,
+			storageAttributesSize: 0,
+			textures: 0,
+			texturesSize: 0,
+			uniformBuffers: 0,
+			uniformBuffersSize: 0,
+			total: 0
 		};
 
 		/**
@@ -362,6 +366,43 @@ class Info {
 		this.memory.readbackBuffers --;
 		this.memory.total -= size;
 		this.memory.readbackBuffersSize -= size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const size = uniformBuffer.byteLength;
+		this.memoryMap.set( uniformBuffer, { size, type: 'uniformBuffers' } );
+
+		this.memory.uniformBuffers ++;
+		this.memory.total += size;
+		this.memory.uniformBuffersSize += size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const data = this.memoryMap.get( uniformBuffer );
+
+		if ( data ) {
+
+			this.memoryMap.delete( uniformBuffer );
+
+			this.memory.uniformBuffers --;
+			this.memory.total -= data.size;
+			this.memory.uniformBuffersSize -= data.size;
+
+		}
 
 	}
 
