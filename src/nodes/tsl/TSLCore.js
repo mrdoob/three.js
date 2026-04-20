@@ -1192,9 +1192,6 @@ export const mat2 = new ConvertType( 'mat2' );
 export const mat3 = new ConvertType( 'mat3' );
 export const mat4 = new ConvertType( 'mat4' );
 
-export const string = ( value = '' ) => new ConstNode( value, 'string' );
-export const arrayBuffer = ( value ) => new ConstNode( value, 'ArrayBuffer' );
-
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );
 addMethodChaining( 'toInt', int );
