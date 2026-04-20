@@ -216,7 +216,7 @@ class NodeMaterialObserver {
 
 			}
 
-			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
+			data.lights = this.getLightsData( renderObject.lightsNode.getLights() );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -629,9 +629,9 @@ class NodeMaterialObserver {
 	 * @param {Array<Light>} materialLights - The material lights.
 	 * @return {Array<Object>} The lights data for the given material lights.
 	 */
-	getLightsData( materialLights, lights ) {
+	getLightsData( materialLights ) {
 
-		lights.length = 0;
+		const lights = [];
 
 		for ( const light of materialLights ) {
 
@@ -658,25 +658,23 @@ class NodeMaterialObserver {
 	 */
 	getLights( lightsNode, renderId ) {
 
-		let cached = _lightsCache.get( lightsNode );
+		if ( _lightsCache.has( lightsNode ) ) {
 
-		if ( cached !== undefined && cached.renderId === renderId ) {
+			const cached = _lightsCache.get( lightsNode );
 
-			return cached.lightsData;
+			if ( cached.renderId === renderId ) {
 
-		}
+				return cached.lightsData;
 
-		if ( cached === undefined ) {
-
-			cached = { renderId: - 1, lightsData: [] };
-			_lightsCache.set( lightsNode, cached );
+			}
 
 		}
 
-		cached.renderId = renderId;
-		this.getLightsData( lightsNode.getLights(), cached.lightsData );
+		const lightsData = this.getLightsData( lightsNode.getLights() );
 
-		return cached.lightsData;
+		_lightsCache.set( lightsNode, { renderId, lightsData } );
+
+		return lightsData;
 
 	}
 
