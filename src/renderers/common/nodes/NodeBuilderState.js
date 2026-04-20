@@ -139,18 +139,18 @@ class NodeBuilderState {
 					let overrideGroup = uniGroups?.[name]
 					if (overrideGroup) {
 						const cached = uniGroupCache[name]
-                        if (cached) {
+						if (cached) {
 							bindingsGroup.bindings.push(cached)
-                        } else {
-                            const newNode = new UniformGroupNode(name)
-                            const newNug = new NodeUniformsGroup(name, newNode)
-                            for (let uni of instanceBinding.uniforms) {
-                                let overrideUni = overrideGroup[uni.name]
+						} else {
+							const newNode = new UniformGroupNode(name)
+							const newNug = new NodeUniformsGroup(name, newNode)
+							for (let uni of instanceBinding.uniforms) {
+								let overrideUni = overrideGroup[uni.name]
 								newNug.uniforms.push(overrideUni ? uni.cloneAndWrap(overrideUni) : uni )
-                            }
-                            uniGroupCache[name] = newNug
-                            bindingsGroup.bindings.push(newNug)
-                        }
+							}
+							uniGroupCache[name] = newNug
+							bindingsGroup.bindings.push(newNug)
+						}
 					} else {
 						bindingsGroup.bindings.push( instanceBinding.clone() );
 					}				
