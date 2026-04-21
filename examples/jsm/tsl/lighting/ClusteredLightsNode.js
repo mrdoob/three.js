@@ -57,6 +57,10 @@ class ClusteredLightsNode extends LightsNode {
 		this._screenClusterIndex = null;
 		this._compute = null;
 		this._lightsTexture = null;
+		this._zSliceRangesTexture = null;
+		this._zSliceRangesData = null;
+		this._lightViewZ = new Float32Array( maxLights );
+		this._lightSortOrder = [];
 
 		this._lightsCount = uniform( 0, 'int' );
 
@@ -79,18 +83,38 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
-	updateLightsTexture() {
+	updateLightsTexture( camera ) {
 
 		const { _lightsTexture: lightsTexture, clusteredLights } = this;
 
 		const data = lightsTexture.image.data;
 		const lineSize = lightsTexture.image.width * 4;
+		const count = clusteredLights.length;
 
-		this._lightsCount.value = clusteredLights.length;
+		this._lightsCount.value = count;
 
-		for ( let i = 0; i < clusteredLights.length; i ++ ) {
+		// Sort lights by view-space depth for Z-culling
 
-			const light = clusteredLights[ i ];
+		const viewZ = this._lightViewZ;
+		const order = this._lightSortOrder;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			_vector3.setFromMatrixPosition( clusteredLights[ i ].matrixWorld );
+			_vector3.applyMatrix4( camera.matrixWorldInverse );
+			viewZ[ i ] = _vector3.z;
+			order[ i ] = i;
+
+		}
+
+		order.length = count;
+		order.sort( ( a, b ) => viewZ[ a ] - viewZ[ b ] );
+
+		// Write sorted lights to texture
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			const light = clusteredLights[ order[ i ] ];
 
 			_vector3.setFromMatrixPosition( light.matrixWorld );
 
@@ -109,6 +133,56 @@ class ClusteredLightsNode extends LightsNode {
 		}
 
 		lightsTexture.needsUpdate = true;
+
+		// Compute per Z-slice light ranges
+
+		const zRanges = this._zSliceRangesData;
+
+		if ( zRanges === null ) return;
+
+		const near = camera.near;
+		const far = camera.far;
+		const NZ = this.zSlices;
+
+		for ( let z = 0; z < NZ; z ++ ) {
+
+			// Exponential Z-slice bounds (view-space, negative values)
+			const sliceNear = - ( near * Math.pow( far / near, z / NZ ) );
+			const sliceFar = - ( near * Math.pow( far / near, ( z + 1 ) / NZ ) );
+
+			let rangeStart = count;
+			let rangeEnd = 0;
+
+			for ( let i = 0; i < count; i ++ ) {
+
+				const vz = viewZ[ order[ i ] ];
+				const r = clusteredLights[ order[ i ] ].distance;
+				const radius = r > 0 ? r : far;
+
+				// Light sphere Z: [vz - radius, vz + radius]
+				// Slice Z: [sliceFar, sliceNear] (both negative, sliceFar < sliceNear)
+				if ( vz + radius >= sliceFar && vz - radius <= sliceNear ) {
+
+					if ( i < rangeStart ) rangeStart = i;
+					if ( i + 1 > rangeEnd ) rangeEnd = i + 1;
+
+				}
+
+			}
+
+			if ( rangeStart >= count ) {
+
+				rangeStart = 0;
+				rangeEnd = 0;
+
+			}
+
+			zRanges[ z * 4 ] = rangeStart;
+			zRanges[ z * 4 + 1 ] = rangeEnd;
+
+		}
+
+		this._zSliceRangesTexture.needsUpdate = true;
 
 	}
 
@@ -347,6 +421,11 @@ class ClusteredLightsNode extends LightsNode {
 		const lightsData = new Float32Array( maxLights * 4 * 2 );
 		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
 
+		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
+
+		const zSliceRangesData = new Float32Array( NZ * 4 );
+		const zSliceRangesTexture = new DataTexture( zSliceRangesData, NZ, 1, RGBAFormat, FloatType );
+
 		// Per-cluster light-index storage (ivec4 chunks)
 
 		const lightIndexesArray = new Int32Array( clusterCount * chunksPerCluster * 4 );
@@ -435,15 +514,22 @@ class ClusteredLightsNode extends LightsNode {
 
 			const index = int( 0 ).toVar();
 
+			// Z-culling: only test lights that can reach this cluster's Z-slice
+			const zRange = textureLoad( zSliceRangesTexture, ivec2( cz, 0 ) );
+			const rangeStart = int( zRange.x );
+			const rangeEnd = int( zRange.y );
+
 			Loop( this.maxLights, ( { i } ) => {
 
-				If( index.greaterThanEqual( int( maxLightsPerCluster ) ).or( int( i ).greaterThanEqual( int( this._lightsCount ) ) ), () => {
+				const lightIdx = rangeStart.add( i );
+
+				If( index.greaterThanEqual( int( maxLightsPerCluster ) ).or( lightIdx.greaterThanEqual( rangeEnd ) ), () => {
 
 					Return();
 
 				} );
 
-				const { viewPosition, distance } = this.getLightData( i );
+				const { viewPosition, distance } = this.getLightData( lightIdx );
 
 				// sphere-AABB intersection in view space
 				const pos = viewPosition.xyz;
@@ -453,7 +539,7 @@ class ClusteredLightsNode extends LightsNode {
 
 				If( distSq.lessThanEqual( distance.mul( distance ) ), () => {
 
-					getClusterSlot( index ).assign( i.add( int( 1 ) ) );
+					getClusterSlot( index ).assign( lightIdx.add( int( 1 ) ) );
 					index.addAssign( int( 1 ) );
 
 				} );
@@ -491,6 +577,8 @@ class ClusteredLightsNode extends LightsNode {
 		this._screenClusterIndex = screenClusterIndex;
 		this._compute = compute;
 		this._lightsTexture = lightsTexture;
+		this._zSliceRangesTexture = zSliceRangesTexture;
+		this._zSliceRangesData = zSliceRangesData;
 
 	}
 
