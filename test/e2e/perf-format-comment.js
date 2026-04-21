@@ -48,8 +48,7 @@ const DISPLAY = [
 	{ name: 'frameTimeMs.p50',              label: 'Frame time (median)', fmt: ms },
 	{ name: 'jsHeapBytes.mean',             label: 'JS heap (mean)',     fmt: mb },
 	{ name: 'webgpu.estimatedVRAMAfter',    label: 'WebGPU VRAM',        fmt: mb },
-	{ name: 'webgpu.cmdSubmitsPerFrame',    label: 'Submits/frame',      fmt: num },
-	{ name: 'gc.events',                    label: 'GC events',          fmt: num } // non-gated
+	{ name: 'webgpu.cmdSubmitsPerFrame',    label: 'Submits/frame',      fmt: num }
 ];
 
 const rowsByName = new Map( s.rows.map( r => [ r.name, r ] ) );
