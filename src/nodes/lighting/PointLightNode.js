@@ -15,7 +15,11 @@ export const directPointLight = ( { color, lightVector, cutoffDistance, decayExp
 		decayExponent
 	} );
 
-	const lightColor = color.mul( attenuation );
+	const lightColor = color.mul(
+		cutoffDistance.equal( 0 )
+			.or( lightDistance.lessThanEqual( cutoffDistance ) )
+			.select( attenuation, 0 )
+	);
 
 	return { lightDirection, lightColor };
 
