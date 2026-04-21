@@ -53,6 +53,7 @@
 				controls,
 				scenePass, clusterInfluence, debugZSliceNode,
 				lighting,
+				maxCount,
 				count,
 				renderPipeline;
 
@@ -75,7 +76,8 @@
 				scene.fog = new THREE.Fog( 0x111111, 30, 80 );
 				scene.background = new THREE.Color( 0x111111 );
 
-				count = 1000;
+				maxCount = 1000;
+				count = 700;
 
 				// sponza
 
@@ -98,9 +100,10 @@
 
 				const material = new THREE.MeshBasicMaterial();
 
-				lightDummy = new THREE.InstancedMesh( new THREE.SphereGeometry( 0.05, 16, 8 ), material, count );
+				lightDummy = new THREE.InstancedMesh( new THREE.SphereGeometry( 0.05, 16, 8 ), material, maxCount );
 				lightDummy.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 				lightDummy.frustumCulled = false;
+				lightDummy.count = count;
 				scene.add( lightDummy );
 
 				// lights
@@ -116,8 +119,11 @@
 						( box.min.y + Math.random() * modelSize.y * 0.7 ) + 0.4,
 						modelCenter.z + ( Math.random() - 0.5 ) * modelSize.z * 0.5
 					);
+
 					light.power = power;
 					light.userData.fixedPosition = light.position.clone();
+					light.visible = ( lights.children.length < count );
+
 					lights.add( light );
 
 					return light;
@@ -126,7 +132,7 @@
 
 				const color = new THREE.Color();
 
-				for ( let i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < maxCount; i ++ ) {
 
 					const hex = ( Math.random() * 0x888888 ) + 0x888888;
 
@@ -182,10 +188,10 @@
 				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const params = {
-					lightCount: count
+					count
 				};
 
-				gui.add( params, 'lightCount', 0, count, 1 ).name( 'light count' ).onChange( ( value ) => {
+				gui.add( params, 'count', 0, maxCount, 1 ).name( 'light count' ).onChange( ( value ) => {
 
 					lightDummy.count = value;
 
