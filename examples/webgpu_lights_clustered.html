@@ -112,9 +112,9 @@
 
 					const light = new THREE.PointLight( hexColor, 1, distance );
 					light.position.set(
-						modelCenter.x + ( Math.random() - 0.5 ) * modelSize.x * 0.9,
-						box.min.y + Math.random() * modelSize.y * 0.8,
-						modelCenter.z + ( Math.random() - 0.5 ) * modelSize.z * 0.9
+						modelCenter.x + ( Math.random() - 0.5 ) * modelSize.x * 0.5,
+						( box.min.y + Math.random() * modelSize.y * 0.7 ) + 0.4,
+						modelCenter.z + ( Math.random() - 0.5 ) * modelSize.z * 0.5
 					);
 					light.power = power;
 					light.userData.fixedPosition = light.position.clone();
