@@ -180,7 +180,24 @@
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'light count per tile' );
+
+				const params = {
+					lightCount: count
+				};
+
+				gui.add( params, 'lightCount', 1, count, 1 ).name( 'light count' ).onChange( ( value ) => {
+
+					lightDummy.count = value;
+
+					for ( let i = 0; i < lights.children.length; i ++ ) {
+
+						lights.children[ i ].visible = ( i < value );
+
+					}
+
+				} );
+
+				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'lights per tile' );
 				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
 
 			}
