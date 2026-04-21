@@ -37,7 +37,7 @@ function verdictBadge( v ) {
 
 	if ( v === 'REGRESS' ) return '🔴 **regress**';
 	if ( v === 'improve' ) return '🟢 improve';
-	return '·';
+	return 'stable';
 
 }
 
@@ -79,7 +79,7 @@ for ( const item of DISPLAY ) {
 	const pctStr = fmtPct( row.pct );
 	// Non-gated rows never show the red regress badge — only neutral indicators.
 	const badge = row.gate === false
-		? ( row.verdict === 'improve' ? '🟢 improve' : '·' )
+		? ( row.verdict === 'improve' ? '🟢 improve' : 'info' )
 		: verdictBadge( row.verdict );
 	out += `| ${ label } | ${ baseStr } | ${ candStr } | ${ pctStr } | ${ badge } |\n`;
 
