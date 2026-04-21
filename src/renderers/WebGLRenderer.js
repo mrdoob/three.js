@@ -253,8 +253,17 @@ class WebGLRenderer {
 		/**
 		 * Optional global clipping volumes. Each volume is an object with:
 		 *
-		 * - `planes`: `Array<Plane>`
-		 * - `mode`: `'include' | 'exclude'`
+		 * - `planes`: `Array<Plane>` describing a convex region.
+		 * - `mode`: `'include' | 'exclude'`.
+		 *
+		 * A fragment is inside a volume only if it is inside all planes.
+		 * Global visibility is:
+		 *
+		 * `globalVisible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude`
+		 *
+		 * Include/exclude volumes are unioned, and exclude wins on overlap.
+		 * If {@link WebGLRenderer#clippingPlanes} is also set, those planes are
+		 * internally represented as one additional global `include` volume.
 		 *
 		 * @type {?(Array<{planes:Array<Plane>,mode:('include'|'exclude')}>)}
 		 * @default undefined

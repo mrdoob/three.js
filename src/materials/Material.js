@@ -327,17 +327,23 @@ class Material extends EventDispatcher {
 		this.clipShadows = false;
 
 		/**
-		 * User-defined clipping volumes for local clipping. Each volume is a convex
-		 * region expressed by a set of planes and a mode:
+		 * User-defined clipping volumes for local clipping. Each volume has:
 		 *
-		 * - `include`: keep fragments inside the volume.
-		 * - `exclude`: remove fragments inside the volume.
+		 * - `planes`: `Array<Plane>` describing a convex region.
+		 * - `mode`: `'include' | 'exclude'`.
+		 *
+		 * A fragment is inside a volume only if it is inside all planes.
+		 * Local visibility is:
+		 *
+		 * `localVisible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude`
+		 *
+		 * Include/exclude volumes are unioned, and exclude wins on overlap.
 		 *
 		 * If this property is `undefined`, clipping behavior based on
 		 * {@link Material#clippingPlanes} and {@link Material#clipIntersection} is used.
-		 * If {@link Material#clippingPlanes} is set, clipping planes are internally
-		 * represented as one clipping volume. If this property is also defined, that
-		 * synthetic clipping volume is combined with these user-defined volumes.
+		 * If {@link Material#clippingPlanes} is also set, those planes are internally
+		 * represented as one synthetic volume (`include` when `clipIntersection` is `false`,
+		 * otherwise `exclude` with inverted planes) and combined with these volumes.
 		 * This requires {@link WebGLRenderer#localClippingEnabled} to be `true`.
 		 *
 		 * @type {?(Array<{planes:Array<Plane>,mode:('include'|'exclude')}>)}
