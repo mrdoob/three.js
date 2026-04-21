@@ -99,7 +99,7 @@ try {
 }
 
 const minIterations = parseInt( flags[ 'min-iterations' ], 10 ) || 4; // 1 warmup + 3 measured
-const maxIterations = parseInt( flags[ 'max-iterations' ], 10 ) || 5; // 1 warmup + 4 measured
+const maxIterations = parseInt( flags[ 'max-iterations' ], 10 ) || 7; // 1 warmup + 6 measured
 // Fast-exit percent thresholds when MAD is not yet meaningful (n < 3 measured).
 // Set conservatively — frame-time percentiles can legitimately swing 40-50%
 // run-to-run on identical code due to GC and scheduler stalls. These
