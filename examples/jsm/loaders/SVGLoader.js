@@ -151,6 +151,12 @@ class SVGLoader extends Loader {
 
 			if ( node.nodeType !== 1 ) return;
 
+			if ( node.hasAttribute( 'filter' ) ) {
+
+				console.warn( 'THREE.SVGLoader: Filters are not supported.' );
+
+			}
+
 			const transform = getNodeTransform( node );
 
 			let isDefsNode = false;
