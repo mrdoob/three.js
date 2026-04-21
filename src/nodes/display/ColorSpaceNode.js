@@ -115,6 +115,9 @@ class ColorSpaceNode extends TempNode {
 
 		if ( ColorManagement.getTransfer( target ) === SRGBTransfer ) {
 
+			// clamp alpha
+			outputNode = vec4( outputNode.rgb, clamp( outputNode.a, 0.0, 1.0 ) );
+
 			// premultiply in sRGB color space for the HTML compositor #33104
 
 			// un-premultiply in linear space
