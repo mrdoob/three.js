@@ -1,0 +1,60 @@
+name: Read perf
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'examples/jsm/**'
+      - 'package.json'
+      - 'utils/build/**'
+      - 'test/e2e/perf-**'
+
+# Read-only: safely operates on untrusted PR code.
+# The matching report-perf.yml runs with pull-requests:write and posts the comment.
+permissions:
+  contents: read
+
+jobs:
+  read-perf:
+    name: Perf regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0  # needed for `git worktree add <baseline-ref>`
+      - name: Install Node
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: 24
+          cache: 'npm'
+      - name: Install Vulkan drivers and xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers xvfb
+      - name: Install dependencies
+        run: npm ci
+
+      - name: === Perf regression ===
+        run: |
+          xvfb-run -a node test/e2e/perf-regression-orchestrator.js \
+            webgpu_backdrop_water \
+            --baseline=${{ github.event.pull_request.base.ref }} || echo "PERF_EXIT=$?" >> $GITHUB_ENV
+
+      - name: Attach PR number to summary
+        run: |
+          PR=${{ github.event.pull_request.number }}
+          node -e "
+            const fs=require('fs');
+            const p='test/e2e/perf-regression-webgpu_backdrop_water.summary.json';
+            const s=JSON.parse(fs.readFileSync(p,'utf8'));
+            s.pr=$PR;
+            fs.writeFileSync(p, JSON.stringify(s));
+          "
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: perf-summary
+          path: test/e2e/perf-regression-*.summary.json
