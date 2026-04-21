@@ -269,7 +269,12 @@ async function startSide( { name, dir, port } ) {
 	} );
 
 	const browser = await puppeteer.launch( {
-		headless: 'new',
+		// On CI Linux, headless 'new' has a broken GPU path — WebGPU adapter
+		// returns null and WebGL context creation fails too. `false` makes
+		// Chromium attach to the xvfb virtual display (the workflow runs us
+		// under xvfb-run), which restores both backends.
+		// Locally (no CI env, no xvfb), keep true-headless for speed.
+		headless: ( 'CI' in process.env || process.env.VISIBLE ) ? false : 'new',
 		args: CHROME_FLAGS,
 		env: {
 			...process.env,
@@ -277,6 +282,7 @@ async function startSide( { name, dir, port } ) {
 		},
 		defaultViewport: { width: 1280, height: 720 },
 		protocolTimeout: 0,
+		handleSIGINT: false,
 		userDataDir: path.join( wtRoot, `.profile-${ name }` )
 	} );
 

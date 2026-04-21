@@ -32,6 +32,16 @@ export async function collectIteration( page, { url, warmup, duration, heapSampl
 	const after = await page.evaluate( () => window.__wgpuSnapshot() );
 	const raw = await page.evaluate( () => window.__perfStop() );
 
+	// Sanity check: if zero frames were recorded the renderer never started.
+	// Common causes: WebGPU adapter request failed (Linux headless GPU path),
+	// a page error before any rAF tick, or a misconfigured example. Fail loudly
+	// here rather than silently producing a summary of zeros.
+	if ( raw.frames.length === 0 ) {
+
+		throw new Error( `no frames recorded during ${ duration }ms sample window — the renderer did not start. Check console errors above (WebGPU adapter null? WebGL context failed?).` );
+
+	}
+
 	return { raw, before, after };
 
 }
