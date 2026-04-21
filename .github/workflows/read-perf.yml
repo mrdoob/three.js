@@ -37,24 +37,41 @@ jobs:
         run: npm ci
 
       - name: === Perf regression ===
+        id: perf
+        # Exit 2 = regression detected (we still want to post the comment).
+        # Exit 1 = crash. continue-on-error lets both cases proceed to the
+        # artifact upload step so the comment still lands on regressions;
+        # the overall workflow status still reflects the failure, so GitHub
+        # shows a red check on regressions or crashes.
+        continue-on-error: true
         run: |
           xvfb-run -a node test/e2e/perf-regression-orchestrator.js \
             webgpu_backdrop_water \
-            --baseline=${{ github.event.pull_request.base.ref }} || echo "PERF_EXIT=$?" >> $GITHUB_ENV
+            --baseline=${{ github.event.pull_request.base.sha }}
 
       - name: Attach PR number to summary
+        # Always run. If the orchestrator crashed we won't have a summary —
+        # skip gracefully; the crash is already visible in the perf step log.
+        if: always()
         run: |
+          SUMMARY=test/e2e/perf-regression-webgpu_backdrop_water.summary.json
+          if [ ! -f "$SUMMARY" ]; then
+            echo "::warning::No summary JSON found — orchestrator likely crashed. See the 'Perf regression' step log."
+            exit 0
+          fi
           PR=${{ github.event.pull_request.number }}
           node -e "
             const fs=require('fs');
-            const p='test/e2e/perf-regression-webgpu_backdrop_water.summary.json';
+            const p='$SUMMARY';
             const s=JSON.parse(fs.readFileSync(p,'utf8'));
             s.pr=$PR;
             fs.writeFileSync(p, JSON.stringify(s));
           "
 
       - name: Upload artifact
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: perf-summary
           path: test/e2e/perf-regression-*.summary.json
+          if-no-files-found: ignore
