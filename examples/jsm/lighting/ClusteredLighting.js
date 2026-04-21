@@ -24,9 +24,9 @@ export class ClusteredLighting extends Lighting {
 	 * @param {number} [maxLights=1024] - Maximum number of point lights.
 	 * @param {number} [tileSize=32] - Screen tile size in pixels (cluster XY size).
 	 * @param {number} [zSlices=24] - Number of exponential depth slices.
-	 * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.
+	 * @param {number} [maxLightsPerCluster=32] - Per-cluster light-list capacity.
 	 */
-	constructor( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 64 ) {
+	constructor( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 32 ) {
 
 		super();
 
