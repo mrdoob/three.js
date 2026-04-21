@@ -3267,7 +3267,7 @@ class SVGLoader extends Loader {
 
 }
 
-const GRADIENT_URL_RE = /^\s*url\(\s*["']?\s*#([^)'"\s]+)\s*["']?\s*\)\s*$/;
+const GRADIENT_URL_RE = /^\s*url\(\s*(?:["']\s*)?#([^)'"\s]+)(?:\s*["'])?\s*\)\s*$/;
 
 // Bakes a gradient into a CanvasTexture in its own local frame and configures
 // `texture.matrix` (with `matrixAutoUpdate = false`) so that shape-space UVs —
