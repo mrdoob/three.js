@@ -157,52 +157,6 @@ be <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="clippingVolumes" translate="no">.<a href="#clippingVolumes">clippingVolumes</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
-					<div class="description">
-						<p>Optional local clipping volumes. Each volume is an object with <code>planes</code>
-(<code>Array.&lt;<a href="Plane.html">Plane</a>></code>) and <code>mode</code> (<code>'include'</code> or <code>'exclude'</code>).</p>
-						<p><code>'include'</code> means keep-region: fragments inside this volume are candidates
-to be rendered. <code>'exclude'</code> means cutout-region: fragments inside this
-volume are removed.</p>
-						<p>When set, volume clipping is used for this material.</p>
-						<p>A fragment is inside a volume only if it is inside all planes of that volume.
-Include volumes are unioned (<code>insideAnyInclude</code>). Exclude volumes are
-unioned (<code>insideAnyExclude</code>).</p>
-						<p>Final rule: <code>visible = ( !hasIncludeVolumes || insideAnyInclude ) &amp;&amp; !insideAnyExclude</code>.</p>
-						<p>If include volumes exist, a fragment must be inside at least one include
-volume. Regardless of that, being inside any exclude volume removes the
-fragment (exclude wins on overlap).</p>
-						<p>This API is additive; <code>clippingPlanes</code> and <code>clipIntersection</code> remain fully supported.</p>
-						<p>Global clipping configured on <code>WebGLRenderer</code> (<code>clippingPlanes</code> / <code>clippingVolumes</code>)
-is evaluated independently and combined with this local result via
-<code>visible = globalVisible &amp;&amp; localVisible</code>.</p>
-						<p>Mixing <code>clippingPlanes</code> with <code>clippingVolumes</code>:</p>
-<ul>
-<li>If <code>clippingPlanes</code> are also set, they are internally added as one additional volume.</li>
-<li>With <code>clipIntersection = false</code>, that additional volume behaves like <code>mode: 'include'</code> with the same planes.</li>
-<li>With <code>clipIntersection = true</code>, that additional volume behaves like <code>mode: 'exclude'</code> with inverted planes.</li>
-</ul>
-						<p>Effective mixed rule: <code>visible = insideAnyInclude( all includes + synthetic include-from-planes ) &amp;&amp; !insideAnyExclude( all excludes + synthetic exclude-from-clipIntersection=true )</code></p>
-						<p>This feature is unrelated to <a href="ClippingGroup.html">ClippingGroup</a>, which is a
-scene-graph clipping feature.</p>
-						<p>Example: clipping box from 6 planes:</p>
-<pre class="prettyprint source"><code>const material = new THREE.MeshStandardMaterial();
-
-material.clippingVolumes = [ {
-	mode: 'include',
-	planes: [
-		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), - box.min.x ),
-		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), box.max.x ),
-		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), - box.min.y ),
-		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), box.max.y ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - box.min.z ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), box.max.z )
-	]
-} ];</code></pre>
-						<p>Default is <code>undefined</code>.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="colorWrite" translate="no">.<a href="#colorWrite">colorWrite</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether to render the material's color.</p>

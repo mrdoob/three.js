@@ -116,66 +116,6 @@ User-defined clipping planes specified as THREE.Plane objects in world space. Th
 
 Default is `null`.
 
-### .clippingVolumes : Array.<Object>
-
-Optional local clipping volumes. Each volume is an object with:
-
-- `planes`: `Array.<Plane>` (convex volume boundary planes, e.g. a box uses 6 planes).
-- `mode`: `'include' | 'exclude'`.
-  - `'include'`: keep-region. Fragments inside this volume are candidates to be rendered.
-  - `'exclude'`: cutout-region. Fragments inside this volume are removed.
-
-When set, volume clipping is used for this material.
-
-Visibility is evaluated as:
-
-- A fragment is **inside a volume** only if it is inside all planes of that volume.
-- All include volumes are unioned (`insideAnyInclude`).
-- All exclude volumes are unioned (`insideAnyExclude`).
-- Final rule:
-
-```txt
-visible = ( !hasIncludeVolumes || insideAnyInclude ) && !insideAnyExclude
-```
-
-So: if include volumes exist, a fragment must be inside at least one include volume. Regardless of that, being inside any exclude volume removes the fragment (`exclude` wins on overlap).
-
-This API is additive; `clippingPlanes` and `clipIntersection` remain fully supported.
-Global clipping configured on `WebGLRenderer` (`clippingPlanes` / `clippingVolumes`) is evaluated independently and combined with this local result via `visible = globalVisible && localVisible`.
-
-Mixing `clippingPlanes` with `clippingVolumes`:
-
-- If `clippingPlanes` are also set, they are internally added as one additional volume.
-- With `clipIntersection = false`, that additional volume behaves like `mode: 'include'` with the same planes.
-- With `clipIntersection = true`, that additional volume behaves like `mode: 'exclude'` with inverted planes.
-- Effective mixed rule:
-
-```txt
-visible = insideAnyInclude( all includes + synthetic include-from-planes ) && !insideAnyExclude( all excludes + synthetic exclude-from-clipIntersection=true )
-```
-
-This feature is unrelated to [ClippingGroup](ClippingGroup.html), which is a scene-graph clipping feature.
-
-Example: clipping box from 6 planes:
-
-```js
-const material = new THREE.MeshStandardMaterial();
-
-material.clippingVolumes = [ {
-	mode: 'include',
-	planes: [
-		new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), - box.min.x ),
-		new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), box.max.x ),
-		new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), - box.min.y ),
-		new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), box.max.y ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), - box.min.z ),
-		new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), box.max.z )
-	]
-} ];
-```
-
-Default is `undefined`.
-
 ### .colorWrite : boolean
 
 Whether to render the material's color.
