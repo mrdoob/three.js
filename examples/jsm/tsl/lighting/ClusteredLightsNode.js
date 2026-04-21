@@ -36,9 +36,9 @@ class ClusteredLightsNode extends LightsNode {
 	 * @param {number} [maxLights=1024] - Maximum number of point lights.
 	 * @param {number} [tileSize=32] - Screen tile size in pixels (cluster XY size).
 	 * @param {number} [zSlices=24] - Number of exponential depth slices.
-	 * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.
+	 * @param {number} [maxLightsPerCluster=32] - Per-cluster light-list capacity.
 	 */
-	constructor( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 64 ) {
+	constructor( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 32 ) {
 
 		super();
 
@@ -348,12 +348,19 @@ class ClusteredLightsNode extends LightsNode {
 
 				const { color, decay, viewPosition, distance } = this.getLightData( lightIndex.sub( 1 ) );
 
-				builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
-					color,
-					lightVector: viewPosition.sub( positionView ),
-					cutoffDistance: distance,
-					decayExponent: decay
-				} ) );
+				const lightVector = viewPosition.sub( positionView );
+
+				// Early-out: skip full BRDF if fragment is beyond the light's cutoff
+				If( distance.equal( 0 ).or( dot( lightVector, lightVector ).lessThanEqual( distance.mul( distance ) ) ), () => {
+
+					builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
+						color,
+						lightVector,
+						cutoffDistance: distance,
+						decayExponent: decay
+					} ) );
+
+				} );
 
 			} );
 
