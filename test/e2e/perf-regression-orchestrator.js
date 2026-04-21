@@ -34,6 +34,24 @@ import * as os from 'node:os';
 import { createServer } from '../../utils/server.js';
 import { attachPerfInjection, collectIteration, buildSummary } from './perf-collector.js';
 
+// Surface any unhandled rejection with a clear stack and a distinctive prefix,
+// so CI logs point at the real cause instead of just "Process completed with
+// exit code 1" and a missing summary file downstream.
+process.on( 'unhandledRejection', ( reason ) => {
+
+	console.error( '\n[orch] FATAL unhandled rejection:' );
+	console.error( reason && reason.stack ? reason.stack : reason );
+	process.exit( 1 );
+
+} );
+process.on( 'uncaughtException', ( err ) => {
+
+	console.error( '\n[orch] FATAL uncaught exception:' );
+	console.error( err.stack || err );
+	process.exit( 1 );
+
+} );
+
 // --- args -------------------------------------------------------------------
 
 const argv = process.argv.slice( 2 );
