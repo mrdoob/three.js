@@ -24,8 +24,12 @@ const num = v => Number.isInteger( v ) ? String( v ) : v.toFixed( 2 );
 function fmtPct( pct ) {
 
 	if ( ! Number.isFinite( pct ) ) return 'new';
+	const rounded = pct.toFixed( 1 );
+	// Anything that rounds to exactly zero is shown as a dot — "+0.0%"
+	// adds visual noise for the common case of an identical metric.
+	if ( rounded === '0.0' || rounded === '-0.0' ) return '·';
 	const sign = pct >= 0 ? '+' : '';
-	return `${ sign }${ pct.toFixed( 1 ) }%`;
+	return `${ sign }${ rounded }%`;
 
 }
 
@@ -37,34 +41,21 @@ function verdictBadge( v ) {
 
 }
 
-const FORMATTERS = {
-	'fps': num,
-	'frameTimeMs.p50': ms,
-	'frameTimeMs.p95': ms,
-	'frameTimeMs.p99': ms,
-	'jsHeapBytes.mean': mb,
-	'jsHeapBytes.growth': mb,
-	'gc.events': num,
-	'gc.totalFreedBytes': mb,
-	'webgpu.estimatedVRAMAfter': mb,
-	'webgpu.cmdSubmitsPerFrame': num,
-	'webgpu.errors': num
-};
+// Whitelist + display order. Only these rows appear in the PR comment;
+// the JSON artifact still contains the full metric set for anyone digging in.
+const DISPLAY = [
+	{ name: 'fps',                          label: 'FPS (uncapped)',     fmt: num },
+	{ name: 'frameTimeMs.p50',              label: 'Frame time (median)', fmt: ms },
+	{ name: 'jsHeapBytes.mean',             label: 'JS heap (mean)',     fmt: mb },
+	{ name: 'webgpu.estimatedVRAMAfter',    label: 'WebGPU VRAM',        fmt: mb },
+	{ name: 'webgpu.cmdSubmitsPerFrame',    label: 'Submits/frame',      fmt: num },
+	{ name: 'gc.events',                    label: 'GC events',          fmt: num } // non-gated
+];
 
-const LABELS = {
-	'fps': 'FPS (uncapped)',
-	'frameTimeMs.p50': 'Frame p50',
-	'frameTimeMs.p95': 'Frame p95',
-	'frameTimeMs.p99': 'Frame p99',
-	'jsHeapBytes.mean': 'JS heap (mean)',
-	'jsHeapBytes.growth': 'JS heap growth',
-	'gc.events': 'GC events',
-	'gc.totalFreedBytes': 'GC heap freed',
-	'webgpu.estimatedVRAMAfter': 'WebGPU VRAM',
-	'webgpu.cmdSubmitsPerFrame': 'Submits/frame',
-	'webgpu.errors': 'WebGPU errors'
-};
+const rowsByName = new Map( s.rows.map( r => [ r.name, r ] ) );
 
+// Regression state only reflects gated metrics (row.isRegression is already
+// false for non-gated rows by construction in the orchestrator).
 const regressions = s.rows.filter( r => r.isRegression );
 const heading = regressions.length
 	? `### 🔴 Perf regression (${ s.example })`
@@ -79,17 +70,15 @@ out += `gated at k=${ s.k }·MAD. Lavapipe (software WebGPU), vsync disabled —
 out += `| Metric | Baseline | Candidate | Δ | Verdict |\n`;
 out += `|:--|:-:|:-:|:-:|:-:|\n`;
 
-for ( const row of s.rows ) {
+for ( const item of DISPLAY ) {
 
-	const fmt = FORMATTERS[ row.name ] || num;
-	const rawLabel = LABELS[ row.name ] || row.name;
-	// Non-gated metrics (heap growth, GC counters) are labeled "(info)" so
-	// reviewers know a red delta there doesn't block the PR.
-	const label = row.gate === false ? `${ rawLabel } <sub>(info)</sub>` : rawLabel;
-	const baseStr = fmt( row.b.median );
-	const candStr = fmt( row.c.median );
+	const row = rowsByName.get( item.name );
+	if ( ! row ) continue;
+	const label = row.gate === false ? `${ item.label } <sub>(info)</sub>` : item.label;
+	const baseStr = item.fmt( row.b.median );
+	const candStr = item.fmt( row.c.median );
 	const pctStr = fmtPct( row.pct );
-	// For non-gated rows, never show the red regress badge — only neutral indicators.
+	// Non-gated rows never show the red regress badge — only neutral indicators.
 	const badge = row.gate === false
 		? ( row.verdict === 'improve' ? '🟢 improve' : '·' )
 		: verdictBadge( row.verdict );
