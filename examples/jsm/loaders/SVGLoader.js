@@ -2663,6 +2663,22 @@ class SVGLoader extends Loader {
 					outerPoint.copy( tempV2_5 ).add( currentPoint );
 					innerPoint.add( currentPoint );
 
+					// in-loop fold detection to mitigate #25326
+					if ( innerSideModified ) {
+
+						//  when the second triangle's signed area would flip, snap innerPoint to the previous inner-side vertex
+
+						const refPt = joinIsOnLeftSide ? lastPointR : lastPointL;
+						const foldCross = ( outerPoint.x - refPt.x ) * ( innerPoint.y - refPt.y )
+							- ( outerPoint.y - refPt.y ) * ( innerPoint.x - refPt.x );
+						if ( ( joinIsOnLeftSide && foldCross < 0 ) || ( ! joinIsOnLeftSide && foldCross > 0 ) ) {
+
+							innerPoint.copy( refPt );
+
+						}
+
+					}
+
 					isMiter = false;
 
 					if ( innerSideModified ) {
@@ -2934,6 +2950,32 @@ class SVGLoader extends Loader {
 						lastOuter.toArray( vertices, 0 * 3 );
 
 					}
+
+				}
+
+			}
+
+		}
+
+		// Second fix for #25326: Scan for reamining flipped (CW) triangles and collapse them to
+		// degenerated ones. This is safe and leaves no "holes" in the stroke because the flipped
+		// triangle's area is covered by neighbouring (CCW) triangles.
+
+		if ( vertices ) {
+
+			const tri = [ new Vector2(), new Vector2(), new Vector2() ];
+			const startFloat = vertexOffset * 3;
+
+			for ( let t = startFloat; t < currentCoordinate; t += 9 ) {
+
+				tri[ 0 ].set( vertices[ t ], vertices[ t + 1 ] );
+				tri[ 1 ].set( vertices[ t + 3 ], vertices[ t + 4 ] );
+				tri[ 2 ].set( vertices[ t + 6 ], vertices[ t + 7 ] );
+
+				if ( ShapeUtils.area( tri ) < 0 ) {
+
+					vertices[ t + 3 ] = tri[ 0 ].x;
+					vertices[ t + 4 ] = tri[ 0 ].y;
 
 				}
 
