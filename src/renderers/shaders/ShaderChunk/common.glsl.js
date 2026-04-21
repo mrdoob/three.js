@@ -64,7 +64,7 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
-#define inverseTransformDirection transformNormalByInverseViewMatrix // keeping this for backwards compatibility
+#define inverseTransformDirection transformDirectionByInverseViewMatrix // keeping this for backwards compatibility
 
 vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
