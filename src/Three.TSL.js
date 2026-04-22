@@ -518,6 +518,7 @@ export const stepElement = TSL.stepElement;
 export const storage = TSL.storage;
 export const storageBarrier = TSL.storageBarrier;
 export const storageTexture = TSL.storageTexture;
+export const storageTexture3D = TSL.storageTexture3D;
 export const struct = TSL.struct;
 export const sub = TSL.sub;
 export const subgroupAdd = TSL.subgroupAdd;
