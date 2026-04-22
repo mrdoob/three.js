@@ -128,9 +128,15 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
+
+		} else if ( op === '!' ) {
+
+			const typeLength = builder.getTypeLength( typeA );
+
+			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
 		} else if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
@@ -330,9 +336,23 @@ class OperatorNode extends TempNode {
 
 				}
 
-			} else if ( op === '!' || op === '~' ) {
+			} else if ( op === '!' ) {
 
-				return builder.format( `(${op}${a})`, typeA, output );
+				if ( isGLSL && builder.isVector( typeA ) ) {
+
+					return builder.format( `not( ${a} )`, output );
+
+				} else {
+
+					// WGSL and scalars on GLSL
+
+					return builder.format( `( ${op} ${a} )`, typeA, output );
+
+				}
+
+			} else if ( op === '~' ) {
+
+				return builder.format( `( ${op} ${a} )`, typeA, output );
 
 			} else if ( fnOpSnippet ) {
 
