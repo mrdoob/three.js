@@ -5,7 +5,7 @@ import StorageTextureNode from './StorageTextureNode.js';
  * This special version of a texture node can be used to
  * write data into a 3D storage texture with a compute shader.
  *
- * @augments TextureNode
+ * @augments StorageTextureNode
  */
 class StorageTexture3DNode extends StorageTextureNode {
 
@@ -70,9 +70,9 @@ export default StorageTexture3DNode;
  *
  * @tsl
  * @function
- * @param {StorageTexture} value - The 3D storage texture.
+ * @param {Storage3DTexture} value - The 3D storage texture.
  * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
- * @returns {Texture3DNode}
+ * @returns {StorageTexture3DNode}
  */
 export const storageTexture3D = /*@__PURE__*/ nodeProxy( StorageTexture3DNode ).setParameterLength( 1, 3 );
