@@ -40,7 +40,7 @@ class MathNode extends TempNode {
 
 			let finalOp = new MathNode( method, aNode, bNode );
 
-			for ( let i = 2; i < arguments.length - 1; i ++ ) {
+			for ( let i = 3; i < arguments.length - 1; i ++ ) {
 
 				finalOp = new MathNode( method, finalOp, arguments[ i ] );
 
