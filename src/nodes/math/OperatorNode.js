@@ -344,7 +344,7 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					// WGSL
+					// WGSL and scalars on GLSL
 
 					return builder.format( `( ${op} ${a} )`, typeA, output );
 
