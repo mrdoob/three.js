@@ -346,7 +346,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '~' ) {
 
-				return builder.format( `(${op}${a})`, typeA, output );
+				return builder.format( `( ${op} ${a} )`, typeA, output );
 
 			} else if ( fnOpSnippet ) {
 
