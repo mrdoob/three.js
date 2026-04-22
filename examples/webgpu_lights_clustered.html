@@ -124,6 +124,10 @@
 					light.userData.fixedPosition = light.position.clone();
 					light.visible = ( lights.children.length < count );
 
+					light.updateMatrixWorld();
+
+					lightDummy.setMatrixAt( lights.children.length, light.matrixWorld );
+
 					lights.add( light );
 
 					return light;
