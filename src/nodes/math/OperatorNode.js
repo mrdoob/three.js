@@ -332,7 +332,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '!' ) {
 
-				if ( isGLSL ) {
+				if ( isGLSL && builder.isVector( typeA ) ) {
 
 					return builder.format( `not( ${a} )`, output );
 
