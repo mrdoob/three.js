@@ -132,7 +132,13 @@ class OperatorNode extends TempNode {
 
 			return 'bool';
 
-		} else if ( op === '!' || op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+		} else if ( op === '!' ) {
+
+			const typeLength = builder.getTypeLength( typeA );
+
+			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
+
+		} else if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
 			const typeLength = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
