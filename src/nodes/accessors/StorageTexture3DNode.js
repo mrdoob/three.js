@@ -16,6 +16,28 @@ class StorageTexture3DNode extends StorageTextureNode {
 	}
 
 	/**
+	 * Constructs a new 3D storage texture node.
+	 *
+	 * @param {Storage3DTexture} value - The 3D storage texture.
+	 * @param {Node<vec3>} uvNode - The uv node.
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
+	 */
+	constructor( value, uvNode, storeNode = null ) {
+
+		super( value, uvNode, storeNode );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isStorageTexture3DNode = true;
+
+	}
+
+	/**
 	 * Returns a default uv node which is in context of 3D textures a three-dimensional
 	 * uv node.
 	 *
