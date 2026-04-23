@@ -1012,6 +1012,24 @@ class FBXTreeParser {
 
 		sceneGraph.animations = animations;
 
+		// Apply coordinate system correction. FBX files can use different
+		// up-axis conventions (Y-up or Z-up). Three.js uses Y-up, so rotate
+		// the scene when the file uses Z-up (UpAxis === 2).
+
+		if ( 'GlobalSettings' in fbxTree && 'UpAxis' in fbxTree.GlobalSettings ) {
+
+			const upAxis = fbxTree.GlobalSettings.UpAxis.value;
+
+			if ( upAxis === 2 ) {
+
+				console.warn( 'THREE.FBXLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted.' );
+
+				sceneGraph.rotation.set( - Math.PI / 2, 0, 0 );
+
+			}
+
+		}
+
 	}
 
 	// parse nodes in FBXTree.Objects.Model
@@ -2346,6 +2364,13 @@ class GeometryParser {
 		parentGeo.morphAttributes.position = [];
 		// parentGeo.morphAttributes.normal = []; // not implemented
 
+		// Morph attribute positions are stored as deltas (morphTargetsRelative = true), so the
+		// translation component of the geometric transform must not be applied to them — only the
+		// rotation/scale part. Otherwise every delta gets the geometric translation added, which
+		// shifts morphed vertices away from their intended position by `weight * translation` as
+		// the influence increases.
+		const morphPreTransform = preTransform.clone().setPosition( 0, 0, 0 );
+
 		const scope = this;
 		morphTargets.forEach( function ( morphTarget ) {
 
@@ -2355,7 +2380,7 @@ class GeometryParser {
 
 				if ( morphGeoNode !== undefined ) {
 
-					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, morphPreTransform, rawTarget.name );
 
 				}
 
@@ -2750,11 +2775,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ].ID;
+								} );
+
+								if ( filteredParents.length === 0 ) return;
+
+								const modelID = filteredParents[ 0 ].ID;
 
 								if ( modelID !== undefined ) {
 
@@ -2814,11 +2843,15 @@ class AnimationParser {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
-								const deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
+								const filteredParents = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 									return parent.relationship !== undefined;
 
-								} )[ 0 ].ID;
+								} );
+
+								if ( filteredParents.length === 0 ) return;
+
+								const deformerID = filteredParents[ 0 ].ID;
 
 								const morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 								const geoID = connections.get( morpherID ).parents[ 0 ].ID;

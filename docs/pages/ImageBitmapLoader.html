@@ -81,7 +81,7 @@ texture.needsUpdate = true;
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : ImageBitmap | undefined</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and pass the loaded image bitmap to the <code>onLoad()</code> callback.</p>
@@ -125,15 +125,14 @@ texture.needsUpdate = true;
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The image bitmap.</dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="setOptions" translate="no">.<a href="#setOptions">setOptions</a><span class="signature">( options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="ImageBitmapLoader.html">ImageBitmapLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given loader options. The structure of the object must match the <code>options</code> parameter of
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap" target="_blank" rel="noopener">createImageBitmap</a>.</p>
+<p>Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
+different options will return the cached result of the first request.</p>
 						</div>
 						<table class="params">
 							<tbody>

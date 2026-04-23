@@ -1,8 +1,7 @@
-/*// debugger tools
-import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
-//*/
+// debugger tools
+// import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 
-import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap, GPUShaderStage } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -325,15 +324,20 @@ class WebGPUBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -1608,20 +1612,17 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				const count = 1;
-				const firstInstance = count > 1 ? 0 : i;
-
 				if ( hasIndex === true ) {
 
-					passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
+					passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
 
 				} else {
 
-					passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
+					passEncoderGPU.draw( counts[ i ], 1, starts[ i ], i );
 
 				}
 
-				info.update( object, counts[ i ], count );
+				info.update( object, counts[ i ], 1 );
 
 			}
 
@@ -2175,6 +2176,70 @@ class WebGPUBackend extends Backend {
 	}
 
 	// bindings
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		if ( uniformBufferData.buffer === undefined ) {
+
+			const byteLength = uniformBuffer.byteLength;
+
+			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+			const visibilities = [];
+
+			if ( uniformBuffer.visibility & GPUShaderStage.VERTEX ) {
+
+				visibilities.push( 'vertex' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.FRAGMENT ) {
+
+				visibilities.push( 'fragment' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.COMPUTE ) {
+
+				visibilities.push( 'compute' );
+
+			}
+
+			const bufferVisibility = `(${visibilities.join( ',' )})`;
+
+			const bufferGPU = this.device.createBuffer( {
+				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
+				size: byteLength,
+				usage: usage
+			} );
+
+			uniformBufferData.buffer = bufferGPU;
+
+		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		uniformBufferData.buffer.destroy();
+
+		this.delete( uniformBuffer );
+
+	}
 
 	/**
 	 * Creates bindings from the given bind group definition.

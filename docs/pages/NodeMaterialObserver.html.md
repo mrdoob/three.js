@@ -48,7 +48,7 @@ The current node builder.
 
 **Returns:** Whether the node builder's material uses node properties or not.
 
-### .equals( renderObject : RenderObject, lightsData : Array.<Light> ) : boolean
+### .equals( renderObject : RenderObject, lightsData : Array.<Light>, renderId : number ) : boolean
 
 Returns `true` if the given render object has not changed its state.
 
@@ -59,6 +59,10 @@ The render object.
 **lightsData**
 
 The current material lights.
+
+**renderId**
+
+The current render ID.
 
 **Returns:** Whether the given render object has changed its state or not.
 
@@ -81,6 +85,16 @@ Returns an attribute data structure holding the attributes versions for monitori
 The geometry attributes.
 
 **Returns:** An object for monitoring the versions of attributes.
+
+### .getGeometryData( geometry : BufferGeometry ) : Object
+
+Returns a geometry data structure holding the geometry property values for monitoring.
+
+**geometry**
+
+The geometry.
+
+**Returns:** An object for monitoring geometry properties.
 
 ### .getLights( lightsNode : LightsNode, renderId : number ) : Array.<Object>
 

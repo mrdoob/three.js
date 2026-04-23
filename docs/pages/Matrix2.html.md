@@ -55,12 +55,6 @@ Constructs a new 2x2 matrix. The arguments are supposed to be in row-major order
 
 A column-major list of matrix values.
 
-### .isMatrix2 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
 ## Methods
 
 ### .fromArray( array : Array.<number>, offset : number ) : Matrix2

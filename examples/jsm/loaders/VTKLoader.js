@@ -27,6 +27,7 @@ import { unzlibSync } from '../libs/fflate.module.js';
  *
  * @augments Loader
  * @three_import import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
+ * @deprecated since r184.
  */
 class VTKLoader extends Loader {
 
@@ -34,15 +35,18 @@ class VTKLoader extends Loader {
 	 * Constructs a new VTK loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @deprecated since r184.
 	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		console.warn( 'THREE.VTKLoader: The loader has been deprecated and will be removed with r194. Export your VTK files to glTF before using them on the web.' ); // @deprecated, r184
+
 	}
 
 	/**
-	 * Starts loading from the given URL and passes the loaded VRML asset
+	 * Starts loading from the given URL and passes the loaded VTK asset
 	 * to the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.

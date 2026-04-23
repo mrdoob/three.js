@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '184dev';
+const REVISION = '185dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -7577,6 +7577,15 @@ class Texture extends EventDispatcher {
 		 */
 		this.pmremVersion = 0;
 
+		/**
+		 * Whether the texture should use one of the 16 bit integer formats which are normalized
+		 * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.normalized = false;
+
 	}
 
 	/**
@@ -7692,6 +7701,7 @@ class Texture extends EventDispatcher {
 		this.format = source.format;
 		this.internalFormat = source.internalFormat;
 		this.type = source.type;
+		this.normalized = source.normalized;
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
@@ -7810,6 +7820,7 @@ class Texture extends EventDispatcher {
 			format: this.format,
 			internalFormat: this.internalFormat,
 			type: this.type,
+			normalized: this.normalized,
 			colorSpace: this.colorSpace,
 
 			minFilter: this.minFilter,
@@ -16673,7 +16684,7 @@ let _id$2 = 0;
  * When working with vector-like data, the `fromBufferAttribute( attribute, index )`
  * helper methods on vector and color class might be helpful. E.g. {@link Vector3#fromBufferAttribute}.
  */
-class BufferAttribute {
+class BufferAttribute extends EventDispatcher {
 
 	/**
 	 * Constructs a new buffer attribute.
@@ -16683,6 +16694,8 @@ class BufferAttribute {
 	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
 	constructor( array, itemSize, normalized = false ) {
+
+		super();
 
 		if ( Array.isArray( array ) ) {
 
@@ -17327,6 +17340,15 @@ class BufferAttribute {
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
 
 		return data;
+
+	}
+
+	/**
+	 * Disposes of the buffer attribute. Available only in {@link WebGPURenderer}.
+	 */
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -24714,7 +24736,7 @@ class InstancedMesh extends Mesh {
 
 	/**
 	 * Sets the given local transformation matrix to the defined instance. Make sure you set the `needsUpdate` flag of
-	 * {@link InstancedMesh#instanceMatrix} to `true` after updating all the colors.
+	 * {@link InstancedMesh#instanceMatrix} to `true` after updating all the matrices.
 	 *
 	 * @param {number} index - The instance index.
 	 * @param {Matrix4} matrix - The local transformation.
@@ -25001,9 +25023,10 @@ class Plane {
 	 *
 	 * @param {Line3} line - The line to compute the intersection for.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
+	 * @param {boolean} [clampToLine=true] - Whether to clamp the intersection to the line segment.
+	 * @return {?Vector3} The intersection point. Returns `null` if no intersection is detected.
 	 */
-	intersectLine( line, target ) {
+	intersectLine( line, target, clampToLine = true ) {
 
 		const direction = line.delta( _vector1 );
 
@@ -25025,7 +25048,7 @@ class Plane {
 
 		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
-		if ( t < 0 || t > 1 ) {
+		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
 
 			return null;
 
@@ -28843,6 +28866,77 @@ class CanvasTexture extends Texture {
 		this.isCanvasTexture = true;
 
 		this.needsUpdate = true;
+
+	}
+
+}
+
+/**
+ * Creates a texture from an HTML element.
+ *
+ * This is almost the same as the base texture class, except that it sets {@link Texture#needsUpdate}
+ * to `true` immediately and listens for the parent canvas's paint events to trigger updates.
+ *
+ * @augments Texture
+ */
+class HTMLTexture extends Texture {
+
+	/**
+	 * Constructs a new texture.
+	 *
+	 * @param {HTMLElement} [element] - The HTML element.
+	 * @param {number} [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
+	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
+	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
+	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
+	 * @param {number} [minFilter=LinearMipmapLinearFilter] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The texture format.
+	 * @param {number} [type=UnsignedByteType] - The texture type.
+	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
+	 */
+	constructor( element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+		super( element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHTMLTexture = true;
+		this.generateMipmaps = false;
+
+		this.needsUpdate = true;
+
+		const parent = element ? element.parentNode : null;
+
+		if ( parent !== null && 'requestPaint' in parent ) {
+
+			parent.onpaint = () => {
+
+				this.needsUpdate = true;
+
+			};
+
+			parent.requestPaint();
+
+		}
+
+	}
+
+	dispose() {
+
+		const parent = this.image ? this.image.parentNode : null;
+
+		if ( parent !== null && 'onpaint' in parent ) {
+
+			parent.onpaint = null;
+
+		}
+
+		super.dispose();
 
 	}
 
@@ -37222,10 +37316,7 @@ function cloneUniforms( src ) {
 
 			const property = src[ u ][ p ];
 
-			if ( property && ( property.isColor ||
-				property.isMatrix3 || property.isMatrix4 ||
-				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture || property.isQuaternion ) ) {
+			if ( isThreeObject( property ) ) {
 
 				if ( property.isRenderTargetTexture ) {
 
@@ -37240,7 +37331,23 @@ function cloneUniforms( src ) {
 
 			} else if ( Array.isArray( property ) ) {
 
-				dst[ u ][ p ] = property.slice();
+				if ( isThreeObject( property[ 0 ] ) ) {
+
+					const clonedProperty = [];
+
+					for ( let i = 0, l = property.length; i < l; i ++ ) {
+
+						clonedProperty[ i ] = property[ i ].clone();
+
+					}
+
+					dst[ u ][ p ] = clonedProperty;
+
+				} else {
+
+					dst[ u ][ p ] = property.slice();
+
+				}
 
 			} else {
 
@@ -37281,6 +37388,15 @@ function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+function isThreeObject( property ) {
+
+	return ( property && ( property.isColor ||
+		property.isMatrix3 || property.isMatrix4 ||
+		property.isVector2 || property.isVector3 || property.isVector4 ||
+		property.isTexture || property.isQuaternion ) );
 
 }
 
@@ -42916,144 +43032,6 @@ class AnimationClip {
 	}
 
 	/**
-	 * Parses the `animation.hierarchy` format and returns a new animation clip.
-	 *
-	 * @static
-	 * @deprecated since r175.
-	 * @param {Object} animation - A serialized animation clip as JSON.
-	 * @param {Array<Bone>} bones - An array of bones.
-	 * @return {?AnimationClip} The new animation clip.
-	 */
-	static parseAnimation( animation, bones ) {
-
-		warn( 'AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
-
-		if ( ! animation ) {
-
-			error( 'AnimationClip: No animation in JSONLoader data.' );
-			return null;
-
-		}
-
-		const addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
-
-			// only return track if there are actually keys.
-			if ( animationKeys.length !== 0 ) {
-
-				const times = [];
-				const values = [];
-
-				flattenJSON( animationKeys, times, values, propertyName );
-
-				// empty keys are filtered out, so check again
-				if ( times.length !== 0 ) {
-
-					destTracks.push( new trackType( trackName, times, values ) );
-
-				}
-
-			}
-
-		};
-
-		const tracks = [];
-
-		const clipName = animation.name || 'default';
-		const fps = animation.fps || 30;
-		const blendMode = animation.blendMode;
-
-		// automatic length determination in AnimationClip.
-		let duration = animation.length || -1;
-
-		const hierarchyTracks = animation.hierarchy || [];
-
-		for ( let h = 0; h < hierarchyTracks.length; h ++ ) {
-
-			const animationKeys = hierarchyTracks[ h ].keys;
-
-			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length === 0 ) continue;
-
-			// process morph targets
-			if ( animationKeys[ 0 ].morphTargets ) {
-
-				// figure out all morph targets used in this track
-				const morphTargetNames = {};
-
-				let k;
-
-				for ( k = 0; k < animationKeys.length; k ++ ) {
-
-					if ( animationKeys[ k ].morphTargets ) {
-
-						for ( let m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
-
-							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = -1;
-
-						}
-
-					}
-
-				}
-
-				// create a track for each morph target with all zero
-				// morphTargetInfluences except for the keys in which
-				// the morphTarget is named.
-				for ( const morphTargetName in morphTargetNames ) {
-
-					const times = [];
-					const values = [];
-
-					for ( let m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
-
-						const animationKey = animationKeys[ k ];
-
-						times.push( animationKey.time );
-						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
-
-					}
-
-					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
-
-				}
-
-				duration = morphTargetNames.length * fps;
-
-			} else {
-
-				// ...assume skeletal animation
-
-				const boneName = '.bones[' + bones[ h ].name + ']';
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.position',
-					animationKeys, 'pos', tracks );
-
-				addNonemptyTrack(
-					QuaternionKeyframeTrack, boneName + '.quaternion',
-					animationKeys, 'rot', tracks );
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.scale',
-					animationKeys, 'scl', tracks );
-
-			}
-
-		}
-
-		if ( tracks.length === 0 ) {
-
-			return null;
-
-		}
-
-		const clip = new this( clipName, duration, tracks, blendMode );
-
-		return clip;
-
-	}
-
-	/**
 	 * Sets the duration of this clip to the duration of its longest keyframe track.
 	 *
 	 * @return {AnimationClip} A reference to this animation clip.
@@ -43517,6 +43495,11 @@ class LoadingManager {
 		 */
 		this.resolveURL = function ( url ) {
 
+			// Normalize to NFC so that Unicode URIs (e.g. from glTF)
+			// are percent-encoded correctly per RFC 3987.
+
+			url = url.normalize( 'NFC' );
+
 			if ( urlModifier ) {
 
 				return urlModifier( url );
@@ -43978,7 +43961,6 @@ class FileLoader extends Loader {
 	 * @param {function(any)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Executed while the loading is in progress.
 	 * @param {onErrorCallback} [onError] - Executed when errors occur.
-	 * @return {any|undefined} The cached resource if available.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
@@ -44002,7 +43984,7 @@ class FileLoader extends Loader {
 
 			}, 0 );
 
-			return cached;
+			return;
 
 		}
 
@@ -48824,6 +48806,7 @@ class ObjectLoader extends Loader {
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
+				if ( data.normalized !== undefined ) texture.normalized = data.normalized;
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 
@@ -49451,6 +49434,9 @@ class ImageBitmapLoader extends Loader {
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
 	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
 	 *
+	 * Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
+	 * different options will return the cached result of the first request.
+	 *
 	 * @param {Object} options - The loader options to set.
 	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
 	 */
@@ -49469,7 +49455,6 @@ class ImageBitmapLoader extends Loader {
 	 * @param {function(ImageBitmap)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
-	 * @return {ImageBitmap|undefined} The image bitmap.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
@@ -49507,8 +49492,6 @@ class ImageBitmapLoader extends Loader {
 
 						scope.manager.itemEnd( url );
 
-						return imageBitmap;
-
 					}
 
 				} );
@@ -49526,7 +49509,7 @@ class ImageBitmapLoader extends Loader {
 
 			}, 0 );
 
-			return cached;
+			return;
 
 		}
 
@@ -49550,8 +49533,6 @@ class ImageBitmapLoader extends Loader {
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
-
-			return imageBitmap;
 
 		} ).catch( function ( e ) {
 
@@ -49683,11 +49664,21 @@ class AudioLoader extends Loader {
 				const bufferCopy = buffer.slice( 0 );
 
 				const context = AudioContext.getContext();
+
+				const decodeUrl = url + '#decode';
+				scope.manager.itemStart( decodeUrl ); // prevent loading manager from completing too early, see #33378
+
 				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
 					onLoad( audioBuffer );
+					scope.manager.itemEnd( decodeUrl );
 
-				} ).catch( handleError );
+				} ).catch( function ( e ) {
+
+					handleError( e );
+					scope.manager.itemEnd( decodeUrl );
+
+				} );
 
 			} catch ( e ) {
 
@@ -55862,7 +55853,7 @@ class Clock {
 		 */
 		this.running = false;
 
-		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
+		warn( 'Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
 
 	}
 
@@ -59605,4 +59596,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HTMLTexture, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };

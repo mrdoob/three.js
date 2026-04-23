@@ -265,8 +265,11 @@ class BufferAttributeNode extends InputNode {
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );
+		const nodeName = builder.context.nodeName;
 
-		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType );
+		if ( nodeName !== undefined ) delete builder.context.nodeName; // deleting when consumed
+
+		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType, nodeName );
 		const propertyName = builder.getPropertyName( nodeAttribute );
 
 		let output = null;
@@ -279,7 +282,15 @@ class BufferAttributeNode extends InputNode {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			let varyingName;
+
+			if ( nodeName ) {
+
+				varyingName = nodeName + 'Varying';
+
+			}
+
+			const nodeVarying = varying( this, varyingName );
 
 			output = nodeVarying.build( builder, nodeType );
 

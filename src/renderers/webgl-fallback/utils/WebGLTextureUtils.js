@@ -634,6 +634,13 @@ class WebGLTextureUtils {
 
 			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
 
+		} else if ( texture.isHTMLTexture ) {
+
+			if ( typeof gl.texElementImage2D === 'function' ) {
+
+				gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
+
+			}
 
 		} else {
 

@@ -58,7 +58,7 @@ Aborts ongoing fetch requests.
 
 **Returns:** A reference to this instance.
 
-### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback ) : ImageBitmap | undefined
+### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback )
 
 Starts loading from the given URL and pass the loaded image bitmap to the `onLoad()` callback.
 
@@ -80,11 +80,11 @@ Executed when errors occur.
 
 **Overrides:** [Loader#load](Loader.html#load)
 
-**Returns:** The image bitmap.
-
 ### .setOptions( options : Object ) : ImageBitmapLoader
 
 Sets the given loader options. The structure of the object must match the `options` parameter of [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
+
+Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with different options will return the cached result of the first request.
 
 **options**
 

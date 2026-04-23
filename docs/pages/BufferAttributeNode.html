@@ -165,6 +165,31 @@ if you are planning to update the attribute data per frame.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from
+the buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#generateNodeType">InputNode#generateNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getHash" translate="no">.<a href="#getHash">getHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -212,31 +237,6 @@ and thus the hash should be shared as well.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>This method is overwritten since the node type is inferred from
-the buffer attribute.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">builder</strong>
-									</td>
-									<td class="description last">
-										<p>The current node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#getNodeType">InputNode#getNodeType</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="setInstanced" translate="no">.<a href="#setInstanced">setInstanced</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>

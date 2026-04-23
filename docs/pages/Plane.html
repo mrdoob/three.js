@@ -217,7 +217,7 @@ projection of the normal at the origin onto the plane.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this plane is equal with the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectLine" translate="no">.<a href="#intersectLine">intersectLine</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="intersectLine" translate="no">.<a href="#intersectLine">intersectLine</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, clampToLine : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the intersection point of the passed line and the plane. Returns
@@ -242,10 +242,19 @@ the line is coplanar with the plane.</p>
 										<p>The target vector that is used to store the method's result.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clampToLine</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to clamp the intersection to the line segment.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The intersection point. Returns <code>null</code> if no intersection is detected.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>

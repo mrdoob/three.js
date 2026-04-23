@@ -1839,9 +1839,10 @@ class NodeBuilder {
 	 *
 	 * @param {BufferAttributeNode} node - The buffer attribute node.
 	 * @param {string} type - The node type.
+	 * @param {?string} [name=null] - The name of the buffer attribute.
 	 * @return {NodeAttribute} The node attribute.
 	 */
-	getBufferAttributeFromNode( node, type ) {
+	getBufferAttributeFromNode( node, type, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'vertex' );
 
@@ -1851,7 +1852,13 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			bufferAttribute = new NodeAttribute( 'nodeAttribute' + index, type, node );
+			if ( name === null ) {
+
+				name = 'nodeAttribute' + index;
+
+			}
+
+			bufferAttribute = new NodeAttribute( name, type, node );
 
 			this.bufferAttributes.push( bufferAttribute );
 

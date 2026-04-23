@@ -309,15 +309,20 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( readbackBuffer );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -1829,24 +1834,9 @@ class WebGLBackend extends Backend {
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const array = binding.buffer;
-				let { bufferGPU } = this.get( array );
+				const bufferGPU = map.bufferGPU;
 
-				if ( bufferGPU === undefined ) {
-
-					// create
-
-					bufferGPU = gl.createBuffer();
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
-
-					this.set( array, { bufferGPU } );
-
-				} else {
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-
-				}
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
 				// update
 
@@ -1877,8 +1867,6 @@ class WebGLBackend extends Backend {
 					}
 
 				}
-
-				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
 
@@ -1945,6 +1933,44 @@ class WebGLBackend extends Backend {
 	}
 
 	// attributes
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		if ( uniformBufferData.bufferGPU === undefined ) {
+
+			const gl = this.gl;
+			const array = uniformBuffer.buffer;
+
+			uniformBufferData.bufferGPU = gl.createBuffer();
+
+			gl.bindBuffer( gl.UNIFORM_BUFFER, uniformBufferData.bufferGPU );
+			gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
+
+		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		this.gl.deleteBuffer( uniformBufferData.bufferGPU );
+
+		this.delete( uniformBuffer );
+
+	}
 
 	/**
 	 * Creates the GPU buffer of an indexed shader attribute.
