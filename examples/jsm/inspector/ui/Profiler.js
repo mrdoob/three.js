@@ -19,10 +19,10 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
-		Style.init();
-
 		this.setupShell();
 		this.setupResizing();
+
+		Style.init( this.domElement );
 
 		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
@@ -238,6 +238,7 @@ export class Profiler extends EventDispatcher {
 
 		this.domElement = document.createElement( 'div' );
 		this.domElement.id = 'profiler-shell';
+		this.domElement.classList.add( 'three-inspector' );
 
 		this.toggleButton = document.createElement( 'button' );
 		this.toggleButton.id = 'profiler-toggle';
@@ -877,14 +878,14 @@ export class Profiler extends EventDispatcher {
 
 			if ( isDragging && hasMoved && previewWindow ) {
 
-				if ( previewWindow.parentNode ) {
+				const finalX = parseInt( previewWindow.style.left ) + 200;
+				const finalY = parseInt( previewWindow.style.top ) + 20;
+
+				if ( previewWindow && previewWindow.parentNode ) {
 
 					previewWindow.parentNode.removeChild( previewWindow );
 
 				}
-
-				const finalX = parseInt( previewWindow.style.left ) + 200;
-				const finalY = parseInt( previewWindow.style.top ) + 20;
 
 				this.detachTab( tab, finalX, finalY );
 
@@ -975,7 +976,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.appendChild( windowHeader );
 		windowPanel.appendChild( windowContent );
 
-		document.body.appendChild( windowPanel );
+		this.domElement.appendChild( windowPanel );
 
 		return windowPanel;
 
@@ -1189,7 +1190,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.appendChild( windowHeader );
 		windowPanel.appendChild( windowContent );
 
-		document.body.appendChild( windowPanel );
+		this.domElement.appendChild( windowPanel );
 
 		// Setup window dragging
 		this.setupDetachedWindowDrag( windowPanel, windowHeader, tab );
