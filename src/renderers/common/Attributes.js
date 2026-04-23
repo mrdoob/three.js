@@ -49,6 +49,13 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
+
+			if ( attributeData.onDispose !== undefined ) {
+
+				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+			}
+
 			this.backend.destroyAttribute( attribute );
 
 			this.info.destroyAttribute( attribute );
@@ -69,6 +76,7 @@ class Attributes extends DataMap {
 	update( attribute, type ) {
 
 		const data = this.get( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
 		if ( data.version === undefined ) {
 
@@ -94,11 +102,16 @@ class Attributes extends DataMap {
 
 			}
 
-			data.version = this._getBufferAttribute( attribute ).version;
+			if ( attribute.isBufferAttribute === true ) {
+
+				data.onDispose = () => this.delete( attribute );
+				attribute.addEventListener( 'dispose', data.onDispose );
+
+			}
+
+			data.version = bufferAttribute.version;
 
 		} else {
-
-			const bufferAttribute = this._getBufferAttribute( attribute );
 
 			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
 
