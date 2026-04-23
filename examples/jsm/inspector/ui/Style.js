@@ -2,17 +2,17 @@ export class Style {
 
 	static init( container ) {
 
-		const css = `
+		const css = /* css */`
 @scope (.three-inspector) {
 
 	:scope {
-		--profiler-bg: #1e1e24f5;
-		--profiler-header-bg: #2a2a33aa;
+		--profiler-background: #1e1e24f5;
+		--profiler-header-background: #2a2a33aa;
 		--profiler-header: #2a2a33;
 		--profiler-border: #4a4a5a;
 		--text-primary: #e0e0e0;
 		--text-secondary: #9a9aab;
-		--accent-color: #00aaff;
+		--color-accent: #00aaff;
 		--color-green: #4caf50;
 		--color-yellow: #ffc107;
 		--color-red: #f44336;
@@ -65,12 +65,12 @@ export class Style {
 	}
 
 	.profiler-toggle:hover {
-		border-color: var(--accent-color);
+		border-color: var(--color-accent);
 	}
 
 	.profiler-toggle.panel-open .toggle-icon {
 		background-color: rgba(0, 170, 255, 0.2);
-		color: var(--accent-color);
+		color: var(--color-accent);
 	}
 
 	.toggle-icon {
@@ -142,7 +142,7 @@ export class Style {
 
 	.builtin-tab-btn:hover {
 		background-color: rgba(255, 255, 255, 0.08);
-		color: var(--accent-color);
+		color: var(--color-accent);
 	}
 
 	.builtin-tab-btn:active {
@@ -151,7 +151,7 @@ export class Style {
 
 	.builtin-tab-btn.active {
 		background-color: rgba(0, 170, 255, 0.2);
-		color: var(--accent-color);
+		color: var(--color-accent);
 	}
 
 	.builtin-tab-btn.active:hover {
@@ -319,7 +319,7 @@ export class Style {
 
 	.mini-panel-content .value-number input:focus,
 	.mini-panel-content .value-slider input:focus {
-		border-color: var(--accent-color);
+		border-color: var(--color-accent);
 	}
 
 	.mini-panel-content .value-slider {
@@ -405,7 +405,7 @@ export class Style {
 		left: 0;
 		right: 0;
 		height: 350px;
-		background-color: var(--profiler-bg);
+		background-color: var(--profiler-background);
 		backdrop-filter: blur(8px);
 		border-top: 2px solid var(--profiler-border);
 		color: var(--text-primary);
@@ -554,7 +554,7 @@ export class Style {
 
 	.profiler-header {
 		display: flex;
-		background-color: var(--profiler-header-bg);
+		background-color: var(--profiler-header-background);
 		border-bottom: 1px solid var(--profiler-border);
 		flex-shrink: 0;
 		justify-content: space-between;
@@ -745,7 +745,7 @@ export class Style {
 		right: 0;
 		top: 0;
 		height: 38px;
-		background: var(--profiler-header-bg);
+		background: var(--profiler-header-background);
 		border-bottom: 1px solid var(--profiler-border);
 	}
 
@@ -768,7 +768,7 @@ export class Style {
 	}
 
 	.tab-btn.active {
-		border-bottom: 2px solid var(--accent-color);
+		border-bottom: 2px solid var(--color-accent);
 		color: white;
 	}
 
@@ -927,7 +927,7 @@ export class Style {
 	}
 
 	.list-item-wrapper.header-wrapper>.list-item-row {
-		color: var(--accent-color);
+		color: var(--color-accent);
 		background-color: rgba(0, 170, 255, 0.1);
 	}
 
@@ -1086,7 +1086,7 @@ export class Style {
 	}
 
 	.console-filter-input {
-		background-color: var(--profiler-bg);
+		background-color: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
 		color: var(--text-primary);
 		border-radius: 4px;
@@ -1194,7 +1194,7 @@ export class Style {
 	.param-control input,
 	.param-control select,
 	.param-control button {
-		background-color: var(--profiler-bg);
+		background-color: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
 		color: var(--text-primary);
 		border-radius: 4px;
@@ -1207,7 +1207,7 @@ export class Style {
 
 	.param-control input:focus {
 		outline: none;
-		border-color: var(--accent-color);
+		border-color: var(--color-accent);
 	}
 
 	.param-control select {
@@ -1252,7 +1252,7 @@ export class Style {
 	.custom-checkbox .checkmark {
 		width: 14px;
 		height: 14px;
-		border: 1px solid var(--accent-color);
+		border: 1px solid var(--color-accent);
 		border-radius: 3px;
 		display: inline-flex;
 		justify-content: center;
@@ -1264,7 +1264,7 @@ export class Style {
 		content: '';
 		width: 6px;
 		height: 6px;
-		background-color: var(--accent-color);
+		background-color: var(--color-accent);
 		border-radius: 1px;
 		display: block;
 		transform: scale(0);
@@ -1272,7 +1272,7 @@ export class Style {
 	}
 
 	.custom-checkbox input:checked+.checkmark {
-		border-color: var(--accent-color);
+		border-color: var(--color-accent);
 	}
 
 	.custom-checkbox input:checked+.checkmark::after {
@@ -1297,8 +1297,8 @@ export class Style {
 		appearance: none;
 		width: 18px;
 		height: 18px;
-		background: var(--profiler-bg);
-		border: 1px solid var(--accent-color);
+		background: var(--profiler-background);
+		border: 1px solid var(--color-accent);
 		border-radius: 3px;
 		cursor: pointer;
 		margin-top: -8px;
@@ -1307,8 +1307,8 @@ export class Style {
 	.param-control input[type="range"]::-moz-range-thumb {
 		width: 18px;
 		height: 18px;
-		background: var(--profiler-bg);
-		border: 2px solid var(--accent-color);
+		background: var(--profiler-background);
+		border: 2px solid var(--color-accent);
 		border-radius: 3px;
 		cursor: pointer;
 	}
@@ -1419,7 +1419,7 @@ export class Style {
 	.drag-preview-indicator {
 		position: fixed;
 		background-color: rgba(0, 170, 255, 0.2);
-		border: 2px dashed var(--accent-color);
+		border: 2px dashed var(--color-accent);
 		z-index: 999;
 		pointer-events: none;
 		transition: all 0.2s ease-out;
@@ -1430,7 +1430,7 @@ export class Style {
 		position: fixed;
 		width: 500px;
 		height: 400px;
-		background: var(--profiler-bg);
+		background: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
 		border-radius: 8px;
 		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -1452,7 +1452,7 @@ export class Style {
 	}
 
 	.detached-tab-header {
-		background: var(--profiler-header-bg);
+		background: var(--profiler-header-background);
 		padding: 0 7px 0 15px;
 		font-family: var(--font-family);
 		font-size: 14px;
@@ -1500,14 +1500,14 @@ export class Style {
 
 	.detached-reattach-btn:hover {
 		background: rgba(0, 170, 255, 0.2);
-		color: var(--accent-color);
+		color: var(--color-accent);
 	}
 
 	.detached-tab-content {
 		flex: 1;
 		overflow: auto;
 		position: relative;
-		background: var(--profiler-bg);
+		background: var(--profiler-background);
 	}
 
 	.detached-tab-content::-webkit-scrollbar {
@@ -1572,7 +1572,7 @@ export class Style {
 
 	.detached-tab-resizer:hover::after {
 		opacity: 1;
-		border-color: var(--accent-color);
+		border-color: var(--color-accent);
 	}
 
 	/* Edge resizers */

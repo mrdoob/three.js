@@ -237,7 +237,7 @@ export class Profiler extends EventDispatcher {
 	setupShell() {
 
 		this.domElement = document.createElement( 'div' );
-		this.domElement.classList.add( 'profiler-shell' );
+
 		this.domElement.classList.add( 'three-inspector' );
 
 		this.toggleButton = document.createElement( 'button' );
