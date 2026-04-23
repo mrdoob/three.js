@@ -27,8 +27,27 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls, loader;
+
+			let model;
+
+			const params = {
+				asset: 'benchy'
+			};
+
+			const assets = [
+				'benchy',
+				'test_m82',
+				'test_m83',
+			];
+
+			const positions = [
+				new THREE.Vector3( - 100, - 20, 100 ),
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( 0, 0, 0 ),
+			];
 
 			init();
 			render();
@@ -40,27 +59,58 @@
 
 				scene = new THREE.Scene();
 
-				const loader = new GCodeLoader();
-				loader.load( 'models/gcode/benchy.gcode', function ( object ) {
-
-					object.position.set( - 100, - 20, 100 );
-					scene.add( object );
-
-					render();
-
-				} );
+				loader = new GCodeLoader();
+				loadAsset( params.asset );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 100;
 
 				window.addEventListener( 'resize', resize );
+
+				const gui = new GUI();
+
+			
+				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+
+					if ( model ) {
+
+						model.traverse( function ( object ) {
+
+							if ( object.material ) object.material.dispose();
+							if ( object.geometry ) object.geometry.dispose();
+
+						} );
+
+						scene.remove( model );
+
+					}
+
+					loadAsset( value );
+
+				} );
+
+				gui.open();
+
+
+			}
+
+			function loadAsset( asset ) {
+
+				loader.load( 'models/gcode/' + asset + '.gcode', function ( object ) {
+
+					model = object;
+					model.position.copy( positions[ assets.indexOf( asset ) ] );
+					scene.add( model );
+					controls.reset();
+
+				} );
 
 			}
 

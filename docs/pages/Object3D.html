@@ -103,7 +103,8 @@ used to filter out unwanted objects in ray-intersection tests when using <a href
 					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>When set to <code>true</code>, the engine automatically computes the local matrix from position,
-rotation and scale every frame.</p>
+rotation and scale every frame. If set to <code>false</code>, the app is responsible for recomputing
+the local matrix by calling <code>updateMatrix()</code>.</p>
 <p>The default values for all 3D objects is defined by <code>Object3D.DEFAULT_MATRIX_AUTO_UPDATE</code>.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
@@ -119,7 +120,8 @@ If the 3D object has no parent, then it's identical to the local transformation 
 					<h3 class="name" id="matrixWorldAutoUpdate" translate="no">.<a href="#matrixWorldAutoUpdate">matrixWorldAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>When set to <code>true</code>, the engine automatically computes the world matrix from the current local
-matrix and the object's transformation hierarchy.</p>
+matrix and the object's transformation hierarchy. If set to <code>false</code>, the app is responsible for
+recomputing the world matrix by directly updating the <code>matrixWorld</code> property.</p>
 <p>The default values for all 3D objects is defined by <code>Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE</code>.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
@@ -154,6 +156,15 @@ to <code>false</code>.</p>
 					<h3 class="name" id="parent" translate="no">.<a href="#parent">parent</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
 					<div class="description">
 						<p>A reference to the parent object.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pivot" translate="no">.<a href="#pivot">pivot</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The pivot point for rotation and scale transformations.
+When set, rotation and scale are applied around this point
+instead of the object's origin.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -200,6 +211,17 @@ render order.</p>
 					<div class="description">
 						<p>Represents the object's local scale.</p>
 						<p>Default is <code>(1,1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="static" translate="no">.<a href="#static">static</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the 3D object is supposed to be static or not. If set to <code>true</code>, it means
+the 3D object is not going to be changed after the initial renderer. This includes
+geometry and material settings. A static 3D object can be processed by the renderer
+slightly faster since certain state checks can be bypassed.</p>
+<p>Only relevant in context of <a href="WebGPURenderer.html">WebGPURenderer</a>.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -273,7 +295,7 @@ removed, since an object can have at most one parent.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to add.</p>
@@ -300,7 +322,7 @@ rotation and scale.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>matrix</strong>
+										<strong translate="no">matrix</strong>
 									</td>
 									<td class="description last">
 										<p>The transformation matrix.</p>
@@ -318,7 +340,7 @@ rotation and scale.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>q</strong>
+										<strong translate="no">q</strong>
 									</td>
 									<td class="description last">
 										<p>The quaternion.</p>
@@ -340,7 +362,7 @@ transform. This method does not support scene graphs having non-uniformly-scaled
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to attach.</p>
@@ -380,7 +402,7 @@ transform. This method does not support scene graphs having non-uniformly-scaled
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>recursive</strong>
+										<strong translate="no">recursive</strong>
 									</td>
 									<td class="description last">
 										<p>When set to <code>true</code>, descendants of the 3D object are also cloned.</p>
@@ -402,7 +424,7 @@ transform. This method does not support scene graphs having non-uniformly-scaled
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>source</strong>
+										<strong translate="no">source</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to copy.</p>
@@ -410,7 +432,7 @@ transform. This method does not support scene graphs having non-uniformly-scaled
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>recursive</strong>
+										<strong translate="no">recursive</strong>
 									</td>
 									<td class="description last">
 										<p>When set to <code>true</code>, descendants of the 3D object are cloned.</p>
@@ -433,7 +455,7 @@ itself, and returns the first with a matching ID.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>id</strong>
+										<strong translate="no">id</strong>
 									</td>
 									<td class="description last">
 										<p>The id.</p>
@@ -455,7 +477,7 @@ itself, and returns the first with a matching name.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name.</p>
@@ -477,7 +499,7 @@ itself, and returns the first with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the property.</p>
@@ -485,7 +507,7 @@ itself, and returns the first with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value.</p>
@@ -507,7 +529,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the property.</p>
@@ -515,7 +537,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value.</p>
@@ -523,7 +545,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>result</strong>
+										<strong translate="no">result</strong>
 									</td>
 									<td class="description last">
 										<p>The method stores the result in this array.</p>
@@ -544,7 +566,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target vector the result is stored to.</p>
@@ -565,7 +587,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target vector the result is stored to.</p>
@@ -586,7 +608,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target Quaternion the result is stored to.</p>
@@ -607,7 +629,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target vector the result is stored to.</p>
@@ -628,7 +650,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>vector</strong>
+										<strong translate="no">vector</strong>
 									</td>
 									<td class="description last">
 										<p>The vector to convert.</p>
@@ -650,7 +672,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>x</strong>
+										<strong translate="no">x</strong>
 									</td>
 									<td class="description last">
 										<p>The x coordinate in world space. Alternatively, a vector representing a position in world space</p>
@@ -658,7 +680,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>y</strong>
+										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
 										<p>The y coordinate in world space.</p>
@@ -666,7 +688,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>z</strong>
+										<strong translate="no">z</strong>
 									</td>
 									<td class="description last">
 										<p>The z coordinate in world space.</p>
@@ -684,7 +706,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -692,7 +714,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -700,7 +722,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -708,7 +730,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's geometry.</p>
@@ -716,7 +738,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's material.</p>
@@ -724,7 +746,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry group data.</p>
@@ -742,7 +764,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -750,7 +772,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -758,7 +780,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -766,7 +788,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCamera</strong>
+										<strong translate="no">shadowCamera</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow camera.</p>
@@ -774,7 +796,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's geometry.</p>
@@ -782,7 +804,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthMaterial</strong>
+										<strong translate="no">depthMaterial</strong>
 									</td>
 									<td class="description last">
 										<p>The depth material.</p>
@@ -790,7 +812,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry group data.</p>
@@ -808,7 +830,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -816,7 +838,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -824,7 +846,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -832,7 +854,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's geometry.</p>
@@ -840,7 +862,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's material.</p>
@@ -848,7 +870,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry group data.</p>
@@ -866,7 +888,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -874,7 +896,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -882,7 +904,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera that is used to render the scene.</p>
@@ -890,7 +912,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowCamera</strong>
+										<strong translate="no">shadowCamera</strong>
 									</td>
 									<td class="description last">
 										<p>The shadow camera.</p>
@@ -898,7 +920,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object's geometry.</p>
@@ -906,7 +928,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthMaterial</strong>
+										<strong translate="no">depthMaterial</strong>
 									</td>
 									<td class="description last">
 										<p>The depth material.</p>
@@ -914,7 +936,7 @@ itself, and returns all 3D objects with a matching property value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>group</strong>
+										<strong translate="no">group</strong>
 									</td>
 									<td class="description last">
 										<p>The geometry group data.</p>
@@ -934,7 +956,7 @@ implement this method in order to use raycasting.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>raycaster</strong>
+										<strong translate="no">raycaster</strong>
 									</td>
 									<td class="description last">
 										<p>The raycaster.</p>
@@ -942,7 +964,7 @@ implement this method in order to use raycasting.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>intersects</strong>
+										<strong translate="no">intersects</strong>
 									</td>
 									<td class="description last">
 										<p>An array holding the result of the method.</p>
@@ -961,7 +983,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object to remove.</p>
@@ -1001,7 +1023,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>axis</strong>
+										<strong translate="no">axis</strong>
 									</td>
 									<td class="description last">
 										<p>The (normalized) axis vector.</p>
@@ -1009,7 +1031,7 @@ An arbitrary number of objects may be removed.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1030,7 +1052,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>axis</strong>
+										<strong translate="no">axis</strong>
 									</td>
 									<td class="description last">
 										<p>The (normalized) axis vector.</p>
@@ -1038,7 +1060,7 @@ An arbitrary number of objects may be removed.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1059,7 +1081,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1080,7 +1102,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1101,7 +1123,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1122,7 +1144,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>axis</strong>
+										<strong translate="no">axis</strong>
 									</td>
 									<td class="description last">
 										<p>The (normalized) axis vector.</p>
@@ -1130,7 +1152,7 @@ An arbitrary number of objects may be removed.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>angle</strong>
+										<strong translate="no">angle</strong>
 									</td>
 									<td class="description last">
 										<p>The angle in radians.</p>
@@ -1148,7 +1170,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>euler</strong>
+										<strong translate="no">euler</strong>
 									</td>
 									<td class="description last">
 										<p>The Euler angles.</p>
@@ -1166,7 +1188,7 @@ An arbitrary number of objects may be removed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>m</strong>
+										<strong translate="no">m</strong>
 									</td>
 									<td class="description last">
 										<p>Although a 4x4 matrix is expected, the upper 3x3 portion must be
@@ -1185,7 +1207,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>q</strong>
+										<strong translate="no">q</strong>
 									</td>
 									<td class="description last">
 										<p>The Quaternion</p>
@@ -1203,7 +1225,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>meta</strong>
+										<strong translate="no">meta</strong>
 									</td>
 									<td class="description last">
 										<p>An optional value holding meta information about the serialization.</p>
@@ -1232,7 +1254,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>axis</strong>
+										<strong translate="no">axis</strong>
 									</td>
 									<td class="description last">
 										<p>The (normalized) axis vector.</p>
@@ -1240,7 +1262,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>distance</strong>
+										<strong translate="no">distance</strong>
 									</td>
 									<td class="description last">
 										<p>The distance in world units.</p>
@@ -1261,7 +1283,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>distance</strong>
+										<strong translate="no">distance</strong>
 									</td>
 									<td class="description last">
 										<p>The distance in world units.</p>
@@ -1282,7 +1304,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>distance</strong>
+										<strong translate="no">distance</strong>
 									</td>
 									<td class="description last">
 										<p>The distance in world units.</p>
@@ -1303,7 +1325,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>distance</strong>
+										<strong translate="no">distance</strong>
 									</td>
 									<td class="description last">
 										<p>The distance in world units.</p>
@@ -1325,7 +1347,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>A callback function that allows to process the current 3D object.</p>
@@ -1344,7 +1366,7 @@ a pure rotation matrix (i.e, unscaled).</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>A callback function that allows to process the current 3D object.</p>
@@ -1364,7 +1386,7 @@ Descendants of invisible 3D objects are not traversed.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>A callback function that allows to process the current 3D object.</p>
@@ -1393,11 +1415,11 @@ local space. The computation of the local and world matrix can be controlled wit
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>force</strong>
+										<strong translate="no">force</strong>
 									</td>
 									<td class="description last">
 										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
-when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+when <a href="Object3D.html#matrixWorldNeedsUpdate">Object3D#matrixWorldNeedsUpdate</a> is <code>false</code>.</p>
 										<p>Default is <code>false</code>.</p>
 									</td>
 								</tr>
@@ -1414,7 +1436,7 @@ update of ancestor and descendant nodes.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>updateParents</strong>
+										<strong translate="no">updateParents</strong>
 									</td>
 									<td class="description last">
 										<p>Whether ancestor nodes should be updated or not.</p>
@@ -1423,7 +1445,7 @@ update of ancestor and descendant nodes.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>updateChildren</strong>
+										<strong translate="no">updateChildren</strong>
 									</td>
 									<td class="description last">
 										<p>Whether descendant nodes should be updated or not.</p>
@@ -1436,13 +1458,13 @@ update of ancestor and descendant nodes.</p>
 					<h3 class="name name-method" id="worldToLocal" translate="no">.<a href="#worldToLocal">worldToLocal</a><span class="signature">( vector : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Converts the given vector from this 3D object's word space to local space.</p>
+							<p>Converts the given vector from this 3D object's world space to local space.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>vector</strong>
+										<strong translate="no">vector</strong>
 									</td>
 									<td class="description last">
 										<p>The vector to convert.</p>

@@ -8,7 +8,7 @@ export class List {
 		this.domElement = document.createElement( 'div' );
 		this.domElement.className = 'list-container';
 		this.domElement.style.padding = '10px';
-		this.id = `list-${Math.random().toString( 36 ).substr( 2, 9 )}`;
+		this.id = `list-${Math.random().toString( 36 ).slice( 2, 11 )}`;
 		this.domElement.dataset.listId = this.id;
 
 		this.gridStyleElement = document.createElement( 'style' );

@@ -27,7 +27,7 @@ represent the shadow configuration for different light types.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The light's view of the world.</p>
@@ -54,6 +54,14 @@ when deciding whether a surface is in shadow.</p>
 <p>The default is <code>0</code>. Very tiny adjustments here (in the order of <code>0.0001</code>)
 may help reduce artifacts in shadows.</p>
 						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="biasNode" translate="no">.<a href="#biasNode">biasNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>A node version of <code>bias</code>. Only supported with <code>WebGPURenderer</code>.</p>
+<p>If a bias node is defined, <code>bias</code> has no effect.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -165,7 +173,7 @@ become visible.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>source</strong>
+										<strong translate="no">source</strong>
 									</td>
 									<td class="description last">
 										<p>The light shadow to copy.</p>
@@ -211,7 +219,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>viewportIndex</strong>
+										<strong translate="no">viewportIndex</strong>
 									</td>
 									<td class="description last">
 										<p>The viewport index.</p>
@@ -259,7 +267,7 @@ to be rendered for this shadow.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>light</strong>
+										<strong translate="no">light</strong>
 									</td>
 									<td class="description last">
 										<p>The light for which the shadow is being rendered.</p>

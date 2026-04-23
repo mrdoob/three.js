@@ -1,4 +1,12 @@
 import { error } from '../../utils.js';
+import {
+	ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType,
+	IntType, UnsignedIntType, FloatType,
+	AlphaFormat, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat,
+	RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat,
+	UnsignedShort4444Type, UnsignedShort5551Type,
+	UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type
+} from '../../constants.js';
 
 /**
  * This renderer module provides a series of statistical information
@@ -86,13 +94,55 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
+		 * @property {number} attributes - The number of active attributes.
+		 * @property {number} attributesSize - The memory size of active attributes in bytes.
 		 * @property {number} geometries - The number of active geometries.
-		 * @property {number} frameCalls - The number of active textures.
+		 * @property {number} indexAttributes - The number of active index attributes.
+		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
+		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
+		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
+		 * @property {number} programs - The number of active programs.
+		 * @property {number} programsSize - The memory size of active programs in bytes.
+		 * @property {number} readbackBuffers - The number of active readback buffers.
+		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} renderTargets - The number of active renderTargets.
+		 * @property {number} storageAttributes - The number of active storage attributes.
+		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} textures - The number of active textures.
+		 * @property {number} texturesSize - The memory size of active textures in bytes.
+		 * @property {number} uniformBuffers - The number of active uniform buffers.
+		 * @property {number} uniformBuffersSize - The memory size of active uniform buffers in bytes.
+		 * @property {number} total - The total memory size in bytes.
 		 */
 		this.memory = {
+			attributes: 0,
+			attributesSize: 0,
 			geometries: 0,
-			textures: 0
+			indexAttributes: 0,
+			indexAttributesSize: 0,
+			indirectStorageAttributes: 0,
+			indirectStorageAttributesSize: 0,
+			programs: 0,
+			programsSize: 0,
+			readbackBuffers: 0,
+			readbackBuffersSize: 0,
+			renderTargets: 0,
+			storageAttributes: 0,
+			storageAttributesSize: 0,
+			textures: 0,
+			texturesSize: 0,
+			uniformBuffers: 0,
+			uniformBuffersSize: 0,
+			total: 0
 		};
+
+		/**
+		 * Map for storing calculated byte sizes of tracked objects.
+		 *
+		 * @type {Map<Object, number>}
+		 * @private
+		 */
+		this.memoryMap = new Map();
 
 	}
 
@@ -161,8 +211,328 @@ class Info {
 
 		this.render.timestamp = 0;
 		this.compute.timestamp = 0;
-		this.memory.geometries = 0;
-		this.memory.textures = 0;
+
+		for ( const prop in this.memory ) {
+
+			this.memory[ prop ] = 0;
+
+		}
+
+		this.memoryMap.clear();
+
+	}
+
+	/**
+	 * Tracks texture memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Texture} texture
+	 */
+	createTexture( texture ) {
+
+		const size = this._getTextureMemorySize( texture );
+		this.memoryMap.set( texture, size );
+
+		this.memory.textures ++;
+		this.memory.total += size;
+		this.memory.texturesSize += size;
+
+	}
+
+	/**
+	 * Tracks texture memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Texture} texture
+	 */
+	destroyTexture( texture ) {
+
+		const size = this.memoryMap.get( texture ) || 0;
+		this.memoryMap.delete( texture );
+
+		this.memory.textures --;
+		this.memory.total -= size;
+		this.memory.texturesSize -= size;
+
+	}
+
+	/**
+	 * Tracks attribute memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {BufferAttribute} attribute
+	 * @param {string} type - type of attribute
+	 * @private
+	 */
+	_createAttribute( attribute, type ) {
+
+		const size = this._getAttributeMemorySize( attribute );
+		this.memoryMap.set( attribute, { size, type } );
+
+		this.memory[ type ] ++;
+		this.memory.total += size;
+		this.memory[ type + 'Size' ] += size;
+
+	}
+
+	/**
+	 * Tracks a regular attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to track.
+	 */
+	createAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'attributes' );
+
+	}
+
+	/**
+	 * Tracks an index attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The index attribute to track.
+	 */
+	createIndexAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'indexAttributes' );
+
+	}
+
+	/**
+	 * Tracks a storage attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The storage attribute to track.
+	 */
+	createStorageAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'storageAttributes' );
+
+	}
+
+	/**
+	 * Tracks an indirect storage attribute memory explicitly.
+	 *
+	 * @param {BufferAttribute} attribute - The indirect storage attribute to track.
+	 */
+	createIndirectStorageAttribute( attribute ) {
+
+		this._createAttribute( attribute, 'indirectStorageAttributes' );
+
+	}
+
+	/**
+	 * Tracks attribute memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {BufferAttribute} attribute
+	 */
+	destroyAttribute( attribute ) {
+
+		const data = this.memoryMap.get( attribute );
+
+		if ( data ) {
+
+			this.memoryMap.delete( attribute );
+
+			this.memory[ data.type ] --;
+			this.memory.total -= data.size;
+			this.memory[ data.type + 'Size' ] -= data.size;
+
+		}
+
+	}
+
+	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	createReadbackBuffer( readbackBuffer ) {
+
+		const maxByteLength = readbackBuffer.maxByteLength;
+		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
+
+		this.memory.readbackBuffers ++;
+		this.memory.total += maxByteLength;
+		this.memory.readbackBuffersSize += maxByteLength;
+
+	}
+
+	/**
+	 * Tracks a readback buffer memory explicitly.
+	 *
+	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer to track.
+	 */
+	destroyReadbackBuffer( readbackBuffer ) {
+
+		const { size } = this.memoryMap.get( readbackBuffer );
+		this.memoryMap.delete( readbackBuffer );
+
+		this.memory.readbackBuffers --;
+		this.memory.total -= size;
+		this.memory.readbackBuffersSize -= size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const size = uniformBuffer.byteLength;
+		this.memoryMap.set( uniformBuffer, { size, type: 'uniformBuffers' } );
+
+		this.memory.uniformBuffers ++;
+		this.memory.total += size;
+		this.memory.uniformBuffersSize += size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const data = this.memoryMap.get( uniformBuffer );
+
+		if ( data ) {
+
+			this.memoryMap.delete( uniformBuffer );
+
+			this.memory.uniformBuffers --;
+			this.memory.total -= data.size;
+			this.memory.uniformBuffersSize -= data.size;
+
+		}
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {ProgrammableStage} program - The program to track.
+	 */
+	createProgram( program ) {
+
+		const size = program.code.length; // Approx size
+
+		this.memoryMap.set( program, size );
+
+		this.memory.programs ++;
+		this.memory.total += size;
+		this.memory.programsSize += size;
+
+	}
+
+	/**
+	 * Tracks program memory explicitly, updating counts and byte tracking.
+	 *
+	 * @param {Object} program - The program to track.
+	 */
+	destroyProgram( program ) {
+
+		const size = this.memoryMap.get( program ) || 0;
+		this.memoryMap.delete( program );
+
+		this.memory.programs --;
+		this.memory.total -= size;
+		this.memory.programsSize -= size;
+
+	}
+
+	/**
+	 * Calculates the memory size of a texture in bytes.
+	 *
+	 * @param {Texture} texture - The texture to calculate the size for.
+	 * @return {number} The calculated size in bytes.
+	 * @private
+	 */
+	_getTextureMemorySize( texture ) {
+
+		if ( texture.isCompressedTexture ) {
+
+			return 1; // Fallback estimate since exact format decompressed isn't readily available without format maps
+
+		}
+
+		let bytesPerChannel = 1;
+
+		if ( texture.type === ByteType || texture.type === UnsignedByteType ) bytesPerChannel = 1;
+		else if ( texture.type === ShortType || texture.type === UnsignedShortType || texture.type === HalfFloatType ) bytesPerChannel = 2;
+		else if ( texture.type === IntType || texture.type === UnsignedIntType || texture.type === FloatType ) bytesPerChannel = 4;
+
+		let channels = 4; // RGBA default
+
+		if ( texture.format === AlphaFormat || texture.format === RedFormat || texture.format === RedIntegerFormat || texture.format === DepthFormat || texture.format === DepthStencilFormat ) channels = 1;
+		else if ( texture.format === RGFormat || texture.format === RGIntegerFormat ) channels = 2;
+		else if ( texture.format === RGBFormat || texture.format === RGBIntegerFormat ) channels = 3;
+
+		let bytesPerPixel = bytesPerChannel * channels;
+
+		// Packed overrides
+		if ( texture.type === UnsignedShort4444Type || texture.type === UnsignedShort5551Type ) bytesPerPixel = 2;
+		else if ( texture.type === UnsignedInt248Type || texture.type === UnsignedInt5999Type || texture.type === UnsignedInt101111Type ) bytesPerPixel = 4;
+
+		const width = texture.width || 1;
+		const height = texture.height || 1;
+		const depth = texture.isCubeTexture ? 6 : ( texture.depth || 1 );
+
+		let size = width * height * depth * bytesPerPixel;
+		const mipmaps = texture.mipmaps;
+
+		if ( mipmaps && mipmaps.length > 0 ) {
+
+			let mipmapSize = 0;
+			for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+				const mipmap = mipmaps[ i ];
+				if ( mipmap.data ) {
+
+					mipmapSize += mipmap.data.byteLength;
+
+				} else {
+
+					const mipWidth = mipmap.width || Math.max( 1, width >> i );
+					const mipHeight = mipmap.height || Math.max( 1, height >> i );
+					mipmapSize += mipWidth * mipHeight * depth * bytesPerPixel;
+
+				}
+
+			}
+
+			size += mipmapSize;
+
+		} else if ( texture.generateMipmaps ) {
+
+			size = size * 1.333; // MiP chain approximation
+
+		}
+
+		return Math.round( size );
+
+	}
+
+	/**
+	 * Calculates the memory size of an attribute in bytes.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to calculate the size for.
+	 * @return {number} The calculated size in bytes.
+	 * @private
+	 */
+	_getAttributeMemorySize( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		if ( attribute.array ) {
+
+			return attribute.array.byteLength;
+
+		} else if ( attribute.count && attribute.itemSize ) {
+
+			return attribute.count * attribute.itemSize * 4; // Assume Float32
+
+		}
+
+		return 0;
 
 	}
 

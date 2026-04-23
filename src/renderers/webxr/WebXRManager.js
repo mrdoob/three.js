@@ -749,8 +749,8 @@ class WebXRManager extends EventDispatcher {
 
 			// inherit camera layers and enable eye layers (1 = left, 2 = right)
 			cameraXR.layers.mask = camera.layers.mask | 0b110;
-			cameraL.layers.mask = cameraXR.layers.mask & 0b011;
-			cameraR.layers.mask = cameraXR.layers.mask & 0b101;
+			cameraL.layers.mask = cameraXR.layers.mask & ~ 0b100;
+			cameraR.layers.mask = cameraXR.layers.mask & ~ 0b010;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;

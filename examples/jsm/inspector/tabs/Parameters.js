@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan } from '../ui/utils.js';
-import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
+import { ValueString, ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
 
@@ -12,6 +12,8 @@ class ParametersGroup {
 		this.name = name;
 
 		this.paramList = new Item( name );
+
+		this.objects = [];
 
 	}
 
@@ -49,6 +51,10 @@ class ParametersGroup {
 		} else if ( type === 'boolean' ) {
 
 			item = this.addBoolean( object, property );
+
+		} else if ( type === 'string' ) {
+
+			item = this.addString( object, property );
 
 		} else if ( type === 'function' ) {
 
@@ -92,6 +98,43 @@ class ParametersGroup {
 			return editor;
 
 		};
+
+
+		this._registerParameter( object, property, editor, subItem );
+
+	}
+
+	_registerParameter( object, property, editor, subItem ) {
+
+		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
+
+	}
+
+	addString( object, property ) {
+
+		const value = object[ property ];
+
+		const editor = new ValueString( { value } );
+		editor.addEventListener( 'change', ( { value } ) => {
+
+			object[ property ] = value;
+
+		} );
+
+		const description = createValueSpan();
+		description.textContent = property;
+
+		const subItem = new Item( description, editor.domElement );
+		this.paramList.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
+		// extend object property
+
+		this._addParameter( object, property, editor, subItem );
+
+		return editor;
 
 	}
 
@@ -291,6 +334,8 @@ class ParametersGroup {
 
 		};
 
+		this._registerParameter( object, property, editor, subItem );
+
 		return editor;
 
 	}
@@ -301,7 +346,7 @@ class Parameters extends Tab {
 
 	constructor( options = {} ) {
 
-		super( 'Parameters', options );
+		super( options.name || 'Parameters', options );
 
 		const paramList = new List( 'Property', 'Value' );
 		paramList.domElement.classList.add( 'parameters' );
@@ -315,6 +360,8 @@ class Parameters extends Tab {
 
 		this.paramList = paramList;
 
+		this.groups = [];
+
 	}
 
 	createGroup( name ) {
@@ -322,6 +369,7 @@ class Parameters extends Tab {
 		const group = new ParametersGroup( this, name );
 
 		this.paramList.add( group.paramList );
+		this.groups.push( group );
 
 		return group;
 

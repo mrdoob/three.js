@@ -46,7 +46,7 @@
 
 
 			let camera;
-			let postProcessing, renderer, mixer, clock;
+			let renderPipeline, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -59,7 +59,8 @@
 
 			async function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -94,14 +95,14 @@
 
 				//
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 
 				const bloomPass = bloom( scenePassColor ).toInspector( 'Bloom' );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				//
 
@@ -160,11 +161,13 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

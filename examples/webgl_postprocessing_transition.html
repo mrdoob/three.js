@@ -37,7 +37,8 @@
 			let renderer, composer, renderTransitionPass;
 
 			const textures = [];
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const params = {
 				sceneAnimate: true,
@@ -116,10 +117,12 @@
 
 			function animate() {
 
+				timer.update();
+
 				// Transition animation
 				if ( params.transitionAnimate ) TWEEN.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 				fxSceneA.update( delta );
 				fxSceneB.update( delta );
 

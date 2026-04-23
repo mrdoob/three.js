@@ -63,7 +63,7 @@
 				'NightLUT': null
 			};
 
-			let camera, scene, renderer, postProcessing, controls, lutPass;
+			let camera, scene, renderer, renderPipeline, controls, lutPass;
 
 			init();
 
@@ -207,12 +207,12 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// ignore default output color transform ( toneMapping and outputColorSpace )
 				// use renderOutput() for control the sequence
 
-				postProcessing.outputColorTransform = false;
+				renderPipeline.outputColorTransform = false;
 
 				// scene pass
 
@@ -222,7 +222,7 @@
 				const lut = lutMap[ params.lut ];
 				lutPass = lut3D( outputPass, texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
 
-				postProcessing.outputNode = lutPass;
+				renderPipeline.outputNode = lutPass;
 
 				// controls
 
@@ -265,7 +265,7 @@
 
 				}
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

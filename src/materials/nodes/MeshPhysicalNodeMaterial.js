@@ -502,6 +502,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.specularIntensityNode = source.specularIntensityNode;
 		this.specularColorNode = source.specularColorNode;
 
+		this.iorNode = source.iorNode;
+
 		this.transmissionNode = source.transmissionNode;
 		this.thicknessNode = source.thicknessNode;
 		this.attenuationDistanceNode = source.attenuationDistanceNode;

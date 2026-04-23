@@ -45,7 +45,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 
 			const params = {
 				resolutionScale: 0.2
@@ -104,9 +104,9 @@
 				const anamorphicPass = anamorphic( scenePass.getTextureNode().toInspector( 'Color' ), threshold, scaleNode, samples ).toInspector( 'Anamorphic' );
 				anamorphicPass.resolutionScale = params.resolutionScale; // 1 = full resolution
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePass.add( anamorphicPass.mul( intensity ) );
-				//postProcessing.outputNode = scenePass.add( anamorphicPass.getTextureNode().gaussianBlur() );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = scenePass.add( anamorphicPass.mul( intensity ) );
+				//renderPipeline.outputNode = scenePass.add( anamorphicPass.getTextureNode().gaussianBlur() );
 
 				// gui
 
@@ -135,7 +135,7 @@
 
 			function render() {
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -46,7 +46,7 @@
 			import TWEEN from 'three/addons/libs/tween.module.js';
 
 			let camera, scene, renderer;
-			let postProcessing;
+			let renderPipeline;
 			let controls;
 
 			// below uniforms will be animated via TWEEN.js
@@ -71,7 +71,7 @@
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.zoom = 1.5;
 				sunLight.shadow.mapSize.set( 1024, 1024 );
-				sunLight.shadow.bias = - 0.0001;
+				sunLight.shadow.bias = - 0.0001; // remove self-shadowing artifacts
 				scene.add( sunLight );
 
 				const backLight = new THREE.DirectionalLight( 0x0487e2, 0.5 );
@@ -155,8 +155,8 @@
 
 				const vignette = screenUV.distance( .5 ).mul( 1.25 ).clamp().oneMinus().sub( 0.2 );
 
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = blendOverlay( scenePassColorBlurred, vignette );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = blendOverlay( scenePassColorBlurred, vignette );
 
 				// tweens
 
@@ -194,7 +194,7 @@
 
 				TWEEN.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

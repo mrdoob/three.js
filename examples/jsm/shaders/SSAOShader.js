@@ -79,6 +79,16 @@ const SSAOShader = {
 
 		#include <packing>
 
+		#ifdef USE_REVERSED_DEPTH_BUFFER
+
+			const float depthThreshold = 0.0;
+
+		#else
+
+			const float depthThreshold = 1.0;
+
+		#endif
+
 		float getDepth( const in vec2 screenPosition ) {
 
 			return texture2D( tDepth, screenPosition ).x;
@@ -137,7 +147,7 @@ const SSAOShader = {
 
 			float depth = getDepth( vUv );
 
-			if ( depth == 1.0 ) {
+			if ( depth == depthThreshold ) {
 
 				gl_FragColor = vec4( 1.0 ); // don't influence background
 

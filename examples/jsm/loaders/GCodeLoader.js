@@ -94,7 +94,7 @@ class GCodeLoader extends Loader {
 	 */
 	parse( data ) {
 
-		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
+		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false, extrusionOverride: false, extrusionRelative: false };
 		const layers = [];
 
 		let currentLayer = undefined;
@@ -147,6 +147,14 @@ class GCodeLoader extends Loader {
 
 		}
 
+		function absoluteExtrusion( v1, v2 ) {
+
+			const relative = state.extrusionOverride ? state.extrusionRelative : state.relative;
+
+			return relative ? v1 + v2 : v2;
+
+		}
+
 		const lines = data.replace( /;.+/g, '' ).split( '\n' );
 
 		for ( let i = 0; i < lines.length; i ++ ) {
@@ -172,13 +180,13 @@ class GCodeLoader extends Loader {
 			//G0/G1 – Linear Movement
 			if ( cmd === 'G0' || cmd === 'G1' ) {
 
-				const line = {
-					x: args.x !== undefined ? absolute( state.x, args.x ) : state.x,
-					y: args.y !== undefined ? absolute( state.y, args.y ) : state.y,
-					z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
-					e: args.e !== undefined ? absolute( state.e, args.e ) : state.e,
-					f: args.f !== undefined ? absolute( state.f, args.f ) : state.f,
-				};
+				const line = Object.assign( {}, state ); // clone state
+
+				if ( args.x !== undefined ) line.x = absolute( state.x, args.x );
+				if ( args.y !== undefined ) line.y = absolute( state.y, args.y );
+				if ( args.z !== undefined ) line.z = absolute( state.z, args.z );
+				if ( args.e !== undefined ) line.e = absoluteExtrusion( state.e, args.e );
+				if ( args.f !== undefined ) line.f = absolute( state.f, args.f );
 
 				//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
 				if ( delta( state.e, line.e ) > 0 ) {
@@ -206,10 +214,28 @@ class GCodeLoader extends Loader {
 				//G90: Set to Absolute Positioning
 				state.relative = false;
 
+				// reset M82/M83 extrusion override
+				state.extrusionOverride = false;
+
 			} else if ( cmd === 'G91' ) {
 
 				//G91: Set to state.relative Positioning
 				state.relative = true;
+
+				// reset M82/M83 extrusion override
+				state.extrusionOverride = false;
+
+			} else if ( cmd === 'M82' ) {
+
+				//M82: Override G91 and put the E axis into absolute mode independent of the other axes
+				state.extrusionOverride = true;
+				state.extrusionRelative = false;
+
+			} else if ( cmd === 'M83' ) {
+
+				//M83: Overrides G90 and put the E axis into relative mode independent of the other axes
+				state.extrusionOverride = true;
+				state.extrusionRelative = true;
 
 			} else if ( cmd === 'G92' ) {
 

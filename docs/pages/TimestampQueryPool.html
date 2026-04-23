@@ -26,7 +26,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>maxQueries</strong>
+										<strong translate="no">maxQueries</strong>
 									</td>
 									<td class="description last">
 										<p>Maximum number of queries this pool can hold.</p>
@@ -61,7 +61,7 @@
 				<div class="member">
 					<h3 class="name" id="lastValue" translate="no">.<a href="#lastValue">lastValue</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>The total frame duration until the next update.</p>
 						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
@@ -73,9 +73,11 @@
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="pendingResolve" translate="no">.<a href="#pendingResolve">pendingResolve</a><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name" id="pendingResolve" translate="no">.<a href="#pendingResolve">pendingResolve</a><span class="type-signature"> : boolean | Promise.&lt;number></span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>This property is used to avoid multiple concurrent resolve operations.
+The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds
+the promise of the current resolve operation.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
@@ -108,7 +110,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>uid</strong>
+										<strong translate="no">uid</strong>
 									</td>
 									<td class="description last">
 										<p>A unique identifier for the render context.</p>
@@ -116,7 +118,7 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>frameId</strong>
+										<strong translate="no">frameId</strong>
 									</td>
 									<td class="description last">
 										<p>The current frame identifier.</p>
@@ -140,7 +142,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>uid</strong>
+										<strong translate="no">uid</strong>
 									</td>
 									<td class="description last">
 										<p>A unique identifier for the render context.</p>
@@ -170,7 +172,7 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>uid</strong>
+										<strong translate="no">uid</strong>
 									</td>
 									<td class="description last">
 										<p>A unique identifier for the render context.</p>

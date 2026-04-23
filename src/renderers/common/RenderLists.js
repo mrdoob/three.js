@@ -57,7 +57,8 @@ class RenderLists {
 
 		}
 
-		_chainKeys.length = 0;
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
 
 		return list;
 

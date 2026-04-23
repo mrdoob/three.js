@@ -44,7 +44,7 @@ class BundleGroup extends Group {
 		/**
 		 * Whether the bundle is static or not. When set to `true`, the structure
 		 * is assumed to be static and does not change. E.g. no new objects are
-		 * added to the group
+		 * added to the group.
 		 *
 		 * If a change is required, an update can still be forced by setting the
 		 * `needsUpdate` flag to `true`.

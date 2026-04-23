@@ -80,13 +80,13 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
-		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node should extract
+		 * the current contents of the bound framebuffer for each render call.
 		 *
 		 * @type {string}
-		 * @default 'frame'
+		 * @default 'render'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 		/**
 		 * The framebuffer texture for the current renderer context.
@@ -99,12 +99,12 @@ class ViewportTextureNode extends TextureNode {
 	}
 
 	/**
-	 * This methods returns a texture for the given render target reference.
+	 * This methods returns a texture for the given render target or canvas target reference.
 	 *
 	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
 	 * for different render contexts.
 	 *
-	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @param {?(RenderTarget|CanvasTarget)} [reference=null] - The render target or canvas target reference.
 	 * @return {Texture} The framebuffer texture.
 	 */
 	getTextureForReference( reference = null ) {
@@ -144,9 +144,13 @@ class ViewportTextureNode extends TextureNode {
 
 	updateReference( frame ) {
 
-		const renderTarget = frame.renderer.getRenderTarget();
+		const renderer = frame.renderer;
+		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		this.value = this.getTextureForReference( renderTarget );
+		const reference = renderTarget ? renderTarget : canvasTarget;
+
+		this.value = this.getTextureForReference( reference );
 
 		return this.value;
 
@@ -156,20 +160,27 @@ class ViewportTextureNode extends TextureNode {
 
 		const renderer = frame.renderer;
 		const renderTarget = renderer.getRenderTarget();
+		const canvasTarget = renderer.getCanvasTarget();
 
-		if ( renderTarget === null ) {
+		const reference = renderTarget ? renderTarget : canvasTarget;
+
+		if ( reference === null ) {
 
 			renderer.getDrawingBufferSize( _size );
 
+		} else if ( reference.getDrawingBufferSize ) {
+
+			reference.getDrawingBufferSize( _size );
+
 		} else {
 
-			_size.set( renderTarget.width, renderTarget.height );
+			_size.set( reference.width, reference.height );
 
 		}
 
 		//
 
-		const framebufferTexture = this.getTextureForReference( renderTarget );
+		const framebufferTexture = this.getTextureForReference( reference );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
@@ -226,3 +237,20 @@ export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode ).se
  * @returns {ViewportTextureNode}
  */
 export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } ).setParameterLength( 0, 3 );
+
+// Singleton instances for common usage
+const _singletonOpaqueViewportTextureNode = /*@__PURE__*/ viewportMipTexture();
+
+/**
+ * TSL function for creating a viewport texture node with enabled mipmap generation.
+ * The texture should only contain the opaque rendering objects.
+ *
+ * This should be used just in transparent or transmissive materials.
+ *
+ * @tsl
+ * @function
+ * @param {?Node} [uv=screenUV] - The uv node.
+ * @param {?Node} [level=null] - The level node.
+ * @returns {ViewportTextureNode}
+ */
+export const viewportOpaqueMipTexture = ( uv = screenUV, level = null ) => _singletonOpaqueViewportTextureNode.sample( uv, level ); // TODO: Use once() when sample() supports it

@@ -142,6 +142,9 @@ class Line3 {
 		_startEnd.subVectors( this.end, this.start );
 
 		const startEnd2 = _startEnd.dot( _startEnd );
+
+		if ( startEnd2 === 0 ) return 0;
+
 		const startEnd_startP = _startEnd.dot( _startP );
 
 		let t = startEnd_startP / startEnd2;
@@ -284,12 +287,10 @@ class Line3 {
 
 		}
 
-		c1.copy( p1 ).add( _d1.multiplyScalar( s ) );
-		c2.copy( p2 ).add( _d2.multiplyScalar( t ) );
+		c1.copy( p1 ).addScaledVector( _d1, s );
+		c2.copy( p2 ).addScaledVector( _d2, t );
 
-		c1.sub( c2 );
-
-		return c1.dot( c1 );
+		return c1.distanceToSquared( c2 );
 
 	}
 

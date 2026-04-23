@@ -61,7 +61,8 @@
 
 			};
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -306,6 +307,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 
 				stats.update();
@@ -314,7 +317,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				for ( let i = 0; i < nCharacters; i ++ ) {
 

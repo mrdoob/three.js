@@ -22,7 +22,7 @@ class Background extends DataMap {
 	 * Constructs a new background management component.
 	 *
 	 * @param {Renderer} renderer - The renderer.
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 */
 	constructor( renderer, nodes ) {
 
@@ -38,7 +38,7 @@ class Background extends DataMap {
 		/**
 		 * Renderer component for managing nodes related logic.
 		 *
-		 * @type {Nodes}
+		 * @type {NodeManager}
 		 */
 		this.nodes = nodes;
 
@@ -203,8 +203,8 @@ class Background extends DataMap {
 
 			//
 
-			renderContext.depthClearValue = renderer._clearDepth;
-			renderContext.stencilClearValue = renderer._clearStencil;
+			renderContext.depthClearValue = renderer.getClearDepth();
+			renderContext.stencilClearValue = renderer.getClearStencil();
 
 			renderContext.clearColor = renderer.autoClearColor === true;
 			renderContext.clearDepth = renderer.autoClearDepth === true;

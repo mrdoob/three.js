@@ -196,7 +196,9 @@ class MeshPhongMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -283,6 +285,14 @@ class MeshPhongMaterial extends Material {
 		 * @default 1
 		 */
 		this.reflectivity = 1;
+
+		/**
+		 * Scales the effect of the environment map by multiplying its color.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.envMapIntensity = 1.0;
 
 		/**
 		 * The index of refraction (IOR) of air (approximately 1) divided by the
@@ -392,6 +402,7 @@ class MeshPhongMaterial extends Material {
 		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
+		this.envMapIntensity = source.envMapIntensity;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;

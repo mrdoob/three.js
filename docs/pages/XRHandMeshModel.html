@@ -22,7 +22,7 @@ custom asset.</p></div>
 				<pre><code class="language-js">import { XRHandMeshModel } from 'three/addons/webxr/XRHandMeshModel.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="XRHandMeshModel" translate="no">new <a href="#XRHandMeshModel">XRHandMeshModel</a><span class="signature">( handModel : <span class="param-type"><a href="XRHandModel.html">XRHandModel</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<h3 class="name name-method" id="XRHandMeshModel" translate="no">new <a href="#XRHandMeshModel">XRHandMeshModel</a><span class="signature">( handModel : <span class="param-type"><a href="XRHandModel.html">XRHandModel</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span>, onLoad : <span class="param-type">function</span>, customCache : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new XR hand mesh model.</p>
@@ -31,7 +31,7 @@ custom asset.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>handModel</strong>
+										<strong translate="no">handModel</strong>
 									</td>
 									<td class="description last">
 										<p>The hand model.</p>
@@ -39,7 +39,7 @@ custom asset.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>controller</strong>
+										<strong translate="no">controller</strong>
 									</td>
 									<td class="description last">
 										<p>The WebXR controller.</p>
@@ -47,7 +47,7 @@ custom asset.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>path</strong>
+										<strong translate="no">path</strong>
 									</td>
 									<td class="description last">
 										<p>The model path.</p>
@@ -55,7 +55,7 @@ custom asset.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>handedness</strong>
+										<strong translate="no">handedness</strong>
 									</td>
 									<td class="description last">
 										<p>The handedness of the XR input source.</p>
@@ -63,7 +63,7 @@ custom asset.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>loader</strong>
+										<strong translate="no">loader</strong>
 									</td>
 									<td class="description last">
 										<p>The loader. If not provided, an instance of <code>GLTFLoader</code> will be used to load models.</p>
@@ -72,10 +72,19 @@ custom asset.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>A callback that is executed when a controller model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">customCache</strong>
+									</td>
+									<td class="description last">
+										<p>An optional shared cache object for storing and reusing loaded assets across instances.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>

@@ -14,7 +14,7 @@ class RenderObjects {
 	 * Constructs a new render object management component.
 	 *
 	 * @param {Renderer} renderer - The renderer.
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 * @param {Geometries} geometries - Renderer component for managing geometries.
 	 * @param {Pipelines} pipelines - Renderer component for managing pipelines.
 	 * @param {Bindings} bindings - Renderer component for managing bindings.
@@ -32,7 +32,7 @@ class RenderObjects {
 		/**
 		 * Renderer component for managing nodes related logic.
 		 *
-		 * @type {Nodes}
+		 * @type {NodeManager}
 		 */
 		this.nodes = nodes;
 
@@ -179,7 +179,7 @@ class RenderObjects {
 	/**
 	 * Factory method for creating render objects with the given list of parameters.
 	 *
-	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
+	 * @param {NodeManager} nodes - Renderer component for managing nodes related logic.
 	 * @param {Geometries} geometries - Renderer component for managing geometries.
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Object3D} object - The 3D object.

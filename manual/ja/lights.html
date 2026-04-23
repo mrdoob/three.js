@@ -128,7 +128,7 @@ lil-guiで色を調整するにはヘルパーが必要です。
     this.prop = prop;
   }
   get value() {
-    return `#${this.object[this.prop].getHexString()}`;
+    return '#' + this.object[this.prop].getHexString();
   }
   set value(hexString) {
     this.object[this.prop].set(hexString);

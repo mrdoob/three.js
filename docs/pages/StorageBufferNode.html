@@ -44,7 +44,7 @@ renderer.computeAsync( computeInit );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer data.</p>
@@ -52,7 +52,7 @@ renderer.computeAsync( computeInit );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bufferType</strong>
+										<strong translate="no">bufferType</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer type (e.g. <code>'vec3'</code>).</p>
@@ -61,7 +61,7 @@ renderer.computeAsync( computeInit );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bufferCount</strong>
+										<strong translate="no">bufferCount</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer count.</p>
@@ -129,7 +129,7 @@ Only relevant for WebGL.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>indexNode</strong>
+										<strong translate="no">indexNode</strong>
 									</td>
 									<td class="description last">
 										<p>The index node.</p>
@@ -150,7 +150,7 @@ Only relevant for WebGL.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -163,6 +163,31 @@ Only relevant for WebGL.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type from the availability of storage buffers
+and the attribute data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#generateNodeType">BufferNode#generateNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getAttributeData" translate="no">.<a href="#getAttributeData">getAttributeData</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
@@ -184,7 +209,7 @@ and thus the hash should be shared as well.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -208,7 +233,7 @@ and thus the hash should be shared as well.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -232,7 +257,7 @@ and thus the hash should be shared as well.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
@@ -240,7 +265,7 @@ and thus the hash should be shared as well.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the member.</p>
@@ -253,31 +278,6 @@ and thus the hash should be shared as well.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The type of the member.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>This method is overwritten since the node type from the availability of storage buffers
-and the attribute data.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>builder</strong>
-									</td>
-									<td class="description last">
-										<p>The current node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#getNodeType">BufferNode#getNodeType</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getPBO" translate="no">.<a href="#getPBO">getPBO</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
@@ -298,7 +298,7 @@ and the attribute data.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The node access.</p>
@@ -319,7 +319,7 @@ and the attribute data.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The atomic flag.</p>
@@ -340,7 +340,7 @@ and the attribute data.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>The value so set.</p>

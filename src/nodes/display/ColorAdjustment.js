@@ -139,3 +139,20 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 	return vec4( v.rgb, color.a );
 
 } );
+
+/**
+ * TSL function for creating a posterize effect which reduces the number of colors
+ * in an image, resulting in a more blocky and stylized appearance.
+ *
+ * @tsl
+ * @function
+ * @param {Node} sourceNode - The input color.
+ * @param {Node} stepsNode - Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.
+ * @returns {Node} The posterized color.
+ */
+export const posterize = Fn( ( [ source, steps ] ) => {
+
+	return source.mul( steps ).floor().div( steps );
+
+} );
+

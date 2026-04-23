@@ -390,6 +390,22 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( /*uniformBuffer*/ ) { }
+
+	/**
+	 * Destroys a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( /*uniformBuffer*/ ) { }
+
+	/**
 	 * Updates the GPU buffer of a shader attribute.
 	 *
 	 * @abstract
@@ -605,14 +621,6 @@ class Backend {
 	hasFeature( /*name*/ ) {}
 
 	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @abstract
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {}
-
-	/**
 	 * Returns the drawing buffer size.
 	 *
 	 * @return {Vector2} The drawing buffer size.
@@ -690,6 +698,14 @@ class Backend {
 		return false;
 
 	}
+
+	/**
+	 * Initializes the render target defined in the given render context.
+	 *
+	 * @abstract
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	initRenderTarget( /*renderContext*/ ) {}
 
 	/**
 	 * Sets a dictionary for the given object into the

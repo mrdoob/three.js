@@ -2,7 +2,6 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { subBuild } from './SubBuildNode.js';
-import { warn } from '../../utils.js';
 
 /**
  * Class for representing shader varyings as nodes. Varyings are create from
@@ -37,7 +36,7 @@ class VaryingNode extends Node {
 		 *
 		 * @type {Node}
 		 */
-		this.node = node;
+		this.node = subBuild( node, 'VERTEX' );
 
 		/**
 		 * The name of the varying in the shader. If no name is defined,
@@ -105,7 +104,7 @@ class VaryingNode extends Node {
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		// VaryingNode is auto type
 
@@ -209,19 +208,3 @@ export const vertexStage = ( node ) => varying( node );
 
 addMethodChaining( 'toVarying', varying );
 addMethodChaining( 'toVertexStage', vertexStage );
-
-// Deprecated
-
-addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
-
-	warn( 'TSL: .varying() has been renamed to .toVarying().' );
-	return varying( ...params );
-
-} );
-
-addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
-
-	warn( 'TSL: .vertexStage() has been renamed to .toVertexStage().' );
-	return varying( ...params );
-
-} );

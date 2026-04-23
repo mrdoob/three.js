@@ -215,6 +215,17 @@ class TransformControls extends Controls {
 		defineProperty( 'size', 1 );
 
 		/**
+		 * The viewport rectangle, in logical (CSS) pixels with the origin at the lower-left
+		 * of the canvas. Set this when the renderer uses a sub-canvas viewport so pointer
+		 * coordinates map to the correct region. If `null`, the full canvas is used.
+		 *
+		 * @name TransformControls#viewport
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this.viewport = null;
+
+		/**
 		 * Whether dragging is currently performed or not.
 		 *
 		 * @name TransformControls#dragging
@@ -250,6 +261,33 @@ class TransformControls extends Controls {
 		 * @default true
 		 */
 		defineProperty( 'showZ', true );
+
+		/**
+		 * Whether the xy-plane helper should be visible or not.
+		 *
+		 * @name TransformControls#showXY
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXY', true );
+
+		/**
+		 * Whether the yz-plane helper should be visible or not.
+		 *
+		 * @name TransformControls#showYZ
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showYZ', true );
+
+		/**
+		 * Whether the xz-axis helper should be visible or not.
+		 *
+		 * @name TransformControls#showXZ
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXZ', true );
 
 		/**
 		 * The minimum allowed X position during translation.
@@ -373,7 +411,7 @@ class TransformControls extends Controls {
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -384,7 +422,7 @@ class TransformControls extends Controls {
 		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 
-		this.domElement.style.touchAction = 'auto';
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 
@@ -939,10 +977,29 @@ function getPointer( event ) {
 	} else {
 
 		const rect = this.domElement.getBoundingClientRect();
+		const viewport = this.viewport;
+
+		let originX, originY, regionWidth, regionHeight;
+
+		if ( viewport !== null ) {
+
+			originX = viewport.x;
+			originY = rect.height - viewport.y - viewport.w;
+			regionWidth = viewport.z;
+			regionHeight = viewport.w;
+
+		} else {
+
+			originX = 0;
+			originY = 0;
+			regionWidth = rect.width;
+			regionHeight = rect.height;
+
+		}
 
 		return {
-			x: ( event.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( event.clientY - rect.top ) / rect.height * 2 + 1,
+			x: ( event.clientX - rect.left - originX ) / regionWidth * 2 - 1,
+			y: - ( event.clientY - rect.top - originY ) / regionHeight * 2 + 1,
 			button: event.button
 		};
 
@@ -1783,6 +1840,11 @@ class TransformControlsGizmo extends Object3D {
 			handle.visible = handle.visible && ( handle.name.indexOf( 'Y' ) === - 1 || this.showY );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'Z' ) === - 1 || this.showZ );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'E' ) === - 1 || ( this.showX && this.showY && this.showZ ) );
+
+			// Hide disabled plane helpers
+			handle.visible = handle.visible && ( handle.name.indexOf( 'XY' ) === - 1 || this.showXY );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'YZ' ) === - 1 || this.showYZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'XZ' ) === - 1 || this.showXZ );
 
 			// highlight selected axis
 

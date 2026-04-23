@@ -1,5 +1,5 @@
-import { TextureLoader } from 'three';
-import { Fn, int, ivec2, textureLoad } from 'three/tsl';
+import { ImageBitmapLoader, Texture } from 'three';
+import { Fn, int, ivec2, textureLoad, screenUV, screenSize, mod, floor, float, vec3 } from 'three/tsl';
 
 /**
  * @module Bayer
@@ -25,10 +25,60 @@ export const bayer16 = Fn( ( [ uv ] ) => {
 
 		const bayer16Base64 = 'data:image/png;base64,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';
 
-		bayer16Texture = new TextureLoader().load( bayer16Base64 );
+		bayer16Texture = new Texture();
+		const loader = new ImageBitmapLoader();
+
+		loader.setOptions( { imageOrientation: 'flipY', premultiplyAlpha: 'none' } );
+
+		loader.load( bayer16Base64, ( imageBitmap ) => {
+
+			bayer16Texture.image = imageBitmap;
+			bayer16Texture.flipY = false;
+			bayer16Texture.needsUpdate = true;
+
+		} );
 
 	}
 
 	return textureLoad( bayer16Texture, ivec2( uv ).mod( int( 16 ) ) );
+
+} );
+
+/**
+ * This TSL function applies Bayer dithering to a color input. It uses a 4x4 Bayer matrix
+ * pattern to add structured noise before color quantization, which helps reduce visible
+ * color banding when limiting color depth.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} color - The input color to apply dithering to.
+ * @param {Node<float>} [steps=32] - The number of color steps per channel.
+ * @return {Node<vec3>} The dithered color ready for quantization.
+ *
+ * @example
+ * // Apply dithering with posterize
+ * const ditheredColor = bayerDither( inputColor, 32 );
+ * const finalColor = posterize( ditheredColor, 32 );
+ */
+export const bayerDither = Fn( ( [ color, steps = float( 32.0 ) ] ) => {
+
+	const screenPos = screenUV.mul( screenSize );
+	const x = mod( floor( screenPos.x ), float( 4.0 ) );
+	const y = mod( floor( screenPos.y ), float( 4.0 ) );
+
+	// Simplified Bayer matrix approximation
+	const bayer = mod(
+		floor( x.add( 1.0 ) ).mul( floor( y.add( 1.0 ) ) ).mul( 17.0 ),
+		16.0
+	).div( 16.0 ).sub( 0.5 );
+
+	// Apply dither offset before quantization
+	const ditherOffset = bayer.div( steps );
+
+	return vec3(
+		color.r.add( ditherOffset ),
+		color.g.add( ditherOffset ),
+		color.b.add( ditherOffset )
+	);
 
 } );

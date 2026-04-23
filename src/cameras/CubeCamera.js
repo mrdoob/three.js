@@ -203,19 +203,38 @@ class CubeCamera extends Object3D {
 
 		renderTarget.texture.generateMipmaps = false;
 
+		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
+
+		let reversedDepthBuffer = false;
+
+		if ( renderer.isWebGLRenderer === true ) {
+
+			reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		} else {
+
+			reversedDepthBuffer = renderer.reversedDepthBuffer;
+
+		}
+
 		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPX );
 
 		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNX );
 
 		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPY );
 
 		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNY );
 
 		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPZ );
 
 		// mipmaps are generated during the last call of render()
@@ -224,6 +243,7 @@ class CubeCamera extends Object3D {
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
 		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNZ );
 
 		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );

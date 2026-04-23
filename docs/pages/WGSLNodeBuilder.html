@@ -31,7 +31,7 @@ for render objects.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The 3D object.</p>
@@ -39,7 +39,7 @@ for render objects.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -50,6 +50,20 @@ for render objects.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="allowEarlyReturns" translate="no">.<a href="#allowEarlyReturns">allowEarlyReturns</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>A flag that indicates that early returns are allowed.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="allowGlobalVariables" translate="no">.<a href="#allowGlobalVariables">allowGlobalVariables</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>A flag that indicates that global variables are allowed.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
 				<div class="member">
 					<h3 class="name" id="builtins" translate="no">.<a href="#builtins">builtins</a><span class="type-signature"> : Object.&lt;string, Map.&lt;string, Object>></span> </h3>
 					<div class="description">
@@ -76,6 +90,13 @@ for render objects.</p></div>
 another dictionary which manages UBOs per group ('render','frame','object').</p>
 					</div>
 				</div>
+				<div class="member">
+					<h3 class="name" id="uniformGroupsBindings" translate="no">.<a href="#uniformGroupsBindings">uniformGroupsBindings</a><span class="type-signature"> : Object.&lt;string, {index: number, id: number}></span> </h3>
+					<div class="description">
+						<p>A dictionary that holds the assigned binding indices for each uniform group.
+This ensures the same binding index is used across all shader stages.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
 					<h3 class="name name-method" id="buildCode" translate="no">.<a href="#buildCode">buildCode</a><span class="signature">()</span> </h3>
 					<div class="method">
@@ -95,7 +116,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderNode</strong>
+										<strong translate="no">shaderNode</strong>
 									</td>
 									<td class="description last">
 										<p>The shader node.</p>
@@ -125,7 +146,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The directive name.</p>
@@ -133,7 +154,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage to enable the directive for.</p>
@@ -158,7 +179,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>planeCount</strong>
+										<strong translate="no">planeCount</strong>
 									</td>
 									<td class="description last">
 										<p>The clipping plane count.</p>
@@ -194,7 +215,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The type.</p>
@@ -202,7 +223,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>count</strong>
+										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
 										<p>The count.</p>
@@ -217,7 +238,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated value as a shader string.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the WGSL snippet for a manual filtered texture.</p>
@@ -226,7 +247,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -234,7 +255,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -242,7 +263,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -250,7 +271,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -258,11 +279,80 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelSnippet</strong>
+										<strong translate="no">levelSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
 										<p>Default is <code>'0u'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateStorageTextureLoad" translate="no">.<a href="#generateStorageTextureLoad">generateStorageTextureLoad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet that reads a single texel from a storage texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvIndexSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -280,7 +370,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -288,7 +378,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -296,7 +386,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -304,7 +394,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -312,7 +402,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -320,7 +410,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -345,7 +435,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -353,7 +443,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -361,7 +451,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -369,7 +459,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>biasSnippet</strong>
+										<strong translate="no">biasSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the bias to apply to the mip level before sampling.</p>
@@ -377,7 +467,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -385,7 +475,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -393,7 +483,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -416,7 +506,7 @@ against a reference value.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -424,7 +514,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -432,7 +522,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -440,7 +530,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>compareSnippet</strong>
+										<strong translate="no">compareSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the reference value.</p>
@@ -448,7 +538,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -456,7 +546,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -464,7 +554,7 @@ against a reference value.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -488,7 +578,7 @@ texture as well as the cube face count of cube textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture to generate the function for.</p>
@@ -496,7 +586,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the video texture uniform in the shader.</p>
@@ -504,7 +594,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelSnippet</strong>
+										<strong translate="no">levelSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
@@ -525,7 +615,7 @@ texture as well as the cube face count of cube textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -533,7 +623,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -541,7 +631,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -549,7 +639,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>gradSnippet</strong>
+										<strong translate="no">gradSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>An array holding both gradient WGSL snippets.</p>
@@ -557,7 +647,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -565,7 +655,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -573,7 +663,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -595,7 +685,7 @@ texture as well as the cube face count of cube textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -603,7 +693,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -611,7 +701,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -619,7 +709,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelSnippet</strong>
+										<strong translate="no">levelSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
@@ -627,7 +717,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -635,7 +725,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -643,7 +733,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -665,7 +755,7 @@ texture as well as the cube face count of cube textures.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -673,7 +763,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -681,7 +771,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvIndexSnippet</strong>
+										<strong translate="no">uvIndexSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -689,7 +779,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelSnippet</strong>
+										<strong translate="no">levelSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
@@ -697,7 +787,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -705,7 +795,7 @@ texture as well as the cube face count of cube textures.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -727,7 +817,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -735,7 +825,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -743,7 +833,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvSnippet</strong>
+										<strong translate="no">uvSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -751,7 +841,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -759,7 +849,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>offsetSnippet</strong>
+										<strong translate="no">offsetSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
@@ -767,7 +857,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>levelSnippet</strong>
+										<strong translate="no">levelSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
@@ -792,7 +882,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -800,7 +890,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>textureProperty</strong>
+										<strong translate="no">textureProperty</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the texture uniform in the shader.</p>
@@ -808,7 +898,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>uvIndexSnippet</strong>
+										<strong translate="no">uvIndexSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
@@ -816,7 +906,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>depthSnippet</strong>
+										<strong translate="no">depthSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
@@ -824,7 +914,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>valueSnippet</strong>
+										<strong translate="no">valueSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represent the new texel value.</p>
@@ -845,7 +935,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture to generate the function for.</p>
@@ -866,7 +956,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -890,7 +980,7 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The output type to bitcast to.</p>
@@ -913,7 +1003,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The builtin name.</p>
@@ -921,7 +1011,7 @@ defined in the WGSL source.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>property</strong>
+										<strong translate="no">property</strong>
 									</td>
 									<td class="description last">
 										<p>The property name.</p>
@@ -929,7 +1019,7 @@ defined in the WGSL source.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The node data type.</p>
@@ -937,7 +1027,7 @@ defined in the WGSL source.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -959,7 +1049,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -989,7 +1079,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1022,7 +1112,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>encoding</strong>
+										<strong translate="no">encoding</strong>
 									</td>
 									<td class="description last">
 										<p>The numeric encoding that describes how the float values are mapped to the integer range.</p>
@@ -1043,7 +1133,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>encoding</strong>
+										<strong translate="no">encoding</strong>
 									</td>
 									<td class="description last">
 										<p>The numeric encoding that describes how the integer values are mapped to the float range.</p>
@@ -1097,7 +1187,7 @@ defined in the WGSL source.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>op</strong>
+										<strong translate="no">op</strong>
 									</td>
 									<td class="description last">
 										<p>The operator name to resolve.</p>
@@ -1152,7 +1242,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>method</strong>
+										<strong translate="no">method</strong>
 									</td>
 									<td class="description last">
 										<p>The method name to resolve.</p>
@@ -1160,7 +1250,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>output</strong>
+										<strong translate="no">output</strong>
 									</td>
 									<td class="description last">
 										<p>An optional output.</p>
@@ -1185,7 +1275,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The storage node.</p>
@@ -1193,7 +1283,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1226,7 +1316,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The node.</p>
@@ -1234,7 +1324,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -1261,7 +1351,7 @@ later used to generate the respective WGSL.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The array name.</p>
@@ -1269,7 +1359,7 @@ later used to generate the respective WGSL.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scope</strong>
+										<strong translate="no">scope</strong>
 									</td>
 									<td class="description last">
 										<p>The scope.</p>
@@ -1277,7 +1367,7 @@ later used to generate the respective WGSL.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bufferType</strong>
+										<strong translate="no">bufferType</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer type.</p>
@@ -1285,7 +1375,7 @@ later used to generate the respective WGSL.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bufferCount</strong>
+										<strong translate="no">bufferCount</strong>
 									</td>
 									<td class="description last">
 										<p>The buffer count.</p>
@@ -1306,7 +1396,7 @@ later used to generate the respective WGSL.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1328,7 +1418,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The storage node.</p>
@@ -1336,7 +1426,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1357,7 +1447,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>struct</strong>
+										<strong translate="no">struct</strong>
 									</td>
 									<td class="description last">
 										<p>The struct type node.</p>
@@ -1378,7 +1468,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1417,7 +1507,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>condSnippet</strong>
+										<strong translate="no">condSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>The condition determining which expression gets resolved.</p>
@@ -1425,7 +1515,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>ifSnippet</strong>
+										<strong translate="no">ifSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>The expression to resolve to if the condition is true.</p>
@@ -1433,7 +1523,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>elseSnippet</strong>
+										<strong translate="no">elseSnippet</strong>
 									</td>
 									<td class="description last">
 										<p>The expression to resolve to if the condition is false.</p>
@@ -1457,7 +1547,7 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The node data type.</p>
@@ -1484,7 +1574,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The uniform node.</p>
@@ -1492,7 +1582,7 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The node data type.</p>
@@ -1500,7 +1590,7 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1508,7 +1598,7 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>An optional uniform name.</p>
@@ -1533,7 +1623,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1548,7 +1638,7 @@ and layouts.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the uniforms.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getVar" translate="no">.<a href="#getVar">getVar</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getVar" translate="no">.<a href="#getVar">getVar</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span>, qualifier : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a WGSL string representing a variable.</p>
@@ -1557,7 +1647,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>type</strong>
+										<strong translate="no">type</strong>
 									</td>
 									<td class="description last">
 										<p>The variable's type.</p>
@@ -1565,7 +1655,7 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The variable's name.</p>
@@ -1573,11 +1663,20 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>count</strong>
+										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
 										<p>The array length.</p>
 										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">qualifier</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's qualifier.</p>
+										<p>Default is <code>''</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1598,7 +1697,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1622,7 +1721,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage.</p>
@@ -1658,7 +1757,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The builtin name.</p>
@@ -1666,7 +1765,7 @@ and layouts.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shaderStage</strong>
+										<strong translate="no">shaderStage</strong>
 									</td>
 									<td class="description last">
 										<p>The shader stage this code snippet is generated for.</p>
@@ -1688,7 +1787,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The requested feature.</p>
@@ -1724,7 +1823,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>
@@ -1745,7 +1844,7 @@ and layouts.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The texture.</p>

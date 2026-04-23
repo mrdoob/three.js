@@ -23,7 +23,8 @@ import {
 	RepeatWrapping,
 	SRGBColorSpace,
 	TextureLoader,
-	Vector2
+	Vector2,
+	Vector3
 } from 'three';
 
 import { IFFParser } from './lwo/IFFParser.js';
@@ -185,8 +186,6 @@ class LWOTreeParser {
 
 		} );
 
-		this.applyPivots( finalMeshes );
-
 		return finalMeshes;
 
 	}
@@ -204,38 +203,14 @@ class LWOTreeParser {
 		if ( layer.name ) mesh.name = layer.name;
 		else mesh.name = this.defaultLayerName + '_layer_' + layer.number;
 
-		mesh.userData.pivot = layer.pivot;
+		const pivot = layer.pivot;
+		if ( pivot[ 0 ] !== 0 || pivot[ 1 ] !== 0 || pivot[ 2 ] !== 0 ) {
+
+			mesh.pivot = new Vector3( pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] );
+
+		}
 
 		return mesh;
-
-	}
-
-	// TODO: may need to be reversed in z to convert LWO to three.js coordinates
-	applyPivots( meshes ) {
-
-		meshes.forEach( function ( mesh ) {
-
-			mesh.traverse( function ( child ) {
-
-				const pivot = child.userData.pivot;
-
-				child.position.x += pivot[ 0 ];
-				child.position.y += pivot[ 1 ];
-				child.position.z += pivot[ 2 ];
-
-				if ( child.parent ) {
-
-					const parentPivot = child.parent.userData.pivot;
-
-					child.position.x -= parentPivot[ 0 ];
-					child.position.y -= parentPivot[ 1 ];
-					child.position.z -= parentPivot[ 2 ];
-
-				}
-
-			} );
-
-		} );
 
 	}
 
@@ -812,13 +787,6 @@ class GeometryParser {
 
 		this.parseUVs( geometry, layer );
 		this.parseMorphTargets( geometry, layer );
-
-		// TODO: z may need to be reversed to account for coordinate system change
-		geometry.translate( - layer.pivot[ 0 ], - layer.pivot[ 1 ], - layer.pivot[ 2 ] );
-
-		// let userData = geometry.userData;
-		// geometry = geometry.toNonIndexed()
-		// geometry.userData = userData;
 
 		return geometry;
 

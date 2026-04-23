@@ -10,11 +10,16 @@ const _errorMap = new WeakMap();
  * textures for rendering.
  *
  * Note that {@link Texture#flipY} and {@link Texture#premultiplyAlpha} are ignored with image bitmaps.
- * They needs these configuration on bitmap creation unlike regular images need them on uploading to GPU.
+ * These options need to be configured via {@link ImageBitmapLoader#setOptions} prior to loading,
+ * unlike regular images which can be configured on the Texture to set these options on GPU upload instead.
  *
- * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
+ * To match the default behaviour of {@link Texture}, the following options are needed:
  *
- * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
+ * ```js
+ * { imageOrientation: 'flipY', premultiplyAlpha: 'none' }
+ * ```
+ *
+ * Also note that unlike {@link FileLoader}, this loader will only avoid multiple concurrent requests to the same URL if {@link Cache} is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -81,6 +86,9 @@ class ImageBitmapLoader extends Loader {
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
 	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
 	 *
+	 * Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
+	 * different options will return the cached result of the first request.
+	 *
 	 * @param {Object} options - The loader options to set.
 	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
 	 */
@@ -99,7 +107,6 @@ class ImageBitmapLoader extends Loader {
 	 * @param {function(ImageBitmap)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
-	 * @return {ImageBitmap|undefined} The image bitmap.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
@@ -137,8 +144,6 @@ class ImageBitmapLoader extends Loader {
 
 						scope.manager.itemEnd( url );
 
-						return imageBitmap;
-
 					}
 
 				} );
@@ -156,7 +161,7 @@ class ImageBitmapLoader extends Loader {
 
 			}, 0 );
 
-			return cached;
+			return;
 
 		}
 
@@ -180,8 +185,6 @@ class ImageBitmapLoader extends Loader {
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
-
-			return imageBitmap;
 
 		} ).catch( function ( e ) {
 

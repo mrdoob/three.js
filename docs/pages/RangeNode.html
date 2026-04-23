@@ -34,7 +34,7 @@ const mesh = new InstancedMesh( geometry, material, count );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>minNode</strong>
+										<strong translate="no">minNode</strong>
 									</td>
 									<td class="description last">
 										<p>A node defining the lower bound of the range.</p>
@@ -43,7 +43,7 @@ const mesh = new InstancedMesh( geometry, material, count );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>maxNode</strong>
+										<strong translate="no">maxNode</strong>
 									</td>
 									<td class="description last">
 										<p>A node defining the upper bound of the range.</p>
@@ -70,6 +70,30 @@ const mesh = new InstancedMesh( geometry, material, count );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from range definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#generateNodeType">Node#generateNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getConstNode" translate="no">.<a href="#getConstNode">getConstNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -79,7 +103,7 @@ const mesh = new InstancedMesh( geometry, material, count );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The node to traverse.</p>
@@ -91,30 +115,6 @@ const mesh = new InstancedMesh( geometry, material, count );
 							<dt class="tag-returns"><strong>Returns:</strong> The constant node, if found.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>This method is overwritten since the node type is inferred from range definition.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>builder</strong>
-									</td>
-									<td class="description last">
-										<p>The current node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
-						</dl>
-					</div>
 					<h3 class="name name-method" id="getVectorLength" translate="no">.<a href="#getVectorLength">getVectorLength</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -124,7 +124,7 @@ const mesh = new InstancedMesh( geometry, material, count );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>

@@ -17,9 +17,9 @@
 Cursor/finger positions and movements are mapped over a virtual trackball surface represented by a gizmo and mapped in intuitive and
 consistent camera movements. Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative
 way (returning to the starting point will make the camera return to its starting orientation).</p>
-<p>In addition to supporting pan, zoom and pinch gestures, Arcball controls provide focus&lt; functionality with a double click/tap for intuitively
-moving the object's point of interest in the center of the virtual trackball. Focus allows a much better inspection and navigation in complex
-environment. Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation. Saving and restoring of Camera State
+<p>In addition to supporting pan, zoom and pinch gestures, double clicking/tapping focuses on a point, intuitively moving the object's
+point of interest to the center of the virtual trackball. Focus allows a much better inspection and navigation in complex environment.
+Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation. Saving and restoring of Camera State
 is supported also through clipboard (use ctrl+c and ctrl+v shortcuts for copy and paste the state).</p>
 <p>Unlike <a href="OrbitControls.html">OrbitControls</a> and <a href="TrackballControls.html">TrackballControls</a>, <code>ArcballControls</code> doesn't require <code>update()</code> to be called externally in an
 animation loop when animations are on.</p></div>
@@ -39,7 +39,7 @@ animation loop when animations are on.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.</p>
@@ -47,7 +47,7 @@ animation loop when animations are on.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>domElement</strong>
+										<strong translate="no">domElement</strong>
 									</td>
 									<td class="description last">
 										<p>The HTML element used for event listeners.</p>
@@ -56,7 +56,7 @@ animation loop when animations are on.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>scene</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
 										<p>The scene rendered by the camera. If not given, gizmos cannot be shown.</p>
@@ -248,7 +248,7 @@ values. Only works with perspective cameras.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>isActive</strong>
+										<strong translate="no">isActive</strong>
 									</td>
 									<td class="description last">
 										<p>If set to <code>true</code>, gizmos are more visible.</p>
@@ -307,7 +307,7 @@ text as saved from <code>copyState()</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to be controlled.</p>
@@ -325,7 +325,7 @@ text as saved from <code>copyState()</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>Value of gizmos visibility.</p>
@@ -343,7 +343,7 @@ text as saved from <code>copyState()</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>operation</strong>
+										<strong translate="no">operation</strong>
 									</td>
 									<td class="description last">
 										<p>The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').</p>
@@ -351,7 +351,7 @@ text as saved from <code>copyState()</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>mouse</strong>
+										<strong translate="no">mouse</strong>
 									</td>
 									<td class="description last">
 										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
@@ -359,7 +359,7 @@ text as saved from <code>copyState()</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>key</strong>
+										<strong translate="no">key</strong>
 									</td>
 									<td class="description last">
 										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>
@@ -381,7 +381,7 @@ text as saved from <code>copyState()</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>value</strong>
+										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
 										<p>Value of radius factor.</p>
@@ -399,7 +399,7 @@ text as saved from <code>copyState()</code>.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>mouse</strong>
+										<strong translate="no">mouse</strong>
 									</td>
 									<td class="description last">
 										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
@@ -407,7 +407,7 @@ text as saved from <code>copyState()</code>.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>key</strong>
+										<strong translate="no">key</strong>
 									</td>
 									<td class="description last">
 										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>

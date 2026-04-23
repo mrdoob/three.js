@@ -48,7 +48,7 @@ class PackFloatNode extends TempNode {
 
 	}
 
-	getNodeType() {
+	generateNodeType() {
 
 		return 'uint';
 

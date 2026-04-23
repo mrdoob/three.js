@@ -1,5 +1,5 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, int, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, vec4, int, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture, textureLoad } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
@@ -11,7 +11,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
@@ -21,6 +21,8 @@ import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowF
 import ChainMap from '../../renderers/common/ChainMap.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UV.js';
+import { positionLocal } from '../accessors/Position.js';
+import { uniform } from '../core/UniformNode.js';
 
 //
 
@@ -341,7 +343,7 @@ class ShadowNode extends ShadowBaseNode {
 		const { shadow } = this;
 		const { renderer } = builder;
 
-		const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+		const bias = shadow.biasNode || reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 
 		let shadowCoord = shadowPosition;
 		let coordZ;
@@ -351,12 +353,6 @@ class ShadowNode extends ShadowBaseNode {
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			coordZ = shadowCoord.z;
-
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
-
-			}
 
 		} else {
 
@@ -376,7 +372,7 @@ class ShadowNode extends ShadowBaseNode {
 		shadowCoord = vec3(
 			shadowCoord.x,
 			shadowCoord.y.oneMinus(), // follow webgpu standards
-			coordZ.add( bias )
+			renderer.reversedDepthBuffer ? coordZ.sub( bias ) : coordZ.add( bias )
 		);
 
 		return shadowCoord;
@@ -400,7 +396,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.name = 'ShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
@@ -423,9 +419,22 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { light, shadow } = this;
 
-		const shadowMapType = renderer.shadowMap.type;
-
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
+
+		const shadowMapType = renderer.shadowMap.type;
+		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+
+		if ( ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) && hasTextureCompare ) {
+
+			depthTexture.minFilter = LinearFilter;
+			depthTexture.magFilter = LinearFilter;
+
+		} else {
+
+			depthTexture.minFilter = NearestFilter;
+			depthTexture.magFilter = NearestFilter;
+
+		}
 
 		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
@@ -499,7 +508,27 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( normalWorld.mul( normalBias ) ) );
+		const shadowMatrix = lightShadowMatrix( light );
+		const shadowNormalBias = normalWorld.mul( normalBias );
+
+		let shadowPosition;
+
+		if ( ! renderer.highPrecision || builder.material.receivedShadowPositionNode || builder.context.shadowPositionWorld ) {
+
+			shadowPosition = shadowMatrix.mul( shadowPositionWorld.add( shadowNormalBias ) );
+
+		} else {
+
+			const highpShadowModelMatrix = uniform( 'mat4' ).onObjectUpdate( ( { object }, self ) => {
+
+				return self.value.multiplyMatrices( shadowMatrix.value, object.matrixWorld );
+
+			} );
+
+			shadowPosition = highpShadowModelMatrix.mul( positionLocal ).add( shadowMatrix.mul( vec4( shadowNormalBias, 0 ) ) );
+
+		}
+
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -518,24 +547,40 @@ class ShadowNode extends ShadowBaseNode {
 
 		let shadowColor;
 
-		if ( shadowMap.texture.isCubeTexture ) {
+		if ( renderer.shadowMap.transmitted === true ) {
 
-			// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
-			shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+			if ( shadowMap.texture.isCubeTexture ) {
 
-		} else {
+				// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+				shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
 
-			shadowColor = texture( shadowMap.texture, shadowCoord );
+			} else {
 
-			if ( depthTexture.isArrayTexture ) {
+				shadowColor = texture( shadowMap.texture, shadowCoord );
 
-				shadowColor = shadowColor.depth( this.depthLayer );
+				if ( depthTexture.isArrayTexture ) {
+
+					shadowColor = shadowColor.depth( this.depthLayer );
+
+				}
 
 			}
 
 		}
 
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		//
+
+		let shadowOutput;
+
+		if ( shadowColor ) {
+
+			shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+
+		} else {
+
+			shadowOutput = mix( 1, shadowNode, shadowIntensity ).toVar();
+
+		}
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
@@ -544,17 +589,23 @@ class ShadowNode extends ShadowBaseNode {
 
 		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
 
-		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+		if ( shadowColor ) {
 
-			if ( this.shadowMap.texture.isCubeTexture ) {
+			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
 
-				return cubeTexture( this.shadowMap.texture );
+				if ( this.shadowMap.texture.isCubeTexture ) {
 
-			}
+					return cubeTexture( this.shadowMap.texture );
 
-			return texture( this.shadowMap.texture );
+				}
 
-		} ).toInspector( `${ inspectName } / Depth`, () => {
+				return texture( this.shadowMap.texture );
+
+			} );
+
+		}
+
+		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
 
 			// TODO: Use linear depth
 

@@ -31,7 +31,7 @@ improve the overall rendering performance in your application.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The mesh geometry.</p>
@@ -39,7 +39,7 @@ improve the overall rendering performance in your application.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The mesh material.</p>
@@ -47,7 +47,7 @@ improve the overall rendering performance in your application.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>count</strong>
+										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
 										<p>The number of instances.</p>
@@ -114,6 +114,14 @@ via <a href="InstancedMesh.html#setMorphAt">InstancedMesh#setMorphAt</a>.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
+				<div class="member">
+					<h3 class="name" id="previousInstanceMatrix" translate="no">.<a href="#previousInstanceMatrix">previousInstanceMatrix</a><span class="type-signature"> : <a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>Represents the local transformation of all instances of the previous frame.
+Required for computing velocity. Maintained in <a href="InstanceNode.html">InstanceNode</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
 					<h3 class="name name-method" id="computeBoundingBox" translate="no">.<a href="#computeBoundingBox">computeBoundingBox</a><span class="signature">()</span> </h3>
 					<div class="method">
@@ -138,7 +146,7 @@ You may need to recompute the bounding sphere if an instance is transformed via 
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="getColorAt" translate="no">.<a href="#getColorAt">getColorAt</a><span class="signature">( index : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span> </h3>
+					<h3 class="name name-method" id="getColorAt" translate="no">.<a href="#getColorAt">getColorAt</a><span class="signature">( index : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Gets the color of the defined instance.</p>
@@ -147,7 +155,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -155,7 +163,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -163,8 +171,11 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to the target color.</dt>
+						</dl>
 					</div>
-					<h3 class="name name-method" id="getMatrixAt" translate="no">.<a href="#getMatrixAt">getMatrixAt</a><span class="signature">( index : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<h3 class="name name-method" id="getMatrixAt" translate="no">.<a href="#getMatrixAt">getMatrixAt</a><span class="signature">( index : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Gets the local transformation matrix of the defined instance.</p>
@@ -173,7 +184,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -181,7 +192,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>matrix</strong>
+										<strong translate="no">matrix</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -189,6 +200,9 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to the target matrix.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="getMorphAt" translate="no">.<a href="#getMorphAt">getMorphAt</a><span class="signature">( index : <span class="param-type">number</span>, object : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
 					<div class="method">
@@ -199,7 +213,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -207,7 +221,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>The target object that is used to store the method's result.</p>
@@ -216,7 +230,7 @@ method whenever this instance is no longer used in your app.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setColorAt" translate="no">.<a href="#setColorAt">setColorAt</a><span class="signature">( index : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span> </h3>
+					<h3 class="name name-method" id="setColorAt" translate="no">.<a href="#setColorAt">setColorAt</a><span class="signature">( index : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="InstancedMesh.html">InstancedMesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given color to the defined instance. Make sure you set the <code>needsUpdate</code> flag of
@@ -226,7 +240,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -234,7 +248,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>color</strong>
+										<strong translate="no">color</strong>
 									</td>
 									<td class="description last">
 										<p>The instance color.</p>
@@ -242,18 +256,21 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instanced mesh.</dt>
+						</dl>
 					</div>
-					<h3 class="name name-method" id="setMatrixAt" translate="no">.<a href="#setMatrixAt">setMatrixAt</a><span class="signature">( index : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<h3 class="name name-method" id="setMatrixAt" translate="no">.<a href="#setMatrixAt">setMatrixAt</a><span class="signature">( index : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="InstancedMesh.html">InstancedMesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given local transformation matrix to the defined instance. Make sure you set the <code>needsUpdate</code> flag of
-<a href="InstancedMesh.html#instanceMatrix">InstancedMesh#instanceMatrix</a> to <code>true</code> after updating all the colors.</p>
+<a href="InstancedMesh.html#instanceMatrix">InstancedMesh#instanceMatrix</a> to <code>true</code> after updating all the matrices.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -261,7 +278,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>matrix</strong>
+										<strong translate="no">matrix</strong>
 									</td>
 									<td class="description last">
 										<p>The local transformation.</p>
@@ -269,8 +286,11 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instanced mesh.</dt>
+						</dl>
 					</div>
-					<h3 class="name name-method" id="setMorphAt" translate="no">.<a href="#setMorphAt">setMorphAt</a><span class="signature">( index : <span class="param-type">number</span>, object : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
+					<h3 class="name name-method" id="setMorphAt" translate="no">.<a href="#setMorphAt">setMorphAt</a><span class="signature">( index : <span class="param-type">number</span>, object : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="InstancedMesh.html">InstancedMesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the morph target weights to the defined instance. Make sure you set the <code>needsUpdate</code> flag of
@@ -280,7 +300,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The instance index.</p>
@@ -288,7 +308,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong translate="no">object</strong>
 									</td>
 									<td class="description last">
 										<p>A mesh which <code>morphTargetInfluences</code> property containing the morph target weights
@@ -297,6 +317,9 @@ of a single instance.</p>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instanced mesh.</dt>
+						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>

@@ -45,7 +45,7 @@
 			let width = window.innerWidth;
 			let height = window.innerHeight;
 
-			let postProcessing;
+			let renderPipeline;
 
 			init();
 
@@ -118,7 +118,7 @@
 
 				// post processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 
@@ -127,7 +127,7 @@
 
 				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focusDistance, effectController.focalLength, effectController.bokehScale );
 
-				postProcessing.outputNode = dofPass;
+				renderPipeline.outputNode = dofPass;
 
 				// controls
 
@@ -161,7 +161,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

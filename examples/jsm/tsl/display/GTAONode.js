@@ -12,7 +12,7 @@ let _rendererState;
 /**
  * Post processing node for applying Ground Truth Ambient Occlusion (GTAO) to a scene.
  * ```js
- * const postProcessing = new THREE.PostProcessing( renderer );
+ * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
  * const scenePass = pass( scene, camera );
  * scenePass.setMRT( mrt( {
@@ -25,8 +25,9 @@ let _rendererState;
  * const scenePassDepth = scenePass.getTextureNode( 'depth' );
  *
  * const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+ * const aoPassOutput = aoPass.getTextureNode();
  *
- * postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
+ * renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
  * ```
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).

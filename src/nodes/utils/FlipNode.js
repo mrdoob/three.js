@@ -56,7 +56,7 @@ class FlipNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.sourceNode.getNodeType( builder );
 

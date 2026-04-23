@@ -46,7 +46,7 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			let camera, scene, renderer, controls;
-			let postProcessing;
+			let renderPipeline;
 			let gltf;
 
 			init();
@@ -74,7 +74,6 @@
 				spotLight.shadow.mapSize.height = 1024;
 				spotLight.shadow.camera.near = .1;
 				spotLight.shadow.camera.far = 1;
-				spotLight.shadow.bias = - .003;
 				spotLight.shadow.intensity = .95;
 				spotLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				scene.add( spotLight );
@@ -165,6 +164,7 @@
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.transmitted = true;
 				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -179,7 +179,7 @@
 
 				// Post-Processing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// Layers
 
@@ -294,7 +294,7 @@
 
 				const scenePassColor = scenePass.add( bloomPass.mul( volumetricLightingIntensity ) );
 
-				postProcessing.outputNode = scenePassColor;
+				renderPipeline.outputNode = scenePassColor;
 
 				// Controls
 
@@ -326,7 +326,7 @@
 
 				controls.update();
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

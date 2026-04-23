@@ -16,6 +16,8 @@ export class Style {
 	--color-green: #4caf50;
 	--color-yellow: #ffc107;
 	--color-red: #f44336;
+	--color-fps: rgb(63, 81, 181);
+	--color-call: rgba(255, 185, 34, 1);
 	--font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	--font-mono: 'Fira Code', 'Courier New', Courier, monospace;
 }
@@ -52,13 +54,25 @@ export class Style {
 	font-family: var(--font-family);
 }
 
+#profiler-toggle.position-right.panel-open {
+	right: auto;
+	left: 15px;
+	border-radius: 6px 12px 12px 6px;
+	flex-direction: row-reverse;
+}
+
+#profiler-toggle.position-right.panel-open #builtin-tabs-container {
+	border-right: none;
+	border-left: 1px solid #262636;
+}
+
 #profiler-toggle:hover {
 	border-color: var(--accent-color);
 }
 
-#profiler-toggle.hidden {
-	opacity: 0;
-	pointer-events: none;
+#profiler-toggle.panel-open #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.2);
+	color: var(--accent-color);
 }
 
 #toggle-icon {
@@ -72,6 +86,10 @@ export class Style {
 
 #profiler-toggle:hover #toggle-icon {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+#profiler-toggle.panel-open:hover #toggle-icon {
+	background-color: rgba(0, 170, 255, 0.3);
 }
 
 .toggle-separator {
@@ -166,6 +184,11 @@ export class Style {
 	            transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+#profiler-mini-panel.position-right.panel-open {
+	right: auto;
+	left: 15px;
+}
+
 #profiler-mini-panel.visible {
 	display: block;
 	opacity: 1;
@@ -209,6 +232,7 @@ export class Style {
 	max-height: calc(100vh - 120px);
 	overflow-y: auto;
 	overflow-x: hidden;
+	width: 100%;
 }
 
 .mini-panel-content .list-scroll-wrapper::-webkit-scrollbar {
@@ -649,7 +673,7 @@ export class Style {
 }
 
 /* Hide drag indicator on mobile devices */
-#profiler-panel.hide-position-toggle .tab-btn.active::before {
+#profiler-panel.is-mobile .tab-btn.active::before {
 	display: none;
 }
 
@@ -742,7 +766,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
-	touch-action: none;
+	touch-action: pan-x;
 }
 
 .tab-btn.active {
@@ -754,7 +778,7 @@ export class Style {
 	content: '⋮⋮';
 	position: absolute;
 	left: 3px;
-	top: calc(50% - 2px);
+	top: calc(50% - .1rem);
 	transform: translateY(-50%);
 	color: var(--profiler-border);
 	font-size: 18px;
@@ -1018,10 +1042,11 @@ export class Style {
 }
 
 .list-scroll-wrapper {
-	overflow-x: auto;
-	width: 100%;
-	user-select: none;
-	-webkit-user-select: none;
+	width: max-content;
+	min-width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {
@@ -1057,7 +1082,7 @@ export class Style {
 	justify-content: space-between;
 }
 
-.console-filters-group {
+.console-buttons-group {
 	display: flex;
 	gap: 20px;
 }
@@ -1074,6 +1099,33 @@ export class Style {
 	border-radius: 15px;
 }
 
+.console-filter-input:focus {
+	outline: none;
+	border-color: var(--text-secondary);
+}
+
+.console-copy-button {
+	background: transparent;
+	border: none;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: color 0.2s, background-color 0.2s;
+}
+
+.console-copy-button:hover {
+	color: var(--text-primary);
+	background-color: var(--profiler-hover);
+}
+
+.console-copy-button.copied {
+	color: var(--color-green);
+}
+
 #console-log {
 	display: flex;
 	flex-direction: column;
@@ -1081,6 +1133,8 @@ export class Style {
 	padding: 10px;
 	overflow-y: auto;
 	flex-grow: 1;
+	user-select: text;
+	-webkit-user-select: text;
 }
 
 .log-message {
@@ -1151,6 +1205,11 @@ export class Style {
 	font-family: var(--font-mono);
 	width: 100%;
 	box-sizing: border-box;
+}
+
+.param-control input:focus {
+	outline: none;
+	border-color: var(--accent-color);
 }
 
 .param-control select {
@@ -1577,6 +1636,25 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 #profiler-panel input[type="number"],
 .detached-tab-content input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+.panel-action-btn {
+	background: transparent;
+	color: var(--text-primary);
+	border: 1px solid var(--profiler-border);
+	border-radius: 4px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-family: var(--font-family);
+	font-size: 12px;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel-action-btn:hover {
+	background-color: rgba(255, 255, 255, 0.05);
 }
 `;
 		const styleElement = document.createElement( 'style' );

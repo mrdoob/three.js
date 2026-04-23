@@ -48,7 +48,7 @@ class ConvertNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		const requestType = this.node.getNodeType( builder );
 

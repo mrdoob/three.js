@@ -26,7 +26,8 @@
 			import * as THREE from 'three';
 			import { ARButton } from 'three/addons/webxr/ARButton.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let camera, scene, renderer;
 			let cube;
@@ -122,7 +123,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				setCameraTexture();
 

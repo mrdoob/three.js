@@ -16,7 +16,9 @@
 				<div class="class-description"><p>This helps with visualizing what a camera contains in its frustum. It
 visualizes the frustum of a camera using a line segments.</p>
 <p>Based on frustum visualization in <a href="https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html" target="_blank" rel="noopener">lightgl.js shadowmap example</a>.</p>
-<p><code>CameraHelper</code> must be a child of the scene.</p></div>
+<p><code>CameraHelper</code> must be a child of the scene.</p>
+<p>When the camera is transformed or its projection matrix is changed, it's necessary
+to call the <code>update()</code> method of the respective helper.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const helper = new THREE.CameraHelper( camera );
@@ -35,7 +37,7 @@ scene.add( helper );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>camera</strong>
+										<strong translate="no">camera</strong>
 									</td>
 									<td class="description last">
 										<p>The camera to visualize.</p>
@@ -75,7 +77,7 @@ method whenever this instance is no longer used in your app.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frustum</strong>
+										<strong translate="no">frustum</strong>
 									</td>
 									<td class="description last">
 										<p>The frustum line color.</p>
@@ -83,7 +85,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cone</strong>
+										<strong translate="no">cone</strong>
 									</td>
 									<td class="description last">
 										<p>The cone line color.</p>
@@ -91,7 +93,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>up</strong>
+										<strong translate="no">up</strong>
 									</td>
 									<td class="description last">
 										<p>The up line color.</p>
@@ -99,7 +101,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
 										<p>The target line color.</p>
@@ -107,7 +109,7 @@ method whenever this instance is no longer used in your app.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>cross</strong>
+										<strong translate="no">cross</strong>
 									</td>
 									<td class="description last">
 										<p>The cross line color.</p>

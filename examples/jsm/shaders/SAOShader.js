@@ -153,9 +153,15 @@ const SAOShader = {
 				angle += ANGLE_STEP;
 
 				float sampleDepth = getDepth( sampleUv );
-				if( sampleDepth >= ( 1.0 - EPSILON ) ) {
+				#ifdef USE_REVERSED_DEPTH_BUFFER
+				if( sampleDepth <= 0.0 + EPSILON ) {
 					continue;
 				}
+				#else
+					if( sampleDepth >= 1.0 - EPSILON ) {
+						continue;
+					}
+				#endif
 
 				float sampleViewZ = getViewZ( sampleDepth );
 				vec3 sampleViewPosition = getViewPosition( sampleUv, sampleDepth, sampleViewZ );
@@ -170,9 +176,16 @@ const SAOShader = {
 
 		void main() {
 			float centerDepth = getDepth( vUv );
-			if( centerDepth >= ( 1.0 - EPSILON ) ) {
-				discard;
-			}
+			
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+				if( centerDepth <= 0.0 + EPSILON ) {
+					discard;
+				}
+			#else
+				if( centerDepth >= 1.0 - EPSILON ) {
+					discard;
+				}
+			#endif
 
 			float centerViewZ = getViewZ( centerDepth );
 			vec3 viewPosition = getViewPosition( vUv, centerDepth, centerViewZ );

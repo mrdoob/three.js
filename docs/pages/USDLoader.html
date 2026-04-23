@@ -13,11 +13,12 @@
 	<h1 translate="no">USDLoader</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>A loader for the USDZ format.</p>
-<p>USDZ files that use USDC internally are not yet supported, only USDA.</p></div>
+				<div class="class-description"><p>A loader for the USD format (USD, USDA, USDC, USDZ).</p>
+<p>Supports both ASCII (USDA) and binary (USDC) USD files, as well as
+USDZ archives containing either format.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const loader = new USDZLoader();
-const model = await loader.loadAsync( 'saeukkang.usdz' );
+				<div translate="no"><pre><code class="language-js">const loader = new USDLoader();
+const model = await loader.loadAsync( 'model.usdz' );
 scene.add( model );
 </code></pre></div>
 			</header>
@@ -36,7 +37,7 @@ scene.add( model );
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>manager</strong>
+										<strong translate="no">manager</strong>
 									</td>
 									<td class="description last">
 										<p>The loading manager.</p>
@@ -57,7 +58,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>url</strong>
+										<strong translate="no">url</strong>
 									</td>
 									<td class="description last">
 										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
@@ -65,7 +66,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onLoad</strong>
+										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when the loading process has been finished.</p>
@@ -73,7 +74,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onProgress</strong>
+										<strong translate="no">onProgress</strong>
 									</td>
 									<td class="description last">
 										<p>Executed while the loading is in progress.</p>
@@ -81,7 +82,7 @@ to the <code>onLoad()</code> callback.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>onError</strong>
+										<strong translate="no">onError</strong>
 									</td>
 									<td class="description last">
 										<p>Executed when errors occur.</p>
@@ -102,7 +103,7 @@ to the <code>onLoad()</code> callback.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>buffer</strong>
+										<strong translate="no">buffer</strong>
 									</td>
 									<td class="description last">
 										<p>The raw USDZ data as an array buffer.</p>

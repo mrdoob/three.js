@@ -165,6 +165,8 @@ class BufferAttributeNode extends InputNode {
 	 */
 	getHash( builder ) {
 
+		let id;
+
 		if ( this.bufferStride === 0 && this.bufferOffset === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
@@ -179,11 +181,15 @@ class BufferAttributeNode extends InputNode {
 
 			}
 
-			return bufferData.node.uuid;
+			id = bufferData.node.id;
+
+		} else {
+
+			id = this.id;
 
 		}
 
-		return this.uuid;
+		return String( id );
 
 	}
 
@@ -194,7 +200,7 @@ class BufferAttributeNode extends InputNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.bufferType === null ) {
 
@@ -259,8 +265,11 @@ class BufferAttributeNode extends InputNode {
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );
+		const nodeName = builder.context.nodeName;
 
-		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType );
+		if ( nodeName !== undefined ) delete builder.context.nodeName; // deleting when consumed
+
+		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType, nodeName );
 		const propertyName = builder.getPropertyName( nodeAttribute );
 
 		let output = null;
@@ -273,7 +282,15 @@ class BufferAttributeNode extends InputNode {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			let varyingName;
+
+			if ( nodeName ) {
+
+				varyingName = nodeName + 'Varying';
+
+			}
+
+			const nodeVarying = varying( this, varyingName );
 
 			output = nodeVarying.build( builder, nodeType );
 
@@ -366,7 +383,7 @@ function createBufferAttribute( array, type = null, stride = 0, offset = 0, usag
 
 	}
 
-	return new BufferAttributeNode( array, type, stride, offset );
+	return new BufferAttributeNode( array, type, stride, offset ).setUsage( usage );
 
 }
 

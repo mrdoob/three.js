@@ -18,7 +18,6 @@ import {
 	RGBA_ASTC_4x4_Format,
 	RGBA_ASTC_6x6_Format,
 	RGBA_BPTC_Format,
-	RGBA_S3TC_DXT3_Format,
 	RGBA_ETC2_EAC_Format,
 	R11_EAC_Format,
 	SIGNED_R11_EAC_Format,
@@ -43,7 +42,8 @@ import {
 	SRGBColorSpace,
 	UnsignedByteType,
 	UnsignedInt5999Type,
-	UnsignedInt101111Type
+	UnsignedInt101111Type,
+	UnsignedShortType
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -84,6 +84,7 @@ import {
 	VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG,
 	VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG,
 	VK_FORMAT_R16G16B16A16_SFLOAT,
+	VK_FORMAT_R16G16B16A16_UNORM,
 	VK_FORMAT_R16G16_SFLOAT,
 	VK_FORMAT_R16_SFLOAT,
 	VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -252,6 +253,7 @@ class KTX2Loader extends Loader {
 			};
 
 			if ( typeof navigator !== 'undefined' &&
+				typeof navigator.platform !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
 				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
 				this.workerConfig.astcSupported && this.workerConfig.etc2Supported &&
 				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
@@ -964,6 +966,8 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R16G16_SFLOAT ]: RGFormat,
 	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
 
+	[ VK_FORMAT_R16G16B16A16_UNORM ]: RGBAFormat,
+
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
 	[ VK_FORMAT_R8G8_SRGB ]: RGFormat,
@@ -993,8 +997,8 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_BC1_RGB_SRGB_BLOCK ]: RGB_S3TC_DXT1_Format,
 	[ VK_FORMAT_BC1_RGB_UNORM_BLOCK ]: RGB_S3TC_DXT1_Format,
 
-	[ VK_FORMAT_BC3_SRGB_BLOCK ]: RGBA_S3TC_DXT3_Format,
-	[ VK_FORMAT_BC3_UNORM_BLOCK ]: RGBA_S3TC_DXT3_Format,
+	[ VK_FORMAT_BC3_SRGB_BLOCK ]: RGBA_S3TC_DXT5_Format,
+	[ VK_FORMAT_BC3_UNORM_BLOCK ]: RGBA_S3TC_DXT5_Format,
 
 	[ VK_FORMAT_BC4_SNORM_BLOCK ]: SIGNED_RED_RGTC1_Format,
 	[ VK_FORMAT_BC4_UNORM_BLOCK ]: RED_RGTC1_Format,
@@ -1022,6 +1026,8 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R16G16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
 
+	[ VK_FORMAT_R16G16B16A16_UNORM ]: UnsignedShortType,
+
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
 	[ VK_FORMAT_R8G8_SRGB ]: UnsignedByteType,
@@ -1035,9 +1041,9 @@ const TYPE_MAP = {
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_EAC_R11_UNORM_BLOCK ]: UnsignedByteType,
-	[ VK_FORMAT_EAC_R11_UNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_EAC_R11_SNORM_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_EAC_R11G11_UNORM_BLOCK ]: UnsignedByteType,
-	[ VK_FORMAT_EAC_R11G11_UNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_EAC_R11G11_SNORM_BLOCK ]: UnsignedByteType,
 
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: HalfFloatType,
 	[ VK_FORMAT_ASTC_4x4_SRGB_BLOCK ]: UnsignedByteType,
@@ -1149,7 +1155,7 @@ async function createRawTexture( container ) {
 
 			);
 
-		} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType ) {
+		} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType || TYPE_MAP[ vkFormat ] === UnsignedShortType ) {
 
 			data = new Uint16Array(
 

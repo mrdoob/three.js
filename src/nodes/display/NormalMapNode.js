@@ -69,7 +69,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	setup( { material } ) {
+	setup( builder ) {
 
 		const { normalMapType, scaleNode, unpackNormalMode } = this;
 
@@ -87,7 +87,7 @@ class NormalMapNode extends TempNode {
 
 			} else if ( unpackNormalMode !== NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
+				error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
 
 			}
 
@@ -95,7 +95,7 @@ class NormalMapNode extends TempNode {
 
 			if ( unpackNormalMode !== NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
+				error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
 
 			}
 
@@ -105,7 +105,7 @@ class NormalMapNode extends TempNode {
 
 			let scale = scaleNode;
 
-			if ( material.flatShading === true ) {
+			if ( builder.isFlatShading() === true ) {
 
 				scale = directionToFaceDirection( scale );
 

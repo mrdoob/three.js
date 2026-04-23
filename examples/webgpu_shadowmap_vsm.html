@@ -39,7 +39,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
 
@@ -205,7 +205,8 @@
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 			}
 
@@ -220,7 +221,9 @@
 
 			function animate( time ) {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( config.animate === true ) {
 

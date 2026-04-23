@@ -13,11 +13,11 @@ import { directionToFaceDirection } from '../display/FrontFacingNode.js';
  * @param {string} varyingName - The name of the varying to assign the bitangent to.
  * @returns {Node<vec3>} The bitangent node.
  */
-const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], { subBuildFn, material } ) => {
+const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], builder ) => {
 
 	let bitangent = crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
-	if ( subBuildFn === 'NORMAL' && material.flatShading !== true ) {
+	if ( builder.subBuildFn === 'NORMAL' && builder.isFlatShading() !== true ) {
 
 		bitangent = bitangent.toVarying( varyingName );
 
@@ -49,11 +49,11 @@ export const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tan
  * @tsl
  * @type {Node<vec3>}
  */
-export const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+export const bitangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+	if ( builder.subBuildFn === 'VERTEX' || builder.geometry.hasAttribute( 'tangent' ) ) {
 
 		node = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize();
 
@@ -63,7 +63,7 @@ export const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, mater
 
 	}
 
-	if ( material.flatShading !== true ) {
+	if ( builder.isFlatShading() !== true ) {
 
 		node = directionToFaceDirection( node );
 

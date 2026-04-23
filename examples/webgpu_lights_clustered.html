@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - clustered lighting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Clustered Lighting</span>
+			</div>
+
+			<small>
+				Forward+ clustered lighting.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, uniform, vec3, float, mix, step } from 'three/tsl';
+
+			import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
+			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
+
+			let camera, scene, renderer,
+				lights, lightDummy,
+				controls,
+				scenePass, clusterInfluence, debugZSliceNode,
+				lighting,
+				maxCount,
+				count,
+				renderPipeline;
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 70 );
+				camera.position.set( - 10, 5, 0 );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x111111, 30, 80 );
+				scene.background = new THREE.Color( 0x111111 );
+
+				maxCount = 1000;
+				count = 700;
+
+				// sponza
+
+				const loader = new GLTFLoader();
+				const modelURL = await getSponzaModelURL();
+				const gltf = await loader.loadAsync( modelURL );
+				const model = gltf.scene;
+
+				model.traverse( ( child ) => {
+
+					if ( child.isLight && child.parent ) child.parent.remove( child );
+
+				} );
+
+				scene.add( model );
+
+				const box = new THREE.Box3().setFromObject( model );
+				const modelSize = box.getSize( new THREE.Vector3() );
+				const modelCenter = box.getCenter( new THREE.Vector3() );
+
+				const material = new THREE.MeshBasicMaterial();
+
+				lightDummy = new THREE.InstancedMesh( new THREE.SphereGeometry( 0.05, 16, 8 ), material, maxCount );
+				lightDummy.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				lightDummy.frustumCulled = false;
+				lightDummy.count = count;
+				scene.add( lightDummy );
+
+				// lights
+
+				lights = new THREE.Group();
+				scene.add( lights );
+
+				const addLight = ( hexColor, power = 30, distance = 1 ) => {
+
+					const light = new THREE.PointLight( hexColor, 1, distance );
+					light.position.set(
+						modelCenter.x + ( Math.random() - 0.5 ) * modelSize.x * 0.7,
+						( box.min.y + Math.random() * modelSize.y * 0.7 ) + 0.4,
+						modelCenter.z + ( Math.random() - 0.5 ) * modelSize.z * 0.5
+					);
+
+					light.power = power;
+					light.userData.fixedPosition = light.position.clone();
+					light.visible = ( lights.children.length < count );
+
+					light.updateMatrixWorld();
+
+					lightDummy.setMatrixAt( lights.children.length, light.matrixWorld );
+
+					lights.add( light );
+
+					return light;
+
+				};
+
+				const color = new THREE.Color();
+
+				for ( let i = 0; i < maxCount; i ++ ) {
+
+					const hex = ( Math.random() * 0x888888 ) + 0x888888;
+
+					lightDummy.setColorAt( i, color.setHex( hex ) );
+
+					addLight( hex );
+
+				}
+
+				//
+
+				const lightAmbient = new THREE.AmbientLight( 0xffffff, .1 );
+				scene.add( lightAmbient );
+
+				// renderer
+
+				lighting = new ClusteredLighting(); // ( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 64 )
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.lighting = lighting; // set lighting system
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1.5;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 5, 0 );
+				controls.maxDistance = 60;
+				controls.update();
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// post processing
+
+				scenePass = pass( scene, camera );
+				clusterInfluence = uniform( 0 );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				debugZSliceNode = uniform( 15, 'int' );
+
+				updatePostProcessing();
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				const params = {
+					count
+				};
+
+				gui.add( params, 'count', 0, maxCount, 1 ).name( 'light count' ).onChange( ( value ) => {
+
+					lightDummy.count = value;
+
+					for ( let i = 0; i < lights.children.length; i ++ ) {
+
+						lights.children[ i ].visible = ( i < value );
+
+					}
+
+				} );
+
+				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'lights per tile' );
+				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
+
+			}
+
+			function updatePostProcessing() {
+
+				// cluster light count debug overlay; needs to be updated every time the renderer size changes
+
+				const lightingNode = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
+
+				// Calculate a color mapping based on the actual number of lights directly affecting the cluster.
+				// We map between 0 and maxLightsPerCluster to a gradient
+				const lightCount = lightingNode.getClusterLightCount( debugZSliceNode );
+				const heatmap = float( lightCount ).div( float( lighting.maxLightsPerCluster ) );
+
+				// Gradient mapping: Blue (0.0) -> Green (0.5) -> Red (1.0)
+				let heatColor = mix( vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 1.0, 0.0 ), heatmap.mul( 2.0 ).saturate() );
+				heatColor = mix( heatColor, vec3( 1.0, 0.0, 0.0 ), heatmap.sub( 0.5 ).mul( 2.0 ).saturate() );
+
+				// Blend the heatmap over the original scene based on the slider value
+				// The `step` drops opacity to 0.0 if there are strictly no lights in the cluster
+				const finalInfluence = clusterInfluence.mul( step( 0.0001, heatmap ) );
+				renderPipeline.outputNode = mix( scenePass, heatColor, finalInfluence );
+				renderPipeline.needsUpdate = true;
+
+			}
+
+			async function getSponzaModelURL() {
+
+				const response = await fetch( MODEL_INDEX_URL );
+				const models = await response.json();
+				const sponzaInfo = models.find( ( model ) => model.name === 'Sponza' );
+
+				if ( ! sponzaInfo ) {
+
+					throw new Error( 'Sponza entry was not found in the glTF sample model index.' );
+
+				}
+
+				const variants = sponzaInfo.variants || {};
+				const variantName = variants[ 'glTF-Binary' ] || variants[ 'glTF' ] || variants[ 'glTF-Embedded' ] || Object.values( variants )[ 0 ];
+
+				if ( ! variantName ) {
+
+					throw new Error( 'Sponza has no supported glTF variant in the model index.' );
+
+				}
+
+				const variantFolder = variantName.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
+				return `${ SAMPLE_ASSETS_BASE_URL }${ sponzaInfo.name }/${ variantFolder }/${ variantName }`;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				updatePostProcessing();
+
+			}
+
+			function animate() {
+
+				const time = performance.now() / 1000;
+
+				for ( let i = 0; i < lights.children.length; i ++ ) {
+
+					const light = lights.children[ i ];
+					const lightTime = ( time * 0.5 ) + light.id;
+
+					light.position.copy( light.userData.fixedPosition );
+					light.position.x += Math.sin( lightTime * 0.7 ) * 1.5;
+					light.position.y += Math.cos( lightTime * 0.5 ) * .3;
+					light.position.z += Math.cos( lightTime * 0.3 ) * 1.5;
+
+					lightDummy.setMatrixAt( i, light.matrixWorld );
+
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

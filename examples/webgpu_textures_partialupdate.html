@@ -35,7 +35,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			let camera, scene, renderer, clock, dataTexture, diffuseMap;
+			let camera, scene, renderer, timer, dataTexture, diffuseMap;
 
 			let last = 0;
 			const position = new THREE.Vector2();
@@ -50,7 +50,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const loader = new THREE.TextureLoader();
 				diffuseMap = loader.load( 'textures/carbon/Carbon.png' );
@@ -71,6 +72,7 @@
 
 				const data = new Uint8Array( width * height * 4 );
 				dataTexture = new THREE.DataTexture( data, width, height );
+				dataTexture.colorSpace = THREE.SRGBColorSpace;
 
 				//
 
@@ -97,7 +99,9 @@
 
 			function animate() {
 
-				const elapsedTime = clock.getElapsedTime();
+				timer.update();
+
+				const elapsedTime = timer.getElapsed();
 
 
 				renderer.render( scene, camera );

@@ -36,7 +36,7 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let scene, mesh, renderer, postProcessing;
+			let scene, mesh, renderer, renderPipeline;
 			let camera, ssaaRenderPass;
 			let timer;
 
@@ -128,12 +128,12 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				ssaaRenderPass = ssaaPass( scene, camera );
 				const scenePassColor = ssaaRenderPass.getTextureNode();
 
-				postProcessing.outputNode = scenePassColor;
+				renderPipeline.outputNode = scenePassColor;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -201,7 +201,7 @@
 
 				camera.view.offsetX = params.viewOffsetX;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

@@ -119,7 +119,7 @@ class LDrawUtils {
 
 		object.traverse( c => {
 
-			if ( c.isMesh | c.isLineSegments ) {
+			if ( c.isMesh || c.isLineSegments ) {
 
 				const elemSize = c.isMesh ? 3 : 2;
 

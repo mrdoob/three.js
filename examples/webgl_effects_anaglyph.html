@@ -94,6 +94,12 @@
 				effect = new AnaglyphEffect( renderer );
 				effect.setSize( width, height );
 
+				// Configure stereo parameters for physically-correct rendering
+				// eyeSep: interpupillary distance (default 0.064m / 64mm for humans)
+				// planeDistance: distance to the zero-parallax plane (objects here appear at screen depth)
+				effect.eyeSep = 0.064;
+				effect.planeDistance = 3; // Match camera distance to origin for zero parallax at scene center
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize );

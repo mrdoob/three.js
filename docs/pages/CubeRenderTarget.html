@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="RenderTarget.html">RenderTarget</a> → <a href="WebGLRenderTarget.html">WebGLRenderTarget</a> → <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="RenderTarget.html">RenderTarget</a> → </p>
 	<h1 translate="no">CubeRenderTarget</h1>
 		<section>
 			<header>
@@ -28,7 +28,7 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>size</strong>
+										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
 										<p>The size of the render target.</p>
@@ -37,7 +37,7 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>options</strong>
+										<strong translate="no">options</strong>
 									</td>
 									<td class="description last">
 										<p>The configuration object.</p>
@@ -55,7 +55,61 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
+				<div class="member">
+					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="DataArrayTexture.html">DataArrayTexture</a></span> </h3>
+					<div class="description">
+						<p>Overwritten with a different texture type.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="RenderTarget.html#texture">RenderTarget#texture</a></dt>
+						</dl>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears this cube render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the color buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">stencil</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the stencil buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="fromEquirectangularTexture" translate="no">.<a href="#fromEquirectangularTexture">fromEquirectangularTexture</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="CubeRenderTarget.html">CubeRenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -65,7 +119,7 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>renderer</strong>
+										<strong translate="no">renderer</strong>
 									</td>
 									<td class="description last">
 										<p>The renderer.</p>
@@ -73,7 +127,7 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>texture</strong>
+										<strong translate="no">texture</strong>
 									</td>
 									<td class="description last">
 										<p>The equirectangular texture.</p>
@@ -81,9 +135,6 @@ of <code>WebGLCubeRenderTarget</code> which is compatible with <code>WebGPURende
 								</tr>
 							</tbody>
 						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="WebGLCubeRenderTarget.html#fromEquirectangularTexture">WebGLCubeRenderTarget#fromEquirectangularTexture</a></dt>
-						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cube render target.</dt>
 						</dl>

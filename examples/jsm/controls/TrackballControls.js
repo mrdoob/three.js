@@ -281,7 +281,7 @@ class TrackballControls extends Controls {
 		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { passive: false } );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
+		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
 	}
 
@@ -297,7 +297,7 @@ class TrackballControls extends Controls {
 		this.domElement.removeEventListener( 'wheel', this._onMouseWheel );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 
-		this.domElement.style.touchAction = 'auto'; // disable touch scroll
+		this.domElement.style.touchAction = ''; // Restore touch scroll
 
 	}
 

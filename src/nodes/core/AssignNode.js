@@ -63,7 +63,7 @@ class AssignNode extends TempNode {
 
 	}
 
-	getNodeType( builder, output ) {
+	generateNodeType( builder, output ) {
 
 		return output !== 'void' ? this.targetNode.getNodeType( builder ) : 'void';
 

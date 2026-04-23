@@ -34,7 +34,7 @@ or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>geometry</strong>
+										<strong translate="no">geometry</strong>
 									</td>
 									<td class="description last">
 										<p>The mesh geometry.</p>
@@ -42,7 +42,7 @@ or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>material</strong>
+										<strong translate="no">material</strong>
 									</td>
 									<td class="description last">
 										<p>The mesh material.</p>
@@ -96,17 +96,18 @@ across multiple skinned meshes.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyBoneTransform" translate="no">.<a href="#applyBoneTransform">applyBoneTransform</a><span class="signature">( index : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="applyBoneTransform" translate="no">.<a href="#applyBoneTransform">applyBoneTransform</a><span class="signature">( index : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a> | <a href="Vector4.html">Vector4</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a> | <a href="Vector4.html">Vector4</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies the bone transform associated with the given index to the given
-vertex position. Returns the updated vector.</p>
+vector. Can be used to transform positions or direction vectors by providing
+a Vector4 with 1 or 0 in the w component respectively. Returns the updated vector.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>index</strong>
+										<strong translate="no">index</strong>
 									</td>
 									<td class="description last">
 										<p>The vertex index.</p>
@@ -114,17 +115,16 @@ vertex position. Returns the updated vector.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>target</strong>
+										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
-										<p>The target object that is used to store the method's result.
-the skinned mesh's world matrix will be used instead.</p>
+										<p>The target object that is used to store the method's result.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The updated vertex position.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The updated vertex attribute data.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="bind" translate="no">.<a href="#bind">bind</a><span class="signature">( skeleton : <span class="param-type"><a href="Skeleton.html">Skeleton</a></span>, bindMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
@@ -136,7 +136,7 @@ the skinned mesh's world matrix will be used instead.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>skeleton</strong>
+										<strong translate="no">skeleton</strong>
 									</td>
 									<td class="description last">
 										<p>The skeleton to bind.</p>
@@ -144,7 +144,7 @@ the skinned mesh's world matrix will be used instead.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>bindMatrix</strong>
+										<strong translate="no">bindMatrix</strong>
 									</td>
 									<td class="description last">
 										<p>The bind matrix. If no bind matrix is provided,

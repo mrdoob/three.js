@@ -52,7 +52,7 @@
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
 			let gui;
-			let clock;
+			let timer;
 
 			const color = new THREE.Color();
 
@@ -104,7 +104,8 @@
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -229,7 +230,9 @@
 
 			async function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				const obj = line.visible ? line : segments;
 				thresholdLine.position.copy( line.position );

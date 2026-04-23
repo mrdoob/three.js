@@ -86,8 +86,12 @@ const PoissonDenoiseShader = {
 
 		const vec3 poissonDisk[SAMPLES] = SAMPLE_VECTORS;
 
-		vec3 getViewPosition(const in vec2 screenPosition, const in float depth) {
-			vec4 clipSpacePosition = vec4(vec3(screenPosition, depth) * 2.0 - 1.0, 1.0);
+		vec3 getViewPosition( const in vec2 screenPosition, const in float depth ) {
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+				vec4 clipSpacePosition = vec4( vec2( screenPosition ) * 2.0 - 1.0, depth, 1.0 );
+			#else
+				vec4 clipSpacePosition = vec4( vec3( screenPosition, depth ) * 2.0 - 1.0, 1.0 );
+			#endif
 			vec4 viewSpacePosition = cameraProjectionMatrixInverse * clipSpacePosition;
 			return viewSpacePosition.xyz / viewSpacePosition.w;
 		}

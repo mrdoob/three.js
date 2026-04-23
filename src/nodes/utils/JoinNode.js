@@ -42,7 +42,7 @@ class JoinNode extends TempNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) {
 
@@ -71,7 +71,7 @@ class JoinNode extends TempNode {
 
 			if ( length >= maxLength ) {
 
-				error( `TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
+				error( `TSL: Length of parameters exceeds maximum length of function '${ type }()' type.`, this.stackTrace );
 				break;
 
 			}
@@ -82,7 +82,7 @@ class JoinNode extends TempNode {
 
 			if ( length + inputTypeLength > maxLength ) {
 
-				error( `TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
+				error( `TSL: Length of '${ type }()' data exceeds maximum length of output type.`, this.stackTrace );
 
 				inputTypeLength = maxLength - length;
 				inputType = builder.getTypeFromLength( inputTypeLength );

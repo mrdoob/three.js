@@ -331,4 +331,4 @@ function generateDefaultNoise( size = 64 ) {
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {DenoiseNode}
  */
-export const denoise = ( node, depthNode, normalNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
+export const denoise = ( node, depthNode, normalNode, camera ) => new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), camera );

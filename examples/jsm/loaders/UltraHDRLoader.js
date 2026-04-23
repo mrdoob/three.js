@@ -18,11 +18,12 @@ import {
  * Short format brief:
  *
  *  [JPEG headers]
- *  [XMP metadata describing the MPF container and *both* SDR and gainmap images]
+ *  [Metadata describing the MPF container and both SDR and gainmap images]
+ *    - XMP metadata (legacy format)
+ *    - ISO 21496-1 metadata (current standard)
  *  [Optional metadata] [EXIF] [ICC Profile]
  *  [SDR image]
- *  [XMP metadata describing only the gainmap image]
- *  [Gainmap image]
+ *  [Gainmap image with metadata]
  *
  * Each section is separated by a 0xFFXX byte followed by a descriptor byte (0xFFE0, 0xFFE1, 0xFFE2.)
  * Binary image storages are prefixed with a unique 0xFFD8 16-bit descriptor.
@@ -45,7 +46,8 @@ for ( let i = 0; i < 1024; i ++ ) {
  *
  * Current feature set:
  * - JPEG headers (required)
- * - XMP metadata (required)
+ * - XMP metadata (legacy format, supported)
+ * - ISO 21496-1 metadata (current standard, supported)
  * - XMP validation (not implemented)
  * - EXIF profile (not implemented)
  * - ICC profile (not implemented)
@@ -109,7 +111,7 @@ class UltraHDRLoader extends Loader {
 	 */
 	parse( buffer, onLoad ) {
 
-		const xmpMetadata = {
+		const metadata = {
 			version: null,
 			baseRenditionIsHDR: null,
 			gainMapMin: null,
@@ -197,18 +199,47 @@ class UltraHDRLoader extends Loader {
 				/* JPEG Header - no useful information */
 			} else if ( sectionType === 0xe1 ) {
 
-				/* XMP Metadata */
+				/* APP1: XMP Metadata */
 
 				this._parseXMPMetadata(
 					textDecoder.decode( new Uint8Array( section ) ),
-					xmpMetadata
+					metadata
 				);
 
 			} else if ( sectionType === 0xe2 ) {
 
-				/* Data Sections - MPF / EXIF / ICC Profile */
+				/* APP2: Data Sections - MPF / ICC Profile / ISO 21496-1 Metadata */
 
 				const sectionData = new DataView( section.buffer, section.byteOffset + 2, section.byteLength - 2 );
+
+				// Check for ISO 21496-1 namespace: "urn:iso:std:iso:ts:21496:-1\0"
+				const isoNameSpace = 'urn:iso:std:iso:ts:21496:-1\0';
+				if ( section.byteLength >= isoNameSpace.length + 2 ) {
+
+					let isISO = true;
+					for ( let j = 0; j < isoNameSpace.length; j ++ ) {
+
+						if ( section[ 2 + j ] !== isoNameSpace.charCodeAt( j ) ) {
+
+							isISO = false;
+							break;
+
+						}
+
+					}
+
+					if ( isISO ) {
+
+						// Parse ISO 21496-1 metadata
+						const isoData = section.subarray( 2 + isoNameSpace.length );
+						this._parseISOMetadata( isoData, metadata );
+						continue;
+
+					}
+
+				}
+
+				// Check for MPF
 				const sectionHeader = sectionData.getUint32( 2, false );
 
 				if ( sectionHeader === 0x4d504600 ) {
@@ -277,7 +308,8 @@ class UltraHDRLoader extends Loader {
 		}
 
 		/* Minimal sufficient validation - https://developer.android.com/media/platform/hdr-image-format#signal_of_the_format */
-		if ( ! xmpMetadata.version ) {
+		// Version can come from either XMP or ISO metadata
+		if ( ! metadata.version ) {
 
 			throw new Error( 'THREE.UltraHDRLoader: Not a valid UltraHDR image' );
 
@@ -286,7 +318,7 @@ class UltraHDRLoader extends Loader {
 		if ( primaryImage && gainmapImage ) {
 
 			this._applyGainmapToSDR(
-				xmpMetadata,
+				metadata,
 				primaryImage,
 				gainmapImage,
 				( hdrBuffer, width, height ) => {
@@ -312,6 +344,126 @@ class UltraHDRLoader extends Loader {
 			throw new Error( 'THREE.UltraHDRLoader: Could not parse UltraHDR images' );
 
 		}
+
+	}
+
+	/**
+	 * Parses ISO 21496-1 gainmap metadata from binary data.
+	 *
+	 * @private
+	 * @param {Uint8Array} data - The binary ISO metadata.
+	 * @param {Object} metadata - The metadata object to populate.
+	 */
+	_parseISOMetadata( data, metadata ) {
+
+		const view = new DataView( data.buffer, data.byteOffset, data.byteLength );
+
+		// Skip minimum version (2 bytes) and writer version (2 bytes)
+		let offset = 4;
+
+		// Read flags (1 byte)
+		const flags = view.getUint8( offset );
+		offset += 1;
+
+		const backwardDirection = ( flags & 0x4 ) !== 0;
+		const useCommonDenominator = ( flags & 0x8 ) !== 0;
+
+		let gainMapMin, gainMapMax, gamma, offsetSDR, offsetHDR, hdrCapacityMin, hdrCapacityMax;
+
+		if ( useCommonDenominator ) {
+
+			// Read common denominator (4 bytes, unsigned)
+			const commonDenominator = view.getUint32( offset, false );
+			offset += 4;
+
+			// Read baseHdrHeadroom (4 bytes, unsigned)
+			const baseHdrHeadroomN = view.getUint32( offset, false );
+			offset += 4;
+			hdrCapacityMin = Math.log2( baseHdrHeadroomN / commonDenominator );
+
+			// Read alternateHdrHeadroom (4 bytes, unsigned)
+			const alternateHdrHeadroomN = view.getUint32( offset, false );
+			offset += 4;
+			hdrCapacityMax = Math.log2( alternateHdrHeadroomN / commonDenominator );
+
+			// Read first channel (or only channel) parameters
+			const gainMapMinN = view.getInt32( offset, false );
+			offset += 4;
+			gainMapMin = gainMapMinN / commonDenominator;
+
+			const gainMapMaxN = view.getInt32( offset, false );
+			offset += 4;
+			gainMapMax = gainMapMaxN / commonDenominator;
+
+			const gammaN = view.getUint32( offset, false );
+			offset += 4;
+			gamma = gammaN / commonDenominator;
+
+			const offsetSDRN = view.getInt32( offset, false );
+			offset += 4;
+			offsetSDR = ( offsetSDRN / commonDenominator ) * 255.0;
+
+			const offsetHDRN = view.getInt32( offset, false );
+			offsetHDR = ( offsetHDRN / commonDenominator ) * 255.0;
+
+		} else {
+
+			// Read baseHdrHeadroom numerator and denominator
+			const baseHdrHeadroomN = view.getUint32( offset, false );
+			offset += 4;
+			const baseHdrHeadroomD = view.getUint32( offset, false );
+			offset += 4;
+			hdrCapacityMin = Math.log2( baseHdrHeadroomN / baseHdrHeadroomD );
+
+			// Read alternateHdrHeadroom numerator and denominator
+			const alternateHdrHeadroomN = view.getUint32( offset, false );
+			offset += 4;
+			const alternateHdrHeadroomD = view.getUint32( offset, false );
+			offset += 4;
+			hdrCapacityMax = Math.log2( alternateHdrHeadroomN / alternateHdrHeadroomD );
+
+			// Read first channel parameters
+			const gainMapMinN = view.getInt32( offset, false );
+			offset += 4;
+			const gainMapMinD = view.getUint32( offset, false );
+			offset += 4;
+			gainMapMin = gainMapMinN / gainMapMinD;
+
+			const gainMapMaxN = view.getInt32( offset, false );
+			offset += 4;
+			const gainMapMaxD = view.getUint32( offset, false );
+			offset += 4;
+			gainMapMax = gainMapMaxN / gainMapMaxD;
+
+			const gammaN = view.getUint32( offset, false );
+			offset += 4;
+			const gammaD = view.getUint32( offset, false );
+			offset += 4;
+			gamma = gammaN / gammaD;
+
+			const offsetSDRN = view.getInt32( offset, false );
+			offset += 4;
+			const offsetSDRD = view.getUint32( offset, false );
+			offset += 4;
+			offsetSDR = ( offsetSDRN / offsetSDRD ) * 255.0;
+
+			const offsetHDRN = view.getInt32( offset, false );
+			offset += 4;
+			const offsetHDRD = view.getUint32( offset, false );
+			offsetHDR = ( offsetHDRN / offsetHDRD ) * 255.0;
+
+		}
+
+		// Convert log2 values to linear
+		metadata.version = '1.0'; // ISO standard doesn't encode version string, use default
+		metadata.baseRenditionIsHDR = backwardDirection;
+		metadata.gainMapMin = gainMapMin;
+		metadata.gainMapMax = gainMapMax;
+		metadata.gamma = gamma;
+		metadata.offsetSDR = offsetSDR;
+		metadata.offsetHDR = offsetHDR;
+		metadata.hdrCapacityMin = hdrCapacityMin;
+		metadata.hdrCapacityMax = hdrCapacityMax;
 
 	}
 
@@ -383,7 +535,7 @@ class UltraHDRLoader extends Loader {
 
 	}
 
-	_parseXMPMetadata( xmpDataString, xmpMetadata ) {
+	_parseXMPMetadata( xmpDataString, metadata ) {
 
 		const domParser = new DOMParser();
 
@@ -408,28 +560,28 @@ class UltraHDRLoader extends Loader {
 
 			const [ gainmapNode ] = xmpXml.getElementsByTagName( 'rdf:Description' );
 
-			xmpMetadata.version = gainmapNode.getAttribute( 'hdrgm:Version' );
-			xmpMetadata.baseRenditionIsHDR =
+			metadata.version = gainmapNode.getAttribute( 'hdrgm:Version' );
+			metadata.baseRenditionIsHDR =
 				gainmapNode.getAttribute( 'hdrgm:BaseRenditionIsHDR' ) === 'True';
-			xmpMetadata.gainMapMin = parseFloat(
+			metadata.gainMapMin = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:GainMapMin' ) || 0.0
 			);
-			xmpMetadata.gainMapMax = parseFloat(
+			metadata.gainMapMax = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:GainMapMax' ) || 1.0
 			);
-			xmpMetadata.gamma = parseFloat(
+			metadata.gamma = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:Gamma' ) || 1.0
 			);
-			xmpMetadata.offsetSDR = parseFloat(
+			metadata.offsetSDR = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:OffsetSDR' ) / ( 1 / 64 )
 			);
-			xmpMetadata.offsetHDR = parseFloat(
+			metadata.offsetHDR = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:OffsetHDR' ) / ( 1 / 64 )
 			);
-			xmpMetadata.hdrCapacityMin = parseFloat(
+			metadata.hdrCapacityMin = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:HDRCapacityMin' ) || 0.0
 			);
-			xmpMetadata.hdrCapacityMax = parseFloat(
+			metadata.hdrCapacityMax = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:HDRCapacityMax' ) || 1.0
 			);
 
@@ -459,7 +611,7 @@ class UltraHDRLoader extends Loader {
 	}
 
 	_applyGainmapToSDR(
-		xmpMetadata,
+		metadata,
 		sdrBuffer,
 		gainmapBuffer,
 		onSuccess,
@@ -527,10 +679,10 @@ class UltraHDRLoader extends Loader {
 				/* HDR Recovery formula - https://developer.android.com/media/platform/hdr-image-format#use_the_gain_map_to_create_adapted_HDR_rendition */
 
 				/* 1.8 instead of 2 near-perfectly rectifies approximations introduced by precalculated SRGB_TO_LINEAR values */
-				const maxDisplayBoost = 1.8 ** ( xmpMetadata.hdrCapacityMax * 0.5 );
+				const maxDisplayBoost = 1.8 ** ( metadata.hdrCapacityMax * 0.5 );
 				const unclampedWeightFactor =
-					( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) /
-					( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
+					( Math.log2( maxDisplayBoost ) - metadata.hdrCapacityMin ) /
+					( metadata.hdrCapacityMax - metadata.hdrCapacityMin );
 				const weightFactor = Math.min(
 					Math.max( unclampedWeightFactor, 0.0 ),
 					1.0
@@ -539,12 +691,12 @@ class UltraHDRLoader extends Loader {
 				const sdrData = sdrImageData.data;
 				const gainmapData = gainmapImageData.data;
 				const dataLength = sdrData.length;
-				const gainMapMin = xmpMetadata.gainMapMin;
-				const gainMapMax = xmpMetadata.gainMapMax;
-				const offsetSDR = xmpMetadata.offsetSDR;
-				const offsetHDR = xmpMetadata.offsetHDR;
-				const invGamma = 1.0 / xmpMetadata.gamma;
-				const useGammaOne = xmpMetadata.gamma === 1.0;
+				const gainMapMin = metadata.gainMapMin;
+				const gainMapMax = metadata.gainMapMax;
+				const offsetSDR = metadata.offsetSDR;
+				const offsetHDR = metadata.offsetHDR;
+				const invGamma = 1.0 / metadata.gamma;
+				const useGammaOne = metadata.gamma === 1.0;
 				const isHalfFloat = this.type === HalfFloatType;
 				const toHalfFloat = DataUtils.toHalfFloat;
 				const srgbToLinear = this._srgbToLinear;

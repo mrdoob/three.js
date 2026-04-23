@@ -1,8 +1,7 @@
-/*// debugger tools
-import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
-//*/
+// debugger tools
+// import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 
-import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap, GPUShaderStage } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -10,12 +9,15 @@ import Backend from '../common/Backend.js';
 import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
+import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
-import { warnOnce, error } from '../../utils.js';
+import { error } from '../../utils.js';
+
+const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 
 /**
  * A backend implementation targeting WebGPU.
@@ -30,8 +32,8 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @typedef {Object} WebGPUBackend~Options
 	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
-	 * @property {boolean} [compatibilityMode=false] - Whether the backend should be in compatibility mode or not.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
@@ -64,16 +66,18 @@ class WebGPUBackend extends Backend {
 
 		// some parameters require default values other than "undefined"
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
-		this.parameters.compatibilityMode = ( parameters.compatibilityMode === undefined ) ? false : parameters.compatibilityMode;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		/**
-		 * Indicates whether the backend is in compatibility mode or not.
-		 * @type {boolean}
-		 * @default false
+		 * Indicates whether the backend is in WebGPU compatibility mode or not.
+		 * The backend must be initialized before the property can be evaluated.
+		 *
+		 * @type {?boolean}
+		 * @readonly
+		 * @default null
 		 */
-		this.compatibilityMode = this.parameters.compatibilityMode;
+		this.compatibilityMode = null;
 
 		/**
 		 * A reference to the device.
@@ -113,6 +117,14 @@ class WebGPUBackend extends Backend {
 		 * @type {WebGPUBindingUtils}
 		 */
 		this.bindingUtils = new WebGPUBindingUtils( this );
+
+		/**
+		 * A reference to a backend module holding device capability related
+		 * utility functions.
+		 *
+		 * @type {WebGPUCapabilities}
+		 */
+		this.capabilities = new WebGPUCapabilities( this );
 
 		/**
 		 * A reference to a backend module holding shader pipeline-related
@@ -175,7 +187,7 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: parameters.compatibilityMode ? 'compatibility' : undefined
+				featureLevel: 'compatibility'
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -212,6 +224,14 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			device = parameters.device;
+
+		}
+
+		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
+
+		if ( this.compatibilityMode ) {
+
+			renderer._samples = 0;
 
 		}
 
@@ -304,15 +324,20 @@ class WebGPUBackend extends Backend {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {number} count - The offset from which to start reading the
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		return await this.attributeUtils.getArrayBufferAsync( attribute );
+		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 
@@ -663,7 +688,21 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.clearColor ) {
 
-					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
+					if ( i === 0 ) {
+
+						colorAttachment.clearValue = renderContext.clearColorValue;
+
+					} else {
+
+						_clearValue.r = 0;
+						_clearValue.g = 0;
+						_clearValue.b = 0;
+						_clearValue.a = 1;
+
+						colorAttachment.clearValue = _clearValue;
+
+					}
+
 					colorAttachment.loadOp = GPULoadOp.Clear;
 
 				} else {
@@ -1205,7 +1244,6 @@ class WebGPUBackend extends Backend {
 
 		let colorAttachments = [];
 		let depthStencilAttachment;
-		let clearValue;
 
 		let supportsDepth;
 		let supportsStencil;
@@ -1213,7 +1251,11 @@ class WebGPUBackend extends Backend {
 		if ( color ) {
 
 			const clearColor = this.getClearColor();
-			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+
+			_clearValue.r = clearColor.r;
+			_clearValue.g = clearColor.g;
+			_clearValue.b = clearColor.b;
+			_clearValue.a = clearColor.a;
 
 		}
 
@@ -1230,7 +1272,7 @@ class WebGPUBackend extends Backend {
 
 				const colorAttachment = colorAttachments[ 0 ];
 
-				colorAttachment.clearValue = clearValue;
+				colorAttachment.clearValue = _clearValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
 
@@ -1249,7 +1291,7 @@ class WebGPUBackend extends Backend {
 
 			const clearConfig = {
 				loadOp: color ? GPULoadOp.Clear : GPULoadOp.Load,
-				clearValue: color ? clearValue : undefined
+				clearValue: color ? _clearValue : undefined
 			};
 
 			if ( supportsDepth ) {
@@ -1387,13 +1429,13 @@ class WebGPUBackend extends Backend {
 
 		if ( dispatchSize === null ) {
 
-			dispatchSize = computeNode.count;
+			dispatchSize = computeNode.dispatchSize || computeNode.count;
 
 		}
 
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
-		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+		if ( dispatchSize && dispatchSize.isIndirectStorageBufferAttribute ) {
 
 			const dispatchBuffer = this.get( dispatchSize ).buffer;
 
@@ -1472,6 +1514,175 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Internal draw function that performs the draw with the given pass encoder.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Info} info - Holds a series of statistical information about the GPU memory and the rendering process.
+	 * @param {Object} renderContextData - The render context data object, holding current pass state and occlusion query tracking.
+	 * @param {GPURenderPipeline} pipelineGPU - The GPU render pipeline.
+	 * @param {Array<BindGroup>} bindings - The bind groups.
+	 * @param {Array<BufferAttribute>} vertexBuffers - The vertex buffers.
+	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
+	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
+	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
+	 */
+	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+
+		const { object, material, context } = renderObject;
+
+		const index = renderObject.getIndex();
+		const hasIndex = ( index !== null );
+
+		// pipeline
+		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
+		currentSets.pipeline = pipelineGPU;
+
+		// bind groups
+		const currentBindingGroups = currentSets.bindingGroups;
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+			if ( currentBindingGroups[ i ] !== bindGroup.id ) {
+
+				passEncoderGPU.setBindGroup( i, bindingsData.group );
+				currentBindingGroups[ i ] = bindGroup.id;
+
+			}
+
+		}
+
+		// attributes
+
+		// index
+
+		if ( hasIndex === true ) {
+
+			if ( currentSets.index !== index ) {
+
+				const buffer = this.get( index ).buffer;
+				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+
+				currentSets.index = index;
+
+			}
+
+		}
+
+		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
+
+			const vertexBuffer = vertexBuffers[ i ];
+
+			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+
+				const buffer = this.get( vertexBuffer ).buffer;
+				passEncoderGPU.setVertexBuffer( i, buffer );
+
+				currentSets.attributes[ i ] = vertexBuffer;
+
+			}
+
+		}
+		// stencil
+
+		if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
+
+			passEncoderGPU.setStencilReference( material.stencilRef );
+			renderContextData.currentStencilRef = material.stencilRef;
+
+		}
+
+		if ( object.isBatchedMesh === true ) {
+
+			const starts = object._multiDrawStarts;
+			const counts = object._multiDrawCounts;
+			const drawCount = object._multiDrawCount;
+
+			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
+
+			if ( material.wireframe ) {
+
+				bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
+
+			}
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				if ( hasIndex === true ) {
+
+					passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
+
+				} else {
+
+					passEncoderGPU.draw( counts[ i ], 1, starts[ i ], i );
+
+				}
+
+				info.update( object, counts[ i ], 1 );
+
+			}
+
+		} else if ( hasIndex === true ) {
+
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
+
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+				const indirectOffset = renderObject.getIndirectOffset();
+				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+					passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
+
+				}
+
+			} else {
+
+				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
+			}
+
+			info.update( object, indexCount, instanceCount );
+
+		} else {
+
+			const { vertexCount, instanceCount, firstVertex } = drawParams;
+
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+				const indirectOffset = renderObject.getIndirectOffset();
+				const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
+
+				for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+					passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
+
+				}
+
+
+			} else {
+
+				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
+			}
+
+			info.update( object, vertexCount, instanceCount );
+
+		}
+
+	}
+
 	// render object
 
 	/**
@@ -1482,186 +1693,22 @@ class WebGPUBackend extends Backend {
 	 */
 	draw( renderObject, info ) {
 
-		const { object, material, context, pipeline } = renderObject;
-		const bindings = renderObject.getBindings();
+		const { object, context, pipeline } = renderObject;
 		const renderContextData = this.get( context );
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
+		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
-
-		const index = renderObject.getIndex();
-		const hasIndex = ( index !== null );
-
 
 		const drawParams = renderObject.getDrawParameters();
 		if ( drawParams === null ) return;
 
-		// pipeline
+		const bindings = renderObject.getBindings();
 
-		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
+		// vertex buffers
 
-			// pipeline
-			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
-			currentSets.pipeline = pipelineGPU;
-
-			// bind groups
-			const currentBindingGroups = currentSets.bindingGroups;
-			for ( let i = 0, l = bindings.length; i < l; i ++ ) {
-
-				const bindGroup = bindings[ i ];
-				const bindingsData = this.get( bindGroup );
-				if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
-
-					passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
-					currentBindingGroups[ bindGroup.index ] = bindGroup.id;
-
-				}
-
-			}
-
-			// attributes
-
-			// index
-
-			if ( hasIndex === true ) {
-
-				if ( currentSets.index !== index ) {
-
-					const buffer = this.get( index ).buffer;
-					const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
-
-					passEncoderGPU.setIndexBuffer( buffer, indexFormat );
-
-					currentSets.index = index;
-
-				}
-
-			}
-			// vertex buffers
-
-			const vertexBuffers = renderObject.getVertexBuffers();
-
-			for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
-
-				const vertexBuffer = vertexBuffers[ i ];
-
-				if ( currentSets.attributes[ i ] !== vertexBuffer ) {
-
-					const buffer = this.get( vertexBuffer ).buffer;
-					passEncoderGPU.setVertexBuffer( i, buffer );
-
-					currentSets.attributes[ i ] = vertexBuffer;
-
-				}
-
-			}
-			// stencil
-
-			if ( context.stencil === true && material.stencilWrite === true && renderContextData.currentStencilRef !== material.stencilRef ) {
-
-				passEncoderGPU.setStencilReference( material.stencilRef );
-				renderContextData.currentStencilRef = material.stencilRef;
-
-			}
-
-
-		};
-
-		// Define draw function
-		const draw = ( passEncoderGPU, currentSets ) => {
-
-			setPipelineAndBindings( passEncoderGPU, currentSets );
-
-			if ( object.isBatchedMesh === true ) {
-
-				const starts = object._multiDrawStarts;
-				const counts = object._multiDrawCounts;
-				const drawCount = object._multiDrawCount;
-				const drawInstances = object._multiDrawInstances;
-
-				if ( drawInstances !== null ) {
-
-					// @deprecated, r174
-					warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
-
-				}
-
-				for ( let i = 0; i < drawCount; i ++ ) {
-
-					const count = drawInstances ? drawInstances[ i ] : 1;
-					const firstInstance = count > 1 ? 0 : i;
-
-					if ( hasIndex === true ) {
-
-						passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / index.array.BYTES_PER_ELEMENT, 0, firstInstance );
-
-					} else {
-
-						passEncoderGPU.draw( counts[ i ], count, starts[ i ], firstInstance );
-
-					}
-
-					info.update( object, counts[ i ], count );
-
-				}
-
-			} else if ( hasIndex === true ) {
-
-				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
-
-				const indirect = renderObject.getIndirect();
-
-				if ( indirect !== null ) {
-
-					const buffer = this.get( indirect ).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
-
-					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
-
-						passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
-
-					}
-
-				} else {
-
-					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
-
-				}
-
-				info.update( object, indexCount, instanceCount );
-
-			} else {
-
-				const { vertexCount, instanceCount, firstVertex } = drawParams;
-
-				const indirect = renderObject.getIndirect();
-
-				if ( indirect !== null ) {
-
-					const buffer = this.get( indirect ).buffer;
-					const indirectOffset = renderObject.getIndirectOffset();
-					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
-
-					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
-
-						passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
-
-					}
-
-
-				} else {
-
-					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
-
-				}
-
-				info.update( object, vertexCount, instanceCount );
-
-			}
-
-		};
+		const vertexBuffers = renderObject.getVertexBuffers();
 
 		if ( renderObject.camera.isArrayCamera && renderObject.camera.cameras.length > 0 ) {
 
@@ -1702,8 +1749,6 @@ class WebGPUBackend extends Backend {
 
 					const vp = subCamera.viewport;
 
-
-
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
 					if ( renderContextData.bundleEncoders ) {
@@ -1714,8 +1759,6 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
-
-
 
 					if ( vp ) {
 
@@ -1730,17 +1773,16 @@ class WebGPUBackend extends Backend {
 
 					}
 
-
 					// Set camera index binding for this layer
 					if ( cameraIndex && cameraData.indexesGPU ) {
 
-						pass.setBindGroup( cameraIndex.index, cameraData.indexesGPU[ i ] );
-						sets.bindingGroups[ cameraIndex.index ] = cameraIndex.id;
+						const indexPos = bindings.indexOf( cameraIndex );
+						pass.setBindGroup( indexPos, cameraData.indexesGPU[ i ] );
+						sets.bindingGroups[ indexPos ] = cameraIndex.id;
 
 					}
 
-					draw( pass, sets );
-
+					this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, pass, sets );
 
 				}
 
@@ -1777,7 +1819,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				draw( renderContextData.currentPass, renderContextData.currentSets );
+				this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, renderContextData.currentPass, renderContextData.currentSets );
 
 			}
 
@@ -2136,6 +2178,70 @@ class WebGPUBackend extends Backend {
 	// bindings
 
 	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		if ( uniformBufferData.buffer === undefined ) {
+
+			const byteLength = uniformBuffer.byteLength;
+
+			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+			const visibilities = [];
+
+			if ( uniformBuffer.visibility & GPUShaderStage.VERTEX ) {
+
+				visibilities.push( 'vertex' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.FRAGMENT ) {
+
+				visibilities.push( 'fragment' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.COMPUTE ) {
+
+				visibilities.push( 'compute' );
+
+			}
+
+			const bufferVisibility = `(${visibilities.join( ',' )})`;
+
+			const bufferGPU = this.device.createBuffer( {
+				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
+				size: byteLength,
+				usage: usage
+			} );
+
+			uniformBufferData.buffer = bufferGPU;
+
+		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		uniformBufferData.buffer.destroy();
+
+		this.delete( uniformBuffer );
+
+	}
+
+	/**
 	 * Creates bindings from the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
@@ -2273,17 +2379,6 @@ class WebGPUBackend extends Backend {
 	}
 
 	// utils public
-
-	/**
-	 * Returns the maximum anisotropy texture filtering value.
-	 *
-	 * @return {number} The maximum anisotropy texture filtering value.
-	 */
-	getMaxAnisotropy() {
-
-		return 16;
-
-	}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -2520,9 +2615,9 @@ class WebGPUBackend extends Backend {
 	 */
 	hasCompatibility( name ) {
 
-		if ( this._compatibility[ Compatibility.TEXTURE_COMPARE ] !== undefined ) {
+		if ( this._compatibility[ name ] !== undefined ) {
 
-			return this._compatibility[ Compatibility.TEXTURE_COMPARE ];
+			return this._compatibility[ name ];
 
 		}
 

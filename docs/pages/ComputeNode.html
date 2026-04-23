@@ -13,7 +13,7 @@
 	<h1 translate="no">ComputeNode</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>TODO</p></div>
+				<div class="class-description"><p>Represents a compute shader node.</p></div>
 			</header>
 			<article>
 				<div class="container-overview">
@@ -27,18 +27,18 @@
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>computeNode</strong>
+										<strong translate="no">computeNode</strong>
 									</td>
 									<td class="description last">
-										<p>TODO</p>
+										<p>The node that defines the compute shader logic.</p>
 									</td>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>workgroupSize</strong>
+										<strong translate="no">workgroupSize</strong>
 									</td>
 									<td class="description last">
-										<p>TODO.</p>
+										<p>An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -49,13 +49,28 @@
 				<div class="member">
 					<h3 class="name" id="computeNode" translate="no">.<a href="#computeNode">computeNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>The node that defines the compute shader logic.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number | Array.&lt;number></span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>The total number of threads (invocations) to execute. If it is a number, it will be used
+to automatically generate bounds checking against <code>instanceIndex</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="countNode" translate="no">.<a href="#countNode">countNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="description">
+						<p>A uniform node holding the dispatch count for bounds checking.
+Created automatically when <code>count</code> is a number.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dispatchSize" translate="no">.<a href="#dispatchSize">dispatchSize</a><span class="type-signature"> : number | Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>The dispatch size for workgroups on X, Y, and Z axes.
+Used directly if <code>count</code> is not provided.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -78,7 +93,7 @@
 				<div class="member">
 					<h3 class="name" id="onInitFunction" translate="no">.<a href="#onInitFunction">onInitFunction</a><span class="type-signature"> : function</span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>A callback executed when the compute node finishes initialization.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -95,7 +110,7 @@ is executed once per object by default.</p>
 				<div class="member">
 					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>The version of the node.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#version">Node#version</a></dt>
@@ -104,7 +119,7 @@ is executed once per object by default.</p>
 				<div class="member">
 					<h3 class="name" id="workgroupSize" translate="no">.<a href="#workgroupSize">workgroupSize</a><span class="type-signature"> : Array.&lt;number></span> </h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.</p>
 						<p>Default is <code>[ 64 ]</code>.</p>
 					</div>
 				</div>
@@ -118,12 +133,6 @@ is executed once per object by default.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#dispose">Node#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getCount" translate="no">.<a href="#getCount">getCount</a><span class="signature">()</span><span class="type-signature"> : number | Array.&lt;number></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>TODO</p>
-						</div>
-					</div>
 					<h3 class="name name-method" id="label" translate="no">.<a href="#label">label</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -133,7 +142,7 @@ is executed once per object by default.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the uniform.</p>
@@ -151,16 +160,16 @@ is executed once per object by default.</p>
 					<h3 class="name name-method" id="onInit" translate="no">.<a href="#onInit">onInit</a><span class="signature">( callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TODO</p>
+							<p>Sets the callback to run during initialization.</p>
 						</div>
 						<table class="params">
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
-										<p>TODO.</p>
+										<p>The callback function.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -168,24 +177,6 @@ is executed once per object by default.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
-					</div>
-					<h3 class="name name-method" id="setCount" translate="no">.<a href="#setCount">setCount</a><span class="signature">( count : <span class="param-type">number | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>TODO</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>count</strong>
-									</td>
-									<td class="description last">
-										<p>Array with [ x, y, z ] values for dispatch or a single number for the count</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
 					</div>
 					<h3 class="name name-method" id="setName" translate="no">.<a href="#setName">setName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
@@ -196,7 +187,7 @@ is executed once per object by default.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>The name of the uniform.</p>
@@ -217,7 +208,7 @@ is executed once per object by default.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current node frame.</p>

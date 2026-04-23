@@ -1,9 +1,14 @@
+import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
+import { getItem, setItem } from '../Inspector.js';
 
-export class Profiler {
+export class Profiler extends EventDispatcher {
 
-	constructor() {
+	constructor( inspector ) {
 
+		super();
+
+		this.inspector = inspector;
 		this.tabs = {};
 		this.activeTabId = null;
 		this.isResizing = false;
@@ -11,7 +16,6 @@ export class Profiler {
 		this.lastWidthRight = 450; // Width for right position
 		this.position = 'bottom'; // 'bottom' or 'right'
 		this.detachedWindows = []; // Array to store detached tab windows
-		this.isMobile = this.detectMobile();
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
@@ -20,15 +24,43 @@ export class Profiler {
 		this.setupShell();
 		this.setupResizing();
 
-		// Setup orientation change listener for mobile devices
-		if ( this.isMobile ) {
+		// Setup window resize listener and update mobile status
+		this.setupWindowResizeListener();
 
-			this.setupOrientationListener();
+		// Setup orientation change listener for mobile devices
+		this.setupOrientationListener();
+
+	}
+
+	getSize() {
+
+		if ( this.panel.classList.contains( 'visible' ) === false || this.panel.classList.contains( 'no-tabs' ) ) {
+
+			return { width: 0, height: 0 };
 
 		}
 
-		// Setup window resize listener to constrain detached windows
-		this.setupWindowResizeListener();
+		if ( this.position === 'right' ) {
+
+			return { width: this.panel.offsetWidth, height: 0 };
+
+		} else {
+
+			return { width: 0, height: this.panel.offsetHeight };
+
+		}
+
+	}
+
+	get isMobile() {
+
+		return this.detectMobile();
+
+	}
+
+	get isSmallScreen() {
+
+		return window.innerWidth <= 768;
 
 	}
 
@@ -38,15 +70,16 @@ export class Profiler {
 		const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 		const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test( userAgent );
 		const isTouchDevice = ( 'ontouchstart' in window ) || ( navigator.maxTouchPoints > 0 );
-		const isSmallScreen = window.innerWidth <= 768;
 
-		return isMobileUA || ( isTouchDevice && isSmallScreen );
+		return isMobileUA || ( isTouchDevice && this.isSmallScreen );
 
 	}
 
 	setupOrientationListener() {
 
 		const handleOrientationChange = () => {
+
+			if ( ! this.isMobile ) return;
 
 			// Check if device is in landscape or portrait mode
 			const isLandscape = window.innerWidth > window.innerHeight;
@@ -122,6 +155,28 @@ export class Profiler {
 
 		// Listen for window resize events
 		window.addEventListener( 'resize', () => {
+
+			if ( this.isSmallScreen ) {
+
+				this.floatingBtn.style.display = 'none';
+				this.panel.classList.add( 'hide-position-toggle' );
+
+			} else {
+
+				this.floatingBtn.style.display = '';
+				this.panel.classList.remove( 'hide-position-toggle' );
+
+			}
+
+			if ( this.isMobile ) {
+
+				this.panel.classList.add( 'is-mobile' );
+
+			} else {
+
+				this.panel.classList.remove( 'is-mobile' );
+
+			}
 
 			constrainDetachedWindows();
 			constrainMainPanel();
@@ -210,6 +265,19 @@ export class Profiler {
 
 		const header = document.createElement( 'div' );
 		header.className = 'profiler-header';
+
+		// Enable horizontal scrolling with vertical mouse wheel
+		header.addEventListener( 'wheel', ( e ) => {
+
+			if ( e.deltaY !== 0 ) {
+
+				e.preventDefault();
+				header.scrollLeft += e.deltaY * .25;
+
+			}
+
+		}, { passive: false } );
+
 		this.tabsContainer = document.createElement( 'div' );
 		this.tabsContainer.className = 'profiler-tabs';
 
@@ -222,11 +290,17 @@ export class Profiler {
 		this.floatingBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>';
 		this.floatingBtn.onclick = () => this.togglePosition();
 
-		// Hide position toggle button on mobile devices
-		if ( this.isMobile ) {
+		// Hide position toggle button on small screens
+		if ( this.isSmallScreen ) {
 
 			this.floatingBtn.style.display = 'none';
 			this.panel.classList.add( 'hide-position-toggle' );
+
+		}
+
+		if ( this.isMobile ) {
+
+			this.panel.classList.add( 'is-mobile' );
 
 		}
 
@@ -255,6 +329,13 @@ export class Profiler {
 
 		// Set initial position class
 		this.panel.classList.add( `position-${this.position}` );
+
+		if ( this.position === 'right' ) {
+
+			this.toggleButton.classList.add( 'position-right' );
+			this.miniPanel.classList.add( 'position-right' );
+
+		}
 
 	}
 
@@ -302,6 +383,8 @@ export class Profiler {
 					}
 
 				}
+
+				this.dispatchEvent( { type: 'resize' } );
 
 			};
 
@@ -395,6 +478,47 @@ export class Profiler {
 
 		}
 
+		this.dispatchEvent( { type: 'resize' } );
+
+	}
+
+	hide() {
+
+		this.miniPanel.classList.remove( 'visible' );
+
+		this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
+
+			content.style.display = 'none';
+
+		} );
+
+		this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
+
+			btn.classList.remove( 'active' );
+
+		} );
+
+	}
+
+	show( tab ) {
+
+		this.hide();
+
+		tab.builtinButton.classList.add( 'active' );
+
+		if ( ! tab.miniContent.firstChild ) {
+
+			while ( tab.content.firstChild ) {
+
+				tab.miniContent.appendChild( tab.content.firstChild );
+
+			}
+
+		}
+
+		tab.miniContent.style.display = 'block';
+		this.miniPanel.classList.add( 'visible' );
+
 	}
 
 	addTab( tab ) {
@@ -416,7 +540,12 @@ export class Profiler {
 
 		this.setupTabDragAndDrop( tab );
 
-		this.tabsContainer.appendChild( tab.button );
+		if ( ! tab.builtin ) {
+
+			this.tabsContainer.appendChild( tab.button );
+
+		}
+
 		this.contentWrapper.appendChild( tab.content );
 
 		// Apply the current visibility state to the DOM elements
@@ -436,6 +565,9 @@ export class Profiler {
 
 		// Update panel size when tabs change
 		this.updatePanelSize();
+
+		// Set profiler reference
+		tab.profiler = this;
 
 	}
 
@@ -473,88 +605,16 @@ export class Profiler {
 
 			e.stopPropagation(); // Prevent toggle panel from triggering
 
-			const isPanelVisible = this.panel.classList.contains( 'visible' );
+			// Toggle mini-panel for this tab
+			const isCurrentlyActive = miniContent.style.display !== 'none' && miniContent.children.length > 0;
 
-			if ( isPanelVisible ) {
+			if ( isCurrentlyActive ) {
 
-				// Panel is visible - navigate to tab
-				if ( ! tab.isVisible ) {
-
-					tab.show();
-
-				}
-
-				if ( tab.isDetached ) {
-
-					// If tab is detached, just bring its window to front
-					if ( tab.detachedWindow ) {
-
-						this.bringWindowToFront( tab.detachedWindow.panel );
-
-					}
-
-				} else {
-
-					// Activate the tab
-					this.setActiveTab( tab.id );
-
-				}
+				this.hide();
 
 			} else {
 
-				// Panel is hidden - toggle mini-panel for this tab
-				const isCurrentlyActive = miniContent.style.display !== 'none' && miniContent.children.length > 0;
-
-				// Hide all other mini-panel contents
-				this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-					content.style.display = 'none';
-
-				} );
-
-				// Remove active state from all builtin buttons
-				this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
-
-					btn.classList.remove( 'active' );
-
-				} );
-
-				if ( isCurrentlyActive ) {
-
-					// Toggle off - hide mini-panel and move content back
-					this.miniPanel.classList.remove( 'visible' );
-					miniContent.style.display = 'none';
-
-					// Move content back to main panel
-					if ( miniContent.firstChild ) {
-
-						tab.content.appendChild( miniContent.firstChild );
-
-					}
-
-				} else {
-
-					// Toggle on - show mini-panel with this tab's content
-					builtinButton.classList.add( 'active' );
-
-					// Move actual content to mini-panel (not clone) if not already there
-					if ( ! miniContent.firstChild ) {
-
-						const actualContent = tab.content.querySelector( '.list-scroll-wrapper' ) || tab.content.firstElementChild;
-
-						if ( actualContent ) {
-
-							miniContent.appendChild( actualContent );
-
-						}
-
-					}
-
-					// Show after content is moved
-					miniContent.style.display = 'block';
-					this.miniPanel.classList.add( 'visible' );
-
-				}
+				this.show( tab );
 
 			}
 
@@ -565,7 +625,6 @@ export class Profiler {
 		// Store references
 		tab.builtinButton = builtinButton;
 		tab.miniContent = miniContent;
-		tab.profiler = this;
 
 		// If the tab was hidden before being added, hide the builtin button
 		if ( ! tab.isVisible ) {
@@ -584,6 +643,98 @@ export class Profiler {
 			}
 
 		}
+
+	}
+
+	removeTab( tab ) {
+
+		if ( ! tab || this.tabs[ tab.id ] === undefined ) return;
+
+		delete this.tabs[ tab.id ];
+
+		if ( tab.isDetached && tab.detachedWindow ) {
+
+			if ( tab.detachedWindow.panel && tab.detachedWindow.panel.parentNode ) {
+
+				tab.detachedWindow.panel.parentNode.removeChild( tab.detachedWindow.panel );
+
+			}
+
+			const index = this.detachedWindows.indexOf( tab.detachedWindow );
+
+			if ( index !== - 1 ) {
+
+				this.detachedWindows.splice( index, 1 );
+
+			}
+
+		}
+
+		if ( ! tab.builtin ) {
+
+			if ( tab.button && tab.button.parentNode ) {
+
+				tab.button.parentNode.removeChild( tab.button );
+
+			}
+
+		} else {
+
+			if ( tab.builtinButton && tab.builtinButton.parentNode ) {
+
+				tab.builtinButton.parentNode.removeChild( tab.builtinButton );
+
+			}
+
+			if ( tab.miniContent && tab.miniContent.parentNode ) {
+
+				tab.miniContent.parentNode.removeChild( tab.miniContent );
+
+			}
+
+			// Clean up builtin container if empty
+			const hasVisibleBuiltinButtons = Array.from( this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ) )
+				.some( btn => btn.style.display !== 'none' );
+
+			if ( ! hasVisibleBuiltinButtons ) {
+
+				this.builtinTabsContainer.style.display = 'none';
+
+			}
+
+		}
+
+		if ( tab.content && tab.content.parentNode ) {
+
+			tab.content.parentNode.removeChild( tab.content );
+
+		}
+
+		if ( this.activeTabId === tab.id ) {
+
+			this.activeTabId = null;
+
+			// Try to activate another tab
+			const remainingTabs = Object.values( this.tabs ).filter( t => ! t.isDetached && t.isVisible );
+
+			if ( remainingTabs.length > 0 ) {
+
+				this.setActiveTab( remainingTabs[ 0 ].id );
+
+			} else {
+
+				this.updatePanelSize();
+
+			}
+
+		} else {
+
+			this.updatePanelSize();
+
+		}
+
+		tab.onVisibilityChange = null;
+		tab.profiler = null;
 
 	}
 
@@ -648,31 +799,25 @@ export class Profiler {
 
 		}
 
+		this.dispatchEvent( { type: 'resize' } );
+
 	}
 
 	setupTabDragAndDrop( tab ) {
 
-		// Disable drag and drop on mobile devices
-		if ( this.isMobile ) {
+		// Always handle basic click
+		tab.button.addEventListener( 'click', () => {
 
-			tab.button.addEventListener( 'click', () => {
+			if ( ! isDragging ) {
 
 				this.setActiveTab( tab.id );
 
-			} );
+			}
 
-			return;
-
-		}
+		} );
 
 		// Disable drag and drop if tab doesn't allow detach
 		if ( tab.allowDetach === false ) {
-
-			tab.button.addEventListener( 'click', () => {
-
-				this.setActiveTab( tab.id );
-
-			} );
 
 			tab.button.style.cursor = 'default';
 
@@ -777,6 +922,8 @@ export class Profiler {
 		};
 
 		tab.button.addEventListener( 'pointerdown', ( e ) => {
+
+			if ( this.isMobile && e.pointerType !== 'mouse' ) return;
 
 			onDragStart( e );
 			tab.button.addEventListener( 'pointermove', onDragMove );
@@ -1466,91 +1613,17 @@ export class Profiler {
 
 		}
 
+		this.saveLayout();
+
 	}
 
 	togglePanel() {
 
 		this.panel.classList.toggle( 'visible' );
-		this.toggleButton.classList.toggle( 'hidden' );
+		this.toggleButton.classList.toggle( 'panel-open' );
+		this.miniPanel.classList.toggle( 'panel-open' );
 
 		const isVisible = this.panel.classList.contains( 'visible' );
-
-		if ( isVisible ) {
-
-			// Save mini-panel state before hiding
-			this.savedMiniPanelState = {
-				isVisible: this.miniPanel.classList.contains( 'visible' ),
-				activeTabId: null,
-				contentMap: {}
-			};
-
-			// Find which tab was active in mini-panel
-			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-				if ( content.style.display !== 'none' && content.firstChild ) {
-
-					// Find the tab that owns this content
-					Object.values( this.tabs ).forEach( tab => {
-
-						if ( tab.miniContent === content ) {
-
-							this.savedMiniPanelState.activeTabId = tab.id;
-							// Move content back to main panel
-							tab.content.appendChild( content.firstChild );
-
-						}
-
-					} );
-
-				}
-
-			} );
-
-			// Hide mini-panel temporarily
-			this.miniPanel.classList.remove( 'visible' );
-
-			// Hide all mini-panel contents
-			this.miniPanel.querySelectorAll( '.mini-panel-content' ).forEach( content => {
-
-				content.style.display = 'none';
-
-			} );
-
-			// Remove active state from builtin buttons
-			this.builtinTabsContainer.querySelectorAll( '.builtin-tab-btn' ).forEach( btn => {
-
-				btn.classList.remove( 'active' );
-
-			} );
-
-		} else {
-
-			// Restore mini-panel state when minimizing
-			if ( this.savedMiniPanelState && this.savedMiniPanelState.isVisible && this.savedMiniPanelState.activeTabId ) {
-
-				const tab = this.tabs[ this.savedMiniPanelState.activeTabId ];
-
-				if ( tab && tab.miniContent && tab.builtinButton ) {
-
-					// Restore mini-panel visibility
-					this.miniPanel.classList.add( 'visible' );
-					tab.miniContent.style.display = 'block';
-					tab.builtinButton.classList.add( 'active' );
-
-					// Move content back to mini-panel
-					const actualContent = tab.content.querySelector( '.list-scroll-wrapper, .profiler-content > *' );
-
-					if ( actualContent ) {
-
-						tab.miniContent.appendChild( actualContent );
-
-					}
-
-				}
-
-			}
-
-		}
 
 		this.detachedWindows.forEach( detachedWindow => {
 
@@ -1569,6 +1642,10 @@ export class Profiler {
 			}
 
 		} );
+
+		this.dispatchEvent( { type: 'resize' } );
+
+		this.saveLayout();
 
 	}
 
@@ -1598,6 +1675,8 @@ export class Profiler {
 			// Apply right position styles
 			this.panel.classList.remove( 'position-bottom' );
 			this.panel.classList.add( 'position-right' );
+			this.toggleButton.classList.add( 'position-right' );
+			this.miniPanel.classList.add( 'position-right' );
 			this.panel.style.bottom = '';
 			this.panel.style.top = '0';
 			this.panel.style.right = '0';
@@ -1626,6 +1705,8 @@ export class Profiler {
 			// Apply bottom position styles
 			this.panel.classList.remove( 'position-right' );
 			this.panel.classList.add( 'position-bottom' );
+			this.toggleButton.classList.remove( 'position-right' );
+			this.miniPanel.classList.remove( 'position-right' );
 			this.panel.style.top = '';
 			this.panel.style.right = '';
 			this.panel.style.bottom = '0';
@@ -1663,12 +1744,15 @@ export class Profiler {
 
 	saveLayout() {
 
+		if ( this.isLoadingLayout ) return;
+
 		const layout = {
 			position: this.position,
 			lastHeightBottom: this.lastHeightBottom,
 			lastWidthRight: this.lastWidthRight,
 			activeTabId: this.activeTabId,
-			detachedTabs: []
+			detachedTabs: [],
+			isVisible: this.panel.classList.contains( 'visible' )
 		};
 
 		// Save detached windows state
@@ -1696,7 +1780,7 @@ export class Profiler {
 
 		try {
 
-			localStorage.setItem( 'profiler-layout', JSON.stringify( layout ) );
+			setItem( 'layout', layout );
 
 		} catch ( e ) {
 
@@ -1708,13 +1792,13 @@ export class Profiler {
 
 	loadLayout() {
 
+		this.isLoadingLayout = true;
+
 		try {
 
-			const savedLayout = localStorage.getItem( 'profiler-layout' );
+			const layout = getItem( 'layout' );
 
-			if ( ! savedLayout ) return;
-
-			const layout = JSON.parse( savedLayout );
+			if ( Object.keys( layout ).length === 0 ) return;
 
 			// Constrain detached tabs positions to current screen bounds
 			if ( layout.detachedTabs && layout.detachedTabs.length > 0 ) {
@@ -1827,6 +1911,8 @@ export class Profiler {
 
 				this.panel.classList.remove( 'position-bottom' );
 				this.panel.classList.add( 'position-right' );
+				this.toggleButton.classList.add( 'position-right' );
+				this.miniPanel.classList.add( 'position-right' );
 				this.panel.style.bottom = '';
 				this.panel.style.top = '0';
 				this.panel.style.right = '0';
@@ -1840,16 +1926,16 @@ export class Profiler {
 
 			}
 
+			if ( layout.isVisible ) {
+
+				this.panel.classList.add( 'visible' );
+				this.toggleButton.classList.add( 'panel-open' );
+
+			}
+
 			if ( layout.activeTabId ) {
 
-				const willBeDetached = layout.detachedTabs &&
-					layout.detachedTabs.some( dt => dt.tabId === layout.activeTabId );
-
-				if ( willBeDetached ) {
-
-					this.setActiveTab( layout.activeTabId );
-
-				}
+				this.setActiveTab( layout.activeTabId );
 
 			}
 
@@ -1863,9 +1949,20 @@ export class Profiler {
 			// Update panel size after loading layout
 			this.updatePanelSize();
 
+			// Ensure initial open state applies to mini panel as well
+			if ( this.panel.classList.contains( 'visible' ) ) {
+
+				this.miniPanel.classList.add( 'panel-open' );
+
+			}
+
 		} catch ( e ) {
 
 			console.warn( 'Failed to load profiler layout:', e );
+
+		} finally {
+
+			this.isLoadingLayout = false;
 
 		}
 

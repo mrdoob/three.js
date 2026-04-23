@@ -344,6 +344,38 @@
 
 				}
 
+				// Sort results: exact matches first, then classes before members
+				const searchLower = v.toLowerCase();
+				results.sort( ( a, b ) => {
+
+					const aName = a.title.split( /[#~]/ ).pop().toLowerCase();
+					const bName = b.title.split( /[#~]/ ).pop().toLowerCase();
+					const aIsClass = ! a.title.includes( '#' ) && ! a.title.includes( '~' );
+					const bIsClass = ! b.title.includes( '#' ) && ! b.title.includes( '~' );
+
+					// Exact match on class name (highest priority)
+					const aExactClass = aIsClass && aName === searchLower;
+					const bExactClass = bIsClass && bName === searchLower;
+					if ( aExactClass !== bExactClass ) return aExactClass ? - 1 : 1;
+
+					// Class starts with search term
+					const aStartsClass = aIsClass && aName.startsWith( searchLower );
+					const bStartsClass = bIsClass && bName.startsWith( searchLower );
+					if ( aStartsClass !== bStartsClass ) return aStartsClass ? - 1 : 1;
+
+					// Exact match on member name
+					const aExact = aName === searchLower;
+					const bExact = bName === searchLower;
+					if ( aExact !== bExact ) return aExact ? - 1 : 1;
+
+					// Classes before members
+					if ( aIsClass !== bIsClass ) return aIsClass ? - 1 : 1;
+
+					// Alphabetically
+					return a.title.localeCompare( b.title );
+
+				} );
+
 				// Display results
 				if ( results.length > 0 ) {
 

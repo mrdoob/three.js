@@ -28,7 +28,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
 										<p>The node to inspect.</p>
@@ -36,7 +36,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>name</strong>
+										<strong translate="no">name</strong>
 									</td>
 									<td class="description last">
 										<p>Optional name for the inspector node.</p>
@@ -45,7 +45,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>callback</strong>
+										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
 										<p>Optional callback to modify the node during setup.</p>
@@ -64,13 +64,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getName" translate="no">.<a href="#getName">getName</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Returns the name of the inspector node.</p>
-						</div>
-					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the type of the wrapped node.</p>
@@ -79,7 +73,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The node builder.</p>
@@ -88,8 +82,14 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#generateNodeType">Node#generateNodeType</a></dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="getName" translate="no">.<a href="#getName">getName</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the name of the inspector node.</p>
+						</div>
 					</div>
 					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
@@ -100,7 +100,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>builder</strong>
+										<strong translate="no">builder</strong>
 									</td>
 									<td class="description last">
 										<p>The node builder.</p>
@@ -124,7 +124,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>frame</strong>
+										<strong translate="no">frame</strong>
 									</td>
 									<td class="description last">
 										<p>A reference to the current node frame.</p>

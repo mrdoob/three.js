@@ -66,7 +66,8 @@
 				'TIE Interceptor': 'models/6965-1-TIEIntercep_4h4MXk5.mpd_Packed.mpd',
 				'Star fighter': 'models/6966-1-JediStarfighter-Mini.mpd_Packed.mpd',
 				'X-Wing': 'models/7140-1-X-wingFighter.mpd_Packed.mpd',
-				'AT-ST': 'models/10174-1-ImperialAT-ST-UCS.mpd_Packed.mpd'
+				'AT-ST': 'models/10174-1-ImperialAT-ST-UCS.mpd_Packed.mpd',
+				'Window': 'models/6156-1-WindowBrick.mpd_Packed.mpd'
 			};
 
 			init();
@@ -94,7 +95,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
