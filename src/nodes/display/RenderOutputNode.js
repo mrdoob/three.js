@@ -1,8 +1,31 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeObject, Fn, If, vec4 } from '../tsl/TSLCore.js';
 
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
+
+import { clamp } from '../math/MathNode.js';
+
+// Internal TSL wrappers to avoid circular dependency with BlendModes.js
+
+const premultiplyAlpha = Fn( ( [ color ] ) => {
+
+	return vec4( color.rgb.mul( color.a ), color.a );
+
+}, { color: 'vec4', return: 'vec4' } );
+
+
+const unpremultiplyAlpha = Fn( ( [ color ] ) => {
+
+	If( color.a.equal( 0.0 ), () => vec4( 0.0 ) );
+
+	return vec4( color.rgb.div( color.a ), color.a );
+
+	// alt
+	//return vec4( color.rgb.div( color.a.max( 1e-6 ) ), color.a.max( 1e-6 ) );
+
+}, { color: 'vec4', return: 'vec4' } );
+
 
 /**
  * Normally, tone mapping and color conversion happens automatically just
@@ -108,9 +131,15 @@ class RenderOutputNode extends TempNode {
 
 		let outputNode = this.colorNode || context.color;
 
-		// tone mapping
+		// clamp alpha
+		outputNode = vec4( outputNode.rgb, clamp( outputNode.a, 0.0, 1.0 ) );
 
+		// unpremultiply
+		outputNode = unpremultiplyAlpha( outputNode );
+
+		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
+
 		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || NoColorSpace;
 
 		if ( toneMapping !== NoToneMapping ) {
@@ -120,12 +149,14 @@ class RenderOutputNode extends TempNode {
 		}
 
 		// working to output color space
-
 		if ( outputColorSpace !== NoColorSpace && outputColorSpace !== ColorManagement.workingColorSpace ) {
 
 			outputNode = outputNode.workingToColorSpace( outputColorSpace );
 
 		}
+
+		// premultiply in output color space
+		outputNode = premultiplyAlpha( outputNode );
 
 		return outputNode;
 
