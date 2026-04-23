@@ -127,7 +127,7 @@
 
 				material = new THREE.MeshBasicNodeMaterial();
 				material.outputNode = vec4(
-					diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) ),
+					diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) ).rgb,
 					diffuseColor.a,
 				);
 		
