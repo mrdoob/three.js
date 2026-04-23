@@ -45,7 +45,8 @@ class Performance extends Tab {
 		label.appendChild( checkmark );
 		*/
 
-		const graphStats = new Item( 'Graph Stats', createValueSpan(), createValueSpan(), createValueSpan( 'graph-fps-counter' ) );
+		this.graphFpsCounter = createValueSpan();
+		const graphStats = new Item( 'Graph Stats', createValueSpan(), createValueSpan(), this.graphFpsCounter );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
@@ -243,7 +244,7 @@ class Performance extends Tab {
 
 		//
 
-		setText( 'graph-fps-counter', inspector.fps.toFixed() + ' FPS' );
+		setText( this.graphFpsCounter, inspector.fps.toFixed() + ' FPS' );
 
 		//
 

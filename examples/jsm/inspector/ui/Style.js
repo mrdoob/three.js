@@ -22,7 +22,7 @@ export class Style {
 		--font-mono: 'Courier New', Courier, monospace;
 	}
 
-	#profiler-panel *, #profiler-toggle * {
+	.profiler-panel *, .profiler-toggle * {
 		text-transform: initial;
 		line-height: normal;
 		box-sizing: border-box;
@@ -30,7 +30,7 @@ export class Style {
 		-moz-osx-font-smoothing: grayscale;
 	}
 
-	#profiler-toggle {
+	.profiler-toggle {
 		position: fixed;
 		top: 15px;
 		right: 15px;
@@ -52,28 +52,28 @@ export class Style {
 		font-family: var(--font-family);
 	}
 
-	#profiler-toggle.position-right.panel-open {
+	.profiler-toggle.position-right.panel-open {
 		right: auto;
 		left: 15px;
 		border-radius: 6px 12px 12px 6px;
 		flex-direction: row-reverse;
 	}
 
-	#profiler-toggle.position-right.panel-open #builtin-tabs-container {
+	.profiler-toggle.position-right.panel-open .builtin-tabs-container {
 		border-right: none;
 		border-left: 1px solid #262636;
 	}
 
-	#profiler-toggle:hover {
+	.profiler-toggle:hover {
 		border-color: var(--accent-color);
 	}
 
-	#profiler-toggle.panel-open #toggle-icon {
+	.profiler-toggle.panel-open .toggle-icon {
 		background-color: rgba(0, 170, 255, 0.2);
 		color: var(--accent-color);
 	}
 
-	#toggle-icon {
+	.toggle-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -82,11 +82,11 @@ export class Style {
 		transition: background-color 0.2s;
 	}
 
-	#profiler-toggle:hover #toggle-icon {
+	.profiler-toggle:hover .toggle-icon {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
-	#profiler-toggle.panel-open:hover #toggle-icon {
+	.profiler-toggle.panel-open:hover .toggle-icon {
 		background-color: rgba(0, 170, 255, 0.3);
 	}
 
@@ -95,7 +95,7 @@ export class Style {
 		background-color: var(--profiler-border);
 	}
 
-	#toggle-text {
+	.toggle-text {
 		display: flex;
 		align-items: baseline;
 		padding: 8px 14px;
@@ -103,13 +103,13 @@ export class Style {
 		justify-content: right;
 	}
 
-	#toggle-text .fps-label {
+	.toggle-text .fps-label {
 		font-size: 0.7em;
 		margin-left: 10px;
 		color: #999;
 	}
 
-	#builtin-tabs-container {
+	.builtin-tabs-container {
 		display: flex;
 		align-items: stretch;
 		gap: 0;
@@ -158,7 +158,7 @@ export class Style {
 		background-color: rgba(0, 170, 255, 0.3);
 	}
 
-	#profiler-mini-panel {
+	.profiler-mini-panel {
 		position: fixed;
 		top: 60px;
 		right: 15px;
@@ -182,32 +182,32 @@ export class Style {
 					transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	#profiler-mini-panel.position-right.panel-open {
+	.profiler-mini-panel.position-right.panel-open {
 		right: auto;
 		left: 15px;
 	}
 
-	#profiler-mini-panel.visible {
+	.profiler-mini-panel.visible {
 		display: block;
 		opacity: 1;
 		transform: translateY(0) scale(1);
 	}
 
-	#profiler-mini-panel::-webkit-scrollbar {
+	.profiler-mini-panel::-webkit-scrollbar {
 		width: 6px;
 	}
 
-	#profiler-mini-panel::-webkit-scrollbar-track {
+	.profiler-mini-panel::-webkit-scrollbar-track {
 		background: transparent;
 	}
 
-	#profiler-mini-panel::-webkit-scrollbar-thumb {
+	.profiler-mini-panel::-webkit-scrollbar-thumb {
 		background: rgba(255, 255, 255, 0.15);
 		border-radius: 3px;
 		transition: background 0.2s;
 	}
 
-	#profiler-mini-panel::-webkit-scrollbar-thumb:hover {
+	.profiler-mini-panel::-webkit-scrollbar-thumb:hover {
 		background: rgba(255, 255, 255, 0.25);
 	}
 
@@ -398,7 +398,7 @@ export class Style {
 		margin-bottom: 0;
 	}
 
-	#profiler-panel {
+	.profiler-panel {
 		position: fixed;
 		z-index: 1001 !important;
 		bottom: 0;
@@ -418,21 +418,21 @@ export class Style {
 		font-family: var(--font-mono);
 	}
 
-	#profiler-panel.resizing,
-	#profiler-panel.dragging {
+	.profiler-panel.resizing,
+	.profiler-panel.dragging {
 		transition: none;
 	}
 
-	#profiler-panel.visible {
+	.profiler-panel.visible {
 		transform: translateY(0);
 	}
 
-	#profiler-panel.maximized {
+	.profiler-panel.maximized {
 		height: 100vh;
 	}
 
 	/* Position-specific styles */
-	#profiler-panel.position-top {
+	.profiler-panel.position-top {
 		bottom: auto;
 		top: 0;
 		border-top: none;
@@ -440,15 +440,15 @@ export class Style {
 		transform: translateY(-100%);
 	}
 
-	#profiler-panel.position-top.visible {
+	.profiler-panel.position-top.visible {
 		transform: translateY(0);
 	}
 
-	#profiler-panel.position-bottom {
+	.profiler-panel.position-bottom {
 		/* Default position - already defined above */
 	}
 
-	#profiler-panel.position-left {
+	.profiler-panel.position-left {
 		top: 0;
 		bottom: 0;
 		left: 0;
@@ -460,11 +460,11 @@ export class Style {
 		transform: translateX(-100%);
 	}
 
-	#profiler-panel.position-left.visible {
+	.profiler-panel.position-left.visible {
 		transform: translateX(0);
 	}
 
-	#profiler-panel.position-right {
+	.profiler-panel.position-right {
 		top: 0;
 		bottom: 0;
 		left: auto;
@@ -476,11 +476,11 @@ export class Style {
 		transform: translateX(100%);
 	}
 
-	#profiler-panel.position-right.visible {
+	.profiler-panel.position-right.visible {
 		transform: translateX(0);
 	}
 
-	#profiler-panel.position-floating {
+	.profiler-panel.position-floating {
 		border: 2px solid var(--profiler-border);
 		border-radius: 8px;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -488,15 +488,15 @@ export class Style {
 		overflow: hidden;
 	}
 
-	#profiler-panel.position-floating.visible {
+	.profiler-panel.position-floating.visible {
 		transform: none !important;
 	}
 
-	#profiler-panel.position-floating .profiler-header {
+	.profiler-panel.position-floating .profiler-header {
 		border-radius: 6px 6px 0 0;
 	}
 
-	#profiler-panel.position-floating .panel-resizer {
+	.profiler-panel.position-floating .panel-resizer {
 		bottom: 0;
 		right: 0;
 		top: auto;
@@ -507,7 +507,7 @@ export class Style {
 		border-radius: 0 0 6px 0;
 	}
 
-	#profiler-panel.position-floating .panel-resizer::after {
+	.profiler-panel.position-floating .panel-resizer::after {
 		content: '';
 		position: absolute;
 		right: 2px;
@@ -529,12 +529,12 @@ export class Style {
 		touch-action: none;
 	}
 
-	#profiler-panel.position-top .panel-resizer {
+	.profiler-panel.position-top .panel-resizer {
 		top: auto;
 		bottom: -2px;
 	}
 
-	#profiler-panel.position-left .panel-resizer {
+	.profiler-panel.position-left .panel-resizer {
 		top: 0;
 		left: auto;
 		right: -2px;
@@ -543,7 +543,7 @@ export class Style {
 		cursor: ew-resize;
 	}
 
-	#profiler-panel.position-right .panel-resizer {
+	.profiler-panel.position-right .panel-resizer {
 		top: 0;
 		left: -2px;
 		right: auto;
@@ -569,57 +569,57 @@ export class Style {
 	}
 
 	/* Adjust header width based on panel position */
-	#profiler-panel.position-right .profiler-header,
-	#profiler-panel.position-left .profiler-header {
+	.profiler-panel.position-right .profiler-header,
+	.profiler-panel.position-left .profiler-header {
 		width: calc(100% - 134px);
 	}
 
-	#profiler-panel.position-bottom .profiler-header,
-	#profiler-panel.position-top .profiler-header {
+	.profiler-panel.position-bottom .profiler-header,
+	.profiler-panel.position-top .profiler-header {
 		width: calc(100% - 134px);
 	}
 
 	/* Adjust header width when position toggle button is hidden (mobile) */
-	#profiler-panel.hide-position-toggle .profiler-header {
+	.profiler-panel.hide-position-toggle .profiler-header {
 		width: calc(100% - 90px);
 	}
 
 	/* ===== RULES FOR WHEN THERE ARE NO TABS ===== */
 
 	/* Horizontal mode (bottom/top) without tabs */
-	#profiler-panel.position-bottom.no-tabs:not(.maximized),
-	#profiler-panel.position-top.no-tabs:not(.maximized) {
+	.profiler-panel.position-bottom.no-tabs:not(.maximized),
+	.profiler-panel.position-top.no-tabs:not(.maximized) {
 		height: 38px !important;
 		min-height: 38px !important;
 	}
 
-	#profiler-panel.position-bottom.no-tabs .profiler-header,
-	#profiler-panel.position-top.no-tabs .profiler-header {
+	.profiler-panel.position-bottom.no-tabs .profiler-header,
+	.profiler-panel.position-top.no-tabs .profiler-header {
 		width: 100%;
 		height: 38px;
 		border-bottom: none;
 	}
 
-	#profiler-panel.position-bottom.no-tabs .profiler-content-wrapper,
-	#profiler-panel.position-top.no-tabs .profiler-content-wrapper {
+	.profiler-panel.position-bottom.no-tabs .profiler-content-wrapper,
+	.profiler-panel.position-top.no-tabs .profiler-content-wrapper {
 		display: none;
 	}
 
-	#profiler-panel.position-bottom.no-tabs .panel-resizer,
-	#profiler-panel.position-top.no-tabs .panel-resizer {
+	.profiler-panel.position-bottom.no-tabs .panel-resizer,
+	.profiler-panel.position-top.no-tabs .panel-resizer {
 		display: none;
 	}
 
 	/* Vertical mode (right/left) without tabs */
-	#profiler-panel.position-right.no-tabs:not(.maximized),
-	#profiler-panel.position-left.no-tabs:not(.maximized) {
+	.profiler-panel.position-right.no-tabs:not(.maximized),
+	.profiler-panel.position-left.no-tabs:not(.maximized) {
 		width: 45px !important;
 		min-width: 45px !important;
 	}
 
 	/* Vertical layout for header when no tabs */
-	#profiler-panel.position-right.no-tabs .profiler-header,
-	#profiler-panel.position-left.no-tabs .profiler-header {
+	.profiler-panel.position-right.no-tabs .profiler-header,
+	.profiler-panel.position-left.no-tabs .profiler-header {
 		width: 100%;
 		flex-direction: column;
 		height: 100%;
@@ -627,8 +627,8 @@ export class Style {
 	}
 
 	/* Vertical layout for controls when no tabs */
-	#profiler-panel.position-right.no-tabs .profiler-controls,
-	#profiler-panel.position-left.no-tabs .profiler-controls {
+	.profiler-panel.position-right.no-tabs .profiler-controls,
+	.profiler-panel.position-left.no-tabs .profiler-controls {
 		position: static;
 		flex-direction: column-reverse;
 		justify-content: flex-end;
@@ -639,8 +639,8 @@ export class Style {
 		background: transparent;
 	}
 
-	#profiler-panel.position-right.no-tabs .profiler-controls button,
-	#profiler-panel.position-left.no-tabs .profiler-controls button {
+	.profiler-panel.position-right.no-tabs .profiler-controls button,
+	.profiler-panel.position-left.no-tabs .profiler-controls button {
 		width: 100%;
 		height: 45px;
 		border-left: none;
@@ -648,30 +648,30 @@ export class Style {
 		border-bottom: 1px solid var(--profiler-border);
 	}
 
-	#profiler-panel.position-right.no-tabs .profiler-content-wrapper,
-	#profiler-panel.position-left.no-tabs .profiler-content-wrapper {
+	.profiler-panel.position-right.no-tabs .profiler-content-wrapper,
+	.profiler-panel.position-left.no-tabs .profiler-content-wrapper {
 		display: none;
 	}
 
-	#profiler-panel.position-right.no-tabs .profiler-tabs,
-	#profiler-panel.position-left.no-tabs .profiler-tabs {
+	.profiler-panel.position-right.no-tabs .profiler-tabs,
+	.profiler-panel.position-left.no-tabs .profiler-tabs {
 		display: none;
 	}
 
-	#profiler-panel.position-right.no-tabs .panel-resizer,
-	#profiler-panel.position-left.no-tabs .panel-resizer {
+	.profiler-panel.position-right.no-tabs .panel-resizer,
+	.profiler-panel.position-left.no-tabs .panel-resizer {
 		display: none;
 	}
 
 	/* Hide position toggle on mobile without tabs */
-	#profiler-panel.hide-position-toggle.position-right.no-tabs:not(.maximized),
-	#profiler-panel.hide-position-toggle.position-left.no-tabs:not(.maximized) {
+	.profiler-panel.hide-position-toggle.position-right.no-tabs:not(.maximized),
+	.profiler-panel.hide-position-toggle.position-left.no-tabs:not(.maximized) {
 		width: 45px !important;
 		min-width: 45px !important;
 	}
 
 	/* Hide drag indicator on mobile devices */
-	#profiler-panel.is-mobile .tab-btn.active::before {
+	.profiler-panel.is-mobile .tab-btn.active::before {
 		display: none;
 	}
 
@@ -698,11 +698,11 @@ export class Style {
 		background: transparent;
 	}
 
-	#profiler-panel.dragging .profiler-header {
+	.profiler-panel.dragging .profiler-header {
 		cursor: grabbing !important;
 	}
 
-	#profiler-panel.dragging {
+	.profiler-panel.dragging {
 		opacity: 0.8;
 	}
 
@@ -788,9 +788,9 @@ export class Style {
 		display: none;
 	}
 
-	#floating-btn,
-	#maximize-btn,
-	#hide-panel-btn {
+	.floating-btn,
+	.maximize-btn,
+	.hide-panel-btn {
 		background: transparent;
 		border: none;
 		border-left: 1px solid var(--profiler-border);
@@ -806,27 +806,27 @@ export class Style {
 	}
 
 	/* Disable transitions in vertical mode to avoid broken animations */
-	#profiler-panel.position-right #floating-btn,
-	#profiler-panel.position-right #maximize-btn,
-	#profiler-panel.position-right #hide-panel-btn,
-	#profiler-panel.position-left #floating-btn,
-	#profiler-panel.position-left #maximize-btn,
-	#profiler-panel.position-left #hide-panel-btn {
+	.profiler-panel.position-right .floating-btn,
+	.profiler-panel.position-right .maximize-btn,
+	.profiler-panel.position-right .hide-panel-btn,
+	.profiler-panel.position-left .floating-btn,
+	.profiler-panel.position-left .maximize-btn,
+	.profiler-panel.position-left .hide-panel-btn {
 		transition: background-color 0.2s, color 0.2s;
 	}
 
-	#floating-btn:hover,
-	#maximize-btn:hover,
-	#hide-panel-btn:hover {
+	.floating-btn:hover,
+	.maximize-btn:hover,
+	.hide-panel-btn:hover {
 		background-color: rgba(255, 255, 255, 0.1);
 		color: var(--text-primary);
 	}
 
 	/* Hide maximize button when there are no tabs */
-	#profiler-panel.position-right.no-tabs #maximize-btn,
-	#profiler-panel.position-left.no-tabs #maximize-btn,
-	#profiler-panel.position-bottom.no-tabs #maximize-btn,
-	#profiler-panel.position-top.no-tabs #maximize-btn {
+	.profiler-panel.position-right.no-tabs .maximize-btn,
+	.profiler-panel.position-left.no-tabs .maximize-btn,
+	.profiler-panel.position-bottom.no-tabs .maximize-btn,
+	.profiler-panel.position-top.no-tabs .maximize-btn {
 		display: none !important;
 	}
 
@@ -1124,7 +1124,7 @@ export class Style {
 		color: var(--color-green);
 	}
 
-	#console-log {
+	.console-log {
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
@@ -1386,19 +1386,19 @@ export class Style {
 			height: 20px !important;
 		}
 
-		#profiler-panel.position-top .panel-resizer {
+		.profiler-panel.position-top .panel-resizer {
 			top: auto !important;
 			bottom: -10px !important;
 			height: 20px !important;
 		}
 
-		#profiler-panel.position-left .panel-resizer {
+		.profiler-panel.position-left .panel-resizer {
 			right: -10px !important;
 			width: 20px !important;
 			height: 100% !important;
 		}
 
-		#profiler-panel.position-right .panel-resizer {
+		.profiler-panel.position-right .panel-resizer {
 			left: -10px !important;
 			width: 20px !important;
 			height: 100% !important;
@@ -1444,8 +1444,8 @@ export class Style {
 		transition: opacity 0.2s, visibility 0.2s;
 	}
 
-	#profiler-panel:not(.visible) ~ * .detached-tab-panel,
-	body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
+	.profiler-panel:not(.visible) ~ * .detached-tab-panel,
+	body:has(.profiler-panel:not(.visible)) .detached-tab-panel {
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
@@ -1622,8 +1622,8 @@ export class Style {
 
 	/* Input number spin buttons - hide arrows */
 	/* Chrome, Safari, Edge, Opera */
-	#profiler-panel input[type="number"]::-webkit-outer-spin-button,
-	#profiler-panel input[type="number"]::-webkit-inner-spin-button,
+	.profiler-panel input[type="number"]::-webkit-outer-spin-button,
+	.profiler-panel input[type="number"]::-webkit-inner-spin-button,
 	.detached-tab-content input[type="number"]::-webkit-outer-spin-button,
 	.detached-tab-content input[type="number"]::-webkit-inner-spin-button {
 		-webkit-appearance: none;
@@ -1631,7 +1631,7 @@ export class Style {
 	}
 
 	/* Firefox */
-	#profiler-panel input[type="number"],
+	.profiler-panel input[type="number"],
 	.detached-tab-content input[type="number"] {
 		-moz-appearance: textfield;
 	}
