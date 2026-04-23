@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, texture, uniform, output, mrt, velocity, uv, screenUV } from 'three/tsl';
+			import { pass, texture, uniform, output, mrt, velocity, uv, screenUV, vec4 } from 'three/tsl';
 			import { motionBlur } from 'three/addons/tsl/display/MotionBlur.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -194,7 +194,7 @@
 				const vignette = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
-				renderPipeline.outputNode = mBlur.mul( vignette );
+				renderPipeline.outputNode = vec4( mBlur.mul( vignette ).rgb, mBlur.a );
 
 				//
 
