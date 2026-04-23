@@ -881,7 +881,7 @@ export class Profiler extends EventDispatcher {
 				const finalX = parseInt( previewWindow.style.left ) + 200;
 				const finalY = parseInt( previewWindow.style.top ) + 20;
 
-				if ( previewWindow && previewWindow.parentNode ) {
+				if ( previewWindow.parentNode ) {
 
 					previewWindow.parentNode.removeChild( previewWindow );
 
