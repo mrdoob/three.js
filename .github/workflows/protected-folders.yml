@@ -6,8 +6,7 @@ on:
       - 'build/**'
       - 'docs/**'
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   check:
