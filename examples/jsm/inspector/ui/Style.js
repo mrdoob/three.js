@@ -765,6 +765,7 @@ export class Style {
 		user-select: none;
 		transition: opacity 0.2s, transform 0.2s;
 		touch-action: pan-x;
+		white-space: nowrap;
 	}
 
 	.tab-btn.active {
