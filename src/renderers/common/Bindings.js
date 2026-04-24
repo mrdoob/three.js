@@ -325,6 +325,10 @@ class Bindings extends DataMap {
 				if ( bindingData.attribute !== attribute ) {
 
 					bindingData.attribute = attribute;
+					const bindGroupData = backend.get( bindGroup );
+
+					bindGroupData.groups = undefined;
+					bindGroupData.versions = undefined;
 
 					needsBindingsUpdate = true;
 
