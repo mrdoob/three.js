@@ -1,7 +1,6 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-
-import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
+import { createWireframeIndexBufferAttribute, getWireframeRangeKey } from './WireframeIndexUtils.js';
 
 /**
  * Returns the wireframe version for the given geometry.
@@ -41,44 +40,16 @@ function getWireframeId( geometry ) {
  */
 function getWireframeIndex( geometry ) {
 
-	const indices = [];
+	const attribute = createWireframeIndexBufferAttribute( geometry );
+	if ( attribute === null ) {
 
-	const geometryIndex = geometry.index;
-	const geometryPosition = geometry.attributes.position;
-
-	if ( geometryIndex !== null ) {
-
-		const array = geometryIndex.array;
-
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-			const a = array[ i + 0 ];
-			const b = array[ i + 1 ];
-			const c = array[ i + 2 ];
-
-			indices.push( a, b, b, c, c, a );
-
-		}
-
-	} else {
-
-		const array = geometryPosition.array;
-
-		for ( let i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
-
-			const a = i + 0;
-			const b = i + 1;
-			const c = i + 2;
-
-			indices.push( a, b, b, c, c, a );
-
-		}
+		throw new Error( 'THREE.Geometries: BufferGeometry is missing a position attribute for wireframe.' );
 
 	}
 
-	const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 	attribute.version = getWireframeVersion( geometry );
 	attribute.__id = getWireframeId( geometry );
+	attribute.__rangeKey = getWireframeRangeKey( geometry );
 
 	return attribute;
 
@@ -361,7 +332,7 @@ class Geometries extends DataMap {
 
 				wireframes.set( geometry, wireframeAttribute );
 
-			} else if ( wireframeAttribute.version !== getWireframeVersion( geometry ) || wireframeAttribute.__id !== getWireframeId( geometry ) ) {
+			} else if ( wireframeAttribute.version !== getWireframeVersion( geometry ) || wireframeAttribute.__id !== getWireframeId( geometry ) || wireframeAttribute.__rangeKey !== getWireframeRangeKey( geometry ) ) {
 
 				this.attributes.delete( wireframeAttribute );
 

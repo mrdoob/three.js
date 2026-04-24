@@ -511,12 +511,7 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-
-				if ( attribute !== undefined ) {
-
-					attributesId[ nodeAttribute.name ] = attribute.id;
-
-				}
+				attributesId[ nodeAttribute.name ] = attribute.id;
 
 			}
 

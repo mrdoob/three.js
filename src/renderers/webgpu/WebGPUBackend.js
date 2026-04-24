@@ -1602,13 +1602,7 @@ class WebGPUBackend extends Backend {
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
 
-			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
-
-			if ( material.wireframe ) {
-
-				bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
-
-			}
+			const bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 

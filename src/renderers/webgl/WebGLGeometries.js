@@ -1,4 +1,4 @@
-import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
+import { createWireframeIndexBufferAttribute, getWireframeRangeKey } from '../common/WireframeIndexUtils.js';
 
 function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
@@ -78,54 +78,20 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	function updateWireframeAttribute( geometry ) {
 
-		const indices = [];
-
-		const geometryIndex = geometry.index;
 		const geometryPosition = geometry.attributes.position;
-		let version = 0;
-
 		if ( geometryPosition === undefined ) {
 
 			return;
 
 		}
 
-		if ( geometryIndex !== null ) {
+		const version = geometry.index !== null ? geometry.index.version : geometryPosition.version;
 
-			const array = geometryIndex.array;
-			version = geometryIndex.version;
+		const attribute = createWireframeIndexBufferAttribute( geometry );
+		if ( attribute === null ) return;
 
-			for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-				const a = array[ i + 0 ];
-				const b = array[ i + 1 ];
-				const c = array[ i + 2 ];
-
-				indices.push( a, b, b, c, c, a );
-
-			}
-
-		} else {
-
-			const array = geometryPosition.array;
-			version = geometryPosition.version;
-
-			for ( let i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
-
-				const a = i + 0;
-				const b = i + 1;
-				const c = i + 2;
-
-				indices.push( a, b, b, c, c, a );
-
-			}
-
-		}
-
-		// check whether a 32 bit or 16 bit buffer is required to store the indices
-		// account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
-		const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 		attribute.version = version;
+		attribute.__rangeKey = getWireframeRangeKey( geometry );
 
 		// Updating index buffer in VAO now. See WebGLBindingStates
 
@@ -148,18 +114,22 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		if ( currentAttribute ) {
 
 			const geometryIndex = geometry.index;
+			const geometryPosition = geometry.attributes.position;
 
+			let needsUpdate = false;
 			if ( geometryIndex !== null ) {
 
-				// if the attribute is obsolete, create a new one
+				if ( currentAttribute.version < geometryIndex.version ) needsUpdate = true;
 
-				if ( currentAttribute.version < geometryIndex.version ) {
+			} else if ( geometryPosition !== undefined ) {
 
-					updateWireframeAttribute( geometry );
-
-				}
+				if ( currentAttribute.version < geometryPosition.version ) needsUpdate = true;
 
 			}
+
+			if ( currentAttribute.__rangeKey !== getWireframeRangeKey( geometry ) ) needsUpdate = true;
+
+			if ( needsUpdate ) updateWireframeAttribute( geometry );
 
 		} else {
 

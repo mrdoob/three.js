@@ -25,6 +25,23 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'position.count vs array length for interleaved (wireframe index generation)', ( assert ) => {
+
+			// Wireframe build uses the number of triangles from position, not `array.length / 3`, because
+			// InterleavedBufferAttribute#array is the full interleaved buffer (all attributes per vertex).
+			const stride = 8;
+			const numVertices = 6;
+			const interleaved = new InterleavedBuffer( new Float32Array( numVertices * stride ), stride );
+			const position = new InterleavedBufferAttribute( interleaved, 3, 0 );
+
+			const triangleCountFromCount = Math.floor( position.count / 3 );
+			const naiveLengthDiv3 = position.array.length / 3;
+
+			assert.equal( triangleCountFromCount, 2, 'six vertices => two triangles' );
+			assert.ok( naiveLengthDiv3 > position.count, 'array.length/3 is not the vertex count for interleaved' );
+
+		} );
+
 		// PUBLIC
 		QUnit.test( 'isInterleavedBufferAttribute', ( assert ) => {
 

@@ -284,6 +284,28 @@ class BatchedMesh extends Mesh {
 	}
 
 	/**
+	 * Sets {@link BufferGeometry#drawRange} to the used prefix of the pooled index or vertex buffer
+	 * so code that walks the full geometry (e.g. wireframe index generation) does not treat the
+	 * reserved tail of the pool as active triangles.
+	 */
+	_syncGeometryDrawRange() {
+
+		if ( this._geometryInitialized === false ) return;
+
+		const geometry = this.geometry;
+		if ( geometry.index !== null ) {
+
+			geometry.setDrawRange( 0, this._nextIndexStart );
+
+		} else {
+
+			geometry.setDrawRange( 0, this._nextVertexStart );
+
+		}
+
+	}
+
+	/**
 	 * The maximum number of individual instances that can be stored in the batch.
 	 *
 	 * @type {number}
@@ -697,6 +719,8 @@ class BatchedMesh extends Mesh {
 		this._nextIndexStart = geometryInfo.indexStart + geometryInfo.reservedIndexCount;
 		this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
 
+		this._syncGeometryDrawRange();
+
 		return geometryId;
 
 	}
@@ -961,6 +985,8 @@ class BatchedMesh extends Mesh {
 		this._nextIndexStart = nextIndexStart;
 		this._nextVertexStart = nextVertexStart;
 		this._visibilityChanged = true;
+
+		this._syncGeometryDrawRange();
 
 		return this;
 
@@ -1377,6 +1403,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		this._syncGeometryDrawRange();
+
 	}
 
 	raycast( raycaster, intersects ) {
@@ -1486,6 +1514,8 @@ class BatchedMesh extends Mesh {
 			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
 
 		}
+
+		this._syncGeometryDrawRange();
 
 		return this;
 

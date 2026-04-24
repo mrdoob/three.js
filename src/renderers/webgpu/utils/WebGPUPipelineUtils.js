@@ -1,7 +1,8 @@
 import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
 
 import {
-	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation,
+	GPUPrimitiveTopology
 } from './WebGPUConstants.js';
 
 import {
@@ -258,8 +259,24 @@ class WebGPUPipelineUtils {
 
 			if ( material.polygonOffset === true ) {
 
-				depthStencil.depthBias = material.polygonOffsetUnits;
-				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+				// WebGPU allows non-zero depth bias only for triangle-list and triangle-strip topologies
+				// (wireframe meshes use line-list; points/lines also forbid bias).
+				const topology = primitiveState.topology;
+				if (
+					topology === GPUPrimitiveTopology.TriangleList ||
+					topology === GPUPrimitiveTopology.TriangleStrip
+				) {
+
+					depthStencil.depthBias = material.polygonOffsetUnits;
+					depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+
+				} else {
+
+					depthStencil.depthBias = 0;
+					depthStencil.depthBiasSlopeScale = 0;
+
+				}
+
 				depthStencil.depthBiasClamp = 0; // three.js does not provide an API to configure this value
 
 			}
