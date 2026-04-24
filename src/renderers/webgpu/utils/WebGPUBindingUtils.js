@@ -190,6 +190,8 @@ class WebGPUBindingUtils {
 		const array = binding.buffer; // cpu
 		const buffer = backend.get( binding ).buffer; // gpu
 
+		if ( buffer === undefined ) return;
+
 		const updateRanges = binding.updateRanges;
 
 		if ( updateRanges.length === 0 ) {
