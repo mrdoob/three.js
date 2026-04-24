@@ -969,60 +969,8 @@ class VTKLoader extends Loader {
 			let points = [];
 			let normals = [];
 			let indices = [];
-
-			if ( json.AppendedData ) {
-
-				const appendedData = json.AppendedData[ '#text' ].slice( 1 );
-				const piece = json.PolyData.Piece;
-
-				const sections = [ 'PointData', 'CellData', 'Points', 'Verts', 'Lines', 'Strips', 'Polys' ];
-				let sectionIndex = 0;
-
-				const offsets = sections.map( s => {
-
-					const sect = piece[ s ];
-
-					if ( sect && sect.DataArray ) {
-
-						const arr = Array.isArray( sect.DataArray ) ? sect.DataArray : [ sect.DataArray ];
-
-						return arr.map( a => a.attributes.offset );
-
-					}
-
-					return [];
-
-				} ).flat();
-
-				for ( const sect of sections ) {
-
-					const section = piece[ sect ];
-
-					if ( section && section.DataArray ) {
-
-						if ( Array.isArray( section.DataArray ) ) {
-
-							for ( const sectionEle of section.DataArray ) {
-
-								sectionEle[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
-								sectionEle.attributes.format = 'binary';
-								sectionIndex ++;
-
-							}
-
-						} else {
-
-							section.DataArray[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
-							section.DataArray.attributes.format = 'binary';
-							sectionIndex ++;
-
-						}
-
-					}
-
-				}
-
-			}
+			let cellScalars = [];
+			let pointScalars = [];
 
 			if ( json.PolyData ) {
 
@@ -1031,7 +979,7 @@ class VTKLoader extends Loader {
 
 				// Can be optimized
 				// Loop through the sections
-				const sections = [ 'PointData', 'Points', 'Strips', 'Polys' ];// +['CellData', 'Verts', 'Lines'];
+				const sections = [ 'PointData', 'CellData', 'Points', 'Strips', 'Polys' ];
 				let sectionIndex = 0;
 				const numberOfSections = sections.length;
 
@@ -1075,13 +1023,14 @@ class VTKLoader extends Loader {
 
 						switch ( sections[ sectionIndex ] ) {
 
-							// if iti is point data
+							// if it is point data
 							case 'PointData':
 
 								{
 
 									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
 									const normalsName = section.attributes.Normals;
+									const scalarsName = section.attributes.Scalars;
 
 									if ( numberOfPoints > 0 ) {
 
@@ -1092,6 +1041,37 @@ class VTKLoader extends Loader {
 												const components = arr[ i ].attributes.NumberOfComponents;
 												normals = new Float32Array( numberOfPoints * components );
 												normals.set( arr[ i ].text, 0 );
+
+											} else if ( scalarsName === arr[ i ].attributes.Name ) {
+
+												pointScalars = arr[ i ].text;
+
+											}
+
+										}
+
+									}
+
+								}
+
+								break;
+
+							// if it is cell data
+							case 'CellData':
+
+								{
+
+									const numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
+									const scalarsName = section.attributes.Scalars;
+
+									if ( numberOfPolys > 0 ) {
+
+										for ( let i = 0, len = arr.length; i < len; i ++ ) {
+
+											if ( ! scalarsName || scalarsName === arr[ i ].attributes.Name ) {
+
+												cellScalars = arr[ i ].text;
+												break;
 
 											}
 
@@ -1247,13 +1227,84 @@ class VTKLoader extends Loader {
 
 				}
 
-				const geometry = new BufferGeometry();
+				let geometry = new BufferGeometry();
 				geometry.setIndex( new BufferAttribute( indices, 1 ) );
 				geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
 				if ( normals.length === points.length ) {
 
 					geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+
+				}
+
+				// Apply per-point scalar colors
+				if ( pointScalars.length > 0 ) {
+
+					let scalarMin = Infinity, scalarMax = - Infinity;
+
+					for ( let i = 0; i < pointScalars.length; i ++ ) {
+
+						if ( pointScalars[ i ] < scalarMin ) scalarMin = pointScalars[ i ];
+						if ( pointScalars[ i ] > scalarMax ) scalarMax = pointScalars[ i ];
+
+					}
+
+					const range = scalarMax - scalarMin || 1;
+					const colorAttr = new Float32Array( pointScalars.length * 3 );
+					const color = new Color();
+
+					for ( let i = 0; i < pointScalars.length; i ++ ) {
+
+						const t = ( pointScalars[ i ] - scalarMin ) / range;
+						color.setHSL( ( 1 - t ) * 0.667, 1.0, 0.5, SRGBColorSpace );
+						colorAttr[ i * 3 ] = color.r;
+						colorAttr[ i * 3 + 1 ] = color.g;
+						colorAttr[ i * 3 + 2 ] = color.b;
+
+					}
+
+					geometry.setAttribute( 'color', new BufferAttribute( colorAttr, 3 ) );
+
+				}
+
+				// Apply per-cell scalar colors (expand to per-vertex after toNonIndexed)
+				if ( cellScalars.length > 0 ) {
+
+					// Determine scalar range from piece attributes
+					let scalarMin = Infinity, scalarMax = - Infinity;
+
+					for ( let i = 0; i < cellScalars.length; i ++ ) {
+
+						if ( cellScalars[ i ] < scalarMin ) scalarMin = cellScalars[ i ];
+						if ( cellScalars[ i ] > scalarMax ) scalarMax = cellScalars[ i ];
+
+					}
+
+					const range = scalarMax - scalarMin || 1;
+
+					geometry = geometry.toNonIndexed();
+
+					const triCount = geometry.attributes.position.count / 3;
+					const colorAttr = new Float32Array( triCount * 9 );
+					const color = new Color();
+
+					for ( let i = 0; i < triCount; i ++ ) {
+
+						const scalar = cellScalars[ i ] !== undefined ? cellScalars[ i ] : 0;
+						const t = ( scalar - scalarMin ) / range;
+						color.setHSL( ( 1 - t ) * 0.667, 1.0, 0.5, SRGBColorSpace );
+
+						for ( let v = 0; v < 3; v ++ ) {
+
+							colorAttr[ ( i * 3 + v ) * 3 ] = color.r;
+							colorAttr[ ( i * 3 + v ) * 3 + 1 ] = color.g;
+							colorAttr[ ( i * 3 + v ) * 3 + 2 ] = color.b;
+
+						}
+
+					}
+
+					geometry.setAttribute( 'color', new BufferAttribute( colorAttr, 3 ) );
 
 				}
 
