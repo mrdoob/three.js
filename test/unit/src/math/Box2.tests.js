@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Box2 } from '../../../../src/math/Box2.js';
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import {

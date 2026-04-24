@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Uniform } from '../../../../src/core/Uniform.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
@@ -23,13 +21,6 @@ export default QUnit.module( 'Core', () => {
 
 			a = new Uniform( b );
 			assert.ok( a.value.equals( b ), 'New constructor works with complex values' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'value', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

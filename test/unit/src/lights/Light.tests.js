@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Light } from '../../../../src/lights/Light.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
@@ -55,18 +53,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'intensity', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isLight', ( assert ) => {
 
@@ -85,18 +71,6 @@ export default QUnit.module( 'Lights', () => {
 			// empty, test exists
 			const object = new Light();
 			object.dispose();
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

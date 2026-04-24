@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="height_to_normal_example">
+    <image name="height_image" type="float">
+      <input name="file" type="filename" value="resources/Images/grid.png" />
+      <input name="default" type="float" value="0.5" />
+    </image>
+    <heighttonormal name="height_to_normal" type="vector3">
+      <input name="in" type="float" nodename="height_image" />
+      <input name="scale" type="float" value="1.0" />
+    </heighttonormal>
+    <convert name="normal_to_color" type="color3">
+      <input name="in" type="vector3" nodename="height_to_normal" />
+    </convert>
+    <output name="out" type="color3" nodename="normal_to_color" />
+  </nodegraph>
+  <surfacematerial name="mat_heightnormal" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
+  </surfacematerial>
+  <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" output="out" nodegraph="height_to_normal_example" />
+  </standard_surface>
+</materialx> 

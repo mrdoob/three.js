@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CanvasTexture } from '../../../../src/textures/CanvasTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
@@ -24,13 +22,6 @@ export default QUnit.module( 'Textures', () => {
 
 			const object = new CanvasTexture();
 			assert.ok( object, 'Can instantiate a CanvasTexture.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'needsUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

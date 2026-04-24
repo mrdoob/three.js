@@ -1,41 +1,69 @@
 import LightingNode from './LightingNode.js';
-import { cache } from '../core/CacheNode.js';
-import { context } from '../core/ContextNode.js';
+import { isolate } from '../core/IsolateNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
-import { cameraViewMatrix } from '../accessors/CameraNode.js';
-import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { float } from '../shadernode/ShaderNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
-import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
+import { cameraViewMatrix } from '../accessors/Camera.js';
+import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
+import { positionViewDirection } from '../accessors/Position.js';
+import { float, pow4 } from '../tsl/TSLBase.js';
+import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
+import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
 
-const envNodeCache = new WeakMap();
+const _rendererCache = new WeakMap();
 
+/**
+ * Represents a physical model for Image-based lighting (IBL). The environment
+ * is defined via environment maps in the equirectangular, cube map or cubeUV (PMREM) format.
+ * `EnvironmentNode` is intended for PBR materials like {@link MeshStandardNodeMaterial}.
+ *
+ * @augments LightingNode
+ */
 class EnvironmentNode extends LightingNode {
 
+	static get type() {
+
+		return 'EnvironmentNode';
+
+	}
+
+	/**
+	 * Constructs a new environment node.
+	 *
+	 * @param {Node} [envNode=null] - A node representing the environment.
+	 */
 	constructor( envNode = null ) {
 
 		super();
 
+		/**
+		 * A node representing the environment.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
 		this.envNode = envNode;
 
 	}
 
 	setup( builder ) {
 
+		const { material } = builder;
+
 		let envNode = this.envNode;
 
-		if ( envNode.isTextureNode ) {
+		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
 
-			let cacheEnvNode = envNodeCache.get( envNode.value );
+			const value = ( envNode.isTextureNode ) ? envNode.value : material[ envNode.property ];
+
+			const cache = this._getPMREMNodeCache( builder.renderer );
+
+			let cacheEnvNode = cache.get( value );
 
 			if ( cacheEnvNode === undefined ) {
 
-				cacheEnvNode = pmremTexture( envNode.value );
+				cacheEnvNode = pmremTexture( value );
 
-				envNodeCache.set( envNode.value, cacheEnvNode );
+				cache.set( value, cacheEnvNode );
 
 			}
 
@@ -45,19 +73,14 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		const { material } = builder;
-
-		const envMap = material.envMap;
-		const intensity = envMap ? reference( 'envMapIntensity', 'float', builder.material ) : reference( 'environmentIntensity', 'float', builder.scene ); // @TODO: Add materialEnvIntensity in MaterialNode
-
 		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
-		const radianceNormalView = useAnisotropy ? transformedBentNormalView : transformedNormalView;
+		const radianceNormalView = useAnisotropy ? bentNormalView : normalView;
 
-		const radiance = context( envNode, createRadianceContext( roughness, radianceNormalView ) ).mul( intensity );
-		const irradiance = context( envNode, createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
+		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity );
+		const irradiance = envNode.context( createIrradianceContext( normalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity );
 
-		const isolateRadiance = cache( radiance );
-		const isolateIrradiance = cache( irradiance );
+		const isolateRadiance = isolate( radiance );
+		const isolateIrradiance = isolate( irradiance );
 
 		//
 
@@ -71,8 +94,8 @@ class EnvironmentNode extends LightingNode {
 
 		if ( clearcoatRadiance ) {
 
-			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
-			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
+			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, clearcoatNormalView ) ).mul( materialEnvIntensity );
+			const isolateClearcoatRadiance = isolate( clearcoatRadianceContext );
 
 			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
@@ -80,7 +103,32 @@ class EnvironmentNode extends LightingNode {
 
 	}
 
+	/**
+	 * Returns the PMREM node cache of the current renderer.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The current renderer.
+	 * @return {WeakMap} The node cache.
+	 */
+	_getPMREMNodeCache( renderer ) {
+
+		let pmremCache = _rendererCache.get( renderer );
+
+		if ( pmremCache === undefined ) {
+
+			pmremCache = new WeakMap();
+
+			_rendererCache.set( renderer, pmremCache );
+
+		}
+
+		return pmremCache;
+
+	}
+
 }
+
+export default EnvironmentNode;
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
@@ -94,7 +142,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
 
 				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = roughnessNode.mul( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
+				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
 
 				reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
@@ -128,7 +176,3 @@ const createIrradianceContext = ( normalWorldNode ) => {
 	};
 
 };
-
-export default EnvironmentNode;
-
-addNodeClass( 'EnvironmentNode', EnvironmentNode );

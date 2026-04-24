@@ -4,14 +4,26 @@
 		<title>three.js webgpu - postprocessing sobel</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span> Sobel</span>
+			</div>
+
+			<small>Edge Detection with a Sobel operator.</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -19,77 +31,80 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { pass, renderOutput } from 'three/tsl';
+			import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			let camera, scene, renderer;
-			let postProcessing;
+			let camera, scene, renderer, controls;
+			let renderPipeline;
 
 			const params = {
-				enable: true
+				enabled: true
 			};
 
 			init();
 
-			function init() {
+			async function init() {
 
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 1, 3 );
-				camera.lookAt( scene.position );
 
 				//
 
-				const ambientLight = new THREE.AmbientLight( 0xe7e7e7 );
-				scene.add( ambientLight );
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gltf/DragonAttenuation.glb' );
+				const model = gltf.scene.children[ 1 ];
+				model.material = new THREE.MeshStandardNodeMaterial();
 
-				const pointLight = new THREE.PointLight( 0xffffff, 20 );
-				camera.add( pointLight );
-				scene.add( camera );
-
-				//
-
-				const geometry = new THREE.TorusKnotGeometry( 1, 0.3, 256, 32 );
-				const material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
-
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
-
+				scene.add( model );
+			
 				//
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.inspector = new Inspector();
+				renderer.toneMapping = THREE.LinearToneMapping;
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				pmremGenerator.dispose();
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.enableZoom = false;
+				controls.target.set( 0, 0.5, 0 );
+				controls.update();
 
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputColorTransform = false;
 
 				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
 
-				postProcessing.outputNode = scenePassColor.sobel();
+				renderPipeline.outputNode = sobel( renderOutput( scenePass ) );
 
 				//
 
-				const gui = new GUI();
-
-				gui.add( params, 'enable' );
-				gui.open();
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'enabled' );
 
 				//
 
@@ -109,9 +124,11 @@
 
 			function animate() {
 
-				if ( params.enable === true ) {
+				controls.update();
 
-					postProcessing.render();
+				if ( params.enabled === true ) {
+
+					renderPipeline.render();
 
 				} else {
 

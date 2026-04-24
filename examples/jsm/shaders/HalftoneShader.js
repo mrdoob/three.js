@@ -1,10 +1,19 @@
 /**
- * RGB Halftone shader for three.js.
- *	NOTE:
- * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
- *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
+ * @module HalftoneShader
+ * @three_import import { HalftoneShader } from 'three/addons/shaders/HalftoneShader.js';
  */
 
+/**
+ * RGB Halftone shader.
+ *
+ * Used by {@link HalftonePass}.
+ *
+ * Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square, 5 = Diamond)
+ * Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const HalftoneShader = {
 
 	name: 'HalftoneShader',
@@ -40,11 +49,13 @@ const HalftoneShader = {
 
 		#define SQRT2_MINUS_ONE 0.41421356
 		#define SQRT2_HALF_MINUS_ONE 0.20710678
+		#define PI 3.14159265
 		#define PI2 6.28318531
 		#define SHAPE_DOT 1
 		#define SHAPE_ELLIPSE 2
 		#define SHAPE_LINE 3
 		#define SHAPE_SQUARE 4
+		#define SHAPE_DIAMOND 5
 		#define BLENDING_LINEAR 1
 		#define BLENDING_MULTIPLY 2
 		#define BLENDING_ADD 3
@@ -115,6 +126,15 @@ const HalftoneShader = {
 			} else if ( shape == SHAPE_SQUARE ) {
 
 				float theta = atan( p.y - coord.y, p.x - coord.x ) - angle;
+				float sin_t = abs( sin( theta ) );
+				float cos_t = abs( cos( theta ) );
+				rad = pow( abs( rad ), 1.4 );
+				rad = rad_max * ( rad + ( ( sin_t > cos_t ) ? rad - sin_t * rad : rad - cos_t * rad ) );
+
+			} else if ( shape == SHAPE_DIAMOND ) {
+
+				float angle45 = PI / 4.0;
+				float theta = atan( p.y - coord.y, p.x - coord.x ) - angle - angle45;
 				float sin_t = abs( sin( theta ) );
 				float cos_t = abs( cos( theta ) );
 				rad = pow( abs( rad ), 1.4 );

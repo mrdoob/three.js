@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br/>(Chrome Android 81+)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br/>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +28,7 @@
 
 			let container;
 			let camera, scene, renderer;
-			let controller;
+			let controller1, controller2;
 
 			let reticle;
 
@@ -81,9 +81,13 @@
 
 				}
 
-				controller = renderer.xr.getController( 0 );
-				controller.addEventListener( 'select', onSelect );
-				scene.add( controller );
+				controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'select', onSelect );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'select', onSelect );
+				scene.add( controller2 );
 
 				reticle = new THREE.Mesh(
 					new THREE.RingGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),

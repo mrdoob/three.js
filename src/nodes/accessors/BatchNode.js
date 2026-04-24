@@ -1,30 +1,62 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import { normalLocal } from './Normal.js';
+import { positionLocal } from './Position.js';
+import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../tsl/TSLBase.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
-import { tangentLocal } from './TangentNode.js';
+import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
+import { varyingProperty } from '../core/PropertyNode.js';
 
+/**
+ * This node implements the vertex shader logic which is required
+ * when rendering 3D objects via batching. `BatchNode` must be used
+ * with instances of {@link BatchedMesh}.
+ *
+ * @augments Node
+ */
 class BatchNode extends Node {
 
+	static get type() {
+
+		return 'BatchNode';
+
+	}
+
+	/**
+	 * Constructs a new batch node.
+	 *
+	 * @param {BatchedMesh} batchMesh - A reference to batched mesh.
+	 */
 	constructor( batchMesh ) {
 
 		super( 'void' );
 
+		/**
+		 * A reference to batched mesh.
+		 *
+		 * @type {BatchedMesh}
+		 */
 		this.batchMesh = batchMesh;
 
-
-		this.instanceColorNode = null;
-
+		/**
+		 * The batching index node.
+		 *
+		 * @type {?IndexNode}
+		 * @default null
+		 */
 		this.batchingIdNode = null;
 
 	}
 
+	/**
+	 * Setups the internal buffers and nodes and assigns the transformed vertex data
+	 * to predefined node variables for accumulation. That follows the same patterns
+	 * like with morph and skinning nodes.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
-
-		// POSITION
 
 		if ( this.batchingIdNode === null ) {
 
@@ -40,11 +72,11 @@ class BatchNode extends Node {
 
 		}
 
-		const getIndirectIndex = tslFn( ( [ id ] ) => {
+		const getIndirectIndex = Fn( ( [ id ] ) => {
 
-			const size = textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 );
-			const x = int( id ).remainder( int( size ) );
-			const y = int( id ).div( int( size ) );
+			const size = int( textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 ).x ).toConst();
+			const x = int( id ).mod( size ).toConst();
+			const y = int( id ).div( size ).toConst();
 			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x;
 
 		} ).setLayout( {
@@ -55,25 +87,50 @@ class BatchNode extends Node {
 			]
 		} );
 
-		const matriceTexture = this.batchMesh._matricesTexture;
+		const indirectId = getIndirectIndex( int( this.batchingIdNode ) );
 
-		const size = textureSize( textureLoad( matriceTexture ), 0 );
-		const j = float( getIndirectIndex( int( this.batchingIdNode ) ) ).mul( 4 ).toVar();
+		const matricesTexture = this.batchMesh._matricesTexture;
 
-		const x = int( j.mod( size ) );
-		const y = int( j ).div( int( size ) );
+		const size = int( textureSize( textureLoad( matricesTexture ), 0 ).x ).toConst();
+		const j = float( indirectId ).mul( 4 ).toInt().toConst();
+
+		const x = j.mod( size ).toConst();
+		const y = j.div( size ).toConst();
 		const batchingMatrix = mat4(
-			textureLoad( matriceTexture, ivec2( x, y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 1 ), y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 2 ), y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 3 ), y ) )
+			textureLoad( matricesTexture, ivec2( x, y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
 		);
 
-		const bm = mat3(
-			batchingMatrix[ 0 ].xyz,
-			batchingMatrix[ 1 ].xyz,
-			batchingMatrix[ 2 ].xyz
-		 );
+
+		const colorsTexture = this.batchMesh._colorsTexture;
+
+		if ( colorsTexture !== null ) {
+
+			const getBatchingColor = Fn( ( [ id ] ) => {
+
+				const size = int( textureSize( textureLoad( colorsTexture ), 0 ).x ).toConst();
+				const j = id;
+				const x = j.mod( size ).toConst();
+				const y = j.div( size ).toConst();
+				return textureLoad( colorsTexture, ivec2( x, y ) ).rgb;
+
+			} ).setLayout( {
+				name: 'getBatchingColor',
+				type: 'vec3',
+				inputs: [
+					{ name: 'id', type: 'int' }
+				]
+			} );
+
+			const color = getBatchingColor( indirectId );
+
+			varyingProperty( 'vec3', 'vBatchColor' ).assign( color );
+
+		}
+
+		const bm = mat3( batchingMatrix );
 
 		positionLocal.assign( batchingMatrix.mul( positionLocal ) );
 
@@ -95,6 +152,12 @@ class BatchNode extends Node {
 
 export default BatchNode;
 
-export const batch = nodeProxy( BatchNode );
-
-addNodeClass( 'batch', BatchNode );
+/**
+ * TSL function for creating a batch node.
+ *
+ * @tsl
+ * @function
+ * @param {BatchedMesh} batchMesh - A reference to batched mesh.
+ * @returns {BatchNode}
+ */
+export const batch = /*@__PURE__*/ nodeProxy( BatchNode ).setParameterLength( 1 );

@@ -1,0 +1,20 @@
+name: Protected Folders Check
+
+on:
+  pull_request:
+    paths:
+      - 'build/**'
+      - 'docs/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for protected folder changes
+        if: ${{ github.event.pull_request.author_association != 'OWNER' && github.event.pull_request.author_association != 'COLLABORATOR' }}
+        run: |
+          echo "::error::The 'build' and 'docs' folders are auto-generated and cannot be modified in PRs. Please remove these changes from your PR."
+          exit 1

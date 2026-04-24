@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - multiple canvas</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+
+			* {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+			}
+
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+
+			a {
+				color: #08f;
+			}
+
+			#content {
+				position: absolute;
+				top: 0; width: 100%;
+				z-index: 1;
+				padding: 3em 0 0 0;
+			}
+
+			.list-item {
+				display: inline-block;
+				margin: 1em;
+				padding: 1em;
+				box-shadow: 1px 2px 4px 0px rgba(0,0,0,0.25);
+			}
+
+			.list-item > canvas:nth-child(1) {
+				width: 200px;
+				height: 200px;
+			}
+
+			.list-item > div:nth-child(2) {
+				color: #888;
+				font-family: sans-serif;
+				font-size: large;
+				width: 200px;
+				margin-top: 0.5em;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="content">
+			<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple canvas</div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { color } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			//
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			//
+
+			let renderer;
+
+			const scenes = [];
+
+			init();
+
+			function init() {
+
+				const geometries = [
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.SphereGeometry( 0.5, 12, 8 ),
+					new THREE.DodecahedronGeometry( 0.5 ),
+					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 )
+				];
+
+				const content = document.getElementById( 'content' );
+
+				for ( let i = 0; i < 40; i ++ ) {
+
+					const scene = new THREE.Scene();
+					scene.backgroundNode = color( 0xeeeeee );
+
+					// make a list item
+					const element = document.createElement( 'div' );
+					element.className = 'list-item';
+
+					const sceneCanvas = document.createElement( 'canvas' );
+					element.appendChild( sceneCanvas );
+
+					const descriptionElement = document.createElement( 'div' );
+					descriptionElement.innerText = 'Scene ' + ( i + 1 );
+					element.appendChild( descriptionElement );
+
+					const canvasTarget = new THREE.CanvasTarget( sceneCanvas );
+					canvasTarget.setPixelRatio( window.devicePixelRatio );
+					canvasTarget.setSize( 200, 200 );
+
+					// the element that represents the area we want to render the scene
+					scene.userData.canvasTarget = canvasTarget;
+					content.appendChild( element );
+
+					const camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
+					camera.position.z = 2;
+					scene.userData.camera = camera;
+
+					const controls = new OrbitControls( scene.userData.camera, scene.userData.canvasTarget.domElement );
+					controls.minDistance = 2;
+					controls.maxDistance = 5;
+					controls.enablePan = false;
+					controls.enableZoom = false;
+					scene.userData.controls = controls;
+
+					// add one random mesh to each scene
+					const geometry = geometries[ geometries.length * Math.random() | 0 ];
+
+					const material = new THREE.MeshStandardMaterial( {
+
+						color: new THREE.Color().setHSL( Math.random(), 1, 0.75, THREE.SRGBColorSpace ),
+						roughness: 0.5,
+						metalness: 0,
+						flatShading: true
+
+					} );
+
+					scene.add( new THREE.Mesh( geometry, material ) );
+
+					scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444, 3 ) );
+
+					const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+					light.position.set( 1, 1, 1 );
+					scene.add( light );
+
+					scenes.push( scene );
+
+				}
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function animate() {
+
+				scenes.forEach( function ( scene ) {
+
+					// so something moves
+					//scene.children[ 0 ].rotation.y = Date.now() * 0.001;
+
+					// get the canvas and camera for this scene
+					const { canvasTarget, camera } = scene.userData;
+
+					//camera.aspect = width / height; // not changing in this example
+					//camera.updateProjectionMatrix();
+
+					//scene.userData.controls.update();
+
+					renderer.setCanvasTarget( canvasTarget );
+					renderer.render( scene, camera );
+
+				} );
+
+			}
+
+		</script>
+
+	</body>
+</html>

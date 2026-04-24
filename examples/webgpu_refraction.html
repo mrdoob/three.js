@@ -4,19 +4,28 @@
 		<title>three.js webgpu - refraction</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - refraction
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Refraction</span>
+			</div>
+
+			<small>
+				Refraction using backdrop.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -24,10 +33,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { viewportSharedTexture, texture, uv } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { viewportSafeUV, viewportSharedTexture, screenUV, texture, uv } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -44,7 +55,7 @@
 
 				// camera
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-				camera.position.set( 0, 75, 160 );
+				camera.position.set( 0, 50, 160 );
 
 				//
 
@@ -63,11 +74,11 @@
 
 				// refractor
 
-				const verticalRefractor = viewportSharedTexture();
-
 				const verticalNormalScale = 0.1;
 				const verticalUVOffset = texture( floorNormal, uv().mul( 5 ) ).xy.mul( 2 ).sub( 1 ).mul( verticalNormalScale );
-				verticalRefractor.uvNode = verticalRefractor.uvNode.add( verticalUVOffset );
+
+				const refractorUV = screenUV.add( verticalUVOffset );
+				const verticalRefractor = viewportSharedTexture( viewportSafeUV( refractorUV ) ).toInspector( 'Viewport Texture' );
 
 				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
@@ -126,16 +137,17 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( /*{ antialias: true }*/ );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// controls
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 40, 0 );
+				cameraControls.target.set( 0, 50, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
 				cameraControls.update();

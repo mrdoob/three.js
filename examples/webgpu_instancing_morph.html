@@ -4,14 +4,28 @@
 		<title>three.js webgpu - instancing morph target animations</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Instancing Morph</span>
+			</div>
+
+			<small>
+				Rendering instances which are individually animated via morph targets.
+			</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -19,13 +33,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			let camera, scene, renderer, stats, mesh, mixer, dummy;
+			let camera, scene, renderer, mesh, mixer, dummy;
 
 			const offset = 5000;
 
@@ -37,7 +50,9 @@
 
 			}
 
-			const clock = new THREE.Clock( true );
+			const timer = new THREE.Timer();
+			timer.connect( document );
+
 
 			init();
 
@@ -51,11 +66,7 @@
 
 				scene.fog = new THREE.Fog( 0x99DDFF, 5000, 10000 );
 
-
 				//
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 
@@ -70,8 +81,6 @@
 				light.shadow.camera.top = 5000;
 				light.shadow.camera.bottom = - 5000;
 				light.shadow.camera.far = 2000;
-
-				light.shadow.bias = - 0.01;
 
 				light.shadow.camera.updateProjectionMatrix();
 
@@ -140,6 +149,8 @@
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -159,7 +170,9 @@
 
 			function animate() {
 
-				const time = clock.getElapsedTime();
+				timer.update();
+
+				const time = timer.getElapsed();
 
 				const r = 3000;
 				camera.position.set( Math.sin( time / 10 ) * r, 1500 + 1000 * Math.cos( time / 5 ), Math.cos( time / 10 ) * r );
@@ -180,8 +193,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

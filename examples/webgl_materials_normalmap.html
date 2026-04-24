@@ -26,35 +26,32 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
 			import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader.js';
-			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { FXAAPass } from 'three/addons/postprocessing/FXAAPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let container, stats, loader;
+			let container, loader;
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls;
 
 			let mesh;
 
 			let directionalLight, pointLight, ambientLight;
 
-			let mouseX = 0;
-			let mouseY = 0;
+			let composer;
 
-			let targetX = 0;
-			let targetY = 0;
-
-			const windowHalfX = window.innerWidth / 2;
-			const windowHalfY = window.innerHeight / 2;
-
-			let composer, effectFXAA;
+			const params = {
+				enableNormalMap: true,
+				normalScale: 1
+			};
 
 			init();
 
@@ -63,7 +60,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 12;
 
 				scene = new THREE.Scene();
@@ -100,7 +97,7 @@
 					map: diffuseMap,
 					specularMap: specularMap,
 					normalMap: normalMap,
-					normalScale: new THREE.Vector2( 0.8, 0.8 )
+					normalScale: new THREE.Vector2( params.normalScale, params.normalScale )
 				} );
 
 				loader = new GLTFLoader();
@@ -122,12 +119,6 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-
 				// COMPOSER
 
 				renderer.autoClear = false;
@@ -137,9 +128,7 @@
 				const effectBleach = new ShaderPass( BleachBypassShader );
 				const effectColor = new ShaderPass( ColorCorrectionShader );
 				const outputPass = new OutputPass();
-				effectFXAA = new ShaderPass( FXAAShader );
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+				const effectFXAA = new FXAAPass();
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.2;
 
@@ -158,8 +147,28 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const gui = new GUI();
+
+				gui.add( params, 'enableNormalMap' ).name( 'enable normal map' ).onChange( ( value ) => {
+
+					material.normalMap = ( value === true ) ? normalMap : null;
+					material.needsUpdate = true;
+
+				} );
+				gui.add( params, 'normalScale', 0, 2 ).name( 'normal scale' ).onChange( ( value )=> material.normalScale.setScalar( value ) );
+				gui.open();
+
+				// CONTROLS
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 8;
+				controls.maxDistance = 50;
+				controls.enablePan = false;
+				controls.enableDamping = true;
 
 			}
 
@@ -176,38 +185,13 @@
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
-
 			}
 
 			//
 
 			function animate() {
 
-				render();
-
-				stats.update();
-
-			}
-
-			function render() {
-
-				targetX = mouseX * .001;
-				targetY = mouseY * .001;
-
-				if ( mesh ) {
-
-					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
-					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
-
-				}
+				controls.update();
 
 				composer.render();
 

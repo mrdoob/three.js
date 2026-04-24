@@ -439,7 +439,7 @@ function SidebarMaterial( editor ) {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		} catch ( e ) {
+		} catch ( error ) {
 
 			output = JSON.stringify( output );
 
@@ -501,7 +501,7 @@ function SidebarMaterial( editor ) {
 						const value = currentMaterial[ property ];
 
 						if ( value === null ) continue;
-						
+
 						if ( value[ 'clone' ] !== undefined ) {
 
 							material[ property ] = value.clone();

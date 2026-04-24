@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
@@ -54,12 +52,6 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'points', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'isSplineCurve', ( assert ) => {
 
@@ -68,30 +60,6 @@ export default QUnit.module( 'Extras', () => {
 					object.isSplineCurve,
 					'SplineCurve.isSplineCurve should be true'
 				);
-
-			} );
-
-			QUnit.todo( 'getPoint', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

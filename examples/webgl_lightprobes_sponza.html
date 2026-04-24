@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - light probe volume (Sponza)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - light probe volume (Sponza)<br/>
+			WASD to move, mouse to look
+		</div>
+
+		<progress id="progressBar" value="0" max="100" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></progress>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
+
+			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
+			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
+
+			let camera, scene, renderer, controls, timer;
+			let probes = null, probesHelper = null;
+			let modelSize = null;
+			let dirLight = null, sky = null, sun = new THREE.Vector3();
+
+			const _box = new THREE.Box3();
+			const _size = new THREE.Vector3();
+			const _center = new THREE.Vector3();
+
+			init();
+
+			async function init() {
+
+				timer = new THREE.Timer();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( - 10.25, 4.99, 0.40 );
+				camera.rotation.set( 1.6505, - 1.5008, 1.6507 );
+
+				scene = new THREE.Scene();
+
+				sky = new Sky();
+				sky.scale.setScalar( 450000 );
+				scene.add( sky );
+
+				const skyUniforms = sky.material.uniforms;
+				skyUniforms[ 'turbidity' ].value = 10;
+				skyUniforms[ 'rayleigh' ].value = 2;
+				skyUniforms[ 'mieCoefficient' ].value = 0.005;
+				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				document.body.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 2.0;
+				controls.lookSpeed = 0.16;
+
+				const progressBar = document.getElementById( 'progressBar' );
+
+				const manager = new THREE.LoadingManager();
+				manager.onProgress = function ( url, loaded, total ) {
+
+					progressBar.value = loaded / total * 100;
+
+				};
+				manager.onLoad = function () {
+
+					progressBar.remove();
+
+				};
+
+				const loader = new GLTFLoader( manager );
+				const modelURL = await getSponzaModelURL();
+				const gltf = await loader.loadAsync( modelURL );
+				const model = gltf.scene;
+				const embeddedLights = [];
+
+				model.traverse( ( child ) => {
+
+					if ( child.isMesh ) {
+
+						child.castShadow = true;
+						child.receiveShadow = true;
+
+					} else if ( child.isLight ) {
+
+						embeddedLights.push( child );
+
+					}
+
+				} );
+
+				for ( const light of embeddedLights ) {
+
+					if ( light.parent ) light.parent.remove( light );
+
+				}
+
+				scene.add( model );
+
+				_box.setFromObject( model );
+				modelSize = _box.getSize( _size ).clone();
+				const modelCenter = _box.getCenter( _center ).clone();
+				const targetY = modelCenter.y + modelSize.y * 0.2;
+				const lightBaseDistance = Math.max( modelSize.x, modelSize.z );
+				const probeFar = Math.max( modelSize.x, modelSize.y, modelSize.z ) * 2.0;
+				let rebakeTimer = null;
+				let isBaking = false;
+				let bakeQueued = false;
+
+				dirLight = new THREE.DirectionalLight( 0xfff2dc, 50.0 );
+				dirLight.target.position.set( modelCenter.x, targetY, modelCenter.z );
+				scene.add( dirLight.target );
+				dirLight.castShadow = true;
+				dirLight.shadow.mapSize.setScalar( 2048 );
+				const shadowExtent = Math.max( modelSize.x, modelSize.z ) * 0.7;
+				dirLight.shadow.camera.left = - shadowExtent;
+				dirLight.shadow.camera.right = shadowExtent;
+				dirLight.shadow.camera.top = shadowExtent;
+				dirLight.shadow.camera.bottom = - shadowExtent;
+				dirLight.shadow.camera.near = 0.1;
+				dirLight.shadow.camera.far = modelSize.y * 4.0;
+				scene.add( dirLight );
+
+				const params = {
+					enabled: true,
+					showProbes: false,
+					probeSize: 0.25,
+					boundsX: - 0.5,
+					boundsY: 6,
+					boundsZ: - 0.3,
+					sizeX: 19,
+					sizeY: 11,
+					sizeZ: 7,
+					countX: 7,
+					countY: 7,
+					countZ: 3,
+					lightAzimuth: - 45,
+					lightElevation: 55,
+					lightIntensity: 50.0,
+					shadows: true
+				};
+
+				function updateLightPosition() {
+
+					const azimuth = THREE.MathUtils.degToRad( params.lightAzimuth );
+					const elevation = THREE.MathUtils.degToRad( params.lightElevation );
+					const radius = lightBaseDistance;
+					const horizontal = Math.cos( elevation ) * radius;
+					const vertical = Math.sin( elevation ) * radius;
+
+					dirLight.position.set(
+						modelCenter.x + Math.cos( azimuth ) * horizontal,
+						targetY + vertical,
+						modelCenter.z + Math.sin( azimuth ) * horizontal
+					);
+					dirLight.target.position.set( modelCenter.x, targetY, modelCenter.z );
+					dirLight.target.updateMatrixWorld();
+
+					const phi = THREE.MathUtils.degToRad( 90 - params.lightElevation );
+					const theta = THREE.MathUtils.degToRad( params.lightAzimuth );
+					sun.setFromSphericalCoords( 1, phi, theta );
+					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+
+				}
+
+				function scheduleRebake() {
+
+					if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
+					rebakeTimer = setTimeout( () => {
+
+						rebakeTimer = null;
+						bakeWithSettings();
+
+					}, 250 );
+
+				}
+
+				async function bakeWithSettings() {
+
+					if ( isBaking ) {
+
+						bakeQueued = true;
+						return;
+
+					}
+
+					isBaking = true;
+
+					do {
+
+						bakeQueued = false;
+
+						if ( probes ) {
+
+							scene.remove( probes );
+							probes.dispose();
+
+						}
+
+						probes = new LightProbeGrid(
+							params.sizeX, params.sizeY, params.sizeZ,
+							params.countX, params.countY, params.countZ
+						);
+						probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
+						probes.bake( renderer, scene, {
+							cubemapSize: 32,
+							near: 0.05,
+							far: probeFar
+						} );
+						probes.visible = params.enabled;
+						scene.add( probes );
+
+						if ( ! probesHelper ) {
+
+							probesHelper = new LightProbeGridHelper( probes, params.probeSize );
+							probesHelper.visible = params.showProbes;
+							scene.add( probesHelper );
+
+						} else {
+
+							probesHelper.probes = probes;
+							probesHelper.update();
+							probesHelper.visible = params.showProbes;
+
+						}
+
+					} while ( bakeQueued );
+
+					isBaking = false;
+
+				}
+
+				updateLightPosition();
+
+				const gui = new GUI();
+				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
+
+					if ( probes ) probes.visible = value;
+
+				} );
+
+				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
+
+					updateLightPosition();
+					scheduleRebake();
+
+				} );
+				gui.add( params, 'lightElevation', 5, 85, 1 ).name( 'Light Elevation' ).onChange( () => {
+
+					updateLightPosition();
+					scheduleRebake();
+
+				} );
+				gui.add( params, 'lightIntensity', 0, 50, 0.1 ).name( 'Light Intensity' ).onChange( ( value ) => {
+
+					dirLight.intensity = value;
+					scheduleRebake();
+
+				} );
+				gui.add( params, 'shadows' ).name( 'Shadows' ).onChange( ( value ) => {
+
+					setShadowsEnabled( value );
+					scheduleRebake();
+
+				} );
+
+				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
+
+					if ( probesHelper ) probesHelper.visible = value;
+
+				} );
+				gui.add( params, 'probeSize', 0.05, 2.0, 0.05 ).name( 'Probe Size' ).onChange( ( value ) => {
+
+					if ( probesHelper ) {
+
+						scene.remove( probesHelper );
+						probesHelper.dispose();
+						probesHelper = new LightProbeGridHelper( probes, value );
+						probesHelper.visible = params.showProbes;
+						scene.add( probesHelper );
+
+					}
+
+				} );
+
+				gui.add( { log: () => {
+
+					console.log( 'position:', camera.position.x.toFixed( 2 ), camera.position.y.toFixed( 2 ), camera.position.z.toFixed( 2 ) );
+					console.log( 'rotation:', camera.rotation.x.toFixed( 4 ), camera.rotation.y.toFixed( 4 ), camera.rotation.z.toFixed( 4 ) );
+
+				} }, 'log' ).name( 'Log Camera' );
+
+				setShadowsEnabled( params.shadows );
+				await bakeWithSettings();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			async function getSponzaModelURL() {
+
+				const response = await fetch( MODEL_INDEX_URL );
+				const models = await response.json();
+				const sponzaInfo = models.find( ( model ) => model.name === 'Sponza' );
+
+				if ( ! sponzaInfo ) {
+
+					throw new Error( 'Sponza entry was not found in the glTF sample model index.' );
+
+				}
+
+				const variants = sponzaInfo.variants || {};
+				const variantName = variants[ 'glTF-Binary' ] || variants[ 'glTF' ] || variants[ 'glTF-Embedded' ] || Object.values( variants )[ 0 ];
+
+				if ( ! variantName ) {
+
+					throw new Error( 'Sponza has no supported glTF variant in the model index.' );
+
+				}
+
+				const variantFolder = variantName.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
+				return `${ SAMPLE_ASSETS_BASE_URL }${ sponzaInfo.name }/${ variantFolder }/${ variantName }`;
+
+			}
+
+			function setShadowsEnabled( enabled ) {
+
+				if ( ! renderer || ! dirLight ) return;
+
+				renderer.shadowMap.enabled = enabled;
+				dirLight.castShadow = enabled;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate( timestamp ) {
+
+				timer.update( timestamp );
+				controls.update( timer.getDelta() );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,7 @@
+# Three.js
+
+> Three.js is a cross-browser JavaScript library for creating 3D graphics using WebGL and WebGPU.
+
+See the full documentation for LLMs at: https://threejs.org/docs/llms.txt
+
+For complete inline documentation including TSL: https://threejs.org/docs/llms-full.txt

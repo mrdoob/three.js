@@ -1,17 +1,52 @@
-import { addNodeClass } from '../core/Node.js';
-import { nodeProxy, addNodeElement } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
 
+/**
+ * This class enables element access on instances of {@link StorageBufferNode}.
+ * In most cases, it is indirectly used when accessing elements with the
+ * {@link StorageBufferNode#element} method.
+ *
+ * ```js
+ * const position = positionStorage.element( instanceIndex );
+ * ```
+ *
+ * @augments ArrayElementNode
+ */
 class StorageArrayElementNode extends ArrayElementNode {
 
+	static get type() {
+
+		return 'StorageArrayElementNode';
+
+	}
+
+	/**
+	 * Constructs storage buffer element node.
+	 *
+	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
+	 * @param {Node} indexNode - The index node that defines the element access.
+	 */
 	constructor( storageBufferNode, indexNode ) {
 
 		super( storageBufferNode, indexNode );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStorageArrayElementNode = true;
 
 	}
 
+	/**
+	 * The storage buffer node.
+	 *
+	 * @param {Node} value
+	 * @type {StorageBufferNode}
+	 */
 	set storageBufferNode( value ) {
 
 		this.node = value;
@@ -24,11 +59,25 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		const structTypeNode = this.storageBufferNode.structTypeNode;
+
+		if ( structTypeNode ) {
+
+			return structTypeNode.getMemberType( builder, name );
+
+		}
+
+		return 'void';
+
+	}
+
 	setup( builder ) {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( ! this.node.instanceIndex && this.node.bufferObject === true ) {
+			if ( this.node.isPBO === true ) {
 
 				builder.setupPBO( this.node );
 
@@ -50,15 +99,13 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			const { node } = this;
-
-			if ( ! node.instanceIndex && this.node.bufferObject === true && isAssignContext !== true ) {
+			if ( this.node.isPBO === true && isAssignContext !== true && ( this.node.value.isInstancedBufferAttribute || builder.shaderStage !== 'compute' ) ) {
 
 				snippet = builder.generatePBO( this );
 
 			} else {
 
-				snippet = node.build( builder );
+				snippet = this.node.build( builder );
 
 			}
 
@@ -84,8 +131,13 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 export default StorageArrayElementNode;
 
-export const storageElement = nodeProxy( StorageArrayElementNode );
-
-addNodeElement( 'storageElement', storageElement );
-
-addNodeClass( 'StorageArrayElementNode', StorageArrayElementNode );
+/**
+ * TSL function for creating a storage element node.
+ *
+ * @tsl
+ * @function
+ * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
+ * @param {Node} indexNode - The index node that defines the element access.
+ * @returns {StorageArrayElementNode}
+ */
+export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode ).setParameterLength( 2 );

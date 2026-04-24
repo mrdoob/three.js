@@ -4,7 +4,7 @@ function Config() {
 
 	const userLanguage = navigator.language.split( '-' )[ 0 ];
 
-	const suggestedLanguage = [ 'fr', 'ja', 'zh' ].includes( userLanguage ) ? userLanguage : 'en';
+	const suggestedLanguage = [ 'fr', 'ja', 'zh', 'ko', 'fa' ].includes( userLanguage ) ? userLanguage : 'en';
 
 	const storage = {
 		'language': suggestedLanguage,
@@ -15,10 +15,11 @@ function Config() {
 		'project/editable': false,
 		'project/vr': false,
 
+		'project/renderer/type': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
 		'project/renderer/shadowType': 1, // PCF
-		'project/renderer/toneMapping': 0, // NoToneMapping
+		'project/renderer/toneMapping': 7, // NeutralToneMapping
 		'project/renderer/toneMappingExposure': 1,
 
 		'settings/history': false,

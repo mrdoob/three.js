@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { StringKeyframeTrack } from '../../../../../src/animation/tracks/StringKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../../src/animation/KeyframeTrack.js';

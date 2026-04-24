@@ -1,5 +1,5 @@
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
-import { Loader } from './Loader.js';
+import { FileLoader } from 'three';
 
 function MenubarFile( editor ) {
 
@@ -70,7 +70,7 @@ function MenubarFile( editor ) {
 		{ title: 'menubar/file/new/Shaders', file: 'shaders.app.json' }
 	];
 
-	const loader = new THREE.FileLoader();
+	const loader = new FileLoader();
 
 	for ( let i = 0; i < examples.length; i ++ ) {
 

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Box3Helper } from '../../../../src/helpers/Box3Helper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
@@ -38,18 +36,7 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'box', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'dispose', ( assert ) => {
 

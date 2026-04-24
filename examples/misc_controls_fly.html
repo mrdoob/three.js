@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - fly controls - earth</title>
+		<title>three.js webgpu - fly controls - earth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -31,7 +31,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -39,8 +40,9 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass } from 'three/tsl';
+			import { film } from 'three/addons/tsl/display/FilmNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
@@ -60,14 +62,15 @@
 			let geometry, meshPlanet, meshClouds, meshMoon;
 			let dirLight;
 
-			let postProcessing;
+			let renderPipeline;
 
 			const textureLoader = new THREE.TextureLoader();
 
 			let d, dPlanet, dMoon;
 			const dMoonVec = new THREE.Vector3();
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
 
@@ -216,12 +219,12 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
 
-				postProcessing.outputNode = scenePassColor.film();
+				renderPipeline.outputNode = film( scenePassColor );
 
 			}
 
@@ -239,6 +242,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -248,7 +253,7 @@
 
 				// rotate the planet and clouds
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
@@ -273,7 +278,7 @@
 				controls.movementSpeed = 0.33 * d;
 				controls.update( delta );
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

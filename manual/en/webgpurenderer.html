@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>WebGPURenderer</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – WebGPURenderer">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "../../build/three.module.js"
+      }
+    }
+    </script>
+    </head>
+    <body>
+      <div class="container">
+        <div class="lesson-title">
+          <h1>WebGPURenderer</h1>
+        </div>
+        <div class="lesson">
+          <div class="lesson-main">
+            
+            <p>
+              The new `WebGPURenderer` is the next-generation renderer for three.js. This article provides a short overview about the new 
+              renderer and basic guidelines about the usage.
+            </p>
+
+            <h2>Overview</h2>
+
+            <p>
+              `WebGPURenderer` is designed to be the modern alternative to the long-standing `WebGLRenderer`.
+              Its primary goal is to use WebGPU, which is a modern, high-performance graphics and compute 3D API. However, it's built to be a 
+              universal renderer. If a device/browser doesn't support WebGPU, the renderer can automatically fall back to using a WebGL 2 backend.
+            </p>
+             <p>
+              Providing a WebGL 2 backend as a fallback is a crucial design decision since it allows applications to benefit from WebGPU but without 
+              sacrificing the support for devices which only support WebGL 2.
+             </p>
+
+             <p>
+             Apart from the fact that `WebGPURenderer` enables access to WebGPU, it offers an exciting feature set:
+             <p>
+
+            <ul>
+              <li>
+                `WebGPURenderer` comes with a new node-based material system which allows to develop custom materials with greater flexibility and 
+                more robustness.
+              </li>
+              <li>
+                The renderer supports TSL, the three.js shading language. With TSL, developers can write shader code with JavaScript in a 
+                platform-independent manner. Shader code written in TSL can be transpiled to WGSL or GLSL depending on the available backend.
+              </li>
+              <li>
+                `WebGPURenderer` comes with a new post-processing stack with built-in Multiple Render Targets (MRT) support and automatic pass combination thanks to the 
+                node material.
+              </li>
+            </ul>
+
+            Let's find out how to integrate `WebGPURenderer` in three.js applications.
+
+            <h2>Usage</h2>
+
+             <p>
+             `WebGPURenderer` has different build files so the way you import three.js changes:
+            </p>
+            
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  import * as THREE from 'three';
++  import * as THREE from 'three/webgpu';
+</pre>
+
+            <p>
+              If you are using an import map, it's recommended to change it to the following (the paths differ depending on your setup):
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+  &lt;script type="importmap"&gt;
+    {
+      "imports": {
+        "three": "../build/three.webgpu.js",
+        "three/webgpu": "../build/three.webgpu.js",
+        "three/tsl": "../build/three.tsl.js",
+        "three/addons/": "./jsm/"
+      }
+    }
+  &lt;/script&gt;
+</pre>
+
+             <p>
+              You can create an instance of the renderer just like with `WebGLRenderer`:
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const renderer = new THREE.WebGPURenderer( { antialias: true } );
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( render );
+document.body.appendChild( renderer.domElement );
+</pre>
+            <p>
+              It's important to understand that WebGPU is initialized in an asynchronous fashion. Hence, it is recommended to use 
+              `setAnimationLoop()` to define the animation loop of your app since this approach will automatically ensure the renderer
+              is initialized when rendering the first frame. If you prefer to manage your animation loop via `window.requestAnimationFrame()` or
+              if you have to use the renderer in your init routine, you need an additional line in the above code section.
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const renderer = new THREE.WebGPURenderer( { antialias: true } );
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( render );
+document.body.appendChild( renderer.domElement );
+
++  await renderer.init();
+</pre>
+            <p>
+              Most common methods known from `WebGLRenderer` like `clear()`, `setRenderTarget()`or `dispose()` are also present in `WebGPURenderer`. 
+              Please have a look at the <a href="https://threejs.org/docs/#Renderer" target="_blank">API documentation</a> for a full overview of the renderer's public interface.
+            </p>
+
+             <p>
+              Like mentioned in the initial part of the guide, `WebGPURenderer` uses a WebGPU backend by default and a WebGL 2 backend as a fallback. 
+              If you want to force the usage of WebGL 2 for testing purposes or if you want to exclude the usage of WebGPU for certain reasons, you can 
+              make use of the `forceWebGL` parameter.
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  const renderer = new THREE.WebGPURenderer( { antialias: true } );
++  const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
+</pre>
+
+            <h2>Migration</h2>
+
+            <p>
+              If you want to give `WebGPURenderer` a try, you have to be aware of the following.
+            </p>
+
+            <ul>
+              <li>
+                Custom materials based on `ShaderMaterial`, `RawShaderMaterial` and modifications of built-in materials via `onBeforeCompile()`
+                are not supported in `WebGPURenderer`. This part of your application must be ported to node materials and TSL.
+              </li>
+              <li>
+                `EffectComposer` with its effect passes are not supported because `WebGPURenderer` comes with a new, more modern 
+                post-processing stack. Similar to materials, post-processing effects are now written in TSL and the effect chain is expressed 
+                as a node composition. All common effects have already been ported to `WebGPURenderer` and exist in a more performant version
+                as a node class. We have also added new effects like SSGI, SSS or a better DoF exclusively for the new renderer. Check out the
+                <a href="https://threejs.org/examples/?q=webgpu%20postprocessing" target="_blank">official examples</a> to get an overview of
+                the current supported effects.
+              </li>
+              <li>
+                The renderer itself is still in an experimental state although its maturity level has been greatly improved in the last years. 
+                Still, depending on your application and scene setup, you will encounter missing features or a better performance with `WebGLRenderer`. 
+                Feel free to file an issue at GitHub so we are aware of open tasks. We are improving `WebGPURenderer` with each release so it's 
+                recommended to upgrade to the latest version whenever possible.
+              </li>
+            </ul>
+
+            <h2>State of WebGLRenderer</h2>
+
+            <p>Although in the meanwhile a lot of work happens in context of `WebGPURenderer`, the node material and TSL, `WebGLRenderer` is still maintained 
+              and the recommended choice for pure WebGL 2 applications. However, keep in mind that there are no plans to add larger new features to 
+              the renderer since the project's focus is now on `WebGPURenderer` which you can easily see at the latest release notes. That said,
+              we are currently investigating the possibility to add limited node material support to `WebGLRenderer` in order to make the transition to
+              `WebGPURenderer` easier for certain projects.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+    <script src="../resources/prettify.js"></script>
+    <script src="../resources/lesson.js"></script>
+  </body>
+</html>

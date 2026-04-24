@@ -1,14 +1,28 @@
 import SpotLightNode from './SpotLightNode.js';
-import { addLightNode } from './LightsNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { vec2 } from '../shadernode/ShaderNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { vec2 } from '../tsl/TSLBase.js';
 
-import IESSpotLight from '../../lights/webgpu/IESSpotLight.js';
-
+/**
+ * An IES version of the default spot light node.
+ *
+ * @augments SpotLightNode
+ */
 class IESSpotLightNode extends SpotLightNode {
 
-	getSpotAttenuation( angleCosine ) {
+	static get type() {
+
+		return 'IESSpotLightNode';
+
+	}
+
+	/**
+	 * Overwrites the default implementation to compute an IES conform spot attenuation.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @return {Node<float>} The spot attenuation.
+	 */
+	getSpotAttenuation( builder, angleCosine ) {
 
 		const iesMap = this.light.iesMap;
 
@@ -33,7 +47,3 @@ class IESSpotLightNode extends SpotLightNode {
 }
 
 export default IESSpotLightNode;
-
-addNodeClass( 'IESSpotLightNode', IESSpotLightNode );
-
-addLightNode( IESSpotLight, IESSpotLightNode );

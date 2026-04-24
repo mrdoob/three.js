@@ -1,10 +1,10 @@
-import { transformedNormalView } from '../../accessors/NormalNode.js';
-import { positionViewDirection } from '../../accessors/PositionNode.js';
+import { normalView } from '../../accessors/Normal.js';
+import { positionViewDirection } from '../../accessors/Position.js';
 import { sheen, sheenRoughness } from '../../core/PropertyNode.js';
-import { tslFn, float } from '../../shadernode/ShaderNode.js';
+import { Fn, float } from '../../tsl/TSLBase.js';
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const D_Charlie = tslFn( ( { roughness, dotNH } ) => {
+const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
 
 	const alpha = roughness.pow2();
 
@@ -25,7 +25,7 @@ const D_Charlie = tslFn( ( { roughness, dotNH } ) => {
 } );
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const V_Neubelt = tslFn( ( { dotNV, dotNL } ) => {
+const V_Neubelt = /*@__PURE__*/ Fn( ( { dotNV, dotNL } ) => {
 
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
 	return float( 1.0 ).div( float( 4.0 ).mul( dotNL.add( dotNV ).sub( dotNL.mul( dotNV ) ) ) );
@@ -39,13 +39,13 @@ const V_Neubelt = tslFn( ( { dotNV, dotNL } ) => {
 	]
 } );
 
-const BRDF_Sheen = tslFn( ( { lightDirection } ) => {
+const BRDF_Sheen = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
-	const dotNL = transformedNormalView.dot( lightDirection ).clamp();
-	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp();
-	const dotNH = transformedNormalView.dot( halfDir ).clamp();
+	const dotNL = normalView.dot( lightDirection ).clamp();
+	const dotNV = normalView.dot( positionViewDirection ).clamp();
+	const dotNH = normalView.dot( halfDir ).clamp();
 
 	const D = D_Charlie( { roughness: sheenRoughness, dotNH } );
 	const V = V_Neubelt( { dotNV, dotNL } );

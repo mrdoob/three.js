@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 class EditorControls extends THREE.EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object ) {
 
 		super();
 
@@ -33,6 +33,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 		var pointers = [];
 		var pointerPositions = {};
+
+		var domElement = null;
 
 		// events
 
@@ -269,7 +271,21 @@ class EditorControls extends THREE.EventDispatcher {
 
 		}
 
-		this.dispose = function () {
+		this.connect = function ( element ) {
+
+			if ( domElement !== null ) this.disconnect();
+
+			domElement = element;
+
+			domElement.addEventListener( 'contextmenu', contextmenu );
+			domElement.addEventListener( 'dblclick', onMouseUp );
+			domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+			domElement.addEventListener( 'pointerdown', onPointerDown );
+
+		};
+
+		this.disconnect = function () {
 
 			domElement.removeEventListener( 'contextmenu', contextmenu );
 			domElement.removeEventListener( 'dblclick', onMouseUp );
@@ -277,13 +293,9 @@ class EditorControls extends THREE.EventDispatcher {
 
 			domElement.removeEventListener( 'pointerdown', onPointerDown );
 
+			domElement = null;
+
 		};
-
-		domElement.addEventListener( 'contextmenu', contextmenu );
-		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
-
-		domElement.addEventListener( 'pointerdown', onPointerDown );
 
 		// touch
 
@@ -352,7 +364,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
-					var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
+					// Divide by 10 to offset inherent over-sensitivity (https://github.com/mrdoob/three.js/issues/32442)
+					var distance = touches[ 0 ].distanceTo( touches[ 1 ] ) / 10;
 					scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 					prevDistance = distance;
 
@@ -430,6 +443,20 @@ class EditorControls extends THREE.EventDispatcher {
 			return pointerPositions[ pointerId ];
 
 		}
+
+	}
+
+	fromJSON( json ) {
+
+		if ( json.center !== undefined ) this.center.fromArray( json.center );
+
+	}
+
+	toJSON() {
+
+		return {
+			center: this.center.toArray()
+		};
 
 	}
 

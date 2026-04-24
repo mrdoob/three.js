@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Comment mettre à jour les éléments</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Comment mettre à jour les éléments">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Comment mettre à jour les éléments</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+
+          <div>
+            <p>Par défaut, tous les objets mettent automatiquement à jour leurs matrices s'ils ont été ajoutés à la scène avec</p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const object = new THREE.Object3D();
+scene.add( object );
+</pre>
+            ou s'ils sont l'enfant d'un autre objet qui a été ajouté à la scène :
+<pre class="prettyprint notranslate lang-js" translate="no">
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
+
+object1.add( object2 );
+scene.add( object1 ); //object1 et object2 mettront automatiquement à jour leurs matrices
+</pre>
+          </div>
+
+          <p>Cependant, si vous savez que l'objet sera statique, vous pouvez désactiver cela et mettre à jour la matrice de transformation manuellement uniquement lorsque nécessaire.</p>
+
+<pre class="prettyprint notranslate lang-js" translate="no">
+object.matrixAutoUpdate = false;
+object.updateMatrix();
+</pre>
+
+          <h2>BufferGeometry</h2>
+          <div>
+            <p>
+              Les BufferGeometries stockent des informations (telles que les positions des sommets, les indices des faces, les normales, les couleurs,
+              les UV et tout attribut personnalisé) dans des tampons d'attributs - c'est-à-dire des
+              [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays tableaux typés].
+              Cela les rend généralement plus rapides que les Geometries standard, au prix d'être un peu plus difficiles à
+              utiliser.
+            </p>
+            <p>
+              En ce qui concerne la mise à jour des BufferGeometries, la chose la plus importante à comprendre est que
+              vous ne pouvez pas redimensionner les tampons (c'est très coûteux, c'est fondamentalement l'équivalent de la création d'une nouvelle géométrie).
+              Vous pouvez cependant mettre à jour le contenu des tampons.
+            </p>
+            <p>
+              Cela signifie que si vous savez qu'un attribut de votre BufferGeometry va croître, par exemple le nombre de sommets,
+              vous devez pré-allouer un tampon suffisamment grand pour contenir tous les nouveaux sommets qui pourraient être créés. Bien sûr,
+              cela signifie également qu'il y aura une taille maximale pour votre BufferGeometry - il n'y a
+              aucun moyen de créer une BufferGeometry qui puisse être étendue efficacement indéfiniment.
+            </p>
+            <p>
+              Nous utiliserons l'exemple d'une ligne qui s'étend au moment du rendu. Nous allouerons de l'espace
+              dans le tampon pour 500 sommets, mais n'en dessinerons que deux au début, en utilisant `BufferGeometry.drawRange`.
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const MAX_POINTS = 500;
+
+// geometry
+const geometry = new THREE.BufferGeometry();
+
+// attributes
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 floats (x, y et z) par point
+geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+// draw range
+const drawCount = 2; // dessine seulement les 2 premiers points, seulement
+geometry.setDrawRange( 0, drawCount );
+
+// material
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+// line
+const line = new THREE.Line( geometry, material );
+scene.add( line );
+</pre>
+             <p>
+              Ensuite, nous ajouterons aléatoirement des points à la ligne en utilisant un modèle comme :
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const positionAttribute = line.geometry.getAttribute( 'position' );
+
+let x = 0, y = 0, z = 0;
+
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+    positionAttribute.setXYZ( i, x, y, z );
+
+    x += ( Math.random() - 0.5 ) * 30;
+    y += ( Math.random() - 0.5 ) * 30;
+    z += ( Math.random() - 0.5 ) * 30;
+
+}
+</pre>
+            <p>
+              Si vous souhaitez modifier le <em>nombre de points</em> rendus après le premier rendu, faites ceci :
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+line.geometry.setDrawRange( 0, newValue );
+</pre>
+            <p>
+              Si vous souhaitez modifier les valeurs des données de position après le premier rendu, vous devez
+              définir le drapeau needsUpdate comme suit :
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+positionAttribute.needsUpdate = true; // requis après le premier rendu
+</pre>
+
+            <p>
+              Si vous modifiez les valeurs des données de position après le rendu initial, vous pourriez avoir besoin de recalculer
+              les volumes englobants afin que d'autres fonctionnalités du moteur comme le culling par frustum de vue ou les assistants fonctionnent correctement.
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+line.geometry.computeBoundingBox();
+line.geometry.computeBoundingSphere();
+</pre>
+
+            <p>
+              [link:https://jsfiddle.net/t4m85pLr/1/ Voici un fiddle] montrant une ligne animée que vous pouvez adapter à votre cas d'utilisation.
+            </p>
+
+            <h3>Exemples</h3>
+
+            <p>
+              [example:webgl_custom_attributes WebGL / personnalisé / attributs]<br />
+              [example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / personnalisé / attributs / particules]
+            </p>
+
+          </div>
+
+          <h2>Matériaux</h2>
+          <div>
+            <p>Toutes les valeurs des uniforms peuvent être modifiées librement (par exemple couleurs, textures, opacité, etc.), les valeurs sont envoyées au shader à chaque image.</p>
+
+            <p>De plus, les paramètres liés à l'état GL peuvent changer à tout moment (depthTest, blending, polygonOffset, etc.).</p>
+
+            <p>Les propriétés suivantes ne peuvent pas être facilement modifiées à l'exécution (une fois que le matériau a été rendu au moins une fois) :</p>
+            <ul>
+              <li>nombre et types des uniforms</li>
+              <li>présence ou non de
+                <ul>
+                  <li>texture</li>
+                  <li>brouillard</li>
+                  <li>couleurs de sommet</li>
+                  <li>morphing</li>
+                  <li>shadow map</li>
+                  <li>test alpha</li>
+                  <li>transparent</li>
+                </ul>
+              </li>
+            </ul>
+
+            <p>Les modifications de ces éléments nécessitent la construction d'un nouveau programme de shader. Vous devrez définir</p>
+            <code>material.needsUpdate = true</code>
+
+            <p>Gardez à l'esprit que cela peut être assez lent et provoquer des à-coups dans la cadence d'images (surtout sous Windows, car la compilation des shaders est plus lente en DirectX qu'en OpenGL).</p>
+
+            <p>Pour une expérience plus fluide, vous pouvez émuler dans une certaine mesure les modifications de ces fonctionnalités en utilisant des valeurs "factices" comme des lumières d'intensité nulle, des textures blanches ou un brouillard de densité nulle.</p>
+
+            <p>Vous pouvez modifier librement le matériau utilisé pour les morceaux de géométrie, cependant, vous ne pouvez pas modifier la façon dont un objet est divisé en morceaux (selon les matériaux des faces). </p>
+
+            <h3>Si vous avez besoin d'avoir différentes configurations de matériaux pendant l'exécution :</h3>
+            <p>Si le nombre de matériaux / morceaux est faible, vous pouvez pré-diviser l'objet à l'avance (par exemple cheveux / visage / corps / vêtements du haut / pantalon pour un humain, avant / côtés / haut / verre / pneu / intérieur pour une voiture). </p>
+
+            <p>Si le nombre est élevé (par exemple, chaque face pourrait être potentiellement différente), envisagez une solution différente, telle que l'utilisation d'attributs / textures pour piloter un aspect différent par face.</p>
+
+            <h3>Exemples</h3>
+            <p>
+              [example:webgl_materials_car WebGL / matériaux / voiture]<br />
+              [example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+            </p>
+          </div>
+
+
+          <h2>Textures</h2>
+          <div>
+            <p>Les textures d'image, de canevas, de vidéo et de données doivent avoir le drapeau suivant défini si elles sont modifiées :</p>
+            <code>
+              texture.needsUpdate = true;
+            </code>
+            <p>Les cibles de rendu se mettent à jour automatiquement.</p>
+
+            <h3>Exemples</h3>
+            <p>
+              [example:webgl_materials_video WebGL / matériaux / vidéo]<br />
+              [example:webgl_rtt WebGL / rtt]
+            </p>
+
+          </div>
+
+          <h2>Caméras</h2>
+          <div>
+            <p>La position et la cible d'une caméra sont mises à jour automatiquement. Si vous avez besoin de changer</p>
+            <ul>
+              <li>
+                fov
+              </li>
+              <li>
+                aspect
+              </li>
+              <li>
+                near
+              </li>
+              <li>
+                far
+              </li>
+            </ul>
+            <p>
+              alors vous devrez recalculer la matrice de projection :
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+</pre>
+          </div>
+
+          <h2>InstancedMesh</h2>
+          <div>
+            <p>
+              <code>InstancedMesh</code> est une classe permettant d'accéder facilement au rendu instancié dans <code>three.js</code>. Certaines fonctionnalités de la bibliothèque comme le culling par frustum de vue ou
+              le ray casting dépendent de volumes englobants à jour (sphère englobante et boîte englobante). En raison de la façon dont <code>InstancedMesh</code> fonctionne, la classe
+              possède ses propres propriétés <code>boundingBox</code> et <code>boundingSphere</code> qui remplacent les volumes englobants au niveau de la géométrie.
+            </p>
+            <p>
+              Similaire aux géométries, vous devez recalculer la boîte englobante et la sphère chaque fois que vous modifiez les données sous-jacentes. Dans le contexte de <code>InstancedMesh</code>, cela
+              se produit lorsque vous transformez des instances via <code>setMatrixAt()</code>. Vous pouvez utiliser le même modèle qu'avec les géométries.
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+instancedMesh.computeBoundingBox();
+instancedMesh.computeBoundingSphere();
+</pre>
+
+          </div>
+
+          <h2>SkinnedMesh</h2>
+          <div>
+            <p>
+              <code>SkinnedMesh</code> suit les mêmes principes que <code>InstancedMesh</code> en ce qui concerne les volumes englobants. Cela signifie que la classe a sa propre version de
+              <code>boundingBox</code> et <code>boundingSphere</code> pour enfermer correctement les maillages animés.
+              Lors de l'appel de <code>computeBoundingBox()</code> et <code>computeBoundingSphere()</code>, la classe calcule les volumes englobants respectifs en fonction de la transformation actuelle des os (ou en d'autres termes, de l'état d'animation actuel).
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

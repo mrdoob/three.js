@@ -1,12 +1,12 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param cmdArray array containing command objects
- * @constructor
- */
 class MultiCmdsCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {Array<Command>} [cmdArray=[]]
+	 * @constructor
+	 */
 	constructor( editor, cmdArray = [] ) {
 
 		super( editor );

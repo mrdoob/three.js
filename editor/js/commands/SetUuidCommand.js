@@ -1,13 +1,13 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newUuid string
- * @constructor
- */
 class SetUuidCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {string|null} newUuid
+	 * @constructor
+	 */
 	constructor( editor, object = null, newUuid = null ) {
 
 		super( editor );

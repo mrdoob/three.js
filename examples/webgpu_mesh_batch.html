@@ -4,47 +4,44 @@
 	<title>three.js webgpu - batch mesh</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		#info {
-			background-color: rgba(0,0,0,0.75);
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="example.css">
 </head>
 <body>
 
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - batch mesh
-	</div>
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
-	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
-		Active Backend: WebGPU
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Batch Mesh</span>
+		</div>
+
+		<small>Mirror reflections using procedural effects.</small>
 	</div>
 
 	<script type="importmap">
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
-				"three/addons/": "./jsm/",
-				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
 
 	<script type="module">
 
-		import * as THREE from 'three';
+		import * as THREE from 'three/webgpu';
 
-		import Stats from 'stats-gl';
-
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
+		import { normalView, directionToColor, diffuseColor, vec4 } from 'three/tsl';
+
 		let camera, scene, renderer;
-		let controls, stats;
+		let controls;
 		let gui;
 		let geometries, mesh, material;
 		const ids = [];
@@ -71,6 +68,15 @@
 			perObjectFrustumCulled: true,
 			opacity: 1,
 			useCustomSort: true,
+			randomizeGeometry: ()=>{
+
+				for ( let i = 0; i < api.count; i ++ ) {
+
+					mesh.setGeometryIdAt( i, Math.floor( Math.random() * geometries.length ) );
+		
+				}
+		
+			}
 		};
 
 
@@ -119,9 +125,13 @@
 
 			if ( ! material ) {
 
-				material = new THREE.MeshNormalNodeMaterial();
-
-			}
+				material = new THREE.MeshBasicNodeMaterial();
+				material.outputNode = vec4(
+					diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) ).rgb,
+					diffuseColor.a,
+				);
+		
+	}
 
 			return material;
 
@@ -175,6 +185,7 @@
 
 				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				mesh.setColorAt( id, new THREE.Color( Math.random() * 0xffffff ) );
 
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
@@ -188,50 +199,35 @@
 
 		}
 
-
-
 		function init( forceWebGL = false ) {
 
 			if ( renderer ) {
 
 				renderer.dispose();
 				controls.dispose();
-				document.body.removeChild( stats.dom );
 				document.body.removeChild( renderer.domElement );
 
 			}
 
-			document.getElementById( 'backend' ).innerText = 'Active Backend: ' + ( forceWebGL ? 'WebGL' : 'WebGPU' );
 			// camera
 
 			const aspect = window.innerWidth / window.innerHeight;
 
 			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
-			camera.position.z = 50;
+			camera.position.z = 30;
 
 			// renderer
 
 			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
+			renderer.inspector = new Inspector();
 			renderer.setAnimationLoop( animate );
 
 			// scene
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );
-
-
-			if ( forceWebGL ) {
-
-				scene.background = new THREE.Color( 0xf10000 );
-
-			} else {
-
-				scene.background = new THREE.Color( 0x0000f1 );
-
-			}
+			scene.background = forceWebGL ? new THREE.Color( 0xffc1c1 ) : new THREE.Color( 0xc1c1ff );
 
 			document.body.appendChild( renderer.domElement );
 
@@ -246,26 +242,16 @@
 			controls.autoRotate = true;
 			controls.autoRotateSpeed = 1.0;
 
-			// stats
-
-			stats = new Stats( {
-				precision: 3,
-				horizontal: false
-			} );
-			stats.init( renderer );
-			document.body.appendChild( stats.dom );
-			stats.dom.style.position = 'absolute';
-
 			// gui
 
-			gui = new GUI();
+			gui = renderer.inspector.createParameters( 'Settings' );
 			gui.add( api, 'webgpu' ).onChange( () => {
 
 				init( ! api.webgpu );
 
 			} );
-			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
-			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
+			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT, 1 ).onChange( initMesh );
+			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT, 1 );
 
 			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
 
@@ -288,14 +274,12 @@
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
+			gui.add( api, 'randomizeGeometry' ).name( 'randomize geometry' );
 
 
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
-
-
-
 
 			function onWindowResize() {
 
@@ -316,7 +300,6 @@
 
 				controls.update();
 
-
 				if ( mesh.isBatchedMesh ) {
 
 					mesh.sortObjects = api.sortObjects;
@@ -325,9 +308,7 @@
 
 				}
 
-				await renderer.renderAsync( scene, camera );
-
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 

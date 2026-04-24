@@ -30,7 +30,7 @@
 
 			let scene, renderer;
 
-			let mouseX = 0, mouseY = 0;
+			let mouseX = 0;
 
 			let windowWidth, windowHeight;
 
@@ -222,7 +222,6 @@
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowWidth / 2 );
-				mouseY = ( event.clientY - windowHeight / 2 );
 
 			}
 
@@ -255,7 +254,7 @@
 					const view = views[ ii ];
 					const camera = view.camera;
 
-					view.updateCamera( camera, scene, mouseX, mouseY );
+					view.updateCamera( camera, scene, mouseX );
 
 					const left = Math.floor( windowWidth * view.left );
 					const bottom = Math.floor( windowHeight * view.bottom );

@@ -1,83 +1,25 @@
-import { vec4, renderOutput, NodeMaterial } from '../../nodes/Nodes.js';
-import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
+import RenderPipeline from './RenderPipeline.js';
+import { warnOnce } from '../../utils.js';
 
-const quadMesh = new QuadMesh( new NodeMaterial() );
+/**
+ * @deprecated since r183. Use {@link RenderPipeline} instead. PostProcessing has been renamed to RenderPipeline.
+ *
+ * This class is a wrapper for backward compatibility and will be removed in a future version.
+ */
+class PostProcessing extends RenderPipeline {
 
-class PostProcessing {
+	/**
+	 * Constructs a new post processing management module.
+	 *
+	 * @param {Renderer} renderer - A reference to the renderer.
+	 * @param {Node<vec4>} outputNode - An optional output node.
+	 * @deprecated since r183. Use {@link RenderPipeline} instead.
+	 */
+	constructor( renderer, outputNode ) {
 
-	constructor( renderer, outputNode = vec4( 0, 0, 1, 1 ) ) {
+		warnOnce( 'PostProcessing: "PostProcessing" has been renamed to "RenderPipeline". Please update your code to use "THREE.RenderPipeline" instead.' ); // @deprecated, r183
 
-		this.renderer = renderer;
-		this.outputNode = outputNode;
-
-		this.outputColorTransform = true;
-
-		this.needsUpdate = true;
-
-	}
-
-	render() {
-
-		this.update();
-
-		const renderer = this.renderer;
-
-		const toneMapping = renderer.toneMapping;
-		const outputColorSpace = renderer.outputColorSpace;
-
-		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
-
-		//
-
-		quadMesh.render( this.renderer );
-
-		//
-
-		renderer.toneMapping = toneMapping;
-		renderer.outputColorSpace = outputColorSpace;
-
-	}
-
-	update() {
-
-		if ( this.needsUpdate === true ) {
-
-			const renderer = this.renderer;
-
-			const toneMapping = renderer.toneMapping;
-			const outputColorSpace = renderer.outputColorSpace;
-
-			quadMesh.material.fragmentNode = this.outputColorTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
-			quadMesh.material.needsUpdate = true;
-
-			this.needsUpdate = false;
-
-		}
-
-	}
-
-	async renderAsync() {
-
-		this.update();
-
-		const renderer = this.renderer;
-
-		const toneMapping = renderer.toneMapping;
-		const outputColorSpace = renderer.outputColorSpace;
-
-		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
-
-		//
-
-		await quadMesh.renderAsync( this.renderer );
-
-		//
-
-		renderer.toneMapping = toneMapping;
-		renderer.outputColorSpace = outputColorSpace;
+		super( renderer, outputNode );
 
 	}
 

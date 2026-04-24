@@ -1,15 +1,14 @@
 import { Command } from '../Command.js';
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newGeometry THREE.Geometry
- * @constructor
- */
-
 class SetGeometryCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {THREE.Geometry|null} [newGeometry=null]
+	 * @constructor
+	 */
 	constructor( editor, object = null, newGeometry = null ) {
 
 		super( editor );

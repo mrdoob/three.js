@@ -20,7 +20,7 @@
 
 			import * as THREE from 'three';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { Reflector } from 'three/addons/objects/Reflector.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
@@ -51,7 +51,7 @@
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'moonless_golf_1k.hdr', function ( texture ) {
 
@@ -78,7 +78,7 @@
 				scene.add( torus );
 
 				const cylinderGeometry = new THREE.CylinderGeometry( 1, 1, 0.1, 50 );
-				const cylinderMaterial = new THREE.MeshStandardMaterial();
+				const cylinderMaterial = new THREE.MeshLambertMaterial();
 				const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 				cylinder.position.z = - 2;
 				scene.add( cylinder );
@@ -96,7 +96,7 @@
 				scene.add( reflector );
 
 				const frameGeometry = new THREE.BoxGeometry( 2.1, 2.1, 0.1 );
-				const frameMaterial = new THREE.MeshPhongMaterial();
+				const frameMaterial = new THREE.MeshLambertMaterial( { color: 0x888888 } );
 				const frame = new THREE.Mesh( frameGeometry, frameMaterial );
 				frame.position.z = - 0.07;
 				reflector.add( frame );

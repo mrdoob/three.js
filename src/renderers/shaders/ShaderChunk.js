@@ -54,6 +54,7 @@ import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fr
 import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl.js';
 import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl.js';
 import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl.js';
+import lightprobes_pars_fragment from './ShaderChunk/lightprobes_pars_fragment.glsl.js';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl.js';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl.js';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl.js';
@@ -110,7 +111,7 @@ import * as background from './ShaderLib/background.glsl.js';
 import * as backgroundCube from './ShaderLib/backgroundCube.glsl.js';
 import * as cube from './ShaderLib/cube.glsl.js';
 import * as depth from './ShaderLib/depth.glsl.js';
-import * as distanceRGBA from './ShaderLib/distanceRGBA.glsl.js';
+import * as distance from './ShaderLib/distance.glsl.js';
 import * as equirect from './ShaderLib/equirect.glsl.js';
 import * as linedashed from './ShaderLib/linedashed.glsl.js';
 import * as meshbasic from './ShaderLib/meshbasic.glsl.js';
@@ -181,6 +182,7 @@ export const ShaderChunk = {
 	lights_fragment_begin: lights_fragment_begin,
 	lights_fragment_maps: lights_fragment_maps,
 	lights_fragment_end: lights_fragment_end,
+	lightprobes_pars_fragment: lightprobes_pars_fragment,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,
@@ -241,8 +243,8 @@ export const ShaderChunk = {
 	cube_frag: cube.fragment,
 	depth_vert: depth.vertex,
 	depth_frag: depth.fragment,
-	distanceRGBA_vert: distanceRGBA.vertex,
-	distanceRGBA_frag: distanceRGBA.fragment,
+	distance_vert: distance.vertex,
+	distance_frag: distance.fragment,
 	equirect_vert: equirect.vertex,
 	equirect_frag: equirect.fragment,
 	linedashed_vert: linedashed.vertex,

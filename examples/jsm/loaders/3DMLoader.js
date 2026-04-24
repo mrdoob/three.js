@@ -23,18 +23,46 @@ import {
 	SpotLight,
 	Sprite,
 	SpriteMaterial,
-	TextureLoader
+	TextureLoader,
+	EquirectangularReflectionMapping
 } from 'three';
 
 import { EXRLoader } from '../loaders/EXRLoader.js';
 
 const _taskCache = new WeakMap();
 
+/**
+ * A loader for Rhinoceros 3D files and objects.
+ *
+ * Rhinoceros is a 3D modeler used to create, edit, analyze, document, render,
+ * animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds,
+ * as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly
+ * from the open source geometry library `openNURBS`. The loader currently uses
+ * `rhino3dm.js 8.4.0`.
+ *
+ * ```js
+ * const loader = new Rhino3dmLoader();
+ * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1' );
+ *
+ * const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
+ */
 class Rhino3dmLoader extends Loader {
 
+	/**
+	 * Constructs a new Rhino 3DM loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
+
+		// internals
 
 		this.libraryPath = '';
 		this.libraryPending = null;
@@ -54,6 +82,12 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Path to a folder containing the JS and WASM libraries.
+	 *
+	 * @param {string} path - The library path to set.
+	 * @return {Rhino3dmLoader} A reference to this loader.
+	 */
 	setLibraryPath( path ) {
 
 		this.libraryPath = path;
@@ -62,6 +96,14 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the maximum number of Web Workers to be used during decoding.
+	 * A lower limit may be preferable if workers are also for other
+	 * tasks in the application.
+	 *
+	 * @param {number} workerLimit - The worker limit.
+	 * @return {Rhino3dmLoader} A reference to this loader.
+	 */
 	setWorkerLimit( workerLimit ) {
 
 		this.workerLimit = workerLimit;
@@ -70,6 +112,15 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded 3DM asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Object3D)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
@@ -105,12 +156,22 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Prints debug messages to the browser console.
+	 */
 	debug() {
 
 		console.log( 'Task load: ', this.workerPool.map( ( worker ) => worker._taskLoad ) );
 
 	}
 
+	/**
+	 * Decodes the 3DM asset data with a Web Worker.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw 3DM asset data as an array buffer.
+	 * @param {string} url - The asset URL.
+	 * @return {Promise<Object3D>} A Promise that resolved with the decoded 3D object.
+	 */
 	decodeObjects( buffer, url ) {
 
 		let worker;
@@ -170,6 +231,14 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given 3DM data and passes the loaded 3DM asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {ArrayBuffer} data - The raw 3DM asset data as an array buffer.
+	 * @param {function(Object3D)} onLoad - Executed when the loading process has been finished.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	parse( data, onLoad, onError ) {
 
 		this.decodeObjects( data, '' )
@@ -439,7 +508,7 @@ class Rhino3dmLoader extends Loader {
 
 			new EXRLoader().load( renderEnvironment.image, function ( texture ) {
 
-				texture.mapping = THREE.EquirectangularReflectionMapping;
+				texture.mapping = EquirectangularReflectionMapping;
 				mat.envMap = texture;
 
 			} );
@@ -629,7 +698,7 @@ class Rhino3dmLoader extends Loader {
 
 				geometry = loader.parse( obj.geometry );
 
-				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+				if ( geometry.hasAttribute( 'color' ) ) {
 
 					material = new PointsMaterial( { vertexColors: true, sizeAttenuation: false, size: 2 } );
 
@@ -672,7 +741,7 @@ class Rhino3dmLoader extends Loader {
 				}
 
 
-				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+				if ( geometry.hasAttribute( 'color' ) ) {
 
 					mat.vertexColors = true;
 
@@ -745,6 +814,7 @@ class Rhino3dmLoader extends Loader {
 
 				const texture = new CanvasTexture( ctx.canvas );
 				texture.minFilter = LinearFilter;
+				texture.generateMipmaps = false;
 				texture.wrapS = ClampToEdgeWrapping;
 				texture.wrapT = ClampToEdgeWrapping;
 
@@ -961,6 +1031,10 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the loader is no longer required.
+	 */
 	dispose() {
 
 		for ( let i = 0; i < this.workerPool.length; ++ i ) {
@@ -970,8 +1044,6 @@ class Rhino3dmLoader extends Loader {
 		}
 
 		this.workerPool.length = 0;
-
-		return this;
 
 	}
 

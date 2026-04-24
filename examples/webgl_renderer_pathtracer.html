@@ -44,8 +44,8 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"three/examples/": "./",
-					"three-gpu-pathtracer": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.22/build/index.module.js",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.4/build/index.module.js"
+					"three-gpu-pathtracer": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.24/build/index.module.js",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.9/build/index.module.js"
 				}
 			}
 		</script>
@@ -57,10 +57,10 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
-
+			import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
 			import { WebGLPathTracer, BlurredEnvMapGenerator, GradientEquirectTexture } from 'three-gpu-pathtracer';
 
 			let progressBarDiv, samplesEl;
@@ -94,7 +94,7 @@
 				camera.position.set( 150, 200, 250 );
 
 				// initialize the renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -156,6 +156,7 @@
 				// only smooth when not rendering with flat colors to improve processing time
 				const ldrawPromise =
 					new LDrawLoader()
+						.setConditionalLineMaterial( LDrawConditionalLineMaterial )
 						.setPath( 'models/ldraw/officialLibrary/' )
 						.loadAsync( 'models/7140-1-X-wingFighter.mpd_Packed.mpd', onProgress )
 						.then( function ( legoGroup ) {
@@ -209,9 +210,9 @@
 						.catch( onError );
 
 				const envMapPromise =
-					new RGBELoader()
+					new UltraHDRLoader()
 						.setPath( 'textures/equirectangular/' )
-						.loadAsync( 'royal_esplanade_1k.hdr' )
+						.loadAsync( 'royal_esplanade_2k.hdr.jpg' )
 						.then( tex => {
 
 							const envMapGenerator = new BlurredEnvMapGenerator( renderer );
@@ -263,7 +264,7 @@
 				updateProgressBar( 0 );
 
 				pathTracer.setScene( scene, camera );
-			
+
 				renderer.setAnimationLoop( animate );
 
 			}
@@ -362,7 +363,7 @@
 
 					updateProgressBar( xhr.loaded / xhr.total );
 
-					console.log( Math.round( xhr.loaded / xhr.total * 100, 2 ) + '% downloaded' );
+					console.log( Math.round( xhr.loaded / xhr.total * 100 ) + '% downloaded' );
 
 				}
 
@@ -391,7 +392,7 @@
 
 			function updateProgressBar( fraction ) {
 
-				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100 ) + '%';
 
 			}
 

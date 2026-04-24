@@ -110,6 +110,7 @@
 
 				const texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
 
 				const width = 640, height = 480;
 				const nearClipping = 850, farClipping = 4000;

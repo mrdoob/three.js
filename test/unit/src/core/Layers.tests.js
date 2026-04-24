@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Layers } from '../../../../src/core/Layers.js';
 
 export default QUnit.module( 'Core', () => {
@@ -11,13 +9,6 @@ export default QUnit.module( 'Core', () => {
 
 			const object = new Layers();
 			assert.ok( object, 'Can instantiate a Layers.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'mask', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -54,12 +45,6 @@ export default QUnit.module( 'Core', () => {
 			a.set( 1 );
 			a.enable( 1 );
 			assert.strictEqual( a.mask, 2, 'Enable channel 1 with mask 1' );
-
-		} );
-
-		QUnit.todo( 'enableAll', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -104,12 +89,6 @@ export default QUnit.module( 'Core', () => {
 			a.set( 1 );
 			a.disable( 1 );
 			assert.strictEqual( a.mask, 0, 'Disable channel 1 with mask 1' );
-
-		} );
-
-		QUnit.todo( 'disableAll', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

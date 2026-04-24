@@ -1,3 +1,5 @@
+import { error } from '../../utils.js';
+
 function WebGLInfo( gl ) {
 
 	const memory = {
@@ -40,7 +42,7 @@ function WebGLInfo( gl ) {
 				break;
 
 			default:
-				console.error( 'THREE.WebGLInfo: Unknown draw mode:', mode );
+				error( 'WebGLInfo: Unknown draw mode:', mode );
 				break;
 
 		}

@@ -1,20 +1,66 @@
-import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { vectorComponents } from '../core/constants.js';
 
+/**
+ * This module is part of the TSL core and usually not used in app level code.
+ * `SetNode` represents a set operation which means it is used to implement any
+ * `setXYZW()`, `setRGBA()` and `setSTPQ()` method invocations on node objects.
+ * For example:
+ * ```js
+ * materialLine.colorNode = color( 0, 0, 0 ).setR( float( 1 ) );
+ * ```
+ *
+ * @augments TempNode
+ */
 class SetNode extends TempNode {
 
+	static get type() {
+
+		return 'SetNode';
+
+	}
+
+	/**
+	 * Constructs a new set node.
+	 *
+	 * @param {Node} sourceNode - The node that should be updated.
+	 * @param {string} components - The components that should be updated.
+	 * @param {Node} targetNode - The value node.
+	 */
 	constructor( sourceNode, components, targetNode ) {
 
 		super();
 
+		/**
+		 * The node that should be updated.
+		 *
+		 * @type {Node}
+		 */
 		this.sourceNode = sourceNode;
+
+		/**
+		 * The components that should be updated.
+		 *
+		 * @type {string}
+		 */
 		this.components = components;
+
+		/**
+		 * The value node.
+		 *
+		 * @type {Node}
+		 */
 		this.targetNode = targetNode;
 
 	}
 
-	getNodeType( builder ) {
+	/**
+	 * This method is overwritten since the node type is inferred from {@link SetNode#sourceNode}.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The node type.
+	 */
+	generateNodeType( builder ) {
 
 		return this.sourceNode.getNodeType( builder );
 
@@ -25,7 +71,9 @@ class SetNode extends TempNode {
 		const { sourceNode, components, targetNode } = this;
 
 		const sourceType = this.getNodeType( builder );
-		const targetType = builder.getTypeFromLength( components.length );
+
+		const componentType = builder.getComponentType( targetNode.getNodeType( builder ) );
+		const targetType = builder.getTypeFromLength( components.length, componentType );
 
 		const targetSnippet = targetNode.build( builder, targetType );
 		const sourceSnippet = sourceNode.build( builder, sourceType );
@@ -58,5 +106,3 @@ class SetNode extends TempNode {
 }
 
 export default SetNode;
-
-addNodeClass( 'SetNode', SetNode );

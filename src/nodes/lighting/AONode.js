@@ -1,27 +1,45 @@
 import LightingNode from './LightingNode.js';
-import { addNodeClass } from '../core/Node.js';
 
+/**
+ * A generic class that can be used by nodes which contribute
+ * ambient occlusion to the scene. E.g. an ambient occlusion map
+ * node can be used as input for this module. Used in {@link NodeMaterial}.
+ *
+ * @augments LightingNode
+ */
 class AONode extends LightingNode {
 
+	static get type() {
+
+		return 'AONode';
+
+	}
+
+	/**
+	 * Constructs a new AO node.
+	 *
+	 * @param {?Node<float>} [aoNode=null] - The ambient occlusion node.
+	 */
 	constructor( aoNode = null ) {
 
 		super();
 
+		/**
+		 * The ambient occlusion node.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
 		this.aoNode = aoNode;
 
 	}
 
 	setup( builder ) {
 
-		const aoIntensity = 1;
-		const aoNode = this.aoNode.x.sub( 1.0 ).mul( aoIntensity ).add( 1.0 );
-
-		builder.context.ambientOcclusion.mulAssign( aoNode );
+		builder.context.ambientOcclusion.mulAssign( this.aoNode );
 
 	}
 
 }
 
 export default AONode;
-
-addNodeClass( 'AONode', AONode );

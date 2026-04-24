@@ -1,0 +1,118 @@
+body {
+	margin: 0;
+	background-color: #000;
+	overscroll-behavior: none;
+	overflow: hidden;
+	height: 100%;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+#info {
+	position: fixed;
+	top: 15px;
+	left: 15px;
+	z-index: 1001;
+
+	display: grid;
+	grid-template-columns: 50px auto;
+	grid-template-rows: auto auto;
+	column-gap: 10px;
+	align-items: start;
+	color: #e0e0e0;
+	text-shadow: 1px 1px 5px rgba(0, 0, 0, .7);
+	font: 400 14px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#info > a.logo-link {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	display: block;
+	width: 50px;
+	height: 50px;
+	background: no-repeat center / contain;
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.77 226.77"><g transform="translate(8.964 4.2527)" stroke="%23ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4" fill="none"><path d="m63.02 200.61-43.213-174.94 173.23 49.874z"/><path d="m106.39 50.612 21.591 87.496-86.567-24.945z"/><path d="m84.91 125.03-10.724-43.465 43.008 12.346z"/><path d="m63.458 38.153 10.724 43.465-43.008-12.346z"/><path d="m149.47 62.93 10.724 43.465-43.008-12.346z"/><path d="m84.915 125.06 10.724 43.465-43.008-12.346z"/></g></svg>');
+}
+
+.title-wrapper {
+	position: absolute;
+    left: 60px;
+    top: 2px;
+    display: flex;
+    width: 300px;
+}
+
+#info > small {
+	font-size: 12px;
+	color: #e0e0e0;
+	position: absolute;
+	left: 60px;
+	top: 25px;
+	width: calc( 100vw - 250px );
+	line-height: 20px;
+}
+
+.title-wrapper > a {
+	font-weight: 600;
+}
+
+.title-wrapper > span {
+	opacity: .7;
+	position: relative;
+	padding-left: 12px;
+	margin-left: 10px;
+}
+
+#info > small a {
+	color: #ff0;
+	text-decoration: none;
+}
+
+#info > small a:hover {
+	text-decoration: underline;
+}
+
+.title-wrapper > span::before {
+	content: "";
+	position: absolute;
+	left: 1px;
+	top: calc(50% + 1px);
+	transform: translateY(-50%);
+	width: 1px;
+	height: 12px;
+	background: #c3c3c3;
+	opacity: .5;
+}
+
+#info.invert {
+	filter: invert(1);
+}
+
+#overlay {
+	position: absolute;
+	font-size: 16px;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background: rgba(0,0,0,0.7);
+}
+
+#overlay button {
+	background: transparent;
+	border: 0;
+	border: 1px solid rgb(255, 255, 255);
+	border-radius: 4px;
+	color: #ffffff;
+	padding: 12px 18px;
+	text-transform: uppercase;
+	cursor: pointer;
+}

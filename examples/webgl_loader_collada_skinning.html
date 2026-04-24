@@ -32,7 +32,7 @@
 			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let container, stats, clock, controls;
+			let container, stats, timer, controls;
 			let camera, scene, renderer, mixer;
 
 			init();
@@ -46,7 +46,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// collada
 
@@ -116,6 +117,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -123,7 +126,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer !== undefined ) {
 

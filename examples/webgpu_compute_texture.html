@@ -1,21 +1,31 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Texture</title>
+		<title>three.js webgpu - compute texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Texture
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Texture</span>
+			</div>
+
+			<small>
+				Compute texture using GPU.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -23,17 +33,16 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { texture, textureStore, tslFn, instanceIndex, float, uvec2, vec4 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { texture, textureStore, Fn, instanceIndex, float, uvec2, vec4 } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let camera, scene, renderer;
 
-			init();
-			render();
+			init().then( render );
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -58,9 +67,9 @@
 
 				// create function
 
-				const computeTexture = tslFn( ( { storageTexture } ) => {
+				const computeTexture = Fn( ( { storageTexture } ) => {
 
-					const posX = instanceIndex.remainder( width );
+					const posX = instanceIndex.mod( width );
 					const posY = instanceIndex.div( width );
 					const indexUV = uvec2( posX, posY );
 
@@ -98,6 +107,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				// compute texture
 				renderer.compute( computeNode );
 
@@ -124,7 +135,7 @@
 
 			function render() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

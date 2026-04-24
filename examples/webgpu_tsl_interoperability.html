@@ -1,16 +1,24 @@
 <html lang="en">
 	<head>
-		<title>three.js - wgsl/tsl node interoperability</title>
+		<title>three.js - wgsl/tsl interoperability</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - wgsl/tsl node interoperability
-			<br />CRT Shader adapted from <a href="https://mini.gmshaders.com/p/gm-shaders-mini-crt" target="_blank" rel="noopener"> Xor</a>.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WGSL/TSL Interoperability</span>
+			</div>
+
+			<small>
+				CRT Shader adapted from <a href="https://mini.gmshaders.com/p/gm-shaders-mini-crt" target="_blank" rel="noopener"> Xor</a>.
+			</small>
 		</div>
+
 		<div id="container">
 			<canvas id="c"></canvas>
 		</div>
@@ -19,7 +27,8 @@
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -27,12 +36,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { Fn, attribute, varyingProperty, time, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let renderer, camera, scene;
 			const dpr = window.devicePixelRatio;
@@ -81,7 +90,7 @@
 
 				// Only wgsl vertex shaders take varyings arguments when defined.
 				// For a wgsl fragment shader, pass the varyingProperty node to the
-				// fragment shader's constructor to acess the varying value computed
+				// fragment shader's constructor to access the varying value computed
 				// by the vertex shader.
 				const wgslFragmentShader = wgslFn( `
 					fn crtFragment(
@@ -182,7 +191,7 @@
 					cellOffset: cellOffsetUniform,
 					cellSize: cellSizeUniform,
 					borderMask: borderMaskUniform,
-					time: timerLocal(),
+					time: time,
 					speed: wgslShaderSpeedUniform,
 					pulseIntensity: pulseIntensityUniform,
 					pulseWidth: pulseWidthUniform,
@@ -191,14 +200,14 @@
 
 				//
 
-				const tslVertexShader = tslFn( () => {
+				const tslVertexShader = Fn( () => {
 
 					vUv.assign( uv() );
 					return positionGeometry;
 
 				} );
 
-				const tslFragmentShader = tslFn( () => {
+				const tslFragmentShader = Fn( () => {
 
 					const dimensions = vec2( crtWidthUniform, crtHeightUniform );
 					const translatedUV = vUv.mul( 0.5 ).add( 0.5 );
@@ -214,8 +223,8 @@
 
 					const maskCoord = floor( coord.add( cellOffset ) ).mul( cellSizeUniform );
 					const samplePoint = maskCoord.div( dimensions );
-					const time = timerLocal().mul( tslShaderSpeedUniform );
-					samplePoint.x = samplePoint.x.add( fract( time.div( 20 ) ) );
+					const scaledTime = time.mul( tslShaderSpeedUniform );
+					samplePoint.x = samplePoint.x.add( fract( scaledTime.div( 20 ) ) );
 					samplePoint.y = samplePoint.y.sub( 1.5 );
 
 					let color = texture( planetTexture, samplePoint );
@@ -274,11 +283,12 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.add( cellSizeUniform, 'value', 6, 50, 1 ).name( 'Cell Size' );
 				gui.add( cellOffsetUniform, 'value', 0, 1, 0.1 ).name( 'Cell Offset' );

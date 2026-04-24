@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Debugging - GLSL</title>
+    <title>Débogage - GLSL</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Debugging - GLSL">
+    <meta name="twitter:title" content="Three.js – Débogage - GLSL">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,12 +22,48 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Debugging - GLSL</h1>
+        <h1>Débogage - GLSL</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/debugging-glsl.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>Ce site ne vous enseigne pas le GLSL, tout comme il ne vous enseigne pas le JavaScript. Ce sont des sujets très vastes. Si vous souhaitez apprendre le GLSL, consultez
+<a href="https://webglfundamentals.org">ces articles</a> comme point de départ.</p>
+<p>Si vous connaissez déjà le GLSL, voici quelques conseils pour le débogage.</p>
+<p>Lorsque je crée un nouveau shader GLSL et que rien n'apparaît, la première chose que je fais généralement est de modifier le shader de fragment pour qu'il renvoie une couleur unie. Par exemple, tout en bas du shader, je pourrais mettre</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">void main() {
+
+  ...
+
+  gl_FragColor = vec4(1, 0, 0, 1);  // red
+}
+</pre>
+<p>Si je vois l'objet que j'essayais de dessiner, je sais que le problème est lié à mon shader de fragment. Cela peut être n'importe quoi, comme de mauvaises textures, des uniforms non initialisés, des uniforms avec les mauvaises valeurs, mais au moins j'ai une direction où chercher.</p>
+<p>Pour tester certains de ces points, je pourrais commencer par essayer de dessiner certaines des entrées. Par exemple, si j'utilise des normales dans le shader de fragment, je pourrais ajouter</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(vNormal * 0.5 + 0.5, 1);
+</pre>
+<p>Les normales vont de -1 à +1, donc en multipliant par 0,5 et en ajoutant 0,5, nous obtenons des valeurs qui vont de 0,0 à 1,0, ce qui les rend utiles pour les couleurs.</p>
+<p>Essayez ceci avec des choses dont vous savez qu'elles fonctionnent et vous commencerez à avoir une idée de ce à quoi ressemblent les normales <em>normalement</em>. Si vos normales ne semblent pas normales, vous avez une piste où chercher. Si vous manipulez les normales dans le shader de fragment, vous pouvez utiliser la même technique pour dessiner le résultat de cette manipulation.</p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-normals.jpg" style="width: 650px;"></div>
+
+<p>De même, si nous utilisons des textures, il y aura des coordonnées de texture et nous pouvons les dessiner avec quelque chose comme</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(fract(vUv), 0, 1);
+</pre>
+<p>Le <code class="notranslate" translate="no">fract</code> est là au cas où nous utiliserions des coordonnées de texture qui dépassent la plage 0 à 1. C'est courant si <code class="notranslate" translate="no">texture.repeat</code> est défini sur une valeur supérieure à 1.</p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-uvs.jpg" style="width: 650px;"></div>
+
+<p>Vous pouvez faire des choses similaires pour toutes les valeurs de votre shader de fragment. Déterminez quelle est leur plage probable, ajoutez du code pour définir <code class="notranslate" translate="no">gl_FragColor</code> avec cette plage mise à l'échelle de 0,0 à 1,0</p>
+<p>Pour vérifier les textures, essayez un <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> ou un <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> dont vous savez qu'il fonctionne.</p>
+<p>Inversement, si après avoir défini <code class="notranslate" translate="no">gl_FragColor</code> sur rouge je ne vois toujours rien, alors j'ai une indication que mon problème pourrait être lié aux choses relatives au shader de vertex. Certaines matrices pourraient être incorrectes ou mes attributs pourraient contenir de mauvaises données ou être mal configurés.</p>
+<p>Je regarderais d'abord les matrices. Je pourrais mettre un point d'arrêt juste après mon appel à <code class="notranslate" translate="no">renderer.render(scene, camera)</code> et commencer ensuite à développer les éléments dans l'inspecteur. La matrice monde et la matrice de projection de la caméra ne sont-elles pas au moins pleines de <code class="notranslate" translate="no">NaN</code>s ? En développant la scène et en regardant ses <code class="notranslate" translate="no">children</code>, je vérifierais que les matrices monde semblent raisonnables (pas de <code class="notranslate" translate="no">NaN</code>s) et que les 4 dernières valeurs de chaque matrice semblent raisonnables pour ma scène. Si j'attends que ma scène fasse 50x50x50 unités et qu'une matrice affiche 552352623.123, il est clair que quelque chose ne va pas.</p>
+<div class="threejs_center"><img src="../resources/images/inspect-matrices.gif"></div>
+
+<p>Tout comme nous l'avons fait pour le shader de fragment, nous pouvons également dessiner les valeurs du shader de vertex en les passant au shader de fragment. Déclarez une variable varying dans les deux et passez la valeur dont vous n'êtes pas sûr qu'elle soit correcte. En fait, si mon shader utilise des normales, je modifierai le shader de fragment pour les afficher comme mentionné ci-dessus, puis je définirai simplement <code class="notranslate" translate="no">vNormal</code> à la valeur que je souhaite afficher, mais mise à l'échelle de sorte que les valeurs aillent de 0,0 à 1,0. Je regarde ensuite les résultats et vois s'ils correspondent à mes attentes.</p>
+<p>Une autre bonne chose à faire est d'utiliser un shader plus simple. Pouvez-vous dessiner vos données avec un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ? Si oui, essayez-le et assurez-vous qu'il s'affiche comme prévu.</p>
+<p>Sinon, quel est le shader de vertex le plus simple qui vous permettra de visualiser votre géométrie ? Généralement, c'est aussi simple que</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_Position = projection * modelView * vec4(position.xyz, 1);
+</pre>
+<p>Si cela fonctionne, commencez à ajouter vos modifications petit à petit.</p>
+<p>Une autre chose que vous pouvez faire est d'utiliser l'<a href="https://chrome.google.com/webstore/detail/shader-editor/ggeaidddejpbakgafapihjbgdlbbbpob?hl=en">extension Shader Editor pour Chrome</a> ou similaire pour d'autres navigateurs. C'est un excellent moyen de voir comment fonctionnent d'autres shaders. C'est aussi pratique car vous pouvez apporter certaines des modifications suggérées ci-dessus en direct pendant que le code s'exécute.</p>
 
         </div>
       </div>

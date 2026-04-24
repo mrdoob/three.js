@@ -3557,7 +3557,7 @@
         },
         "clampPoint": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
+          "!doc": "Clamps a point within the sphere. If the point is outside the sphere, it will clamp it to the closets point on the edge of the sphere."
         },
         "translate": {
           "!type": "fn(offset: +THREE.Vector3) -> +THREE.Sphere",
@@ -4556,7 +4556,7 @@
         },
         "format": {
           "!type": "number",
-          "!doc": "The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat, THREE.LuminanceFormat, and THREE.LuminanceAlphaFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format."
+          "!doc": "The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format."
         },
         "type": {
           "!type": "number",
@@ -4970,7 +4970,7 @@
         },
         "format": {
           "!type": "number",
-          "!doc": "The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat, THREE.LuminanceFormat, and THREE.LuminanceAlphaFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format."
+          "!doc": "The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format."
         },
         "type": {
           "!type": "number",

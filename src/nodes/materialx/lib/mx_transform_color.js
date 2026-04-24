@@ -1,11 +1,11 @@
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
 
-import { bvec3, vec3, tslFn } from '../../shadernode/ShaderNode.js';
+import { bvec3, vec3, Fn } from '../../tsl/TSLBase.js';
 import { greaterThan } from '../../math/OperatorNode.js';
 import { max, pow, mix } from '../../math/MathNode.js';
 
-export const mx_srgb_texture_to_lin_rec709 = /*#__PURE__*/ tslFn( ( [ color_immutable ] ) => {
+export const mx_srgb_texture_to_lin_rec709 = /*@__PURE__*/ Fn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
 	const isAbove = bvec3( greaterThan( color, vec3( 0.04045 ) ) ).toVar();

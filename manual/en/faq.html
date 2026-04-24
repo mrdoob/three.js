@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>FAQ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – FAQ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>FAQ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <h2>Which 3D model format is best supported?</h2>
+          <div>
+            <p>
+              The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
+            </p>
+            <p>
+              three.js provides loaders for many other popular formats like FBX, Collada or OBJ as well. Nevertheless, you should always try to establish a glTF based workflow in your projects first. 
+            </p>
+          </div>
+      
+          <h2>Why are there meta viewport tags in examples?</h2>
+          <div>
+            <pre class="prettyprint notranslate lang-js" translate="no">&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</pre>
+      
+              <p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+      
+              <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+      
+              <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+          </div>
+      
+          <h2>How can scene scale be preserved on resize?</h2>
+          <p>
+            We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
+      
+            The key equation to solving this is this formula for the visible height at a given distance:
+      
+            <pre class="prettyprint notranslate lang-js" translate="no">visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;</pre>
+            If we increase the window height by a certain percentage, then what we want is the visible height at all distances
+            to increase by the same percentage.
+      
+            This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
+            [link:http://jsfiddle.net/Q4Jpu/ Example].
+          </p>
+      
+          <h2>Why is part of my object invisible?</h2>
+          <p>
+            This could be because of face culling. Faces have an orientation that decides which side is which. And the culling removes the backside in normal circumstances. 
+            To see if this is your problem, change the material side to THREE.DoubleSide.
+            <pre class="prettyprint notranslate lang-js" translate="no">material.side = THREE.DoubleSide</pre>
+          </p>
+      
+          <h2>Why does three.js sometimes return strange results for invalid inputs?</h2>
+          <p>
+            For performance reasons, three.js doesn't validate inputs in most cases. It's your app's responsibility to make sure that all inputs are valid.
+          </p>
+      
+          <h2>Can I use three.js in Node.js?</h2>
+          <p>
+            Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be avoided by using shims like 
+            [link:https://github.com/stackgl/headless-gl headless-gl] and [link:https://github.com/rstacruz/jsdom-global jsdom-global], or by replacing components like `TextureLoader` 
+            with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull 
+            requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

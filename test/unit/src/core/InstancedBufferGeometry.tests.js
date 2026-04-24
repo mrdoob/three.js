@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -53,12 +51,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'instanceCount', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isInstancedBufferGeometry', ( assert ) => {
 
@@ -104,12 +96,6 @@ export default QUnit.module( 'Core', () => {
 			assert.equal( copiedInstance.groups[ 1 ].start, 10, 'group was copied' );
 			assert.equal( copiedInstance.groups[ 1 ].count, 5, 'group was copied' );
 			assert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, 'group was copied' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

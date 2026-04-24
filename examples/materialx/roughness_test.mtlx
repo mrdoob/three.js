@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <surfacematerial name="mat_roughness_test" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
+  </surfacematerial>
+  <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" value="0.8, 0.8, 0.8" />
+    <input name="roughness" type="float" output="out" nodegraph="roughness_map" />
+  </standard_surface>
+  <nodegraph name="roughness_map">
+    <image name="roughness_image" type="float">
+      <input name="file" type="filename" value="resources/Images/grid.png" />
+      <input name="default" type="float" value="0.5" />
+    </image>
+    <output name="out" type="float" nodename="roughness_image" />
+  </nodegraph>
+</materialx> 

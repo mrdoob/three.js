@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>WebGPURenderer 后处理</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js - WebGPURenderer 后处理">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+        <link rel="stylesheet" href="/manual/zh/lang.css">
+<script type="importmap">
+    {
+      "imports": {
+        "three": "../../build/three.module.js"
+      }
+    }
+    </script>
+    </head>
+    <body>
+      <div class="container">
+        <div class="lesson-title">
+          <h1>WebGPURenderer 后处理</h1>
+        </div>
+        <div class="lesson">
+          <div class="lesson-main">
+            
+            <p>
+              `WebGPURenderer` 提供了全新的后处理组件。本文介绍其工作方式和基础用法。
+            </p>
+
+            <h2>概述</h2>
+
+             <p>
+              旧版 `WebGLRenderer` 的后处理在设计上存在一些限制。由于渲染器支持不足，
+              使用 MRT（多渲染目标）较繁琐，同时缺少自动 pass/effect 合并机制，
+              难以优化整体性能。
+            </p>
+
+            <p>
+              新版 `WebGPURenderer` 后处理栈从一开始就面向这些需求设计。
+            </p>
+            <ul>
+              <li>
+                内置完整 MRT 支持。
+              </li>
+              <li>
+                系统会在可能时自动合并效果，减少总渲染 pass 数量。
+              </li>
+              <li>
+                效果链通过节点组合表达，可更灵活地搭建后处理流程。
+              </li>
+            </ul>
+            <p>
+               下面来看如何在 three.js 应用中接入这套后处理系统。
+            </p>
+
+            <h2>基础用法</h2>
+
+            <p>
+              请先阅读 <a href="webgpurenderer">WebGPURenderer</a> 指南并正确配置导入。
+              然后按如下方式创建渲染管线模块实例：
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const renderPipeline = new THREE.RenderPipeline( renderer );
+</pre>
+
+            <p>
+              `RenderPipeline` 用于替代旧的 `EffectComposer`。
+              要确保最终输出来自该模块，需要把动画循环改成如下形式：
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  renderer.render( scene, camera );
++  renderPipeline.render();
+</pre>
+
+            <p>
+             大多数后处理流程都会先创建一个所谓的场景 pass（scene pass），也称 beauty pass，
+             作为原始渲染图像，然后再叠加 Bloom、景深、SSR 等效果。
+             先从 TSL 命名空间导入 `pass()` 并创建该 pass。
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass } from 'three/tsl';
+
+// 在你的初始化流程中
+
+const scenePass = pass( scene, camera );
+</pre>
+            <p>
+             节点系统的核心思想是：把材质或后处理效果表示为节点组合。
+             例如要实现 DotScreen 与 RGB Shift，只需创建对应效果节点并串联。
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass } from 'three/tsl';
++  import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
++  import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+
+// 在你的初始化流程中
+
+const scenePass = pass( scene, camera );
+
++  const dotScreenPass = dotScreen( scenePass );
++  const rgbShiftPass = rgbShift( dotScreenPass );
+</pre>
+
+            <p>
+            完成后，把最终节点赋给 `RenderPipeline` 即可。
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+renderPipeline.outputNode = rgbShiftPass;
+</pre>
+
+            <h2>色调映射与色彩空间</h2>
+
+            <p>
+            使用后处理时，色调映射与色彩空间转换会在效果链末尾自动执行。
+            但某些场景你可能希望完全控制执行时机与顺序。
+            例如使用 `FXAANode` 做 FXAA，或用 `Lut3DNode` 做调色时，
+            可以关闭自动处理，并通过 `renderOutput()` 手动应用。
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass, renderOutput } from 'three/tsl';
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+
+// 在你的初始化流程中
+
+const renderPipeline = new THREE.RenderPipeline( renderer );
+renderPipeline.outputColorTransform = false; // 禁用默认输出色彩变换
+
+const scenePass = pass( scene, camera );
+const outputPass = renderOutput( scenePass ); // 在这里应用色调映射和色彩空间转换
+
+// FXAA 必须在 sRGB 色彩空间中计算
+
+const fxaaPass = fxaa( outputPass );
+renderPipeline.outputNode = fxaaPass;
+</pre>
+
+          <p>
+            `renderOutput()` 不是强制的，你也可以按需求自行实现色调映射与色彩空间转换。
+          </p>
+
+          <h2>MRT（多渲染目标）</h2>
+
+          <p>
+            新后处理栈内置 MRT，对高级效果非常关键。MRT 允许你在一次渲染 pass 中产生多个输出。
+            例如使用 TRAA 时，你可以按下述配置准备抗锯齿输入。
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass, mrt, output, velocity } from 'three/tsl';
+
+// 在你的初始化流程中
+
+const scenePass = pass( scene, camera );
+scenePass.setMRT( mrt( {
+  output: output,
+  velocity: velocity
+} ) );
+</pre>
+          <p>
+            传给 `mrt()` 的配置对象用于描述该 pass 的各个输出。
+            本例中我们保存默认输出（场景主图）和速度信息，用于 TRAA。
+            如果还需要深度，一般无需额外作为 MRT 输出配置；
+            在默认输出 pass 中按需请求即可获取。
+            若后续效果需要这些结果，可把它们作为纹理节点读取。
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+// 在你的初始化流程中
+
+const scenePassColor = scenePass.getTextureNode( 'output' );
+const scenePassDepth = scenePass.getTextureNode( 'depth' );
+const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+
+const traaPass = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+renderPipeline.outputNode = traaPass;
+</pre>
+
+          <p>
+           MRT 配置取决于你的具体方案。你可以使用 `output`、`velocity`、`normalView`、
+           `emissive` 等 TSL 对象，把片元数据写入不同 attachment。
+           在复杂 MRT 流程中，为提升性能并避免显存压力，必须做好数据打包与格式优化。
+           默认 attachment 精度是 RGBA16（Half-Float），并非所有数据都需要这么高。
+           例如下方把 `diffuseColor` 改为 RGBA8，可将带宽和内存占用减半。
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+diffuseTexture.type = THREE.UnsignedByteType;
+</pre> 
+
+          <p>
+            下方 SSR（屏幕空间反射）示例把默认 FP16 法线转换为 RGBA8 颜色，
+            并将金属度/粗糙度打包到单个 attachment。配合 `sample()` TSL 函数可实现自定义解包，
+            本例中会把颜色还原为归一化方向向量。
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+scenePass.setMRT( mrt( {
+  output: output,
+  normal: directionToColor( normalView ),
+  metalrough: vec2( metalness, roughness )
+} ) );
+
+// 使用 RGBA8 替代 RGBA16
+
+const normalTexture = scenePass.getTexture( 'normal' );
+normalTexture.type = THREE.UnsignedByteType;
+
+const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+metalRoughTexture.type = THREE.UnsignedByteType;
+
+// 自定义解包。后续效果里请使用得到的 "sceneNormal"
+// 来替代 "scenePassNormal"
+
+const sceneNormal = sample( ( uv ) => {
+
+  return colorToDirection( scenePassNormal.sample( uv ) );
+
+} );
+</pre>
+
+          <p>
+            后续还会继续增强打包/解包能力，提供更多 MRT 数据组织方式。
+            目前建议参考
+            <a href="https://threejs.org/examples/?q=webgpu%20postprocessing" target="_blank">官方示例</a>，
+            了解现有效果和配置模式。
+          </p>
+          </div>
+        </div>
+      </div>
+
+    <script src="../resources/prettify.js"></script>
+    <script src="../resources/lesson.js"></script>
+  </body>
+</html>
+
+
+

@@ -48,7 +48,8 @@
 			let container, stats;
 			let camera, scene, renderer;
 			let terrainMesh;
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			// Physics variables
 			let collisionConfiguration;
@@ -391,6 +392,8 @@
 
 			function animate() {
 
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -398,7 +401,7 @@
 
 			function render() {
 
-				const deltaTime = clock.getDelta();
+				const deltaTime = timer.getDelta();
 
 				if ( dynamicObjects.length < maxNumObjects && time > timeNextSpawn ) {
 

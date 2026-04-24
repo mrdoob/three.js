@@ -4,19 +4,28 @@
 		<title>three.js webgpu - instance uniform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - instance uniform
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Instanced Uniform</span>
+			</div>
+
+			<small>
+				Rendering instanced meshes with individual instance uniforms.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -24,14 +33,14 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { nodeObject, uniform, cubeTexture } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { uniform, cubeTexture } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			class InstanceUniformNode extends THREE.Node {
 
@@ -62,8 +71,6 @@
 				}
 
 			}
-
-			let stats;
 
 			let camera, scene, renderer;
 			let controls;
@@ -102,10 +109,10 @@
 
 				// Materials
 
-				const instanceUniform = nodeObject( new InstanceUniformNode() );
+				const instanceUniform = new InstanceUniformNode();
 				const cubeTextureNode = cubeTexture( cTexture );
 
-				const material = new THREE.MeshStandardNodeMaterial();
+				const material = new THREE.MeshBasicNodeMaterial();
 				material.colorNode = instanceUniform.add( cubeTextureNode );
 				material.emissiveNode = instanceUniform.mul( cubeTextureNode );
 
@@ -125,6 +132,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				//
@@ -132,11 +140,6 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 400;
 				controls.maxDistance = 2000;
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				//
 
@@ -186,8 +189,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

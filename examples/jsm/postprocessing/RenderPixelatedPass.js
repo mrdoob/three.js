@@ -10,87 +10,171 @@ import {
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 
+/**
+ * A special type of render pass that produces a pixelated beauty pass.
+ *
+ * ```js
+ * const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
+ * composer.addPass( renderPixelatedPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
+ */
 class RenderPixelatedPass extends Pass {
 
+	/**
+	 * Constructs a new render pixelated pass.
+	 *
+	 * @param {number} pixelSize - The effect's pixel size.
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera.
+	 * @param {{normalEdgeStrength:number,depthEdgeStrength:number}} options - The pass options.
+	 */
 	constructor( pixelSize, scene, camera, options = {} ) {
 
 		super();
 
+		/**
+		 * The effect's pixel size.
+		 *
+		 * @type {number}
+		 */
 		this.pixelSize = pixelSize;
-		this.resolution = new Vector2();
-		this.renderResolution = new Vector2();
 
-		this.pixelatedMaterial = this.createPixelatedMaterial();
-		this.normalMaterial = new MeshNormalMaterial();
-
-		this.fsQuad = new FullScreenQuad( this.pixelatedMaterial );
+		/**
+		 * The scene to render.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 
+		/**
+		 * The normal edge strength.
+		 *
+		 * @type {number}
+		 * @default 0.3
+		 */
 		this.normalEdgeStrength = options.normalEdgeStrength || 0.3;
+
+		/**
+		 * The normal edge strength.
+		 *
+		 * @type {number}
+		 * @default 0.4
+		 */
 		this.depthEdgeStrength = options.depthEdgeStrength || 0.4;
 
-		this.beautyRenderTarget = new WebGLRenderTarget();
-		this.beautyRenderTarget.texture.minFilter = NearestFilter;
-		this.beautyRenderTarget.texture.magFilter = NearestFilter;
-		this.beautyRenderTarget.texture.type = HalfFloatType;
-		this.beautyRenderTarget.depthTexture = new DepthTexture();
+		/**
+		 * The pixelated material.
+		 *
+		 * @type {ShaderMaterial}
+		 */
+		this.pixelatedMaterial = this._createPixelatedMaterial();
 
-		this.normalRenderTarget = new WebGLRenderTarget();
-		this.normalRenderTarget.texture.minFilter = NearestFilter;
-		this.normalRenderTarget.texture.magFilter = NearestFilter;
-		this.normalRenderTarget.texture.type = HalfFloatType;
+		// internals
+
+		this._resolution = new Vector2();
+		this._renderResolution = new Vector2();
+
+		this._normalMaterial = new MeshNormalMaterial();
+
+		this._beautyRenderTarget = new WebGLRenderTarget();
+		this._beautyRenderTarget.texture.minFilter = NearestFilter;
+		this._beautyRenderTarget.texture.magFilter = NearestFilter;
+		this._beautyRenderTarget.texture.type = HalfFloatType;
+		this._beautyRenderTarget.depthTexture = new DepthTexture();
+
+		this._normalRenderTarget = new WebGLRenderTarget();
+		this._normalRenderTarget.texture.minFilter = NearestFilter;
+		this._normalRenderTarget.texture.magFilter = NearestFilter;
+		this._normalRenderTarget.texture.type = HalfFloatType;
+
+		this._fsQuad = new FullScreenQuad( this.pixelatedMaterial );
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
 	dispose() {
 
-		this.beautyRenderTarget.dispose();
-		this.normalRenderTarget.dispose();
+		this._beautyRenderTarget.dispose();
+		this._normalRenderTarget.dispose();
 
 		this.pixelatedMaterial.dispose();
-		this.normalMaterial.dispose();
+		this._normalMaterial.dispose();
 
-		this.fsQuad.dispose();
+		this._fsQuad.dispose();
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The height to set.
+	 */
 	setSize( width, height ) {
 
-		this.resolution.set( width, height );
-		this.renderResolution.set( ( width / this.pixelSize ) | 0, ( height / this.pixelSize ) | 0 );
-		const { x, y } = this.renderResolution;
-		this.beautyRenderTarget.setSize( x, y );
-		this.normalRenderTarget.setSize( x, y );
-		this.fsQuad.material.uniforms.resolution.value.set( x, y, 1 / x, 1 / y );
+		this._resolution.set( width, height );
+		this._renderResolution.set( ( width / this.pixelSize ) | 0, ( height / this.pixelSize ) | 0 );
+		const { x, y } = this._renderResolution;
+		this._beautyRenderTarget.setSize( x, y );
+		this._normalRenderTarget.setSize( x, y );
+		this._fsQuad.material.uniforms.resolution.value.set( x, y, 1 / x, 1 / y );
 
 	}
 
+	/**
+	 * Sets the effect's pixel size.
+	 *
+	 * @param {number} pixelSize - The pixel size to set.
+	 */
 	setPixelSize( pixelSize ) {
 
 		this.pixelSize = pixelSize;
-		this.setSize( this.resolution.x, this.resolution.y );
+		this.setSize( this._resolution.x, this._resolution.y );
 
 	}
 
-	render( renderer, writeBuffer ) {
+	/**
+	 * Performs the pixelation pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer/*, readBuffer , deltaTime, maskActive */ ) {
 
-		const uniforms = this.fsQuad.material.uniforms;
+		const uniforms = this._fsQuad.material.uniforms;
 		uniforms.normalEdgeStrength.value = this.normalEdgeStrength;
 		uniforms.depthEdgeStrength.value = this.depthEdgeStrength;
 
-		renderer.setRenderTarget( this.beautyRenderTarget );
+		renderer.setRenderTarget( this._beautyRenderTarget );
 		renderer.render( this.scene, this.camera );
 
 		const overrideMaterial_old = this.scene.overrideMaterial;
-		renderer.setRenderTarget( this.normalRenderTarget );
-		this.scene.overrideMaterial = this.normalMaterial;
+		renderer.setRenderTarget( this._normalRenderTarget );
+		this.scene.overrideMaterial = this._normalMaterial;
 		renderer.render( this.scene, this.camera );
 		this.scene.overrideMaterial = overrideMaterial_old;
 
-		uniforms.tDiffuse.value = this.beautyRenderTarget.texture;
-		uniforms.tDepth.value = this.beautyRenderTarget.depthTexture;
-		uniforms.tNormal.value = this.normalRenderTarget.texture;
+		uniforms.tDiffuse.value = this._beautyRenderTarget.texture;
+		uniforms.tDepth.value = this._beautyRenderTarget.depthTexture;
+		uniforms.tNormal.value = this._normalRenderTarget.texture;
 
 		if ( this.renderToScreen ) {
 
@@ -104,25 +188,20 @@ class RenderPixelatedPass extends Pass {
 
 		}
 
-		this.fsQuad.render( renderer );
+		this._fsQuad.render( renderer );
 
 	}
 
-	createPixelatedMaterial() {
+	// internals
+
+	_createPixelatedMaterial() {
 
 		return new ShaderMaterial( {
 			uniforms: {
 				tDiffuse: { value: null },
 				tDepth: { value: null },
 				tNormal: { value: null },
-				resolution: {
-					value: new Vector4(
-						this.renderResolution.x,
-						this.renderResolution.y,
-						1 / this.renderResolution.x,
-						1 / this.renderResolution.y,
-					)
-				},
+				resolution: { value: new Vector4() },
 				normalEdgeStrength: { value: 0 },
 				depthEdgeStrength: { value: 0 }
 			},

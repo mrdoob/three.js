@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ImageBitmapLoader } from '../../../../src/loaders/ImageBitmapLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -12,7 +10,7 @@ export default QUnit.module( 'Loaders', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			// surpress the following console message when testing
+			// suppress the following console message when testing
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
 
 			console.level = CONSOLE_LEVEL.OFF;
@@ -29,7 +27,7 @@ export default QUnit.module( 'Loaders', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			// surpress the following console message when testing
+			// suppress the following console message when testing
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
 
 			console.level = CONSOLE_LEVEL.OFF;
@@ -43,7 +41,7 @@ export default QUnit.module( 'Loaders', () => {
 		// PROPERTIES
 		QUnit.test( 'options', ( assert ) => {
 
-			// surpress the following console message when testing in node
+			// suppress the following console message when testing in node
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
 
 			console.level = CONSOLE_LEVEL.OFF;
@@ -58,7 +56,7 @@ export default QUnit.module( 'Loaders', () => {
 		// PUBLIC
 		QUnit.test( 'isImageBitmapLoader', ( assert ) => {
 
-			// surpress the following console message when testing in node
+			// suppress the following console message when testing in node
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
 
 			console.level = CONSOLE_LEVEL.OFF;
@@ -69,20 +67,6 @@ export default QUnit.module( 'Loaders', () => {
 				object.isImageBitmapLoader,
 				'ImageBitmapLoader.isImageBitmapLoader should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'setOptions', ( assert ) => {
-
-			// setOptions( options )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'load', ( assert ) => {
-
-			// load( url, onLoad, onProgress, onError )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

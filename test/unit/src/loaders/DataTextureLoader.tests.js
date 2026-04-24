@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -24,13 +22,6 @@ export default QUnit.module( 'Loaders', () => {
 
 			const object = new DataTextureLoader();
 			assert.ok( object, 'Can instantiate a DataTextureLoader.' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

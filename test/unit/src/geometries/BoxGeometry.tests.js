@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -56,19 +54,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'BoxGeometry',
 				'BoxGeometry.type should be BoxGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

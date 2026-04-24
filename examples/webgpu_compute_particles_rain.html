@@ -1,21 +1,28 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Particles Rain</title>
+		<title>three.js webgpu - compute particles rain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Rain
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Rain</span>
+			</div>
+
+			<small>Compatible with native lights and shadows using post-processing pass.</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -23,14 +30,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionGeometry, storage, If } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { Fn, texture, uv, uint, instancedArray, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, If } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -38,17 +43,17 @@
 			const instanceCount = maxParticleCount / 2;
 
 			let camera, scene, renderer;
-			let controls, stats;
+			let controls;
 			let computeParticles;
 			let monkey;
-			let clock;
+			let timer;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
 			let collisionBoxPos, collisionBoxPosUI;
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const { innerWidth, innerHeight } = window;
 
@@ -59,20 +64,9 @@
 				scene = new THREE.Scene();
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-				dirLight.castShadow = true;
 				dirLight.position.set( 3, 17, 17 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.near = 1;
-				dirLight.shadow.camera.far = 50;
-				dirLight.shadow.camera.right = 25;
-				dirLight.shadow.camera.left = - 25;
-				dirLight.shadow.camera.top = 25;
-				dirLight.shadow.camera.bottom = - 25;
-				dirLight.shadow.mapSize.width = 2048;
-				dirLight.shadow.mapSize.height = 2048;
-				dirLight.shadow.bias = - 0.01;
-
 				scene.add( dirLight );
+			
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
 				//
@@ -87,34 +81,31 @@
 				collisionPosRT.texture.type = THREE.HalfFloatType;
 				collisionPosRT.texture.magFilter = THREE.NearestFilter;
 				collisionPosRT.texture.minFilter = THREE.NearestFilter;
+				collisionPosRT.texture.generateMipmaps = false;
 
 				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.colorNode = positionWorld;
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new THREE.StorageInstancedBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
-
-				const positionBuffer = createBuffer();
-				const velocityBuffer = createBuffer();
-				const ripplePositionBuffer = createBuffer();
-				const rippleTimeBuffer = createBuffer();
+				const positionBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const velocityBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const ripplePositionBuffer = instancedArray( maxParticleCount, 'vec3' );
+				const rippleTimeBuffer = instancedArray( maxParticleCount, 'vec3' );
 
 				// compute
 
-				const timer = timerLocal();
-
 				const randUint = () => uint( Math.random() * 0xFFFFFF );
 
-				const computeInit = tslFn( () => {
+				const computeInit = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
 					const rippleTime = rippleTimeBuffer.element( instanceIndex );
 
-					const randX = instanceIndex.hash();
-					const randY = instanceIndex.add( randUint() ).hash();
-					const randZ = instanceIndex.add( randUint() ).hash();
+					const randX = hash( instanceIndex );
+					const randY = hash( instanceIndex.add( randUint() ) );
+					const randZ = hash( instanceIndex.add( randUint() ) );
 
 					position.x = randX.mul( 100 ).add( - 50 );
 					position.y = randY.mul( 25 );
@@ -128,7 +119,7 @@
 
 				//
 
-				const computeUpdate = tslFn( () => {
+				const computeUpdate = Fn( () => {
 
 					const getCoord = ( pos ) => pos.add( 50 ).div( 100 );
 
@@ -139,7 +130,7 @@
 
 					position.addAssign( velocity );
 
-					rippleTime.x = rippleTime.x.add( timerDelta().mul( 4 ) );
+					rippleTime.x = rippleTime.x.add( deltaTime.mul( 4 ) );
 
 					//
 
@@ -166,8 +157,8 @@
 
 						// next drops will not fall in the same place
 
-						position.x = instanceIndex.add( timer ).hash().mul( 100 ).add( - 50 );
-						position.z = instanceIndex.add( timer.add( randUint() ) ).hash().mul( 100 ).add( - 50 );
+						position.x = hash( instanceIndex.add( time ) ).mul( 100 ).add( - 50 );
+						position.z = hash( instanceIndex.add( time.add( randUint() ) ) ).mul( 100 ).add( - 50 );
 
 					} );
 
@@ -183,38 +174,13 @@
 
 				} );
 
-				computeParticles = computeUpdate().compute( maxParticleCount );
+				computeParticles = computeUpdate().compute( maxParticleCount ).setName( 'Particles' );
 
 				// rain
 
-				const billboarding = tslFn( () => {
-
-					const particlePosition = positionBuffer.toAttribute();
-
-					const worldMatrix = modelWorldMatrix.toVar();
-					worldMatrix[ 3 ][ 0 ] = particlePosition.x;
-					worldMatrix[ 3 ][ 1 ] = particlePosition.y;
-					worldMatrix[ 3 ][ 2 ] = particlePosition.z;
-
-					const modelViewMatrix = cameraViewMatrix.mul( worldMatrix );
-					modelViewMatrix[ 0 ][ 0 ] = 1;
-					modelViewMatrix[ 0 ][ 1 ] = 0;
-					modelViewMatrix[ 0 ][ 2 ] = 0;
-
-					//modelViewMatrix[ 0 ][ 0 ] = modelWorldMatrix[ 0 ].length();
-					//modelViewMatrix[ 1 ][ 1 ] = modelWorldMatrix[ 1 ].length();
-
-					modelViewMatrix[ 2 ][ 0 ] = 0;
-					modelViewMatrix[ 2 ][ 1 ] = 0;
-					modelViewMatrix[ 2 ][ 2 ] = 1;
-
-					return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionGeometry );
-
-				} );
-
 				const rainMaterial = new THREE.MeshBasicNodeMaterial();
 				rainMaterial.colorNode = uv().distance( vec2( .5, 0 ) ).oneMinus().mul( 3 ).exp().mul( .1 );
-				rainMaterial.vertexNode = billboarding();
+				rainMaterial.vertexNode = billboarding( { position: positionBuffer.toAttribute() } );
 				rainMaterial.opacity = .2;
 				rainMaterial.side = THREE.DoubleSide;
 				rainMaterial.forceSinglePass = true;
@@ -230,7 +196,7 @@
 
 				const rippleTime = rippleTimeBuffer.element( instanceIndex ).x;
 
-				const rippleEffect = tslFn( () => {
+				const rippleEffect = Fn( () => {
 
 					const center = uv().add( vec2( - .5 ) ).length().mul( 7 );
 					const distance = rippleTime.sub( center );
@@ -280,7 +246,6 @@
 				collisionBox.position.y = 12;
 				collisionBox.scale.x = 3.5;
 				collisionBox.layers.enable( 1 );
-				collisionBox.castShadow = true;
 				scene.add( collisionBox );
 
 				//
@@ -291,7 +256,6 @@
 					geometry.computeVertexNormals();
 
 					monkey = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { roughness: 1, metalness: 0 } ) );
-					monkey.receiveShadow = true;
 					monkey.scale.setScalar( 5 );
 					monkey.rotation.y = Math.PI / 2;
 					monkey.position.y = 4.5;
@@ -303,7 +267,8 @@
 
 				//
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -311,9 +276,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+
+				await renderer.init();
 
 				//
 
@@ -332,7 +298,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				// use lerp to smooth the movement
 				collisionBoxPosUI = new THREE.Vector3().copy( collisionBox.position );
@@ -357,9 +323,9 @@
 
 			function animate() {
 
-				stats.update();
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( monkey ) {
 
@@ -374,6 +340,7 @@
 				// position
 
 				scene.overrideMaterial = collisionPosMaterial;
+				scene.name = 'Collision Scene';
 				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
 
@@ -384,6 +351,7 @@
 				// result
 
 				scene.overrideMaterial = null;
+				scene.name = 'Scene';
 				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 

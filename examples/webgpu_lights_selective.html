@@ -4,20 +4,28 @@
 		<title>three.js webgpu - selective lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - selective lights<br />
-			<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Selective Lights</span>
+			</div>
+
+			<small>
+				<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -25,19 +33,17 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { rangeFog, color, lights, texture, normalMap } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { fog, rangeFogFactor, color, lights, texture, normalMap } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
-				stats, controls;
+				controls;
 
 			init();
 
@@ -47,11 +53,11 @@
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
-				scene.fogNode = rangeFog( color( 0xFF00FF ), 12, 30 );
+				scene.fogNode = fog( color( 0xFF00FF ), rangeFogFactor( 12, 30 ) );
 
 				const sphereGeometry = new THREE.SphereGeometry( 0.1, 16, 8 );
 
-				//textures
+				// textures
 
 				const textureLoader = new THREE.TextureLoader();
 
@@ -63,7 +69,7 @@
 				alphaTexture.wrapS = THREE.RepeatWrapping;
 				alphaTexture.wrapT = THREE.RepeatWrapping;
 
-				//lights
+				// lights
 
 				const addLight = ( hexColor, power = 1700, distance = 100 ) => {
 
@@ -88,12 +94,12 @@
 				light3 = addLight( 0x80ff80 );
 				light4 = addLight( 0xffaa00 );
 
-				//light nodes ( selective lights )
+				// light nodes ( selective lights )
 
 				const redLightsNode = lights( [ light1 ] );
 				const blueLightsNode = lights( [ light2 ] );
 
-				//models
+				// models
 
 				const geometryTeapot = new TeapotGeometry( .8, 18 );
 
@@ -119,30 +125,28 @@
 				leftObject.rotation.y = centerObject.rotation.y = rightObject.rotation.y = Math.PI * - 0.5;
 				leftObject.position.y = centerObject.position.y = rightObject.position.y = - 1;
 
-				//renderer
+				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				//controls
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 3;
 				controls.maxDistance = 25;
 
-				//stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				//gui
+				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Material' );
 
 				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
 				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
@@ -187,8 +191,6 @@
 				if ( time > 3.5 && light4.parent === null ) scene.add( light4 );
 				*/
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

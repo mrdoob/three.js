@@ -1,0 +1,609 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - storage pbo external element</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<style>
+			.swap_area {
+				position: absolute;
+				top: 150px;
+				padding: 10px;
+				background: rgba( 0, 0, 0, 0.5 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.5;
+				pointer-events: none;
+				text-align: left;
+			}
+		
+		</style>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
+			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
+			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
+			<br />
+			<div id="local_swap" class="swap_area" style="left: 0;"></div>
+			<div id="global_swap" class="swap_area" style="right: 0;"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { storage, If, vec3, not, uniform, uv, uint, Fn, vec2, abs, int, uvec2, floor, instanceIndex } from 'three/tsl';
+
+			import { BitonicSort, getBitonicDisperseIndices, getBitonicFlipIndices } from 'three/addons/gpgpu/BitonicSort.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			const StepType = {
+
+				NONE: 0,
+				// Swap values within workgroup local values
+				SWAP_LOCAL: 1,
+				DISPERSE_LOCAL: 2,
+				// Swap values within global data buffer.
+				FLIP_GLOBAL: 3,
+				DISPERSE_GLOBAL: 4,
+
+			};
+
+			const timestamps = {
+				local_swap: document.getElementById( 'local_swap' ),
+				global_swap: document.getElementById( 'global_swap' )
+			};
+
+			const localColors = [ 'rgb(203, 64, 203)', 'rgb(0, 215, 215)' ];
+			const globalColors = [ 'rgb(1, 150, 1)', 'red' ];
+
+			// Total number of elements and the dimensions of the display grid.
+			const size = 16384;
+			const gridDim = Math.sqrt( size );
+
+			const getNumSteps = () => {
+
+				const n = Math.log2( size );
+				return ( n * ( n + 1 ) ) / 2;
+
+			};
+
+			// Total number of steps in a bitonic sort with 'size' elements.
+			const MAX_STEPS = getNumSteps();
+
+			const effectController = {
+				// Sqr root of 16834
+				gridWidth: uniform( gridDim ),
+				gridHeight: uniform( gridDim ),
+				highlight: uniform( 1 ),
+				stepBitonic: true,
+				'Display Mode': 'Swap Zone Highlight'
+			};
+
+			const gui = new GUI();
+			gui.add( effectController, 'Display Mode', [ 'Elements', 'Swap Zone Highlight' ] ).onChange( () => {
+
+				if ( effectController[ 'Display Mode' ] === 'Elements' ) {
+
+					effectController.highlight.value = 0;
+
+
+				} else {
+
+					effectController.highlight.value = 1;
+
+				}
+
+			} );
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			// Display utilities
+
+			const getElementIndex = Fn( ( [ uvNode, gridWidth, gridHeight ] ) => {
+
+				const newUV = uvNode.mul( vec2( gridWidth, gridHeight ) );
+				const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
+				const elementIndex = uint( gridWidth ).mul( pixel.y ).add( pixel.x );
+
+				return elementIndex;
+
+			}, {
+				uvNode: 'vec2',
+				gridWidth: 'uint',
+				gridHeight: 'uint',
+				return: 'uint'
+			} );
+
+			const getColor = Fn( ( [ colorChanger, gridWidth, gridHeight ] ) => {
+
+				const subtracter = colorChanger.div( gridWidth.mul( gridHeight ) );
+				return vec3( subtracter.oneMinus() ).toVar();
+
+			}, {
+				colorChanger: 'float',
+				gridWidth: 'float',
+				gridHeight: 'float',
+				return: 'vec3'
+			} );
+
+			const randomizeDataArray = ( array ) => {
+
+				let currentIndex = array.length;
+				while ( currentIndex !== 0 ) {
+
+					const randomIndex = Math.floor( Math.random() * currentIndex );
+					currentIndex -= 1;
+					[ array[ currentIndex ], array[ randomIndex ] ] = [
+						array[ randomIndex ],
+						array[ currentIndex ],
+					];
+
+				}
+
+			};
+
+			const windowResizeCallback = ( renderer, scene, camera ) => {
+
+				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+				const frustumHeight = camera.top - camera.bottom;
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+				camera.updateProjectionMatrix();
+				renderer.render( scene, camera );
+
+			};
+
+			const constructInnerHTML = ( isGlobal, colorsArr ) => {
+
+				return `
+
+				Compute ${isGlobal ? 'Global' : 'Local'}:
+				<div style="display: flex; flex-direction:row; justify-content: center; align-items: center;">
+					${isGlobal ? 'Global Swaps' : 'Local Swaps'} Compare Region&nbsp;
+					<div style="background-color: ${ colorsArr[ 0 ]}; width:12.5px; height: 1em; border-radius: 20%;"></div>
+					&nbsp;to Region&nbsp;
+					<div style="background-color: ${ colorsArr[ 1 ] }; width:12.5px; height: 1em; border-radius: 20%;"></div>
+				</div>`;
+
+			};
+
+			const createDisplayMesh = ( elementsStorage, algoStorage = null, blockHeightStorage = null ) => {
+
+				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+				const display = Fn( () => {
+
+					const { gridWidth, gridHeight, highlight } = effectController;
+
+					const elementIndex = getElementIndex( uv(), gridWidth, gridHeight );
+					const color = getColor( elementsStorage.element( elementIndex ), gridWidth, gridHeight ).toVar();
+
+					if ( algoStorage !== null && blockHeightStorage !== null ) {
+
+						If( highlight.equal( 1 ).and( not( algoStorage.element( 0 ).equal( StepType.NONE ) ) ), () => {
+
+							const boolCheck = int( elementIndex.mod( blockHeightStorage.element( 0 ) ).lessThan( blockHeightStorage.element( 0 ).div( 2 ) ) );
+							color.z.assign( algoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
+							color.x.mulAssign( boolCheck );
+							color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
+
+						} );
+
+					}
+
+					return color;
+
+				} );
+
+				material.colorNode = display();
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				return plane;
+
+			};
+
+			const createDisplayMesh2 = ( elementsStorage, infoStorage ) => {
+
+				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+				const display = Fn( () => {
+
+					const { gridWidth, gridHeight, highlight } = effectController;
+
+					const elementIndex = getElementIndex( uv(), gridWidth, gridHeight );
+					const color = getColor( elementsStorage.element( elementIndex ), gridWidth, gridHeight ).toVar();
+
+
+					If( highlight.equal( 1 ).and( not( infoStorage.element( 0 ).equal( StepType.SWAP_LOCAL ) ) ), () => {
+
+						const boolCheck = int( elementIndex.mod( infoStorage.element( 1 ) ).lessThan( infoStorage.element( 1 ).div( 2 ) ) );
+						color.z.assign( infoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
+						color.x.mulAssign( boolCheck );
+						color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
+
+					} );
+
+
+					return color;
+
+				} );
+
+				material.colorNode = display();
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				return plane;
+
+			};
+			
+			const setupDomElement = ( renderer ) => {
+
+				document.body.appendChild( renderer.domElement );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.top = '0';
+				renderer.domElement.style.left = '0';
+				renderer.domElement.style.width = '50%';
+				renderer.domElement.style.height = '100%';
+
+			};
+
+			async function initBitonicSort() {
+
+				let currentStep = 0;
+
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+
+				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
+
+					return i;
+
+				} ) );
+
+
+				randomizeDataArray( array );
+
+				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).setName( 'Elements' );
+				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).setName( 'RandomizedElements' );
+
+				const computeInitFn = Fn( () => {
+
+					randomizedElementsStorage.element( instanceIndex ).assign( currentElementsStorage.element( instanceIndex ) );
+
+				} );
+
+				const computeResetBuffersFn = Fn( () => {
+
+					currentElementsStorage.element( instanceIndex ).assign( randomizedElementsStorage.element( instanceIndex ) );
+
+				} );
+
+				const renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+
+				await renderer.init();
+
+				const animate = () => {
+
+					renderer.render( scene, camera );
+
+				};
+
+				renderer.setAnimationLoop( animate );
+				setupDomElement( renderer );
+				scene.background = new THREE.Color( 0x313131 );
+
+				const bitonicSortModule = new BitonicSort(
+					renderer,
+					currentElementsStorage,
+					{
+						workgroupSize: 64,
+					}
+				);
+
+				scene.add( createDisplayMesh2( currentElementsStorage, bitonicSortModule.infoStorage ) );
+
+				// Initialize each value in the elements buffer.
+				const computeInit = computeInitFn().compute( size );
+				const computeReset = computeResetBuffersFn().compute( size );
+
+				renderer.compute( computeInit );
+
+				const stepAnimation = async function () {
+
+					renderer.info.reset();
+
+					if ( currentStep < bitonicSortModule.stepCount ) {
+
+						bitonicSortModule.computeStep( renderer );
+
+						currentStep ++;
+
+					} else {
+
+						renderer.compute( computeReset );
+
+						currentStep = 0;
+
+					}
+
+					timestamps[ 'local_swap' ].innerHTML = constructInnerHTML( false, localColors );
+
+					if ( currentStep === bitonicSortModule.stepCount ) {
+
+						setTimeout( stepAnimation, 1000 );
+
+					} else {
+
+						setTimeout( stepAnimation, 100 );
+
+					}
+
+				};
+
+				stepAnimation();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					windowResizeCallback( renderer, scene, camera );
+
+				}
+
+			}
+
+			initBitonicSort();
+
+			// Global Swaps Only
+			initGlobalSwapOnly();
+
+			// When forceGlobalSwap is true, force all valid local swaps to be global swaps.
+			async function initGlobalSwapOnly() {
+
+				let currentStep = 0;
+
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+
+				const infoArray = new Uint32Array( [ 3, 2, 2 ] );
+				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
+				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count ).setPBO( true ).setName( 'TheInfo' );
+
+				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
+				const nextBlockHeightStorage = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' );
+				const nextBlockHeightRead = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' ).toReadOnly();
+
+				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
+
+					return i;
+
+				} ) );
+
+				randomizeDataArray( array );
+
+				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).setName( 'Elements' );
+				const tempBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
+				const tempStorage = storage( tempBuffer, 'uint', size ).setPBO( true ).setName( 'Temp' );
+				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).setName( 'RandomizedElements' );
+
+				// Swap the elements in local storage
+				const globalCompareAndSwap = ( idxBefore, idxAfter ) => {
+
+					// If the later element is less than the current element
+					If( currentElementsStorage.element( idxAfter ).lessThan( currentElementsStorage.element( idxBefore ) ), () => {
+
+						// Apply the swapped values to temporary storage.
+						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxAfter ) );
+						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxBefore ) );
+
+					} ).Else( () => {
+
+						// Otherwise apply the existing values to temporary storage.
+						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxBefore ) );
+						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxAfter ) );
+
+					} );
+
+				};
+
+				const computeInitFn = Fn( () => {
+
+					randomizedElementsStorage.element( instanceIndex ).assign( currentElementsStorage.element( instanceIndex ) );
+
+				} );
+
+				const computeBitonicStepFn = Fn( () => {
+
+					const nextBlockHeight = nextBlockHeightStorage.element( 0 ).toVar();
+					const nextAlgo = infoStorage.element( 0 ).toVar();
+
+					// TODO: Convert to switch block.
+					If( nextAlgo.equal( uint( StepType.FLIP_GLOBAL ) ), () => {
+
+						const idx = getBitonicFlipIndices( instanceIndex, nextBlockHeight );
+						globalCompareAndSwap( idx.x, idx.y );
+
+					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_GLOBAL ) ), () => {
+
+						const idx = getBitonicDisperseIndices( instanceIndex, nextBlockHeight );
+						globalCompareAndSwap( idx.x, idx.y );
+
+					} );
+
+					// Since this algorithm is global only, we execute an additional compute step to sync the current buffer with the output buffer.
+
+				} );
+
+				const computeSetAlgoFn = Fn( () => {
+
+					const nextBlockHeight = nextBlockHeightStorage.element( 0 ).toVar();
+					const nextAlgo = infoStorage.element( 0 );
+					const highestBlockHeight = infoStorage.element( 2 ).toVar();
+
+					nextBlockHeight.divAssign( 2 );
+
+					If( nextBlockHeight.equal( 1 ), () => {
+
+						highestBlockHeight.mulAssign( 2 );
+
+						If( highestBlockHeight.equal( size * 2 ), () => {
+
+							nextAlgo.assign( StepType.NONE );
+							nextBlockHeight.assign( 0 );
+
+						} ).Else( () => {
+
+							nextAlgo.assign( StepType.FLIP_GLOBAL );
+							nextBlockHeight.assign( highestBlockHeight );
+
+						} );
+
+
+					} ).Else( () => {
+
+						nextAlgo.assign( StepType.DISPERSE_GLOBAL );
+
+					} );
+
+					nextBlockHeightStorage.element( 0 ).assign( nextBlockHeight );
+					infoStorage.element( 2 ).assign( highestBlockHeight );
+
+				} );
+
+				const computeAlignCurrentFn = Fn( () => {
+
+					currentElementsStorage.element( instanceIndex ).assign( tempStorage.element( instanceIndex ) );
+
+				} );
+
+				const computeResetBuffersFn = Fn( () => {
+
+					currentElementsStorage.element( instanceIndex ).assign( randomizedElementsStorage.element( instanceIndex ) );
+
+				} );
+
+				const computeResetAlgoFn = Fn( () => {
+
+					infoStorage.element( 0 ).assign( StepType.FLIP_GLOBAL );
+					nextBlockHeightStorage.element( 0 ).assign( 2 );
+					infoStorage.element( 2 ).assign( 2 );
+
+				} );
+
+				// Initialize each value in the elements buffer.
+				const computeInit = computeInitFn().compute( size );
+				// Swap a pair of elements in the elements buffer.
+				const computeBitonicStep = computeBitonicStepFn().compute( size / 2 );
+				// Set the conditions for the next swap.
+				const computeSetAlgo = computeSetAlgoFn().compute( 1 );
+				// Align the current buffer with the temp buffer if the previous sort was executed in a global scope.
+				const computeAlignCurrent = computeAlignCurrentFn().compute( size );
+				// Reset the buffers and algorithm information after a full bitonic sort has been completed.
+				const computeResetBuffers = computeResetBuffersFn().compute( size );
+				const computeResetAlgo = computeResetAlgoFn().compute( 1 );
+
+				scene.add( createDisplayMesh( currentElementsStorage, infoStorage, nextBlockHeightRead ) );
+
+				const renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+
+				await renderer.init();
+
+				const animate = () => {
+
+					renderer.render( scene, camera );
+
+				};
+
+				renderer.setAnimationLoop( animate );
+				setupDomElement( renderer );
+				renderer.domElement.style.left = '50%';
+				scene.background = new THREE.Color( 0x212121 );
+
+				renderer.compute( computeInit );
+
+				const stepAnimation = async function () {
+
+					if ( currentStep !== MAX_STEPS ) {
+
+						renderer.compute( computeBitonicStep );
+
+						renderer.compute( computeAlignCurrent );
+
+						renderer.compute( computeSetAlgo );
+
+						currentStep ++;
+
+					} else {
+
+						renderer.compute( computeResetBuffers );
+						renderer.compute( computeResetAlgo );
+
+						currentStep = 0;
+
+					}
+
+					timestamps[ 'global_swap' ].innerHTML = constructInnerHTML( true, globalColors );
+
+					if ( currentStep === MAX_STEPS ) {
+
+						setTimeout( stepAnimation, 1000 );
+
+					} else {
+
+						setTimeout( stepAnimation, 100 );
+
+					}
+
+				};
+
+				stepAnimation();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					windowResizeCallback( renderer, scene, camera );
+
+				}
+
+			}
+		</script>
+	</body>
+</html>

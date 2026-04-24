@@ -1,108 +1,164 @@
 import TempNode from '../core/TempNode.js';
-import { mix } from '../math/MathNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeObject, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, mat3, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
-import { LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { SRGBTransfer } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+import { sRGBTransferEOTF, sRGBTransferOETF } from './ColorSpaceFunctions.js';
+import { Matrix3 } from '../../math/Matrix3.js';
 
-const sRGBToLinearShader = tslFn( ( inputs ) => {
+const WORKING_COLOR_SPACE = 'WorkingColorSpace';
+const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
 
-	const { value } = inputs;
-	const { rgb } = value;
+/**
+ * This node represents a color space conversion. Meaning it converts
+ * a color value from a source to a target color space.
+ *
+ * @augments TempNode
+ */
+class ColorSpaceNode extends TempNode {
 
-	const a = rgb.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
-	const b = rgb.mul( 0.0773993808 );
-	const factor = rgb.lessThanEqual( 0.04045 );
+	static get type() {
 
-	const rgbResult = mix( a, b, factor );
-
-	return vec4( rgbResult, value.a );
-
-} );
-
-const LinearTosRGBShader = tslFn( ( inputs ) => {
-
-	const { value } = inputs;
-	const { rgb } = value;
-
-	const a = rgb.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );
-	const b = rgb.mul( 12.92 );
-	const factor = rgb.lessThanEqual( 0.0031308 );
-
-	const rgbResult = mix( a, b, factor );
-
-	return vec4( rgbResult, value.a );
-
-} );
-
-const getColorSpaceMethod = ( colorSpace ) => {
-
-	let method = null;
-
-	if ( colorSpace === LinearSRGBColorSpace ) {
-
-		method = 'Linear';
-
-	} else if ( colorSpace === SRGBColorSpace ) {
-
-		method = 'sRGB';
+		return 'ColorSpaceNode';
 
 	}
 
-	return method;
-
-};
-
-const getMethod = ( source, target ) => {
-
-	return getColorSpaceMethod( source ) + 'To' + getColorSpaceMethod( target );
-
-};
-
-class ColorSpaceNode extends TempNode {
-
-	constructor( method, node ) {
+	/**
+	 * Constructs a new color space node.
+	 *
+	 * @param {Node} colorNode - Represents the color to convert.
+	 * @param {string} source - The source color space.
+	 * @param {string} target - The target color space.
+	 */
+	constructor( colorNode, source, target ) {
 
 		super( 'vec4' );
 
-		this.method = method;
-		this.node = node;
+		/**
+		 * Represents the color to convert.
+		 *
+		 * @type {Node}
+		 */
+		this.colorNode = colorNode;
+
+		/**
+		 * The source color space.
+		 *
+		 * @type {string}
+		 */
+		this.source = source;
+
+		/**
+		 * The target color space.
+		 *
+		 * @type {string}
+		 */
+		this.target = target;
 
 	}
 
-	setup() {
+	/**
+	 * This method resolves the constants `WORKING_COLOR_SPACE` and
+	 * `OUTPUT_COLOR_SPACE` based on the current configuration of the
+	 * color management and renderer.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} colorSpace - The color space to resolve.
+	 * @return {string} The resolved color space.
+	 */
+	resolveColorSpace( builder, colorSpace ) {
 
-		const { method, node } = this;
+		if ( colorSpace === WORKING_COLOR_SPACE ) {
 
-		if ( method === ColorSpaceNode.LINEAR_TO_LINEAR )
-			return node;
+			return ColorManagement.workingColorSpace;
 
-		return Methods[ method ]( { value: node } );
+		} else if ( colorSpace === OUTPUT_COLOR_SPACE ) {
+
+			return builder.context.outputColorSpace || builder.renderer.outputColorSpace;
+
+		}
+
+		return colorSpace;
+
+	}
+
+	setup( builder ) {
+
+		const { colorNode } = this;
+
+		const source = this.resolveColorSpace( builder, this.source );
+		const target = this.resolveColorSpace( builder, this.target );
+
+		let outputNode = colorNode;
+
+		if ( ColorManagement.enabled === false || source === target || ! source || ! target ) {
+
+			return outputNode;
+
+		}
+
+		if ( ColorManagement.getTransfer( source ) === SRGBTransfer ) {
+
+			outputNode = vec4( sRGBTransferEOTF( outputNode.rgb ), outputNode.a );
+
+		}
+
+		if ( ColorManagement.getPrimaries( source ) !== ColorManagement.getPrimaries( target ) ) {
+
+			outputNode = vec4(
+				mat3( ColorManagement._getMatrix( new Matrix3(), source, target ) ).mul( outputNode.rgb ),
+				outputNode.a
+			);
+
+		}
+
+		if ( ColorManagement.getTransfer( target ) === SRGBTransfer ) {
+
+			outputNode = vec4( sRGBTransferOETF( outputNode.rgb ), outputNode.a );
+
+		}
+
+		return outputNode;
 
 	}
 
 }
 
-ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
-ColorSpaceNode.LINEAR_TO_sRGB = 'LinearTosRGB';
-ColorSpaceNode.sRGB_TO_LINEAR = 'sRGBToLinear';
-
-const Methods = {
-	[ ColorSpaceNode.LINEAR_TO_sRGB ]: LinearTosRGBShader,
-	[ ColorSpaceNode.sRGB_TO_LINEAR ]: sRGBToLinearShader
-};
-
 export default ColorSpaceNode;
 
-export const linearToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getMethod( LinearSRGBColorSpace, colorSpace ), nodeObject( node ) ) );
-export const colorSpaceToLinear = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getMethod( colorSpace, LinearSRGBColorSpace ), nodeObject( node ) ) );
+/**
+ * TSL function for converting a given color node from the current working color space to the given color space.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - Represents the node to convert.
+ * @param {string} targetColorSpace - The target color space.
+ * @returns {ColorSpaceNode}
+ */
+export const workingToColorSpace = ( node, targetColorSpace ) => new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, targetColorSpace );
 
-export const linearTosRGB = nodeProxy( ColorSpaceNode, ColorSpaceNode.LINEAR_TO_sRGB );
-export const sRGBToLinear = nodeProxy( ColorSpaceNode, ColorSpaceNode.sRGB_TO_LINEAR );
+/**
+ * TSL function for converting a given color node from the given color space to the current working color space.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - Represents the node to convert.
+ * @param {string} sourceColorSpace - The source color space.
+ * @returns {ColorSpaceNode}
+ */
+export const colorSpaceToWorking = ( node, sourceColorSpace ) => new ColorSpaceNode( nodeObject( node ), sourceColorSpace, WORKING_COLOR_SPACE );
 
-addNodeElement( 'linearTosRGB', linearTosRGB );
-addNodeElement( 'sRGBToLinear', sRGBToLinear );
-addNodeElement( 'linearToColorSpace', linearToColorSpace );
-addNodeElement( 'colorSpaceToLinear', colorSpaceToLinear );
+/**
+ * TSL function for converting a given color node from one color space to another one.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - Represents the node to convert.
+ * @param {string} sourceColorSpace - The source color space.
+ * @param {string} targetColorSpace - The target color space.
+ * @returns {ColorSpaceNode}
+ */
+export const convertColorSpace = ( node, sourceColorSpace, targetColorSpace ) => new ColorSpaceNode( nodeObject( node ), sourceColorSpace, targetColorSpace );
 
-addNodeClass( 'ColorSpaceNode', ColorSpaceNode );
+addMethodChaining( 'workingToColorSpace', workingToColorSpace );
+addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );

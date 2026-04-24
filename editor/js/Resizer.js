@@ -44,6 +44,13 @@ function Resizer( editor ) {
 		document.getElementById( 'player' ).style.right = x + 'px';
 		document.getElementById( 'script' ).style.right = x + 'px';
 		document.getElementById( 'viewport' ).style.right = x + 'px';
+		document.getElementById( 'animation' ).style.right = x + 'px';
+		document.getElementById( 'animation-resizer' ).style.right = x + 'px';
+
+		// Center toolbar in viewport area
+		const toolbar = document.getElementById( 'toolbar' );
+		const viewportWidth = offsetWidth - x;
+		toolbar.style.left = ( viewportWidth / 2 ) + 'px';
 
 		signals.windowResize.dispatch();
 

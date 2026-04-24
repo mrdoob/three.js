@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
@@ -38,36 +36,6 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'linewidth', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'linecap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'linejoin', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fog', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isLineBasicMaterial', ( assert ) => {
 
@@ -76,12 +44,6 @@ export default QUnit.module( 'Materials', () => {
 				object.isLineBasicMaterial,
 				'LineBasicMaterial.isLineBasicMaterial should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -32,16 +32,16 @@
 			function addImageBitmap() {
 
 				new THREE.ImageBitmapLoader()
+					.setOptions( { imageOrientation: 'flipY' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
 						const texture = new THREE.CanvasTexture( imageBitmap );
 						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						/* ImageBitmap should be disposed when done with it
-						   Can't be done until it's actually uploaded to WebGLTexture */
+						// ImageBitmap should be disposed when done with it.
 
-						// imageBitmap.close();
+						texture.onUpdate = disposeImageBitmap;
 
 						addCube( material );
 
@@ -145,6 +145,13 @@
 				group.rotation.y = performance.now() / 3000;
 
 				renderer.render( scene, camera );
+
+			}
+
+			function disposeImageBitmap( texture ) {
+
+				texture.source.data.close();
+				texture.onUpdate = null; // make sure this callback is executed only once per texture
 
 			}
 

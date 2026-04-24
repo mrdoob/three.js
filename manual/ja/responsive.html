@@ -110,7 +110,7 @@ three.jsでは <code class="notranslate" translate="no">renderer.setSize</code> 
 </pre>
 <p>キャンバスのサイズを変更する必要があるかどうかをチェックしています。キャンバスのサイズを変更する事は、キャンバスの仕様の興味深い部分であり、すでに必要なサイズになっている場合は同じサイズを設定しない方が良いでしょう。</p>
 <p>サイズを変更する必要があるかどうかわかったら、次に <code class="notranslate" translate="no">renderer.setSize</code> を呼び出して新しい幅と高さを渡します。最後に <code class="notranslate" translate="no">false</code> を渡す事が重要です。</p>
-<p>デフォルトでは <code class="notranslate" translate="no">render.setSize</code> はキャンバスのCSSサイズを設定しますが、これは私たちが望んでいるものではありません。ブラウザは他の全ての要素に対して、CSSを使用して要素の表示サイズを決定するという方法で動作し続けてほしいのです。3つの要素で使用されるキャンバスが他の要素と異なるのは避けたいのです。</p>
+<p>デフォルトでは <code class="notranslate" translate="no">renderer.setSize</code> はキャンバスのCSSサイズを設定しますが、これは私たちが望んでいるものではありません。ブラウザは他の全ての要素に対して、CSSを使用して要素の表示サイズを決定するという方法で動作し続けてほしいのです。3つの要素で使用されるキャンバスが他の要素と異なるのは避けたいのです。</p>
 <p>この関数はキャンバスのサイズが変更された場合、trueを返す事に注意して下さい。この関数を使って他にも更新すべき事があるかどうかをチェックする事ができます。この関数を使ってレンダーのループ処理を修正してみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;

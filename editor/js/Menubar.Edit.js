@@ -1,11 +1,11 @@
 import { Box3, Vector3 } from 'three';
+import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
 import { UIPanel, UIRow, UIHorizontalRule, UIText } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
-import { clone } from '../../examples/jsm/utils/SkeletonUtils.js';
 
 function MenubarEdit( editor ) {
 

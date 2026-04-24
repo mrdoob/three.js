@@ -27,9 +27,11 @@
 			import * as THREE from 'three';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-			import { LottieLoader } from 'three/addons/loaders/LottieLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let renderer, scene, camera;
+			import lottie from 'https://cdn.jsdelivr.net/npm/lottie-web@5.13.0/+esm';
+
+			let renderer, scene, camera, controls;
 			let mesh;
 
 			init();
@@ -42,17 +44,47 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111111 );
 
-				const loader = new LottieLoader();
-				loader.setQuality( 2 );
-				loader.load( 'textures/lottie/24017-lottie-logo-animation.json', function ( texture ) {
+				// lottie
 
-					setupControls( texture.animation );
+				const loader = new THREE.FileLoader();
+				loader.setResponseType( 'json' );
+				loader.load( 'textures/lottie/24017-lottie-logo-animation.json', function ( data ) {
+
+					const container = document.createElement( 'div' );
+					const dpr = window.devicePixelRatio;
+					container.style.width = data.w * dpr + 'px';
+					container.style.height = data.h * dpr + 'px';
+					document.body.appendChild( container );
+
+					const animation = lottie.loadAnimation( {
+						container: container,
+						animType: 'canvas',
+						loop: true,
+						autoplay: true,
+						animationData: data,
+						rendererSettings: { dpr: dpr }
+					} );
+
+					const texture = new THREE.CanvasTexture( animation.container );
+					texture.minFilter = THREE.NearestFilter;
+					texture.generateMipmaps = false;
+					texture.colorSpace = THREE.SRGBColorSpace;
+
+					animation.addEventListener( 'enterFrame', function () {
+
+						texture.needsUpdate = true;
+
+					} );
+
+					container.style.display = 'none'; // must be done after loadAnimation() otherwise canvas has 0 dimensions
+
+					setupControls( animation );
 
 					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
 					// texture.colorSpace = THREE.SRGBColorSpace;
 
-					const geometry = new RoundedBoxGeometry( 1, 1, 1, 7, 0.2 );
-					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );
+					const geometry = new RoundedBoxGeometry( 1, 1, 1, 7, 0.1 );
+					const material = new THREE.MeshStandardMaterial( { roughness: 0, map: texture } );
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
 
@@ -62,12 +94,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
-				const environment = new RoomEnvironment( renderer );
+				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
 
 				//
 
@@ -125,11 +161,7 @@
 
 			function animate() {
 
-				if ( mesh ) {
-
-					mesh.rotation.y -= 0.001;
-
-				}
+				controls.update();
 
 				renderer.render( scene, camera );
 

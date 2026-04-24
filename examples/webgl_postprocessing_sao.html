@@ -84,26 +84,35 @@
 				scene.add( light4 );
 
 				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
+				const material = new THREE.MeshStandardMaterial();
+				material.roughness = 0.5;
+				material.metalness = 0;
+
+				const mesh = new THREE.InstancedMesh( geometry, material, 120 );
+				const dummy = new THREE.Object3D();
+				const color = new THREE.Color();
 
 				for ( let i = 0; i < 120; i ++ ) {
 
-					const material = new THREE.MeshStandardMaterial();
-					material.roughness = 0.5 * Math.random() + 0.25;
-					material.metalness = 0;
-					material.color.setHSL( Math.random(), 1.0, 0.3 );
+					dummy.position.x = Math.random() * 4 - 2;
+					dummy.position.y = Math.random() * 4 - 2;
+					dummy.position.z = Math.random() * 4 - 2;
+					dummy.rotation.x = Math.random();
+					dummy.rotation.y = Math.random();
+					dummy.rotation.z = Math.random();
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 4 - 2;
-					mesh.position.y = Math.random() * 4 - 2;
-					mesh.position.z = Math.random() * 4 - 2;
-					mesh.rotation.x = Math.random();
-					mesh.rotation.y = Math.random();
-					mesh.rotation.z = Math.random();
+					const scale = Math.random() * 0.2 + 0.05;
+					dummy.scale.set( scale, scale, scale );
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
-					group.add( mesh );
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
+
+					color.setHSL( Math.random(), 1.0, 0.3 );
+					mesh.setColorAt( i, color );
 
 				}
+
+				group.add( mesh );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

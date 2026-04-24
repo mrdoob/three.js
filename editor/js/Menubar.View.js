@@ -84,6 +84,16 @@ function MenubarView( editor ) {
 
 	options.add( option );
 
+	// new helpers are visible by default, the global visibility state
+	// of helpers is managed in this component. every time a helper is added,
+	// we request a viewport updated by firing the showHelpersChanged signal.
+
+	signals.helperAdded.add( function () {
+
+		signals.showHelpersChanged.dispatch( states );
+
+	} );
+
 	//
 
 	options.add( new UIHorizontalRule() );

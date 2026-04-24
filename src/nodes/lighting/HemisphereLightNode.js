@@ -1,27 +1,62 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
-import { normalView } from '../accessors/NormalNode.js';
-import { objectPosition } from '../accessors/Object3DNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { normalWorld } from '../accessors/Normal.js';
+import { lightPosition } from '../accessors/Lights.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Color } from '../../math/Color.js';
-import { HemisphereLight } from '../../lights/HemisphereLight.js';
 
+/**
+ * Module for representing hemisphere lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
 class HemisphereLightNode extends AnalyticLightNode {
 
+	static get type() {
+
+		return 'HemisphereLightNode';
+
+	}
+
+	/**
+	 * Constructs a new hemisphere light node.
+	 *
+	 * @param {?HemisphereLight} [light=null] - The hemisphere light source.
+	 */
 	constructor( light = null ) {
 
 		super( light );
 
-		this.lightPositionNode = objectPosition( light );
+		/**
+		 * Uniform node representing the light's position.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.lightPositionNode = lightPosition( light );
+
+		/**
+		 * A node representing the light's direction.
+		 *
+		 * @type {Node<vec3>}
+		 */
 		this.lightDirectionNode = this.lightPositionNode.normalize();
 
-		this.groundColorNode = uniform( new Color() );
+		/**
+		 * Uniform node representing the light's ground color.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.groundColorNode = uniform( new Color() ).setGroup( renderGroup );
 
 	}
 
+	/**
+	 * Overwritten to updated hemisphere light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( frame ) {
 
 		const { light } = this;
@@ -38,7 +73,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		const dotNL = normalView.dot( lightDirectionNode );
+		const dotNL = normalWorld.dot( lightDirectionNode );
 		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
 		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
@@ -50,7 +85,3 @@ class HemisphereLightNode extends AnalyticLightNode {
 }
 
 export default HemisphereLightNode;
-
-addNodeClass( 'HemisphereLightNode', HemisphereLightNode );
-
-addLightNode( HemisphereLight, HemisphereLightNode );
