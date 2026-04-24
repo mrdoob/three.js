@@ -851,6 +851,77 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {number} gatherComponent - The index of the channel to read. This must be in range [0, 3].
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
+
+		if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet })`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {number} gatherComponent - The index of the channel to read. This must be in range [0, 3].
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, gatherComponent, compareSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGatherCompare( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGatherCompare( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet })`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet })`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet when sampling textures with explicit mip level.
 	 *
 	 * @param {Texture} texture - The texture.

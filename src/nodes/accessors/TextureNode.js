@@ -92,6 +92,15 @@ class TextureNode extends UniformNode {
 		this.depthNode = null;
 
 		/**
+		 * Represents the optional index constant of the channel to gather.
+		 * This must be in range [0, 3].
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.gatherComponent = null;
+
+		/**
 		 * When defined, a texture is sampled using explicit gradients.
 		 *
 		 * @type {?Array<Node<vec2>>}
@@ -431,6 +440,7 @@ class TextureNode extends UniformNode {
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
+		properties.gatherComponent = this.gatherComponent;
 
 	}
 
@@ -470,11 +480,12 @@ class TextureNode extends UniformNode {
 	 * @param {?string} biasSnippet - The bias snippet.
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
+	 * @param {?number} gatherComponent - The index of the channel to gather.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gatherComponent, gradSnippet, offsetSnippet ) {
 
 		const texture = this.value;
 
@@ -487,6 +498,18 @@ class TextureNode extends UniformNode {
 		} else if ( gradSnippet ) {
 
 			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( this.gatherComponent !== null ) {
+
+			if ( compareSnippet ) {
+
+				snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, gatherComponent, compareSnippet, depthSnippet, offsetSnippet );
+
+			} else {
+
+				snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet );
+
+			}
 
 		} else if ( compareSnippet ) {
 
@@ -565,7 +588,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, offsetSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, this.gatherComponent, gradSnippet, offsetSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
@@ -798,6 +821,22 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.offsetNode = nodeObject( offsetNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * Gathers four texels from the texture.
+	 *
+	 * @param {[number]} component - The index of the channel to read.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	gather( component = 0 ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherComponent = component;
 		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
