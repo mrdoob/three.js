@@ -31,7 +31,7 @@ export class Tab extends EventDispatcher {
 
 		super();
 
-		this.id = title.toLowerCase();
+		this.id = title.toLowerCase().replace( /\s+/g, '-' );
 		this.button = document.createElement( 'button' );
 		this.button.className = 'tab-btn';
 		this.button.textContent = title;
