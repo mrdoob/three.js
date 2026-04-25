@@ -13,7 +13,11 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
-import TexelCopyTextureInfo from './utils/TexelCopyTextureInfo.js';
+import TexelCopyTextureInfo from './descriptors/TexelCopyTextureInfo.js';
+import CommandEncoderDescriptor from './descriptors/CommandEncoderDescriptor.js';
+import TextureViewDescriptor from './descriptors/TextureViewDescriptor.js';
+import RenderPassDescriptor from './descriptors/RenderPassDescriptor.js';
+import RenderPassTimestampWrites from './descriptors/RenderPassTimestampWrites.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
@@ -30,23 +34,23 @@ const _copySrc = new TexelCopyTextureInfo();
 const _copyDst = new TexelCopyTextureInfo();
 const _copySize = [ 0, 0 ];
 
-const _texCopyEncoderOptions = { label: '' };
+const _texCopyEncoderOptions = new CommandEncoderDescriptor();
 const _texCopySrc = new TexelCopyTextureInfo();
 const _texCopyDst = new TexelCopyTextureInfo();
 const _texCopySize = [ 0, 0, 0 ];
 
-const _clearEncoderOptions = { label: 'clear' };
-const _clearPassDescriptor = { colorAttachments: null, depthStencilAttachment: null };
+const _clearEncoderOptions = new CommandEncoderDescriptor( 'clear' );
+const _clearPassDescriptor = new RenderPassDescriptor();
 const _clearConfig = { loadOp: null, clearValue: null, depthLoadOp: undefined, depthClearValue: undefined, depthStoreOp: undefined, stencilLoadOp: undefined, stencilClearValue: undefined, stencilStoreOp: undefined };
 
-const _timestampWrites = { querySet: null, beginningOfPassWriteIndex: 0, endOfPassWriteIndex: 0 };
+const _timestampWrites = new RenderPassTimestampWrites();
 
 const _indirectOffsets = [ 0 ];
 const _bundles = [];
 const _singleBundleArray = [ null ];
 
-const _viewDescriptor = { label: '', baseMipLevel: 0, mipLevelCount: 1, baseArrayLayer: 0, arrayLayerCount: 1, dimension: null, depthOrArrayLayers: undefined };
-const _depthViewOptions = { dimension: undefined, arrayLayerCount: undefined, baseArrayLayer: undefined };
+const _viewDescriptor = new TextureViewDescriptor();
+const _depthViewOptions = new TextureViewDescriptor();
 
 function _resetCurrentSets( sets ) {
 
