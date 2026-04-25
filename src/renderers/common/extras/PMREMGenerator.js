@@ -267,7 +267,7 @@ class PMREMGenerator {
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
-	 * with the 256 x 256 cubemap output. The minimum supported input cube 
+	 * with the 256 x 256 cubemap output. The minimum supported input cube
 	 * size is 16 x 16 per face.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
