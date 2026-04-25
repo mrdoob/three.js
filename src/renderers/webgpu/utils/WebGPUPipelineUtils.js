@@ -428,14 +428,9 @@ class WebGPUPipelineUtils {
 	}
 
 	/**
-	 * Reads line-accurate diagnostics from shader modules and logs any
-	 * errors/warnings/info messages. Called from pipeline creation error paths
-	 * to turn opaque validation failures into actionable WGSL feedback.
-	 *
-	 * Contract: this method is best-effort and must never propagate an error
-	 * to its caller. All failures (spec gaps, custom logger throwing, future
-	 * edits) are swallowed by the top-level try/catch. Callers can fire and
-	 * forget without a `.catch()` guard.
+	 * Reads line-accurate diagnostics from shader modules and logs them.
+	 * Called from pipeline creation error paths to turn opaque validation
+	 * failures into actionable WGSL feedback.
 	 *
 	 * @private
 	 * @param {Array<{program: ProgrammableStage, module: GPUShaderModule}>} stages - Pairs of program + compiled shader module.
@@ -444,71 +439,32 @@ class WebGPUPipelineUtils {
 	 */
 	async _reportShaderDiagnostics( stages, pipelineLabel ) {
 
-		try {
+		for ( const { program, module } of stages ) {
 
-			for ( const { program, module } of stages ) {
+			const info = await module.getCompilationInfo();
+			if ( info.messages.length === 0 ) continue;
 
-				if ( ! module || typeof module.getCompilationInfo !== 'function' ) continue;
+			const sourceLines = program.code.split( '\n' );
 
-				let info;
+			for ( const msg of info.messages ) {
 
-				try {
+				const location = msg.lineNum > 0
+					? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
+					: '';
 
-					info = await module.getCompilationInfo();
+				const header = `WebGPURenderer [${ pipelineLabel } / ${ program.stage } ${ msg.type }]${ location }: ${ msg.message }`;
 
-				} catch ( _ ) {
+				let excerpt = '';
+				if ( msg.lineNum > 0 && msg.lineNum <= sourceLines.length ) {
 
-					continue;
-
-				}
-
-				if ( ! info || ! info.messages || info.messages.length === 0 ) continue;
-
-				const stageName = program ? program.stage : 'shader';
-				const sourceLines = program && program.code ? program.code.split( '\n' ) : null;
-
-				for ( const msg of info.messages ) {
-
-					const location = ( msg.lineNum > 0 )
-						? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
-						: '';
-
-					const header = `WebGPURenderer [${ pipelineLabel } / ${ stageName } ${ msg.type }]${ location }: ${ msg.message }`;
-
-					let excerpt = '';
-					if ( sourceLines && msg.lineNum > 0 ) {
-
-						const line = sourceLines[ msg.lineNum - 1 ];
-						if ( line !== undefined ) {
-
-							excerpt = `\n  ${ line }`;
-							if ( msg.linePos > 0 ) {
-
-								excerpt += `\n  ${ ' '.repeat( Math.max( 0, msg.linePos - 1 ) ) }^`;
-
-							}
-
-						}
-
-					}
-
-					if ( msg.type === 'error' ) {
-
-						error( header + excerpt );
-
-					} else {
-
-						warn( header + excerpt );
-
-					}
+					excerpt = `\n  ${ sourceLines[ msg.lineNum - 1 ] }`;
+					if ( msg.linePos > 0 ) excerpt += `\n  ${ ' '.repeat( msg.linePos - 1 ) }^`;
 
 				}
+
+				( msg.type === 'error' ? error : warn )( header + excerpt );
 
 			}
-
-		} catch ( _ ) {
-
-			// Diagnostics are best-effort; never propagate.
 
 		}
 
