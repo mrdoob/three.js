@@ -125,14 +125,14 @@
 
 				const wheelGeometry = new THREE.PlaneGeometry( 2.2, 2.2 );
 
-				const hslWheelMaterial = new THREE.MeshBasicNodeMaterial();
+				const hslWheelMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
 				hslWheelMaterial.colorNode = hslWheelShader();
 
 				const hslWheel = new THREE.Mesh( wheelGeometry, hslWheelMaterial );
 				hslWheel.position.set( - 1.8, 3.2, 0 );
 				scene.add( hslWheel );
 
-				const oklchWheelMaterial = new THREE.MeshBasicNodeMaterial();
+				const oklchWheelMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
 				oklchWheelMaterial.colorNode = oklchWheelShader();
 
 				const oklchWheel = new THREE.Mesh( wheelGeometry, oklchWheelMaterial );
@@ -179,21 +179,21 @@
 
 				const gradientGeometry = new THREE.PlaneGeometry( 5.5, 0.25 );
 
-				const rgbGradMaterial = new THREE.MeshBasicNodeMaterial();
+				const rgbGradMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
 				rgbGradMaterial.colorNode = rgbGradientShader();
 
 				const rgbGrad = new THREE.Mesh( gradientGeometry, rgbGradMaterial );
 				rgbGrad.position.set( 0, 1.55, 0 );
 				scene.add( rgbGrad );
 
-				const hslGradMaterial = new THREE.MeshBasicNodeMaterial();
+				const hslGradMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
 				hslGradMaterial.colorNode = hslGradientShader();
 
 				const hslGrad = new THREE.Mesh( gradientGeometry, hslGradMaterial );
 				hslGrad.position.set( 0, 1.15, 0 );
 				scene.add( hslGrad );
 
-				const oklchGradMaterial = new THREE.MeshBasicNodeMaterial();
+				const oklchGradMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
 				oklchGradMaterial.colorNode = oklchGradientShader();
 
 				const oklchGrad = new THREE.Mesh( gradientGeometry, oklchGradMaterial );
@@ -244,6 +244,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0.5, 0 );
+				controls.enableDamping = true;
 				controls.update();
 
 				// Inspector GUI

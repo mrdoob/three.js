@@ -1,6 +1,7 @@
-import { MathUtils } from 'three';
+import { Color, ColorManagement, LinearSRGBColorSpace, MathUtils } from 'three';
 
 const _hsl = {};
+const _color = /*@__PURE__*/ new Color();
 
 function linearSRGBToOKLCH( r, g, b, target ) {
 
@@ -119,6 +120,11 @@ class ColorConverter {
 	/**
 	 * Sets the given OKLCH color definition to the given color object.
 	 *
+	 * The result is written into the configured working color space and
+	 * gamut-mapped to that space's primaries, so a color that lies outside
+	 * the sRGB gamut but inside a wider working gamut (e.g. linear
+	 * Display-P3) is preserved instead of being clipped to sRGB.
+	 *
 	 * @param {Color} color - The color to set.
 	 * @param {number} l - The lightness.
 	 * @param {number} c - The chroma.
@@ -133,6 +139,8 @@ class ColorConverter {
 
 		oklchToLinearSRGB( l, c, h, color );
 
+		ColorManagement.colorSpaceToWorking( color, LinearSRGBColorSpace );
+
 		return scaleToRGBGamut( color );
 
 	}
@@ -146,7 +154,11 @@ class ColorConverter {
 	 */
 	static getOKLCH( color, target ) {
 
-		return linearSRGBToOKLCH( color.r, color.g, color.b, target );
+		_color.copy( color );
+
+		ColorManagement.workingToColorSpace( _color, LinearSRGBColorSpace );
+
+		return linearSRGBToOKLCH( _color.r, _color.g, _color.b, target );
 
 	}
 

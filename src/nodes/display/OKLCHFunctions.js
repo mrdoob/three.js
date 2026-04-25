@@ -131,7 +131,10 @@ export const oklchToLinearSRGB = /*@__PURE__*/ Fn( ( [ lch ] ) => {
 } );
 
 /**
- * Gamut maps a linear RGB color by clipping negative values and scaling values above one.
+ * Gamut maps a linear RGB color into [0,1] by clipping negative values and
+ * scaling so the largest component is at most one. The mapping is gamut
+ * agnostic; it operates on whatever set of primaries the input was expressed
+ * in, so it can be applied in any working color space.
  *
  * @tsl
  * @function
@@ -156,12 +159,18 @@ export const linearRGBToRGBGamut = /*@__PURE__*/ Fn( ( [ color ] ) => {
 /**
  * Converts an OKLCH color to the current working color space.
  *
+ * The OKLab→linear sRGB conversion uses Björn Ottosson's matrices, then the
+ * result is transformed into the working color space. Gamut mapping is
+ * deferred until after the working-space conversion so that wider working
+ * spaces (e.g. linear Display-P3) keep colors that would have been outside
+ * the sRGB gamut.
+ *
  * @tsl
  * @function
  * @param {Node<vec3>} lch - The OKLCH color (L, C, H) where H is normalized 0-1.
  * @return {Node<vec3>} The working color.
  */
-export const OKLCHToWorking = ( lch ) => colorSpaceToWorking( linearRGBToRGBGamut( oklchToLinearSRGB( lch ) ), LinearSRGBColorSpace ).rgb;
+export const OKLCHToWorking = ( lch ) => linearRGBToRGBGamut( colorSpaceToWorking( oklchToLinearSRGB( lch ), LinearSRGBColorSpace ).rgb );
 
 /**
  * Converts a color from the current working color space to OKLCH.
