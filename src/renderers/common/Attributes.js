@@ -102,9 +102,10 @@ class Attributes extends DataMap {
 
 			}
 
-			const isStorageAttribute = type === AttributeType.STORAGE || type === AttributeType.INDIRECT;
+			// Standalone disposal is currently limited to WebGPU storage/indirect attributes.
+			// Other attribute types would require additional render-state invalidation before this is safe.
 
-			if ( this.backend.isWebGPUBackend === true && isStorageAttribute ) {
+			if ( this.backend.isWebGPUBackend === true && ( type === AttributeType.STORAGE || type === AttributeType.INDIRECT ) ) {
 
 				data.onDispose = () => this.delete( attribute );
 				attribute.addEventListener( 'dispose', data.onDispose );
