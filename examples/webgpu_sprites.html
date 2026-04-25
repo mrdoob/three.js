@@ -105,6 +105,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
