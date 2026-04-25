@@ -50,6 +50,7 @@
 
 				// scene
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				// camera
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
@@ -183,7 +184,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
