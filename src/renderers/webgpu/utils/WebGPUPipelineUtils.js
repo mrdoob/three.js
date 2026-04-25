@@ -1,7 +1,7 @@
 import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
 
 import {
-	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation, GPUPrimitiveTopology
 } from './WebGPUConstants.js';
 
 import {
@@ -256,7 +256,7 @@ class WebGPUPipelineUtils {
 
 			}
 
-			if ( material.polygonOffset === true ) {
+			if ( material.polygonOffset === true && ( primitiveState.topology === GPUPrimitiveTopology.TriangleList ) ) {
 
 				depthStencil.depthBias = material.polygonOffsetUnits;
 				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
