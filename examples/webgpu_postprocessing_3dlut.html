@@ -73,6 +73,7 @@
 				camera.position.set( 8, 10, 12 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				// Loaders
 
@@ -201,7 +202,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );

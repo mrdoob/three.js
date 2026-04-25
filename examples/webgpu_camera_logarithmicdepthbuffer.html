@@ -157,7 +157,6 @@
 				const renderer = new THREE.WebGPURenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-				renderer.setClearColor( 0x000000 );
 				renderer.domElement.style.position = 'relative';
 				renderer.domElement.id = 'renderer_' + name;
 				renderer.inspector = new Inspector();
@@ -172,6 +171,7 @@
 			function initScene( font ) {
 
 				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				scene.add( new THREE.AmbientLight( 0x777777 ) );
 
