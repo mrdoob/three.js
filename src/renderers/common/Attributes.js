@@ -102,7 +102,7 @@ class Attributes extends DataMap {
 
 			}
 
-			if ( attribute.isBufferAttribute === true ) {
+			if ( this.backend.isWebGPUBackend === true && ( type === AttributeType.STORAGE || type === AttributeType.INDIRECT ) && attribute.isBufferAttribute === true ) {
 
 				data.onDispose = () => this.delete( attribute );
 				attribute.addEventListener( 'dispose', data.onDispose );
