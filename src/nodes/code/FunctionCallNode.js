@@ -104,15 +104,38 @@ class FunctionCallNode extends TempNode {
 		const inputs = functionNode.getInputs( builder );
 		const parameters = this.parameters;
 
+		// Track storage pointer bindings for this function
+		const storageBindingMap = {};
+
 		const generateInput = ( node, inputNode ) => {
 
 			const type = inputNode.type;
 			const pointer = type === 'pointer';
+			const storagePointer = type === 'storagePointer';
 
 			let output;
 
-			if ( pointer ) output = '&' + node.build( builder );
-			else output = node.build( builder, type );
+			if ( storagePointer ) {
+
+				// Build the storage buffer node - this registers it as a uniform/binding
+				// and returns the property name (e.g., "nodeU1")
+				output = node.build( builder );
+
+				// Store the mapping from parameter name to the generated binding name
+				storageBindingMap[ inputNode.name ] = output;
+
+				// Return null to indicate this parameter should not be in the call
+				return null;
+
+			} else if ( pointer ) {
+
+				output = '&' + node.build( builder );
+
+			} else {
+
+				output = node.build( builder, type );
+
+			}
 
 			return output;
 
@@ -140,7 +163,14 @@ class FunctionCallNode extends TempNode {
 
 			for ( let i = 0; i < parameters.length; i ++ ) {
 
-				params.push( generateInput( parameters[ i ], inputs[ i ] ) );
+				const result = generateInput( parameters[ i ], inputs[ i ] );
+
+				// Only add non-storage pointer parameters to the call
+				if ( result !== null ) {
+
+					params.push( result );
+
+				}
 
 			}
 
@@ -152,17 +182,37 @@ class FunctionCallNode extends TempNode {
 
 				if ( node !== undefined ) {
 
-					params.push( generateInput( node, inputNode ) );
+					const result = generateInput( node, inputNode );
+
+					// Only add non-storage pointer parameters to the call
+					if ( result !== null ) {
+
+						params.push( result );
+
+					}
 
 				} else {
 
-					error( `TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+					// Only error for non-storage pointer parameters
+					if ( inputNode.type !== 'storagePointer' ) {
 
-					params.push( generateInput( float( 0 ), inputNode ) );
+						error( `TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+
+						params.push( generateInput( float( 0 ), inputNode ) );
+
+					}
 
 				}
 
 			}
+
+		}
+
+		// Store storage binding map in builder's node data for FunctionNode to use
+		if ( Object.keys( storageBindingMap ).length > 0 ) {
+
+			const functionNodeData = builder.getDataFromNode( functionNode );
+			functionNodeData.storageBindingMap = storageBindingMap;
 
 		}
 

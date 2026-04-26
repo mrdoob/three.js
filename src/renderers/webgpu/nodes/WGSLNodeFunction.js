@@ -75,6 +75,30 @@ const wgslTypeLib = {
 
 };
 
+/**
+ * Parses a storage pointer type like "ptr<storage, array<vec3f>, read>" and extracts metadata.
+ *
+ * @param {string} ptrType - The full ptr type string.
+ * @return {Object|null} Object with { storageAccess, baseType } or null if not a storage pointer.
+ */
+const parseStoragePointer = ( ptrType ) => {
+
+	// Match ptr<storage, TYPE, ACCESS> or ptr<storage, TYPE>
+	const match = ptrType.match( /^ptr\s*<\s*storage\s*,\s*(.+?)(?:\s*,\s*(read|write|read_write))?\s*>$/i );
+
+	if ( match ) {
+
+		return {
+			baseType: match[ 1 ].trim(),
+			storageAccess: match[ 2 ] || 'read'
+		};
+
+	}
+
+	return null;
+
+};
+
 const parse = ( source ) => {
 
 	source = source.trim();
@@ -100,10 +124,24 @@ const parse = ( source ) => {
 			const { name, type } = propsMatches[ i ];
 
 			let resolvedType = type;
+			let storagePointerInfo = null;
 
 			if ( resolvedType.startsWith( 'ptr' ) ) {
 
-				resolvedType = 'pointer';
+				// Check if it's a storage pointer
+				storagePointerInfo = parseStoragePointer( type );
+
+				if ( storagePointerInfo !== null ) {
+
+					// Storage pointer - mark as special type
+					resolvedType = 'storagePointer';
+
+				} else {
+
+					// Other pointer types (function, private, workgroup)
+					resolvedType = 'pointer';
+
+				}
 
 			} else {
 
@@ -117,7 +155,17 @@ const parse = ( source ) => {
 
 			}
 
-			inputs.push( new NodeFunctionInput( resolvedType, name ) );
+			const input = new NodeFunctionInput( resolvedType, name );
+
+			// Store storage pointer metadata if applicable
+			if ( storagePointerInfo !== null ) {
+
+				input.storageAccess = storagePointerInfo.storageAccess;
+				input.storageBaseType = storagePointerInfo.baseType;
+
+			}
+
+			inputs.push( input );
 
 		}
 
@@ -172,13 +220,159 @@ class WGSLNodeFunction extends NodeFunction {
 	 * This method returns the WGSL code of the node function.
 	 *
 	 * @param {string} [name=this.name] - The function's name.
+	 * @param {Object} [storageBindingMap=null] - Map of storage pointer parameter names to their bound variable names.
 	 * @return {string} The shader code.
 	 */
-	getCode( name = this.name ) {
+	getCode( name = this.name, storageBindingMap = null ) {
 
 		const outputType = this.outputType !== 'void' ? '-> ' + this.outputType : '';
 
-		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ outputType }` + this.blockCode;
+		let inputsCode = this.inputsCode.trim();
+		let blockCode = this.blockCode;
+
+		// If we have storage bindings, filter them from the parameter list
+		// and replace references in the function body
+		if ( storageBindingMap !== null && Object.keys( storageBindingMap ).length > 0 ) {
+
+			// Build list of non-storage parameters
+			// Split by comma but respect angle bracket nesting (for types like texture_storage_3d<r32float, write>)
+			const filteredParams = [];
+			const storageParamNames = new Set();
+			const inputParts = [];
+			let depth = 0;
+			let current = '';
+
+			for ( let i = 0; i < inputsCode.length; i ++ ) {
+
+				const char = inputsCode[ i ];
+
+				if ( char === '<' ) {
+
+					depth ++;
+					current += char;
+
+				} else if ( char === '>' ) {
+
+					depth --;
+					current += char;
+
+				} else if ( char === ',' && depth === 0 ) {
+
+					inputParts.push( current.trim() );
+					current = '';
+
+				} else {
+
+					current += char;
+
+				}
+
+			}
+
+			if ( current.trim() !== '' ) {
+
+				inputParts.push( current.trim() );
+
+			}
+
+			for ( const part of inputParts ) {
+
+				const trimmed = part.trim();
+				if ( trimmed === '' ) continue;
+
+				// Extract parameter name
+				const colonIndex = trimmed.indexOf( ':' );
+				if ( colonIndex === - 1 ) continue;
+
+				const paramName = trimmed.substring( 0, colonIndex ).trim();
+
+				// Check if this is a storage pointer parameter (either in map or has ptr<storage type)
+				const paramType = trimmed.substring( colonIndex + 1 ).trim();
+				const isStoragePtr = storageBindingMap[ paramName ] !== undefined ||
+					( paramType.startsWith( 'ptr' ) && paramType.includes( 'storage' ) );
+
+				if ( isStoragePtr ) {
+
+					storageParamNames.add( paramName );
+					continue;
+
+				}
+
+				filteredParams.push( trimmed );
+
+			}
+
+			inputsCode = filteredParams.join( ', ' );
+
+			// Replace storage pointer parameter references in the body
+			// The user's code may use (*param)[i] or param[i] syntax
+			// Note: boundName already includes '.value' from WGSLNodeBuilder.getPropertyName()
+			for ( const paramName in storageBindingMap ) {
+
+				const boundName = storageBindingMap[ paramName ];
+
+				// Replace (*paramName) with boundName (dereferenced array access)
+				// boundName is already "NodeBuffer_XXX.value"
+				blockCode = blockCode.replace(
+					new RegExp( '\\(\\s*\\*\\s*' + paramName + '\\s*\\)', 'g' ),
+					boundName
+				);
+
+				// Replace direct paramName references with boundName
+				// Use word boundary to avoid partial matches
+				blockCode = blockCode.replace(
+					new RegExp( '\\b' + paramName + '\\b', 'g' ),
+					boundName
+				);
+
+			}
+
+			// Also remove storage arguments from function calls within the body
+			// This handles calls like: someFunc(storageArg, otherArg) -> someFunc(otherArg)
+			// We need to remove arguments that are now global bindings
+			for ( const paramName in storageBindingMap ) {
+
+				const boundName = storageBindingMap[ paramName ];
+
+				// Remove as first argument: func( boundName, ... ) -> func( ... )
+				blockCode = blockCode.replace(
+					new RegExp( '(\\w+\\s*\\()\\s*' + this._escapeRegex( boundName ) + '\\s*,\\s*', 'g' ),
+					'$1'
+				);
+
+				// Remove as middle argument: func( ..., boundName, ... ) -> func( ..., ... )
+				blockCode = blockCode.replace(
+					new RegExp( ',\\s*' + this._escapeRegex( boundName ) + '\\s*,', 'g' ),
+					','
+				);
+
+				// Remove as last argument: func( ..., boundName ) -> func( ... )
+				blockCode = blockCode.replace(
+					new RegExp( ',\\s*' + this._escapeRegex( boundName ) + '\\s*\\)', 'g' ),
+					')'
+				);
+
+				// Remove as only argument: func( boundName ) -> func( )
+				blockCode = blockCode.replace(
+					new RegExp( '(\\w+\\s*\\()\\s*' + this._escapeRegex( boundName ) + '\\s*\\)', 'g' ),
+					'$1)'
+				);
+
+			}
+
+		}
+
+		return `fn ${ name } ( ${ inputsCode } ) ${ outputType }` + blockCode;
+
+	}
+
+	/**
+	 * Escapes special regex characters in a string.
+	 * @private
+	 */
+	_escapeRegex( str ) {
+
+		return str.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 
 	}
 
