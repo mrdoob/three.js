@@ -48,6 +48,18 @@ A value that modifies the atomic variable.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+Overwritten since the node type is inferred from the input type.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getInputType( builder : NodeBuilder ) : string
 
 Overwrites the default implementation to return the type of the pointer node.
@@ -57,18 +69,6 @@ Overwrites the default implementation to return the type of the pointer node.
 The current node builder.
 
 **Returns:** The input type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-Overwritten since the node type is inferred from the input type.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ## Source
 

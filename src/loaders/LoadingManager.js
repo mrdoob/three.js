@@ -156,6 +156,11 @@ class LoadingManager {
 		 */
 		this.resolveURL = function ( url ) {
 
+			// Normalize to NFC so that Unicode URIs (e.g. from glTF)
+			// are percent-encoded correctly per RFC 3987.
+
+			url = url.normalize( 'NFC' );
+
 			if ( urlModifier ) {
 
 				return urlModifier( url );

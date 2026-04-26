@@ -1,0 +1,17 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+
+ <g  transform="matrix(0,-1.3333333,-1.3333333,0,800,600)">
+  <title>Layer 1</title>
+  <line stroke-width="3" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_1" y2="136" x2="593.5" y1="305" x1="113.5" stroke="#000" fill="none"/>
+  <line stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_2" y2="305" x2="-688.5" y1="306" x1="-688.5" stroke="#000" fill="none"/>
+  <rect stroke-width="8" id="svg_3" height="63" width="154" y="77" x="174.5" stroke="#000" fill="#fff"/>
+  <g
+       id="g10"
+       transform="matrix(0.12,0,0,-0.12,0,600)">
+      <path
+         d="m 2000,900 19,-1 19,-4 18,-6 18,-9 15,-10 15,-13 13,-15 10,-16 9,-17 6,-18 4,-19 1,-19 -1,-19 -4,-19 -6,-18 -9,-18 -10,-15 -13,-15 -15,-13 -15,-10 -18,-9 -18,-6 -19,-4 -19,-1 -19,1 -19,4 -18,6 -17,9 -16,10 -15,13 -13,15 -10,15 -9,18 -6,18 -4,19 -1,19 1,19 4,19 6,18 9,17 10,16 13,15 15,13 16,10 17,9 18,6 19,4 z"
+         style="fill:none;stroke:#000000;stroke-width:12;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+         id="path12" />
+    </g>
+ </g>
+</svg>

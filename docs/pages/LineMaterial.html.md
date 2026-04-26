@@ -94,7 +94,7 @@ Default is `1`.
 
 ### .resolution : Vector2
 
-The size of the viewport, in screen pixels. This must be kept updated to make screen-space rendering accurate.The `LineSegments2.onBeforeRender` callback performs the update for visible objects.
+The size of the viewport, in screen pixels. This must be kept updated to make screen-space rendering accurate. The `LineSegments2.onBeforeRender` callback performs the update for visible objects.
 
 ### .worldUnits : boolean
 

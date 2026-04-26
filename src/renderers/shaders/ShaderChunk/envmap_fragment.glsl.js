@@ -16,7 +16,7 @@ export default /* glsl */`
 		}
 
 		// Transforming Normal Vectors with the Inverse Transformation
-		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
+		vec3 worldNormal = transformNormalByInverseViewMatrix( normal, viewMatrix );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 

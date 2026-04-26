@@ -17,6 +17,10 @@ const exceptionList = [
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
 
+	// Requires HTML-in-Canvas API
+	'webgl_materials_texture_html',
+	'webgpu_materials_texture_html',
+
 	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
@@ -35,6 +39,8 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webxr_vr_video',
+	'webgpu_tsl_transpiler',
+	'webgpu_rendertarget_2d-array_3d',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -51,6 +57,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'webgpu_materials_video',
 	'webgl_video_kinect',
+	'webgl_video_panorama_equirectangular',
 
 	// Timeout
 	'webgl_test_memory2',
@@ -213,7 +220,7 @@ async function main() {
 	const buildInjection = ( code ) => code
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
-		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, "Object.defineProperty(this, 'trackTimestamp', { get: () => false, set: () => {} });" );
+		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );

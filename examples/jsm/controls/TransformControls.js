@@ -215,6 +215,17 @@ class TransformControls extends Controls {
 		defineProperty( 'size', 1 );
 
 		/**
+		 * The viewport rectangle, in logical (CSS) pixels with the origin at the lower-left
+		 * of the canvas. Set this when the renderer uses a sub-canvas viewport so pointer
+		 * coordinates map to the correct region. If `null`, the full canvas is used.
+		 *
+		 * @name TransformControls#viewport
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this.viewport = null;
+
+		/**
 		 * Whether dragging is currently performed or not.
 		 *
 		 * @name TransformControls#dragging
@@ -966,10 +977,29 @@ function getPointer( event ) {
 	} else {
 
 		const rect = this.domElement.getBoundingClientRect();
+		const viewport = this.viewport;
+
+		let originX, originY, regionWidth, regionHeight;
+
+		if ( viewport !== null ) {
+
+			originX = viewport.x;
+			originY = rect.height - viewport.y - viewport.w;
+			regionWidth = viewport.z;
+			regionHeight = viewport.w;
+
+		} else {
+
+			originX = 0;
+			originY = 0;
+			regionWidth = rect.width;
+			regionHeight = rect.height;
+
+		}
 
 		return {
-			x: ( event.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( event.clientY - rect.top ) / rect.height * 2 + 1,
+			x: ( event.clientX - rect.left - originX ) / regionWidth * 2 - 1,
+			y: - ( event.clientY - rect.top - originY ) / regionHeight * 2 + 1,
 			button: event.button
 		};
 

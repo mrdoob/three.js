@@ -100,19 +100,19 @@ class StackNode extends Node {
 
 	getElementType( builder ) {
 
-		return this.hasOutput( builder ) ? this.outputNode.getElementType( builder ) : 'void';
+		return this.outputNode ? this.outputNode.getElementType( builder ) : 'void';
 
 	}
 
 	generateNodeType( builder ) {
 
-		return this.hasOutput( builder ) ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.outputNode ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.hasOutput( builder ) ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.outputNode ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -336,12 +336,6 @@ class StackNode extends Node {
 
 	}
 
-	hasOutput( builder ) {
-
-		return this.outputNode && this.outputNode.isNode && this.outputNode.getNodeType( builder ) !== 'void';
-
-	}
-
 	build( builder, ...params ) {
 
 		const previousStack = getCurrentStack();
@@ -417,9 +411,15 @@ class StackNode extends Node {
 
 		let result;
 
-		if ( this.hasOutput( builder ) ) {
+		if ( this.outputNode ) {
 
-			result = this.outputNode.build( builder, ...params );
+			const buildResult = this.outputNode.build( builder, ...params );
+
+			if ( builder.buildStage !== 'generate' || this.outputNode.getNodeType( builder ) !== 'void' ) {
+
+				result = buildResult;
+
+			}
 
 		} else {
 

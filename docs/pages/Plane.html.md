@@ -116,7 +116,7 @@ The plane to test for equality.
 
 **Returns:** Whether this plane is equal with the given one.
 
-### .intersectLine( line : Line3, target : Vector3 ) : Vector3
+### .intersectLine( line : Line3, target : Vector3, clampToLine : boolean ) : Vector3
 
 Returns the intersection point of the passed line and the plane. Returns `null` if the line does not intersect. Returns the line's starting point if the line is coplanar with the plane.
 
@@ -128,7 +128,13 @@ The line to compute the intersection for.
 
 The target vector that is used to store the method's result.
 
-**Returns:** The intersection point.
+**clampToLine**
+
+Whether to clamp the intersection to the line segment.
+
+Default is `true`.
+
+**Returns:** The intersection point. Returns `null` if no intersection is detected.
 
 ### .intersectsBox( box : Box3 ) : boolean
 

@@ -11,6 +11,16 @@ More references:
 *   [http://simonwallner.at/project/atmospheric-scattering/](http://simonwallner.at/project/atmospheric-scattering/)
 *   [http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR](http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR)
 
+It can be useful to hide the sun disc when generating an environment map to avoid artifacts
+
+```js
+// disable before rendering environment map
+sky.showSunDisc.value = false;
+// ...
+// re-enable before scene sky box rendering
+sky.showSunDisc.value = true;
+```
+
 ## Code Example
 
 ```js
@@ -80,6 +90,10 @@ The mieDirectionalG uniform.
 ### .rayleigh : UniformNode.<float>
 
 The rayleigh uniform.
+
+### .showSunDisc : UniformNode.<float>
+
+Whether to render the solar disc.
 
 ### .sunPosition : UniformNode.<vec3>
 
