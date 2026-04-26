@@ -80,7 +80,7 @@
 				const MOON_RADIUS = 0.27;
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( 10, 5, 20 );
+				camera.position.set( 5, 2, 10 );
 				camera.layers.enableAll();
 
 				scene = new THREE.Scene();
@@ -127,32 +127,37 @@
 				earthDiv.className = 'label';
 				earthDiv.textContent = 'Earth';
 				earthDiv.style.backgroundColor = 'transparent';
+				earthDiv.style.border = "1px solid white";
 
 				const earthLabel = new CSS2DObject( earthDiv );
 				earthLabel.position.set( 1.5 * EARTH_RADIUS, 0, 0 );
-				earthLabel.center.set( 0, 1 );
+				earthLabel.center.set( 0, 1 ); // lower-left
 				earth.add( earthLabel );
 				earthLabel.layers.set( 0 );
+				earthLabel.rotationAngle = Math.PI / 8;
 
 				const earthMassDiv = document.createElement( 'div' );
 				earthMassDiv.className = 'label';
 				earthMassDiv.textContent = '5.97237e24 kg';
 				earthMassDiv.style.backgroundColor = 'transparent';
+				earthMassDiv.style.border = "1px solid white";
 
 				const earthMassLabel = new CSS2DObject( earthMassDiv );
 				earthMassLabel.position.set( 1.5 * EARTH_RADIUS, 0, 0 );
-				earthMassLabel.center.set( 0, 0 );
+				earthMassLabel.center.set( 0, 0 ); // upper-left
 				earth.add( earthMassLabel );
 				earthMassLabel.layers.set( 1 );
+				earthMassLabel.rotationAngle = - Math.PI / 8;
 
 				const moonDiv = document.createElement( 'div' );
 				moonDiv.className = 'label';
 				moonDiv.textContent = 'Moon';
 				moonDiv.style.backgroundColor = 'transparent';
+				moonDiv.style.border = "1px solid white";
 
 				const moonLabel = new CSS2DObject( moonDiv );
 				moonLabel.position.set( 1.5 * MOON_RADIUS, 0, 0 );
-				moonLabel.center.set( 0, 1 );
+				moonLabel.center.set( 0, 1 ); // lower-left
 				moon.add( moonLabel );
 				moonLabel.layers.set( 0 );
 
@@ -160,10 +165,11 @@
 				moonMassDiv.className = 'label';
 				moonMassDiv.textContent = '7.342e22 kg';
 				moonMassDiv.style.backgroundColor = 'transparent';
+				moonMassDiv.style.border = "1px solid white";
 
 				const moonMassLabel = new CSS2DObject( moonMassDiv );
 				moonMassLabel.position.set( 1.5 * MOON_RADIUS, 0, 0 );
-				moonMassLabel.center.set( 0, 0 );
+				moonMassLabel.center.set( 0, 0 ); // upper-left
 				moon.add( moonMassLabel );
 				moonMassLabel.layers.set( 1 );
 
