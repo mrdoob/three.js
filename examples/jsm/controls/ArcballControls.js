@@ -265,6 +265,10 @@ class ArcballControls extends Controls {
 		 * performed trying to maintain the same visible portion given by initial near and far
 		 * values. Only works with perspective cameras.
 		 *
+		 * This feature only works as expected if the camera's initial state (position, near and far values)
+		 * is correctly configured before creating the controls. Otherwise {@link ArcballControls#setCamera}
+		 * must be called by the application.
+		 *
 		 * @type {boolean}
 		 * @default false
 		 */
