@@ -6,30 +6,29 @@
 	if ( window.frameElement ) {
 
 		// in iframe
-		document.querySelectorAll( 'a' ).forEach( a => {
+		// Use event delegation to handle all links, including dynamically added ones
+		// (e.g. from threejs-material-table.js), otherwise they navigate inside
+		// the iframe causing overlapping sidebars.
+		document.addEventListener( 'click', e => {
 
-			// we have to send all links to the parent
-			// otherwise we'll end up with 3rd party
-			// sites under the frame.
-			a.addEventListener( 'click', e => {
+			const a = e.target.closest( 'a' );
+			if ( ! a ) return;
 
-				// opening a new tab?
-				if ( a.target === '_blank' ) {
+			// opening a new tab?
+			if ( a.target === '_blank' ) {
 
-					return;
+				return;
 
-				}
+			}
 
-				// change changing hashes?
-				if ( a.origin !== window.location.origin || a.pathname !== window.location.pathname ) {
+			// change changing hashes?
+			if ( a.origin !== window.location.origin || a.pathname !== window.location.pathname ) {
 
-					e.preventDefault();
+				e.preventDefault();
 
-				}
+			}
 
-				window.parent.setUrl( a.href );
-
-			} );
+			window.parent.setUrl( a.href );
 
 		} );
 		window.parent.setTitle( document.title );
