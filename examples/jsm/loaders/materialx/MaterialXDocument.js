@@ -244,50 +244,20 @@ function invertConstantMatrixValues( values, size ) {
 
 	if ( size === 3 ) {
 
-		const matrix = new Matrix3().set(
-			values[ 0 ],
-			values[ 1 ],
-			values[ 2 ],
-			values[ 3 ],
-			values[ 4 ],
-			values[ 5 ],
-			values[ 6 ],
-			values[ 7 ],
-			values[ 8 ],
-		);
+		const matrix = new Matrix3().setFromArray(values);
 		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
 		matrix.invert();
-		const e = matrix.elements;
 		// Convert Three.js internal column-major storage back to row-major literal order.
-		return [ e[ 0 ], e[ 3 ], e[ 6 ], e[ 1 ], e[ 4 ], e[ 7 ], e[ 2 ], e[ 5 ], e[ 8 ] ];
-
+		return matrix.transpose().elements;
 	}
 
 	if ( size === 4 ) {
 
-		const matrix = new Matrix4().set(
-			values[ 0 ],
-			values[ 1 ],
-			values[ 2 ],
-			values[ 3 ],
-			values[ 4 ],
-			values[ 5 ],
-			values[ 6 ],
-			values[ 7 ],
-			values[ 8 ],
-			values[ 9 ],
-			values[ 10 ],
-			values[ 11 ],
-			values[ 12 ],
-			values[ 13 ],
-			values[ 14 ],
-			values[ 15 ],
-		);
+		const matrix = new Matrix4().setFromArray(values);
 		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
 		matrix.invert();
-		const e = matrix.elements;
 		// Convert Three.js internal column-major storage back to row-major literal order.
-		return [ e[ 0 ], e[ 4 ], e[ 8 ], e[ 12 ], e[ 1 ], e[ 5 ], e[ 9 ], e[ 13 ], e[ 2 ], e[ 6 ], e[ 10 ], e[ 14 ], e[ 3 ], e[ 7 ], e[ 11 ], e[ 15 ] ];
+		return matrix.transpose().elements;
 
 	}
 
