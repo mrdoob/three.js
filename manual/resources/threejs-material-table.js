@@ -243,7 +243,8 @@ const thead = addElem( 'thead', table );
 
 		const td = addElem( 'td', thead );
 		const a = addElem( 'a', td, material.shortName );
-		a.href = `https://threejs.org/docs/#api/materials/${material.name}`;
+		a.href = `https://threejs.org/docs/#${material.name}`;
+		a.target = '_blank';
 
 	} );
 
@@ -258,7 +259,8 @@ Array.from( allProperties ).sort().forEach( ( property ) => {
 		const hasProperty = material.properties.indexOf( property ) >= 0;
 		const td = addElem( 'td', tr );
 		const a = addElem( 'a', td, hasProperty ? '•' : '' );
-		a.href = `https://threejs.org/docs/#api/materials/${material.name}.${property}`;
+		a.href = `https://threejs.org/docs/#${material.name}.${property}`;
+		a.target = '_blank';
 
 	} );
 
