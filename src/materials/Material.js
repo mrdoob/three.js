@@ -580,13 +580,13 @@ class Material extends EventDispatcher {
 
 				currentValue.set( newValue );
 
-			} else if ( currentValue && currentValue.isVector2 && Array.isArray( newValue ) ) {
+			} else if ( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) {
 
-				currentValue.fromArray( newValue );
+				currentValue.copy( newValue );
 
-			} else if ( currentValue && currentValue.isEuler && Array.isArray( newValue ) ) {
+			} else if ( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) {
 
-				currentValue.fromArray( newValue );
+				currentValue.copy( newValue );
 
 			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
