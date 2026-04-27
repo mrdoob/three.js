@@ -1,20 +1,21 @@
 import {
 	mx_perlin_noise_float, mx_perlin_noise_vec3,
+	mx_worley_noise_float_2d as worley_noise_float_2d, mx_worley_noise_float_3d as worley_noise_float_3d,
 	mx_worley_noise_vec2 as worley_noise_vec2, mx_worley_noise_vec3 as worley_noise_vec3,
-	mx_cell_noise_float as cell_noise_float,
+	mx_cell_noise_float as cell_noise_float, mx_cell_noise_vec3 as cell_noise_vec3,
+	mx_unifiednoise2d as unifiednoise2d, mx_unifiednoise3d as unifiednoise3d,
 	mx_fractal_noise_float as fractal_noise_float, mx_fractal_noise_vec2 as fractal_noise_vec2, mx_fractal_noise_vec3 as fractal_noise_vec3, mx_fractal_noise_vec4 as fractal_noise_vec4
 } from './lib/mx_noise.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
 import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
 
 import {
-	float, vec2, vec3, vec4, int, uint, add, sub, mul, div, atan, mix, pow, smoothstep,
-	floor, abs, max, clamp, step, fract, sin, cos, dot, sqrt, normalize, If, Fn
+	float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
+	floor, abs, max, clamp, step, sin, cos, normalize
 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { frameId, time } from '../utils/Timer.js';
-import { Loop } from '../utils/LoopNode.js';
 
 export const mx_aastep = ( threshold, value ) => {
 
@@ -73,91 +74,6 @@ export const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => {
 
 };
 
-const mx_rotl32 = ( x, k ) => x.shiftLeft( uint( k ) ).bitOr( x.shiftRight( uint( 32 - k ) ) );
-
-const mx_bjmix = ( aInput, bInput, cInput ) => {
-
-	const a = uint( aInput ).toVar();
-	const b = uint( bInput ).toVar();
-	const c = uint( cInput ).toVar();
-
-	a.subAssign( c );
-	a.assign( a.bitXor( mx_rotl32( c, 4 ) ) );
-	c.addAssign( b );
-	b.subAssign( a );
-	b.assign( b.bitXor( mx_rotl32( a, 6 ) ) );
-	a.addAssign( c );
-	c.subAssign( b );
-	c.assign( c.bitXor( mx_rotl32( b, 8 ) ) );
-	b.addAssign( a );
-	a.subAssign( c );
-	a.assign( a.bitXor( mx_rotl32( c, 16 ) ) );
-	c.addAssign( b );
-	b.subAssign( a );
-	b.assign( b.bitXor( mx_rotl32( a, 19 ) ) );
-	a.addAssign( c );
-	c.subAssign( b );
-	c.assign( c.bitXor( mx_rotl32( b, 4 ) ) );
-	b.addAssign( a );
-
-	return [ a, b, c ];
-
-};
-
-const mx_bjfinal = ( aInput, bInput, cInput ) => {
-
-	const a = uint( aInput ).toVar();
-	const b = uint( bInput ).toVar();
-	const c = uint( cInput ).toVar();
-
-	c.assign( c.bitXor( b ) );
-	c.subAssign( mx_rotl32( b, 14 ) );
-	a.assign( a.bitXor( c ) );
-	a.subAssign( mx_rotl32( c, 11 ) );
-	b.assign( b.bitXor( a ) );
-	b.subAssign( mx_rotl32( a, 25 ) );
-	c.assign( c.bitXor( b ) );
-	c.subAssign( mx_rotl32( b, 16 ) );
-	a.assign( a.bitXor( c ) );
-	a.subAssign( mx_rotl32( c, 4 ) );
-	b.assign( b.bitXor( a ) );
-	b.subAssign( mx_rotl32( a, 14 ) );
-	c.assign( c.bitXor( b ) );
-	c.subAssign( mx_rotl32( b, 24 ) );
-
-	return c;
-
-};
-
-const mx_bits_to_01 = ( bits ) => div( float( bits ), float( uint( 0xffffffff ) ) );
-
-export const mx_cell_noise_vec3 = Fn( ( [ positionInput ] ) => {
-
-	const position = vec3( positionInput ).toVar();
-	const ix = int( floor( position.x ) ).toVar();
-	const iy = int( floor( position.y ) ).toVar();
-	const iz = int( floor( position.z ) ).toVar();
-	const seed = uint( 0xdeadbeef + ( 4 << 2 ) + 13 ).toVar();
-	const a = seed.toVar();
-	const b = seed.toVar();
-	const c = seed.toVar();
-	a.addAssign( uint( ix ) );
-	b.addAssign( uint( iy ) );
-	c.addAssign( uint( iz ) );
-
-	const [ mixedA, mixedB, mixedC ] = mx_bjmix( a, b, c );
-	const hash0 = mx_bjfinal( mixedA, mixedB, mixedC );
-	const hash1 = mx_bjfinal( add( mixedA, uint( 1 ) ), mixedB, mixedC );
-	const hash2 = mx_bjfinal( add( mixedA, uint( 2 ) ), mixedB, mixedC );
-
-	return vec3(
-		mx_bits_to_01( hash0 ),
-		mx_bits_to_01( hash1 ),
-		mx_bits_to_01( hash2 )
-	);
-
-} );
-
 export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 
 	const range = sub( high, low );
@@ -170,208 +86,11 @@ export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 
 };
 
-export const mx_worley_noise_float_3d = Fn( ( [ positionInput, jitterInput, styleInput ] ) => {
-
-	const position = vec3( positionInput ).toVar();
-	const jitter = float( jitterInput ).toVar();
-	const style = int( styleInput ).toVar();
-	const baseCell = vec3( floor( position.x ), floor( position.y ), floor( position.z ) ).toVar();
-	const localpos = fract( position ).toVar();
-	const sqdist = float( 1e6 ).toVar();
-	const minpos = vec3( 0, 0, 0 ).toVar();
-
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
-
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
-
-			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
-
-				const cellCoords = vec3( baseCell.x.add( float( x ) ), baseCell.y.add( float( y ) ), baseCell.z.add( float( z ) ) ).toVar();
-				const off = vec3( mx_cell_noise_vec3( cellCoords ) ).toVar();
-				off.subAssign( 0.5 );
-				off.mulAssign( jitter );
-				off.addAssign( 0.5 );
-				const cellpos = vec3( vec3( float( x ), float( y ), float( z ) ).add( off ).sub( localpos ) ).toVar();
-				const dist = dot( cellpos, cellpos ).toVar();
-
-				If( dist.lessThan( sqdist ), () => {
-
-					sqdist.assign( dist );
-					minpos.assign( cellpos );
-
-				} );
-
-			} );
-
-		} );
-
-	} );
-
-	If( style.equal( int( 1 ) ), () => {
-
-		sqdist.assign( mx_cell_noise_float( minpos.add( position ) ) );
-
-	} ).Else( () => {
-
-		sqdist.assign( sqrt( sqdist ) );
-
-	} );
-
-	return sqdist;
-
-} );
-
-export const mx_worley_noise_float_2d = Fn( ( [ texcoordInput, jitterInput, styleInput ] ) => {
-
-	const texcoord = vec2( texcoordInput ).toVar();
-	const jitter = float( jitterInput ).toVar();
-	const style = int( styleInput ).toVar();
-	const floorPos = floor( texcoord ).toVar();
-	const localpos = vec2( fract( texcoord.x ), fract( texcoord.y ) ).toVar();
-	const sqdist = float( 1e6 ).toVar();
-	const minpos = vec2( 0, 0 ).toVar();
-
-	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
-
-		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
-
-			const cell = vec2( float( x ), float( y ) ).toVar();
-			const seed = vec2( cell.x.add( floorPos.x ), cell.y.add( floorPos.y ) ).toVar();
-			const off = vec2( mx_cell_noise_float( vec3( seed.x, seed.y, 0 ) ), mx_cell_noise_float( vec3( seed.x, seed.y, 1 ) ) ).toVar();
-			off.subAssign( 0.5 );
-			off.mulAssign( jitter );
-			off.addAssign( 0.5 );
-			const cellpos = vec2( cell.add( off ).sub( localpos ) ).toVar();
-			const dist = dot( cellpos, cellpos ).toVar();
-
-			If( dist.lessThan( sqdist ), () => {
-
-				sqdist.assign( dist );
-				minpos.assign( cellpos );
-
-			} );
-
-		} );
-
-	} );
-
-	If( style.equal( int( 1 ) ), () => {
-
-		sqdist.assign( mx_cell_noise_float( minpos.add( texcoord ) ) );
-
-	} ).Else( () => {
-
-		sqdist.assign( sqrt( sqdist ) );
-
-	} );
-
-	return sqdist;
-
-} );
-
-export const mx_unifiednoise2d = Fn( ( [
-	noiseTypeInput,
-	texcoordInput,
-	freqInput,
-	offsetInput,
-	jitterInput,
-	outminInput,
-	outmaxInput,
-	clampoutputInput,
-	octavesInput,
-	lacunarityInput,
-	diminishInput,
-	styleInput
-] ) => {
-
-	const noiseType = int( noiseTypeInput ).toVar();
-	const texcoord = vec2( texcoordInput ).toVar();
-	const freq = vec2( freqInput ).toVar();
-	const offset = vec2( offsetInput ).toVar();
-	const jitter = float( jitterInput ).toVar();
-	const outmin = float( outminInput ).toVar();
-	const outmax = float( outmaxInput ).toVar();
-	const clampoutput = float( clampoutputInput ).toVar();
-	const octaves = int( octavesInput ).toVar();
-	const lacunarity = float( lacunarityInput ).toVar();
-	const diminish = float( diminishInput ).toVar();
-	const style = int( styleInput ).toVar();
-
-	const applyFreq = mul( texcoord, freq ).toVar();
-	const applyOffset = add( applyFreq, offset ).toVar();
-	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
-	const applyCellJitter = mx_rotate2d( applyOffset, cellJitterMult ).toVar();
-	const fractalInput = vec3( applyOffset.x, applyOffset.y, cellJitterMult ).toVar();
-	const result = float( 0 ).toVar();
-
-	If( noiseType.equal( int( 0 ) ), () => {
-
-		result.assign( mx_noise_float( applyCellJitter, 0.5, 0.5 ) );
-
-	} );
-	If( noiseType.equal( int( 1 ) ), () => {
-
-		result.assign( mx_cell_noise_float( applyCellJitter ) );
-
-	} );
-	If( noiseType.equal( int( 2 ) ), () => {
-
-		result.assign( mx_worley_noise_float_2d( applyOffset, jitter, style ) );
-
-	} );
-	If( noiseType.equal( int( 3 ) ), () => {
-
-		result.assign( mx_fractal_noise_float( fractalInput, octaves, lacunarity, diminish, 1 ) );
-
-	} );
-
-	const ranged = add( outmin, mul( result, sub( outmax, outmin ) ) ).toVar();
-	const clamped = clamp( ranged, outmin, outmax ).toVar();
-	return mx_ifequal( clampoutput, float( 1 ), clamped, ranged );
-
-} );
-
-export const mx_unifiednoise3d = (
-	noiseType = 0,
-	position = vec3( 0, 0, 0 ),
-	freq = vec3( 1, 1, 1 ),
-	offset = vec3( 0, 0, 0 ),
-	jitter = 1,
-	outmin = 0,
-	outmax = 1,
-	clampoutput = true,
-	octaves = 3,
-	lacunarity = 2,
-	diminish = 0.5,
-	style = 0
-) => {
-
-	const applyFreq = mul( position, freq );
-	const applyOffset = add( applyFreq, offset );
-	const cellJitterMult = mul( sub( jitter, 1 ), 90000 );
-	const applyCellJitter = mx_rotate3d( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) );
-	const perlin = mx_noise_float( applyCellJitter, 0.5, 0.5 );
-	const cell = mx_cell_noise_float( applyCellJitter );
-	const worley = mx_worley_noise_float_3d( applyOffset, jitter, style );
-	const fractal = mx_fractal_noise_float( applyCellJitter, octaves, lacunarity, diminish, 1 );
-
-	const typeFloat = float( noiseType );
-	const switched = mx_ifequal(
-		typeFloat,
-		float( 3 ),
-		fractal,
-		mx_ifequal(
-			typeFloat,
-			float( 2 ),
-			worley,
-			mx_ifequal( typeFloat, float( 1 ), cell, perlin )
-		)
-	);
-	const ranged = add( outmin, mul( switched, sub( outmax, outmin ) ) );
-	const clamped = clamp( ranged, outmin, outmax );
-	return mx_ifequal( clampoutput, float( 1 ), clamped, ranged );
-
-};
+export const mx_cell_noise_vec3 = ( texcoord = uv() ) => cell_noise_vec3( texcoord.convert( 'vec2|vec3' ) );
+export const mx_worley_noise_float_2d = ( texcoord = uv(), jitter = 1, style = 0 ) => worley_noise_float_2d( texcoord, jitter, style );
+export const mx_worley_noise_float_3d = ( texcoord = uv(), jitter = 1, style = 0 ) => worley_noise_float_3d( texcoord, jitter, style );
+export const mx_unifiednoise2d = ( noiseType, texcoord = uv(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => unifiednoise2d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
+export const mx_unifiednoise3d = ( noiseType, texcoord = uv(), freq = vec3( 1, 1, 1 ), offset = vec3( 0, 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => unifiednoise3d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
 
 export const mx_worley_noise_float = ( texcoord = uv(), jitter = 1, style = 0 ) => mx_worley_noise_float_3d( texcoord.convert( 'vec2|vec3' ), jitter, style );
 export const mx_worley_noise_vec2 = ( texcoord = uv(), jitter = 1 ) => worley_noise_vec2( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
