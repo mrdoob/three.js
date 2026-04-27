@@ -5,9 +5,9 @@ import {
 	mx_cell_noise_float as cell_noise_float, mx_cell_noise_vec3 as cell_noise_vec3,
 	mx_unifiednoise2d as unifiednoise2d, mx_unifiednoise3d as unifiednoise3d,
 	mx_fractal_noise_float as fractal_noise_float, mx_fractal_noise_vec2 as fractal_noise_vec2, mx_fractal_noise_vec3 as fractal_noise_vec3, mx_fractal_noise_vec4 as fractal_noise_vec4
-} from './lib/mx_noise.js';
-import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
-import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
+} from './MaterialXNoise.js';
+import { mx_hsvtorgb, mx_rgbtohsv } from './MaterialXColor.js';
+import { mx_srgb_texture_to_lin_rec709 } from './MaterialXColorTransform.js';
 
 import {
 	float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,

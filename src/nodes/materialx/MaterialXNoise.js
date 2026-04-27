@@ -1,12 +1,9 @@
-// Three.js Transpiler
-// https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/libraries/stdlib/genglsl/lib/mx_noise.glsl
-
-import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../../tsl/TSLBase.js';
-import { select } from '../../math/ConditionalNode.js';
-import { add, sub, mul } from '../../math/OperatorNode.js';
-import { floor, abs, max, dot, sqrt, clamp, fract, sin, cos, normalize } from '../../math/MathNode.js';
-import { overloadingFn } from '../../utils/FunctionOverloadingNode.js';
-import { Loop } from '../../utils/LoopNode.js';
+import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
+import { select } from '../math/ConditionalNode.js';
+import { add, sub, mul } from '../math/OperatorNode.js';
+import { floor, abs, max, dot, sqrt, clamp, fract, sin, cos, normalize } from '../math/MathNode.js';
+import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
+import { Loop } from '../utils/LoopNode.js';
 
 
 export const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
@@ -66,6 +63,22 @@ export const mx_floorfrac = /*@__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
 } );
 
+const mxBilerpValue = ( v0, v1, v2, v3, s, t ) => {
+
+	const s1 = float( sub( 1.0, s ) ).toVar();
+	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+
+};
+
+const mxTrilerpValue = ( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r ) => {
+
+	const s1 = float( sub( 1.0, s ) ).toVar();
+	const t1 = float( sub( 1.0, t ) ).toVar();
+	const r1 = float( sub( 1.0, r ) ).toVar();
+	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+
+};
+
 export const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
@@ -74,9 +87,8 @@ export const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_
 	const v2 = float( v2_immutable ).toVar();
 	const v1 = float( v1_immutable ).toVar();
 	const v0 = float( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
 
-	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
 } ).setLayout( {
 	name: 'mx_bilerp_0',
@@ -99,9 +111,8 @@ export const mx_bilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_
 	const v2 = vec3( v2_immutable ).toVar();
 	const v1 = vec3( v1_immutable ).toVar();
 	const v0 = vec3( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
 
-	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
 } ).setLayout( {
 	name: 'mx_bilerp_1',
@@ -131,11 +142,8 @@ export const mx_trilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2
 	const v2 = float( v2_immutable ).toVar();
 	const v1 = float( v1_immutable ).toVar();
 	const v0 = float( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
-	const t1 = float( sub( 1.0, t ) ).toVar();
-	const r1 = float( sub( 1.0, r ) ).toVar();
 
-	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
 } ).setLayout( {
 	name: 'mx_trilerp_0',
@@ -168,11 +176,8 @@ export const mx_trilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2
 	const v2 = vec3( v2_immutable ).toVar();
 	const v1 = vec3( v1_immutable ).toVar();
 	const v0 = vec3( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
-	const t1 = float( sub( 1.0, t ) ).toVar();
-	const r1 = float( sub( 1.0, r ) ).toVar();
 
-	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
 } ).setLayout( {
 	name: 'mx_trilerp_1',
@@ -987,7 +992,7 @@ export const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutab
 
 export const mx_worley_distance = /*@__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
 
-const mx_noise_float = ( texcoord, amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord ).mul( amplitude ).add( pivot );
+const mx_perlin_noise_float_scaled = ( texcoord, amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord ).mul( amplitude ).add( pivot );
 
 const mx_rotate2d_noise = ( inNode, amount = 0 ) => {
 
@@ -1391,7 +1396,7 @@ export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [
 
 	If( noiseType.equal( int( 0 ) ), () => {
 
-		result.assign( mx_noise_float( applyCellJitter, 0.5, 0.5 ) );
+		result.assign( mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 ) );
 
 	} );
 	If( noiseType.equal( int( 1 ) ), () => {
@@ -1444,7 +1449,7 @@ export const mx_unifiednoise3d = (
 	const applyOffset = add( applyFreq, offset );
 	const cellJitterMult = mul( sub( jitter, 1 ), 90000 );
 	const applyCellJitter = mx_rotate3d_noise( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) );
-	const perlin = mx_noise_float( applyCellJitter, 0.5, 0.5 );
+	const perlin = mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 );
 	const cell = mx_cell_noise_float( applyCellJitter );
 	const worley = mx_worley_noise_float_3d( applyOffset, jitter, style );
 	const fractal = mx_fractal_noise_float( applyCellJitter, octaves, lacunarity, diminish );

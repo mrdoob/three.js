@@ -35,6 +35,7 @@ import {
 	inverse,
 	normalMap,
 	mat3,
+	mx_ramp4,
 	mx_ramplr,
 	mx_ramptb,
 	mx_splitlr,
@@ -48,6 +49,7 @@ import {
 	mx_unifiednoise2d,
 	mx_unifiednoise3d,
 	mx_modulo,
+	mx_invert,
 	mx_place2d,
 	mx_rotate2d,
 	mx_rotate3d,
@@ -82,8 +84,6 @@ import {
 import { normalizeSpaceName } from './MaterialXUtils.js';
 
 const createMXElement = ( name, nodeFunc, params = [], defaults = {} ) => ( { name, nodeFunc, params, defaults } );
-
-const mx_invert = ( inNode, amount = 1 ) => sub( amount, inNode );
 
 const mx_range = ( inNode, inLow, inHigh, outLow, outHigh, gamma = 1 ) => {
 
@@ -303,15 +303,15 @@ const isVec3Like = ( node ) =>
 	node && ( node.nodeType === 'vec3' || node.nodeType === 'color' || node.nodeType === 'color3' );
 const isVec4Like = ( node ) => node && ( node.nodeType === 'vec4' || node.nodeType === 'color4' );
 
-const mx_burn = ( fg, bg, mixval = 1 ) => {
+const applyBlendByChannel = ( channelFunc, fg, bg, mixval = 1 ) => {
 
 	if ( isVec4Like( fg ) || isVec4Like( bg ) ) {
 
 		return vec4(
-			mx_burn_channel( element( fg, 0 ), element( bg, 0 ), mixval ),
-			mx_burn_channel( element( fg, 1 ), element( bg, 1 ), mixval ),
-			mx_burn_channel( element( fg, 2 ), element( bg, 2 ), mixval ),
-			mx_burn_channel( element( fg, 3 ), element( bg, 3 ), mixval ),
+			channelFunc( element( fg, 0 ), element( bg, 0 ), mixval ),
+			channelFunc( element( fg, 1 ), element( bg, 1 ), mixval ),
+			channelFunc( element( fg, 2 ), element( bg, 2 ), mixval ),
+			channelFunc( element( fg, 3 ), element( bg, 3 ), mixval ),
 		);
 
 	}
@@ -319,52 +319,43 @@ const mx_burn = ( fg, bg, mixval = 1 ) => {
 	if ( isVec3Like( fg ) || isVec3Like( bg ) ) {
 
 		return vec3(
-			mx_burn_channel( element( fg, 0 ), element( bg, 0 ), mixval ),
-			mx_burn_channel( element( fg, 1 ), element( bg, 1 ), mixval ),
-			mx_burn_channel( element( fg, 2 ), element( bg, 2 ), mixval ),
+			channelFunc( element( fg, 0 ), element( bg, 0 ), mixval ),
+			channelFunc( element( fg, 1 ), element( bg, 1 ), mixval ),
+			channelFunc( element( fg, 2 ), element( bg, 2 ), mixval ),
 		);
 
 	}
 
-	return mx_burn_channel( fg, bg, mixval );
+	return channelFunc( fg, bg, mixval );
 
 };
 
-const mx_dodge = ( fg, bg, mixval = 1 ) => {
+const mx_burn = ( fg, bg, mixval = 1 ) => applyBlendByChannel( mx_burn_channel, fg, bg, mixval );
+const mx_dodge = ( fg, bg, mixval = 1 ) => applyBlendByChannel( mx_dodge_channel, fg, bg, mixval );
 
-	if ( isVec4Like( fg ) || isVec4Like( bg ) ) {
+const mixColor4 = ( bg, fg, factor ) =>
+	vec4(
+		mix( element( bg, 0 ), element( fg, 0 ), factor ),
+		mix( element( bg, 1 ), element( fg, 1 ), factor ),
+		mix( element( bg, 2 ), element( fg, 2 ), factor ),
+		mix( element( bg, 3 ), element( fg, 3 ), factor ),
+	);
 
-		return vec4(
-			mx_dodge_channel( element( fg, 0 ), element( bg, 0 ), mixval ),
-			mx_dodge_channel( element( fg, 1 ), element( bg, 1 ), mixval ),
-			mx_dodge_channel( element( fg, 2 ), element( bg, 2 ), mixval ),
-			mx_dodge_channel( element( fg, 3 ), element( bg, 3 ), mixval ),
-		);
+const mxRampSegment = ( x, color1, color2, interval1, interval2, interpolation ) => {
 
-	}
-
-	if ( isVec3Like( fg ) || isVec3Like( bg ) ) {
-
-		return vec3(
-			mx_dodge_channel( element( fg, 0 ), element( bg, 0 ), mixval ),
-			mx_dodge_channel( element( fg, 1 ), element( bg, 1 ), mixval ),
-			mx_dodge_channel( element( fg, 2 ), element( bg, 2 ), mixval ),
-		);
-
-	}
-
-	return mx_dodge_channel( fg, bg, mixval );
-
-};
-
-const mx_ramp4 = ( valuetl, valuetr, valuebl, valuebr, texcoord = vec2( 0, 0 ) ) => {
-
-	const clamped = clamp( texcoord, vec2( 0, 0 ), vec2( 1, 1 ) );
-	const s = element( clamped, 0 );
-	const t = element( clamped, 1 );
-	const topMix = mix( valuetl, valuetr, s );
-	const bottomMix = mix( valuebl, valuebr, s );
-	return mix( topMix, bottomMix, t );
+	const linearClamped = clamp( x, interval1, interval2 );
+	const rangeSize = sub( interval2, interval1 );
+	const safeRange = max( rangeSize, float( 1e-6 ) );
+	const linearRemap = div( sub( linearClamped, interval1 ), safeRange );
+	const smoothVal = mx_smoothstep( x, interval1, interval2 );
+	const interpolationDistanceToLinear = abs( sub( interpolation, float( 0 ) ) );
+	const useLinear = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToLinear ) );
+	const interpFactor = mix( smoothVal, linearRemap, useLinear );
+	const mixedColor = mixColor4( color1, color2, interpFactor );
+	const stepColor = mixColor4( color1, color2, step( interval2, x ) );
+	const interpolationDistanceToStep = abs( sub( interpolation, float( 2 ) ) );
+	const useStep = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToStep ) );
+	return mixColor4( mixedColor, stepColor, useStep );
 
 };
 
@@ -386,40 +377,13 @@ const mx_ramp_gradient = (
 	const interpolationFloat = float( interpolation );
 	const intervalNumFloat = float( intervalNum );
 	const numIntervalsFloat = float( numIntervals );
-	const mixColor4 = ( bg, fg, factor ) =>
-		vec4(
-			mix( element( bg, 0 ), element( fg, 0 ), factor ),
-			mix( element( bg, 1 ), element( fg, 1 ), factor ),
-			mix( element( bg, 2 ), element( fg, 2 ), factor ),
-			mix( element( bg, 3 ), element( fg, 3 ), factor ),
-		);
-	const linearClamped = clamp( xFloat, interval1Float, interval2Float );
-	const rangeSize = sub( interval2Float, interval1Float );
-	const safeRange = max( rangeSize, float( 1e-6 ) );
-	const linearRemap = div( sub( linearClamped, interval1Float ), safeRange );
-	const smoothVal = mx_smoothstep( xFloat, interval1Float, interval2Float );
-	const interpolationDistanceToLinear = abs( sub( interpolationFloat, float( 0 ) ) );
-	const useLinear = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToLinear ) );
-	const interpFactor = mix( smoothVal, linearRemap, useLinear );
-	const mixedColor = mixColor4( color1, color2, interpFactor );
-	const stepColor = mixColor4( color1, color2, step( interval2Float, xFloat ) );
-	const interpolationDistanceToStep = abs( sub( interpolationFloat, float( 2 ) ) );
-	const useStep = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToStep ) );
-	const interpolated = mixColor4( mixedColor, stepColor, useStep );
+	const interpolated = mxRampSegment( xFloat, color1, color2, interval1Float, interval2Float, interpolationFloat );
 	const withinInterval = mixColor4( prevColor, interpolated, step( add( interval1Float, float( 1e-6 ) ), xFloat ) );
 	return mixColor4( withinInterval, prevColor, step( numIntervalsFloat, intervalNumFloat ) );
 
 };
 
 const mx_ramp = ( texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numIntervals = 2, ...rest ) => {
-
-	const mixColor4 = ( bg, fg, factor ) =>
-		vec4(
-			mix( element( bg, 0 ), element( fg, 0 ), factor ),
-			mix( element( bg, 1 ), element( fg, 1 ), factor ),
-			mix( element( bg, 2 ), element( fg, 2 ), factor ),
-			mix( element( bg, 3 ), element( fg, 3 ), factor ),
-		);
 
 	const rampTypeFloat = float( type );
 	const interpolationFloat = float( interpolation );
@@ -467,20 +431,7 @@ const mx_ramp = ( texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numInter
 		const c2 = colors[ i + 1 ];
 		const intNum = float( i + 1 );
 
-		const rangeSize = sub( iv2, iv1 );
-		const safeRange = max( rangeSize, float( 1e-6 ) );
-		const linearClamped = clamp( rampX, iv1, iv2 );
-		const linearRemap = div( sub( linearClamped, iv1 ), safeRange );
-		const smoothVal = mx_smoothstep( rampX, iv1, iv2 );
-
-		const interpolationDistanceToLinear = abs( sub( interpolationFloat, float( 0 ) ) );
-		const useLinear = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToLinear ) );
-		const interpFactor = mix( smoothVal, linearRemap, useLinear );
-		const mixedColor = mixColor4( c1, c2, interpFactor );
-		const stepColor = mixColor4( c1, c2, step( iv2, rampX ) );
-		const interpolationDistanceToStep = abs( sub( interpolationFloat, float( 2 ) ) );
-		const useStep = sub( float( 1 ), step( float( 0.5 ), interpolationDistanceToStep ) );
-		const interpolated = mixColor4( mixedColor, stepColor, useStep );
+		const interpolated = mxRampSegment( rampX, c1, c2, iv1, iv2, interpolationFloat );
 		const withinInterval = mixColor4( result, interpolated, step( add( iv1, float( 1e-6 ) ), rampX ) );
 		result = mixColor4( withinInterval, result, step( numIntervalsFloat, intNum ) );
 
