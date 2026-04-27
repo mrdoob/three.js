@@ -81,18 +81,7 @@ import {
 } from 'three/tsl';
 import { normalizeSpaceName } from './MaterialXUtils.js';
 
-class MXElement {
-
-	constructor( name, nodeFunc, params = [], defaults = {} ) {
-
-		this.name = name;
-		this.nodeFunc = nodeFunc;
-		this.params = params;
-		this.defaults = defaults;
-
-	}
-
-}
+const createMXElement = ( name, nodeFunc, params = [], defaults = {} ) => ( { name, nodeFunc, params, defaults } );
 
 const mx_invert = ( inNode, amount = 1 ) => sub( amount, inNode );
 
@@ -510,76 +499,76 @@ const defaultVec3 = ( x, y, z ) => () => vec3( x, y, z );
 const defaultVec4 = ( x, y, z, w ) => () => vec4( x, y, z, w );
 
 const MXElements = [
-	new MXElement( 'add', add, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'subtract', sub, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'multiply', mul, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
-	new MXElement( 'divide', div, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
-	new MXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
-	new MXElement( 'absval', abs, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'sign', sign, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'floor', floor, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'ceil', ceil, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'round', round, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'power', pow, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
-	new MXElement( 'sin', sin, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'cos', cos, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'tan', tan, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'asin', asin, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'acos', acos, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'atan2', mx_atan2, [ 'iny', 'inx' ], { iny: defaultFloat( 0 ), inx: defaultFloat( 1 ) } ),
-	new MXElement( 'sqrt', sqrt, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'ln', log, [ 'in' ], { in: defaultFloat( 1 ) } ),
-	new MXElement( 'exp', exp, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'fract', fract, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'clamp', clamp, [ 'in', 'low', 'high' ], {
+	createMXElement( 'add', add, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'subtract', sub, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'multiply', mul, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
+	createMXElement( 'divide', div, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
+	createMXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
+	createMXElement( 'absval', abs, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'sign', sign, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'floor', floor, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'ceil', ceil, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'round', round, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'power', pow, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
+	createMXElement( 'sin', sin, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'cos', cos, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'tan', tan, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'asin', asin, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'acos', acos, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'atan2', mx_atan2, [ 'iny', 'inx' ], { iny: defaultFloat( 0 ), inx: defaultFloat( 1 ) } ),
+	createMXElement( 'sqrt', sqrt, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'ln', log, [ 'in' ], { in: defaultFloat( 1 ) } ),
+	createMXElement( 'exp', exp, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'fract', fract, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'clamp', clamp, [ 'in', 'low', 'high' ], {
 		in: defaultFloat( 0 ),
 		low: defaultFloat( 0 ),
 		high: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'min', min, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'max', max, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'normalize', normalize, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'magnitude', length, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'length', length, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'dot', mx_dot, [ 'in' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'viewdirection', mx_viewdirection ),
-	new MXElement( 'crossproduct', cross, [ 'in1', 'in2' ], { in1: defaultVec3( 0, 0, 0 ), in2: defaultVec3( 0, 0, 0 ) } ),
-	new MXElement( 'distance', distance, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ], { in: defaultFloat( 0 ), amount: defaultFloat( 1 ) } ),
-	new MXElement( 'transformmatrix', mul, [ 'in', 'mat' ], { in: defaultFloat( 0 ) } ),
-	new MXElement( 'transformnormal', mx_transformnormal, [ 'in', 'fromspace', 'tospace' ], {
+	createMXElement( 'min', min, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'max', max, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'normalize', normalize, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'magnitude', length, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'length', length, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'dot', mx_dot, [ 'in' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'dotproduct', dot, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'viewdirection', mx_viewdirection ),
+	createMXElement( 'crossproduct', cross, [ 'in1', 'in2' ], { in1: defaultVec3( 0, 0, 0 ), in2: defaultVec3( 0, 0, 0 ) } ),
+	createMXElement( 'distance', distance, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'invert', mx_invert, [ 'in', 'amount' ], { in: defaultFloat( 0 ), amount: defaultFloat( 1 ) } ),
+	createMXElement( 'transformmatrix', mul, [ 'in', 'mat' ], { in: defaultFloat( 0 ) } ),
+	createMXElement( 'transformnormal', mx_transformnormal, [ 'in', 'fromspace', 'tospace' ], {
 		in: defaultVec3( 0, 0, 1 ),
 		fromspace: () => 'world',
 		tospace: () => 'world',
 	} ),
-	new MXElement( 'transformpoint', mx_transformpoint, [ 'in', 'fromspace', 'tospace' ], {
+	createMXElement( 'transformpoint', mx_transformpoint, [ 'in', 'fromspace', 'tospace' ], {
 		in: defaultVec3( 0, 0, 0 ),
 		fromspace: () => 'world',
 		tospace: () => 'world',
 	} ),
-	new MXElement( 'transformvector', mx_transformvector, [ 'in', 'fromspace', 'tospace' ], {
+	createMXElement( 'transformvector', mx_transformvector, [ 'in', 'fromspace', 'tospace' ], {
 		in: defaultVec3( 0, 0, 0 ),
 		fromspace: () => 'world',
 		tospace: () => 'world',
 	} ),
-	new MXElement( 'normalmap', normalMap, [ 'in', 'scale' ], { in: defaultVec3( 0.5, 0.5, 1.0 ), scale: defaultFloat( 1 ) } ),
-	new MXElement( 'transpose', transpose, [ 'in' ] ),
-	new MXElement( 'determinant', determinant, [ 'in' ] ),
-	new MXElement( 'invertmatrix', inverse, [ 'in' ] ),
-	new MXElement( 'creatematrix', mat3, [ 'in1', 'in2', 'in3' ], {
+	createMXElement( 'normalmap', normalMap, [ 'in', 'scale' ], { in: defaultVec3( 0.5, 0.5, 1.0 ), scale: defaultFloat( 1 ) } ),
+	createMXElement( 'transpose', transpose, [ 'in' ] ),
+	createMXElement( 'determinant', determinant, [ 'in' ] ),
+	createMXElement( 'invertmatrix', inverse, [ 'in' ] ),
+	createMXElement( 'creatematrix', mat3, [ 'in1', 'in2', 'in3' ], {
 		in1: defaultVec3( 1, 0, 0 ),
 		in2: defaultVec3( 0, 1, 0 ),
 		in3: defaultVec3( 0, 0, 1 ),
 	} ),
-	new MXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ], {
+	createMXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ], {
 		in: defaultFloat( 0 ),
 		inlow: defaultFloat( 0 ),
 		inhigh: defaultFloat( 1 ),
 		outlow: defaultFloat( 0 ),
 		outhigh: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'range', mx_range, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh', 'gamma' ], {
+	createMXElement( 'range', mx_range, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh', 'gamma' ], {
 		in: defaultFloat( 0 ),
 		inlow: defaultFloat( 0 ),
 		inhigh: defaultFloat( 1 ),
@@ -587,53 +576,53 @@ const MXElements = [
 		outhigh: defaultFloat( 1 ),
 		gamma: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'open_pbr_anisotropy', mx_open_pbr_anisotropy, [ 'roughness', 'anisotropy' ], {
+	createMXElement( 'open_pbr_anisotropy', mx_open_pbr_anisotropy, [ 'roughness', 'anisotropy' ], {
 		roughness: defaultFloat( 0 ),
 		anisotropy: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'smoothstep', mx_smoothstep, [ 'in', 'low', 'high' ], {
+	createMXElement( 'smoothstep', mx_smoothstep, [ 'in', 'low', 'high' ], {
 		in: defaultFloat( 0 ),
 		low: defaultFloat( 0 ),
 		high: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'luminance', luminance, [ 'in', 'lumacoeffs' ], {
+	createMXElement( 'luminance', luminance, [ 'in', 'lumacoeffs' ], {
 		in: defaultColor( 0, 0, 0 ),
 		lumacoeffs: defaultColor( 0.2722287, 0.6740818, 0.0536895 ),
 	} ),
-	new MXElement( 'rgbtohsv', mx_rgbtohsv, [ 'in' ], { in: defaultColor( 0, 0, 0 ) } ),
-	new MXElement( 'hsvtorgb', mx_hsvtorgb, [ 'in' ], { in: defaultColor( 0, 0, 0 ) } ),
-	new MXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ], { bg: defaultFloat( 0 ), fg: defaultFloat( 0 ), mix: defaultFloat( 0 ) } ),
-	new MXElement( 'minus', mx_minus, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'rgbtohsv', mx_rgbtohsv, [ 'in' ], { in: defaultColor( 0, 0, 0 ) } ),
+	createMXElement( 'hsvtorgb', mx_hsvtorgb, [ 'in' ], { in: defaultColor( 0, 0, 0 ) } ),
+	createMXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ], { bg: defaultFloat( 0 ), fg: defaultFloat( 0 ), mix: defaultFloat( 0 ) } ),
+	createMXElement( 'minus', mx_minus, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'difference', mx_difference, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'difference', mx_difference, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'screen', mx_screen, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'screen', mx_screen, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'overlay', mx_overlay, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'overlay', mx_overlay, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'burn', mx_burn, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'burn', mx_burn, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'dodge', mx_dodge, [ 'fg', 'bg', 'mix' ], {
+	createMXElement( 'dodge', mx_dodge, [ 'fg', 'bg', 'mix' ], {
 		fg: defaultFloat( 0 ),
 		bg: defaultFloat( 0 ),
 		mix: defaultFloat( 1 ),
 	} ),
-	new MXElement(
+	createMXElement(
 		'colorcorrect',
 		mx_colorcorrect,
 		[ 'in', 'hue', 'saturation', 'gamma', 'lift', 'gain', 'contrast', 'contrastpivot', 'exposure' ],
@@ -649,35 +638,35 @@ const MXElements = [
 			exposure: defaultFloat( 0 ),
 		},
 	),
-	new MXElement( 'unpremult', mx_unpremult, [ 'in' ], { in: defaultVec4( 0, 0, 0, 1 ) } ),
-	new MXElement( 'combine2', vec2, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	new MXElement( 'combine3', vec3, [ 'in1', 'in2', 'in3' ], {
+	createMXElement( 'unpremult', mx_unpremult, [ 'in' ], { in: defaultVec4( 0, 0, 0, 1 ) } ),
+	createMXElement( 'combine2', vec2, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
+	createMXElement( 'combine3', vec3, [ 'in1', 'in2', 'in3' ], {
 		in1: defaultFloat( 0 ),
 		in2: defaultFloat( 0 ),
 		in3: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'combine4', vec4, [ 'in1', 'in2', 'in3', 'in4' ], {
+	createMXElement( 'combine4', vec4, [ 'in1', 'in2', 'in3', 'in4' ], {
 		in1: defaultFloat( 0 ),
 		in2: defaultFloat( 0 ),
 		in3: defaultFloat( 0 ),
 		in4: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ], {
+	createMXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ], {
 		valuel: defaultFloat( 0 ),
 		valuer: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ], {
+	createMXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ], {
 		valuet: defaultFloat( 0 ),
 		valueb: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'ramp4', mx_ramp4, [ 'valuetl', 'valuetr', 'valuebl', 'valuebr', 'texcoord' ], {
+	createMXElement( 'ramp4', mx_ramp4, [ 'valuetl', 'valuetr', 'valuebl', 'valuebr', 'texcoord' ], {
 		valuetl: defaultColor( 0, 0, 0 ),
 		valuetr: defaultColor( 0, 0, 0 ),
 		valuebl: defaultColor( 0, 0, 0 ),
 		valuebr: defaultColor( 0, 0, 0 ),
 		texcoord: defaultVec2( 0, 0 ),
 	} ),
-	new MXElement(
+	createMXElement(
 		'ramp_gradient',
 		mx_ramp_gradient,
 		[ 'x', 'interval1', 'interval2', 'color1', 'color2', 'interpolation', 'prev_color', 'interval_num', 'num_intervals' ],
@@ -693,7 +682,7 @@ const MXElements = [
 			num_intervals: defaultFloat( 2 ),
 		},
 	),
-	new MXElement(
+	createMXElement(
 		'ramp',
 		mx_ramp,
 		[
@@ -749,46 +738,46 @@ const MXElements = [
 			color10: defaultVec4( 1, 1, 1, 1 ),
 		},
 	),
-	new MXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'center', 'texcoord' ], {
+	createMXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'center', 'texcoord' ], {
 		valuel: defaultFloat( 0 ),
 		valuer: defaultFloat( 0 ),
 		center: defaultFloat( 0.5 ),
 	} ),
-	new MXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'center', 'texcoord' ], {
+	createMXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'center', 'texcoord' ], {
 		valuet: defaultFloat( 0 ),
 		valueb: defaultFloat( 0 ),
 		center: defaultFloat( 0.5 ),
 	} ),
-	new MXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ], {
+	createMXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		amplitude: defaultFloat( 1 ),
 		pivot: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'noise3d', mx_noise_float, [ 'position', 'amplitude', 'pivot' ], {
+	createMXElement( 'noise3d', mx_noise_float, [ 'position', 'amplitude', 'pivot' ], {
 		position: () => positionLocal,
 		amplitude: defaultFloat( 1 ),
 		pivot: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
+	createMXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
 		position: () => positionLocal,
 		octaves: defaultInt( 3 ),
 		lacunarity: defaultFloat( 2.0 ),
 		diminish: defaultFloat( 0.5 ),
 		amplitude: defaultFloat( 1.0 ),
 	} ),
-	new MXElement( 'cellnoise2d', mx_cell_noise_float, [ 'texcoord' ], { texcoord: defaultVec2( 0, 0 ) } ),
-	new MXElement( 'cellnoise3d', mx_cell_noise_float, [ 'position' ], { position: () => positionLocal } ),
-	new MXElement( 'worleynoise2d', mx_worley_noise_float_2d, [ 'texcoord', 'jitter', 'style' ], {
+	createMXElement( 'cellnoise2d', mx_cell_noise_float, [ 'texcoord' ], { texcoord: defaultVec2( 0, 0 ) } ),
+	createMXElement( 'cellnoise3d', mx_cell_noise_float, [ 'position' ], { position: () => positionLocal } ),
+	createMXElement( 'worleynoise2d', mx_worley_noise_float_2d, [ 'texcoord', 'jitter', 'style' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		jitter: defaultFloat( 1 ),
 		style: defaultInt( 0 ),
 	} ),
-	new MXElement( 'worleynoise3d', mx_worley_noise_float_3d, [ 'position', 'jitter', 'style' ], {
+	createMXElement( 'worleynoise3d', mx_worley_noise_float_3d, [ 'position', 'jitter', 'style' ], {
 		position: () => positionLocal,
 		jitter: defaultFloat( 1 ),
 		style: defaultInt( 0 ),
 	} ),
-	new MXElement(
+	createMXElement(
 		'unifiednoise2d',
 		mx_unifiednoise2d,
 		[
@@ -820,7 +809,7 @@ const MXElements = [
 			style: defaultInt( 0 ),
 		},
 	),
-	new MXElement(
+	createMXElement(
 		'unifiednoise3d',
 		mx_unifiednoise3d,
 		[
@@ -852,7 +841,7 @@ const MXElements = [
 			style: defaultInt( 0 ),
 		},
 	),
-	new MXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset', 'operationorder' ], {
+	createMXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset', 'operationorder' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		pivot: defaultVec2( 0, 0 ),
 		scale: defaultVec2( 1, 1 ),
@@ -860,71 +849,66 @@ const MXElements = [
 		offset: defaultVec2( 0, 0 ),
 		operationorder: defaultInt( 0 ),
 	} ),
-	new MXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
-	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ], {
+	createMXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 1 ) } ),
+	createMXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ], {
 		in: defaultFloat( 0 ),
 		amount: defaultFloat( 1 ),
 		pivot: defaultFloat( 0.5 ),
 	} ),
-	new MXElement( 'saturate', mx_saturation, [ 'in', 'amount' ], { in: defaultColor( 0, 0, 0 ), amount: defaultFloat( 1 ) } ),
-	new MXElement( 'extract', element, [ 'in', 'index' ], { in: defaultFloat( 0 ), index: defaultInt( 0 ) } ),
-	new MXElement( 'separate2', element, [ 'in' ], { in: defaultVec2( 0, 0 ) } ),
-	new MXElement( 'separate3', element, [ 'in' ], { in: defaultVec3( 0, 0, 0 ) } ),
-	new MXElement( 'separate4', element, [ 'in' ], { in: defaultVec4( 0, 0, 0, 0 ) } ),
-	new MXElement( 'reflect', reflect, [ 'in', 'normal' ], { in: defaultVec3( 1, 0, 0 ) } ),
-	new MXElement( 'refract', refract, [ 'in', 'normal', 'ior' ], { in: defaultVec3( 1, 0, 0 ), ior: defaultFloat( 1 ) } ),
-	new MXElement( 'time', mx_timer ),
-	new MXElement( 'frame', mx_frame ),
-	new MXElement( 'ifgreater', mx_ifgreater, [ 'value1', 'value2', 'in1', 'in2' ], {
+	createMXElement( 'saturate', mx_saturation, [ 'in', 'amount' ], { in: defaultColor( 0, 0, 0 ), amount: defaultFloat( 1 ) } ),
+	createMXElement( 'extract', element, [ 'in', 'index' ], { in: defaultFloat( 0 ), index: defaultInt( 0 ) } ),
+	createMXElement( 'separate2', element, [ 'in' ], { in: defaultVec2( 0, 0 ) } ),
+	createMXElement( 'separate3', element, [ 'in' ], { in: defaultVec3( 0, 0, 0 ) } ),
+	createMXElement( 'separate4', element, [ 'in' ], { in: defaultVec4( 0, 0, 0, 0 ) } ),
+	createMXElement( 'reflect', reflect, [ 'in', 'normal' ], { in: defaultVec3( 1, 0, 0 ) } ),
+	createMXElement( 'refract', refract, [ 'in', 'normal', 'ior' ], { in: defaultVec3( 1, 0, 0 ), ior: defaultFloat( 1 ) } ),
+	createMXElement( 'time', mx_timer ),
+	createMXElement( 'frame', mx_frame ),
+	createMXElement( 'ifgreater', mx_ifgreater, [ 'value1', 'value2', 'in1', 'in2' ], {
 		value1: defaultFloat( 1 ),
 		value2: defaultFloat( 0 ),
 		in1: defaultFloat( 0 ),
 		in2: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'ifgreatereq', mx_ifgreatereq, [ 'value1', 'value2', 'in1', 'in2' ], {
+	createMXElement( 'ifgreatereq', mx_ifgreatereq, [ 'value1', 'value2', 'in1', 'in2' ], {
 		value1: defaultFloat( 1 ),
 		value2: defaultFloat( 0 ),
 		in1: defaultFloat( 0 ),
 		in2: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'ifequal', mx_ifequal, [ 'value1', 'value2', 'in1', 'in2' ], {
+	createMXElement( 'ifequal', mx_ifequal, [ 'value1', 'value2', 'in1', 'in2' ], {
 		value1: defaultFloat( 0 ),
 		value2: defaultFloat( 0 ),
 		in1: defaultFloat( 0 ),
 		in2: defaultFloat( 0 ),
 	} ),
-	new MXElement( 'rotate2d', mx_rotate2d, [ 'in', 'amount' ], { in: defaultVec2( 0, 0 ), amount: defaultFloat( 0 ) } ),
-	new MXElement( 'rotate3d', mx_rotate3d, [ 'in', 'amount', 'axis' ], {
+	createMXElement( 'rotate2d', mx_rotate2d, [ 'in', 'amount' ], { in: defaultVec2( 0, 0 ), amount: defaultFloat( 0 ) } ),
+	createMXElement( 'rotate3d', mx_rotate3d, [ 'in', 'amount', 'axis' ], {
 		in: defaultVec3( 0, 0, 0 ),
 		amount: defaultFloat( 0 ),
 		axis: defaultVec3( 0, 1, 0 ),
 	} ),
-	new MXElement( 'heighttonormal', mx_heighttonormal, [ 'in', 'scale', 'texcoord' ], {
+	createMXElement( 'heighttonormal', mx_heighttonormal, [ 'in', 'scale', 'texcoord' ], {
 		in: defaultFloat( 0 ),
 		scale: defaultFloat( 1 ),
 	} ),
-	new MXElement( 'and', mx_and, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
-	new MXElement( 'or', mx_or, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
-	new MXElement( 'xor', mx_xor, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
-	new MXElement( 'not', mx_not, [ 'in' ], { in: defaultBool( false ) } ),
-	new MXElement( 'checkerboard', mx_checkerboard, [ 'color1', 'color2', 'texcoord' ], {
+	createMXElement( 'and', mx_and, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
+	createMXElement( 'or', mx_or, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
+	createMXElement( 'xor', mx_xor, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
+	createMXElement( 'not', mx_not, [ 'in' ], { in: defaultBool( false ) } ),
+	createMXElement( 'checkerboard', mx_checkerboard, [ 'color1', 'color2', 'texcoord' ], {
 		color1: defaultColor( 1, 1, 1 ),
 		color2: defaultColor( 0, 0, 0 ),
 		texcoord: defaultVec2( 0, 0 ),
 	} ),
-	new MXElement( 'circle', mx_circle, [ 'texcoord', 'center', 'radius' ], {
+	createMXElement( 'circle', mx_circle, [ 'texcoord', 'center', 'radius' ], {
 		center: defaultVec2( 0, 0 ),
 		radius: defaultFloat( 0.5 ),
 	} ),
-	new MXElement( 'bump', mx_bump, [ 'height', 'scale' ], { height: defaultFloat( 0 ), scale: defaultFloat( 1 ) } ),
-	new MXElement( 'blackbody', mx_blackbody, [ 'temperature' ], { temperature: defaultFloat( 5000 ) } ),
+	createMXElement( 'bump', mx_bump, [ 'height', 'scale' ], { height: defaultFloat( 0 ), scale: defaultFloat( 1 ) } ),
+	createMXElement( 'blackbody', mx_blackbody, [ 'temperature' ], { temperature: defaultFloat( 5000 ) } ),
 ];
 
-const MtlXLibrary = {};
-for ( const entry of MXElements ) {
-
-	MtlXLibrary[ entry.name ] = entry;
-
-}
+const MtlXLibrary = Object.fromEntries( MXElements.map( ( entry ) => [ entry.name, entry ] ) );
 
 export { MtlXLibrary };
