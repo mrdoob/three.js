@@ -11,7 +11,24 @@ import { error } from '../../../utils.js';
 
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' )
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
+	textureGather: new CodeNode( /* glsl */`
+		vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset ) {
+			ivec2 size = textureSize( map, 0 );
+			ivec2 st = ivec2( floor( coord * vec2( size ) + vec2( offset ) - 0.5 ) );
+			ivec4 i = ivec4( st, st + 1 );
+			return vec4(
+				texelFetch( map, i.xw, 0 )[comp],
+				texelFetch( map, i.zw, 0 )[comp],
+				texelFetch( map, i.zy, 0 )[comp],
+				texelFetch( map, i.xy, 0 )[comp]
+			);
+		}
+` ),
+	textureGatherDepth: new CodeNode( /* glsl */`
+` ),
+	textureGatherArray: new CodeNode( /* glsl */`
+` )
 };
 
 const glslMethods = {
@@ -662,6 +679,59 @@ ${ flowData.code }
 			error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
 
 		}
+
+	}
+
+	/**
+	 * Generates the GLSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {number} gatherComponent - The index of the channel to read. This must be in range [0, 3].
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
+
+		if ( texture.isDepthTexture === true ) {
+
+			if ( texture.isArrayTexture === true ) {
+
+				this._include( 'textureGatherArray' );
+
+				if ( offsetSnippet ) {
+
+					return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ depthSnippet } )`;
+
+			}
+
+			this._include( 'textureGatherDepth' );
+
+			if ( offsetSnippet ) {
+
+				return `tsl_textureGather_depth( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `tsl_textureGather_depth( ${ textureProperty }, ${ uvSnippet } )`;
+
+		}
+
+		this._include( 'textureGather' );
+
+		if ( offsetSnippet ) {
+
+			return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ivec2( 0 ) )`;
 
 	}
 
