@@ -44,9 +44,8 @@ import {
 
 import { createMaterialXCompileRegistry, compileNodeFromRegistry } from './compile/MaterialXCompileRegistry.js';
 import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXParser.js';
-import { getSurfaceMapper, getSupportedSurfaceCategories } from './MaterialXSurfaceRegistry.js';
+import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
-import { validateCategoryCoverage } from './MaterialXNodeRegistry.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709,
@@ -59,8 +58,32 @@ const HEXTILE_SQRT3_2 = Math.sqrt( 3 ) * 2;
 const HEXTILE_EPSILON = 1e-6;
 const HEXTILE_PI_OVER_180 = Math.PI / 180;
 const COMPILE_REGISTRY = createMaterialXCompileRegistry();
-const ALLOWED_NON_STANDARD_COMPILE_CATEGORIES = [ 'hextiledimage', 'hextilednormalmap', 'gltf_anisotropy_image' ];
-let translatorRegistryValidated = false;
+const NODE_CLASS_BY_TYPE = {
+	integer: int,
+	float,
+	vector2: vec2,
+	vector3: vec3,
+	vector4: vec4,
+	color4: vec4,
+	color3: color,
+	boolean: null,
+	matrix33: mat3,
+	matrix44: mat4,
+};
+const OUTPUT_CHANNELS = {
+	outx: 0,
+	outr: 0,
+	r: 0,
+	outy: 1,
+	outg: 1,
+	g: 1,
+	outz: 2,
+	outb: 2,
+	b: 2,
+	outw: 3,
+	outa: 3,
+	a: 3,
+};
 
 function toRadians( degrees ) {
 
@@ -244,16 +267,17 @@ function invertConstantMatrixValues( values, size ) {
 
 	if ( size === 3 ) {
 
-		const matrix = new Matrix3().setFromArray(values);
+		const matrix = new Matrix3().setFromArray( values );
 		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
 		matrix.invert();
 		// Convert Three.js internal column-major storage back to row-major literal order.
 		return matrix.transpose().elements;
+
 	}
 
 	if ( size === 4 ) {
 
-		const matrix = new Matrix4().setFromArray(values);
+		const matrix = new Matrix4().setFromArray( values );
 		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
 		matrix.invert();
 		// Convert Three.js internal column-major storage back to row-major literal order.
@@ -267,20 +291,13 @@ function invertConstantMatrixValues( values, size ) {
 
 function getOutputChannel( outputName ) {
 
-	if ( outputName === 'outx' || outputName === 'outr' || outputName === 'r' ) return 0;
-	if ( outputName === 'outy' || outputName === 'outg' || outputName === 'g' ) return 1;
-	if ( outputName === 'outz' || outputName === 'outb' || outputName === 'b' ) return 2;
-	if ( outputName === 'outw' || outputName === 'outa' || outputName === 'a' ) return 3;
-	return 0;
+	return OUTPUT_CHANNELS[ outputName ] || 0;
 
 }
 
 function isChannelOutput( outputName ) {
 
-	return outputName === 'outx' || outputName === 'outr' || outputName === 'r' ||
-    outputName === 'outy' || outputName === 'outg' || outputName === 'g' ||
-    outputName === 'outz' || outputName === 'outb' || outputName === 'b' ||
-    outputName === 'outw' || outputName === 'outa' || outputName === 'a';
+	return outputName in OUTPUT_CHANNELS;
 
 }
 
@@ -457,16 +474,7 @@ class MaterialXNode {
 
 	getClassFromType( type ) {
 
-		if ( type === 'integer' ) return int;
-		if ( type === 'float' ) return float;
-		if ( type === 'vector2' ) return vec2;
-		if ( type === 'vector3' ) return vec3;
-		if ( type === 'vector4' || type === 'color4' ) return vec4;
-		if ( type === 'color3' ) return color;
-		if ( type === 'boolean' ) return null;
-		if ( type === 'matrix33' ) return mat3;
-		if ( type === 'matrix44' ) return mat4;
-		return null;
+		return NODE_CLASS_BY_TYPE[ type ] || null;
 
 	}
 
@@ -900,17 +908,6 @@ class MaterialXDocument {
 			IDENTITY_MAT3_VALUES,
 			IDENTITY_MAT4_VALUES,
 		};
-
-		if ( ! translatorRegistryValidated ) {
-
-			validateCategoryCoverage( {
-				compileCategories: [ ...COMPILE_REGISTRY.keys() ],
-				surfaceCategories: getSupportedSurfaceCategories(),
-				allowUnknownCompileCategories: ALLOWED_NON_STANDARD_COMPILE_CATEGORIES,
-			} );
-			translatorRegistryValidated = true;
-
-		}
 
 	}
 

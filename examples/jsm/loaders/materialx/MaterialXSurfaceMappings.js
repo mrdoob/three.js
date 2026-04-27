@@ -630,8 +630,28 @@ const MaterialXSurfaceMappings = {
 	open_pbr_surface: applyOpenPbrSurface,
 };
 
+const surfaceMapperRegistry = new Map( Object.entries( MaterialXSurfaceMappings ).map( ( [ category, apply ] ) => [
+	category,
+	{ category, apply },
+] ) );
+
+function getSurfaceMapper( category ) {
+
+	return surfaceMapperRegistry.get( category );
+
+}
+
+function getSupportedSurfaceCategories() {
+
+	return [ ...surfaceMapperRegistry.keys() ];
+
+}
+
 export {
 	MaterialXSurfaceMappings,
+	surfaceMapperRegistry,
+	getSurfaceMapper,
+	getSupportedSurfaceCategories,
 	applyStandardSurface,
 	applyGltfPbrSurface,
 	applyOpenPbrSurface,
