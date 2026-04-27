@@ -36,6 +36,7 @@ import {
 	uv,
 	mat3,
 	mat4,
+	inverse,
 	element,
 	mx_transform_uv,
 	mx_srgb_texture_to_lin_rec709,
@@ -291,172 +292,6 @@ function invertConstantMatrixValues( values, size ) {
 	}
 
 	return null;
-
-}
-
-function matrixNodeAt( matrixNode, row, col ) {
-
-	return element( element( matrixNode, col ), row );
-
-}
-
-function det2Node( a, b, c, d ) {
-
-	return sub( mul( a, d ), mul( b, c ) );
-
-}
-
-function det3Node( matrixRows ) {
-
-	const a = matrixRows[ 0 ][ 0 ];
-	const b = matrixRows[ 0 ][ 1 ];
-	const c = matrixRows[ 0 ][ 2 ];
-	const d = matrixRows[ 1 ][ 0 ];
-	const e = matrixRows[ 1 ][ 1 ];
-	const f = matrixRows[ 1 ][ 2 ];
-	const g = matrixRows[ 2 ][ 0 ];
-	const h = matrixRows[ 2 ][ 1 ];
-	const i = matrixRows[ 2 ][ 2 ];
-
-	const eiMinusFh = det2Node( e, f, h, i );
-	const diMinusFg = det2Node( d, f, g, i );
-	const dhMinusEg = det2Node( d, e, g, h );
-
-	return add( sub( mul( a, eiMinusFh ), mul( b, diMinusFg ) ), mul( c, dhMinusEg ) );
-
-}
-
-function readMatrixRows( matrixNode, size ) {
-
-	const rows = [];
-	for ( let row = 0; row < size; row += 1 ) {
-
-		const rowValues = [];
-		for ( let col = 0; col < size; col += 1 ) {
-
-			rowValues.push( matrixNodeAt( matrixNode, row, col ) );
-
-		}
-
-		rows.push( rowValues );
-
-	}
-
-	return rows;
-
-}
-
-function invertMatrixNode( matrixNode, size ) {
-
-	if ( size === 3 ) {
-
-		const m = readMatrixRows( matrixNode, 3 );
-		const a = m[ 0 ][ 0 ];
-		const b = m[ 0 ][ 1 ];
-		const c = m[ 0 ][ 2 ];
-		const d = m[ 1 ][ 0 ];
-		const e = m[ 1 ][ 1 ];
-		const f = m[ 1 ][ 2 ];
-		const g = m[ 2 ][ 0 ];
-		const h = m[ 2 ][ 1 ];
-		const i = m[ 2 ][ 2 ];
-
-		const determinant = det3Node( m );
-		const invDet = div( 1, determinant );
-
-		const cofactor00 = det2Node( e, f, h, i );
-		const cofactor01 = sub( 0, det2Node( d, f, g, i ) );
-		const cofactor02 = det2Node( d, e, g, h );
-		const cofactor10 = sub( 0, det2Node( b, c, h, i ) );
-		const cofactor11 = det2Node( a, c, g, i );
-		const cofactor12 = sub( 0, det2Node( a, b, g, h ) );
-		const cofactor20 = det2Node( b, c, e, f );
-		const cofactor21 = sub( 0, det2Node( a, c, d, f ) );
-		const cofactor22 = det2Node( a, b, d, e );
-
-		return mat3(
-			mul( cofactor00, invDet ),
-			mul( cofactor10, invDet ),
-			mul( cofactor20, invDet ),
-			mul( cofactor01, invDet ),
-			mul( cofactor11, invDet ),
-			mul( cofactor21, invDet ),
-			mul( cofactor02, invDet ),
-			mul( cofactor12, invDet ),
-			mul( cofactor22, invDet ),
-		);
-
-	}
-
-	if ( size === 4 ) {
-
-		const m = readMatrixRows( matrixNode, 4 );
-		const det3FromMinor = ( rowToRemove, colToRemove ) => {
-
-			const minorRows = [];
-			for ( let row = 0; row < 4; row += 1 ) {
-
-				if ( row === rowToRemove ) continue;
-				const minorRow = [];
-				for ( let col = 0; col < 4; col += 1 ) {
-
-					if ( col === colToRemove ) continue;
-					minorRow.push( m[ row ][ col ] );
-
-				}
-
-				minorRows.push( minorRow );
-
-			}
-
-			return det3Node( minorRows );
-
-		};
-
-		const determinant = add(
-			sub( mul( m[ 0 ][ 0 ], det3FromMinor( 0, 0 ) ), mul( m[ 0 ][ 1 ], det3FromMinor( 0, 1 ) ) ),
-			add( mul( m[ 0 ][ 2 ], det3FromMinor( 0, 2 ) ), sub( 0, mul( m[ 0 ][ 3 ], det3FromMinor( 0, 3 ) ) ) ),
-		);
-		const invDet = div( 1, determinant );
-
-		const inverseRows = [];
-		for ( let row = 0; row < 4; row += 1 ) {
-
-			const inverseRow = [];
-			for ( let col = 0; col < 4; col += 1 ) {
-
-				const cofactor = det3FromMinor( col, row );
-				const signedCofactor = ( col + row ) % 2 === 0 ? cofactor : sub( 0, cofactor );
-				inverseRow.push( mul( signedCofactor, invDet ) );
-
-			}
-
-			inverseRows.push( inverseRow );
-
-		}
-
-		return mat4(
-			inverseRows[ 0 ][ 0 ],
-			inverseRows[ 0 ][ 1 ],
-			inverseRows[ 0 ][ 2 ],
-			inverseRows[ 0 ][ 3 ],
-			inverseRows[ 1 ][ 0 ],
-			inverseRows[ 1 ][ 1 ],
-			inverseRows[ 1 ][ 2 ],
-			inverseRows[ 1 ][ 3 ],
-			inverseRows[ 2 ][ 0 ],
-			inverseRows[ 2 ][ 1 ],
-			inverseRows[ 2 ][ 2 ],
-			inverseRows[ 2 ][ 3 ],
-			inverseRows[ 3 ][ 0 ],
-			inverseRows[ 3 ][ 1 ],
-			inverseRows[ 3 ][ 2 ],
-			inverseRows[ 3 ][ 3 ],
-		);
-
-	}
-
-	return matrixNode;
 
 }
 
@@ -1091,7 +926,7 @@ class MaterialXDocument {
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
 			invertConstantMatrixValues,
-			invertMatrixNode,
+			invertMatrixNode: inverse,
 			IDENTITY_MAT3_VALUES,
 			IDENTITY_MAT4_VALUES,
 		};
