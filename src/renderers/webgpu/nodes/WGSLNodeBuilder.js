@@ -863,15 +863,27 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
 
-		if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
+		if ( texture.isDepthTexture === true ) {
 
-			if ( offsetSnippet ) {
+			if ( texture.isArrayTexture === true ) {
 
-				return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+				if ( offsetSnippet ) {
+
+					return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+				}
+
+				return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
 
 			}
 
-			return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+			if ( offsetSnippet ) {
+
+				return `textureGather( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGather( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet } )`;
 
 		}
 
@@ -1986,7 +1998,7 @@ ${ flowData.code }
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) ) {
+					if ( uniform.node.compareNode !== null && this.isSampleCompare( texture ) ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 

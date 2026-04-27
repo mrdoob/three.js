@@ -228,7 +228,13 @@ class TextureNode extends UniformNode {
 	 */
 	generateNodeType( /*builder*/ ) {
 
-		if ( this.value.isDepthTexture === true ) return 'float';
+		if ( this.value.isDepthTexture === true ) {
+
+			if ( this.gatherComponent === null ) return 'float';
+
+			return 'vec4';
+
+		}
 
 		if ( this.value.type === UnsignedIntType ) {
 
@@ -559,13 +565,13 @@ class TextureNode extends UniformNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			const nodeType = this.getNodeType( builder );
+			let nodeType = this.getNodeType( builder );
 
 			let propertyName = nodeData.propertyName;
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode, gatherComponent } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -575,6 +581,12 @@ class TextureNode extends UniformNode {
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
+
+				if ( gatherComponent !== null ) {
+
+					nodeType = 'vec4';
+
+				}
 
 				let finalDepthSnippet = depthSnippet;
 
