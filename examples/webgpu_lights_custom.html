@@ -59,6 +59,7 @@
 				camera.position.z = 1.5;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				// lights
 
@@ -120,7 +121,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 

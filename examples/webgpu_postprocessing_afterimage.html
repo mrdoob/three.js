@@ -57,7 +57,6 @@
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
@@ -66,6 +65,7 @@
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				const sprite = new THREE.TextureLoader().load( 'textures/sprites/circle.png' );
 
