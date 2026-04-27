@@ -208,6 +208,7 @@ import './src/math/Vector4.tests.js';
 
 //src/math/interpolants
 import './src/math/interpolants/CubicInterpolant.tests.js';
+import './src/math/interpolants/CustomInterpolant.tests.js';
 import './src/math/interpolants/DiscreteInterpolant.tests.js';
 import './src/math/interpolants/LinearInterpolant.tests.js';
 import './src/math/interpolants/QuaternionLinearInterpolant.tests.js';
