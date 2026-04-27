@@ -456,6 +456,8 @@ class WebGLTextureUtils {
 
 		}
 
+		backend.renderer.xr.foveateBoundTexture( texture, glTextureType );
+
 		backend.set( texture, {
 			textureGPU,
 			glTextureType,
