@@ -92,6 +92,14 @@ class TextureNode extends UniformNode {
 		this.depthNode = null;
 
 		/**
+		 * When defined, a texture is sampled using explicit gradients.
+		 *
+		 * @type {?Array<Node<vec2>>}
+		 * @default null
+		 */
+		this.gradNode = null;
+
+		/**
 		 * Represents the optional index constant of the channel to gather.
 		 * This must be in range [0, 3].
 		 *
@@ -99,14 +107,6 @@ class TextureNode extends UniformNode {
 		 * @default null
 		 */
 		this.gatherComponent = null;
-
-		/**
-		 * When defined, a texture is sampled using explicit gradients.
-		 *
-		 * @type {?Array<Node<vec2>>}
-		 * @default null
-		 */
-		this.gradNode = null;
 
 		/**
 		 * Represents the optional texel offset applied to the unnormalized texture
@@ -444,9 +444,9 @@ class TextureNode extends UniformNode {
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
 		properties.gradNode = this.gradNode;
+		properties.gatherComponent = this.gatherComponent;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
-		properties.gatherComponent = this.gatherComponent;
 
 	}
 
@@ -486,12 +486,12 @@ class TextureNode extends UniformNode {
 	 * @param {?string} biasSnippet - The bias snippet.
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
-	 * @param {?number} gatherComponent - The index of the channel to gather.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
+	 * @param {?number} gatherComponent - The index of the channel to gather.
 	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gatherComponent, gradSnippet, offsetSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherComponent, offsetSnippet ) {
 
 		const texture = this.value;
 
@@ -571,7 +571,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode, gatherComponent } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherComponent, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -600,7 +600,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, this.gatherComponent, gradSnippet, offsetSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, this.gatherComponent, offsetSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
@@ -808,6 +808,22 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Gathers four texels from the texture.
+	 *
+	 * @param {[number]} component - The index of the channel to read.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	gather( component = 0 ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherComponent = component;
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
 	 * Samples the texture by defining a depth node.
 	 *
 	 * @param {Node<int>} depthNode - The depth node.
@@ -833,22 +849,6 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.offsetNode = nodeObject( offsetNode );
-		textureNode.referenceNode = this.getBase();
-
-		return nodeObject( textureNode );
-
-	}
-
-	/**
-	 * Gathers four texels from the texture.
-	 *
-	 * @param {[number]} component - The index of the channel to read.
-	 * @return {TextureNode} A texture node representing the texture sample.
-	 */
-	gather( component = 0 ) {
-
-		const textureNode = this.clone();
-		textureNode.gatherComponent = component;
 		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
@@ -919,6 +919,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherComponent = this.gatherComponent;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
