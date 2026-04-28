@@ -34,7 +34,13 @@ vec4 tsl_textureGather( const int comp, sampler2D map, ivec4 ij ) {
 }
 ` ),
 	textureGatherArray: new CodeNode( /* glsl */`
-vec4 tsl_textureGather_array( const int comp, sampler2DArray map, ivec4 i, int depth ) {
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, ivec4 ij, int depth ) {
+	return vec4(
+		texelFetch( map, ivec3( ij.xy, depth ), 0 )[ comp ],
+		texelFetch( map, ivec3( ij.zy, depth ), 0 )[ comp ],
+		texelFetch( map, ivec3( ij.zw, depth ), 0 )[ comp ],
+		texelFetch( map, ivec3( ij.xw, depth ), 0 )[ comp ]
+	);
 }
 ` )
 };
@@ -498,9 +504,9 @@ ${ flowData.code }
 
 			const includes = [];
 
-			let code = `ivec4 ${ functionName }( vec2 coord, ivec2 offset, sampler2D map ) {\n\n`;
+			let code = `ivec4 ${ functionName }( vec2 coord, ivec2 offset, ${ texture.isArrayTexture ? 'sampler2DArray' : 'sampler2D' } map ) {\n\n`;
 
-			code += '\tivec2 size = textureSize( map, 0 );\n';
+			code += '\tivec2 size = textureSize( map, 0 ).xy;\n';
 			code += '\tivec2 st = ivec2( floor( coord * vec2( size ) + vec2( offset ) - 0.5 ) );\n';
 			code += '\tivec4 ij = ivec4( st, st + 1 );\n';
 			code += '\treturn ivec4(\n';
@@ -784,35 +790,23 @@ ${ flowData.code }
 
 		const wrapFunction = this._generateTextureGatherWrapFunction( texture );
 
-		if ( texture.isDepthTexture === true ) {
+		if ( texture.isArrayTexture === true ) {
 
-			if ( texture.isArrayTexture === true ) {
-
-				this._include( 'textureGatherArray' );
-
-				if ( offsetSnippet ) {
-
-					return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ), ${ depthSnippet } )`;
-
-				}
-
-				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ), ${ depthSnippet } )`;
-
-			}
-
-			this._include( 'textureGather' );
+			this._include( 'textureGatherArray' );
 
 			if ( offsetSnippet ) {
 
-				return `tsl_textureGather( 0, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ) )`;
+				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ), ${ depthSnippet } )`;
 
 			}
 
-			return `tsl_textureGather( 0, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ) )`;
+			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ), ${ depthSnippet } )`;
 
 		}
 
 		this._include( 'textureGather' );
+
+		if ( texture.isDepthTexture ) gatherComponent = 0;
 
 		if ( offsetSnippet ) {
 

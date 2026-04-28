@@ -863,19 +863,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
 
-		if ( texture.isDepthTexture === true ) {
+		if ( texture.isArrayTexture === true ) {
 
-			if ( texture.isArrayTexture === true ) {
+			if ( offsetSnippet ) {
 
-				if ( offsetSnippet ) {
-
-					return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
-
-				}
-
-				return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+				return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
 
 			}
+
+			return `textureGather( ${gatherComponent}, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+
+		}
+
+		if ( texture.isDepthTexture === true ) {
 
 			if ( offsetSnippet ) {
 
