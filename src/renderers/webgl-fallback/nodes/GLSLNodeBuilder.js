@@ -496,7 +496,7 @@ ${ flowData.code }
 	 */
 	_generateTextureGatherWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_2d_gather`;
+		const functionName = `tsl_gather_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.isArrayTexture ? 'array' : '2d' }`;
 
 		let nodeCode = glslCodeCache[ functionName ];
 
