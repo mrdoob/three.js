@@ -33,14 +33,17 @@
 			import { Water } from 'three/addons/objects/Water.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+			import { Timer } from 'three';
 
-			let container, stats;
+			let container, stats, timer;
 			let camera, scene, renderer;
 			let controls, water, sun, sky, mesh, bloomPass;
 
 			init();
 
 			function init() {
+
+				timer = new Timer();
 
 				container = document.getElementById( 'container' );
 
@@ -217,6 +220,7 @@
 
 			function animate() {
 
+				timer.update();
 				render();
 				stats.update();
 
@@ -230,7 +234,9 @@
 				mesh.rotation.x = time * 0.5;
 				mesh.rotation.z = time * 0.51;
 
-				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+				const delta = timer.getDelta();
+
+				water.material.uniforms[ 'time' ].value += delta;
 				sky.material.uniforms[ 'time' ].value = time;
 
 				renderer.render( scene, camera );
