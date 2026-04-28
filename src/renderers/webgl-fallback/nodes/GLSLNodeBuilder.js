@@ -21,7 +21,7 @@ const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
 	repeatWrapping_int: new CodeNode( /* glsl */'int tsl_repeatWrapping_int( int coord, int size ) { return ((coord % size) + size) % size; }' ),
-	mirrorWrapping_int: new CodeNode( /* glsl */'int tsl_mirrorWrapping_int( int coord, int size ) { int p = size * 2; int m = ((coord % p) + p) % p; m < size ? m : period - 1 - m; }' ),
+	mirrorWrapping_int: new CodeNode( /* glsl */'int tsl_mirrorWrapping_int( int coord, int size ) { int p = size * 2; int m = ((coord % p) + p) % p; m < size ? m : p - 1 - m; }' ),
 	clampWrapping_int: new CodeNode( /* glsl */'int tsl_clampWrapping_int( int coord, int size ) { return clamp(coord, 0, size - 1); }' ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, ivec4 ij ) {
@@ -488,7 +488,7 @@ ${ flowData.code }
 	 * @param {Texture} texture - The texture to generate the function for.
 	 * @return {string} The name of the generated function.
 	 */
-	generateTextureGatherWrapFunction( texture ) {
+	_generateTextureGatherWrapFunction( texture ) {
 
 		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_2d_gather`;
 
@@ -527,7 +527,7 @@ ${ flowData.code }
 
 				} else {
 
-					code += `\t\tcoord.${ axis }`;
+					code += `\t\tij.${ axis }`;
 
 					warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
 
@@ -782,7 +782,7 @@ ${ flowData.code }
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
 
-		const wrapFunction = this.generateTextureGatherWrapFunction( texture );
+		const wrapFunction = this._generateTextureGatherWrapFunction( texture );
 
 		if ( texture.isDepthTexture === true ) {
 
