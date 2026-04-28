@@ -33,7 +33,6 @@
 			import { Water } from 'three/addons/objects/Water.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { Timer } from 'three';
 
 			let container, stats, timer;
 			let camera, scene, renderer;
@@ -42,8 +41,6 @@
 			init();
 
 			function init() {
-
-				timer = new Timer();
 
 				container = document.getElementById( 'container' );
 
@@ -69,6 +66,8 @@
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 30, 30, 100 );
+
+				timer = new THREE.Timer();
 
 				//
 
