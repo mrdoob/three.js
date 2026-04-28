@@ -5,44 +5,36 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from '../../../constants.js';
+import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
 import { DataTexture } from '../../../textures/DataTexture.js';
-import { error, warn } from '../../../utils.js';
-
-const wrapNames = {
-	[ RepeatWrapping ]: 'repeat',
-	[ ClampToEdgeWrapping ]: 'clamp',
-	[ MirroredRepeatWrapping ]: 'mirror'
-};
-
-const glslCodeCache = {};
+import { error } from '../../../utils.js';
 
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
-	repeatWrapping_float: new CodeNode( 'float tsl_repeatWrapping_float( coord: f32 ) -> f32 { return fract( coord ); }' ),
-	mirrorWrapping_float: new CodeNode( 'float tsl_mirrorWrapping_float( coord: f32 ) -> f32 { let mirrored = fract( coord * 0.5 ) * 2.0; return 1.0 - abs( 1.0 - mirrored ); }' ),
-	clampWrapping_float: new CodeNode( 'float tsl_clampWrapping_float( coord: f32 ) -> f32 { return clamp( coord, 0.0, 1.0 ); }' ),
-	repeatWrapping_int: new CodeNode( /* glsl */'int tsl_repeatWrapping_int( int coord, int size ) { return ((coord % size) + size) % size; }' ),
-	mirrorWrapping_int: new CodeNode( /* glsl */'int tsl_mirrorWrapping_int( int coord, int size ) { int p = size * 2; int m = ((coord % p) + p) % p; m < size ? m : p - 1 - m; }' ),
-	clampWrapping_int: new CodeNode( /* glsl */'int tsl_clampWrapping_int( int coord, int size ) { return clamp(coord, 0, size - 1); }' ),
 	textureGather: new CodeNode( /* glsl */`
-vec4 tsl_textureGather( const int comp, sampler2D map, ivec4 ij ) {
+vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset ) {
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texelFetch( map, ij.xy, 0 )[ comp ],
-		texelFetch( map, ij.zy, 0 )[ comp ],
-		texelFetch( map, ij.zw, 0 )[ comp ],
-		texelFetch( map, ij.xw, 0 )[ comp ]
+		texture( map, ij.xy )[ comp ],
+		texture( map, ij.zy )[ comp ],
+		texture( map, ij.zw )[ comp ],
+		texture( map, ij.xw )[ comp ]
 	);
 }
 ` ),
 	textureGatherArray: new CodeNode( /* glsl */`
-vec4 tsl_textureGather_array( const int comp, sampler2DArray map, ivec4 ij, float depth ) {
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, ivec2 offset ) {
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texelFetch( map, ivec3( ij.xy, depth ), 0 )[ comp ],
-		texelFetch( map, ivec3( ij.zy, depth ), 0 )[ comp ],
-		texelFetch( map, ivec3( ij.zw, depth ), 0 )[ comp ],
-		texelFetch( map, ivec3( ij.xw, depth ), 0 )[ comp ]
+		texture( map, vec3( ij.xy, coord.z ) )[ comp ],
+		texture( map, vec3( ij.zy, coord.z ) )[ comp ],
+		texture( map, vec3( ij.zw, coord.z ) )[ comp ],
+		texture( map, vec3( ij.xw, coord.z ) )[ comp ]
 	);
 }
 ` ),
@@ -518,85 +510,6 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Generates a wrap function used in context of `textureGather`.
-	 *
-	 * @param {Texture} texture - The texture to generate the function for.
-	 * @return {string} The name of the generated function.
-	 */
-	_generateTextureGatherWrapFunction( texture ) {
-
-		const functionName = `tsl_gather_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.isArrayTexture ? 'array' : '2d' }`;
-
-		let nodeCode = glslCodeCache[ functionName ];
-
-		if ( nodeCode === undefined ) {
-
-			const includes = [];
-
-			let code = `ivec4 ${ functionName }( vec2 coord, ivec2 offset, ${ texture.isArrayTexture ? 'sampler2DArray' : 'sampler2D' } map ) {\n\n`;
-
-			code += '\tivec2 size = textureSize( map, 0 ).xy;\n';
-			code += '\tivec2 st = ivec2( floor( coord * vec2( size ) + vec2( offset ) - 0.5 ) );\n';
-			code += '\tivec4 ij = ivec4( st, st + 1 );\n';
-			code += '\treturn ivec4(\n';
-
-			const addWrapSnippet = ( wrap, axis, sizeAxis ) => {
-
-				if ( wrap === RepeatWrapping ) {
-
-					includes.push( glslPolyfills.repeatWrapping_int );
-
-					code += `\t\ttsl_repeatWrapping_int( ij.${ axis }, size.${ sizeAxis } )`;
-
-				} else if ( wrap === ClampToEdgeWrapping ) {
-
-					includes.push( glslPolyfills.clampWrapping_int );
-
-					code += `\t\ttsl_clampWrapping_int( ij.${ axis }, size.${ sizeAxis } )`;
-
-				} else if ( wrap === MirroredRepeatWrapping ) {
-
-					includes.push( glslPolyfills.mirrorWrapping_int );
-
-					code += `\t\ttsl_mirrorWrapping_int( ij.${ axis }, size.${ sizeAxis } )`;
-
-				} else {
-
-					code += `\t\tij.${ axis }`;
-
-					warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
-
-				}
-
-			};
-
-			addWrapSnippet( texture.wrapS, 'x', 'x' );
-
-			code += ',\n';
-
-			addWrapSnippet( texture.wrapT, 'y', 'y' );
-
-			code += ',\n';
-
-			addWrapSnippet( texture.wrapS, 'z', 'x' );
-
-			code += ',\n';
-
-			addWrapSnippet( texture.wrapT, 'w', 'y' );
-
-			code += '\n\t);\n\n}\n';
-
-			glslCodeCache[ functionName ] = nodeCode = new CodeNode( code, includes );
-
-		}
-
-		nodeCode.build( this );
-
-		return functionName;
-
-	}
-
-	/**
 	 * Generates the GLSL snippet that reads a single texel from a texture without sampling or filtering.
 	 *
 	 * @param {?Texture} texture - The texture.
@@ -817,33 +730,21 @@ ${ flowData.code }
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet ) {
 
-		const wrapFunction = this._generateTextureGatherWrapFunction( texture );
-
 		if ( texture.isDepthTexture ) gatherComponent = 0;
+
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
 
 		if ( depthSnippet ) {
 
 			this._include( 'textureGatherArray' );
 
-			if ( offsetSnippet ) {
-
-				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ), float( ${ depthSnippet } ) )`;
-
-			}
-
-			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ), float( ${ depthSnippet } ) )`;
+			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, vec3( ${ uvSnippet }, ${ depthSnippet } ), ${ offsetSnippet } )`;
 
 		}
 
 		this._include( 'textureGather' );
 
-		if ( offsetSnippet ) {
-
-			return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ) )`;
-
-		}
-
-		return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ) )`;
+		return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
 
 	}
 
@@ -860,29 +761,19 @@ ${ flowData.code }
 	 */
 	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
 
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
+
 		if ( depthSnippet ) {
 
 			this._include( 'textureGatherCompareArray' );
 
-			if ( offsetSnippet ) {
-
-				return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ${ offsetSnippet }, ${ compareSnippet } )`;
-
-			}
-
-			return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ivec2( 0 ), ${ compareSnippet } )`;
+			return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ${ offsetSnippet }, ${ compareSnippet } )`;
 
 		}
 
 		this._include( 'textureGatherCompare' );
 
-		if ( offsetSnippet ) {
-
-			return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ compareSnippet } )`;
-
-		}
-
-		return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ivec2( 0 ), ${ compareSnippet } )`;
+		return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ compareSnippet } )`;
 
 	}
 

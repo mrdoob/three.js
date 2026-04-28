@@ -67,13 +67,13 @@
 					If( vuv.y.greaterThan( 0.5 ), () => {
 
 						color.assign(
-							colorNode.gather( 0 ).sample( vuv )
+							colorNode.sample( vuv ).gather( 0 )
 						);
 
 					} ).Else( () => {
 
 						color.assign(
-							depthNode.gather( 0 ).sample( vuv )
+							depthNode.sample( vuv ).gather( 0 ).compare( 1 )
 						);
 
 					} );
@@ -114,8 +114,10 @@
 
 				//
 
+				const depthTexture = new THREE.DepthTexture();
+				depthTexture.compareFunction = THREE.LessEqualCompare;
 				const rt = new THREE.RenderTarget( 100, 100, {
-					depthTexture: new THREE.DepthTexture(),
+					depthTexture,
 				} );
 
 				const cameraZ = 2.5;
