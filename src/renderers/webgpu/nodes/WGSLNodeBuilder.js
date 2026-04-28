@@ -1210,8 +1210,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// textureGather also needs samplers.
-				const needsSampler = node.value.isCubeTexture === true || node.gatherComponent !== null || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
 
 				if ( needsSampler ) {
 
@@ -1992,15 +1991,15 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// textureGather also needs samplers.
-				const needsSampler = texture.isCubeTexture === true || uniform.node.gatherComponent !== null || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true );
 
 				if ( needsSampler ) {
 
-					if ( uniform.node.compareNode !== null && this.isSampleCompare( texture ) ) {
+					if ( this.isSampleCompare( texture ) && textureNode.compareNode !== null ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
