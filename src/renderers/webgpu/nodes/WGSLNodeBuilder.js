@@ -1210,7 +1210,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				// textureGather also needs samplers.
+				const needsSampler = node.value.isCubeTexture === true || node.gatherComponent !== null || ( this.isUnfilterable( node.value ) === false && texture.store === false );
 
 				if ( needsSampler ) {
 
@@ -1994,7 +1995,8 @@ ${ flowData.code }
 				const texture = uniform.node.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				// textureGather also needs samplers.
+				const needsSampler = texture.isCubeTexture === true || uniform.node.gatherComponent !== null || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
 
 				if ( needsSampler ) {
 

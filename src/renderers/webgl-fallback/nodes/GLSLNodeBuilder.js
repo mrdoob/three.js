@@ -13,21 +13,22 @@ const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
 	textureGather: new CodeNode( /* glsl */`
-		vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset ) {
-			ivec2 size = textureSize( map, 0 );
-			ivec2 st = ivec2( floor( coord * vec2( size ) + vec2( offset ) - 0.5 ) );
-			ivec4 i = ivec4( st, st + 1 );
-			return vec4(
-				texelFetch( map, i.xw, 0 )[comp],
-				texelFetch( map, i.zw, 0 )[comp],
-				texelFetch( map, i.zy, 0 )[comp],
-				texelFetch( map, i.xy, 0 )[comp]
-			);
-		}
-` ),
-	textureGatherDepth: new CodeNode( /* glsl */`
+vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset ) {
+	ivec2 size = textureSize( map, 0 );
+	ivec2 st = ivec2( floor( coord * vec2( size ) + vec2( offset ) - 0.5 ) );
+	// TODO: textureGather uses a sampler and respects the wrap mode.
+	ivec4 i = ivec4( st, st + 1 );
+	return vec4(
+		texelFetch( map, i.xy, 0 )[ comp ],
+		texelFetch( map, i.zy, 0 )[ comp ],
+		texelFetch( map, i.zw, 0 )[ comp ],
+		texelFetch( map, i.xw, 0 )[ comp ]
+	);
+}
 ` ),
 	textureGatherArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec2 coord, int depth, ivec2 offset ) {
+}
 ` )
 };
 
@@ -707,19 +708,19 @@ ${ flowData.code }
 
 				}
 
-				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ depthSnippet } )`;
+				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ depthSnippet }, ivec2( 0 ) )`;
 
 			}
 
-			this._include( 'textureGatherDepth' );
+			this._include( 'textureGather' );
 
 			if ( offsetSnippet ) {
 
-				return `tsl_textureGather_depth( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+				return `tsl_textureGather( 0, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
 
 			}
 
-			return `tsl_textureGather_depth( ${ textureProperty }, ${ uvSnippet } )`;
+			return `tsl_textureGather( 0, ${ textureProperty }, ${ uvSnippet }, ivec2( 0 ) )`;
 
 		}
 
