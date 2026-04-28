@@ -533,7 +533,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					if ( binding.texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+					if ( binding.texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) && binding.textureNode.gatherComponent === null ) {
 
 						sampler.type = GPUSamplerBindingType.Comparison;
 
