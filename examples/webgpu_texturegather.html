@@ -120,6 +120,7 @@
 
 				const cameraZ = 2.5;
 				const rtScene = new THREE.Scene();
+				rtScene.background = new THREE.Color( 0x808080 );
 				const rtCamera = new THREE.PerspectiveCamera( 50, 1, cameraZ - 0.5 * Math.sqrt( 3 ), cameraZ + 0.5 * Math.sqrt( 3 ) );
 				rtCamera.position.z = cameraZ;
 

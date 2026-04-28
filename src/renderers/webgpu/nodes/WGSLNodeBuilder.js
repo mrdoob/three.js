@@ -352,7 +352,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
