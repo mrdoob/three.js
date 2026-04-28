@@ -45,8 +45,8 @@ let _batchTargetProbes = 0;
 // Reusable temp objects
 const _position = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector3();
-const _savedViewport = /*@__PURE__*/ new Vector4();
-const _savedScissor = /*@__PURE__*/ new Vector4();
+const _currentViewport = /*@__PURE__*/ new Vector4();
+const _currentScissor = /*@__PURE__*/ new Vector4();
 
 // Number of padding texels added at each boundary of every sub-volume in the atlas.
 const ATLAS_PADDING = 1;
@@ -231,10 +231,19 @@ class LightProbeGrid extends Object3D {
 		const batchTarget = _ensureBatchTarget( totalProbes );
 
 		// Save renderer state
-		const savedRenderTarget = renderer.getRenderTarget();
-		renderer.getViewport( _savedViewport );
-		renderer.getScissor( _savedScissor );
-		const savedScissorTest = renderer.getScissorTest();
+		const currentRenderTarget = renderer.getRenderTarget();
+		renderer.getViewport( _currentViewport );
+		renderer.getScissor( _currentScissor );
+		const currentScissorTest = renderer.getScissorTest();
+
+		// Scene is static across the bake — update once and disable per-render auto updates.
+		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+		if ( currentMatrixWorldAutoUpdate === true ) {
+
+			scene.updateMatrixWorld( true );
+			scene.matrixWorldAutoUpdate = false;
+
+		}
 
 		// Clear pooled batch target so skipped probes read as zero
 		batchTarget.scissorTest = false;
@@ -250,7 +259,7 @@ class LightProbeGrid extends Object3D {
 
 		// Disable shadow map auto-update during bake — lights don't move between probes.
 		// Force one shadow update on the first render so maps are initialized.
-		const savedShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 		renderer.shadowMap.autoUpdate = false;
 		renderer.shadowMap.needsUpdate = true;
 
@@ -280,7 +289,7 @@ class LightProbeGrid extends Object3D {
 
 		}
 
-		renderer.shadowMap.autoUpdate = savedShadowAutoUpdate;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		// Phase 2: Repack SH data from batch target into the atlas 3D texture (GPU-to-GPU).
 		//
@@ -330,10 +339,12 @@ class LightProbeGrid extends Object3D {
 		}
 
 		// Restore renderer state
-		renderer.setRenderTarget( savedRenderTarget );
-		renderer.setViewport( _savedViewport );
-		renderer.setScissor( _savedScissor );
-		renderer.setScissorTest( savedScissorTest );
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setViewport( _currentViewport );
+		renderer.setScissor( _currentScissor );
+		renderer.setScissorTest( currentScissorTest );
+
+		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 		// console.log( `LightProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
