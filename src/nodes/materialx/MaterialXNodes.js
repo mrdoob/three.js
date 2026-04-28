@@ -4,6 +4,7 @@ import {
 	mx_worley_noise_vec2 as worley_noise_vec2, mx_worley_noise_vec3 as worley_noise_vec3,
 	mx_cell_noise_float as cell_noise_float, mx_cell_noise_vec3 as cell_noise_vec3,
 	mx_unifiednoise2d as unifiednoise2d, mx_unifiednoise3d as unifiednoise3d,
+	mx_fractal_noise_float_2d as fractal_noise_float_2d,
 	mx_fractal_noise_float as fractal_noise_float, mx_fractal_noise_vec2 as fractal_noise_vec2, mx_fractal_noise_vec3 as fractal_noise_vec3, mx_fractal_noise_vec4 as fractal_noise_vec4
 } from './MaterialXNoise.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './MaterialXColor.js';
@@ -98,6 +99,7 @@ export const mx_worley_noise_vec3 = ( texcoord = uv(), jitter = 1 ) => worley_no
 
 export const mx_cell_noise_float = ( texcoord = uv() ) => cell_noise_float( texcoord.convert( 'vec2|vec3' ) );
 
+export const mx_fractal_noise_float_2d = ( texcoord = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_float_2d( texcoord, int( octaves ), lacunarity, diminish ).mul( amplitude );
 export const mx_fractal_noise_float = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_float( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 export const mx_fractal_noise_vec2 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec2( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 export const mx_fractal_noise_vec3 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec3( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
