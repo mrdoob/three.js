@@ -234,7 +234,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @param {string} type - The output type to bitcast to.
 	 * @param {string} inputType - The input type of the.
-	 * @return {string} The resolved WGSL bitcast invocation.
+	 * @return {string} The resolved GLSL bitcast invocation.
 	 */
 	getBitcastMethod( type, inputType ) {
 
@@ -753,11 +753,11 @@ ${ flowData.code }
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
-	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
-	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
-	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @return {string} The WGSL snippet.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A GLSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The GLSL snippet.
 	 */
 	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
 
