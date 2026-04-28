@@ -202,7 +202,7 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampler ) {
 
-						this.textures.updateSampler( binding.texture );
+						this.textures.updateSampler( binding.texture, binding.textureNode );
 
 					} else if ( binding.isStorageBuffer ) {
 
@@ -410,7 +410,7 @@ class Bindings extends DataMap {
 
 				if ( updated ) {
 
-					const samplerKey = this.textures.updateSampler( binding.texture );
+					const samplerKey = this.textures.updateSampler( binding.texture, binding.textureNode );
 
 					if ( binding.samplerKey !== samplerKey ) {
 
