@@ -183,7 +183,8 @@ Sky.SkyShader = {
 
 		// Cloud noise functions
 		float hash( vec2 p ) {
-			return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453123 );
+			p = 50.0 * fract( p * 0.3183099 + vec2( 0.71, 0.113 ) );
+			return -1.0 + 2.0 * fract( p.x * p.y * ( p.x + p.y ) );
 		}
 
 		float noise( vec2 p ) {
