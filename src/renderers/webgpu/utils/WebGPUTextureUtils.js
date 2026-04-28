@@ -133,7 +133,8 @@ class WebGPUTextureUtils {
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
-			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
+			texture.anisotropy + '-' + ( + texture.isDepthTexture ) + '-' +
+			( texture.compareFunction !== null && textureNode.compareNode !== null ? texture.compareFunction : 0 );
 
 		let samplerData = this._samplerCache.get( samplerKey );
 
@@ -150,7 +151,7 @@ class WebGPUTextureUtils {
 			};
 
 			// Depth textures without compare function must use non-filtering (nearest) sampling
-			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+			if ( texture.isDepthTexture && ( texture.compareFunction === null || textureNode.compareNode === null ) ) {
 
 				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
 				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
@@ -166,7 +167,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) && textureNode.compareNode !== null ) {
+			if ( texture.isDepthTexture && texture.compareFunction !== null && textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
 
