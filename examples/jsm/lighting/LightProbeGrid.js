@@ -236,6 +236,15 @@ class LightProbeGrid extends Object3D {
 		renderer.getScissor( _currentScissor );
 		const currentScissorTest = renderer.getScissorTest();
 
+		// Scene is static across the bake — update once and disable per-render auto updates.
+		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+		if ( currentMatrixWorldAutoUpdate === true ) {
+
+			scene.updateMatrixWorld( true );
+			scene.matrixWorldAutoUpdate = false;
+
+		}
+
 		// Clear pooled batch target so skipped probes read as zero
 		batchTarget.scissorTest = false;
 		batchTarget.viewport.set( 0, 0, 9, totalProbes );
@@ -334,6 +343,8 @@ class LightProbeGrid extends Object3D {
 		renderer.setViewport( _currentViewport );
 		renderer.setScissor( _currentScissor );
 		renderer.setScissorTest( currentScissorTest );
+
+		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 		// console.log( `LightProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
