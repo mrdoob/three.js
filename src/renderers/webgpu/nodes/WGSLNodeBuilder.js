@@ -869,21 +869,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( offsetSnippet ) {
 
-				return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+				return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } ).wzyx`;
 
 			}
 
-			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } ).wzyx`;
 
 		}
 
 		if ( offsetSnippet ) {
 
-			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } ).wzyx`;
 
 		}
 
-		return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet })`;
+		return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }).wzyx`;
 
 	}
 

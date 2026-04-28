@@ -18,10 +18,10 @@ vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset 
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texture( map, ij.xy )[ comp ],
-		texture( map, ij.zy )[ comp ],
+		texture( map, ij.xw )[ comp ],
 		texture( map, ij.zw )[ comp ],
-		texture( map, ij.xw )[ comp ]
+		texture( map, ij.zy )[ comp ],
+		texture( map, ij.xy )[ comp ]
 	);
 }
 ` ),
@@ -31,10 +31,10 @@ vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, iv
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texture( map, vec3( ij.xy, coord.z ) )[ comp ],
-		texture( map, vec3( ij.zy, coord.z ) )[ comp ],
+		texture( map, vec3( ij.xw, coord.z ) )[ comp ],
 		texture( map, vec3( ij.zw, coord.z ) )[ comp ],
-		texture( map, vec3( ij.xw, coord.z ) )[ comp ]
+		texture( map, vec3( ij.zy, coord.z ) )[ comp ],
+		texture( map, vec3( ij.xy, coord.z ) )[ comp ]
 	);
 }
 ` ),
@@ -44,10 +44,10 @@ vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, fl
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texture( map, vec3( ij.xy, ref ) ),
-		texture( map, vec3( ij.zy, ref ) ),
+		texture( map, vec3( ij.xw, ref ) ),
 		texture( map, vec3( ij.zw, ref ) ),
-		texture( map, vec3( ij.xw, ref ) )
+		texture( map, vec3( ij.zy, ref ) ),
+		texture( map, vec3( ij.xy, ref ) )
 	);
 }
 ` ),
@@ -57,10 +57,10 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	return vec4(
-		texture( map, vec4( ij.xy, coord.z, ref ) ),
-		texture( map, vec4( ij.zy, coord.z, ref ) ),
+		texture( map, vec4( ij.xw, coord.z, ref ) ),
 		texture( map, vec4( ij.zw, coord.z, ref ) ),
-		texture( map, vec4( ij.xw, coord.z, ref ) )
+		texture( map, vec4( ij.zy, coord.z, ref ) ),
+		texture( map, vec4( ij.xy, coord.z, ref ) )
 	);
 }
 ` )
