@@ -187,7 +187,8 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: 'compatibility'
+				featureLevel: 'compatibility',
+				xrCompatible: renderer.xr.enabled
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -255,6 +256,35 @@ class WebGPUBackend extends Backend {
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * Registers external GPU textures from XRGPUBinding for use in rendering.
+	 * This allows WebXR sessions to provide their own textures for rendering.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to register the textures for.
+	 * @param {GPUTexture|Array<GPUTexture>} colorTextures - The color GPUTexture(s) from XRSubImage. Can be a single texture or array for MRT.
+	 * @param {?Array<Object>} [viewDescriptors=null] - Array of view descriptors from XRSubImage.getViewDescriptor(), one per view.
+	 */
+	setXRRenderTargetTextures( renderTarget, colorTextures, viewDescriptors = null ) {
+
+		// Handle both single texture and array of textures (for MRT)
+		const colorTextureArray = Array.isArray( colorTextures ) ? colorTextures : [ colorTextures ];
+
+		// For XR, all views typically share the same array texture, just with different view descriptors
+		// So we use the first color texture and store the view descriptors for later use
+		const colorTexture = colorTextureArray[ 0 ];
+
+		// Register color texture - store as 'texture' so view creation code can find it
+		// Also store the format from the GPUTexture for pipeline creation
+		this.set( renderTarget.texture, {
+			texture: colorTexture,
+			format: colorTexture.format,
+			externalTexture: true,
+			xrViewDescriptors: viewDescriptors,
+			initialized: true
+		} );
 
 	}
 
@@ -421,7 +451,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 * Returns whether the render target is a render target array with depth 2D array texture.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
@@ -430,7 +460,9 @@ class WebGPUBackend extends Backend {
 	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
-		return renderContext.depthTexture && renderContext.depthTexture.image.depth > 1 && renderContext.camera.isArrayCamera;
+		const camera = renderContext.camera;
+
+		return renderContext.depthTexture && renderContext.depthTexture.isArrayTexture === true && camera !== null && camera.isArrayCamera === true;
 
 	}
 
@@ -447,12 +479,34 @@ class WebGPUBackend extends Backend {
 		const renderTarget = renderContext.renderTarget;
 		const renderTargetData = this.get( renderTarget );
 
+		// Check if any textures are external XR textures - these should not be cached
+		// because XR textures can change every frame
+		const textures = renderContext.textures;
+		let hasExternalXRTexture = false;
+
+		if ( textures ) {
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const textureData = this.get( textures[ i ] );
+				if ( textureData.externalTexture === true ) {
+
+					hasExternalXRTexture = true;
+					break;
+
+				}
+
+			}
+
+		}
+
 		let descriptors = renderTargetData.descriptors;
 
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.samples !== renderTarget.samples ||
+			hasExternalXRTexture // Don't use cache for XR textures
 		) {
 
 			descriptors = {};
@@ -464,90 +518,129 @@ class WebGPUBackend extends Backend {
 		const cacheKey = renderContext.getCacheKey();
 		let descriptorBase = descriptors[ cacheKey ];
 
-		if ( descriptorBase === undefined ) {
+		if ( descriptorBase === undefined || hasExternalXRTexture ) {
 
-			const textures = renderContext.textures;
 			const textureViews = [];
 
 			let sliceIndex;
 
 			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( renderContext );
+			const isArrayCamera = renderContext.camera !== null && renderContext.camera.isArrayCamera === true;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
 
-				const viewDescriptor = {
-					label: `colorAttachment_${ i }`,
-					baseMipLevel: renderContext.activeMipmapLevel,
-					mipLevelCount: 1,
-					baseArrayLayer: renderContext.activeCubeFace,
-					arrayLayerCount: 1,
-					dimension: GPUTextureViewDimension.TwoD
-				};
+				// Check if this is an external XR texture with view descriptors
+				// Only create multiple color attachments when using an array camera (XR scene rendering)
+				// For output passes (non-array camera), we need only 1 color attachment
+				if ( textureData.externalTexture === true && textureData.xrViewDescriptors && textureData.xrViewDescriptors.length > 0 && isArrayCamera ) {
 
-				if ( renderTarget.isRenderTarget3D ) {
+					// XR path: Use the view descriptors from XRGPUBinding to create proper 2D views
+					for ( let viewIndex = 0; viewIndex < textureData.xrViewDescriptors.length; viewIndex ++ ) {
 
-					sliceIndex = renderContext.activeCubeFace;
+						const xrViewDescriptor = textureData.xrViewDescriptors[ viewIndex ];
+						const textureView = textureData.texture.createView( xrViewDescriptor );
 
-					viewDescriptor.baseArrayLayer = 0;
-					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
-					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+						textureViews.push( {
+							view: textureView,
+							resolveTarget: undefined,
+							depthSlice: undefined
+						} );
 
-				} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
+					}
 
-					if ( isRenderCameraDepthArray === true ) {
+				} else if ( textureData.externalTexture === true ) {
 
-						const cameras = renderContext.camera.cameras;
-						for ( let layer = 0; layer < cameras.length; layer ++ ) {
+					// External XR texture without view descriptors OR non-array camera output pass
+					// Create a simple 2D view for the correct layer based on activeCubeFace
+					const textureView = textureData.texture.createView( {
+						dimension: '2d',
+						baseArrayLayer: renderContext.activeCubeFace,
+						arrayLayerCount: 1
+					} );
 
-							const layerViewDescriptor = {
-								...viewDescriptor,
-								baseArrayLayer: layer,
-								arrayLayerCount: 1,
-								dimension: GPUTextureViewDimension.TwoD
-							};
-							const textureView = textureData.texture.createView( layerViewDescriptor );
-							textureViews.push( {
-								view: textureView,
-								resolveTarget: undefined,
-								depthSlice: undefined
-							} );
+					textureViews.push( {
+						view: textureView,
+						resolveTarget: undefined,
+						depthSlice: undefined
+					} );
+
+				} else {
+
+					const viewDescriptor = {
+						label: `colorAttachment_${ i }`,
+						baseMipLevel: renderContext.activeMipmapLevel,
+						mipLevelCount: 1,
+						baseArrayLayer: renderContext.activeCubeFace,
+						arrayLayerCount: 1,
+						dimension: GPUTextureViewDimension.TwoD
+					};
+
+					if ( renderTarget.isRenderTarget3D ) {
+
+						sliceIndex = renderContext.activeCubeFace;
+
+						viewDescriptor.baseArrayLayer = 0;
+						viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
+						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+
+					} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
+
+						if ( isRenderCameraDepthArray === true ) {
+
+							const cameras = renderContext.camera.cameras;
+							for ( let layer = 0; layer < cameras.length; layer ++ ) {
+
+								const layerViewDescriptor = {
+									...viewDescriptor,
+									baseArrayLayer: layer,
+									arrayLayerCount: 1,
+									dimension: GPUTextureViewDimension.TwoD
+								};
+								const textureView = textureData.texture.createView( layerViewDescriptor );
+								textureViews.push( {
+									view: textureView,
+									resolveTarget: undefined,
+									depthSlice: undefined
+								} );
+
+							}
+
+						} else {
+
+							viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
+							viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
 
 						}
 
-					} else {
-
-						viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
-						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
-
 					}
 
-				}
+					if ( isRenderCameraDepthArray !== true ) {
 
-				if ( isRenderCameraDepthArray !== true ) {
+						const textureView = textureData.texture.createView( viewDescriptor );
 
-					const textureView = textureData.texture.createView( viewDescriptor );
+						let view, resolveTarget;
 
-					let view, resolveTarget;
+						if ( textureData.msaaTexture !== undefined ) {
 
-					if ( textureData.msaaTexture !== undefined ) {
+							view = textureData.msaaTexture.createView();
+							resolveTarget = textureView;
 
-						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
+						} else {
 
-					} else {
+							view = textureView;
+							resolveTarget = undefined;
 
-						view = textureView;
-						resolveTarget = undefined;
+						}
+
+						textureViews.push( {
+							view,
+							resolveTarget,
+							depthSlice: sliceIndex
+						} );
 
 					}
-
-					textureViews.push( {
-						view,
-						resolveTarget,
-						depthSlice: sliceIndex
-					} );
 
 				}
 
@@ -749,7 +842,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -766,7 +859,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -1751,7 +1844,9 @@ class WebGPUBackend extends Backend {
 
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
-					if ( renderContextData.bundleEncoders ) {
+					const isBundleEncoder = renderContextData.bundleEncoders !== undefined;
+
+					if ( isBundleEncoder ) {
 
 						const bundleEncoder = renderContextData.bundleEncoders[ i ];
 						const bundleSets = renderContextData.bundleSets[ i ];
@@ -1759,8 +1854,9 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
+					// GPURenderBundleEncoder does not support setViewport, only GPURenderPassEncoder does
 
-					if ( vp ) {
+					if ( vp && ! isBundleEncoder ) {
 
 						pass.setViewport(
 							Math.floor( vp.x * pixelRatio ),

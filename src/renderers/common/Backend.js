@@ -125,6 +125,15 @@ class Backend {
 	finishRender( /*renderContext*/ ) {}
 
 	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * Backends that render directly into XR framebuffers can override this hook.
+	 *
+	 * @param {?Object} xrTarget - The XR rendering destination.
+	 */
+	setXRTarget( /*xrTarget*/ ) {}
+
+	/**
 	 * This method is executed at the beginning of a compute call and
 	 * can be used by the backend to prepare the state for upcoming
 	 * compute tasks.
