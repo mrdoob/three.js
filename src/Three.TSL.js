@@ -342,6 +342,7 @@ export const mx_cell_noise_float = TSL.mx_cell_noise_float;
 export const mx_cell_noise_vec3 = TSL.mx_cell_noise_vec3;
 export const mx_contrast = TSL.mx_contrast;
 export const mx_divide = TSL.mx_divide;
+export const mx_fractal_noise_float_2d = TSL.mx_fractal_noise_float_2d;
 export const mx_fractal_noise_float = TSL.mx_fractal_noise_float;
 export const mx_fractal_noise_vec2 = TSL.mx_fractal_noise_vec2;
 export const mx_fractal_noise_vec3 = TSL.mx_fractal_noise_vec3;

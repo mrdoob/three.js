@@ -37,7 +37,7 @@ const register = ( registry, categories, handler ) => {
 
 };
 
-const UV_FALLBACK_CATEGORIES = new Set( [ 'noise2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
+const UV_FALLBACK_CATEGORIES = new Set( [ 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToUvSpace( uv( 0 ) );
 

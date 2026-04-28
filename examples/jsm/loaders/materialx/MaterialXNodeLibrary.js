@@ -80,6 +80,8 @@ import {
 	fract,
 	sub,
 	step,
+	Fn,
+	Loop,
 } from 'three/tsl';
 import { normalizeSpaceName } from './MaterialXUtils.js';
 
@@ -449,6 +451,28 @@ const defaultVec2 = ( x, y ) => () => vec2( x, y );
 const defaultVec3 = ( x, y, z ) => () => vec3( x, y, z );
 const defaultVec4 = ( x, y, z, w ) => () => vec4( x, y, z, w );
 
+const mx_fractal_noise_float_materialx_2d = Fn( ( [ texcoordInput, octavesInput, lacunarityInput, diminishInput, amplitudeInput ] ) => {
+
+	const texcoord = vec2( texcoordInput ).toVar();
+	const octaves = int( octavesInput ).toVar();
+	const lacunarity = float( lacunarityInput ).toVar();
+	const diminish = float( diminishInput ).toVar();
+	const amplitude = float( amplitudeInput ).toVar();
+	const result = float( 0 ).toVar();
+	const octaveAmplitude = float( 1 ).toVar();
+
+	Loop( octaves, () => {
+
+		result.addAssign( mul( octaveAmplitude, mx_noise_float( texcoord, float( 1 ), float( 0 ) ) ) );
+		octaveAmplitude.mulAssign( diminish );
+		texcoord.mulAssign( lacunarity );
+
+	} );
+
+	return mul( result, amplitude );
+
+} );
+
 const MXElements = [
 	createMXElement( 'add', add, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
 	createMXElement( 'subtract', sub, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
@@ -708,6 +732,13 @@ const MXElements = [
 		position: () => positionLocal,
 		amplitude: defaultFloat( 1 ),
 		pivot: defaultFloat( 0 ),
+	} ),
+	createMXElement( 'fractal2d', mx_fractal_noise_float_materialx_2d, [ 'texcoord', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
+		texcoord: defaultVec2( 0, 0 ),
+		octaves: defaultInt( 3 ),
+		lacunarity: defaultFloat( 2.0 ),
+		diminish: defaultFloat( 0.5 ),
+		amplitude: defaultFloat( 1.0 ),
 	} ),
 	createMXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
 		position: () => positionLocal,
