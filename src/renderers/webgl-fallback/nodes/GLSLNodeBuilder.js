@@ -20,6 +20,9 @@ const glslCodeCache = {};
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
+	repeatWrapping_float: new CodeNode( 'float tsl_repeatWrapping_float( coord: f32 ) -> f32 { return fract( coord ); }' ),
+	mirrorWrapping_float: new CodeNode( 'float tsl_mirrorWrapping_float( coord: f32 ) -> f32 { let mirrored = fract( coord * 0.5 ) * 2.0; return 1.0 - abs( 1.0 - mirrored ); }' ),
+	clampWrapping_float: new CodeNode( 'float tsl_clampWrapping_float( coord: f32 ) -> f32 { return clamp( coord, 0.0, 1.0 ); }' ),
 	repeatWrapping_int: new CodeNode( /* glsl */'int tsl_repeatWrapping_int( int coord, int size ) { return ((coord % size) + size) % size; }' ),
 	mirrorWrapping_int: new CodeNode( /* glsl */'int tsl_mirrorWrapping_int( int coord, int size ) { int p = size * 2; int m = ((coord % p) + p) % p; m < size ? m : p - 1 - m; }' ),
 	clampWrapping_int: new CodeNode( /* glsl */'int tsl_clampWrapping_int( int coord, int size ) { return clamp(coord, 0, size - 1); }' ),
@@ -34,12 +37,38 @@ vec4 tsl_textureGather( const int comp, sampler2D map, ivec4 ij ) {
 }
 ` ),
 	textureGatherArray: new CodeNode( /* glsl */`
-vec4 tsl_textureGather_array( const int comp, sampler2DArray map, ivec4 ij, int depth ) {
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, ivec4 ij, float depth ) {
 	return vec4(
 		texelFetch( map, ivec3( ij.xy, depth ), 0 )[ comp ],
 		texelFetch( map, ivec3( ij.zy, depth ), 0 )[ comp ],
 		texelFetch( map, ivec3( ij.zw, depth ), 0 )[ comp ],
 		texelFetch( map, ivec3( ij.xw, depth ), 0 )[ comp ]
+	);
+}
+` ),
+	textureGatherCompare: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, float ref ) {
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	return vec4(
+		texture( map, vec3( ij.xy, ref ) ),
+		texture( map, vec3( ij.zy, ref ) ),
+		texture( map, vec3( ij.zw, ref ) ),
+		texture( map, vec3( ij.xw, ref ) )
+	);
+}
+` ),
+	textureGatherCompareArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2 offset, float ref ) {
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	return vec4(
+		texture( map, vec4( ij.xy, coord.z, ref ) ),
+		texture( map, vec4( ij.zy, coord.z, ref ) ),
+		texture( map, vec4( ij.zw, coord.z, ref ) ),
+		texture( map, vec4( ij.xw, coord.z, ref ) )
 	);
 }
 ` )
@@ -790,23 +819,23 @@ ${ flowData.code }
 
 		const wrapFunction = this._generateTextureGatherWrapFunction( texture );
 
-		if ( texture.isArrayTexture === true ) {
+		if ( texture.isDepthTexture ) gatherComponent = 0;
+
+		if ( depthSnippet ) {
 
 			this._include( 'textureGatherArray' );
 
 			if ( offsetSnippet ) {
 
-				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ), ${ depthSnippet } )`;
+				return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ${ offsetSnippet }, ${ textureProperty } ), float( ${ depthSnippet } ) )`;
 
 			}
 
-			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ), ${ depthSnippet } )`;
+			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ), float( ${ depthSnippet } ) )`;
 
 		}
 
 		this._include( 'textureGather' );
-
-		if ( texture.isDepthTexture ) gatherComponent = 0;
 
 		if ( offsetSnippet ) {
 
@@ -815,6 +844,45 @@ ${ flowData.code }
 		}
 
 		return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet }, ivec2( 0 ), ${ textureProperty } ) )`;
+
+	}
+
+	/**
+	 * Generates the GLSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( depthSnippet ) {
+
+			this._include( 'textureGatherCompareArray' );
+
+			if ( offsetSnippet ) {
+
+				return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ${ offsetSnippet }, ${ compareSnippet } )`;
+
+			}
+
+			return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ivec2( 0 ), ${ compareSnippet } )`;
+
+		}
+
+		this._include( 'textureGatherCompare' );
+
+		if ( offsetSnippet ) {
+
+			return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ compareSnippet } )`;
+
+		}
+
+		return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ivec2( 0 ), ${ compareSnippet } )`;
 
 	}
 

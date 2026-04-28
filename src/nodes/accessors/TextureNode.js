@@ -509,7 +509,7 @@ class TextureNode extends UniformNode {
 
 			if ( compareSnippet ) {
 
-				snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, gatherComponent, compareSnippet, depthSnippet, offsetSnippet );
+				snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet );
 
 			} else {
 
