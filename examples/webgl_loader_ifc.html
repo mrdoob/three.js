@@ -133,7 +133,6 @@
 						side: THREE.DoubleSide,
 						vertexColors: true,
 						transparent: true,
-						opacity: 0.5,
 					} );
 					scene.add( new THREE.Mesh( merged, material ) );
 
@@ -189,36 +188,44 @@
 
 			}
 
+			const _tmpColor = new THREE.Color();
+
 			function ifcGeometryToBuffer( color, vertexData, indexData ) {
 
 				// web-ifc returns interleaved [px, py, pz, nx, ny, nz] per vertex.
-				const halfLength = vertexData.length / 2;
-				const positions = new Float32Array( halfLength );
-				const normals = new Float32Array( halfLength );
-				const colors = new Float32Array( halfLength );
+				const vertexCount = vertexData.length / 6;
+				const positions = new Float32Array( vertexCount * 3 );
+				const normals = new Float32Array( vertexCount * 3 );
+				const colors = new Float32Array( vertexCount * 4 );
 
-				for ( let i = 0; i < vertexData.length; i += 6 ) {
+				// IFC stores colors in sRGB display space; convert to linear once per geometry.
+				_tmpColor.setRGB( color.x, color.y, color.z, THREE.SRGBColorSpace );
 
-					const j = i / 2;
+				for ( let v = 0; v < vertexCount; v ++ ) {
 
-					positions[ j + 0 ] = vertexData[ i + 0 ];
-					positions[ j + 1 ] = vertexData[ i + 1 ];
-					positions[ j + 2 ] = vertexData[ i + 2 ];
+					const src = v * 6;
+					const dst3 = v * 3;
+					const dst4 = v * 4;
 
-					normals[ j + 0 ] = vertexData[ i + 3 ];
-					normals[ j + 1 ] = vertexData[ i + 4 ];
-					normals[ j + 2 ] = vertexData[ i + 5 ];
+					positions[ dst3 + 0 ] = vertexData[ src + 0 ];
+					positions[ dst3 + 1 ] = vertexData[ src + 1 ];
+					positions[ dst3 + 2 ] = vertexData[ src + 2 ];
 
-					colors[ j + 0 ] = color.x;
-					colors[ j + 1 ] = color.y;
-					colors[ j + 2 ] = color.z;
+					normals[ dst3 + 0 ] = vertexData[ src + 3 ];
+					normals[ dst3 + 1 ] = vertexData[ src + 4 ];
+					normals[ dst3 + 2 ] = vertexData[ src + 5 ];
+
+					colors[ dst4 + 0 ] = _tmpColor.r;
+					colors[ dst4 + 1 ] = _tmpColor.g;
+					colors[ dst4 + 2 ] = _tmpColor.b;
+					colors[ dst4 + 3 ] = color.w;
 
 				}
 
 				const geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
 				geometry.setIndex( new THREE.BufferAttribute( indexData, 1 ) );
 				return geometry;
 
