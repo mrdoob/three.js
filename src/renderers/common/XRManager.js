@@ -627,30 +627,43 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Applies WebXR fixed foveation to the currently bound post-processing texture
-	 * that is used by the first XR render pass before compositing into a projection layer.
+	 * Applies WebXR fixed foveation to the internal post-processing render target
+	 * used by the first XR render pass before compositing into a projection layer.
 	 *
 	 * Browser-side `XRWebGLBinding.foveateBoundTexture()` failures are treated as
 	 * non-fatal so they do not interrupt rendering.
 	 *
-	 * @param {Texture} texture - The currently bound texture.
-	 * @param {GLenum} glTextureType - The bound texture target.
+	 * @param {RenderTarget} renderTarget - The internal render target.
 	 */
-	foveateBoundTexture( texture, glTextureType ) {
+	foveateBoundTexture( renderTarget ) {
 
-		if ( texture.isRenderTargetTexture !== true ) return;
-		if ( texture.renderTarget.isPostProcessingRenderTarget !== true ) return;
+		if ( renderTarget.isPostProcessingRenderTarget !== true ) return;
 		if ( this.isPresenting !== true ) return;
+		if ( this._glProjLayer === null ) return;
+
+		const backend = this._renderer.backend;
+
+		if ( backend === undefined || backend.isWebGLBackend !== true ) return;
+		if ( backend.state === null ) return;
 
 		const outputRenderTarget = this._renderer.getOutputRenderTarget();
-		const baseLayer = this.getBaseLayer();
 
 		if ( outputRenderTarget === null || outputRenderTarget.isXRRenderTarget !== true ) return;
-		if ( baseLayer === null || baseLayer.textureWidth === undefined ) return;
 
 		const glBinding = this.getBinding();
 
 		if ( glBinding === null || typeof glBinding.foveateBoundTexture !== 'function' ) return;
+
+		this._renderer._textures.updateRenderTarget( renderTarget );
+
+		const { textureGPU, glTextureType } = backend.get( renderTarget.texture );
+
+		if ( textureGPU === undefined || glTextureType === undefined ) return;
+		if ( renderTarget._xrFoveationTextureGPU === textureGPU ) return;
+
+		renderTarget._xrFoveationTextureGPU = textureGPU;
+
+		backend.state.bindTexture( glTextureType, textureGPU );
 
 		try {
 
@@ -659,6 +672,10 @@ class XRManager extends EventDispatcher {
 		} catch ( error ) {
 
 			warnOnce( `XRManager: Unable to foveate bound XR post-processing texture. ${error.name}: ${error.message}` );
+
+		} finally {
+
+			backend.state.unbindTexture();
 
 		}
 
@@ -1703,6 +1720,9 @@ function onAnimationFrame( time, frame ) {
 		}
 
 		renderer.setOutputRenderTarget( this._xrRenderTarget );
+
+		const frameBufferTarget = renderer._getFrameBufferTarget();
+		renderer.xr.foveateBoundTexture( frameBufferTarget );
 
 	}
 
