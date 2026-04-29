@@ -79,6 +79,14 @@ class StackNode extends Node {
 		this._currentNode = null;
 
 		/**
+		 * Stores additional data for nodes that are added to the stack.
+		 *
+		 * @private
+		 * @type {Map<Node, {delta: number}>}
+		 */
+		this._nodeDataLibrary = new Map();
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -111,15 +119,44 @@ class StackNode extends Node {
 	 * Adds a node to this stack.
 	 *
 	 * @param {Node} node - The node to add.
-	 * @param {number} [index=this.nodes.length] - The index where the node should be added.
+	 * @param {number} [index=-1] - The index of the node. If not specified, the node will be added to the end of the stack.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStack( node, index = this.nodes.length ) {
+	addToStack( node, index = - 1 ) {
 
 		if ( node.isNode !== true ) {
 
 			error( 'TSL: Invalid node added to stack.', new StackTrace() );
 			return this;
+
+		}
+
+
+		if ( index === - 1 ) {
+
+			if ( this._currentNode ) {
+
+				let nodeData = this._nodeDataLibrary.get( this._currentNode );
+
+				if ( nodeData === undefined ) {
+
+					nodeData = {
+						delta: 0
+					};
+
+					this._nodeDataLibrary.set( this._currentNode, nodeData );
+
+				}
+
+				nodeData.delta ++;
+
+				index = this.nodes.indexOf( this._currentNode ) + nodeData.delta;
+
+			} else {
+
+				index = this.nodes.length;
+
+			}
 
 		}
 
@@ -137,7 +174,7 @@ class StackNode extends Node {
 	 */
 	addToStackBefore( node ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = this._currentNode !== null ? this.nodes.indexOf( this._currentNode ) : - 1;
 
 		return this.addToStack( node, index );
 
@@ -324,7 +361,10 @@ class StackNode extends Node {
 
 		//
 
-		const buildNode = ( node ) => {
+		for ( let i = 0; i < this.nodes.length; i ++ ) {
+
+			const node = this.nodes[ i ];
+			const previousNode = this._currentNode;
 
 			this._currentNode = node;
 
@@ -332,7 +372,7 @@ class StackNode extends Node {
 
 				if ( node.isAssign( builder ) !== true ) {
 
-					return;
+					continue;
 
 				}
 
@@ -353,7 +393,7 @@ class StackNode extends Node {
 
 				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
 
-					return; // skip var nodes that are only used in .toVarying()
+					continue; // skip var nodes that are only used in .toVarying()
 
 				}
 
@@ -361,25 +401,7 @@ class StackNode extends Node {
 
 			}
 
-		};
-
-		//
-
-		const nodes = [ ...this.nodes ];
-
-		for ( const node of nodes ) {
-
-			buildNode( node );
-
-		}
-
-		this._currentNode = null;
-
-		const newNodes = this.nodes.filter( ( node ) => nodes.indexOf( node ) === - 1 );
-
-		for ( const node of newNodes ) {
-
-			buildNode( node );
+			this._currentNode = previousNode;
 
 		}
 
