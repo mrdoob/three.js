@@ -101,12 +101,12 @@ class TextureNode extends UniformNode {
 
 		/**
 		 * Represents the optional index constant of the channel to gather.
-		 * This must be in range [0, 3].
+		 * This must be in range [0, 3] and a compile-time constant.
 		 *
-		 * @type {?number}
+		 * @type {?Node<int>}
 		 * @default null
 		 */
-		this.gatherComponent = null;
+		this.gatherNode = null;
 
 		/**
 		 * Represents the optional texel offset applied to the unnormalized texture
@@ -230,7 +230,7 @@ class TextureNode extends UniformNode {
 
 		if ( this.value.isDepthTexture === true ) {
 
-			if ( this.gatherComponent === null ) return 'float';
+			if ( this.gatherNode === null ) return 'float';
 
 			return 'vec4';
 
@@ -486,12 +486,12 @@ class TextureNode extends UniformNode {
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
-	 * @param {?number} gatherComponent - The index of the channel to gather.
+	 * @param {?string} gatherSnippet - The gather snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @param {?string} flipYSnippet - The y-flip snippet. Only used for WebGL.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherComponent, offsetSnippet, flipYSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet ) {
 
 		const texture = this.value;
 
@@ -505,7 +505,7 @@ class TextureNode extends UniformNode {
 
 			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
 
-		} else if ( this.gatherComponent !== null ) {
+		} else if ( gatherSnippet ) {
 
 			if ( compareSnippet ) {
 
@@ -513,7 +513,7 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet, flipYSnippet );
+				snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet );
 
 			}
 
@@ -571,7 +571,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -580,10 +580,11 @@ class TextureNode extends UniformNode {
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 				const flipYSnippet = this._flipYUniform ? this._flipYUniform.build( builder, 'bool' ) : null;
 
-				if ( this.gatherComponent !== null ) {
+				if ( gatherSnippet ) {
 
 					nodeType = 'vec4';
 
@@ -601,7 +602,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, this.gatherComponent, offsetSnippet, flipYSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
@@ -811,13 +812,13 @@ class TextureNode extends UniformNode {
 	/**
 	 * Gathers four texels from the texture.
 	 *
-	 * @param {[number]} component - The index of the channel to read.
+	 * @param {[Node<int>]} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
 	 * @return {TextureNode} A texture node representing the texture sample.
 	 */
-	gather( component = 0 ) {
+	gather( gatherNode = 0 ) {
 
 		const textureNode = this.clone();
-		textureNode.gatherComponent = component;
+		textureNode.gatherNode = nodeObject( gatherNode );
 		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
@@ -920,7 +921,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
-		newNode.gatherComponent = this.gatherComponent;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;

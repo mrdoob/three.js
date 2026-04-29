@@ -727,15 +727,15 @@ ${ flowData.code }
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
-	 * @param {number} gatherComponent - The index of the channel to read. This must be in range [0, 3].
+	 * @param {string} gatherSnippet - A GLSL snippet that represents the index of the channel to read.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {?string} flipYSnippet - A GLSL snippet that represents the y-flip. Only used for WebGL.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureGather( texture, textureProperty, uvSnippet, gatherComponent, depthSnippet, offsetSnippet, flipYSnippet ) {
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet ) {
 
-		if ( texture.isDepthTexture ) gatherComponent = 0;
+		if ( texture.isDepthTexture ) gatherSnippet = '0';
 
 		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
 
@@ -745,13 +745,13 @@ ${ flowData.code }
 
 			this._include( 'textureGatherArray' );
 
-			return `tsl_textureGather_array( ${gatherComponent}, ${ textureProperty }, vec3( ${ uvSnippet }, ${ depthSnippet } ), ${ offsetSnippet }, ${ flipYSnippet } )`;
+			return `tsl_textureGather_array( ${gatherSnippet}, ${ textureProperty }, vec3( ${ uvSnippet }, ${ depthSnippet } ), ${ offsetSnippet }, ${ flipYSnippet } )`;
 
 		}
 
 		this._include( 'textureGather' );
 
-		return `tsl_textureGather( ${gatherComponent}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ flipYSnippet } )`;
+		return `tsl_textureGather( ${gatherSnippet}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ flipYSnippet } )`;
 
 	}
 
