@@ -117,12 +117,17 @@ export let wasm;
 
 export let isReady = false;
 
-export const ready = fetch(wasmDataURI)
-    .then((res) => res.arrayBuffer())
-    .then((buffer) => WebAssembly.instantiate(buffer, {
-        './mikktspace_module_bg.js': {__wbindgen_string_new, __wbindgen_rethrow}
-    }))
-    .then((result) => {
-        wasm = result.instance.exports;
-        isReady = true;
+export const ready = async function() {
+    const res = await fetch(wasmDataURI);
+    const buffer = await res.arrayBuffer();
+    const result = await WebAssembly.instantiate(buffer, {
+        './mikktspace_module_bg.js': { __wbindgen_string_new, __wbindgen_rethrow }
     });
+    wasm = result.instance.exports;
+    isReady = true;
+}
+
+export const dispose = function() {
+    wasm = null;
+    isReady = false;
+}
