@@ -704,25 +704,54 @@ function Loader( editor ) {
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
+					let renderOrder = 0;
+
 					for ( let i = 0; i < paths.length; i ++ ) {
 
 						const path = paths[ i ];
 
-						const material = new THREE.MeshBasicMaterial( {
-							color: path.color,
-							depthWrite: false
-						} );
+						// fill
 
-						const shapes = SVGLoader.createShapes( path );
+						const fillMaterial = SVGLoader.createFillMaterial( path );
 
-						for ( let j = 0; j < shapes.length; j ++ ) {
+						if ( fillMaterial ) {
 
-							const shape = shapes[ j ];
+							const shapes = SVGLoader.createShapes( path );
 
-							const geometry = new THREE.ShapeGeometry( shape );
-							const mesh = new THREE.Mesh( geometry, material );
+							for ( let j = 0; j < shapes.length; j ++ ) {
 
-							group.add( mesh );
+								const shape = shapes[ j ];
+
+								const geometry = new THREE.ShapeGeometry( shape );
+								const mesh = new THREE.Mesh( geometry, fillMaterial );
+								mesh.renderOrder = renderOrder ++;
+
+								group.add( mesh );
+
+							}
+
+						}
+
+						// stroke
+
+						const strokeMaterial = SVGLoader.createStrokeMaterial( path );
+
+						if ( strokeMaterial ) {
+
+							for ( const subPath of path.subPaths ) {
+
+								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+
+								if ( geometry ) {
+
+									const mesh = new THREE.Mesh( geometry, strokeMaterial );
+									mesh.renderOrder = renderOrder ++;
+
+									group.add( mesh );
+
+								}
+
+							}
 
 						}
 

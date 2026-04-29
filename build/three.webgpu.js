@@ -224,7 +224,7 @@ class NodeMaterialObserver {
 
 			}
 
-			data.lights = this.getLightsData( renderObject.lightsNode.getLights() );
+			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -341,7 +341,7 @@ class NodeMaterialObserver {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: value.version };
+						data[ property ] = { id: value.id, version: 0 };
 
 					} else {
 
@@ -637,9 +637,9 @@ class NodeMaterialObserver {
 	 * @param {Array<Light>} materialLights - The material lights.
 	 * @return {Array<Object>} The lights data for the given material lights.
 	 */
-	getLightsData( materialLights ) {
+	getLightsData( materialLights, lights ) {
 
-		const lights = [];
+		lights.length = 0;
 
 		for ( const light of materialLights ) {
 
@@ -666,23 +666,25 @@ class NodeMaterialObserver {
 	 */
 	getLights( lightsNode, renderId ) {
 
-		if ( _lightsCache.has( lightsNode ) ) {
+		let cached = _lightsCache.get( lightsNode );
 
-			const cached = _lightsCache.get( lightsNode );
+		if ( cached === undefined ) {
 
-			if ( cached.renderId === renderId ) {
-
-				return cached.lightsData;
-
-			}
+			cached = { renderId: -1, lightsData: [] };
+			_lightsCache.set( lightsNode, cached );
 
 		}
 
-		const lightsData = this.getLightsData( lightsNode.getLights() );
+		if ( cached.renderId === renderId ) {
 
-		_lightsCache.set( lightsNode, { renderId, lightsData } );
+			return cached.lightsData;
 
-		return lightsData;
+		}
+
+		cached.renderId = renderId;
+		this.getLightsData( lightsNode.getLights(), cached.lightsData );
+
+		return cached.lightsData;
 
 	}
 
@@ -4764,9 +4766,6 @@ const mat2 = new ConvertType( 'mat2' );
 const mat3 = new ConvertType( 'mat3' );
 const mat4 = new ConvertType( 'mat4' );
 
-const string = ( value = '' ) => new ConstNode( value, 'string' );
-const arrayBuffer = ( value ) => new ConstNode( value, 'ArrayBuffer' );
-
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );
 addMethodChaining( 'toInt', int );
@@ -6868,24 +6867,6 @@ addMethodChaining( 'incrementBefore', incrementBefore );
 addMethodChaining( 'decrementBefore', decrementBefore );
 addMethodChaining( 'increment', increment );
 addMethodChaining( 'decrement', decrement );
-
-/**
- * @tsl
- * @function
- * @deprecated since r175. Use {@link mod} instead.
- *
- * @param {Node} a - The first input.
- * @param {Node} b - The second input.
- * @returns {OperatorNode}
- */
-const modInt = ( a, b ) => { // @deprecated, r175
-
-	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.', new StackTrace() );
-	return mod( int( a ), int( b ) );
-
-};
-
-addMethodChaining( 'modInt', modInt );
 
 /**
  * This node represents a variety of mathematical methods available in shaders.
@@ -10264,8 +10245,11 @@ class BufferAttributeNode extends InputNode {
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );
+		const nodeName = builder.context.nodeName;
 
-		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType );
+		if ( nodeName !== undefined ) delete builder.context.nodeName; // deleting when consumed
+
+		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType, nodeName );
 		const propertyName = builder.getPropertyName( nodeAttribute );
 
 		let output = null;
@@ -10278,7 +10262,15 @@ class BufferAttributeNode extends InputNode {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			let varyingName;
+
+			if ( nodeName ) {
+
+				varyingName = nodeName + 'Varying';
+
+			}
+
+			const nodeVarying = varying( this, varyingName );
 
 			output = nodeVarying.build( builder, nodeType );
 
@@ -31231,42 +31223,46 @@ class Info {
 		 *
 		 * @type {Object}
 		 * @readonly
-		 * @property {number} geometries - The number of active geometries.
-		 * @property {number} textures - The number of active textures.
 		 * @property {number} attributes - The number of active attributes.
-		 * @property {number} indexAttributes - The number of active index attributes.
-		 * @property {number} storageAttributes - The number of active storage attributes.
-		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
-		 * @property {number} readbackBuffers - The number of active readback buffers.
-		 * @property {number} programs - The number of active programs.
-		 * @property {number} renderTargets - The number of active renderTargets.
-		 * @property {number} total - The total memory size in bytes.
-		 * @property {number} texturesSize - The memory size of active textures in bytes.
 		 * @property {number} attributesSize - The memory size of active attributes in bytes.
+		 * @property {number} geometries - The number of active geometries.
+		 * @property {number} indexAttributes - The number of active index attributes.
 		 * @property {number} indexAttributesSize - The memory size of active index attributes in bytes.
-		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} indirectStorageAttributes - The number of active indirect storage attributes.
 		 * @property {number} indirectStorageAttributesSize - The memory size of active indirect storage attributes in bytes.
-		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} programs - The number of active programs.
 		 * @property {number} programsSize - The memory size of active programs in bytes.
+		 * @property {number} readbackBuffers - The number of active readback buffers.
+		 * @property {number} readbackBuffersSize - The memory size of active readback buffers in bytes.
+		 * @property {number} renderTargets - The number of active renderTargets.
+		 * @property {number} storageAttributes - The number of active storage attributes.
+		 * @property {number} storageAttributesSize - The memory size of active storage attributes in bytes.
+		 * @property {number} textures - The number of active textures.
+		 * @property {number} texturesSize - The memory size of active textures in bytes.
+		 * @property {number} uniformBuffers - The number of active uniform buffers.
+		 * @property {number} uniformBuffersSize - The memory size of active uniform buffers in bytes.
+		 * @property {number} total - The total memory size in bytes.
 		 */
 		this.memory = {
-			geometries: 0,
-			textures: 0,
 			attributes: 0,
-			indexAttributes: 0,
-			storageAttributes: 0,
-			indirectStorageAttributes: 0,
-			readbackBuffers: 0,
-			programs: 0,
-			renderTargets: 0,
-			total: 0,
-			texturesSize: 0,
 			attributesSize: 0,
+			geometries: 0,
+			indexAttributes: 0,
 			indexAttributesSize: 0,
-			storageAttributesSize: 0,
+			indirectStorageAttributes: 0,
 			indirectStorageAttributesSize: 0,
+			programs: 0,
+			programsSize: 0,
+			readbackBuffers: 0,
 			readbackBuffersSize: 0,
-			programsSize: 0
+			renderTargets: 0,
+			storageAttributes: 0,
+			storageAttributesSize: 0,
+			textures: 0,
+			texturesSize: 0,
+			uniformBuffers: 0,
+			uniformBuffersSize: 0,
+			total: 0
 		};
 
 		/**
@@ -31499,6 +31495,43 @@ class Info {
 		this.memory.readbackBuffers --;
 		this.memory.total -= size;
 		this.memory.readbackBuffersSize -= size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const size = uniformBuffer.byteLength;
+		this.memoryMap.set( uniformBuffer, { size, type: 'uniformBuffers' } );
+
+		this.memory.uniformBuffers ++;
+		this.memory.total += size;
+		this.memory.uniformBuffersSize += size;
+
+	}
+
+	/**
+	 * Tracks a uniform buffer memory explicitly.
+	 *
+	 * @param {UniformBuffer} uniformBuffer - The uniform buffer to track.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const data = this.memoryMap.get( uniformBuffer );
+
+		if ( data ) {
+
+			this.memoryMap.delete( uniformBuffer );
+
+			this.memory.uniformBuffers --;
+			this.memory.total -= data.size;
+			this.memory.uniformBuffersSize -= data.size;
+
+		}
 
 	}
 
@@ -32390,21 +32423,15 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
-		for ( const bindGroup of bindings ) {
+		const renderObjectData = this.get( renderObject );
 
-			const groupData = this.get( bindGroup );
+		if ( renderObjectData.initialized !== true ) {
 
-			if ( groupData.bindGroup === undefined ) {
+			// bind groups are created once per object
 
-				// each object defines an array of bindings (ubos, textures, samplers etc.)
+			this._createBindings( bindings );
 
-				this._init( bindGroup );
-
-				this.backend.createBindings( bindGroup, bindings, 0 );
-
-				groupData.bindGroup = bindGroup;
-
-			}
+			renderObjectData.initialized = true;
 
 		}
 
@@ -32421,20 +32448,15 @@ class Bindings extends DataMap {
 	getForCompute( computeNode ) {
 
 		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+		const computeNodeData = this.get( computeNode );
 
-		for ( const bindGroup of bindings ) {
+		if ( computeNodeData.initialized !== true ) {
 
-			const groupData = this.get( bindGroup );
+			// bind groups are created once per object
 
-			if ( groupData.bindGroup === undefined ) {
+			this._createBindings( bindings );
 
-				this._init( bindGroup );
-
-				this.backend.createBindings( bindGroup, bindings, 0 );
-
-				groupData.bindGroup = bindGroup;
-
-			}
+			computeNodeData.initialized = true;
 
 		}
 
@@ -32473,12 +32495,9 @@ class Bindings extends DataMap {
 
 		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 
-		for ( const bindGroup of bindings ) {
+		this._destroyBindings( bindings );
 
-			this.backend.deleteBindGroupData( bindGroup );
-			this.delete( bindGroup );
-
-		}
+		this.delete( computeNode );
 
 	}
 
@@ -32491,10 +32510,105 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
+		this._destroyBindings( bindings );
+
+		this.delete( renderObject );
+
+	}
+
+	/**
+	 * Creates the bindings for the given array of bindings.
+	 *
+	 * @param {Array<BindGroup>} bindings - The bind groups.
+	 */
+	_createBindings( bindings ) {
+
 		for ( const bindGroup of bindings ) {
 
-			this.backend.deleteBindGroupData( bindGroup );
-			this.delete( bindGroup );
+			// binding group
+
+			const groupData = this.get( bindGroup );
+
+			if ( groupData.bindGroup === undefined ) {
+
+				// initialize
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding.isUniformBuffer ) {
+
+						this.backend.createUniformBuffer( binding );
+						this.info.createUniformBuffer( binding );
+
+					} else if ( binding.isSampledTexture ) {
+
+						this.textures.updateTexture( binding.texture );
+
+					} else if ( binding.isSampler ) {
+
+						this.textures.updateSampler( binding.texture );
+
+					} else if ( binding.isStorageBuffer ) {
+
+						const attribute = binding.attribute;
+						const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
+
+						this.attributes.update( attribute, attributeType );
+
+					}
+
+				}
+
+				// each object defines an array of bindings (ubos, textures, samplers etc.)
+
+				this.backend.createBindings( bindGroup, bindings, 0 );
+
+				groupData.bindGroup = bindGroup;
+				groupData.usedTimes = 1;
+
+			} else {
+
+				groupData.usedTimes ++;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Deletes the given array of bindings.
+	 *
+	 * @param {Array<BindGroup>} bindings - The bind groups.
+	 */
+	_destroyBindings( bindings ) {
+
+		for ( const bindGroup of bindings ) {
+
+			const groupData = this.get( bindGroup );
+			groupData.usedTimes --;
+
+			if ( groupData.usedTimes === 0 ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding.isUniformBuffer ) {
+
+						this.backend.destroyUniformBuffer( binding );
+						this.info.destroyUniformBuffer( binding );
+
+						// release arrays
+
+						binding.release();
+
+					}
+
+				}
+
+				this.backend.deleteBindGroupData( bindGroup );
+				this.delete( bindGroup );
+
+			}
 
 		}
 
@@ -32510,36 +32624,6 @@ class Bindings extends DataMap {
 		for ( const bindGroup of bindings ) {
 
 			this._update( bindGroup, bindings );
-
-		}
-
-	}
-
-	/**
-	 * Initializes the given bind group.
-	 *
-	 * @param {BindGroup} bindGroup - The bind group to initialize.
-	 */
-	_init( bindGroup ) {
-
-		for ( const binding of bindGroup.bindings ) {
-
-			if ( binding.isSampledTexture ) {
-
-				this.textures.updateTexture( binding.texture );
-
-			} else if ( binding.isSampler ) {
-
-				this.textures.updateSampler( binding.texture );
-
-			} else if ( binding.isStorageBuffer ) {
-
-				const attribute = binding.attribute;
-				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
-
-				this.attributes.update( attribute, attributeType );
-
-			}
 
 		}
 
@@ -39674,14 +39758,21 @@ class PassNode extends TempNode {
 		 */
 		this._height = 1;
 
-		const depthTexture = new DepthTexture();
-		depthTexture.isRenderTargetTexture = true;
-		//depthTexture.type = FloatType;
-		depthTexture.name = 'depth';
-
 		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options, } );
 		renderTarget.texture.name = 'output';
-		renderTarget.depthTexture = depthTexture;
+
+		let depthTexture = null;
+
+		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
+
+			depthTexture = new DepthTexture();
+			depthTexture.isRenderTargetTexture = true;
+			//depthTexture.type = FloatType;
+			depthTexture.name = 'depth';
+
+			renderTarget.depthTexture = depthTexture;
+
+		}
 
 		/**
 		 * The pass's render target.
@@ -39733,12 +39824,17 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {Object<string, Texture>}
+		 * @type {{ output: Texture, depth?: DepthTexture }}
 		 */
 		this._textures = {
-			output: renderTarget.texture,
-			depth: depthTexture
+			output: renderTarget.texture
 		};
+
+		if ( depthTexture !== null ) {
+
+			this._textures.depth = depthTexture;
+
+		}
 
 		/**
 		 * A dictionary holding the internal texture nodes.
@@ -39990,6 +40086,12 @@ class PassNode extends TempNode {
 
 		if ( texture === undefined ) {
 
+			if ( name === 'depth' ) {
+
+				throw new Error( 'THREE.PassNode: Depth texture is not available for this pass.' );
+
+			}
+
 			const refTexture = this.renderTarget.texture;
 
 			texture = refTexture.clone();
@@ -40180,7 +40282,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
-		if ( renderer.reversedDepthBuffer === true ) {
+		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
 			this.renderTarget.depthTexture.type = FloatType;
 
@@ -47472,7 +47574,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	any: any,
 	append: append,
 	array: array,
-	arrayBuffer: arrayBuffer,
 	asin: asin,
 	asinh: asinh,
 	assign: assign,
@@ -47741,7 +47842,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mix: mix,
 	mixElement: mixElement,
 	mod: mod,
-	modInt: modInt,
 	modelDirection: modelDirection,
 	modelNormalMatrix: modelNormalMatrix,
 	modelPosition: modelPosition,
@@ -47939,7 +48039,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	storage: storage,
 	storageBarrier: storageBarrier,
 	storageTexture: storageTexture,
-	string: string,
 	struct: struct,
 	sub: sub,
 	subBuild: subBuild,
@@ -51435,9 +51534,10 @@ class NodeBuilder {
 	 *
 	 * @param {BufferAttributeNode} node - The buffer attribute node.
 	 * @param {string} type - The node type.
+	 * @param {?string} [name=null] - The name of the buffer attribute.
 	 * @return {NodeAttribute} The node attribute.
 	 */
-	getBufferAttributeFromNode( node, type ) {
+	getBufferAttributeFromNode( node, type, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'vertex' );
 
@@ -51447,7 +51547,13 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			bufferAttribute = new NodeAttribute( 'nodeAttribute' + index, type, node );
+			if ( name === null ) {
+
+				name = 'nodeAttribute' + index;
+
+			}
+
+			bufferAttribute = new NodeAttribute( name, type, node );
 
 			this.bufferAttributes.push( bufferAttribute );
 
@@ -61617,6 +61723,15 @@ class Buffer extends Binding {
 
 	}
 
+	/**
+	 * Releases the buffer.
+	 */
+	release() {
+
+		this._buffer = null;
+
+	}
+
 }
 
 /**
@@ -61805,6 +61920,15 @@ class UniformsGroup extends UniformBuffer {
 		 */
 		this._updateRangeCache = new Map();
 
+		/**
+		 * Uniform indices whose range has already been pushed into `updateRanges`
+		 * during the current update cycle. Reset on `clearUpdateRanges()`.
+		 *
+		 * @private
+		 * @type {Set<number>}
+		 */
+		this._addedIndices = new Set();
+
 	}
 
 	/**
@@ -61816,20 +61940,22 @@ class UniformsGroup extends UniformBuffer {
 
 		const index = uniform.index;
 
-		if ( this._updateRangeCache.has( index ) !== true ) {
+		if ( this._addedIndices.has( index ) ) return;
 
-			const updateRanges = this.updateRanges;
+		let range = this._updateRangeCache.get( index );
 
-			const start = uniform.offset;
-			const count = uniform.itemSize;
+		if ( range === undefined ) {
 
-			const range = { start, count };
-
-			updateRanges.push( range );
-
+			range = { start: 0, count: 0 };
 			this._updateRangeCache.set( index, range );
 
 		}
+
+		range.start = uniform.offset;
+		range.count = uniform.itemSize;
+
+		this._addedIndices.add( index );
+		this.updateRanges.push( range );
 
 	}
 
@@ -61838,7 +61964,7 @@ class UniformsGroup extends UniformBuffer {
 	 */
 	clearUpdateRanges() {
 
-		this._updateRangeCache.clear();
+		this._addedIndices.clear();
 
 		super.clearUpdateRanges();
 
@@ -61985,6 +62111,17 @@ class UniformsGroup extends UniformBuffer {
 		}
 
 		return updated;
+
+	}
+
+	/**
+	 * Releases the buffer.
+	 */
+	release() {
+
+		super.release();
+
+		this._values = null;
 
 	}
 
@@ -64747,6 +64884,22 @@ class Backend {
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
 	createStorageAttribute( /*attribute*/ ) { }
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( /*uniformBuffer*/ ) { }
+
+	/**
+	 * Destroys a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( /*uniformBuffer*/ ) { }
 
 	/**
 	 * Updates the GPU buffer of a shader attribute.
@@ -71112,24 +71265,9 @@ class WebGLBackend extends Backend {
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const array = binding.buffer;
-				let { bufferGPU } = this.get( array );
+				const bufferGPU = map.bufferGPU;
 
-				if ( bufferGPU === undefined ) {
-
-					// create
-
-					bufferGPU = gl.createBuffer();
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
-
-					this.set( array, { bufferGPU } );
-
-				} else {
-
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-
-				}
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 
 				// update
 
@@ -71160,8 +71298,6 @@ class WebGLBackend extends Backend {
 					}
 
 				}
-
-				map.bufferGPU = bufferGPU;
 
 				this.set( binding, map );
 
@@ -71228,6 +71364,44 @@ class WebGLBackend extends Backend {
 	}
 
 	// attributes
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		if ( uniformBufferData.bufferGPU === undefined ) {
+
+			const gl = this.gl;
+			const array = uniformBuffer.buffer;
+
+			uniformBufferData.bufferGPU = gl.createBuffer();
+
+			gl.bindBuffer( gl.UNIFORM_BUFFER, uniformBufferData.bufferGPU );
+			gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
+
+		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		this.gl.deleteBuffer( uniformBufferData.bufferGPU );
+
+		this.delete( uniformBuffer );
+
+	}
 
 	/**
 	 * Creates the GPU buffer of an indexed shader attribute.
@@ -72935,6 +73109,29 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+
+	device.queue.writeTexture(
+		{
+			texture: textureGPU,
+			mipLevel,
+			origin: { x: 0, y: 0, z: layerIndex }
+		},
+		mipmap.data,
+		{
+			offset: layerIndex * bytesPerImage,
+			bytesPerRow,
+			rowsPerImage
+		},
+		{
+			width: textureWidth,
+			height: textureHeight,
+			depthOrArrayLayers: 1
+		}
+	);
+
+}
+
 /**
  * A WebGPU backend utility module for managing textures.
  *
@@ -73460,7 +73657,17 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+
+			}
 
 		} else if ( texture.isCubeTexture ) {
 
@@ -73847,8 +74054,9 @@ class WebGPUTextureUtils {
 	 * @param {Array<Object>} mipmaps - An array with mipmap data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -73856,6 +74064,7 @@ class WebGPUTextureUtils {
 
 		const blockData = this._getBlockData( textureDescriptorGPU.format );
 		const isArrayTexture = textureDescriptorGPU.size.depthOrArrayLayers > 1;
+		const activeLayerUpdates = layerUpdates && layerUpdates.size > 0 ? layerUpdates : null;
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -73866,28 +74075,26 @@ class WebGPUTextureUtils {
 			const depth = isArrayTexture ? textureDescriptorGPU.size.depthOrArrayLayers : 1;
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
-			const bytesPerImage = bytesPerRow * Math.ceil( height / blockData.height );
+			const rowsPerImage = Math.ceil( height / blockData.height );
+			const bytesPerImage = bytesPerRow * rowsPerImage;
+			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
+			const textureHeight = rowsPerImage * blockData.height;
 
-			for ( let j = 0; j < depth; j ++ ) {
+			if ( activeLayerUpdates !== null ) {
 
-				device.queue.writeTexture(
-					{
-						texture: textureGPU,
-						mipLevel: i,
-						origin: { x: 0, y: 0, z: j }
-					},
-					mipmap.data,
-					{
-						offset: j * bytesPerImage,
-						bytesPerRow,
-						rowsPerImage: Math.ceil( height / blockData.height )
-					},
-					{
-						width: Math.ceil( width / blockData.width ) * blockData.width,
-						height: Math.ceil( height / blockData.height ) * blockData.height,
-						depthOrArrayLayers: 1
-					}
-				);
+				for ( const layerIndex of activeLayerUpdates ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
+
+			} else {
+
+				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
 
 			}
 
@@ -78329,43 +78536,6 @@ class WebGPUBindingUtils {
 
 				const bindingData = backend.get( binding );
 
-				if ( bindingData.buffer === undefined ) {
-
-					const byteLength = binding.byteLength;
-
-					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
-
-					const visibilities = [];
-					if ( binding.visibility & GPUShaderStage.VERTEX ) {
-
-						visibilities.push( 'vertex' );
-
-					}
-
-					if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
-
-						visibilities.push( 'fragment' );
-
-					}
-
-					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
-
-						visibilities.push( 'compute' );
-
-					}
-
-					const bufferVisibility = `(${visibilities.join( ',' )})`;
-
-					const bufferGPU = device.createBuffer( {
-						label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
-						size: byteLength,
-						usage: usage
-					} );
-
-					bindingData.buffer = bufferGPU;
-
-				}
-
 				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
 			} else if ( binding.isStorageBuffer ) {
@@ -82028,6 +82198,70 @@ class WebGPUBackend extends Backend {
 	}
 
 	// bindings
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		if ( uniformBufferData.buffer === undefined ) {
+
+			const byteLength = uniformBuffer.byteLength;
+
+			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+			const visibilities = [];
+
+			if ( uniformBuffer.visibility & GPUShaderStage.VERTEX ) {
+
+				visibilities.push( 'vertex' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.FRAGMENT ) {
+
+				visibilities.push( 'fragment' );
+
+			}
+
+			if ( uniformBuffer.visibility & GPUShaderStage.COMPUTE ) {
+
+				visibilities.push( 'compute' );
+
+			}
+
+			const bufferVisibility = `(${visibilities.join( ',' )})`;
+
+			const bufferGPU = this.device.createBuffer( {
+				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
+				size: byteLength,
+				usage: usage
+			} );
+
+			uniformBufferData.buffer = bufferGPU;
+
+		}
+
+	}
+
+	/**
+	 * Destroys the GPU data for the given uniform buffer.
+	 *
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( uniformBuffer ) {
+
+		const uniformBufferData = this.get( uniformBuffer );
+
+		uniformBufferData.buffer.destroy();
+
+		this.delete( uniformBuffer );
+
+	}
 
 	/**
 	 * Creates bindings from the given bind group definition.

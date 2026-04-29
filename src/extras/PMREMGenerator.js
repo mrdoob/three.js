@@ -142,8 +142,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512),
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input image size
+	 * is 64 x 32.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
@@ -157,8 +158,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256,
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input cube
+	 * size is 16 x 16 per face.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.

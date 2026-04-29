@@ -354,6 +354,7 @@
 		"webgpu_lensflares",
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
+		"webgpu_lights_clustered",
 		"webgpu_lights_custom",
 		"webgpu_lights_dynamic",
 		"webgpu_lights_ies_spotlight",

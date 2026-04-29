@@ -580,7 +580,11 @@ class Material extends EventDispatcher {
 
 				currentValue.set( newValue );
 
-			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
+			} else if (
+				( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) ||
+				( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) ||
+				( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) )
+			) {
 
 				currentValue.copy( newValue );
 
