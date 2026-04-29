@@ -174,7 +174,7 @@ class StackNode extends Node {
 	 */
 	addToStackBefore( node ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = this._currentNode !== null ? this.nodes.indexOf( this._currentNode ) : - 1;
 
 		return this.addToStack( node, index );
 
