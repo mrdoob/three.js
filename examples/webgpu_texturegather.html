@@ -116,9 +116,7 @@
 
 				const depthTexture = new THREE.DepthTexture();
 				depthTexture.compareFunction = THREE.LessEqualCompare;
-				const rt = new THREE.RenderTarget( 100, 100, {
-					depthTexture,
-				} );
+				const rt = new THREE.RenderTarget( 100, 100, { depthTexture } );
 
 				const cameraZ = 2.5;
 				const rtScene = new THREE.Scene();
