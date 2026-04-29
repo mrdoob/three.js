@@ -117,7 +117,7 @@ export let wasm;
 
 export let isReady = false;
 
-export const ready = async function() {
+export async function ready() {
     const res = await fetch(wasmDataURI);
     const buffer = await res.arrayBuffer();
     const result = await WebAssembly.instantiate(buffer, {
@@ -127,7 +127,7 @@ export const ready = async function() {
     isReady = true;
 }
 
-export const dispose = function() {
+export function dispose() {
     wasm = null;
     isReady = false;
 }
