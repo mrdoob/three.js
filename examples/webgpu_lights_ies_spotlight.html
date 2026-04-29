@@ -173,8 +173,33 @@
 
 				//
 
+				const profiles = {
+					'Profile 1': iesTexture1,
+					'Profile 2': iesTexture2,
+					'Profile 3': iesTexture3,
+					'Profile 4': iesTexture4
+				};
+
+				const lightLabels = [ 'Red light', 'Green light', 'Blue light', 'White light' ];
+
+				//
+
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( { helper: false }, 'helper' ).onChange( ( v ) => setHelperVisible( v ) );
+
+				for ( let i = 0; i < lights.length; i ++ ) {
+
+					const light = lights[ i ];
+					const folder = gui.addFolder( lightLabels[ i ] );
+					const state = { profile: light.iesMap };
+
+					folder.add( state, 'profile', profiles ).name( 'IES profile' ).onChange( ( v ) => {
+
+						light.iesMap = v;
+
+					} );
+
+				}
 
 				//
 
