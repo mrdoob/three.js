@@ -1,46 +1,6 @@
 import SpotLightNode from './SpotLightNode.js';
-import TextureNode, { texture } from '../accessors/TextureNode.js';
+import { texture } from '../accessors/TextureNode.js';
 import { vec2 } from '../tsl/TSLBase.js';
-
-/**
- * Internal TextureNode subclass whose uniform hash is scoped to the owning
- * light. The default hash is `value.uuid`, which would dedupe iesMap bindings
- * across lights that share the same texture and prevent per-light runtime
- * swaps from taking effect.
- *
- * @augments TextureNode
- */
-class IESTextureNode extends TextureNode {
-
-	static get type() {
-
-		return 'IESTextureNode';
-
-	}
-
-	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
-
-		super( value, uvNode, levelNode, biasNode );
-
-		this._lightId = null;
-
-	}
-
-	getUniformHash( /*builder*/ ) {
-
-		return `${ this._lightId }_${ this.value.uuid }`;
-
-	}
-
-	clone() {
-
-		const cloned = super.clone();
-		cloned._lightId = this._lightId;
-		return cloned;
-
-	}
-
-}
 
 /**
  * An IES version of the default spot light node.
@@ -55,34 +15,22 @@ class IESSpotLightNode extends SpotLightNode {
 
 	}
 
+	/**
+	 * Constructs a new IES spot light node.
+	 *
+	 * @param {?SpotLight} [light=null] - The spot light source.
+	 */
 	constructor( light = null ) {
 
 		super( light );
 
 		/**
-		 * Cached IES texture node. Its `value` is synced to `light.iesMap` in
-		 * `update()` so a runtime swap rebinds the texture without recompiling
-		 * the shader.
+		 * The texture node representing the IES texture.
 		 *
-		 * @type {?IESTextureNode}
+		 * @type {?TextureNode}
 		 * @default null
 		 */
-		this.iesMapNode = null;
-
-	}
-
-	update( frame ) {
-
-		super.update( frame );
-
-		// Only sync when iesMap is truthy: the shader branch was selected at
-		// build time, so a light built with an IES map cannot drop back to the
-		// non-IES path without being recreated.
-		if ( this.iesMapNode !== null && this.light.iesMap ) {
-
-			this.iesMapNode.value = this.light.iesMap;
-
-		}
+		this._iesTextureNode = null;
 
 	}
 
@@ -101,19 +49,11 @@ class IESSpotLightNode extends SpotLightNode {
 
 		if ( iesMap && iesMap.isTexture === true ) {
 
-			if ( this.iesMapNode === null ) {
-
-				this.iesMapNode = new IESTextureNode( iesMap );
-				this.iesMapNode._lightId = this.light.id;
-
-			}
-
 			const angle = angleCosine.acos().mul( 1.0 / Math.PI );
-			const iesSample = texture( this.iesMapNode, vec2( angle, 0 ), 0 );
 
-			iesSample.setUpdateMatrix( false );
+			this._iesTextureNode = texture( iesMap, vec2( angle, 0 ), 0 );
 
-			spotAttenuation = iesSample.r;
+			spotAttenuation = this._iesTextureNode.r;
 
 		} else {
 
@@ -122,6 +62,23 @@ class IESSpotLightNode extends SpotLightNode {
 		}
 
 		return spotAttenuation;
+
+	}
+
+	/**
+	 * Overwritten to update the IES spot light texture.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		super.update( frame );
+
+		if ( this._iesTextureNode !== null && this.light.iesMap ) {
+
+			this._iesTextureNode.value = this.light.iesMap;
+
+		}
 
 	}
 
