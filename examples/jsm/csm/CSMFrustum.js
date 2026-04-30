@@ -161,7 +161,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] );
+					cascade.vertices.near[ j ].copy( this.vertices.far[ j ] ).multiplyScalar( breaks[ i - 1 ] );
 
 				}
 
@@ -179,7 +179,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] );
+					cascade.vertices.far[ j ].copy( this.vertices.far[ j ] ).multiplyScalar( breaks[ i ] );
 
 				}
 
