@@ -327,13 +327,15 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+							// Prefer the texture's actual array flag over the cached 3D binding type.
+							// Layered render targets can become array textures after shader compilation.
+							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
 						} else if ( binding.isSampledTexture3D ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
-
-						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
-
-							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
 						} else {
 

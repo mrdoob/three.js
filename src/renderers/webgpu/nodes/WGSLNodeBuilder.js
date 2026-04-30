@@ -901,7 +901,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
-	 * Generates the WGSL snippet when sampling textures with a bias to the mip level.
+	 * Generates the WGSL snippet for sampling/loading the given texture with bias.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
@@ -1102,7 +1102,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					if ( node.value.is3DTexture === true ) {
+					if ( node.value.isArrayTexture === true || node.value.isDataArrayTexture === true || node.value.isCompressedArrayTexture === true ) {
+
+						// Array textures should use regular NodeSampledTexture, not NodeSampledTexture3D
+						texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, access );
+
+					} else if ( node.value.is3DTexture === true ) {
 
 						texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
 
