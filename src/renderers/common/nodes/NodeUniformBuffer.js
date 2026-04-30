@@ -1,4 +1,5 @@
 import UniformBuffer from '../UniformBuffer.js';
+import { getFloatLength } from '../BufferUtils.js';
 
 let _id = 0;
 
@@ -86,6 +87,18 @@ class NodeUniformBuffer extends UniformBuffer {
 	clearUpdateRanges() {
 
 		this.nodeUniform.clearUpdateRanges();
+
+	}
+
+	/**
+	 * The buffer's byte length.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get byteLength() {
+
+		return getFloatLength( this.buffer.byteLength );
 
 	}
 

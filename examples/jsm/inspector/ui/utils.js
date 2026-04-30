@@ -1,9 +1,7 @@
-export function createValueSpan( id = null ) {
+export function createValueSpan() {
 
 	const span = document.createElement( 'span' );
 	span.className = 'value';
-
-	if ( id !== null ) span.id = id;
 
 	return span;
 
@@ -11,11 +9,9 @@ export function createValueSpan( id = null ) {
 
 export function setText( element, text ) {
 
-	const el = element instanceof HTMLElement ? element : document.getElementById( element );
+	if ( element && element.textContent !== text ) {
 
-	if ( el && el.textContent !== text ) {
-
-		el.textContent = text;
+		element.textContent = text;
 
 	}
 
@@ -23,9 +19,7 @@ export function setText( element, text ) {
 
 export function getText( element ) {
 
-	const el = element instanceof HTMLElement ? element : document.getElementById( element );
-
-	return el ? el.textContent : null;
+	return element ? element.textContent : null;
 
 }
 
