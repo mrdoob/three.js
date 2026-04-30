@@ -832,6 +832,14 @@ class WebGLBackend extends Backend {
 
 				if ( setFrameBuffer && resolveRenderTarget ) this._resolveRenderTarget( descriptor );
 
+				// Restore the framebuffer of the active render pass when clearing an unrelated
+				// render target, so subsequent draws in the pass don't bind to the cleared target.
+				if ( setFrameBuffer && this._currentContext !== null && this._currentContext !== descriptor ) {
+
+					this._setFramebuffer( this._currentContext );
+
+				}
+
 			}
 
 		}
