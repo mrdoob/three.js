@@ -610,7 +610,7 @@ class Textures extends DataMap {
 					bindingsData.groups = undefined;
 					bindingsData.versions = undefined;
 
-					// go through all bindings an if one points to the destroyed texture, trigger dispose as well
+					// go through all bindings and if one points to the destroyed texture, trigger dispose as well
 
 					for ( const binding of bindGroup.bindings ) {
 
