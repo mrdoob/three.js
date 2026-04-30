@@ -88,7 +88,6 @@
 
 				matLine = new THREE.Line2NodeMaterial( {
 
-					alphaToCoverage: true,
 					color: 0x4080ff,
 					linewidth: 5, // in world units with size attenuation, pixels otherwise
 					dashed: false
@@ -139,8 +138,6 @@
 			function animate() {
 
 				// main scene
-
-				renderer.setClearColor( 0x000000, 1 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
 
