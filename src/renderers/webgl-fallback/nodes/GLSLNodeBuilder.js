@@ -946,7 +946,7 @@ ${ flowData.code }
 
 		}
 
-		if ( outputSnippet.length === 0 ) {
+		if ( shaderStage === 'fragment' && outputSnippet.length === 0 ) {
 
 			outputSnippet.push( 'layout( location = 0 ) out vec4 fragColor;' );
 
@@ -1389,6 +1389,9 @@ ${shaderData.extensions}
 
 // precision
 ${ defaultPrecisions }
+
+// structs
+${shaderData.structs}
 
 // uniforms
 ${shaderData.uniforms}
