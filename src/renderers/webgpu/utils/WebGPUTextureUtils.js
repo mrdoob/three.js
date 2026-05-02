@@ -4,6 +4,7 @@ import {
 import { ColorManagement } from '../../../math/ColorManagement.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
+import { submit } from './WebGPUUtils.js';
 
 import {
 	ByteType, ShortType,
@@ -708,7 +709,7 @@ class WebGPUTextureUtils {
 
 		const typedArrayType = this._getTypedArrayType( format );
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
