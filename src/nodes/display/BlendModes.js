@@ -1,4 +1,4 @@
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { Fn, vec4 } from '../tsl/TSLCore.js';
 import { mix, min, step } from '../math/MathNode.js';
 
 /**
