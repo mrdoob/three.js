@@ -1,5 +1,6 @@
 import DataMap from '../../common/DataMap.js';
 import { GPUFilterMode, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
+import { submit } from './WebGPUUtils.js';
 
 /**
  * A WebGPU backend utility module used by {@link WebGPUTextureUtils}.
@@ -259,7 +260,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		pass( copyTransferPipeline, textureGPU, baseArrayLayer, tempTexture, 0, false );
 		pass( flipTransferPipeline, tempTexture, 0, textureGPU, baseArrayLayer, true );
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		submit( this.device, commandEncoder.finish() );
 
 		tempTexture.destroy();
 
@@ -281,7 +282,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		if ( encoder === null ) this.device.queue.submit( [ commandEncoder.finish() ] );
+		if ( encoder === null ) submit( this.device, commandEncoder.finish() );
 
 		textureData.layers = passes;
 

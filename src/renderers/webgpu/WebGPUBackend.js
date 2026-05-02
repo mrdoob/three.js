@@ -6,7 +6,7 @@ import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDi
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
-import WebGPUUtils from './utils/WebGPUUtils.js';
+import WebGPUUtils, { submit } from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
@@ -1105,7 +1105,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+		submit( this.device, renderContextData.encoder.finish() );
 
 
 		//
@@ -1378,7 +1378,7 @@ class WebGPUBackend extends Backend {
 
 		currentPass.end();
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 	}
 
@@ -1525,7 +1525,7 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
-		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+		submit( this.device, groupData.cmdEncoderGPU.finish() );
 
 	}
 
@@ -2490,7 +2490,7 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
-		this.device.queue.submit( [ encoder.finish() ] );
+		submit( this.device, encoder.finish() );
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
@@ -2616,7 +2616,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			this.device.queue.submit( [ encoder.finish() ] );
+			submit( this.device, encoder.finish() );
 
 		}
 
