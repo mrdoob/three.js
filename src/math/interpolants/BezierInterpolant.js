@@ -7,9 +7,8 @@ import { Interpolant } from '../Interpolant.js';
  * each keyframe has explicit in/out tangent control points specified as
  * 2D coordinates (time, value).
  *
- * The tangent data must be provided via the `settings` object:
- * - `settings.inTangents`: Float32Array with [time, value] pairs per keyframe per component
- * - `settings.outTangents`: Float32Array with [time, value] pairs per keyframe per component
+ * Tangent data is read from `inTangents` and `outTangents` on the interpolant
+ * (populated by `KeyframeTrack.InterpolantFactoryMethodBezier`).
  *
  * For a track with N keyframes and stride S:
  * - Each tangent array has N * S * 2 values
@@ -29,9 +28,8 @@ class BezierInterpolant extends Interpolant {
 		const offset1 = i1 * stride;
 		const offset0 = offset1 - stride;
 
-		const settings = this.settings || this.DefaultSettings_;
-		const inTangents = settings.inTangents;
-		const outTangents = settings.outTangents;
+		const inTangents = this.inTangents;
+		const outTangents = this.outTangents;
 
 		// If no tangent data, fall back to linear interpolation
 		if ( ! inTangents || ! outTangents ) {
