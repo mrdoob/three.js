@@ -99,6 +99,7 @@ export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
 export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
+export * from './display/PremultiplyAlphaFunctions.js';
 export * from './display/ToneMappingNode.js';
 export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';

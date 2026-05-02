@@ -1,31 +1,11 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeObject, Fn, If, vec4 } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
+import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunctions.js';
 
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 import { clamp } from '../math/MathNode.js';
-
-// Internal TSL wrappers to avoid circular dependency with BlendModes.js
-
-const premultiplyAlpha = Fn( ( [ color ] ) => {
-
-	return vec4( color.rgb.mul( color.a ), color.a );
-
-}, { color: 'vec4', return: 'vec4' } );
-
-
-const unpremultiplyAlpha = Fn( ( [ color ] ) => {
-
-	If( color.a.equal( 0.0 ), () => vec4( 0.0 ) );
-
-	return vec4( color.rgb.div( color.a ), color.a );
-
-	// alt
-	//return vec4( color.rgb.div( color.a.max( 1e-6 ) ), color.a.max( 1e-6 ) );
-
-}, { color: 'vec4', return: 'vec4' } );
-
 
 /**
  * Normally, tone mapping and color conversion happens automatically just
