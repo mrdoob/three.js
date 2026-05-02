@@ -38,6 +38,8 @@ const register = ( registry, categories, handler ) => {
 };
 
 const UV_FALLBACK_CATEGORIES = new Set( [ 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
+const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
+const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToUvSpace( uv( 0 ) );
 
@@ -62,8 +64,25 @@ const applyTextureColorSpace = ( node, file ) => {
 
 const compileConvertNode = ( nodeX ) => {
 
+	const input = nodeX.getNodeByName( 'in' );
+	const inputElement = nodeX.getChildByName( 'in' );
+	const inputType = inputElement ? inputElement.type : null;
 	const nodeClass = nodeX.getClassFromType( nodeX.type ) || float;
-	return nodeClass( nodeX.getNodeByName( 'in' ) );
+
+	if ( SCALAR_TYPES.has( inputType ) && THREE_COMPONENT_TYPES.has( nodeX.type ) ) {
+
+		const componentCount = nodeX.type === 'vector2' ? 2 : nodeX.type === 'vector3' || nodeX.type === 'color3' ? 3 : 4;
+		return nodeClass( ...Array( componentCount ).fill( input ) );
+
+	}
+
+	if ( THREE_COMPONENT_TYPES.has( inputType ) && SCALAR_TYPES.has( nodeX.type ) ) {
+
+		return nodeClass( element( input, 0 ) );
+
+	}
+
+	return nodeClass( input );
 
 };
 
