@@ -36,6 +36,7 @@ const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709,
 };
 
+const DEFAULT_DOCUMENT_COLOR_SPACE = 'lin_rec709';
 const IDENTITY_MAT3_VALUES = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
 const IDENTITY_MAT4_VALUES = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
 const MATRIX_INVERSE_EPSILON = 1e-8;
@@ -551,7 +552,14 @@ class MaterialXNode {
 
 	getAttribute( name ) {
 
-		return this.nodeXML.getAttribute( name );
+		const value = this.nodeXML.getAttribute( name );
+		if ( value === null && this.element === 'materialx' && name === 'colorspace' ) {
+
+			return DEFAULT_DOCUMENT_COLOR_SPACE;
+
+		}
+
+		return value;
 
 	}
 
