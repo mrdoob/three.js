@@ -5,8 +5,6 @@ import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunction
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
-import { clamp } from '../math/MathNode.js';
-
 /**
  * Normally, tone mapping and color conversion happens automatically just
  * before outputting a pixel to the default (screen) framebuffer. In certain
@@ -112,7 +110,7 @@ class RenderOutputNode extends TempNode {
 		let outputNode = this.colorNode || context.color;
 
 		// clamp alpha
-		outputNode = vec4( outputNode.rgb, clamp( outputNode.a, 0.0, 1.0 ) );
+		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
 		// unpremultiply
 		outputNode = unpremultiplyAlpha( outputNode );
