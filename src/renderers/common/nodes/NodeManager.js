@@ -4,7 +4,7 @@ import NodeBuilderState from './NodeBuilderState.js';
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame, StackTrace } from '../../../nodes/Nodes.js';
-import { renderGroup, cubeTexture, texture, texture3D, vec3, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform } from '../../../nodes/TSL.js';
+import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform } from '../../../nodes/TSL.js';
 import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
@@ -874,7 +874,7 @@ class NodeManager extends DataMap {
 
 			if ( this.backend.isWebGLBackend ) {
 
-				output = texture3D( outputTarget, vec3( screenUV, builtin( 'gl_ViewID_OVR' ) ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+				output = texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
 			} else {
 

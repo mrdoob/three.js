@@ -1322,6 +1322,8 @@ class Renderer {
 
 		}
 
+		const currentActiveCubeFace = this._activeCubeFace;
+
 		try {
 
 			for ( let layer = 0; layer < renderTarget.texture.image.depth; layer ++ ) {
@@ -1336,7 +1338,7 @@ class Renderer {
 		} finally {
 
 			this._nodes.setOutputLayerIndex( 0 );
-			this._activeCubeFace = 0;
+			this._activeCubeFace = currentActiveCubeFace;
 
 		}
 
