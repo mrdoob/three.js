@@ -88,6 +88,23 @@ const compileConvertNode = ( nodeX ) => {
 
 const compileConstantNode = ( nodeX ) => nodeX.getNodeByName( 'value' );
 
+const compileBooleanConditionalNode = ( nodeX ) => {
+
+	if ( nodeX.type !== 'boolean' ) return null;
+
+	const value1Default = nodeX.element === 'ifequal' ? float( 0 ) : float( 1 );
+	const value2Default = float( 0 );
+	const value1 = nodeX.getNodeByName( 'value1' ) || value1Default;
+	const value2 = nodeX.getNodeByName( 'value2' ) || value2Default;
+
+	if ( nodeX.element === 'ifgreater' ) return value1.greaterThan( value2 );
+	if ( nodeX.element === 'ifgreatereq' ) return value1.greaterThanEqual( value2 );
+	if ( nodeX.element === 'ifequal' ) return value1.equal( value2 );
+
+	return null;
+
+};
+
 const compileSpaceInputNode = ( nodeX, objectNode, worldNode ) => {
 
 	const rawSpace = nodeX.getInputValueByName( 'space' ) ?? nodeX.getAttribute( 'space' );
@@ -391,6 +408,13 @@ function compileNodeFromRegistry( nodeX, out, compileContext ) {
 	if ( handler ) {
 
 		return handler( nodeX, out, compileContext );
+
+	}
+
+	const booleanConditional = compileBooleanConditionalNode( nodeX );
+	if ( booleanConditional ) {
+
+		return booleanConditional;
 
 	}
 
