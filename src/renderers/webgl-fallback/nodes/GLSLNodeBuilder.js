@@ -14,6 +14,7 @@ const glslPolyfills = {
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ) );
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
@@ -28,6 +29,7 @@ vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset,
 ` ),
 	textureGatherArray: new CodeNode( /* glsl */`
 vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ).xy );
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
@@ -42,6 +44,7 @@ vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, iv
 ` ),
 	textureGatherCompare: new CodeNode( /* glsl */`
 vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ) );
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
@@ -56,6 +59,7 @@ vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, fl
 ` ),
 	textureGatherCompareArray: new CodeNode( /* glsl */`
 vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ).xy );
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
