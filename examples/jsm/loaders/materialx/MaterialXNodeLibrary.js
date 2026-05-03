@@ -41,11 +41,15 @@ import {
 	mx_splitlr,
 	mx_splittb,
 	mx_fractal_noise_float,
+	mx_fractal_noise_vec3,
 	mx_noise_float,
+	mx_noise_vec3,
 	mx_cell_noise_float,
+	mx_cell_noise_vec3,
 	mx_smoothstep,
 	mx_worley_noise_float_2d,
 	mx_worley_noise_float_3d,
+	mx_worley_noise_vec3_style,
 	mx_unifiednoise2d,
 	mx_unifiednoise3d,
 	mx_modulo,
@@ -85,7 +89,7 @@ import {
 } from 'three/tsl';
 import { normalizeSpaceName } from './MaterialXUtils.js';
 
-const createMXElement = ( name, nodeFunc, params = [], defaults = {} ) => ( { name, nodeFunc, params, defaults } );
+const createMXElement = ( name, nodeFunc, params = [], defaults = {}, usesNode = false ) => ( { name, nodeFunc, params, defaults, usesNode } );
 
 const mx_range = ( inNode, inLow, inHigh, outLow, outHigh, gamma = 1 ) => {
 
@@ -450,6 +454,33 @@ const defaultColor = ( r, g, b ) => () => color( r, g, b );
 const defaultVec2 = ( x, y ) => () => vec2( x, y );
 const defaultVec3 = ( x, y, z ) => () => vec3( x, y, z );
 const defaultVec4 = ( x, y, z, w ) => () => vec4( x, y, z, w );
+const usesVec2Noise = ( nodeX ) => nodeX && nodeX.type === 'vector2';
+const usesVec3Noise = ( nodeX ) => nodeX && ( nodeX.type === 'vector3' || nodeX.type === 'color3' );
+
+const mx_noise_materialx = ( texcoord, amplitude, pivot, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_noise_vec3( texcoord, vec3( amplitude ), pivot ) : mx_noise_float( texcoord, amplitude, pivot );
+
+const mx_fractal_noise_materialx_2d = ( texcoord, octaves, lacunarity, diminish, amplitude, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_fractal_noise_vec3_materialx_2d( texcoord, octaves, lacunarity, diminish, amplitude ) : mx_fractal_noise_float_materialx_2d( texcoord, octaves, lacunarity, diminish, amplitude );
+
+const mx_fractal_noise_materialx_3d = ( position, octaves, lacunarity, diminish, amplitude, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_fractal_noise_vec3( position, octaves, lacunarity, diminish, vec3( amplitude ) ) : mx_fractal_noise_float( position, octaves, lacunarity, diminish, amplitude );
+
+const mx_cell_noise_materialx = ( position, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_cell_noise_vec3( position ) : mx_cell_noise_float( position );
+
+const mx_worley_noise_vec2_style = ( position, jitter, style ) => {
+
+	const result = mx_worley_noise_vec3_style( position, jitter, style, 0 );
+	return vec2( element( result, 0 ), element( result, 1 ) );
+
+};
+
+const mx_worley_noise_materialx_2d = ( texcoord, jitter, style, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_worley_noise_vec3_style( texcoord, jitter, style, 0 ) : usesVec2Noise( nodeX ) ? mx_worley_noise_vec2_style( texcoord, jitter, style ) : mx_worley_noise_float_2d( texcoord, jitter, style );
+
+const mx_worley_noise_materialx_3d = ( position, jitter, style, nodeX ) =>
+	usesVec3Noise( nodeX ) ? mx_worley_noise_vec3_style( position, jitter, style, 0 ) : usesVec2Noise( nodeX ) ? mx_worley_noise_vec2_style( position, jitter, style ) : mx_worley_noise_float_3d( position, jitter, style );
 
 const mx_fractal_noise_float_materialx_2d = Fn( ( [ texcoordInput, octavesInput, lacunarityInput, diminishInput, amplitudeInput ] ) => {
 
@@ -464,6 +495,28 @@ const mx_fractal_noise_float_materialx_2d = Fn( ( [ texcoordInput, octavesInput,
 	Loop( octaves, () => {
 
 		result.addAssign( mul( octaveAmplitude, mx_noise_float( texcoord, float( 1 ), float( 0 ) ) ) );
+		octaveAmplitude.mulAssign( diminish );
+		texcoord.mulAssign( lacunarity );
+
+	} );
+
+	return mul( result, amplitude );
+
+} );
+
+const mx_fractal_noise_vec3_materialx_2d = Fn( ( [ texcoordInput, octavesInput, lacunarityInput, diminishInput, amplitudeInput ] ) => {
+
+	const texcoord = vec2( texcoordInput ).toVar();
+	const octaves = int( octavesInput ).toVar();
+	const lacunarity = float( lacunarityInput ).toVar();
+	const diminish = float( diminishInput ).toVar();
+	const amplitude = vec3( amplitudeInput ).toVar();
+	const result = vec3( 0 ).toVar();
+	const octaveAmplitude = float( 1 ).toVar();
+
+	Loop( octaves, () => {
+
+		result.addAssign( mul( octaveAmplitude, mx_noise_vec3( texcoord, vec3( 1 ), float( 0 ) ) ) );
 		octaveAmplitude.mulAssign( diminish );
 		texcoord.mulAssign( lacunarity );
 
@@ -723,42 +776,42 @@ const MXElements = [
 		valueb: defaultFloat( 0 ),
 		center: defaultFloat( 0.5 ),
 	} ),
-	createMXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ], {
+	createMXElement( 'noise2d', mx_noise_materialx, [ 'texcoord', 'amplitude', 'pivot' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		amplitude: defaultFloat( 1 ),
 		pivot: defaultFloat( 0 ),
-	} ),
-	createMXElement( 'noise3d', mx_noise_float, [ 'position', 'amplitude', 'pivot' ], {
+	}, true ),
+	createMXElement( 'noise3d', mx_noise_materialx, [ 'position', 'amplitude', 'pivot' ], {
 		position: () => positionLocal,
 		amplitude: defaultFloat( 1 ),
 		pivot: defaultFloat( 0 ),
-	} ),
-	createMXElement( 'fractal2d', mx_fractal_noise_float_materialx_2d, [ 'texcoord', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
+	}, true ),
+	createMXElement( 'fractal2d', mx_fractal_noise_materialx_2d, [ 'texcoord', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		octaves: defaultInt( 3 ),
 		lacunarity: defaultFloat( 2.0 ),
 		diminish: defaultFloat( 0.5 ),
 		amplitude: defaultFloat( 1.0 ),
-	} ),
-	createMXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
+	}, true ),
+	createMXElement( 'fractal3d', mx_fractal_noise_materialx_3d, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ], {
 		position: () => positionLocal,
 		octaves: defaultInt( 3 ),
 		lacunarity: defaultFloat( 2.0 ),
 		diminish: defaultFloat( 0.5 ),
 		amplitude: defaultFloat( 1.0 ),
-	} ),
-	createMXElement( 'cellnoise2d', mx_cell_noise_float, [ 'texcoord' ], { texcoord: defaultVec2( 0, 0 ) } ),
-	createMXElement( 'cellnoise3d', mx_cell_noise_float, [ 'position' ], { position: () => positionLocal } ),
-	createMXElement( 'worleynoise2d', mx_worley_noise_float_2d, [ 'texcoord', 'jitter', 'style' ], {
+	}, true ),
+	createMXElement( 'cellnoise2d', mx_cell_noise_materialx, [ 'texcoord' ], { texcoord: defaultVec2( 0, 0 ) }, true ),
+	createMXElement( 'cellnoise3d', mx_cell_noise_materialx, [ 'position' ], { position: () => positionLocal }, true ),
+	createMXElement( 'worleynoise2d', mx_worley_noise_materialx_2d, [ 'texcoord', 'jitter', 'style' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		jitter: defaultFloat( 1 ),
 		style: defaultInt( 0 ),
-	} ),
-	createMXElement( 'worleynoise3d', mx_worley_noise_float_3d, [ 'position', 'jitter', 'style' ], {
+	}, true ),
+	createMXElement( 'worleynoise3d', mx_worley_noise_materialx_3d, [ 'position', 'jitter', 'style' ], {
 		position: () => positionLocal,
 		jitter: defaultFloat( 1 ),
 		style: defaultInt( 0 ),
-	} ),
+	}, true ),
 	createMXElement(
 		'unifiednoise2d',
 		mx_unifiednoise2d,
