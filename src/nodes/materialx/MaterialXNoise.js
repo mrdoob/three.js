@@ -363,6 +363,9 @@ export const mx_rotl32 = /*@__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
 
 export const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
+	a = uint( a ).toVar();
+	b = uint( b ).toVar();
+	c = uint( c ).toVar();
 	a.subAssign( c );
 	a.bitXorAssign( mx_rotl32( c, int( 4 ) ) );
 	c.addAssign( b );
@@ -382,6 +385,16 @@ export const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 	c.bitXorAssign( mx_rotl32( b, int( 4 ) ) );
 	b.addAssign( a );
 
+	return uvec3( a, b, c );
+
+} ).setLayout( {
+	name: 'mx_bjmix',
+	type: 'uvec3',
+	inputs: [
+		{ name: 'a', type: 'uint' },
+		{ name: 'b', type: 'uint' },
+		{ name: 'c', type: 'uint' }
+	]
 } );
 
 export const mx_bjfinal = /*@__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
@@ -420,7 +433,7 @@ export const mx_bits_to_01 = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 	const bits = uint( bits_immutable ).toVar();
 
-	return float( bits ).div( float( uint( int( 0xffffffff ) ) ) );
+	return float( bits ).div( float( uint( 0xffffffff ) ) );
 
 } ).setLayout( {
 	name: 'mx_bits_to_01',
@@ -448,7 +461,7 @@ export const mx_hash_int_0 = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 1 ) ).toVar();
-	const seed = uint( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ).toVar();
+	const seed = uint( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ).toVar();
 
 	return mx_bjfinal( seed.add( uint( x ) ), seed, seed );
 
@@ -466,7 +479,7 @@ export const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 2 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 
@@ -488,7 +501,7 @@ export const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 3 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -513,11 +526,14 @@ export const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 4 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
-	mx_bjmix( a, b, c );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
 	a.addAssign( uint( xx ) );
 
 	return mx_bjfinal( a, b, c );
@@ -542,11 +558,14 @@ export const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 5 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
-	mx_bjmix( a, b, c );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
 	a.addAssign( uint( xx ) );
 	b.addAssign( uint( yy ) );
 
@@ -768,24 +787,130 @@ export const mx_cell_noise_float_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 export const mx_cell_noise_float = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
 
-export const mx_cell_noise_vec3 = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
+export const mx_cell_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
+
+	const p = float( p_immutable ).toVar();
+	const ix = int( mx_floor( p ) ).toVar();
+
+	return vec3(
+		mx_bits_to_01( mx_hash_int( ix, int( 0 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, int( 1 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, int( 2 ) ) )
+	);
+
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'float' }
+	]
+} );
+
+export const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
+
+	const p = vec2( p_immutable ).toVar();
+	const ix = int( mx_floor( p.x ) ).toVar();
+	const iy = int( mx_floor( p.y ) ).toVar();
+
+	return vec3(
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 0 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 1 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 2 ) ) )
+	);
+
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec2' }
+	]
+} );
+
+export const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
 
 	const position = vec3( positionInput ).toVar();
 	const ix = int( floor( position.x ) ).toVar();
 	const iy = int( floor( position.y ) ).toVar();
 	const iz = int( floor( position.z ) ).toVar();
 	const seed = uint( 0xdeadbeef + ( 4 << 2 ) + 13 ).toVar();
-	const a = seed.toVar();
-	const b = seed.toVar();
-	const c = seed.toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
 	a.addAssign( uint( ix ) );
 	b.addAssign( uint( iy ) );
 	c.addAssign( uint( iz ) );
 
-	mx_bjmix( a, b, c );
-	const hash0 = mx_bjfinal( a, b, c );
-	const hash1 = mx_bjfinal( add( a, uint( 1 ) ), b, c );
-	const hash2 = mx_bjfinal( add( a, uint( 2 ) ), b, c );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	const hash0 = mx_bjfinal( mixed.x, mixed.y, mixed.z );
+	const hash1 = mx_bjfinal( add( mixed.x, uint( 1 ) ), mixed.y, mixed.z );
+	const hash2 = mx_bjfinal( add( mixed.x, uint( 2 ) ), mixed.y, mixed.z );
+
+	return vec3(
+		mx_bits_to_01( hash0 ),
+		mx_bits_to_01( hash1 ),
+		mx_bits_to_01( hash2 )
+	);
+
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_2',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' }
+	]
+} );
+
+export const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
+
+	const p = vec4( p_immutable ).toVar();
+	const ix = int( mx_floor( p.x ) ).toVar();
+	const iy = int( mx_floor( p.y ) ).toVar();
+	const iz = int( mx_floor( p.z ) ).toVar();
+	const iw = int( mx_floor( p.w ) ).toVar();
+	const seed = uint( 0xdeadbeef + ( 5 << 2 ) + 13 ).toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
+	a.addAssign( uint( ix ) );
+	b.addAssign( uint( iy ) );
+	c.addAssign( uint( iz ) );
+
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
+	a.addAssign( uint( iw ) );
+
+	return vec3(
+		mx_bits_to_01( mx_bjfinal( a, b, c ) ),
+		mx_bits_to_01( mx_bjfinal( a, add( b, uint( 1 ) ), c ) ),
+		mx_bits_to_01( mx_bjfinal( a, add( b, uint( 2 ) ), c ) )
+	);
+
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_3',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec4' }
+	]
+} );
+
+export const mx_cell_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
+
+const mx_cell_noise_vec3_3d = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
+
+	const position = vec3( positionInput ).toVar();
+	const ix = int( floor( position.x ) ).toVar();
+	const iy = int( floor( position.y ) ).toVar();
+	const iz = int( floor( position.z ) ).toVar();
+	const seed = uint( 0xdeadbeef + ( 4 << 2 ) + 13 ).toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
+	a.addAssign( uint( ix ) );
+	b.addAssign( uint( iy ) );
+	c.addAssign( uint( iz ) );
+
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	const hash0 = mx_bjfinal( mixed.x, mixed.y, mixed.z );
+	const hash1 = mx_bjfinal( add( mixed.x, uint( 1 ) ), mixed.y, mixed.z );
+	const hash2 = mx_bjfinal( add( mixed.x, uint( 2 ) ), mixed.y, mixed.z );
 
 	return vec3(
 		mx_bits_to_01( hash0 ),
@@ -983,7 +1108,7 @@ export const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutab
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
 	const p = vec3( p_immutable ).toVar();
-	const off = vec3( mx_cell_noise_vec3( vec3( x.add( xoff ), y.add( yoff ), z.add( zoff ) ) ) ).toVar();
+	const off = vec3( mx_cell_noise_vec3_3d( vec3( x.add( xoff ), y.add( yoff ), z.add( zoff ) ) ) ).toVar();
 	off.subAssign( 0.5 );
 	off.mulAssign( jitter );
 	off.addAssign( 0.5 );
@@ -1076,8 +1201,8 @@ export const mx_worley_noise_float_3d = /*@__PURE__*/ Fn( ( [ positionInput, jit
 	const position = vec3( positionInput ).toVar();
 	const jitter = float( jitterInput ).toVar();
 	const style = int( styleInput ).toVar();
-	const baseCell = vec3( floor( position.x ), floor( position.y ), floor( position.z ) ).toVar();
-	const localpos = fract( position ).toVar();
+	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
+	const localpos = vec3( mx_floorfrac( position.x, X ), mx_floorfrac( position.y, Y ), mx_floorfrac( position.z, Z ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
 	const minpos = vec3( 0, 0, 0 ).toVar();
 
@@ -1087,13 +1212,12 @@ export const mx_worley_noise_float_3d = /*@__PURE__*/ Fn( ( [ positionInput, jit
 
 			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
-				const cellCoords = vec3( baseCell.x.add( float( x ) ), baseCell.y.add( float( y ) ), baseCell.z.add( float( z ) ) ).toVar();
-				const off = vec3( mx_cell_noise_vec3( cellCoords ) ).toVar();
+				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, int( 0 ) ) ).toVar();
+				const off = vec3( mx_cell_noise_vec3_3d( vec3( X.add( x ), Y.add( y ), Z.add( z ) ) ) ).toVar();
 				off.subAssign( 0.5 );
 				off.mulAssign( jitter );
 				off.addAssign( 0.5 );
 				const cellpos = vec3( vec3( float( x ), float( y ), float( z ) ).add( off ).sub( localpos ) ).toVar();
-				const dist = dot( cellpos, cellpos ).toVar();
 
 				If( dist.lessThan( sqdist ), () => {
 
@@ -1387,6 +1511,119 @@ export const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 } );
 
 export const mx_worley_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
+
+export const mx_worley_noise_vec3_style_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, style_immutable, metric_immutable ] ) => {
+
+	const metric = int( metric_immutable ).toVar();
+	const style = int( style_immutable ).toVar();
+	const jitter = float( jitter_immutable ).toVar();
+	const p = vec2( p_immutable ).toVar();
+	const X = int().toVar(), Y = int().toVar();
+	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
+	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec2( 0, 0 ).toVar();
+
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+
+			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
+			const tmp = vec3( mx_cell_noise_vec3( vec2( X.add( x ), Y.add( y ) ) ) ).toVar();
+			const off = vec2( tmp.x, tmp.y ).toVar();
+			off.subAssign( 0.5 );
+			off.mulAssign( jitter );
+			off.addAssign( 0.5 );
+			const cellpos = vec2( vec2( float( x ), float( y ) ).add( off ).sub( localpos ) ).toVar();
+
+			If( dist.lessThan( sqdist ), () => {
+
+				sqdist.assign( dist );
+				minpos.assign( cellpos );
+
+			} );
+
+		} );
+
+	} );
+
+	const result = vec3( mx_worley_noise_vec3( p, jitter, metric ) ).toVar();
+	If( style.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_vec3( minpos.add( p ) ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_worley_noise_vec3_style_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'style', type: 'int' },
+		{ name: 'metric', type: 'int' }
+	]
+} );
+
+export const mx_worley_noise_vec3_style_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, style_immutable, metric_immutable ] ) => {
+
+	const metric = int( metric_immutable ).toVar();
+	const style = int( style_immutable ).toVar();
+	const jitter = float( jitter_immutable ).toVar();
+	const p = vec3( p_immutable ).toVar();
+	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
+	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
+	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec3( 0, 0, 0 ).toVar();
+
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+
+			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+
+				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
+				const off = vec3( mx_cell_noise_vec3_3d( vec3( X.add( x ), Y.add( y ), Z.add( z ) ) ) ).toVar();
+				off.subAssign( 0.5 );
+				off.mulAssign( jitter );
+				off.addAssign( 0.5 );
+				const cellpos = vec3( vec3( float( x ), float( y ), float( z ) ).add( off ).sub( localpos ) ).toVar();
+
+				If( dist.lessThan( sqdist ), () => {
+
+					sqdist.assign( dist );
+					minpos.assign( cellpos );
+
+				} );
+
+			} );
+
+		} );
+
+	} );
+
+	const result = vec3( mx_worley_noise_vec3( p, jitter, metric ) ).toVar();
+	If( style.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_vec3_3d( minpos.add( p ) ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_worley_noise_vec3_style_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'style', type: 'int' },
+		{ name: 'metric', type: 'int' }
+	]
+} );
+
+export const mx_worley_noise_vec3_style = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_style_0, mx_worley_noise_vec3_style_1 ] );
 
 // Unified Noise 2D
 export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [

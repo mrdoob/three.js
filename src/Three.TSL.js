@@ -381,6 +381,7 @@ export const mx_worley_noise_float_2d = TSL.mx_worley_noise_float_2d;
 export const mx_worley_noise_float_3d = TSL.mx_worley_noise_float_3d;
 export const mx_worley_noise_vec2 = TSL.mx_worley_noise_vec2;
 export const mx_worley_noise_vec3 = TSL.mx_worley_noise_vec3;
+export const mx_worley_noise_vec3_style = TSL.mx_worley_noise_vec3_style;
 export const negate = TSL.negate;
 export const neutralToneMapping = TSL.neutralToneMapping;
 export const nodeArray = TSL.nodeArray;

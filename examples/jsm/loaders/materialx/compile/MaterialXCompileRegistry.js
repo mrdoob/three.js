@@ -434,7 +434,7 @@ function compileNodeFromRegistry( nodeX, out, compileContext ) {
 
 	}
 
-	return nodeElement.nodeFunc( ...args );
+	return nodeElement.usesNode ? nodeElement.nodeFunc( ...args, nodeX ) : nodeElement.nodeFunc( ...args );
 
 }
 

@@ -2,6 +2,7 @@ import {
 	mx_perlin_noise_float, mx_perlin_noise_vec3,
 	mx_worley_noise_float_2d as worley_noise_float_2d, mx_worley_noise_float_3d as worley_noise_float_3d,
 	mx_worley_noise_vec2 as worley_noise_vec2, mx_worley_noise_vec3 as worley_noise_vec3,
+	mx_worley_noise_vec3_style as worley_noise_vec3_style,
 	mx_cell_noise_float as cell_noise_float, mx_cell_noise_vec3 as cell_noise_vec3,
 	mx_unifiednoise2d as unifiednoise2d, mx_unifiednoise3d as unifiednoise3d,
 	mx_fractal_noise_float_2d as fractal_noise_float_2d,
@@ -95,7 +96,8 @@ export const mx_unifiednoise3d = ( noiseType, texcoord = uv(), freq = vec3( 1, 1
 
 export const mx_worley_noise_float = ( texcoord = uv(), jitter = 1, style = 0 ) => mx_worley_noise_float_3d( texcoord.convert( 'vec2|vec3' ), jitter, style );
 export const mx_worley_noise_vec2 = ( texcoord = uv(), jitter = 1 ) => worley_noise_vec2( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
-export const mx_worley_noise_vec3 = ( texcoord = uv(), jitter = 1 ) => worley_noise_vec3( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+export const mx_worley_noise_vec3 = ( texcoord = uv(), jitter = 1, metric = 1 ) => worley_noise_vec3( texcoord.convert( 'vec2|vec3' ), jitter, int( metric ) );
+export const mx_worley_noise_vec3_style = ( texcoord = uv(), jitter = 1, style = 0, metric = 0 ) => worley_noise_vec3_style( texcoord.convert( 'vec2|vec3' ), jitter, int( style ), int( metric ) );
 
 export const mx_cell_noise_float = ( texcoord = uv() ) => cell_noise_float( texcoord.convert( 'vec2|vec3' ) );
 
