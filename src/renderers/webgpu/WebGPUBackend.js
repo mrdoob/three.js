@@ -436,7 +436,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 * Returns whether the render target is a render target array with depth 2D array texture.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
@@ -445,7 +445,9 @@ class WebGPUBackend extends Backend {
 	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
-		return renderContext.depthTexture && renderContext.depthTexture.image.depth > 1 && renderContext.camera.isArrayCamera;
+		const camera = renderContext.camera;
+
+		return renderContext.depthTexture && renderContext.depthTexture.isArrayTexture === true && camera !== null && camera.isArrayCamera === true;
 
 	}
 
@@ -764,7 +766,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -781,7 +783,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -789,7 +791,7 @@ class WebGPUBackend extends Backend {
 
 		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
 
-		// shadow arrays - prepare bundle encoders for each camera in an array camera
+		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
@@ -797,11 +799,11 @@ class WebGPUBackend extends Backend {
 
 			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length ) {
 
-				this._createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
+				this._createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
 
 			} else {
 
-				this._updateDepthLayerDescriptors( renderContext, renderContextData, cameras );
+				this._updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras );
 
 			}
 
@@ -862,8 +864,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * This method creates layer descriptors for each camera in an array camera
-	 * to prepare for rendering to a depth array texture.
+	 * Creates render pass descriptors for each camera in an array camera.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object} renderContextData - The render context data.
@@ -872,7 +873,7 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @private
 	 */
-	_createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
+	_createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 		renderContextData.layerDescriptors = [];
@@ -936,15 +937,14 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * This method updates the layer descriptors for each camera in an array camera
-	 * to prepare for rendering to a depth array texture.
+	 * Updates render pass descriptors for each camera in an array camera.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object} renderContextData - The render context data.
 	 * @param {ArrayCamera} cameras - The array camera.
 	 *
 	 */
-	_updateDepthLayerDescriptors( renderContext, renderContextData, cameras ) {
+	_updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras ) {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
@@ -1013,7 +1013,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// shadow arrays - Execute bundles for each layer
+		// Layered render targets: execute the bundle for each layer.
 
 		const encoder = renderContextData.encoder;
 
@@ -1766,7 +1766,9 @@ class WebGPUBackend extends Backend {
 
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
-					if ( renderContextData.bundleEncoders ) {
+					const isBundleEncoder = renderContextData.bundleEncoders !== undefined;
+
+					if ( isBundleEncoder ) {
 
 						const bundleEncoder = renderContextData.bundleEncoders[ i ];
 						const bundleSets = renderContextData.bundleSets[ i ];
@@ -1774,8 +1776,9 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
+					// GPURenderBundleEncoder does not support setViewport, only GPURenderPassEncoder does
 
-					if ( vp ) {
+					if ( vp && ! isBundleEncoder ) {
 
 						pass.setViewport(
 							Math.floor( vp.x * pixelRatio ),
