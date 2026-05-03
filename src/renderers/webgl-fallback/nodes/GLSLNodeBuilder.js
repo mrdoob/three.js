@@ -19,10 +19,10 @@ vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset,
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
-		texture( map, ij.xw )[ comp ],
-		texture( map, ij.zw )[ comp ],
-		texture( map, ij.zy )[ comp ],
-		texture( map, ij.xy )[ comp ]
+		textureLod( map, ij.xw, 0.0 )[ comp ],
+		textureLod( map, ij.zw, 0.0 )[ comp ],
+		textureLod( map, ij.zy, 0.0 )[ comp ],
+		textureLod( map, ij.xy, 0.0 )[ comp ]
 	);
 	return flipY ? ret.wzyx : ret;
 }
@@ -34,10 +34,10 @@ vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, iv
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
-		texture( map, vec3( ij.xw, coord.z ) )[ comp ],
-		texture( map, vec3( ij.zw, coord.z ) )[ comp ],
-		texture( map, vec3( ij.zy, coord.z ) )[ comp ],
-		texture( map, vec3( ij.xy, coord.z ) )[ comp ]
+		textureLod( map, vec3( ij.xw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zy, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.xy, coord.z ), 0.0 )[ comp ]
 	);
 	return flipY ? ret.wzyx : ret;
 }
@@ -49,10 +49,10 @@ vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, fl
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
-		texture( map, vec3( ij.xw, ref ) ),
-		texture( map, vec3( ij.zw, ref ) ),
-		texture( map, vec3( ij.zy, ref ) ),
-		texture( map, vec3( ij.xy, ref ) )
+		textureLod( map, vec3( ij.xw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zy, ref ), 0.0 ),
+		textureLod( map, vec3( ij.xy, ref ), 0.0 )
 	);
 	return flipY ? ret.wzyx : ret;
 }
