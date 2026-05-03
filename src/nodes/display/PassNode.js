@@ -155,6 +155,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;

@@ -419,11 +419,12 @@ class Textures extends DataMap {
 	 * them when the texture parameters match.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
-		return this.backend.updateSampler( texture );
+		return this.backend.updateSampler( texture, textureNode );
 
 	}
 

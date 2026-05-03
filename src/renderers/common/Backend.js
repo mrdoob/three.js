@@ -277,9 +277,10 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) { }
+	updateSampler( /*texture, textureNode*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
