@@ -20,7 +20,6 @@ import {
 	uv,
 	mat3,
 	mat4,
-	inverse,
 	element,
 	mx_transform_uv,
 	mx_srgb_texture_to_lin_rec709,
@@ -734,7 +733,6 @@ class MaterialXDocument {
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
 			invertConstantMatrixValues,
-			invertMatrixNode: inverse,
 			IDENTITY_MAT3_VALUES,
 			IDENTITY_MAT4_VALUES,
 		};
