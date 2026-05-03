@@ -145,11 +145,13 @@ class Frustum {
 	 */
 	intersectsObject( object ) {
 
+		let sphere;
+
 		if ( object.boundingSphere !== undefined ) {
 
 			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-			_sphere.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+			sphere = object.boundingSphere;
 
 		} else {
 
@@ -157,11 +159,41 @@ class Frustum {
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			sphere = geometry.boundingSphere;
 
 		}
 
-		return this.intersectsSphere( _sphere );
+		const center = sphere.center;
+		const e = object.matrixWorld.elements;
+
+		const x = center.x, y = center.y, z = center.z;
+		const w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
+
+		const cx = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
+		const cy = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
+		const cz = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+
+		const scaleXSq = e[ 0 ] * e[ 0 ] + e[ 1 ] * e[ 1 ] + e[ 2 ] * e[ 2 ];
+		const scaleYSq = e[ 4 ] * e[ 4 ] + e[ 5 ] * e[ 5 ] + e[ 6 ] * e[ 6 ];
+		const scaleZSq = e[ 8 ] * e[ 8 ] + e[ 9 ] * e[ 9 ] + e[ 10 ] * e[ 10 ];
+
+		const negRadius = - sphere.radius * Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
+		const planes = this.planes;
+
+		for ( let i = 0; i < 6; i ++ ) {
+
+			const plane = planes[ i ];
+			const normal = plane.normal;
+
+			if ( normal.x * cx + normal.y * cy + normal.z * cz + plane.constant < negRadius ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
 
 	}
 
