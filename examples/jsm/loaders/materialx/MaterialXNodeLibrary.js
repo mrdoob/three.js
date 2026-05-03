@@ -81,7 +81,6 @@ import {
 	vec2,
 	vec3,
 	vec4,
-	checker,
 	fract,
 	sub,
 	step,
@@ -134,7 +133,13 @@ const mx_and = ( in1, in2 ) => tslAnd( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_or = ( in1, in2 ) => tslOr( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_xor = ( in1, in2 ) => tslXor( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_not = ( inNode ) => tslNot( mx_boolean( inNode ) );
-const mx_checkerboard = ( color1, color2, texcoord ) => mix( color1, color2, clamp( checker( texcoord ), 0, 1 ) );
+const mx_checkerboard = ( color1, color2, uvtiling, uvoffset, texcoord ) => {
+
+	const tiledUv = sub( mul( texcoord, uvtiling ), uvoffset );
+	const checkerMix = mx_modulo( dot( floor( tiledUv ), vec2( 1, 1 ) ), float( 2 ) );
+	return mix( color2, color1, checkerMix );
+
+};
 
 const mx_circle = ( texcoord, center, radius ) => {
 
@@ -946,9 +951,11 @@ const MXElements = [
 	createMXElement( 'or', mx_or, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
 	createMXElement( 'xor', mx_xor, [ 'in1', 'in2' ], { in1: defaultBool( false ), in2: defaultBool( false ) } ),
 	createMXElement( 'not', mx_not, [ 'in' ], { in: defaultBool( false ) } ),
-	createMXElement( 'checkerboard', mx_checkerboard, [ 'color1', 'color2', 'texcoord' ], {
+	createMXElement( 'checkerboard', mx_checkerboard, [ 'color1', 'color2', 'uvtiling', 'uvoffset', 'texcoord' ], {
 		color1: defaultColor( 1, 1, 1 ),
 		color2: defaultColor( 0, 0, 0 ),
+		uvtiling: defaultVec2( 8, 8 ),
+		uvoffset: defaultVec2( 0, 0 ),
 		texcoord: defaultVec2( 0, 0 ),
 	} ),
 	createMXElement( 'circle', mx_circle, [ 'texcoord', 'center', 'radius' ], {
