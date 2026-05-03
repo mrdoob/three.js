@@ -22,6 +22,7 @@ import {
 	sub,
 	mix,
 	dot,
+	div,
 	normalize,
 	mx_atan2,
 } from 'three/tsl';
@@ -335,6 +336,131 @@ const compileTransformMatrixNode = ( nodeX, compileContext ) => {
 
 };
 
+const compileCreateMatrixNode = ( nodeX ) => {
+
+	if ( nodeX.type === 'matrix44' ) {
+
+		const vector3Input = nodeX.getAttribute( 'nodedef' ) === 'ND_creatematrix_vector3_matrix44';
+		const toVec4Input = ( name, fallback, w ) => {
+
+			const input = nodeX.getNodeByName( name ) || fallback;
+			return vector3Input ? vec4( element( input, 0 ), element( input, 1 ), element( input, 2 ), w ) : input;
+
+		};
+		const in1 = toVec4Input( 'in1', vector3Input ? vec3( 1, 0, 0 ) : vec4( 1, 0, 0, 0 ), 0 );
+		const in2 = toVec4Input( 'in2', vector3Input ? vec3( 0, 1, 0 ) : vec4( 0, 1, 0, 0 ), 0 );
+		const in3 = toVec4Input( 'in3', vector3Input ? vec3( 0, 0, 1 ) : vec4( 0, 0, 1, 0 ), 0 );
+		const in4 = toVec4Input( 'in4', vector3Input ? vec3( 0, 0, 0 ) : vec4( 0, 0, 0, 1 ), 1 );
+		return mat4( in1, in2, in3, in4 );
+
+	}
+
+	const in1 = nodeX.getNodeByName( 'in1' ) || vec3( 1, 0, 0 );
+	const in2 = nodeX.getNodeByName( 'in2' ) || vec3( 0, 1, 0 );
+	const in3 = nodeX.getNodeByName( 'in3' ) || vec3( 0, 0, 1 );
+	return mat3( in1, in2, in3 );
+
+};
+
+const getMatrixElement = ( matrixNode, row, column ) => element( element( matrixNode, column ), row );
+
+const determinant2 = ( a, b, c, d ) => sub( mul( a, d ), mul( b, c ) );
+
+const determinant3 = ( m00, m01, m02, m10, m11, m12, m20, m21, m22 ) =>
+	add(
+		sub( mul( m00, determinant2( m11, m12, m21, m22 ) ), mul( m01, determinant2( m10, m12, m20, m22 ) ) ),
+		mul( m02, determinant2( m10, m11, m20, m21 ) ),
+	);
+
+const compileInvertMatrix3Node = ( matrixNode ) => {
+
+	const m00 = getMatrixElement( matrixNode, 0, 0 );
+	const m01 = getMatrixElement( matrixNode, 0, 1 );
+	const m02 = getMatrixElement( matrixNode, 0, 2 );
+	const m10 = getMatrixElement( matrixNode, 1, 0 );
+	const m11 = getMatrixElement( matrixNode, 1, 1 );
+	const m12 = getMatrixElement( matrixNode, 1, 2 );
+	const m20 = getMatrixElement( matrixNode, 2, 0 );
+	const m21 = getMatrixElement( matrixNode, 2, 1 );
+	const m22 = getMatrixElement( matrixNode, 2, 2 );
+
+	const inv00 = determinant2( m11, m12, m21, m22 );
+	const inv01 = determinant2( m02, m01, m22, m21 );
+	const inv02 = determinant2( m01, m02, m11, m12 );
+	const inv10 = determinant2( m12, m10, m22, m20 );
+	const inv11 = determinant2( m00, m02, m20, m22 );
+	const inv12 = determinant2( m02, m00, m12, m10 );
+	const inv20 = determinant2( m10, m11, m20, m21 );
+	const inv21 = determinant2( m01, m00, m21, m20 );
+	const inv22 = determinant2( m00, m01, m10, m11 );
+	const determinant = add( add( mul( m00, inv00 ), mul( m01, inv10 ) ), mul( m02, inv20 ) );
+
+	return mat3(
+		div( inv00, determinant ), div( inv10, determinant ), div( inv20, determinant ),
+		div( inv01, determinant ), div( inv11, determinant ), div( inv21, determinant ),
+		div( inv02, determinant ), div( inv12, determinant ), div( inv22, determinant ),
+	);
+
+};
+
+const compileInvertMatrix4Node = ( matrixNode ) => {
+
+	const m = [];
+	for ( let row = 0; row < 4; row ++ ) {
+
+		m[ row ] = [];
+		for ( let column = 0; column < 4; column ++ ) {
+
+			m[ row ][ column ] = getMatrixElement( matrixNode, row, column );
+
+		}
+
+	}
+
+	const getMinor3 = ( skipRow, skipColumn ) => {
+
+		const rows = [ 0, 1, 2, 3 ].filter( ( row ) => row !== skipRow );
+		const columns = [ 0, 1, 2, 3 ].filter( ( column ) => column !== skipColumn );
+		return determinant3(
+			m[ rows[ 0 ] ][ columns[ 0 ] ], m[ rows[ 0 ] ][ columns[ 1 ] ], m[ rows[ 0 ] ][ columns[ 2 ] ],
+			m[ rows[ 1 ] ][ columns[ 0 ] ], m[ rows[ 1 ] ][ columns[ 1 ] ], m[ rows[ 1 ] ][ columns[ 2 ] ],
+			m[ rows[ 2 ] ][ columns[ 0 ] ], m[ rows[ 2 ] ][ columns[ 1 ] ], m[ rows[ 2 ] ][ columns[ 2 ] ],
+		);
+
+	};
+
+	const cofactors = [];
+	for ( let row = 0; row < 4; row ++ ) {
+
+		cofactors[ row ] = [];
+		for ( let column = 0; column < 4; column ++ ) {
+
+			const minor = getMinor3( row, column );
+			cofactors[ row ][ column ] = ( row + column ) % 2 === 0 ? minor : mul( minor, - 1 );
+
+		}
+
+	}
+
+	const determinant = add(
+		add( mul( m[ 0 ][ 0 ], cofactors[ 0 ][ 0 ] ), mul( m[ 0 ][ 1 ], cofactors[ 0 ][ 1 ] ) ),
+		add( mul( m[ 0 ][ 2 ], cofactors[ 0 ][ 2 ] ), mul( m[ 0 ][ 3 ], cofactors[ 0 ][ 3 ] ) ),
+	);
+	const values = [];
+	for ( let column = 0; column < 4; column ++ ) {
+
+		for ( let row = 0; row < 4; row ++ ) {
+
+			values.push( div( cofactors[ column ][ row ], determinant ) );
+
+		}
+
+	}
+
+	return mat4( ...values );
+
+};
+
 const compileInvertMatrixNode = ( nodeX, compileContext ) => {
 
 	const inInput = nodeX.getChildByName( 'in' );
@@ -367,7 +493,8 @@ const compileInvertMatrixNode = ( nodeX, compileContext ) => {
 
 		const size = matrixType === 'matrix33' ? 3 : 4;
 		const fallback = size === 3 ? mat3( ...compileContext.IDENTITY_MAT3_VALUES ) : mat4( ...compileContext.IDENTITY_MAT4_VALUES );
-		return compileContext.invertMatrixNode( inNode === undefined || inNode === null ? fallback : inNode, size );
+		const matrixNode = inNode === undefined || inNode === null ? fallback : inNode;
+		return size === 3 ? compileInvertMatrix3Node( matrixNode ) : compileInvertMatrix4Node( matrixNode );
 
 	}
 
@@ -397,6 +524,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'gltf_iridescence_thickness' ], ( nodeX, out, compileContext ) =>
 		compileGltfIridescenceThicknessNode( nodeX, compileContext ) );
 	register( registry, [ 'transformmatrix' ], ( nodeX, out, compileContext ) => compileTransformMatrixNode( nodeX, compileContext ) );
+	register( registry, [ 'creatematrix' ], ( nodeX ) => compileCreateMatrixNode( nodeX ) );
 	register( registry, [ 'invertmatrix' ], ( nodeX, out, compileContext ) => compileInvertMatrixNode( nodeX, compileContext ) );
 	return registry;
 
