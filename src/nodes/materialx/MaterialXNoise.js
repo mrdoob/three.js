@@ -1697,43 +1697,55 @@ export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [
 } );
 
 // Unified Noise 3D
-export const mx_unifiednoise3d = (
-	noiseType = 0,
-	position = vec3( 0, 0, 0 ),
-	freq = vec3( 1, 1, 1 ),
-	offset = vec3( 0, 0, 0 ),
-	jitter = 1,
-	outmin = 0,
-	outmax = 1,
-	clampoutput = true,
-	octaves = 3,
-	lacunarity = 2,
-	diminish = 0.5,
-	style = 0
-) => {
+export const mx_unifiednoise3d = /*@__PURE__*/ Fn( ( [
+	noiseTypeInput,
+	positionInput,
+	freqInput,
+	offsetInput,
+	jitterInput,
+	outminInput,
+	outmaxInput,
+	clampoutputInput,
+	octavesInput,
+	lacunarityInput,
+	diminishInput,
+	styleInput
+] ) => {
 
-	const applyFreq = mul( position, freq );
-	const applyOffset = add( applyFreq, offset );
-	const cellJitterMult = mul( sub( jitter, 1 ), 90000 );
-	const applyCellJitter = mx_rotate3d_noise( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) );
+	const noiseType = int( noiseTypeInput ).toVar();
+	const position = vec3( positionInput ).toVar();
+	const freq = vec3( freqInput ).toVar();
+	const offset = vec3( offsetInput ).toVar();
+	const jitter = float( jitterInput ).toVar();
+	const outmin = float( outminInput ).toVar();
+	const outmax = float( outmaxInput ).toVar();
+	const clampoutput = float( clampoutputInput ).toVar();
+	const octaves = int( octavesInput ).toVar();
+	const lacunarity = float( lacunarityInput ).toVar();
+	const diminish = float( diminishInput ).toVar();
+	const style = int( styleInput ).toVar();
+
+	const applyFreq = mul( position, freq ).toVar();
+	const applyOffset = add( applyFreq, offset ).toVar();
+	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
+	const applyCellJitter = mx_rotate3d_noise( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) ).toVar();
 	const perlin = mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 );
 	const cell = mx_cell_noise_float( applyCellJitter );
 	const worley = mx_worley_noise_float_3d( applyOffset, jitter, style );
 	const fractal = mx_fractal_noise_float( applyCellJitter, octaves, lacunarity, diminish );
-	const typeFloat = float( noiseType );
 	const result = perlin.toVar();
 
-	If( typeFloat.equal( float( 1 ) ), () => {
+	If( noiseType.equal( int( 1 ) ), () => {
 
 		result.assign( cell );
 
 	} );
-	If( typeFloat.equal( float( 2 ) ), () => {
+	If( noiseType.equal( int( 2 ) ), () => {
 
 		result.assign( worley );
 
 	} );
-	If( typeFloat.equal( float( 3 ) ), () => {
+	If( noiseType.equal( int( 3 ) ), () => {
 
 		result.assign( fractal );
 
@@ -1743,7 +1755,7 @@ export const mx_unifiednoise3d = (
 	const clamped = clamp( ranged, outmin, outmax ).toVar();
 	const output = ranged.toVar();
 
-	If( float( clampoutput ).equal( float( 1 ) ), () => {
+	If( clampoutput.equal( float( 1 ) ), () => {
 
 		output.assign( clamped );
 
@@ -1751,4 +1763,4 @@ export const mx_unifiednoise3d = (
 
 	return output;
 
-};
+} );
