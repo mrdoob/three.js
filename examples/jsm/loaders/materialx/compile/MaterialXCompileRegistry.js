@@ -39,7 +39,7 @@ const register = ( registry, categories, handler ) => {
 
 };
 
-const UV_FALLBACK_CATEGORIES = new Set( [ 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
+const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
 const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
