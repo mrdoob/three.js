@@ -343,6 +343,7 @@
 		"webgpu_display_stereo",
 		"webgpu_equirectangular",
 		"webgpu_fog_height",
+		"webgpu_furnace_test",
 		"webgpu_hdr",
 		"webgpu_instance_mesh",
 		"webgpu_instance_path",
