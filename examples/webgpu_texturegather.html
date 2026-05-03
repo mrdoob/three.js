@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { If, vec4, uv, texture, Fn } from 'three/tsl';
+			import { If, vec4, uv, ivec2, texture, Fn } from 'three/tsl';
 
 			// WebGPU Backend
 			init();
@@ -67,13 +67,13 @@
 					If( vuv.y.greaterThan( 0.5 ), () => {
 
 						color.assign(
-							colorNode.sample( vuv ).gather( 0 )
+							colorNode.sample( vuv.mul( 10 ) ).offset( ivec2( 0, 7 ) ).gather( 0 )
 						);
 
 					} ).Else( () => {
 
 						color.assign(
-							depthNode.sample( vuv ).gather( 0 ).compare( 1 )
+							depthNode.sample( vuv ).offset( ivec2( 0, 7 ) ).gather( 0 ).compare( 1 )
 						);
 
 					} );
@@ -116,7 +116,13 @@
 
 				const depthTexture = new THREE.DepthTexture();
 				depthTexture.compareFunction = THREE.LessEqualCompare;
-				const rt = new THREE.RenderTarget( 100, 100, { depthTexture } );
+				const rt = new THREE.RenderTarget( 100, 100, {
+					depthTexture,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter
+				} );
+				rt.texture.wrapS = THREE.RepeatWrapping;
+				rt.texture.wrapT = THREE.RepeatWrapping;
 
 				const cameraZ = 2.5;
 				const rtScene = new THREE.Scene();
