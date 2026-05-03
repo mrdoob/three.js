@@ -73,6 +73,7 @@ import {
 	mx_heighttonormal,
 	float,
 	int,
+	bool,
 	color,
 	modelNormalMatrix,
 	modelWorldMatrix,
@@ -84,6 +85,10 @@ import {
 	fract,
 	sub,
 	step,
+	and as tslAnd,
+	or as tslOr,
+	xor as tslXor,
+	not as tslNot,
 	Fn,
 	Loop,
 } from 'three/tsl';
@@ -115,10 +120,20 @@ const mx_open_pbr_anisotropy = ( roughness = 0, anisotropy = 0 ) => {
 
 };
 
-const mx_and = ( in1, in2 ) => clamp( mul( in1, in2 ), float( 0 ), float( 1 ) );
-const mx_or = ( in1, in2 ) => clamp( add( in1, in2 ), float( 0 ), float( 1 ) );
-const mx_xor = ( in1, in2 ) => abs( sub( in1, in2 ) );
-const mx_not = ( inNode ) => sub( float( 1 ), inNode );
+const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
+const isBooleanNode = ( node ) => node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) );
+const mx_boolean = ( inNode ) => {
+
+	if ( typeof inNode === 'boolean' ) return bool( inNode );
+	if ( typeof inNode === 'number' ) return bool( inNode !== 0 );
+	if ( isBooleanNode( inNode ) ) return inNode;
+	return inNode.notEqual( float( 0 ) );
+
+};
+const mx_and = ( in1, in2 ) => tslAnd( mx_boolean( in1 ), mx_boolean( in2 ) );
+const mx_or = ( in1, in2 ) => tslOr( mx_boolean( in1 ), mx_boolean( in2 ) );
+const mx_xor = ( in1, in2 ) => tslXor( mx_boolean( in1 ), mx_boolean( in2 ) );
+const mx_not = ( inNode ) => tslNot( mx_boolean( inNode ) );
 const mx_checkerboard = ( color1, color2, texcoord ) => mix( color1, color2, clamp( checker( texcoord ), 0, 1 ) );
 
 const mx_circle = ( texcoord, center, radius ) => {
@@ -449,7 +464,7 @@ const mx_ramp = ( texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numInter
 
 const defaultFloat = ( value ) => () => float( value );
 const defaultInt = ( value ) => () => int( value );
-const defaultBool = ( value ) => () => float( value ? 1 : 0 );
+const defaultBool = ( value ) => () => bool( value );
 const defaultColor = ( r, g, b ) => () => color( r, g, b );
 const defaultVec2 = ( x, y ) => () => vec2( x, y );
 const defaultVec3 = ( x, y, z ) => () => vec3( x, y, z );

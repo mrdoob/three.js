@@ -12,6 +12,7 @@ import {
 import {
 	float,
 	int,
+	bool,
 	sub,
 	vec2,
 	vec3,
@@ -52,6 +53,7 @@ const NODE_CLASS_BY_TYPE = {
 	matrix33: mat3,
 	matrix44: mat4,
 };
+const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
 const OUTPUT_CHANNELS = {
 	outx: 0,
 	outr: 0,
@@ -300,21 +302,27 @@ class MaterialXNode {
 
 	}
 
-	toBooleanMaskNode( node ) {
-
-		if ( node && node.nodeType === 'bool' && typeof node.select === 'function' ) {
-
-			return node.select( float( 1 ), float( 0 ) );
-
-		}
+	toBooleanNode( node ) {
 
 		if ( typeof node === 'boolean' ) {
 
-			return float( node ? 1 : 0 );
+			return bool( node );
 
 		}
 
-		return node;
+		if ( typeof node === 'number' ) {
+
+			return bool( node !== 0 );
+
+		}
+
+		if ( node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) ) ) {
+
+			return node;
+
+		}
+
+		return node.notEqual( float( 0 ) );
 
 	}
 
@@ -352,7 +360,7 @@ class MaterialXNode {
 			if ( type === 'boolean' ) {
 
 				const normalized = this.getValue().trim().toLowerCase();
-				node = float( normalized === 'true' || normalized === '1' ? 1 : 0 );
+				node = bool( normalized === 'true' || normalized === '1' );
 
 			} else if ( type === 'matrix33' ) {
 
@@ -420,7 +428,7 @@ class MaterialXNode {
 		const resolvedType = channelRequested ? 'float' : type;
 		if ( resolvedType === 'boolean' ) {
 
-			node = this.toBooleanMaskNode( node );
+			node = this.toBooleanNode( node );
 
 		} else if ( resolvedType === 'string' ) {
 
