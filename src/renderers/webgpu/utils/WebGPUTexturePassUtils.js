@@ -1,6 +1,17 @@
 import DataMap from '../../common/DataMap.js';
 import { GPUFilterMode, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 import { submit } from './WebGPUUtils.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
+import GPURenderPassColorAttachment from '../descriptors/GPURenderPassColorAttachment.js';
+import GPURenderPassDescriptor from '../descriptors/GPURenderPassDescriptor.js';
+import GPUTextureViewDescriptor from '../descriptors/GPUTextureViewDescriptor.js';
+
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+const _renderPassDescriptor = new GPURenderPassDescriptor();
+const _colorAttachment = new GPURenderPassColorAttachment();
+const _viewDescriptor = new GPUTextureViewDescriptor();
 
 /**
  * A WebGPU backend utility module used by {@link WebGPUTextureUtils}.
@@ -212,11 +223,18 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
 
-		const commandEncoder = this.device.createCommandEncoder( {} );
+		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 		const pass = ( pipeline, sourceTexture, sourceArrayLayer, destinationTexture, destinationArrayLayer, flipY ) => {
 
 			const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
+
+			_viewDescriptor.dimension = sourceTexture.textureBindingViewDimension || '2d-array';
+			_viewDescriptor.mipLevelCount = 1;
+
+			const sourceView = sourceTexture.createView( _viewDescriptor );
+
+			_viewDescriptor.reset();
 
 			const bindGroup = this.device.createBindGroup( {
 				layout: bindGroupLayout,
@@ -225,30 +243,32 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 					resource: this.flipYSampler
 				}, {
 					binding: 1,
-					resource: sourceTexture.createView( {
-						dimension: sourceTexture.textureBindingViewDimension || '2d-array',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-					} ),
+					resource: sourceView,
 				}, {
 					binding: 2,
 					resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
 				} ]
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
-				colorAttachments: [ {
-					view: destinationTexture.createView( {
-						dimension: '2d',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-						baseArrayLayer: destinationArrayLayer,
-						arrayLayerCount: 1,
-					} ),
-					loadOp: GPULoadOp.Clear,
-					storeOp: GPUStoreOp.Store,
-				} ]
-			} );
+			_viewDescriptor.dimension = '2d';
+			_viewDescriptor.mipLevelCount = 1;
+			_viewDescriptor.baseArrayLayer = destinationArrayLayer;
+			_viewDescriptor.arrayLayerCount = 1;
+
+			const destinationView = destinationTexture.createView( _viewDescriptor );
+
+			_viewDescriptor.reset();
+
+			_colorAttachment.view = destinationView;
+			_colorAttachment.loadOp = GPULoadOp.Clear;
+			_colorAttachment.storeOp = GPUStoreOp.Store;
+
+			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
+
+			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
+
+			_renderPassDescriptor.reset();
+			_colorAttachment.reset();
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
@@ -278,7 +298,15 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		const passes = textureData.layers || this._mipmapCreateBundles( textureGPU );
 
-		const commandEncoder = encoder || this.device.createCommandEncoder( { label: 'mipmapEncoder' } );
+		let commandEncoder = encoder;
+
+		if ( commandEncoder === null ) {
+
+			_commandEncoderDescriptor.label = 'mipmapEncoder';
+			commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+			_commandEncoderDescriptor.reset();
+
+		}
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
@@ -308,6 +336,14 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			for ( let baseArrayLayer = 0; baseArrayLayer < textureGPU.depthOrArrayLayers; baseArrayLayer ++ ) {
 
+				_viewDescriptor.dimension = textureBindingViewDimension;
+				_viewDescriptor.baseMipLevel = baseMipLevel - 1;
+				_viewDescriptor.mipLevelCount = 1;
+
+				const sourceView = textureGPU.createView( _viewDescriptor );
+
+				_viewDescriptor.reset();
+
 				const bindGroup = this.device.createBindGroup( {
 					layout: bindGroupLayout,
 					entries: [ {
@@ -315,34 +351,36 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 						resource: this.mipmapSampler
 					}, {
 						binding: 1,
-						resource: textureGPU.createView( {
-							dimension: textureBindingViewDimension,
-							baseMipLevel: baseMipLevel - 1,
-							mipLevelCount: 1,
-						} ),
+						resource: sourceView,
 					}, {
 						binding: 2,
 						resource: { buffer: this.noFlipUniformBuffer }
 					} ]
 				} );
 
-				const passDescriptor = {
-					colorAttachments: [ {
-						view: textureGPU.createView( {
-							dimension: '2d',
-							baseMipLevel,
-							mipLevelCount: 1,
-							baseArrayLayer,
-							arrayLayerCount: 1,
-						} ),
-						loadOp: GPULoadOp.Clear,
-						storeOp: GPUStoreOp.Store,
-					} ]
-				};
+				_viewDescriptor.dimension = '2d';
+				_viewDescriptor.baseMipLevel = baseMipLevel;
+				_viewDescriptor.mipLevelCount = 1;
+				_viewDescriptor.baseArrayLayer = baseArrayLayer;
+				_viewDescriptor.arrayLayerCount = 1;
 
-				const passEncoder = this.device.createRenderBundleEncoder( {
-					colorFormats: [ textureGPU.format ]
-				} );
+				const destinationView = textureGPU.createView( _viewDescriptor );
+
+				_viewDescriptor.reset();
+
+				const passColorAttachment = new GPURenderPassColorAttachment();
+				passColorAttachment.view = destinationView;
+				passColorAttachment.loadOp = GPULoadOp.Clear;
+				passColorAttachment.storeOp = GPUStoreOp.Store;
+
+				const passDescriptor = new GPURenderPassDescriptor();
+				passDescriptor.colorAttachments.push( passColorAttachment );
+
+				_renderBundleEncoderDescriptor.colorFormats = [ textureGPU.format ];
+
+				const passEncoder = this.device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
+
+				_renderBundleEncoderDescriptor.reset();
 
 				passEncoder.setPipeline( pipeline );
 				passEncoder.setBindGroup( 0, bindGroup );

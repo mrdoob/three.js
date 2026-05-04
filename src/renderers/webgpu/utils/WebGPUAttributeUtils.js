@@ -1,8 +1,11 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 import { submit } from './WebGPUUtils.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
 import { isTypedArray, error } from '../../../utils.js';
+
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -406,9 +409,9 @@ class WebGPUAttributeUtils {
 		}
 
 		// copy the data
-		const cmdEncoder = device.createCommandEncoder( {
-			label: `readback_encoder_${ attribute.name }`
-		} );
+		_commandEncoderDescriptor.label = `readback_encoder_${ attribute.name }`;
+		const cmdEncoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,

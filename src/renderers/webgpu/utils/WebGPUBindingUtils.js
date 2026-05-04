@@ -8,6 +8,10 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
 import { hashString } from '../../../nodes/core/NodeUtils.js';
 
+import GPUTextureViewDescriptor from '../descriptors/GPUTextureViewDescriptor.js';
+
+const _viewDescriptor = new GPUTextureViewDescriptor();
+
 /**
  * Class representing a WebGPU bind group layout.
  *
@@ -343,7 +347,14 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
+						_viewDescriptor.aspect = aspectGPU;
+						_viewDescriptor.dimension = dimensionViewGPU;
+						_viewDescriptor.mipLevelCount = mipLevelCount;
+						_viewDescriptor.baseMipLevel = baseMipLevel;
+
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( _viewDescriptor );
+
+						_viewDescriptor.reset();
 
 					}
 

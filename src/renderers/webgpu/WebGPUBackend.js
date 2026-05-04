@@ -17,7 +17,24 @@ import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compat
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error } from '../../utils.js';
 
+import GPUCommandEncoderDescriptor from './descriptors/GPUCommandEncoderDescriptor.js';
+import GPUComputePassDescriptor from './descriptors/GPUComputePassDescriptor.js';
+import GPURenderPassColorAttachment from './descriptors/GPURenderPassColorAttachment.js';
+import GPURenderPassDepthStencilAttachment from './descriptors/GPURenderPassDepthStencilAttachment.js';
+import GPURenderPassDescriptor from './descriptors/GPURenderPassDescriptor.js';
+import GPURenderPassTimestampWrites from './descriptors/GPURenderPassTimestampWrites.js';
+import GPUTexelCopyTextureInfo from './descriptors/GPUTexelCopyTextureInfo.js';
+import GPUTextureViewDescriptor from './descriptors/GPUTextureViewDescriptor.js';
+import GPUExtent3D from './descriptors/GPUExtent3D.js';
+
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _computePassDescriptor = new GPUComputePassDescriptor();
+const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
+const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
+const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
+const _viewDescriptor = new GPUTextureViewDescriptor();
+const _extent3D = new GPUExtent3D();
 
 /**
  * A backend implementation targeting WebGPU.
@@ -388,17 +405,14 @@ class WebGPUBackend extends Backend {
 
 		if ( descriptor === undefined || canvasData.samples !== samples ) {
 
-			descriptor = {
-				colorAttachments: [ {
-					view: null
-				} ]
-			};
+			descriptor = new GPURenderPassDescriptor();
+			descriptor.colorAttachments.push( new GPURenderPassColorAttachment() );
 
 			if ( renderer.depth === true || renderer.stencil === true ) {
 
-				descriptor.depthStencilAttachment = {
-					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
-				};
+				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				depthStencilAttachment.view = this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView();
+				descriptor.depthStencilAttachment = depthStencilAttachment;
 
 			}
 
@@ -494,22 +508,19 @@ class WebGPUBackend extends Backend {
 
 				const textureData = this.get( textures[ i ] );
 
-				const viewDescriptor = {
-					label: `colorAttachment_${ i }`,
-					baseMipLevel: renderContext.activeMipmapLevel,
-					mipLevelCount: 1,
-					baseArrayLayer: renderContext.activeCubeFace,
-					arrayLayerCount: 1,
-					dimension: GPUTextureViewDimension.TwoD
-				};
+				_viewDescriptor.label = `colorAttachment_${ i }`;
+				_viewDescriptor.baseMipLevel = renderContext.activeMipmapLevel;
+				_viewDescriptor.mipLevelCount = 1;
+				_viewDescriptor.baseArrayLayer = renderContext.activeCubeFace;
+				_viewDescriptor.arrayLayerCount = 1;
+				_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
 
 				if ( renderTarget.isRenderTarget3D ) {
 
 					sliceIndex = renderContext.activeCubeFace;
 
-					viewDescriptor.baseArrayLayer = 0;
-					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
-					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+					_viewDescriptor.baseArrayLayer = 0;
+					_viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
 
 				} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
 
@@ -518,13 +529,11 @@ class WebGPUBackend extends Backend {
 						const cameras = renderContext.camera.cameras;
 						for ( let layer = 0; layer < cameras.length; layer ++ ) {
 
-							const layerViewDescriptor = {
-								...viewDescriptor,
-								baseArrayLayer: layer,
-								arrayLayerCount: 1,
-								dimension: GPUTextureViewDimension.TwoD
-							};
-							const textureView = textureData.texture.createView( layerViewDescriptor );
+							_viewDescriptor.baseArrayLayer = layer;
+							_viewDescriptor.arrayLayerCount = 1;
+							_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+
+							const textureView = textureData.texture.createView( _viewDescriptor );
 							textureViews.push( {
 								view: textureView,
 								resolveTarget: undefined,
@@ -535,8 +544,7 @@ class WebGPUBackend extends Backend {
 
 					} else {
 
-						viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
-						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+						_viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
 
 					}
 
@@ -544,7 +552,7 @@ class WebGPUBackend extends Backend {
 
 				if ( isRenderCameraDepthArray !== true ) {
 
-					const textureView = textureData.texture.createView( viewDescriptor );
+					const textureView = textureData.texture.createView( _viewDescriptor );
 
 					let view, resolveTarget;
 
@@ -568,23 +576,46 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				_viewDescriptor.reset();
+
 			}
 
-			descriptorBase = { textureViews };
+			const colorAttachments = [];
+
+			for ( let i = 0; i < textureViews.length; i ++ ) {
+
+				const viewInfo = textureViews[ i ];
+				const attachment = new GPURenderPassColorAttachment();
+				attachment.view = viewInfo.view;
+				attachment.depthSlice = viewInfo.depthSlice;
+				attachment.resolveTarget = viewInfo.resolveTarget;
+				colorAttachments.push( attachment );
+
+			}
+
+			descriptorBase = {
+				textureViews,
+				colorAttachments,
+				descriptor: new GPURenderPassDescriptor()
+			};
 
 			if ( renderContext.depth ) {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
-				const options = {};
+
 				if ( renderContext.depthTexture.isArrayTexture || renderContext.depthTexture.isCubeTexture ) {
 
-					options.dimension = GPUTextureViewDimension.TwoD;
-					options.arrayLayerCount = 1;
-					options.baseArrayLayer = renderContext.activeCubeFace;
+					_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+					_viewDescriptor.arrayLayerCount = 1;
+					_viewDescriptor.baseArrayLayer = renderContext.activeCubeFace;
 
 				}
 
-				descriptorBase.depthStencilView = depthTextureData.texture.createView( options );
+				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				depthStencilAttachment.view = depthTextureData.texture.createView( _viewDescriptor );
+				descriptorBase.depthStencilAttachment = depthStencilAttachment;
+
+				_viewDescriptor.reset();
 
 			}
 
@@ -598,14 +629,14 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const descriptor = {
-			colorAttachments: []
-		};
+		const descriptor = descriptorBase.descriptor;
 
-		// Apply dynamic properties to cached views
-		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+		descriptor.reset();
 
-			const viewInfo = descriptorBase.textureViews[ i ];
+		// Apply dynamic properties to cached attachments
+		for ( let i = 0; i < descriptorBase.colorAttachments.length; i ++ ) {
+
+			const attachment = descriptorBase.colorAttachments[ i ];
 
 			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
 			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
@@ -614,22 +645,17 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			descriptor.colorAttachments.push( {
-				view: viewInfo.view,
-				depthSlice: viewInfo.depthSlice,
-				resolveTarget: viewInfo.resolveTarget,
-				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
-				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
-				clearValue: clearValue
-			} );
+			attachment.loadOp = colorAttachmentsConfig.loadOp || GPULoadOp.Load;
+			attachment.storeOp = colorAttachmentsConfig.storeOp || GPUStoreOp.Store;
+			attachment.clearValue = clearValue;
+
+			descriptor.colorAttachments.push( attachment );
 
 		}
 
-		if ( descriptorBase.depthStencilView ) {
+		if ( descriptorBase.depthStencilAttachment ) {
 
-			descriptor.depthStencilAttachment = {
-				view: descriptorBase.depthStencilView
-			};
+			descriptor.depthStencilAttachment = descriptorBase.depthStencilAttachment;
 
 		}
 
@@ -789,7 +815,9 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
+		_commandEncoderDescriptor.label = 'renderContext_' + renderContext.id;
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
 
 		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
@@ -887,13 +915,21 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
-			const layerDescriptor = {
-				...descriptor,
-				colorAttachments: [ {
-					...descriptor.colorAttachments[ 0 ],
-					view: descriptor.colorAttachments[ i ].view
-				} ]
-			};
+			const sourceAttachment = descriptor.colorAttachments[ 0 ];
+
+			const layerColorAttachment = new GPURenderPassColorAttachment();
+			layerColorAttachment.view = descriptor.colorAttachments[ i ].view;
+			layerColorAttachment.depthSlice = sourceAttachment.depthSlice;
+			layerColorAttachment.resolveTarget = sourceAttachment.resolveTarget;
+			layerColorAttachment.loadOp = sourceAttachment.loadOp;
+			layerColorAttachment.storeOp = sourceAttachment.storeOp;
+			layerColorAttachment.clearValue = sourceAttachment.clearValue;
+
+			const layerDescriptor = new GPURenderPassDescriptor();
+			layerDescriptor.label = descriptor.label;
+			layerDescriptor.occlusionQuerySet = descriptor.occlusionQuerySet;
+			layerDescriptor.timestampWrites = descriptor.timestampWrites;
+			layerDescriptor.colorAttachments.push( layerColorAttachment );
 
 			if ( descriptor.depthStencilAttachment ) {
 
@@ -901,32 +937,45 @@ class WebGPUBackend extends Backend {
 
 				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
 
-					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( {
-						dimension: GPUTextureViewDimension.TwoD,
-						baseArrayLayer: i,
-						arrayLayerCount: 1
-					} );
+					_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+					_viewDescriptor.baseArrayLayer = i;
+					_viewDescriptor.arrayLayerCount = 1;
+
+					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+
+					_viewDescriptor.reset();
 
 				}
 
-				layerDescriptor.depthStencilAttachment = {
-					view: depthTextureData.viewCache[ layerIndex ],
-					depthLoadOp: depthStencilAttachment.depthLoadOp || GPULoadOp.Clear,
-					depthStoreOp: depthStencilAttachment.depthStoreOp || GPUStoreOp.Store,
-					depthClearValue: depthStencilAttachment.depthClearValue || 1.0
-				};
+				const layerDepthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				layerDepthStencilAttachment.view = depthTextureData.viewCache[ layerIndex ];
+				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp || GPULoadOp.Clear;
+				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp || GPUStoreOp.Store;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue || 1.0;
 
 				if ( renderContext.stencil ) {
 
-					layerDescriptor.depthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
-					layerDescriptor.depthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
-					layerDescriptor.depthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+					layerDepthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+					layerDepthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+					layerDepthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
 
 				}
 
+				layerDescriptor.depthStencilAttachment = layerDepthStencilAttachment;
+
 			} else {
 
-				layerDescriptor.depthStencilAttachment = { ...depthStencilAttachment };
+				const layerDepthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				layerDepthStencilAttachment.view = depthStencilAttachment.view;
+				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp;
+				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue;
+				layerDepthStencilAttachment.depthReadOnly = depthStencilAttachment.depthReadOnly;
+				layerDepthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+				layerDepthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+				layerDepthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+				layerDepthStencilAttachment.stencilReadOnly = depthStencilAttachment.stencilReadOnly;
+				layerDescriptor.depthStencilAttachment = layerDepthStencilAttachment;
 
 			}
 
@@ -1370,7 +1419,10 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'clear' } );
+		_commandEncoderDescriptor.label = 'clear';
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
+
 		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
@@ -1396,15 +1448,18 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const descriptor = {
-			label: 'computeGroup_' + computeGroup.id
-		};
+		const label = 'computeGroup_' + computeGroup.id;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
+		_computePassDescriptor.label = label;
+		_commandEncoderDescriptor.label = label;
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
 
-		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
+
+		_commandEncoderDescriptor.reset();
+		_computePassDescriptor.reset();
 
 	}
 
@@ -2062,11 +2117,11 @@ class WebGPUBackend extends Backend {
 
 		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
-		descriptor.timestampWrites = {
-			querySet: timestampQueryPool.querySet,
-			beginningOfPassWriteIndex: baseOffset,
-			endOfPassWriteIndex: baseOffset + 1,
-		};
+		_renderPassTimestampWrites.querySet = timestampQueryPool.querySet;
+		_renderPassTimestampWrites.beginningOfPassWriteIndex = baseOffset;
+		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
+
+		descriptor.timestampWrites = _renderPassTimestampWrites;
 
 	}
 
@@ -2471,28 +2526,38 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
+		_commandEncoderDescriptor.label = 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id;
+		const encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
 
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
 
+		_texelCopyTextureInfoSrc.texture = sourceGPU;
+		_texelCopyTextureInfoSrc.mipLevel = srcLevel;
+		_texelCopyTextureInfoSrc.origin.x = srcX;
+		_texelCopyTextureInfoSrc.origin.y = srcY;
+		_texelCopyTextureInfoSrc.origin.z = srcZ;
+
+		_texelCopyTextureInfoDst.texture = destinationGPU;
+		_texelCopyTextureInfoDst.mipLevel = dstLevel;
+		_texelCopyTextureInfoDst.origin.x = dstX;
+		_texelCopyTextureInfoDst.origin.y = dstY;
+		_texelCopyTextureInfoDst.origin.z = dstZ;
+
+		_extent3D.width = srcWidth;
+		_extent3D.height = srcHeight;
+		_extent3D.depthOrArrayLayers = srcDepth;
+
 		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				mipLevel: srcLevel,
-				origin: { x: srcX, y: srcY, z: srcZ }
-			},
-			{
-				texture: destinationGPU,
-				mipLevel: dstLevel,
-				origin: { x: dstX, y: dstY, z: dstZ }
-			},
-			[
-				srcWidth,
-				srcHeight,
-				srcDepth
-			]
+			_texelCopyTextureInfoSrc,
+			_texelCopyTextureInfoDst,
+			_extent3D
 		);
+
+		_texelCopyTextureInfoSrc.reset();
+		_texelCopyTextureInfoDst.reset();
+		_extent3D.reset();
 
 		submit( this.device, encoder.finish() );
 
@@ -2563,23 +2628,30 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+			_commandEncoderDescriptor.label = 'copyFramebufferToTexture_' + texture.id;
+			encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+			_commandEncoderDescriptor.reset();
 
 		}
 
+		_texelCopyTextureInfoSrc.texture = sourceGPU;
+		_texelCopyTextureInfoSrc.origin.x = rectangle.x;
+		_texelCopyTextureInfoSrc.origin.y = rectangle.y;
+
+		_texelCopyTextureInfoDst.texture = destinationGPU;
+
+		_extent3D.width = rectangle.z;
+		_extent3D.height = rectangle.w;
+
 		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				origin: [ rectangle.x, rectangle.y, 0 ],
-			},
-			{
-				texture: destinationGPU
-			},
-			[
-				rectangle.z,
-				rectangle.w
-			]
+			_texelCopyTextureInfoSrc,
+			_texelCopyTextureInfoDst,
+			_extent3D
 		);
+
+		_texelCopyTextureInfoSrc.reset();
+		_texelCopyTextureInfoDst.reset();
+		_extent3D.reset();
 
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
