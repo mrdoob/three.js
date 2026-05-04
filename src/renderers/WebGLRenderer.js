@@ -295,6 +295,12 @@ class WebGLRenderer {
 		let _isContextLost = false;
 		let _nodesHandler = null;
 
+		// scratch framebuffers
+
+		let _scratchFrameBuffer = null;
+		let _srcFramebuffer = null;
+		let _dstFramebuffer = null;
+
 		// internal state cache
 
 		this._outputColorSpace = SRGBColorSpace;
@@ -437,6 +443,10 @@ class WebGLRenderer {
 				state.buffers.depth.setReversed( true );
 
 			}
+
+			_scratchFrameBuffer = _gl.createFramebuffer();
+			_srcFramebuffer = _gl.createFramebuffer();
+			_dstFramebuffer = _gl.createFramebuffer();
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -2870,8 +2880,6 @@ class WebGLRenderer {
 
 		};
 
-		const _scratchFrameBuffer = _gl.createFramebuffer();
-
 		/**
 		 * Sets the active rendertarget.
 		 *
@@ -3247,8 +3255,6 @@ class WebGLRenderer {
 
 		};
 
-		const _srcFramebuffer = _gl.createFramebuffer();
-		const _dstFramebuffer = _gl.createFramebuffer();
 
 		/**
 		 * Copies data of the given source texture into a destination texture.
