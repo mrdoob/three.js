@@ -89,14 +89,14 @@
 				const geometry = new THREE.SphereGeometry( 5, 64, 32 );
 				const labelMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
-				const position2D = vec2( normalWorld.x, normalWorld.y ).mul( 4 ).add( vec2( time.mul( .35 ), time.mul( .19 ) ) );
+				const position2D = uv( 0 ).mul( 12 ).add( vec2( time.mul( .35 ), time.mul( .19 ) ) );
 				const position3D = normalWorld.mul( 4 ).add( vec3( time.mul( .35 ), time.mul( .19 ), time.mul( .27 ) ) );
 				const fractal2D = vec3( position2D.x, position2D.y, 0 ).mul( .35 );
 				const fractal3D = position3D.mul( .35 );
 				const unifiedOffset2D = vec2( time.mul( .35 ), time.mul( .19 ) );
 				const unifiedOffset3D = vec3( time.mul( .35 ), time.mul( .19 ), time.mul( .27 ) );
 				const unifiedNoise3D = ( noiseType, position, freq, offset, jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => Fn( () => mx_unifiednoise3d( noiseType, position, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style ) )();
-				const textileTexcoord = ( speedX, speedY ) => uv( 0 ).add( vec2( time.mul( speedX ), time.mul( speedY ) ) );
+				const textileTexcoord = ( speedX, speedY ) => uv( 0 ).mul( 3 ).add( vec2( time.mul( speedX ), time.mul( speedY ) ) );
 				const checkerboard = ( color1, color2, uvtiling, uvoffset, texcoord ) => {
 
 					const tiledUv = sub( mul( texcoord, uvtiling ), uvoffset );
