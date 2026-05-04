@@ -215,21 +215,20 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const falloff = nodeX.getNodeByName( 'falloff' ) || float( 0.5 );
 	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' ) || float( 0.5 );
 	const lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' ) || vec3( 0.2722287, 0.6740818, 0.0536895 );
-	const transformedUv = mul( uvNode, tiling );
+	const transformedUv = compileContext.mxFromUvSpace( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
-	const invertY = ( v ) => vec2( element( v, 0 ), mul( element( v, 1 ), - 1 ) );
-	let sample0 = texture( textureFile, compileContext.mxFromUvSpace( tileData.coords[ 0 ] ) ).grad(
-		invertY( tileData.ddx[ 0 ] ),
-		invertY( tileData.ddy[ 0 ] ),
+	let sample0 = texture( textureFile, tileData.coords[ 0 ] ).grad(
+		tileData.ddx[ 0 ],
+		tileData.ddy[ 0 ],
 	);
-	let sample1 = texture( textureFile, compileContext.mxFromUvSpace( tileData.coords[ 1 ] ) ).grad(
-		invertY( tileData.ddx[ 1 ] ),
-		invertY( tileData.ddy[ 1 ] ),
+	let sample1 = texture( textureFile, tileData.coords[ 1 ] ).grad(
+		tileData.ddx[ 1 ],
+		tileData.ddy[ 1 ],
 	);
-	let sample2 = texture( textureFile, compileContext.mxFromUvSpace( tileData.coords[ 2 ] ) ).grad(
-		invertY( tileData.ddx[ 2 ] ),
-		invertY( tileData.ddy[ 2 ] ),
+	let sample2 = texture( textureFile, tileData.coords[ 2 ] ).grad(
+		tileData.ddx[ 2 ],
+		tileData.ddy[ 2 ],
 	);
 	const sample0Raw = sample0;
 	const sample1Raw = sample1;
