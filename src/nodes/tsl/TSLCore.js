@@ -522,6 +522,22 @@ class ShaderCallNodeInternal extends Node {
 
 			if ( functionNode === undefined ) {
 
+				// Build struct types referenced by the call inputs first
+
+				if ( rawInputs ) {
+
+					for ( const param of rawInputs ) {
+
+						if ( param && param.isStructNode ) {
+
+							param.structTypeNode.build( builder );
+
+						}
+
+					}
+
+				}
+
 				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
 
 				functionNodesCacheMap.set( shaderNode, functionNode );
