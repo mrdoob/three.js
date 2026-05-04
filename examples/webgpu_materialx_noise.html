@@ -37,9 +37,10 @@
 
 			import * as THREE from 'three/webgpu';
 			import {
-				Fn, int, normalWorld, time, vec2, vec3,
+				Fn, add, dot, element, float, floor, int, mix, mul, normalWorld, sub, time, uv, vec2, vec3,
 				mx_cell_noise_float,
 				mx_fractal_noise_vec3,
+				mx_modulo,
 				mx_noise_vec3,
 				mx_unifiednoise2d,
 				mx_unifiednoise3d,
@@ -53,6 +54,7 @@
 			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { mxHextileComputeBlendWeights, mxHextileCoord } from 'three/addons/loaders/materialx/MaterialXHextile.js';
 
 			let container;
 
@@ -70,7 +72,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 120;
+				camera.position.z = 190;
 
 				scene = new THREE.Scene();
 
@@ -94,6 +96,44 @@
 				const unifiedOffset2D = vec2( time.mul( .35 ), time.mul( .19 ) );
 				const unifiedOffset3D = vec3( time.mul( .35 ), time.mul( .19 ), time.mul( .27 ) );
 				const unifiedNoise3D = ( noiseType, position, freq, offset, jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => Fn( () => mx_unifiednoise3d( noiseType, position, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style ) )();
+				const textileTexcoord = ( speedX, speedY ) => uv( 0 ).add( vec2( time.mul( speedX ), time.mul( speedY ) ) );
+				const checkerboard = ( color1, color2, uvtiling, uvoffset, texcoord ) => {
+
+					const tiledUv = sub( mul( texcoord, uvtiling ), uvoffset );
+					const checkerMix = mx_modulo( dot( floor( tiledUv ), vec2( 1, 1 ) ), float( 2 ) );
+					return mix( color2, color1, checkerMix );
+
+				};
+				const hextiledCheckerboard = ( texcoord, {
+					color1 = vec3( 1, 1, 1 ),
+					color2 = vec3( 0, 0, 0 ),
+					uvtiling = vec2( 4, 4 ),
+					uvoffset = vec2( 0, 0 ),
+					tiling = vec2( 1, 1 ),
+					rotation = 0,
+					rotationrange = vec2( 0, 360 ),
+					scale = 0,
+					scalerange = vec2( .5, 2 ),
+					offset = 0,
+					offsetrange = vec2( 0, 1 ),
+					falloff = .5,
+					falloffcontrast = .5,
+					lumacoeffs = vec3( 0.2722287, 0.6740818, 0.0536895 )
+				} = {} ) => {
+
+					const tileData = mxHextileCoord( mul( texcoord, tiling ), rotation, rotationrange, scale, scalerange, offset, offsetrange );
+					const c0 = checkerboard( color1, color2, uvtiling, uvoffset, tileData.coords[ 0 ] );
+					const c1 = checkerboard( color1, color2, uvtiling, uvoffset, tileData.coords[ 1 ] );
+					const c2 = checkerboard( color1, color2, uvtiling, uvoffset, tileData.coords[ 2 ] );
+					const luminanceWeights = mix(
+						vec3( 1, 1, 1 ),
+						vec3( dot( c0, lumacoeffs ), dot( c1, lumacoeffs ), dot( c2, lumacoeffs ) ),
+						vec3( falloffcontrast, falloffcontrast, falloffcontrast )
+					);
+					const blendWeights = mxHextileComputeBlendWeights( luminanceWeights, tileData.weights, falloff );
+					return add( add( mul( element( blendWeights, 0 ), c0 ), mul( element( blendWeights, 1 ), c1 ) ), mul( element( blendWeights, 2 ), c2 ) );
+
+				};
 
 				const noiseExamples = [
 					{ label: [ 'Noise', '2D' ], createNode: () => mx_noise_vec3( position2D ) },
@@ -115,7 +155,21 @@
 					{ label: [ 'Unified Worley', '2D style 1' ], createNode: () => mx_unifiednoise2d( int( 2 ), position2D, vec2( 1, 1 ), unifiedOffset2D, 1, 0, 1, false, 1, 2, .5, 1 ) },
 					{ label: [ 'Unified Worley', '3D style 1' ], createNode: () => unifiedNoise3D( int( 2 ), position3D, vec3( 1, 1, 1 ), unifiedOffset3D, 1, 0, 1, false, 1, 2, .5, 1 ) },
 					{ label: [ 'Unified Fractal', '2D' ], createNode: () => mx_unifiednoise2d( int( 3 ), position2D, vec2( 1, 1 ), unifiedOffset2D, 1, 0, 1, false, 3 ) },
-					{ label: [ 'Unified Fractal', '3D' ], createNode: () => unifiedNoise3D( int( 3 ), position3D, vec3( 1, 1, 1 ), unifiedOffset3D, 1, 0, 1, false, 3 ) }
+					{ label: [ 'Unified Fractal', '3D' ], createNode: () => unifiedNoise3D( int( 3 ), position3D, vec3( 1, 1, 1 ), unifiedOffset3D, 1, 0, 1, false, 3 ) },
+					{
+						label: [ 'Hex Tiled', 'checkerboard' ],
+						createNode: () => hextiledCheckerboard( textileTexcoord( .08, .04 ), {
+							color1: vec3( 1, 1, 1 ),
+							color2: vec3( 0, 0, 0 ),
+							uvtiling: vec2( 8, 8 ),
+							tiling: vec2( 2.2, 2.2 ),
+							rotation: .25,
+							scale: .1,
+							offset: .2,
+							falloff: .35,
+							falloffcontrast: .25
+						} )
+					}
 				];
 
 				createNoiseGrid( noiseExamples, geometry, font, labelMaterial );
