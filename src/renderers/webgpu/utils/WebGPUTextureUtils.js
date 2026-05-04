@@ -8,7 +8,7 @@ import { submit } from './WebGPUUtils.js';
 
 import {
 	ByteType, ShortType,
-	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
+	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
 	RGBAFormat, RGBFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBTransfer, DepthFormat, DepthStencilFormat,
@@ -147,7 +147,7 @@ class WebGPUTextureUtils {
 				addressModeW: this._convertAddressMode( texture.wrapR ),
 				magFilter: this._convertFilterMode( texture.magFilter ),
 				minFilter: this._convertFilterMode( texture.minFilter ),
-				mipmapFilter: this._convertFilterMode( texture.minFilter ),
+				mipmapFilter: this._convertMipmapFilterMode( texture.minFilter ),
 				maxAnisotropy: 1
 			};
 
@@ -1117,6 +1117,27 @@ class WebGPUTextureUtils {
 		}
 
 		return filterMode;
+
+	}
+
+	/**
+	 * Converts the three.js filter constants to a GPU mipmap filter constant.
+	 * Unlike `_convertFilterMode`, this extracts the between-mip-level filtering
+	 * axis from the combined three.js constant rather than the within-level axis.
+	 *
+	 * @private
+	 * @param {number} value - The three.js constant defining a filter mode.
+	 * @return {string} The GPU mipmap filter mode.
+	 */
+	_convertMipmapFilterMode( value ) {
+
+		if ( value === NearestMipmapLinearFilter || value === LinearMipmapLinearFilter ) {
+
+			return GPUFilterMode.Linear;
+
+		}
+
+		return GPUFilterMode.Nearest;
 
 	}
 
