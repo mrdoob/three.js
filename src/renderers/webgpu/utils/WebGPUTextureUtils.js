@@ -5,6 +5,21 @@ import { ColorManagement } from '../../../math/ColorManagement.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 import { submit } from './WebGPUUtils.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+import GPUTexelCopyTextureInfo from '../descriptors/GPUTexelCopyTextureInfo.js';
+import GPUTexelCopyBufferInfo from '../descriptors/GPUTexelCopyBufferInfo.js';
+import GPUTexelCopyBufferLayout from '../descriptors/GPUTexelCopyBufferLayout.js';
+import GPUCopyExternalImageSourceInfo from '../descriptors/GPUCopyExternalImageSourceInfo.js';
+import GPUCopyExternalImageDestInfo from '../descriptors/GPUCopyExternalImageDestInfo.js';
+import GPUExtent3D from '../descriptors/GPUExtent3D.js';
+
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _texelCopyTextureInfo = new GPUTexelCopyTextureInfo();
+const _texelCopyBufferInfo = new GPUTexelCopyBufferInfo();
+const _texelCopyBufferLayout = new GPUTexelCopyBufferLayout();
+const _copyExternalImageSourceInfo = new GPUCopyExternalImageSourceInfo();
+const _copyExternalImageDestInfo = new GPUCopyExternalImageDestInfo();
+const _extent3D = new GPUExtent3D();
 
 import {
 	ByteType, ShortType,
@@ -38,24 +53,27 @@ const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
 function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
 
+	_texelCopyTextureInfo.texture = textureGPU;
+	_texelCopyTextureInfo.mipLevel = mipLevel;
+	_texelCopyTextureInfo.origin.z = layerIndex;
+
+	_texelCopyBufferLayout.offset = layerIndex * bytesPerImage;
+	_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+	_texelCopyBufferLayout.rowsPerImage = rowsPerImage;
+
+	_extent3D.width = textureWidth;
+	_extent3D.height = textureHeight;
+
 	device.queue.writeTexture(
-		{
-			texture: textureGPU,
-			mipLevel,
-			origin: { x: 0, y: 0, z: layerIndex }
-		},
+		_texelCopyTextureInfo,
 		mipmap.data,
-		{
-			offset: layerIndex * bytesPerImage,
-			bytesPerRow,
-			rowsPerImage
-		},
-		{
-			width: textureWidth,
-			height: textureHeight,
-			depthOrArrayLayers: 1
-		}
+		_texelCopyBufferLayout,
+		_extent3D
 	);
+
+	_texelCopyTextureInfo.reset();
+	_texelCopyBufferLayout.reset();
+	_extent3D.reset();
 
 }
 
@@ -691,23 +709,28 @@ class WebGPUTextureUtils {
 			}
 		);
 
-		const encoder = device.createCommandEncoder();
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.origin.x = x;
+		_texelCopyTextureInfo.origin.y = y;
+		_texelCopyTextureInfo.origin.z = faceIndex;
+
+		_texelCopyBufferInfo.buffer = readBuffer;
+		_texelCopyBufferInfo.bytesPerRow = bytesPerRow;
+
+		_extent3D.width = width;
+		_extent3D.height = height;
 
 		encoder.copyTextureToBuffer(
-			{
-				texture: textureGPU,
-				origin: { x, y, z: faceIndex },
-			},
-			{
-				buffer: readBuffer,
-				bytesPerRow: bytesPerRow
-			},
-			{
-				width: width,
-				height: height
-			}
-
+			_texelCopyTextureInfo,
+			_texelCopyBufferInfo,
+			_extent3D
 		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferInfo.reset();
+		_extent3D.reset();
 
 		const typedArrayType = this._getTypedArrayType( format );
 
@@ -856,27 +879,36 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
+		_copyExternalImageSourceInfo.source = image;
+		_copyExternalImageSourceInfo.flipY = flipY;
+
+		_copyExternalImageDestInfo.texture = textureGPU;
+		_copyExternalImageDestInfo.mipLevel = mipLevel;
+		_copyExternalImageDestInfo.origin.z = originDepth;
+		_copyExternalImageDestInfo.premultipliedAlpha = premultiplyAlpha;
+
+		_extent3D.width = width;
+		_extent3D.height = height;
+
 		try {
 
 			device.queue.copyExternalImageToTexture(
-				{
-					source: image,
-					flipY: flipY
-				}, {
-					texture: textureGPU,
-					mipLevel: mipLevel,
-					origin: { x: 0, y: 0, z: originDepth },
-					premultipliedAlpha: premultiplyAlpha
-				}, {
-					width: width,
-					height: height,
-					depthOrArrayLayers: 1
-				}
+				_copyExternalImageSourceInfo,
+				_copyExternalImageDestInfo,
+				_extent3D
 			);
 
 			// try/catch has been added to fix bad video frame data on certain devices, see #32391
 
-		} catch ( _ ) {}
+		} catch ( _ ) {
+
+		} finally {
+
+			_copyExternalImageSourceInfo.reset();
+			_copyExternalImageDestInfo.reset();
+			_extent3D.reset();
+
+		}
 
 	}
 
@@ -951,22 +983,26 @@ class WebGPUTextureUtils {
 		const bytesPerTexel = this._getBytesPerTexel( textureDescriptorGPU.format );
 		const bytesPerRow = image.width * bytesPerTexel;
 
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.mipLevel = mipLevel;
+		_texelCopyTextureInfo.origin.z = originDepth;
+
+		_texelCopyBufferLayout.offset = image.width * image.height * bytesPerTexel * depth;
+		_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+
+		_extent3D.width = image.width;
+		_extent3D.height = image.height;
+
 		device.queue.writeTexture(
-			{
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth }
-			},
+			_texelCopyTextureInfo,
 			data,
-			{
-				offset: image.width * image.height * bytesPerTexel * depth,
-				bytesPerRow
-			},
-			{
-				width: image.width,
-				height: image.height,
-				depthOrArrayLayers: 1
-			} );
+			_texelCopyBufferLayout,
+			_extent3D
+		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferLayout.reset();
+		_extent3D.reset();
 
 		if ( flipY === true ) {
 

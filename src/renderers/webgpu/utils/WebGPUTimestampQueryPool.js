@@ -1,6 +1,9 @@
 import { error, warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 import { submit } from './WebGPUUtils.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 
 /**
  * Manages a pool of WebGPU timestamp queries for performance measurement.
@@ -137,7 +140,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			this.currentQueryIndex = 0;
 			this.queryOffsets.clear();
 
-			const commandEncoder = this.device.createCommandEncoder();
+			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 			commandEncoder.resolveQuerySet(
 				this.querySet,

@@ -17,6 +17,10 @@ import {
 
 import { error, ReversedDepthFuncs, warn, warnOnce } from '../../../utils.js';
 
+import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
+
+const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+
 /**
  * A WebGPU backend utility module for managing pipelines.
  *
@@ -359,14 +363,16 @@ class WebGPUPipelineUtils {
 		const colorFormats = utils.getCurrentColorFormats( renderContext );
 		const sampleCount = this._getSampleCount( renderContext );
 
-		const descriptor = {
-			label,
-			colorFormats,
-			depthStencilFormat,
-			sampleCount
-		};
+		_renderBundleEncoderDescriptor.label = label;
+		_renderBundleEncoderDescriptor.colorFormats = colorFormats;
+		_renderBundleEncoderDescriptor.depthStencilFormat = depthStencilFormat;
+		_renderBundleEncoderDescriptor.sampleCount = sampleCount;
 
-		return device.createRenderBundleEncoder( descriptor );
+		const bundleEncoder = device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
+
+		_renderBundleEncoderDescriptor.reset();
+
+		return bundleEncoder;
 
 	}
 
