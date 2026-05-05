@@ -528,11 +528,7 @@ class ShaderCallNodeInternal extends Node {
 
 					for ( const param of rawInputs ) {
 
-						if ( param && param.isStructNode ) {
-
-							param.structTypeNode.build( builder );
-
-						}
+						param.build( builder );
 
 					}
 
