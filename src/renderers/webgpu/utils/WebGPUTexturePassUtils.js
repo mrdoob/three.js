@@ -1,16 +1,26 @@
 import DataMap from '../../common/DataMap.js';
 import { GPUFilterMode, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 import { submit } from './WebGPUUtils.js';
+import GPUBindGroupDescriptor from '../descriptors/GPUBindGroupDescriptor.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
 import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
 import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
 import GPURenderPassColorAttachment from '../descriptors/GPURenderPassColorAttachment.js';
 import GPURenderPassDescriptor from '../descriptors/GPURenderPassDescriptor.js';
+import GPURenderPipelineDescriptor from '../descriptors/GPURenderPipelineDescriptor.js';
+import GPUShaderModuleDescriptor from '../descriptors/GPUShaderModuleDescriptor.js';
+import GPUTextureDescriptor from '../descriptors/GPUTextureDescriptor.js';
 import GPUTextureViewDescriptor from '../descriptors/GPUTextureViewDescriptor.js';
 
+const _bindGroupDescriptor = new GPUBindGroupDescriptor();
+const _bufferDescriptor = new GPUBufferDescriptor();
 const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
 const _renderPassDescriptor = new GPURenderPassDescriptor();
+const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
 const _colorAttachment = new GPURenderPassColorAttachment();
+const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
+const _textureDescriptor = new GPUTextureDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 
 /**
@@ -130,20 +140,25 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 * flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.flipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-		} );
+		_bufferDescriptor.size = 4;
+		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+		this.flipUniformBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
+
 		device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
 
 		/**
 		 * no flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.noFlipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM
-		} );
+		_bufferDescriptor.size = 4;
+		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM;
+
+		this.noFlipUniformBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
 
 		/**
 		 * A cache for GPU render pipelines used for copy/transfer passes.
@@ -158,10 +173,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 *
 		 * @type {GPUShaderModule}
 		 */
-		this.mipmapShaderModule = device.createShaderModule( {
-			label: 'mipmap',
-			code: mipmapSource
-		} );
+		_shaderModuleDescriptor.label = 'mipmap';
+		_shaderModuleDescriptor.code = mipmapSource;
+
+		this.mipmapShaderModule = device.createShaderModule( _shaderModuleDescriptor );
+
+		_shaderModuleDescriptor.reset();
 
 	}
 
@@ -181,18 +198,18 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = this.device.createRenderPipeline( {
-				label: `mipmap-${ format }-${ textureBindingViewDimension }`,
-				vertex: {
-					module: this.mipmapShaderModule,
-				},
-				fragment: {
-					module: this.mipmapShaderModule,
-					entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
-					targets: [ { format } ]
-				},
-				layout: 'auto'
-			} );
+			_renderPipelineDescriptor.label = `mipmap-${ format }-${ textureBindingViewDimension }`;
+			_renderPipelineDescriptor.vertex = { module: this.mipmapShaderModule };
+			_renderPipelineDescriptor.fragment = {
+				module: this.mipmapShaderModule,
+				entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
+				targets: [ { format } ]
+			};
+			_renderPipelineDescriptor.layout = 'auto';
+
+			pipeline = this.device.createRenderPipeline( _renderPipelineDescriptor );
+
+			_renderPipelineDescriptor.reset();
 
 			this.transferPipelines[ key ] = pipeline;
 
@@ -214,11 +231,14 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const format = textureGPUDescriptor.format;
 		const { width, height } = textureGPUDescriptor.size;
 
-		const tempTexture = this.device.createTexture( {
-			size: { width, height },
-			format,
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-		} );
+		_textureDescriptor.size.width = width;
+		_textureDescriptor.size.height = height;
+		_textureDescriptor.format = format;
+		_textureDescriptor.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
+
+		const tempTexture = this.device.createTexture( _textureDescriptor );
+
+		_textureDescriptor.reset();
 
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
@@ -236,19 +256,21 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			_viewDescriptor.reset();
 
-			const bindGroup = this.device.createBindGroup( {
-				layout: bindGroupLayout,
-				entries: [ {
-					binding: 0,
-					resource: this.flipYSampler
-				}, {
-					binding: 1,
-					resource: sourceView,
-				}, {
-					binding: 2,
-					resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
-				} ]
+			_bindGroupDescriptor.layout = bindGroupLayout;
+			_bindGroupDescriptor.entries.push( {
+				binding: 0,
+				resource: this.flipYSampler
+			}, {
+				binding: 1,
+				resource: sourceView,
+			}, {
+				binding: 2,
+				resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
 			} );
+
+			const bindGroup = this.device.createBindGroup( _bindGroupDescriptor );
+
+			_bindGroupDescriptor.reset();
 
 			_viewDescriptor.dimension = '2d';
 			_viewDescriptor.mipLevelCount = 1;
@@ -344,19 +366,21 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 				_viewDescriptor.reset();
 
-				const bindGroup = this.device.createBindGroup( {
-					layout: bindGroupLayout,
-					entries: [ {
-						binding: 0,
-						resource: this.mipmapSampler
-					}, {
-						binding: 1,
-						resource: sourceView,
-					}, {
-						binding: 2,
-						resource: { buffer: this.noFlipUniformBuffer }
-					} ]
+				_bindGroupDescriptor.layout = bindGroupLayout;
+				_bindGroupDescriptor.entries.push( {
+					binding: 0,
+					resource: this.mipmapSampler
+				}, {
+					binding: 1,
+					resource: sourceView,
+				}, {
+					binding: 2,
+					resource: { buffer: this.noFlipUniformBuffer }
 				} );
+
+				const bindGroup = this.device.createBindGroup( _bindGroupDescriptor );
+
+				_bindGroupDescriptor.reset();
 
 				_viewDescriptor.dimension = '2d';
 				_viewDescriptor.baseMipLevel = baseMipLevel;

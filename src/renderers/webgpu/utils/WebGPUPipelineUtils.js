@@ -17,9 +17,15 @@ import {
 
 import { error, ReversedDepthFuncs, warn, warnOnce } from '../../../utils.js';
 
+import GPUComputePipelineDescriptor from '../descriptors/GPUComputePipelineDescriptor.js';
+import GPUPipelineLayoutDescriptor from '../descriptors/GPUPipelineLayoutDescriptor.js';
 import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
+import GPURenderPipelineDescriptor from '../descriptors/GPURenderPipelineDescriptor.js';
 
+const _computePipelineDescriptor = new GPUComputePipelineDescriptor();
+const _pipelineLayoutDescriptor = new GPUPipelineLayoutDescriptor();
 const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -222,20 +228,19 @@ class WebGPUPipelineUtils {
 
 		const sampleCount = this._getSampleCount( renderObject.context );
 
-		const pipelineDescriptor = {
-			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
-			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets } ),
-			primitive: primitiveState,
-			multisample: {
-				count: sampleCount,
-				alphaToCoverageEnabled: material.alphaToCoverage && sampleCount > 1
-			},
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		};
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
 
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_renderPipelineDescriptor.label = `renderPipeline_${ material.name || material.type }_${ material.id }`;
+		_renderPipelineDescriptor.vertex = Object.assign( {}, vertexModule, { buffers: vertexBuffers } );
+		_renderPipelineDescriptor.fragment = Object.assign( {}, fragmentModule, { targets } );
+		_renderPipelineDescriptor.primitive = primitiveState;
+		_renderPipelineDescriptor.multisample.count = sampleCount;
+		_renderPipelineDescriptor.multisample.alphaToCoverageEnabled = material.alphaToCoverage && sampleCount > 1;
+		_renderPipelineDescriptor.layout = pipelineLayout;
 
 		const depthStencil = {};
 		const renderDepth = renderObject.context.depth;
@@ -268,7 +273,7 @@ class WebGPUPipelineUtils {
 
 			}
 
-			pipelineDescriptor.depthStencil = depthStencil;
+			_renderPipelineDescriptor.depthStencil = depthStencil;
 
 		}
 
@@ -280,11 +285,13 @@ class WebGPUPipelineUtils {
 			{ program: vertexProgram, module: vertexModule.module },
 			{ program: fragmentProgram, module: fragmentModule.module }
 		];
-		const pipelineLabel = pipelineDescriptor.label;
+		const pipelineLabel = _renderPipelineDescriptor.label;
 
 		if ( promises === null ) {
 
-			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
+			pipelineData.pipeline = device.createRenderPipeline( _renderPipelineDescriptor );
+
+			_renderPipelineDescriptor.reset();
 
 			device.popErrorScope().then( ( err ) => {
 
@@ -310,7 +317,7 @@ class WebGPUPipelineUtils {
 
 					try {
 
-						pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
+						pipelineData.pipeline = await device.createRenderPipelineAsync( _renderPipelineDescriptor );
 
 					} catch ( err ) {
 
@@ -332,6 +339,8 @@ class WebGPUPipelineUtils {
 					}
 
 				} finally {
+
+					_renderPipelineDescriptor.reset();
 
 					// Guarantee resolution so `compileAsync`'s Promise.all cannot hang on an
 					// unexpected throw from any await above.
@@ -409,13 +418,19 @@ class WebGPUPipelineUtils {
 
 		device.pushErrorScope( 'validation' );
 
-		pipelineGPU.pipeline = device.createComputePipeline( {
-			label: pipelineLabel,
-			compute: computeProgram,
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		} );
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
+
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_computePipelineDescriptor.label = pipelineLabel;
+		_computePipelineDescriptor.compute = computeProgram;
+		_computePipelineDescriptor.layout = pipelineLayout;
+
+		pipelineGPU.pipeline = device.createComputePipeline( _computePipelineDescriptor );
+
+		_computePipelineDescriptor.reset();
 
 		device.popErrorScope().then( ( err ) => {
 

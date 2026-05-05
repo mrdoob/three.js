@@ -74,6 +74,15 @@ class GPUTextureViewDescriptor {
 		 */
 		this.arrayLayerCount = undefined;
 
+		/**
+		 * The component swizzle to apply when sampling the texture view.
+		 * Requires the `'texture-component-swizzle'` feature; ignored otherwise.
+		 *
+		 * @type {string}
+		 * @default 'rgba'
+		 */
+		this.swizzle = 'rgba';
+
 	}
 
 	/**
@@ -90,6 +99,7 @@ class GPUTextureViewDescriptor {
 		this.mipLevelCount = undefined;
 		this.baseArrayLayer = 0;
 		this.arrayLayerCount = undefined;
+		this.swizzle = 'rgba';
 
 	}
 
