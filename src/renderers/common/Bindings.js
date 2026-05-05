@@ -106,13 +106,20 @@ class Bindings extends DataMap {
 		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 		const computeNodeData = this.get( computeNode );
 
-		if ( computeNodeData.initialized !== true ) {
+		if ( computeNodeData.initialized !== true || computeNodeData.bindings !== bindings ) {
 
-			// bind groups are created once per object
+			// bind groups are created once per compute node version
+
+			if ( computeNodeData.bindings !== undefined ) {
+
+				this._destroyBindings( computeNodeData.bindings );
+
+			}
 
 			this._createBindings( bindings );
 
 			computeNodeData.initialized = true;
+			computeNodeData.bindings = bindings;
 
 		}
 
@@ -149,7 +156,8 @@ class Bindings extends DataMap {
 	 */
 	deleteForCompute( computeNode ) {
 
-		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+		const computeNodeData = this.get( computeNode );
+		const bindings = computeNodeData.bindings || this.nodes.getForCompute( computeNode ).bindings;
 
 		this._destroyBindings( bindings );
 

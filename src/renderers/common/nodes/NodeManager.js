@@ -444,7 +444,7 @@ class NodeManager extends DataMap {
 
 		let nodeBuilderState = computeData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined ) {
+		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
 			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
 			nodeBuilder.build();
@@ -452,6 +452,7 @@ class NodeManager extends DataMap {
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
 			computeData.nodeBuilderState = nodeBuilderState;
+			computeData.version = computeNode.version;
 
 		}
 
