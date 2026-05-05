@@ -522,13 +522,25 @@ class ShaderCallNodeInternal extends Node {
 
 			if ( functionNode === undefined ) {
 
-				// Build struct types referenced by the call inputs first
+				// build inputs first
 
 				if ( rawInputs ) {
 
 					for ( const param of rawInputs ) {
 
-						param.build( builder );
+						if ( param.isNode ) {
+
+							param.build( builder );
+
+						} else if ( typeof param === 'object' ) {
+
+							for ( const key in param ) {
+
+							 	param[ key ].build( builder );
+
+							}
+
+						}
 
 					}
 
