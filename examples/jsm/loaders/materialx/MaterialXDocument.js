@@ -333,19 +333,6 @@ class MaterialXNode {
 		let node = this.node;
 		if ( node !== null && out === null ) return node;
 
-		if ( this.element === 'input' && this.name === 'texcoord' && this.type === 'vector2' ) {
-
-			let index = 0;
-			const defaultGeomProp = this.getAttribute( 'defaultgeomprop' );
-			if ( defaultGeomProp && /^UV(\d+)$/.test( defaultGeomProp ) ) {
-
-				index = parseInt( defaultGeomProp.match( /^UV(\d+)$/ )[ 1 ], 10 );
-
-			}
-
-			node = mxToUvSpace( uv( index ) );
-
-		}
 
 		if ( ( this.element === 'separate2' || this.element === 'separate3' || this.element === 'separate4' ) && out ) {
 
@@ -407,6 +394,18 @@ class MaterialXNode {
 				node = float( 0 );
 
 			}
+
+		} else if ( this.element === 'input' && this.name === 'texcoord' && this.type === 'vector2' ) {
+
+			let index = 0;
+			const defaultGeomProp = this.getAttribute( 'defaultgeomprop' );
+			if ( defaultGeomProp && /^UV(\d+)$/.test( defaultGeomProp ) ) {
+
+				index = parseInt( defaultGeomProp.match( /^UV(\d+)$/ )[ 1 ], 10 );
+
+			}
+
+			node = mxToUvSpace( uv( index ) );
 
 		} else {
 
