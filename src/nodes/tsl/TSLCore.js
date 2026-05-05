@@ -291,8 +291,6 @@ Object.defineProperties( Node.prototype, proto );
 
 // --- FINISH ---
 
-const nodeBuilderFunctionsCacheMap = new WeakMap();
-
 const ShaderNodeObject = function ( obj, altType = null ) {
 
 	const type = getValueType( obj );
@@ -506,27 +504,51 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.layout ) {
 
-			const backend = builder.renderer.backend;
+			// build inputs first
 
-			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( backend );
+			if ( rawInputs ) {
 
-			if ( functionNodesCacheMap === undefined ) {
+				// use layout inputs to ensure that no extra parameters are built
 
-				functionNodesCacheMap = new WeakMap();
+				const inputs = shaderNode.layout.inputs;
 
-				nodeBuilderFunctionsCacheMap.set( backend, functionNodesCacheMap );
+				if ( isArrayAsParameter( rawInputs ) ) {
+
+					const rawArrayParameters = rawInputs;
+
+					for ( let i = 0; i < inputs.length; i ++ ) {
+
+						const rawParameter = rawArrayParameters[ i ];
+
+						if ( rawParameter && rawParameter.isNode ) {
+
+							rawParameter.build( builder );
+
+						}
+
+					}
+
+				} else {
+
+					const rawObjectParameters = rawInputs[ 0 ];
+
+					for ( const param of inputs ) {
+
+						const rawParameter = rawObjectParameters[ param.name ];
+
+						if ( rawParameter && rawParameter.isNode ) {
+
+							rawParameter.build( builder );
+
+						}
+
+					}
+
+				}
 
 			}
 
-			let functionNode = functionNodesCacheMap.get( shaderNode );
-
-			if ( functionNode === undefined ) {
-
-				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
-
-				functionNodesCacheMap.set( shaderNode, functionNode );
-
-			}
+			const functionNode = builder.buildFunctionNode( shaderNode );
 
 			builder.addInclude( functionNode );
 
@@ -534,7 +556,7 @@ class ShaderCallNodeInternal extends Node {
 
 			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
 
-			result = nodeObject( functionNode.call( inputs ) );
+			result = functionNode.call( inputs );
 
 		} else {
 
@@ -681,15 +703,19 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
+function isArrayAsParameter( params ) {
+
+	return params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+}
+
 function getLayoutParameters( params ) {
 
 	let output;
 
 	nodeObjects( params );
 
-	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-	if ( isArrayAsParameter ) {
+	if ( isArrayAsParameter( params ) ) {
 
 		output = [ ...params ];
 
