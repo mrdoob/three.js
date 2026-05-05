@@ -508,21 +508,37 @@ class ShaderCallNodeInternal extends Node {
 
 			if ( rawInputs ) {
 
-				for ( const param of rawInputs ) {
+				// use layout inputs to ensure that no extra parameters are built
 
-					if ( param.isNode ) {
+				const inputs = shaderNode.layout.inputs;
 
-						param.build( builder );
+				if ( isArrayAsParameter( rawInputs ) ) {
 
-					} else if ( typeof param === 'object' ) {
+					const rawArrayParameters = rawInputs;
 
-						for ( const key in param ) {
+					for ( let i = 0; i < inputs.length; i ++ ) {
 
-							if ( param[ key ].isNode ) {
+						const rawParameter = rawArrayParameters[ i ];
 
-								param[ key ].build( builder );
+						if ( rawParameter && rawParameter.isNode ) {
 
-							}
+							rawParameter.build( builder );
+
+						}
+
+					}
+
+				} else {
+
+					const rawObjectParameters = rawInputs[ 0 ];
+
+					for ( const param of inputs ) {
+
+						const rawParameter = rawObjectParameters[ param.name ];
+
+						if ( rawParameter && rawParameter.isNode ) {
+
+							rawParameter.build( builder );
 
 						}
 
@@ -532,7 +548,7 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			const functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
+			const functionNode = builder.buildFunctionNode( shaderNode );
 
 			builder.addInclude( functionNode );
 
@@ -540,7 +556,7 @@ class ShaderCallNodeInternal extends Node {
 
 			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
 
-			result = nodeObject( functionNode.call( inputs ) );
+			result = functionNode.call( inputs );
 
 		} else {
 
@@ -687,15 +703,19 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
+function isArrayAsParameter( params ) {
+
+	return params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+}
+
 function getLayoutParameters( params ) {
 
 	let output;
 
 	nodeObjects( params );
 
-	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-	if ( isArrayAsParameter ) {
+	if ( isArrayAsParameter( params ) ) {
 
 		output = [ ...params ];
 
