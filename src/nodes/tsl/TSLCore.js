@@ -291,8 +291,6 @@ Object.defineProperties( Node.prototype, proto );
 
 // --- FINISH ---
 
-const nodeBuilderFunctionsCacheMap = new WeakMap();
-
 const ShaderNodeObject = function ( obj, altType = null ) {
 
 	const type = getValueType( obj );
@@ -506,37 +504,23 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.layout ) {
 
-			const backend = builder.renderer.backend;
+			// build inputs first
 
-			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( backend );
+			if ( rawInputs ) {
 
-			if ( functionNodesCacheMap === undefined ) {
+				for ( const param of rawInputs ) {
 
-				functionNodesCacheMap = new WeakMap();
+					if ( param.isNode ) {
 
-				nodeBuilderFunctionsCacheMap.set( backend, functionNodesCacheMap );
+						param.build( builder );
 
-			}
+					} else if ( typeof param === 'object' ) {
 
-			let functionNode = functionNodesCacheMap.get( shaderNode );
+						for ( const key in param ) {
 
-			if ( functionNode === undefined ) {
+							if ( param[ key ].isNode ) {
 
-				// build inputs first
-
-				if ( rawInputs ) {
-
-					for ( const param of rawInputs ) {
-
-						if ( param.isNode ) {
-
-							param.build( builder );
-
-						} else if ( typeof param === 'object' ) {
-
-							for ( const key in param ) {
-
-							 	param[ key ].build( builder );
+								param[ key ].build( builder );
 
 							}
 
@@ -546,11 +530,9 @@ class ShaderCallNodeInternal extends Node {
 
 				}
 
-				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
-
-				functionNodesCacheMap.set( shaderNode, functionNode );
-
 			}
+
+			const functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
 
 			builder.addInclude( functionNode );
 
