@@ -9094,7 +9094,8 @@ class RenderTarget extends EventDispatcher {
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
 	 * @property {number} [depth=1] - The texture depth.
-	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering.
+	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).
+	 * @property {boolean} [useArrayDepthTexture=false] - Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
 	 */
 
 	/**
@@ -9120,7 +9121,8 @@ class RenderTarget extends EventDispatcher {
 			samples: 0,
 			count: 1,
 			depth: 1,
-			multiview: false
+			multiview: false,
+			useArrayDepthTexture: false
 		}, options );
 
 		/**
@@ -9256,6 +9258,16 @@ class RenderTarget extends EventDispatcher {
 		 * @default false
 		 */
 		this.multiview = options.multiview;
+
+		/**
+		 * Whether to create the depth texture as an array texture for per-layer depth testing.
+		 * This is separate from multiview so layered render targets can use array depth without
+		 * the multiview extension.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.useArrayDepthTexture = options.useArrayDepthTexture;
 
 	}
 
@@ -9428,6 +9440,7 @@ class RenderTarget extends EventDispatcher {
 
 		this.samples = source.samples;
 		this.multiview = source.multiview;
+		this.useArrayDepthTexture = source.useArrayDepthTexture;
 
 		return this;
 
@@ -18933,13 +18946,14 @@ class BufferGeometry extends EventDispatcher {
 		const normalAttribute = attributes.normal;
 		const uvAttribute = attributes.uv;
 
-		if ( this.hasAttribute( 'tangent' ) === false ) {
+		let tangentAttribute = this.getAttribute( 'tangent' );
 
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
+		if ( tangentAttribute === undefined || tangentAttribute.count !== positionAttribute.count ) {
+
+			tangentAttribute = new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 );
+			this.setAttribute( 'tangent', tangentAttribute );
 
 		}
-
-		const tangentAttribute = this.getAttribute( 'tangent' );
 
 		const tan1 = [], tan2 = [];
 
@@ -19085,7 +19099,7 @@ class BufferGeometry extends EventDispatcher {
 
 			let normalAttribute = this.getAttribute( 'normal' );
 
-			if ( normalAttribute === undefined ) {
+			if ( normalAttribute === undefined || normalAttribute.count !== positionAttribute.count ) {
 
 				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
 				this.setAttribute( 'normal', normalAttribute );
@@ -41737,9 +41751,8 @@ class DiscreteInterpolant extends Interpolant {
  * each keyframe has explicit in/out tangent control points specified as
  * 2D coordinates (time, value).
  *
- * The tangent data must be provided via the `settings` object:
- * - `settings.inTangents`: Float32Array with [time, value] pairs per keyframe per component
- * - `settings.outTangents`: Float32Array with [time, value] pairs per keyframe per component
+ * Tangent data is read from `inTangents` and `outTangents` on the interpolant
+ * (populated by `KeyframeTrack.InterpolantFactoryMethodBezier`).
  *
  * For a track with N keyframes and stride S:
  * - Each tangent array has N * S * 2 values
@@ -41759,9 +41772,8 @@ class BezierInterpolant extends Interpolant {
 		const offset1 = i1 * stride;
 		const offset0 = offset1 - stride;
 
-		const settings = this.settings || this.DefaultSettings_;
-		const inTangents = settings.inTangents;
-		const outTangents = settings.outTangents;
+		const inTangents = this.inTangents;
+		const outTangents = this.outTangents;
 
 		// If no tangent data, fall back to linear interpolation
 		if ( ! inTangents || ! outTangents ) {
@@ -41982,10 +41994,10 @@ class KeyframeTrack {
 
 		const interpolant = new BezierInterpolant( this.times, this.values, this.getValueSize(), result );
 
-		// Pass tangent data from track settings to interpolant
 		if ( this.settings ) {
 
-			interpolant.settings = this.settings;
+			interpolant.inTangents = this.settings.inTangents;
+			interpolant.outTangents = this.settings.outTangents;
 
 		}
 
@@ -53281,15 +53293,6 @@ class AnimationAction {
 
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
-
-			// preserve interpolant settings (like tangent data from BezierInterpolant)
-
-			if ( interpolant.settings ) {
-
-				Object.assign( interpolantSettings, interpolant.settings );
-
-			}
-
 			interpolant.settings = interpolantSettings;
 
 		}

@@ -4086,13 +4086,15 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.layout ) {
 
-			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+			const backend = builder.renderer.backend;
+
+			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( backend );
 
 			if ( functionNodesCacheMap === undefined ) {
 
 				functionNodesCacheMap = new WeakMap();
 
-				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+				nodeBuilderFunctionsCacheMap.set( backend, functionNodesCacheMap );
 
 			}
 
@@ -12248,6 +12250,15 @@ class TextureNode extends UniformNode {
 		this.gradNode = null;
 
 		/**
+		 * Represents the optional index constant of the channel to gather.
+		 * This must be in range [0, 3] and a compile-time constant.
+		 *
+		 * @type {?Node<int>}
+		 * @default null
+		 */
+		this.gatherNode = null;
+
+		/**
 		 * Represents the optional texel offset applied to the unnormalized texture
 		 * coordinate before sampling the texture.
 		 *
@@ -12367,7 +12378,13 @@ class TextureNode extends UniformNode {
 	 */
 	generateNodeType( /*builder*/ ) {
 
-		if ( this.value.isDepthTexture === true ) return 'float';
+		if ( this.value.isDepthTexture === true ) {
+
+			if ( this.gatherNode === null ) return 'float';
+
+			return 'vec4';
+
+		}
 
 		if ( this.value.type === UnsignedIntType ) {
 
@@ -12577,6 +12594,7 @@ class TextureNode extends UniformNode {
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
 		properties.gradNode = this.gradNode;
+		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
 
@@ -12619,10 +12637,12 @@ class TextureNode extends UniformNode {
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
+	 * @param {?string} gatherSnippet - The gather snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
+	 * @param {?string} flipYSnippet - The y-flip snippet. Only used for WebGL.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet ) {
 
 		const texture = this.value;
 
@@ -12635,6 +12655,18 @@ class TextureNode extends UniformNode {
 		} else if ( gradSnippet ) {
 
 			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( gatherSnippet ) {
+
+			if ( compareSnippet ) {
+
+				snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, flipYSnippet );
+
+			} else {
+
+				snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet );
+
+			}
 
 		} else if ( compareSnippet ) {
 
@@ -12684,13 +12716,13 @@ class TextureNode extends UniformNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			const nodeType = this.getNodeType( builder );
+			let nodeType = this.getNodeType( builder );
 
 			let propertyName = nodeData.propertyName;
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -12699,7 +12731,15 @@ class TextureNode extends UniformNode {
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
+				const flipYSnippet = this._flipYUniform ? this._flipYUniform.build( builder, 'bool' ) : null;
+
+				if ( gatherSnippet ) {
+
+					nodeType = 'vec4';
+
+				}
 
 				let finalDepthSnippet = depthSnippet;
 
@@ -12713,7 +12753,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, offsetSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
@@ -12921,6 +12961,22 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Gathers four texels from the texture.
+	 *
+	 * @param {[Node<int>]} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	gather( gatherNode = 0 ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherNode = nodeObject( gatherNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
 	 * Samples the texture by defining a depth node.
 	 *
 	 * @param {Node<int>} depthNode - The depth node.
@@ -13016,6 +13072,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
@@ -32455,7 +32512,7 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampler ) {
 
-						this.textures.updateSampler( binding.texture );
+						this.textures.updateSampler( binding.texture, binding.textureNode );
 
 					} else if ( binding.isStorageBuffer ) {
 
@@ -32663,7 +32720,7 @@ class Bindings extends DataMap {
 
 				if ( updated ) {
 
-					const samplerKey = this.textures.updateSampler( binding.texture );
+					const samplerKey = this.textures.updateSampler( binding.texture, binding.textureNode );
 
 					if ( binding.samplerKey !== samplerKey ) {
 
@@ -33621,6 +33678,9 @@ class Textures extends DataMap {
 
 		let textureNeedsUpdate = false;
 
+		const hasArrayDepthTexture = depthTexture !== undefined && depthTexture.image !== undefined && depthTexture.image.depth > 1;
+		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
+
 		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
@@ -33631,9 +33691,14 @@ class Textures extends DataMap {
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
 			depthTexture.renderTarget = renderTarget;
-			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
+
+		}
+
+		if ( depthTexture ) {
+
+			depthTexture.isArrayTexture = useArrayDepth;
 
 		}
 
@@ -33646,7 +33711,7 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthTexture.isArrayTexture ? depthTexture.image.depth : 1;
+				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
 
 			}
 
@@ -33957,11 +34022,12 @@ class Textures extends DataMap {
 	 * them when the texture parameters match.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
-		return this.backend.updateSampler( texture );
+		return this.backend.updateSampler( texture, textureNode );
 
 	}
 
@@ -37010,6 +37076,7 @@ class ReflectorNode extends TextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
@@ -39734,6 +39801,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
@@ -54372,6 +54440,10 @@ class GLSLNodeParser extends NodeParser {
 const _chainKeys$1 = [];
 const _cacheKeyValues = [];
 
+// Dedicated uniform for output pass array layer selection
+// This is separate from cameraIndex to avoid the sharedUniformGroup complexity
+const _outputLayerIndex = /*@__PURE__*/ uniform( 0, 'int' ).setGroup( renderGroup );
+
 /**
  * This renderer module manages node-related objects and is the
  * primary interface between the renderer and the node system.
@@ -55222,11 +55294,39 @@ class NodeManager extends DataMap {
 
 		const renderer = this.renderer;
 
-		const output = outputTarget.isArrayTexture ?
-			texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
-			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		let output;
+
+		if ( outputTarget.isArrayTexture ) {
+
+			if ( this.backend.isWebGLBackend ) {
+
+				output = texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+			} else {
+
+				output = texture( outputTarget, screenUV ).depth( _outputLayerIndex ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+			}
+
+		} else {
+
+			output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+		}
 
 		return output;
+
+	}
+
+	/**
+	 * Sets the output layer index for array texture output pass.
+	 * This should be called before each layer render during the output pass.
+	 *
+	 * @param {number} index - The layer index.
+	 */
+	setOutputLayerIndex( index ) {
+
+		_outputLayerIndex.value = index;
 
 	}
 
@@ -59399,6 +59499,37 @@ class Renderer {
 
 	}
 
+	_renderOutputLayers( quad, renderTarget ) {
+
+		if ( renderTarget.texture.isArrayTexture !== true || renderTarget.texture.image.depth <= 1 ) {
+
+			this._renderScene( quad, quad.camera, false );
+			return;
+
+		}
+
+		const currentActiveCubeFace = this._activeCubeFace;
+
+		try {
+
+			for ( let layer = 0; layer < renderTarget.texture.image.depth; layer ++ ) {
+
+				this._nodes.setOutputLayerIndex( layer );
+				this._activeCubeFace = layer;
+
+				this._renderScene( quad, quad.camera, false );
+
+			}
+
+		} finally {
+
+			this._nodes.setOutputLayerIndex( 0 );
+			this._activeCubeFace = currentActiveCubeFace;
+
+		}
+
+	}
+
 	/**
 	 * Returns an internal render target which is used when computing the output tone mapping
 	 * and color space conversion. Unlike in `WebGLRenderer`, this is done in a separate render
@@ -59484,6 +59615,7 @@ class Renderer {
 		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
 		frameBufferTarget.scissorTest = scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.useArrayDepthTexture = outputRenderTarget !== null ? outputRenderTarget.useArrayDepthTexture : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
@@ -59817,7 +59949,6 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
@@ -59923,8 +60054,7 @@ class Renderer {
 
 		this.autoClear = false;
 		this.xr.enabled = false;
-
-		this._renderScene( quad, quad.camera, false );
+		this._renderOutputLayers( quad, renderTarget );
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
@@ -63021,7 +63151,67 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' )
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
+	textureGather: new CodeNode( /* glsl */`
+vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, ij.xw, 0.0 )[ comp ],
+		textureLod( map, ij.zw, 0.0 )[ comp ],
+		textureLod( map, ij.zy, 0.0 )[ comp ],
+		textureLod( map, ij.xy, 0.0 )[ comp ]
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, vec3( ij.xw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zy, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.xy, coord.z ), 0.0 )[ comp ]
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherCompare: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, vec3( ij.xw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zy, ref ), 0.0 ),
+		textureLod( map, vec3( ij.xy, ref ), 0.0 )
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherCompareArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		texture( map, vec4( ij.xw, coord.z, ref ) ),
+		texture( map, vec4( ij.zw, coord.z, ref ) ),
+		texture( map, vec4( ij.zy, coord.z, ref ) ),
+		texture( map, vec4( ij.xy, coord.z, ref ) )
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` )
 };
 
 const glslMethods = {
@@ -63192,7 +63382,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @param {string} type - The output type to bitcast to.
 	 * @param {string} inputType - The input type of the.
-	 * @return {string} The resolved WGSL bitcast invocation.
+	 * @return {string} The resolved GLSL bitcast invocation.
 	 */
 	getBitcastMethod( type, inputType ) {
 
@@ -63676,6 +63866,72 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Generates the GLSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} gatherSnippet - A GLSL snippet that represents the index of the channel to read.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A GLSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet ) {
+
+		if ( texture.isDepthTexture ) gatherSnippet = '0';
+
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
+
+		if ( flipYSnippet === null ) flipYSnippet = 'false';
+
+		if ( depthSnippet ) {
+
+			this._include( 'textureGatherArray' );
+
+			return `tsl_textureGather_array( ${gatherSnippet}, ${ textureProperty }, vec3( ${ uvSnippet }, ${ depthSnippet } ), ${ offsetSnippet }, ${ flipYSnippet } )`;
+
+		}
+
+		this._include( 'textureGather' );
+
+		return `tsl_textureGather( ${gatherSnippet}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ flipYSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the GLSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A GLSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A GLSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, flipYSnippet ) {
+
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
+
+		if ( flipYSnippet === null ) flipYSnippet = 'false';
+
+		if ( depthSnippet ) {
+
+			this._include( 'textureGatherCompareArray' );
+
+			return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ${ offsetSnippet }, ${ compareSnippet }, ${ flipYSnippet } )`;
+
+		}
+
+		this._include( 'textureGatherCompare' );
+
+		return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ compareSnippet }, ${ flipYSnippet } )`;
+
+	}
+
+	/**
 	 * Returns the uniforms of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -63695,7 +63951,8 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				let typePrefix = '';
 
@@ -63717,7 +63974,7 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction ) {
+				} else if ( texture.compareFunction && textureNode.compareNode !== null ) {
 
 					if ( texture.isArrayTexture === true ) {
 
@@ -64960,9 +65217,10 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) { }
+	updateSampler( /*texture, textureNode*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -71038,9 +71296,10 @@ class WebGLBackend extends Backend {
 	 * This method does nothing since WebGL 2 has no concept of samplers.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) {
+	updateSampler( /*texture, textureNode*/ ) {
 
 		return '';
 
@@ -72908,6 +73167,1028 @@ class NodeStorageBuffer extends StorageBuffer {
 
 }
 
+const _commandList = [ null ];
+
+/**
+ * A WebGPU backend utility module with common helpers.
+ *
+ * @private
+ */
+class WebGPUUtils {
+
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 */
+	constructor( backend ) {
+
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
+		this.backend = backend;
+
+	}
+
+	/**
+	 * Returns the depth/stencil GPU format for the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {string} The depth/stencil GPU texture format.
+	 */
+	getCurrentDepthStencilFormat( renderContext ) {
+
+		let format;
+
+		if ( renderContext.depth ) {
+
+			if ( renderContext.depthTexture !== null ) {
+
+				format = this.getTextureFormatGPU( renderContext.depthTexture );
+
+			} else if ( renderContext.stencil ) {
+
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32FloatStencil8;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24PlusStencil8;
+
+				}
+
+			} else {
+
+				if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+					format = GPUTextureFormat.Depth32Float;
+
+				} else {
+
+					format = GPUTextureFormat.Depth24Plus;
+
+				}
+
+			}
+
+		}
+
+		return format;
+
+	}
+
+	/**
+	 * Returns the GPU format for the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {string} The GPU texture format.
+	 */
+	getTextureFormatGPU( texture ) {
+
+		return this.backend.get( texture ).format;
+
+	}
+
+	/**
+	 * Returns an object that defines the multi-sampling state of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} The multi-sampling state.
+	 */
+	getTextureSampleData( texture ) {
+
+		let samples;
+
+		if ( texture.isFramebufferTexture ) {
+
+			samples = 1;
+
+		} else if ( texture.isDepthTexture && ! texture.renderTarget ) {
+
+			const renderer = this.backend.renderer;
+			const renderTarget = renderer.getRenderTarget();
+
+			samples = renderTarget ? renderTarget.samples : renderer.currentSamples;
+
+		} else if ( texture.renderTarget ) {
+
+			samples = texture.renderTarget.samples;
+
+		}
+
+		samples = samples || 1;
+
+		const isMSAA = samples > 1 && texture.renderTarget !== null && ( texture.isDepthTexture !== true && texture.isFramebufferTexture !== true );
+		const primarySamples = isMSAA ? 1 : samples;
+
+		return { samples, primarySamples, isMSAA };
+
+	}
+
+	/**
+	 * Returns the default color attachment's GPU format of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {string} The GPU texture format of the default color attachment.
+	 */
+	getCurrentColorFormat( renderContext ) {
+
+		let format;
+
+		if ( renderContext.textures !== null ) {
+
+			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
+
+		} else {
+
+			format = this.getPreferredCanvasFormat(); // default context format
+
+		}
+
+		return format;
+
+	}
+
+	/**
+	 * Returns the GPU formats of all color attachments of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Array<string>} The GPU texture formats of all color attachments.
+	 */
+	getCurrentColorFormats( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return renderContext.textures.map( t => this.getTextureFormatGPU( t ) );
+
+		} else {
+
+			return [ this.getPreferredCanvasFormat() ]; // default context format
+
+		}
+
+	}
+
+	/**
+	 * Returns the output color space of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {string} The output color space.
+	 */
+	getCurrentColorSpace( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return renderContext.textures[ 0 ].colorSpace;
+
+		}
+
+		return this.backend.renderer.outputColorSpace;
+
+	}
+
+	/**
+	 * Returns GPU primitive topology for the given object and material.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Material} material - The material.
+	 * @return {string} The GPU primitive topology.
+	 */
+	getPrimitiveTopology( object, material ) {
+
+		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
+		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
+		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+
+	}
+
+	/**
+	 * Returns a modified sample count from the given sample count value.
+	 *
+	 * That is required since WebGPU only supports either 1 or 4.
+	 *
+	 * @param {number} sampleCount - The input sample count.
+	 * @return {number} The (potentially updated) output sample count.
+	 */
+	getSampleCount( sampleCount ) {
+
+		return sampleCount >= 4 ? 4 : 1;
+
+	}
+
+	/**
+	 * Returns the sample count of the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {number} The sample count.
+	 */
+	getSampleCountRenderContext( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return this.getSampleCount( renderContext.sampleCount );
+
+		}
+
+		return this.getSampleCount( this.backend.renderer.currentSamples );
+
+	}
+
+	/**
+	 * Returns the preferred canvas format.
+	 *
+	 * There is a separate method for this so it's possible to
+	 * honor edge cases for specific devices.
+	 *
+	 * @return {string} The GPU texture format of the canvas.
+	 */
+	getPreferredCanvasFormat() {
+
+		const parameters = this.backend.parameters;
+
+		const bufferType = parameters.outputType;
+
+		if ( bufferType === undefined ) {
+
+			return navigator.gpu.getPreferredCanvasFormat();
+
+		} else if ( bufferType === UnsignedByteType ) {
+
+			return GPUTextureFormat.BGRA8Unorm;
+
+		} else if ( bufferType === HalfFloatType ) {
+
+			return GPUTextureFormat.RGBA16Float;
+
+		} else {
+
+			throw new Error( 'Unsupported output buffer type.' );
+
+		}
+
+	}
+
+}
+
+/**
+ * Submits a single GPU command to the device queue using a shared, module-scoped
+ * array to avoid per-call array allocations.
+ *
+ * @private
+ * @param {GPUDevice} device - The GPU device.
+ * @param {GPUCommandBuffer} command - The command buffer to submit.
+ */
+function submit( device, command ) {
+
+	_commandList[ 0 ] = command;
+
+	device.queue.submit( _commandList );
+
+	_commandList[ 0 ] = null;
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createBindGroup()`.
+ *
+ * @private
+ */
+class GPUBindGroupDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the bind group.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The bind group layout the bind group conforms to.
+		 *
+		 * @type {?GPUBindGroupLayout}
+		 * @default null
+		 */
+		this.layout = null;
+
+		/**
+		 * The bind group entries.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.entries = [];
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state. The internal `entries` array
+	 * is emptied without releasing its backing storage.
+	 */
+	reset() {
+
+		this.label = '';
+		this.layout = null;
+		this.entries.length = 0;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createBuffer()`.
+ *
+ * @private
+ */
+class GPUBufferDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the buffer.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The size of the buffer in bytes.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.size = 0;
+
+		/**
+		 * The allowed usages for the buffer.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.usage = 0;
+
+		/**
+		 * Whether the buffer is in the mapped state at creation.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.mappedAtCreation = false;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.size = 0;
+		this.usage = 0;
+		this.mappedAtCreation = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createCommandEncoder()`.
+ *
+ * @private
+ */
+class GPUCommandEncoderDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the command encoder.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createRenderBundleEncoder()`.
+ *
+ * @private
+ */
+class GPURenderBundleEncoderDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the render bundle encoder.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The formats of the color attachments the bundle is compatible with.
+		 *
+		 * @type {?Array<?string>}
+		 * @default null
+		 */
+		this.colorFormats = null;
+
+		/**
+		 * The format of the depth/stencil attachment the bundle is compatible with.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.depthStencilFormat = undefined;
+
+		/**
+		 * The number of samples per pixel the bundle is compatible with.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.sampleCount = 1;
+
+		/**
+		 * Whether the depth attachment is read-only.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.depthReadOnly = false;
+
+		/**
+		 * Whether the stencil attachment is read-only.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.stencilReadOnly = false;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.colorFormats = null;
+		this.depthStencilFormat = undefined;
+		this.sampleCount = 1;
+		this.depthReadOnly = false;
+		this.stencilReadOnly = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPURenderPassColorAttachment`, the type of each
+ * entry in `GPURenderPassDescriptor.colorAttachments`.
+ *
+ * @private
+ */
+class GPURenderPassColorAttachment {
+
+	constructor() {
+
+		/**
+		 * The texture view the pass renders into.
+		 *
+		 * @type {?GPUTextureView}
+		 * @default null
+		 */
+		this.view = null;
+
+		/**
+		 * The depth slice the pass renders into.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.depthSlice = undefined;
+
+		/**
+		 * The texture view that receives the resolved output of multisampled rendering.
+		 *
+		 * @type {?GPUTextureView|undefined}
+		 */
+		this.resolveTarget = undefined;
+
+		/**
+		 * The clear value used when `loadOp` is `'clear'`.
+		 *
+		 * @type {Object|undefined}
+		 */
+		this.clearValue = undefined;
+
+		/**
+		 * The load operation performed at the start of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.loadOp = undefined;
+
+		/**
+		 * The store operation performed at the end of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.storeOp = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.view = null;
+		this.depthSlice = undefined;
+		this.resolveTarget = undefined;
+		this.clearValue = undefined;
+		this.loadOp = undefined;
+		this.storeOp = undefined;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUCommandEncoder.beginRenderPass()`.
+ *
+ * @private
+ */
+class GPURenderPassDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the render pass.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The color attachments of the render pass.
+		 *
+		 * @type {Array<?Object>}
+		 */
+		this.colorAttachments = [];
+
+		/**
+		 * The depth-stencil attachment of the render pass.
+		 *
+		 * @type {Object|undefined}
+		 */
+		this.depthStencilAttachment = undefined;
+
+		/**
+		 * The query set used for occlusion queries during the pass.
+		 *
+		 * @type {?GPUQuerySet|undefined}
+		 */
+		this.occlusionQuerySet = undefined;
+
+		/**
+		 * Defines which timestamp values are written and where.
+		 *
+		 * @type {Object|undefined}
+		 */
+		this.timestampWrites = undefined;
+
+		/**
+		 * The maximum number of draw calls that can be issued during the pass.
+		 *
+		 * @type {number}
+		 * @default 50000000
+		 */
+		this.maxDrawCount = 50000000;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state. The internal `colorAttachments`
+	 * array is emptied without releasing its backing storage.
+	 */
+	reset() {
+
+		this.label = '';
+		this.colorAttachments.length = 0;
+		this.depthStencilAttachment = undefined;
+		this.occlusionQuerySet = undefined;
+		this.timestampWrites = undefined;
+		this.maxDrawCount = 50000000;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createRenderPipeline()` and
+ * `createRenderPipelineAsync()`.
+ *
+ * @private
+ */
+class GPURenderPipelineDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the render pipeline.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The pipeline layout the pipeline conforms to, or `'auto'`.
+		 *
+		 * @type {?GPUPipelineLayout|string}
+		 * @default null
+		 */
+		this.layout = null;
+
+		/**
+		 * The programmable vertex stage.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.vertex = null;
+
+		/**
+		 * The primitive-assembly state.
+		 *
+		 * @type {Object}
+		 */
+		this.primitive = {};
+
+		/**
+		 * The depth/stencil state, omitted when the pipeline has no depth or stencil aspect.
+		 *
+		 * @type {Object|undefined}
+		 */
+		this.depthStencil = undefined;
+
+		/**
+		 * The multisample state.
+		 *
+		 * @type {GPUMultisampleState}
+		 */
+		this.multisample = new GPUMultisampleState();
+
+		/**
+		 * The programmable fragment stage. Omitted for vertex-only pipelines.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.fragment = null;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.layout = null;
+		this.vertex = null;
+		this.primitive = {};
+		this.depthStencil = undefined;
+		this.multisample.reset();
+		this.fragment = null;
+
+	}
+
+}
+
+/**
+ * Reusable nested state for `GPURenderPipelineDescriptor.multisample`.
+ *
+ * @private
+ */
+class GPUMultisampleState {
+
+	constructor() {
+
+		/**
+		 * The number of samples per pixel.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
+		/**
+		 * A bitmask determining which samples are written to.
+		 *
+		 * @type {number}
+		 * @default 0xFFFFFFFF
+		 */
+		this.mask = 0xFFFFFFFF;
+
+		/**
+		 * Whether a fragment's alpha channel is used to generate a sample coverage mask.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.alphaToCoverageEnabled = false;
+
+	}
+
+	/**
+	 * Resets the state to its default values.
+	 */
+	reset() {
+
+		this.count = 1;
+		this.mask = 0xFFFFFFFF;
+		this.alphaToCoverageEnabled = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createShaderModule()`.
+ *
+ * @private
+ */
+class GPUShaderModuleDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the shader module.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The WGSL source code of the shader module.
+		 *
+		 * @type {string}
+		 */
+		this.code = '';
+
+		/**
+		 * Compilation hints that may help the implementation produce optimized code.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.compilationHints = [];
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.code = '';
+		this.compilationHints.length = 0;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createTexture()`.
+ *
+ * @private
+ */
+class GPUTextureDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the texture.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The size of the texture.
+		 *
+		 * @type {{width: number, height: number, depthOrArrayLayers: number}}
+		 */
+		this.size = { width: 0, height: 1, depthOrArrayLayers: 1 };
+
+		/**
+		 * The number of mip levels the texture will contain.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.mipLevelCount = 1;
+
+		/**
+		 * The sample count of the texture.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.sampleCount = 1;
+
+		/**
+		 * The dimension of the set of texel coordinates.
+		 *
+		 * @type {string}
+		 * @default '2d'
+		 */
+		this.dimension = '2d';
+
+		/**
+		 * The format of the texture.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.format = undefined;
+
+		/**
+		 * The allowed usages for the texture.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.usage = undefined;
+
+		/**
+		 * The formats that views of this texture may use.
+		 *
+		 * @type {Array<string>}
+		 */
+		this.viewFormats = [];
+
+		/**
+		 * The view dimension to use when binding the texture (compatibility mode).
+		 *
+		 * @type {string|undefined}
+		 */
+		this.textureBindingViewDimension = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.size.width = 0;
+		this.size.height = 1;
+		this.size.depthOrArrayLayers = 1;
+		this.mipLevelCount = 1;
+		this.sampleCount = 1;
+		this.dimension = '2d';
+		this.format = undefined;
+		this.usage = undefined;
+		this.viewFormats.length = 0;
+		this.textureBindingViewDimension = undefined;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUTexture.createView()`.
+ *
+ * @private
+ */
+class GPUTextureViewDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the texture view.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The format of the texture view.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.format = undefined;
+
+		/**
+		 * The dimension of the texture view.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.dimension = undefined;
+
+		/**
+		 * The allowed usages for the texture view.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.usage = 0;
+
+		/**
+		 * Which aspect of the texture is referenced.
+		 *
+		 * @type {string}
+		 * @default 'all'
+		 */
+		this.aspect = 'all';
+
+		/**
+		 * The first mip level accessible to the texture view.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.baseMipLevel = 0;
+
+		/**
+		 * The number of mip levels accessible to the texture view.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.mipLevelCount = undefined;
+
+		/**
+		 * The first array layer accessible to the texture view.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.baseArrayLayer = 0;
+
+		/**
+		 * The number of array layers accessible to the texture view.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.arrayLayerCount = undefined;
+
+		/**
+		 * The component swizzle to apply when sampling the texture view.
+		 * Requires the `'texture-component-swizzle'` feature; ignored otherwise.
+		 *
+		 * @type {string}
+		 * @default 'rgba'
+		 */
+		this.swizzle = 'rgba';
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.format = undefined;
+		this.dimension = undefined;
+		this.usage = 0;
+		this.aspect = 'all';
+		this.baseMipLevel = 0;
+		this.mipLevelCount = undefined;
+		this.baseArrayLayer = 0;
+		this.arrayLayerCount = undefined;
+		this.swizzle = 'rgba';
+
+	}
+
+}
+
+const _bindGroupDescriptor$1 = new GPUBindGroupDescriptor();
+const _bufferDescriptor$5 = new GPUBufferDescriptor();
+const _commandEncoderDescriptor$4 = new GPUCommandEncoderDescriptor();
+const _renderBundleEncoderDescriptor$1 = new GPURenderBundleEncoderDescriptor();
+const _renderPassDescriptor = new GPURenderPassDescriptor();
+const _renderPipelineDescriptor$1 = new GPURenderPipelineDescriptor();
+const _colorAttachment = new GPURenderPassColorAttachment();
+const _shaderModuleDescriptor$1 = new GPUShaderModuleDescriptor();
+const _textureDescriptor$1 = new GPUTextureDescriptor();
+const _viewDescriptor$2 = new GPUTextureViewDescriptor();
+
 /**
  * A WebGPU backend utility module used by {@link WebGPUTextureUtils}.
  *
@@ -73025,20 +74306,25 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 * flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.flipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-		} );
+		_bufferDescriptor$5.size = 4;
+		_bufferDescriptor$5.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+		this.flipUniformBuffer = device.createBuffer( _bufferDescriptor$5 );
+
+		_bufferDescriptor$5.reset();
+
 		device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
 
 		/**
 		 * no flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.noFlipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM
-		} );
+		_bufferDescriptor$5.size = 4;
+		_bufferDescriptor$5.usage = GPUBufferUsage.UNIFORM;
+
+		this.noFlipUniformBuffer = device.createBuffer( _bufferDescriptor$5 );
+
+		_bufferDescriptor$5.reset();
 
 		/**
 		 * A cache for GPU render pipelines used for copy/transfer passes.
@@ -73053,10 +74339,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 *
 		 * @type {GPUShaderModule}
 		 */
-		this.mipmapShaderModule = device.createShaderModule( {
-			label: 'mipmap',
-			code: mipmapSource
-		} );
+		_shaderModuleDescriptor$1.label = 'mipmap';
+		_shaderModuleDescriptor$1.code = mipmapSource;
+
+		this.mipmapShaderModule = device.createShaderModule( _shaderModuleDescriptor$1 );
+
+		_shaderModuleDescriptor$1.reset();
 
 	}
 
@@ -73076,18 +74364,18 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = this.device.createRenderPipeline( {
-				label: `mipmap-${ format }-${ textureBindingViewDimension }`,
-				vertex: {
-					module: this.mipmapShaderModule,
-				},
-				fragment: {
-					module: this.mipmapShaderModule,
-					entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
-					targets: [ { format } ]
-				},
-				layout: 'auto'
-			} );
+			_renderPipelineDescriptor$1.label = `mipmap-${ format }-${ textureBindingViewDimension }`;
+			_renderPipelineDescriptor$1.vertex = { module: this.mipmapShaderModule };
+			_renderPipelineDescriptor$1.fragment = {
+				module: this.mipmapShaderModule,
+				entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
+				targets: [ { format } ]
+			};
+			_renderPipelineDescriptor$1.layout = 'auto';
+
+			pipeline = this.device.createRenderPipeline( _renderPipelineDescriptor$1 );
+
+			_renderPipelineDescriptor$1.reset();
 
 			this.transferPipelines[ key ] = pipeline;
 
@@ -73109,52 +74397,66 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const format = textureGPUDescriptor.format;
 		const { width, height } = textureGPUDescriptor.size;
 
-		const tempTexture = this.device.createTexture( {
-			size: { width, height },
-			format,
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-		} );
+		_textureDescriptor$1.size.width = width;
+		_textureDescriptor$1.size.height = height;
+		_textureDescriptor$1.format = format;
+		_textureDescriptor$1.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
+
+		const tempTexture = this.device.createTexture( _textureDescriptor$1 );
+
+		_textureDescriptor$1.reset();
 
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
 
-		const commandEncoder = this.device.createCommandEncoder( {} );
+		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor$4 );
 
 		const pass = ( pipeline, sourceTexture, sourceArrayLayer, destinationTexture, destinationArrayLayer, flipY ) => {
 
 			const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
-			const bindGroup = this.device.createBindGroup( {
-				layout: bindGroupLayout,
-				entries: [ {
-					binding: 0,
-					resource: this.flipYSampler
-				}, {
-					binding: 1,
-					resource: sourceTexture.createView( {
-						dimension: sourceTexture.textureBindingViewDimension || '2d-array',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-					} ),
-				}, {
-					binding: 2,
-					resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
-				} ]
+			_viewDescriptor$2.dimension = sourceTexture.textureBindingViewDimension || '2d-array';
+			_viewDescriptor$2.mipLevelCount = 1;
+
+			const sourceView = sourceTexture.createView( _viewDescriptor$2 );
+
+			_viewDescriptor$2.reset();
+
+			_bindGroupDescriptor$1.layout = bindGroupLayout;
+			_bindGroupDescriptor$1.entries.push( {
+				binding: 0,
+				resource: this.flipYSampler
+			}, {
+				binding: 1,
+				resource: sourceView,
+			}, {
+				binding: 2,
+				resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
-				colorAttachments: [ {
-					view: destinationTexture.createView( {
-						dimension: '2d',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-						baseArrayLayer: destinationArrayLayer,
-						arrayLayerCount: 1,
-					} ),
-					loadOp: GPULoadOp.Clear,
-					storeOp: GPUStoreOp.Store,
-				} ]
-			} );
+			const bindGroup = this.device.createBindGroup( _bindGroupDescriptor$1 );
+
+			_bindGroupDescriptor$1.reset();
+
+			_viewDescriptor$2.dimension = '2d';
+			_viewDescriptor$2.mipLevelCount = 1;
+			_viewDescriptor$2.baseArrayLayer = destinationArrayLayer;
+			_viewDescriptor$2.arrayLayerCount = 1;
+
+			const destinationView = destinationTexture.createView( _viewDescriptor$2 );
+
+			_viewDescriptor$2.reset();
+
+			_colorAttachment.view = destinationView;
+			_colorAttachment.loadOp = GPULoadOp.Clear;
+			_colorAttachment.storeOp = GPUStoreOp.Store;
+
+			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
+
+			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
+
+			_renderPassDescriptor.reset();
+			_colorAttachment.reset();
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
@@ -73166,7 +74468,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		pass( copyTransferPipeline, textureGPU, baseArrayLayer, tempTexture, 0, false );
 		pass( flipTransferPipeline, tempTexture, 0, textureGPU, baseArrayLayer, true );
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		submit( this.device, commandEncoder.finish() );
 
 		tempTexture.destroy();
 
@@ -73184,11 +74486,19 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		const passes = textureData.layers || this._mipmapCreateBundles( textureGPU );
 
-		const commandEncoder = encoder || this.device.createCommandEncoder( { label: 'mipmapEncoder' } );
+		let commandEncoder = encoder;
+
+		if ( commandEncoder === null ) {
+
+			_commandEncoderDescriptor$4.label = 'mipmapEncoder';
+			commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor$4 );
+			_commandEncoderDescriptor$4.reset();
+
+		}
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		if ( encoder === null ) this.device.queue.submit( [ commandEncoder.finish() ] );
+		if ( encoder === null ) submit( this.device, commandEncoder.finish() );
 
 		textureData.layers = passes;
 
@@ -73214,41 +74524,53 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			for ( let baseArrayLayer = 0; baseArrayLayer < textureGPU.depthOrArrayLayers; baseArrayLayer ++ ) {
 
-				const bindGroup = this.device.createBindGroup( {
-					layout: bindGroupLayout,
-					entries: [ {
-						binding: 0,
-						resource: this.mipmapSampler
-					}, {
-						binding: 1,
-						resource: textureGPU.createView( {
-							dimension: textureBindingViewDimension,
-							baseMipLevel: baseMipLevel - 1,
-							mipLevelCount: 1,
-						} ),
-					}, {
-						binding: 2,
-						resource: { buffer: this.noFlipUniformBuffer }
-					} ]
+				_viewDescriptor$2.dimension = textureBindingViewDimension;
+				_viewDescriptor$2.baseMipLevel = baseMipLevel - 1;
+				_viewDescriptor$2.mipLevelCount = 1;
+
+				const sourceView = textureGPU.createView( _viewDescriptor$2 );
+
+				_viewDescriptor$2.reset();
+
+				_bindGroupDescriptor$1.layout = bindGroupLayout;
+				_bindGroupDescriptor$1.entries.push( {
+					binding: 0,
+					resource: this.mipmapSampler
+				}, {
+					binding: 1,
+					resource: sourceView,
+				}, {
+					binding: 2,
+					resource: { buffer: this.noFlipUniformBuffer }
 				} );
 
-				const passDescriptor = {
-					colorAttachments: [ {
-						view: textureGPU.createView( {
-							dimension: '2d',
-							baseMipLevel,
-							mipLevelCount: 1,
-							baseArrayLayer,
-							arrayLayerCount: 1,
-						} ),
-						loadOp: GPULoadOp.Clear,
-						storeOp: GPUStoreOp.Store,
-					} ]
-				};
+				const bindGroup = this.device.createBindGroup( _bindGroupDescriptor$1 );
 
-				const passEncoder = this.device.createRenderBundleEncoder( {
-					colorFormats: [ textureGPU.format ]
-				} );
+				_bindGroupDescriptor$1.reset();
+
+				_viewDescriptor$2.dimension = '2d';
+				_viewDescriptor$2.baseMipLevel = baseMipLevel;
+				_viewDescriptor$2.mipLevelCount = 1;
+				_viewDescriptor$2.baseArrayLayer = baseArrayLayer;
+				_viewDescriptor$2.arrayLayerCount = 1;
+
+				const destinationView = textureGPU.createView( _viewDescriptor$2 );
+
+				_viewDescriptor$2.reset();
+
+				const passColorAttachment = new GPURenderPassColorAttachment();
+				passColorAttachment.view = destinationView;
+				passColorAttachment.loadOp = GPULoadOp.Clear;
+				passColorAttachment.storeOp = GPUStoreOp.Store;
+
+				const passDescriptor = new GPURenderPassDescriptor();
+				passDescriptor.colorAttachments.push( passColorAttachment );
+
+				_renderBundleEncoderDescriptor$1.colorFormats = [ textureGPU.format ];
+
+				const passEncoder = this.device.createRenderBundleEncoder( _renderBundleEncoderDescriptor$1 );
+
+				_renderBundleEncoderDescriptor$1.reset();
 
 				passEncoder.setPipeline( pipeline );
 				passEncoder.setBindGroup( 0, bindGroup );
@@ -73293,6 +74615,441 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 }
 
+/**
+ * Reusable descriptor for `GPUDevice.createSampler()`.
+ *
+ * @private
+ */
+class GPUSamplerDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the sampler.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The address mode for the sampler's U coordinate.
+		 *
+		 * @type {string}
+		 * @default 'clamp-to-edge'
+		 */
+		this.addressModeU = 'clamp-to-edge';
+
+		/**
+		 * The address mode for the sampler's V coordinate.
+		 *
+		 * @type {string}
+		 * @default 'clamp-to-edge'
+		 */
+		this.addressModeV = 'clamp-to-edge';
+
+		/**
+		 * The address mode for the sampler's W coordinate.
+		 *
+		 * @type {string}
+		 * @default 'clamp-to-edge'
+		 */
+		this.addressModeW = 'clamp-to-edge';
+
+		/**
+		 * The magnification filter mode.
+		 *
+		 * @type {string}
+		 * @default 'nearest'
+		 */
+		this.magFilter = 'nearest';
+
+		/**
+		 * The minification filter mode.
+		 *
+		 * @type {string}
+		 * @default 'nearest'
+		 */
+		this.minFilter = 'nearest';
+
+		/**
+		 * The mipmap filter mode.
+		 *
+		 * @type {string}
+		 * @default 'nearest'
+		 */
+		this.mipmapFilter = 'nearest';
+
+		/**
+		 * The minimum level of detail used to sample.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.lodMinClamp = 0;
+
+		/**
+		 * The maximum level of detail used to sample.
+		 *
+		 * @type {number}
+		 * @default 32
+		 */
+		this.lodMaxClamp = 32;
+
+		/**
+		 * The compare function used by the sampler.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.compare = undefined;
+
+		/**
+		 * The maximum allowed anisotropic filtering.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.maxAnisotropy = 1;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.addressModeU = 'clamp-to-edge';
+		this.addressModeV = 'clamp-to-edge';
+		this.addressModeW = 'clamp-to-edge';
+		this.magFilter = 'nearest';
+		this.minFilter = 'nearest';
+		this.mipmapFilter = 'nearest';
+		this.lodMinClamp = 0;
+		this.lodMaxClamp = 32;
+		this.compare = undefined;
+		this.maxAnisotropy = 1;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUTexelCopyTextureInfo`, the texture side of
+ * `GPUCommandEncoder.copyTextureToTexture()`, `copyTextureToBuffer()` and
+ * `GPUQueue.writeTexture()`.
+ *
+ * @private
+ */
+class GPUTexelCopyTextureInfo {
+
+	constructor() {
+
+		/**
+		 * The target texture.
+		 *
+		 * @type {?GPUTexture}
+		 * @default null
+		 */
+		this.texture = null;
+
+		/**
+		 * The mipmap level of the texture.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
+
+		/**
+		 * The origin offset within the texture.
+		 *
+		 * @type {{x: number, y: number, z: number}}
+		 */
+		this.origin = { x: 0, y: 0, z: 0 };
+
+		/**
+		 * Which aspect of the texture is referenced.
+		 *
+		 * @type {string}
+		 * @default 'all'
+		 */
+		this.aspect = 'all';
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.texture = null;
+		this.mipLevel = 0;
+		this.origin.x = 0;
+		this.origin.y = 0;
+		this.origin.z = 0;
+		this.aspect = 'all';
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUTexelCopyBufferInfo`, the buffer side of
+ * `GPUCommandEncoder.copyTextureToBuffer()` and `copyBufferToTexture()`.
+ *
+ * @private
+ */
+class GPUTexelCopyBufferInfo {
+
+	constructor() {
+
+		/**
+		 * The target buffer.
+		 *
+		 * @type {?GPUBuffer}
+		 * @default null
+		 */
+		this.buffer = null;
+
+		/**
+		 * The byte offset within the buffer where the texel data begins.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.offset = 0;
+
+		/**
+		 * The stride, in bytes, between rows of texel blocks.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.bytesPerRow = undefined;
+
+		/**
+		 * The number of texel block rows per single image of the texture.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.rowsPerImage = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.buffer = null;
+		this.offset = 0;
+		this.bytesPerRow = undefined;
+		this.rowsPerImage = undefined;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUTexelCopyBufferLayout`, the data-layout argument
+ * to `GPUQueue.writeTexture()`.
+ *
+ * @private
+ */
+class GPUTexelCopyBufferLayout {
+
+	constructor() {
+
+		/**
+		 * The byte offset within the source data where the texel data begins.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.offset = 0;
+
+		/**
+		 * The stride, in bytes, between rows of texel blocks.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.bytesPerRow = undefined;
+
+		/**
+		 * The number of texel block rows per single image of the texture.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.rowsPerImage = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.offset = 0;
+		this.bytesPerRow = undefined;
+		this.rowsPerImage = undefined;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUCopyExternalImageSourceInfo`, the source argument
+ * to `GPUQueue.copyExternalImageToTexture()`.
+ *
+ * @private
+ */
+class GPUCopyExternalImageSourceInfo {
+
+	constructor() {
+
+		/**
+		 * The image-like source.
+		 *
+		 * @type {?(ImageBitmap|ImageData|HTMLImageElement|HTMLVideoElement|VideoFrame|HTMLCanvasElement|OffscreenCanvas)}
+		 * @default null
+		 */
+		this.source = null;
+
+		/**
+		 * The origin offset within the source.
+		 *
+		 * @type {{x: number, y: number}}
+		 */
+		this.origin = { x: 0, y: 0 };
+
+		/**
+		 * Whether the source is flipped vertically before copying.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.flipY = false;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.source = null;
+		this.origin.x = 0;
+		this.origin.y = 0;
+		this.flipY = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUCopyExternalImageDestInfo`, the destination
+ * argument to `GPUQueue.copyExternalImageToTexture()`.
+ *
+ * @private
+ * @augments GPUTexelCopyTextureInfo
+ */
+class GPUCopyExternalImageDestInfo extends GPUTexelCopyTextureInfo {
+
+	constructor() {
+
+		super();
+
+		/**
+		 * The predefined color space the destination texture is interpreted in.
+		 *
+		 * @type {string}
+		 * @default 'srgb'
+		 */
+		this.colorSpace = 'srgb';
+
+		/**
+		 * Whether the destination texture has premultiplied alpha.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.premultipliedAlpha = false;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		super.reset();
+		this.colorSpace = 'srgb';
+		this.premultipliedAlpha = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUExtent3D` in its dictionary form, used by
+ * `GPUQueue.writeTexture()`, `GPUQueue.copyExternalImageToTexture()` and
+ * the various `GPUCommandEncoder` copy methods.
+ *
+ * @private
+ */
+class GPUExtent3D {
+
+	constructor() {
+
+		/**
+		 * The width of the extent.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.width = 0;
+
+		/**
+		 * The height of the extent.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.height = 1;
+
+		/**
+		 * The depth (for 3D textures) or number of array layers.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.depthOrArrayLayers = 1;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.width = 0;
+		this.height = 1;
+		this.depthOrArrayLayers = 1;
+
+	}
+
+}
+
+const _bufferDescriptor$4 = new GPUBufferDescriptor();
+const _commandEncoderDescriptor$3 = new GPUCommandEncoderDescriptor();
+const _samplerDescriptor = new GPUSamplerDescriptor();
+const _texelCopyTextureInfo = new GPUTexelCopyTextureInfo();
+const _texelCopyBufferInfo = new GPUTexelCopyBufferInfo();
+const _texelCopyBufferLayout = new GPUTexelCopyBufferLayout();
+const _copyExternalImageSourceInfo = new GPUCopyExternalImageSourceInfo();
+const _copyExternalImageDestInfo = new GPUCopyExternalImageDestInfo();
+const _textureDescriptor = new GPUTextureDescriptor();
+const _extent3D$1 = new GPUExtent3D();
+
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
 	[ LessCompare ]: 'less',
@@ -73308,24 +75065,27 @@ const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
 function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
 
+	_texelCopyTextureInfo.texture = textureGPU;
+	_texelCopyTextureInfo.mipLevel = mipLevel;
+	_texelCopyTextureInfo.origin.z = layerIndex;
+
+	_texelCopyBufferLayout.offset = layerIndex * bytesPerImage;
+	_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+	_texelCopyBufferLayout.rowsPerImage = rowsPerImage;
+
+	_extent3D$1.width = textureWidth;
+	_extent3D$1.height = textureHeight;
+
 	device.queue.writeTexture(
-		{
-			texture: textureGPU,
-			mipLevel,
-			origin: { x: 0, y: 0, z: layerIndex }
-		},
+		_texelCopyTextureInfo,
 		mipmap.data,
-		{
-			offset: layerIndex * bytesPerImage,
-			bytesPerRow,
-			rowsPerImage
-		},
-		{
-			width: textureWidth,
-			height: textureHeight,
-			depthOrArrayLayers: 1
-		}
+		_texelCopyBufferLayout,
+		_extent3D$1
 	);
+
+	_texelCopyTextureInfo.reset();
+	_texelCopyBufferLayout.reset();
+	_extent3D$1.reset();
 
 }
 
@@ -73395,54 +75155,55 @@ class WebGPUTextureUtils {
 	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
 		const backend = this.backend;
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
-			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
+			texture.anisotropy + '-' + ( texture.isDepthTexture === true ? 1 : 0 ) + '-' +
+			( texture.compareFunction !== null && textureNode.compareNode !== null ? texture.compareFunction : 0 );
 
 		let samplerData = this._samplerCache.get( samplerKey );
 
 		if ( samplerData === undefined ) {
 
-			const samplerDescriptorGPU = {
-				addressModeU: this._convertAddressMode( texture.wrapS ),
-				addressModeV: this._convertAddressMode( texture.wrapT ),
-				addressModeW: this._convertAddressMode( texture.wrapR ),
-				magFilter: this._convertFilterMode( texture.magFilter ),
-				minFilter: this._convertFilterMode( texture.minFilter ),
-				mipmapFilter: this._convertFilterMode( texture.minFilter ),
-				maxAnisotropy: 1
-			};
+			_samplerDescriptor.addressModeU = this._convertAddressMode( texture.wrapS );
+			_samplerDescriptor.addressModeV = this._convertAddressMode( texture.wrapT );
+			_samplerDescriptor.addressModeW = this._convertAddressMode( texture.wrapR );
+			_samplerDescriptor.magFilter = this._convertFilterMode( texture.magFilter );
+			_samplerDescriptor.minFilter = this._convertFilterMode( texture.minFilter );
+			_samplerDescriptor.mipmapFilter = this._convertMipmapFilterMode( texture.minFilter );
 
 			// Depth textures without compare function must use non-filtering (nearest) sampling
-			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+			if ( texture.isDepthTexture && ( texture.compareFunction === null || textureNode.compareNode === null ) ) {
 
-				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
-				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
-				samplerDescriptorGPU.mipmapFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.magFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.minFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.mipmapFilter = GPUFilterMode.Nearest;
 
 			}
 
 			// anisotropy can only be used when all filter modes are set to linear.
 
-			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+			if ( _samplerDescriptor.magFilter === GPUFilterMode.Linear && _samplerDescriptor.minFilter === GPUFilterMode.Linear && _samplerDescriptor.mipmapFilter === GPUFilterMode.Linear ) {
 
-				samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
-
-			}
-
-			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
-
-				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+				_samplerDescriptor.maxAnisotropy = texture.anisotropy;
 
 			}
 
-			const sampler = backend.device.createSampler( samplerDescriptorGPU );
+			if ( texture.isDepthTexture && texture.compareFunction !== null && textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+
+				_samplerDescriptor.compare = _compareToWebGPU[ texture.compareFunction ];
+
+			}
+
+			const sampler = backend.device.createSampler( _samplerDescriptor );
+
+			_samplerDescriptor.reset();
 
 			samplerData = { sampler, usedTimes: 0 };
 
@@ -73575,19 +75336,16 @@ class WebGPUTextureUtils {
 
 		}
 
-		const textureDescriptorGPU = {
-			label: texture.name,
-			size: {
-				width: width,
-				height: height,
-				depthOrArrayLayers: depth,
-			},
-			mipLevelCount: levels,
-			sampleCount: primarySamples,
-			dimension: dimension,
-			format: format,
-			usage: usage
-		};
+		const textureDescriptorGPU = new GPUTextureDescriptor();
+		textureDescriptorGPU.label = texture.name;
+		textureDescriptorGPU.size.width = width;
+		textureDescriptorGPU.size.height = height;
+		textureDescriptorGPU.size.depthOrArrayLayers = depth;
+		textureDescriptorGPU.mipLevelCount = levels;
+		textureDescriptorGPU.sampleCount = primarySamples;
+		textureDescriptorGPU.dimension = dimension;
+		textureDescriptorGPU.format = format;
+		textureDescriptorGPU.usage = usage;
 
 		// texture creation
 
@@ -73697,17 +75455,16 @@ class WebGPUTextureUtils {
 
 		if ( colorBuffer ) colorBuffer.destroy();
 
-		colorBuffer = backend.device.createTexture( {
-			label: 'colorBuffer',
-			size: {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.currentSamples ),
-			format: backend.utils.getPreferredCanvasFormat(),
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
-		} );
+		_textureDescriptor.label = 'colorBuffer';
+		_textureDescriptor.size.width = width;
+		_textureDescriptor.size.height = height;
+		_textureDescriptor.sampleCount = backend.utils.getSampleCount( backend.renderer.currentSamples );
+		_textureDescriptor.format = backend.utils.getPreferredCanvasFormat();
+		_textureDescriptor.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC;
+
+		colorBuffer = backend.device.createTexture( _textureDescriptor );
+
+		_textureDescriptor.reset();
 
 		//
 
@@ -73952,34 +75709,39 @@ class WebGPUTextureUtils {
 		let bytesPerRow = width * bytesPerTexel;
 		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
 
-		const readBuffer = device.createBuffer(
-			{
-				size: ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ), // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			}
-		);
+		_bufferDescriptor$4.size = ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ); // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
+		_bufferDescriptor$4.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
-		const encoder = device.createCommandEncoder();
+		const readBuffer = device.createBuffer( _bufferDescriptor$4 );
+
+		_bufferDescriptor$4.reset();
+
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor$3 );
+
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.origin.x = x;
+		_texelCopyTextureInfo.origin.y = y;
+		_texelCopyTextureInfo.origin.z = faceIndex;
+
+		_texelCopyBufferInfo.buffer = readBuffer;
+		_texelCopyBufferInfo.bytesPerRow = bytesPerRow;
+
+		_extent3D$1.width = width;
+		_extent3D$1.height = height;
 
 		encoder.copyTextureToBuffer(
-			{
-				texture: textureGPU,
-				origin: { x, y, z: faceIndex },
-			},
-			{
-				buffer: readBuffer,
-				bytesPerRow: bytesPerRow
-			},
-			{
-				width: width,
-				height: height
-			}
-
+			_texelCopyTextureInfo,
+			_texelCopyBufferInfo,
+			_extent3D$1
 		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferInfo.reset();
+		_extent3D$1.reset();
 
 		const typedArrayType = this._getTypedArrayType( format );
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
@@ -74124,27 +75886,36 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
+		_copyExternalImageSourceInfo.source = image;
+		_copyExternalImageSourceInfo.flipY = flipY;
+
+		_copyExternalImageDestInfo.texture = textureGPU;
+		_copyExternalImageDestInfo.mipLevel = mipLevel;
+		_copyExternalImageDestInfo.origin.z = originDepth;
+		_copyExternalImageDestInfo.premultipliedAlpha = premultiplyAlpha;
+
+		_extent3D$1.width = width;
+		_extent3D$1.height = height;
+
 		try {
 
 			device.queue.copyExternalImageToTexture(
-				{
-					source: image,
-					flipY: flipY
-				}, {
-					texture: textureGPU,
-					mipLevel: mipLevel,
-					origin: { x: 0, y: 0, z: originDepth },
-					premultipliedAlpha: premultiplyAlpha
-				}, {
-					width: width,
-					height: height,
-					depthOrArrayLayers: 1
-				}
+				_copyExternalImageSourceInfo,
+				_copyExternalImageDestInfo,
+				_extent3D$1
 			);
 
 			// try/catch has been added to fix bad video frame data on certain devices, see #32391
 
-		} catch ( _ ) {}
+		} catch ( _ ) {
+
+		} finally {
+
+			_copyExternalImageSourceInfo.reset();
+			_copyExternalImageDestInfo.reset();
+			_extent3D$1.reset();
+
+		}
 
 	}
 
@@ -74219,22 +75990,26 @@ class WebGPUTextureUtils {
 		const bytesPerTexel = this._getBytesPerTexel( textureDescriptorGPU.format );
 		const bytesPerRow = image.width * bytesPerTexel;
 
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.mipLevel = mipLevel;
+		_texelCopyTextureInfo.origin.z = originDepth;
+
+		_texelCopyBufferLayout.offset = image.width * image.height * bytesPerTexel * depth;
+		_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+
+		_extent3D$1.width = image.width;
+		_extent3D$1.height = image.height;
+
 		device.queue.writeTexture(
-			{
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth }
-			},
+			_texelCopyTextureInfo,
 			data,
-			{
-				offset: image.width * image.height * bytesPerTexel * depth,
-				bytesPerRow
-			},
-			{
-				width: image.width,
-				height: image.height,
-				depthOrArrayLayers: 1
-			} );
+			_texelCopyBufferLayout,
+			_extent3D$1
+		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferLayout.reset();
+		_extent3D$1.reset();
 
 		if ( flipY === true ) {
 
@@ -74385,6 +76160,27 @@ class WebGPUTextureUtils {
 		}
 
 		return filterMode;
+
+	}
+
+	/**
+	 * Converts the three.js filter constants to a GPU mipmap filter constant.
+	 * Unlike `_convertFilterMode`, this extracts the between-mip-level filtering
+	 * axis from the combined three.js constant rather than the within-level axis.
+	 *
+	 * @private
+	 * @param {number} value - The three.js constant defining a filter mode.
+	 * @return {string} The GPU mipmap filter mode.
+	 */
+	_convertMipmapFilterMode( value ) {
+
+		if ( value === NearestMipmapLinearFilter || value === LinearMipmapLinearFilter ) {
+
+			return GPUFilterMode.Linear;
+
+		}
+
+		return GPUFilterMode.Nearest;
 
 	}
 
@@ -75517,7 +77313,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -76016,6 +77812,80 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} gatherSnippet - A WGSL snippet that represents the index of the channel to read.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
+
+		const componentSnippet = texture.isDepthTexture === true ? '' : `${gatherSnippet}, `;
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet })`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet })`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet })`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet when sampling textures with explicit mip level.
 	 *
 	 * @param {Texture} texture - The texture.
@@ -76292,7 +78162,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				// Also textureGather always need sampler.
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -77073,14 +78944,16 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				// Also textureGather always need sampler.
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) ) {
+					if ( this.isSampleCompare( texture ) && textureNode.compareNode !== null ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -77685,270 +79558,8 @@ var<${access}> ${ name } : ${ structName };`;
 
 }
 
-/**
- * A WebGPU backend utility module with common helpers.
- *
- * @private
- */
-class WebGPUUtils {
-
-	/**
-	 * Constructs a new utility object.
-	 *
-	 * @param {WebGPUBackend} backend - The WebGPU backend.
-	 */
-	constructor( backend ) {
-
-		/**
-		 * A reference to the WebGPU backend.
-		 *
-		 * @type {WebGPUBackend}
-		 */
-		this.backend = backend;
-
-	}
-
-	/**
-	 * Returns the depth/stencil GPU format for the given render context.
-	 *
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {string} The depth/stencil GPU texture format.
-	 */
-	getCurrentDepthStencilFormat( renderContext ) {
-
-		let format;
-
-		if ( renderContext.depth ) {
-
-			if ( renderContext.depthTexture !== null ) {
-
-				format = this.getTextureFormatGPU( renderContext.depthTexture );
-
-			} else if ( renderContext.stencil ) {
-
-				if ( this.backend.renderer.reversedDepthBuffer === true ) {
-
-					format = GPUTextureFormat.Depth32FloatStencil8;
-
-				} else {
-
-					format = GPUTextureFormat.Depth24PlusStencil8;
-
-				}
-
-			} else {
-
-				if ( this.backend.renderer.reversedDepthBuffer === true ) {
-
-					format = GPUTextureFormat.Depth32Float;
-
-				} else {
-
-					format = GPUTextureFormat.Depth24Plus;
-
-				}
-
-			}
-
-		}
-
-		return format;
-
-	}
-
-	/**
-	 * Returns the GPU format for the given texture.
-	 *
-	 * @param {Texture} texture - The texture.
-	 * @return {string} The GPU texture format.
-	 */
-	getTextureFormatGPU( texture ) {
-
-		return this.backend.get( texture ).format;
-
-	}
-
-	/**
-	 * Returns an object that defines the multi-sampling state of the given texture.
-	 *
-	 * @param {Texture} texture - The texture.
-	 * @return {Object} The multi-sampling state.
-	 */
-	getTextureSampleData( texture ) {
-
-		let samples;
-
-		if ( texture.isFramebufferTexture ) {
-
-			samples = 1;
-
-		} else if ( texture.isDepthTexture && ! texture.renderTarget ) {
-
-			const renderer = this.backend.renderer;
-			const renderTarget = renderer.getRenderTarget();
-
-			samples = renderTarget ? renderTarget.samples : renderer.currentSamples;
-
-		} else if ( texture.renderTarget ) {
-
-			samples = texture.renderTarget.samples;
-
-		}
-
-		samples = samples || 1;
-
-		const isMSAA = samples > 1 && texture.renderTarget !== null && ( texture.isDepthTexture !== true && texture.isFramebufferTexture !== true );
-		const primarySamples = isMSAA ? 1 : samples;
-
-		return { samples, primarySamples, isMSAA };
-
-	}
-
-	/**
-	 * Returns the default color attachment's GPU format of the current render context.
-	 *
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {string} The GPU texture format of the default color attachment.
-	 */
-	getCurrentColorFormat( renderContext ) {
-
-		let format;
-
-		if ( renderContext.textures !== null ) {
-
-			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
-
-		} else {
-
-			format = this.getPreferredCanvasFormat(); // default context format
-
-		}
-
-		return format;
-
-	}
-
-	/**
-	 * Returns the GPU formats of all color attachments of the current render context.
-	 *
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {Array<string>} The GPU texture formats of all color attachments.
-	 */
-	getCurrentColorFormats( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return renderContext.textures.map( t => this.getTextureFormatGPU( t ) );
-
-		} else {
-
-			return [ this.getPreferredCanvasFormat() ]; // default context format
-
-		}
-
-	}
-
-	/**
-	 * Returns the output color space of the current render context.
-	 *
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {string} The output color space.
-	 */
-	getCurrentColorSpace( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return renderContext.textures[ 0 ].colorSpace;
-
-		}
-
-		return this.backend.renderer.outputColorSpace;
-
-	}
-
-	/**
-	 * Returns GPU primitive topology for the given object and material.
-	 *
-	 * @param {Object3D} object - The 3D object.
-	 * @param {Material} material - The material.
-	 * @return {string} The GPU primitive topology.
-	 */
-	getPrimitiveTopology( object, material ) {
-
-		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-
-	}
-
-	/**
-	 * Returns a modified sample count from the given sample count value.
-	 *
-	 * That is required since WebGPU only supports either 1 or 4.
-	 *
-	 * @param {number} sampleCount - The input sample count.
-	 * @return {number} The (potentially updated) output sample count.
-	 */
-	getSampleCount( sampleCount ) {
-
-		return sampleCount >= 4 ? 4 : 1;
-
-	}
-
-	/**
-	 * Returns the sample count of the given render context.
-	 *
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {number} The sample count.
-	 */
-	getSampleCountRenderContext( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return this.getSampleCount( renderContext.sampleCount );
-
-		}
-
-		return this.getSampleCount( this.backend.renderer.currentSamples );
-
-	}
-
-	/**
-	 * Returns the preferred canvas format.
-	 *
-	 * There is a separate method for this so it's possible to
-	 * honor edge cases for specific devices.
-	 *
-	 * @return {string} The GPU texture format of the canvas.
-	 */
-	getPreferredCanvasFormat() {
-
-		const parameters = this.backend.parameters;
-
-		const bufferType = parameters.outputType;
-
-		if ( bufferType === undefined ) {
-
-			return navigator.gpu.getPreferredCanvasFormat();
-
-		} else if ( bufferType === UnsignedByteType ) {
-
-			return GPUTextureFormat.BGRA8Unorm;
-
-		} else if ( bufferType === HalfFloatType ) {
-
-			return GPUTextureFormat.RGBA16Float;
-
-		} else {
-
-			throw new Error( 'Unsupported output buffer type.' );
-
-		}
-
-	}
-
-}
+const _bufferDescriptor$3 = new GPUBufferDescriptor();
+const _commandEncoderDescriptor$2 = new GPUCommandEncoderDescriptor();
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -78071,12 +79682,14 @@ class WebGPUAttributeUtils {
 			const byteLength = array.byteLength;
 			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
-			buffer = device.createBuffer( {
-				label: bufferAttribute.name,
-				size: size,
-				usage: usage,
-				mappedAtCreation: true
-			} );
+			_bufferDescriptor$3.label = bufferAttribute.name;
+			_bufferDescriptor$3.size = size;
+			_bufferDescriptor$3.usage = usage;
+			_bufferDescriptor$3.mappedAtCreation = true;
+
+			buffer = device.createBuffer( _bufferDescriptor$3 );
+
+			_bufferDescriptor$3.reset();
 
 			new array.constructor( buffer.getMappedRange() ).set( array );
 
@@ -78298,11 +79911,13 @@ class WebGPUAttributeUtils {
 			// initialize the GPU-side read copy buffer if it is not present
 			if ( readbackInfo.readBufferGPU === undefined ) {
 
-				readBufferGPU = device.createBuffer( {
-					label: `${ target.name }_readback`,
-					size: target.maxByteLength,
-					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-				} );
+				_bufferDescriptor$3.label = `${ target.name }_readback`;
+				_bufferDescriptor$3.size = target.maxByteLength;
+				_bufferDescriptor$3.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+				readBufferGPU = device.createBuffer( _bufferDescriptor$3 );
+
+				_bufferDescriptor$3.reset();
 
 				// release / dispose
 				const releaseCallback = () => {
@@ -78343,18 +79958,20 @@ class WebGPUAttributeUtils {
 		} else {
 
 			// create a new temp buffer for array buffers otherwise
-			readBufferGPU = device.createBuffer( {
-				label: `${ attribute.name }_readback`,
-				size: byteLength,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			} );
+			_bufferDescriptor$3.label = `${ attribute.name }_readback`;
+			_bufferDescriptor$3.size = byteLength;
+			_bufferDescriptor$3.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			readBufferGPU = device.createBuffer( _bufferDescriptor$3 );
+
+			_bufferDescriptor$3.reset();
 
 		}
 
 		// copy the data
-		const cmdEncoder = device.createCommandEncoder( {
-			label: `readback_encoder_${ attribute.name }`
-		} );
+		_commandEncoderDescriptor$2.label = `readback_encoder_${ attribute.name }`;
+		const cmdEncoder = device.createCommandEncoder( _commandEncoderDescriptor$2 );
+		_commandEncoderDescriptor$2.reset();
 
 		cmdEncoder.copyBufferToBuffer(
 			bufferGPU,
@@ -78365,7 +79982,7 @@ class WebGPUAttributeUtils {
 		);
 
 		const gpuCommands = cmdEncoder.finish();
-		device.queue.submit( [ gpuCommands ] );
+		submit( device, gpuCommands );
 
 		// map the data to the CPU
 		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );
@@ -78465,6 +80082,10 @@ class WebGPUAttributeUtils {
 	}
 
 }
+
+const _bindGroupDescriptor = new GPUBindGroupDescriptor();
+const _bufferDescriptor$2 = new GPUBufferDescriptor();
+const _viewDescriptor$1 = new GPUTextureViewDescriptor();
 
 /**
  * Class representing a WebGPU bind group layout.
@@ -78702,21 +80323,25 @@ class WebGPUBindingUtils {
 		const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 		const index = data[ 0 ];
 
-		const buffer = device.createBuffer( {
-			label: 'bindingCameraIndex_' + index,
-			size: 16, // uint(4) * 4
-			usage: usage
-		} );
+		_bufferDescriptor$2.label = 'bindingCameraIndex_' + index;
+		_bufferDescriptor$2.size = 16; // uint(4) * 4
+		_bufferDescriptor$2.usage = usage;
+
+		const buffer = device.createBuffer( _bufferDescriptor$2 );
+
+		_bufferDescriptor$2.reset();
 
 		device.queue.writeBuffer( buffer, 0, data, 0 );
 
-		const entries = [ { binding: 0, resource: { buffer } } ];
+		_bindGroupDescriptor.label = 'bindGroupCameraIndex_' + index;
+		_bindGroupDescriptor.layout = layoutGPU;
+		_bindGroupDescriptor.entries.push( { binding: 0, resource: { buffer } } );
 
-		return device.createBindGroup( {
-			label: 'bindGroupCameraIndex_' + index,
-			layout: layoutGPU,
-			entries
-		} );
+		const bindGroup = device.createBindGroup( _bindGroupDescriptor );
+
+		_bindGroupDescriptor.reset();
+
+		return bindGroup;
 
 	}
 
@@ -78733,7 +80358,9 @@ class WebGPUBindingUtils {
 		const device = backend.device;
 
 		let bindingPoint = 0;
-		const entriesGPU = [];
+
+		_bindGroupDescriptor.label = 'bindGroup_' + bindGroup.name;
+		_bindGroupDescriptor.layout = layoutGPU;
 
 		for ( const binding of bindGroup.bindings ) {
 
@@ -78741,13 +80368,13 @@ class WebGPUBindingUtils {
 
 				const bindingData = backend.get( binding );
 
-				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
 			} else if ( binding.isStorageBuffer ) {
 
 				const buffer = backend.get( binding.attribute ).buffer;
 
-				entriesGPU.push( { binding: bindingPoint, resource: { buffer: buffer } } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: { buffer: buffer } } );
 
 			} else if ( binding.isSampledTexture ) {
 
@@ -78785,13 +80412,15 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+							// Prefer the texture's actual array flag over the cached 3D binding type.
+							// Layered render targets can become array textures after shader compilation.
+							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
 						} else if ( binding.isSampledTexture3D ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
-
-						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
-
-							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
 						} else {
 
@@ -78799,19 +80428,26 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
+						_viewDescriptor$1.aspect = aspectGPU;
+						_viewDescriptor$1.dimension = dimensionViewGPU;
+						_viewDescriptor$1.mipLevelCount = mipLevelCount;
+						_viewDescriptor$1.baseMipLevel = baseMipLevel;
+
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( _viewDescriptor$1 );
+
+						_viewDescriptor$1.reset();
 
 					}
 
 				}
 
-				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: resourceGPU } );
 
 			} else if ( binding.isSampler ) {
 
 				const textureGPU = backend.get( binding.texture );
 
-				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
 			}
 
@@ -78819,11 +80455,11 @@ class WebGPUBindingUtils {
 
 		}
 
-		return device.createBindGroup( {
-			label: 'bindGroup_' + bindGroup.name,
-			layout: layoutGPU,
-			entries: entriesGPU
-		} );
+		const bindGroupGPU = device.createBindGroup( _bindGroupDescriptor );
+
+		_bindGroupDescriptor.reset();
+
+		return bindGroupGPU;
 
 	}
 
@@ -78991,7 +80627,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					if ( binding.texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+					if ( binding.texture.compareFunction !== null && binding.textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 						sampler.type = GPUSamplerBindingType.Comparison;
 
@@ -79106,6 +80742,96 @@ class WebGPUCapabilities {
 	}
 
 }
+
+/**
+ * Reusable descriptor for `GPUDevice.createComputePipeline()`.
+ *
+ * @private
+ */
+class GPUComputePipelineDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the compute pipeline.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The pipeline layout the pipeline conforms to, or `'auto'`.
+		 *
+		 * @type {?GPUPipelineLayout|string}
+		 * @default null
+		 */
+		this.layout = null;
+
+		/**
+		 * The programmable compute stage.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.compute = null;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.layout = null;
+		this.compute = null;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPUDevice.createPipelineLayout()`.
+ *
+ * @private
+ */
+class GPUPipelineLayoutDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the pipeline layout.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The set of bind group layouts the pipeline layout describes.
+		 *
+		 * @type {?Array<?GPUBindGroupLayout>}
+		 * @default null
+		 */
+		this.bindGroupLayouts = null;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.bindGroupLayouts = null;
+
+	}
+
+}
+
+const _computePipelineDescriptor = new GPUComputePipelineDescriptor();
+const _pipelineLayoutDescriptor = new GPUPipelineLayoutDescriptor();
+const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -79308,20 +81034,19 @@ class WebGPUPipelineUtils {
 
 		const sampleCount = this._getSampleCount( renderObject.context );
 
-		const pipelineDescriptor = {
-			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
-			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets } ),
-			primitive: primitiveState,
-			multisample: {
-				count: sampleCount,
-				alphaToCoverageEnabled: material.alphaToCoverage && sampleCount > 1
-			},
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		};
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
 
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_renderPipelineDescriptor.label = `renderPipeline_${ material.name || material.type }_${ material.id }`;
+		_renderPipelineDescriptor.vertex = Object.assign( {}, vertexModule, { buffers: vertexBuffers } );
+		_renderPipelineDescriptor.fragment = Object.assign( {}, fragmentModule, { targets } );
+		_renderPipelineDescriptor.primitive = primitiveState;
+		_renderPipelineDescriptor.multisample.count = sampleCount;
+		_renderPipelineDescriptor.multisample.alphaToCoverageEnabled = material.alphaToCoverage && sampleCount > 1;
+		_renderPipelineDescriptor.layout = pipelineLayout;
 
 		const depthStencil = {};
 		const renderDepth = renderObject.context.depth;
@@ -79354,7 +81079,7 @@ class WebGPUPipelineUtils {
 
 			}
 
-			pipelineDescriptor.depthStencil = depthStencil;
+			_renderPipelineDescriptor.depthStencil = depthStencil;
 
 		}
 
@@ -79366,11 +81091,13 @@ class WebGPUPipelineUtils {
 			{ program: vertexProgram, module: vertexModule.module },
 			{ program: fragmentProgram, module: fragmentModule.module }
 		];
-		const pipelineLabel = pipelineDescriptor.label;
+		const pipelineLabel = _renderPipelineDescriptor.label;
 
 		if ( promises === null ) {
 
-			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
+			pipelineData.pipeline = device.createRenderPipeline( _renderPipelineDescriptor );
+
+			_renderPipelineDescriptor.reset();
 
 			device.popErrorScope().then( ( err ) => {
 
@@ -79396,7 +81123,7 @@ class WebGPUPipelineUtils {
 
 					try {
 
-						pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
+						pipelineData.pipeline = await device.createRenderPipelineAsync( _renderPipelineDescriptor );
 
 					} catch ( err ) {
 
@@ -79418,6 +81145,8 @@ class WebGPUPipelineUtils {
 					}
 
 				} finally {
+
+					_renderPipelineDescriptor.reset();
 
 					// Guarantee resolution so `compileAsync`'s Promise.all cannot hang on an
 					// unexpected throw from any await above.
@@ -79449,14 +81178,16 @@ class WebGPUPipelineUtils {
 		const colorFormats = utils.getCurrentColorFormats( renderContext );
 		const sampleCount = this._getSampleCount( renderContext );
 
-		const descriptor = {
-			label,
-			colorFormats,
-			depthStencilFormat,
-			sampleCount
-		};
+		_renderBundleEncoderDescriptor.label = label;
+		_renderBundleEncoderDescriptor.colorFormats = colorFormats;
+		_renderBundleEncoderDescriptor.depthStencilFormat = depthStencilFormat;
+		_renderBundleEncoderDescriptor.sampleCount = sampleCount;
 
-		return device.createRenderBundleEncoder( descriptor );
+		const bundleEncoder = device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
+
+		_renderBundleEncoderDescriptor.reset();
+
+		return bundleEncoder;
 
 	}
 
@@ -79493,13 +81224,19 @@ class WebGPUPipelineUtils {
 
 		device.pushErrorScope( 'validation' );
 
-		pipelineGPU.pipeline = device.createComputePipeline( {
-			label: pipelineLabel,
-			compute: computeProgram,
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		} );
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
+
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_computePipelineDescriptor.label = pipelineLabel;
+		_computePipelineDescriptor.compute = computeProgram;
+		_computePipelineDescriptor.layout = pipelineLayout;
+
+		pipelineGPU.pipeline = device.createComputePipeline( _computePipelineDescriptor );
+
+		_computePipelineDescriptor.reset();
 
 		device.popErrorScope().then( ( err ) => {
 
@@ -80022,6 +81759,56 @@ class WebGPUPipelineUtils {
 }
 
 /**
+ * Reusable descriptor for `GPUDevice.createQuerySet()`.
+ *
+ * @private
+ */
+class GPUQuerySetDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the query set.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * The type of queries managed by the set.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.type = undefined;
+
+		/**
+		 * The number of queries managed by the set.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.count = 0;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.type = undefined;
+		this.count = 0;
+
+	}
+
+}
+
+const _bufferDescriptor$1 = new GPUBufferDescriptor();
+const _commandEncoderDescriptor$1 = new GPUCommandEncoderDescriptor();
+const _querySetDescriptor$1 = new GPUQuerySetDescriptor();
+
+/**
  * Manages a pool of WebGPU timestamp queries for performance measurement.
  * Extends the base TimestampQueryPool to provide WebGPU-specific implementation.
  *
@@ -80042,24 +81829,31 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		this.device = device;
 		this.type = type;
 
-		this.querySet = this.device.createQuerySet( {
-			type: 'timestamp',
-			count: this.maxQueries,
-			label: `queryset_global_timestamp_${type}`
-		} );
+		_querySetDescriptor$1.label = `queryset_global_timestamp_${type}`;
+		_querySetDescriptor$1.type = 'timestamp';
+		_querySetDescriptor$1.count = this.maxQueries;
+
+		this.querySet = this.device.createQuerySet( _querySetDescriptor$1 );
+
+		_querySetDescriptor$1.reset();
 
 		const bufferSize = this.maxQueries * 8;
-		this.resolveBuffer = this.device.createBuffer( {
-			label: `buffer_timestamp_resolve_${type}`,
-			size: bufferSize,
-			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
-		} );
 
-		this.resultBuffer = this.device.createBuffer( {
-			label: `buffer_timestamp_result_${type}`,
-			size: bufferSize,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-		} );
+		_bufferDescriptor$1.label = `buffer_timestamp_resolve_${type}`;
+		_bufferDescriptor$1.size = bufferSize;
+		_bufferDescriptor$1.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
+
+		this.resolveBuffer = this.device.createBuffer( _bufferDescriptor$1 );
+
+		_bufferDescriptor$1.reset();
+
+		_bufferDescriptor$1.label = `buffer_timestamp_result_${type}`;
+		_bufferDescriptor$1.size = bufferSize;
+		_bufferDescriptor$1.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+		this.resultBuffer = this.device.createBuffer( _bufferDescriptor$1 );
+
+		_bufferDescriptor$1.reset();
 
 	}
 
@@ -80156,7 +81950,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			this.currentQueryIndex = 0;
 			this.queryOffsets.clear();
 
-			const commandEncoder = this.device.createCommandEncoder();
+			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor$1 );
 
 			commandEncoder.resolveQuerySet(
 				this.querySet,
@@ -80175,7 +81969,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			);
 
 			const commandBuffer = commandEncoder.finish();
-			this.device.queue.submit( [ commandBuffer ] );
+			submit( this.device, commandBuffer );
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 
@@ -80327,11 +82121,204 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 }
 
+/**
+ * Reusable descriptor for `GPUCommandEncoder.beginComputePass()`.
+ *
+ * @private
+ */
+class GPUComputePassDescriptor {
+
+	constructor() {
+
+		/**
+		 * The label of the compute pass.
+		 *
+		 * @type {string}
+		 */
+		this.label = '';
+
+		/**
+		 * Defines which timestamp values are written and where.
+		 *
+		 * @type {Object|undefined}
+		 */
+		this.timestampWrites = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.label = '';
+		this.timestampWrites = undefined;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPURenderPassDepthStencilAttachment`, the
+ * `depthStencilAttachment` field of `GPURenderPassDescriptor`.
+ *
+ * @private
+ */
+class GPURenderPassDepthStencilAttachment {
+
+	constructor() {
+
+		/**
+		 * The depth/stencil texture view the pass renders into.
+		 *
+		 * @type {?GPUTextureView}
+		 * @default null
+		 */
+		this.view = null;
+
+		/**
+		 * The load operation applied to the depth aspect at the start of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.depthLoadOp = undefined;
+
+		/**
+		 * The store operation applied to the depth aspect at the end of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.depthStoreOp = undefined;
+
+		/**
+		 * The clear value used when `depthLoadOp` is `'clear'`.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.depthClearValue = undefined;
+
+		/**
+		 * Whether the depth aspect is read-only.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.depthReadOnly = false;
+
+		/**
+		 * The load operation applied to the stencil aspect at the start of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.stencilLoadOp = undefined;
+
+		/**
+		 * The store operation applied to the stencil aspect at the end of the pass.
+		 *
+		 * @type {string|undefined}
+		 */
+		this.stencilStoreOp = undefined;
+
+		/**
+		 * The clear value used when `stencilLoadOp` is `'clear'`.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.stencilClearValue = 0;
+
+		/**
+		 * Whether the stencil aspect is read-only.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.stencilReadOnly = false;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.view = null;
+		this.depthLoadOp = undefined;
+		this.depthStoreOp = undefined;
+		this.depthClearValue = undefined;
+		this.depthReadOnly = false;
+		this.stencilLoadOp = undefined;
+		this.stencilStoreOp = undefined;
+		this.stencilClearValue = 0;
+		this.stencilReadOnly = false;
+
+	}
+
+}
+
+/**
+ * Reusable descriptor for `GPURenderPassTimestampWrites`, the
+ * `timestampWrites` field of `GPURenderPassDescriptor`. The same shape is
+ * also accepted as `GPUComputePassTimestampWrites`.
+ *
+ * @private
+ */
+class GPURenderPassTimestampWrites {
+
+	constructor() {
+
+		/**
+		 * The query set the timestamps are written to.
+		 *
+		 * @type {?GPUQuerySet}
+		 * @default null
+		 */
+		this.querySet = null;
+
+		/**
+		 * The index in the query set the beginning timestamp is written to.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.beginningOfPassWriteIndex = undefined;
+
+		/**
+		 * The index in the query set the ending timestamp is written to.
+		 *
+		 * @type {number|undefined}
+		 */
+		this.endOfPassWriteIndex = undefined;
+
+	}
+
+	/**
+	 * Resets the descriptor to its default state.
+	 */
+	reset() {
+
+		this.querySet = null;
+		this.beginningOfPassWriteIndex = undefined;
+		this.endOfPassWriteIndex = undefined;
+
+	}
+
+}
+
 // debugger tools
 // import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+const _bufferDescriptor = new GPUBufferDescriptor();
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _computePassDescriptor = new GPUComputePassDescriptor();
+const _querySetDescriptor = new GPUQuerySetDescriptor();
+const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
+const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
+const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
+const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
+const _viewDescriptor = new GPUTextureViewDescriptor();
+const _extent3D = new GPUExtent3D();
 
 /**
  * A backend implementation targeting WebGPU.
@@ -80702,17 +82689,14 @@ class WebGPUBackend extends Backend {
 
 		if ( descriptor === undefined || canvasData.samples !== samples ) {
 
-			descriptor = {
-				colorAttachments: [ {
-					view: null
-				} ]
-			};
+			descriptor = new GPURenderPassDescriptor();
+			descriptor.colorAttachments.push( new GPURenderPassColorAttachment() );
 
 			if ( renderer.depth === true || renderer.stencil === true ) {
 
-				descriptor.depthStencilAttachment = {
-					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
-				};
+				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				depthStencilAttachment.view = this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView();
+				descriptor.depthStencilAttachment = depthStencilAttachment;
 
 			}
 
@@ -80750,7 +82734,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Internal to determine if the current render target is a render target array with depth 2D array texture.
+	 * Returns whether the render target is a render target array with depth 2D array texture.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @return {boolean} Whether the render target is a render target array with depth 2D array texture.
@@ -80759,7 +82743,9 @@ class WebGPUBackend extends Backend {
 	 */
 	_isRenderCameraDepthArray( renderContext ) {
 
-		return renderContext.depthTexture && renderContext.depthTexture.image.depth > 1 && renderContext.camera.isArrayCamera;
+		const camera = renderContext.camera;
+
+		return renderContext.depthTexture && renderContext.depthTexture.isArrayTexture === true && camera !== null && camera.isArrayCamera === true;
 
 	}
 
@@ -80806,22 +82792,19 @@ class WebGPUBackend extends Backend {
 
 				const textureData = this.get( textures[ i ] );
 
-				const viewDescriptor = {
-					label: `colorAttachment_${ i }`,
-					baseMipLevel: renderContext.activeMipmapLevel,
-					mipLevelCount: 1,
-					baseArrayLayer: renderContext.activeCubeFace,
-					arrayLayerCount: 1,
-					dimension: GPUTextureViewDimension.TwoD
-				};
+				_viewDescriptor.label = `colorAttachment_${ i }`;
+				_viewDescriptor.baseMipLevel = renderContext.activeMipmapLevel;
+				_viewDescriptor.mipLevelCount = 1;
+				_viewDescriptor.baseArrayLayer = renderContext.activeCubeFace;
+				_viewDescriptor.arrayLayerCount = 1;
+				_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
 
 				if ( renderTarget.isRenderTarget3D ) {
 
 					sliceIndex = renderContext.activeCubeFace;
 
-					viewDescriptor.baseArrayLayer = 0;
-					viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
-					viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+					_viewDescriptor.baseArrayLayer = 0;
+					_viewDescriptor.dimension = GPUTextureViewDimension.ThreeD;
 
 				} else if ( renderTarget.isRenderTarget && textures[ i ].image.depth > 1 ) {
 
@@ -80830,13 +82813,11 @@ class WebGPUBackend extends Backend {
 						const cameras = renderContext.camera.cameras;
 						for ( let layer = 0; layer < cameras.length; layer ++ ) {
 
-							const layerViewDescriptor = {
-								...viewDescriptor,
-								baseArrayLayer: layer,
-								arrayLayerCount: 1,
-								dimension: GPUTextureViewDimension.TwoD
-							};
-							const textureView = textureData.texture.createView( layerViewDescriptor );
+							_viewDescriptor.baseArrayLayer = layer;
+							_viewDescriptor.arrayLayerCount = 1;
+							_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+
+							const textureView = textureData.texture.createView( _viewDescriptor );
 							textureViews.push( {
 								view: textureView,
 								resolveTarget: undefined,
@@ -80847,8 +82828,7 @@ class WebGPUBackend extends Backend {
 
 					} else {
 
-						viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
-						viewDescriptor.depthOrArrayLayers = textures[ i ].image.depth;
+						_viewDescriptor.dimension = GPUTextureViewDimension.TwoDArray;
 
 					}
 
@@ -80856,7 +82836,7 @@ class WebGPUBackend extends Backend {
 
 				if ( isRenderCameraDepthArray !== true ) {
 
-					const textureView = textureData.texture.createView( viewDescriptor );
+					const textureView = textureData.texture.createView( _viewDescriptor );
 
 					let view, resolveTarget;
 
@@ -80880,23 +82860,46 @@ class WebGPUBackend extends Backend {
 
 				}
 
+				_viewDescriptor.reset();
+
 			}
 
-			descriptorBase = { textureViews };
+			const colorAttachments = [];
+
+			for ( let i = 0; i < textureViews.length; i ++ ) {
+
+				const viewInfo = textureViews[ i ];
+				const attachment = new GPURenderPassColorAttachment();
+				attachment.view = viewInfo.view;
+				attachment.depthSlice = viewInfo.depthSlice;
+				attachment.resolveTarget = viewInfo.resolveTarget;
+				colorAttachments.push( attachment );
+
+			}
+
+			descriptorBase = {
+				textureViews,
+				colorAttachments,
+				descriptor: new GPURenderPassDescriptor()
+			};
 
 			if ( renderContext.depth ) {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
-				const options = {};
+
 				if ( renderContext.depthTexture.isArrayTexture || renderContext.depthTexture.isCubeTexture ) {
 
-					options.dimension = GPUTextureViewDimension.TwoD;
-					options.arrayLayerCount = 1;
-					options.baseArrayLayer = renderContext.activeCubeFace;
+					_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+					_viewDescriptor.arrayLayerCount = 1;
+					_viewDescriptor.baseArrayLayer = renderContext.activeCubeFace;
 
 				}
 
-				descriptorBase.depthStencilView = depthTextureData.texture.createView( options );
+				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				depthStencilAttachment.view = depthTextureData.texture.createView( _viewDescriptor );
+				descriptorBase.depthStencilAttachment = depthStencilAttachment;
+
+				_viewDescriptor.reset();
 
 			}
 
@@ -80910,14 +82913,14 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const descriptor = {
-			colorAttachments: []
-		};
+		const descriptor = descriptorBase.descriptor;
 
-		// Apply dynamic properties to cached views
-		for ( let i = 0; i < descriptorBase.textureViews.length; i ++ ) {
+		descriptor.reset();
 
-			const viewInfo = descriptorBase.textureViews[ i ];
+		// Apply dynamic properties to cached attachments
+		for ( let i = 0; i < descriptorBase.colorAttachments.length; i ++ ) {
+
+			const attachment = descriptorBase.colorAttachments[ i ];
 
 			let clearValue = { r: 0, g: 0, b: 0, a: 1 };
 			if ( i === 0 && colorAttachmentsConfig.clearValue ) {
@@ -80926,22 +82929,17 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			descriptor.colorAttachments.push( {
-				view: viewInfo.view,
-				depthSlice: viewInfo.depthSlice,
-				resolveTarget: viewInfo.resolveTarget,
-				loadOp: colorAttachmentsConfig.loadOp || GPULoadOp.Load,
-				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
-				clearValue: clearValue
-			} );
+			attachment.loadOp = colorAttachmentsConfig.loadOp || GPULoadOp.Load;
+			attachment.storeOp = colorAttachmentsConfig.storeOp || GPUStoreOp.Store;
+			attachment.clearValue = clearValue;
+
+			descriptor.colorAttachments.push( attachment );
 
 		}
 
-		if ( descriptorBase.depthStencilView ) {
+		if ( descriptorBase.depthStencilAttachment ) {
 
-			descriptor.depthStencilAttachment = {
-				view: descriptorBase.depthStencilView
-			};
+			descriptor.depthStencilAttachment = descriptorBase.depthStencilAttachment;
 
 		}
 
@@ -80979,7 +82977,13 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
+			_querySetDescriptor.label = `occlusionQuerySet_${ renderContext.id }`;
+			_querySetDescriptor.type = 'occlusion';
+			_querySetDescriptor.count = occlusionQueryCount;
+
+			occlusionQuerySet = device.createQuerySet( _querySetDescriptor );
+
+			_querySetDescriptor.reset();
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
@@ -81078,7 +83082,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 		}
 
@@ -81095,15 +83099,17 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		  depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
+		_commandEncoderDescriptor.label = 'renderContext_' + renderContext.id;
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
 
-		// shadow arrays - prepare bundle encoders for each camera in an array camera
+		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
@@ -81111,11 +83117,11 @@ class WebGPUBackend extends Backend {
 
 			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length ) {
 
-				this._createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
+				this._createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
 
 			} else {
 
-				this._updateDepthLayerDescriptors( renderContext, renderContextData, cameras );
+				this._updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras );
 
 			}
 
@@ -81176,8 +83182,7 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * This method creates layer descriptors for each camera in an array camera
-	 * to prepare for rendering to a depth array texture.
+	 * Creates render pass descriptors for each camera in an array camera.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object} renderContextData - The render context data.
@@ -81186,7 +83191,7 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @private
 	 */
-	_createDepthLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
+	_createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 		renderContextData.layerDescriptors = [];
@@ -81200,13 +83205,21 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
-			const layerDescriptor = {
-				...descriptor,
-				colorAttachments: [ {
-					...descriptor.colorAttachments[ 0 ],
-					view: descriptor.colorAttachments[ i ].view
-				} ]
-			};
+			const sourceAttachment = descriptor.colorAttachments[ 0 ];
+
+			const layerColorAttachment = new GPURenderPassColorAttachment();
+			layerColorAttachment.view = descriptor.colorAttachments[ i ].view;
+			layerColorAttachment.depthSlice = sourceAttachment.depthSlice;
+			layerColorAttachment.resolveTarget = sourceAttachment.resolveTarget;
+			layerColorAttachment.loadOp = sourceAttachment.loadOp;
+			layerColorAttachment.storeOp = sourceAttachment.storeOp;
+			layerColorAttachment.clearValue = sourceAttachment.clearValue;
+
+			const layerDescriptor = new GPURenderPassDescriptor();
+			layerDescriptor.label = descriptor.label;
+			layerDescriptor.occlusionQuerySet = descriptor.occlusionQuerySet;
+			layerDescriptor.timestampWrites = descriptor.timestampWrites;
+			layerDescriptor.colorAttachments.push( layerColorAttachment );
 
 			if ( descriptor.depthStencilAttachment ) {
 
@@ -81214,32 +83227,45 @@ class WebGPUBackend extends Backend {
 
 				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
 
-					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( {
-						dimension: GPUTextureViewDimension.TwoD,
-						baseArrayLayer: i,
-						arrayLayerCount: 1
-					} );
+					_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+					_viewDescriptor.baseArrayLayer = i;
+					_viewDescriptor.arrayLayerCount = 1;
+
+					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+
+					_viewDescriptor.reset();
 
 				}
 
-				layerDescriptor.depthStencilAttachment = {
-					view: depthTextureData.viewCache[ layerIndex ],
-					depthLoadOp: depthStencilAttachment.depthLoadOp || GPULoadOp.Clear,
-					depthStoreOp: depthStencilAttachment.depthStoreOp || GPUStoreOp.Store,
-					depthClearValue: depthStencilAttachment.depthClearValue || 1.0
-				};
+				const layerDepthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				layerDepthStencilAttachment.view = depthTextureData.viewCache[ layerIndex ];
+				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp || GPULoadOp.Clear;
+				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp || GPUStoreOp.Store;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue || 1.0;
 
 				if ( renderContext.stencil ) {
 
-					layerDescriptor.depthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
-					layerDescriptor.depthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
-					layerDescriptor.depthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+					layerDepthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+					layerDepthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+					layerDepthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
 
 				}
 
+				layerDescriptor.depthStencilAttachment = layerDepthStencilAttachment;
+
 			} else {
 
-				layerDescriptor.depthStencilAttachment = { ...depthStencilAttachment };
+				const layerDepthStencilAttachment = new GPURenderPassDepthStencilAttachment();
+				layerDepthStencilAttachment.view = depthStencilAttachment.view;
+				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp;
+				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue;
+				layerDepthStencilAttachment.depthReadOnly = depthStencilAttachment.depthReadOnly;
+				layerDepthStencilAttachment.stencilLoadOp = depthStencilAttachment.stencilLoadOp;
+				layerDepthStencilAttachment.stencilStoreOp = depthStencilAttachment.stencilStoreOp;
+				layerDepthStencilAttachment.stencilClearValue = depthStencilAttachment.stencilClearValue;
+				layerDepthStencilAttachment.stencilReadOnly = depthStencilAttachment.stencilReadOnly;
+				layerDescriptor.depthStencilAttachment = layerDepthStencilAttachment;
 
 			}
 
@@ -81250,15 +83276,14 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * This method updates the layer descriptors for each camera in an array camera
-	 * to prepare for rendering to a depth array texture.
+	 * Updates render pass descriptors for each camera in an array camera.
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object} renderContextData - The render context data.
 	 * @param {ArrayCamera} cameras - The array camera.
 	 *
 	 */
-	_updateDepthLayerDescriptors( renderContext, renderContextData, cameras ) {
+	_updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras ) {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
@@ -81327,7 +83352,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// shadow arrays - Execute bundles for each layer
+		// Layered render targets: execute the bundle for each layer.
 
 		const encoder = renderContextData.encoder;
 
@@ -81387,12 +83412,12 @@ class WebGPUBackend extends Backend {
 
 			if ( queryResolveBuffer === undefined ) {
 
-				queryResolveBuffer = this.device.createBuffer(
-					{
-						size: bufferSize,
-						usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
-					}
-				);
+				_bufferDescriptor.size = bufferSize;
+				_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
+
+				queryResolveBuffer = this.device.createBuffer( _bufferDescriptor );
+
+				_bufferDescriptor.reset();
 
 				this.occludedResolveCache.set( bufferSize, queryResolveBuffer );
 
@@ -81400,12 +83425,12 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			const readBuffer = this.device.createBuffer(
-				{
-					size: bufferSize,
-					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-				}
-			);
+			_bufferDescriptor.size = bufferSize;
+			_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			const readBuffer = this.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ to be combined
 			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
@@ -81419,7 +83444,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+		submit( this.device, renderContextData.encoder.finish() );
 
 
 		//
@@ -81684,7 +83709,10 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const encoder = device.createCommandEncoder( { label: 'clear' } );
+		_commandEncoderDescriptor.label = 'clear';
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
+
 		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
@@ -81692,7 +83720,7 @@ class WebGPUBackend extends Backend {
 
 		currentPass.end();
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 	}
 
@@ -81710,15 +83738,18 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const descriptor = {
-			label: 'computeGroup_' + computeGroup.id
-		};
+		const label = 'computeGroup_' + computeGroup.id;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
+		_computePassDescriptor.label = label;
+		_commandEncoderDescriptor.label = label;
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
 
-		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
+
+		_commandEncoderDescriptor.reset();
+		_computePassDescriptor.reset();
 
 	}
 
@@ -81839,7 +83870,7 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
-		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+		submit( this.device, groupData.cmdEncoderGPU.finish() );
 
 	}
 
@@ -82080,7 +84111,9 @@ class WebGPUBackend extends Backend {
 
 					let pass = renderContextData.currentPass;
 					let sets = renderContextData.currentSets;
-					if ( renderContextData.bundleEncoders ) {
+					const isBundleEncoder = renderContextData.bundleEncoders !== undefined;
+
+					if ( isBundleEncoder ) {
 
 						const bundleEncoder = renderContextData.bundleEncoders[ i ];
 						const bundleSets = renderContextData.bundleSets[ i ];
@@ -82088,8 +84121,9 @@ class WebGPUBackend extends Backend {
 						sets = bundleSets;
 
 					}
+					// GPURenderBundleEncoder does not support setViewport, only GPURenderPassEncoder does
 
-					if ( vp ) {
+					if ( vp && ! isBundleEncoder ) {
 
 						pass.setViewport(
 							Math.floor( vp.x * pixelRatio ),
@@ -82264,11 +84298,12 @@ class WebGPUBackend extends Backend {
 	 * Updates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
-		return this.textureUtils.updateSampler( texture );
+		return this.textureUtils.updateSampler( texture, textureNode );
 
 	}
 
@@ -82372,11 +84407,11 @@ class WebGPUBackend extends Backend {
 
 		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
-		descriptor.timestampWrites = {
-			querySet: timestampQueryPool.querySet,
-			beginningOfPassWriteIndex: baseOffset,
-			endOfPassWriteIndex: baseOffset + 1,
-		};
+		_renderPassTimestampWrites.querySet = timestampQueryPool.querySet;
+		_renderPassTimestampWrites.beginningOfPassWriteIndex = baseOffset;
+		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
+
+		descriptor.timestampWrites = _renderPassTimestampWrites;
 
 	}
 
@@ -82407,10 +84442,15 @@ class WebGPUBackend extends Backend {
 
 		const programGPU = this.get( program );
 
+		_shaderModuleDescriptor.label = program.stage + ( program.name !== '' ? `_${ program.name }` : '' );
+		_shaderModuleDescriptor.code = program.code;
+
 		programGPU.module = {
-			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${ program.name }` : '' ) } ),
+			module: this.device.createShaderModule( _shaderModuleDescriptor ),
 			entryPoint: 'main'
 		};
+
+		_shaderModuleDescriptor.reset();
 
 	}
 
@@ -82543,11 +84583,13 @@ class WebGPUBackend extends Backend {
 
 			const bufferVisibility = `(${visibilities.join( ',' )})`;
 
-			const bufferGPU = this.device.createBuffer( {
-				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
-				size: byteLength,
-				usage: usage
-			} );
+			_bufferDescriptor.label = `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`;
+			_bufferDescriptor.size = byteLength;
+			_bufferDescriptor.usage = usage;
+
+			const bufferGPU = this.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 			uniformBufferData.buffer = bufferGPU;
 
@@ -82781,30 +84823,40 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
+		_commandEncoderDescriptor.label = 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id;
+		const encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		_commandEncoderDescriptor.reset();
 
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
 
+		_texelCopyTextureInfoSrc.texture = sourceGPU;
+		_texelCopyTextureInfoSrc.mipLevel = srcLevel;
+		_texelCopyTextureInfoSrc.origin.x = srcX;
+		_texelCopyTextureInfoSrc.origin.y = srcY;
+		_texelCopyTextureInfoSrc.origin.z = srcZ;
+
+		_texelCopyTextureInfoDst.texture = destinationGPU;
+		_texelCopyTextureInfoDst.mipLevel = dstLevel;
+		_texelCopyTextureInfoDst.origin.x = dstX;
+		_texelCopyTextureInfoDst.origin.y = dstY;
+		_texelCopyTextureInfoDst.origin.z = dstZ;
+
+		_extent3D.width = srcWidth;
+		_extent3D.height = srcHeight;
+		_extent3D.depthOrArrayLayers = srcDepth;
+
 		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				mipLevel: srcLevel,
-				origin: { x: srcX, y: srcY, z: srcZ }
-			},
-			{
-				texture: destinationGPU,
-				mipLevel: dstLevel,
-				origin: { x: dstX, y: dstY, z: dstZ }
-			},
-			[
-				srcWidth,
-				srcHeight,
-				srcDepth
-			]
+			_texelCopyTextureInfoSrc,
+			_texelCopyTextureInfoDst,
+			_extent3D
 		);
 
-		this.device.queue.submit( [ encoder.finish() ] );
+		_texelCopyTextureInfoSrc.reset();
+		_texelCopyTextureInfoDst.reset();
+		_extent3D.reset();
+
+		submit( this.device, encoder.finish() );
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
@@ -82873,23 +84925,30 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+			_commandEncoderDescriptor.label = 'copyFramebufferToTexture_' + texture.id;
+			encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+			_commandEncoderDescriptor.reset();
 
 		}
 
+		_texelCopyTextureInfoSrc.texture = sourceGPU;
+		_texelCopyTextureInfoSrc.origin.x = rectangle.x;
+		_texelCopyTextureInfoSrc.origin.y = rectangle.y;
+
+		_texelCopyTextureInfoDst.texture = destinationGPU;
+
+		_extent3D.width = rectangle.z;
+		_extent3D.height = rectangle.w;
+
 		encoder.copyTextureToTexture(
-			{
-				texture: sourceGPU,
-				origin: [ rectangle.x, rectangle.y, 0 ],
-			},
-			{
-				texture: destinationGPU
-			},
-			[
-				rectangle.z,
-				rectangle.w
-			]
+			_texelCopyTextureInfoSrc,
+			_texelCopyTextureInfoDst,
+			_extent3D
 		);
+
+		_texelCopyTextureInfoSrc.reset();
+		_texelCopyTextureInfoDst.reset();
+		_extent3D.reset();
 
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
@@ -82930,7 +84989,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			this.device.queue.submit( [ encoder.finish() ] );
+			submit( this.device, encoder.finish() );
 
 		}
 
