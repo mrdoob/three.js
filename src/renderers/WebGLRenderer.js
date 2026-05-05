@@ -295,8 +295,6 @@ class WebGLRenderer {
 		let _isContextLost = false;
 		let _nodesHandler = null;
 
-		// scratch framebuffers
-
 		let _scratchFramebuffer = null;
 		let _srcFramebuffer = null;
 		let _dstFramebuffer = null;
