@@ -297,7 +297,7 @@ class WebGLRenderer {
 
 		// scratch framebuffers
 
-		let _scratchFrameBuffer = null;
+		let _scratchFramebuffer = null;
 		let _srcFramebuffer = null;
 		let _dstFramebuffer = null;
 
@@ -444,7 +444,7 @@ class WebGLRenderer {
 
 			}
 
-			_scratchFrameBuffer = _gl.createFramebuffer();
+			_scratchFramebuffer = _gl.createFramebuffer();
 			_srcFramebuffer = _gl.createFramebuffer();
 			_dstFramebuffer = _gl.createFramebuffer();
 
@@ -3012,7 +3012,7 @@ class WebGLRenderer {
 			// being bound that are different sizes.
 			if ( activeMipmapLevel !== 0 ) {
 
-				framebuffer = _scratchFrameBuffer;
+				framebuffer = _scratchFramebuffer;
 
 			}
 
