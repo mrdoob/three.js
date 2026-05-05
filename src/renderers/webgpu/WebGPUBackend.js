@@ -17,8 +17,11 @@ import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compat
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error } from '../../utils.js';
 
+import GPUBufferDescriptor from './descriptors/GPUBufferDescriptor.js';
 import GPUCommandEncoderDescriptor from './descriptors/GPUCommandEncoderDescriptor.js';
 import GPUComputePassDescriptor from './descriptors/GPUComputePassDescriptor.js';
+import GPUQuerySetDescriptor from './descriptors/GPUQuerySetDescriptor.js';
+import GPUShaderModuleDescriptor from './descriptors/GPUShaderModuleDescriptor.js';
 import GPURenderPassColorAttachment from './descriptors/GPURenderPassColorAttachment.js';
 import GPURenderPassDepthStencilAttachment from './descriptors/GPURenderPassDepthStencilAttachment.js';
 import GPURenderPassDescriptor from './descriptors/GPURenderPassDescriptor.js';
@@ -28,8 +31,11 @@ import GPUTextureViewDescriptor from './descriptors/GPUTextureViewDescriptor.js'
 import GPUExtent3D from './descriptors/GPUExtent3D.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+const _bufferDescriptor = new GPUBufferDescriptor();
 const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
+const _querySetDescriptor = new GPUQuerySetDescriptor();
+const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
 const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
@@ -693,7 +699,13 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount, label: `occlusionQuerySet_${ renderContext.id }` } );
+			_querySetDescriptor.label = `occlusionQuerySet_${ renderContext.id }`;
+			_querySetDescriptor.type = 'occlusion';
+			_querySetDescriptor.count = occlusionQueryCount;
+
+			occlusionQuerySet = device.createQuerySet( _querySetDescriptor );
+
+			_querySetDescriptor.reset();
 
 			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
@@ -1122,12 +1134,12 @@ class WebGPUBackend extends Backend {
 
 			if ( queryResolveBuffer === undefined ) {
 
-				queryResolveBuffer = this.device.createBuffer(
-					{
-						size: bufferSize,
-						usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
-					}
-				);
+				_bufferDescriptor.size = bufferSize;
+				_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
+
+				queryResolveBuffer = this.device.createBuffer( _bufferDescriptor );
+
+				_bufferDescriptor.reset();
 
 				this.occludedResolveCache.set( bufferSize, queryResolveBuffer );
 
@@ -1135,12 +1147,12 @@ class WebGPUBackend extends Backend {
 
 			//
 
-			const readBuffer = this.device.createBuffer(
-				{
-					size: bufferSize,
-					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-				}
-			);
+			_bufferDescriptor.size = bufferSize;
+			_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			const readBuffer = this.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ to be combined
 			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
@@ -2152,10 +2164,15 @@ class WebGPUBackend extends Backend {
 
 		const programGPU = this.get( program );
 
+		_shaderModuleDescriptor.label = program.stage + ( program.name !== '' ? `_${ program.name }` : '' );
+		_shaderModuleDescriptor.code = program.code;
+
 		programGPU.module = {
-			module: this.device.createShaderModule( { code: program.code, label: program.stage + ( program.name !== '' ? `_${ program.name }` : '' ) } ),
+			module: this.device.createShaderModule( _shaderModuleDescriptor ),
 			entryPoint: 'main'
 		};
+
+		_shaderModuleDescriptor.reset();
 
 	}
 
@@ -2288,11 +2305,13 @@ class WebGPUBackend extends Backend {
 
 			const bufferVisibility = `(${visibilities.join( ',' )})`;
 
-			const bufferGPU = this.device.createBuffer( {
-				label: `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`,
-				size: byteLength,
-				usage: usage
-			} );
+			_bufferDescriptor.label = `bindingBuffer${uniformBuffer.id}_${uniformBuffer.name}_${bufferVisibility}`;
+			_bufferDescriptor.size = byteLength;
+			_bufferDescriptor.usage = usage;
+
+			const bufferGPU = this.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 			uniformBufferData.buffer = bufferGPU;
 

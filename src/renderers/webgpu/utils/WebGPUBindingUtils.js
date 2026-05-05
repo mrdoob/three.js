@@ -8,8 +8,12 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
 import { hashString } from '../../../nodes/core/NodeUtils.js';
 
+import GPUBindGroupDescriptor from '../descriptors/GPUBindGroupDescriptor.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
 import GPUTextureViewDescriptor from '../descriptors/GPUTextureViewDescriptor.js';
 
+const _bindGroupDescriptor = new GPUBindGroupDescriptor();
+const _bufferDescriptor = new GPUBufferDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 
 /**
@@ -248,21 +252,25 @@ class WebGPUBindingUtils {
 		const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 		const index = data[ 0 ];
 
-		const buffer = device.createBuffer( {
-			label: 'bindingCameraIndex_' + index,
-			size: 16, // uint(4) * 4
-			usage: usage
-		} );
+		_bufferDescriptor.label = 'bindingCameraIndex_' + index;
+		_bufferDescriptor.size = 16; // uint(4) * 4
+		_bufferDescriptor.usage = usage;
+
+		const buffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
 
 		device.queue.writeBuffer( buffer, 0, data, 0 );
 
-		const entries = [ { binding: 0, resource: { buffer } } ];
+		_bindGroupDescriptor.label = 'bindGroupCameraIndex_' + index;
+		_bindGroupDescriptor.layout = layoutGPU;
+		_bindGroupDescriptor.entries.push( { binding: 0, resource: { buffer } } );
 
-		return device.createBindGroup( {
-			label: 'bindGroupCameraIndex_' + index,
-			layout: layoutGPU,
-			entries
-		} );
+		const bindGroup = device.createBindGroup( _bindGroupDescriptor );
+
+		_bindGroupDescriptor.reset();
+
+		return bindGroup;
 
 	}
 
@@ -279,7 +287,9 @@ class WebGPUBindingUtils {
 		const device = backend.device;
 
 		let bindingPoint = 0;
-		const entriesGPU = [];
+
+		_bindGroupDescriptor.label = 'bindGroup_' + bindGroup.name;
+		_bindGroupDescriptor.layout = layoutGPU;
 
 		for ( const binding of bindGroup.bindings ) {
 
@@ -287,13 +297,13 @@ class WebGPUBindingUtils {
 
 				const bindingData = backend.get( binding );
 
-				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
 			} else if ( binding.isStorageBuffer ) {
 
 				const buffer = backend.get( binding.attribute ).buffer;
 
-				entriesGPU.push( { binding: bindingPoint, resource: { buffer: buffer } } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: { buffer: buffer } } );
 
 			} else if ( binding.isSampledTexture ) {
 
@@ -360,13 +370,13 @@ class WebGPUBindingUtils {
 
 				}
 
-				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: resourceGPU } );
 
 			} else if ( binding.isSampler ) {
 
 				const textureGPU = backend.get( binding.texture );
 
-				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
 			}
 
@@ -374,11 +384,11 @@ class WebGPUBindingUtils {
 
 		}
 
-		return device.createBindGroup( {
-			label: 'bindGroup_' + bindGroup.name,
-			layout: layoutGPU,
-			entries: entriesGPU
-		} );
+		const bindGroupGPU = device.createBindGroup( _bindGroupDescriptor );
+
+		_bindGroupDescriptor.reset();
+
+		return bindGroupGPU;
 
 	}
 

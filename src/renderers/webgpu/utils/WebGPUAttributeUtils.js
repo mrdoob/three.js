@@ -1,10 +1,12 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 import { submit } from './WebGPUUtils.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
 import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
 import { isTypedArray, error } from '../../../utils.js';
 
+const _bufferDescriptor = new GPUBufferDescriptor();
 const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 
 const typedArraysToVertexFormatPrefix = new Map( [
@@ -128,12 +130,14 @@ class WebGPUAttributeUtils {
 			const byteLength = array.byteLength;
 			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
-			buffer = device.createBuffer( {
-				label: bufferAttribute.name,
-				size: size,
-				usage: usage,
-				mappedAtCreation: true
-			} );
+			_bufferDescriptor.label = bufferAttribute.name;
+			_bufferDescriptor.size = size;
+			_bufferDescriptor.usage = usage;
+			_bufferDescriptor.mappedAtCreation = true;
+
+			buffer = device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 			new array.constructor( buffer.getMappedRange() ).set( array );
 
@@ -355,11 +359,13 @@ class WebGPUAttributeUtils {
 			// initialize the GPU-side read copy buffer if it is not present
 			if ( readbackInfo.readBufferGPU === undefined ) {
 
-				readBufferGPU = device.createBuffer( {
-					label: `${ target.name }_readback`,
-					size: target.maxByteLength,
-					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-				} );
+				_bufferDescriptor.label = `${ target.name }_readback`;
+				_bufferDescriptor.size = target.maxByteLength;
+				_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+				readBufferGPU = device.createBuffer( _bufferDescriptor );
+
+				_bufferDescriptor.reset();
 
 				// release / dispose
 				const releaseCallback = () => {
@@ -400,11 +406,13 @@ class WebGPUAttributeUtils {
 		} else {
 
 			// create a new temp buffer for array buffers otherwise
-			readBufferGPU = device.createBuffer( {
-				label: `${ attribute.name }_readback`,
-				size: byteLength,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			} );
+			_bufferDescriptor.label = `${ attribute.name }_readback`;
+			_bufferDescriptor.size = byteLength;
+			_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			readBufferGPU = device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
 
 		}
 
