@@ -304,6 +304,8 @@ class MaterialXNode {
 
 	toBooleanNode( node ) {
 
+		if ( ! node ) return bool( false );
+
 		if ( typeof node === 'boolean' ) {
 
 			return bool( node );
@@ -316,7 +318,7 @@ class MaterialXNode {
 
 		}
 
-		if ( node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) ) ) {
+		if ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) ) {
 
 			return node;
 
