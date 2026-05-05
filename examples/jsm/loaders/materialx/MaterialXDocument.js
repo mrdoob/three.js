@@ -75,8 +75,29 @@ function mxFlipUvY( uvNode ) {
 
 }
 
-const mxToUvSpace = mxFlipUvY;
-const mxFromUvSpace = mxFlipUvY;
+function mxIdentityUv( uvNode ) {
+
+	return uvNode;
+
+}
+
+function getBottomLeftUvSpaceHelpers( uvSpace ) {
+
+	const helper = uvSpace === 'top-left' ? mxFlipUvY : mxIdentityUv;
+	return {
+		mxToBottomLeftUvSpace: helper,
+		mxFromBottomLeftUvSpace: helper,
+	};
+
+}
+
+function normalizeUvSpace( uvSpace ) {
+
+	if ( uvSpace === undefined || uvSpace === null ) return 'bottom-left';
+	if ( uvSpace === 'bottom-left' || uvSpace === 'top-left' ) return uvSpace;
+	throw new Error( `Unsupported MaterialX uvSpace "${uvSpace}". Expected "bottom-left" or "top-left".` );
+
+}
 
 function isSvgUri( uri ) {
 
@@ -405,7 +426,7 @@ class MaterialXNode {
 
 			}
 
-			node = mxToUvSpace( uv( index ) );
+			node = this.materialX.compileContext.mxToBottomLeftUvSpace( uv( index ) );
 
 		} else {
 
@@ -718,12 +739,13 @@ class MaterialXNode {
 
 class MaterialXDocument {
 
-	constructor( manager, path, issueCollector, archiveResolver = null ) {
+	constructor( manager, path, issueCollector, archiveResolver = null, uvSpace = 'bottom-left' ) {
 
 		this.manager = manager;
 		this.path = path;
 		this.issueCollector = issueCollector;
 		this.archiveResolver = archiveResolver;
+		this.uvSpace = normalizeUvSpace( uvSpace );
 
 		this.nodesXLib = new Map();
 		this.imageLoader = new ImageLoader( manager );
@@ -732,12 +754,12 @@ class MaterialXDocument {
 		this.textureLoader.setOptions( { imageOrientation: 'none' } );
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
+		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
-			mxToUvSpace,
-			mxFromUvSpace,
+			...bottomLeftUvSpaceHelpers,
 			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,

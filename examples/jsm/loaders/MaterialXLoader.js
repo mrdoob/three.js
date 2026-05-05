@@ -136,7 +136,7 @@ class MaterialXLoader extends Loader {
 			onWarning: options.onWarning || options.warningCallback
 		} );
 
-		const document = new MaterialXDocument( this.manager, options.path || this.path, issueCollector, options.archiveResolver || null );
+		const document = new MaterialXDocument( this.manager, options.path || this.path, issueCollector, options.archiveResolver || null, options.uvSpace );
 		const result = document.parse( text, options.materialName || null );
 
 		issueCollector.throwIfNeeded();

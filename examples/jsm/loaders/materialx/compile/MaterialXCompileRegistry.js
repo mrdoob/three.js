@@ -44,7 +44,7 @@ const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
 const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
 
-const getDefaultUvNode = ( compileContext ) => compileContext.mxToUvSpace( uv( 0 ) );
+const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
 
 const isBooleanNode = ( node ) => node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) );
 
@@ -69,7 +69,7 @@ const getTextureInputs = ( nodeX, compileContext ) => {
 };
 
 const sampleTexture = ( textureFile, uvNode, compileContext, fallback ) =>
-	textureFile ? texture( textureFile, compileContext.mxFromUvSpace( uvNode ) ) : fallback;
+	textureFile ? texture( textureFile, compileContext.mxFromBottomLeftUvSpace( uvNode ) ) : fallback;
 
 const applyTextureColorSpace = ( node, file ) => {
 
@@ -153,7 +153,7 @@ const compileTexcoordNode = ( nodeX, compileContext ) => {
 
 	const indexNode = nodeX.getChildByName( 'index' );
 	const index = indexNode ? parseInt( indexNode.value, 10 ) : 0;
-	return compileContext.mxToUvSpace( uv( index ) );
+	return compileContext.mxToBottomLeftUvSpace( uv( index ) );
 
 };
 
@@ -215,7 +215,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const falloff = nodeX.getNodeByName( 'falloff' ) || float( 0.5 );
 	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' ) || float( 0.5 );
 	const lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' ) || vec3( 0.2722287, 0.6740818, 0.0536895 );
-	const transformedUv = compileContext.mxFromUvSpace( mul( uvNode, tiling ) );
+	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
 	let sample0 = texture( textureFile, tileData.coords[ 0 ] ).grad(
