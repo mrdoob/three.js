@@ -97,70 +97,48 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
  */
 export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow, depthLayer } ) => {
 
-	const depthCompare = ( uv, compare ) => {
-
-		let depth = texture( depthTexture, uv );
-
-		if ( depthTexture.isArrayTexture ) {
-
-			depth = depth.depth( depthLayer );
-
-		}
-
-		return depth.compare( compare );
-
-	};
-
-
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 	const texelSize = vec2( 1 ).div( mapSize );
-	const dx = texelSize.x;
-	const dy = texelSize.y;
 
 	const uv = shadowCoord.xy;
 	const f = fract( uv.mul( mapSize ).add( 0.5 ) );
 	uv.subAssign( f.mul( texelSize ) );
 
-	return add(
-		depthCompare( uv, shadowCoord.z ),
-		depthCompare( uv.add( vec2( dx, 0 ) ), shadowCoord.z ),
-		depthCompare( uv.add( vec2( 0, dy ) ), shadowCoord.z ),
-		depthCompare( uv.add( texelSize ), shadowCoord.z ),
-		mix(
-			depthCompare( uv.add( vec2( dx.negate(), 0 ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx.mul( 2 ), 0 ) ), shadowCoord.z ),
-			f.x
-		),
-		mix(
-			depthCompare( uv.add( vec2( dx.negate(), dy ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx.mul( 2 ), dy ) ), shadowCoord.z ),
-			f.x
-		),
-		mix(
-			depthCompare( uv.add( vec2( 0, dy.negate() ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( 0, dy.mul( 2 ) ) ), shadowCoord.z ),
-			f.y
-		),
-		mix(
-			depthCompare( uv.add( vec2( dx, dy.negate() ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx, dy.mul( 2 ) ) ), shadowCoord.z ),
-			f.y
-		),
-		mix(
-			mix(
-				depthCompare( uv.add( vec2( dx.negate(), dy.negate() ) ), shadowCoord.z ),
-				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.negate() ) ), shadowCoord.z ),
-				f.x
-			),
-			mix(
-				depthCompare( uv.add( vec2( dx.negate(), dy.mul( 2 ) ) ), shadowCoord.z ),
-				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.mul( 2 ) ) ), shadowCoord.z ),
-				f.x
-			),
-			f.y
-		)
-	).mul( 1 / 9 );
+	const gatherCompare = ( uvOffset ) => {
+
+		let t = texture( depthTexture, uv.add( uvOffset ) ).gather();
+
+		if ( depthTexture.isArrayTexture ) {
+
+			t = t.depth( depthLayer );
+
+		}
+
+		return t.compare( shadowCoord.z );
+
+	};
+
+	// 4 textureGatherCompare calls covering a 4×4 texel neighborhood.
+	// Each returns vec4: .w=(0,0) .z=(1,0) .x=(0,1) .y=(1,1) relative to base.
+	const bottomLeft = gatherCompare( texelSize.mul( vec2( - 1, - 1 ) ) ).toVar();
+	const bottomRight = gatherCompare( texelSize.mul( vec2( 1, - 1 ) ) ).toVar();
+	const topLeft = gatherCompare( texelSize.mul( vec2( - 1, 1 ) ) ).toVar();
+	const topRight = gatherCompare( texelSize.mul( vec2( 1, 1 ) ) ).toVar();
+
+	// Bilinear weighting per row: edge columns weighted by (1-f.x)/f.x, edge rows by (1-f.y)/f.y
+	const rowBot = float( 1 ).sub( f.y ).mul(
+		mix( bottomLeft.w, bottomRight.z, f.x ).add( bottomLeft.z ).add( bottomRight.w )
+	);
+
+	const row0 = mix( bottomLeft.x, bottomRight.y, f.x ).add( bottomLeft.y ).add( bottomRight.x );
+	const row1 = mix( topLeft.w, topRight.z, f.x ).add( topLeft.z ).add( topRight.w );
+
+	const rowTop = f.y.mul(
+		mix( topLeft.x, topRight.y, f.x ).add( topLeft.y ).add( topRight.x )
+	);
+
+	return add( rowBot, row0, row1, rowTop ).mul( 1 / 9 );
 
 } );
 
