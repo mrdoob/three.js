@@ -16238,6 +16238,10 @@ class WebGLRenderer {
 		let _isContextLost = false;
 		let _nodesHandler = null;
 
+		let _scratchFramebuffer = null;
+		let _srcFramebuffer = null;
+		let _dstFramebuffer = null;
+
 		// internal state cache
 
 		this._outputColorSpace = SRGBColorSpace;
@@ -16380,6 +16384,10 @@ class WebGLRenderer {
 				state.buffers.depth.setReversed( true );
 
 			}
+
+			_scratchFramebuffer = _gl.createFramebuffer();
+			_srcFramebuffer = _gl.createFramebuffer();
+			_dstFramebuffer = _gl.createFramebuffer();
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -18813,8 +18821,6 @@ class WebGLRenderer {
 
 		};
 
-		const _scratchFrameBuffer = _gl.createFramebuffer();
-
 		/**
 		 * Sets the active rendertarget.
 		 *
@@ -18947,7 +18953,7 @@ class WebGLRenderer {
 			// being bound that are different sizes.
 			if ( activeMipmapLevel !== 0 ) {
 
-				framebuffer = _scratchFrameBuffer;
+				framebuffer = _scratchFramebuffer;
 
 			}
 
@@ -19190,8 +19196,6 @@ class WebGLRenderer {
 
 		};
 
-		const _srcFramebuffer = _gl.createFramebuffer();
-		const _dstFramebuffer = _gl.createFramebuffer();
 
 		/**
 		 * Copies data of the given source texture into a destination texture.
