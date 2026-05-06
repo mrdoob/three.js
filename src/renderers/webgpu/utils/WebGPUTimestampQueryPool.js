@@ -1,5 +1,6 @@
 import { error, warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
+import { submit } from './WebGPUUtils.js';
 
 /**
  * Manages a pool of WebGPU timestamp queries for performance measurement.
@@ -155,7 +156,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			);
 
 			const commandBuffer = commandEncoder.finish();
-			this.device.queue.submit( [ commandBuffer ] );
+			submit( this.device, commandBuffer );
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 

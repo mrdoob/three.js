@@ -832,6 +832,14 @@ class WebGLBackend extends Backend {
 
 				if ( setFrameBuffer && resolveRenderTarget ) this._resolveRenderTarget( descriptor );
 
+				// Restore the framebuffer of the active render pass when clearing an unrelated
+				// render target, so subsequent draws in the pass don't bind to the cleared target.
+				if ( setFrameBuffer && this._currentContext !== null && this._currentContext !== descriptor ) {
+
+					this._setFramebuffer( this._currentContext );
+
+				}
+
 			}
 
 		}
@@ -1410,9 +1418,10 @@ class WebGLBackend extends Backend {
 	 * This method does nothing since WebGL 2 has no concept of samplers.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) {
+	updateSampler( /*texture, textureNode*/ ) {
 
 		return '';
 
@@ -1621,7 +1630,7 @@ class WebGLBackend extends Backend {
 					const fragmentErrors = this._getShaderErrors( gl, glFragmentShader, 'fragment' );
 
 					error(
-						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( programGPU, gl.VALIDATE_STATUS ) + '\n\n' +
 						'Program Info Log: ' + programLog + '\n' +
 						vertexErrors + '\n' +

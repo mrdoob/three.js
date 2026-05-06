@@ -506,13 +506,15 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.layout ) {
 
-			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+			const backend = builder.renderer.backend;
+
+			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( backend );
 
 			if ( functionNodesCacheMap === undefined ) {
 
 				functionNodesCacheMap = new WeakMap();
 
-				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+				nodeBuilderFunctionsCacheMap.set( backend, functionNodesCacheMap );
 
 			}
 

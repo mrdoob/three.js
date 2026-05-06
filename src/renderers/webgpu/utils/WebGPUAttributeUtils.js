@@ -1,4 +1,5 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
+import { submit } from './WebGPUUtils.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
 import { isTypedArray, error } from '../../../utils.js';
@@ -418,7 +419,7 @@ class WebGPUAttributeUtils {
 		);
 
 		const gpuCommands = cmdEncoder.finish();
-		device.queue.submit( [ gpuCommands ] );
+		submit( device, gpuCommands );
 
 		// map the data to the CPU
 		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );

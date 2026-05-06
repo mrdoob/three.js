@@ -841,13 +841,14 @@ class BufferGeometry extends EventDispatcher {
 		const normalAttribute = attributes.normal;
 		const uvAttribute = attributes.uv;
 
-		if ( this.hasAttribute( 'tangent' ) === false ) {
+		let tangentAttribute = this.getAttribute( 'tangent' );
 
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
+		if ( tangentAttribute === undefined || tangentAttribute.count !== positionAttribute.count ) {
+
+			tangentAttribute = new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 );
+			this.setAttribute( 'tangent', tangentAttribute );
 
 		}
-
-		const tangentAttribute = this.getAttribute( 'tangent' );
 
 		const tan1 = [], tan2 = [];
 
@@ -993,7 +994,7 @@ class BufferGeometry extends EventDispatcher {
 
 			let normalAttribute = this.getAttribute( 'normal' );
 
-			if ( normalAttribute === undefined ) {
+			if ( normalAttribute === undefined || normalAttribute.count !== positionAttribute.count ) {
 
 				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
 				this.setAttribute( 'normal', normalAttribute );

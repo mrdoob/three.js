@@ -163,6 +163,7 @@ class ReflectorNode extends TextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 		newNode._reflectorBaseNode = this._reflectorBaseNode;
 

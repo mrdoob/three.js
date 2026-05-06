@@ -4,6 +4,7 @@ import {
 import { ColorManagement } from '../../../math/ColorManagement.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
+import { submit } from './WebGPUUtils.js';
 
 import {
 	ByteType, ShortType,
@@ -124,15 +125,17 @@ class WebGPUTextureUtils {
 	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
 		const backend = this.backend;
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
-			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
+			texture.anisotropy + '-' + ( texture.isDepthTexture === true ? 1 : 0 ) + '-' +
+			( texture.compareFunction !== null && textureNode.compareNode !== null ? texture.compareFunction : 0 );
 
 		let samplerData = this._samplerCache.get( samplerKey );
 
@@ -149,7 +152,7 @@ class WebGPUTextureUtils {
 			};
 
 			// Depth textures without compare function must use non-filtering (nearest) sampling
-			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+			if ( texture.isDepthTexture && ( texture.compareFunction === null || textureNode.compareNode === null ) ) {
 
 				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
 				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
@@ -165,7 +168,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+			if ( texture.isDepthTexture && texture.compareFunction !== null && textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
 
@@ -708,7 +711,7 @@ class WebGPUTextureUtils {
 
 		const typedArrayType = this._getTypedArrayType( format );
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 

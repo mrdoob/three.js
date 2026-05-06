@@ -2739,8 +2739,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512),
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input image size
+	 * is 64 x 32.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
@@ -2754,8 +2755,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256,
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input cube
+	 * size is 16 x 16 per face.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
@@ -4793,13 +4795,14 @@ const toneMappingMap = {
 	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
 };
 
-function WebGLOutput( type, width, height, depth, stencil ) {
+function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 
 	// render targets for scene and post-processing
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
 		stencilBuffer: stencil,
+		samples: antialias ? 4 : 0,
 		depthTexture: depth ? new DepthTexture( width, height ) : undefined
 	} );
 
@@ -7119,7 +7122,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
 					error(
-						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
 						'Material Name: ' + self.name + '\n' +
 						'Material Type: ' + self.type + '\n\n' +
@@ -16484,7 +16487,7 @@ class WebGLRenderer {
 
 		if ( _outputBufferType !== UnsignedByteType ) {
 
-			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, antialias, depth, stencil );
 
 		}
 
@@ -16668,7 +16671,7 @@ class WebGLRenderer {
 
 			if ( _outputBufferType === UnsignedByteType ) {
 
-				error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
+				error( 'WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
 				return;
 
 			}
@@ -16679,7 +16682,7 @@ class WebGLRenderer {
 
 					if ( effects[ i ].isOutputPass === true ) {
 
-						warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
+						warn( 'WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
 						break;
 
 					}
