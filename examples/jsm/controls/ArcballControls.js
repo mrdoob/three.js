@@ -2012,8 +2012,8 @@ class ArcballControls extends Controls {
 		const gizmoZ = new Line( curveGeometry, curveMaterialZ );
 
 		const rotation = Math.PI * 0.5;
-		gizmoX.rotation.x = rotation;
-		gizmoY.rotation.y = rotation;
+		gizmoX.rotation.y = rotation;
+		gizmoY.rotation.x = rotation;
 
 
 		//setting state
