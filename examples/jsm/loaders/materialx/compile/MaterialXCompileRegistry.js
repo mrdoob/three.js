@@ -18,6 +18,8 @@ import {
 	normalWorld,
 	tangentLocal,
 	tangentWorld,
+	bitangentLocal,
+	bitangentWorld,
 	clamp,
 	add,
 	sub,
@@ -149,6 +151,8 @@ const compileSpaceInputNode = ( nodeX, objectNode, worldNode ) => {
 
 };
 
+const compileNormalizedSpaceInputNode = ( nodeX, objectNode, worldNode ) => normalize( compileSpaceInputNode( nodeX, objectNode, worldNode ) );
+
 const compileTexcoordNode = ( nodeX, compileContext ) => {
 
 	const indexNode = nodeX.getChildByName( 'index' );
@@ -274,12 +278,65 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 	const { file, uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
-	const node = applyTextureColorSpace( sampleTexture( textureFile, uvNode, compileContext, float( 0 ) ), file );
+	let transformedUv = uvNode;
+	const place2d = compileContext.nodeLibrary.place2d;
+
+	if ( place2d ) {
+
+		const pivot = nodeX.getNodeByName( 'pivot' ) || vec2( 0, 1 );
+		const scale = nodeX.getNodeByName( 'scale' ) || vec2( 1, 1 );
+		const rotate = nodeX.getNodeByName( 'rotate' ) || float( 0 );
+		const offset = nodeX.getNodeByName( 'offset' ) || vec2( 0, 0 );
+		const operationorder = nodeX.getNodeByName( 'operationorder' ) || int( 0 );
+		transformedUv = place2d.nodeFunc(
+			uvNode,
+			pivot,
+			div( vec2( 1, 1 ), scale ),
+			mul( rotate, - 1 ),
+			mul( offset, vec2( - 1, 1 ) ),
+			operationorder,
+		);
+
+	}
+
+	const defaultInput = nodeX.getNodeByName( 'default' );
+	let fallback = float( 0 );
+
+	if ( nodeX.type === 'color3' || nodeX.type === 'vector3' ) {
+
+		const defaultColor = defaultInput || vec3( 0, 0, 0 );
+		fallback = vec4( element( defaultColor, 0 ), element( defaultColor, 1 ), element( defaultColor, 2 ), 1 );
+
+	} else if ( nodeX.type === 'color4' || nodeX.type === 'vector4' ) {
+
+		fallback = defaultInput || vec4( 0, 0, 0, 1 );
+
+	} else {
+
+		fallback = defaultInput || float( 0 );
+
+	}
+
+	const node = applyTextureColorSpace( sampleTexture( textureFile, transformedUv, compileContext, fallback ), file );
 
 	if ( category === 'gltf_normalmap' ) {
 
 		const normalScale = nodeX.getNodeByName( 'scale' ) || float( 1 );
 		return normalMap( node, normalScale );
+
+	}
+
+	const factor = nodeX.getNodeByName( 'factor' );
+
+	if ( factor ) {
+
+		if ( nodeX.type === 'color3' || nodeX.type === 'vector3' ) {
+
+			return mul( factor, vec3( element( node, 0 ), element( node, 1 ), element( node, 2 ) ) );
+
+		}
+
+		return mul( factor, node );
 
 	}
 
@@ -542,8 +599,9 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'convert' ], ( nodeX ) => compileConvertNode( nodeX ) );
 	register( registry, [ 'constant' ], ( nodeX ) => compileConstantNode( nodeX ) );
 	register( registry, [ 'position' ], ( nodeX ) => compileSpaceInputNode( nodeX, positionLocal, positionWorld ) );
-	register( registry, [ 'normal' ], ( nodeX ) => normalize( compileSpaceInputNode( nodeX, normalLocal, normalWorld ) ) );
-	register( registry, [ 'tangent' ], ( nodeX ) => compileSpaceInputNode( nodeX, tangentLocal, tangentWorld ) );
+	register( registry, [ 'normal' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, normalLocal, normalWorld ) );
+	register( registry, [ 'tangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, tangentLocal, tangentWorld ) );
+	register( registry, [ 'bitangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, bitangentLocal, bitangentWorld ) );
 	register( registry, [ 'texcoord' ], ( nodeX, out, compileContext ) => compileTexcoordNode( nodeX, compileContext ) );
 	register( registry, [ 'geomcolor' ], ( nodeX ) => compileGeomColorNode( nodeX ) );
 	register( registry, [ 'tiledimage' ], ( nodeX, out, compileContext ) => compileTiledImageNode( nodeX, compileContext ) );
