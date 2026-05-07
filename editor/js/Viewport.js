@@ -498,6 +498,20 @@ function Viewport( editor ) {
 
 		}
 
+		// update light helper when light target is changed
+
+		for ( const id in editor.helpers ) {
+
+			const helper = editor.helpers[ id ];
+
+			if ( helper.light && helper.light.target === object ) {
+
+				helper.update();
+
+			}
+
+		}
+
 		initPT();
 		render();
 

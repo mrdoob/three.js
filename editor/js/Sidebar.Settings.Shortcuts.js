@@ -1,5 +1,6 @@
 import { UIPanel, UIText, UIRow, UIInput } from './libs/ui.js';
 
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
 function SidebarSettingsShortcuts( editor ) {
@@ -109,10 +110,20 @@ function SidebarSettingsShortcuts( editor ) {
 
 				const object = editor.selected;
 
-				if ( object === null ) return;
+				if ( object === null || object.parent === null ) return;
 
-				const parent = object.parent;
-				if ( parent !== null ) editor.execute( new RemoveObjectCommand( editor, object ) );
+				if ( object.isSpotLight || object.isDirectionalLight ) {
+
+					editor.execute( new MultiCmdsCommand( editor, [
+						new RemoveObjectCommand( editor, object ),
+						new RemoveObjectCommand( editor, object.target )
+					] ) );
+
+				} else {
+
+					editor.execute( new RemoveObjectCommand( editor, object ) );
+
+				}
 
 				break;
 

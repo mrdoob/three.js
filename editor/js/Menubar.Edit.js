@@ -4,6 +4,7 @@ import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { UIPanel, UIRow, UIHorizontalRule, UIText } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 
@@ -129,7 +130,16 @@ function MenubarEdit( editor ) {
 
 		const object = editor.selected;
 
-		if ( object !== null && object.parent !== null ) {
+		if ( object === null || object.parent === null ) return;
+
+		if ( object.isSpotLight || object.isDirectionalLight ) {
+
+			editor.execute( new MultiCmdsCommand( editor, [
+				new RemoveObjectCommand( editor, object ),
+				new RemoveObjectCommand( editor, object.target )
+			] ) );
+
+		} else {
 
 			editor.execute( new RemoveObjectCommand( editor, object ) );
 

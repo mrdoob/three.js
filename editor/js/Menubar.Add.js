@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { UIPanel, UIRow } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -419,7 +420,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
@@ -483,7 +487,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
