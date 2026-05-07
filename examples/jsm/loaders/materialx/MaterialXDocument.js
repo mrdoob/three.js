@@ -1,6 +1,8 @@
 import {
 	Texture,
 	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
 	ImageLoader,
 	ImageBitmapLoader,
 	Matrix3,
@@ -42,6 +44,12 @@ const IDENTITY_MAT3_VALUES = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
 const IDENTITY_MAT4_VALUES = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
 const MATRIX_INVERSE_EPSILON = 1e-8;
 const COMPILE_REGISTRY = createMaterialXCompileRegistry();
+const TEXTURE_ADDRESS_MODE_WRAPPING = {
+	constant: ClampToEdgeWrapping,
+	clamp: ClampToEdgeWrapping,
+	periodic: RepeatWrapping,
+	mirror: MirroredRepeatWrapping,
+};
 const NODE_CLASS_BY_TYPE = {
 	integer: int,
 	float,
@@ -103,6 +111,15 @@ function isSvgUri( uri ) {
 
 	if ( typeof uri !== 'string' ) return false;
 	return /\.svg(?:$|[?#])/i.test( uri );
+
+}
+
+function normalizeTextureAddressMode( value ) {
+
+	if ( value === null || value === undefined || value === '' ) return 'periodic';
+
+	const mode = value.trim().toLowerCase();
+	return mode in TEXTURE_ADDRESS_MODE_WRAPPING ? mode : null;
 
 }
 
@@ -276,16 +293,42 @@ class MaterialXNode {
 
 	}
 
+	getTextureAddressMode( inputName ) {
+
+		const rawMode = this.getInputValueByName( inputName );
+		const mode = normalizeTextureAddressMode( rawMode );
+		if ( mode ) return mode;
+
+		this.materialX.issueCollector.addInvalidValue(
+			this.name,
+			`Unsupported texture address mode "${rawMode}" on input "${inputName}". Expected constant, clamp, periodic, or mirror.`,
+		);
+		return 'periodic';
+
+	}
+
+	getTextureAddressModes() {
+
+		return {
+			u: this.getTextureAddressMode( 'uaddressmode' ),
+			v: this.getTextureAddressMode( 'vaddressmode' ),
+		};
+
+	}
+
 	getTexture() {
 
 		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
 		const sourceURI = filePrefix + this.value;
 		const resolvedURI = this.materialX.resolveTextureURI( sourceURI );
 		const svgTexture = isSvgUri( resolvedURI );
+		const textureSourceNode = this.parent && typeof this.parent.getTextureAddressModes === 'function' ? this.parent : this;
+		const addressModes = textureSourceNode.getTextureAddressModes();
+		const textureCacheKey = `${resolvedURI}|${addressModes.u}|${addressModes.v}`;
 
-		if ( this.materialX.textureCache.has( resolvedURI ) ) {
+		if ( this.materialX.textureCache.has( textureCacheKey ) ) {
 
-			return this.materialX.textureCache.get( resolvedURI );
+			return this.materialX.textureCache.get( textureCacheKey );
 
 		}
 
@@ -298,9 +341,10 @@ class MaterialXNode {
 		}
 
 		const textureNode = new Texture();
-		textureNode.wrapS = textureNode.wrapT = RepeatWrapping;
+		textureNode.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
+		textureNode.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
 		textureNode.flipY = false;
-		this.materialX.textureCache.set( resolvedURI, textureNode );
+		this.materialX.textureCache.set( textureCacheKey, textureNode );
 
 		loader.load( resolvedURI, ( imageData ) => {
 

@@ -48,22 +48,88 @@ const register = ( registry, categories, handler ) => {
 const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
+const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirror' ] );
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
+
+const getTextureAddressMode = ( nodeX, inputName ) => {
+
+	const value = nodeX.getInputValueByName( inputName );
+	if ( value === null || value === undefined || value === '' ) return 'periodic';
+
+	const mode = value.trim().toLowerCase();
+	return TEXTURE_ADDRESS_MODES.has( mode ) ? mode : 'periodic';
+
+};
+
+const getTextureAddressModes = ( nodeX ) => ( {
+	u: getTextureAddressMode( nodeX, 'uaddressmode' ),
+	v: getTextureAddressMode( nodeX, 'vaddressmode' ),
+} );
+
+const getZeroNodeForType = ( type ) => {
+
+	if ( type === 'vector2' ) return vec2( 0, 0 );
+	if ( type === 'vector3' || type === 'color3' ) return vec3( 0, 0, 0 );
+	if ( type === 'vector4' || type === 'color4' ) return vec4( 0, 0, 0, 0 );
+	return float( 0 );
+
+};
+
+const toTextureDefaultNode = ( node, type ) => {
+
+	if ( type === 'vector2' ) return vec4( node, 0, 1 );
+	if ( type === 'vector3' || type === 'color3' ) return vec4( node, 1 );
+	if ( type === 'vector4' || type === 'color4' ) return vec4( node );
+	return vec4( node, 0, 0, 1 );
+
+};
 
 const getTextureInputs = ( nodeX, compileContext ) => {
 
 	const file = nodeX.getChildByName( 'file' );
 	const uvNode = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
 	const textureFile = file ? file.getTexture() : null;
-	return { file, uvNode, textureFile };
+	const defaultNode = nodeX.getNodeByName( 'default' ) || getZeroNodeForType( nodeX.type );
+	const addressModes = getTextureAddressModes( nodeX );
+	return { file, uvNode, textureFile, defaultNode, addressModes };
 
 };
 
-const sampleTexture = ( textureFile, uvNode, compileContext, fallback ) =>
-	textureFile ? texture( textureFile, compileContext.mxFromBottomLeftUvSpace( uvNode ) ) : fallback;
+const applyTextureAddressModeDefault = ( node, uvNode, addressModes, defaultNode ) => {
+
+	let outsideBounds = null;
+
+	if ( addressModes.u === 'constant' ) {
+
+		const u = element( uvNode, 0 );
+		outsideBounds = u.lessThan( 0 ).or( u.greaterThan( 1 ) );
+
+	}
+
+	if ( addressModes.v === 'constant' ) {
+
+		const v = element( uvNode, 1 );
+		const vOutsideBounds = v.lessThan( 0 ).or( v.greaterThan( 1 ) );
+		outsideBounds = outsideBounds ? outsideBounds.or( vOutsideBounds ) : vOutsideBounds;
+
+	}
+
+	return outsideBounds ? outsideBounds.select( defaultNode, node ) : node;
+
+};
+
+const sampleTexture = ( textureFile, uvNode, compileContext, fallback, addressModes = null, defaultNode = fallback ) => {
+
+	if ( ! textureFile ) return fallback;
+
+	const textureUvNode = compileContext.mxFromBottomLeftUvSpace( uvNode );
+	const sampled = texture( textureFile, textureUvNode );
+	return addressModes ? applyTextureAddressModeDefault( sampled, textureUvNode, addressModes, defaultNode ) : sampled;
+
+};
 
 const applyTextureColorSpace = ( node, file ) => {
 
@@ -163,25 +229,27 @@ const compileGeomColorNode = ( nodeX ) => {
 
 const compileImageLikeNode = ( nodeX, compileContext ) => {
 
-	const { file, uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
-	const node = sampleTexture( textureFile, uvNode, compileContext, vec4( 0, 0, 0, 1 ) );
+	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX, compileContext );
+	const textureDefault = toTextureDefaultNode( defaultNode, nodeX.type );
+	const node = sampleTexture( textureFile, uvNode, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
 
 };
 
 const compileTiledImageNode = ( nodeX, compileContext ) => {
 
-	const { file, uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX, compileContext );
+	const textureDefault = toTextureDefaultNode( defaultNode, nodeX.type );
 	if ( ! textureFile ) {
 
-		return vec4( 0, 0, 0, 1 );
+		return textureDefault;
 
 	}
 
 	const uvTiling = nodeX.getNodeByName( 'uvtiling' );
 	const uvOffset = nodeX.getNodeByName( 'uvoffset' );
 	const transformedUv = compileContext.mxTransformUv( uvTiling, uvOffset, uvNode );
-	const node = sampleTexture( textureFile, transformedUv, compileContext, vec4( 0, 0, 0, 1 ) );
+	const node = sampleTexture( textureFile, transformedUv, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
 
 };
@@ -269,7 +337,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
-	const { file, uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
 	let transformedUv = uvNode;
 	const place2d = compileContext.nodeLibrary.place2d;
 
@@ -305,11 +373,12 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 	} else {
 
-		fallback = defaultInput || float( 0 );
+		const defaultValue = defaultInput || float( 0 );
+		fallback = vec4( defaultValue, 0, 0, 1 );
 
 	}
 
-	const node = applyTextureColorSpace( sampleTexture( textureFile, transformedUv, compileContext, fallback ), file );
+	const node = applyTextureColorSpace( sampleTexture( textureFile, transformedUv, compileContext, fallback, addressModes, fallback ), file );
 
 	if ( category === 'gltf_normalmap' ) {
 
@@ -338,8 +407,9 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
-	const { file, uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
-	const sampled = sampleTexture( textureFile, uvNode, compileContext, vec4( 0, 0, 0, 1 ) );
+	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
+	const fallback = vec4( 0, 0, 0, 1 );
+	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
 
 	if ( out === 'outa' || out === 'a' ) {
 
@@ -354,9 +424,10 @@ const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
 const compileGltfAnisotropyImageNode = ( nodeX, out, compileContext ) => {
 
-	const { uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
+	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
 	const defaultInput = nodeX.getNodeByName( 'default' ) || vec3( 1, 0.5, 1 );
-	const sampled = sampleTexture( textureFile, uvNode, compileContext, vec4( element( defaultInput, 0 ), element( defaultInput, 1 ), element( defaultInput, 2 ), 1 ) );
+	const fallback = vec4( element( defaultInput, 0 ), element( defaultInput, 1 ), element( defaultInput, 2 ), 1 );
+	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
 	const anisotropyStrengthFactor = nodeX.getNodeByName( 'anisotropy_strength' ) || float( 1 );
 	const anisotropyRotationFactor = nodeX.getNodeByName( 'anisotropy_rotation' ) || float( 0 );
 	const encodedDirection = vec2( sub( mul( element( sampled, 0 ), 2 ), 1 ), sub( mul( element( sampled, 1 ), 2 ), 1 ) );
@@ -376,8 +447,9 @@ const compileGltfAnisotropyImageNode = ( nodeX, out, compileContext ) => {
 
 const compileGltfIridescenceThicknessNode = ( nodeX, compileContext ) => {
 
-	const { uvNode, textureFile } = getTextureInputs( nodeX, compileContext );
-	const sampled = sampleTexture( textureFile, uvNode, compileContext, vec4( 0, 0, 0, 1 ) );
+	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
+	const fallback = vec4( 0, 0, 0, 1 );
+	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
 	const sampledThickness = element( sampled, 0 );
 	const thicknessMin = nodeX.getNodeByName( 'thicknessMin' ) || float( 100 );
 	const thicknessMax = nodeX.getNodeByName( 'thicknessMax' ) || float( 400 );
