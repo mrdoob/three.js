@@ -1,9 +1,10 @@
 import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
 import { select } from '../math/ConditionalNode.js';
 import { add, sub, mul } from '../math/OperatorNode.js';
-import { floor, abs, max, dot, sqrt, clamp, fract, sin, cos, normalize } from '../math/MathNode.js';
+import { floor, abs, max, dot, sqrt, clamp, fract } from '../math/MathNode.js';
 import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
 import { Loop } from '../utils/LoopNode.js';
+import { mx_rotate2d, mx_rotate3d } from './MaterialXCore.js';
 
 
 export const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
@@ -1149,53 +1150,6 @@ export const mx_worley_distance = /*@__PURE__*/ overloadingFn( [ mx_worley_dista
 
 const mx_perlin_noise_float_scaled = ( texcoord, amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord ).mul( amplitude ).add( pivot );
 
-const mx_rotate2d_noise = ( inNode, amount = 0 ) => {
-
-	const rotationRadians = mul( amount, Math.PI / 180.0 );
-	const sa = sin( rotationRadians );
-	const ca = cos( rotationRadians );
-	const x = inNode.x;
-	const y = inNode.y;
-
-	return vec2( add( mul( ca, x ), mul( sa, y ) ), sub( mul( ca, y ), mul( sa, x ) ) );
-
-};
-
-const mx_rotate3d_noise = ( inNode, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
-
-	const normalizedAxis = normalize( axis );
-	const rotationRadians = mul( amount, Math.PI / 180.0 );
-	const s = sin( rotationRadians );
-	const c = cos( rotationRadians );
-	const oc = sub( 1, c );
-
-	const x = inNode.x;
-	const y = inNode.y;
-	const z = inNode.z;
-	const ax = normalizedAxis.x;
-	const ay = normalizedAxis.y;
-	const az = normalizedAxis.z;
-
-	const m00 = add( mul( mul( oc, ax ), ax ), c );
-	const m01 = sub( mul( mul( oc, ax ), ay ), mul( az, s ) );
-	const m02 = add( mul( mul( oc, az ), ax ), mul( ay, s ) );
-
-	const m10 = add( mul( mul( oc, ax ), ay ), mul( az, s ) );
-	const m11 = add( mul( mul( oc, ay ), ay ), c );
-	const m12 = sub( mul( mul( oc, ay ), az ), mul( ax, s ) );
-
-	const m20 = sub( mul( mul( oc, az ), ax ), mul( ay, s ) );
-	const m21 = add( mul( mul( oc, ay ), az ), mul( ax, s ) );
-	const m22 = add( mul( mul( oc, az ), az ), c );
-
-	return vec3(
-		add( add( mul( m00, x ), mul( m10, y ) ), mul( m20, z ) ),
-		add( add( mul( m01, x ), mul( m11, y ) ), mul( m21, z ) ),
-		add( add( mul( m02, x ), mul( m12, y ) ), mul( m22, z ) )
-	);
-
-};
-
 export const mx_worley_noise_float_3d = /*@__PURE__*/ Fn( ( [ positionInput, jitterInput, styleInput ] ) => {
 
 	const position = vec3( positionInput ).toVar();
@@ -1657,7 +1611,7 @@ export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [
 	const applyFreq = mul( texcoord, freq ).toVar();
 	const applyOffset = add( applyFreq, offset ).toVar();
 	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
-	const applyCellJitter = mx_rotate2d_noise( applyOffset, cellJitterMult ).toVar();
+	const applyCellJitter = mx_rotate2d( applyOffset, cellJitterMult ).toVar();
 	const fractalInput = vec3( applyOffset.x, applyOffset.y, cellJitterMult ).toVar();
 	const result = float( 0 ).toVar();
 
@@ -1728,7 +1682,7 @@ export const mx_unifiednoise3d = /*@__PURE__*/ Fn( ( [
 	const applyFreq = mul( position, freq ).toVar();
 	const applyOffset = add( applyFreq, offset ).toVar();
 	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
-	const applyCellJitter = mx_rotate3d_noise( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) ).toVar();
+	const applyCellJitter = mx_rotate3d( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) ).toVar();
 	const perlin = mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 );
 	const cell = mx_cell_noise_float( applyCellJitter );
 	const worley = mx_worley_noise_float_3d( applyOffset, jitter, style );

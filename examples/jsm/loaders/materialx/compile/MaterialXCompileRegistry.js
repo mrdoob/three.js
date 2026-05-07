@@ -1,6 +1,5 @@
 import {
 	element,
-	bool,
 	float,
 	mat3,
 	mat4,
@@ -29,7 +28,12 @@ import {
 	normalize,
 	mx_atan2,
 } from 'three/tsl';
-import { normalizeSpaceName } from '../MaterialXUtils.js';
+import {
+	getComponentCountForType,
+	normalizeSpaceName,
+	toBooleanNode,
+	toVec3Channels,
+} from '../MaterialXUtils.js';
 
 const register = ( registry, categories, handler ) => {
 
@@ -44,20 +48,8 @@ const register = ( registry, categories, handler ) => {
 const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d' ] );
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
-const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
-
-const isBooleanNode = ( node ) => node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) );
-
-const toBooleanNode = ( node ) => {
-
-	if ( typeof node === 'boolean' ) return bool( node );
-	if ( typeof node === 'number' ) return bool( node !== 0 );
-	if ( isBooleanNode( node ) ) return node;
-	return node.notEqual( float( 0 ) );
-
-};
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
 
@@ -98,7 +90,7 @@ const compileConvertNode = ( nodeX ) => {
 		const inputMask = toBooleanMaskNode( input );
 		if ( THREE_COMPONENT_TYPES.has( nodeX.type ) ) {
 
-			const componentCount = nodeX.type === 'vector2' ? 2 : nodeX.type === 'vector3' || nodeX.type === 'color3' ? 3 : 4;
+			const componentCount = getComponentCountForType( nodeX.type );
 			return nodeClass( ...Array( componentCount ).fill( inputMask ) );
 
 		}
@@ -109,7 +101,7 @@ const compileConvertNode = ( nodeX ) => {
 
 	if ( SCALAR_TYPES.has( inputType ) && THREE_COMPONENT_TYPES.has( nodeX.type ) ) {
 
-		const componentCount = nodeX.type === 'vector2' ? 2 : nodeX.type === 'vector3' || nodeX.type === 'color3' ? 3 : 4;
+		const componentCount = getComponentCountForType( nodeX.type );
 		return nodeClass( ...Array( componentCount ).fill( input ) );
 
 	}
@@ -247,9 +239,9 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 	}
 
-	const c0 = vec3( element( sample0, 0 ), element( sample0, 1 ), element( sample0, 2 ) );
-	const c1 = vec3( element( sample1, 0 ), element( sample1, 1 ), element( sample1, 2 ) );
-	const c2 = vec3( element( sample2, 0 ), element( sample2, 1 ), element( sample2, 2 ) );
+	const c0 = toVec3Channels( sample0 );
+	const c1 = toVec3Channels( sample1 );
+	const c2 = toVec3Channels( sample2 );
 	const cw = mix(
 		vec3( 1, 1, 1 ),
 		vec3( dot( c0, lumaCoeffs ), dot( c1, lumaCoeffs ), dot( c2, lumaCoeffs ) ),
@@ -332,7 +324,7 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 		if ( nodeX.type === 'color3' || nodeX.type === 'vector3' ) {
 
-			return mul( factor, vec3( element( node, 0 ), element( node, 1 ), element( node, 2 ) ) );
+			return mul( factor, toVec3Channels( node ) );
 
 		}
 
@@ -356,7 +348,7 @@ const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 	}
 
 	const converted = applyTextureColorSpace( sampled, file );
-	return vec3( element( converted, 0 ), element( converted, 1 ), element( converted, 2 ) );
+	return toVec3Channels( converted );
 
 };
 

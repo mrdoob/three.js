@@ -31,6 +31,7 @@ import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXPar
 import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
 import { mxHextileCoord, mxHextileComputeBlendWeights } from './MaterialXHextile.js';
+import { toBooleanNode } from './MaterialXUtils.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709,
@@ -53,7 +54,6 @@ const NODE_CLASS_BY_TYPE = {
 	matrix33: mat3,
 	matrix44: mat4,
 };
-const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
 const OUTPUT_CHANNELS = {
 	outx: 0,
 	outr: 0,
@@ -325,27 +325,7 @@ class MaterialXNode {
 
 	toBooleanNode( node ) {
 
-		if ( ! node ) return bool( false );
-
-		if ( typeof node === 'boolean' ) {
-
-			return bool( node );
-
-		}
-
-		if ( typeof node === 'number' ) {
-
-			return bool( node !== 0 );
-
-		}
-
-		if ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) ) {
-
-			return node;
-
-		}
-
-		return node.notEqual( float( 0 ) );
+		return toBooleanNode( node );
 
 	}
 
