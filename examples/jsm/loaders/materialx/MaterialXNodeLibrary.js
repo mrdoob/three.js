@@ -91,7 +91,7 @@ import {
 	Fn,
 	Loop,
 } from 'three/tsl';
-import { normalizeSpaceName } from './MaterialXUtils.js';
+import { normalizeSpaceName, toBooleanNode, toVec3Channels } from './MaterialXUtils.js';
 
 const createMXElement = ( name, nodeFunc, params = [], defaults = {}, usesNode = false ) => ( { name, nodeFunc, params, defaults, usesNode } );
 
@@ -119,16 +119,7 @@ const mx_open_pbr_anisotropy = ( roughness = 0, anisotropy = 0 ) => {
 
 };
 
-const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
-const isBooleanNode = ( node ) => node && ( node.nodeType === 'bool' || ( node.isOperatorNode && BOOLEAN_OPERATOR_OPS.has( node.op ) ) );
-const mx_boolean = ( inNode ) => {
-
-	if ( typeof inNode === 'boolean' ) return bool( inNode );
-	if ( typeof inNode === 'number' ) return bool( inNode !== 0 );
-	if ( isBooleanNode( inNode ) ) return inNode;
-	return inNode.notEqual( float( 0 ) );
-
-};
+const mx_boolean = ( inNode ) => toBooleanNode( inNode );
 const mx_and = ( in1, in2 ) => tslAnd( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_or = ( in1, in2 ) => tslOr( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_xor = ( in1, in2 ) => tslXor( mx_boolean( in1 ), mx_boolean( in2 ) );
@@ -153,7 +144,6 @@ const mx_circle = ( texcoord, center, radius ) => {
 const mx_bump = ( height, scale = 1 ) => normalMap( mx_heighttonormal( height, 1 ), scale );
 const mx_dot = ( inNode ) => inNode;
 const mx_viewdirection = () => normalize( mul( positionWorld, float( - 1 ) ) );
-const getRGBChannels = ( input ) => vec3( element( input, 0 ), element( input, 1 ), element( input, 2 ) );
 const mx_blackbody = ( temperature = 5000 ) => {
 
 	const temperatureKelvin = clamp( temperature, float( 800 ), float( 25000 ) );
@@ -198,7 +188,7 @@ const mx_blackbody = ( temperature = 5000 ) => {
 const mx_unpremult = ( input ) => {
 
 	const alpha = element( input, 3 );
-	const rgb = getRGBChannels( input );
+	const rgb = toVec3Channels( input );
 	const unpremultiplied = alpha.equal( 0 ).mix( rgb, div( rgb, alpha ) );
 	return vec4( unpremultiplied, alpha );
 
@@ -216,7 +206,7 @@ const mx_colorcorrect = (
 	exposure = 0,
 ) => {
 
-	const rgbInput = getRGBChannels( input );
+	const rgbInput = toVec3Channels( input );
 	const hsv = mx_rgbtohsv( rgbInput );
 	const hueAdjusted = mx_hsvtorgb( add( hsv, vec3( hue, 0, 0 ) ) );
 	const saturationAdjusted = mx_saturation( hueAdjusted, saturationAmount );

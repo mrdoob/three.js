@@ -8,12 +8,13 @@ import {
 	mx_fractal_noise_float_2d as fractal_noise_float_2d,
 	mx_fractal_noise_float as fractal_noise_float, mx_fractal_noise_vec2 as fractal_noise_vec2, mx_fractal_noise_vec3 as fractal_noise_vec3, mx_fractal_noise_vec4 as fractal_noise_vec4
 } from './MaterialXNoise.js';
+import { mx_rotate2d, mx_rotate3d } from './MaterialXCore.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './MaterialXColor.js';
 import { mx_srgb_texture_to_lin_rec709 } from './MaterialXColorTransform.js';
 
 import {
 	float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
-	floor, abs, max, clamp, step, sin, cos, normalize
+	floor, abs, max, clamp, step
 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
 import { bumpMap } from '../display/BumpMapNode.js';
@@ -107,6 +108,7 @@ export const mx_fractal_noise_vec2 = ( position = uv(), octaves = 3, lacunarity 
 export const mx_fractal_noise_vec3 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec3( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 export const mx_fractal_noise_vec4 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec4( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 
+export { mx_rotate2d, mx_rotate3d };
 export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };
 
 // === Moved from MaterialXLoader.js ===
@@ -165,60 +167,6 @@ export const mx_place2d = (
 	if ( typeof operationorder === 'number' ) return Math.abs( operationorder ) > Number.EPSILON ? trs : srt;
 
 	return mix( srt, trs, step( 0.5, float( operationorder ) ) );
-
-};
-
-export const mx_rotate2d = ( input, amount = 0 ) => {
-
-	input = vec2( input );
-	amount = float( amount );
-
-	const rotationRadians = mul( amount, Math.PI / 180.0 );
-	const sa = sin( rotationRadians );
-	const ca = cos( rotationRadians );
-	const x = input.x;
-	const y = input.y;
-
-	return vec2( add( mul( ca, x ), mul( sa, y ) ), sub( mul( ca, y ), mul( sa, x ) ) );
-
-};
-
-export const mx_rotate3d = ( input, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
-
-	input = vec3( input );
-	amount = float( amount );
-	axis = vec3( axis );
-
-	const normalizedAxis = normalize( axis );
-	const rotationRadians = mul( amount, Math.PI / 180.0 );
-	const s = sin( rotationRadians );
-	const c = cos( rotationRadians );
-	const oc = sub( 1, c );
-
-	const x = input.x;
-	const y = input.y;
-	const z = input.z;
-	const ax = normalizedAxis.x;
-	const ay = normalizedAxis.y;
-	const az = normalizedAxis.z;
-
-	const m00 = add( mul( mul( oc, ax ), ax ), c );
-	const m01 = sub( mul( mul( oc, ax ), ay ), mul( az, s ) );
-	const m02 = add( mul( mul( oc, az ), ax ), mul( ay, s ) );
-
-	const m10 = add( mul( mul( oc, ax ), ay ), mul( az, s ) );
-	const m11 = add( mul( mul( oc, ay ), ay ), c );
-	const m12 = sub( mul( mul( oc, ay ), az ), mul( ax, s ) );
-
-	const m20 = sub( mul( mul( oc, az ), ax ), mul( ay, s ) );
-	const m21 = add( mul( mul( oc, ay ), az ), mul( ax, s ) );
-	const m22 = add( mul( mul( oc, az ), az ), c );
-
-	return vec3(
-		add( add( mul( m00, x ), mul( m10, y ) ), mul( m20, z ) ),
-		add( add( mul( m01, x ), mul( m11, y ) ), mul( m21, z ) ),
-		add( add( mul( m02, x ), mul( m12, y ) ), mul( m22, z ) )
-	);
 
 };
 
