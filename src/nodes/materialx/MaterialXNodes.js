@@ -43,7 +43,7 @@ export const mx_ramp4 = (
 	const v = texcoord.y.clamp();
 	const top = mix( valuetl, valuetr, u );
 	const bottom = mix( valuebl, valuebr, u );
-	return mix( top, bottom, v );
+	return mix( bottom, top, v );
 
 };
 
