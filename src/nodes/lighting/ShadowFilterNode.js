@@ -1,7 +1,7 @@
-import { float, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec4, ivec2, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { mix, fract, step, max, clamp } from '../math/MathNode.js';
+import { mix, floor, step, max, clamp } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
@@ -99,15 +99,19 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
 
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	const texelSize = vec2( 1 ).div( mapSize );
+	// Integer texel index `i` is the source of truth for both the gather footprint
+	// and the bilinear weights `f`, so they always agree by construction.
+	const coordPixel = shadowCoord.xy.mul( mapSize );
+	const i = floor( coordPixel.sub( 0.5 ) ).toVar();
+	const f = coordPixel.sub( 0.5 ).sub( i ).toVar();
 
-	const uv = shadowCoord.xy;
-	const f = fract( uv.mul( mapSize ).add( 0.5 ) );
-	uv.subAssign( f.mul( texelSize ) );
+	// Snap baseUV to the center of texel `i`. Tiny bias guards against FP round-trip
+	// in (i+0.5)/size*size for non-power-of-two map sizes.
+	const baseUV = i.add( vec2( 0.5 + 1.0 / 65536.0 ) ).div( mapSize ).toVar();
 
-	const gatherCompare = ( uvOffset ) => {
+	const gatherCompare = ( ox, oy ) => {
 
-		let t = texture( depthTexture, uv.add( uvOffset ) ).gather();
+		let t = texture( depthTexture, baseUV ).offset( ivec2( ox, oy ) ).gather();
 
 		if ( depthTexture.isArrayTexture ) {
 
@@ -119,23 +123,24 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
 
 	};
 
-	// 4 textureGatherCompare calls covering a 4×4 texel neighborhood.
-	// Each returns vec4: .w=(0,0) .z=(1,0) .x=(0,1) .y=(1,1) relative to base.
-	const bottomLeft = gatherCompare( texelSize.mul( vec2( - 1, - 1 ) ) ).toVar();
-	const bottomRight = gatherCompare( texelSize.mul( vec2( 1, - 1 ) ) ).toVar();
-	const topLeft = gatherCompare( texelSize.mul( vec2( - 1, 1 ) ) ).toVar();
-	const topRight = gatherCompare( texelSize.mul( vec2( 1, 1 ) ) ).toVar();
+	// 4 textureGatherCompare calls at integer offsets from `i`. Footprints are
+	// (i + offset, i + offset + 1) — never on a texel boundary, so neither hardware
+	// fixed-point precision nor the polyfill's FP `floor` can flip the selection.
+	const gBL = gatherCompare( - 1, - 1 ).toVar();
+	const gBR = gatherCompare( 1, - 1 ).toVar();
+	const gTL = gatherCompare( - 1, 1 ).toVar();
+	const gTR = gatherCompare( 1, 1 ).toVar();
 
-	// Bilinear weighting per row: edge columns weighted by (1-f.x)/f.x, edge rows by (1-f.y)/f.y
+	// Bilinear weighting per row of the 4×4 footprint.
 	const rowBot = float( 1 ).sub( f.y ).mul(
-		mix( bottomLeft.w, bottomRight.z, f.x ).add( bottomLeft.z ).add( bottomRight.w )
+		mix( gBL.w, gBR.z, f.x ).add( gBL.z ).add( gBR.w )
 	);
 
-	const row0 = mix( bottomLeft.x, bottomRight.y, f.x ).add( bottomLeft.y ).add( bottomRight.x );
-	const row1 = mix( topLeft.w, topRight.z, f.x ).add( topLeft.z ).add( topRight.w );
+	const row0 = mix( gBL.x, gBR.y, f.x ).add( gBL.y ).add( gBR.x );
+	const row1 = mix( gTL.w, gTR.z, f.x ).add( gTL.z ).add( gTR.w );
 
 	const rowTop = f.y.mul(
-		mix( topLeft.x, topRight.y, f.x ).add( topLeft.y ).add( topRight.x )
+		mix( gTL.x, gTR.y, f.x ).add( gTL.y ).add( gTR.x )
 	);
 
 	return add( rowBot, row0, row1, rowTop ).mul( 1 / 9 );

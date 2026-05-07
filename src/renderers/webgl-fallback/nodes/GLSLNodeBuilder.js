@@ -17,6 +17,7 @@ vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset,
 	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ) );
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	if ( flipY ) st.y -= 1.0; // compensate for gather's +1 footprint extension under Y flip
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
 		textureLod( map, ij.xw, 0.0 )[ comp ],
@@ -32,6 +33,7 @@ vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, iv
 	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ).xy );
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	if ( flipY ) st.y -= 1.0;
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
 		textureLod( map, vec3( ij.xw, coord.z ), 0.0 )[ comp ],
@@ -47,6 +49,7 @@ vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, fl
 	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ) );
 	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	if ( flipY ) st.y -= 1.0;
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
 		textureLod( map, vec3( ij.xw, ref ), 0.0 ),
@@ -62,6 +65,7 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 	if ( flipY ) offset.y = - offset.y;
 	vec2 size = vec2( textureSize( map, 0 ).xy );
 	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	if ( flipY ) st.y -= 1.0;
 	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
 	vec4 ret = vec4(
 		texture( map, vec4( ij.xw, coord.z, ref ) ),
