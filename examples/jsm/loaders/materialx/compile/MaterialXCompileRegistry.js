@@ -1,6 +1,7 @@
 import {
 	element,
 	float,
+	int,
 	mat3,
 	mat4,
 	mul,
