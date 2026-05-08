@@ -62,7 +62,7 @@ function normalizeBlendWeights( weights ) {
 	const wx = element( weights, 0 );
 	const wy = element( weights, 1 );
 	const wz = element( weights, 2 );
-	const sum = max( add( add( wx, wy ), wz ), HEXTILE_EPSILON );
+	const sum = add( add( wx, wy ), wz );
 	return div( weights, sum );
 
 }
@@ -84,7 +84,7 @@ function toTileCenter( tileId ) {
 
 export function mxHextileComputeBlendWeights( luminanceWeights, tileWeights, falloff ) {
 
-	const weighted = mul( luminanceWeights, pow( max( tileWeights, vec3( HEXTILE_EPSILON, HEXTILE_EPSILON, HEXTILE_EPSILON ) ), vec3( 7, 7, 7 ) ) );
+	const weighted = mul( luminanceWeights, pow( tileWeights, vec3( 7, 7, 7 ) ) );
 	const normalized = normalizeBlendWeights( weighted );
 	const gained = vec3(
 		mxSchlickGain( element( normalized, 0 ), falloff ),

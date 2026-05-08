@@ -309,7 +309,19 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const offsetRange = nodeX.getNodeByName( 'offsetrange' ) || vec2( 0, 1 );
 	const falloff = nodeX.getNodeByName( 'falloff' ) || float( 0.5 );
 	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' ) || float( 0.5 );
-	const lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' ) || vec3( 0.2722287, 0.6740818, 0.0536895 );
+	let lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' ) || vec3( 0.2722287, 0.6740818, 0.0536895 );
+	const lumaCoeffsInput = nodeX.getChildByName( 'lumacoeffs' );
+	if ( lumaCoeffsInput && lumaCoeffsInput.isConst ) {
+
+		const lumaCoeffValues = lumaCoeffsInput.getVector();
+		if ( lumaCoeffValues.length === 3 ) {
+
+			// Treat luminance coefficients as raw numeric values, not display colors.
+			lumaCoeffs = vec3( lumaCoeffValues[ 0 ], lumaCoeffValues[ 1 ], lumaCoeffValues[ 2 ] );
+
+		}
+
+	}
 	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
@@ -341,10 +353,11 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const c0 = toVec3Channels( sample0 );
 	const c1 = toVec3Channels( sample1 );
 	const c2 = toVec3Channels( sample2 );
+	const falloffContrastWeight = mul( falloffContrast, 0.5 );
 	const cw = mix(
 		vec3( 1, 1, 1 ),
 		vec3( dot( c0, lumaCoeffs ), dot( c1, lumaCoeffs ), dot( c2, lumaCoeffs ) ),
-		vec3( falloffContrast, falloffContrast, falloffContrast ),
+		vec3( falloffContrastWeight, falloffContrastWeight, falloffContrastWeight ),
 	);
 	const blendWeights = compileContext.mxHextileComputeBlendWeights( cw, tileData.weights, falloff );
 	const alphaWeights = compileContext.mxHextileComputeBlendWeights( vec3( 1, 1, 1 ), tileData.weights, falloff );
