@@ -148,7 +148,7 @@ export function getTypedArrayFromType( type ) {
  */
 export function getLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -170,7 +170,7 @@ export function getLengthFromType( type ) {
  */
 export function getMemoryLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -192,7 +192,7 @@ export function getMemoryLengthFromType( type ) {
  */
 export function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 4;
 	if ( /vec4/.test( type ) ) return 4;
