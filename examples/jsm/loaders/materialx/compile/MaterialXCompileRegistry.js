@@ -25,8 +25,10 @@ import {
 	mix,
 	dot,
 	div,
+	max,
 	normalize,
 	mx_atan2,
+	sqrt,
 } from 'three/tsl';
 import {
 	getComponentCountForType,
@@ -183,6 +185,35 @@ const compileConvertNode = ( nodeX ) => {
 };
 
 const compileConstantNode = ( nodeX ) => nodeX.getNodeByName( 'value' );
+
+const compileArtisticIorNode = ( nodeX, out ) => {
+
+	const reflectivity = clamp(
+		nodeX.getNodeByName( 'reflectivity' ) || vec3( 0.944, 0.776, 0.373 ),
+		vec3( 0, 0, 0 ),
+		vec3( 0.99, 0.99, 0.99 ),
+	);
+	const edgeColor = nodeX.getNodeByName( 'edge_color' ) || vec3( 0.998, 0.981, 0.751 );
+	const one = vec3( 1, 1, 1 );
+	const nMin = div( sub( one, reflectivity ), add( one, reflectivity ) );
+	const nMax = div( add( one, sqrt( reflectivity ) ), sub( one, sqrt( reflectivity ) ) );
+	const ior = mix( nMax, nMin, edgeColor );
+	const iorPlusOne = add( ior, one );
+	const iorMinusOne = sub( ior, one );
+	const k2 = max(
+		div(
+			sub(
+				mul( mul( iorPlusOne, iorPlusOne ), reflectivity ),
+				mul( iorMinusOne, iorMinusOne ),
+			),
+			sub( one, reflectivity ),
+		),
+		vec3( 0, 0, 0 ),
+	);
+	const extinction = sqrt( k2 );
+	return out === 'extinction' ? extinction : ior;
+
+};
 
 const compileBooleanConditionalNode = ( nodeX ) => {
 
@@ -662,6 +693,7 @@ function createMaterialXCompileRegistry() {
 	const registry = new Map();
 	register( registry, [ 'convert' ], ( nodeX ) => compileConvertNode( nodeX ) );
 	register( registry, [ 'constant' ], ( nodeX ) => compileConstantNode( nodeX ) );
+	register( registry, [ 'artistic_ior' ], ( nodeX, out ) => compileArtisticIorNode( nodeX, out ) );
 	register( registry, [ 'position' ], ( nodeX ) => compileSpaceInputNode( nodeX, positionLocal, positionWorld ) );
 	register( registry, [ 'normal' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, normalLocal, normalWorld ) );
 	register( registry, [ 'tangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, tangentLocal, tangentWorld ) );
