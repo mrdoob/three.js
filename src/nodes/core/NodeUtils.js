@@ -161,12 +161,12 @@ export function getLengthFromType( type ) {
 }
 
 /**
- * Returns the gpu memory length for the given data type.
+ * Returns the gpu memory length for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The length.
+ * @return {number} The memory length in 4-byte elements.
  */
 export function getMemoryLengthFromType( type ) {
 
@@ -183,22 +183,22 @@ export function getMemoryLengthFromType( type ) {
 }
 
 /**
- * Returns the alignment requirement for the given data type.
+ * Returns the alignment requirement for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The alignment requirement in bytes.
+ * @return {number} The alignment requirement in 4-byte elements.
  */
 export function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 4;
-	if ( /vec2/.test( type ) ) return 8;
-	if ( /vec3/.test( type ) ) return 16;
-	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 8;
-	if ( /mat3/.test( type ) ) return 16;
-	if ( /mat4/.test( type ) ) return 16;
+	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 4;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 2;
+	if ( /mat3/.test( type ) ) return 4;
+	if ( /mat4/.test( type ) ) return 4;
 
 	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
