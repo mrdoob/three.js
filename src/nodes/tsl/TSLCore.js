@@ -985,6 +985,26 @@ export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = nu
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
 export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
 
+export const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
+
+	return new Proxy( constructorFunction, {
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( nodeInstance, prop, receiver );
+
+		},
+
+		set( target, prop, value ) {
+
+			return Reflect.set( nodeInstance, prop, value );
+
+		}
+
+	} );
+
+};
+
 let fnId = 0;
 
 class FnNode extends Node {
