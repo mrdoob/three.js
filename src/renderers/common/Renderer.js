@@ -2619,6 +2619,7 @@ class Renderer {
 	 */
 	_resetXRState() {
 
+		this.backend.setXRTarget( null );
 		this.setOutputRenderTarget( null );
 		this.setRenderTarget( null );
 
@@ -2627,74 +2628,6 @@ class Renderer {
 			canvasTarget.dispose();
 
 		}
-
-	}
-
-	/**
-	 * Swaps the current backend with a new one, saving the current state
-	 * for later restoration. Used by XRManager to switch from WebGPU to
-	 * WebGL when the XR session doesn't support WebGPU.
-	 *
-	 * @private
-	 * @param {Backend} newBackend - The new backend to use.
-	 * @return {Object} The saved state for restoration via _restoreBackend().
-	 */
-	_swapBackend( newBackend ) {
-
-		const savedState = {
-			backend: this.backend,
-			nodes: this._nodes,
-			attributes: this._attributes,
-			background: this._background,
-			geometries: this._geometries,
-			textures: this._textures,
-			pipelines: this._pipelines,
-			bindings: this._bindings,
-			objects: this._objects,
-			bundles: this._bundles,
-			renderContexts: this._renderContexts,
-		};
-
-		this.backend = newBackend;
-
-		this._nodes = new NodeManager( this, newBackend );
-		this._attributes = new Attributes( newBackend, this.info );
-		this._background = new Background( this, this._nodes );
-		this._geometries = new Geometries( this._attributes, this.info );
-		this._textures = new Textures( this, newBackend, this.info );
-		this._pipelines = new Pipelines( newBackend, this._nodes, this.info );
-		this._bindings = new Bindings( newBackend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
-		this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
-		this._bundles = new RenderBundles();
-		this._renderContexts = new RenderContexts( this );
-
-		this._animation.nodes = this._nodes;
-
-		return savedState;
-
-	}
-
-	/**
-	 * Restores the backend and subsystems from a previously saved state.
-	 *
-	 * @private
-	 * @param {Object} savedState - The state returned by _swapBackend().
-	 */
-	_restoreBackend( savedState ) {
-
-		this.backend = savedState.backend;
-		this._nodes = savedState.nodes;
-		this._attributes = savedState.attributes;
-		this._background = savedState.background;
-		this._geometries = savedState.geometries;
-		this._textures = savedState.textures;
-		this._pipelines = savedState.pipelines;
-		this._bindings = savedState.bindings;
-		this._objects = savedState.objects;
-		this._bundles = savedState.bundles;
-		this._renderContexts = savedState.renderContexts;
-
-		this._animation.nodes = this._nodes;
 
 	}
 

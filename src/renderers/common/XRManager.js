@@ -16,7 +16,6 @@ import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { warn } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
-import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -342,24 +341,6 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._glBinding = null;
-
-		/**
-		 * A reference to the current renderer backend (WebGL/WebGPU).
-		 *
-		 * @private
-		 * @type {?Object}
-		 * @default null
-		 */
-		this._backend = null;
-
-		/**
-		 * Saved backend state when switching from WebGPU to WebGL for XR.
-		 *
-		 * @private
-		 * @type {?Object}
-		 * @default null
-		 */
-		this._savedBackendState = null;
 
 		/**
 		 * A reference to the current XR projection layer.
@@ -933,70 +914,6 @@ class XRManager extends EventDispatcher {
 	}
 
 	/**
-	 * Activates the backend used for the current XR session.
-	 *
-	 * WebGPURenderer falls back to a temporary WebGL backend for WebXR on this branch.
-	 *
-	 * @private
-	 */
-	_activateSessionBackend() {
-
-		const renderer = this._renderer;
-
-		this._backend = renderer.backend;
-		this._gl = renderer.getContext();
-
-		if ( this._backend.isWebGPUBackend !== true ) return;
-
-		const xrCanvas = document.createElement( 'canvas' );
-		const glContext = xrCanvas.getContext( 'webgl2', { xrCompatible: true } );
-
-		const webglBackend = new WebGLBackend( { context: glContext } );
-		webglBackend.init( renderer );
-
-		this._savedBackendState = renderer._swapBackend( webglBackend );
-		this._backend = webglBackend;
-		this._gl = glContext;
-
-	}
-
-	/**
-	 * Restores the renderer backend after an XR session ends.
-	 *
-	 * @private
-	 */
-	_restoreSessionBackend() {
-
-		const renderer = this._renderer;
-
-		if ( this._savedBackendState !== null ) {
-
-			renderer._restoreBackend( this._savedBackendState );
-			this._savedBackendState = null;
-
-		}
-
-		this._backend = renderer.backend;
-		this._gl = renderer.getContext();
-
-	}
-
-	/**
-	 * Clears the XR target on the active session backend before XR teardown.
-	 *
-	 * @private
-	 */
-	_resetSessionBackendXRTarget() {
-
-		if ( this._backend !== null && this._backend.isWebGLBackend === true ) {
-
-			this._backend.setXRTarget( null );
-
-		}
-
-	}
-
-	/**
 	 * After a XR session has been requested usually with one of the `*Button` modules, it
 	 * is injected into the renderer with this method. This method triggers the start of
 	 * the actual XR rendering.
@@ -1008,10 +925,21 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
+		const backend = renderer.backend;
+
+		if ( session !== null && backend.isWebGPUBackend === true ) {
+
+			throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+
+		}
 
 		this._session = session;
 
 		if ( session !== null ) {
+
+			this._gl = renderer.getContext();
+			const gl = this._gl;
+			const attributes = gl.getContextAttributes();
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
@@ -1022,6 +950,8 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
+			await backend.makeXRCompatible();
+
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
 
@@ -1031,10 +961,6 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			this._activateSessionBackend();
-
-			const gl = this._gl;
-
 			if ( this._supportsLayers === true ) {
 
 				// default path using XRProjectionLayer
@@ -1042,9 +968,6 @@ class XRManager extends EventDispatcher {
 				let depthFormat = null;
 				let depthType = null;
 				let glDepthFormat = null;
-				const attributes = gl.getContextAttributes();
-
-				await this._backend.makeXRCompatible();
 
 				if ( renderer.depth ) {
 
@@ -1128,8 +1051,6 @@ class XRManager extends EventDispatcher {
 			} else {
 
 				// fallback to XRWebGLLayer
-
-				await this._backend.makeXRCompatible();
 
 				const layerInit = {
 					antialias: renderer.currentSamples > 0,
@@ -1468,7 +1389,6 @@ function onSessionEnd() {
 
 	// restore framebuffer/rendering state
 
-	this._resetSessionBackendXRTarget();
 	renderer._resetXRState();
 
 	this._session = null;
@@ -1522,7 +1442,6 @@ function onSessionEnd() {
 
 	this.isPresenting = false;
 	this._useMultiview = false;
-	this._restoreSessionBackend();
 
 	renderer._animation.stop();
 	renderer._animation.setAnimationLoop( this._currentAnimationLoop );

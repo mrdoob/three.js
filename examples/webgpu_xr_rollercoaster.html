@@ -29,20 +29,54 @@
 				SkyGeometry
 			} from 'three/addons/misc/RollerCoaster.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { setupWebGLXRFallback } from 'three/addons/webxr/WebGLXRFallback.js';
 
 			let mesh, material, geometry;
+			let renderer;
 
-			const renderer = new THREE.WebGPURenderer( { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: false } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
-			renderer.xr.enabled = true;
-			renderer.xr.setReferenceSpaceType( 'local' );
-			document.body.appendChild( renderer.domElement );
+			const rendererParameters = { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: false };
+
+			renderer = createRenderer();
+			setRenderer( renderer );
+			setupWebGLXRFallback( renderer, () => createRenderer( true ), setRenderer );
 
 			document.body.appendChild( VRButton.createButton( renderer ) );
 
 			//
+
+			function createRenderer( forceWebGL = false ) {
+
+				const parameters = { ...rendererParameters };
+
+				if ( forceWebGL === true ) parameters.forceWebGL = true;
+
+				const renderer = new THREE.WebGPURenderer( parameters );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+
+				return renderer;
+
+			}
+
+			function setRenderer( newRenderer, oldRenderer = null ) {
+
+				if ( oldRenderer === null ) {
+
+					document.body.appendChild( newRenderer.domElement );
+
+				} else {
+
+					document.body.replaceChild( newRenderer.domElement, oldRenderer.domElement );
+					oldRenderer.dispose();
+
+				}
+
+				renderer = newRenderer;
+
+			}
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xf0f0ff );
@@ -250,7 +284,7 @@
 
 				let headingChange = Math.atan2( tangent2.x, tangent2.z ) - Math.atan2( tangent1.x, tangent1.z );
 				if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
-				if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+				if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
 				train.up.set( 0, 1, 0 );
 				bankQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );
