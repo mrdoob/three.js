@@ -70,6 +70,7 @@ import {
 	mx_atan2,
 	positionLocal,
 	positionWorld,
+	cameraPosition,
 	mx_heighttonormal,
 	float,
 	int,
@@ -143,7 +144,20 @@ const mx_circle = ( texcoord, center, radius ) => {
 
 const mx_bump = ( height, scale = 1 ) => normalMap( mx_heighttonormal( height, 1 ), scale );
 const mx_dot = ( inNode ) => inNode;
-const mx_viewdirection = () => normalize( mul( positionWorld, float( - 1 ) ) );
+const mx_viewdirection = ( space = 'world' ) => {
+
+	const outputSpace = normalizeSpaceName( space, 'world' );
+	const worldDirection = normalize( sub( positionWorld, cameraPosition ) );
+
+	if ( outputSpace === 'world' ) {
+
+		return worldDirection;
+
+	}
+
+	return mx_transformnormal( worldDirection, 'world', outputSpace );
+
+};
 const mx_blackbody = ( temperature = 5000 ) => {
 
 	const temperatureKelvin = clamp( temperature, float( 800 ), float( 25000 ) );
@@ -570,7 +584,7 @@ const MXElements = [
 	createMXElement( 'length', length, [ 'in' ], { in: defaultFloat( 0 ) } ),
 	createMXElement( 'dot', mx_dot, [ 'in' ], { in: defaultFloat( 0 ) } ),
 	createMXElement( 'dotproduct', dot, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
-	createMXElement( 'viewdirection', mx_viewdirection ),
+	createMXElement( 'viewdirection', mx_viewdirection, [ 'space' ], { space: () => 'world' } ),
 	createMXElement( 'crossproduct', cross, [ 'in1', 'in2' ], { in1: defaultVec3( 0, 0, 0 ), in2: defaultVec3( 0, 0, 0 ) } ),
 	createMXElement( 'distance', distance, [ 'in1', 'in2' ], { in1: defaultFloat( 0 ), in2: defaultFloat( 0 ) } ),
 	createMXElement( 'invert', mx_invert, [ 'in', 'amount' ], { in: defaultFloat( 0 ), amount: defaultFloat( 1 ) } ),
