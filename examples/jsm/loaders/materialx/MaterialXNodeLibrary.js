@@ -310,7 +310,7 @@ const mx_transformpoint = ( inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospa
 
 	const point4 = vec4( inPoint, 1 );
 	const matrix = from === 'object' && to === 'world' ? modelWorldMatrix : modelWorldMatrixInverse;
-	const transformed4 = mul( point4, matrix );
+	const transformed4 = mul( matrix, point4 );
 	return vec3( element( transformed4, 0 ), element( transformed4, 1 ), element( transformed4, 2 ) );
 
 };
