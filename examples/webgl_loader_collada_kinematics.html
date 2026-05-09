@@ -4,6 +4,10 @@
 		<title>three.js webgl - collada - kinematics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - collada - kinematics">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_collada_kinematics.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_collada_kinematics.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -44,24 +48,12 @@
 
 				dae = collada.scene;
 
-				dae.traverse( function ( child ) {
-
-					if ( child.isMesh ) {
-
-						// model does not have normals
-						child.material.flatShading = true;
-
-					}
-
-				} );
-
 				dae.scale.x = dae.scale.y = dae.scale.z = 10.0;
 				dae.updateMatrix();
 
 				kinematics = collada.kinematics;
 
 				init();
-				animate();
 
 			} );
 
@@ -92,6 +84,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -172,11 +165,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
+				TWEEN.update();
 				render();
 				stats.update();
-				TWEEN.update();
 
 			}
 

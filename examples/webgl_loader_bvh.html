@@ -4,6 +4,10 @@
 	  <title>three.js webgl - loaders - BVHLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - BVHLoader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_bvh.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_bvh.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -37,13 +41,13 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let camera, controls, scene, renderer;
 			let mixer;
 
 			init();
-			animate();
 
 			const loader = new BVHLoader();
 			loader.load( 'models/bvh/pirouette.bvh', function ( result ) {
@@ -73,6 +77,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -94,9 +99,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

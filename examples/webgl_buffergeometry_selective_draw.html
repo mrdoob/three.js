@@ -4,6 +4,10 @@
 	<title>three.js webgl - buffergeometry - selective - draw</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - buffergeometry - selective - draw">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_buffergeometry_selective_draw.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_buffergeometry_selective_draw.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 
 	<script type="x-shader/x-vertex" id="vertexshader">
@@ -68,14 +72,9 @@
 			let numLinesCulled = 0;
 
 			init();
-			animate();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
@@ -94,6 +93,12 @@
 
 				const showAllLinesButton = document.getElementById( 'showAllLines' );
 				showAllLinesButton.addEventListener( 'click', showAllLines );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
 
 			}
 
@@ -219,15 +224,14 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;
 
-				stats.update();
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

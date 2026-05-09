@@ -1,35 +1,45 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Sandbox</title>
+		<title>three.js webgpu - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - sandbox">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_sandbox.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_sandbox.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WebGPU sandbox</span>
+			</div>
+
+			<small>A sandbox for testing basic scene setups.</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { timerLocal, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute, MeshBasicNodeMaterial, PointsNodeMaterial, LineBasicNodeMaterial } from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { time, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute } from 'three/tsl';
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -39,14 +49,6 @@
 
 			async function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 4;
 
@@ -55,11 +57,14 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				// textures
 
@@ -75,17 +80,18 @@
 
 				const ktxLoader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
-					.detectSupportAsync( renderer );
+					.detectSupport( renderer );
 
-				const ktxTexture = await ktxLoader.loadAsync( './textures/compressed/sample_uastc_zstd.ktx2' );
+				const ktxTexture = await ktxLoader.loadAsync( './textures/ktx2/2d_uastc.ktx2' );
 
 				// box mesh
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new MeshBasicNodeMaterial();
+				const materialBox = new THREE.MeshBasicNodeMaterial();
 
 				// birection speed
-				const timerScaleNode = timerLocal().mul( vec2( - 0.5, 0.1 ) );
+
+				const timerScaleNode = time.mul( vec2( - 0.5, 0.1 ) );
 				const animateUV = uv().add( timerScaleNode );
 
 				const textureNode = texture( uvTexture, animateUV );
@@ -103,7 +109,7 @@
 				// displace example
 
 				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
-				const materialSphere = new MeshBasicNodeMaterial();
+				const materialSphere = new THREE.MeshBasicNodeMaterial();
 
 				const displaceY = texture( textureDisplace ).x.mul( 0.25 );
 
@@ -119,7 +125,7 @@
 				// data texture
 
 				const geometryPlane = new THREE.PlaneGeometry();
-				const materialPlane = new MeshBasicNodeMaterial();
+				const materialPlane = new THREE.MeshBasicNodeMaterial();
 				materialPlane.colorNode = texture( createDataTexture() ).add( color( 0x0000FF ) );
 				materialPlane.transparent = true;
 
@@ -129,7 +135,7 @@
 
 				// compressed texture
 
-				const materialCompressed = new MeshBasicNodeMaterial();
+				const materialCompressed = new THREE.MeshBasicNodeMaterial();
 				materialCompressed.colorNode = texture( ktxTexture );
 				materialCompressed.emissiveNode = oscSine().mix( color( 0x663300 ), color( 0x0000FF ) );
 				materialCompressed.alphaTestNode = oscSine();
@@ -152,7 +158,7 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new PointsNodeMaterial();
+				const materialPoints = new THREE.PointsNodeMaterial();
 
 				materialPoints.colorNode = positionLocal.mul( 3 );
 
@@ -172,7 +178,7 @@
 
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
 
-				const materialLine = new LineBasicNodeMaterial();
+				const materialLine = new THREE.LineBasicNodeMaterial();
 				materialLine.colorNode = attribute( 'color' );
 
 				const line = new THREE.Line( geometryLine, materialLine );
@@ -236,7 +242,9 @@
 
 			}
 
-			/** Correct UVs to be compatible with `flipY=false` textures. */
+			/*
+			 * Correct UVs to be compatible with `flipY=false` textures.
+			 */
 			function flipY( geometry ) {
 
 				const uv = geometry.attributes.uv;

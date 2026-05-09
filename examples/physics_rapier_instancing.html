@@ -4,12 +4,17 @@
 		<title>three.js physics - rapier3d instancing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js physics - rapier3d instancing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_rapier_instancing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_rapier_instancing.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - rapier3d instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing<br />
+			<button id="shake" style="margin-top: 25px;">SHAKE</button>
 		</div>
 
 		<script type="importmap">
@@ -58,14 +63,24 @@
 				dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
 
-				const floor = new THREE.Mesh(
-					new THREE.BoxGeometry( 10, 5, 10 ),
-					new THREE.ShadowMaterial( { color: 0x444444 } )
+				const shadowPlane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 10, 10 ),
+					new THREE.ShadowMaterial( {
+						color: 0x444444
+					} ),
 				);
-				floor.position.y = - 2.5;
-				floor.receiveShadow = true;
-				floor.userData.physics = { mass: 0 };
-				scene.add( floor );
+				shadowPlane.rotation.x = - Math.PI / 2;
+				shadowPlane.receiveShadow = true;
+				scene.add( shadowPlane );
+
+				const floorCollider = new THREE.Mesh(
+					new THREE.BoxGeometry( 10, 5, 10 ),
+					new THREE.MeshBasicMaterial( { color: 0x666666 } )
+				);
+				floorCollider.position.y = - 2.5;
+				floorCollider.userData.physics = { mass: 0 };
+				floorCollider.visible = false;
+				scene.add( floorCollider );
 
 				//
 
@@ -117,6 +132,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -129,7 +145,27 @@
 				controls.target.y = 0.5;
 				controls.update();
 
-				animate();
+				document.querySelector( 'button#shake' ).addEventListener( 'click', () => {
+
+					const impulse = new THREE.Vector3();
+
+					for ( let i = 0; i < spheres.count; i ++ ) {
+
+						impulse.set( ( Math.random() - 0.5 ) * 5, Math.random() * 5, ( Math.random() - 0.5 ) * 5 );
+
+						physics.applyImpulse( spheres, impulse, i );
+
+					}
+
+					for ( let i = 0; i < boxes.count; i ++ ) {
+
+						impulse.set( ( Math.random() - 0.5 ) * 5, Math.random() * 5, ( Math.random() - 0.5 ) * 5 );
+
+						physics.applyImpulse( boxes, impulse, i );
+
+					}
+
+				} );
 
 				setInterval( () => {
 
@@ -147,11 +183,21 @@
 
 				}, 1000 / 60 );
 
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

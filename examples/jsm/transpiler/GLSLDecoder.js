@@ -1,31 +1,52 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment, StructMember, StructDefinition } from './AST.js';
+
+import { isBuiltinType } from './TranspilerUtils.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
 ];
 
+const arithmeticOperators = [
+	'*', '/', '%', '+', '-', '<<', '>>'
+];
+
 const precedenceOperators = [
-	'*', '/', '%',
-	'-', '+',
-	'<<', '>>',
-	'<', '>', '<=', '>=',
-	'==', '!=',
-	'&',
-	'^',
-	'|',
-	'&&',
-	'^^',
-	'||',
-	'?',
+	[ ',' ],
+	[ '=', '+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=' ],
+	[ '?' ],
+	[ '||' ],
+	[ '^^' ],
+	[ '&&' ],
+	[ '|' ],
+	[ '^' ],
+	[ '&' ],
+	[ '==', '!=' ],
+	[ '<', '>', '<=', '>=' ],
+	[ '<<', '>>' ],
+	[ '+', '-' ],
+	[ '*', '/', '%' ]
+];
+
+const associativityRightToLeft = [
 	'=',
 	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
-	','
-].reverse();
+	',',
+	'?',
+	':'
+];
+
+const glslToTSL = {
+	inversesqrt: 'inverseSqrt'
+};
+
+const samplers = [ 'sampler1D', 'sampler2D', 'sampler2DArray', 'sampler2DShadow', 'sampler2DArrayShadow', 'isampler2D', 'isampler2DArray', 'usampler2D', 'usampler2DArray' ];
+const samplersCube = [ 'samplerCube', 'samplerCubeShadow', 'usamplerCube', 'isamplerCube' ];
+const samplers3D = [ 'sampler3D', 'isampler3D', 'usampler3D' ];
 
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
-const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
+const inlineCommentRegExp = /^\/\/.*?(?=\n|$)/;
 
 const numberRegExp = /^((0x\w+)|(\.?\d+\.?\d*((e-?\d+)|\w)?))/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
@@ -37,6 +58,12 @@ const operatorsRegExp = new RegExp( '^(\\' + [
 	'(', ')', '[', ']', '{', '}',
 	'.', ',', ';', '!', '=', '~', '*', '/', '%', '+', '-', '<', '>', '&', '^', '|', '?', ':', '#'
 ].join( '$' ).split( '' ).join( '\\' ).replace( /\\\$/g, '|' ) + ')' );
+
+function getFunctionName( str ) {
+
+	return glslToTSL[ str ] || str;
+
+}
 
 function getGroupDelta( str ) {
 
@@ -58,7 +85,9 @@ class Token {
 		this.str = str;
 		this.pos = pos;
 
-		this.tag = null;
+		this.isTag = false;
+
+		this.tags = null;
 
 	}
 
@@ -141,7 +170,7 @@ class Tokenizer {
 
 	skip( ...params ) {
 
-		let remainingCode = this.source.substr( this.position );
+		let remainingCode = this.source.slice( this.position );
 		let i = params.length;
 
 		while ( i -- ) {
@@ -153,7 +182,7 @@ class Tokenizer {
 
 				this.position += skipLength;
 
-				remainingCode = this.source.substr( this.position );
+				remainingCode = this.source.slice( this.position );
 
 				// re-skip, new remainingCode is generated
 				// maybe exist previous regexp non detected
@@ -167,7 +196,7 @@ class Tokenizer {
 
 	}
 
-	readToken() {
+	nextToken() {
 
 		const remainingCode = this.skip( spaceRegExp );
 
@@ -179,22 +208,9 @@ class Tokenizer {
 			if ( result ) {
 
 				const token = new Token( this, parser.type, result[ parser.group || 0 ], this.position );
+				token.isTag = parser.isTag;
 
 				this.position += result[ 0 ].length;
-
-				if ( parser.isTag ) {
-
-					const nextToken = this.readToken();
-
-					if ( nextToken ) {
-
-						nextToken.tag = token;
-
-					}
-
-					return nextToken;
-
-				}
 
 				return token;
 
@@ -204,9 +220,33 @@ class Tokenizer {
 
 	}
 
-}
+	readToken() {
 
-const isType = ( str ) => /void|bool|float|u?int|(u|i)?vec[234]/.test( str );
+		let token = this.nextToken();
+
+		if ( token && token.isTag ) {
+
+			const tags = [];
+
+			while ( token.isTag ) {
+
+				tags.push( token );
+
+				token = this.nextToken();
+
+				if ( ! token ) return;
+
+			}
+
+			token.tags = tags;
+
+		}
+
+		return token;
+
+	}
+
+}
 
 class GLSLDecoder {
 
@@ -215,10 +255,9 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = null;
 		this.keywords = [];
+		this.structTypes = new Map();
 
-		this._currentFunction = null;
-
-		this.addPolyfill( 'gl_FragCoord', 'vec2 gl_FragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
+		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
 	}
 
@@ -295,17 +334,26 @@ class GLSLDecoder {
 
 		let groupIndex = 0;
 
-		for ( const operator of precedenceOperators ) {
+		for ( const operators of precedenceOperators ) {
 
-			for ( let i = 0; i < tokens.length; i ++ ) {
+			const parseToken = ( i, inverse = false ) => {
 
 				const token = tokens[ i ];
 
 				groupIndex += getGroupDelta( token.str );
 
-				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) continue;
+				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) return;
 
-				if ( groupIndex === 0 && token.str === operator ) {
+				// important for negate operator after arithmetic operator: a * -1, a * -( b )
+				if ( inverse && arithmeticOperators.includes( tokens[ i - 1 ].str ) ) {
+
+					return;
+
+				}
+
+				if ( groupIndex === 0 && operators.includes( token.str ) ) {
+
+					const operator = token.str;
 
 					if ( operator === '?' ) {
 
@@ -324,15 +372,51 @@ class GLSLDecoder {
 						const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
 						const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
 
-						return this._evalOperator( new Operator( operator, left, right ) );
+						return new Operator( operator, left, right );
 
 					}
 
 				}
 
-				if ( groupIndex < 0 ) {
+				if ( inverse ) {
 
-					return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+					if ( groupIndex > 0 ) {
+
+						return this.parseExpressionFromTokens( tokens.slice( i ) );
+
+					}
+
+				} else {
+
+					if ( groupIndex < 0 ) {
+
+						return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+
+					}
+
+				}
+
+			};
+
+			const isRightAssociative = operators.some( op => associativityRightToLeft.includes( op ) );
+
+			if ( isRightAssociative ) {
+
+				for ( let i = 0; i < tokens.length; i ++ ) {
+
+					const result = parseToken( i );
+
+					if ( result ) return result;
+
+				}
+
+			} else {
+
+				for ( let i = tokens.length - 1; i >= 0; i -- ) {
+
+					const result = parseToken( i, true );
+
+					if ( result ) return result;
 
 				}
 
@@ -357,7 +441,6 @@ class GLSLDecoder {
 			}
 
 		}
-
 
 		// unary operators (after)
 
@@ -392,7 +475,7 @@ class GLSLDecoder {
 				const rightTokens = tokens.slice( leftTokens.length + 1 );
 				const right = this.parseExpressionFromTokens( rightTokens );
 
-				return this._evalOperator( new Operator( operator.str, left, right ) );
+				return new Operator( operator.str, left, right );
 
 			}
 
@@ -409,11 +492,11 @@ class GLSLDecoder {
 			const isHex = /^(0x)/.test( firstToken.str );
 
 			if ( isHex ) type = 'int';
-			else if ( /u$/.test( firstToken.str ) ) type = 'uint';
+			else if ( /u$|U$/.test( firstToken.str ) ) type = 'uint';
 			else if ( /f|e|\./.test( firstToken.str ) ) type = 'float';
 			else type = 'int';
 
-			let str = firstToken.str.replace( /u|i$/, '' );
+			let str = firstToken.str.replace( /u|U|i$/, '' );
 
 			if ( isHex === false ) {
 
@@ -433,6 +516,18 @@ class GLSLDecoder {
 
 				return new Return( this.parseExpressionFromTokens( tokens.slice( 1 ) ) );
 
+			} else if ( firstToken.str === 'discard' ) {
+
+				return new Discard();
+
+			} else if ( firstToken.str === 'continue' ) {
+
+				return new Continue();
+
+			} else if ( firstToken.str === 'break' ) {
+
+				return new Break();
+
 			}
 
 			const secondToken = tokens[ 1 ];
@@ -443,53 +538,31 @@ class GLSLDecoder {
 
 					// function call
 
-					const paramsTokens = this.parseFunctionParametersFromTokens( tokens.slice( 2, tokens.length - 1 ) );
+					const internalTokens = this.getTokensUntil( ')', tokens, 1 ).slice( 1, - 1 );
 
-					return new FunctionCall( firstToken.str, paramsTokens );
+					const paramsTokens = this.parseFunctionParametersFromTokens( internalTokens );
+
+					const functionCall = new FunctionCall( getFunctionName( firstToken.str ), paramsTokens );
+
+					const accessTokens = tokens.slice( 3 + internalTokens.length );
+
+					if ( accessTokens.length > 0 ) {
+
+						const elements = this.parseAccessorElementsFromTokens( accessTokens );
+
+						return new AccessorElements( functionCall, elements );
+
+					}
+
+					return functionCall;
 
 				} else if ( secondToken.str === '[' ) {
 
 					// array accessor
 
-					const elements = [];
+					const elements = this.parseAccessorElementsFromTokens( tokens.slice( 1 ) );
 
-					let currentTokens = tokens.slice( 1 );
-
-					while ( currentTokens.length > 0 ) {
-
-						const token = currentTokens[ 0 ];
-
-						if ( token.str === '[' ) {
-
-							const accessorTokens = this.getTokensUntil( ']', currentTokens );
-
-							const element = this.parseExpressionFromTokens( accessorTokens.slice( 1, accessorTokens.length - 1 ) );
-
-							currentTokens = currentTokens.slice( accessorTokens.length );
-
-							elements.push( new DynamicElement( element ) );
-
-						} else if ( token.str === '.' ) {
-
-							const accessorTokens = currentTokens.slice( 1, 2 );
-
-							const element = this.parseExpressionFromTokens( accessorTokens );
-
-							currentTokens = currentTokens.slice( 2 );
-
-							elements.push( new StaticElement( element ) );
-
-						} else {
-
-							console.error( 'Unknown accessor expression', token );
-
-							break;
-
-						}
-
-					}
-
-					return new AccessorElements( firstToken.str, elements );
+					return new AccessorElements( new Accessor( firstToken.str ), elements );
 
 				}
 
@@ -498,6 +571,50 @@ class GLSLDecoder {
 			return new Accessor( firstToken.str );
 
 		}
+
+	}
+
+	parseAccessorElementsFromTokens( tokens ) {
+
+		const elements = [];
+
+		let currentTokens = tokens;
+
+		while ( currentTokens.length > 0 ) {
+
+			const token = currentTokens[ 0 ];
+
+			if ( token.str === '[' ) {
+
+				const accessorTokens = this.getTokensUntil( ']', currentTokens );
+
+				const element = this.parseExpressionFromTokens( accessorTokens.slice( 1, accessorTokens.length - 1 ) );
+
+				currentTokens = currentTokens.slice( accessorTokens.length );
+
+				elements.push( new DynamicElement( element ) );
+
+			} else if ( token.str === '.' ) {
+
+				const accessorTokens = currentTokens.slice( 1, 2 );
+
+				const element = this.parseExpressionFromTokens( accessorTokens );
+
+				currentTokens = currentTokens.slice( 2 );
+
+				elements.push( new StaticElement( element ) );
+
+			} else {
+
+				console.error( 'Unknown accessor expression', token );
+
+				break;
+
+			}
+
+		}
+
+		return elements;
 
 	}
 
@@ -576,14 +693,9 @@ class GLSLDecoder {
 		const paramsTokens = this.readTokensUntil( ')' );
 
 		const params = this.parseFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
+		const body = this.parseBlock();
 
-		const func = new FunctionDeclaration( type, name, params );
-
-		this._currentFunction = func;
-
-		this.parseBlock( func );
-
-		this._currentFunction = null;
+		const func = new FunctionDeclaration( type, name, params, body );
 
 		return func;
 
@@ -645,8 +757,14 @@ class GLSLDecoder {
 
 		const tokens = this.readTokensUntil( ';' );
 
-		const type = tokens[ 1 ].str;
+		let type = tokens[ 1 ].str;
 		const name = tokens[ 2 ].str;
+
+		// GLSL to TSL types
+
+		if ( samplers.includes( type ) ) type = 'texture';
+		else if ( samplersCube.includes( type ) ) type = 'cubeTexture';
+		else if ( samplers3D.includes( type ) ) type = 'texture3D';
 
 		return new Uniform( type, name );
 
@@ -663,6 +781,54 @@ class GLSLDecoder {
 
 	}
 
+	parseStructDefinition() {
+
+		const tokens = this.readTokensUntil( ';' );
+
+		const structName = tokens[ 1 ].str;
+
+		if ( tokens[ 2 ].str !== '{' ) {
+
+			throw new Error( 'Expected \'{\' after struct name ' );
+
+		}
+
+		const structMembers = [];
+		for ( let i = 3; i < tokens.length - 2; i += 3 ) {
+
+			const typeToken = tokens[ i ];
+			const nameToken = tokens[ i + 1 ];
+
+			if ( typeToken.type != 'literal' || nameToken.type != 'literal' ) {
+
+				throw new Error( 'Invalid struct declaration' );
+
+			}
+
+			if ( tokens[ i + 2 ].str !== ';' ) {
+
+				throw new Error( 'Missing \';\' after struct member name' );
+
+			}
+
+			const member = new StructMember( typeToken.str, nameToken.str );
+			structMembers.push( member );
+
+		}
+
+		if ( tokens[ tokens.length - 2 ].str !== '}' ) {
+
+			throw new Error( 'Missing closing \'}\' for struct ' + structName );
+
+		}
+
+		const definition = new StructDefinition( structName, structMembers );
+		this.structTypes.set( structName, definition );
+
+		return definition;
+
+	}
+
 	parseReturn() {
 
 		this.readToken(); // skip 'return'
@@ -670,6 +836,31 @@ class GLSLDecoder {
 		const expression = this.parseExpression();
 
 		return new Return( expression );
+
+	}
+
+	parseWhile() {
+
+		this.readToken(); // skip 'while'
+
+		const conditionTokens = this.readTokensUntil( ')' ).slice( 1, - 1 );
+		const condition = this.parseExpressionFromTokens( conditionTokens );
+
+		let body;
+
+		if ( this.getToken().str === '{' ) {
+
+			body = this.parseBlock();
+
+		} else {
+
+			body = [ this.parseExpression() ];
+
+		}
+
+		const statement = new While( condition, body );
+
+		return statement;
 
 	}
 
@@ -685,7 +876,9 @@ class GLSLDecoder {
 
 		let initialization;
 
-		if ( initializationTokens[ 0 ] && isType( initializationTokens[ 0 ].str ) ) {
+		const firstToken = initializationTokens[ 0 ];
+
+		if ( firstToken && ( isBuiltinType( firstToken.str ) || this.structTypes.has( firstToken.str ) ) ) {
 
 			initialization = this.parseVariablesFromToken( initializationTokens );
 
@@ -698,19 +891,97 @@ class GLSLDecoder {
 		const condition = this.parseExpressionFromTokens( conditionTokens );
 		const afterthought = this.parseExpressionFromTokens( afterthoughtTokens );
 
-		const statement = new For( initialization, condition, afterthought );
+		let body;
 
 		if ( this.getToken().str === '{' ) {
 
-			this.parseBlock( statement );
+			body = this.parseBlock();
 
 		} else {
 
-			statement.body.push( this.parseExpression() );
+			body = [ this.parseExpression() ];
 
 		}
 
+		const statement = new For( initialization, condition, afterthought, body );
+
 		return statement;
+
+	}
+
+	parseSwitch() {
+
+		this.readToken(); // Skip 'switch'
+
+		const switchDeterminantTokens = this.readTokensUntil( ')' );
+
+		// Parse expression between parentheses. Index 1: char after '('. Index -1: char before ')'
+		const discriminant = this.parseExpressionFromTokens( switchDeterminantTokens.slice( 1, - 1 ) );
+
+		// Validate curly braces
+		if ( this.getToken().str !== '{' ) {
+
+			throw new Error( 'Expected \'{\' after switch(...) ' );
+
+		}
+
+		this.readToken(); // Skip '{'
+
+		const cases = this.parseSwitchCases();
+
+		const switchStatement = new Switch( discriminant, cases );
+
+		return switchStatement;
+
+	}
+
+	parseSwitchCases() {
+
+		const cases = [];
+
+		let token = this.getToken();
+		let conditions = null;
+
+		const isCase = ( token ) => token.str === 'case' || token.str === 'default';
+
+		while ( isCase( token ) ) {
+
+			this.readToken(); // Skip 'case' or 'default'
+
+			if ( token.str === 'case' ) {
+
+				const caseTokens = this.readTokensUntil( ':' );
+				const caseStatement = this.parseExpressionFromTokens( caseTokens.slice( 0, - 1 ) );
+
+				conditions = conditions || [];
+				conditions.push( caseStatement );
+
+			} else {
+
+				this.readTokensUntil( ':' ); // Skip 'default:'
+
+				conditions = null;
+
+			}
+
+			token = this.getToken();
+
+			if ( isCase( token ) ) {
+
+				// If the next token is another case/default, continue parsing
+				continue;
+
+			}
+
+			cases.push( new SwitchCase( this.parseBlock(), conditions ) );
+
+			token = this.getToken();
+
+			conditions = null;
+
+		}
+
+		return cases;
 
 	}
 
@@ -726,25 +997,28 @@ class GLSLDecoder {
 
 		};
 
-		const parseIfBlock = ( cond ) => {
+		const parseIfBlock = () => {
+
+			let body;
 
 			if ( this.getToken().str === '{' ) {
 
-				this.parseBlock( cond );
+				body = this.parseBlock();
 
 			} else {
 
-				cond.body.push( this.parseExpression() );
+				body = [ this.parseExpression() ];
 
 			}
+
+			return body;
 
 		};
 
 		//
 
-		const conditional = new Conditional( parseIfExpression() );
-
-		parseIfBlock( conditional );
+		// Parse the first if statement
+		const conditional = new Conditional( parseIfExpression(), parseIfBlock() );
 
 		//
 
@@ -754,21 +1028,24 @@ class GLSLDecoder {
 
 			this.readToken(); // skip 'else'
 
+			// Assign the current if/else statement as the previous within the chain of conditionals
 			const previous = current;
 
+			let expression = null;
+
+			// If an 'else if' statement, parse the conditional within the if
 			if ( this.getToken().str === 'if' ) {
 
-				current = new Conditional( parseIfExpression() );
-
-			} else {
-
-				current = new Conditional();
+				// Current conditional now equal to next conditional in the chain
+				expression = parseIfExpression();
 
 			}
 
-			previous.elseConditional = current;
+			current = new Conditional( expression, parseIfBlock() );
+			current.parent = previous;
 
-			parseIfBlock( current );
+			// n - 1 conditional's else statement assigned to new if/else statement
+			previous.elseConditional = current;
 
 		}
 
@@ -776,7 +1053,9 @@ class GLSLDecoder {
 
 	}
 
-	parseBlock( scope ) {
+	parseBlock() {
+
+		const body = [];
 
 		const firstToken = this.getToken();
 
@@ -796,17 +1075,48 @@ class GLSLDecoder {
 
 			groupIndex += getGroupDelta( token.str );
 
-			if ( groupIndex < 0 ) {
+			if ( groupIndex === 0 && ( token.str === 'case' || token.str === 'default' ) ) {
+
+				return body; // switch case or default statement, return body
+
+			} else if ( groupIndex < 0 ) {
 
 				this.readToken(); // skip '}'
 
-				break;
+				return body;
 
 			}
 
 			//
 
-			if ( token.isLiteral ) {
+			if ( token.tags ) {
+
+				let lastStatement = null;
+
+				for ( const tag of token.tags ) {
+
+					if ( tag.type === Token.COMMENT ) {
+
+						const str = tag.str.replace( /\t/g, '' );
+
+						if ( ! lastStatement || lastStatement.isComment !== true ) {
+
+							lastStatement = new Comment( str );
+							body.push( lastStatement );
+
+						} else {
+
+							lastStatement.comment += '\n' + str;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			if ( token.isLiteral || token.isOperator ) {
 
 				if ( token.str === 'const' ) {
 
@@ -820,7 +1130,11 @@ class GLSLDecoder {
 
 					statement = this.parseVarying();
 
-				} else if ( isType( token.str ) ) {
+				} else if ( token.str === 'struct' ) {
+
+					statement = this.parseStructDefinition();
+
+				} else if ( isBuiltinType( token.str ) || this.structTypes.has( token.str ) ) {
 
 					if ( this.getToken( 2 ).str === '(' ) {
 
@@ -844,6 +1158,14 @@ class GLSLDecoder {
 
 					statement = this.parseFor();
 
+				} else if ( token.str === 'while' ) {
+
+					statement = this.parseWhile();
+
+				} else if ( token.str === 'switch' ) {
+
+					statement = this.parseSwitch();
+
 				} else {
 
 					statement = this.parseExpression();
@@ -854,7 +1176,7 @@ class GLSLDecoder {
 
 			if ( statement ) {
 
-				scope.body.push( statement );
+				body.push( statement );
 
 			} else {
 
@@ -864,43 +1186,7 @@ class GLSLDecoder {
 
 		}
 
-	}
-
-	_evalOperator( operator ) {
-
-		if ( operator.type.includes( '=' ) ) {
-
-			const parameter = this._getFunctionParameter( operator.left.property );
-
-			if ( parameter !== undefined ) {
-
-				// Parameters are immutable in WGSL
-
-				parameter.immutable = false;
-
-			}
-
-		}
-
-		return operator;
-
-	}
-
-	_getFunctionParameter( name ) {
-
-		if ( this._currentFunction ) {
-
-			for ( const param of this._currentFunction.params ) {
-
-				if ( param.name === name ) {
-
-					return param;
-
-				}
-
-			}
-
-		}
+		return body;
 
 	}
 
@@ -927,9 +1213,10 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = new Tokenizer( polyfill + source ).tokenize();
 
-		const program = new Program();
+		const body = this.parseBlock();
 
-		this.parseBlock( program );
+		const program = new Program( body );
+		program.structTypes = this.structTypes;
 
 		return program;
 

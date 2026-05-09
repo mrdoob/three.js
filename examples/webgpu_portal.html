@@ -1,40 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Portal</title>
+		<title>three.js webgpu - portal</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - portal">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_portal.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_portal.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Portal
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Portal</span>
+			</div>
+
+			<small>
+				The portal displays a different scene when viewed through it.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { pass, color, mx_worley_noise_float, timerLocal, viewportTopLeft, vec2, uv, normalWorld, mx_fractal_noise_vec3, toneMapping, MeshBasicNodeMaterial } from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { pass, color, mx_worley_noise_float, time, screenUV, vec2, uv, normalWorld, mx_fractal_noise_vec3 } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			let camera, sceneMain, scenePortal, renderer;
-			let clock;
+			let timer;
 
 			const mixers = [];
 
@@ -49,7 +62,8 @@
 				sceneMain.backgroundNode = normalWorld.y.mix( color( 0x0066ff ), color( 0xff0066 ) );
 
 				scenePortal = new THREE.Scene();
-				scenePortal.backgroundNode = mx_worley_noise_float( normalWorld.mul( 20 ).add( vec2( 0, timerLocal().oneMinus() ) ) ).mul( color( 0x0066ff ) );
+				scenePortal.backgroundNode = mx_worley_noise_float( normalWorld.mul( 20 ).add( vec2( 0, time.oneMinus() ) ) ).mul( color( 0x0066ff ) );
+				scenePortal.name = 'Portal Scene';
 
 				//
 
@@ -58,7 +72,8 @@
 				camera.position.multiplyScalar( .8 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -113,7 +128,7 @@
 
 					};
 
-					const colorNode = mx_fractal_noise_vec3( uv().mul( 20 ).add( timerLocal() ) );
+					const colorNode = mx_fractal_noise_vec3( uv().mul( 20 ).add( time ) );
 
 					const modelMain = createModel();
 					const modelPortal = createModel( colorNode );
@@ -129,8 +144,8 @@
 
 				const geometry = new THREE.PlaneGeometry( 1.7, 2 );
 
-				const material = new MeshBasicNodeMaterial();
-				material.colorNode = pass( scenePortal, camera ).context( { getUV: () => viewportTopLeft } );
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = pass( scenePortal, camera ).context( { getUV: () => screenUV } );
 				material.opacityNode = uv().distance( .5 ).remapClamp( .3, .5 ).oneMinus();
 				material.side = THREE.DoubleSide;
 				material.transparent = true;
@@ -141,11 +156,13 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMappingExposure = 0.15;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -170,7 +187,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				for ( const mixer of mixers ) {
 

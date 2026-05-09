@@ -4,6 +4,10 @@
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - shadow map">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_performance.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_performance.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -51,11 +55,10 @@
 
 			const morphs = [], animGroups = [];
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
-			animate();
-
 
 			function init() {
 
@@ -101,6 +104,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -108,7 +112,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// CONTROLS
 
@@ -140,8 +144,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				controls.handleResize();
 
 			}
 
@@ -304,7 +306,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
 				stats.begin();
 				render();
@@ -314,7 +316,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

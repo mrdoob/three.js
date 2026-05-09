@@ -4,6 +4,10 @@
 		<title>three.js webaudio - visualizer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webaudio - visualizer">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webaudio_visualizer.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webaudio_visualizer.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 
 		<script id="vertexShader" type="x-shader/x-vertex">
@@ -82,11 +86,6 @@
 
 				const container = document.getElementById( 'container' );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
 				scene = new THREE.Scene();
 
 				camera = new THREE.Camera();
@@ -142,9 +141,15 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
 
-				animate();
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -155,14 +160,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				analyser.getFrequencyData();
 

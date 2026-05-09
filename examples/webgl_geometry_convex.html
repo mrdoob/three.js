@@ -4,6 +4,10 @@
 		<title>three.js webgl - convex geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - convex geometry">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_geometry_convex.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_geometry_convex.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -30,7 +34,6 @@
 			let group, camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -39,6 +42,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				// camera
@@ -80,7 +84,7 @@
 
 				let dodecahedronGeometry = new THREE.DodecahedronGeometry( 10 );
 
-				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate identical vertices with different normal/uv data
 
 				dodecahedronGeometry.deleteAttribute( 'normal' );
 				dodecahedronGeometry.deleteAttribute( 'uv' );
@@ -141,15 +145,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				group.rotation.y += 0.005;
-
-				render();
-
-			}
-
-			function render() {
 
 				renderer.render( scene, camera );
 

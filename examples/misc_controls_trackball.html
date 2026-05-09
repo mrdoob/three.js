@@ -4,6 +4,10 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - trackball controls">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_controls_trackball.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_controls_trackball.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -49,7 +53,6 @@
 			const frustumSize = 400;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -70,17 +73,21 @@
 				const geometry = new THREE.ConeGeometry( 10, 30, 4, 1 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
+				const mesh = new THREE.InstancedMesh( geometry, material, 500 );
+				const dummy = new THREE.Object3D();
+
 				for ( let i = 0; i < 500; i ++ ) {
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+					dummy.position.x = ( Math.random() - 0.5 ) * 1000;
+					dummy.position.y = ( Math.random() - 0.5 ) * 1000;
+					dummy.position.z = ( Math.random() - 0.5 ) * 1000;
+
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
 
 				}
+
+				scene.add( mesh );
 
 				// lights
 
@@ -100,6 +107,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -157,13 +165,11 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				controls.update();
 
-				stats.update();
-
 				render();
+
+				stats.update();
 
 			}
 

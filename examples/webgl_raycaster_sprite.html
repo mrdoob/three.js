@@ -4,6 +4,10 @@
 		<title>three.js raycaster - sprite</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js raycaster - sprite">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_raycaster_sprite.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_raycaster_sprite.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -41,7 +45,6 @@
 		const pointer = new THREE.Vector2();
 
 		init();
-		animate();
 
 		function init() {
 
@@ -49,6 +52,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
 			// init scene
@@ -102,7 +106,6 @@
 		function animate() {
 
 			renderer.render( scene, camera );
-			requestAnimationFrame( animate );
 
 		}
 

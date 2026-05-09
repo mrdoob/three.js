@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js xr - controls - trasnform</title>
+		<title>three.js xr - controls - transform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js xr - controls - transform">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_xr_controls_transform.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_xr_controls_transform.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -27,9 +31,11 @@
 			import { TransformControls } from 'three/addons/controls/TransformControls.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 			let container;
 			let camera, scene, renderer;
+			let bloomPass;
 			let controller1, controller2, line;
 			let controllerGrip1, controllerGrip2;
 
@@ -38,7 +44,6 @@
 			let controls, group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -111,12 +116,19 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
+
+				// post-processing
+
+				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+				renderer.setEffects( [ bloomPass ] );
 
 				document.body.appendChild( XRButton.createButton( renderer ) );
 
@@ -162,7 +174,7 @@
 
 				controls = new TransformControls( camera, renderer.domElement );
 				controls.attach( group.children[ 0 ] );
-				scene.add( controls );
+				scene.add( controls.getHelper() );
 
 				//
 
@@ -242,12 +254,6 @@
 			//
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				renderer.render( scene, camera );
 

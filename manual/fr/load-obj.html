@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Loading a .OBJ File</title>
+    <title>Charger un fichier .OBJ</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Loading a .OBJ File">
+    <meta name="twitter:title" content="Three.js – Charger un fichier .OBJ">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,12 +22,590 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Loading a .OBJ File</h1>
+        <h1>Charger un fichier .OBJ</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/load-obj.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>L'une des choses les plus courantes que les gens veulent faire avec three.js
+est de charger et d'afficher des modèles 3D. Un format courant est le format 3D
+.OBJ, alors essayons d'en charger un.</p>
+<p>En cherchant sur internet, j'ai trouvé <a href="https://www.blendswap.com/blends/view/69174">ce modèle 3D de moulin à vent sous licence CC-BY-NC 3.0</a> par <a href="https://www.blendswap.com/user/ahedov">ahedov</a>.</p>
+<div class="threejs_center"><img src="../resources/images/windmill-obj.jpg"></div>
+
+<p>J'ai téléchargé le fichier .blend à partir de ce site, je l'ai chargé dans <a href="https://blender.org">Blender</a>
+et l'ai exporté en tant que fichier .OBJ.</p>
+<div class="threejs_center"><img style="width: 827px;" src="../resources/images/windmill-export-as-obj.jpg"></div>
+
+<blockquote>
+<p>Note : Si vous n'avez jamais utilisé Blender, vous pourriez être surpris
+par le fait que Blender fait les choses différemment de presque tous les autres
+programmes que vous avez utilisés. Sachez simplement que vous pourriez avoir besoin de
+prendre le temps de lire quelques bases sur la navigation dans l'interface utilisateur de Blender.</p>
+<p>Permettez-moi d'ajouter également que les programmes 3D en général sont d'énormes bêtes avec
+des milliers de fonctionnalités. Ce sont parmi les logiciels les plus compliqués qui existent.
+Lorsque j'ai appris 3D Studio Max en 1996, j'ai lu 70% du manuel
+de 600 pages en y consacrant quelques heures par jour pendant environ 3 semaines. Cela a
+porté ses fruits, car lorsque j'ai appris Maya quelques années plus tard, certaines des leçons
+apprises auparavant étaient applicables à Maya. Alors, sachez simplement que si vous
+voulez vraiment pouvoir utiliser un logiciel 3D pour créer des assets 3D
+ou pour modifier des assets existants, inscrivez-le à votre emploi du temps et réservez
+du temps pour vraiment suivre quelques leçons.</p>
+</blockquote>
+<p>Dans tous les cas, j'ai utilisé ces options d'exportation</p>
+<div class="threejs_center"><img style="width: 239px;" src="../resources/images/windmill-export-options.jpg"></div>
+
+<p>Essayons de l'afficher !</p>
+<p>Je suis parti de l'exemple d'éclairage directionnel de
+<a href="lights.html">l'article sur les lumières</a> et je l'ai combiné avec
+l'exemple d'éclairage hémisphérique, j'ai donc fini avec une
+<a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> et une <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>. J'ai également supprimé tout ce qui concerne l'interface utilisateur
+pour régler les lumières. J'ai également supprimé le cube et la sphère
+qui étaient ajoutés à la scène.</p>
+<p>À partir de là, la première chose à faire est d'inclure le chargeur <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>
+dans notre script.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+</pre>
+<p>Ensuite, pour charger le fichier .OBJ, nous créons une instance de <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>,
+lui passons l'URL de notre fichier .OBJ, et ajoutons un rappel qui
+ajoute le modèle chargé à notre scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const objLoader = new OBJLoader();
+  objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
+    scene.add(root);
+  });
+}
+</pre>
+<p>Si nous exécutons cela, que se passe-t-il ?</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-no-materials.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-no-materials.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Eh bien, c'est presque ça, mais nous obtenons des erreurs concernant les matériaux,
+car nous n'avons pas donné de matériaux à la scène et les fichiers .OBJ n'ont pas de
+paramètres de matériaux. </p>
+<p>Le chargeur .OBJ peut recevoir un
+objet de paires nom / matériau. Lorsqu'il charge le fichier .OBJ,
+pour chaque nom de matériau qu'il trouve, il cherchera le matériau correspondant
+dans la carte des matériaux définie sur le chargeur. S'il trouve un
+matériau correspondant au nom, il utilisera ce matériau. Sinon,
+il utilisera le matériau par défaut du chargeur.</p>
+<p>Parfois, les fichiers .OBJ sont accompagnés d'un fichier .MTL qui définit
+les matériaux. Dans notre cas, l'exportateur a également créé un fichier .MTL.
+Le format .MTL est du texte brut (ASCII), il est donc facile à examiner.
+En le regardant ici</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no"># Blender MTL File: 'windmill_001.blend'
+# Material Count: 2
+
+newmtl Material
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_lopatky_COL.jpg
+map_Bump windmill_001_lopatky_NOR.jpg
+
+newmtl windmill
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_base_COL.jpg
+map_Bump windmill_001_base_NOR.jpg
+map_Ns windmill_001_base_SPEC.jpg
+</pre>
+<p>Nous pouvons voir qu'il y a 2 matériaux référençant 5 textures jpg,
+mais où sont les fichiers de texture ?</p>
+<div class="threejs_center"><img style="width: 757px;" src="../resources/images/windmill-exported-files.png"></div>
+
+<p>Tout ce que nous avons obtenu était un fichier .OBJ et un fichier .MTL.</p>
+<p>Au moins pour ce modèle, il s'avère que les textures sont intégrées
+dans le fichier .blend que nous avons téléchargé. Nous pouvons demander à Blender
+d'exporter ces fichiers en choisissant <strong>Fichier->Données externes->Désintégrer tout en fichiers (File->External Data->Unpack All Into Files)</strong></p>
+<div class="threejs_center"><img style="width: 828px;" src="../resources/images/windmill-export-textures.jpg"></div>
+
+<p>puis en choisissant <strong>Écrire les fichiers dans le répertoire actuel (Write Files to Current Directory)</strong></p>
+<div class="threejs_center"><img style="width: 828px;" src="../resources/images/windmill-overwrite.jpg"></div>
+
+<p>Cela finit par écrire les fichiers dans le même dossier que le fichier .blend,
+dans un sous-dossier appelé <strong>textures</strong>.</p>
+<div class="threejs_center"><img style="width: 758px;" src="../resources/images/windmill-exported-texture-files.png"></div>
+
+<p>Maintenant que les textures sont disponibles, nous pouvons charger le fichier .MTL.</p>
+<p>D'abord, nous devons inclure le <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a> ;</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
++import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
+</pre>
+<p>Ensuite, nous chargeons d'abord le fichier .MTL. Une fois le chargement terminé,
+nous ajoutons les matériaux tout juste chargés au <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> lui-même via la méthode <code class="notranslate" translate="no">setMaterials</code>,
+puis nous chargeons le fichier .OBJ.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
++  const mtlLoader = new MTLLoader();
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) =&gt; {
++    mtl.preload();
++    objLoader.setMaterials(mtl);
+    objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
+      scene.add(root);
+    });
++  });
+}
+</pre>
+<p>Et si nous essayons cela...</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-materials.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-materials.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Notez que si vous faites tourner le modèle, vous verrez le tissu du moulin disparaître</p>
+<div class="threejs_center"><img style="width: 528px;" src="../resources/images/windmill-missing-cloth.jpg"></div>
+
+<p>Nous devons rendre le matériau des pales double face,
+ce que nous avons vu dans <a href="materials.html">l'article sur les matériaux</a>.
+Il n'y a pas de moyen facile de corriger cela dans le fichier .MTL.
+Spontanément, je peux penser à 3 façons de corriger cela.</p>
+<ol>
+<li><p>Parcourir tous les matériaux après les avoir chargés et les rendre tous double face.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const mtlLoader = new MTLLoader();
+ mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) =&gt; {
+   mtl.preload();
+   for (const material of Object.values(mtl.materials)) {
+     material.side = THREE.DoubleSide;
+   }
+   ...
+</pre><p>Cette solution fonctionne, mais idéalement, nous ne voulons que les matériaux qui ont besoin
+d'être double face soient double face, car dessiner en double face
+est plus lent qu'en simple face.</p>
+</li>
+<li><p>Définir manuellement un matériau spécifique</p>
+<p>En regardant dans le fichier .MTL, il y a 2 matériaux. L'un s'appelle <code class="notranslate" translate="no">"windmill"</code>
+et l'autre s'appelle <code class="notranslate" translate="no">"Material"</code>. Par essais et erreurs, j'ai découvert
+que les pales utilisent le matériau appelé <code class="notranslate" translate="no">"Material"</code>, nous pourrions donc le définir
+spécifiquement </p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const mtlLoader = new MTLLoader();
+ mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) =&gt; {
+   mtl.preload();
+   mtl.materials.Material.side = THREE.DoubleSide;
+   ...
+</pre></li>
+<li><p>Réalisant que le fichier .MTL est limité, nous pourrions simplement ne pas l'utiliser
+et créer nous-mêmes les matériaux à la place.</p>
+<p>Dans ce cas, nous devrions rechercher l'objet <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> après
+avoir chargé le fichier obj.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
+   const materials = {
+     Material: new THREE.MeshPhongMaterial({...}),
+     windmill: new THREE.MeshPhongMaterial({...}),
+   };
+   root.traverse(node =&gt; {
+     const material = materials[node.material?.name];
+     if (material) {
+       node.material = material;
+     }
+   })
+   scene.add(root);
+ });
+</pre></li>
+</ol>
+<p>À vous de choisir laquelle vous préférez. 1 est la plus simple. 3 est la plus flexible.
+2 est entre les deux. Pour l'instant, je vais choisir la 2.</p>
+<p>Et avec cette modification, vous devriez toujours voir le tissu sur les pales
+en regardant par derrière, mais il y a un autre problème. Si nous zoomons de près,
+nous voyons que les choses deviennent pixellisées.</p>
+<div class="threejs_center"><img style="width: 700px;" src="../resources/images/windmill-blocky.jpg"></div>
+
+<p>Que se passe-t-il ?</p>
+<p>En regardant les textures, il y a 2 textures étiquetées NOR pour carte NORmale.
+Et en les regardant, elles ressemblent à des cartes normales. Les cartes normales sont généralement
+violettes, tandis que les cartes de relief sont noires et blanches. Les cartes normales représentent
+la direction de la surface, tandis que les cartes de relief représentent la hauteur de
+la surface.</p>
+<div class="threejs_center"><img style="width: 256px;" src="../examples/resources/models/windmill/windmill_001_base_NOR.jpg"></div>
+
+<p>En regardant <a href="https://github.com/mrdoob/three.js/blob/1a560a3426e24bbfc9ca1f5fb0dfb4c727d59046/examples/js/loaders/MTLLoader.js#L432">le code source du MTLLoader</a>,
+il s'attend au mot-clé <code class="notranslate" translate="no">norm</code> pour les cartes normales, alors éditons le fichier .MTL</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no"># Blender MTL File: 'windmill_001.blend'
+# Material Count: 2
+
+newmtl Material
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_lopatky_COL.jpg
+-map_Bump windmill_001_lopatky_NOR.jpg
++norm windmill_001_lopatky_NOR.jpg
+
+newmtl windmill
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_base_COL.jpg
+-map_Bump windmill_001_base_NOR.jpg
++norm windmill_001_base_NOR.jpg
+map_Ns windmill_001_base_SPEC.jpg
+</pre>
+<p>et maintenant, lorsque nous le chargerons, il utilisera les cartes normales comme cartes normales
+et nous pourrons voir l'arrière des pales.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-materials-fixed.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-materials-fixed.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Chargeons un fichier différent.</p>
+<p>En cherchant sur internet, j'ai trouvé ce modèle 3D de moulin à vent sous licence <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC</a> réalisé par <a href="http://www.gerzi.ch/">Roger Gerzner / GERIZ.3D Art</a>.</p>
+<div class="threejs_center"><img src="../resources/images/windmill-obj-2.jpg"></div>
+
+<p>Il avait déjà une version .OBJ disponible. Chargeons-le (notez que j'ai retiré le chargeur .MTL pour l'instant)</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  objLoader.load('resources/models/windmill/windmill.obj', ...
++  objLoader.load('resources/models/windmill-2/windmill.obj', ...
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-wat.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-wat.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Hmmm, rien n'apparaît. Quel est le problème ? Quelle taille a le modèle ?
+Nous pouvons demander à THREE.js quelle taille a le modèle et essayer de régler notre
+caméra automatiquement.</p>
+<p>Tout d'abord, nous pouvons demander à THREE.js de calculer une boîte qui contient la scène
+que nous venons de charger et de demander sa taille et son centre</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">objLoader.load('resources/models/windmill_2/windmill.obj', (root) =&gt; {
+  scene.add(root);
+
++  const box = new THREE.Box3().setFromObject(root);
++  const boxSize = box.getSize(new THREE.Vector3()).length();
++  const boxCenter = box.getCenter(new THREE.Vector3());
++  console.log(boxSize);
++  console.log(boxCenter);
+</pre>
+<p>En regardant dans <a href="debugging-javascript.html">la console JavaScript</a>, je vois</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">size 2123.6499788469982
+center p {x: -0.00006103515625, y: 770.0909731090069, z: -3.313507080078125}
+</pre>
+<p>Notre caméra n'affiche actuellement qu'environ 100 unités, avec <code class="notranslate" translate="no">near</code> à 0.1 et <code class="notranslate" translate="no">far</code> à 100.
+Notre plan de sol ne mesure que 40 unités de large, donc en gros, ce modèle de moulin à vent est si grand, 2000 unités,
+qu'il entoure notre caméra et que toutes ses parties sont en dehors de notre frustum.</p>
+<div class="threejs_center"><img style="width: 280px;" src="../resources/images/camera-inside-windmill.svg"></div>
+
+<p>Nous pourrions corriger cela manuellement, mais nous pourrions aussi faire en sorte que la caméra cadre automatiquement notre scène.
+Essayons cela. Nous pouvons ensuite utiliser la boîte que nous venons de calculer pour ajuster les paramètres de la caméra afin de
+visualiser toute la scène. Notez qu'il n'y a pas de <em>bonne</em> réponse
+sur l'endroit où placer la caméra. Nous pourrions être face à la scène depuis n'importe quelle direction et à n'importe quelle
+altitude, il faudra donc choisir quelque chose.</p>
+<p>Comme nous l'avons vu dans <a href="cameras.html">l'article sur les caméras</a>, la caméra définit un frustum.
+Ce frustum est défini par le champ de vision (<code class="notranslate" translate="no">fov</code>) et les paramètres <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code>. Nous
+voulons savoir, étant donné le champ de vision actuel de la caméra, à quelle distance la caméra
+doit se trouver pour que la boîte contenant la scène s'inscrive dans le frustum, en supposant que le frustum
+s'étende à l'infini. En d'autres termes, supposons que <code class="notranslate" translate="no">near</code> est 0.00000001 et <code class="notranslate" translate="no">far</code> est l'infini.</p>
+<p>Puisque nous connaissons la taille de la boîte et que nous connaissons le champ de vision, nous avons ce triangle</p>
+<div class="threejs_center"><img style="width: 600px;" src="../resources/images/camera-fit-scene.svg"></div>
+
+<p>Vous pouvez voir à gauche la caméra et le frustum bleu qui se projette devant elle.
+Nous venons de calculer la boîte qui contient le moulin à vent. Nous devons
+calculer à quelle distance la caméra doit se trouver de la boîte pour que celle-ci
+apparaisse à l'intérieur du frustum.</p>
+<p>En utilisant la trigonométrie de base des triangles rectangles et <a href="https://www.google.com/search?q=SOHCAHTOA">SOHCAHTOA</a>,
+étant donné que nous connaissons le champ de vision pour le frustum et que nous connaissons la taille de la boîte, nous pouvons calculer la <em>distance</em>.</p>
+<div class="threejs_center"><img style="width: 600px;" src="../resources/images/field-of-view-camera.svg"></div>
+
+<p>Sur la base de ce diagramme, la formule pour calculer la distance est</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">distance = halfSizeToFitOnScreen / tangent(halfFovY)
+</pre>
+<p>Traduisons cela en code. D'abord, créons une fonction qui calculera <code class="notranslate" translate="no">distance</code>, puis déplacera la
+caméra de <code class="notranslate" translate="no">distance</code> unités à partir du centre de la boîte. Nous dirigerons
+ensuite la caméra vers le <code class="notranslate" translate="no">center</code> de la boîte.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+  const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+  const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
+  const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+  // calcule un vecteur unitaire qui pointe dans la direction où se trouve actuellement la caméra par rapport au centre de la boîte
+  const direction = (new THREE.Vector3()).subVectors(camera.position, boxCenter).normalize();
+
+  // déplace la caméra vers une position située à distance unités du centre,
+  // dans la même direction où se trouvait déjà la caméra par rapport au centre
+  camera.position.copy(direction.multiplyScalar(distance).add(boxCenter));
+
+  // choisit des valeurs near et far pour le frustum qui
+  // contiendront la boîte.
+  camera.near = boxSize / 100;
+  camera.far = boxSize * 100;
+
+  camera.updateProjectionMatrix();
+
+  // oriente la caméra pour qu'elle regarde le centre de la boîte
+  camera.lookAt(boxCenter.x, boxCenter.y, boxCenter.z);
+}
+</pre>
+<p>Nous passons 2 tailles. Le <code class="notranslate" translate="no">boxSize</code> et le <code class="notranslate" translate="no">sizeToFitOnScreen</code>. Si nous passions simplement <code class="notranslate" translate="no">boxSize</code>
+et l'utilisions comme <code class="notranslate" translate="no">sizeToFitOnScreen</code>, alors le calcul ferait en sorte que la boîte s'insère parfaitement dans
+le frustum. Nous voulons un peu d'espace supplémentaire au-dessus et en dessous, nous passerons donc une taille
+légèrement plus grande.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const objLoader = new OBJLoader();
+  objLoader.load('resources/models/windmill_2/windmill.obj', (root) =&gt; {
+    scene.add(root);
++    // calcule la boîte qui contient tout ce qui se trouve
++    // à partir de la racine et en dessous
++    const box = new THREE.Box3().setFromObject(root);
++
++    const boxSize = box.getSize(new THREE.Vector3()).length();
++    const boxCenter = box.getCenter(new THREE.Vector3());
++
++    // positionne la caméra pour encadrer la boîte
++    frameArea(boxSize * 1.2, boxSize, boxCenter, camera);
++
++    // met à jour les contrôles OrbitControls pour gérer la nouvelle taille
++    controls.maxDistance = boxSize * 10;
++    controls.target.copy(boxCenter);
++    controls.update();
+  });
+}
+</pre>
+<p>Vous pouvez voir ci-dessus que nous passons <code class="notranslate" translate="no">boxSize * 1.2</code> pour nous donner 20% d'espace supplémentaire
+au-dessus et en dessous de la boîte lorsque nous essayons de l'insérer dans le frustum. Nous avons également mis à jour les
+<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> afin que la caméra orbite autour du centre
+de la scène.</p>
+<p>Maintenant si nous essayons cela, nous obtenons...</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-auto-camera.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-auto-camera.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Cela fonctionne presque. Utilisez la souris pour faire pivoter la caméra et vous
+devriez voir le moulin à vent. Le problème est que le moulin à vent est grand et que le centre de la boîte se trouve à environ (0, 770, 0).
+Ainsi, lorsque nous déplaçons la caméra de sa position de départ (0, 10, 20) à <code class="notranslate" translate="no">distance</code> unités du centre
+dans la direction où se trouve la caméra par rapport au centre, cela déplace la caméra presque droit vers le bas,
+sous le moulin à vent.</p>
+<div class="threejs_center"><img style="width: 360px;" src="../resources/images/computed-camera-position.svg"></div>
+
+<p>Changeons cela pour nous déplacer latéralement à partir du centre de la boîte, dans la direction
+où se trouve la caméra par rapport au centre. Tout ce que nous devons faire pour cela
+est de mettre à zéro la composante <code class="notranslate" translate="no">y</code> du vecteur allant de la boîte à la caméra.
+Ensuite, lorsque nous normalisons ce vecteur, il deviendra un vecteur parallèle au plan XZ.
+En d'autres termes, parallèle au sol.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// calcule un vecteur unitaire qui pointe dans la direction où se trouve actuellement la caméra par rapport au centre de la boîte
+-// from the center of the box
+-const direction = (new THREE.Vector3()).subVectors(camera.position, boxCenter).normalize();
++// calcule un vecteur unitaire qui pointe dans la direction où se trouve actuellement la caméra
++// dans le plan xz par rapport au centre de la boîte
++const direction = (new THREE.Vector3())
++    .subVectors(camera.position, boxCenter)
++    .multiply(new THREE.Vector3(1, 0, 1))
++    .normalize();
+</pre>
+<p>Si vous regardez le bas du moulin à vent, vous verrez un petit carré.
+C'est notre plan de sol.</p>
+<div class="threejs_center"><img style="width: 365px;" src="../resources/images/tiny-ground-plane.jpg"></div>
+
+<p>Il ne mesure que 40x40 unités et est donc beaucoup trop petit par rapport au moulin à vent.
+Étant donné que le moulin à vent mesure plus de 2000 unités, changeons la taille du plan de sol
+pour quelque chose de plus approprié. Nous devons également ajuster la répétition, sinon notre damier
+sera si fin que nous ne pourrons même pas le voir à moins de zoomer très très près.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const planeSize = 40;
++const planeSize = 4000;
+
+const loader = new THREE.TextureLoader();
+const texture = loader.load('resources/images/checker.png');
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.magFilter = THREE.NearestFilter;
+-const repeats = planeSize / 2;
++const repeats = planeSize / 200;
+texture.repeat.set(repeats, repeats);
+</pre>
+<p>et maintenant nous pouvons voir ce moulin à vent</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-auto-camera-xz.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-auto-camera-xz.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Ajoutons à nouveau les matériaux. Comme précédemment, il y a un fichier .MTL qui référence
+des textures, mais en regardant les fichiers, je constate rapidement un problème.</p>
+<pre class="prettyprint showlinemods notranslate lang-shell" translate="no"> $ ls -l windmill
+ -rw-r--r--@ 1 gregg  staff       299 May 20  2009 windmill.mtl
+ -rw-r--r--@ 1 gregg  staff    142989 May 20  2009 windmill.obj
+ -rw-r--r--@ 1 gregg  staff  12582956 Apr 19  2009 windmill_diffuse.tga
+ -rw-r--r--@ 1 gregg  staff  12582956 Apr 20  2009 windmill_normal.tga
+ -rw-r--r--@ 1 gregg  staff  12582956 Apr 19  2009 windmill_spec.tga
+</pre>
+<p>Il y a des fichiers TARGA (.tga) et ils sont gigantesques !</p>
+<p>THREE.js a en fait un chargeur TGA, mais il est discutable de l'utiliser pour la plupart des cas d'utilisation.
+Si vous créez une visionneuse où vous voulez permettre aux utilisateurs de voir des fichiers 3D aléatoires qu'ils
+trouvent sur internet, alors peut-être, juste peut-être, que vous voudrez charger des fichiers TGA. (<a href="#loading-scenes">*</a>)</p>
+<p>Un problème avec les fichiers TGA est qu'ils ne peuvent pas être bien compressés du tout.
+TGA ne prend en charge qu'une compression très simple, et en regardant ci-dessus, nous pouvons voir que les fichiers ne sont pas du tout
+compressés, car les chances qu'ils aient tous exactement la même taille sont extrêmement faibles.
+De plus, ils font 12 mégaoctets chacun !!!</p>
+<p>Si nous utilisions ces fichiers, l'utilisateur devrait télécharger 36 Mo
+pour voir le moulin à vent.</p>
+<p>Un autre problème avec TGA est que le navigateur lui-même ne les prend pas en charge, donc le chargement
+sera probablement plus lent que le chargement de formats pris en charge comme .JPG et .PNG</p>
+<p>Je suis presque sûr que pour nos besoins, les convertir en .JPG sera la meilleure option.
+En regardant à l'intérieur, je vois qu'ils ont 3 canaux chacun, RGB, il n'y a pas de canal alpha. JPG
+ne prend en charge que 3 canaux, c'est donc une bonne correspondance. JPG prend également en charge la compression
+avec perte, ce qui nous permet de rendre les fichiers beaucoup plus petits à télécharger</p>
+<p>En chargeant les fichiers, ils étaient chacun de 2048x2048. Cela m'a semblé un gâchis,
+mais bien sûr, cela dépend de votre cas d'utilisation. Je les ai mis chacun en 1024x1024
+et les ai enregistrés avec un réglage de qualité de 50% dans Photoshop. Obtenir une liste de fichiers</p>
+<pre class="prettyprint showlinemods notranslate lang-shell" translate="no"> $ ls -l ../threejs.org/manual/examples/resources/models/windmill
+ -rw-r--r--@ 1 gregg  staff     299 May 20  2009 windmill.mtl
+ -rw-r--r--@ 1 gregg  staff  142989 May 20  2009 windmill.obj
+ -rw-r--r--@ 1 gregg  staff  259927 Nov  7 18:37 windmill_diffuse.jpg
+ -rw-r--r--@ 1 gregg  staff   98013 Nov  7 18:38 windmill_normal.jpg
+ -rw-r--r--@ 1 gregg  staff  191864 Nov  7 18:39 windmill_spec.jpg
+</pre>
+<p>Nous sommes passés de 36 Mo à 0,55 Mo ! Bien sûr, l'artiste pourrait ne pas être satisfait
+de cette compression, alors assurez-vous de le consulter pour discuter des compromis.</p>
+<p>Maintenant, pour utiliser le fichier .MTL, nous devons l'éditer pour qu'il référence les fichiers .JPG
+au lieu des fichiers .TGA. Heureusement, c'est un simple fichier texte, il est donc facile à éditer</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">newmtl blinn1SG
+Ka 0.10 0.10 0.10
+
+Kd 0.00 0.00 0.00
+Ks 0.00 0.00 0.00
+Ke 0.00 0.00 0.00
+Ns 0.060000
+Ni 1.500000
+d 1.000000
+Tr 0.000000
+Tf 1.000000 1.000000 1.000000
+illum 2
+-map_Kd windmill_diffuse.tga
++map_Kd windmill_diffuse.jpg
+
+-map_Ks windmill_spec.tga
++map_Ks windmill_spec.jpg
+
+-map_bump windmill_normal.tga
+-bump windmill_normal.tga
++map_bump windmill_normal.jpg
++bump windmill_normal.jpg
+</pre>
+<p>Maintenant que le fichier .MTL pointe vers des textures de taille raisonnable, nous devons le charger.
+Nous allons donc faire comme nous l'avons fait ci-dessus : charger d'abord les matériaux,
+puis les définir sur l'<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
++  const mtlLoader = new MTLLoader();
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) =&gt; {
++    mtl.preload();
++    const objLoader = new OBJLoader();
++    objLoader.setMaterials(mtl);
+    objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
+      root.updateMatrixWorld();
+      scene.add(root);
+      // calcule la boîte qui contient tout ce qui se trouve
+      // à partir de la racine et en dessous
+      const box = new THREE.Box3().setFromObject(root);
+
+      const boxSize = box.getSize(new THREE.Vector3()).length();
+      const boxCenter = box.getCenter(new THREE.Vector3());
+
+      // positionne la caméra pour encadrer la boîte
+      frameArea(boxSize * 1.2, boxSize, boxCenter, camera);
+
+      // met à jour les contrôles Trackball pour gérer la nouvelle taille
+      controls.maxDistance = boxSize * 10;
+      controls.target.copy(boxCenter);
+      controls.update();
+    });
++  });
+}
+</pre>
+<p>Avant d'essayer, j'ai rencontré quelques problèmes que, plutôt que de montrer un échec,
+je vais simplement passer en revue.</p>
+<p>Problème n°1 : Le MTLLoader de three crée des matériaux qui multiplient la couleur diffuse du matériau par la carte de texture diffuse.</p>
+<p>C'est une fonctionnalité utile, mais en regardant le fichier .MTL ci-dessus, la ligne</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">Kd 0.00 0.00 0.00
+</pre>
+<p>définit la couleur diffuse à 0. Carte de texture * 0 = noir ! Il est possible que l'outil de modélisation
+utilisé pour créer le moulin à vent n'ait pas multiplié la carte de texture diffuse par la couleur diffuse.
+C'est pourquoi cela a fonctionné pour les artistes qui ont créé ce moulin à vent.</p>
+<p>Pour corriger cela, nous pouvons changer la ligne en</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">Kd 1.00 1.00 1.00
+</pre>
+<p>car Carte de Texture * 1 = Carte de Texture.</p>
+<p>Problème n°2 : La couleur spéculaire est également noire</p>
+<p>La ligne qui commence par <code class="notranslate" translate="no">Ks</code> spécifie la couleur spéculaire. Il est probable que le logiciel de modélisation
+utilisé pour créer le moulin à vent ait fait quelque chose de similaire à ce qu'il a fait avec les cartes diffuses,
+c'est-à-dire qu'il a utilisé la couleur de la carte spéculaire pour les reflets spéculaires.
+Three.js utilise uniquement le canal rouge d'une carte spéculaire comme entrée pour déterminer la quantité
+de couleur spéculaire à refléter, mais three a toujours besoin d'une couleur spéculaire définie.</p>
+<p>Comme ci-dessus, nous pouvons corriger cela en éditant le fichier .MTL comme ceci.</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-Ks 0.00 0.00 0.00
++Ks 1.00 1.00 1.00
+</pre>
+<p>Problème n°3 : Le fichier <code class="notranslate" translate="no">windmill_normal.jpg</code> est une carte normale et non une carte de relief.</p>
+<p>Tout comme ci-dessus, il suffit d'éditer le fichier .MTL</p>
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-map_bump windmill_normal.jpg
+-bump windmill_normal.jpg
++norm windmill_normal.jpg
+</pre>
+<p>Compte tenu de tout cela, si nous l'essayons maintenant, il devrait se charger avec les matériaux.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-obj-materials-windmill2.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/load-obj-materials-windmill2.html" target="_blank">cliquez ici pour ouvrir dans une nouvelle fenêtre</a>
+</div>
+
+<p></p>
+<p>Le chargement de modèles rencontre souvent ce genre de problèmes. Les problèmes courants incluent :</p>
+<ul>
+<li><p>Nécessité de connaître la taille</p>
+<p>Ci-dessus, nous avons fait en sorte que la caméra essaie de cadrer la scène, mais ce n'est pas toujours la chose appropriée à faire. Généralement, la chose la plus appropriée à faire est de créer vos propres modèles ou de télécharger les modèles, de les charger dans un logiciel 3D et d'examiner leur échelle et de l'ajuster si nécessaire.</p>
+</li>
+<li><p>Orientation incorrecte</p>
+<p>THREE.js utilise généralement Y vers le haut. Certains logiciels de modélisation utilisent par défaut Z vers le haut, d'autres Y vers le haut. Certains sont configurables.
+Si vous rencontrez ce cas où vous chargez un modèle et qu'il est sur le côté. Vous pouvez soit modifier votre code pour faire pivoter le modèle après le chargement (non recommandé), soit charger le modèle dans votre logiciel de modélisation préféré ou utiliser des outils en ligne de commande pour faire pivoter l'objet dans l'orientation dont vous avez besoin, tout comme vous éditeriez une image pour votre site web plutôt que de la télécharger et d'appliquer du code pour l'ajuster. Blender a même des options lors de l'exportation pour changer l'orientation.</p>
+</li>
+<li><p>Pas de fichier .MTL ou matériaux incorrects ou paramètres incompatibles</p>
+<p>Ci-dessus, nous avons utilisé un fichier .MTL qui nous a aidés à charger des matériaux, mais il y a eu des problèmes. Nous avons édité manuellement le fichier .MTL pour les corriger.
+Il est également courant de regarder à l'intérieur du fichier .OBJ pour voir quels matériaux il contient, ou de charger le fichier .OBJ dans THREE.js et de parcourir la scène pour afficher tous les matériaux. Ensuite, modifiez le code pour créer des matériaux personnalisés et les attribuer là où cela est approprié, soit en créant un objet paire nom/matériau à passer au chargeur au lieu de charger le fichier .MTL, SOIT, après le chargement de la scène, en parcourant la scène et en corrigeant les choses.</p>
+</li>
+<li><p>Textures trop grandes</p>
+<p>La plupart des modèles 3D sont créés pour l'architecture, les films et publicités, ou les jeux. Pour l'architecture et les films, personne ne se soucie vraiment de la taille des textures puisque. Pour les jeux, les gens s'en soucient car les jeux ont une mémoire limitée, mais la plupart des jeux s'exécutent localement. Cependant, sur les pages web, vous voulez charger le plus rapidement possible, et vous devez donc regarder les textures et essayer de les rendre aussi petites que possible tout en conservant un bon rendu. En fait, pour le premier moulin à vent, nous aurions probablement dû faire quelque chose concernant les textures. Elles totalisent actuellement 10 Mo !!!</p>
+<p>Rappelez-vous également,
+comme nous l'avons mentionné dans <a href="textures.html">l'article sur les textures</a>, que
+les textures prennent de la mémoire. Ainsi, un JPG de 50 Ko qui s'étend à 4096x4096 se téléchargera
+rapidement mais prendra toujours une énorme quantité de mémoire.</p>
+</li>
+</ul>
+<p>La dernière chose que je voulais montrer est de faire tourner les moulins à vent. Malheureusement,
+les fichiers .OBJ n'ont pas de hiérarchie. Cela signifie que toutes les parties de chaque
+moulin à vent sont fondamentalement considérées comme un seul maillage. Vous ne pouvez pas faire tourner les
+pales du moulin car elles ne sont pas séparées du reste du bâtiment.</p>
+<p>C'est l'une des principales raisons pour lesquelles le .OBJ n'est pas vraiment un bon format.
+Si je devais deviner, la raison pour laquelle il est plus courant que d'autres formats
+est qu'il est simple et, comme il ne prend pas en charge de nombreuses fonctionnalités, il fonctionne le plus souvent.
+Surtout si vous créez quelque chose de statique comme une image architecturale
+et qu'il n'y a pas besoin d'animer quoi que ce soit, ce n'est pas une mauvaise façon d'intégrer des
+éléments statiques dans une scène.</p>
+<p>Ensuite, nous allons essayer <a href="load-gltf.html">le chargement d'une scène gLTF</a>.
+Le format gLTF prend en charge beaucoup plus de fonctionnalités.</p>
 
         </div>
       </div>

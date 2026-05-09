@@ -4,6 +4,10 @@
 		<title>three.js webgl - custom attributes [lines]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - custom attributes [lines]">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_custom_attributes_lines.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_custom_attributes_lines.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -73,7 +77,6 @@
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
-				animate();
 
 			} );
 
@@ -146,6 +149,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -169,8 +173,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

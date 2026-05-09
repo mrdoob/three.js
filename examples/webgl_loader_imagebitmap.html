@@ -4,6 +4,10 @@
 		<title>three.js webgl - loader - ImageBitmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loader - ImageBitmap">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_imagebitmap.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_imagebitmap.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -28,21 +32,20 @@
 			let group, cubes;
 
 			init();
-			animate();
 
 			function addImageBitmap() {
 
 				new THREE.ImageBitmapLoader()
+					.setOptions( { imageOrientation: 'flipY' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
 						const texture = new THREE.CanvasTexture( imageBitmap );
 						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						/* ImageBitmap should be disposed when done with it
-						   Can't be done until it's actually uploaded to WebGLTexture */
+						// ImageBitmap should be disposed when done with it.
 
-						// imageBitmap.close();
+						texture.onUpdate = disposeImageBitmap;
 
 						addCube( material );
 
@@ -114,6 +117,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// TESTS
@@ -146,7 +150,12 @@
 
 				renderer.render( scene, camera );
 
-				requestAnimationFrame( animate );
+			}
+
+			function disposeImageBitmap( texture ) {
+
+				texture.source.data.close();
+				texture.onUpdate = null; // make sure this callback is executed only once per texture
 
 			}
 

@@ -4,6 +4,10 @@
 	<title>three.js webgl - instanced particles - billboards - colors</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - instanced particles - billboards - colors">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_buffergeometry_instancing_billboards.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_buffergeometry_instancing_billboards.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -47,7 +51,7 @@
 		varying vec2 vUv;
 		varying float vScale;
 
-		// HSL to RGB Convertion helpers
+		// HSL to RGB Conversion helpers
 		vec3 HUEtoRGB(float H){
 			H = mod(H,1.0);
 			float R = abs(H * 6.0 - 3.0) - 1.0;
@@ -88,6 +92,8 @@
 
 		let camera, scene, renderer;
 		let geometry, material, mesh;
+
+		init();
 
 		function init() {
 
@@ -137,6 +143,7 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
@@ -159,15 +166,6 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
-
-			render();
-			stats.update();
-
-		}
-
-		function render() {
-
 			const time = performance.now() * 0.0005;
 
 			material.uniforms[ 'time' ].value = time;
@@ -177,13 +175,10 @@
 
 			renderer.render( scene, camera );
 
-		}
-
-		if ( init() ) {
-
-			animate();
+			stats.update();
 
 		}
+
 	</script>
 
 </body>

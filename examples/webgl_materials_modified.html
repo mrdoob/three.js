@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - modified</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - modified">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_modified.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_modified.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -34,7 +38,6 @@
 			let camera, scene, renderer, stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -63,6 +66,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -104,7 +108,7 @@
 
 				};
 
-				// Make sure WebGLRenderer doesnt reuse a single program
+				// Make sure WebGLRenderer doesn't reuse a single program
 
 				material.customProgramCacheKey = function () {
 
@@ -133,8 +137,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

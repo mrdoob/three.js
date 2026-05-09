@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_toon.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_toon.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -40,7 +44,6 @@
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
-				animate();
 
 			} );
 
@@ -62,14 +65,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// Materials
 
 				const cubeWidth = 400;
-				const numberOfSphersPerSide = 5;
-				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-				const stepSize = 1.0 / numberOfSphersPerSide;
+				const numberOfSpheresPerSide = 5;
+				const sphereRadius = ( cubeWidth / numberOfSpheresPerSide ) * 0.8 * 0.5;
+				const stepSize = 1.0 / numberOfSpheresPerSide;
 
 				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
@@ -179,8 +183,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

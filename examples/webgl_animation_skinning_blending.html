@@ -4,6 +4,10 @@
 		<title>three.js webgl - animation - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - skinning">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_skinning_blending.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_skinning_blending.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			a {
@@ -38,7 +42,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let scene, renderer, camera, stats;
-			let model, skeleton, mixer, clock;
+			let model, skeleton, mixer, timer;
 
 			const crossFadeControls = [];
 
@@ -59,7 +63,8 @@
 				camera.position.set( 1, 2, - 3 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -126,7 +131,7 @@
 
 					activateAllActions();
 
-					animate();
+					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -466,9 +471,7 @@
 
 			function animate() {
 
-				// Render loop
-
-				requestAnimationFrame( animate );
+				timer.update();
 
 				idleWeight = idleAction.getEffectiveWeight();
 				walkWeight = walkAction.getEffectiveWeight();
@@ -484,7 +487,7 @@
 
 				// Get the time elapsed since the last frame, used for mixer update (if not in single step mode)
 
-				let mixerUpdateDelta = clock.getDelta();
+				let mixerUpdateDelta = timer.getDelta();
 
 				// If in single step mode, make one step and then do nothing (until the user clicks again)
 
@@ -499,9 +502,9 @@
 
 				mixer.update( mixerUpdateDelta );
 
-				stats.update();
-
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

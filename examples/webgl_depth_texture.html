@@ -4,6 +4,10 @@
 		<title>three.js webgl - Depth Texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - Depth Texture">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_depth_texture.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_depth_texture.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			#error {
@@ -25,8 +29,6 @@
 			}
 		</script>
 		<script id="post-frag" type="x-shader/x-fragment">
-			#include <packing>
-
 			varying vec2 vUv;
 			uniform sampler2D tDiffuse;
 			uniform sampler2D tDepth;
@@ -36,8 +38,8 @@
 
 			float readDepth( sampler2D depthSampler, vec2 coord ) {
 				float fragCoordZ = texture2D( depthSampler, coord ).x;
-				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
-				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+				float viewZ = ( cameraNear * cameraFar ) / ( ( cameraFar - cameraNear ) * fragCoordZ - cameraFar );
+				return ( viewZ + cameraNear ) / ( cameraNear - cameraFar );
 			}
 
 			void main() {
@@ -83,24 +85,24 @@
 			let camera, scene, renderer, controls, stats;
 			let target;
 			let postScene, postCamera, postMaterial;
-			const supportsExtension = true;
 
 			const params = {
 				format: THREE.DepthFormat,
-				type: THREE.UnsignedShortType
+				type: THREE.UnsignedShortType,
+				samples: 0,
 			};
 
 			const formats = { DepthFormat: THREE.DepthFormat, DepthStencilFormat: THREE.DepthStencilFormat };
-			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, UnsignedInt248Type: THREE.UnsignedInt248Type };
+			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, FloatType: THREE.FloatType };
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -131,6 +133,7 @@
 
 				gui.add( params, 'format', formats ).onChange( setupRenderTarget );
 				gui.add( params, 'type', types ).onChange( setupRenderTarget );
+				gui.add( params, 'samples', 0, 16, 1 ).onChange( setupRenderTarget );
 				gui.open();
 
 			}
@@ -139,13 +142,18 @@
 
 				if ( target ) target.dispose();
 
-				const format = parseFloat( params.format );
-				const type = parseFloat( params.type );
+				const format = parseInt( params.format );
+				const type = parseInt( params.type );
+				const samples = parseInt( params.samples );
 
-				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				const dpr = renderer.getPixelRatio();
+				target = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 				target.texture.minFilter = THREE.NearestFilter;
 				target.texture.magFilter = THREE.NearestFilter;
+				target.texture.generateMipmaps = false;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
+				target.samples = samples;
+
 				target.depthTexture = new THREE.DepthTexture();
 				target.depthTexture.format = format;
 				target.depthTexture.type = type;
@@ -183,22 +191,28 @@
 				const count = 50;
 				const scale = 5;
 
+				const mesh = new THREE.InstancedMesh( geometry, material, count );
+				const dummy = new THREE.Object3D();
+
 				for ( let i = 0; i < count; i ++ ) {
 
 					const r = Math.random() * 2.0 * Math.PI;
 					const z = ( Math.random() * 2.0 ) - 1.0;
 					const zScale = Math.sqrt( 1.0 - z * z ) * scale;
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set(
+					dummy.position.set(
 						Math.cos( r ) * zScale,
 						Math.sin( r ) * zScale,
 						z * scale
 					);
-					mesh.rotation.set( Math.random(), Math.random(), Math.random() );
-					scene.add( mesh );
+					dummy.rotation.set( Math.random(), Math.random(), Math.random() );
+
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
 
 				}
+
+				scene.add( mesh );
 
 			}
 
@@ -215,10 +229,6 @@
 			}
 
 			function animate() {
-
-				if ( ! supportsExtension ) return;
-
-				requestAnimationFrame( animate );
 
 				// render scene into target
 				renderer.setRenderTarget( target );

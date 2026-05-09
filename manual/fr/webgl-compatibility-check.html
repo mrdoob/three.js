@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Vérification de la compatibilité WebGL</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – WebGL Compatibility Check">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Vérification de la compatibilité WebGL</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Bien que cela devienne de moins en moins un problème, certains appareils ou navigateurs peuvent encore ne pas prendre en charge WebGL 2.
+            La méthode suivante vous permet de vérifier s'il est pris en charge et d'afficher un message à l'utilisateur si ce n'est pas le cas.
+            Importez le module de détection de la prise en charge WebGL et exécutez le code suivant avant de tenter de rendre quoi que ce soit.
+          </p>
+      
+<pre class="prettyprint notranslate lang-js" translate="no">
+import WebGL from 'three/addons/capabilities/WebGL.js';
+
+if ( WebGL.isWebGL2Available() ) {
+
+  // Initialisez la fonction ou d'autres initialisations ici
+  animate();
+
+} else {
+
+  const warning = WebGL.getWebGL2ErrorMessage();
+  document.getElementById( 'container' ).appendChild( warning );
+
+}
+</pre>
+          
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

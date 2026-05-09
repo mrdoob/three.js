@@ -4,6 +4,10 @@
 		<title> three.js webgl - ShadowMesh </title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content=" three.js webgl - ShadowMesh ">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmesh.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmesh.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -34,7 +38,8 @@
 
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const renderer = new THREE.WebGLRenderer( { stencil: true } );
 
 			const sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 3 );
@@ -61,7 +66,6 @@
 			const TWO_PI = Math.PI * 2;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -69,7 +73,9 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setAnimationLoop( animate );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
+			
 				window.addEventListener( 'resize', onWindowResize );
 
 				camera.position.set( 0, 2.5, 10 );
@@ -178,9 +184,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				frameTime = clock.getDelta();
+				frameTime = timer.getDelta();
 
 				cube.rotation.x += 1.0 * frameTime;
 				cube.rotation.y += 1.0 * frameTime;

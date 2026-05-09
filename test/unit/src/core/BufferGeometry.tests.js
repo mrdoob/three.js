@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 
 import {
@@ -30,7 +28,7 @@ function bufferAttributeEquals( a, b, tolerance ) {
 
 	for ( let i = 0, il = a.count * a.itemSize; i < il; i ++ ) {
 
-		const delta = a[ i ] - b[ i ];
+		const delta = Math.abs( a.array[ i ] - b.array[ i ] );
 		if ( delta > tolerance ) {
 
 			return false;
@@ -103,23 +101,6 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'id', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'uuid', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'name', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'type', ( assert ) => {
 
@@ -128,60 +109,6 @@ export default QUnit.module( 'Core', () => {
 				object.type === 'BufferGeometry',
 				'BufferGeometry.type should be BufferGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'index', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'attributes', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'morphAttributes', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'morphTargetsRelative', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'groups', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'boundingBox', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'boundingSphere', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'drawRange', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'userData', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -213,12 +140,6 @@ export default QUnit.module( 'Core', () => {
 
 			a.setIndex( str );
 			assert.strictEqual( a.getIndex(), str, 'Weird index gets stored correctly' );
-
-		} );
-
-		QUnit.todo( 'getAttribute', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -262,11 +183,6 @@ export default QUnit.module( 'Core', () => {
 
 			a.clearGroups();
 			assert.strictEqual( a.groups.length, 0, 'Check groups were deleted correctly' );
-
-		} );
-		QUnit.todo( 'clearGroups', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -390,7 +306,7 @@ export default QUnit.module( 'Core', () => {
 			a.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 			const sqrt = Math.sqrt( 2 );
-			const expected = new Float32Array( [
+			const expected = new BufferAttribute( new Float32Array( [
 				1, 0, - sqrt,
 				- 1, 0, - sqrt,
 				- 1, sqrt, 0,
@@ -398,11 +314,11 @@ export default QUnit.module( 'Core', () => {
 				- 1, sqrt, 0,
 				1, sqrt, 0,
 				1, 0, - sqrt
-			] );
+			] ), 3 );
 
 			a.lookAt( new Vector3( 0, 1, - 1 ) );
 
-			assert.ok( bufferAttributeEquals( a.attributes.position.array, expected ), 'Rotation is correct' );
+			assert.ok( bufferAttributeEquals( a.attributes.position, expected ), 'Rotation is correct' );
 
 		} );
 
@@ -424,12 +340,6 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( pos[ 0 ] === - 2.5 && pos[ 1 ] === - 2.5 && pos[ 2 ] === - 2.5 &&
 				pos[ 3 ] === - 0.5 && pos[ 4 ] === - 0.5 && pos[ 5 ] === - 0.5 &&
 				pos[ 6 ] === 2.5 && pos[ 7 ] === 2.5 && pos[ 8 ] === 2.5, 'vertices were replaced by boundingBox dimensions' );
-
-		} );
-
-		QUnit.todo( 'setFromPoints', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -463,14 +373,20 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		const toHalfFloatArray = ( f32Array ) => {
+
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
+
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+
 			}
+
 			return f16Array;
+
 		};
 
 		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
+
 			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
 			const geometry = new BufferGeometry();
 
@@ -490,6 +406,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
+
 			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
 			const geometry = new BufferGeometry();
 
@@ -509,37 +426,31 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'computeTangents', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'computeVertexNormals', ( assert ) => {
 
 			// get normals for a counter clockwise created triangle
 			let normals = getNormalsForVertices( [ - 1, 0, 0, 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === 1,
-				'first normal is pointing to screen since the the triangle was created counter clockwise' );
+				'first normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === 1,
-				'second normal is pointing to screen since the the triangle was created counter clockwise' );
+				'second normal is pointing to screen since the triangle was created counter clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === 1,
-				'third normal is pointing to screen since the the triangle was created counter clockwise' );
+				'third normal is pointing to screen since the triangle was created counter clockwise' );
 
 			// get normals for a clockwise created triangle
 			normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === - 1,
-				'first normal is pointing to screen since the the triangle was created clockwise' );
+				'first normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 3 ] === 0 && normals[ 4 ] === 0 && normals[ 5 ] === - 1,
-				'second normal is pointing to screen since the the triangle was created clockwise' );
+				'second normal is pointing to screen since the triangle was created clockwise' );
 
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === - 1,
-				'third normal is pointing to screen since the the triangle was created clockwise' );
+				'third normal is pointing to screen since the triangle was created clockwise' );
 
 			normals = getNormalsForVertices( [ 0, 0, 1, 0, 0, - 1, 1, 1, 0 ], assert );
 
@@ -568,16 +479,17 @@ export default QUnit.module( 'Core', () => {
 			const sqrt = 0.5 * Math.sqrt( 2 );
 			const normal = new BufferAttribute( new Float32Array( [
 				- 1, 0, 0, - 1, 0, 0, - 1, 0, 0,
-				sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0,
-				- 1, 0, 0
+				sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0
 			] ), 3 );
 			const position = new BufferAttribute( new Float32Array( [
 				0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5,
-				0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5,
-				- 0.5, - 0.5, - 0.5
+				0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5
 			] ), 3 );
+			// the index buffer defines the same two triangles but in counter-clockwise order,
+			// which should result in flipped normals.
+			const flippedNormals = normal.clone().applyMatrix4( new Matrix4().makeScale( - 1, - 1, - 1 ) );
 			const index = new BufferAttribute( new Uint16Array( [
-				0, 2, 1, 2, 3, 1, 4, 6, 5, 6, 7, 5
+				0, 2, 1, 3, 5, 4
 			] ), 1 );
 
 			let a = new BufferGeometry();
@@ -600,13 +512,7 @@ export default QUnit.module( 'Core', () => {
 			a.setAttribute( 'position', position );
 			a.setIndex( index );
 			a.computeVertexNormals();
-			assert.ok( bufferAttributeEquals( normal, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
-
-		} );
-
-		QUnit.todo( 'normalizeNormals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok( bufferAttributeEquals( flippedNormals, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
 
 		} );
 
@@ -646,7 +552,7 @@ export default QUnit.module( 'Core', () => {
 			let j = a.toJSON();
 			const gold = {
 				'metadata': {
-					'version': 4.6,
+					'version': 4.7,
 					'type': 'BufferGeometry',
 					'generator': 'BufferGeometry.toJSON'
 				},

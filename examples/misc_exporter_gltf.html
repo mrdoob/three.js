@@ -4,6 +4,10 @@
 		<title>three.js webgl - exporter - gltf</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - exporter - gltf">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_exporter_gltf.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_exporter_gltf.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -29,10 +33,11 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import * as TextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
 
 			function exportGLTF( input ) {
 
-				const gltfExporter = new GLTFExporter();
+				const gltfExporter = new GLTFExporter().setTextureUtils( TextureUtils );
 
 				const options = {
 					trs: params.trs,
@@ -97,7 +102,7 @@
 			let container;
 
 			let camera, object, object2, material, geometry, scene1, scene2, renderer;
-			let gridHelper, sphere, model, coffeemat;
+			let gridHelper, sphere, model, coffeemat, webpBox;
 
 			const params = {
 				trs: false,
@@ -111,10 +116,10 @@
 				exportObjects: exportObjects,
 				exportSceneObject: exportSceneObject,
 				exportCompressedObject: exportCompressedObject,
+				exportWebPModel: exportWebPModel,
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -369,7 +374,13 @@
 				// ---------------------------------------------------------------------
 				// Ortho camera
 				// ---------------------------------------------------------------------
-				const cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 10 );
+
+				const height = 1000; // frustum height
+				const aspect = window.innerWidth / window.innerHeight;
+
+				const cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 0, 2000 );
+				cameraOrtho.position.set( 600, 400, 0 );
+				cameraOrtho.lookAt( 0, 0, 0 );
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 
@@ -464,6 +475,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 
@@ -494,6 +506,30 @@
 
 				} );
 
+				// ---------------------------------------------------------------------
+				// Box with WebP texture (EXT_texture_webp)
+				// ---------------------------------------------------------------------
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 64;
+				canvas.height = 64;
+				const ctx = canvas.getContext( '2d' );
+				ctx.fillStyle = '#005BBB';
+				ctx.fillRect( 0, 0, 64, 64 );
+				ctx.fillStyle = '#FFD500';
+				ctx.fillRect( 16, 16, 32, 32 );
+
+				const webpTexture = new THREE.CanvasTexture( canvas );
+				webpTexture.userData.mimeType = 'image/webp';
+				webpTexture.colorSpace = THREE.SRGBColorSpace;
+
+				webpBox = new THREE.Mesh(
+					new THREE.BoxGeometry( 100, 100, 100 ),
+					new THREE.MeshBasicMaterial( { map: webpTexture } )
+				);
+				webpBox.position.set( 400, 0, 0 );
+				webpBox.name = 'WebPBox';
+				scene1.add( webpBox );
+
 				//
 
 				const gui = new GUI();
@@ -512,6 +548,7 @@
 				h.add( params, 'exportObjects' ).name( 'Export Sphere With Grid' );
 				h.add( params, 'exportSceneObject' ).name( 'Export Scene 1 and Object' );
 				h.add( params, 'exportCompressedObject' ).name( 'Export Coffeemat (from compressed data)' );
+				h.add( params, 'exportWebPModel' ).name( 'Export WebP Model (EXT_texture_webp)' );
 
 				gui.open();
 
@@ -559,6 +596,12 @@
 
 			}
 
+			function exportWebPModel() {
+
+				exportGLTF( webpBox );
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -572,14 +615,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
-
 				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
@@ -589,6 +624,8 @@
 				renderer.render( scene1, camera );
 
 			}
+
+
 
 		</script>
 

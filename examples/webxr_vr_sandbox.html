@@ -4,6 +4,10 @@
 		<title>three.js vr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - sandbox">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_sandbox.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_sandbox.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -20,8 +24,7 @@
 
 			import * as THREE from 'three';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-			import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { Reflector } from 'three/addons/objects/Reflector.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
@@ -47,13 +50,12 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'moonless_golf_1k.hdr', function ( texture ) {
 
@@ -80,24 +82,10 @@
 				scene.add( torus );
 
 				const cylinderGeometry = new THREE.CylinderGeometry( 1, 1, 0.1, 50 );
-				const cylinderMaterial = new THREE.MeshStandardMaterial();
+				const cylinderMaterial = new THREE.MeshLambertMaterial();
 				const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 				cylinder.position.z = - 2;
 				scene.add( cylinder );
-
-				// lensflare
-				const loader = new THREE.TextureLoader();
-				const texture0 = loader.load( 'textures/lensflare/lensflare0.png' );
-				const texture3 = loader.load( 'textures/lensflare/lensflare3.png' );
-
-				const lensflare = new Lensflare();
-				lensflare.position.set( 0, 5, - 5 );
-				lensflare.addElement( new LensflareElement( texture0, 700, 0 ) );
-				lensflare.addElement( new LensflareElement( texture3, 60, 0.6 ) );
-				lensflare.addElement( new LensflareElement( texture3, 70, 0.7 ) );
-				lensflare.addElement( new LensflareElement( texture3, 120, 0.9 ) );
-				lensflare.addElement( new LensflareElement( texture3, 70, 1 ) );
-				scene.add( lensflare );
 
 				//
 
@@ -112,7 +100,7 @@
 				scene.add( reflector );
 
 				const frameGeometry = new THREE.BoxGeometry( 2.1, 2.1, 0.1 );
-				const frameMaterial = new THREE.MeshPhongMaterial();
+				const frameMaterial = new THREE.MeshLambertMaterial( { color: 0x888888 } );
 				const frame = new THREE.Mesh( frameGeometry, frameMaterial );
 				frame.position.z = - 0.07;
 				reflector.add( frame );
@@ -123,6 +111,7 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -223,12 +212,6 @@
 			}
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				const time = performance.now() * 0.0002;
 				const torus = scene.getObjectByName( 'torus' );

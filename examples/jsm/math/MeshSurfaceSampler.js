@@ -4,6 +4,10 @@ import {
 	Vector3
 } from 'three';
 
+const _face = new Triangle();
+const _color = new Vector3();
+const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
+
 /**
  * Utility class for sampling weighted random points on the surface of a mesh.
  *
@@ -11,16 +15,41 @@ import {
  * random samples may be selected in O(logn) time. Memory usage is O(n).
  *
  * References:
- * - http://www.joesfer.com/?p=84
- * - https://stackoverflow.com/a/4322940/1314762
+ * - {@link http://www.joesfer.com/?p=84}
+ * - {@link https://stackoverflow.com/a/4322940/1314762}
+ *
+ * ```js
+ * const sampler = new MeshSurfaceSampler( surfaceMesh )
+ * 	.setWeightAttribute( 'color' )
+ * 	.build();
+ *
+ * const mesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+ *
+ * const position = new THREE.Vector3();
+ * const matrix = new THREE.Matrix4();
+ *
+ * // Sample randomly from the surface, creating an instance of the sample geometry at each sample point.
+ *
+ * for ( let i = 0; i < 100; i ++ ) {
+ *
+ * 	sampler.sample( position );
+ * 	matrix.makeTranslation( position.x, position.y, position.z );
+ * 	mesh.setMatrixAt( i, matrix );
+ *
+ * }
+ *
+ * scene.add( mesh );
+ * ```
+ *
+ * @three_import import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
  */
-
-const _face = new Triangle();
-const _color = new Vector3();
-const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
-
 class MeshSurfaceSampler {
 
+	/**
+	 * Constructs a mesh surface sampler.
+	 *
+	 * @param {Mesh} mesh - Surface mesh from which to sample.
+	 */
 	constructor( mesh ) {
 
 		this.geometry = mesh.geometry;
@@ -37,6 +66,16 @@ class MeshSurfaceSampler {
 
 	}
 
+	/**
+	 * Specifies a vertex attribute to be used as a weight when sampling from the surface.
+	 * Faces with higher weights are more likely to be sampled, and those with weights of
+	 * zero will not be sampled at all. For vector attributes, only .x is used in sampling.
+	 *
+	 * If no weight attribute is selected, sampling is randomly distributed by area.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @return {MeshSurfaceSampler} A reference to this sampler.
+	 */
 	setWeightAttribute( name ) {
 
 		this.weightAttribute = name ? this.geometry.getAttribute( name ) : null;
@@ -45,6 +84,13 @@ class MeshSurfaceSampler {
 
 	}
 
+	/**
+	 * Processes the input geometry and prepares to return samples. Any configuration of the
+	 * geometry or sampler must occur before this method is called. Time complexity is O(n)
+	 * for a surface with n faces.
+	 *
+	 * @return {MeshSurfaceSampler} A reference to this sampler.
+	 */
 	build() {
 
 		const indexAttribute = this.indexAttribute;
@@ -107,6 +153,12 @@ class MeshSurfaceSampler {
 
 	}
 
+	/**
+	 * Allows to set a custom random number generator. Default is `Math.random()`.
+	 *
+	 * @param {Function} randomFunction - A random number generator.
+	 * @return {MeshSurfaceSampler} A reference to this sampler.
+	 */
 	setRandomGenerator( randomFunction ) {
 
 		this.randomFunction = randomFunction;
@@ -114,21 +166,34 @@ class MeshSurfaceSampler {
 
 	}
 
+	/**
+	 * Selects a random point on the surface of the input geometry, returning the
+	 * position and optionally the normal vector, color and UV Coordinate at that point.
+	 * Time complexity is O(log n) for a surface with n faces.
+	 *
+	 * @param {Vector3} targetPosition - The target object holding the sampled position.
+	 * @param {Vector3} targetNormal - The target object holding the sampled normal.
+	 * @param {Color} targetColor - The target object holding the sampled color.
+	 * @param {Vector2} targetUV -  The target object holding the sampled uv coordinates.
+	 * @return {MeshSurfaceSampler} A reference to this sampler.
+	 */
 	sample( targetPosition, targetNormal, targetColor, targetUV ) {
 
-		const faceIndex = this.sampleFaceIndex();
-		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV );
+		const faceIndex = this._sampleFaceIndex();
+		return this._sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV );
 
 	}
 
-	sampleFaceIndex() {
+	// private
+
+	_sampleFaceIndex() {
 
 		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
-		return this.binarySearch( this.randomFunction() * cumulativeTotal );
+		return this._binarySearch( this.randomFunction() * cumulativeTotal );
 
 	}
 
-	binarySearch( x ) {
+	_binarySearch( x ) {
 
 		const dist = this.distribution;
 		let start = 0;
@@ -162,7 +227,7 @@ class MeshSurfaceSampler {
 
 	}
 
-	sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV ) {
+	_sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV ) {
 
 		let u = this.randomFunction();
 		let v = this.randomFunction();

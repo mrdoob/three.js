@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - cube refraction [Lucy]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - cube refraction [Lucy]">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_cubemap_refraction.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_cubemap_refraction.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -41,7 +45,6 @@
 			let windowHalfY = window.innerHeight / 2;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -83,6 +86,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -147,8 +151,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

@@ -4,6 +4,10 @@
 		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - effects - ascii">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_effects_ascii.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_effects_ascii.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -33,7 +37,6 @@
 			const start = Date.now();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -64,6 +67,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
@@ -96,14 +100,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				const timer = Date.now() - start;
 

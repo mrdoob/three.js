@@ -4,6 +4,10 @@
 		<title>three.js webgl - clipping planes - advanced</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - clipping planes - advanced">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_clipping_advanced.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_clipping_advanced.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -208,18 +212,20 @@
 					clipShadows: true
 				} );
 
-				object = new THREE.Group();
-
+				const count = 5 * 5 * 5;
 				const geometry = new THREE.BoxGeometry( 0.18, 0.18, 0.18 );
+				object = new THREE.InstancedMesh( geometry, clipMaterial, count );
+				object.castShadow = true;
+
+				let i = 0;
+				const matrix = new THREE.Matrix4();
 
 				for ( let z = - 2; z <= 2; ++ z )
 					for ( let y = - 2; y <= 2; ++ y )
 						for ( let x = - 2; x <= 2; ++ x ) {
 
-							const mesh = new THREE.Mesh( geometry, clipMaterial );
-							mesh.position.set( x / 5, y / 5, z / 5 );
-							mesh.castShadow = true;
-							object.add( mesh );
+							matrix.setPosition( x / 5, y / 5, z / 5 );
+							object.setMatrixAt( i ++, matrix );
 
 						}
 
@@ -279,15 +285,17 @@
 				const container = document.body;
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				window.addEventListener( 'resize', onWindowResize );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 				// Clipping setup:
 				globalClippingPlanes = createPlanes( GlobalClippingPlanes.length );
 				renderer.clippingPlanes = Empty;
 				renderer.localClippingEnabled = true;
+
+				window.addEventListener( 'resize', onWindowResize );
 
 				// Stats
 
@@ -397,8 +405,6 @@
 				const currentTime = Date.now(),
 					time = ( currentTime - startTime ) / 1000;
 
-				requestAnimationFrame( animate );
-
 				object.position.y = 1;
 				object.rotation.x = time * 0.5;
 				object.rotation.y = time * 0.2;
@@ -433,7 +439,6 @@
 			}
 
 			init();
-			animate();
 
 		</script>
 

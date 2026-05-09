@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -56,13 +57,36 @@ function GeometryParametersPanel( editor, object ) {
 	// arc
 
 	const arcRow = new UIRow();
-	const arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setClass( 'Label' ) );
 	arcRow.add( arc );
 
 	container.add( arcRow );
 
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		tube.setValue( parameters.tube );
+		radialSegments.setValue( parameters.radialSegments );
+		tubularSegments.setValue( parameters.tubularSegments );
+		arc.setValue( parameters.arc * THREE.MathUtils.RAD2DEG );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

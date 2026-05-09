@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - clearcoat</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - clearcoat">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_physical_clearcoat.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_physical_clearcoat.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -39,7 +43,6 @@
 			let group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -177,6 +180,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -219,9 +223,7 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
+			
 				render();
 
 				stats.update();

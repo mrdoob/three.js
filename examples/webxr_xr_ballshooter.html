@@ -4,6 +4,10 @@
 		<title>three.js xr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js xr - ball shooter">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_xr_ballshooter.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_xr_ballshooter.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -36,8 +40,8 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
-			let room, spheres;
-			let physics, velocity = new THREE.Vector3();
+			let room, spheres, physics;
+			const velocity = new THREE.Vector3();
 
 			let count = 0;
 
@@ -70,7 +74,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -81,7 +85,10 @@
 				controls.target.y = 1.6;
 				controls.update();
 
-				document.body.appendChild( XRButton.createButton( renderer, { 'optionalFeatures': [ 'depth-sensing'] } ) );
+				document.body.appendChild( XRButton.createButton( renderer, {
+					'optionalFeatures': [ 'depth-sensing' ],
+					'depthSensing': { 'usagePreference': [ 'gpu-optimized' ], 'dataFormatPreference': [] }
+				} ) );
 
 				// controllers
 
@@ -277,7 +284,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				handleController( controller1 );
 				handleController( controller2 );

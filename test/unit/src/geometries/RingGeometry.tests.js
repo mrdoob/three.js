@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { RingGeometry } from '../../../../src/geometries/RingGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -60,19 +58,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'RingGeometry',
 				'RingGeometry.type should be RingGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

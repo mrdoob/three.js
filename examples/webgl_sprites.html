@@ -4,6 +4,10 @@
 		<title>three.js webgl - sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - sprites">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_sprites.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_sprites.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -35,7 +39,6 @@
 			let group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -110,6 +113,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 
 				document.body.appendChild( renderer.domElement );
@@ -192,13 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
-
-			function render() {
 
 				const time = Date.now() / 1000;
 

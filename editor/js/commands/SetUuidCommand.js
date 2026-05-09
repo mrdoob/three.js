@@ -1,23 +1,23 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newUuid string
- * @constructor
- */
 class SetUuidCommand extends Command {
 
-	constructor( editor, object, newUuid ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {string|null} newUuid
+	 * @constructor
+	 */
+	constructor( editor, object = null, newUuid = null ) {
 
 		super( editor );
 
 		this.type = 'SetUuidCommand';
-		this.name = 'Update UUID';
+		this.name = editor.strings.getKey( 'command/SetUuid' );
 
 		this.object = object;
 
-		this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
+		this.oldUuid = ( object !== null ) ? object.uuid : null;
 		this.newUuid = newUuid;
 
 	}

@@ -3,6 +3,10 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js css2d - label">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/css2d_label.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/css2d_label.jpg">
 		<title>three.js css2d - label</title>
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
@@ -65,7 +69,8 @@
 
 			};
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			const textureLoader = new THREE.TextureLoader();
 
 			let moon;
@@ -206,9 +211,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				requestAnimationFrame( animate );
 
-				const elapsed = clock.getElapsedTime();
+				const elapsed = timer.getElapsed();
 
 				moon.position.set( Math.sin( elapsed ) * 5, 0, Math.cos( elapsed ) * 5 );
 

@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing procedural effects</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing procedural effects">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_procedural.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_procedural.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -77,16 +81,6 @@
 			const params = { procedure: 'noiseRandom3D' };
 
 			init();
-			animate();
-			initGui();
-
-			// Init gui
-			function initGui() {
-
-				const gui = new GUI();
-				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
-
-			}
 
 			function init() {
 
@@ -95,6 +89,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -122,6 +117,11 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				//
+
+				const gui = new GUI();
+				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
+
 			}
 
 			function onWindowResize() {
@@ -131,8 +131,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				switch ( params.procedure ) {
 

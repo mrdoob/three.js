@@ -3,9 +3,16 @@ import {
 } from 'three';
 
 /**
- * Colorify shader
+ * @module ColorifyShader
+ * @three_import import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js';
  */
 
+/**
+ * Colorify shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const ColorifyShader = {
 
 	name: 'ColorifyShader',
@@ -39,8 +46,7 @@ const ColorifyShader = {
 
 			vec4 texel = texture2D( tDiffuse, vUv );
 
-			vec3 luma = vec3( 0.299, 0.587, 0.114 );
-			float v = dot( texel.xyz, luma );
+			float v = luminance( texel.xyz );
 
 			gl_FragColor = vec4( v * color, texel.w );
 

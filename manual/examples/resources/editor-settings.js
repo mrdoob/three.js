@@ -1,7 +1,7 @@
 
-( function () { // eslint-disable-line strict
+( function () {
 
-	'use strict'; // eslint-disable-line strict
+	'use strict';
 
 	function dirname( path ) {
 
@@ -70,7 +70,7 @@
 		const linkRE = /(href=)(")(.*?)(")()/g;
 		const imageSrcRE = /((?:image|img)\.src = )(")(.*?)(")()/g;
 		const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
-		const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
+		const loaderArrayLoadRE = /(loader\.load[a-z]*\(\s*\[)([\s\S]*?)(\])/ig;
 		const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
 		const threejsUrlRE = /(.*?)('|")([^"']*?)('|")([^'"]*?)(\/\*\s+threejs.org:\s+url\s+\*\/)/ig;
 		const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
@@ -169,8 +169,8 @@
 
 		const moduleRE = /(import.*?)('|")(.*?)('|")/g;
 
-		// convert https://threejs.org/build/three.module.js -> https://unpkg.com/three@<version>
-		// convert https://threejs.org/examples/jsm/.?? -> https://unpkg.com/three@<version>/examples/jsm/.??
+		// convert https://threejs.org/build/three.module.js -> https://cdn.jsdelivr.net/npm/three@<version>
+		// convert https://threejs.org/examples/jsm/.?? -> https://cdn.jsdelivr.net/npm/three@<version>/examples/jsm/.??
 
 		if ( ! version ) {
 
@@ -194,12 +194,12 @@
 
 				if ( href.includes( '/build/three.module.js' ) ) {
 
-					return `https://unpkg.com/three@${version}`;
+					return `https://cdn.jsdelivr.net/npm/three@${version}`;
 
 				} else if ( href.includes( '/examples/jsm/' ) ) {
 
 					const url = new URL( href );
-					return `https://unpkg.com/three@${version}${url.pathname}${url.search}${url.hash}`;
+					return `https://cdn.jsdelivr.net/npm/three@${version}${url.pathname}${url.search}${url.hash}`;
 
 				}
 

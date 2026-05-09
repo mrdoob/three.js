@@ -4,6 +4,10 @@
 	<title>three.js webgl - loaders - Draco loader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - Draco loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_draco.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_draco.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
@@ -38,7 +42,6 @@
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
 		init();
-		animate();
 
 		function init() {
 
@@ -52,7 +55,7 @@
 			// Ground
 			const plane = new THREE.Mesh(
 				new THREE.PlaneGeometry( 8, 8 ),
-				new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x101010 } )
+				new THREE.MeshLambertMaterial( { color: 0xcbcbcb } )
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.03;
@@ -68,6 +71,7 @@
 			spotLight.angle = Math.PI / 16;
 			spotLight.penumbra = 0.5;
 			spotLight.castShadow = true;
+			spotLight.shadow.radius = 8;
 			spotLight.position.set( - 1, 1, 1 );
 			scene.add( spotLight );
 
@@ -90,6 +94,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
@@ -107,13 +112,6 @@
 		}
 
 		function animate() {
-
-			render();
-			requestAnimationFrame( animate );
-
-		}
-
-		function render() {
 
 			const timer = Date.now() * 0.0003;
 

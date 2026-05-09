@@ -4,6 +4,10 @@
 		<title>three.js webgl - custom attributes [particles][billboards][alphatest]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - custom attributes [particles][billboards][alphatest]">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_custom_attributes_points3.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_custom_attributes_points3.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -84,7 +88,6 @@
 			const HEIGHT = window.innerHeight;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -119,7 +122,7 @@
 
 				let boxGeometry1 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
 
-				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate identical vertices with different normal/uv data
 
 				boxGeometry1.deleteAttribute( 'normal' );
 				boxGeometry1.deleteAttribute( 'uv' );
@@ -237,6 +240,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
+				renderer.setAnimationLoop( animate );
 
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -260,8 +264,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

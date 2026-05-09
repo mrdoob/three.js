@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( USE_MORPHCOLORS ) && defined( MORPHTARGETS_TEXTURE )
+#if defined( USE_MORPHCOLORS )
 
 	// morphTargetBaseInfluence is set based on BufferGeometry.morphTargetsRelative value:
 	// When morphTargetsRelative is false, this is set to 1 - sum(influences); this results in normal = sum((target - base) * influence)

@@ -1,34 +1,46 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Ping/Pong Texture</title>
+		<title>three.js webgpu - compute ping/pong texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - compute ping/pong texture">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_compute_texture_pingpong.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_compute_texture_pingpong.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Texture
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Ping/Pong Texture</span>
+			</div>
+
+			<small>
+				Compute ping/pong texture using GPU (pure TSL).
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { texture, textureStore, wgslFn, code, instanceIndex, uniform } from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { storageTexture, textureStore, Fn, instanceIndex, uniform, float, vec2, vec4, uvec2, ivec2, int, NodeAccess } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageTexture from 'three/addons/renderers/common/StorageTexture.js';
 
 			let camera, scene, renderer;
 			let computeInitNode, computeToPing, computeToPong;
@@ -37,12 +49,13 @@
 			let phase = true;
 			let lastUpdate = - 1;
 
+			const width = 512, height = 512;
+
 			const seed = uniform( new THREE.Vector2() );
 
 			init();
-			render();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -61,10 +74,9 @@
 				// texture
 
 				const hdr = true;
-				const width = 512, height = 512;
 
-				pingTexture = new StorageTexture( width, height );
-				pongTexture = new StorageTexture( width, height );
+				pingTexture = new THREE.StorageTexture( width, height );
+				pongTexture = new THREE.StorageTexture( width, height );
 
 				if ( hdr ) {
 
@@ -73,78 +85,63 @@
 
 				}
 
-				const wgslFormat = hdr ? 'rgba16float' : 'rgba8unorm';
+				const rand2 = Fn( ( [ n ] ) => {
 
-				// compute init
+					return n.dot( vec2( 12.9898, 4.1414 ) ).sin().mul( 43758.5453 ).fract();
 
-				const rand2 = code( `
-					fn rand2( n: vec2f ) -> f32 {
+				} );
 
-						return fract( sin( dot( n, vec2f( 12.9898, 4.1414 ) ) ) * 43758.5453 );
+				// Create storage texture nodes with proper access
+				const writePing = storageTexture( pingTexture ).setAccess( NodeAccess.WRITE_ONLY );
+				const readPing = storageTexture( pingTexture ).setAccess( NodeAccess.READ_ONLY );
+				const writePong = storageTexture( pongTexture ).setAccess( NodeAccess.WRITE_ONLY );
+				const readPong = storageTexture( pongTexture ).setAccess( NodeAccess.READ_ONLY );
 
-					}
+				const computeInit = Fn( () => {
 
-					fn blur( image : texture_2d<f32>, uv : vec2i ) -> vec4f {
+					const posX = instanceIndex.mod( width );
+					const posY = instanceIndex.div( width );
+					const indexUV = uvec2( posX, posY );
+					const uv = vec2( float( posX ).div( width ), float( posY ).div( height ) );
 
-						var color = vec4f( 0.0 );
+					const r = rand2( uv.add( seed.mul( 100 ) ) ).sub( rand2( uv.add( seed.mul( 300 ) ) ) );
+					const g = rand2( uv.add( seed.mul( 200 ) ) ).sub( rand2( uv.add( seed.mul( 300 ) ) ) );
+					const b = rand2( uv.add( seed.mul( 200 ) ) ).sub( rand2( uv.add( seed.mul( 100 ) ) ) );
 
-						color += textureLoad( image, uv + vec2i( - 1, 1 ), 0 );
-						color += textureLoad( image, uv + vec2i( - 1, - 1 ), 0 );
-						color += textureLoad( image, uv + vec2i( 0, 0 ), 0 );
-						color += textureLoad( image, uv + vec2i( 1, - 1 ), 0 );
-						color += textureLoad( image, uv + vec2i( 1, 1 ), 0 );
+					textureStore( writePing, indexUV, vec4( r, g, b, 1 ) );
 
-						return color / 5.0; 
-					}
+				} );
 
-					fn getUV( posX: u32, posY: u32 ) -> vec2f {
+				computeInitNode = computeInit().compute( width * height );
 
-						let uv = vec2f( f32( posX ) / ${ width }.0, f32( posY ) / ${ height }.0 );
+				// compute ping-pong: blur function using .load() for textureLoad
+				const blur = Fn( ( [ readTex, uv ] ) => {
 
-						return uv;
+					const c0 = readTex.load( uv.add( ivec2( - 1, 1 ) ) );
+					const c1 = readTex.load( uv.add( ivec2( - 1, - 1 ) ) );
+					const c2 = readTex.load( uv.add( ivec2( 0, 0 ) ) );
+					const c3 = readTex.load( uv.add( ivec2( 1, - 1 ) ) );
+					const c4 = readTex.load( uv.add( ivec2( 1, 1 ) ) );
 
-					}
-				` );
+					return c0.add( c1 ).add( c2 ).add( c3 ).add( c4 ).div( 5.0 );
 
-				const computeInitWGSL = wgslFn( `
-					fn computeInitWGSL( writeTex: texture_storage_2d<${ wgslFormat }, write>, index: u32, seed: vec2f ) -> void {
+				} );
 
-						let posX = index % ${ width };
-						let posY = index / ${ width };
-						let indexUV = vec2u( posX, posY );
-						let uv = getUV( posX, posY );
+				// compute loop: read from one texture, blur, write to another
+				const computePingPong = Fn( ( [ readTex, writeTex ] ) => {
 
-						let r = rand2( uv + seed * 100 ) - rand2( uv + seed * 300 );
-						let g = rand2( uv + seed * 200 ) - rand2( uv + seed * 300 );
-						let b = rand2( uv + seed * 200 ) - rand2( uv + seed * 100 );
+					const posX = instanceIndex.mod( width );
+					const posY = instanceIndex.div( width );
+					const indexUV = ivec2( int( posX ), int( posY ) );
 
-						textureStore( writeTex, indexUV, vec4( r, g, b, 1 ) );
+					const color = blur( readTex, indexUV );
 
-					}
-				`, [ rand2 ] );
+					textureStore( writeTex, indexUV, vec4( color.rgb.mul( 1.05 ), 1 ) );
 
-				computeInitNode = computeInitWGSL( { writeTex: textureStore( pingTexture ), index: instanceIndex, seed } ).compute( width * height );
+				} );
 
-				// compute loop
-
-				const computePingPongWGSL = wgslFn( `
-					fn computePingPongWGSL( readTex: texture_2d<f32>, writeTex: texture_storage_2d<${ wgslFormat }, write>, index: u32 ) -> void {
-
-						let posX = index % ${ width };
-						let posY = index / ${ width };
-						let indexUV = vec2i( i32( posX ), i32( posY ) );
-
-						let color = blur( readTex, indexUV ).rgb;
-
-						textureStore( writeTex, indexUV, vec4f( color * 1.05, 1 ) );
-
-					}
-				`, [ rand2 ] );
-
-				//
-
-				computeToPong = computePingPongWGSL( { readTex: texture( pingTexture ), writeTex: textureStore( pongTexture ), index: instanceIndex } ).compute( width * height );
-				computeToPing = computePingPongWGSL( { readTex: texture( pongTexture ), writeTex: textureStore( pingTexture ), index: instanceIndex } ).compute( width * height );
+				computeToPong = computePingPong( readPing, writePong ).compute( width * height );
+				computeToPing = computePingPong( readPong, writePing ).compute( width * height );
 
 				//
 
@@ -153,11 +150,13 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -179,8 +178,6 @@
 				camera.right = frustumHeight * aspect / 2;
 
 				camera.updateProjectionMatrix();
-
-				render();
 
 			}
 

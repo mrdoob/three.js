@@ -4,6 +4,10 @@
 		<title>three.js webgl - geometry - minecraft</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - geometry - minecraft">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_geometry_minecraft.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_geometry_minecraft.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -48,10 +52,10 @@
 			const worldHalfDepth = worldDepth / 2;
 			const data = generateHeight( worldWidth, worldDepth );
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -167,6 +171,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
@@ -190,8 +195,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				controls.handleResize();
 
 			}
 
@@ -232,7 +235,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
 				render();
 				stats.update();
@@ -241,7 +244,7 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				controls.update( timer.getDelta() );
 				renderer.render( scene, camera );
 
 			}

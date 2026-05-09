@@ -4,6 +4,10 @@
 		<title>three.js xr - haptics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js xr - haptics">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_xr_haptics.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_xr_haptics.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -30,45 +34,16 @@
 
 			let container;
 			let camera, scene, renderer;
+
+			let listener;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
+
 			const box = new THREE.Box3();
 
-			const controllers = [];
-			const oscillators = [];
 			let controls, group;
-			let audioCtx = null;
-
-			// minor pentatonic scale, so whichever notes is striked would be more pleasant
-			const musicScale = [ 0, 3, 5, 7, 10 ];
 
 			init();
-			animate();
-
-			function initAudio() {
-
-				if ( audioCtx !== null ) {
-
-					return;
-
-				}
-
-				audioCtx = new ( window.AudioContext || window.webkitAudioContext )();
-				function createOscillator() {
-
-					// creates oscillator
-					const oscillator = audioCtx.createOscillator();
-					oscillator.type = 'sine'; // possible values: sine, triangle, square
-					oscillator.start();
-					return oscillator;
-
-				}
-
-				oscillators.push( createOscillator() );
-				oscillators.push( createOscillator() );
-				window.oscillators = oscillators;
-
-			}
 
 			function init() {
 
@@ -80,6 +55,9 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
+
+				listener = new THREE.AudioListener();
+				camera.add( listener );
 
 				controls = new OrbitControls( camera, container );
 				controls.target.set( 0, 1.6, 0 );
@@ -140,13 +118,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( XRButton.createButton( renderer ) );
-
-				document.getElementById( 'XRButton' ).addEventListener( 'click', initAudio );
 
 				// controllers
 
@@ -176,25 +153,31 @@
 
 			}
 
-			function controllerConnected( evt ) {
+			function controllerConnected( event ) {
 
-				controllers.push( {
-					gamepad: evt.data.gamepad,
-					grip: evt.target,
-					colliding: false,
-					playing: false
-				} );
+				const oscillator = listener.context.createOscillator();
+				oscillator.type = 'sine';
+				oscillator.start();
+
+				const audio = new THREE.PositionalAudio( listener );
+				audio.setNodeSource( oscillator );
+				audio.setRefDistance( 20 );
+				audio.setVolume( 0 );
+
+				this.userData.gamepad = event.data.gamepad;
+				this.userData.colliding = false;
+				this.userData.audio = audio;
+
+				this.add( audio );
 
 			}
 
-			function controllerDisconnected( evt ) {
+			function controllerDisconnected() {
 
-				const index = controllers.findIndex( o => o.controller === evt.target );
-				if ( index !== - 1 ) {
+				const audio = this.userData.audio;
+				audio.source.stop();
 
-					controllers.splice( index, 1 );
-
-				}
+				this.remove( audio );
 
 			}
 
@@ -207,13 +190,6 @@
 
 			}
 
-			//
-
-			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
 
 			function handleCollisions() {
 
@@ -223,67 +199,8 @@
 
 				}
 
-				for ( let g = 0; g < controllers.length; g ++ ) {
-
-					const controller = controllers[ g ];
-					controller.colliding = false;
-
-					const { grip, gamepad } = controller;
-					const sphere = {
-						radius: 0.03,
-						center: grip.position
-					};
-
-					const supportHaptic = 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0;
-
-					for ( let i = 0; i < group.children.length; i ++ ) {
-
-						const child = group.children[ i ];
-						box.setFromObject( child );
-						if ( box.intersectsSphere( sphere ) ) {
-
-							child.material.emissive.b = 1;
-							const intensity = child.userData.index / group.children.length;
-							child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
-
-							if ( supportHaptic ) {
-
-								gamepad.hapticActuators[ 0 ].pulse( intensity, 100 );
-
-							}
-
-							const musicInterval = musicScale[ child.userData.index % musicScale.length ] + 12 * Math.floor( child.userData.index / musicScale.length );
-							oscillators[ g ].frequency.value = 110 * Math.pow( 2, musicInterval / 12 );
-							controller.colliding = true;
-							group.children[ i ].collided = true;
-
-						}
-
-					}
-
-
-
-					if ( controller.colliding ) {
-
-						if ( ! controller.playing ) {
-
-							controller.playing = true;
-							oscillators[ g ].connect( audioCtx.destination );
-
-						}
-
-					} else {
-
-						if ( controller.playing ) {
-
-							controller.playing = false;
-							oscillators[ g ].disconnect( audioCtx.destination );
-
-						}
-
-					}
-
-				}
+				handleController( controllerGrip1 );
+				handleController( controllerGrip2 );
 
 				for ( let i = 0; i < group.children.length; i ++ ) {
 
@@ -300,7 +217,65 @@
 
 			}
 
-			function render() {
+			// minor pentatonic scale, so whichever notes is stricken would be more pleasant
+			const musicScale = [ 0, 3, 5, 7, 10 ];
+
+			function handleController( controller ) {
+
+				controller.userData.colliding = false;
+
+				const audio = controller.userData.audio;
+				const gamepad = controller.userData.gamepad;
+
+				if ( audio === undefined || gamepad === undefined ) return;
+
+				const oscillator = audio.source;
+				const supportHaptic = 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0;
+
+				const sphere = {
+					radius: 0.03,
+					center: controller.position
+				};
+
+				for ( let i = 0; i < group.children.length; i ++ ) {
+
+					const child = group.children[ i ];
+					box.setFromObject( child );
+
+					if ( box.intersectsSphere( sphere ) ) {
+
+						child.material.emissive.b = 1;
+						const intensity = child.userData.index / group.children.length;
+						child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
+
+						if ( supportHaptic ) {
+
+							gamepad.hapticActuators[ 0 ].pulse( intensity, 100 );
+
+						}
+
+						const musicInterval = musicScale[ child.userData.index % musicScale.length ] + 12 * Math.floor( child.userData.index / musicScale.length );
+						oscillator.frequency.value = 110 * Math.pow( 2, musicInterval / 12 );
+						controller.userData.colliding = true;
+						group.children[ i ].collided = true;
+
+					}
+
+				}
+
+				if ( controller.userData.colliding ) {
+
+					audio.setVolume( 0.5 );
+
+				} else {
+
+					audio.setVolume( 0 );
+
+				}
+
+			}
+
+			function animate() {
 
 				handleCollisions();
 

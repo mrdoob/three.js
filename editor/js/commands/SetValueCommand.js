@@ -1,25 +1,25 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param attributeName string
- * @param newValue number, string, boolean or object
- * @constructor
- */
 class SetValueCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {string} attributeName
+	 * @param {number|string|boolean|Object|null} newValue
+	 * @constructor
+	 */
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
 		this.type = 'SetValueCommand';
-		this.name = `Set ${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
+		this.oldValue = ( object !== null ) ? object[ attributeName ] : null;
 		this.newValue = newValue;
 
 	}

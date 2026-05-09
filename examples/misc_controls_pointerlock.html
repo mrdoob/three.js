@@ -4,6 +4,10 @@
 		<title>three.js - pointerlock controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js - pointerlock controls">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_controls_pointerlock.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_controls_pointerlock.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			#blocker {
@@ -76,7 +80,6 @@
 			const color = new THREE.Color();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -116,7 +119,7 @@
 
 				} );
 
-				scene.add( controls.getObject() );
+				scene.add( controls.object );
 
 				const onKeyDown = function ( event ) {
 
@@ -260,6 +263,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -279,13 +283,11 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				const time = performance.now();
 
 				if ( controls.isLocked === true ) {
 
-					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.copy( controls.object.position );
 					raycaster.ray.origin.y -= 10;
 
 					const intersections = raycaster.intersectObjects( objects, false );
@@ -316,12 +318,12 @@
 					controls.moveRight( - velocity.x * delta );
 					controls.moveForward( - velocity.z * delta );
 
-					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+					controls.object.position.y += ( velocity.y * delta ); // new behavior
 
-					if ( controls.getObject().position.y < 10 ) {
+					if ( controls.object.position.y < 10 ) {
 
 						velocity.y = 0;
-						controls.getObject().position.y = 10;
+						controls.object.position.y = 10;
 
 						canJump = true;
 

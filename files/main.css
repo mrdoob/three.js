@@ -11,7 +11,8 @@
 	--font-size: 16px;
 	--line-height: 26px;
 
-	--border-style: 1px solid #E8E8E8;
+	--border-color: #E8E8E8;
+	--border-style: 1px solid var(--border-color);
 	--header-height: 48px;
 	--panel-width: 300px;
 	--panel-padding: 16px;
@@ -27,7 +28,8 @@
 		--text-color: #bbb;
 		--secondary-text-color: #666;
 
-		--border-style: 1px solid #444;
+		--border-color: #444;
+		--border-style: 1px solid var(--border-color);
 	}
 
 	#previewsToggler {
@@ -101,6 +103,13 @@ h3 {
 
 h1 a {
 	color: var(--color-blue);
+}
+
+hr {
+	border: 0;
+	height: 1px;
+	background-color: var(--border-color);
+	margin: 16px 0;
 }
 
 #header {
@@ -294,6 +303,50 @@ h1 a {
 		-webkit-overflow-scrolling: touch;
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
+
+	#panel #searchResults {
+		flex: 1;
+		overflow-y: auto;
+		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
+	}
+
+		#panel #searchResults .search-result-group {
+			margin-bottom: 12px;
+		}
+
+		#panel #searchResults .search-result-class {
+			display: block;
+			color: var(--text-color);
+			font-weight: 500;
+			margin-bottom: 2px;
+		}
+
+		#panel #searchResults .search-result-class:hover {
+			color: var(--color-blue);
+		}
+
+		#panel #searchResults .search-result-member {
+			display: block;
+			color: var(--text-color);
+			margin-left: 16px;
+			margin-bottom: 1px;
+		}
+
+		#panel #searchResults .search-result-member:hover {
+			color: var(--color-blue);
+		}
+
+		#panel #searchResults .search-result-class.selected,
+		#panel #searchResults .search-result-member.selected {
+			color: var(--color-blue);
+			text-decoration: underline;
+		}
+
+		#panel #searchResults strong {
+			font-weight: 600;
+		}
 
 		#panel #content ul {
 			list-style-type: none;
@@ -538,9 +591,11 @@ iframe#viewer {
 }
 
 .card .tag {
+	position: absolute;
+	top: 8px;
+	right: 8px;
 	background-color: var(--background-color);
 	color: var(--color-blue);
-	margin-left: 6px;
 	padding: 1px 6px 2px;
 	border-radius: 2px;
 	font-size: calc(var(--font-size) - 2px);

@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - video - webcam</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - video - webcam">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_video_webcam.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_video_webcam.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -32,7 +36,6 @@
 			let camera, scene, renderer, video;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -68,6 +71,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -114,7 +118,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				renderer.render( scene, camera );
 
 			}

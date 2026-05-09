@@ -4,6 +4,10 @@
 		<title>three.js webaudio - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webaudio - sandbox">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webaudio_sandbox.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webaudio_sandbox.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -53,7 +57,8 @@
 
 			let analyser1, analyser2, analyser3;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
@@ -214,6 +219,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -228,8 +234,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				animate();
-
 			}
 
 			function onWindowResize() {
@@ -239,21 +243,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
-
 			}
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-				render();
+				timer.update();
 
-			}
-
-
-			function render() {
-
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				controls.update( delta );
 

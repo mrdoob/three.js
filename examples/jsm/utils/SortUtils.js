@@ -1,6 +1,9 @@
-// Hybrid radix sort from
-// - https://gist.github.com/sciecode/93ed864dd77c5c8803c6a86698d68dab
-// - https://github.com/mrdoob/three.js/pull/27202#issuecomment-1817640271
+
+/**
+ * @module SortUtils
+ * @three_import import * as SortUtils from 'three/addons/utils/SortUtils.js';
+ */
+
 const POWER = 3;
 const BIT_MAX = 32;
 const BIN_BITS = 1 << POWER;
@@ -21,6 +24,18 @@ for ( let i = 0; i < ( ITERATIONS + 1 ); i ++ ) {
 
 const defaultGet = ( el ) => el;
 
+/**
+ * Hybrid radix sort from.
+ *
+ * - {@link https://gist.github.com/sciecode/93ed864dd77c5c8803c6a86698d68dab}
+ * - {@link https://github.com/mrdoob/three.js/pull/27202#issuecomment-1817640271}
+ *
+ * Expects unsigned 32b integer values.
+ *
+ * @function
+ * @param {Array<Object>} arr - The array to sort.
+ * @param {Object} opt - The options
+ */
 export const radixSort = ( arr, opt ) => {
 
 	const len = arr.length;
@@ -102,11 +117,11 @@ export const radixSort = ( arr, opt ) => {
 
 		for ( let j = start + 1; j < start + len; j ++ ) {
 
-			const p = a[ j ], t = get( p );
+			const p = a[ j ], t = get( p ) >>> 0;
 			let i = j;
-			while ( i > 0 ) {
+			while ( i > start ) {
 
-				if ( compare( get( a[ i - 1 ] ), t ) )
+				if ( compare( get( a[ i - 1 ] ) >>> 0, t ) )
 					a[ i ] = a[ -- i ];
 				else
 					break;
@@ -140,14 +155,14 @@ export const radixSort = ( arr, opt ) => {
 		bin.fill( 0 );
 
 		for ( let j = start; j < end; j ++ )
-			bin[ ( get( a[ j ] ) >> shift ) & BIN_MAX ] ++;
+			bin[ ( get( a[ j ] ) >>> shift ) & BIN_MAX ] ++;
 
 		accumulate( bin );
 
 		cache.set( bin );
 
 		for ( let j = end - 1; j >= start; j -- )
-			b[ start + -- bin[ ( get( a[ j ] ) >> shift ) & BIN_MAX ] ] = a[ j ];
+			b[ start + -- bin[ ( get( a[ j ] ) >>> shift ) & BIN_MAX ] ] = a[ j ];
 
 		if ( depth == ITERATIONS - 1 ) return;
 

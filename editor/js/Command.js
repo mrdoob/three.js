@@ -1,11 +1,10 @@
-/**
- * @param editor pointer to main editor object used to initialize
- *        each command object with a reference to the editor
- * @constructor
- */
-
 class Command {
 
+	/**
+	 * @param {Editor} editor pointer to main editor object used to initialize
+	 *        each command object with a reference to the editor
+	 * @constructor
+	 */
 	constructor( editor ) {
 
 		this.id = - 1;

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <surfacematerial name="mat_texture_opacity_test" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
+  </surfacematerial>
+  <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" value="0.2, 0.6, 0.8" />
+    <input name="opacity" type="float" output="out" nodegraph="opacity_texture_graph" />
+    <input name="specular_roughness" type="float" value="0.2" />
+    <input name="metalness" type="float" value="0.0" />
+  </standard_surface>
+  <nodegraph name="opacity_texture_graph">
+    <image name="opacity_texture" type="float">
+      <input name="file" type="filename" value="resources/Images/grid.png" />
+      <input name="default" type="float" value="1.0" />
+    </image>
+    <output name="out" type="float" nodename="opacity_texture" />
+  </nodegraph>
+</materialx> 

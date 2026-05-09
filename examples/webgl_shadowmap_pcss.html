@@ -4,6 +4,10 @@
 		<title>three.js webgl - percent closer soft-shadows</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - percent closer soft-shadows">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_pcss.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_pcss.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -60,7 +64,7 @@
 					int numBlockers = 0;
 
 					for( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; i++ ) {
-						float shadowMapDepth = unpackRGBAToDepth(texture2D(shadowMap, uv + poissonDisk[i] * searchRadius));
+						float shadowMapDepth = texture2D(shadowMap, uv + poissonDisk[i] * searchRadius).r;
 						if ( shadowMapDepth < zReceiver ) {
 							blockerDepthSum += shadowMapDepth;
 							numBlockers ++;
@@ -77,13 +81,13 @@
 					float depth;
 					#pragma unroll_loop_start
 					for( int i = 0; i < 17; i ++ ) {
-						depth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
+						depth = texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ).r;
 						if( zReceiver <= depth ) sum += 1.0;
 					}
 					#pragma unroll_loop_end
 					#pragma unroll_loop_start
 					for( int i = 0; i < 17; i ++ ) {
-						depth = unpackRGBAToDepth( texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ) );
+						depth = texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ).r;
 						if( zReceiver <= depth ) sum += 1.0;
 					}
 					#pragma unroll_loop_end
@@ -141,7 +145,6 @@
 			let group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -235,9 +238,10 @@
 				);
 
 				shader = shader.replace(
-					'#if defined( SHADOWMAP_TYPE_PCF )',
-					document.getElementById( 'PCSSGetShadow' ).textContent +
-					'#if defined( SHADOWMAP_TYPE_PCF )'
+					'\t\t\tif ( frustumTest ) {\n\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;',
+					'\t\t\tif ( frustumTest ) {\n' +
+					document.getElementById( 'PCSSGetShadow' ).textContent + '\n' +
+					'\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;'
 				);
 
 				THREE.ShaderChunk.shadowmap_pars_fragment = shader;
@@ -247,11 +251,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.setClearColor( scene.fog.color );
 
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.BasicShadowMap; // PCSS requires reading raw depth values
 
 				// controls
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -302,8 +308,6 @@
 				renderer.render( scene, camera );
 
 				stats.update();
-
-				requestAnimationFrame( animate );
 
 			}
 

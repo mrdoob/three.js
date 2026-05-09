@@ -4,6 +4,10 @@
 		<title>three.js webgl - arcball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - arcball controls">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_controls_arcball.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_controls_arcball.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 
 	</head>
@@ -31,7 +35,7 @@
 			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };
@@ -59,6 +63,7 @@
 				populateGui: function () {
 
 					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
+					folderOptions.add( controls, 'enableFocus' ).name( 'Enable focus' );
 					folderOptions.add( controls, 'enableGrid' ).name( 'Enable Grid' );
 					folderOptions.add( controls, 'enableRotate' ).name( 'Enable rotate' );
 					folderOptions.add( controls, 'enablePan' ).name( 'Enable pan' );
@@ -148,7 +153,7 @@
 						scene.add( group );
 						render();
 
-						new RGBELoader()
+						new HDRLoader()
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 

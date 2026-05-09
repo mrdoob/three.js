@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - compressed textures</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - compressed textures">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_texture_pvrtc.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_texture_pvrtc.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -31,7 +35,6 @@
 			const meshes = [];
 
 			init();
-			animate();
 
 			function init() {
 
@@ -89,10 +92,10 @@
 				flare_2bpp_rgba.minFilter =
 				flare_2bpp_rgba.magFilter = THREE.LinearFilter;
 
-				disturb_2bpp_rgb.encoding =
-				flare_4bpp_rgba.encoding =
-				disturb_4bpp_rgb.encoding =
-				disturb_4bpp_rgb_v3.encoding =
+				disturb_2bpp_rgb.colorSpace =
+				flare_4bpp_rgba.colorSpace =
+				disturb_4bpp_rgb.colorSpace =
+				disturb_4bpp_rgb_v3.colorSpace =
 				flare_2bpp_rgba.colorSpace = THREE.SRGBColorSpace;
 
 				const material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
@@ -162,6 +165,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -178,8 +182,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const time = Date.now() * 0.001;
 

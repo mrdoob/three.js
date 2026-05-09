@@ -4,6 +4,10 @@
 		<title>three.js webgl - GLTFloader + Iridescence</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - GLTFloader + Iridescence">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_gltf_iridescence.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_gltf_iridescence.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -29,7 +33,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let renderer, scene, camera, controls;
 
@@ -42,7 +46,7 @@
 			async function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -59,13 +63,13 @@
 				controls.target.set( 0, 0.2, 0 );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
+				const hdrLoader = new HDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					hdrLoader.loadAsync( 'venice_sunset_1k.hdr' ),
 					gltfLoader.loadAsync( 'IridescenceLamp.glb' ),
 				] );
 
@@ -80,8 +84,6 @@
 
 				scene.add( gltf.scene );
 
-				render();
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -94,11 +96,9 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
-			function render() {
+			function animate() {
 
 				controls.update();
 				renderer.render( scene, camera );

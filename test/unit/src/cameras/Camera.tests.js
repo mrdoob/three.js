@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Camera } from '../../../../src/cameras/Camera.js';
 
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -39,24 +37,6 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.todo( 'matrixWorldInverse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'projectionMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'projectionMatrixInverse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isCamera', ( assert ) => {
 
@@ -65,30 +45,6 @@ export default QUnit.module( 'Cameras', () => {
 				object.isCamera,
 				'Camera.isCamera should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getWorldDirection', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'updateWorldMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

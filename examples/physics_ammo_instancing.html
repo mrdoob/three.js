@@ -4,6 +4,10 @@
 		<title>three.js physics - ammo.js instancing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js physics - ammo.js instancing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_ammo_instancing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_ammo_instancing.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -60,14 +64,24 @@
 				dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
 
-				const floor = new THREE.Mesh(
-					new THREE.BoxGeometry( 10, 5, 10 ),
-					new THREE.ShadowMaterial( { color: 0x444444 } )
+				const shadowPlane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 10, 10 ),
+					new THREE.ShadowMaterial( {
+						color: 0x444444
+					} ),
 				);
-				floor.position.y = - 2.5;
-				floor.receiveShadow = true;
-				floor.userData.physics = { mass: 0 };
-				scene.add( floor );
+				shadowPlane.rotation.x = - Math.PI / 2;
+				shadowPlane.receiveShadow = true;
+				scene.add( shadowPlane );
+
+				const floorCollider = new THREE.Mesh(
+					new THREE.BoxGeometry( 10, 5, 10 ),
+					new THREE.MeshBasicMaterial( { color: 0x666666 } )
+				);
+				floorCollider.position.y = - 2.5;
+				floorCollider.userData.physics = { mass: 0 };
+				floorCollider.visible = false;
+				scene.add( floorCollider );
 
 				//
 
@@ -119,6 +133,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -130,8 +145,6 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
-
-				animate();
 
 				setInterval( () => {
 
@@ -152,8 +165,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

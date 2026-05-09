@@ -4,6 +4,10 @@
 		<title>three.js webgl - GLTFloader + compressed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - GLTFloader + compressed">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_gltf_compressed.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_gltf_compressed.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -54,12 +58,12 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 100, 0 );
 
-				const environment = new RoomEnvironment( renderer );
+				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbbbbbb );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
 				environment.dispose();
 
 				const grid = new THREE.GridHelper( 500, 10, 0xffffff, 0xffffff );

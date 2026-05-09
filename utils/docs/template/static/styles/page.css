@@ -1,0 +1,419 @@
+:root {
+	color-scheme: light dark;
+
+	-webkit-font-smoothing: antialiased;
+
+	--color-blue: #049EF4;
+	--text-color: #444;
+
+	--font-size: 16px;
+	--line-height: 26px;
+
+	--border-style: 1px solid #E8E8E8;
+	--panel-width: 300px;
+	--page-padding: 24px;
+	--max-width: 760px;
+	--icon-size: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+
+	:root {
+		--text-color: #bbb;
+
+		--border-style: 1px solid #444;
+	}
+
+}
+
+@font-face {
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../../files/RobotoMono-Regular.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Inter-Regular'), url("../../files/Inter-Regular.woff2?v=3.6") format("woff2");
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Inter-SemiBold'), url("../../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
+}
+
+html {
+	font-family: 'Inter', sans-serif;
+	font-size: var(--font-size);
+	line-height: var(--line-height);
+}
+
+body {
+	color: var(--text-color);
+	tab-size: 4;
+	overflow: auto;
+	max-width: var(--max-width);
+	margin: 0 auto;
+	padding-top: var(--page-padding);
+	padding-bottom: var(--page-padding);
+	padding-right: var(--page-padding);
+	padding-left: calc(var(--page-padding) + var(--panel-width));
+	word-break: break-word;
+}
+
+body a {
+	color: var(--color-blue);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+body h1 {
+	font-size: 40px;
+	line-height: 48px;
+	font-weight: normal;
+	margin-left: -2px;
+	margin-top: 16px;
+	margin-bottom: -8px;
+}
+
+body h2 {
+	font-size: 28px;
+	line-height: 36px;
+	font-weight: normal;
+	margin-left: -1px;
+	margin-top: 28px;
+	margin-bottom: -8px;
+}
+
+body h3 {
+	font-size: 20px;
+	line-height: 28px;
+	font-weight: normal;
+	margin-top: 24px;
+	margin-bottom: -8px;
+}
+
+body p,
+body div,
+body table,
+body ol,
+body ul,
+body summary {
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+body summary:hover {
+	cursor: pointer;
+}
+
+body p {
+	padding-right: 16px;
+}
+
+body ul, body ol {
+	box-sizing: border-box;
+	padding-left: 24px;
+}
+body ul li,
+body ol li {
+	padding-left: 4px;
+	margin-bottom: 4px;
+}
+
+body li ul,
+body li ol {
+	margin-top: 4px;
+}
+
+body code {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+	padding: 0px 5px;
+	background: #F5F5F5;
+}
+
+body pre {
+	position: relative;
+	margin: 16px calc(-1 * var(--page-padding));
+}
+
+body pre code {
+	display: block;
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) - 1px);
+	padding: calc(var(--page-padding) - 6px) var(--page-padding);
+	white-space: pre-wrap;
+	overflow: auto;
+	box-sizing: border-box;
+	background: #F5F5F5;
+	border-radius: 0;
+}
+
+body ol code,
+body ul code {
+	margin: 0;
+}
+
+body .copy-btn {
+	cursor: pointer;
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 24px;
+	height: 24px;
+	background-color: transparent;
+	background-image: url('../../files/ic_copy_grey_24dp.svg');
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	opacity: 0.9;
+	border: none;
+}
+
+body .copy-btn:hover {
+	opacity: 1;
+}
+
+body .copy-btn.copied {
+	pointer-events: none;
+	opacity: 1;
+	background-image: url('../../files/ic_tick_green_24dp.svg');
+}
+
+body table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+body .desc {
+	padding-left: 0px;
+}
+
+body table th,
+body table td {
+	text-align: left;
+	vertical-align: top;
+	padding: 8px 6px;
+	border-bottom: var(--border-style);
+}
+
+body table table th,
+body table table td {
+	border-bottom: none;
+}
+
+body table tr:last-child th,
+body table tr:last-child td {
+	border-bottom: none;
+}
+
+body table th {
+	text-decoration: none;
+}
+body table th:first-child,
+body table td:first-child {
+	padding-left: 0;
+}
+
+body table code {
+	margin: 0px;
+	width: auto;
+}
+
+body table.props td.name,
+body table.params td.name {
+	width: 150px;
+	word-break: keep-all;
+}
+
+body table p {
+	margin: 0;
+	margin-top: 10px;
+}
+
+body table td p:first-child {
+	margin-top: 0;
+}
+
+body strong {
+	font-weight: 600;
+}
+
+body a.param,
+body span.param {
+	color: #999;
+}
+
+body a.param:hover {
+	color: var(--text-color);
+}
+
+body .inheritance {
+	color: #999;
+	margin-bottom: 0;
+	font-size: var(--font-size);
+	line-height: var(--line-height);
+	margin-top: 0;
+}
+
+body .method,
+body .member {
+	margin-bottom: 32px;
+}
+
+body ol.linenums {
+	padding-left: 64px;
+}
+
+body ol.linenums .selected {
+	background-color: #ddd;
+}
+
+body h3.name {
+	color: #000;
+}
+
+body h3.name a {
+	color: var(--color-blue);
+	text-decoration: none;
+}
+
+body h3.name .signature {
+	color: #000;
+	font-weight: normal;
+}
+
+body h3.name .type-signature {
+	color: #999;
+	font-weight: normal;
+}
+
+body h3.name .type-signature a {
+	color: #999;
+}
+
+body h3.name .param-type {
+	color: #999;
+}
+
+body h3.name .param-type a {
+	color: #999;
+}
+
+body h2.subsection-title + p {
+	margin-top: 24px;
+}
+
+body iframe#viewer {
+	width: 100%;
+	height: 400px;
+	border: none;
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+
+	body h2 {
+		color: var(--text-color);
+	}
+
+	body h3.name {
+		color: var(--text-color);
+	}
+
+	body h3.name .signature {
+		color: var(--text-color);
+	}
+
+	body .link-anchor {
+		color: #555;
+	}
+
+	body ol.linenums .selected {
+		background-color: #444;
+	}
+
+	body code {
+		background: #444;
+	}
+
+	body pre code {
+		background: #444;
+	}
+
+}
+
+@media all and ( min-width: 1700px ) {
+
+	:root {
+		--panel-width: 360px;
+		--font-size: 18px;
+		--line-height: 28px;
+		--max-width: 880px;
+		--page-padding: 28px;
+		--icon-size: 24px;
+	}
+
+	body h1 {
+		font-size: 42px;
+		line-height: 50px;
+	}
+
+	body h2 {
+		font-size: 32px;
+		line-height: 40px;
+	}
+
+	body h3 {
+		font-size: 24px;
+		line-height: 32px;
+	}
+
+}
+
+/* mobile */
+
+@media all and ( max-width: 640px ) {
+
+	:root {
+		--page-padding: 16px;
+		--icon-size: 24px;
+	}
+
+	body {
+		padding: var(--page-padding);
+	}
+
+	body h1 {
+		font-size: 28px;
+		line-height: 36px;
+		padding-right: 20px;
+		margin-top: 0;
+	}
+
+	body h2 {
+		font-size: 24px;
+		line-height: 32px;
+		margin-top: 24px;
+	}
+
+	body h3 {
+		font-size: 20px;
+		line-height: 28px;
+	}
+
+	body .copy-btn {
+		top: 12px;
+		right: 8px;
+		width: 20px;
+		height: 20px;
+	}
+}

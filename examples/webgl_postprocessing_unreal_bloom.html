@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing - unreal bloom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing - unreal bloom">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_unreal_bloom.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_unreal_bloom.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 		#info > * {
@@ -48,31 +52,23 @@
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, stats;
-			let composer, renderer, mixer, clock;
+			let composer, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
 				strength: 1,
-				radius: 0,
+				radius: 0.5,
 				exposure: 1
 			};
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const container = document.getElementById( 'container' );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				clock = new THREE.Clock();
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
-				container.appendChild( renderer.domElement );
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -80,15 +76,31 @@
 				camera.position.set( - 5, 2.5, - 3.5 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 3;
-				controls.maxDistance = 8;
-
 				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 100 );
 				camera.add( pointLight );
+
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gltf/PrimaryIonDrive.glb' );
+
+				const model = gltf.scene;
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				const clip = gltf.animations[ 0 ];
+				mixer.clipAction( clip.optimize() ).play();
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				container.appendChild( renderer.domElement );
+
+				//
 
 				const renderScene = new RenderPass( scene, camera );
 
@@ -104,19 +116,19 @@
 				composer.addPass( bloomPass );
 				composer.addPass( outputPass );
 
-				new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
+				//
 
-					const model = gltf.scene;
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					scene.add( model );
+				//
 
-					mixer = new THREE.AnimationMixer( model );
-					const clip = gltf.animations[ 0 ];
-					mixer.clipAction( clip.optimize() ).play();
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.5;
+				controls.minDistance = 3;
+				controls.maxDistance = 8;
 
-					animate();
-
-				} );
+				//
 
 				const gui = new GUI();
 
@@ -167,9 +179,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

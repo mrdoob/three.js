@@ -6,18 +6,20 @@ on:
     types:
       - completed
 
-# This workflow needs to be run with "pull-requests: write" permissions to
-# be able to comment on the pull request. We can't checkout the PR code
-# in this workflow.
-# Reference:
-# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 permissions:
-  pull-requests: write
+  contents: read
 
 jobs:
   report-size:
     name: Comment on PR
     runs-on: ubuntu-latest
+    # This job needs "pull-requests: write" permissions to be able to comment
+    # on the pull request. We can't checkout the PR code in this workflow.
+    # Reference:
+    # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
     steps:
@@ -29,7 +31,7 @@ jobs:
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         id: download-artifact
         with:
           result-encoding: string
@@ -56,11 +58,11 @@ jobs:
 
       # This runs on the base branch of the PR, meaning "dev"
       - name: Git checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Install Node
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
-          node-version: 18
+          node-version: 24
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -71,69 +73,181 @@ jobs:
       - name: Read sizes
         id: read-size
         run: |
-          FILESIZE_BASE=$(stat --format=%s build/three.module.min.js)
+          WEBGL_FILESIZE_BASE=$(stat --format=%s build/three.module.min.js)
           gzip -k build/three.module.min.js
-          FILESIZE_BASE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
-          TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          WEBGL_FILESIZE_BASE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
+          WEBGL_TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
           gzip -k test/treeshake/index.bundle.min.js
-          TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)
+          WEBGL_TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)
+
+          WEBGPU_FILESIZE_BASE=$(stat --format=%s build/three.webgpu.min.js)
+          gzip -k build/three.webgpu.min.js
+          WEBGPU_FILESIZE_BASE_GZIP=$(stat --format=%s build/three.webgpu.min.js.gz)
+          WEBGPU_TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.webgpu.bundle.min.js)
+          gzip -k test/treeshake/index.webgpu.bundle.min.js
+          WEBGPU_TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.webgpu.bundle.min.js.gz)
+
+          WEBGPU_NODES_FILESIZE_BASE=$(stat --format=%s build/three.webgpu.nodes.min.js)
+          gzip -k build/three.webgpu.nodes.min.js
+          WEBGPU_NODES_FILESIZE_BASE_GZIP=$(stat --format=%s build/three.webgpu.nodes.min.js.gz)
+          WEBGPU_NODES_TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.webgpu.nodes.bundle.min.js)
+          gzip -k test/treeshake/index.webgpu.nodes.bundle.min.js
+          WEBGPU_NODES_TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.webgpu.nodes.bundle.min.js.gz)
 
           # log to console
-          echo "FILESIZE_BASE=$FILESIZE_BASE"
-          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP"
-          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE"
-          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP"
+          echo "WEBGL_FILESIZE_BASE=$WEBGL_FILESIZE_BASE"
+          echo "WEBGL_FILESIZE_BASE_GZIP=$WEBGL_FILESIZE_BASE_GZIP"
+          echo "WEBGL_TREESHAKEN_BASE=$WEBGL_TREESHAKEN_BASE"
+          echo "WEBGL_TREESHAKEN_BASE_GZIP=$WEBGL_TREESHAKEN_BASE_GZIP"
 
-          echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
-          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_BASE=$WEBGL_FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_BASE_GZIP=$WEBGL_FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_BASE=$WEBGL_TREESHAKEN_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_BASE_GZIP=$WEBGL_TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
+
+          echo "WEBGPU_FILESIZE_BASE=$WEBGPU_FILESIZE_BASE"
+          echo "WEBGPU_FILESIZE_BASE_GZIP=$WEBGPU_FILESIZE_BASE_GZIP"
+          echo "WEBGPU_TREESHAKEN_BASE=$WEBGPU_TREESHAKEN_BASE"
+          echo "WEBGPU_TREESHAKEN_BASE_GZIP=$WEBGPU_TREESHAKEN_BASE_GZIP"
+
+          echo "WEBGPU_FILESIZE_BASE=$WEBGPU_FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_BASE_GZIP=$WEBGPU_FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_BASE=$WEBGPU_TREESHAKEN_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_BASE_GZIP=$WEBGPU_TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
+
+          echo "WEBGPU_NODES_FILESIZE_BASE=$WEBGPU_NODES_FILESIZE_BASE"
+          echo "WEBGPU_NODES_FILESIZE_BASE_GZIP=$WEBGPU_NODES_FILESIZE_BASE_GZIP"
+          echo "WEBGPU_NODES_TREESHAKEN_BASE=$WEBGPU_NODES_TREESHAKEN_BASE"
+          echo "WEBGPU_NODES_TREESHAKEN_BASE_GZIP=$WEBGPU_NODES_TREESHAKEN_BASE_GZIP"
+
+          echo "WEBGPU_NODES_FILESIZE_BASE=$WEBGPU_NODES_FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_BASE_GZIP=$WEBGPU_NODES_FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_BASE=$WEBGPU_NODES_TREESHAKEN_BASE" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_BASE_GZIP=$WEBGPU_NODES_TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
 
       - name: Format sizes
         id: format
         # It's important these are passed as env variables.
         # https://securitylab.github.com/research/github-actions-untrusted-input/
         env:
-          FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
-          FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
-          FILESIZE_BASE: ${{ steps.read-size.outputs.FILESIZE_BASE }}
-          FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.FILESIZE_BASE_GZIP }}
-          TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken }}
-          TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
-          TREESHAKEN_BASE: ${{ steps.read-size.outputs.TREESHAKEN_BASE }}
-          TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.TREESHAKEN_BASE_GZIP }}
+          WEBGL_FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
+          WEBGL_FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
+          WEBGL_FILESIZE_BASE: ${{ steps.read-size.outputs.WEBGL_FILESIZE_BASE }}
+          WEBGL_FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.WEBGL_FILESIZE_BASE_GZIP }}
+          WEBGL_TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken }}
+          WEBGL_TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
+          WEBGL_TREESHAKEN_BASE: ${{ steps.read-size.outputs.WEBGL_TREESHAKEN_BASE }}
+          WEBGL_TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.WEBGL_TREESHAKEN_BASE_GZIP }}
+          WEBGPU_FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize2 }}
+          WEBGPU_FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip2 }}
+          WEBGPU_FILESIZE_BASE: ${{ steps.read-size.outputs.WEBGPU_FILESIZE_BASE }}
+          WEBGPU_FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_FILESIZE_BASE_GZIP }}
+          WEBGPU_TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken2 }}
+          WEBGPU_TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip2 }}
+          WEBGPU_TREESHAKEN_BASE: ${{ steps.read-size.outputs.WEBGPU_TREESHAKEN_BASE }}
+          WEBGPU_TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_TREESHAKEN_BASE_GZIP }}
+          WEBGPU_NODES_FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize3 }}
+          WEBGPU_NODES_FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip3 }}
+          WEBGPU_NODES_FILESIZE_BASE: ${{ steps.read-size.outputs.WEBGPU_NODES_FILESIZE_BASE }}
+          WEBGPU_NODES_FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_NODES_FILESIZE_BASE_GZIP }}
+          WEBGPU_NODES_TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken3 }}
+          WEBGPU_NODES_TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip3 }}
+          WEBGPU_NODES_TREESHAKEN_BASE: ${{ steps.read-size.outputs.WEBGPU_NODES_TREESHAKEN_BASE }}
+          WEBGPU_NODES_TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_NODES_TREESHAKEN_BASE_GZIP }}
         run: |
-          FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE")
-          FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_GZIP")
-          FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE")
-          FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE_GZIP")
-          FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$FILESIZE" "$FILESIZE_BASE")
-          TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN")
-          TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_GZIP")
-          TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE")
-          TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE_GZIP")
-          TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$TREESHAKEN" "$TREESHAKEN_BASE")
+          WEBGL_FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE")
+          WEBGL_FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE_GZIP")
+          WEBGL_FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE_BASE")
+          WEBGL_FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE_BASE_GZIP")
+          WEBGL_FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGL_FILESIZE" "$WEBGL_FILESIZE_BASE")
+          WEBGL_FILESIZE_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGL_FILESIZE_GZIP" "$WEBGL_FILESIZE_BASE_GZIP")
 
-          echo "FILESIZE=$FILESIZE_FORM" >> $GITHUB_OUTPUT
-          echo "FILESIZE_GZIP=$FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
-          echo "FILESIZE_BASE=$FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
-          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
-          echo "FILESIZE_DIFF=$FILESIZE_DIFF" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN=$TREESHAKEN_FORM" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_GZIP=$TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
-          echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
+          WEBGL_TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_TREESHAKEN")
+          WEBGL_TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_TREESHAKEN_GZIP")
+          WEBGL_TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_TREESHAKEN_BASE")
+          WEBGL_TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_TREESHAKEN_BASE_GZIP")
+          WEBGL_TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGL_TREESHAKEN" "$WEBGL_TREESHAKEN_BASE")
+          WEBGL_TREESHAKEN_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGL_TREESHAKEN_GZIP" "$WEBGL_TREESHAKEN_BASE_GZIP")
+
+          WEBGPU_FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_FILESIZE")
+          WEBGPU_FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_FILESIZE_GZIP")
+          WEBGPU_FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_FILESIZE_BASE")
+          WEBGPU_FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_FILESIZE_BASE_GZIP")
+          WEBGPU_FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_FILESIZE" "$WEBGPU_FILESIZE_BASE")
+          WEBGPU_FILESIZE_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_FILESIZE_GZIP" "$WEBGPU_FILESIZE_BASE_GZIP")
+
+          WEBGPU_TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_TREESHAKEN")
+          WEBGPU_TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_TREESHAKEN_GZIP")
+          WEBGPU_TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_TREESHAKEN_BASE")
+          WEBGPU_TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_TREESHAKEN_BASE_GZIP")
+          WEBGPU_TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_TREESHAKEN" "$WEBGPU_TREESHAKEN_BASE")
+          WEBGPU_TREESHAKEN_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_TREESHAKEN_GZIP" "$WEBGPU_TREESHAKEN_BASE_GZIP")
+
+          WEBGPU_NODES_FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE")
+          WEBGPU_NODES_FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_GZIP")
+          WEBGPU_NODES_FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_BASE")
+          WEBGPU_NODES_FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_BASE_GZIP")
+          WEBGPU_NODES_FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_FILESIZE" "$WEBGPU_NODES_FILESIZE_BASE")
+          WEBGPU_NODES_FILESIZE_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_FILESIZE_GZIP" "$WEBGPU_NODES_FILESIZE_BASE_GZIP")
+
+          WEBGPU_NODES_TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN")
+          WEBGPU_NODES_TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_GZIP")
+          WEBGPU_NODES_TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_BASE")
+          WEBGPU_NODES_TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_BASE_GZIP")
+          WEBGPU_NODES_TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_TREESHAKEN" "$WEBGPU_NODES_TREESHAKEN_BASE")
+          WEBGPU_NODES_TREESHAKEN_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_TREESHAKEN_GZIP" "$WEBGPU_NODES_TREESHAKEN_BASE_GZIP")
+
+          echo "WEBGL_FILESIZE=$WEBGL_FILESIZE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_GZIP=$WEBGL_FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_BASE=$WEBGL_FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_BASE_GZIP=$WEBGL_FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_DIFF=$WEBGL_FILESIZE_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGL_FILESIZE_DIFF_GZIP=$WEBGL_FILESIZE_DIFF_GZIP" >> $GITHUB_OUTPUT
+
+          echo "WEBGL_TREESHAKEN=$WEBGL_TREESHAKEN_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_GZIP=$WEBGL_TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_BASE=$WEBGL_TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_BASE_GZIP=$WEBGL_TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_DIFF=$WEBGL_TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGL_TREESHAKEN_DIFF_GZIP=$WEBGL_TREESHAKEN_DIFF_GZIP" >> $GITHUB_OUTPUT
+
+          echo "WEBGPU_FILESIZE=$WEBGPU_FILESIZE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_GZIP=$WEBGPU_FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_BASE=$WEBGPU_FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_BASE_GZIP=$WEBGPU_FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_DIFF=$WEBGPU_FILESIZE_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGPU_FILESIZE_DIFF_GZIP=$WEBGPU_FILESIZE_DIFF_GZIP" >> $GITHUB_OUTPUT
+          
+          echo "WEBGPU_TREESHAKEN=$WEBGPU_TREESHAKEN_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_GZIP=$WEBGPU_TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_BASE=$WEBGPU_TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_BASE_GZIP=$WEBGPU_TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_DIFF=$WEBGPU_TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGPU_TREESHAKEN_DIFF_GZIP=$WEBGPU_TREESHAKEN_DIFF_GZIP" >> $GITHUB_OUTPUT
+
+          echo "WEBGPU_NODES_FILESIZE=$WEBGPU_NODES_FILESIZE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_GZIP=$WEBGPU_NODES_FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_BASE=$WEBGPU_NODES_FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_BASE_GZIP=$WEBGPU_NODES_FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_DIFF=$WEBGPU_NODES_FILESIZE_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_FILESIZE_DIFF_GZIP=$WEBGPU_NODES_FILESIZE_DIFF_GZIP" >> $GITHUB_OUTPUT
+          
+          echo "WEBGPU_NODES_TREESHAKEN=$WEBGPU_NODES_TREESHAKEN_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_GZIP=$WEBGPU_NODES_TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_BASE=$WEBGPU_NODES_TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_BASE_GZIP=$WEBGPU_NODES_TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_DIFF=$WEBGPU_NODES_TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
+          echo "WEBGPU_NODES_TREESHAKEN_DIFF_GZIP=$WEBGPU_NODES_TREESHAKEN_DIFF_GZIP" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
@@ -143,14 +257,18 @@ jobs:
 
             _Full ESM build, minified and gzipped._
 
-            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
-            |----------|---------|------|
-            | ${{ steps.format.outputs.FILESIZE_BASE }} (${{ steps.format.outputs.FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.FILESIZE }} (${{ steps.format.outputs.FILESIZE_GZIP }}) | ${{ steps.format.outputs.FILESIZE_DIFF }} |
+            || Before | After | Diff |
+            |:-:|:-:|:-:|:-:|
+            | WebGL | ${{ steps.format.outputs.WEBGL_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGL_FILESIZE }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGL_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_DIFF_GZIP }}** |
+            | WebGPU | ${{ steps.format.outputs.WEBGPU_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF_GZIP }}** |
+            | WebGPU Nodes | ${{ steps.format.outputs.WEBGPU_NODES_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGPU_NODES_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_NODES_FILESIZE }} <br> **${{ steps.format.outputs.WEBGPU_NODES_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_NODES_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_NODES_FILESIZE_DIFF_GZIP }}** |
 
             ### 🌳 Bundle size after tree-shaking
 
             _Minimal build including a renderer, camera, empty scene, and dependencies._
 
-            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
-            |----------|---------|------|
-            | ${{ steps.format.outputs.TREESHAKEN_BASE }} (${{ steps.format.outputs.TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN }} (${{ steps.format.outputs.TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |
+            || Before | After | Diff |
+            |:-:|:-:|:-:|:-:|
+            | WebGL | ${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE }} <br> **${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGL_TREESHAKEN }} <br> **${{ steps.format.outputs.WEBGL_TREESHAKEN_GZIP }}** | ${{ steps.format.outputs.WEBGL_TREESHAKEN_DIFF }} <br> **${{ steps.format.outputs.WEBGL_TREESHAKEN_DIFF_GZIP }}** |
+            | WebGPU | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE }} <br> **${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_TREESHAKEN }} <br> **${{ steps.format.outputs.WEBGPU_TREESHAKEN_GZIP }}** | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_TREESHAKEN_DIFF_GZIP }}** |
+            | WebGPU Nodes | ${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN_BASE }} <br> **${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN }} <br> **${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN_GZIP }}** | ${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_NODES_TREESHAKEN_DIFF_GZIP }}** |

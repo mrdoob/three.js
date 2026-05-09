@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
 
 import { Mesh } from '../../../../src/objects/Mesh.js';
@@ -50,30 +48,6 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'light', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'dispose', ( assert ) => {
 
@@ -82,12 +56,6 @@ export default QUnit.module( 'Helpers', () => {
 			const light = new PointLight( parameters.color );
 			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
 			object.dispose();
-
-		} );
-
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

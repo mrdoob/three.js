@@ -4,6 +4,10 @@
 		<title>three.js webgl - multiple views</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - multiple views">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_multiple_views.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_multiple_views.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -30,7 +34,7 @@
 
 			let scene, renderer;
 
-			let mouseX = 0, mouseY = 0;
+			let mouseX = 0;
 
 			let windowWidth, windowHeight;
 
@@ -89,7 +93,6 @@
 			];
 
 			init();
-			animate();
 
 			function init() {
 
@@ -210,6 +213,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -222,7 +226,6 @@
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowWidth / 2 );
-				mouseY = ( event.clientY - windowHeight / 2 );
 
 			}
 
@@ -244,8 +247,6 @@
 				render();
 				stats.update();
 
-				requestAnimationFrame( animate );
-
 			}
 
 			function render() {
@@ -257,7 +258,7 @@
 					const view = views[ ii ];
 					const camera = view.camera;
 
-					view.updateCamera( camera, scene, mouseX, mouseY );
+					view.updateCamera( camera, scene, mouseX );
 
 					const left = Math.floor( windowWidth * view.left );
 					const bottom = Math.floor( windowHeight * view.bottom );

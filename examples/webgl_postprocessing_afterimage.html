@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing - afterimage</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing - afterimage">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_afterimage.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_afterimage.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -39,14 +43,13 @@
 			};
 
 			init();
-			createGUI();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -73,24 +76,8 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				if ( typeof TESTING !== 'undefined' ) {
-
-					for ( let i = 0; i < 45; i ++ ) {
-
-						render();
-
-					}
-
-
-
-				}
-
-			}
-
-			function createGUI() {
-
 				const gui = new GUI( { title: 'Damp setting' } );
-				gui.add( afterimagePass.uniforms[ 'damp' ], 'value', 0, 1 ).step( 0.001 );
+				gui.add( afterimagePass, 'damp', 0, 1 ).step( 0.001 );
 				gui.add( params, 'enable' );
 
 			}
@@ -105,7 +92,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
@@ -114,13 +101,6 @@
 
 				composer.render();
 
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
 
 			}
 

@@ -1,33 +1,33 @@
 import { Command } from '../Command.js';
 import { Vector3 } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newScale THREE.Vector3
- * @param optionalOldScale THREE.Vector3
- * @constructor
- */
 class SetScaleCommand extends Command {
 
-	constructor( editor, object, newScale, optionalOldScale ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Vector3|null} newScale
+	 * @param {THREE.Vector3|null} optionalOldScale
+	 * @constructor
+	 */
+	constructor( editor, object = null, newScale = null, optionalOldScale = null ) {
 
 		super( editor );
 
 		this.type = 'SetScaleCommand';
-		this.name = 'Set Scale';
+		this.name = editor.strings.getKey( 'command/SetScale' );
 		this.updatable = true;
 
 		this.object = object;
 
-		if ( object !== undefined && newScale !== undefined ) {
+		if ( object !== null && newScale !== null ) {
 
 			this.oldScale = object.scale.clone();
 			this.newScale = newScale.clone();
 
 		}
 
-		if ( optionalOldScale !== undefined ) {
+		if ( optionalOldScale !== null ) {
 
 			this.oldScale = optionalOldScale.clone();
 

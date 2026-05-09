@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Occlusion</title>
+		<title>three.js webgpu - occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - occlusion">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_occlusion.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_occlusion.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Occlusion<br />
-			The plane changes color if the sphere behind it is rendered
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Occlusion</span>
+			</div>
+
+			<small>
+				The plane is green when the sphere is completely occluded.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { nodeObject, uniform, Node, NodeUpdateType, MeshPhongNodeMaterial } from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			let camera, scene, renderer, controls;
 
-			class OcclusionNode extends Node {
+			class OcclusionNode extends THREE.Node {
 
 				constructor( testObject, normalColor, occludedColor ) {
 
 					super( 'vec3' );
 
-					this.updateType = NodeUpdateType.OBJECT;
+					this.updateType = THREE.NodeUpdateType.OBJECT;
 
 					this.uniformNode = uniform( new THREE.Color() );
 
@@ -73,14 +80,6 @@
 
 			async function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.z = 7;
 
@@ -101,10 +100,10 @@
 				const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
 				const sphereGeometry = new THREE.SphereGeometry( 0.5 );
 
-				const plane = new THREE.Mesh( planeGeometry, new MeshPhongNodeMaterial( { color: 0x00ff00 } ) );
-				const sphere = new THREE.Mesh( sphereGeometry, new MeshPhongNodeMaterial( { color: 0xffff00 } ) );
+				const plane = new THREE.Mesh( planeGeometry, new THREE.MeshPhongNodeMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
+				const sphere = new THREE.Mesh( sphereGeometry, new THREE.MeshPhongNodeMaterial( { color: 0xffff00 } ) );
 
-				const instanceUniform = nodeObject( new OcclusionNode( sphere, new THREE.Color( 0x00ff00 ), new THREE.Color( 0x0000ff ) ) );
+				const instanceUniform = new OcclusionNode( sphere, new THREE.Color( 0x0000ff ), new THREE.Color( 0x00ff00 ) );
 
 				plane.material.colorNode = instanceUniform;
 
@@ -116,14 +115,9 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				// ensure shaders/pipelines are all complete before rendering
-
-				await renderer.compileAsync( scene, camera );
-
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 

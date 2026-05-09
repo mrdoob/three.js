@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Ray } from '../../../../src/math/Ray.js';
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -281,12 +279,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'distanceToPlane', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'intersectPlane', ( assert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
@@ -302,17 +294,17 @@ export default QUnit.module( 'Maths', () => {
 			a.intersectPlane( c, point.copy( posInf3 ) );
 			assert.ok( point.equals( posInf3 ), 'Passed!' );
 
-			// parallel plane infront
+			// parallel plane in front
 			const d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
 			a.intersectPlane( d, point.copy( posInf3 ) );
 			assert.ok( point.equals( a.origin ), 'Passed!' );
 
-			// perpendical ray that overlaps exactly
+			// perpendicular ray that overlaps exactly
 			const e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
 			a.intersectPlane( e, point.copy( posInf3 ) );
 			assert.ok( point.equals( a.origin ), 'Passed!' );
 
-			// perpendical ray that doesn't overlap
+			// perpendicular ray that doesn't overlap
 			const f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
 			a.intersectPlane( f, point.copy( posInf3 ) );
 			assert.ok( point.equals( posInf3 ), 'Passed!' );
@@ -335,11 +327,11 @@ export default QUnit.module( 'Maths', () => {
 			const d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 1 ) ) );
 			assert.ok( ! a.intersectsPlane( d ), 'Passed!' );
 
-			// perpendical ray that overlaps exactly
+			// perpendicular ray that overlaps exactly
 			const e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
 			assert.ok( a.intersectsPlane( e ), 'Passed!' );
 
-			// perpendical ray that doesn't overlap
+			// perpendicular ray that doesn't overlap
 			const f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
 			assert.ok( ! a.intersectsPlane( f ), 'Passed!' );
 
@@ -387,12 +379,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( f.intersectsBox( box ) === false, 'Passed!' );
 			f.intersectBox( box, point.copy( posInf3 ) );
 			assert.ok( point.equals( posInf3 ), 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'intersectsBox', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -468,12 +454,6 @@ export default QUnit.module( 'Maths', () => {
 			a2 = a.clone().applyMatrix4( m );
 			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Passed!' );
 			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'equals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

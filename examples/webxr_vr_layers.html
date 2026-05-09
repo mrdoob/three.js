@@ -4,13 +4,16 @@
 		<title>three.js vr - layers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - layers">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_layers.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_layers.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> media and projection layers<br/>
-			(Oculus Browser 16.1+)
 
 			<p> This example demonstrates the use of <a href="https://www.w3.org/TR/webxrlayers-1/">WebXR Layers</a> to render high quality text and video.
 				  For static content such as text, using layers increases the usable resolution of the content by avoiding the extra resampling pass that occurs during normal VR rendering.
@@ -106,7 +109,6 @@
 			snellenConfig.quadHeight = .5 * snellenConfig.heightMeters / snellenConfig.cropY;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -123,9 +125,10 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.setClearAlpha( 1 );
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
 
 				document.body.appendChild( renderer.domElement );
@@ -196,7 +199,7 @@
 				eyeCharts.add( snellenMeshMipMap );
 
 				// The layers don't participate depth testing between each other. Since the projection
-				// layer is rendered last, any 3D object will incorrecly overlap layers. To avoid this,
+				// layer is rendered last, any 3D object will incorrectly overlap layers. To avoid this,
 				// invisible quads can be placed into the scene to participate in depth testing when the
 				// projection layer is rendered.
 				const dummyMeshLeft = new THREE.Mesh(
@@ -298,20 +301,19 @@
 			}
 			//
 
-			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render( t, frame ) {
+			function animate( t, frame ) {
 
 				const xr = renderer.xr;
 				const session = xr.getSession();
 				const gl = renderer.getContext();
 
 				// Init layers once in immersive mode and video is ready.
-				if ( session && session.renderState.layers === undefined ) {
+				const useLayers = session &&
+					session.enabledFeatures !== undefined &&
+					session.enabledFeatures.includes( 'layers' ) &&
+					XRMediaBinding !== undefined;
+
+				if ( ! useLayers ) {
 
 					errorMesh.visible = true;
 
@@ -319,7 +321,7 @@
 
 				if (
 					session &&
-					session.renderState.layers !== undefined &&
+					useLayers &&
 					session.hasMediaLayer === undefined &&
 					video.readyState >= 2
 				) {
@@ -403,7 +405,7 @@
 
 					const glayer = xr.getBinding().getSubImage( quadLayerPlain, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
 						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
 						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
@@ -417,7 +419,7 @@
 
 					const glayer = xr.getBinding().getSubImage( quadLayerMips, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
 						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
 						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
@@ -432,7 +434,7 @@
 
 					const glayer = xr.getBinding().getSubImage( guiLayer, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					const canvas = guiMesh.material.map.image;
 					gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, canvas );
 					guiLayer.needsUpdate = false;

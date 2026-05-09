@@ -3,7 +3,7 @@ LDraw Readme File
 Welcome to LDraw
 
 This short readme file explains what files and subdirectories are present in 
-your LDraw installation, described the LDraw library structure and and has links 
+your LDraw installation, described the LDraw library structure and has links 
 to some sites on the internet where you can find help and further information.
 
  * LDraw program directory contents
@@ -35,18 +35,18 @@ to some sites on the internet where you can find help and further information.
                    There are two sample model .dat files installed for you
                    to look at - Car.dat and Pyramid.dat.
    \P\          -  This directory is where parts primitives are located.
-                   Parts primitives are tyically highly reusable components
+                   Parts primitives are typically highly reusable components
                    used by the part files in the LDraw library.
    \P\48\       -  This directory is where high resolution parts primitives 
                    are located. These are typically used for large curved
                    parts where excessive scaling of the regular curved 
-                   primitives would produce an undesriable result.
+                   primitives would produce an undesirable result.
    \PARTS\      -  This directory holds all the actual parts that can be used
                    in creating or rendering your models.  A list of these
                    parts can be seen by viewing the parts.lst file.
    \PARTS\S\    -  This directory holds sub-parts that are used by the LDraw
                    parts to optimise file size and improve parts development
-                   efficiancy. 
+                   efficiency. 
 
 --------------------------------------------------------------------------------
 * LDraw library structure:
@@ -57,7 +57,7 @@ to some sites on the internet where you can find help and further information.
                       authors have agreed to the Contributor Agreement, allowing
                       their work to be re-distributed. Full details of this 
                       agreement can be found in the CAreadme.txt and 
-                      CAlicense.txt files in the same diectory as this file.
+                      CAlicense.txt files in the same directory as this file.
                       This download is restricted to generic colour versions of 
                       each part and does not contain duplicate copies of part 
                       files where different numbers have been used for the same 

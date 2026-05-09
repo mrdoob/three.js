@@ -4,6 +4,10 @@
 		<title>three.js webgl - shader [Monjori]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - shader [Monjori]">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shader.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shader.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -81,7 +85,6 @@
 			let uniforms;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -111,6 +114,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -126,8 +130,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				uniforms[ 'time' ].value = performance.now() / 1000;
 

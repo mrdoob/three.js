@@ -4,6 +4,10 @@
 		<title>Ammo.js terrain heightfield demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="Ammo.js terrain heightfield demo">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_ammo_terrain.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_ammo_terrain.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -48,7 +52,8 @@
 			let container, stats;
 			let camera, scene, renderer;
 			let terrainMesh;
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			// Physics variables
 			let collisionConfiguration;
@@ -72,7 +77,6 @@
 				Ammo = AmmoLib;
 
 				init();
-				animate();
 
 			} );
 
@@ -93,6 +97,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -391,7 +396,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
 				render();
 				stats.update();
@@ -400,7 +405,7 @@
 
 			function render() {
 
-				const deltaTime = clock.getDelta();
+				const deltaTime = timer.getDelta();
 
 				if ( dynamicObjects.length < maxNumObjects && time > timeNextSpawn ) {
 

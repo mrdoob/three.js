@@ -4,6 +4,10 @@
 		<title>three.js webgl - loaders - NRRD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - NRRD loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_nrrd.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_nrrd.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -32,7 +36,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 			import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
-			import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
 
 			let stats,
 				camera,
@@ -41,7 +44,6 @@
 				renderer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -125,31 +127,12 @@
 
 				} );
 
-				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, side: THREE.DoubleSide, color: 0xff0000 } );
-
-				const vtkloader = new VTKLoader();
-				vtkloader.load( 'models/vtk/liver.vtk', function ( geometry ) {
-
-					geometry.computeVertexNormals();
-
-					const mesh = new THREE.Mesh( geometry, vtkmaterial );
-					scene.add( mesh );
-					const visibilityControl = {
-						visible: true
-					};
-					gui.add( visibilityControl, 'visible' ).name( 'Model Visible' ).onChange( function () {
-
-						mesh.visible = visibilityControl.visible;
-						renderer.render( scene, camera );
-
-					} );
-
-				} );
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );
@@ -180,8 +163,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 

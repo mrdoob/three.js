@@ -4,6 +4,10 @@
 		<title>three.js webgl - effects - parallax barrier</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - effects - parallax barrier">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_effects_parallaxbarrier.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_effects_parallaxbarrier.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -41,7 +45,6 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -87,6 +90,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				const width = window.innerWidth || 2;
@@ -123,14 +127,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				const timer = 0.0001 * Date.now();
 

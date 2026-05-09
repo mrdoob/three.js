@@ -6,19 +6,62 @@ import {
 	Int32BufferAttribute,
 	Loader,
 	Points,
-	PointsMaterial
+	PointsMaterial,
+	SRGBColorSpace
 } from 'three';
 
+/**
+ * A loader for the Point Cloud Data (PCD) format.
+ *
+ * PCDLoader supports ASCII and (compressed) binary files as well as the following PCD fields:
+ * - x y z
+ * - rgb
+ * - normal_x normal_y normal_z
+ * - intensity
+ * - label
+ *
+ * ```js
+ * const loader = new PCDLoader();
+ *
+ * const points = await loader.loadAsync( './models/pcd/binary/Zaghetto.pcd' );
+ * points.geometry.center(); // optional
+ * points.geometry.rotateX( Math.PI ); // optional
+ * scene.add( points );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+ */
 class PCDLoader extends Loader {
 
+	/**
+	 * Constructs a new PCD loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Whether to use little Endian or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.littleEndian = true;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded PCD asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Points)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -54,6 +97,78 @@ class PCDLoader extends Loader {
 
 	}
 
+	/**
+	 * Get dataview value by field type and size.
+	 *
+	 * @private
+	 * @param {DataView} dataview - The DataView to read from.
+	 * @param {number} offset - The offset to start reading from.
+	 * @param {'F' | 'U' | 'I'} type - Field type.
+	 * @param {number} size - Field size.
+	 * @returns {number} Field value.
+	 */
+	_getDataView( dataview, offset, type, size ) {
+
+		switch ( type ) {
+
+			case 'F': {
+
+				if ( size === 8 ) {
+
+					return dataview.getFloat64( offset, this.littleEndian );
+
+				}
+
+				return dataview.getFloat32( offset, this.littleEndian );
+
+			}
+
+			case 'I': {
+
+				if ( size === 1 ) {
+
+					return dataview.getInt8( offset );
+
+				}
+
+				if ( size === 2 ) {
+
+					return dataview.getInt16( offset, this.littleEndian );
+
+				}
+
+				return dataview.getInt32( offset, this.littleEndian );
+
+			}
+
+			case 'U': {
+
+				if ( size === 1 ) {
+
+					return dataview.getUint8( offset );
+
+				}
+
+				if ( size === 2 ) {
+
+					return dataview.getUint16( offset, this.littleEndian );
+
+				}
+
+				return dataview.getUint32( offset, this.littleEndian );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Parses the given PCD data and returns a point cloud.
+	 *
+	 * @param {ArrayBuffer} data - The raw PCD data as an array buffer.
+	 * @return {Points} The parsed point cloud.
+	 */
 	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
@@ -111,9 +226,40 @@ class PCDLoader extends Loader {
 
 		}
 
-		function parseHeader( data ) {
+		function parseHeader( binaryData ) {
 
 			const PCDheader = {};
+
+			const buffer = new Uint8Array( binaryData );
+
+			let data = '', line = '', i = 0, end = false;
+
+			const max = buffer.length;
+
+			while ( i < max && end === false ) {
+
+				const char = String.fromCharCode( buffer[ i ++ ] );
+
+				if ( char === '\n' || char === '\r' ) {
+
+					if ( line.trim().toLowerCase().startsWith( 'data' ) ) {
+
+						end = true;
+
+					}
+
+					line = '';
+
+				} else {
+
+					line += char;
+
+				}
+
+				data += char;
+
+			}
+
 			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
 			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
 
@@ -127,15 +273,15 @@ class PCDLoader extends Loader {
 
 			// parse
 
-			PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
-			PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
-			PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
-			PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
-			PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
-			PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
-			PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
-			PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
-			PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
+			PCDheader.version = /^VERSION (.*)/im.exec( PCDheader.str );
+			PCDheader.fields = /^FIELDS (.*)/im.exec( PCDheader.str );
+			PCDheader.size = /^SIZE (.*)/im.exec( PCDheader.str );
+			PCDheader.type = /^TYPE (.*)/im.exec( PCDheader.str );
+			PCDheader.count = /^COUNT (.*)/im.exec( PCDheader.str );
+			PCDheader.width = /^WIDTH (.*)/im.exec( PCDheader.str );
+			PCDheader.height = /^HEIGHT (.*)/im.exec( PCDheader.str );
+			PCDheader.viewpoint = /^VIEWPOINT (.*)/im.exec( PCDheader.str );
+			PCDheader.points = /^POINTS (.*)/im.exec( PCDheader.str );
 
 			// evaluate
 
@@ -219,11 +365,9 @@ class PCDLoader extends Loader {
 
 		}
 
-		const textData = new TextDecoder().decode( data );
+		// parse header
 
-		// parse header (always ascii format)
-
-		const PCDheader = parseHeader( textData );
+		const PCDheader = parseHeader( data );
 
 		// parse data
 
@@ -240,6 +384,7 @@ class PCDLoader extends Loader {
 		if ( PCDheader.data === 'ascii' ) {
 
 			const offset = PCDheader.offset;
+			const textData = new TextDecoder().decode( data );
 			const pcdData = textData.slice( PCDheader.headerLen );
 			const lines = pcdData.split( '\n' );
 
@@ -279,7 +424,7 @@ class PCDLoader extends Loader {
 					const g = ( ( rgb >> 8 ) & 0x0000ff ) / 255;
 					const b = ( ( rgb >> 0 ) & 0x0000ff ) / 255;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 
@@ -332,9 +477,9 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'x' );
 					const yIndex = PCDheader.fields.indexOf( 'y' );
 					const zIndex = PCDheader.fields.indexOf( 'z' );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					position.push( this._getDataView( dataview, ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
@@ -346,7 +491,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0;
 					const b = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 
@@ -357,23 +502,23 @@ class PCDLoader extends Loader {
 					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
 					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
 					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					normal.push( this._getDataView( dataview, ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
 				if ( offset.intensity !== undefined ) {
 
 					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
-					intensity.push( dataview.getFloat32( ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+					intensity.push( this._getDataView( dataview, ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, PCDheader.type[ intensityIndex ], PCDheader.size[ intensityIndex ] ) );
 
 				}
 
 				if ( offset.label !== undefined ) {
 
 					const labelIndex = PCDheader.fields.indexOf( 'label' );
-					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
+					label.push( this._getDataView( dataview, ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, PCDheader.type[ labelIndex ], PCDheader.size[ labelIndex ] ) );
 
 				}
 
@@ -392,9 +537,12 @@ class PCDLoader extends Loader {
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( row + offset.x, this.littleEndian ) );
-					position.push( dataview.getFloat32( row + offset.y, this.littleEndian ) );
-					position.push( dataview.getFloat32( row + offset.z, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'x' );
+					const yIndex = PCDheader.fields.indexOf( 'y' );
+					const zIndex = PCDheader.fields.indexOf( 'z' );
+					position.push( this._getDataView( dataview, row + offset.x, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					position.push( this._getDataView( dataview, row + offset.y, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					position.push( this._getDataView( dataview, row + offset.z, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
@@ -404,7 +552,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
 					const b = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
 
-					c.set( r, g, b ).convertSRGBToLinear();
+					c.setRGB( r, g, b, SRGBColorSpace );
 
 					color.push( c.r, c.g, c.b );
 
@@ -412,21 +560,26 @@ class PCDLoader extends Loader {
 
 				if ( offset.normal_x !== undefined ) {
 
-					normal.push( dataview.getFloat32( row + offset.normal_x, this.littleEndian ) );
-					normal.push( dataview.getFloat32( row + offset.normal_y, this.littleEndian ) );
-					normal.push( dataview.getFloat32( row + offset.normal_z, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
+					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
+					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
+					normal.push( this._getDataView( dataview, row + offset.normal_x, PCDheader.type[ xIndex ], PCDheader.size[ xIndex ] ) );
+					normal.push( this._getDataView( dataview, row + offset.normal_y, PCDheader.type[ yIndex ], PCDheader.size[ yIndex ] ) );
+					normal.push( this._getDataView( dataview, row + offset.normal_z, PCDheader.type[ zIndex ], PCDheader.size[ zIndex ] ) );
 
 				}
 
 				if ( offset.intensity !== undefined ) {
 
-					intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+					intensity.push( this._getDataView( dataview, row + offset.intensity, PCDheader.type[ intensityIndex ], PCDheader.size[ intensityIndex ] ) );
 
 				}
 
 				if ( offset.label !== undefined ) {
 
-					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( this._getDataView( dataview, row + offset.label, PCDheader.type[ labelIndex ], PCDheader.size[ labelIndex ] ) );
 
 				}
 

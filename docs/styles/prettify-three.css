@@ -1,0 +1,29 @@
+pre .str, code .str { color: #8000ff; } /* string */
+pre .kwd, code .kwd { color: #30b030; } /* keyword */
+pre .com, code .com { color: #999999; } /* comment */
+pre .typ, code .typ { color: #2194ce; } /* type */
+pre .lit, code .lit { color: #ff0080; } /* literal */
+pre .pun, code .pun { color: #888888; } /* punctuation */
+pre .pln, code .pln { color: #444444; } /* plaintext */
+pre .dec, code .dec { color: #22c0c4; } /* decimal */
+
+pre {
+	background-color: #F5F5F5;
+	font-family: 'Roboto Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+
+	pre .tag, code .tag { color: #2194ce; } /* HTML tag */
+	pre .atn, code .atn { color: #BB55FF; } /* HTML attribute name */
+	pre .atv, code .atv { color: #30b030; } /* HTML attribute value */
+	pre .str, code .str { color: #BB55FF; } /* string */
+	pre .com, code .com { color: #666666; } /* comment */
+	pre .lit, code .lit { color: #ff3399; } /* literal */
+	pre .pln, code .pln { color: #aaaaaa; } /* plaintext */
+
+	pre {
+		background-color: #333333;
+	}
+
+}

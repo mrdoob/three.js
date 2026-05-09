@@ -4,6 +4,10 @@
 		<title>three.js svg - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js svg - sandbox">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/svg_sandbox.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/svg_sandbox.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			svg {
@@ -26,12 +30,13 @@
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { SVGRenderer, SVGObject } from 'three/addons/renderers/SVGRenderer.js';
 
 			THREE.ColorManagement.enabled = false;
 
-			let camera, scene, renderer, stats;
+			let camera, scene, renderer, stats, controls;
 
 			let group;
 
@@ -218,6 +223,9 @@
 				renderer.setQuality( 'low' );
 				document.body.appendChild( renderer.domElement );
 
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -249,13 +257,9 @@
 
 			function render() {
 
-				const time = Date.now() * 0.0002;
-
-				camera.position.x = Math.sin( time ) * 500;
-				camera.position.z = Math.cos( time ) * 500;
-				camera.lookAt( scene.position );
-
 				group.rotation.x += 0.01;
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

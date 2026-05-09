@@ -4,6 +4,10 @@
 	  <title>three.js webgl - loaders - USDZLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - USDZLoader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_usdz.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_usdz.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -34,13 +38,12 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-			import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { USDLoader } from 'three/addons/loaders/USDLoader.js';
 
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			async function init() {
 
@@ -49,27 +52,14 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 2.0;
-				document.body.appendChild( renderer.domElement );
-
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
-				controls.maxDistance = 8;
-				// controls.target.y = 15;
-				// controls.update();
-
-				const rgbeLoader = new RGBELoader()
+				const hdrLoader = new HDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
-				const usdzLoader = new USDZLoader()
+				const usdzLoader = new USDLoader()
 					.setPath( 'models/usdz/' );
 
 				const [ texture, model ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					hdrLoader.loadAsync( 'venice_sunset_1k.hdr' ),
 					usdzLoader.loadAsync( 'saeukkang.usdz' ),
 				] );
 
@@ -87,6 +77,22 @@
 				model.position.z = - 0.25;
 				scene.add( model );
 
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 2.0;
+				document.body.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 8;
+				// controls.target.y = 15;
+				// controls.update();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -101,8 +107,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

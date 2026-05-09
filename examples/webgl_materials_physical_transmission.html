@@ -4,6 +4,10 @@
 		<title>threejs webgl - materials - transmission</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="threejs webgl - materials - transmission">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_physical_transmission.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_physical_transmission.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -26,7 +30,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			const params = {
 				color: 0xffffff,
@@ -40,16 +44,17 @@
 				specularColor: 0xffffff,
 				envMapIntensity: 1,
 				lightIntensity: 1,
-				exposure: 1
+				exposure: 1,
+				transmissionResolutionScale: 1
 			};
 
 			let camera, scene, renderer;
 
 			let mesh;
 
-			const hdrEquirect = new RGBELoader()
+			const hdrEquirect = new UltraHDRLoader()
 				.setPath( 'textures/equirectangular/' )
-				.load( 'royal_esplanade_1k.hdr', function () {
+				.load( 'royal_esplanade_2k.hdr.jpg', function () {
 
 					hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -206,6 +211,15 @@
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
+						render();
+
+					} );
+
+				gui.add( params, 'transmissionResolutionScale', 0.01, 1, 0.01 )
+					.name( 'transmission resolution' )
+					.onChange( function () {
+
+						renderer.transmissionResolutionScale = params.transmissionResolutionScale;
 						render();
 
 					} );

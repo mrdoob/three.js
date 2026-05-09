@@ -3,6 +3,10 @@
 		<title>Convex object breaking example</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="Convex object breaking example">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_ammo_break.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_ammo_break.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -41,7 +45,8 @@
 		let container, stats;
 		let camera, controls, scene, renderer;
 		let textureLoader;
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 
 		const mouseCoords = new THREE.Vector2();
 		const raycaster = new THREE.Raycaster();
@@ -86,7 +91,6 @@
 			Ammo = AmmoLib;
 
 			init();
-			animate();
 
 		} );
 
@@ -119,6 +123,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
@@ -338,9 +343,10 @@
 			physicsShape.calculateLocalInertia( mass, localInertia );
 
 			const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
-			const body = new Ammo.btRigidBody( rbInfo );
+			rbInfo.set_m_restitution( 0.5 );
+			rbInfo.set_m_friction( 0.5 );
 
-			body.setFriction( 0.5 );
+			const body = new Ammo.btRigidBody( rbInfo );
 
 			if ( vel ) {
 
@@ -431,7 +437,7 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
+			timer.update();
 
 			render();
 			stats.update();
@@ -440,7 +446,7 @@
 
 		function render() {
 
-			const deltaTime = clock.getDelta();
+			const deltaTime = timer.getDelta();
 
 			updatePhysics( deltaTime );
 
@@ -540,7 +546,7 @@
 
 				if ( breakable0 && ! collided0 && maxImpulse > fractureImpulse ) {
 
-					const debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2 );
 
 					const numObjects = debris.length;
 					for ( let j = 0; j < numObjects; j ++ ) {
@@ -562,7 +568,7 @@
 
 				if ( breakable1 && ! collided1 && maxImpulse > fractureImpulse ) {
 
-					const debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2 );
 
 					const numObjects = debris.length;
 					for ( let j = 0; j < numObjects; j ++ ) {

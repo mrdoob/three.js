@@ -2,7 +2,6 @@ import {
 	Color,
 	Matrix4,
 	Mesh,
-	PerspectiveCamera,
 	Plane,
 	ShaderMaterial,
 	UniformsUtils,
@@ -12,16 +11,67 @@ import {
 	HalfFloatType
 } from 'three';
 
+/**
+ * Can be used to create a flat, reflective surface like a mirror.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link ReflectorNode}.
+ *
+ * ```js
+ * const geometry = new THREE.PlaneGeometry( 100, 100 );
+ *
+ * const reflector = new Reflector( geometry, {
+ * 	clipBias: 0.003,
+ * 	textureWidth: window.innerWidth * window.devicePixelRatio,
+ * 	textureHeight: window.innerHeight * window.devicePixelRatio,
+ * 	color: 0xc1cbcb
+ * } );
+ *
+ * scene.add( reflector );
+ * ```
+ *
+ * @augments Mesh
+ * @three_import import { Reflector } from 'three/addons/objects/Reflector.js';
+ */
 class Reflector extends Mesh {
 
+	/**
+	 * Constructs a new reflector.
+	 *
+	 * @param {BufferGeometry} geometry - The reflector's geometry.
+	 * @param {Reflector~Options} [options] - The configuration options.
+	 */
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isReflector = true;
 
 		this.type = 'Reflector';
-		this.camera = new PerspectiveCamera();
+
+		/**
+		 * Whether to force an update, no matter if the reflector
+		 * is in view or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.forceUpdate = false;
+
+		/**
+		 * Weak map for managing reflection cameras.
+		 *
+		 * @private
+		 * @type {WeakMap<Camera, Camera>}
+		 */
+		this._reflectionCameras = new WeakMap();
 
 		const scope = this;
 
@@ -47,7 +97,6 @@ class Reflector extends Mesh {
 		const q = new Vector4();
 
 		const textureMatrix = new Matrix4();
-		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
@@ -66,6 +115,8 @@ class Reflector extends Mesh {
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
+			const reflectionCamera = this._getReflectionCamera( camera );
+
 			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 
@@ -76,9 +127,10 @@ class Reflector extends Mesh {
 
 			view.subVectors( reflectorWorldPosition, cameraWorldPosition );
 
-			// Avoid rendering when reflector is facing away
+			// Avoid rendering when reflector is facing away unless forcing an update
+			const isFacingAway = view.dot( normal ) > 0;
 
-			if ( view.dot( normal ) > 0 ) return;
+			if ( isFacingAway === true && this.forceUpdate === false ) return;
 
 			view.reflect( normal ).negate();
 			view.add( reflectorWorldPosition );
@@ -93,16 +145,16 @@ class Reflector extends Mesh {
 			target.reflect( normal ).negate();
 			target.add( reflectorWorldPosition );
 
-			virtualCamera.position.copy( view );
-			virtualCamera.up.set( 0, 1, 0 );
-			virtualCamera.up.applyMatrix4( rotationMatrix );
-			virtualCamera.up.reflect( normal );
-			virtualCamera.lookAt( target );
+			reflectionCamera.position.copy( view );
+			reflectionCamera.up.set( 0, 1, 0 );
+			reflectionCamera.up.applyMatrix4( rotationMatrix );
+			reflectionCamera.up.reflect( normal );
+			reflectionCamera.lookAt( target );
 
-			virtualCamera.far = camera.far; // Used in WebGLBackground
+			reflectionCamera.far = camera.far; // Used in WebGLBackground
 
-			virtualCamera.updateMatrixWorld();
-			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+			reflectionCamera.updateMatrixWorld();
+			reflectionCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 			// Update the texture matrix
 			textureMatrix.set(
@@ -111,23 +163,34 @@ class Reflector extends Mesh {
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
-			textureMatrix.multiply( virtualCamera.projectionMatrix );
-			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
+			textureMatrix.multiply( reflectionCamera.projectionMatrix );
+			textureMatrix.multiply( reflectionCamera.matrixWorldInverse );
 			textureMatrix.multiply( scope.matrixWorld );
 
 			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+			reflectorPlane.applyMatrix4( reflectionCamera.matrixWorldInverse );
 
 			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
 
-			const projectionMatrix = virtualCamera.projectionMatrix;
+			const projectionMatrix = reflectionCamera.projectionMatrix;
 
-			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
-			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-			q.z = - 1.0;
-			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+			if ( reflectionCamera.isOrthographicCamera ) {
+
+				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+				q.z = - camera.far; // actual view-space z at the far plane, no normalization needed
+				q.w = 1.0; // w_clip = 1 in orthographic (no perspective division)
+
+			} else {
+
+				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+				q.z = - 1.0;
+				q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+
+			}
 
 			// Calculate the scaled plane vector
 			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
@@ -135,8 +198,21 @@ class Reflector extends Mesh {
 			// Replacing the third row of the projection matrix
 			projectionMatrix.elements[ 2 ] = clipPlane.x;
 			projectionMatrix.elements[ 6 ] = clipPlane.y;
-			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
-			projectionMatrix.elements[ 14 ] = clipPlane.w;
+
+			if ( reflectionCamera.isOrthographicCamera ) {
+
+				// For orthographic cameras, w_clip = 1 always (no perspective division),
+				// so the -1 near-plane offset must go into the constant term (elements[14])
+				// rather than the z coefficient (elements[10]).
+				projectionMatrix.elements[ 10 ] = clipPlane.z - clipBias;
+				projectionMatrix.elements[ 14 ] = clipPlane.w - 1.0;
+
+			} else {
+
+				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
+				projectionMatrix.elements[ 14 ] = clipPlane.w;
+
+			}
 
 			// Render
 			scope.visible = false;
@@ -154,7 +230,7 @@ class Reflector extends Mesh {
 			renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
 			if ( renderer.autoClear === false ) renderer.clear();
-			renderer.render( scene, virtualCamera );
+			renderer.render( scene, reflectionCamera );
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -172,19 +248,53 @@ class Reflector extends Mesh {
 			}
 
 			scope.visible = true;
+			this.forceUpdate = false;
 
 		};
 
+		/**
+		 * Returns the reflector's internal render target.
+		 *
+		 * @return {WebGLRenderTarget} The internal render target
+		 */
 		this.getRenderTarget = function () {
 
 			return renderTarget;
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			renderTarget.dispose();
 			scope.material.dispose();
+
+		};
+
+		/**
+		 * Returns a reflection camera for the given camera. The reflection camera is used to
+		 * render the scene from the reflector's view so correct reflections can be produced.
+		 *
+		 * @private
+		 * @param {Camera} camera - The scene's camera.
+		 * @return {Camera} The corresponding reflection camera.
+		 */
+		this._getReflectionCamera = function ( camera ) {
+
+			let reflectionCamera = this._reflectionCameras.get( camera );
+
+			if ( reflectionCamera === undefined ) {
+
+				reflectionCamera = camera.clone();
+
+				this._reflectionCameras.set( camera, reflectionCamera );
+
+			}
+
+			return reflectionCamera;
 
 		};
 
@@ -260,5 +370,17 @@ Reflector.ReflectorShader = {
 
 		}`
 };
+
+/**
+ * Constructor options of `Reflector`.
+ *
+ * @typedef {Object} Reflector~Options
+ * @property {number|Color|string} [color=0x7F7F7F] - The reflector's color.
+ * @property {number} [textureWidth=512] - The texture width. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [textureHeight=512] - The texture height. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [clipBias=0] - The clip bias.
+ * @property {Object} [shader] - Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.
+ * @property {number} [multisample=4] - How many samples to use for MSAA. `0` disables MSAA.
+ **/
 
 export { Reflector };

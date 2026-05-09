@@ -4,6 +4,10 @@
 		<title>three.js webgl - skinning and morphing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - skinning and morphing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_skinning_morph.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_skinning_morph.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -52,13 +56,12 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			let container, stats, clock, gui, mixer, actions, activeAction, previousAction;
+			let container, stats, timer, gui, mixer, actions, activeAction, previousAction;
 			let camera, scene, renderer, model, face;
 
 			const api = { state: 'Walking' };
 
 			init();
-			animate();
 
 			function init() {
 
@@ -73,7 +76,8 @@
 				scene.background = new THREE.Color( 0xe0e0e0 );
 				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				// lights
 
@@ -115,6 +119,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -252,11 +257,11 @@
 
 			function animate() {
 
-				const dt = clock.getDelta();
+				timer.update();
+
+				const dt = timer.getDelta();
 
 				if ( mixer ) mixer.update( dt );
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

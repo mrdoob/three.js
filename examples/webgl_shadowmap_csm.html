@@ -4,6 +4,10 @@
 		<title>three.js webgl - cascaded shadow maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - cascaded shadow maps">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_csm.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_csm.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -55,7 +59,6 @@
 			};
 
 			init();
-			animate();
 
 			function updateOrthoCamera() {
 
@@ -82,9 +85,10 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = params.shadows;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI / 2;
@@ -283,8 +287,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				camera.updateMatrixWorld();
 				csm.update();

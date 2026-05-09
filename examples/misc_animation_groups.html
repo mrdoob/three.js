@@ -4,6 +4,10 @@
 		<title>three.js webgl - animation - groups</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - groups">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_animation_groups.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_animation_groups.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -27,11 +31,10 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let stats, clock;
+			let stats, timer;
 			let scene, camera, renderer, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -97,6 +100,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -106,7 +110,8 @@
 
 				//
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -125,15 +130,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				render();
-
-			}
-
-			function render() {
-
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer ) {
 

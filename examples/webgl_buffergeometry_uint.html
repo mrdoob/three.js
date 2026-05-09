@@ -4,6 +4,10 @@
 		<title>three.js webgl - buffergeometry - uint</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - buffergeometry - uint">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_buffergeometry_uint.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_buffergeometry_uint.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -33,7 +37,6 @@
 			let mesh;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -166,6 +169,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -192,21 +196,14 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

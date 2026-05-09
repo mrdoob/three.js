@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - compressed textures</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - compressed textures">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_texture_dds.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_texture_dds.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -32,12 +36,12 @@
 			const meshes = [];
 
 			init();
-			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 15;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.y = - 2;
+				camera.position.z = 16;
 
 				scene = new THREE.Scene();
 
@@ -91,6 +95,8 @@
 				const map10 = loader.load( 'textures/compressed/disturb_dx10_bc6h_unsigned_mip.dds' );
 				map10.anisotropy = 4;
 
+				const map11 = loader.load( 'textures/wave_normals_24bit_uncompressed.dds' );
+				map11.anisotropy = 4;
 
 				const cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
 
@@ -134,6 +140,7 @@
 				const material10 = new THREE.MeshBasicMaterial( { map: map8 } );
 				const material11 = new THREE.MeshBasicMaterial( { map: map9 } );
 				const material12 = new THREE.MeshBasicMaterial( { map: map10 } );
+				const material13 = new THREE.MeshBasicMaterial( { map: map11, transparent: true } );
 
 				let mesh = new THREE.Mesh( new THREE.TorusGeometry(), material1 );
 				mesh.position.x = - 10;
@@ -207,9 +214,16 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
+				mesh = new THREE.Mesh( geometry, material13 );
+				mesh.position.x = - 10;
+				mesh.position.y = - 6;
+				scene.add( mesh );
+				meshes.push( mesh );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -226,8 +240,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const time = Date.now() * 0.001;
 

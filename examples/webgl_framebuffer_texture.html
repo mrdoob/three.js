@@ -4,6 +4,10 @@
 		<title>three.js webgl - framebuffer - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - framebuffer - texture">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_framebuffer_texture.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_framebuffer_texture.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			#selection {
@@ -65,7 +69,6 @@
 			const color = new THREE.Color();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -120,6 +123,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
@@ -169,8 +173,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				const colorAttribute = line.geometry.getAttribute( 'color' );
 				updateColors( colorAttribute );
 
@@ -184,7 +186,7 @@
 				vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
 				vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
 
-				renderer.copyFramebufferToTexture( vector, texture );
+				renderer.copyFramebufferToTexture( texture, vector );
 
 				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );

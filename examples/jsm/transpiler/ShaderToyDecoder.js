@@ -7,9 +7,9 @@ class ShaderToyDecoder extends GLSLDecoder {
 
 		super();
 
-		this.addPolyfill( 'iTime', 'float iTime = timerGlobal();' );
-		this.addPolyfill( 'iResolution', 'vec2 iResolution = viewportResolution;' );
-		this.addPolyfill( 'fragCoord', 'vec2 fragCoord = vec2( viewportCoordinate.x, viewportResolution.y - viewportCoordinate.y );' );
+		this.addPolyfill( 'iTime', 'float iTime = time;' );
+		this.addPolyfill( 'iResolution', 'vec2 iResolution = screenSize;' );
+		this.addPolyfill( 'fragCoord', 'vec3 fragCoord = vec3( screenCoordinate.x, screenSize.y - screenCoordinate.y, screenCoordinate.z );' );
 
 	}
 
@@ -37,6 +37,8 @@ class ShaderToyDecoder extends GLSLDecoder {
 
 			node.body.unshift( new VariableDeclaration( 'vec4', 'fragColor' ) );
 			node.body.push( new Return( fragColor ) );
+
+			node.initialize();
 
 		}
 

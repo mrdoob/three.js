@@ -4,6 +4,10 @@
 		<title>three.js webgl - ShadowMapViewer example </title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - ShadowMapViewer example ">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_viewer.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_viewer.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -29,14 +33,12 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';
 
-			let camera, scene, renderer, clock, stats;
+			let camera, scene, renderer, timer, stats;
 			let dirLight, spotLight;
 			let torusKnot, cube;
 			let dirLightShadowMapViewer, spotLightShadowMapViewer;
 
 			init();
-			animate();
-
 
 			function init() {
 
@@ -140,6 +142,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 
@@ -148,7 +151,8 @@
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -186,7 +190,8 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
+
 				render();
 
 				stats.update();
@@ -208,7 +213,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				renderScene();
 				renderShadowMapViewers();

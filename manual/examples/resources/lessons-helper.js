@@ -56,10 +56,11 @@
 	const topWindow = this;
 
 	/**
-   * Check if the page is embedded.
-   * @param {Window?) w window to check
-   * @return {boolean} True of we are in an iframe
-   */
+	 * Check if the page is embedded.
+	 *
+	 * @param {Window?} w - window to check.
+	 * @return {boolean} True of we are in an iframe
+	 */
 	function isInIFrame( w ) {
 
 		w = w || topWindow;
@@ -75,17 +76,13 @@
 
 				document.getElementsByTagName( 'html' )[ 0 ].className = 'iframe';
 
-			} catch ( e ) {
-        // eslint-disable-line
-			}
+			} catch ( e ) { }
 
 			try {
 
 				document.body.className = 'iframe';
 
-			} catch ( e ) {
-        // eslint-disable-line
-			}
+			} catch ( e ) { }
 
 		}
 
@@ -371,9 +368,7 @@
 					// });
 					return matcher( lines[ lineNdx ] );
 
-				} catch ( e ) {
-					// do nothing
-				}
+				} catch ( e ) {}
 
 			}
 
@@ -388,7 +383,7 @@
 		function log( data ) {
 
 			const { logType, msg } = data;
-			console[ logType ]( '[Worker]', msg ); /* eslint-disable-line no-console */
+			console[ logType ]( '[Worker]', msg );
 
 		}
 

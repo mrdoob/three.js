@@ -1,5 +1,5 @@
 import {
-	BoxGeometry,
+	CylinderGeometry,
 	CanvasTexture,
 	Color,
 	Euler,
@@ -11,25 +11,80 @@ import {
 	Raycaster,
 	Sprite,
 	SpriteMaterial,
+	SRGBColorSpace,
 	Vector2,
 	Vector3,
 	Vector4
 } from 'three';
 
+/**
+ * A special type of helper that visualizes the camera's transformation
+ * in a small viewport area as an axes helper. Such a helper is often wanted
+ * in 3D modeling tools or scene editors like the [three.js editor](https://threejs.org/editor).
+ *
+ * The helper allows to click on the X, Y and Z axes which animates the camera
+ * so it looks along the selected axis.
+ *
+ * @augments Object3D
+ * @three_import import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';
+ */
 class ViewHelper extends Object3D {
 
+	/**
+	 * Constructs a new view helper.
+	 *
+	 * @param {Camera} camera - The camera whose transformation should be visualized.
+	 * @param {HTMLElement} [domElement] - The DOM element that is used to render the view.
+	 */
 	constructor( camera, domElement ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isViewHelper = true;
 
+		/**
+		 * Whether the helper is currently animating or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.animating = false;
+
+		/**
+		 * The helper's center point.
+		 *
+		 * @type {Vector3}
+		 */
 		this.center = new Vector3();
 
-		const color1 = new Color( '#ff3653' );
-		const color2 = new Color( '#8adb00' );
-		const color3 = new Color( '#2c8fff' );
+		/**
+		 * Controls the position of the helper in the viewport.
+		 * Use `top`/`bottom` for vertical positioning and `left`/`right` for horizontal.
+		 * If `left` is `null`, `right` is used. If `top` is `null`, `bottom` is used.
+		 *
+		 * @type {{top: number|null, right: number, bottom: number, left: number|null}}
+		 */
+		this.location = {
+			top: null,
+			right: 0,
+			bottom: 0,
+			left: null
+		};
+
+		const color1 = new Color( '#ff4466' );
+		const color2 = new Color( '#88ff44' );
+		const color3 = new Color( '#4488ff' );
+		const color4 = new Color( '#000000' );
+
+		const options = {};
 
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
@@ -39,7 +94,7 @@ class ViewHelper extends Object3D {
 		const orthoCamera = new OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 		orthoCamera.position.set( 0, 0, 2 );
 
-		const geometry = new BoxGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
+		const geometry = new CylinderGeometry( 0.04, 0.04, 0.8, 5 ).rotateZ( - Math.PI / 2 ).translate( 0.4, 0, 0 );
 
 		const xAxis = new Mesh( geometry, getAxisMaterial( color1 ) );
 		const yAxis = new Mesh( geometry, getAxisMaterial( color2 ) );
@@ -52,28 +107,35 @@ class ViewHelper extends Object3D {
 		this.add( zAxis );
 		this.add( yAxis );
 
-		const posXAxisHelper = new Sprite( getSpriteMaterial( color1, 'X' ) );
-		posXAxisHelper.userData.type = 'posX';
-		const posYAxisHelper = new Sprite( getSpriteMaterial( color2, 'Y' ) );
-		posYAxisHelper.userData.type = 'posY';
-		const posZAxisHelper = new Sprite( getSpriteMaterial( color3, 'Z' ) );
-		posZAxisHelper.userData.type = 'posZ';
-		const negXAxisHelper = new Sprite( getSpriteMaterial( color1 ) );
-		negXAxisHelper.userData.type = 'negX';
-		const negYAxisHelper = new Sprite( getSpriteMaterial( color2 ) );
-		negYAxisHelper.userData.type = 'negY';
-		const negZAxisHelper = new Sprite( getSpriteMaterial( color3 ) );
-		negZAxisHelper.userData.type = 'negZ';
+		const spriteMaterial1 = getSpriteMaterial( color1 );
+		const spriteMaterial2 = getSpriteMaterial( color2 );
+		const spriteMaterial3 = getSpriteMaterial( color3 );
+		const spriteMaterial4 = getSpriteMaterial( color4 );
+
+		const posXAxisHelper = new Sprite( spriteMaterial1 );
+		const posYAxisHelper = new Sprite( spriteMaterial2 );
+		const posZAxisHelper = new Sprite( spriteMaterial3 );
+		const negXAxisHelper = new Sprite( spriteMaterial4 );
+		const negYAxisHelper = new Sprite( spriteMaterial4 );
+		const negZAxisHelper = new Sprite( spriteMaterial4 );
 
 		posXAxisHelper.position.x = 1;
 		posYAxisHelper.position.y = 1;
 		posZAxisHelper.position.z = 1;
 		negXAxisHelper.position.x = - 1;
-		negXAxisHelper.scale.setScalar( 0.8 );
 		negYAxisHelper.position.y = - 1;
-		negYAxisHelper.scale.setScalar( 0.8 );
 		negZAxisHelper.position.z = - 1;
-		negZAxisHelper.scale.setScalar( 0.8 );
+
+		negXAxisHelper.material.opacity = 0.2;
+		negYAxisHelper.material.opacity = 0.2;
+		negZAxisHelper.material.opacity = 0.2;
+
+		posXAxisHelper.userData.type = 'posX';
+		posYAxisHelper.userData.type = 'posY';
+		posZAxisHelper.userData.type = 'posZ';
+		negXAxisHelper.userData.type = 'negX';
+		negYAxisHelper.userData.type = 'negY';
+		negZAxisHelper.userData.type = 'negZ';
 
 		this.add( posXAxisHelper );
 		this.add( posYAxisHelper );
@@ -93,6 +155,12 @@ class ViewHelper extends Object3D {
 		const dim = 128;
 		const turnRate = 2 * Math.PI; // turn rate in angles per second
 
+		/**
+		 * Renders the helper in a separate view in the viewport.
+		 * Position is controlled by the `location` property.
+		 *
+		 * @param {WebGLRenderer|WebGPURenderer} renderer - The renderer.
+		 */
 		this.render = function ( renderer ) {
 
 			this.quaternion.copy( camera.quaternion ).invert();
@@ -101,50 +169,38 @@ class ViewHelper extends Object3D {
 			point.set( 0, 0, 1 );
 			point.applyQuaternion( camera.quaternion );
 
-			if ( point.x >= 0 ) {
-
-				posXAxisHelper.material.opacity = 1;
-				negXAxisHelper.material.opacity = 0.5;
-
-			} else {
-
-				posXAxisHelper.material.opacity = 0.5;
-				negXAxisHelper.material.opacity = 1;
-
-			}
-
-			if ( point.y >= 0 ) {
-
-				posYAxisHelper.material.opacity = 1;
-				negYAxisHelper.material.opacity = 0.5;
-
-			} else {
-
-				posYAxisHelper.material.opacity = 0.5;
-				negYAxisHelper.material.opacity = 1;
-
-			}
-
-			if ( point.z >= 0 ) {
-
-				posZAxisHelper.material.opacity = 1;
-				negZAxisHelper.material.opacity = 0.5;
-
-			} else {
-
-				posZAxisHelper.material.opacity = 0.5;
-				negZAxisHelper.material.opacity = 1;
-
-			}
-
 			//
 
-			const x = domElement.offsetWidth - dim;
+			const location = this.location;
+
+			let x, y;
+
+			if ( location.left !== null ) {
+
+				x = location.left;
+
+			} else {
+
+				x = domElement.offsetWidth - dim - location.right;
+
+			}
+
+			if ( location.top !== null ) {
+
+				// Position from top
+				y = renderer.isWebGPURenderer ? location.top : domElement.offsetHeight - dim - location.top;
+
+			} else {
+
+				// Position from bottom
+				y = renderer.isWebGPURenderer ? domElement.offsetHeight - dim - location.bottom : location.bottom;
+
+			}
 
 			renderer.clearDepth();
 
 			renderer.getViewport( viewport );
-			renderer.setViewport( x, 0, dim, dim );
+			renderer.setViewport( x, y, dim, dim );
 
 			renderer.render( this, orthoCamera );
 
@@ -160,15 +216,44 @@ class ViewHelper extends Object3D {
 		const viewport = new Vector4();
 		let radius = 0;
 
+		/**
+		 * This method should be called when a click or pointer event
+		 * has happened in the app.
+		 *
+		 * @param {PointerEvent} event - The event to process.
+		 * @return {boolean} Whether an intersection with the helper has been detected or not.
+		 */
 		this.handleClick = function ( event ) {
 
 			if ( this.animating === true ) return false;
 
 			const rect = domElement.getBoundingClientRect();
-			const offsetX = rect.left + ( domElement.offsetWidth - dim );
-			const offsetY = rect.top + ( domElement.offsetHeight - dim );
-			mouse.x = ( ( event.clientX - offsetX ) / ( rect.right - offsetX ) ) * 2 - 1;
-			mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+			const location = this.location;
+
+			let offsetX, offsetY;
+
+			if ( location.left !== null ) {
+
+				offsetX = rect.left + location.left;
+
+			} else {
+
+				offsetX = rect.left + domElement.offsetWidth - dim - location.right;
+
+			}
+
+			if ( location.top !== null ) {
+
+				offsetY = rect.top + location.top;
+
+			} else {
+
+				offsetY = rect.top + domElement.offsetHeight - dim - location.bottom;
+
+			}
+
+			mouse.x = ( ( event.clientX - offsetX ) / dim ) * 2 - 1;
+			mouse.y = - ( ( event.clientY - offsetY ) / dim ) * 2 + 1;
 
 			raycaster.setFromCamera( mouse, orthoCamera );
 
@@ -193,6 +278,46 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Sets labels for each axis. By default, they are unlabeled.
+		 *
+		 * @param {string|undefined} labelX - The label for the x-axis.
+		 * @param {string|undefined} labelY - The label for the y-axis.
+		 * @param {string|undefined} labelZ - The label for the z-axis.
+		 */
+		this.setLabels = function ( labelX, labelY, labelZ ) {
+
+			options.labelX = labelX;
+			options.labelY = labelY;
+			options.labelZ = labelZ;
+
+			updateLabels();
+
+		};
+
+		/**
+		 * Sets the label style. Has no effect when the axes are unlabeled.
+		 *
+		 * @param {string} [font='24px Arial'] - The label font.
+		 * @param {string} [color='#000000'] - The label color.
+		 * @param {number} [radius=14] - The label radius.
+		 */
+		this.setLabelStyle = function ( font, color, radius ) {
+
+			options.font = font;
+			options.color = color;
+			options.radius = radius;
+
+			updateLabels();
+
+		};
+
+		/**
+		 * Updates the helper. This method should be called in the app's animation
+		 * loop.
+		 *
+		 * @param {number} delta - The delta time in seconds.
+		 */
 		this.update = function ( delta ) {
 
 			const step = delta * turnRate;
@@ -214,6 +339,10 @@ class ViewHelper extends Object3D {
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
 		this.dispose = function () {
 
 			geometry.dispose();
@@ -298,31 +427,88 @@ class ViewHelper extends Object3D {
 
 		}
 
-		function getSpriteMaterial( color, text = null ) {
+		function useOffscreenCanvas() {
 
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = 64;
-			canvas.height = 64;
+			let result = false;
+
+			try {
+
+				// this check has been adapted from WebGLTextures
+
+				result = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
+			} catch ( err ) {
+
+				// Ignore any errors
+
+			}
+
+			return result;
+
+		}
+
+		function createCanvas( width, height ) {
+
+			let canvas;
+
+			if ( useOffscreenCanvas() ) {
+
+				canvas = new OffscreenCanvas( width, height );
+
+			} else {
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+			}
+
+			return canvas;
+
+		}
+
+		function getSpriteMaterial( color, text ) {
+
+			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
+
+			const canvas = createCanvas( 64, 64 );
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();
-			context.arc( 32, 32, 16, 0, 2 * Math.PI );
+			context.arc( 32, 32, radius, 0, 2 * Math.PI );
 			context.closePath();
 			context.fillStyle = color.getStyle();
 			context.fill();
 
-			if ( text !== null ) {
+			if ( text ) {
 
-				context.font = '24px Arial';
+				context.font = font;
 				context.textAlign = 'center';
-				context.fillStyle = '#000000';
+				context.fillStyle = labelColor;
 				context.fillText( text, 32, 41 );
 
 			}
 
 			const texture = new CanvasTexture( canvas );
+			texture.colorSpace = SRGBColorSpace;
 
 			return new SpriteMaterial( { map: texture, toneMapped: false } );
+
+		}
+
+		function updateLabels() {
+
+			posXAxisHelper.material.map.dispose();
+			posYAxisHelper.material.map.dispose();
+			posZAxisHelper.material.map.dispose();
+
+			posXAxisHelper.material.dispose();
+			posYAxisHelper.material.dispose();
+			posZAxisHelper.material.dispose();
+
+			posXAxisHelper.material = getSpriteMaterial( color1, options.labelX );
+			posYAxisHelper.material = getSpriteMaterial( color2, options.labelY );
+			posZAxisHelper.material = getSpriteMaterial( color3, options.labelZ );
 
 		}
 

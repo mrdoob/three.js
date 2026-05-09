@@ -4,6 +4,10 @@
 		<title>three.js webgl - morphtargets - MD2</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - morphtargets - MD2">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_md2.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_md2.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -50,12 +54,12 @@
 
 			let controls;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -121,6 +125,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -324,7 +329,8 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
+
 				render();
 
 				stats.update();
@@ -333,7 +339,7 @@
 
 			function render() {
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				character.update( delta );
 

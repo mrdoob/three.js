@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing - GTAO</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing - GTAO">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_gtao.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_gtao.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -43,10 +47,9 @@
 			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, scene, renderer, composer, controls, clock, stats, mixer;
+			let camera, scene, renderer, composer, controls, timer, stats, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -57,7 +60,8 @@
 				loader.setDRACOLoader( dracoLoader );
 				loader.setPath( 'models/gltf/' );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -66,13 +70,14 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfe3dd );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 5, 2, 8 );
@@ -186,9 +191,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				if ( mixer ) {
 

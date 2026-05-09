@@ -9,8 +9,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
-
-import { SidebarObjectAnimation } from './Sidebar.Object.Animation.js';
+import { SetShadowValueCommand } from './commands/SetShadowValueCommand.js';
 
 function SidebarObject( editor ) {
 
@@ -298,6 +297,17 @@ function SidebarObject( editor ) {
 
 	container.add( objectShadowRow );
 
+	// shadow intensity
+
+	const objectShadowIntensityRow = new UIRow();
+
+	objectShadowIntensityRow.add( new UIText( strings.getKey( 'sidebar/object/shadowIntensity' ) ).setClass( 'Label' ) );
+
+	const objectShadowIntensity = new UINumber( 0 ).setRange( 0, 1 ).onChange( update );
+	objectShadowIntensityRow.add( objectShadowIntensity );
+
+	container.add( objectShadowIntensityRow );
+
 	// shadow bias
 
 	const objectShadowBiasRow = new UIRow();
@@ -403,24 +413,17 @@ function SidebarObject( editor ) {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		} catch ( e ) {
+		} catch ( error ) {
 
 			output = JSON.stringify( output );
 
 		}
 
-		const left = ( screen.width - 500 ) / 2;
-		const top = ( screen.height - 500 ) / 2;
 
-		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain;charset=utf-8' } ) );
-		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
+		editor.utils.save( new Blob( [ output ] ), `${ objectName.getValue() || 'object' }.json` );
 
 	} );
 	container.add( exportJson );
-
-	// Animations
-
-	container.add( new SidebarObjectAnimation( editor ) );
 
 	//
 
@@ -583,21 +586,27 @@ function SidebarObject( editor ) {
 
 			if ( object.shadow !== undefined ) {
 
+				if ( object.shadow.intensity !== objectShadowIntensity.getValue() ) {
+
+					editor.execute( new SetShadowValueCommand( editor, object, 'intensity', objectShadowIntensity.getValue() ) );
+
+				}
+
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'bias', objectShadowBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'normalBias', objectShadowNormalBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
@@ -641,7 +650,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
+			'shadow': [ objectShadowIntensityRow, objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
 		};
 
 		for ( const property in properties ) {
@@ -682,8 +691,7 @@ function SidebarObject( editor ) {
 
 	function updateTransformRows( object ) {
 
-		if ( object.isLight ||
-		   ( object.isObject3D && object.userData.targetInverse ) ) {
+		if ( object.isLight ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
@@ -849,6 +857,7 @@ function SidebarObject( editor ) {
 
 		if ( object.shadow !== undefined ) {
 
+			objectShadowIntensity.setValue( object.shadow.intensity );
 			objectShadowBias.setValue( object.shadow.bias );
 			objectShadowNormalBias.setValue( object.shadow.normalBias );
 			objectShadowRadius.setValue( object.shadow.radius );

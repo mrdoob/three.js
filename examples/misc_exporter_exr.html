@@ -4,6 +4,10 @@
 		<title>three.js webgl - exporter - exr</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - exporter - exr">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_exporter_exr.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_exporter_exr.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -26,7 +30,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EXRExporter, ZIP_COMPRESSION, ZIPS_COMPRESSION, NO_COMPRESSION } from 'three/addons/exporters/EXRExporter.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh, controls, renderTarget, dataTexture;
@@ -39,13 +43,13 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -56,14 +60,14 @@
 				scene = new THREE.Scene();
 
 				exporter = new EXRExporter();
-				const rgbeloader = new RGBELoader();
+				const hdrLoader = new HDRLoader();
 
 				//
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				rgbeloader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', function ( texture ) {
+				hdrLoader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -109,7 +113,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				controls.update();
 				renderer.render( scene, camera );
 
@@ -179,7 +182,7 @@
 
 			}
 
-			function exportFile() {
+			async function exportFile() {
 
 				let result, exportType, exportCompression;
 
@@ -196,9 +199,9 @@
 					exportCompression = NO_COMPRESSION;
 
 				if ( params.target == 'pmrem' )
-					result = exporter.parse( renderer, renderTarget, { type: exportType, compression: exportCompression } );
+					result = await exporter.parse( renderer, renderTarget, { type: exportType, compression: exportCompression } );
 				else
-					result = exporter.parse( dataTexture, { type: exportType, compression: exportCompression } );
+					result = await exporter.parse( dataTexture, { type: exportType, compression: exportCompression } );
 
 				saveArrayBuffer( result, params.target + '.exr' );
 

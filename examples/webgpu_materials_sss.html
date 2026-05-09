@@ -4,40 +4,51 @@
 		<title>three.js webgpu - sss</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - sss">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_sss.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_sss.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br/>Fast subsurface scattering<br/>
-			[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSS</span>
+			</div>
+
+			<small>
+				Fast subsurface scattering<br/>
+				[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { texture, uniform, vec3 } from 'three/tsl';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
 			let model;
 
@@ -75,16 +86,18 @@
 				pointLight2.position.y = 20;
 				pointLight2.position.z = - 260;
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.inspector.domElement );
+
+				//
 
 				const controls = new OrbitControls( camera, container );
 				controls.minDistance = 500;
@@ -105,15 +118,15 @@
 				const thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-				const material = new Nodes.MeshSSSNodeMaterial();
+				const material = new THREE.MeshSSSNodeMaterial();
 				material.color = new THREE.Color( 1.0, 0.2, 0.2 );
 				material.roughness = 0.3;
-				material.thicknessColorNode = Nodes.texture( thicknessTexture ).mul( Nodes.vec3( 0.5, 0.3, 0.0 ) );
-				material.thicknessDistortionNode = Nodes.uniform( 0.1 );
-				material.thicknessAmbientNode = Nodes.uniform( 0.4 );
-				material.thicknessAttenuationNode = Nodes.uniform( 0.8 );
-				material.thicknessPowerNode = Nodes.uniform( 2.0 );
-				material.thicknessScaleNode = Nodes.uniform( 16.0 );
+				material.thicknessColorNode = texture( thicknessTexture ).mul( vec3( 0.5, 0.3, 0.0 ) );
+				material.thicknessDistortionNode = uniform( 0.1 );
+				material.thicknessAmbientNode = uniform( 0.4 );
+				material.thicknessAttenuationNode = uniform( 0.8 );
+				material.thicknessPowerNode = uniform( 2.0 );
+				material.thicknessScaleNode = uniform( 16.0 );
 
 				// LOADER
 
@@ -134,7 +147,7 @@
 
 			function initGUI( material ) {
 
-				const gui = new GUI( { title: 'Thickness Control' } );
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				const ThicknessControls = function () {
 
@@ -148,32 +161,31 @@
 
 				const thicknessControls = new ThicknessControls();
 
-				gui.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+				gui.add( thicknessControls, 'distortion', 0.01, 1, 0.01 ).onChange( function () {
 
 					material.thicknessDistortionNode.value = thicknessControls.distortion;
-					console.log( 'distortion' );
 
 				} );
 
-				gui.add( thicknessControls, 'ambient' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+				gui.add( thicknessControls, 'ambient', 0.01, 5.0, 0.05 ).onChange( function () {
 
 					material.thicknessAmbientNode.value = thicknessControls.ambient;
 
 				} );
 
-				gui.add( thicknessControls, 'attenuation' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+				gui.add( thicknessControls, 'attenuation', 0.01, 5.0, 0.05 ).onChange( function () {
 
 					material.thicknessAttenuationNode.value = thicknessControls.attenuation;
 
 				} );
 
-				gui.add( thicknessControls, 'power' ).min( 0.01 ).max( 16.0 ).step( 0.1 ).onChange( function () {
+				gui.add( thicknessControls, 'power', 0.01, 16.0, 0.1 ).onChange( function () {
 
 					material.thicknessPowerNode.value = thicknessControls.power;
 
 				} );
 
-				gui.add( thicknessControls, 'scale' ).min( 0.01 ).max( 50.0 ).step( 0.1 ).onChange( function () {
+				gui.add( thicknessControls, 'scale', 0.01, 50.0, 0.1 ).onChange( function () {
 
 					material.thicknessScaleNode.value = thicknessControls.scale;
 
@@ -191,14 +203,6 @@
 			}
 
 			//
-
-			function animate() {
-
-				render();
-
-				stats.update();
-
-			}
 
 			function render() {
 

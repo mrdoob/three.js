@@ -4,6 +4,10 @@
 		<title>three.js webgl - equirectangular video panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - equirectangular video panorama">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_video_panorama_equirectangular.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_video_panorama_equirectangular.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -49,7 +53,6 @@
 			const distance = .5;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -76,6 +79,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'pointerdown', onPointerDown );
@@ -127,13 +131,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				update();
-
-			}
-
-			function update() {
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.MathUtils.degToRad( 90 - lat );

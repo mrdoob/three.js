@@ -4,6 +4,10 @@
 		<title>Multiple animated skinned meshes</title>
 		<meta charset="utf-8">
 		<meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
+		<meta property="og:title" content="Multiple animated skinned meshes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_multiple.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_multiple.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -29,7 +33,7 @@
 			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 			let model, animations;
 
 			const mixers = [], objects = [];
@@ -39,7 +43,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -47,7 +50,8 @@
 				camera.position.set( 2, 3, - 6 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -96,6 +100,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -237,9 +242,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				const delta = clock.getDelta();
+				const delta = timer.getDelta();
 
 				for ( const mixer of mixers ) mixer.update( delta );
 

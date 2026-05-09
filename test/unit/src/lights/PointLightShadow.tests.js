@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PointLightShadow } from '../../../../src/lights/PointLightShadow.js';
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
@@ -35,12 +33,6 @@ export default QUnit.module( 'Lights', () => {
 				object.isPointLightShadow,
 				'PointLightShadow.isPointLightShadow should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'updateMatrices', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

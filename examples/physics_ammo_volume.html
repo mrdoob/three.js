@@ -3,6 +3,10 @@
 		<title>Ammo.js softbody volume demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="Ammo.js softbody volume demo">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_ammo_volume.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_ammo_volume.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -41,7 +45,8 @@
 			let container, stats;
 			let camera, controls, scene, renderer;
 			let textureLoader;
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			let clickRequest = false;
 			const mouseCoords = new THREE.Vector2();
 			const raycaster = new THREE.Raycaster();
@@ -63,7 +68,6 @@
 				Ammo = AmmoLib;
 
 				init();
-				animate();
 
 			} );
 
@@ -93,6 +97,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -414,7 +419,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
 				render();
 				stats.update();
@@ -423,7 +428,7 @@
 
 			function render() {
 
-				const deltaTime = clock.getDelta();
+				const deltaTime = timer.getDelta();
 
 				updatePhysics( deltaTime );
 

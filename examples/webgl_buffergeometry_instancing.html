@@ -4,6 +4,10 @@
 	<title>three.js webgl - instancing test (single triangle)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - instancing test (single triangle)">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_buffergeometry_instancing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_buffergeometry_instancing.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -86,7 +90,6 @@
 		let camera, scene, renderer;
 
 		init();
-		animate();
 
 		function init() {
 
@@ -142,7 +145,7 @@
 			}
 
 			const geometry = new THREE.InstancedBufferGeometry();
-			geometry.instanceCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+			geometry.instanceCount = instances; // set so its initialized for dat.GUI, will be set in first draw otherwise
 
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
@@ -177,6 +180,7 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			container.appendChild( renderer.domElement );
 
 			//
@@ -208,15 +212,6 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
-
-			render();
-			stats.update();
-
-		}
-
-		function render() {
-
 			const time = performance.now();
 
 			const object = scene.children[ 0 ];
@@ -226,6 +221,8 @@
 			object.material.uniforms[ 'sineTime' ].value = Math.sin( object.material.uniforms[ 'time' ].value * 0.05 );
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

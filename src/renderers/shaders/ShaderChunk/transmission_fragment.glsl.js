@@ -21,11 +21,11 @@ export default /* glsl */`
 
 	vec3 pos = vWorldPosition;
 	vec3 v = normalize( cameraPosition - pos );
-	vec3 n = inverseTransformDirection( normal, viewMatrix );
+	vec3 n = transformNormalByInverseViewMatrix( normal, viewMatrix );
 
 	vec4 transmitted = getIBLVolumeRefraction(
-		n, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,
-		pos, modelMatrix, viewMatrix, projectionMatrix, material.ior, material.thickness,
+		n, v, material.roughness, material.diffuseContribution, material.specularColorBlended, material.specularF90,
+		pos, modelMatrix, viewMatrix, projectionMatrix, material.dispersion, material.ior, material.thickness,
 		material.attenuationColor, material.attenuationDistance );
 
 	material.transmissionAlpha = mix( material.transmissionAlpha, transmitted.a, material.transmission );

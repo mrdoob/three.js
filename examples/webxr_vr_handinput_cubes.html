@@ -4,13 +4,16 @@
 		<title>three.js vr - handinput - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - handinput - cubes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_handinput_cubes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_handinput_cubes.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput - cubes<br/>
-			(Oculus Browser 15.1+)
 		</div>
 
 		<script type="importmap">
@@ -52,7 +55,6 @@
 			const spheres = [];
 
 			init();
-			animate();
 
 			function init() {
 
@@ -93,6 +95,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 
@@ -272,12 +275,6 @@
 			//
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				if ( scaling.active ) {
 

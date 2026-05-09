@@ -4,6 +4,10 @@
 		<title>three.js - misc - octree collisions</title>
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js - misc - octree collisions">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/games_fps.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/games_fps.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -38,7 +42,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x88ccee );
@@ -71,6 +76,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.VSMShadowMap;
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -201,7 +207,9 @@
 
 				if ( result ) {
 
-					playerOnFloor = result.normal.y > 0;
+					// determine if the surface we bumped into is something we can stand on
+
+					playerOnFloor = result.normal.y >= 0.15; // allow slopes up to ~81° but ignore sheer vertical walls
 
 					if ( ! playerOnFloor ) {
 
@@ -209,7 +217,11 @@
 
 					}
 
-					playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
+					if ( result.depth >= 1e-10 ) {
+
+						playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
+
+					}
 
 				}
 
@@ -442,9 +454,7 @@
 						helper.visible = value;
 
 					} );
-
-				animate();
-
+			
 			} );
 
 			function teleportPlayerIfOob() {
@@ -464,7 +474,9 @@
 
 			function animate() {
 
-				const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
+				timer.update();
+
+				const deltaTime = Math.min( 0.05, timer.getDelta() ) / STEPS_PER_FRAME;
 
 				// we look for collisions in substeps to mitigate the risk of
 				// an object traversing another too quickly for detection.
@@ -484,8 +496,6 @@
 				renderer.render( scene, camera );
 
 				stats.update();
-
-				requestAnimationFrame( animate );
 
 			}
 

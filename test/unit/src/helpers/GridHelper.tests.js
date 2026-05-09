@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { GridHelper } from '../../../../src/helpers/GridHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

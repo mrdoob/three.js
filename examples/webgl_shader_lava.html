@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - shaders [lava]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - shaders [lava]">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shader_lava.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shader_lava.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -92,12 +96,11 @@
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, renderer, composer, clock;
+			let camera, renderer, composer, timer;
 
 			let uniforms, mesh;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -108,7 +111,8 @@
 
 				const scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const textureLoader = new THREE.TextureLoader();
 
@@ -147,8 +151,10 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
@@ -165,8 +171,6 @@
 				composer.addPass( outputPass );
 
 				//
-
-				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -186,15 +190,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
 
-				render();
-
-			}
-
-			function render() {
-
-				const delta = 5 * clock.getDelta();
+				const delta = 5 * timer.getDelta();
 
 				uniforms[ 'time' ].value += 0.2 * delta;
 

@@ -5,6 +5,10 @@
 	<title>three.js ve - handinput - point and drag</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js ve - handinput - point and drag">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_handinput_pointerdrag.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_handinput_pointerdrag.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
@@ -12,7 +16,6 @@
 
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput - point and drag<br />
-		(Oculus Browser 15.1+)
 	</div>
 
 	<script type="importmap">
@@ -376,11 +379,11 @@
 		};
 
 		const world = new World();
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 		let camera, scene, renderer;
 
 		init();
-		animate();
 
 		function makeButtonMesh( x, y, z, color ) {
 
@@ -417,6 +420,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
 			renderer.xr.cameraAutoUpdate = false;
@@ -586,14 +590,10 @@
 
 		function animate() {
 
-			renderer.setAnimationLoop( render );
+			timer.update();
 
-		}
-
-		function render() {
-
-			const delta = clock.getDelta();
-			const elapsedTime = clock.elapsedTime;
+			const delta = timer.getDelta();
+			const elapsedTime = timer.getElapsed();
 			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );

@@ -1,23 +1,24 @@
 import { Command } from '../Command.js';
 import { ObjectLoader } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @constructor
- */
 class AddObjectCommand extends Command {
 
-	constructor( editor, object ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @constructor
+	 */
+	constructor( editor, object = null ) {
 
 		super( editor );
 
 		this.type = 'AddObjectCommand';
 
 		this.object = object;
-		if ( object !== undefined ) {
 
-			this.name = `Add Object: ${object.name}`;
+		if ( object !== null ) {
+
+			this.name = editor.strings.getKey( 'command/AddObject' ) + ': ' + object.name;
 
 		}
 

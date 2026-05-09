@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -46,7 +47,7 @@ function GeometryParametersPanel( editor, object ) {
 	// phiStart
 
 	const phiStartRow = new UIRow();
-	const phiStart = new UINumber( parameters.phiStart * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const phiStart = new UINumber( parameters.phiStart * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/phistart' ) ).setClass( 'Label' ) );
 	phiStartRow.add( phiStart );
@@ -56,7 +57,7 @@ function GeometryParametersPanel( editor, object ) {
 	// phiLength
 
 	const phiLengthRow = new UIRow();
-	const phiLength = new UINumber( parameters.phiLength * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const phiLength = new UINumber( parameters.phiLength * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/philength' ) ).setClass( 'Label' ) );
 	phiLengthRow.add( phiLength );
@@ -66,7 +67,7 @@ function GeometryParametersPanel( editor, object ) {
 	// thetaStart
 
 	const thetaStartRow = new UIRow();
-	const thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/thetastart' ) ).setClass( 'Label' ) );
 	thetaStartRow.add( thetaStart );
@@ -76,13 +77,38 @@ function GeometryParametersPanel( editor, object ) {
 	// thetaLength
 
 	const thetaLengthRow = new UIRow();
-	const thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/thetalength' ) ).setClass( 'Label' ) );
 	thetaLengthRow.add( thetaLength );
 
 	container.add( thetaLengthRow );
 
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		widthSegments.setValue( parameters.widthSegments );
+		heightSegments.setValue( parameters.heightSegments );
+		phiStart.setValue( parameters.phiStart * THREE.MathUtils.RAD2DEG );
+		phiLength.setValue( parameters.phiLength * THREE.MathUtils.RAD2DEG );
+		thetaStart.setValue( parameters.thetaStart * THREE.MathUtils.RAD2DEG );
+		thetaLength.setValue( parameters.thetaLength * THREE.MathUtils.RAD2DEG );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

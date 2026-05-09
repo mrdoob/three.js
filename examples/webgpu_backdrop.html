@@ -4,64 +4,63 @@
 		<title>three.js - WebGPU - Backdrop</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js - WebGPU - Backdrop">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_backdrop.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_backdrop.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Backdrop
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Backdrop</span>
+			</div>
+
+			<small>Backdrop objects can apply blend, overlay or filter effects on occluded 3D objects.</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { float, vec3, color, toneMapping, viewportSharedTexture, viewportTopLeft, checker, uv, timerLocal, oscSine, output, MeshStandardNodeMaterial } from 'three/nodes';
+			import * as THREE from 'three/webgpu';
+			import { float, vec3, color, viewportSharedTexture, hue, blendOverlay, posterize, grayscale, saturation, viewportSafeUV, screenUV, checker, uv, time, oscSine, output } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
 			let portals, rotate = true;
-			let mixer, clock;
+			let mixer, timer;
 
 			init();
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 'lightblue' );
+				scene.backgroundNode = screenUV.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
-				//lights
+				// lights
 
 				const light = new THREE.SpotLight( 0xffffff, 1 );
 				light.power = 2000;
@@ -75,11 +74,7 @@
 					mixer = new THREE.AnimationMixer( object );
 
 					const material = object.children[ 0 ].children[ 0 ].material;
-
-					// output material effect ( better using hsv )
-					// ignore output.sRGBToLinear().linearTosRGB() for now
-
-					material.outputNode = oscSine( timerLocal( .1 ) ).mix( output, output.add( .1 ).posterize( 4 ).mul( 2 ) );
+					material.outputNode = oscSine( time.mul( .1 ) ).mix( output, posterize( output.add( .1 ), 4 ).mul( 2 ) );
 
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
@@ -101,7 +96,7 @@
 					const id = portals.children.length;
 					const rotation = THREE.MathUtils.degToRad( id * 45 );
 
-					const material = new MeshStandardNodeMaterial( { color: 0x0066ff } );
+					const material = new THREE.MeshStandardNodeMaterial( { color: 0x0066ff } );
 					material.roughnessNode = float( .2 );
 					material.metalnessNode = float( 0 );
 					material.backdropNode = backdropNode;
@@ -119,22 +114,23 @@
 
 				}
 
-				addBackdropSphere( viewportSharedTexture().bgr.hue( oscSine().mul( Math.PI ) ) );
+				addBackdropSphere( hue( viewportSharedTexture().bgr, oscSine().mul( Math.PI ) ) );
 				addBackdropSphere( viewportSharedTexture().rgb.oneMinus() );
-				addBackdropSphere( viewportSharedTexture().rgb.saturation( 0 ) );
-				addBackdropSphere( viewportSharedTexture().rgb.saturation( 10 ), oscSine() );
-				addBackdropSphere( viewportSharedTexture().rgb.overlay( checker( uv().mul( 10 ) ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 40 ).floor().div( 40 ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 80 ).floor().div( 80 ) ).add( color( 0x0033ff ) ) );
+				addBackdropSphere( grayscale( viewportSharedTexture().rgb ) );
+				addBackdropSphere( saturation( viewportSharedTexture().rgb, 10 ), oscSine() );
+				addBackdropSphere( blendOverlay( viewportSharedTexture().rgb, checker( uv().mul( 10 ) ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( screenUV.mul( 40 ).floor().div( 40 ) ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( screenUV.mul( 80 ).floor().div( 80 ) ) ).add( color( 0x0033ff ) ) );
 				addBackdropSphere( vec3( 0, 0, viewportSharedTexture().b ) );
 
-				//renderer
+				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 0.3;
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -158,7 +154,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

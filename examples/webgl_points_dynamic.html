@@ -4,6 +4,10 @@
 		<title>three.js webgl - particles - dynamic - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - particles - dynamic - postprocessing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_points_dynamic.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_points_dynamic.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -47,12 +51,12 @@
 
 			let composer, effectFocus;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -96,6 +100,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
@@ -237,7 +242,8 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				timer.update();
+
 				render();
 				stats.update();
 
@@ -245,7 +251,7 @@
 
 			function render() {
 
-				let delta = 10 * clock.getDelta();
+				let delta = 10 * timer.getDelta();
 
 				delta = delta < 2 ? delta : 2;
 

@@ -4,14 +4,17 @@
 		<title>three.js webgl - equirectangular panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - equirectangular panorama">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_panorama_equirectangular.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_panorama_equirectangular.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.<br />
-			drag equirectangular texture into the page.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>
 		</div>
 
 		<script type="importmap">
@@ -36,7 +39,6 @@
 				phi = 0, theta = 0;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -61,52 +63,13 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointerdown', onPointerDown );
 
 				document.addEventListener( 'wheel', onDocumentMouseWheel );
-
-				//
-
-				document.addEventListener( 'dragover', function ( event ) {
-
-					event.preventDefault();
-					event.dataTransfer.dropEffect = 'copy';
-
-				} );
-
-				document.addEventListener( 'dragenter', function () {
-
-					document.body.style.opacity = 0.5;
-
-				} );
-
-				document.addEventListener( 'dragleave', function () {
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				document.addEventListener( 'drop', function ( event ) {
-
-					event.preventDefault();
-
-					const reader = new FileReader();
-					reader.addEventListener( 'load', function ( event ) {
-
-						material.map.image.src = event.target.result;
-						material.map.needsUpdate = true;
-
-					} );
-					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -147,7 +110,7 @@
 
 			}
 
-			function onPointerUp() {
+			function onPointerUp( event ) {
 
 				if ( event.isPrimary === false ) return;
 
@@ -169,13 +132,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				update();
-
-			}
-
-			function update() {
 
 				if ( isUserInteracting === false ) {
 

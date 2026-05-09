@@ -1,169 +1,77 @@
-import * as THREE from 'three';
-import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
-import {
-	PathTracingSceneGenerator,
-	PathTracingRenderer,
-	PhysicalPathTracingMaterial,
-	ProceduralEquirectTexture,
-} from 'three-gpu-pathtracer';
-
-function buildColorTexture( color ) {
-
-	const texture = new ProceduralEquirectTexture( 4, 4 );
-	texture.generationCallback = ( polar, uv, coord, target ) => {
-
-		target.copy( color );
-
-	};
-
-	texture.update();
-
-	return texture;
-
-}
+import { WebGLPathTracer } from 'three-gpu-pathtracer';
 
 function ViewportPathtracer( renderer ) {
 
-	let generator = null;
-	let pathtracer = null;
-	let quad = null;
-	let hdr = null;
+	let pathTracer = null;
 
 	function init( scene, camera ) {
 
-		if ( pathtracer === null ) {
+		if ( pathTracer === null ) {
 
-			generator = new PathTracingSceneGenerator();
-
-			pathtracer = new PathTracingRenderer( renderer );
-			pathtracer.setSize( renderer.domElement.offsetWidth, renderer.domElement.offsetHeight );
-			pathtracer.alpha = true;
-			pathtracer.camera = camera;
-			pathtracer.material = new PhysicalPathTracingMaterial();
-			pathtracer.tiles.set( 3, 4 );
-
-			quad = new FullScreenQuad( new THREE.MeshBasicMaterial( {
-				map: pathtracer.target.texture,
-				blending: THREE.CustomBlending
-			} ) );
+			pathTracer = new WebGLPathTracer( renderer );
+			pathTracer.filterGlossyFactor = 0.5;
 
 		}
 
-		pathtracer.reset();
-
-		const { bvh, textures, materials, lights } = generator.generate( scene );
-
-		const ptGeometry = bvh.geometry;
-		const ptMaterial = pathtracer.material;
-
-		ptMaterial.bvh.updateFrom( bvh );
-		ptMaterial.attributesArray.updateFrom(
-			ptGeometry.attributes.normal,
-			ptGeometry.attributes.tangent,
-			ptGeometry.attributes.uv,
-			ptGeometry.attributes.color,
-		);
-		ptMaterial.materialIndexAttribute.updateFrom( ptGeometry.attributes.materialIndex );
-		ptMaterial.textures.setTextures( renderer, 2048, 2048, textures );
-		ptMaterial.materials.updateFrom( materials, textures );
-		ptMaterial.lights.updateFrom( lights );
-		ptMaterial.filterGlossyFactor = 0.5;
-
-		//
-
-		setBackground( scene.background, scene.backgroundBlurriness );
-		setEnvironment( scene.environment );
+		pathTracer.setScene( scene, camera );
 
 	}
 
-	function setSize( width, height ) {
+	function setSize( /* width, height */ ) {
 
-		if ( pathtracer === null ) return;
+		if ( pathTracer === null ) return;
 
-		pathtracer.setSize( width, height );
-		pathtracer.reset();
-
-	}
-
-	function setBackground( background, blurriness ) {
-
-		if ( pathtracer === null ) return;
-
-		const ptMaterial = pathtracer.material;
-
-		if ( background ) {
-
-			if ( background.isTexture ) {
-
-				ptMaterial.backgroundMap = background;
-				ptMaterial.backgroundBlur = blurriness;
-
-			} else if ( background.isColor ) {
-
-				ptMaterial.backgroundMap = buildColorTexture( background );
-				ptMaterial.backgroundBlur = 0;
-
-			}
-
-		} else {
-
-			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0 ) );
-			ptMaterial.backgroundBlur = 0;
-
-		}
-
-		pathtracer.reset();
+		// path tracer size automatically updates based on the canvas
+		pathTracer.updateCamera();
 
 	}
 
-	function setEnvironment( environment ) {
+	function setBackground( /* background, blurriness */ ) {
 
-		if ( pathtracer === null ) return;
+		if ( pathTracer === null ) return;
 
-		const ptMaterial = pathtracer.material;
+		// update environment settings based on initialized scene fields
+		pathTracer.updateEnvironment();
 
-		if ( environment && environment.isDataTexture === true ) {
+	}
 
-			// Avoid calling envMapInfo() with the same hdr
+	function updateMaterials() {
 
-			if ( environment !== hdr ) {
+		if ( pathTracer === null ) return;
 
-				ptMaterial.envMapInfo.updateFrom( environment );
-				hdr = environment;
+		pathTracer.updateMaterials();
 
-			}
+	}
 
-		} else {
+	function setEnvironment( /* environment */ ) {
 
-			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0 ) ) );
+		if ( pathTracer === null ) return;
 
-		}
-
-		pathtracer.reset();
+		pathTracer.updateEnvironment();
 
 	}
 
 	function update() {
 
-		if ( pathtracer === null ) return;
+		if ( pathTracer === null ) return;
 
-		pathtracer.update();
-
-		if ( pathtracer.samples >= 1 ) {
-
-			renderer.autoClear = false;
-			quad.render( renderer );
-			renderer.autoClear = true;
-
-		}
+		pathTracer.renderSample();
 
 	}
 
 	function reset() {
 
-		if ( pathtracer === null ) return;
+		if ( pathTracer === null ) return;
 
-		pathtracer.reset();
+		pathTracer.updateCamera();
+
+	}
+
+	function getSamples() {
+
+		if ( pathTracer === null ) return;
+
+		return pathTracer.samples;
 
 	}
 
@@ -172,8 +80,10 @@ function ViewportPathtracer( renderer ) {
 		setSize: setSize,
 		setBackground: setBackground,
 		setEnvironment: setEnvironment,
+		updateMaterials: updateMaterials,
 		update: update,
-		reset: reset
+		reset: reset,
+		getSamples: getSamples
 	};
 
 }

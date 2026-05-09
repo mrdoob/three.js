@@ -1,10 +1,8 @@
-/* global QUnit */
-
 import { Color } from '../../../../src/math/Color.js';
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
-import { DisplayP3ColorSpace, SRGBColorSpace } from '../../../../src/constants.js';
+import { SRGBColorSpace } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -41,7 +39,6 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'Color.NAMES', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
-
 
 			assert.ok( Color.NAMES.aliceblue == 0xF0F8FF, 'Exposed Color.NAMES' );
 
@@ -127,18 +124,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.equal( c.g.toFixed( 3 ), 0.214, 'Green: ' + c.g + ' (srgb)' );
 			assert.equal( c.b.toFixed( 3 ), 0.448, 'Blue: ' + c.b + ' (srgb)' );
 
-			c.setRGB( 0.614, 0.731, 0.843, DisplayP3ColorSpace );
-
-			assert.numEqual( c.r.toFixed( 2 ), 0.3, 'Red: ' + c.r + ' (display-p3, in gamut)' );
-			assert.numEqual( c.g.toFixed( 2 ), 0.5, 'Green: ' + c.g + ' (display-p3, in gamut)' );
-			assert.numEqual( c.b.toFixed( 2 ), 0.7, 'Blue: ' + c.b + ' (display-p3, in gamut)' );
-
-			c.setRGB( 1.0, 0.5, 0.0, DisplayP3ColorSpace );
-
-			assert.numEqual( c.r.toFixed( 3 ), 1.179, 'Red: ' + c.r + ' (display-p3, out of gamut)' );
-			assert.numEqual( c.g.toFixed( 3 ), 0.181, 'Green: ' + c.g + ' (display-p3, out of gamut)' );
-			assert.numEqual( c.b.toFixed( 3 ), - 0.036, 'Blue: ' + c.b + ' (display-p3, out of gamut)' );
-
 		} );
 
 		QUnit.test( 'setHSL', ( assert ) => {
@@ -214,7 +199,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'clone', ( assert ) => {
-
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 			const c = new Color( 'teal' );
@@ -343,12 +327,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.equal( t.g.toFixed( 3 ), ( 160 / 255 ).toFixed( 3 ), 'g (srgb)' );
 			assert.equal( t.b.toFixed( 3 ), ( 221 / 255 ).toFixed( 3 ), 'b (srgb)' );
 
-			c.getRGB( t, DisplayP3ColorSpace );
-
-			assert.equal( t.r.toFixed( 3 ), 0.831, 'r (display-p3)' );
-			assert.equal( t.g.toFixed( 3 ), 0.637, 'g (display-p3)' );
-			assert.equal( t.b.toFixed( 3 ), 0.852, 'b (display-p3)' );
-
 		} );
 
 		QUnit.test( 'getStyle', ( assert ) => {
@@ -358,7 +336,6 @@ export default QUnit.module( 'Maths', () => {
 			const c = new Color( 'plum' );
 
 			assert.equal( c.getStyle(), 'rgb(221,160,221)', 'style: srgb' );
-			assert.equal( c.getStyle( DisplayP3ColorSpace ), 'color(display-p3 0.831 0.637 0.852)', 'style: display-p3' );
 
 		} );
 
@@ -403,7 +380,6 @@ export default QUnit.module( 'Maths', () => {
 			d.addColors( a, b );
 
 			assert.ok( d.equals( c ), 'Passed' );
-
 
 		} );
 
@@ -475,20 +451,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'lerpColors', ( assert ) => {
-
-			// lerpColors( color1, color2, alpha )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'lerpHSL', ( assert ) => {
-
-			// lerpHSL( color, alpha )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'equals', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
@@ -556,13 +518,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 1 ], r, 'With array and offset: check r' );
 			assert.strictEqual( array[ 2 ], g, 'With array and offset: check g' );
 			assert.strictEqual( array[ 3 ], b, 'With array and offset: check b' );
-
-		} );
-
-		QUnit.todo( 'fromBufferAttribute', ( assert ) => {
-
-			// fromBufferAttribute( attribute, index )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -880,7 +835,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 2 ], 1, 'Color is iterable.' );
 
 		} );
-
 
 	} );
 

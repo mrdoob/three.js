@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_advanced.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_advanced.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -66,7 +70,6 @@
 			const delta = 0.01;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -127,6 +130,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 
 				//
@@ -153,8 +157,8 @@
 
 				effectSepia.uniforms[ 'amount' ].value = 0.9;
 
-				effectVignette.uniforms[ 'offset' ].value = 0.95;
-				effectVignette.uniforms[ 'darkness' ].value = 1.6;
+				effectVignette.uniforms[ 'offset' ].value = 1.6;
+				effectVignette.uniforms[ 'darkness' ].value = 0.95;
 
 				const effectBloom = new BloomPass( 0.5 );
 				const effectFilm = new FilmPass( 0.35 );
@@ -315,8 +319,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

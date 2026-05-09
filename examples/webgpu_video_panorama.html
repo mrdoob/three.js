@@ -4,7 +4,11 @@
 		<title>three.js webgpu - video panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - video panorama">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_video_panorama.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_video_panorama.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			body {
 				touch-action: none;
@@ -12,8 +16,15 @@
 		</style>
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Video Panorama</span>
+			</div>
+
+			<small>Video panorama using equirectangular projection.</small>
 		</div>
 
 		<div id="container"></div>
@@ -26,7 +37,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -34,9 +47,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import * as THREE from 'three/webgpu';
 
 			let camera, scene, renderer;
 
@@ -74,7 +85,7 @@
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

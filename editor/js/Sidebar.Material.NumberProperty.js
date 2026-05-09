@@ -1,14 +1,14 @@
 import { UINumber, UIRow, UIText } from './libs/ui.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
-function SidebarMaterialNumberProperty( editor, property, name, range = [ - Infinity, Infinity ] ) {
+function SidebarMaterialNumberProperty( editor, property, name, range = [ - Infinity, Infinity ], precision = 2 ) {
 
 	const signals = editor.signals;
 
 	const container = new UIRow();
 	container.add( new UIText( name ).setClass( 'Label' ) );
 
-	const number = new UINumber().setWidth( '60px' ).setRange( range[ 0 ], range[ 1 ] ).onChange( onChange );
+	const number = new UINumber().setWidth( '60px' ).setRange( range[ 0 ], range[ 1 ] ).setPrecision( precision ).onChange( onChange );
 	container.add( number );
 
 	let object = null;

@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 
-import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
@@ -48,7 +46,7 @@ class UITexture extends UISpan {
 		} );
 		this.dom.appendChild( canvas );
 
-		function loadFile( file ) {
+		async function loadFile( file ) {
 
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
@@ -65,11 +63,13 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'hdr' || extension === 'pic' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
 
 					// assuming RGBE/Radiance HDR image format
 
-					const loader = new RGBELoader();
+					const { HDRLoader } = await import( 'three/addons/loaders/HDRLoader.js' );
+
+					const loader = new HDRLoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;
@@ -88,7 +88,9 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'tga' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { TGALoader } = await import( 'three/addons/loaders/TGALoader.js' );
 
 					const loader = new TGALoader();
 					loader.load( event.target.result, function ( texture ) {
@@ -111,7 +113,9 @@ class UITexture extends UISpan {
 
 			} else if ( extension === 'ktx2' ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { KTX2Loader } = await import( 'three/addons/loaders/KTX2Loader.js' );
 
 					const arrayBuffer = event.target.result;
 					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
@@ -131,6 +135,33 @@ class UITexture extends UISpan {
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 						ktx2Loader.dispose();
+
+					} );
+
+				} );
+
+				reader.readAsArrayBuffer( file );
+
+			} else if ( extension === 'exr' ) {
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { EXRLoader } = await import( 'three/addons/loaders/EXRLoader.js' );
+
+					const arrayBuffer = event.target.result;
+					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
+					const exrLoader = new EXRLoader();
+
+					exrLoader.load( blobURL, function ( texture ) {
+
+						texture.sourceFile = file.name;
+						texture.needsUpdate = true;
+
+						cache.set( hash, texture );
+
+						scope.setValue( texture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					} );
 
@@ -270,10 +301,10 @@ class UIOutliner extends UIDiv {
 		// Prevent native scroll behavior
 		this.dom.addEventListener( 'keydown', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
-				case 40: // down
+				case 'ArrowUp':
+				case 'ArrowDown':
 					event.preventDefault();
 					event.stopPropagation();
 					break;
@@ -285,12 +316,12 @@ class UIOutliner extends UIDiv {
 		// Keybindings to support arrow navigation
 		this.dom.addEventListener( 'keyup', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
+				case 'ArrowUp':
 					scope.selectIndex( scope.selectedIndex - 1 );
 					break;
-				case 40: // down
+				case 'ArrowDown':
 					scope.selectIndex( scope.selectedIndex + 1 );
 					break;
 
@@ -312,8 +343,7 @@ class UIOutliner extends UIDiv {
 
 			this.setValue( this.options[ index ].value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			this.dom.dispatchEvent( changeEvent );
 
 		}
@@ -334,8 +364,7 @@ class UIOutliner extends UIDiv {
 
 			scope.setValue( this.value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -448,8 +477,7 @@ class UIOutliner extends UIDiv {
 			const editor = scope.editor;
 			editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -551,9 +579,7 @@ class UIPoints extends UISpan {
 		this.lastPointIdx = 0;
 		this.onChangeCallback = null;
 
-		// TODO Remove this bind() stuff
-
-		this.update = function () {
+		this.update = () => { // bind lexical this
 
 			if ( this.onChangeCallback !== null ) {
 
@@ -561,7 +587,7 @@ class UIPoints extends UISpan {
 
 			}
 
-		}.bind( this );
+		};
 
 	}
 
@@ -575,13 +601,9 @@ class UIPoints extends UISpan {
 
 	clear() {
 
-		for ( let i = 0; i < this.pointsUI.length; ++ i ) {
+		for ( let i = this.pointsUI.length - 1; i >= 0; -- i ) {
 
-			if ( this.pointsUI[ i ] ) {
-
-				this.deletePointRow( i, true );
-
-			}
+			this.deletePointRow( i, false );
 
 		}
 
@@ -589,7 +611,7 @@ class UIPoints extends UISpan {
 
 	}
 
-	deletePointRow( idx, dontUpdate ) {
+	deletePointRow( idx, needsUpdate = true ) {
 
 		if ( ! this.pointsUI[ idx ] ) return;
 
@@ -597,7 +619,7 @@ class UIPoints extends UISpan {
 
 		this.pointsUI.splice( idx, 1 );
 
-		if ( dontUpdate !== true ) {
+		if ( needsUpdate === true ) {
 
 			this.update();
 
@@ -662,7 +684,7 @@ class UIPoints2 extends UIPoints {
 
 	}
 
-	setValue( points ) {
+	setValue( points, needsUpdate = true ) {
 
 		this.clear();
 
@@ -673,7 +695,8 @@ class UIPoints2 extends UIPoints {
 
 		}
 
-		this.update();
+		if ( needsUpdate === true ) this.update();
+
 		return this;
 
 	}
@@ -757,7 +780,7 @@ class UIPoints3 extends UIPoints {
 
 	}
 
-	setValue( points ) {
+	setValue( points, needsUpdate = true ) {
 
 		this.clear();
 
@@ -768,7 +791,8 @@ class UIPoints3 extends UIPoints {
 
 		}
 
-		this.update();
+		if ( needsUpdate === true ) this.update();
+
 		return this;
 
 	}
@@ -831,7 +855,7 @@ class UIBoolean extends UISpan {
 
 }
 
-let renderer;
+let renderer, fsQuad;
 
 function renderToCanvas( texture ) {
 
@@ -841,19 +865,18 @@ function renderToCanvas( texture ) {
 
 	}
 
+	if ( fsQuad === undefined ) {
+
+		fsQuad = new FullScreenQuad( new THREE.MeshBasicMaterial() );
+
+	}
+
 	const image = texture.image;
 
 	renderer.setSize( image.width, image.height, false );
 
-	const scene = new THREE.Scene();
-	const camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-	const material = new THREE.MeshBasicMaterial( { map: texture } );
-	const quad = new THREE.PlaneGeometry( 2, 2 );
-	const mesh = new THREE.Mesh( quad, material );
-	scene.add( mesh );
-
-	renderer.render( scene, camera );
+	fsQuad.material.map = texture;
+	fsQuad.render( renderer );
 
 	return renderer.domElement;
 

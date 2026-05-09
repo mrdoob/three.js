@@ -4,6 +4,10 @@
 		<title>three.js webgl - morph targets - webcam</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - morph targets - webcam">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_morphtargets_webcam.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_morphtargets_webcam.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -32,7 +36,6 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
@@ -114,13 +117,10 @@
 			camera.position.z = 5;
 
 			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x666666 );
 			scene.scale.x = - 1;
 
-			const environment = new RoomEnvironment( renderer );
-			const pmremGenerator = new THREE.PMREMGenerator( renderer );
-
-			scene.background = new THREE.Color( 0x666666 );
-			scene.environment = pmremGenerator.fromScene( environment ).texture;
+			scene.add( new THREE.AmbientLight( 0xffffff, 5 ) );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 
@@ -144,6 +144,9 @@
 					const head = mesh.getObjectByName( 'mesh_2' );
 					head.material = new THREE.MeshNormalMaterial();
 
+					const teeth = mesh.getObjectByName( 'mesh_3' );
+					teeth.material = new THREE.MeshNormalMaterial();
+
 					face = mesh.getObjectByName( 'mesh_2' );
 					eyeL = mesh.getObjectByName( 'eyeLeft' );
   					eyeR = mesh.getObjectByName( 'eyeRight' );
@@ -163,7 +166,7 @@
 
 					}
 
-					renderer.setAnimationLoop( animation );
+					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -215,7 +218,7 @@
 
 			const transform = new THREE.Object3D();
 
-			function animation() {
+			function animate() {
 
 				if ( video.readyState >= HTMLMediaElement.HAVE_METADATA ) {
 
@@ -298,10 +301,10 @@
 
 						}
 
-					eyeL.rotation.z = eyeScore.leftHorizontal * eyeRotationLimit;
-      					eyeR.rotation.z = eyeScore.rightHorizontal * eyeRotationLimit;
-      					eyeL.rotation.x = eyeScore.leftVertical * eyeRotationLimit;
-      					eyeR.rotation.x = eyeScore.rightVertical * eyeRotationLimit;
+						eyeL.rotation.z = eyeScore.leftHorizontal * eyeRotationLimit;
+						eyeR.rotation.z = eyeScore.rightHorizontal * eyeRotationLimit;
+						eyeL.rotation.x = eyeScore.leftVertical * eyeRotationLimit;
+						eyeR.rotation.x = eyeScore.rightVertical * eyeRotationLimit;
 			
 					}
 

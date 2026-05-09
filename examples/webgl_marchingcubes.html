@@ -4,6 +4,10 @@
 	<title>three.js webgl - marching cubes</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - marching cubes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_marchingcubes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_marchingcubes.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
@@ -49,10 +53,10 @@
 
 		let time = 0;
 
-		const clock = new THREE.Clock();
+		const timer = new THREE.Timer();
+		timer.connect( document );
 
 		init();
-		animate();
 
 		function init() {
 
@@ -104,6 +108,7 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			container.appendChild( renderer.domElement );
 
 			// CONTROLS
@@ -321,7 +326,7 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
+			timer.update();
 
 			render();
 			stats.update();
@@ -330,7 +335,7 @@
 
 		function render() {
 
-			const delta = clock.getDelta();
+			const delta = timer.getDelta();
 
 			time += delta * effectController.speed * 0.5;
 

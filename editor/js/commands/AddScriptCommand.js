@@ -1,19 +1,19 @@
 import { Command } from '../Command.js';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param script javascript object
- * @constructor
- */
 class AddScriptCommand extends Command {
 
-	constructor( editor, object, script ) {
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} [object=null]
+	 * @param {string} [script='']
+	 * @constructor
+	 */
+	constructor( editor, object = null, script = '' ) {
 
 		super( editor );
 
 		this.type = 'AddScriptCommand';
-		this.name = 'Add Script';
+		this.name = editor.strings.getKey( 'command/AddScript' );
 
 		this.object = object;
 		this.script = script;

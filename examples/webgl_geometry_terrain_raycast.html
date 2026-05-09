@@ -4,6 +4,10 @@
 		<title>three.js webgl - geometry - terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - geometry - terrain">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_geometry_terrain_raycast.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_geometry_terrain_raycast.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -53,7 +57,6 @@
 			const pointer = new THREE.Vector2();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -63,6 +66,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -226,8 +230,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();
