@@ -578,35 +578,27 @@ class TransformControls extends Controls {
 
 				if ( space === 'world' ) {
 
-					if ( object.parent ) {
-
-						object.position.add( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.getWorldPosition( _tempVector );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
-						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+						_tempVector.x = Math.round( _tempVector.x / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Y' ) !== - 1 ) {
 
-						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+						_tempVector.y = Math.round( _tempVector.y / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Z' ) !== - 1 ) {
 
-						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+						_tempVector.z = Math.round( _tempVector.z / this.translationSnap ) * this.translationSnap;
 
 					}
 
-					if ( object.parent ) {
-
-						object.position.sub( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.position.copy( object.parent.worldToLocal( _tempVector ) );
 
 				}
 
@@ -1147,6 +1139,15 @@ class TransformControlsRoot extends Object3D {
 		} else {
 
 			controls.eye.copy( controls.cameraPosition ).sub( controls.worldPosition ).normalize();
+
+		}
+
+		// Cancel out the parent's transform so the gizmo stays world-aligned.
+
+		if ( this.parent ) {
+
+			_tempMatrix.copy( this.parent.matrixWorld ).invert();
+			_tempMatrix.decompose( this.position, this.quaternion, this.scale );
 
 		}
 
