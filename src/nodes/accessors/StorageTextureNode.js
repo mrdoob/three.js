@@ -99,6 +99,20 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * Overwrites the default implementation since storage texture
+	 * coordinates are texel coordinates and should not be transformed
+	 * by the texture uv matrix.
+	 *
+	 * @param {Node} uvNode - The uv node.
+	 * @return {Node} The unmodified uv node.
+	 */
+	getTransformedUV( uvNode ) {
+
+		return uvNode;
+
+	}
+
 	setup( builder ) {
 
 		super.setup( builder );
