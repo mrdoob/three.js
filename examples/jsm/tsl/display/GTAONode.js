@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, add, normalize, mul, cross, div, mix, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -29,6 +29,9 @@ let _rendererState;
  *
  * renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
  * ```
+ *
+ * The integration uses two perpendicular slices with the cosine-weighted closed-form
+ * inner integral (Eq. 7) and per-slice normal projection from the Activision paper.
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
@@ -146,9 +149,9 @@ class GTAONode extends TempNode {
 		this.scale = uniform( 1 );
 
 		/**
-		 * How many samples are used to compute the AO.
-		 * A higher value results in better quality but also
-		 * in a more expensive runtime behavior.
+		 * Total ray-march sample budget used to compute the AO.
+		 * The implementation uses 2 perpendicular slices, so each slice marches
+		 * `samples / 2` steps. A higher value yields better quality at higher cost.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -355,86 +358,126 @@ class GTAONode extends TempNode {
 			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
 
 			const noiseTexel = sampleNoise( noiseUv );
-			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
-			const tangent = vec3( randomVec.xy, 0.0 ).normalize();
-			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
-			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
-			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
+			// View direction (perspective camera: normalize( -viewPosition )).
+			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
-			const ao = float( 0 ).toVar();
+			// Initial slice azimuth, randomized via the noise texture and a temporal offset.
+			// Two perpendicular slices cover the [0, π) azimuth range, so a quarter turn (π/2)
+			// of jitter is sufficient to randomize across frames.
+			const sliceAngle = noiseTexel.x.add( this._temporalDirection ).mul( PI ).mul( 0.5 ).toVar();
+			const sliceDir = vec2( cos( sliceAngle ), sin( sliceAngle ) ).toVar();
 
-			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
+			// Independent per-step jitter (Activision GTAO paper, Section 5.4).
+			const stepJitter = add( 0.5, mul( 0.5, noiseTexel.w ) ).toVar();
 
-			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
+			// Two perpendicular slices total. STEPS is per-slice, so total marches ≈ samples
+			// (preserves the legacy semantics of the `samples` uniform).
+			const STEPS = max( this.samples.div( 2 ), float( 1 ) ).toVar();
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
-				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
-				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
+			const visibility = float( 0 ).toVar();
 
-				const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
-				const sliceBitangent = normalize( cross( sampleDir.xyz, viewDir ) ).toVar();
-				const sliceTangent = cross( sliceBitangent, viewDir );
-				const normalInSlice = normalize( viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ) );
+			// Hemisphere clamp: ±( π/2 − ε ) around the projected normal angle. The 0.05 rad bias
+			// reduces self-shadowing artifacts at grazing angles. (Activision GTAO paper, Fig. 11.)
+			const HEMISPHERE_MAX_ANGLE = float( Math.PI * 0.5 - 0.05 );
 
-				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
-				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
+			// Each iteration analyzes one azimuthal slice of the 3D space around the fragment.
 
-				// For each slice, the inner loop performs ray marching to find the horizons.
+			Loop( { start: int( 0 ), end: int( 2 ), type: 'int', condition: '<' }, () => {
+
+				// Per-slice orthonormal basis in view space:
+				//   T: tangent along the slice direction
+				//   B: bitangent (slice plane normal)
+				// T is re-orthogonalized against viewDir so the slice plane contains viewDir exactly.
+				const T_init = normalize( vec3( sliceDir, 0 ) ).toVar();
+				const B = normalize( cross( viewDir, T_init ) ).toVar();
+				const T = normalize( cross( B, viewDir ) ).toVar();
+
+				// Project the view normal onto the slice plane (remove component along B).
+				// The unnormalized length is the foreshortening weight applied at slice integration.
+				// (Activision GTAO paper, Section 3.2 "Per-pixel sampling".)
+				const projNRaw = viewNormal.sub( B.mul( dot( viewNormal, B ) ) ).toVar();
+				const projNLen = projNRaw.length().toVar();
+				const projN = projNRaw.div( max( projNLen, float( 0.0001 ) ) ).toVar();
+
+				// γ — angle of projN within the slice plane, signed by the tangent direction.
+				const nSin = dot( projN, T ).toVar();
+				const nCos = clamp( dot( projN, viewDir ), 0, 1 ).toVar();
+				const signNSin = nSin.greaterThanEqual( 0 ).select( float( 1 ), float( - 1 ) );
+				const angleN = signNSin.mul( acos( nCos ) ).toVar();
+
+				// Horizon cosines (one per direction along T). Initialized to cos( π ) = −1 (no occluder).
+				const cosHPos = float( - 1 ).toVar();
+				const cosHNeg = float( - 1 ).toVar();
+
+				// Inner loop ray-marches both directions of the slice to find the horizons.
 
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
-					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+					const sampleOffset = T.mul( radiusToUse ).mul( stepJitter ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
 
-					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
+					// Positive direction along T.
 
-					// x
-
-					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
-					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
+					const omegaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
 
-					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
+					If( abs( omegaX.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaX ) );
-						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						const sH = dot( viewDir, normalize( omegaX ) );
+						cosHPos.addAssign( max( 0, mul( sH.sub( cosHPos ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
 
-					// y
+					// Negative direction along T.
 
-					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleOffset ), this._cameraProjectionMatrix ).toVar();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
-					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
+					const omegaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
 
-					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
+					If( abs( omegaY.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaY ) );
-						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						const sH = dot( viewDir, normalize( omegaY ) );
+						cosHNeg.addAssign( max( 0, mul( sH.sub( cosHNeg ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
 
 				} );
 
-				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
+				// Convert horizon cosines to angles. The negative-side horizon is negated to express
+				// it on the opposite side of T (so hPos > 0 > hNeg).
+				const hPos = acos( cosHPos ).toVar();
+				const hNeg = acos( cosHNeg ).negate().toVar();
 
-				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
-				const nx = dot( normalInSlice, sliceTangent );
-				const ny = dot( normalInSlice, viewDir );
-				const nxb = mul( 0.5, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) );
-				const nyb = mul( 0.5, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) );
-				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
-				ao.addAssign( occlusion );
+				// Clamp horizons to the hemisphere around the (projected) shading normal.
+				const hPosLimit = angleN.add( HEMISPHERE_MAX_ANGLE );
+				hPos.assign( hPos.lessThan( hPosLimit ).select( hPos, hPosLimit ) );
+
+				const hNegLimit = angleN.sub( HEMISPHERE_MAX_ANGLE );
+				hNeg.assign( hNeg.greaterThan( hNegLimit ).select( hNeg, hNegLimit ) );
+
+				// Cosine-weighted inner integral, closed-form (Activision GTAO paper, Eq. 7).
+				// Per horizon h_i:    term_i = −cos( 2 h_i − γ ) + cos( γ ) + 2 h_i sin( γ )
+				// The 0.25 factor is ½ (integral normalization) × ½ (averaging the two horizons).
+				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
+				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
+				const a = termPos.add( termNeg ).mul( 0.25 );
+
+				// |projN| is the foreshortening weight from the per-slice normal projection.
+				visibility.addAssign( projNLen.mul( a ) );
+
+				// Rotate slice direction 90° for the perpendicular second slice.
+				sliceDir.assign( vec2( sliceDir.y.negate(), sliceDir.x ) );
 
 			} );
 
-			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
-			ao.assign( pow( ao, this.scale ) );
+			// Average over the 2 slices, clamp, and apply user-tunable scale (power curve).
+			visibility.assign( clamp( visibility.mul( 0.5 ), 0, 1 ) );
+			visibility.assign( pow( visibility, this.scale ) );
 
-			return ao;
+			return visibility;
 
 		} );
 
