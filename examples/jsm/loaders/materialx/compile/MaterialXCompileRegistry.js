@@ -286,6 +286,43 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 
 };
 
+const compileHexTiledNormalMapNode = ( nodeX, compileContext, sampleNode ) => {
+
+	const normalMapNodeElement = compileContext.nodeLibrary.normalmap;
+	const strengthNode = nodeX.getNodeByName( 'strength' ) || float( 1 );
+
+	if ( ! normalMapNodeElement || typeof normalMapNodeElement.nodeFunc !== 'function' ) {
+
+		return normalMap( vec4( sampleNode, 1 ), strengthNode );
+
+	}
+
+	const args = normalMapNodeElement.params.map( ( paramName ) => {
+
+		if ( paramName === 'in' ) return sampleNode;
+		if ( paramName === 'scale' ) return strengthNode;
+		return nodeX.getNodeByName( paramName );
+
+	} );
+
+	for ( let i = 0; i < normalMapNodeElement.params.length; i += 1 ) {
+
+		if ( args[ i ] !== undefined && args[ i ] !== null ) {
+
+			continue;
+
+		}
+
+		const paramName = normalMapNodeElement.params[ i ];
+		const defaultValue = normalMapNodeElement.defaults ? normalMapNodeElement.defaults[ paramName ] : undefined;
+		args[ i ] = defaultValue !== undefined ? ( typeof defaultValue === 'function' ? defaultValue() : float( defaultValue ) ) : float( 0 );
+
+	}
+
+	return normalMapNodeElement.nodeFunc( ...args );
+
+};
+
 const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 	const file = nodeX.getChildByName( 'file' );
@@ -295,11 +332,27 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 			nodeX.name,
 			`Texture node "${nodeX.name || nodeX.element}" is missing required input "file".`,
 		);
+		if ( category === 'hextilednormalmap' ) {
+
+			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
+
+		}
 		return vec4( 0, 0, 0, 1 );
 
 	}
 
 	const textureFile = file.getTexture();
+	if ( ! textureFile ) {
+
+		if ( category === 'hextilednormalmap' ) {
+
+			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
+
+		}
+		return vec4( 0, 0, 0, 1 );
+
+	}
+
 	const uvNode = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
 	const tiling = nodeX.getNodeByName( 'tiling' ) || vec2( 1, 1 );
 	const rotation = nodeX.getNodeByName( 'rotation' ) || float( 1 );
@@ -371,8 +424,22 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 	if ( category === 'hextilednormalmap' ) {
 
-		const normalScale = nodeX.getNodeByName( 'scale' ) || float( 1 );
-		return normalMap( blended, normalScale );
+		const flipGNode = nodeX.getNodeByName( 'flip_g' );
+		let normalSample = blended;
+
+		if ( flipGNode ) {
+
+			const flippedSample = vec4(
+				element( blended, 0 ),
+				sub( 1, element( blended, 1 ) ),
+				element( blended, 2 ),
+				element( blended, 3 ),
+			);
+			normalSample = toBooleanNode( flipGNode ).select( flippedSample, blended );
+
+		}
+
+		return compileHexTiledNormalMapNode( nodeX, compileContext, toVec3Channels( normalSample ) );
 
 	}
 
