@@ -33,7 +33,6 @@ import {
 	transpose,
 	determinant,
 	inverse,
-	normalMap,
 	mat3,
 	mx_ramp4,
 	mx_ramplr,
@@ -70,6 +69,9 @@ import {
 	mx_atan2,
 	positionLocal,
 	positionWorld,
+	normalWorld,
+	tangentWorld,
+	bitangentWorld,
 	cameraPosition,
 	mx_heighttonormal,
 	float,
@@ -142,7 +144,37 @@ const mx_circle = ( texcoord, center, radius ) => {
 
 };
 
-const mx_bump = ( height, scale = 1 ) => normalMap( mx_heighttonormal( height, 1 ), scale );
+const mx_normalmap = (
+	value = vec3( 0.5, 0.5, 1.0 ),
+	scale = 1.0,
+	normal = vec3( 0.0, 0.0, 1.0 ),
+	tangent = vec3( 1.0, 0.0, 0.0 ),
+	bitangent = vec3( 0.0, 1.0, 0.0 ),
+) => {
+
+	const mapValue = toVec3Channels( value );
+	const decoded = sub( mul( mapValue, 2.0 ), vec3( 1.0, 1.0, 1.0 ) );
+	const safeValue = dot( mapValue, mapValue ).equal( 0 ).mix( decoded, vec3( 0.0, 0.0, 1.0 ) );
+	const normalScale = vec2( scale );
+	const blended =
+		add(
+			add(
+				mul( tangent, mul( element( safeValue, 0 ), element( normalScale, 0 ) ) ),
+				mul( bitangent, mul( element( safeValue, 1 ), element( normalScale, 1 ) ) ),
+			),
+			mul( normal, element( safeValue, 2 ) ),
+		);
+	return normalize( blended );
+
+};
+
+const mx_bump = (
+	height,
+	scale = 1,
+	normal = vec3( 0.0, 0.0, 1.0 ),
+	tangent = vec3( 1.0, 0.0, 0.0 ),
+	bitangent = vec3( 0.0, 1.0, 0.0 ),
+) => mx_normalmap( mx_heighttonormal( height, 1 ), scale, normal, tangent, bitangent );
 const mx_dot = ( inNode ) => inNode;
 const mx_viewdirection = ( space = 'world' ) => {
 
@@ -604,7 +636,13 @@ const MXElements = [
 		fromspace: () => 'world',
 		tospace: () => 'world',
 	} ),
-	createMXElement( 'normalmap', normalMap, [ 'in', 'scale' ], { in: defaultVec3( 0.5, 0.5, 1.0 ), scale: defaultFloat( 1 ) } ),
+	createMXElement( 'normalmap', mx_normalmap, [ 'in', 'scale', 'normal', 'tangent', 'bitangent' ], {
+		in: defaultVec3( 0.5, 0.5, 1.0 ),
+		scale: defaultFloat( 1 ),
+		normal: () => normalWorld,
+		tangent: () => tangentWorld,
+		bitangent: () => bitangentWorld,
+	} ),
 	createMXElement( 'transpose', transpose, [ 'in' ] ),
 	createMXElement( 'determinant', determinant, [ 'in' ] ),
 	createMXElement( 'invertmatrix', inverse, [ 'in' ] ),
@@ -966,7 +1004,13 @@ const MXElements = [
 		center: defaultVec2( 0, 0 ),
 		radius: defaultFloat( 0.5 ),
 	} ),
-	createMXElement( 'bump', mx_bump, [ 'height', 'scale' ], { height: defaultFloat( 0 ), scale: defaultFloat( 1 ) } ),
+	createMXElement( 'bump', mx_bump, [ 'height', 'scale', 'normal', 'tangent', 'bitangent' ], {
+		height: defaultFloat( 0 ),
+		scale: defaultFloat( 1 ),
+		normal: () => normalWorld,
+		tangent: () => tangentWorld,
+		bitangent: () => bitangentWorld,
+	} ),
 	createMXElement( 'blackbody', mx_blackbody, [ 'temperature' ], { temperature: defaultFloat( 5000 ) } ),
 ];
 
