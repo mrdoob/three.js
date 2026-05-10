@@ -23,6 +23,7 @@ import {
 	clamp,
 	add,
 	sub,
+	floor,
 	mix,
 	dot,
 	div,
@@ -52,6 +53,8 @@ const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d'
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
 const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirror' ] );
+const SWITCH_MIN_INDEX = 1;
+const SWITCH_MAX_INDEX = 10;
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
 
@@ -230,6 +233,31 @@ const compileBooleanConditionalNode = ( nodeX ) => {
 	if ( nodeX.element === 'ifequal' ) return value1.equal( value2 );
 
 	return null;
+
+};
+
+const getSwitchBranchNode = ( nodeX, index ) => nodeX.getNodeByName( `in${index}` ) || getZeroNodeForType( nodeX.type );
+
+const compileSwitchNode = ( nodeX ) => {
+
+	const fallbackNode = getSwitchBranchNode( nodeX, SWITCH_MIN_INDEX );
+	const whichInput = nodeX.getNodeByName( 'which' );
+	const switchIndex = add( floor( float( whichInput === undefined || whichInput === null ? 0 : whichInput ) ), 1 );
+	const whichNode = clamp(
+		float( switchIndex ),
+		float( SWITCH_MIN_INDEX ),
+		float( SWITCH_MAX_INDEX ),
+	);
+
+	let result = fallbackNode;
+	for ( let branchIndex = SWITCH_MIN_INDEX + 1; branchIndex <= SWITCH_MAX_INDEX; branchIndex += 1 ) {
+
+		const branchNode = getSwitchBranchNode( nodeX, branchIndex );
+		result = whichNode.equal( float( branchIndex ) ).select( branchNode, result );
+
+	}
+
+	return result;
 
 };
 
@@ -792,6 +820,7 @@ function createMaterialXCompileRegistry() {
 		compileGltfAnisotropyImageNode( nodeX, out, compileContext ) );
 	register( registry, [ 'gltf_iridescence_thickness' ], ( nodeX, out, compileContext ) =>
 		compileGltfIridescenceThicknessNode( nodeX, compileContext ) );
+	register( registry, [ 'switch' ], ( nodeX ) => compileSwitchNode( nodeX ) );
 	register( registry, [ 'transformmatrix' ], ( nodeX, out, compileContext ) => compileTransformMatrixNode( nodeX, compileContext ) );
 	register( registry, [ 'creatematrix' ], ( nodeX ) => compileCreateMatrixNode( nodeX ) );
 	register( registry, [ 'invertmatrix' ], ( nodeX, out, compileContext ) => compileInvertMatrixNode( nodeX, compileContext ) );
