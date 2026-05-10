@@ -259,8 +259,14 @@ class AsciiEffect {
 
 					let strThisChar = aCharList[ iCharIdx ];
 
-					if ( strThisChar === undefined || strThisChar == ' ' )
+					if ( strThisChar === undefined )
+						strThisChar = ' ';
+					if ( strThisChar == '&' )
+						strThisChar = '&amp;';
+					else if ( strThisChar == ' ' )
 						strThisChar = '&nbsp;';
+					else if ( strThisChar == '<' )
+						strThisChar = '&lt;';
 
 					if ( bColor ) {
 
