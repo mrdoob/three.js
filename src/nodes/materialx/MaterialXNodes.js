@@ -14,10 +14,9 @@ import { mx_srgb_texture_to_lin_rec709 } from './MaterialXColorTransform.js';
 
 import {
 	float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
-	floor, abs, max, clamp, step
+	floor, abs, max, clamp, step, cross, dot, normalize
 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
-import { bumpMap } from '../display/BumpMapNode.js';
 import { frameId, time } from '../utils/Timer.js';
 
 export const mx_aastep = ( threshold, value ) => {
@@ -170,11 +169,21 @@ export const mx_place2d = (
 
 };
 
-export const mx_heighttonormal = ( input, scale/*, texcoord*/ ) => {
+export const mx_heighttonormal = ( input, scale = 1, texcoord = uv() ) => {
 
-	input = vec3( input );
-	scale = float( scale );
-
-	return bumpMap( input, scale );
+	const sobelScale = float( 1.0 / 16.0 );
+	const height = float( input );
+	const uvNode = vec2( texcoord );
+	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( float( scale ) ).mul( sobelScale );
+	const dUdS = vec2( uvNode.x.dFdx(), uvNode.x.dFdy() );
+	const dVdS = vec2( uvNode.y.dFdx(), uvNode.y.dFdy() );
+	const tangent = vec3( dUdS.x, dVdS.x, dHdS.x );
+	const bitangent = vec3( dUdS.y, dVdS.y, dHdS.y );
+	let n = cross( tangent, bitangent );
+	const invalid = dot( n, n ).lessThan( float( 1e-12 ) );
+	n = invalid.mix( n, vec3( 0, 0, 1 ) );
+	const mirrored = n.z.lessThan( float( 0 ) );
+	n = mirrored.mix( n, n.mul( - 1 ) );
+	return normalize( n ).mul( 0.5 ).add( 0.5 );
 
 };
