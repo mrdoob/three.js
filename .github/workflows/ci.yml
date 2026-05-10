@@ -13,9 +13,17 @@ permissions:
 jobs:
   test:
     name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        CI: [ 0, 1, 2, 3, 4 ]
+    env:
+      CI: ${{ matrix.CI }}
     steps:
       - name: Git checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -24,6 +32,10 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
+      - name: Install Vulkan drivers and xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers xvfb
       - name: Install dependencies
         run: npm ci
 
@@ -31,10 +43,10 @@ jobs:
         run: npm run lint
 
       - name: === Unit testing ===
-        run: npm run test-unit
+        run: xvfb-run -a npm run test-unit
 
       - name: === Unit addons testing ===
-        run: npm run test-unit-addons
+        run: xvfb-run -a npm run test-unit-addons
 
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov
