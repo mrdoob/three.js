@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<title>ThreeJS Unit Tests - Using Files in /src</title>
+		<meta charset="UTF-8">
+		<title>ThreeJS Unit Tests - Using Files in /examples/jsm</title>
 		<!-- if we don't set favicon here, we have to intercept the request for it in puppeteer page to prevent console error -->
-		<link rel="icon" type="image/x-icon" href="/files/favicon.ico" />
+		<link rel="icon" type="image/x-icon" href="/files/favicon.ico"/>
 		<link rel="stylesheet" href="../../node_modules/qunit/qunit/qunit.css">
 	</head>
 	<body>
@@ -21,7 +21,6 @@
 				}
 			}
 		</script>
-
 		<script type="module">
 			window.QUnit.on( 'runEnd', ( runEnd ) => {
 
@@ -32,7 +31,6 @@
 		</script>
 
 		<!-- add sources to test below -->
-		<script src="./three.source.unit.js" type="module"></script>
+		<script src="./three.addons.unit.js" type="module"></script>
 	</body>
 </html>
-
