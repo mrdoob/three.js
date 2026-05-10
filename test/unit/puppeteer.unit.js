@@ -83,11 +83,27 @@ function main() {
 		const flags = [ '--hide-scrollbars', '--enable-gpu' ];
 		// '--enable-chrome-browser-cloud-management'
 
-		const testPage = process.env.TEST_PAGE;
-		const testMode = process.env.VISIBLE ? 'headful' : 'headless';
+		let testPage = '';
+		let testMode = '';
+
+		let argvIndex = 2;
+
+		if ( process.argv[ argvIndex ].startsWith( '--testPage' ) ) {
+
+			testPage = process.argv[ argvIndex ].split( '=' )[ 1 ];
+			argvIndex ++;
+
+		}
+
+		if ( process.argv[ argvIndex ].startsWith( '--mode' ) ) {
+
+			testMode = process.argv[ argvIndex ].split( '=' )[ 1 ];
+			argvIndex ++;
+
+		}
 
 		browser = await puppeteer.launch( {
-			headless: testMode === 'headful' ? false : 'new',
+			headless: testMode === 'headless',
 			args: flags,
 			defaultViewport: viewport,
 			handleSIGINT: false,
