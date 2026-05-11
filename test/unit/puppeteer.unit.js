@@ -28,44 +28,21 @@ const yellow = color( 33 );
 const blue = color( 34 );
 const cyan = color( 36 );
 
-
-// allows consoles from browser to be captured and displayed in CLI
-// https://stackoverflow.com/questions/51676159/puppeteer-console-log-how-to-look-inside-jshandleobject
 export const captureConsole = ( page ) => {
-
-	// make args accessible
-	const describe = ( jsHandle ) => {
-
-		return jsHandle.evaluate( ( obj ) => {
-
-			// serialize |obj| however you want
-			return `OBJ: ${typeof obj}, ${ obj }`;
-
-		}, jsHandle );
-
-	};
 
 	const colors = {
 		LOG: white,
-		ERR: red,
-		WAR: yellow,
-		INF: green,
+		ERROR: red,
+		WARN: yellow,
+		INFO: green,
 	};
 
 	page.on( 'console', async ( message ) => {
 
-		const args = await Promise.all( ( message.args() ).map( async arg => describe( arg ) ) );
-		const type = message.type().substring( 0, 3 ).toUpperCase();
+		const type = message.type().toUpperCase();
 		const color = colors[ type ] || blue;
-		let text = '';
 
-		for ( let i = 0; i < args.length; ++ i ) {
-
-			text += `[${i}] ${args[ i ]} `;
-
-		}
-
-		color( `CONSOLE.${type}: ${message.text()}\n${text} ` );
+		color( `${type}: ${message.text()} ` );
 
 	} );
 
