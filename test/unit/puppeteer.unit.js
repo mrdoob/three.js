@@ -80,8 +80,15 @@ function main() {
 
 	( async () => {
 
-		const flags = [ '--hide-scrollbars', '--enable-gpu' ];
-		// '--enable-chrome-browser-cloud-management'
+		const flags = [
+			'--hide-scrollbars',
+			'--enable-unsafe-webgpu',
+			'--enable-features=Vulkan',
+			'--disable-vulkan-surface',
+			'--ignore-gpu-blocklist',
+			'--disable-gpu-driver-bug-workarounds',
+			'--no-sandbox'
+		];
 
 		let testPage = '';
 		let testMode = '';
@@ -105,9 +112,11 @@ function main() {
 		browser = await puppeteer.launch( {
 			headless: testMode === 'headless',
 			args: flags,
+			env: { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' },
 			defaultViewport: viewport,
 			handleSIGINT: false,
-			protocolTimeout: 0
+			protocolTimeout: 0,
+			userDataDir: './.puppeteer_profile'
 		} );
 
 		if ( testMode === 'headful' ) {
