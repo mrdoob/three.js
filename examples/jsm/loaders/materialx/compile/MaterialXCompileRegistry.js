@@ -548,17 +548,43 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
 	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
-	const fallback = vec4( 0, 0, 0, 1 );
-	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
+	let transformedUv = uvNode;
+	const place2d = compileContext.nodeLibrary.place2d;
 
-	if ( out === 'outa' || out === 'a' ) {
+	if ( place2d ) {
 
-		return element( sampled, 3 );
+		const pivot = nodeX.getNodeByName( 'pivot' ) || vec2( 0, 1 );
+		const scale = nodeX.getNodeByName( 'scale' ) || vec2( 1, 1 );
+		const rotate = nodeX.getNodeByName( 'rotate' ) || float( 0 );
+		const offset = nodeX.getNodeByName( 'offset' ) || vec2( 0, 0 );
+		// Match MaterialX's ND_gltf_colorimage graph implementation, which wires gltf_image with operationorder=0.
+		const operationorder = int( 0 );
+		transformedUv = place2d.nodeFunc(
+			uvNode,
+			pivot,
+			div( vec2( 1, 1 ), scale ),
+			mul( rotate, - 1 ),
+			mul( offset, vec2( - 1, 1 ) ),
+			operationorder,
+		);
 
 	}
 
+	const defaultInput = nodeX.getNodeByName( 'default' ) || vec4( 0, 0, 0, 0 );
+	const fallback = vec4( defaultInput );
+	const sampled = sampleTexture( textureFile, transformedUv, compileContext, fallback, addressModes, fallback );
 	const converted = applyTextureColorSpace( sampled, file );
-	return toVec3Channels( converted );
+	const color = nodeX.getNodeByName( 'color' ) || vec4( 1, 1, 1, 1 );
+	const geomcolor = nodeX.getNodeByName( 'geomcolor' ) || vec4( 1, 1, 1, 1 );
+	const modulated = mul( mul( converted, color ), geomcolor );
+
+	if ( out === 'outa' || out === 'a' ) {
+
+		return element( modulated, 3 );
+
+	}
+
+	return toVec3Channels( modulated );
 
 };
 
