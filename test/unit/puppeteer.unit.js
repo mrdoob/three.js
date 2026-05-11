@@ -28,7 +28,7 @@ const yellow = color( 33 );
 const blue = color( 34 );
 const cyan = color( 36 );
 
-export const captureConsole = ( page ) => {
+const captureConsole = ( page ) => {
 
 	const colors = {
 		LOG: white,
