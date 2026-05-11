@@ -10,7 +10,7 @@ import {
 	MeshStandardMaterial,
 	Scene,
 	SphereGeometry,
-} from '../../../../src/Three.js';
+} from 'three';
 
 function isValidUSDA( usda ) {
 
