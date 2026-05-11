@@ -22,6 +22,8 @@ import {
 	bitangentWorld,
 	clamp,
 	add,
+	abs,
+	min,
 	sub,
 	floor,
 	mix,
@@ -30,6 +32,7 @@ import {
 	max,
 	normalize,
 	mx_atan2,
+	pow,
 	sqrt,
 } from 'three/tsl';
 import {
@@ -233,6 +236,88 @@ const compileBooleanConditionalNode = ( nodeX ) => {
 	if ( nodeX.element === 'ifequal' ) return value1.equal( value2 );
 
 	return null;
+
+};
+
+const compileClampNode = ( nodeX ) => {
+
+	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
+	const low = nodeX.getNodeByName( 'low' ) || float( 0 );
+	const high = nodeX.getNodeByName( 'high' ) || float( 1 );
+	return min( max( inNode, low ), high );
+
+};
+
+const compileNormalizeNode = ( nodeX ) => {
+
+	const inNode = nodeX.getNodeByName( 'in' ) || getZeroNodeForType( nodeX.type );
+	const zeroNode = getZeroNodeForType( nodeX.type );
+	const lengthSquared = dot( inNode, inNode );
+	const safeLengthSquared = max( lengthSquared, float( 1e-8 ) );
+	const normalized = mul( inNode, div( float( 1 ), sqrt( safeLengthSquared ) ) );
+	return abs( lengthSquared ).lessThan( float( 1e-8 ) ).select( zeroNode, normalized );
+
+};
+
+const compileRemapNode = ( nodeX ) => {
+
+	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
+	const inLow = nodeX.getNodeByName( 'inlow' ) || float( 0 );
+	const inHigh = nodeX.getNodeByName( 'inhigh' ) || float( 1 );
+	const outLow = nodeX.getNodeByName( 'outlow' ) || float( 0 );
+	const outHigh = nodeX.getNodeByName( 'outhigh' ) || float( 1 );
+	const denominator = sub( inHigh, inLow );
+	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
+	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
+	const remapped = add(
+		mul( div( sub( inNode, inLow ), safeDenominator ), sub( outHigh, outLow ) ),
+		outLow,
+	);
+	return isDegenerate.select( outLow, remapped );
+
+};
+
+const compileRangeNode = ( nodeX ) => {
+
+	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
+	const inLow = nodeX.getNodeByName( 'inlow' ) || float( 0 );
+	const inHigh = nodeX.getNodeByName( 'inhigh' ) || float( 1 );
+	const outLow = nodeX.getNodeByName( 'outlow' ) || float( 0 );
+	const outHigh = nodeX.getNodeByName( 'outhigh' ) || float( 1 );
+	const gamma = nodeX.getNodeByName( 'gamma' ) || float( 1 );
+	const doClamp = nodeX.getNodeByName( 'doclamp' ) || int( 0 );
+
+	const denominator = sub( inHigh, inLow );
+	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
+	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
+	const normalized = div( sub( inNode, inLow ), safeDenominator );
+	const safeGamma = max( abs( gamma ), float( 1e-8 ) );
+	const gammaApplied = pow( normalized, div( float( 1 ), safeGamma ) );
+	const remapped = add( mul( gammaApplied, sub( outHigh, outLow ) ), outLow );
+	const result = isDegenerate.select( outLow, remapped );
+	const clamped = min( max( result, outLow ), outHigh );
+
+	return toBooleanNode( doClamp ).select( clamped, result );
+
+};
+
+const compileRamplrNode = ( nodeX, compileContext ) => {
+
+	const texcoord = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
+	const valuel = nodeX.getNodeByName( 'valuel' ) || float( 0 );
+	const valuer = nodeX.getNodeByName( 'valuer' ) || float( 1 );
+	const t = min( max( element( texcoord, 0 ), float( 0 ) ), float( 1 ) );
+	return mix( valuel, valuer, t );
+
+};
+
+const compileRamptbNode = ( nodeX, compileContext ) => {
+
+	const texcoord = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
+	const valueb = nodeX.getNodeByName( 'valueb' ) || float( 0 );
+	const valuet = nodeX.getNodeByName( 'valuet' ) || float( 1 );
+	const t = min( max( element( texcoord, 1 ), float( 0 ) ), float( 1 ) );
+	return mix( valueb, valuet, t );
 
 };
 
@@ -829,6 +914,12 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'convert' ], ( nodeX ) => compileConvertNode( nodeX ) );
 	register( registry, [ 'constant' ], ( nodeX ) => compileConstantNode( nodeX ) );
 	register( registry, [ 'artistic_ior' ], ( nodeX, out ) => compileArtisticIorNode( nodeX, out ) );
+	register( registry, [ 'clamp' ], ( nodeX ) => compileClampNode( nodeX ) );
+	register( registry, [ 'normalize' ], ( nodeX ) => compileNormalizeNode( nodeX ) );
+	register( registry, [ 'range' ], ( nodeX ) => compileRangeNode( nodeX ) );
+	register( registry, [ 'remap' ], ( nodeX ) => compileRemapNode( nodeX ) );
+	register( registry, [ 'ramplr' ], ( nodeX, out, compileContext ) => compileRamplrNode( nodeX, compileContext ) );
+	register( registry, [ 'ramptb' ], ( nodeX, out, compileContext ) => compileRamptbNode( nodeX, compileContext ) );
 	register( registry, [ 'position' ], ( nodeX ) => compileSpaceInputNode( nodeX, positionLocal, positionWorld ) );
 	register( registry, [ 'normal' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, normalLocal, normalWorld ) );
 	register( registry, [ 'tangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, tangentLocal, tangentWorld ) );
