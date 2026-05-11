@@ -11,10 +11,6 @@ import puppeteer from 'puppeteer';
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const port = 1234;
-const width = 400;
-const height = 250;
-const viewScale = 2;
-const viewport = { width: width * viewScale, height: height * viewScale };
 
 let browser;
 
@@ -113,7 +109,7 @@ function main() {
 			headless: testMode === 'headless',
 			args: flags,
 			env: { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' },
-			defaultViewport: viewport,
+			defaultViewport: null,
 			handleSIGINT: false,
 			protocolTimeout: 0,
 			userDataDir: './.puppeteer_profile'
