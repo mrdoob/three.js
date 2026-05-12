@@ -250,8 +250,8 @@ class NodeMaterialObserver {
 			const attribute = attributes[ name ];
 
 			attributesData[ name ] = {
-				id: attribute.id,
-				version: attribute.version,
+				id: attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id,
+				version: attribute.isInterleavedBufferAttribute ? attribute.data.version : attribute.version,
 			};
 
 		}
@@ -509,10 +509,13 @@ class NodeMaterialObserver {
 
 				}
 
-				if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+				const id = attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id;
+				const version = attribute.isInterleavedBufferAttribute ? attribute.data.version : attribute.version;
 
-					storedAttributeData.id = attribute.id;
-					storedAttributeData.version = attribute.version;
+				if ( storedAttributeData.id !== id || storedAttributeData.version !== version ) {
+
+					storedAttributeData.id = id;
+					storedAttributeData.version = version;
 
 					geometryData._equal = false;
 					return false;
@@ -1002,7 +1005,7 @@ function getTypedArrayFromType( type ) {
  */
 function getLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -1015,16 +1018,16 @@ function getLengthFromType( type ) {
 }
 
 /**
- * Returns the gpu memory length for the given data type.
+ * Returns the gpu memory length for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The length.
+ * @return {number} The memory length in 4-byte elements.
  */
 function getMemoryLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -1037,22 +1040,22 @@ function getMemoryLengthFromType( type ) {
 }
 
 /**
- * Returns the alignment requirement for the given data type.
+ * Returns the alignment requirement for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The alignment requirement in bytes.
+ * @return {number} The alignment requirement in 4-byte elements.
  */
 function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 4;
-	if ( /vec2/.test( type ) ) return 8;
-	if ( /vec3/.test( type ) ) return 16;
-	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 8;
-	if ( /mat3/.test( type ) ) return 16;
-	if ( /mat4/.test( type ) ) return 16;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 4;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 2;
+	if ( /mat3/.test( type ) ) return 4;
+	if ( /mat4/.test( type ) ) return 4;
 
 	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
@@ -4564,6 +4567,26 @@ const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType )
 const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
 const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
+
+const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
+
+	return new Proxy( constructorFunction, {
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( nodeInstance, prop, receiver );
+
+		},
+
+		set( target, prop, value ) {
+
+			return Reflect.set( nodeInstance, prop, value );
+
+		}
+
+	} );
+
+};
 
 let fnId = 0;
 
@@ -17542,10 +17565,10 @@ class StorageBufferNode extends BufferNode {
 
 		let nodeType, structTypeNode = null;
 
-		if ( bufferType && bufferType.isStruct ) {
+		if ( bufferType && bufferType.isStructTypeNode ) {
 
 			nodeType = 'struct';
-			structTypeNode = bufferType.layout;
+			structTypeNode = bufferType;
 
 			if ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) {
 
@@ -29891,7 +29914,15 @@ class RenderObject {
 
 				if ( attribute !== undefined ) {
 
-					attributesId[ nodeAttribute.name ] = attribute.id;
+					if ( attribute.isInterleavedBufferAttribute ) {
+
+						attributesId[ nodeAttribute.name ] = attribute.data.uuid;
+
+					} else {
+
+						attributesId[ nodeAttribute.name ] = attribute.id;
+
+					}
 
 				}
 
@@ -30196,7 +30227,11 @@ class RenderObject {
 
 				const attribute = this.geometry.getAttribute( name );
 
-				if ( attribute === undefined || attributesId[ name ] !== attribute.id ) {
+				if ( attribute === undefined ) return true;
+
+				const id = attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id;
+
+				if ( attributesId[ name ] !== id ) {
 
 					return true;
 
@@ -34952,19 +34987,19 @@ class StructTypeNode extends Node {
 		 * @readonly
 		 * @default true
 		 */
-		this.isStructLayoutNode = true;
+		this.isStructTypeNode = true;
 
 	}
 
 	/**
-	 * Returns the length of the struct.
-	 * The length is calculated by summing the lengths of the struct's members.
+	 * Returns the length of the struct in 4-byte elements (e.g. float or int components).
+	 * The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.
+	 * To get the size in bytes, multiply the returned value by 4.
 	 *
-	 * @returns {number} The length of the struct.
+	 * @returns {number} The length of the struct in 4-byte elements.
 	 */
 	getLength() {
 
-		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
 		let maxAlignment = 1; // maximum alignment value in this struct
 		let offset = 0; // global buffer offset in 4 byte elements
 
@@ -34973,7 +35008,7 @@ class StructTypeNode extends Node {
 			const type = member.type;
 
 			const itemSize = getMemoryLengthFromType( type );
-			const alignment = getAlignmentFromType( type ) / BYTES_PER_ELEMENT;
+			const alignment = getAlignmentFromType( type );
 			maxAlignment = Math.max( maxAlignment, alignment );
 
 			const chunkOffset = offset % maxAlignment; // offset in the current chunk of maxAlignment elements
@@ -35114,7 +35149,7 @@ class StructNode extends Node {
  */
 const struct = ( membersLayout, name = null ) => {
 
-	const structLayout = new StructTypeNode( membersLayout, name );
+	const structType = new StructTypeNode( membersLayout, name );
 
 	const struct = ( ...params ) => {
 
@@ -35142,14 +35177,11 @@ const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return new StructNode( structLayout, values );
+		return new StructNode( structType, values );
 
 	};
 
-	struct.layout = structLayout;
-	struct.isStruct = true;
-
-	return struct;
+	return nodeProxyConstructor( struct, structType );
 
 };
 
@@ -38434,9 +38466,9 @@ const attributeArray = ( count, type = 'float' ) => {
 
 	let itemSize, typedArray;
 
-	if ( type.isStruct === true ) {
+	if ( type.isStructTypeNode === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = type.getLength();
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -38466,9 +38498,9 @@ const instancedArray = ( count, type = 'float' ) => {
 
 	let itemSize, typedArray;
 
-	if ( type.isStruct === true ) {
+	if ( type.isStructTypeNode === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = type.getLength();
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -38676,6 +38708,20 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * Overwrites the default implementation since storage texture
+	 * coordinates are texel coordinates and should not be transformed
+	 * by the texture uv matrix.
+	 *
+	 * @param {Node} uvNode - The uv node.
+	 * @return {Node} The unmodified uv node.
+	 */
+	getTransformedUV( uvNode ) {
+
+		return uvNode;
+
+	}
+
 	setup( builder ) {
 
 		super.setup( builder );
@@ -38790,6 +38836,27 @@ class StorageTextureNode extends TextureNode {
 	}
 
 	/**
+	 * Stores a value in this storage texture at the given coordinates.
+	 *
+	 * @param {Node<vec2|vec3>} uvNode - The storage texture coordinates.
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
+	 * @return {StorageTextureNode} A storage texture node representing the store operation.
+	 */
+	store( uvNode, storeNode ) {
+
+		const node = this.clone();
+
+		node.referenceNode = this.getBase();
+		node.uvNode = uvNode;
+		node.storeNode = storeNode;
+
+		if ( storeNode !== null ) node.toStack();
+
+		return node;
+
+	}
+
+	/**
 	 * Generates the code snippet of the storage texture node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -38841,7 +38908,7 @@ const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setParamete
  *
  * @tsl
  * @function
- * @param {StorageTexture} value - The storage texture.
+ * @param {StorageTexture|StorageTextureNode} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
@@ -38852,18 +38919,15 @@ const textureStore = ( value, uvNode, storeNode ) => {
 
 	if ( value.isStorageTextureNode === true ) {
 
-		// Derive new storage texture node from existing one
-		node = value.clone();
-		node.uvNode = uvNode;
-		node.storeNode = storeNode;
+		node = value.store( uvNode, storeNode );
 
 	} else {
 
 		node = storageTexture( value, uvNode, storeNode );
 
-	}
+		if ( storeNode !== null ) node.toStack();
 
-	if ( storeNode !== null ) node.toStack();
+	}
 
 	return node;
 
@@ -41499,26 +41563,11 @@ class FunctionNode extends CodeNode {
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 
-	for ( let i = 0; i < includes.length; i ++ ) {
-
-		const include = includes[ i ];
-
-		// TSL Function: glslFn, wgslFn
-
-		if ( typeof include === 'function' ) {
-
-			includes[ i ] = include.functionNode;
-
-		}
-
-	}
-
 	const functionNode = new FunctionNode( code, includes, language );
 
 	const fn = ( ...params ) => functionNode.call( ...params );
-	fn.functionNode = functionNode;
 
-	return fn;
+	return nodeProxyConstructor( fn, functionNode );
 
 };
 
@@ -44011,69 +44060,38 @@ const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow,
  */
 const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow, depthLayer } ) => {
 
-	const depthCompare = ( uv, compare ) => {
-
-		let depth = texture( depthTexture, uv );
-
-		if ( depthTexture.isArrayTexture ) {
-
-			depth = depth.depth( depthLayer );
-
-		}
-
-		return depth.compare( compare );
-
-	};
-
-
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 	const texelSize = vec2( 1 ).div( mapSize );
-	const dx = texelSize.x;
-	const dy = texelSize.y;
 
 	const uv = shadowCoord.xy;
-	const f = fract( uv.mul( mapSize ).add( 0.5 ) );
-	uv.subAssign( f.mul( texelSize ) );
+	const f = fract( uv.mul( mapSize ).add( 0.5 ) ).toConst();
+	uv.subAssign( f.sub( 0.5 ).mul( texelSize ) );
+
+	const gatherCompare = ( offset ) => {
+
+		let t = texture( depthTexture, uv ).offset( offset ).gather();
+
+		if ( depthTexture.isArrayTexture ) {
+
+			t = t.depth( depthLayer );
+
+		}
+
+		return t.compare( shadowCoord.z );
+
+	};
+
+	const c1 = gatherCompare( ivec2( -1, 1 ) ).toConst();
+	const c2 = gatherCompare( ivec2( 1, 1 ) ).toConst();
+	const c3 = gatherCompare( ivec2( -1, -1 ) ).toConst();
+	const c4 = gatherCompare( ivec2( 1, -1 ) ).toConst();
 
 	return add(
-		depthCompare( uv, shadowCoord.z ),
-		depthCompare( uv.add( vec2( dx, 0 ) ), shadowCoord.z ),
-		depthCompare( uv.add( vec2( 0, dy ) ), shadowCoord.z ),
-		depthCompare( uv.add( texelSize ), shadowCoord.z ),
-		mix(
-			depthCompare( uv.add( vec2( dx.negate(), 0 ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx.mul( 2 ), 0 ) ), shadowCoord.z ),
-			f.x
-		),
-		mix(
-			depthCompare( uv.add( vec2( dx.negate(), dy ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx.mul( 2 ), dy ) ), shadowCoord.z ),
-			f.x
-		),
-		mix(
-			depthCompare( uv.add( vec2( 0, dy.negate() ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( 0, dy.mul( 2 ) ) ), shadowCoord.z ),
-			f.y
-		),
-		mix(
-			depthCompare( uv.add( vec2( dx, dy.negate() ) ), shadowCoord.z ),
-			depthCompare( uv.add( vec2( dx, dy.mul( 2 ) ) ), shadowCoord.z ),
-			f.y
-		),
-		mix(
-			mix(
-				depthCompare( uv.add( vec2( dx.negate(), dy.negate() ) ), shadowCoord.z ),
-				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.negate() ) ), shadowCoord.z ),
-				f.x
-			),
-			mix(
-				depthCompare( uv.add( vec2( dx.negate(), dy.mul( 2 ) ) ), shadowCoord.z ),
-				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.mul( 2 ) ) ), shadowCoord.z ),
-				f.x
-			),
-			f.y
-		)
+		mix( c1.x, c2.y, f.x ).add( c1.y ).add( c2.x ).mul( f.y ),
+		mix( c1.w, c2.z, f.x ).add( c1.z ).add( c2.w ),
+		mix( c3.x, c4.y, f.x ).add( c3.y ).add( c4.x ),
+		mix( c3.w, c4.z, f.x ).add( c3.z ).add( c4.w ).mul( f.y.oneMinus() )
 	).mul( 1 / 9 );
 
 } );
@@ -48080,6 +48098,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	nodeObjectIntent: nodeObjectIntent,
 	nodeObjects: nodeObjects,
 	nodeProxy: nodeProxy,
+	nodeProxyConstructor: nodeProxyConstructor,
 	nodeProxyIntent: nodeProxyIntent,
 	normalFlat: normalFlat,
 	normalGeometry: normalGeometry,
@@ -57156,15 +57175,19 @@ class XRManager extends EventDispatcher {
 		const renderer = this._renderer;
 		const backend = renderer.backend;
 
-		this._gl = renderer.getContext();
-		const gl = this._gl;
-		const attributes = gl.getContextAttributes();
+		if ( session !== null && backend.isWebGPUBackend === true ) {
+
+			throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+
+		}
 
 		this._session = session;
 
 		if ( session !== null ) {
 
-			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+			this._gl = renderer.getContext();
+			const gl = this._gl;
+			const attributes = gl.getContextAttributes();
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
