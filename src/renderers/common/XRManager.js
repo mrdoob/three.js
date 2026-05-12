@@ -996,15 +996,19 @@ class XRManager extends EventDispatcher {
 		const renderer = this._renderer;
 		const backend = renderer.backend;
 
-		this._gl = renderer.getContext();
-		const gl = this._gl;
-		const attributes = gl.getContextAttributes();
+		if ( session !== null && backend.isWebGPUBackend === true ) {
+
+			throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+
+		}
 
 		this._session = session;
 
 		if ( session !== null ) {
 
-			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+			this._gl = renderer.getContext();
+			const gl = this._gl;
+			const attributes = gl.getContextAttributes();
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );

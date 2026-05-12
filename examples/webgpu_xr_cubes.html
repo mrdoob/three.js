@@ -34,9 +34,13 @@
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { setupWebGLXRFallback } from 'three/addons/webxr/WebGLXRFallback.js';
 
 			const timer = new THREE.Timer();
 			timer.connect( document );
+
+			const rendererParameters = { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: true };
+			const controllerModelFactory = new XRControllerModelFactory();
 
 			let container;
 			let camera, scene, raycaster, renderer;
@@ -101,26 +105,58 @@
 
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, outputBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer = createRenderer();
+				setRenderer( renderer );
+				setupWebGLXRFallback( renderer, () => createRenderer( true ), setRenderer );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				document.body.appendChild( XRButton.createButton( renderer ) );
+
+			}
+
+			function createRenderer( forceWebGL = false ) {
+
+				const parameters = { ...rendererParameters };
+
+				if ( forceWebGL === true ) parameters.forceWebGL = true;
+
+				const renderer = new THREE.WebGPURenderer( parameters );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
 
-				//
+				return renderer;
 
-				function onSelectStart() {
+			}
 
-					this.userData.isSelecting = true;
+			function setRenderer( newRenderer, oldRenderer = null ) {
+
+				if ( controller !== undefined ) scene.remove( controller );
+				if ( controllerGrip !== undefined ) scene.remove( controllerGrip );
+
+				if ( oldRenderer === null ) {
+
+					container.appendChild( newRenderer.domElement );
+
+				} else {
+
+					container.replaceChild( newRenderer.domElement, oldRenderer.domElement );
+					oldRenderer.dispose();
 
 				}
 
-				function onSelectEnd() {
+				renderer = newRenderer;
+				setupControllers();
 
-					this.userData.isSelecting = false;
+			}
 
-				}
+			function setupControllers() {
 
 				controller = renderer.xr.getController( 0 );
 				controller.addEventListener( 'selectstart', onSelectStart );
@@ -143,17 +179,21 @@
 				} );
 				scene.add( controller );
 
-				const controllerModelFactory = new XRControllerModelFactory();
-
 				controllerGrip = renderer.xr.getControllerGrip( 0 );
 				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
 				scene.add( controllerGrip );
 
-				window.addEventListener( 'resize', onWindowResize );
+			}
 
-				//
+			function onSelectStart() {
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				this.userData.isSelecting = true;
+
+			}
+
+			function onSelectEnd() {
+
+				this.userData.isSelecting = false;
 
 			}
 
