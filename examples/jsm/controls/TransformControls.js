@@ -290,6 +290,24 @@ class TransformControls extends Controls {
 		defineProperty( 'showXZ', true );
 
 		/**
+		 * Whether the xyze rotation helper should be visible or not.
+		 *
+		 * @name TransformControls#showXYZE
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXYZE', true );
+
+		/**
+		 * Whether the e rotation helper should be visible or not.
+		 *
+		 * @name TransformControls#showE
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showE', true );
+
+		/**
 		 * The minimum allowed X position during translation.
 		 *
 		 * @name TransformControls#minX
@@ -1846,6 +1864,10 @@ class TransformControlsGizmo extends Object3D {
 			handle.visible = handle.visible && ( handle.name.indexOf( 'XY' ) === - 1 || this.showXY );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'YZ' ) === - 1 || this.showYZ );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'XZ' ) === - 1 || this.showXZ );
+
+			// Hide disabled rotation helpers
+			handle.visible = handle.visible && ( handle.name !== 'E' || this.showE );
+			handle.visible = handle.visible && ( handle.name !== 'XYZE' || this.showXYZE );
 
 			// highlight selected axis
 
