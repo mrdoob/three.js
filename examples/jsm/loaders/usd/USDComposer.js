@@ -109,7 +109,7 @@ class USDComposer {
 		// Get FPS from root spec
 		const rootSpec = this.specsByPath[ '/' ];
 		const rootFields = rootSpec ? rootSpec.fields : {};
-		this.fps = rootFields.framesPerSecond || rootFields.timeCodesPerSecond || 30;
+		this.fps = rootFields.timeCodesPerSecond || rootFields.framesPerSecond || 24;
 
 		const group = new Group();
 		this._buildHierarchy( group, '/' );
