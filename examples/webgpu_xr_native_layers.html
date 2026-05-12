@@ -45,6 +45,7 @@
 			} from 'three/addons/misc/RollerCoaster.js';
 			import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { setWebGLXRFallback } from 'three/addons/webxr/WebGLXRFallback.js';
 
 			let camera, scene, renderer;
 			let controller1, controller2;
@@ -185,7 +186,10 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, outputBufferType: THREE.UnsignedByteType, multiview: true } );
+				const rendererParameters = { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: true };
+				setWebGLXRFallback( rendererParameters );
+
+				renderer = new THREE.WebGPURenderer( rendererParameters );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
