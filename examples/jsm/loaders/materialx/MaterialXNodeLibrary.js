@@ -745,9 +745,9 @@ const MXElements = [
 		valuel: defaultFloat( 0 ),
 		valuer: defaultFloat( 0 ),
 	} ),
-	createMXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ], {
-		valuet: defaultFloat( 0 ),
+	createMXElement( 'ramptb', mx_ramptb, [ 'valueb', 'valuet', 'texcoord' ], {
 		valueb: defaultFloat( 0 ),
+		valuet: defaultFloat( 0 ),
 	} ),
 	createMXElement( 'ramp4', mx_ramp4, [ 'valuetl', 'valuetr', 'valuebl', 'valuebr', 'texcoord' ], {
 		valuetl: defaultColor( 0, 0, 0 ),
@@ -833,9 +833,9 @@ const MXElements = [
 		valuer: defaultFloat( 0 ),
 		center: defaultFloat( 0.5 ),
 	} ),
-	createMXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'center', 'texcoord' ], {
-		valuet: defaultFloat( 0 ),
+	createMXElement( 'splittb', mx_splittb, [ 'valueb', 'valuet', 'center', 'texcoord' ], {
 		valueb: defaultFloat( 0 ),
+		valuet: defaultFloat( 0 ),
 		center: defaultFloat( 0.5 ),
 	} ),
 	createMXElement( 'noise2d', mx_noise_materialx, [ 'texcoord', 'amplitude', 'pivot' ], {

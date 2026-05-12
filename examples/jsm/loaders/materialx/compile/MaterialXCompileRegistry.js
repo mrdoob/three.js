@@ -34,6 +34,7 @@ import {
 	mx_atan2,
 	pow,
 	sqrt,
+	sign,
 } from 'three/tsl';
 import {
 	getComponentCountForType,
@@ -291,33 +292,15 @@ const compileRangeNode = ( nodeX ) => {
 	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
 	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
 	const normalized = div( sub( inNode, inLow ), safeDenominator );
-	const safeGamma = max( abs( gamma ), float( 1e-8 ) );
-	const gammaApplied = pow( normalized, div( float( 1 ), safeGamma ) );
+	// Match stdlib range nodegraph semantics:
+	// gamma stage is sign(normalized) * pow(abs(normalized), 1 / gamma).
+	const reciprocalGamma = div( float( 1 ), gamma );
+	const gammaApplied = mul( pow( abs( normalized ), reciprocalGamma ), sign( normalized ) );
 	const remapped = add( mul( gammaApplied, sub( outHigh, outLow ) ), outLow );
 	const result = isDegenerate.select( outLow, remapped );
 	const clamped = min( max( result, outLow ), outHigh );
 
 	return toBooleanNode( doClamp ).select( clamped, result );
-
-};
-
-const compileRamplrNode = ( nodeX, compileContext ) => {
-
-	const texcoord = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
-	const valuel = nodeX.getNodeByName( 'valuel' ) || float( 0 );
-	const valuer = nodeX.getNodeByName( 'valuer' ) || float( 1 );
-	const t = min( max( element( texcoord, 0 ), float( 0 ) ), float( 1 ) );
-	return mix( valuel, valuer, t );
-
-};
-
-const compileRamptbNode = ( nodeX, compileContext ) => {
-
-	const texcoord = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
-	const valueb = nodeX.getNodeByName( 'valueb' ) || float( 0 );
-	const valuet = nodeX.getNodeByName( 'valuet' ) || float( 1 );
-	const t = min( max( element( texcoord, 1 ), float( 0 ) ), float( 1 ) );
-	return mix( valueb, valuet, t );
 
 };
 
@@ -918,8 +901,6 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'normalize' ], ( nodeX ) => compileNormalizeNode( nodeX ) );
 	register( registry, [ 'range' ], ( nodeX ) => compileRangeNode( nodeX ) );
 	register( registry, [ 'remap' ], ( nodeX ) => compileRemapNode( nodeX ) );
-	register( registry, [ 'ramplr' ], ( nodeX, out, compileContext ) => compileRamplrNode( nodeX, compileContext ) );
-	register( registry, [ 'ramptb' ], ( nodeX, out, compileContext ) => compileRamptbNode( nodeX, compileContext ) );
 	register( registry, [ 'position' ], ( nodeX ) => compileSpaceInputNode( nodeX, positionLocal, positionWorld ) );
 	register( registry, [ 'normal' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, normalLocal, normalWorld ) );
 	register( registry, [ 'tangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, tangentLocal, tangentWorld ) );
