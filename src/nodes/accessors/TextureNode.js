@@ -813,7 +813,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Gathers four texels from the texture.
 	 *
-	 * @param {[Node<int>]} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
+	 * @param {Node<int>} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
 	 * @return {TextureNode} A texture node representing the texture sample.
 	 */
 	gather( gatherNode = 0 ) {

@@ -318,7 +318,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {{ output: Texture, depth?: DepthTexture }}
+		 * @type {{ output: Texture, depth: ?DepthTexture }}
 		 */
 		this._textures = {
 			output: renderTarget.texture
