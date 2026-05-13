@@ -2,6 +2,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
 import { error } from '../utils.js';
+import { WebGPUCoordinateSystem } from '../constants.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 
@@ -126,7 +127,23 @@ class Raycaster {
 
 		} else if ( camera.isOrthographicCamera ) {
 
-			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
+			let coordsZ;
+
+			if ( camera.reversedDepth ) {
+
+				coordsZ = camera.far / ( camera.far - camera.near );
+
+			} else if ( camera.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				coordsZ = camera.near / ( camera.near - camera.far );
+
+			} else {
+
+				coordsZ = ( camera.near + camera.far ) / ( camera.near - camera.far );
+
+			}
+
+			this.ray.origin.set( coords.x, coords.y, coordsZ ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
 			this.camera = camera;
 
