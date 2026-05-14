@@ -27,8 +27,9 @@
 			import * as THREE from 'three/webgpu';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
-			import { VRButtonGPU } from 'three/addons/webxr/VRButtonGPU.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { setupWebGLXRFallback } from 'three/addons/webxr/WebGLXRFallback.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -43,6 +44,9 @@
 			const intersected = [];
 
 			let group;
+
+			const rendererParameters = { antialias: false, outputBufferType: THREE.UnsignedByteType, multiview: true };
+			const controllerModelFactory = new XRControllerModelFactory();
 
 			init();
 
@@ -117,14 +121,62 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: false, outputBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer = createRenderer();
+				setRenderer( renderer );
+				setupWebGLXRFallback( renderer, () => createRenderer( true ), setRenderer );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				raycaster = new THREE.Raycaster();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createRenderer( forceWebGL = false ) {
+
+				const parameters = { ...rendererParameters };
+
+				if ( forceWebGL === true ) parameters.forceWebGL = true;
+
+				const renderer = new THREE.WebGPURenderer( parameters );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( VRButtonGPU.createButton( renderer ) );
+				return renderer;
+
+			}
+
+			function setRenderer( newRenderer, oldRenderer = null ) {
+
+				if ( controller1 !== undefined ) scene.remove( controller1 );
+				if ( controller2 !== undefined ) scene.remove( controller2 );
+				if ( controllerGrip1 !== undefined ) scene.remove( controllerGrip1 );
+				if ( controllerGrip2 !== undefined ) scene.remove( controllerGrip2 );
+
+				if ( oldRenderer === null ) {
+
+					container.appendChild( newRenderer.domElement );
+
+				} else {
+
+					container.replaceChild( newRenderer.domElement, oldRenderer.domElement );
+					oldRenderer.dispose();
+
+				}
+
+				renderer = newRenderer;
+				setupControllers();
+
+			}
+
+			function setupControllers() {
 
 				// controllers
 
@@ -137,8 +189,6 @@
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
-
-				const controllerModelFactory = new XRControllerModelFactory();
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
@@ -158,12 +208,6 @@
 
 				controller1.add( line.clone() );
 				controller2.add( line.clone() );
-
-				raycaster = new THREE.Raycaster();
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
