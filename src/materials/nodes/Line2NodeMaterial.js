@@ -141,7 +141,11 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
 			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
-			const nearEstimate = b.mul( - 0.5 ).div( a );
+
+			// we need different nearEstimate formular for reversed and default depth buffer
+			// a is positive with a reversed depth buffer so it can be used for controlling the code flow
+
+			const nearEstimate = a.greaterThan( 0 ).select( b.negate().div( a.add( 1 ) ), b.mul( - 0.5 ).div( a ) );
 
 			const alpha = nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
