@@ -43,7 +43,8 @@ function _loadState() {
 	_state = {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
-		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {}
+		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {},
+		storage: settings.storage !== undefined ? settings.storage : 'url'
 	};
 
 	if ( _state.forceWebGL ) {
@@ -67,7 +68,8 @@ function _saveState() {
 	setItem( 'settings', {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
-		activeExtensions: _state.activeExtensions
+		activeExtensions: _state.activeExtensions,
+		storage: _state.storage
 	} );
 
 }
@@ -113,6 +115,28 @@ class Settings extends Parameters {
 	init() {
 
 		const extensionsGroup = this.createGroup( 'Extensions' );
+
+		const storageGroup = this.createGroup( 'Storage' );
+
+		const currentState = _loadState();
+
+		storageGroup.add( currentState, 'storage', { 'URL Session Only': 'url', 'Keep across Domain': 'domain' } ).name( 'Save Settings' ).onChange( () => {
+
+			_saveState();
+
+		} );
+
+		const storageOptions = {
+			clear: () => {
+
+				localStorage.removeItem( 'threejs-inspector' );
+
+				location.reload();
+
+			}
+		};
+
+		storageGroup.add( storageOptions, 'clear' ).name( 'Clear Settings' );
 
 		this._getExtensions().then( extensions => {
 

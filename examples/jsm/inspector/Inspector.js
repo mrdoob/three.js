@@ -466,7 +466,7 @@ class Inspector extends RendererInspector {
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( this.profiler.toggleButton.querySelector('.fps-counter'), this.fps.toFixed() );
+			setText( this.profiler.toggleButton.querySelector( '.fps-counter' ), this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
 			this.memory.updateText( this );
@@ -498,25 +498,20 @@ class Inspector extends RendererInspector {
 
 	}
 
-	static getItem( id ) {
-
-		console.warn( 'Inspector.getItem is deprecated. Use getItem directly instead.' );
-		return getItem( id );
-
-	}
-
-	static setItem( id, state ) {
-
-		console.warn( 'Inspector.setItem is deprecated. Use setItem directly instead.' );
-		setItem( id, state );
-
-	}
-
 }
 
 function getItem( id ) {
 
 	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
+
+	if ( data.settings && data.settings.storage === 'url' && data.settings.url !== location.href ) {
+
+		localStorage.removeItem( 'threejs-inspector' );
+
+		return {};
+
+	}
+
 	return data[ id ] || {};
 
 }
@@ -534,6 +529,10 @@ function setItem( id, state ) {
 		data[ id ] = state;
 
 	}
+
+	data.settings = data.settings || {};
+	data.settings.url = data.settings.url || location.href;
+	data.settings.storage = data.settings.storage || 'url';
 
 	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
