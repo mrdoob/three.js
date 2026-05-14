@@ -120,7 +120,7 @@ class Settings extends Parameters {
 
 		const currentState = _loadState();
 
-		storageGroup.add( currentState, 'storage', { 'URL Session Only': 'url', 'Keep across Domain': 'domain' } ).name( 'Save Settings' ).onChange( () => {
+		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Domain': 'domain' } ).name( 'Save Settings' ).onChange( () => {
 
 			_saveState();
 
