@@ -504,7 +504,8 @@ function getItem( id ) {
 
 	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
 
-	if ( data.settings && data.settings.storage === 'url' && data.settings.url !== location.href ) {
+	if ( data.version !== REVISION ||
+		 data.settings && ( data.settings.storage === 'url' && data.settings.url !== location.href ) ) {
 
 		localStorage.removeItem( 'threejs-inspector' );
 
@@ -533,6 +534,7 @@ function setItem( id, state ) {
 	data.settings = data.settings || {};
 	data.settings.url = data.settings.url || location.href;
 	data.settings.storage = data.settings.storage || 'url';
+	data.version = REVISION;
 
 	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
