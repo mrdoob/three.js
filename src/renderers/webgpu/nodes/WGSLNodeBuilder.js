@@ -238,6 +238,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 */
 		this.allowEarlyReturns = true;
 
+		/**
+		 * A flag that indicates that global variables are allowed.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.allowGlobalVariables = true;
+
 	}
 
 	/**
@@ -344,7 +352,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -436,7 +444,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureDimension( texture, textureProperty, levelSnippet ) {
 
-		const textureData = this.getDataFromNode( texture, this.shaderStage, this.globalCache );
+		const textureData = this.getDataFromNode( texture, this.shaderStage, this.cache );
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
@@ -843,6 +851,80 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} gatherSnippet - A WGSL snippet that represents the index of the channel to read.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
+
+		const componentSnippet = texture.isDepthTexture === true ? '' : `${gatherSnippet}, `;
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet })`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet })`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet })`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet when sampling textures with explicit mip level.
 	 *
 	 * @param {Texture} texture - The texture.
@@ -1119,7 +1201,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				// Also textureGather always need sampler.
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -1741,11 +1824,12 @@ ${ flowData.code }
 	 * @param {string} type - The variable's type.
 	 * @param {string} name - The variable's name.
 	 * @param {?number} [count=null] - The array length.
+	 * @param {string} [qualifier=''] - The variable's qualifier.
 	 * @return {string} The WGSL snippet that defines a variable.
 	 */
-	getVar( type, name, count = null ) {
+	getVar( type, name, count = null, qualifier = '' ) {
 
-		let snippet = `var ${ name } : `;
+		let snippet = `var${ qualifier } ${ name } : `;
 
 		if ( count !== null ) {
 
@@ -1767,7 +1851,15 @@ ${ flowData.code }
 	 * @param {string} shaderStage - The shader stage.
 	 * @return {string} The WGSL snippet that defines the variables.
 	 */
-	getVars( shaderStage ) {
+	getVars( shaderStage, global = false ) {
+
+		let qualifier = '';
+
+		if ( global ) {
+
+			qualifier = '<private>';
+
+		}
 
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
@@ -1776,13 +1868,13 @@ ${ flowData.code }
 
 			for ( const variable of vars ) {
 
-				snippets.push( `\t${ this.getVar( variable.type, variable.name, variable.count ) };` );
+				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count, qualifier ) };` );
 
 			}
 
 		}
 
-		return `\n${ snippets.join( '\n' ) }\n`;
+		return global ? snippets.join( '\n' ) : `\n\t${ snippets.join( '\n\t' ) }\n`;
 
 	}
 
@@ -1876,6 +1968,7 @@ ${ flowData.code }
 	 */
 	getUniforms( shaderStage ) {
 
+		const backend = this.renderer.backend;
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
@@ -1890,14 +1983,16 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				// Also textureGather always need sampler.
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) ) {
+					if ( this.isSampleCompare( texture ) && textureNode.compareNode !== null ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -1913,7 +2008,7 @@ ${ flowData.code }
 
 				let multisampled = '';
 
-				const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+				const { primarySamples } = backend.utils.getTextureSampleData( texture );
 
 				if ( primarySamples > 1 ) {
 
@@ -1931,7 +2026,7 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					if ( this.renderer.backend.compatibilityMode && texture.compareFunction === null ) {
+					if ( backend.compatibilityMode && texture.compareFunction === null ) {
 
 						textureType = `texture${ multisampled }_2d<f32>`;
 
@@ -1943,7 +2038,7 @@ ${ flowData.code }
 
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
-					const format = getFormat( texture );
+					const format = getFormat( texture, backend.device );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
 					const is3D = uniform.node.value.is3DTexture;
@@ -2071,12 +2166,14 @@ ${ flowData.code }
 
 			this.shaderStage = shaderStage;
 
+			const allowGlobal = this.allowGlobalVariables;
+
 			const stageData = shadersData[ shaderStage ];
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
 			stageData.structs = this.getStructs( shaderStage );
-			stageData.vars = this.getVars( shaderStage );
+			stageData.vars = this.getVars( shaderStage, allowGlobal );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
 			stageData.scopedArrays = this.getScopedArrays( shaderStage );
@@ -2351,14 +2448,14 @@ ${shaderData.uniforms}
 ${shaderData.varyings}
 var<private> varyings : VaryingsStruct;
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 @vertex
 fn main( ${shaderData.attributes} ) -> VaryingsStruct {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -2389,14 +2486,14 @@ ${shaderData.structs}
 // uniforms
 ${shaderData.uniforms}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 @fragment
 fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -2434,19 +2531,22 @@ ${ shaderData.structs }
 // uniforms
 ${ shaderData.uniforms }
 
+// vars
+${ this.allowGlobalVariables ? shaderData.vars : '' }
+
 // codes
 ${ shaderData.codes }
 
 @compute @workgroup_size( ${ workgroupSizeX }, ${ workgroupSizeY }, ${ workgroupSizeZ } )
 fn main( ${ shaderData.attributes } ) {
 
+	// local vars
+	${ this.allowGlobalVariables ? '' : shaderData.vars }
+
 	// system
 	instanceIndex = globalId.x
 		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
 		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
-
-	// vars
-	${ shaderData.vars }
 
 	// flow
 	${ shaderData.flow }

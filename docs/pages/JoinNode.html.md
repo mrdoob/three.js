@@ -28,7 +28,7 @@ An array of nodes that should be joined.
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 This method is overwritten since the node type must be inferred from the joined data length if not explicitly defined.
 
@@ -36,7 +36,7 @@ This method is overwritten since the node type must be inferred from the joined 
 
 The current node builder.
 
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
 
 **Returns:** The node type.
 

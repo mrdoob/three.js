@@ -23,7 +23,7 @@ import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
-import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
+import { premultiplyAlpha } from '../../nodes/display/PremultiplyAlphaFunctions.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
 
 /**

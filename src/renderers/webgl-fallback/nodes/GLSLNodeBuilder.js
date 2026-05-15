@@ -11,7 +11,67 @@ import { error } from '../../../utils.js';
 
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' )
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
+	textureGather: new CodeNode( /* glsl */`
+vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, ij.xw, 0.0 )[ comp ],
+		textureLod( map, ij.zw, 0.0 )[ comp ],
+		textureLod( map, ij.zy, 0.0 )[ comp ],
+		textureLod( map, ij.xy, 0.0 )[ comp ]
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGather_array( const int comp, sampler2DArray map, vec3 coord, ivec2 offset, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, vec3( ij.xw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zw, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.zy, coord.z ), 0.0 )[ comp ],
+		textureLod( map, vec3( ij.xy, coord.z ), 0.0 )[ comp ]
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherCompare: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare( sampler2DShadow map, vec2 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ) );
+	vec2 st = floor( coord * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		textureLod( map, vec3( ij.xw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zw, ref ), 0.0 ),
+		textureLod( map, vec3( ij.zy, ref ), 0.0 ),
+		textureLod( map, vec3( ij.xy, ref ), 0.0 )
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` ),
+	textureGatherCompareArray: new CodeNode( /* glsl */`
+vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2 offset, float ref, bool flipY ) {
+	if ( flipY ) offset.y = - offset.y;
+	vec2 size = vec2( textureSize( map, 0 ).xy );
+	vec2 st = floor( coord.xy * size + vec2( offset ) - 0.5 );
+	vec4 ij = vec4( st + 0.5, st + 1.5 ) / size.xyxy;
+	vec4 ret = vec4(
+		texture( map, vec4( ij.xw, coord.z, ref ) ),
+		texture( map, vec4( ij.zw, coord.z, ref ) ),
+		texture( map, vec4( ij.zy, coord.z, ref ) ),
+		texture( map, vec4( ij.xy, coord.z, ref ) )
+	);
+	return flipY ? ret.wzyx : ret;
+}
+` )
 };
 
 const glslMethods = {
@@ -182,7 +242,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 *
 	 * @param {string} type - The output type to bitcast to.
 	 * @param {string} inputType - The input type of the.
-	 * @return {string} The resolved WGSL bitcast invocation.
+	 * @return {string} The resolved GLSL bitcast invocation.
 	 */
 	getBitcastMethod( type, inputType ) {
 
@@ -478,11 +538,11 @@ ${ flowData.code }
 
 			if ( offsetSnippet ) {
 
-				snippet = `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet }, ${ offsetSnippet } )`;
+				snippet = `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), int( ${ levelSnippet } ), ${ offsetSnippet } )`;
 
 			} else {
 
-				snippet = `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
+				snippet = `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), int( ${ levelSnippet } ) )`;
 
 			}
 
@@ -490,11 +550,11 @@ ${ flowData.code }
 
 			if ( offsetSnippet ) {
 
-				snippet = `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+				snippet = `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, int( ${ levelSnippet } ), ${ offsetSnippet } )`;
 
 			} else {
 
-				snippet = `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
+				snippet = `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, int( ${ levelSnippet } ) )`;
 
 			}
 
@@ -666,28 +726,68 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the variables of the given shader stage as a GLSL string.
+	 * Generates the GLSL snippet for gathering four texels from the given texture.
 	 *
-	 * @param {string} shaderStage - The shader stage.
-	 * @return {string} The GLSL snippet that defines the variables.
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} gatherSnippet - A GLSL snippet that represents the index of the channel to read.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A GLSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The GLSL snippet.
 	 */
-	getVars( shaderStage ) {
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet ) {
 
-		const snippets = [];
+		if ( texture.isDepthTexture ) gatherSnippet = '0';
 
-		const vars = this.vars[ shaderStage ];
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
 
-		if ( vars !== undefined ) {
+		if ( flipYSnippet === null ) flipYSnippet = 'false';
 
-			for ( const variable of vars ) {
+		if ( depthSnippet ) {
 
-				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count ) };` );
+			this._include( 'textureGatherArray' );
 
-			}
+			return `tsl_textureGather_array( ${gatherSnippet}, ${ textureProperty }, vec3( ${ uvSnippet }, ${ depthSnippet } ), ${ offsetSnippet }, ${ flipYSnippet } )`;
 
 		}
 
-		return snippets.join( '\n\t' );
+		this._include( 'textureGather' );
+
+		return `tsl_textureGather( ${gatherSnippet}, ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ flipYSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the GLSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A GLSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A GLSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, flipYSnippet ) {
+
+		if ( offsetSnippet === null ) offsetSnippet = 'ivec2( 0 )';
+
+		if ( flipYSnippet === null ) flipYSnippet = 'false';
+
+		if ( depthSnippet ) {
+
+			this._include( 'textureGatherCompareArray' );
+
+			return `tsl_textureGatherCompare_array( ${ textureProperty }, vec3( ${ uvSnippet }, ${depthSnippet} ), ${ offsetSnippet }, ${ compareSnippet }, ${ flipYSnippet } )`;
+
+		}
+
+		this._include( 'textureGatherCompare' );
+
+		return `tsl_textureGatherCompare( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ compareSnippet }, ${ flipYSnippet } )`;
 
 	}
 
@@ -711,7 +811,8 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				let typePrefix = '';
 
@@ -733,7 +834,7 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction ) {
+				} else if ( texture.compareFunction && textureNode.compareNode !== null ) {
 
 					if ( texture.isArrayTexture === true ) {
 
@@ -972,7 +1073,7 @@ ${ flowData.code }
 
 		}
 
-		if ( outputSnippet.length === 0 ) {
+		if ( shaderStage === 'fragment' && outputSnippet.length === 0 ) {
 
 			outputSnippet.push( `layout( location = 0 ) out ${ this.getOutputType() } fragColor;` );
 
@@ -1416,6 +1517,9 @@ ${shaderData.extensions}
 // precision
 ${ defaultPrecisions }
 
+// structs
+${shaderData.structs}
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -1425,13 +1529,13 @@ ${shaderData.varyings}
 // attributes
 ${shaderData.attributes}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 void main() {
-
-	// vars
-	${shaderData.vars}
 
 	// transforms
 	${shaderData.transforms}
@@ -1474,13 +1578,13 @@ ${shaderData.uniforms}
 // varyings
 ${shaderData.varyings}
 
+// vars
+${shaderData.vars}
+
 // codes
 ${shaderData.codes}
 
 void main() {
-
-	// vars
-	${shaderData.vars}
 
 	// flow
 	${shaderData.flow}
@@ -1552,7 +1656,7 @@ void main() {
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
-			stageData.vars = this.getVars( shaderStage );
+			stageData.vars = this.getVars( shaderStage, true );
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.transforms = this.getTransforms( shaderStage );

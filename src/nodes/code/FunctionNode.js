@@ -1,4 +1,5 @@
 import CodeNode from './CodeNode.js';
+import { nodeProxyConstructor } from '../tsl/TSLCore.js';
 
 /**
  * This class represents a native shader function. It can be used to implement
@@ -155,26 +156,11 @@ export default FunctionNode;
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 
-	for ( let i = 0; i < includes.length; i ++ ) {
-
-		const include = includes[ i ];
-
-		// TSL Function: glslFn, wgslFn
-
-		if ( typeof include === 'function' ) {
-
-			includes[ i ] = include.functionNode;
-
-		}
-
-	}
-
 	const functionNode = new FunctionNode( code, includes, language );
 
 	const fn = ( ...params ) => functionNode.call( ...params );
-	fn.functionNode = functionNode;
 
-	return fn;
+	return nodeProxyConstructor( fn, functionNode );
 
 };
 

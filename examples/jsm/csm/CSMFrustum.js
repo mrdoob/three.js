@@ -28,6 +28,13 @@ class CSMFrustum {
 		this.zNear = data.webGL === true ? - 1 : 0;
 
 		/**
+		 * The zFar value.
+		 *
+		 * @type {number}
+		 */
+		this.zFar = 1;
+
+		/**
 		 * An object representing the vertices of the near and
 		 * far plane in view space.
 		 *
@@ -54,6 +61,15 @@ class CSMFrustum {
 
 		}
 
+		// In case of reversed depth buffer, zNear and zFar must be 1 and 0
+		// respectively regardless of the coordinate system.
+		if ( data.reversedDepth === true ) {
+
+			this.zNear = 1;
+			this.zFar = 0;
+
+		}
+
 	}
 
 	/**
@@ -66,6 +82,7 @@ class CSMFrustum {
 	setFromProjectionMatrix( projectionMatrix, maxFar ) {
 
 		const zNear = this.zNear;
+		const zFar = this.zFar;
 		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
 
 		inverseProjectionMatrix.copy( projectionMatrix ).invert();
@@ -85,10 +102,10 @@ class CSMFrustum {
 
 		} );
 
-		this.vertices.far[ 0 ].set( 1, 1, 1 );
-		this.vertices.far[ 1 ].set( 1, - 1, 1 );
-		this.vertices.far[ 2 ].set( - 1, - 1, 1 );
-		this.vertices.far[ 3 ].set( - 1, 1, 1 );
+		this.vertices.far[ 0 ].set( 1, 1, zFar );
+		this.vertices.far[ 1 ].set( 1, - 1, zFar );
+		this.vertices.far[ 2 ].set( - 1, - 1, zFar );
+		this.vertices.far[ 3 ].set( - 1, 1, zFar );
 		this.vertices.far.forEach( function ( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
@@ -128,6 +145,9 @@ class CSMFrustum {
 
 		target.length = breaks.length;
 
+		const near = this.vertices.near[ 0 ].z;
+		const far = this.vertices.far[ 0 ].z;
+
 		for ( let i = 0; i < breaks.length; i ++ ) {
 
 			const cascade = target[ i ];
@@ -142,9 +162,11 @@ class CSMFrustum {
 
 			} else {
 
+				const alpha = ( breaks[ i - 1 ] * far - near ) / ( far - near );
+
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] );
+					cascade.vertices.near[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha );
 
 				}
 
@@ -160,9 +182,11 @@ class CSMFrustum {
 
 			} else {
 
+				const alpha = ( breaks[ i ] * far - near ) / ( far - near );
+
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] );
+					cascade.vertices.far[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha );
 
 				}
 
@@ -202,6 +226,7 @@ class CSMFrustum {
  *
  * @typedef {Object} CSMFrustum~Data
  * @property {boolean} [webGL] - Whether this CSM frustum is used with WebGL or WebGPU.
+ * @property {boolean} [reversedDepth] - Whether reversed depth buffer is enabled.
  * @property {Matrix4} [projectionMatrix] - A projection matrix usually of the scene's camera.
  * @property {number} [maxFar] - The maximum far value.
  **/

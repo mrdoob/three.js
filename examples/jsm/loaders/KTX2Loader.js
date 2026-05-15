@@ -42,7 +42,8 @@ import {
 	SRGBColorSpace,
 	UnsignedByteType,
 	UnsignedInt5999Type,
-	UnsignedInt101111Type
+	UnsignedInt101111Type,
+	UnsignedShortType
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -83,6 +84,7 @@ import {
 	VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG,
 	VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG,
 	VK_FORMAT_R16G16B16A16_SFLOAT,
+	VK_FORMAT_R16G16B16A16_UNORM,
 	VK_FORMAT_R16G16_SFLOAT,
 	VK_FORMAT_R16_SFLOAT,
 	VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -964,6 +966,8 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R16G16_SFLOAT ]: RGFormat,
 	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
 
+	[ VK_FORMAT_R16G16B16A16_UNORM ]: RGBAFormat,
+
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
 	[ VK_FORMAT_R8G8_SRGB ]: RGFormat,
@@ -1021,6 +1025,8 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R16G16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
+
+	[ VK_FORMAT_R16G16B16A16_UNORM ]: UnsignedShortType,
 
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
@@ -1149,7 +1155,7 @@ async function createRawTexture( container ) {
 
 			);
 
-		} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType ) {
+		} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType || TYPE_MAP[ vkFormat ] === UnsignedShortType ) {
 
 			data = new Uint16Array(
 

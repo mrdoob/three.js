@@ -52,14 +52,6 @@ A node holding the strength of the effect.
 
 The texture node that represents the input of the effect.
 
-### .updateBeforeType : string
-
-The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates its internal uniforms once per frame in `updateBefore()`.
-
-Default is `'frame'`.
-
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
-
 ## Methods
 
 ### .setup( builder : NodeBuilder ) : ShaderCallNodeInternal
@@ -71,16 +63,6 @@ This method is used to setup the effect's TSL code.
 The current node builder.
 
 **Overrides:** [TempNode#setup](TempNode.html#setup)
-
-### .updateBefore( frame : NodeFrame )
-
-This method is used to update the effect's uniforms once per frame.
-
-**frame**
-
-The current node frame.
-
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
 
 ## Source
 

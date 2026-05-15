@@ -55,6 +55,15 @@ class UniformsGroup extends UniformBuffer {
 		 */
 		this._updateRangeCache = new Map();
 
+		/**
+		 * Uniform indices whose range has already been pushed into `updateRanges`
+		 * during the current update cycle. Reset on `clearUpdateRanges()`.
+		 *
+		 * @private
+		 * @type {Set<number>}
+		 */
+		this._addedIndices = new Set();
+
 	}
 
 	/**
@@ -66,20 +75,22 @@ class UniformsGroup extends UniformBuffer {
 
 		const index = uniform.index;
 
-		if ( this._updateRangeCache.has( index ) !== true ) {
+		if ( this._addedIndices.has( index ) ) return;
 
-			const updateRanges = this.updateRanges;
+		let range = this._updateRangeCache.get( index );
 
-			const start = uniform.offset;
-			const count = uniform.itemSize;
+		if ( range === undefined ) {
 
-			const range = { start, count };
-
-			updateRanges.push( range );
-
+			range = { start: 0, count: 0 };
 			this._updateRangeCache.set( index, range );
 
 		}
+
+		range.start = uniform.offset;
+		range.count = uniform.itemSize;
+
+		this._addedIndices.add( index );
+		this.updateRanges.push( range );
 
 	}
 
@@ -88,7 +99,7 @@ class UniformsGroup extends UniformBuffer {
 	 */
 	clearUpdateRanges() {
 
-		this._updateRangeCache.clear();
+		this._addedIndices.clear();
 
 		super.clearUpdateRanges();
 
@@ -235,6 +246,17 @@ class UniformsGroup extends UniformBuffer {
 		}
 
 		return updated;
+
+	}
+
+	/**
+	 * Releases the buffer.
+	 */
+	release() {
+
+		super.release();
+
+		this._values = null;
 
 	}
 

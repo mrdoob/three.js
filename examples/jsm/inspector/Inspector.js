@@ -466,7 +466,7 @@ class Inspector extends RendererInspector {
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.fps.toFixed() );
+			setText( this.profiler.toggleButton.querySelector('.fps-counter'), this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
 			this.memory.updateText( this );

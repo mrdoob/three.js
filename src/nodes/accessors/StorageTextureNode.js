@@ -99,6 +99,20 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * Overwrites the default implementation since storage texture
+	 * coordinates are texel coordinates and should not be transformed
+	 * by the texture uv matrix.
+	 *
+	 * @param {Node} uvNode - The uv node.
+	 * @return {Node} The unmodified uv node.
+	 */
+	getTransformedUV( uvNode ) {
+
+		return uvNode;
+
+	}
+
 	setup( builder ) {
 
 		super.setup( builder );
@@ -213,6 +227,27 @@ class StorageTextureNode extends TextureNode {
 	}
 
 	/**
+	 * Stores a value in this storage texture at the given coordinates.
+	 *
+	 * @param {Node<vec2|vec3>} uvNode - The storage texture coordinates.
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
+	 * @return {StorageTextureNode} A storage texture node representing the store operation.
+	 */
+	store( uvNode, storeNode ) {
+
+		const node = this.clone();
+
+		node.referenceNode = this.getBase();
+		node.uvNode = uvNode;
+		node.storeNode = storeNode;
+
+		if ( storeNode !== null ) node.toStack();
+
+		return node;
+
+	}
+
+	/**
 	 * Generates the code snippet of the storage texture node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -266,7 +301,7 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
  *
  * @tsl
  * @function
- * @param {StorageTexture} value - The storage texture.
+ * @param {StorageTexture|StorageTextureNode} value - The storage texture.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
@@ -277,18 +312,15 @@ export const textureStore = ( value, uvNode, storeNode ) => {
 
 	if ( value.isStorageTextureNode === true ) {
 
-		// Derive new storage texture node from existing one
-		node = value.clone();
-		node.uvNode = uvNode;
-		node.storeNode = storeNode;
+		node = value.store( uvNode, storeNode );
 
 	} else {
 
 		node = storageTexture( value, uvNode, storeNode );
 
-	}
+		if ( storeNode !== null ) node.toStack();
 
-	if ( storeNode !== null ) node.toStack();
+	}
 
 	return node;
 

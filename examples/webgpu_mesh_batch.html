@@ -4,6 +4,10 @@
 	<title>three.js webgpu - batch mesh</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - batch mesh">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_mesh_batch.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_mesh_batch.jpg">
 	<link type="text/css" rel="stylesheet" href="example.css">
 </head>
 <body>
@@ -38,7 +42,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
-		import { normalView, directionToColor, diffuseColor } from 'three/tsl';
+		import { normalView, directionToColor, diffuseColor, vec4 } from 'three/tsl';
 
 		let camera, scene, renderer;
 		let controls;
@@ -126,7 +130,10 @@
 			if ( ! material ) {
 
 				material = new THREE.MeshBasicNodeMaterial();
-				material.outputNode = diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) );
+				material.outputNode = vec4(
+					diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) ).rgb,
+					diffuseColor.a,
+				);
 		
 	}
 

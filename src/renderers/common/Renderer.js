@@ -595,6 +595,17 @@ class Renderer {
 		this.onDeviceLost = this._onDeviceLost;
 
 		/**
+		 * A callback function that defines what should happen when an uncaptured
+		 * backend error is reported (e.g. a WebGPU validation/out-of-memory/internal
+		 * error raised outside an error scope). Applications can override this to
+		 * surface errors in their own UI without letting them escalate to a device
+		 * loss. The default implementation logs to the console.
+		 *
+		 * @type {Function}
+		 */
+		this.onError = this._onError;
+
+		/**
 		 * Defines the type of output buffers. The default `HalfFloatType` is recommend for
 		 * best quality. To save memory and bandwidth, `UnsignedByteType` might be used.
 		 * This will reduce rendering quality though.
@@ -1197,6 +1208,26 @@ class Renderer {
 	}
 
 	/**
+	 * Default implementation of the uncaptured backend error callback.
+	 *
+	 * @private
+	 * @param {Object} info - Information about the uncaptured error.
+	 */
+	_onError( info ) {
+
+		let errorMessage = `WebGPURenderer: Uncaptured ${ info.api } ${ info.type }`;
+
+		if ( info.message ) {
+
+			errorMessage += `: ${ info.message }`;
+
+		}
+
+		error( errorMessage );
+
+	}
+
+	/**
 	 * Renders the given render bundle.
 	 *
 	 * @private
@@ -1212,17 +1243,11 @@ class Renderer {
 
 		//
 
-		const renderBundle = this._bundles.get( bundleGroup, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera, renderContext );
 		const renderBundleData = this.backend.get( renderBundle );
 
-		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
-
-		//
-
 		const needsUpdate = bundleGroup.version !== renderBundleData.version;
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || needsUpdate;
-
-		renderBundleData.renderContexts.add( renderContext );
+		const renderBundleNeedsUpdate = needsUpdate || renderBundleData.bundleGPU === undefined;
 
 		if ( renderBundleNeedsUpdate ) {
 
@@ -1319,6 +1344,37 @@ class Renderer {
 
 	}
 
+	_renderOutputLayers( quad, renderTarget ) {
+
+		if ( renderTarget.texture.isArrayTexture !== true || renderTarget.texture.image.depth <= 1 ) {
+
+			this._renderScene( quad, quad.camera, false );
+			return;
+
+		}
+
+		const currentActiveCubeFace = this._activeCubeFace;
+
+		try {
+
+			for ( let layer = 0; layer < renderTarget.texture.image.depth; layer ++ ) {
+
+				this._nodes.setOutputLayerIndex( layer );
+				this._activeCubeFace = layer;
+
+				this._renderScene( quad, quad.camera, false );
+
+			}
+
+		} finally {
+
+			this._nodes.setOutputLayerIndex( 0 );
+			this._activeCubeFace = currentActiveCubeFace;
+
+		}
+
+	}
+
 	/**
 	 * Returns an internal render target which is used when computing the output tone mapping
 	 * and color space conversion. Unlike in `WebGLRenderer`, this is done in a separate render
@@ -1404,6 +1460,7 @@ class Renderer {
 		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
 		frameBufferTarget.scissorTest = scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.useArrayDepthTexture = outputRenderTarget !== null ? outputRenderTarget.useArrayDepthTexture : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
@@ -1737,7 +1794,6 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
@@ -1843,8 +1899,7 @@ class Renderer {
 
 		this.autoClear = false;
 		this.xr.enabled = false;
-
-		this._renderScene( quad, quad.camera, false );
+		this._renderOutputLayers( quad, renderTarget );
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
@@ -1918,12 +1973,42 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		return await this.backend.getArrayBufferAsync( attribute );
+		// tally the memory for this readback buffer
+		if ( target !== null && target.isReadbackBuffer ) {
+
+			if ( this.info.memoryMap.has( target ) === false ) {
+
+				this.info.createReadbackBuffer( target );
+
+				const disposeInfo = () => {
+
+					target.removeEventListener( 'dispose', disposeInfo );
+
+					this.info.destroyReadbackBuffer( target );
+
+				};
+
+				target.addEventListener( 'dispose', disposeInfo );
+
+			}
+
+		}
+
+		if ( offset % 4 !== 0 || ( count > 0 && count % 4 !== 0 ) ) {
+
+			throw new Error( 'THREE.Renderer: "getArrayBufferAsync()" offset and count must be a multiple of 4.' );
+
+		}
+
+		return await this.backend.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
 

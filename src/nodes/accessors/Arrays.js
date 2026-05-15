@@ -16,9 +16,9 @@ export const attributeArray = ( count, type = 'float' ) => {
 
 	let itemSize, typedArray;
 
-	if ( type.isStruct === true ) {
+	if ( type.isStructTypeNode === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = type.getLength();
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {
@@ -48,9 +48,9 @@ export const instancedArray = ( count, type = 'float' ) => {
 
 	let itemSize, typedArray;
 
-	if ( type.isStruct === true ) {
+	if ( type.isStructTypeNode === true ) {
 
-		itemSize = type.layout.getLength();
+		itemSize = type.getLength();
 		typedArray = getTypedArrayFromType( 'float' );
 
 	} else {

@@ -4,6 +4,10 @@
 		<title>three.js raycaster - bvh</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js raycaster - bvh">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_raycaster_bvh.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_raycaster_bvh.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -29,7 +33,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.9/build/index.module.js"
 				}
 			}
 		</script>
@@ -37,7 +41,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHHelper } from 'three-mesh-bvh';
+			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, BVHHelper } from 'three-mesh-bvh';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -138,7 +142,7 @@
 					scene.add( mesh );
 					mesh.scale.setScalar( 0.0075 );
 
-					helper = new MeshBVHHelper( mesh );
+					helper = new BVHHelper( mesh );
 					helper.color.set( 0xE91E63 );
 					scene.add( helper );
 

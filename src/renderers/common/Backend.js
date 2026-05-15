@@ -277,9 +277,10 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) { }
+	updateSampler( /*texture, textureNode*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -388,6 +389,22 @@ class Backend {
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
 	createStorageAttribute( /*attribute*/ ) { }
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( /*uniformBuffer*/ ) { }
+
+	/**
+	 * Destroys a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( /*uniformBuffer*/ ) { }
 
 	/**
 	 * Updates the GPU buffer of a shader attribute.

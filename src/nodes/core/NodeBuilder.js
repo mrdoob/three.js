@@ -35,6 +35,7 @@ import { warn, error, yieldToMain } from '../../utils.js';
 let _id = 0;
 
 const _bindingGroupsCache = new WeakMap();
+const _functionNodeCache = new WeakMap();
 
 const sharedNodeData = new WeakMap();
 
@@ -1892,9 +1893,10 @@ class NodeBuilder {
 	 *
 	 * @param {BufferAttributeNode} node - The buffer attribute node.
 	 * @param {string} type - The node type.
+	 * @param {?string} [name=null] - The name of the buffer attribute.
 	 * @return {NodeAttribute} The node attribute.
 	 */
-	getBufferAttributeFromNode( node, type ) {
+	getBufferAttributeFromNode( node, type, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'vertex' );
 
@@ -1904,7 +1906,13 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			bufferAttribute = new NodeAttribute( 'nodeAttribute' + index, type, node );
+			if ( name === null ) {
+
+				name = 'nodeAttribute' + index;
+
+			}
+
+			bufferAttribute = new NodeAttribute( name, type, node );
 
 			this.bufferAttributes.push( bufferAttribute );
 
@@ -2424,15 +2432,34 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		const fn = new FunctionNode();
+		const backend = this.renderer.backend;
 
-		const previous = this.currentFunctionNode;
+		let cache = _functionNodeCache.get( backend );
 
-		this.currentFunctionNode = fn;
+		if ( cache === undefined ) {
 
-		fn.code = this.buildFunctionCode( shaderNode );
+			cache = new WeakMap();
+			_functionNodeCache.set( backend, cache );
 
-		this.currentFunctionNode = previous;
+		}
+
+		let fn = cache.get( shaderNode );
+
+		if ( fn === undefined ) {
+
+			fn = new FunctionNode();
+
+			const previous = this.currentFunctionNode;
+
+			this.currentFunctionNode = fn;
+
+			fn.code = this.buildFunctionCode( shaderNode );
+
+			this.currentFunctionNode = previous;
+
+			cache.set( shaderNode, fn );
+
+		}
 
 		return fn;
 
@@ -2725,11 +2752,12 @@ class NodeBuilder {
 	 * Returns the variable definitions as a shader string for the given shader stage.
 	 *
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
+	 * @param {boolean} [global=false] - Whether the variables are global.
 	 * @return {string} The variable code section.
 	 */
-	getVars( shaderStage ) {
+	getVars( shaderStage, global = false ) {
 
-		let snippet = '';
+		const snippets = [];
 
 		const vars = this.vars[ shaderStage ];
 
@@ -2737,13 +2765,13 @@ class NodeBuilder {
 
 			for ( const variable of vars ) {
 
-				snippet += `${ this.getVar( variable.type, variable.name ) }; `;
+				snippets.push( `${ this.getVar( variable.type, variable.name, variable.count ) };` );
 
 			}
 
 		}
 
-		return snippet;
+		return snippets.join( global ? '\n' : '\n\t' );
 
 	}
 

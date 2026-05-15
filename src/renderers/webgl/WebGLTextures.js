@@ -11,6 +11,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
+	const _htmlTextures = new Set();
 	let _canvas;
 
 	const _sources = new WeakMap(); // maps WebglTexture objects to instances of Source
@@ -125,13 +126,27 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, normalized, colorSpace, forceLinearTransfer = false ) {
 
 		if ( internalFormatName !== null ) {
 
 			if ( _gl[ internalFormatName ] !== undefined ) return _gl[ internalFormatName ];
 
 			warn( 'WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+
+		}
+
+		let ext_texture_norm16;
+
+		if ( normalized ) {
+
+			ext_texture_norm16 = extensions.get( 'EXT_texture_norm16' );
+
+			if ( ! ext_texture_norm16 ) {
+
+				warn( 'WebGLRenderer: Unable to use normalized textures without EXT_texture_norm16 extension' );
+
+			}
 
 		}
 
@@ -142,6 +157,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.R32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.R16F;
 			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.R8;
+			if ( glType === _gl.UNSIGNED_SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.R16_EXT;
+			if ( glType === _gl.SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.R16_SNORM_EXT;
 
 		}
 
@@ -161,6 +178,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.RG32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RG16F;
 			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RG8;
+			if ( glType === _gl.UNSIGNED_SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RG16_EXT;
+			if ( glType === _gl.SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RG16_SNORM_EXT;
 
 		}
 
@@ -199,6 +218,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( glFormat === _gl.RGB ) {
 
+			if ( glType === _gl.UNSIGNED_SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RGB16_EXT;
+			if ( glType === _gl.SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RGB16_SNORM_EXT;
 			if ( glType === _gl.UNSIGNED_INT_5_9_9_9_REV ) internalFormat = _gl.RGB9_E5;
 			if ( glType === _gl.UNSIGNED_INT_10F_11F_11F_REV ) internalFormat = _gl.R11F_G11F_B10F;
 
@@ -211,6 +232,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
 			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( transfer === SRGBTransfer ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+			if ( glType === _gl.UNSIGNED_SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RGBA16_EXT;
+			if ( glType === _gl.SHORT && ext_texture_norm16 ) internalFormat = ext_texture_norm16.RGBA16_SNORM_EXT;
 			if ( glType === _gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = _gl.RGBA4;
 			if ( glType === _gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = _gl.RGB5_A1;
 
@@ -309,6 +332,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( texture.isVideoTexture ) {
 
 			_videoTextures.delete( texture );
+
+		}
+
+		if ( texture.isHTMLTexture ) {
+
+			_htmlTextures.delete( texture );
 
 		}
 
@@ -908,7 +937,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const glFormat = utils.convert( texture.format, texture.colorSpace );
 
 			const glType = utils.convert( texture.type );
-			let glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
+			let glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace, texture.isVideoTexture );
 
 			setTextureParameters( textureType, texture );
 
@@ -1225,6 +1254,59 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
+			} else if ( texture.isHTMLTexture ) {
+
+				if ( 'texElementImage2D' in _gl ) {
+
+					const canvas = _gl.canvas;
+
+					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
+					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+						canvas.setAttribute( 'layoutsubtree', 'true' );
+
+					}
+
+					if ( image.parentNode !== canvas ) {
+
+						canvas.appendChild( image );
+
+						// Register and set up a shared paint callback for all HTMLTextures.
+						_htmlTextures.add( texture );
+
+						canvas.onpaint = ( event ) => {
+
+							const changed = event.changedElements;
+
+							for ( const t of _htmlTextures ) {
+
+								if ( changed.includes( t.image ) ) {
+
+									t.needsUpdate = true;
+
+								}
+
+							}
+
+						};
+
+						canvas.requestPaint();
+						return;
+
+					}
+
+					const level = 0;
+					const internalFormat = _gl.RGBA;
+					const srcFormat = _gl.RGBA;
+					const srcType = _gl.UNSIGNED_BYTE;
+
+					_gl.texElementImage2D( _gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+
+				}
+
 			} else {
 
 				// regular Texture (image, video, canvas)
@@ -1357,7 +1439,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const image = cubeImage[ 0 ],
 				glFormat = utils.convert( texture.format, texture.colorSpace ),
 				glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace );
 
 			const useTexStorage = ( texture.isVideoTexture !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
@@ -1553,7 +1635,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const glFormat = utils.convert( texture.format, texture.colorSpace );
 		const glType = utils.convert( texture.type );
-		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
+		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace );
 		const renderTargetProperties = properties.get( renderTarget );
 		const textureProperties = properties.get( texture );
 
@@ -1632,7 +1714,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const glFormat = utils.convert( texture.format, texture.colorSpace );
 				const glType = utils.convert( texture.type );
-				const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
+				const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace );
 
 				if ( useMultisampledRTT( renderTarget ) ) {
 
@@ -2022,7 +2104,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const glFormat = utils.convert( texture.format, texture.colorSpace );
 					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, renderTarget.isXRRenderTarget === true );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace, renderTarget.isXRRenderTarget === true );
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 

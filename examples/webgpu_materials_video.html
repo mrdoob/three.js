@@ -4,13 +4,13 @@
 		<title>three.js webgpu - video material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - video material">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_video.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_video.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
-
-		<div id="overlay">
-			<button id="startButton">Play</button>
-		</div>
 
 		<div id="container"></div>
 
@@ -26,7 +26,7 @@
 			</small>
 		</div>
 
-		<video id="video" loop crossOrigin="anonymous" playsinline style="display:none">
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
@@ -66,17 +66,9 @@
 				xgrid = 20,
 				ygrid = 10;
 
-			const startButton = document.getElementById( 'startButton' );
-			startButton.addEventListener( 'click', function () {
-
-				init();
-
-			} );
+			init();
 
 			function init() {
-
-				const overlay = document.getElementById( 'overlay' );
-				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );

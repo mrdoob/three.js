@@ -14,7 +14,7 @@ import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { warn } from '../../utils.js';
+import { warn, warnOnce } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
@@ -591,6 +591,20 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the current base layer.
+	 *
+	 * This is an `XRProjectionLayer` when the targeted XR device supports the
+	 * WebXR Layers API, or an `XRWebGLLayer` otherwise.
+	 *
+	 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
+	 */
+	getBaseLayer() {
+
+		return this._glProjLayer !== null ? this._glProjLayer : this._glBaseLayer;
+
+	}
+
 
 	/**
 	 * Returns the current XR binding.
@@ -609,6 +623,61 @@ class XRManager extends EventDispatcher {
 		}
 
 		return this._glBinding;
+
+	}
+
+	/**
+	 * Applies WebXR fixed foveation to the internal post-processing render target
+	 * used by the first XR render pass before compositing into a projection layer.
+	 *
+	 * Browser-side `XRWebGLBinding.foveateBoundTexture()` failures are treated as
+	 * non-fatal so they do not interrupt rendering.
+	 *
+	 * @param {RenderTarget} renderTarget - The internal render target.
+	 */
+	foveateBoundTexture( renderTarget ) {
+
+		if ( renderTarget.isPostProcessingRenderTarget !== true ) return;
+		if ( this.isPresenting !== true ) return;
+		if ( this._glProjLayer === null ) return;
+
+		const backend = this._renderer.backend;
+
+		if ( backend === undefined || backend.isWebGLBackend !== true ) return;
+		if ( backend.state === null ) return;
+
+		const outputRenderTarget = this._renderer.getOutputRenderTarget();
+
+		if ( outputRenderTarget === null || outputRenderTarget.isXRRenderTarget !== true ) return;
+
+		const glBinding = this.getBinding();
+
+		if ( glBinding === null || typeof glBinding.foveateBoundTexture !== 'function' ) return;
+
+		this._renderer._textures.updateRenderTarget( renderTarget );
+
+		const { textureGPU, glTextureType } = backend.get( renderTarget.texture );
+
+		if ( textureGPU === undefined || glTextureType === undefined ) return;
+		if ( renderTarget._xrFoveationTextureGPU === textureGPU ) return;
+
+		renderTarget._xrFoveationTextureGPU = textureGPU;
+
+		backend.state.bindTexture( glTextureType, textureGPU );
+
+		try {
+
+			glBinding.foveateBoundTexture( glTextureType, this.getFoveation() );
+
+		} catch ( error ) {
+
+			warnOnce( `XRManager: Unable to foveate bound XR post-processing texture. ${error.name}: ${error.message}` );
+
+		} finally {
+
+			backend.state.unbindTexture();
+
+		}
 
 	}
 
@@ -927,15 +996,19 @@ class XRManager extends EventDispatcher {
 		const renderer = this._renderer;
 		const backend = renderer.backend;
 
-		this._gl = renderer.getContext();
-		const gl = this._gl;
-		const attributes = gl.getContextAttributes();
+		if ( session !== null && backend.isWebGPUBackend === true ) {
+
+			throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+
+		}
 
 		this._session = session;
 
 		if ( session !== null ) {
 
-			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
+			this._gl = renderer.getContext();
+			const gl = this._gl;
+			const attributes = gl.getContextAttributes();
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
@@ -1651,6 +1724,9 @@ function onAnimationFrame( time, frame ) {
 		}
 
 		renderer.setOutputRenderTarget( this._xrRenderTarget );
+
+		const frameBufferTarget = renderer._getFrameBufferTarget();
+		renderer.xr.foveateBoundTexture( frameBufferTarget );
 
 	}
 

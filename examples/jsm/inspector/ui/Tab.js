@@ -31,13 +31,13 @@ export class Tab extends EventDispatcher {
 
 		super();
 
-		this.id = title.toLowerCase();
+		this.id = title.toLowerCase().replace( /\s+/g, '-' );
 		this.button = document.createElement( 'button' );
 		this.button.className = 'tab-btn';
 		this.button.textContent = title;
 
 		this.content = document.createElement( 'div' );
-		this.content.id = `${this.id}-content`;
+		this.content.classList.add( `${this.id}-content` );
 		this.content.className = 'profiler-content';
 
 		this._isActive = false;

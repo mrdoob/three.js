@@ -180,6 +180,18 @@ The current output.
 
 **Returns:** The generated code snippet.
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+Overwritten since the node type is inferred from the texture type.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [UniformNode#generateNodeType](UniformNode.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .generateOffset( builder : NodeBuilder, offsetNode : Node ) : string
 
 Generates the offset code snippet.
@@ -273,18 +285,6 @@ The current node builder.
 **Overrides:** [UniformNode#getInputType](UniformNode.html#getInputType)
 
 **Returns:** The input type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-Overwritten since the node type is inferred from the texture type.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [UniformNode#getNodeType](UniformNode.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .getSampler() : boolean
 

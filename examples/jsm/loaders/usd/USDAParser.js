@@ -460,6 +460,18 @@ class USDAParser {
 
 			}
 
+			if ( header.framesPerSecond !== undefined ) {
+
+				rootFields.framesPerSecond = parseFloat( header.framesPerSecond );
+
+			}
+
+			if ( header.timeCodesPerSecond !== undefined ) {
+
+				rootFields.timeCodesPerSecond = parseFloat( header.timeCodesPerSecond );
+
+			}
+
 		}
 
 		specsByPath[ '/' ] = { specType: SpecType.Prim, fields: rootFields };

@@ -21,6 +21,7 @@ GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/
 *   KHR\_texture\_transform
 *   EXT\_materials\_bump
 *   EXT\_mesh\_gpu\_instancing
+*   EXT\_texture\_webp
 
 The following glTF 2.0 extension is supported by an external user plugin:
 

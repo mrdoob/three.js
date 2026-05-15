@@ -52,7 +52,7 @@ The node that is evaluate when the condition ends up `true`.
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 This method is overwritten since the node type is inferred from the if/else nodes.
 
@@ -60,7 +60,7 @@ This method is overwritten since the node type is inferred from the if/else node
 
 The current node builder.
 
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

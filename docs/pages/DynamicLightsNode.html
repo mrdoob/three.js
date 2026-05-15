@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DynamicLightsNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="LightsNode.html">LightsNode</a> → </p>
+	<h1 translate="no">DynamicLightsNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A custom version of <code>LightsNode</code> that batches supported analytic lights into
+uniform arrays and loops.</p>
+<p>Unsupported lights, node lights, shadow-casting lights, and projected spot
+lights keep the default per-light path.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DynamicLightsNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DynamicLightsNode } from 'three/addons/tsl/lighting/DynamicLightsNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DynamicLightsNode" translate="no">new <a href="#DynamicLightsNode">DynamicLightsNode</a><span class="signature">( options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new dynamic lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Dynamic lighting configuration.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxDirectionalLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched directional lights.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxPointLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched point lights.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxSpotLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched spot lights.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxHemisphereLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of batched hemisphere lights.</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/lighting/DynamicLightsNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/lighting/DynamicLightsNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

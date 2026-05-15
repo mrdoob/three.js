@@ -100,6 +100,15 @@ class TextureNode extends UniformNode {
 		this.gradNode = null;
 
 		/**
+		 * Represents the optional index constant of the channel to gather.
+		 * This must be in range [0, 3] and a compile-time constant.
+		 *
+		 * @type {?Node<int>}
+		 * @default null
+		 */
+		this.gatherNode = null;
+
+		/**
 		 * Represents the optional texel offset applied to the unnormalized texture
 		 * coordinate before sampling the texture.
 		 *
@@ -219,7 +228,13 @@ class TextureNode extends UniformNode {
 	 */
 	generateNodeType( /*builder*/ ) {
 
-		if ( this.value.isDepthTexture === true ) return 'float';
+		if ( this.value.isDepthTexture === true ) {
+
+			if ( this.gatherNode === null ) return 'float';
+
+			return 'vec4';
+
+		}
 
 		if ( this.value.type === UnsignedIntType ) {
 
@@ -429,6 +444,7 @@ class TextureNode extends UniformNode {
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
 		properties.gradNode = this.gradNode;
+		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
 
@@ -471,10 +487,12 @@ class TextureNode extends UniformNode {
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
+	 * @param {?string} gatherSnippet - The gather snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
+	 * @param {?string} flipYSnippet - The y-flip snippet. Only used for WebGL.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet ) {
 
 		const texture = this.value;
 
@@ -487,6 +505,18 @@ class TextureNode extends UniformNode {
 		} else if ( gradSnippet ) {
 
 			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( gatherSnippet ) {
+
+			if ( compareSnippet ) {
+
+				snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, flipYSnippet );
+
+			} else {
+
+				snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet, flipYSnippet );
+
+			}
 
 		} else if ( compareSnippet ) {
 
@@ -536,13 +566,13 @@ class TextureNode extends UniformNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			const nodeType = this.getNodeType( builder );
+			let nodeType = this.getNodeType( builder );
 
 			let propertyName = nodeData.propertyName;
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -551,7 +581,15 @@ class TextureNode extends UniformNode {
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
+				const flipYSnippet = this._flipYUniform ? this._flipYUniform.build( builder, 'bool' ) : null;
+
+				if ( gatherSnippet ) {
+
+					nodeType = 'vec4';
+
+				}
 
 				let finalDepthSnippet = depthSnippet;
 
@@ -565,7 +603,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, offsetSnippet );
+				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet );
 
 				if ( compareStepSnippet !== null ) {
 
@@ -773,6 +811,22 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Gathers four texels from the texture.
+	 *
+	 * @param {Node<int>} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	gather( gatherNode = 0 ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherNode = nodeObject( gatherNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
 	 * Samples the texture by defining a depth node.
 	 *
 	 * @param {Node<int>} depthNode - The depth node.
@@ -868,6 +922,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;

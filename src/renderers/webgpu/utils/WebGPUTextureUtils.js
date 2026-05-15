@@ -4,18 +4,40 @@ import {
 import { ColorManagement } from '../../../math/ColorManagement.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
+import { submit } from './WebGPUUtils.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+import GPUSamplerDescriptor from '../descriptors/GPUSamplerDescriptor.js';
+import GPUTexelCopyTextureInfo from '../descriptors/GPUTexelCopyTextureInfo.js';
+import GPUTexelCopyBufferInfo from '../descriptors/GPUTexelCopyBufferInfo.js';
+import GPUTexelCopyBufferLayout from '../descriptors/GPUTexelCopyBufferLayout.js';
+import GPUCopyExternalImageSourceInfo from '../descriptors/GPUCopyExternalImageSourceInfo.js';
+import GPUCopyExternalImageDestInfo from '../descriptors/GPUCopyExternalImageDestInfo.js';
+import GPUTextureDescriptor from '../descriptors/GPUTextureDescriptor.js';
+import GPUExtent3D from '../descriptors/GPUExtent3D.js';
+
+const _bufferDescriptor = new GPUBufferDescriptor();
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _samplerDescriptor = new GPUSamplerDescriptor();
+const _texelCopyTextureInfo = new GPUTexelCopyTextureInfo();
+const _texelCopyBufferInfo = new GPUTexelCopyBufferInfo();
+const _texelCopyBufferLayout = new GPUTexelCopyBufferLayout();
+const _copyExternalImageSourceInfo = new GPUCopyExternalImageSourceInfo();
+const _copyExternalImageDestInfo = new GPUCopyExternalImageDestInfo();
+const _textureDescriptor = new GPUTextureDescriptor();
+const _extent3D = new GPUExtent3D();
 
 import {
 	ByteType, ShortType,
-	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
+	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
 	RGBAFormat, RGBFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBTransfer, DepthFormat, DepthStencilFormat,
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
 	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type, UnsignedInt5999Type,
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
-	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format,
-	R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format,
+	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format,
+	SIGNED_RED_GREEN_RGTC2_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format,
 	Compatibility
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
@@ -34,6 +56,32 @@ const _compareToWebGPU = {
 };
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
+
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+
+	_texelCopyTextureInfo.texture = textureGPU;
+	_texelCopyTextureInfo.mipLevel = mipLevel;
+	_texelCopyTextureInfo.origin.z = layerIndex;
+
+	_texelCopyBufferLayout.offset = layerIndex * bytesPerImage;
+	_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+	_texelCopyBufferLayout.rowsPerImage = rowsPerImage;
+
+	_extent3D.width = textureWidth;
+	_extent3D.height = textureHeight;
+
+	device.queue.writeTexture(
+		_texelCopyTextureInfo,
+		mipmap.data,
+		_texelCopyBufferLayout,
+		_extent3D
+	);
+
+	_texelCopyTextureInfo.reset();
+	_texelCopyBufferLayout.reset();
+	_extent3D.reset();
+
+}
 
 /**
  * A WebGPU backend utility module for managing textures.
@@ -101,54 +149,55 @@ class WebGPUTextureUtils {
 	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
 		const backend = this.backend;
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
-			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
+			texture.anisotropy + '-' + ( texture.isDepthTexture === true ? 1 : 0 ) + '-' +
+			( texture.compareFunction !== null && textureNode.compareNode !== null ? texture.compareFunction : 0 );
 
 		let samplerData = this._samplerCache.get( samplerKey );
 
 		if ( samplerData === undefined ) {
 
-			const samplerDescriptorGPU = {
-				addressModeU: this._convertAddressMode( texture.wrapS ),
-				addressModeV: this._convertAddressMode( texture.wrapT ),
-				addressModeW: this._convertAddressMode( texture.wrapR ),
-				magFilter: this._convertFilterMode( texture.magFilter ),
-				minFilter: this._convertFilterMode( texture.minFilter ),
-				mipmapFilter: this._convertFilterMode( texture.minFilter ),
-				maxAnisotropy: 1
-			};
+			_samplerDescriptor.addressModeU = this._convertAddressMode( texture.wrapS );
+			_samplerDescriptor.addressModeV = this._convertAddressMode( texture.wrapT );
+			_samplerDescriptor.addressModeW = this._convertAddressMode( texture.wrapR );
+			_samplerDescriptor.magFilter = this._convertFilterMode( texture.magFilter );
+			_samplerDescriptor.minFilter = this._convertFilterMode( texture.minFilter );
+			_samplerDescriptor.mipmapFilter = this._convertMipmapFilterMode( texture.minFilter );
 
 			// Depth textures without compare function must use non-filtering (nearest) sampling
-			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+			if ( texture.isDepthTexture && ( texture.compareFunction === null || textureNode.compareNode === null ) ) {
 
-				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
-				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
-				samplerDescriptorGPU.mipmapFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.magFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.minFilter = GPUFilterMode.Nearest;
+				_samplerDescriptor.mipmapFilter = GPUFilterMode.Nearest;
 
 			}
 
 			// anisotropy can only be used when all filter modes are set to linear.
 
-			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+			if ( _samplerDescriptor.magFilter === GPUFilterMode.Linear && _samplerDescriptor.minFilter === GPUFilterMode.Linear && _samplerDescriptor.mipmapFilter === GPUFilterMode.Linear ) {
 
-				samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
-
-			}
-
-			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
-
-				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+				_samplerDescriptor.maxAnisotropy = texture.anisotropy;
 
 			}
 
-			const sampler = backend.device.createSampler( samplerDescriptorGPU );
+			if ( texture.isDepthTexture && texture.compareFunction !== null && textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+
+				_samplerDescriptor.compare = _compareToWebGPU[ texture.compareFunction ];
+
+			}
+
+			const sampler = backend.device.createSampler( _samplerDescriptor );
+
+			_samplerDescriptor.reset();
 
 			samplerData = { sampler, usedTimes: 0 };
 
@@ -198,7 +247,7 @@ class WebGPUTextureUtils {
 
 		let textureGPU;
 
-		const format = getFormat( texture );
+		const format = getFormat( texture, this.backend.device );
 
 		if ( texture.isCubeTexture ) {
 
@@ -281,19 +330,16 @@ class WebGPUTextureUtils {
 
 		}
 
-		const textureDescriptorGPU = {
-			label: texture.name,
-			size: {
-				width: width,
-				height: height,
-				depthOrArrayLayers: depth,
-			},
-			mipLevelCount: levels,
-			sampleCount: primarySamples,
-			dimension: dimension,
-			format: format,
-			usage: usage
-		};
+		const textureDescriptorGPU = new GPUTextureDescriptor();
+		textureDescriptorGPU.label = texture.name;
+		textureDescriptorGPU.size.width = width;
+		textureDescriptorGPU.size.height = height;
+		textureDescriptorGPU.size.depthOrArrayLayers = depth;
+		textureDescriptorGPU.mipLevelCount = levels;
+		textureDescriptorGPU.sampleCount = primarySamples;
+		textureDescriptorGPU.dimension = dimension;
+		textureDescriptorGPU.format = format;
+		textureDescriptorGPU.usage = usage;
 
 		// texture creation
 
@@ -403,17 +449,16 @@ class WebGPUTextureUtils {
 
 		if ( colorBuffer ) colorBuffer.destroy();
 
-		colorBuffer = backend.device.createTexture( {
-			label: 'colorBuffer',
-			size: {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.currentSamples ),
-			format: backend.utils.getPreferredCanvasFormat(),
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
-		} );
+		_textureDescriptor.label = 'colorBuffer';
+		_textureDescriptor.size.width = width;
+		_textureDescriptor.size.height = height;
+		_textureDescriptor.sampleCount = backend.utils.getSampleCount( backend.renderer.currentSamples );
+		_textureDescriptor.format = backend.utils.getPreferredCanvasFormat();
+		_textureDescriptor.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC;
+
+		colorBuffer = backend.device.createTexture( _textureDescriptor );
+
+		_textureDescriptor.reset();
 
 		//
 
@@ -560,11 +605,52 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
+
+			}
 
 		} else if ( texture.isCubeTexture ) {
 
 			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
+
+		} else if ( texture.isHTMLTexture ) {
+
+			const device = this.backend.device;
+			const canvas = this.backend.renderer.domElement;
+			const image = texture.image;
+
+			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
+
+			// Skip the first frame — the element needs a paint record first.
+			if ( ! textureData.hasPaintCallback ) {
+
+				textureData.hasPaintCallback = true;
+				canvas.requestPaint();
+				return;
+
+			}
+
+			const width = textureDescriptorGPU.size.width;
+			const height = textureDescriptorGPU.size.height;
+
+			device.queue.copyElementImageToTexture(
+				image, width, height,
+				{ texture: textureData.texture }
+			);
+
+			if ( texture.flipY ) {
+
+				this._flipY( textureData.texture, textureDescriptorGPU );
+
+			}
 
 		} else {
 
@@ -617,38 +703,45 @@ class WebGPUTextureUtils {
 		let bytesPerRow = width * bytesPerTexel;
 		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
 
-		const readBuffer = device.createBuffer(
-			{
-				size: ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ), // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			}
-		);
+		_bufferDescriptor.size = ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ); // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
+		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
-		const encoder = device.createCommandEncoder();
+		const readBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
+
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.origin.x = x;
+		_texelCopyTextureInfo.origin.y = y;
+		_texelCopyTextureInfo.origin.z = faceIndex;
+
+		_texelCopyBufferInfo.buffer = readBuffer;
+		_texelCopyBufferInfo.bytesPerRow = bytesPerRow;
+
+		_extent3D.width = width;
+		_extent3D.height = height;
 
 		encoder.copyTextureToBuffer(
-			{
-				texture: textureGPU,
-				origin: { x, y, z: faceIndex },
-			},
-			{
-				buffer: readBuffer,
-				bytesPerRow: bytesPerRow
-			},
-			{
-				width: width,
-				height: height
-			}
-
+			_texelCopyTextureInfo,
+			_texelCopyBufferInfo,
+			_extent3D
 		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferInfo.reset();
+		_extent3D.reset();
 
 		const typedArrayType = this._getTypedArrayType( format );
 
-		device.queue.submit( [ encoder.finish() ] );
+		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange();
+		const buffer = readBuffer.getMappedRange().slice();
+
+		readBuffer.destroy();
 
 		return new typedArrayType( buffer );
 
@@ -787,27 +880,36 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
+		_copyExternalImageSourceInfo.source = image;
+		_copyExternalImageSourceInfo.flipY = flipY;
+
+		_copyExternalImageDestInfo.texture = textureGPU;
+		_copyExternalImageDestInfo.mipLevel = mipLevel;
+		_copyExternalImageDestInfo.origin.z = originDepth;
+		_copyExternalImageDestInfo.premultipliedAlpha = premultiplyAlpha;
+
+		_extent3D.width = width;
+		_extent3D.height = height;
+
 		try {
 
 			device.queue.copyExternalImageToTexture(
-				{
-					source: image,
-					flipY: flipY
-				}, {
-					texture: textureGPU,
-					mipLevel: mipLevel,
-					origin: { x: 0, y: 0, z: originDepth },
-					premultipliedAlpha: premultiplyAlpha
-				}, {
-					width: width,
-					height: height,
-					depthOrArrayLayers: 1
-				}
+				_copyExternalImageSourceInfo,
+				_copyExternalImageDestInfo,
+				_extent3D
 			);
 
 			// try/catch has been added to fix bad video frame data on certain devices, see #32391
 
-		} catch ( _ ) {}
+		} catch ( _ ) {
+
+		} finally {
+
+			_copyExternalImageSourceInfo.reset();
+			_copyExternalImageDestInfo.reset();
+			_extent3D.reset();
+
+		}
 
 	}
 
@@ -882,22 +984,26 @@ class WebGPUTextureUtils {
 		const bytesPerTexel = this._getBytesPerTexel( textureDescriptorGPU.format );
 		const bytesPerRow = image.width * bytesPerTexel;
 
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyTextureInfo.mipLevel = mipLevel;
+		_texelCopyTextureInfo.origin.z = originDepth;
+
+		_texelCopyBufferLayout.offset = image.width * image.height * bytesPerTexel * depth;
+		_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+
+		_extent3D.width = image.width;
+		_extent3D.height = image.height;
+
 		device.queue.writeTexture(
-			{
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth }
-			},
+			_texelCopyTextureInfo,
 			data,
-			{
-				offset: image.width * image.height * bytesPerTexel * depth,
-				bytesPerRow
-			},
-			{
-				width: image.width,
-				height: image.height,
-				depthOrArrayLayers: 1
-			} );
+			_texelCopyBufferLayout,
+			_extent3D
+		);
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferLayout.reset();
+		_extent3D.reset();
 
 		if ( flipY === true ) {
 
@@ -914,8 +1020,9 @@ class WebGPUTextureUtils {
 	 * @param {Array<Object>} mipmaps - An array with mipmap data.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -923,6 +1030,7 @@ class WebGPUTextureUtils {
 
 		const blockData = this._getBlockData( textureDescriptorGPU.format );
 		const isArrayTexture = textureDescriptorGPU.size.depthOrArrayLayers > 1;
+		const activeLayerUpdates = layerUpdates && layerUpdates.size > 0 ? layerUpdates : null;
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -933,28 +1041,26 @@ class WebGPUTextureUtils {
 			const depth = isArrayTexture ? textureDescriptorGPU.size.depthOrArrayLayers : 1;
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
-			const bytesPerImage = bytesPerRow * Math.ceil( height / blockData.height );
+			const rowsPerImage = Math.ceil( height / blockData.height );
+			const bytesPerImage = bytesPerRow * rowsPerImage;
+			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
+			const textureHeight = rowsPerImage * blockData.height;
 
-			for ( let j = 0; j < depth; j ++ ) {
+			if ( activeLayerUpdates !== null ) {
 
-				device.queue.writeTexture(
-					{
-						texture: textureGPU,
-						mipLevel: i,
-						origin: { x: 0, y: 0, z: j }
-					},
-					mipmap.data,
-					{
-						offset: j * bytesPerImage,
-						bytesPerRow,
-						rowsPerImage: Math.ceil( height / blockData.height )
-					},
-					{
-						width: Math.ceil( width / blockData.width ) * blockData.width,
-						height: Math.ceil( height / blockData.height ) * blockData.height,
-						depthOrArrayLayers: 1
-					}
-				);
+				for ( const layerIndex of activeLayerUpdates ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
+
+			} else {
+
+				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
+
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+				}
 
 			}
 
@@ -1052,6 +1158,27 @@ class WebGPUTextureUtils {
 	}
 
 	/**
+	 * Converts the three.js filter constants to a GPU mipmap filter constant.
+	 * Unlike `_convertFilterMode`, this extracts the between-mip-level filtering
+	 * axis from the combined three.js constant rather than the within-level axis.
+	 *
+	 * @private
+	 * @param {number} value - The three.js constant defining a filter mode.
+	 * @return {string} The GPU mipmap filter mode.
+	 */
+	_convertMipmapFilterMode( value ) {
+
+		if ( value === NearestMipmapLinearFilter || value === LinearMipmapLinearFilter ) {
+
+			return GPUFilterMode.Linear;
+
+		}
+
+		return GPUFilterMode.Nearest;
+
+	}
+
+	/**
 	 * Returns the bytes-per-texel value for the given GPU texture format.
 	 *
 	 * @private
@@ -1073,7 +1200,9 @@ class WebGPUTextureUtils {
 			format === GPUTextureFormat.RG8Unorm ||
 			format === GPUTextureFormat.RG8Snorm ||
 			format === GPUTextureFormat.RG8Uint ||
-			format === GPUTextureFormat.RG8Sint ) return 2;
+			format === GPUTextureFormat.RG8Sint ||
+			format === GPUTextureFormat.R16Unorm ||
+			format === GPUTextureFormat.R16Snorm ) return 2;
 
 		// 32-bit formats
 		if ( format === GPUTextureFormat.R32Uint ||
@@ -1089,6 +1218,8 @@ class WebGPUTextureUtils {
 			format === GPUTextureFormat.RGBA8Sint ||
 			format === GPUTextureFormat.BGRA8Unorm ||
 			format === GPUTextureFormat.BGRA8UnormSRGB ||
+			format === GPUTextureFormat.RG16Unorm ||
+			format === GPUTextureFormat.RG16Snorm ||
 			// Packed 32-bit formats
 			format === GPUTextureFormat.RGB9E5UFloat ||
 			format === GPUTextureFormat.RGB10A2Unorm ||
@@ -1104,7 +1235,9 @@ class WebGPUTextureUtils {
 			format === GPUTextureFormat.RG32Float ||
 			format === GPUTextureFormat.RGBA16Uint ||
 			format === GPUTextureFormat.RGBA16Sint ||
-			format === GPUTextureFormat.RGBA16Float ) return 8;
+			format === GPUTextureFormat.RGBA16Float ||
+			format === GPUTextureFormat.RGBA16Unorm ||
+			format === GPUTextureFormat.RGBA16Snorm ) return 8;
 
 		// 128-bit formats
 		if ( format === GPUTextureFormat.RGBA32Uint ||
@@ -1147,6 +1280,12 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG16Float ) return Uint16Array;
 		if ( format === GPUTextureFormat.RGBA16Float ) return Uint16Array;
 
+		if ( format === GPUTextureFormat.R16Unorm ) return Uint16Array;
+		if ( format === GPUTextureFormat.R16Snorm ) return Int16Array;
+		if ( format === GPUTextureFormat.RG16Unorm ) return Uint16Array;
+		if ( format === GPUTextureFormat.RG16Snorm ) return Int16Array;
+		if ( format === GPUTextureFormat.RGBA16Unorm ) return Uint16Array;
+		if ( format === GPUTextureFormat.RGBA16Snorm ) return Int16Array;
 
 		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
 		if ( format === GPUTextureFormat.R32Sint ) return Int32Array;
@@ -1201,18 +1340,32 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {?GPUDevice} [device=null] - The GPU device which is used for feature detection.
- * It is not necessary to apply the device for most formats.
+ * @param {GPUDevice} [device] - The GPU device which is used for feature detection.
  * @return {string} The GPU format.
  */
-export function getFormat( texture, device = null ) {
+export function getFormat( texture, device ) {
 
 	const format = texture.format;
 	const type = texture.type;
+	const normalized = texture.normalized;
 	const colorSpace = texture.colorSpace;
 	const transfer = ColorManagement.getTransfer( colorSpace );
 
 	let formatGPU;
+
+	let textureFormatsTier1 = false;
+
+	if ( normalized ) {
+
+		textureFormatsTier1 = device.features.has( GPUFeatureName.TextureFormatsTier1 );
+
+		if ( textureFormatsTier1 === false ) {
+
+			warn( 'WebGPURenderer: Unable to use normalized textures without texture-formats-tier1 feature.' );
+
+		}
+
+	}
 
 	if ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) {
 
@@ -1249,6 +1402,14 @@ export function getFormat( texture, device = null ) {
 
 			case RGBA_BPTC_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC7RGBAUnormSRGB : GPUTextureFormat.BC7RGBAUnorm;
+				break;
+
+			case RGB_BPTC_SIGNED_Format:
+				formatGPU = GPUTextureFormat.BC6HRGBFloat;
+				break;
+
+			case RGB_BPTC_UNSIGNED_Format:
+				formatGPU = GPUTextureFormat.BC6HRGBUFloat;
 				break;
 
 			case RGB_ETC2_Format:
@@ -1354,12 +1515,13 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = GPUTextureFormat.RGBA16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RGBA16Snorm : GPUTextureFormat.RGBA16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = GPUTextureFormat.RGBA16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RGBA16Unorm : GPUTextureFormat.RGBA16Uint;
 						break;
+
 					case UnsignedIntType:
 						formatGPU = GPUTextureFormat.RGBA32Uint;
 						break;
@@ -1415,11 +1577,11 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = GPUTextureFormat.R16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.R16Snorm : GPUTextureFormat.R16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = GPUTextureFormat.R16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.R16Unorm : GPUTextureFormat.R16Uint;
 						break;
 
 					case UnsignedIntType:
@@ -1458,11 +1620,11 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					case ShortType:
-						formatGPU = GPUTextureFormat.RG16Sint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RG16Snorm : GPUTextureFormat.RG16Sint;
 						break;
 
 					case UnsignedShortType:
-						formatGPU = GPUTextureFormat.RG16Uint;
+						formatGPU = textureFormatsTier1 ? GPUTextureFormat.RG16Unorm : GPUTextureFormat.RG16Uint;
 						break;
 
 					case UnsignedIntType:
