@@ -1523,6 +1523,8 @@ class NodeBuilder {
 
 		const type = texture.type;
 
+		if ( texture.isDepthTexture === true ) return 'float';
+
 		if ( type === IntType ) return 'int';
 		if ( type === UnsignedIntType ) return 'uint';
 
