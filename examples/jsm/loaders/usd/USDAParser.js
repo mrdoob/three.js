@@ -675,12 +675,23 @@ class USDAParser {
 					// Parse value based on type
 					const parsedValue = this._parseAttributeValue( valueType, rawValue );
 
-					// Store as attribute spec
+					// Store as attribute spec, preserving any existing fields
+					// (e.g. connectionPaths set by an earlier `.connect` form)
 					const attrPath = path + '.' + attrName;
-					specsByPath[ attrPath ] = {
-						specType: SpecType.Attribute,
-						fields: { default: parsedValue, typeName: valueType }
-					};
+
+					if ( specsByPath[ attrPath ] ) {
+
+						specsByPath[ attrPath ].fields.default = parsedValue;
+						specsByPath[ attrPath ].fields.typeName = valueType;
+
+					} else {
+
+						specsByPath[ attrPath ] = {
+							specType: SpecType.Attribute,
+							fields: { default: parsedValue, typeName: valueType }
+						};
+
+					}
 
 				}
 
