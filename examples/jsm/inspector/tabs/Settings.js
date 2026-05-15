@@ -120,7 +120,7 @@ class Settings extends Parameters {
 
 		const currentState = _loadState();
 
-		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Domain': 'domain' } )
+		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Origin': 'origin' } )
 			.name( 'Save Settings' )
 			.onChange( () => {
 
@@ -132,7 +132,7 @@ Defines how the **Inspector** preferences and states are stored in the browser.
 **URL Session**
 Saves state based on the exact URL. It will reset the settings whenever the URL changes.
 
-**Keep across Domain**
+**Keep across Origin**
 Shares the same state across any page within the current origin.` );
 
 		storageGroup.add( {
