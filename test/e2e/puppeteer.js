@@ -36,6 +36,7 @@ const exceptionList = [
 	'webaudio_visualizer',
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
+	'webgpu_compute_particles_fluid',
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
