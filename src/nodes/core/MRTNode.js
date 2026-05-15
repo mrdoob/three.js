@@ -170,8 +170,9 @@ class MRTNode extends OutputStructNode {
 		for ( const name in outputNodes ) {
 
 			const index = getTextureIndex( textures, name );
+			const type = builder.getOutputType( index );
 
-			members[ index ] = vec4( outputNodes[ name ] );
+			members[ index ] = outputNodes[ name ].convert( type );
 
 		}
 
