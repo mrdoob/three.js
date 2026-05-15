@@ -1,5 +1,5 @@
 import OutputStructNode from './OutputStructNode.js';
-import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { MaterialBlending, NoBlending } from '../../constants.js';
 import BlendMode from '../../renderers/common/BlendMode.js';
 
