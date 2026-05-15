@@ -855,7 +855,8 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		if ( color !== undefined ) {
 
-			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color )}` );
+			const alpha = ( mapType === 'diffuse' ) ? material.opacity : 1;
+			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color, alpha )}` );
 
 		}
 
@@ -1146,9 +1147,9 @@ function buildColor( color ) {
 
 }
 
-function buildColor4( color ) {
+function buildColor4( color, alpha = 1 ) {
 
-	return `(${color.r}, ${color.g}, ${color.b}, 1.0)`;
+	return `(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
 
 }
 
