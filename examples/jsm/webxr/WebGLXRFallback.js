@@ -26,6 +26,12 @@ function setupWebGLXRFallback( renderer, createFallbackRenderer, onFallback = ()
 
 			}
 
+			if ( session !== null && renderer.backend.isWebGPUBackend === true && session.enabledFeatures.includes( 'webgpu' ) === false ) {
+
+				return switchToFallbackRenderer( session, renderer );
+
+			}
+
 			try {
 
 				return await setSession( session );
@@ -38,29 +44,41 @@ function setupWebGLXRFallback( renderer, createFallbackRenderer, onFallback = ()
 
 				}
 
-				const fallbackRenderer = createFallbackRenderer( renderer );
-
-				if ( fallbackRenderer.backend.isWebGLBackend !== true ) {
-
-					throw new Error( 'WebGLXRFallback: createFallbackRenderer() must return a renderer with a WebGL backend.' );
-
-				}
-
-				fallbackRenderer.xr.enabled = renderer.xr.enabled;
-				fallbackRenderer.xr.cameraAutoUpdate = renderer.xr.cameraAutoUpdate;
-				fallbackRenderer.xr.setFramebufferScaleFactor( renderer.xr.getFramebufferScaleFactor() );
-				fallbackRenderer.xr.setReferenceSpaceType( renderer.xr.getReferenceSpaceType() );
-
-				await onFallback( fallbackRenderer, renderer );
-
-				currentRenderer = fallbackRenderer;
-				patchRenderer( fallbackRenderer );
-
-				return fallbackRenderer.xr.setSession( session );
+				return switchToFallbackRenderer( session, renderer );
 
 			}
 
 		};
+
+	}
+
+	async function switchToFallbackRenderer( session, renderer ) {
+
+		if ( renderer.initialized === false ) await renderer.init();
+
+		const fallbackRenderer = createFallbackRenderer( renderer );
+
+		if ( fallbackRenderer.backend.isWebGLBackend !== true ) {
+
+			throw new Error( 'WebGLXRFallback: createFallbackRenderer() must return a renderer with a WebGL backend.' );
+
+		}
+
+		const animationLoop = renderer.getAnimationLoop();
+
+		fallbackRenderer.xr.enabled = renderer.xr.enabled;
+		fallbackRenderer.xr.cameraAutoUpdate = renderer.xr.cameraAutoUpdate;
+		fallbackRenderer.xr.setFramebufferScaleFactor( renderer.xr.getFramebufferScaleFactor() );
+		fallbackRenderer.xr.setReferenceSpaceType( renderer.xr.getReferenceSpaceType() );
+
+		if ( animationLoop !== null ) await fallbackRenderer.setAnimationLoop( animationLoop );
+
+		await onFallback( fallbackRenderer, renderer );
+
+		currentRenderer = fallbackRenderer;
+		patchRenderer( fallbackRenderer );
+
+		return fallbackRenderer.xr.setSession( session );
 
 	}
 
