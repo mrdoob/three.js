@@ -133,7 +133,7 @@ Defines how the **Inspector** preferences and states are stored in the browser.
 Saves state based on the exact URL. It will reset the settings whenever the URL changes.
 
 **Keep across Domain**
-Shares the same state across any page within the current domain.` );
+Shares the same state across any page within the current origin.` );
 
 		storageGroup.add( {
 			clear: () => {
