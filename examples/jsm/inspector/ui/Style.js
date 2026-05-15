@@ -288,6 +288,61 @@ export class Style {
 		cursor: pointer;
 	}
 
+	.info-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background-color: rgba(255, 255, 255, 0.1);
+		color: var(--text-secondary);
+		font-size: 10px;
+		font-style: italic;
+		margin-left: 6px;
+		cursor: help;
+		position: relative;
+	}
+
+	.info-icon:hover {
+		background-color: var(--color-accent);
+		color: white;
+	}
+
+	.info-tooltip {
+		position: fixed;
+		transform: translate(-50%, -100%);
+		background-color: rgba(30, 30, 36, 0.95);
+		border: 1px solid var(--profiler-border);
+		border-radius: 6px;
+		padding: 10px 14px;
+		color: var(--text-primary);
+		font-size: 12px;
+		width: max-content;
+		max-width: 250px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.2s, visibility 0.2s;
+		z-index: 999999;
+		font-style: normal;
+		font-family: var(--font-family);
+		text-align: left;
+		white-space: normal;
+	}
+
+	.info-tooltip h3 {
+		margin: 0 0 6px 0;
+		font-size: 13px;
+		color: var(--color-accent);
+	}
+
+	.info-tooltip strong {
+		font-weight: 600;
+		color: white;
+	}
+
 	/* Style adjustments for lil-gui look */
 	.mini-panel-content .item-row {
 		padding: 3px 8px;
