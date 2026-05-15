@@ -58,7 +58,7 @@ class USDLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( text ) );
+				scope.parse( text, onLoad, onError );
 
 			} catch ( e ) {
 
@@ -83,10 +83,16 @@ class USDLoader extends Loader {
 	/**
 	 * Parses the given USDZ data and returns the resulting group.
 	 *
+	 * The returned group is created synchronously, but any referenced textures
+	 * are loaded asynchronously. Provide `onLoad` to be notified once all
+	 * textures have finished loading.
+	 *
 	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
+	 * @param {function(Group)} [onLoad] - Executed once the group and all of its textures are ready.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {Group} The parsed asset as a group.
 	 */
-	parse( buffer ) {
+	parse( buffer, onLoad, onError ) {
 
 		const usda = new USDAParser();
 		const usdc = new USDCParser();
@@ -217,13 +223,27 @@ class USDLoader extends Loader {
 
 		const scope = this;
 
+		const finalize = ( composer, group ) => {
+
+			if ( onLoad ) {
+
+				Promise.all( composer.texturePromises )
+					.then( () => onLoad( group ) )
+					.catch( ( err ) => onError ? onError( err ) : console.error( err ) );
+
+			}
+
+			return group;
+
+		};
+
 		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
 			const composer = new USDComposer( scope.manager );
 			const data = usda.parseData( buffer );
-			return composer.compose( data, {} );
+			return finalize( composer, composer.compose( data, {} ) );
 
 		}
 
@@ -233,7 +253,7 @@ class USDLoader extends Loader {
 
 			const composer = new USDComposer( scope.manager );
 			const data = usdc.parseData( toArrayBuffer( buffer ) );
-			return composer.compose( data, {} );
+			return finalize( composer, composer.compose( data, {} ) );
 
 		}
 
@@ -261,7 +281,7 @@ class USDLoader extends Loader {
 
 			}
 
-			return composer.compose( data, assets, {}, basePath );
+			return finalize( composer, composer.compose( data, assets, {}, basePath ) );
 
 		}
 
@@ -270,7 +290,7 @@ class USDLoader extends Loader {
 		const composer = new USDComposer( scope.manager );
 		const text = textDecoder.decode( bytes );
 		const data = usda.parseData( text );
-		return composer.compose( data, {} );
+		return finalize( composer, composer.compose( data, {} ) );
 
 	}
 
