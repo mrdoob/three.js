@@ -699,6 +699,8 @@ class USDAParser {
 		// Array types
 		if ( valueType.endsWith( '[]' ) ) {
 
+			let result;
+
 			// Parse JSON-like arrays
 			try {
 
@@ -709,19 +711,13 @@ class USDAParser {
 				const parsed = JSON.parse( cleaned );
 
 				// Flatten nested arrays for types like point3f[]
-				if ( Array.isArray( parsed ) && Array.isArray( parsed[ 0 ] ) ) {
-
-					return parsed.flat();
-
-				}
-
-				return parsed;
+				result = Array.isArray( parsed ) && Array.isArray( parsed[ 0 ] ) ? parsed.flat() : parsed;
 
 			} catch ( e ) {
 
 				// Try simple array parsing
 				const cleaned = str.replace( /[\[\]]/g, '' );
-				return cleaned.split( ',' ).map( s => {
+				result = cleaned.split( ',' ).map( s => {
 
 					const trimmed = s.trim();
 					const num = parseFloat( trimmed );
@@ -730,6 +726,23 @@ class USDAParser {
 				} );
 
 			}
+
+			//reorder (w, x, y, z) to (x, y, z, w)
+			if ( valueType.startsWith( 'quat' ) ) {
+
+				for ( let i = 0; i < result.length; i += 4 ) {
+
+					const w = result[ i ];
+					result[ i ] = result[ i + 1 ];
+					result[ i + 1 ] = result[ i + 2 ];
+					result[ i + 2 ] = result[ i + 3 ];
+					result[ i + 3 ] = w;
+
+				}
+
+			}
+
+			return result;
 
 		}
 
