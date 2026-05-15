@@ -592,7 +592,15 @@ class NodeMaterial extends Material {
 
 		} else {
 
-			resultNode = this.setupOutput( builder, this.fragmentNode );
+			let fragmentNode = this.fragmentNode;
+
+			if ( fragmentNode.isOutputStructNode !== true ) {
+
+				fragmentNode = fragmentNode.convert( builder.getOutputType() );
+
+			}
+
+			resultNode = this.setupOutput( builder, fragmentNode );
 
 		}
 

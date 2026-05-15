@@ -2126,7 +2126,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = `\t@location( 0 ) color: ${ this.getOutputType() }`;
+							let structSnippet = `\t@location( 0 ) color: ${ this.getType( this.getOutputType() ) }`;
 
 							const builtins = this.getBuiltins( 'output' );
 
@@ -2259,18 +2259,6 @@ ${ flowData.code }
 		return wgslTypeLib[ type ] || type;
 
 	}
-
-	/**
-	 * Returns the type of the color output based on the renderer's render target.
-	 *
-	 * @return {string} The WGSL type.
-	 */
-	getOutputType() {
-
-		return this.getType( super.getOutputType() );
-
-	}
-
 
 	/**
 	 * Whether the requested feature is available or not.

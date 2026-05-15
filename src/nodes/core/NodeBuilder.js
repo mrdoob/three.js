@@ -537,9 +537,10 @@ class NodeBuilder {
 	/**
 	 * Returns the type of the color output based on the renderer's render target.
 	 *
+	 * @param {number} [index=0] - The index of the render target texture.
 	 * @return {string} The type.
 	 */
-	getOutputType() {
+	getOutputType( index = 0 ) {
 
 		let type = 'vec4';
 
@@ -547,8 +548,8 @@ class NodeBuilder {
 
 		if ( renderTarget !== null ) {
 
-			const renderTargetType = renderTarget.texture.type;
-			const renderTargetFormat = renderTarget.texture.format;
+			const renderTargetType = renderTarget.textures[ index ].type;
+			const renderTargetFormat = renderTarget.textures[ index ].format;
 
 			let typeStr = 'vec';
 
@@ -1521,8 +1522,6 @@ class NodeBuilder {
 	getComponentTypeFromTexture( texture ) {
 
 		const type = texture.type;
-
-		if ( texture.isDepthTexture === true ) return 'float';
 
 		if ( type === IntType ) return 'int';
 		if ( type === UnsignedIntType ) return 'uint';
