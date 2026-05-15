@@ -711,7 +711,28 @@ class USDAParser {
 				// Flatten nested arrays for types like point3f[]
 				if ( Array.isArray( parsed ) && Array.isArray( parsed[ 0 ] ) ) {
 
-					return parsed.flat();
+					const flat = parsed.flat();
+
+					// Quaternion arrays (quatf[], quatd[], quath[]):
+					// USDA text format stores each quat as (w, x, y, z),
+					// but Three.js/USDComposer expects (x, y, z, w).
+					// Scalar quatf already gets reordered below, but the array
+					// path used to skip reordering — causing animation deformation.
+					if ( valueType.startsWith( 'quat' ) ) {
+
+						for ( let i = 0; i < flat.length; i += 4 ) {
+
+							const w = flat[ i ];
+							flat[ i ] = flat[ i + 1 ];
+							flat[ i + 1 ] = flat[ i + 2 ];
+							flat[ i + 2 ] = flat[ i + 3 ];
+							flat[ i + 3 ] = w;
+
+						}
+
+					}
+
+					return flat;
 
 				}
 
