@@ -1,71 +1,23 @@
 /**
  * Sets up a construction-time WebGL fallback for WebGPU XR examples.
  *
- * @param {WebGPURenderer} renderer - The initial renderer.
- * @param {Function} createFallbackRenderer - A function that returns a new renderer with a WebGL backend.
- * @param {Function} onFallback - A function that installs the new renderer in the app.
+ * WebGPU XR requires the browser to expose `XRGPUBinding`. If the API is not
+ * available, this helper mutates the renderer parameters to use the existing
+ * WebGL fallback backend.
+ *
+ * @param {Object} parameters - The parameters passed to `WebGPURenderer`.
+ * @return {Object} The same parameters object.
  */
-function setupWebGLXRFallback( renderer, createFallbackRenderer, onFallback = () => {} ) {
+function setWebGLXRFallback( parameters ) {
 
-	let currentRenderer = renderer;
-	const patchedRenderers = new WeakSet();
+	if ( ! ( 'XRGPUBinding' in window ) ) {
 
-	function patchRenderer( renderer ) {
-
-		if ( patchedRenderers.has( renderer ) ) return;
-
-		patchedRenderers.add( renderer );
-
-		const setSession = renderer.xr.setSession.bind( renderer.xr );
-
-		renderer.xr.setSession = async function ( session ) {
-
-			if ( renderer !== currentRenderer ) {
-
-				return currentRenderer.xr.setSession( session );
-
-			}
-
-			try {
-
-				return await setSession( session );
-
-			} catch ( error ) {
-
-				if ( session === null || renderer.backend.isWebGPUBackend !== true ) {
-
-					throw error;
-
-				}
-
-				const fallbackRenderer = createFallbackRenderer( renderer );
-
-				if ( fallbackRenderer.backend.isWebGLBackend !== true ) {
-
-					throw new Error( 'WebGLXRFallback: createFallbackRenderer() must return a renderer with a WebGL backend.' );
-
-				}
-
-				fallbackRenderer.xr.enabled = renderer.xr.enabled;
-				fallbackRenderer.xr.cameraAutoUpdate = renderer.xr.cameraAutoUpdate;
-				fallbackRenderer.xr.setFramebufferScaleFactor( renderer.xr.getFramebufferScaleFactor() );
-				fallbackRenderer.xr.setReferenceSpaceType( renderer.xr.getReferenceSpaceType() );
-
-				await onFallback( fallbackRenderer, renderer );
-
-				currentRenderer = fallbackRenderer;
-				patchRenderer( fallbackRenderer );
-
-				return fallbackRenderer.xr.setSession( session );
-
-			}
-
-		};
+		parameters.forceWebGL = true;
 
 	}
 
-	patchRenderer( renderer );
+	return parameters;
 
 }
 
-export { setupWebGLXRFallback };
+export { setWebGLXRFallback };
