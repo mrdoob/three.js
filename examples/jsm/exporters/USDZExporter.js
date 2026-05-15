@@ -284,11 +284,14 @@ class USDZExporter {
 				texture.flipY,
 				options.maxTextureSize
 			);
+
+			const mimeType = ( texture.userData.mimeType === 'image/jpeg' ) ? 'image/jpeg' : 'image/png';
+
 			const blob = await new Promise( ( resolve ) =>
-				canvas.toBlob( resolve, 'image/png', 1 )
+				canvas.toBlob( resolve, mimeType )
 			);
 
-			files[ `textures/Texture_${id}.png` ] = new Uint8Array(
+			files[ `textures/Texture_${id}.${getTextureExtension( texture )}` ] = new Uint8Array(
 				await blob.arrayBuffer()
 			);
 
@@ -360,6 +363,12 @@ function getName( object, namesSet ) {
 	namesSet.add( name );
 
 	return name;
+
+}
+
+function getTextureExtension( texture ) {
+
+	return texture.userData.mimeType === 'image/jpeg' ? 'jpg' : 'png';
 
 }
 
@@ -839,7 +848,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			'Shader'
 		);
 		textureNode.addProperty( 'uniform token info:id = "UsdUVTexture"' );
-		textureNode.addProperty( `asset inputs:file = @textures/Texture_${id}.png@` );
+		textureNode.addProperty( `asset inputs:file = @textures/Texture_${id}.${getTextureExtension( texture )}@` );
 		textureNode.addProperty(
 			`float2 inputs:st.connect = </Materials/Material_${material.id}/Transform2d_${mapType}.outputs:result>`
 		);
