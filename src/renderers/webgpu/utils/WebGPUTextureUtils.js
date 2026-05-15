@@ -276,6 +276,13 @@ class WebGPUTextureUtils {
 
 		if ( textureData.initialized ) {
 
+			// Skip creation for external XR textures - they are already set up
+			if ( textureData.externalTexture === true ) {
+
+				return;
+
+			}
+
 			throw new Error( 'WebGPUTextureUtils: Texture already initialized.' );
 
 		}

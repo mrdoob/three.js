@@ -210,7 +210,8 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: 'compatibility'
+				featureLevel: 'compatibility',
+				xrCompatible: renderer.xr.enabled
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -293,6 +294,25 @@ class WebGPUBackend extends Backend {
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * Registers external GPU textures from `XRGPUBinding` for use in rendering.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to register the textures for.
+	 * @param {GPUTexture} colorTexture - The shared XR color GPUTexture.
+	 * @param {?Array<Object>} [viewDescriptors=null] - Optional view descriptors, one per XR view.
+	 */
+	setXRRenderTargetTextures( renderTarget, colorTexture, viewDescriptors = null ) {
+
+		this.set( renderTarget.texture, {
+			texture: colorTexture,
+			format: colorTexture.format,
+			externalTexture: true,
+			xrViewDescriptors: viewDescriptors,
+			initialized: true
+		} );
 
 	}
 
@@ -472,6 +492,74 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Returns whether the current render context references external textures.
+	 *
+	 * External textures can change every frame, so their descriptors must not be cached.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {boolean} Whether the render context uses external textures.
+	 */
+	_hasExternalTexture( renderContext ) {
+
+		const textures = renderContext.textures;
+
+		if ( textures === null ) return false;
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			if ( this.get( textures[ i ] ).externalTexture === true ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Creates attachment views for an external texture render target.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} textureData - The backend data for the texture.
+	 * @return {Array<Object>} The attachment view descriptors.
+	 */
+	_createExternalTextureViews( renderContext, textureData ) {
+
+		const textureViews = [];
+		const camera = renderContext.camera;
+
+		if ( textureData.xrViewDescriptors && camera !== null && camera.isArrayCamera === true ) {
+
+			for ( let i = 0; i < textureData.xrViewDescriptors.length; i ++ ) {
+
+				textureViews.push( {
+					view: textureData.texture.createView( textureData.xrViewDescriptors[ i ] ),
+					resolveTarget: undefined,
+					depthSlice: undefined
+				} );
+
+			}
+
+		} else {
+
+			textureViews.push( {
+				view: textureData.texture.createView( {
+					dimension: GPUTextureViewDimension.TwoD,
+					baseArrayLayer: renderContext.activeCubeFace,
+					arrayLayerCount: 1
+				} ),
+				resolveTarget: undefined,
+				depthSlice: undefined
+			} );
+
+		}
+
+		return textureViews;
+
+	}
+
+	/**
 	 * Returns the render pass descriptor for the given render context.
 	 *
 	 * @private
@@ -483,13 +571,15 @@ class WebGPUBackend extends Backend {
 
 		const renderTarget = renderContext.renderTarget;
 		const renderTargetData = this.get( renderTarget );
+		const hasExternalTexture = this._hasExternalTexture( renderContext );
 
 		let descriptors = renderTargetData.descriptors;
 
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.samples !== renderTarget.samples ||
+			hasExternalTexture
 		) {
 
 			descriptors = {};
@@ -501,7 +591,7 @@ class WebGPUBackend extends Backend {
 		const cacheKey = renderContext.getCacheKey();
 		let descriptorBase = descriptors[ cacheKey ];
 
-		if ( descriptorBase === undefined ) {
+		if ( descriptorBase === undefined || hasExternalTexture ) {
 
 			const textures = renderContext.textures;
 			const textureViews = [];
@@ -513,6 +603,13 @@ class WebGPUBackend extends Backend {
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
+
+				if ( textureData.externalTexture === true ) {
+
+					textureViews.push( ...this._createExternalTextureViews( renderContext, textureData ) );
+					continue;
+
+				}
 
 				_viewDescriptor.label = `colorAttachment_${ i }`;
 				_viewDescriptor.baseMipLevel = renderContext.activeMipmapLevel;
