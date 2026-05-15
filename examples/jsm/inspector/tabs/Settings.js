@@ -120,13 +120,22 @@ class Settings extends Parameters {
 
 		const currentState = _loadState();
 
-		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Domain': 'domain' } ).name( 'Save Settings' ).onChange( () => {
+		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Domain': 'domain' } )
+			.name( 'Save Settings' )
+			.onChange( () => {
 
-			_saveState();
+				_saveState();
 
-		} );
+			} ).info( `
+Defines how the **Inspector** preferences and states are stored in the browser.
 
-		const storageOptions = {
+**URL Session**
+Saves state based on the exact URL. It will reset the settings whenever the URL changes.
+
+**Keep across Domain**
+Shares the same state across any page within the current domain.` );
+
+		storageGroup.add( {
 			clear: () => {
 
 				localStorage.removeItem( 'threejs-inspector' );
@@ -134,9 +143,7 @@ class Settings extends Parameters {
 				location.reload();
 
 			}
-		};
-
-		storageGroup.add( storageOptions, 'clear' ).name( 'Clear Settings' );
+		}, 'clear' ).name( 'Clear Settings' );
 
 		this._getExtensions().then( extensions => {
 
