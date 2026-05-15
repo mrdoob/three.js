@@ -596,7 +596,7 @@ class NodeMaterial extends Material {
 
 			if ( fragmentNode.isOutputStructNode !== true ) {
 
-				fragmentNode = vec4( fragmentNode );
+				fragmentNode = fragmentNode.convert( builder.getOutputType() );
 
 			}
 
