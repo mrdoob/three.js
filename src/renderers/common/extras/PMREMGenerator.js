@@ -148,7 +148,7 @@ class PMREMGenerator {
 
 			warn( 'PMREMGenerator: ".fromScene()" called before the backend is initialized. Try using "await renderer.init()" instead.' );
 
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget( true );
 
 			options.renderTarget = cubeUVRenderTarget;
 
@@ -162,8 +162,7 @@ class PMREMGenerator {
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTarget();
-		cubeUVRenderTarget.depthBuffer = true;
+		const cubeUVRenderTarget = renderTarget || this._allocateTarget( true );
 
 		this._init( cubeUVRenderTarget );
 
@@ -231,7 +230,7 @@ class PMREMGenerator {
 
 			this._setSizeFromTexture( equirectangular );
 
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
 
 			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
 
@@ -283,9 +282,9 @@ class PMREMGenerator {
 
 			this._setSizeFromTexture( cubemap );
 
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+			const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
 
-			this.fromCubemapAsync( cubemap, renderTarget );
+			this.fromCubemapAsync( cubemap, cubeUVRenderTarget );
 
 			return cubeUVRenderTarget;
 
@@ -424,7 +423,7 @@ class PMREMGenerator {
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTarget();
+		const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
 		this._init( cubeUVRenderTarget );
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
@@ -434,12 +433,12 @@ class PMREMGenerator {
 
 	}
 
-	_allocateTarget() {
+	_allocateTarget( depthBuffer ) {
 
 		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
 		const height = 4 * this._cubeSize;
 
-		const cubeUVRenderTarget = _createRenderTarget( width, height );
+		const cubeUVRenderTarget = _createRenderTarget( width, height, depthBuffer );
 
 		return cubeUVRenderTarget;
 
@@ -921,7 +920,7 @@ function _createPlanes( lodMax ) {
 
 }
 
-function _createRenderTarget( width, height ) {
+function _createRenderTarget( width, height, depthBuffer ) {
 
 	const params = {
 		magFilter: LinearFilter,
@@ -930,7 +929,7 @@ function _createRenderTarget( width, height ) {
 		type: HalfFloatType,
 		format: RGBAFormat,
 		colorSpace: LinearSRGBColorSpace,
-		//depthBuffer: false
+		depthBuffer
 	};
 
 	const cubeUVRenderTarget = new RenderTarget( width, height, params );
