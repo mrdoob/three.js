@@ -31,8 +31,8 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZ exporter<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>
+			Carbon Frame Bike by
+			<a href="https://sketchfab.com/prefrontalcortex" target="_blank" rel="noopener">prefrontal cortex</a>
 		</div>
 
 		<a id="link" rel="ar" href="" download="asset.usdz">
@@ -56,28 +56,33 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+			import * as WebGLTextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, mixer, timer, controls;
 
 			const params = {
 				exportUSDZ: exportUSDZ
 			};
 
 			init();
-			render();
 
 			function init() {
+
+				timer = new THREE.Timer();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 2.5, 0.6, 3.0 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 2.5, 1.6, 3.0 );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
@@ -85,23 +90,32 @@
 				scene.background = new THREE.Color( 0xf0f0f0 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-				loader.load( 'DamagedHelmet.gltf', async function ( gltf ) {
+				const ktx2loader = new KTX2Loader().setTranscoderPath( 'jsm/libs/basis/' ).detectSupport( renderer );
+				const dracoLoader = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/' );
+				const gltfLoader = new GLTFLoader();
+			
+				gltfLoader.setDRACOLoader( dracoLoader );
+				gltfLoader.setKTX2Loader( ktx2loader );
+				gltfLoader.setPath( 'models/gltf/' );
+				gltfLoader.load( 'CarbonFrameBike.glb', async function ( gltf ) {
 
 					scene.add( gltf.scene );
 
-					const shadowMesh = createSpotShadowMesh();
-					shadowMesh.position.y = - 1.1;
-					shadowMesh.position.z = - 0.25;
-					shadowMesh.scale.setScalar( 2 );
-					scene.add( shadowMesh );
+					if ( gltf.animations.length > 0 ) {
 
-					render();
+						mixer = new THREE.AnimationMixer( gltf.scene );
+						const action = mixer.clipAction( gltf.animations[ 0 ] );
+						action.setLoop( THREE.LoopRepeat, Infinity );
+						action.play();
+
+					}
+
 
 					// USDZ
 
 					const exporter = new USDZExporter();
-					const arraybuffer = await exporter.parseAsync( gltf.scene );
+					exporter.setTextureUtils( WebGLTextureUtils ); // for texture decompresssing
+					const arraybuffer = await exporter.parseAsync( gltf.scene, { animations: gltf.animations } );
 					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
 
 					const link = document.getElementById( 'link' );
@@ -109,11 +123,11 @@
 
 				} );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, - 0.15, - 0.2 );
+				controls.enableDamping = true;
+				controls.target.set( 0, 0.7, 0 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -131,42 +145,12 @@
 
 			}
 
-			function createSpotShadowMesh() {
-
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = 128;
-				canvas.height = 128;
-
-				const context = canvas.getContext( '2d' );
-				const gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-				gradient.addColorStop( 0.1, 'rgba(130,130,130,1)' );
-				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
-
-				context.fillStyle = gradient;
-				context.fillRect( 0, 0, canvas.width, canvas.height );
-
-				const shadowTexture = new THREE.CanvasTexture( canvas );
-
-				const geometry = new THREE.PlaneGeometry();
-				const material = new THREE.MeshBasicMaterial( {
-					map: shadowTexture, blending: THREE.MultiplyBlending, toneMapped: false, premultipliedAlpha: true
-				} );
-
-				const mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = - Math.PI / 2;
-
-				return mesh;
-
-			}
-
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 
@@ -179,7 +163,15 @@
 
 			//
 
-			function render() {
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( mixer ) mixer.update( delta );
+
+				controls.update();
 
 				renderer.render( scene, camera );
 
