@@ -83,6 +83,7 @@ class USDComposer {
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
+		this.texturePromises = [];
 
 	}
 
@@ -102,6 +103,7 @@ class USDComposer {
 		this.basePath = basePath;
 		this.skinnedMeshes = [];
 		this.skeletons = {};
+		this.texturePromises = [];
 
 		// Build indexes for O(1) lookups
 		this._buildIndexes();
@@ -3864,27 +3866,48 @@ class USDComposer {
 		}
 
 		const image = new Image();
-		image.onload = function () {
 
-			texture.image = image;
+		this.texturePromises.push( new Promise( ( resolve ) => {
 
-			if ( textureAttrs ) {
+			image.onload = function () {
 
-				texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
-				texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+				texture.image = image;
 
-			}
+				if ( textureAttrs ) {
 
-			scope._applyTextureTransforms( texture, transformAttrs );
-			texture.needsUpdate = true;
+					texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+					texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
 
-			if ( typeof data !== 'string' ) {
+				}
 
-				URL.revokeObjectURL( url );
+				scope._applyTextureTransforms( texture, transformAttrs );
+				texture.needsUpdate = true;
 
-			}
+				if ( typeof data !== 'string' ) {
 
-		};
+					URL.revokeObjectURL( url );
+
+				}
+
+				resolve();
+
+			};
+
+			image.onerror = function () {
+
+				console.warn( 'USDLoader: Failed to load texture:', url );
+
+				if ( typeof data !== 'string' ) {
+
+					URL.revokeObjectURL( url );
+
+				}
+
+				resolve();
+
+			};
+
+		} ) );
 
 		image.src = url;
 
