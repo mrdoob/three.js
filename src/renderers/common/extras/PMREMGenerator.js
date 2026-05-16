@@ -284,7 +284,7 @@ class PMREMGenerator {
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
 
-			this.fromCubemapAsync( cubemap, renderTarget );
+			this.fromCubemapAsync( cubemap, cubeUVRenderTarget );
 
 			return cubeUVRenderTarget;
 
