@@ -4938,6 +4938,20 @@ class PropertyNode extends Node {
 
 	}
 
+	getNodeType( builder ) {
+
+		const nodeType = super.getNodeType( builder );
+
+		if ( nodeType === 'output' ) {
+
+			return builder.getOutputType();
+
+		}
+
+		return nodeType;
+
+	}
+
 	customCacheKey() {
 
 		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
@@ -5159,7 +5173,7 @@ const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Shininess
  * @tsl
  * @type {PropertyNode<vec4>}
  */
-const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output' );
+const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'output', 'Output' );
 
 /**
  * TSL object that represents the shader variable `dashSize`.
@@ -8138,12 +8152,12 @@ addMethodChaining( 'rand', rand );
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
  *
- * The corresponding TSL `select()` looks like so:
+ * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
+ * determine the outcome of the entire statement.
+ *
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
  * ```
- * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
- * determine the outcome of the entire statement.
  *
  * @augments Node
  */
@@ -13012,7 +13026,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * Gathers four texels from the texture.
 	 *
-	 * @param {[Node<int>]} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
+	 * @param {Node<int>} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
 	 * @return {TextureNode} A texture node representing the texture sample.
 	 */
 	gather( gatherNode = 0 ) {
@@ -21238,7 +21252,7 @@ class NodeMaterial extends Material {
 
 			if ( fragmentNode.isOutputStructNode !== true ) {
 
-				fragmentNode = vec4( fragmentNode );
+				fragmentNode = fragmentNode.convert( builder.getOutputType() );
 
 			}
 
@@ -22260,7 +22274,11 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
 			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
-			const nearEstimate = b.mul( -0.5 ).div( a );
+
+			// we need different nearEstimate formula for reversed and default depth buffer
+			// a is positive with a reversed depth buffer so it can be used for controlling the code flow
+
+			const nearEstimate = a.greaterThan( 0 ).select( b.negate().div( a.add( 1 ) ), b.mul( -0.5 ).div( a ) );
 
 			const alpha = nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
@@ -35264,7 +35282,7 @@ class OutputStructNode extends Node {
 
 		for ( let i = 0; i < members.length; i ++ ) {
 
-			const snippet = members[ i ].build( builder );
+			const snippet = members[ i ].build( builder, nodeData.membersLayout[ i ].type );
 
 			builder.addLineFlowCode( `${ structPrefix }m${ i } = ${ snippet }`, this );
 
@@ -35593,8 +35611,9 @@ class MRTNode extends OutputStructNode {
 		for ( const name in outputNodes ) {
 
 			const index = getTextureIndex( textures, name );
+			const type = builder.getOutputType( index );
 
-			members[ index ] = vec4( outputNodes[ name ] );
+			members[ index ] = outputNodes[ name ].convert( type );
 
 		}
 
@@ -40062,7 +40081,7 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {{ output: Texture, depth?: DepthTexture }}
+		 * @type {{ output: Texture, depth: ?DepthTexture }}
 		 */
 		this._textures = {
 			output: renderTarget.texture
@@ -45159,6 +45178,11 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 
 			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
 			dp.subAssign( bias );
+
+		} else if ( builder.renderer.logarithmicDepthBuffer ) {
+
+			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
 
 		} else {
 
@@ -50424,6 +50448,61 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the type of the color output based on the renderer's render target.
+	 *
+	 * @param {number} [index=0] - The index of the render target texture.
+	 * @return {string} The type.
+	 */
+	getOutputType( index = 0 ) {
+
+		let type = 'vec4';
+
+		const renderTarget = this.renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetType = renderTarget.textures[ index ].type;
+			const renderTargetFormat = renderTarget.textures[ index ].format;
+
+			let typeStr = 'vec';
+
+			if ( renderTargetType === IntType ) {
+
+				typeStr = 'ivec';
+
+			} else if ( renderTargetType === UnsignedIntType ) {
+
+				typeStr = 'uvec';
+
+			}
+
+			if ( renderTargetFormat === RedFormat || renderTargetFormat === RedIntegerFormat ) {
+
+				if ( renderTargetType === IntType ) type = 'int';
+				else if ( renderTargetType === UnsignedIntType ) type = 'uint';
+				else type = 'float';
+
+			} else if ( renderTargetFormat === RGFormat || renderTargetFormat === RGIntegerFormat ) {
+
+				type = `${ typeStr }2`;
+
+			} else if ( renderTargetFormat === RGBFormat || renderTargetFormat === RGBIntegerFormat ) {
+
+				type = `${ typeStr }3`;
+
+			} else {
+
+				type = `${ typeStr }4`;
+
+			}
+
+		}
+
+		return type;
+
+	}
+
+	/**
 	 * Returns the output struct name which is required by
 	 * {@link OutputStructNode}.
 	 *
@@ -51357,12 +51436,10 @@ class NodeBuilder {
 
 		const type = texture.type;
 
-		if ( texture.isDataTexture ) {
+		if ( texture.isDepthTexture === true ) return 'float';
 
-			if ( type === IntType ) return 'int';
-			if ( type === UnsignedIntType ) return 'uint';
-
-		}
+		if ( type === IntType ) return 'int';
+		if ( type === UnsignedIntType ) return 'uint';
 
 		return 'float';
 
@@ -55563,6 +55640,13 @@ class ClippingContext {
 		this.shadowPass = false;
 
 		/**
+		 * The view matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.viewMatrix = new Matrix4();
+
+		/**
 		 * The view normal matrix.
 		 *
 		 * @type {Matrix3}
@@ -55600,11 +55684,11 @@ class ClippingContext {
 
 		if ( parentContext !== null ) {
 
+			this.viewMatrix = parentContext.viewMatrix;
 			this.viewNormalMatrix = parentContext.viewNormalMatrix;
 			this.clippingGroupContexts = parentContext.clippingGroupContexts;
 
 			this.shadowPass = parentContext.shadowPass;
-			this.viewMatrix = parentContext.viewMatrix;
 
 		}
 
@@ -55647,8 +55731,8 @@ class ClippingContext {
 	updateGlobal( scene, camera ) {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
-		this.viewMatrix = camera.matrixWorldInverse;
 
+		this.viewMatrix.copy( camera.matrixWorldInverse );
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 	}
@@ -56203,9 +56287,7 @@ const _contextNodeLib = /*@__PURE__*/ new WeakMap();
 
 /**
  * The XR manager is built on top of the WebXR Device API to
- * manage XR sessions with `WebGPURenderer`.
- *
- * XR is currently only supported with a WebGL 2 backend.
+ * manage XR sessions with renderer backends.
  *
  * @augments EventDispatcher
  */
@@ -56264,6 +56346,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraL = new PerspectiveCamera();
 		this._cameraL.viewport = new Vector4();
+		this._cameraL.matrixWorldAutoUpdate = false;
 
 		/**
 		 * Represents the camera for the right eye.
@@ -56273,6 +56356,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraR = new PerspectiveCamera();
 		this._cameraR.viewport = new Vector4();
+		this._cameraR.matrixWorldAutoUpdate = false;
 
 		/**
 		 * A list of cameras used for rendering the XR views.
@@ -56361,6 +56445,7 @@ class XRManager extends EventDispatcher {
 		 * @readonly
 		 */
 		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+		this._supportsWebGPUBinding = typeof globalThis.XRGPUBinding !== 'undefined';
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -56405,6 +56490,15 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._currentPixelRatio = null;
+
+		/**
+		 * The renderer's sample count before XR temporarily overrides it.
+		 *
+		 * @private
+		 * @type {?number}
+		 * @default null
+		 */
+		this._currentSamples = null;
 
 		/**
 		 * The current size of the renderer's canvas
@@ -56522,6 +56616,16 @@ class XRManager extends EventDispatcher {
 		this._glBinding = null;
 
 		/**
+		 * A reference to the current XR WebGPU binding.
+		 *
+		 * @private
+		 * @type {?XRGPUBinding}
+		 * @default null
+		 */
+
+		this._webgpuBinding = null;
+
+		/**
 		 * A reference to the current XR projection layer.
 		 *
 		 * @private
@@ -56624,15 +56728,9 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the foveation value.
 	 *
-	 * @return {number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
+	 * @return {number|undefined} The foveation value.
 	 */
 	getFoveation() {
-
-		if ( this._glProjLayer === null && this._glBaseLayer === null ) {
-
-			return undefined;
-
-		}
 
 		return this._foveation;
 
@@ -56857,6 +56955,203 @@ class XRManager extends EventDispatcher {
 			backend.state.unbindTexture();
 
 		}
+
+	}
+
+	/**
+	 * Returns the current XR WebGPU binding.
+	 *
+	 * Creates a new binding if needed and the browser is
+	 * capable of doing so.
+	 *
+	 * @return {?XRGPUBinding} The XR WebGPU binding. Returns `null` if one cannot be created.
+	 */
+	getWebGPUBinding() {
+
+		if ( this._webgpuBinding === null && this._supportsWebGPUBinding ) {
+
+			this._webgpuBinding = new globalThis.XRGPUBinding( this._session, this._renderer.backend.device );
+
+		}
+
+		return this._webgpuBinding;
+
+	}
+
+	/**
+	 * Returns whether the current XR session is using WebGPU.
+	 *
+	 * @private
+	 * @return {boolean} Whether the current session uses the WebGPU backend and the `webgpu` session feature.
+	 */
+	_isWebGPUSession() {
+
+		return this._renderer.backend.isWebGPUBackend === true &&
+			this._session !== null &&
+			this._session.enabledFeatures.includes( 'webgpu' );
+
+	}
+
+	/**
+	 * Validates the current WebGPU XR session requirements.
+	 *
+	 * @private
+	 */
+	_validateWebGPUSession() {
+
+		const renderer = this._renderer;
+
+		if ( renderer.backend.isWebGPUBackend !== true ) return;
+
+		if ( this._session.enabledFeatures.includes( 'webgpu' ) === false ) {
+
+			throw new Error( 'THREE.XRManager: WebGPU XR sessions require the "webgpu" session feature. Use VRButtonGPU/XRButton with "webgpu" enabled or use a WebGL backend.' );
+
+		}
+
+		if ( renderer.samples > 0 ) {
+
+			warnOnce( 'THREE.XRManager: WebGPU XR does not support MSAA yet. Disabling MSAA for this XR session.' );
+
+			if ( this._currentSamples === null ) this._currentSamples = renderer.samples;
+			renderer._samples = 0;
+
+		}
+
+	}
+
+	/**
+	 * Initializes the WebGPU XR projection layer and render target.
+	 *
+	 * @private
+	 * @async
+	 * @param {XRSession} session - The XR session.
+	 * @return {Promise<void>}
+	 */
+	async _initWebGPUSession( session ) {
+
+		const webgpuBinding = this.getWebGPUBinding();
+		const glProjLayer = webgpuBinding.createProjectionLayer( {
+			colorFormat: webgpuBinding.getPreferredColorFormat(),
+			depthStencilFormat: 'depth24plus'
+		} );
+
+		this._glProjLayer = glProjLayer;
+
+		session.updateRenderState( { layers: [ glProjLayer ] } );
+
+		this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
+		this._xrRenderTarget = new RenderTarget( glProjLayer.textureWidth, glProjLayer.textureHeight, {
+			depth: 2,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			depthBuffer: true,
+			multiview: false,
+			useArrayDepthTexture: true,
+			samples: 0
+		} );
+
+		this._xrRenderTarget.texture.isArrayTexture = true;
+
+		if ( this._useMultiviewIfPossible === true ) {
+
+			warnOnce( 'THREE.XRManager: WebGPU XR does not support multiview yet. Disabling multiview for this XR session.' );
+
+		}
+
+		this._useMultiview = false;
+
+	}
+
+	/**
+	 * Releases WebGPU XR resources associated with the current session.
+	 *
+	 * @private
+	 */
+	_disposeWebGPUSession() {
+
+		const renderer = this._renderer;
+		const xrRenderTarget = this._xrRenderTarget;
+
+		if ( xrRenderTarget === null || renderer.backend.isWebGPUBackend !== true ) return;
+
+		// XR textures are external (from XRGPUBinding), so clear cached state before disposal.
+		const backend = renderer.backend;
+		const texturesModule = renderer._textures;
+
+		const renderTargetData = backend.get ? backend.get( xrRenderTarget ) : null;
+		if ( renderTargetData ) {
+
+			renderTargetData.descriptors = undefined;
+
+		}
+
+		const deleteResource = ( resource ) => {
+
+			if ( resource === null || resource === undefined ) return;
+
+			if ( backend.delete ) backend.delete( resource );
+			if ( texturesModule.delete ) texturesModule.delete( resource );
+
+		};
+
+		for ( let i = 0; i < xrRenderTarget.textures.length; i ++ ) {
+
+			deleteResource( xrRenderTarget.textures[ i ] );
+
+		}
+
+		deleteResource( xrRenderTarget.depthTexture );
+		deleteResource( xrRenderTarget );
+
+		if ( renderer._renderContexts && renderer._renderContexts.dispose ) {
+
+			renderer._renderContexts.dispose();
+
+		}
+
+		xrRenderTarget.dispose();
+
+	}
+
+	/**
+	 * Collects WebGPU XR sub-image data for the current frame.
+	 *
+	 * @private
+	 * @param {Array<XRView>} views - The XR views for the current pose.
+	 * @return {{colorTexture:?GPUTexture, viewDescriptors:Array<Object>, viewports:Array<XRViewport>}} The WebGPU XR view data.
+	 */
+	_getWebGPUViewData( views ) {
+
+		const webgpuBinding = this.getWebGPUBinding();
+		const viewData = {
+			colorTexture: null,
+			viewDescriptors: [],
+			viewports: []
+		};
+
+		for ( let i = 0; i < views.length; i ++ ) {
+
+			const gpuSubImage = webgpuBinding.getViewSubImage( this._glProjLayer, views[ i ] );
+
+			if ( viewData.colorTexture === null ) {
+
+				viewData.colorTexture = gpuSubImage.colorTexture;
+
+			}
+
+			viewData.viewports.push( gpuSubImage.viewport );
+
+			if ( gpuSubImage.getViewDescriptor ) {
+
+				viewData.viewDescriptors.push( gpuSubImage.getViewDescriptor() );
+
+			}
+
+		}
+
+		return viewData;
 
 	}
 
@@ -57173,21 +57468,15 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
-		const backend = renderer.backend;
 
-		if ( session !== null && backend.isWebGPUBackend === true ) {
+		if ( renderer.initialized === false ) await renderer.init();
 
-			throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
-
-		}
+		this._gl = renderer.getContext();
+		const gl = this._gl;
 
 		this._session = session;
 
 		if ( session !== null ) {
-
-			this._gl = renderer.getContext();
-			const gl = this._gl;
-			const attributes = gl.getContextAttributes();
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
@@ -57198,7 +57487,7 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
-			await backend.makeXRCompatible();
+			this._validateWebGPUSession();
 
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
@@ -57209,13 +57498,21 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			if ( this._supportsLayers === true ) {
+			if ( this._isWebGPUSession() ) {
+
+				await this._initWebGPUSession( session );
+
+			} else if ( this._supportsLayers === true ) {
 
 				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
 				let glDepthFormat = null;
+
+				const attributes = gl.getContextAttributes();
+				await renderer.backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				if ( renderer.depth ) {
 
@@ -57299,6 +57596,8 @@ class XRManager extends EventDispatcher {
 			} else {
 
 				// fallback to XRWebGLLayer
+				await renderer.backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				const layerInit = {
 					antialias: renderer.currentSamples > 0,
@@ -57335,8 +57634,6 @@ class XRManager extends EventDispatcher {
 			}
 
 			//
-
-			this.setFoveation( this.getFoveation() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
@@ -57635,13 +57932,23 @@ function onSessionEnd() {
 	this._currentDepthNear = null;
 	this._currentDepthFar = null;
 
+	if ( this._currentSamples !== null ) {
+
+		renderer._samples = this._currentSamples;
+		this._currentSamples = null;
+
+	}
+
 	// restore framebuffer/rendering state
 
 	renderer._resetXRState();
 
+	this._disposeWebGPUSession();
+
 	this._session = null;
 	this._xrRenderTarget = null;
 	this._glBinding = null;
+	this._webgpuBinding = null;
 	this._glBaseLayer = null;
 	this._glProjLayer = null;
 
@@ -57825,7 +58132,9 @@ function onAnimationFrame( time, frame ) {
 
 		const views = pose.views;
 
-		if ( this._glBaseLayer !== null ) {
+		const webgpuViewData = this._isWebGPUSession() ? this._getWebGPUViewData( views ) : null;
+
+		if ( this._glBaseLayer !== null && webgpuViewData === null ) {
 
 			backend.setXRTarget( glBaseLayer.framebuffer );
 
@@ -57848,8 +58157,13 @@ function onAnimationFrame( time, frame ) {
 
 			let viewport;
 
-			if ( this._supportsLayers === true ) {
+			if ( webgpuViewData !== null ) {
 
+				viewport = webgpuViewData.viewports[ i ];
+
+			} else if ( this._supportsLayers === true ) {
+
+				// WebGL path: Use XRWebGLBinding
 				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
 				viewport = glSubImage.viewport;
 
@@ -57877,6 +58191,7 @@ function onAnimationFrame( time, frame ) {
 				camera = new PerspectiveCamera();
 				camera.layers.enable( i );
 				camera.viewport = new Vector4();
+				camera.matrixWorldAutoUpdate = false;
 				this._cameras[ i ] = camera;
 
 			}
@@ -57899,6 +58214,16 @@ function onAnimationFrame( time, frame ) {
 				cameraXR.cameras.push( camera );
 
 			}
+
+		}
+
+		if ( webgpuViewData !== null && webgpuViewData.colorTexture !== null ) {
+
+			backend.setXRRenderTargetTextures(
+				this._xrRenderTarget,
+				webgpuViewData.colorTexture,
+				webgpuViewData.viewDescriptors
+			);
 
 		}
 
@@ -64293,7 +64618,7 @@ ${ flowData.code }
 
 		if ( shaderStage === 'fragment' && outputSnippet.length === 0 ) {
 
-			outputSnippet.push( 'layout( location = 0 ) out vec4 fragColor;' );
+			outputSnippet.push( `layout( location = 0 ) out ${ this.getOutputType() } fragColor;` );
 
 		}
 
@@ -64851,14 +65176,14 @@ void main() {
 					if ( shaderStage === 'vertex' ) {
 
 						flow += 'gl_Position = ';
-						flow += `${ flowSlotData.result };`;
+						flow += `${ this.format( flowSlotData.result, mainNode.getNodeType( this ), 'vec4' ) };`;
 
 					} else if ( shaderStage === 'fragment' ) {
 
 						if ( ! node.outputNode.isOutputStructNode ) {
 
 							flow += 'fragColor = ';
-							flow += `${ flowSlotData.result };`;
+							flow += `${ this.format( flowSlotData.result, mainNode.getNodeType( this ), this.getOutputType() ) };`;
 
 						}
 
@@ -65141,6 +65466,15 @@ class Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	finishRender( /*renderContext*/ ) {}
+
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * Backends that render directly into XR framebuffers can override this hook.
+	 *
+	 * @param {?Object} xrTarget - The XR rendering destination.
+	 */
+	setXRTarget( /*xrTarget*/ ) {}
 
 	/**
 	 * This method is executed at the beginning of a compute call and
@@ -75360,6 +75694,13 @@ class WebGPUTextureUtils {
 
 		if ( textureData.initialized ) {
 
+			// Skip creation for external XR textures - they are already set up
+			if ( textureData.externalTexture === true ) {
+
+				return;
+
+			}
+
 			throw new Error( 'WebGPUTextureUtils: Texture already initialized.' );
 
 		}
@@ -79262,7 +79603,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = '\t@location( 0 ) color: vec4<f32>';
+							let structSnippet = `\t@location( 0 ) color: ${ this.getType( this.getOutputType() ) }`;
 
 							const builtins = this.getBuiltins( 'output' );
 
@@ -79272,7 +79613,7 @@ ${ flowData.code }
 							stageData.structs += this._getWGSLStruct( 'OutputStruct', structSnippet );
 							stageData.structs += '\nvar<private> output : OutputStruct;';
 
-							flow += `output.color = ${ flowSlotData.result };\n\n\treturn output;`;
+							flow += `output.color = ${ this.format( flowSlotData.result, mainNode.getNodeType( this ), this.getOutputType() ) };\n\n\treturn output;`;
 
 						}
 
@@ -80655,7 +80996,7 @@ class WebGPUBindingUtils {
 
 					}
 
-				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture || binding.texture.isStorageTexture ) {
+				} else {
 
 					const type = binding.texture.type;
 
@@ -82566,7 +82907,8 @@ class WebGPUBackend extends Backend {
 
 			const adapterOptions = {
 				powerPreference: parameters.powerPreference,
-				featureLevel: 'compatibility'
+				featureLevel: 'compatibility',
+				xrCompatible: renderer.xr.enabled
 			};
 
 			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
@@ -82649,6 +82991,25 @@ class WebGPUBackend extends Backend {
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * Registers external GPU textures from `XRGPUBinding` for use in rendering.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to register the textures for.
+	 * @param {GPUTexture} colorTexture - The shared XR color GPUTexture.
+	 * @param {?Array<Object>} [viewDescriptors=null] - Optional view descriptors, one per XR view.
+	 */
+	setXRRenderTargetTextures( renderTarget, colorTexture, viewDescriptors = null ) {
+
+		this.set( renderTarget.texture, {
+			texture: colorTexture,
+			format: colorTexture.format,
+			externalTexture: true,
+			xrViewDescriptors: viewDescriptors,
+			initialized: true
+		} );
 
 	}
 
@@ -82828,6 +83189,74 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Returns whether the current render context references external textures.
+	 *
+	 * External textures can change every frame, so their descriptors must not be cached.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {boolean} Whether the render context uses external textures.
+	 */
+	_hasExternalTexture( renderContext ) {
+
+		const textures = renderContext.textures;
+
+		if ( textures === null ) return false;
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			if ( this.get( textures[ i ] ).externalTexture === true ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Creates attachment views for an external texture render target.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} textureData - The backend data for the texture.
+	 * @return {Array<Object>} The attachment view descriptors.
+	 */
+	_createExternalTextureViews( renderContext, textureData ) {
+
+		const textureViews = [];
+		const camera = renderContext.camera;
+
+		if ( textureData.xrViewDescriptors && camera !== null && camera.isArrayCamera === true ) {
+
+			for ( let i = 0; i < textureData.xrViewDescriptors.length; i ++ ) {
+
+				textureViews.push( {
+					view: textureData.texture.createView( textureData.xrViewDescriptors[ i ] ),
+					resolveTarget: undefined,
+					depthSlice: undefined
+				} );
+
+			}
+
+		} else {
+
+			textureViews.push( {
+				view: textureData.texture.createView( {
+					dimension: GPUTextureViewDimension.TwoD,
+					baseArrayLayer: renderContext.activeCubeFace,
+					arrayLayerCount: 1
+				} ),
+				resolveTarget: undefined,
+				depthSlice: undefined
+			} );
+
+		}
+
+		return textureViews;
+
+	}
+
+	/**
 	 * Returns the render pass descriptor for the given render context.
 	 *
 	 * @private
@@ -82839,13 +83268,15 @@ class WebGPUBackend extends Backend {
 
 		const renderTarget = renderContext.renderTarget;
 		const renderTargetData = this.get( renderTarget );
+		const hasExternalTexture = this._hasExternalTexture( renderContext );
 
 		let descriptors = renderTargetData.descriptors;
 
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.samples !== renderTarget.samples ||
+			hasExternalTexture
 		) {
 
 			descriptors = {};
@@ -82857,7 +83288,7 @@ class WebGPUBackend extends Backend {
 		const cacheKey = renderContext.getCacheKey();
 		let descriptorBase = descriptors[ cacheKey ];
 
-		if ( descriptorBase === undefined ) {
+		if ( descriptorBase === undefined || hasExternalTexture ) {
 
 			const textures = renderContext.textures;
 			const textureViews = [];
@@ -82869,6 +83300,13 @@ class WebGPUBackend extends Backend {
 			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const textureData = this.get( textures[ i ] );
+
+				if ( textureData.externalTexture === true ) {
+
+					textureViews.push( ...this._createExternalTextureViews( renderContext, textureData ) );
+					continue;
+
+				}
 
 				_viewDescriptor.label = `colorAttachment_${ i }`;
 				_viewDescriptor.baseMipLevel = renderContext.activeMipmapLevel;

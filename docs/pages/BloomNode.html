@@ -14,6 +14,12 @@
 		<section>
 			<header>
 				<div class="class-description"><p>Post processing node for creating a bloom effect.</p>
+<pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
+const scenePass = pass( scene, camera );
+const scenePassColor = scenePass.getTextureNode( 'output' );
+const bloomPass = bloom( scenePassColor );
+renderPipeline.outputNode = scenePassColor.add( bloomPass );
+</code></pre>
 <p>By default, the node affects the entire image. For a selective bloom,
 use the <code>emissive</code> material property to control which objects should
 contribute to bloom or not. This can be achieved via MRT.</p>
@@ -26,13 +32,6 @@ scenePass.setMRT( mrt( {
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const emissivePass = scenePass.getTextureNode( 'emissive' );
 const bloomPass = bloom( emissivePass );
-renderPipeline.outputNode = scenePassColor.add( bloomPass );
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
-const scenePass = pass( scene, camera );
-const scenePassColor = scenePass.getTextureNode( 'output' );
-const bloomPass = bloom( scenePassColor );
 renderPipeline.outputNode = scenePassColor.add( bloomPass );
 </code></pre></div>
 			</header>

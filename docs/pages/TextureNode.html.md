@@ -54,6 +54,12 @@ When using texture arrays, the depth node defines the layer to select.
 
 Default is `null`.
 
+### .gatherNode : Node.<int>
+
+Represents the optional index constant of the channel to gather. This must be in range \[0, 3\] and a compile-time constant.
+
+Default is `null`.
+
 ### .gradNode : Array.<Node.<vec2>>
 
 When defined, a texture is sampled using explicit gradients.
@@ -164,6 +170,18 @@ The depth node.
 
 **Returns:** A texture node representing the texture sample.
 
+### .gather( gatherNode : Node.<int> ) : TextureNode
+
+Gathers four texels from the texture.
+
+**gatherNode**
+
+The index of the channel to read. This must be in range \[0, 3\] and a compile-time constant.
+
+Default is `0`.
+
+**Returns:** A texture node representing the texture sample.
+
 ### .generate( builder : NodeBuilder, output : string ) : string
 
 Generates the code snippet of the texture node.
@@ -206,7 +224,7 @@ The offset node to generate code for.
 
 **Returns:** The generated code snippet.
 
-### .generateSnippet( builder : NodeBuilder, textureProperty : string, uvSnippet : string, levelSnippet : string, biasSnippet : string, depthSnippet : string, compareSnippet : string, gradSnippet : Array.<string>, offsetSnippet : string ) : string
+### .generateSnippet( builder : NodeBuilder, textureProperty : string, uvSnippet : string, levelSnippet : string, biasSnippet : string, depthSnippet : string, compareSnippet : string, gradSnippet : Array.<string>, gatherSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
 
 Generates the snippet for the texture sampling.
 
@@ -242,9 +260,17 @@ The compare snippet.
 
 The grad snippet.
 
+**gatherSnippet**
+
+The gather snippet.
+
 **offsetSnippet**
 
 The offset snippet.
+
+**flipYSnippet**
+
+The y-flip snippet. Only used for WebGL.
 
 **Returns:** The generated code snippet.
 

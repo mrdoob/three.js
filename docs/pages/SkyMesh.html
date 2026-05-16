@@ -22,17 +22,16 @@ When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Sky.html
 <li><a href="http://simonwallner.at/project/atmospheric-scattering/" target="_blank" rel="noopener">http://simonwallner.at/project/atmospheric-scattering/</a></li>
 <li><a href="http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR" target="_blank" rel="noopener">http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR</a></li>
 </ul>
+<pre><code class="language-js">const sky = new SkyMesh();
+sky.scale.setScalar( 10000 );
+scene.add( sky );
+</code></pre>
 <p>It can be useful to hide the sun disc when generating an environment map to avoid artifacts</p>
 <pre><code class="language-js">// disable before rendering environment map
 sky.showSunDisc.value = false;
 // ...
 // re-enable before scene sky box rendering
 sky.showSunDisc.value = true;
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const sky = new SkyMesh();
-sky.scale.setScalar( 10000 );
-scene.add( sky );
 </code></pre></div>
 			</header>
 			<article>

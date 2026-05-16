@@ -1901,6 +1901,22 @@ The rotation applied to the third axis, in radians.
 
 A string specifying the axes order.
 
+### .setupWebGLXRFallback( renderer : WebGPURenderer, createFallbackRenderer : function, onFallback : function )
+
+Sets up a construction-time WebGL fallback for WebGPU XR examples.
+
+**renderer**
+
+The initial renderer.
+
+**createFallbackRenderer**
+
+A function that returns a new renderer with a WebGL backend.
+
+**onFallback**
+
+A function that installs the new renderer in the app.
+
 ### .shadowRenderObjectFunction( object : Object3D, scene : Scene, _camera : Camera, geometry : BufferGeometry, material : Material, group : Group, …params : any )
 
 Shadow Render Object Function.

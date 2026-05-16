@@ -147,6 +147,10 @@ Returns `true` if a framebuffer target is needed to perform tone mapping or colo
 
 A callback function that defines what should happen when a device/context lost occurs.
 
+### .onError : function
+
+A callback function that defines what should happen when an uncaptured backend error is reported (e.g. a WebGPU validation/out-of-memory/internal error raised outside an error scope). Applications can override this to surface errors in their own UI without letting them escalate to a device loss. The default implementation logs to the console.
+
 ### .opaque : boolean
 
 Whether the renderer should render opaque render objects or not.

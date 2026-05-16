@@ -62,7 +62,7 @@ Default is `0`.
 
 ### .displacementMap : Texture
 
-The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh.
+The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh. For best results, pair a displacement map with a matching normal map, since the renderer can not recompute surface normals from the displaced vertices.
 
 Default is `null`.
 

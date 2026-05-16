@@ -3344,6 +3344,55 @@ Useful for masking effects based on distance from center.</p>
 							<p>TSL function for setting up alpha to coverage.</p>
 						</div>
 					</div>
+					<h3 class="name name-method" id="clusteredLights" translate="no">.<a href="#clusteredLights">clusteredLights</a><span class="signature">( maxLights : <span class="param-type">number</span>, tileSize : <span class="param-type">number</span>, zSlices : <span class="param-type">number</span>, maxLightsPerCluster : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function that creates a clustered lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of point lights.</p>
+										<p>Default is <code>1024</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">tileSize</strong>
+									</td>
+									<td class="description last">
+										<p>Screen tile size in pixels.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">zSlices</strong>
+									</td>
+									<td class="description last">
+										<p>Depth slice count.</p>
+										<p>Default is <code>24</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLightsPerCluster</strong>
+									</td>
+									<td class="description last">
+										<p>Per-cluster light-list capacity.</p>
+										<p>Default is <code>64</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clustered lights node.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="code" translate="no">.<a href="#code">code</a><span class="signature">( code : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span>, language : <span class="param-type">'js' | 'wgsl' | 'glsl'</span> )</span><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -6527,32 +6576,6 @@ When no material is set, the node refers to the material of the current rendered
 								</tr>
 							</tbody>
 						</table>
-					</div>
-					<h3 class="name name-method" id="modInt" translate="no">.<a href="#modInt">modInt</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
-					<div class="method">
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">a</strong>
-									</td>
-									<td class="description last">
-										<p>The first input.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">b</strong>
-									</td>
-									<td class="description last">
-										<p>The second input.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r175. Use <a href="TSL.html#mod">mod</a> instead.</dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="morphReference" translate="no">.<a href="#morphReference">morphReference</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="MorphNode.html">MorphNode</a></span> </h3>
 					<div class="method">
@@ -9933,6 +9956,42 @@ to complete before the barrier can be passed.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="storageTexture3D" translate="no">.<a href="#storageTexture3D">storageTexture3D</a><span class="signature">( value : <span class="param-type"><a href="Storage3DTexture.html">Storage3DTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTexture3DNode.html">StorageTexture3DNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a 3D storage texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D storage texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">storeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node that should be stored in the texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="struct" translate="no">.<a href="#struct">struct</a><span class="signature">( membersLayout : <span class="param-type">Object</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : function</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -10919,7 +10978,7 @@ to complete before the barrier can be passed.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="textureStore" translate="no">.<a href="#textureStore">textureStore</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="textureStore" translate="no">.<a href="#textureStore">textureStore</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a> | <a href="StorageTextureNode.html">StorageTextureNode</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TODO: Explain difference to <code>storageTexture()</code>.</p>

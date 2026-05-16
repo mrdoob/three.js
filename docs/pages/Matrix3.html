@@ -18,6 +18,11 @@
 <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order" target="_blank" rel="noopener">row-major</a>
 order, while internally they are stored in the <a href="Matrix3.html#elements">Matrix3#elements</a> array in column-major order.
 This means that calling:</p>
+<pre><code class="language-js">const m = new THREE.Matrix();
+m.set( 11, 12, 13,
+       21, 22, 23,
+       31, 32, 33 );
+</code></pre>
 <p>will result in the elements array containing:</p>
 <pre><code class="language-js">m.elements = [ 11, 21, 31,
                12, 22, 32,
@@ -29,12 +34,6 @@ most people are used to thinking about matrices in row-major order, the
 three.js documentation shows matrices in row-major order. Just bear in
 mind that if you are reading the source code, you'll have to take the
 transpose of any matrices outlined here to make sense of the calculations.</p></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const m = new THREE.Matrix();
-m.set( 11, 12, 13,
-       21, 22, 23,
-       31, 32, 33 );
-</code></pre></div>
 			</header>
 			<article>
 				<div class="container-overview">

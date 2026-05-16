@@ -124,9 +124,9 @@ The node to add.
 
 **index**
 
-The index where the node should be added.
+The index of the node. If not specified, the node will be added to the end of the stack.
 
-Default is `this.nodes.length`.
+Default is `-1`.
 
 **Returns:** A reference to this stack node.
 

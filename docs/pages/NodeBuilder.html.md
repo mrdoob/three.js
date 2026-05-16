@@ -766,7 +766,7 @@ Returns a list bindings of all shader stages separated by groups.
 
 **Returns:** The list of bindings.
 
-### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string ) : NodeAttribute
+### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string, name : string ) : NodeAttribute
 
 Returns an instance of [NodeAttribute](NodeAttribute.html) for the given buffer attribute node.
 
@@ -777,6 +777,12 @@ The buffer attribute node.
 **type**
 
 The node type.
+
+**name**
+
+The name of the buffer attribute.
+
+Default is `null`.
 
 **Returns:** The node attribute.
 
@@ -1041,6 +1047,18 @@ The output struct node.
 The output struct types.
 
 **Returns:** The struct type attribute.
+
+### .getOutputType( index : number ) : string
+
+Returns the type of the color output based on the renderer's render target.
+
+**index**
+
+The index of the render target texture.
+
+Default is `0`.
+
+**Returns:** The type.
 
 ### .getPropertyName( node : Node, shaderStage : 'vertex' | 'fragment' | 'compute' | 'any' ) : string
 

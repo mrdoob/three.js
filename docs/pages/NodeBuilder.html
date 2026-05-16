@@ -1413,7 +1413,7 @@ this method might be used to convert a simple float string <code>&quot;1.0&quot;
 							<dt class="tag-returns"><strong>Returns:</strong> The list of bindings.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getBufferAttributeFromNode" translate="no">.<a href="#getBufferAttributeFromNode">getBufferAttributeFromNode</a><span class="signature">( node : <span class="param-type"><a href="BufferAttributeNode.html">BufferAttributeNode</a></span>, type : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeAttribute.html">NodeAttribute</a></span> </h3>
+					<h3 class="name name-method" id="getBufferAttributeFromNode" translate="no">.<a href="#getBufferAttributeFromNode">getBufferAttributeFromNode</a><span class="signature">( node : <span class="param-type"><a href="BufferAttributeNode.html">BufferAttributeNode</a></span>, type : <span class="param-type">string</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeAttribute.html">NodeAttribute</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns an instance of <a href="NodeAttribute.html">NodeAttribute</a> for the given buffer attribute node.</p>
@@ -1434,6 +1434,15 @@ this method might be used to convert a simple float string <code>&quot;1.0&quot;
 									</td>
 									<td class="description last">
 										<p>The node type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the buffer attribute.</p>
+										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1945,6 +1954,28 @@ to the current node's properties in the setup stage and building those propertie
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The struct type attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputType" translate="no">.<a href="#getOutputType">getOutputType</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the type of the color output based on the renderer's render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the render target texture.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getPropertyName" translate="no">.<a href="#getPropertyName">getPropertyName</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, shaderStage : <span class="param-type">'vertex' | 'fragment' | 'compute' | 'any'</span> )</span><span class="type-signature"> : string</span> </h3>

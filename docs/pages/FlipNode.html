@@ -16,12 +16,11 @@
 				<div class="class-description"><p>This module is part of the TSL core and usually not used in app level code.
 It represents a flip operation during the shader generation process
 meaning it flips normalized values with the following formula:</p>
+<pre class="prettyprint source"><code>x = 1 - x;
+</code></pre>
 <p><code>FlipNode</code> is internally used to implement any <code>flipXYZW()</code>, <code>flipRGBA()</code> and
 <code>flipSTPQ()</code> method invocations on node objects. For example:</p>
 <pre><code class="language-js">uvNode = uvNode.flipY();
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source"><code>x = 1 - x;
 </code></pre></div>
 			</header>
 			<article>

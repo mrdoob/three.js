@@ -26,6 +26,10 @@ The CSM data.
 
 An object representing the vertices of the near and far plane in view space.
 
+### .zFar : number
+
+The zFar value.
+
 ### .zNear : number
 
 The zNear value. This value depends on whether the CSM is used with WebGL or WebGPU. Both API use different conventions for their projection matrices.
@@ -80,6 +84,11 @@ Constructor data of `CSMFrustum`.
 boolean
 
 Whether this CSM frustum is used with WebGL or WebGPU.
+
+**reversedDepth**  
+boolean
+
+Whether reversed depth buffer is enabled.
 
 **projectionMatrix**  
 [Matrix4](Matrix4.html)

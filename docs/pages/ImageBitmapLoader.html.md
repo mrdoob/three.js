@@ -8,6 +8,10 @@ Note that [Texture#flipY](Texture.html#flipY) and [Texture#premultiplyAlpha](Tex
 
 To match the default behaviour of [Texture](Texture.html), the following options are needed:
 
+```js
+{ imageOrientation: 'flipY', premultiplyAlpha: 'none' }
+```
+
 Also note that unlike [FileLoader](FileLoader.html), this loader will only avoid multiple concurrent requests to the same URL if [Cache](Cache.html) is enabled.
 
 ```js
@@ -16,12 +20,6 @@ loader.setOptions( { imageOrientation: 'flipY' } ); // set options if needed
 const imageBitmap = await loader.loadAsync( 'image.png' );
 const texture = new THREE.Texture( imageBitmap );
 texture.needsUpdate = true;
-```
-
-## Code Example
-
-```js
-{ imageOrientation: 'flipY', premultiplyAlpha: 'none' }
 ```
 
 ## Constructor

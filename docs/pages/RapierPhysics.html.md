@@ -90,6 +90,24 @@ box.userData.physics = { mass: 1, restitution: 0 };
 
 The scene or any type of 3D object to add.
 
+### .applyImpulse( mesh : Mesh, impulse : Vector3, index : number )
+
+Applies an impulse to the given mesh which is part of the physics simulation.
+
+**mesh**
+
+The mesh to apply the impulse to.
+
+**impulse**
+
+The impulse to apply.
+
+**index**
+
+If the mesh is instanced, the index represents the instanced ID.
+
+Default is `0`.
+
 ### .removeMesh( mesh : Mesh )
 
 Removes the given mesh from this physics simulation.
