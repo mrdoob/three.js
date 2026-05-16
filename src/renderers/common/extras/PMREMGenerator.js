@@ -146,15 +146,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'PMREMGenerator: ".fromScene()" called before the backend is initialized. Try using "await renderer.init()" instead.' );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget( true );
-
-			options.renderTarget = cubeUVRenderTarget;
-
-			this.fromSceneAsync( scene, sigma, near, far, options );
-
-			return cubeUVRenderTarget;
+			throw new Error( 'PMREMGenerator: .fromScene() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -226,15 +218,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using "await renderer.init()" instead.' );
-
-			this._setSizeFromTexture( equirectangular );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
-
-			this.fromEquirectangularAsync( equirectangular, cubeUVRenderTarget );
-
-			return cubeUVRenderTarget;
+			throw new Error( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -278,15 +262,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
-
-			this._setSizeFromTexture( cubemap );
-
-			const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
-
-			this.fromCubemapAsync( cubemap, cubeUVRenderTarget );
-
-			return cubeUVRenderTarget;
+			throw new Error( 'PMREMGenerator: .fromCubemap() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
