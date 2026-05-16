@@ -644,7 +644,7 @@ class LDrawParsedCache {
 
 		}
 
-		throw new Error( 'LDrawLoader: Subobject "' + fileName + '" could not be loaded.' );
+		throw new Error( 'THREE.LDrawLoader: Subobject "' + fileName + '" could not be loaded.' );
 
 	}
 
@@ -1060,7 +1060,7 @@ class LDrawParsedCache {
 					break;
 
 				default:
-					throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
+					throw new Error( 'THREE.LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
 
 			}
 
@@ -2217,7 +2217,7 @@ class LDrawLoader extends Loader {
 		const name = lineParser.getToken();
 		if ( ! name ) {
 
-			throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
+			throw new Error( 'THREE.LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
 
 		}
 
@@ -2251,7 +2251,7 @@ class LDrawLoader extends Loader {
 
 						} else if ( ! fillColor.startsWith( '#' ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'THREE.LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -2270,7 +2270,7 @@ class LDrawLoader extends Loader {
 							edgeMaterial = this.getMaterial( edgeColor );
 							if ( ! edgeMaterial ) {
 
-								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
+								throw new Error( 'THREE.LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 							}
 
@@ -2287,7 +2287,7 @@ class LDrawLoader extends Loader {
 
 						if ( isNaN( alpha ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'THREE.LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -2305,7 +2305,7 @@ class LDrawLoader extends Loader {
 
 						if ( ! parseLuminance( lineParser.getToken() ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'THREE.LDrawLoader: Invalid luminance value in material definition' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -2337,7 +2337,7 @@ class LDrawLoader extends Loader {
 						break;
 
 					default:
-						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
+						throw new Error( 'THREE.LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
 
 				}
 

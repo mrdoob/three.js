@@ -146,7 +146,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			throw new Error( 'PMREMGenerator: .fromScene() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -218,7 +218,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			throw new Error( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -262,7 +262,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			throw new Error( 'PMREMGenerator: .fromCubemap() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 

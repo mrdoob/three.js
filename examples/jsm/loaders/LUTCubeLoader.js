@@ -118,7 +118,7 @@ export class LUTCubeLoader extends Loader {
 
 		if ( result === null ) {
 
-			throw new Error( 'LUTCubeLoader: Missing LUT_3D_SIZE information' );
+			throw new Error( 'THREE.LUTCubeLoader: Missing LUT_3D_SIZE information' );
 
 		}
 
@@ -147,7 +147,7 @@ export class LUTCubeLoader extends Loader {
 
 		if ( domainMin.x > domainMax.x || domainMin.y > domainMax.y || domainMin.z > domainMax.z ) {
 
-			throw new Error( 'LUTCubeLoader: Invalid input domain' );
+			throw new Error( 'THREE.LUTCubeLoader: Invalid input domain' );
 
 		}
 

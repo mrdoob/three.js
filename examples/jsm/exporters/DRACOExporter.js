@@ -146,7 +146,7 @@ class DRACOExporter {
 
 		} else {
 
-			throw new Error( 'DRACOExporter: Unsupported object type.' );
+			throw new Error( 'THREE.DRACOExporter: Unsupported object type.' );
 
 		}
 
