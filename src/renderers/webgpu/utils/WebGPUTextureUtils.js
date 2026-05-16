@@ -283,7 +283,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			throw new Error( 'WebGPUTextureUtils: Texture already initialized.' );
+			throw new Error( 'THREE.WebGPUTextureUtils: Texture already initialized.' );
 
 		}
 

@@ -1277,7 +1277,7 @@ class BatchedMesh extends Mesh {
 		// throw an error if it can't be shrunk to the desired size
 		if ( maxInstanceCount < instanceInfo.length ) {
 
-			throw new Error( `BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
+			throw new Error( `THREE.BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
 
 		}
 
@@ -1329,7 +1329,7 @@ class BatchedMesh extends Mesh {
 		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.reservedVertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
-			throw new Error( `BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+			throw new Error( `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 		}
 
@@ -1339,7 +1339,7 @@ class BatchedMesh extends Mesh {
 			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.reservedIndexCount ) );
 			if ( requiredIndexLength > maxIndexCount ) {
 
-				throw new Error( `BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+				throw new Error( `THREE.BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 			}
 

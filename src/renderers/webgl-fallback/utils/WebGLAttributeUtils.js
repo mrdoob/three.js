@@ -286,7 +286,7 @@ class WebGLAttributeUtils {
 
 			if ( target._mapped === true ) {
 
-				throw new Error( 'WebGPURenderer: ReadbackBuffer must be released before being used again.' );
+				throw new Error( 'THREE.WebGPURenderer: ReadbackBuffer must be released before being used again.' );
 
 			}
 

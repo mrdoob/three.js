@@ -18,7 +18,7 @@ class TileShadowNodeHelper extends Group {
 
 		if ( ! tileShadowNode ) {
 
-			throw new Error( 'TileShadowNode instance is required for TileShadowNodeHelper.' );
+			throw new Error( 'THREE.TileShadowNode instance is required for TileShadowNodeHelper.' );
 
 		}
 

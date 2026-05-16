@@ -269,7 +269,7 @@ class USDLoader extends Loader {
 
 			if ( ! file ) {
 
-				throw new Error( 'USDLoader: Invalid USDZ package. The first ZIP entry must be a USD layer (.usd/.usda/.usdc).' );
+				throw new Error( 'THREE.USDLoader: Invalid USDZ package. The first ZIP entry must be a USD layer (.usd/.usda/.usdc).' );
 
 			}
 
@@ -277,7 +277,7 @@ class USDLoader extends Loader {
 			const data = assets[ filename ];
 			if ( ! data ) {
 
-				throw new Error( 'USDLoader: Failed to parse root layer "' + filename + '".' );
+				throw new Error( 'THREE.USDLoader: Failed to parse root layer "' + filename + '".' );
 
 			}
 

@@ -297,7 +297,7 @@ class Interpolant {
 	 */
 	interpolate_( /* i1, t0, t, t1 */ ) {
 
-		throw new Error( 'call to abstract method' );
+		throw new Error( 'THREE.Interpolant: Call to abstract method.' );
 		// implementations shall return this.resultBuffer
 
 	}

@@ -1253,7 +1253,7 @@ class WebGLTextureUtils {
 		if ( glType === gl.HALF_FLOAT ) return Uint16Array;
 		if ( glType === gl.FLOAT ) return Float32Array;
 
-		throw new Error( `Unsupported WebGL type: ${glType}` );
+		throw new Error( `THREE.WebGLTextureUtils: Unsupported WebGL type: ${glType}` );
 
 	}
 

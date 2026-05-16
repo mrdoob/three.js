@@ -398,11 +398,11 @@ class WebGLRenderer {
 
 					if ( getContext( contextName ) ) {
 
-						throw new Error( 'Error creating WebGL context with your selected attributes.' );
+						throw new Error( 'THREE.WebGLRenderer: Error creating WebGL context with your selected attributes.' );
 
 					} else {
 
-						throw new Error( 'Error creating WebGL context.' );
+						throw new Error( 'THREE.WebGLRenderer: Error creating WebGL context.' );
 
 					}
 
@@ -2941,7 +2941,7 @@ class WebGLRenderer {
 							( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
 						) {
 
-							throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+							throw new Error( 'THREE.WebGLRenderer: Attached DepthTexture is initialized to the incorrect size.' );
 
 						}
 

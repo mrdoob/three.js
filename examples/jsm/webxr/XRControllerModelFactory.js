@@ -353,7 +353,7 @@ class XRControllerModelFactory {
 
 					if ( ! this.gltfLoader ) {
 
-						throw new Error( 'GLTFLoader not set.' );
+						throw new Error( 'THREE.XRControllerModelFactory: GLTFLoader not set.' );
 
 					}
 
@@ -372,7 +372,7 @@ class XRControllerModelFactory {
 					null,
 					() => {
 
-						throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
+						throw new Error( `THREE.XRControllerModelFactory: Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
 
 					} );
 

@@ -60,7 +60,7 @@ function setupWebGLXRFallback( renderer, createFallbackRenderer, onFallback = ()
 
 		if ( fallbackRenderer.backend.isWebGLBackend !== true ) {
 
-			throw new Error( 'WebGLXRFallback: createFallbackRenderer() must return a renderer with a WebGL backend.' );
+			throw new Error( 'THREE.WebGLXRFallback: createFallbackRenderer() must return a renderer with a WebGL backend.' );
 
 		}
 

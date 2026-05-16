@@ -955,7 +955,7 @@ class NodeBuilder {
 
 		if ( lastChain !== node ) {
 
-			throw new Error( 'NodeBuilder: Invalid node chaining!' );
+			throw new Error( 'THREE.NodeBuilder: Invalid node chaining!' );
 
 		}
 
@@ -1386,7 +1386,7 @@ class NodeBuilder {
 
 		}
 
-		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
+		throw new Error( `THREE.NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
 	}
 
@@ -1753,7 +1753,7 @@ class NodeBuilder {
 
 		} else {
 
-			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+			throw new Error( 'THREE.NodeBuilder: Invalid active stack removal.' );
 
 		}
 
@@ -3245,7 +3245,7 @@ class NodeBuilder {
 			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
 			else {
 
-				throw new Error( `Uniform "${ type }" not implemented.` );
+				throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
 
 			}
 

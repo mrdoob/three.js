@@ -39,13 +39,13 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
 
-		throw new Error( 'BufferGeometryUtils: Initialized MikkTSpace library required.' );
+		throw new Error( 'THREE.BufferGeometryUtils: Initialized MikkTSpace library required.' );
 
 	}
 
 	if ( ! geometry.hasAttribute( 'position' ) || ! geometry.hasAttribute( 'normal' ) || ! geometry.hasAttribute( 'uv' ) ) {
 
-		throw new Error( 'BufferGeometryUtils: Tangents require "position", "normal", and "uv" attributes.' );
+		throw new Error( 'THREE.BufferGeometryUtils: Tangents require "position", "normal", and "uv" attributes.' );
 
 	}
 

@@ -1324,7 +1324,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
+			throw new Error( 'THREE.Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
 
@@ -2330,7 +2330,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -2903,7 +2903,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -2953,7 +2953,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -2970,7 +2970,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -3553,7 +3553,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .hasCompatibility() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
+			throw new Error( 'THREE.Renderer: .hasCompatibility() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 

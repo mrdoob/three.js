@@ -260,7 +260,7 @@ class WebGPUUtils {
 
 		} else {
 
-			throw new Error( 'Unsupported output buffer type.' );
+			throw new Error( 'THREE.WebGPUUtils: Unsupported output buffer type.' );
 
 		}
 
