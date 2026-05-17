@@ -66,15 +66,89 @@ class ParametersGroup {
 
 	}
 
-	_addParameter( object, property, editor, subItem ) {
+	_addInfo( editor, itemNode ) {
 
-		editor.name = ( name ) => {
+		editor.info = ( text ) => {
 
-			subItem.data[ 0 ].textContent = name;
+			let infoIcon = itemNode.querySelector( '.info-icon' );
+
+			if ( ! infoIcon ) {
+
+				infoIcon = document.createElement( 'span' );
+				infoIcon.className = 'info-icon';
+				infoIcon.textContent = 'i';
+
+				itemNode.appendChild( infoIcon );
+
+				infoIcon.addEventListener( 'mouseenter', () => {
+
+					const container = infoIcon.closest( '.three-inspector' ) || document.body;
+					let tooltip = container.querySelector( '.three-inspector-info-tooltip' );
+
+					if ( ! tooltip ) {
+
+						tooltip = document.createElement( 'div' );
+						tooltip.className = 'info-tooltip three-inspector-info-tooltip';
+						container.appendChild( tooltip );
+
+					}
+
+					const html = text.trim().replace( /### (.*?)(?:\r?\n|$)/g, '<h3>$1</h3>' )
+								   .replace( /\*\*(.*?)\*\*/g, '<strong>$1</strong>' )
+								   .replace( /\n/g, '<br/>' );
+
+					tooltip.innerHTML = html;
+
+					const rect = infoIcon.getBoundingClientRect();
+
+					tooltip.style.left = ( rect.left + rect.width / 2 ) + 'px';
+					tooltip.style.top = ( rect.top - 8 ) + 'px';
+
+					tooltip.style.opacity = '1';
+					tooltip.style.visibility = 'visible';
+
+				} );
+
+				infoIcon.addEventListener( 'mouseleave', () => {
+
+					const container = infoIcon.closest( '.three-inspector' ) || document.body;
+					const tooltip = container.querySelector( '.three-inspector-info-tooltip' );
+					if ( tooltip ) {
+
+						tooltip.style.opacity = '0';
+						tooltip.style.visibility = 'hidden';
+
+					}
+
+				} );
+
+			}
 
 			return editor;
 
 		};
+
+	}
+
+	_addParameter( object, property, editor, subItem ) {
+
+		editor.name = ( name ) => {
+
+			if ( subItem.data[ 0 ].childNodes.length > 0 && subItem.data[ 0 ].firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				subItem.data[ 0 ].firstChild.textContent = name;
+
+			} else {
+
+				subItem.data[ 0 ].insertBefore( document.createTextNode( name ), subItem.data[ 0 ].firstChild );
+
+			}
+
+			return editor;
+
+		};
+
+		this._addInfo( editor, subItem.data[ 0 ] );
 
 		editor.listen = () => {
 
@@ -328,11 +402,23 @@ class ParametersGroup {
 
 		editor.name = ( name ) => {
 
-			editor.domElement.childNodes[ 0 ].textContent = name;
+			const buttonNode = editor.domElement.childNodes[ 0 ];
+
+			if ( buttonNode.childNodes.length > 0 && buttonNode.firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				buttonNode.firstChild.textContent = name;
+
+			} else {
+
+				buttonNode.insertBefore( document.createTextNode( name ), buttonNode.firstChild );
+
+			}
 
 			return editor;
 
 		};
+
+		this._addInfo( editor, editor.domElement.childNodes[ 0 ] );
 
 		this._registerParameter( object, property, editor, subItem );
 
