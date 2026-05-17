@@ -106,7 +106,7 @@
     "jsdoc": "^4.0.5",
     "magic-string": "^0.30.0",
     "pngjs": "^7.0.0",
-    "puppeteer": "^24.40.0",
+    "puppeteer": "^25.0.0",
     "rollup": "^4.6.0",
     "turndown": "^7.2.2"
   },
