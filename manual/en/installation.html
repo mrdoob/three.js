@@ -111,7 +111,7 @@ npm install --save-dev vite
                 <details>
                   <summary>Improve your editor auto-completion with <i>jsconfig</i> or <i>tsconfig</i></summary>
                   <p>
-                    Place a <i>jsconfig.json</i> (or <i>tsconfig.json</i> for TypeScript projects) in your project's root. Adding the configuration below helps your editor locate three.js files for enhanced auto-completion.
+                    Place a <i>jsconfig.json</i> in your project's root. Adding the configuration below helps your editor locate three.js files for enhanced auto-completion.
                   </p>
 <pre class="prettyprint notranslate lang-js" translate="no">
 {
@@ -120,6 +120,20 @@ npm install --save-dev vite
     "paths": {
       "three/webgpu": ["node_modules/three/build/three.webgpu.js"],
       "three/tsl": ["node_modules/three/build/three.tsl.js"],
+    },
+  }
+}
+</pre>
+                  <p>
+                    For TypeScript projects using <i>tsconfig.json</i>, install <i>@types/three</i> and point these paths to the declaration files instead.
+                  </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+{
+  "compilerOptions": {
+    // other options...
+    "paths": {
+      "three/webgpu": ["node_modules/@types/three/src/Three.WebGPU.d.ts"],
+      "three/tsl": ["node_modules/@types/three/src/Three.TSL.d.ts"],
     },
   }
 }
