@@ -90,7 +90,18 @@
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
-			let canvas, renderer;
+			const canvas = document.getElementById( 'c' );
+
+			const renderer = new THREE.WebGLRenderer( { canvas, antialias: true } );
+			renderer.setClearColor( 0xffffff, 1 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+
+			const loader = new KTX2Loader()
+				.setTranscoderPath( 'jsm/libs/basis/' )
+				.setPath( 'textures/ktx2/' )
+				.detectSupport( renderer );
+
+			const formats = loader.workerConfig;
 
 			const scenes = [];
 
@@ -115,14 +126,14 @@
 						+ ' reducing memory cost. Requires native support on the device GPU: no single compressed'
 						+ ' format is supported on every device.',
 					textures: [
-						{ path: '2d_astc4x4.ktx2' },
-						{ path: '2d_etc1.ktx2' },
-						{ path: '2d_etc2.ktx2' },
-						{ path: '2d_bc1.ktx2' },
-						{ path: '2d_bc3.ktx2' },
-						{ path: '2d_bc4.ktx2' },
-						{ path: '2d_bc5.ktx2' },
-						{ path: '2d_bc7.ktx2' },
+						{ path: '2d_astc4x4.ktx2', supported: formats[ 'astcSupported' ] },
+						{ path: '2d_etc1.ktx2', supported: formats[ 'etc1Supported' ] },
+						{ path: '2d_etc2.ktx2', supported: formats[ 'etc2Supported' ] },
+						{ path: '2d_bc1.ktx2', supported: formats[ 'dxtSupported' ] || formats[ 'bptcSupported' ] },
+						{ path: '2d_bc3.ktx2', supported: formats[ 'dxtSupported' ] || formats[ 'bptcSupported' ] },
+						{ path: '2d_bc4.ktx2', supported: formats[ 'rgtcSupported' ] || formats[ 'bptcSupported' ] },
+						{ path: '2d_bc5.ktx2', supported: formats[ 'rgtcSupported' ] || formats[ 'bptcSupported' ] },
+						{ path: '2d_bc7.ktx2', supported: formats[ 'bptcSupported' ] }
 					]
 				},
 
@@ -142,17 +153,6 @@
 			init();
 
 			async function init() {
-
-				canvas = document.getElementById( 'c' );
-
-				renderer = new THREE.WebGLRenderer( { canvas, antialias: true } );
-				renderer.setClearColor( 0xffffff, 1 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-
-				const loader = new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
-					.setPath( 'textures/ktx2/' )
-					.detectSupport( renderer );
 
 				const geometry = flipY( new THREE.PlaneGeometry( 1, 1 ) );
 
