@@ -13,6 +13,10 @@ import {
 
 const _taskCache = new WeakMap();
 
+const WASM_BIN_URL = new URL( '../libs/draco/draco_decoder.wasm', import.meta.url ).toString();
+const WASM_JS_URL = new URL( '../libs/draco/draco_wasm_wrapper.js', import.meta.url ).toString();
+const JS_URL = new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toString();
+
 /**
  * A loader for the Draco format.
  *
@@ -358,14 +362,31 @@ class DRACOLoader extends Loader {
 		const useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js';
 		const librariesPending = [];
 
-		if ( useJS ) {
+		if ( this.decoderPath === '' ) {
 
-			librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
+			if ( useJS ) {
+
+				librariesPending.push( this._loadLibrary( JS_URL, 'text' ) );
+
+			} else {
+
+				librariesPending.push( this._loadLibrary( WASM_JS_URL, 'text' ) );
+				librariesPending.push( this._loadLibrary( WASM_BIN_URL, 'arraybuffer' ) );
+
+			}
 
 		} else {
 
-			librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
-			librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
+			if ( useJS ) {
+
+				librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
+
+			} else {
+
+				librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
+				librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
+
+			}
 
 		}
 
