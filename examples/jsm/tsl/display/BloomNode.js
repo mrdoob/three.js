@@ -83,21 +83,21 @@ class BloomNode extends TempNode {
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.strength = uniform( strength );
+		this.strength = strength.isNode ? strength : uniform( strength );
 
 		/**
 		 * The radius of the bloom. Must be in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.radius = uniform( radius );
+		this.radius = radius.isNode ? radius : uniform( radius );
 
 		/**
 		 * The luminance threshold limits which bright areas contribute to the bloom effect.
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.threshold = uniform( threshold );
+		this.threshold = threshold.isNode ? threshold : uniform( threshold );
 
 		/**
 		 * Can be used to tweak the extracted luminance from the scene.
