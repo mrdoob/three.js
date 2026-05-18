@@ -197,13 +197,27 @@ class RTTNode extends TextureNode {
 
 		//
 
+		const currentRenderTarget = renderer.getRenderTarget();
+
 		if ( this.autoResize === true ) {
 
-			const pixelRatio = renderer.getPixelRatio();
-			const size = renderer.getSize( _size );
+			let effectiveWidth;
+			let effectiveHeight;
 
-			const effectiveWidth = Math.floor( size.width * pixelRatio );
-			const effectiveHeight = Math.floor( size.height * pixelRatio );
+			if ( currentRenderTarget ) {
+
+				effectiveWidth = currentRenderTarget.width;
+				effectiveHeight = currentRenderTarget.height;
+
+			} else {
+
+				const pixelRatio = renderer.getPixelRatio();
+				const size = renderer.getSize( _size );
+
+				effectiveWidth = Math.floor( size.width * pixelRatio );
+				effectiveHeight = Math.floor( size.height * pixelRatio );
+
+			}
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
@@ -230,8 +244,6 @@ class RTTNode extends TextureNode {
 		this._quadMesh.name = name;
 
 		//
-
-		const currentRenderTarget = renderer.getRenderTarget();
 
 		renderer.setRenderTarget( this.renderTarget );
 
