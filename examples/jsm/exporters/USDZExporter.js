@@ -247,7 +247,15 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+		if ( scene.isScene ) {
+
+			buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+
+		} else {
+
+			buildNode( scene, sceneNode, materials, usedNames, files, options );
+
+		}
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -544,71 +552,66 @@ function buildHierarchy( object, parentNode, materials, usedNames, files, option
 
 	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-		const child = object.children[ i ];
-
-		if ( child.visible === false && options.onlyVisible === true ) continue;
-
-		let childNode;
-
-		if ( child.isMesh ) {
-
-			const geometry = child.geometry;
-			const material = child.material;
-
-			if ( material.isMeshStandardMaterial ) {
-
-				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
-
-				if ( ! ( geometryFileName in files ) ) {
-
-					const meshObject = buildMeshObject( geometry );
-					files[ geometryFileName ] = strToU8(
-						buildHeader() + '\n' + meshObject.toString()
-					);
-
-				}
-
-				if ( ! ( material.uuid in materials ) ) {
-
-					materials[ material.uuid ] = material;
-
-				}
-
-				childNode = buildMesh(
-					child,
-					geometry,
-					materials[ material.uuid ],
-					usedNames,
-					options
-				);
-
-			} else {
-
-				console.warn(
-					'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)',
-					child
-				);
-
-			}
-
-		} else if ( child.isCamera ) {
-
-			childNode = buildCamera( child, usedNames, options );
-
-		} else {
-
-			childNode = buildXform( child, usedNames, options );
-
-		}
-
-		if ( childNode ) {
-
-			parentNode.addChild( childNode );
-			buildHierarchy( child, childNode, materials, usedNames, files, options );
-
-		}
+		buildNode( object.children[ i ], parentNode, materials, usedNames, files, options );
 
 	}
+
+}
+
+function buildNode( object, parentNode, materials, usedNames, files, options ) {
+
+	if ( object.visible === false && options.onlyVisible === true ) return;
+
+	let childNode;
+
+	if ( object.isMesh ) {
+
+		const geometry = object.geometry;
+		const material = object.material;
+
+		if ( ! material.isMeshStandardMaterial ) {
+
+			console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
+
+		}
+
+		const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
+
+		if ( ! ( geometryFileName in files ) ) {
+
+			const meshObject = buildMeshObject( geometry );
+			files[ geometryFileName ] = strToU8(
+				buildHeader() + '\n' + meshObject.toString()
+			);
+
+		}
+
+		if ( ! ( material.uuid in materials ) ) {
+
+			materials[ material.uuid ] = material;
+
+		}
+
+		childNode = buildMesh(
+			object,
+			geometry,
+			materials[ material.uuid ],
+			usedNames,
+			options
+		);
+
+	} else if ( object.isCamera ) {
+
+		childNode = buildCamera( object, usedNames, options );
+
+	} else {
+
+		childNode = buildXform( object, usedNames, options );
+
+	}
+
+	parentNode.addChild( childNode );
+	buildHierarchy( object, childNode, materials, usedNames, files, options );
 
 }
 
@@ -1097,33 +1100,39 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.emissiveMap !== null ) {
+	if ( material.emissive ) {
 
-		previewSurfaceNode.addProperty(
-			`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
-		);
+		const emissiveIntensity = material.emissiveIntensity ?? 1;
 
-		const emissiveColor = new Color(
-			material.emissive.r * material.emissiveIntensity,
-			material.emissive.g * material.emissiveIntensity,
-			material.emissive.b * material.emissiveIntensity
-		);
-		const textureNodes = buildTextureNodes(
-			material.emissiveMap,
-			'emissive',
-			emissiveColor
-		);
-		textureNodes.forEach( ( node ) => materialNode.addChild( node ) );
+		if ( material.emissiveMap ) {
 
-	} else if ( material.emissive.getHex() > 0 ) {
+			previewSurfaceNode.addProperty(
+				`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
+			);
 
-		previewSurfaceNode.addProperty(
-			`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
-		);
+			const emissiveColor = new Color(
+				material.emissive.r * emissiveIntensity,
+				material.emissive.g * emissiveIntensity,
+				material.emissive.b * emissiveIntensity
+			);
+			const textureNodes = buildTextureNodes(
+				material.emissiveMap,
+				'emissive',
+				emissiveColor
+			);
+			textureNodes.forEach( ( node ) => materialNode.addChild( node ) );
+
+		} else if ( material.emissive.getHex() > 0 ) {
+
+			previewSurfaceNode.addProperty(
+				`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
+			);
+
+		}
 
 	}
 
-	if ( material.normalMap !== null ) {
+	if ( material.normalMap ) {
 
 		previewSurfaceNode.addProperty(
 			`normal3f inputs:normal.connect = </Materials/Material_${material.id}/Texture_${material.normalMap.id}_normal.outputs:rgb>`
@@ -1134,16 +1143,17 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.aoMap !== null ) {
+	if ( material.aoMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:occlusion.connect = </Materials/Material_${material.id}/Texture_${material.aoMap.id}_occlusion.outputs:r>`
 		);
 
+		const aoMapIntensity = material.aoMapIntensity ?? 1;
 		const aoColor = new Color(
-			material.aoMapIntensity,
-			material.aoMapIntensity,
-			material.aoMapIntensity
+			aoMapIntensity,
+			aoMapIntensity,
+			aoMapIntensity
 		);
 		const textureNodes = buildTextureNodes(
 			material.aoMap,
@@ -1154,7 +1164,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.roughnessMap !== null ) {
+	if ( material.roughnessMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>`
@@ -1175,12 +1185,12 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	} else {
 
 		previewSurfaceNode.addProperty(
-			`float inputs:roughness = ${material.roughness}`
+			`float inputs:roughness = ${material.roughness ?? 1}`
 		);
 
 	}
 
-	if ( material.metalnessMap !== null ) {
+	if ( material.metalnessMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>`
@@ -1201,12 +1211,12 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	} else {
 
 		previewSurfaceNode.addProperty(
-			`float inputs:metallic = ${material.metalness}`
+			`float inputs:metallic = ${material.metalness ?? 0}`
 		);
 
 	}
 
-	if ( material.alphaMap !== null ) {
+	if ( material.alphaMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>`
