@@ -567,35 +567,49 @@ function buildNode( object, parentNode, materials, usedNames, files, options ) {
 	if ( object.isMesh ) {
 
 		const geometry = object.geometry;
-		const material = object.material;
+		const isMultiMaterial = Array.isArray( object.material );
 
-		if ( ! material.isMeshStandardMaterial ) {
+		const meshMaterials = isMultiMaterial ? object.material : [ object.material ];
 
-			console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
+		for ( let i = 0; i < meshMaterials.length; i ++ ) {
+
+			const material = meshMaterials[ i ];
+
+			if ( ! material.isMeshStandardMaterial ) {
+
+				console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
+
+			}
+
+			if ( ! ( material.uuid in materials ) ) {
+
+				materials[ material.uuid ] = material;
+
+			}
 
 		}
 
-		const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
+		const resolvedMaterials = meshMaterials.map( ( m ) => materials[ m.uuid ] );
 
-		if ( ! ( geometryFileName in files ) ) {
+		if ( isMultiMaterial === false ) {
 
-			const meshObject = buildMeshObject( geometry );
-			files[ geometryFileName ] = strToU8(
-				buildHeader() + '\n' + meshObject.toString()
-			);
+			const geometryFileName = `geometries/Geometry_${geometry.id}.usda`;
 
-		}
+			if ( ! ( geometryFileName in files ) ) {
 
-		if ( ! ( material.uuid in materials ) ) {
+				const meshObject = buildMeshObject( geometry );
+				files[ geometryFileName ] = strToU8(
+					buildHeader() + '\n' + meshObject.toString()
+				);
 
-			materials[ material.uuid ] = material;
+			}
 
 		}
 
 		childNode = buildMesh(
 			object,
 			geometry,
-			materials[ material.uuid ],
+			resolvedMaterials,
 			usedNames,
 			options
 		);
@@ -706,19 +720,26 @@ function buildXform( object, usedNames, options ) {
 
 }
 
-function buildMesh( object, geometry, material, usedNames, options ) {
+function buildMesh( object, geometry, materials, usedNames, options ) {
 
 	const node = buildXform( object, usedNames, options );
 
-	node.addMetadata(
-		'prepend references',
-		`@./geometries/Geometry_${geometry.id}.usda@</Geometry>`
-	);
-	node.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+	if ( materials.length === 1 ) {
 
-	node.addProperty(
-		`rel material:binding = </Materials/Material_${material.id}>`
-	);
+		node.addMetadata(
+			'prepend references',
+			`@./geometries/Geometry_${geometry.id}.usda@</Geometry>`
+		);
+		node.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+		node.addProperty(
+			`rel material:binding = </Materials/Material_${materials[ 0 ].id}>`
+		);
+
+	} else {
+
+		node.addChild( buildMeshNode( geometry, materials ) );
+
+	}
 
 	return node;
 
@@ -756,7 +777,7 @@ function buildMeshObject( geometry ) {
 
 }
 
-function buildMeshNode( geometry ) {
+function buildMeshNode( geometry, materials = null ) {
 
 	const name = 'Geometry';
 	const attributes = geometry.attributes;
@@ -807,6 +828,41 @@ function buildMeshNode( geometry ) {
 	}
 
 	node.addProperty( 'uniform token subdivisionScheme = "none"' );
+
+	if ( materials !== null ) {
+
+		const groups = geometry.groups;
+
+		const totalFaces = ( geometry.index !== null
+			? geometry.index.count
+			: attributes.position.count ) / 3;
+
+		for ( let i = 0; i < groups.length; i ++ ) {
+
+			const group = groups[ i ];
+			const material = materials[ group.materialIndex ];
+
+			if ( material === undefined ) continue;
+
+			const startFace = Math.floor( group.start / 3 );
+			const endFace = Math.min( startFace + Math.floor( group.count / 3 ), totalFaces );
+
+			const indices = [];
+			for ( let j = startFace; j < endFace; j ++ ) indices.push( j );
+
+			const subsetNode = new USDNode( `subset_${i}`, 'GeomSubset' );
+			subsetNode.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+			subsetNode.addProperty( 'uniform token elementType = "face"' );
+			subsetNode.addProperty( 'uniform token familyName = "materialBind"' );
+			subsetNode.addProperty( `int[] indices = [${indices.join( ', ' )}]` );
+			subsetNode.addProperty(
+				`rel material:binding = </Materials/Material_${material.id}>`
+			);
+			node.addChild( subsetNode );
+
+		}
+
+	}
 
 	return node;
 
