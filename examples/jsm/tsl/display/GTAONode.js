@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, RGBAFormat, HalfFloatType, FloatType, NearestFilter } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, normalize, mul, cross, mix, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, exp, If, textureSize, sin, cos, PI, texture, passTexture, normalize, mul, cross, mix, acos, clamp } from 'three/tsl';
 import { generateBlueNoiseTexture } from '../../math/BlueNoise.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -100,6 +100,20 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
+		/**
+		 * Render target the denoise pass writes into; the public output texture
+		 * always reads from this target. When {@link GTAONode#denoise} is `false`
+		 * the AO pass writes directly here and the denoise pass is skipped, so
+		 * consumers see the same texture binding regardless of the toggle.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._denoiseRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
+		this._denoiseRenderTarget.texture.name = 'GTAONode.Denoise';
+		this._denoiseRenderTarget.texture.minFilter = NearestFilter;
+		this._denoiseRenderTarget.texture.magFilter = NearestFilter;
+
 		// Half-res depth / normal targets, populated by the downsample passes when
 		// resolutionScale < 1. Depth uses Float32 because perspective depth values
 		// cluster near 1.0 where Float16 quantizes horizon angles into visible rings.
@@ -186,13 +200,27 @@ class GTAONode extends TempNode {
 		 * although it introduces typical TAA artifacts like ghosting and temporal
 		 * instabilities.
 		 *
-		 * If setting this property to `false`, a manual denoise via `DenoiseNode`
-		 * might be required.
-		 *
 		 * @type {boolean}
 		 * @default false
 		 */
 		this.useTemporalFiltering = false;
+
+		/**
+		 * Whether to apply a 3×3 cross-bilateral filter to the raw AO output.
+		 * Each tap is weighted by (spatial Gaussian) × (view-Z similarity) ×
+		 * (normal angle similarity), so the filter smooths horizon-scan noise
+		 * within a surface but rejects neighbors across silhouettes. When
+		 * `false`, the AO pass writes its raw output directly to the result
+		 * texture (useful when chaining with `DenoiseNode` or relying on TAA
+		 * via {@link GTAONode#useTemporalFiltering}).
+		 *
+		 * Cross-bilateral reconstruction as described in the Activision GTAO
+		 * paper, Section 5.5.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.denoise = true;
 
 		/**
 		 * Blue-noise texture sampled for the slice direction and step jitter.
@@ -259,13 +287,19 @@ class GTAONode extends TempNode {
 		this._normalDownsampleMaterial = new NodeMaterial();
 		this._normalDownsampleMaterial.name = 'GTAO.NormalDownsample';
 
+		this._denoiseMaterial = new NodeMaterial();
+		this._denoiseMaterial.name = 'GTAO.Denoise';
+
 		/**
 		 * The result of the effect is represented as a separate texture node.
+		 * Points at the denoise render target — when the denoise pass is
+		 * disabled the AO pass writes there directly, so this binding is fixed
+		 * regardless of the toggle.
 		 *
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+		this._textureNode = passTexture( this, this._denoiseRenderTarget.texture );
 
 	}
 
@@ -325,6 +359,7 @@ class GTAONode extends TempNode {
 
 		this.resolution.value.set( lowW, lowH );
 		this._aoRenderTarget.setSize( lowW, lowH );
+		this._denoiseRenderTarget.setSize( lowW, lowH );
 
 		// Only resize the half-res RTs when we'll actually use them. Shrinking them
 		// here at scale=1 while the renderer holds cached bindings from a previous
@@ -390,13 +425,33 @@ class GTAONode extends TempNode {
 
 		}
 
-		// ao
+		// AO horizon search. When the denoise pass is enabled the AO writes into
+		// _aoRenderTarget and the denoise pass reads it back into _denoiseRenderTarget.
+		// When disabled the AO writes straight into _denoiseRenderTarget — the public
+		// output texture is bound to _denoiseRenderTarget, so consumers see the raw
+		// AO without a recompile.
+
+		const aoTarget = this.denoise ? this._aoRenderTarget : this._denoiseRenderTarget;
 
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
 
-		renderer.setRenderTarget( this._aoRenderTarget );
+		renderer.setRenderTarget( aoTarget );
 		_quadMesh.render( renderer );
+
+		// Cross-bilateral denoise of the raw AO. Reads _aoRenderTarget, writes
+		// _denoiseRenderTarget at the same resolution. Depth + normal edge-aware
+		// weights smooth horizon-scan noise within a surface without bleeding
+		// across silhouettes.
+
+		if ( this.denoise ) {
+
+			_quadMesh.material = this._denoiseMaterial;
+			_quadMesh.name = 'GTAO.Denoise';
+			renderer.setRenderTarget( this._denoiseRenderTarget );
+			_quadMesh.render( renderer );
+
+		}
 
 		// restore
 
@@ -477,7 +532,7 @@ class GTAONode extends TempNode {
 			// Phase-shifted per-step jitter: shifts the step index by [0, 0.5) of a step
 			// interval before the t² distribution is applied. This gives sub-step
 			// temporal decorrelation without compressing the near-field samples.
-			// (Activision GTAO paper, Section 5.4; matches Blender EEVEE-Next.)
+			// (Activision GTAO paper, Section 5.4.)
 			const stepJitter = mul( 0.5, noise2 ).toVar();
 
 			// Two perpendicular slices total. STEPS is per-slice, so total marches ≈ samples
@@ -614,6 +669,79 @@ class GTAONode extends TempNode {
 		this._material.fragmentNode = ao().context( builder.getSharedContext() );
 		this._material.needsUpdate = true;
 
+		// ─── Cross-bilateral denoise ───────────────────────────────────────────
+		//
+		// 3×3 spatial filter over the raw AO. Each tap is weighted by
+		// (spatial Gaussian) × (view-Z similarity) × (normal angle similarity).
+		// The center pixel is included with full weight (1×1×1). Sky neighbors
+		// (depth ≥ 1.0) are naturally rejected by the depth weight because
+		// their view-Z sits at −far.
+		//
+		// Operates at the AO target's resolution and reads the same depth /
+		// normal sources the AO pass uses (full-res when resolutionScale = 1,
+		// the half-res RTs otherwise), so the depth / normal at each tap stays
+		// aligned with the AO texel it produced.
+		//
+		// Cross-bilateral reconstruction as described in the Activision GTAO
+		// paper, Section 5.5.
+
+		const aoTextureNode = texture( this._aoRenderTarget.texture );
+
+		const denoise = Fn( () => {
+
+			const centerDepth = sampleDepth( uvNode ).toVar();
+
+			// Sky pixels short-circuit. The render target clears to white (set in
+			// updateBefore via setClearColor( 0xffffff, 1 )), so discarding here
+			// leaves the sky reading as visibility = 1 (no occlusion).
+			centerDepth.greaterThanEqual( 1.0 ).discard();
+
+			const centerViewZ = perspectiveDepthToViewZ( centerDepth, this._cameraNear, this._cameraFar ).toVar();
+			const centerNormal = sampleNormal( uvNode ).toVar();
+			const texelSize = vec2( 1 ).div( this.resolution ).toVar();
+
+			const totalAO = float( 0 ).toVar();
+			const totalW = float( 0 ).toVar();
+
+			for ( let dy = - 1; dy <= 1; dy ++ ) {
+
+				for ( let dx = - 1; dx <= 1; dx ++ ) {
+
+					const sUv = uvNode.add( vec2( dx, dy ).mul( texelSize ) );
+					const sDepth = sampleDepth( sUv ).toVar();
+					const sAO = aoTextureNode.sample( sUv ).r;
+					const sViewZ = perspectiveDepthToViewZ( sDepth, this._cameraNear, this._cameraFar );
+					const sNormal = sampleNormal( sUv );
+
+					// Spatial Gaussian, σ ≈ 1 texel. dx / dy are loop-unrolled
+					// compile-time constants, so this folds to a literal float.
+					const spatialW = float( Math.exp( - 0.5 * ( dx * dx + dy * dy ) ) );
+
+					// View-Z difference falloff — rejects neighbors more than
+					// ~0.5 view-space units away at the chosen sharpness.
+					const depthDiff = abs( centerViewZ.sub( sViewZ ) );
+					const depthW = exp( depthDiff.negate().mul( 2.0 ) );
+
+					// Normal angle similarity. pow( ·, 8 ) sharpens the cutoff
+					// so a ~30° normal difference roughly halves the weight.
+					const normalW = pow( max( dot( centerNormal, sNormal ), 0 ), float( 8 ) );
+
+					const w = spatialW.mul( depthW ).mul( normalW );
+
+					totalAO.addAssign( sAO.mul( w ) );
+					totalW.addAssign( w );
+
+				}
+
+			}
+
+			return vec4( totalAO.div( max( totalW, float( 0.0001 ) ) ), 0, 0, 1 );
+
+		} );
+
+		this._denoiseMaterial.fragmentNode = denoise().context( builder.getSharedContext() );
+		this._denoiseMaterial.needsUpdate = true;
+
 		// At scale=1 the downsample passes are skipped, so building their fragment
 		// nodes is dead work. Recompile when crossing the boundary picks the right path.
 		if ( ! useHalfRes ) {
@@ -695,12 +823,14 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget.dispose();
 		this._depthHalfRT.dispose();
 		this._normalHalfRT.dispose();
+		this._denoiseRenderTarget.dispose();
 
 		this._noiseNode.value.dispose();
 
 		this._material.dispose();
 		this._depthDownsampleMaterial.dispose();
 		this._normalDownsampleMaterial.dispose();
+		this._denoiseMaterial.dispose();
 
 	}
 
