@@ -3,6 +3,13 @@ const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
 const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
 const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
 
+// Spec types (must match USDCParser/USDComposer)
+const SpecType = {
+	Attribute: 1,
+	Prim: 6,
+	Relationship: 8
+};
+
 class USDAParser {
 
 	parseText( text ) {
@@ -429,13 +436,6 @@ class USDAParser {
 		const root = this.parseText( text );
 		const specsByPath = {};
 
-		// Spec types (must match USDCParser/USDComposer)
-		const SpecType = {
-			Attribute: 1,
-			Prim: 6,
-			Relationship: 8
-		};
-
 		// Parse root metadata
 		const rootFields = {};
 		if ( '#usda 1.0' in root ) {
@@ -526,64 +526,40 @@ class USDAParser {
 
 		// Fallback: infer elementSize for primvars:skel:jointIndices/jointWeights
 		// when not explicitly declared in the USDA text
-		this._inferElementSize( specsByPath );
+		this._inferSkelElementSize( specsByPath );
 
 		return { specsByPath };
 
 	}
 
-	_inferElementSize( specsByPath ) {
+	_inferSkelElementSize( specsByPath ) {
 
-		// For each mesh prim that has primvars:skel:jointIndices but no elementSize,
-		// infer elementSize from the data: elementSize = array.length / numPoints
+		// For each mesh prim with primvars:skel:jointIndices/jointWeights but no
+		// elementSize, infer it from the data: elementSize = array.length / numVertices.
 		for ( const path in specsByPath ) {
 
 			const spec = specsByPath[ path ];
-			if ( spec.specType !== 6 || spec.fields.typeName !== 'Mesh' ) continue; // SpecType.Prim
+			if ( spec.specType !== SpecType.Prim || spec.fields.typeName !== 'Mesh' ) continue;
 
-			// Find points attribute to get numVertices
-			const pointsPath = path + '.points';
-			const pointsSpec = specsByPath[ pointsPath ];
+			const pointsSpec = specsByPath[ path + '.points' ];
 			if ( ! pointsSpec || ! pointsSpec.fields.default ) continue;
 
-			const pointsData = pointsSpec.fields.default;
-			const numVertices = Array.isArray( pointsData ) ? pointsData.length / 3 :
-				( pointsData.length !== undefined ? pointsData.length / 3 : 0 );
+			const numVertices = pointsSpec.fields.default.length / 3;
 			if ( numVertices === 0 ) continue;
 
-			// Infer elementSize for jointIndices
-			const jiPath = path + '.primvars:skel:jointIndices';
-			const jiSpec = specsByPath[ jiPath ];
-			if ( jiSpec && jiSpec.fields.elementSize === undefined && jiSpec.fields.default ) {
-
-				const jiData = jiSpec.fields.default;
-				const jiLen = Array.isArray( jiData ) ? jiData.length :
-					( jiData.length !== undefined ? jiData.length : 0 );
-				if ( jiLen > 0 && jiLen % numVertices === 0 ) {
-
-					jiSpec.fields.elementSize = jiLen / numVertices;
-
-				}
-
-			}
-
-			// Infer elementSize for jointWeights
-			const jwPath = path + '.primvars:skel:jointWeights';
-			const jwSpec = specsByPath[ jwPath ];
-			if ( jwSpec && jwSpec.fields.elementSize === undefined && jwSpec.fields.default ) {
-
-				const jwData = jwSpec.fields.default;
-				const jwLen = Array.isArray( jwData ) ? jwData.length :
-					( jwData.length !== undefined ? jwData.length : 0 );
-				if ( jwLen > 0 && jwLen % numVertices === 0 ) {
-
-					jwSpec.fields.elementSize = jwLen / numVertices;
-
-				}
-
-			}
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointIndices' ], numVertices );
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointWeights' ], numVertices );
 
 		}
+
+	}
+
+	_inferElementSize( attrSpec, numVertices ) {
+
+		if ( ! attrSpec || attrSpec.fields.elementSize !== undefined || ! attrSpec.fields.default ) return;
+
+		const len = attrSpec.fields.default.length;
+		if ( len > 0 && len % numVertices === 0 ) attrSpec.fields.elementSize = len / numVertices;
 
 	}
 
