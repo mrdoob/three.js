@@ -610,12 +610,8 @@ function buildNode( object, parentNode, materials, usedNames, files, options ) {
 
 	}
 
-	if ( childNode ) {
-
-		parentNode.addChild( childNode );
-		buildHierarchy( object, childNode, materials, usedNames, files, options );
-
-	}
+	parentNode.addChild( childNode );
+	buildHierarchy( object, childNode, materials, usedNames, files, options );
 
 }
 
