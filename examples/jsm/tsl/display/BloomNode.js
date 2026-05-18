@@ -9,6 +9,15 @@ const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
+const luminosityHighPass = Fn( ( { input, threshold, smoothWidth } ) => {
+
+	const v = luminance( input.rgb );
+	const alpha = smoothstep( threshold, threshold.add( smoothWidth ), v );
+
+	return mix( vec4( 0 ), input, alpha );
+
+} );
+
 /**
  * Post processing node for creating a bloom effect.
  * ```js
@@ -96,6 +105,13 @@ class BloomNode extends TempNode {
 		 * @type {UniformNode<float>}
 		 */
 		this.smoothWidth = uniform( 0.01 );
+
+		/**
+		 * Can be used to inject a custom high pass filter (e.g., for anamorphic effects).
+		 *
+		 * @type {Function}
+		 */
+		this.highPassFn = luminosityHighPass;
 
 		/**
 		 * An array that holds the render targets for the horizontal blur passes.
@@ -350,19 +366,8 @@ class BloomNode extends TempNode {
 
 		// luminosity high pass material
 
-		const luminosityHighPass = Fn( () => {
-
-			const texel = this.inputNode;
-			const v = luminance( texel.rgb );
-
-			const alpha = smoothstep( this.threshold, this.threshold.add( this.smoothWidth ), v );
-
-			return mix( vec4( 0 ), texel, alpha );
-
-		} );
-
 		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
-		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
+		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } ).context( builder.getSharedContext() );
 		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 
