@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, add, normalize, mul, cross, div, mix, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, normalize, mul, cross, mix, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -125,17 +125,18 @@ class GTAONode extends TempNode {
 		this.thickness = uniform( 1 );
 
 		/**
-		 * Another option to tweak the occlusion. The recommended range is
-		 * `[1,2]` for attenuating the AO.
+		 * @deprecated Since the switch to quadratic ray stepping with sphere falloff,
+		 * step distribution is fixed at `t²` and this uniform has no effect. Kept for
+		 * backward compatibility and will be removed in a future release.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.distanceExponent = uniform( 1 );
 
 		/**
-		 * The distance fall off value of the ambient occlusion.
-		 * A lower value leads to a larger AO effect. The value
-		 * should lie in the range `[0,1]`.
+		 * @deprecated Replaced by the sphere falloff `mix( max( h, sH ), h, (dist/radius)² )`,
+		 * which has no tunable parameter. Kept for backward compatibility and will be
+		 * removed in a future release.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -368,8 +369,11 @@ class GTAONode extends TempNode {
 			const sliceAngle = noiseTexel.x.add( this._temporalDirection ).mul( PI ).mul( 0.5 ).toVar();
 			const sliceDir = vec2( cos( sliceAngle ), sin( sliceAngle ) ).toVar();
 
-			// Independent per-step jitter (Activision GTAO paper, Section 5.4).
-			const stepJitter = add( 0.5, mul( 0.5, noiseTexel.w ) ).toVar();
+			// Phase-shifted per-step jitter: shifts the step index by [0, 0.5) of a step
+			// interval before the t² distribution is applied. This gives sub-step
+			// temporal decorrelation without compressing the near-field samples.
+			// (Activision GTAO paper, Section 5.4; matches Blender EEVEE-Next.)
+			const stepJitter = mul( 0.5, noiseTexel.w ).toVar();
 
 			// Two perpendicular slices total. STEPS is per-slice, so total marches ≈ samples
 			// (preserves the legacy semantics of the `samples` uniform).
@@ -414,7 +418,12 @@ class GTAONode extends TempNode {
 
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
-					const sampleOffset = T.mul( radiusToUse ).mul( stepJitter ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+					// Quadratic step distribution: t = ( j + 1 + jitter ) / STEPS, sampleDist = t².
+					// Concentrates samples in the near-field where AO detail matters and lets the
+					// far end of the ray reach the full radius. (Activision GTAO paper, Section 5.3.)
+					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
+					const sampleDist = t.mul( t );
+					const sampleOffset = T.mul( radiusToUse ).mul( sampleDist );
 
 					// Positive direction along T.
 
@@ -422,11 +431,22 @@ class GTAONode extends TempNode {
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
 					const omegaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
+					const lenX = omegaX.length().toVar();
+
+					// Horizon angle cosine. Manual normalize guards against zero-length omega.
+					const sHX = dot( viewDir, omegaX.div( max( lenX, float( 0.0001 ) ) ) );
+
+					// Sphere falloff: squared normalized distance to the radius boundary.
+					// distFac² = ( clamp( dist / radius, 0, 1 ) )² — 0 at the fragment, 1 at the radius.
+					const distFacX = clamp( lenX.div( radiusToUse ), 0, 1 );
+					const distFacSqX = distFacX.mul( distFacX );
 
 					If( abs( omegaX.z ).lessThan( this.thickness ), () => {
 
-						const sH = dot( viewDir, normalize( omegaX ) );
-						cosHPos.addAssign( max( 0, mul( sH.sub( cosHPos ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						// Smoothly relax the new horizon contribution back to the prior horizon as
+						// the sample approaches the radius boundary. At distFac=0 the sample is
+						// fully considered ( max( h, sH ) ); at distFac=1 it has no effect.
+						cosHPos.assign( mix( max( cosHPos, sHX ), cosHPos, distFacSqX ) );
 
 					} );
 
@@ -436,11 +456,16 @@ class GTAONode extends TempNode {
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
 					const omegaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
+					const lenY = omegaY.length().toVar();
+
+					const sHY = dot( viewDir, omegaY.div( max( lenY, float( 0.0001 ) ) ) );
+
+					const distFacY = clamp( lenY.div( radiusToUse ), 0, 1 );
+					const distFacSqY = distFacY.mul( distFacY );
 
 					If( abs( omegaY.z ).lessThan( this.thickness ), () => {
 
-						const sH = dot( viewDir, normalize( omegaY ) );
-						cosHNeg.addAssign( max( 0, mul( sH.sub( cosHNeg ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHNeg.assign( mix( max( cosHNeg, sHY ), cosHNeg, distFacSqY ) );
 
 					} );
 
