@@ -247,7 +247,15 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+		if ( scene.isScene ) {
+
+			buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+
+		} else {
+
+			buildNode( scene, sceneNode, materials, usedNames, files, options );
+
+		}
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -544,64 +552,68 @@ function buildHierarchy( object, parentNode, materials, usedNames, files, option
 
 	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-		const child = object.children[ i ];
+		buildNode( object.children[ i ], parentNode, materials, usedNames, files, options );
 
-		if ( child.visible === false && options.onlyVisible === true ) continue;
+	}
 
-		let childNode;
+}
 
-		if ( child.isMesh ) {
+function buildNode( object, parentNode, materials, usedNames, files, options ) {
 
-			const geometry = child.geometry;
-			const material = child.material;
+	if ( object.visible === false && options.onlyVisible === true ) return;
 
-			if ( ! material.isMeshStandardMaterial ) {
+	let childNode;
 
-				console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
+	if ( object.isMesh ) {
 
-			}
+		const geometry = object.geometry;
+		const material = object.material;
 
-			const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
+		if ( ! material.isMeshStandardMaterial ) {
 
-			if ( ! ( geometryFileName in files ) ) {
+			console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
 
-				const meshObject = buildMeshObject( geometry );
-				files[ geometryFileName ] = strToU8(
-					buildHeader() + '\n' + meshObject.toString()
-				);
+		}
 
-			}
+		const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
-			if ( ! ( material.uuid in materials ) ) {
+		if ( ! ( geometryFileName in files ) ) {
 
-				materials[ material.uuid ] = material;
-
-			}
-
-			childNode = buildMesh(
-				child,
-				geometry,
-				materials[ material.uuid ],
-				usedNames,
-				options
+			const meshObject = buildMeshObject( geometry );
+			files[ geometryFileName ] = strToU8(
+				buildHeader() + '\n' + meshObject.toString()
 			);
 
-		} else if ( child.isCamera ) {
+		}
 
-			childNode = buildCamera( child, usedNames, options );
+		if ( ! ( material.uuid in materials ) ) {
 
-		} else {
-
-			childNode = buildXform( child, usedNames, options );
+			materials[ material.uuid ] = material;
 
 		}
 
-		if ( childNode ) {
+		childNode = buildMesh(
+			object,
+			geometry,
+			materials[ material.uuid ],
+			usedNames,
+			options
+		);
 
-			parentNode.addChild( childNode );
-			buildHierarchy( child, childNode, materials, usedNames, files, options );
+	} else if ( object.isCamera ) {
 
-		}
+		childNode = buildCamera( object, usedNames, options );
+
+	} else {
+
+		childNode = buildXform( object, usedNames, options );
+
+	}
+
+	if ( childNode ) {
+
+		parentNode.addChild( childNode );
+		buildHierarchy( object, childNode, materials, usedNames, files, options );
 
 	}
 
