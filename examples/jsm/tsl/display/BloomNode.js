@@ -107,6 +107,15 @@ class BloomNode extends TempNode {
 		this.smoothWidth = uniform( 0.01 );
 
 		/**
+		 * Scale factor for the internal render targets.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this._resolutionScale = 0.5;
+
+		/**
 		 * Can be used to inject a custom high pass filter (e.g., for anamorphic effects).
 		 *
 		 * @type {Function}
@@ -270,6 +279,32 @@ class BloomNode extends TempNode {
 	}
 
 	/**
+	 * Sets the resolution scale for the pass.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
+	 * @return {BloomNode} A reference to this node.
+	 */
+	setResolutionScale( resolutionScale ) {
+
+		this._resolutionScale = resolutionScale;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution scale of the pass.
+	 *
+	 * @return {number} The current resolution scale. A value of `1` means full resolution.
+	 */
+	getResolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	/**
 	 * Sets the size of the effect.
 	 *
 	 * @param {number} width - The width of the effect.
@@ -277,8 +312,8 @@ class BloomNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		let resx = Math.round( width / 2 );
-		let resy = Math.round( height / 2 );
+		let resx = Math.round( width * this._resolutionScale );
+		let resy = Math.round( height * this._resolutionScale );
 
 		this._renderTargetBright.setSize( resx, resy );
 
