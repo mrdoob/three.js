@@ -109,21 +109,10 @@ npm install --save-dev vite
                   </p>
                 </details>
                 <details>
-                  <summary>使用 <i>jsconfig</i> 或 <i>tsconfig</i> 改善编辑器自动补全</summary>
+                  <summary>Using three.js with TypeScript</summary>
                   <p>
-                    在项目根目录放置一个 <i>jsconfig.json</i>（TypeScript 项目则使用 <i>tsconfig.json</i>）。添加以下配置可以帮助编辑器定位 three.js 文件，从而增强自动补全功能。
+                    Community-maintained TypeScript type definitions for three.js are available at [link:https://github.com/three-types/three-ts-types three-types/three-ts-types].
                   </p>
-<pre class="prettyprint notranslate lang-js" translate="no">
-{
-  "compilerOptions": {
-    // other options...
-    "paths": {
-      "three/webgpu": ["node_modules/three/build/three.webgpu.js"],
-      "three/tsl": ["node_modules/three/build/three.tsl.js"],
-    },
-  }
-}
-</pre>
                 </details>
               </aside>
             </li>
