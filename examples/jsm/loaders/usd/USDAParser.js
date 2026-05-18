@@ -524,7 +524,66 @@ class USDAParser {
 
 		walkTree( root, '/' );
 
+		// Fallback: infer elementSize for primvars:skel:jointIndices/jointWeights
+		// when not explicitly declared in the USDA text
+		this._inferElementSize( specsByPath );
+
 		return { specsByPath };
+
+	}
+
+	_inferElementSize( specsByPath ) {
+
+		// For each mesh prim that has primvars:skel:jointIndices but no elementSize,
+		// infer elementSize from the data: elementSize = array.length / numPoints
+		for ( const path in specsByPath ) {
+
+			const spec = specsByPath[ path ];
+			if ( spec.specType !== 6 || spec.fields.typeName !== 'Mesh' ) continue; // SpecType.Prim
+
+			// Find points attribute to get numVertices
+			const pointsPath = path + '.points';
+			const pointsSpec = specsByPath[ pointsPath ];
+			if ( ! pointsSpec || ! pointsSpec.fields.default ) continue;
+
+			const pointsData = pointsSpec.fields.default;
+			const numVertices = Array.isArray( pointsData ) ? pointsData.length / 3 :
+				( pointsData.length !== undefined ? pointsData.length / 3 : 0 );
+			if ( numVertices === 0 ) continue;
+
+			// Infer elementSize for jointIndices
+			const jiPath = path + '.primvars:skel:jointIndices';
+			const jiSpec = specsByPath[ jiPath ];
+			if ( jiSpec && jiSpec.fields.elementSize === undefined && jiSpec.fields.default ) {
+
+				const jiData = jiSpec.fields.default;
+				const jiLen = Array.isArray( jiData ) ? jiData.length :
+					( jiData.length !== undefined ? jiData.length : 0 );
+				if ( jiLen > 0 && jiLen % numVertices === 0 ) {
+
+					jiSpec.fields.elementSize = jiLen / numVertices;
+
+				}
+
+			}
+
+			// Infer elementSize for jointWeights
+			const jwPath = path + '.primvars:skel:jointWeights';
+			const jwSpec = specsByPath[ jwPath ];
+			if ( jwSpec && jwSpec.fields.elementSize === undefined && jwSpec.fields.default ) {
+
+				const jwData = jwSpec.fields.default;
+				const jwLen = Array.isArray( jwData ) ? jwData.length :
+					( jwData.length !== undefined ? jwData.length : 0 );
+				if ( jwLen > 0 && jwLen % numVertices === 0 ) {
+
+					jwSpec.fields.elementSize = jwLen / numVertices;
+
+				}
+
+			}
+
+		}
 
 	}
 
