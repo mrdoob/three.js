@@ -132,6 +132,7 @@
 					const v = luminance( input.rgb );
 					const alpha = smoothstep( threshold, threshold.add( smoothWidth ), v );
 					const brightPass = rtt( mix( vec4( 0 ), input, alpha ) );
+					brightPass.renderTarget.texture.wrapS = THREE.MirroredRepeatWrapping;
 
 					// Horizontal blur
 					const total = vec4( 0 );
