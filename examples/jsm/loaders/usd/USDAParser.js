@@ -3,6 +3,13 @@ const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
 const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
 const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
 
+// Spec types (must match USDCParser/USDComposer)
+const SpecType = {
+	Attribute: 1,
+	Prim: 6,
+	Relationship: 8
+};
+
 class USDAParser {
 
 	parseText( text ) {
@@ -429,13 +436,6 @@ class USDAParser {
 		const root = this.parseText( text );
 		const specsByPath = {};
 
-		// Spec types (must match USDCParser/USDComposer)
-		const SpecType = {
-			Attribute: 1,
-			Prim: 6,
-			Relationship: 8
-		};
-
 		// Parse root metadata
 		const rootFields = {};
 		if ( '#usda 1.0' in root ) {
@@ -524,7 +524,42 @@ class USDAParser {
 
 		walkTree( root, '/' );
 
+		// Fallback: infer elementSize for primvars:skel:jointIndices/jointWeights
+		// when not explicitly declared in the USDA text
+		this._inferSkelElementSize( specsByPath );
+
 		return { specsByPath };
+
+	}
+
+	_inferSkelElementSize( specsByPath ) {
+
+		// For each mesh prim with primvars:skel:jointIndices/jointWeights but no
+		// elementSize, infer it from the data: elementSize = array.length / numVertices.
+		for ( const path in specsByPath ) {
+
+			const spec = specsByPath[ path ];
+			if ( spec.specType !== SpecType.Prim || spec.fields.typeName !== 'Mesh' ) continue;
+
+			const pointsSpec = specsByPath[ path + '.points' ];
+			if ( ! pointsSpec || ! pointsSpec.fields.default ) continue;
+
+			const numVertices = pointsSpec.fields.default.length / 3;
+			if ( numVertices === 0 ) continue;
+
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointIndices' ], numVertices );
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointWeights' ], numVertices );
+
+		}
+
+	}
+
+	_inferElementSize( attrSpec, numVertices ) {
+
+		if ( ! attrSpec || attrSpec.fields.elementSize !== undefined || ! attrSpec.fields.default ) return;
+
+		const len = attrSpec.fields.default.length;
+		if ( len > 0 && len % numVertices === 0 ) attrSpec.fields.elementSize = len / numVertices;
 
 	}
 
