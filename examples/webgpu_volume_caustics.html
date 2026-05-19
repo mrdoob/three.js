@@ -85,7 +85,6 @@
 				// Model / Textures
 
 				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 
 				gltf = ( await new GLTFLoader().setDRACOLoader( dracoLoader ).loadAsync( './models/gltf/duck.glb' ) ).scene;
 				gltf.scale.setScalar( .5 );
