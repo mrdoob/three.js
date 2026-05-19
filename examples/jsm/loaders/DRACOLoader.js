@@ -102,11 +102,13 @@ class DRACOLoader extends Loader {
 	/**
 	 * Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 	 *
+	 * @deprecated
 	 * @param {{type:('js'|'wasm')}} config - The decoder config.
 	 * @return {DRACOLoader} A reference to this loader.
 	 */
 	setDecoderConfig( config ) {
 
+		console.warn( 'THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.' );
 		this.decoderConfig = config;
 
 		return this;
