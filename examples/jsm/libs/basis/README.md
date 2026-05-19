@@ -24,7 +24,6 @@ Both are dependencies of `KTX2Loader`:
 
 ```js
 const ktx2Loader = new KTX2Loader();
-ktx2Loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
 ktx2Loader.detectSupport( renderer );
 ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
 

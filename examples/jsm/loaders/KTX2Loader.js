@@ -103,6 +103,9 @@ import {
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
 
+const WASM_BIN_URL = new URL( '../libs/basis/basis_transcoder.wasm', import.meta.url ).toString();
+const WASM_JS_URL = new URL( '../libs/basis/basis_transcoder.js', import.meta.url ).toString();
+
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
@@ -169,9 +172,9 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
-	 * Sets the transcoder path.
+	 * Sets the transcoder path to optionally set the decoder load path from a CDN.
 	 *
-	 * The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+	 * By default The WASM transcoder and JS wrapper are loaded from the `examples/jsm/libs/basis` directory.
 	 *
 	 * @param {string} path - The transcoder path to set.
 	 * @return {KTX2Loader} A reference to this loader.
@@ -280,18 +283,30 @@ class KTX2Loader extends Loader {
 
 		if ( ! this.transcoderPending ) {
 
-			// Load transcoder wrapper.
 			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
-			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+			binaryLoader.setResponseType( 'arraybuffer' );
+
+			let jsContent, binaryContent;
+			if ( this.transcoderPath === '' ) {
+
+				jsContent = jsLoader.loadAsync( WASM_JS_URL );
+				binaryContent = binaryLoader.loadAsync( WASM_BIN_URL );
+
+			} else {
+
+				// Load transcoder wrapper.
+				jsLoader.setPath( this.transcoderPath );
+				jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+
+				// Load transcoder WASM binary.
+				binaryLoader.setPath( this.transcoderPath );
+				binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+
+			}
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
