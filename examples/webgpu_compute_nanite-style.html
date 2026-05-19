@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - nanite-style rasterizer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Nanite-style Rasterizer</span>
+			</div>
+
+			<small>Rendering <span id="triangleCount"></span> triangles.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, distance, screenSize, time, texture } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, renderer, controls;
+			let computeRasterize, computeClear, computeFrustum, computeDispatch;
+			let quadMesh;
+			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform;
+			let workQueueCountAtomic, workQueueCountRead, dispatchBuffer, workQueueBuffer, chunkBoundsBuffer;
+			let instanceWorldBuffer, instanceMvpBuffer;
+			let instanceWorldAttr, instanceMvpAttr;
+
+			const rows = 500;
+			const cols = 500;
+			const instanceCount = rows * cols;
+
+			const maxScreenW = 3840;
+			const maxScreenH = 2160;
+			const maxPixels = maxScreenW * maxScreenH;
+			
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				const statsDiv = document.createElement( 'div' );
+				statsDiv.style.position = 'absolute';
+				statsDiv.style.bottom = '10px';
+				statsDiv.style.left = '10px';
+				statsDiv.style.color = 'white';
+				statsDiv.style.fontFamily = 'monospace';
+				statsDiv.style.padding = '10px';
+				statsDiv.style.background = 'rgba(0,0,0,0.5)';
+				statsDiv.style.borderRadius = '5px';
+				statsDiv.id = 'stats';
+				document.body.appendChild( statsDiv );
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
+				camera.position.set( 0, 15, 50 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.y = 1;
+				controls.enableDamping = true;
+				controls.zoomSpeed = .5;
+				controls.maxDistance = 1000;
+				controls.maxPolarAngle = Math.PI / 2;
+
+				// Generate LOD Geometries
+				const lods = [
+					{ geometry: new TeapotGeometry( 1, 10 ), distance: 0 },
+					{ geometry: new TeapotGeometry( 1, 8 ), distance: 20 },
+					{ geometry: new TeapotGeometry( 1, 6 ), distance: 40 },
+					{ geometry: new TeapotGeometry( 1, 5 ), distance: 60 },
+					{ geometry: new TeapotGeometry( 1, 4 ), distance: 80 },
+					{ geometry: new TeapotGeometry( 1, 3 ), distance: 110 },
+					{ geometry: new TeapotGeometry( 1, 2 ), distance: 150 }
+				];
+
+				let totalVertices = 0;
+				let totalIndices = 0;
+
+				for ( const lod of lods ) {
+
+					const geom = lod.geometry;
+					const pos = geom.attributes.position;
+					const uvs = geom.attributes.uv;
+					const idx = geom.index ? Array.from( geom.index.array ) : Array.from( { length: pos.count }, ( _, i ) => i );
+
+					lod.numVertices = pos.count;
+					lod.numTriangles = idx.length / 3;
+					lod.vertexOffset = totalVertices;
+					lod.indexOffset = totalIndices;
+					lod.positions = pos;
+					lod.uvs = uvs;
+					lod.indices = idx;
+
+					totalVertices += pos.count;
+					totalIndices += idx.length;
+
+				}
+
+				const maxTrianglesPerInstance = lods[ 0 ].numTriangles;
+				const totalTriangles = rows * cols * maxTrianglesPerInstance;
+				document.getElementById( 'triangleCount' ).innerText = new Intl.NumberFormat().format( totalTriangles );
+
+				const vertexArray = new Float32Array( totalVertices * 4 ); // vec4 padded
+				const uvArray = new Float32Array( totalVertices * 2 );
+				const indexArray = new Uint32Array( totalIndices );
+				const meshletTriangleArray = new Uint32Array( totalIndices / 3 ); // 1 meshlet ID per triangle
+
+				let currentMeshletId = 1;
+
+				for ( const lod of lods ) {
+
+					for ( let i = 0; i < lod.numVertices; i ++ ) {
+
+						const vIdx = lod.vertexOffset + i;
+						vertexArray[ vIdx * 4 + 0 ] = lod.positions.getX( i );
+						vertexArray[ vIdx * 4 + 1 ] = lod.positions.getY( i );
+						vertexArray[ vIdx * 4 + 2 ] = lod.positions.getZ( i );
+						vertexArray[ vIdx * 4 + 3 ] = 1.0;
+
+						if ( lod.uvs ) {
+
+							uvArray[ vIdx * 2 + 0 ] = lod.uvs.getX( i );
+							uvArray[ vIdx * 2 + 1 ] = lod.uvs.getY( i );
+
+						}
+
+					}
+
+					let currentTriCount = 0;
+					for ( let i = 0; i < lod.numTriangles; i ++ ) {
+
+						const triIdx = ( lod.indexOffset / 3 ) + i;
+						indexArray[ triIdx * 3 + 0 ] = lod.vertexOffset + lod.indices[ i * 3 + 0 ];
+						indexArray[ triIdx * 3 + 1 ] = lod.vertexOffset + lod.indices[ i * 3 + 1 ];
+						indexArray[ triIdx * 3 + 2 ] = lod.vertexOffset + lod.indices[ i * 3 + 2 ];
+
+						if ( currentTriCount >= 126 ) {
+
+							currentMeshletId ++;
+							currentTriCount = 0;
+
+						}
+
+						meshletTriangleArray[ triIdx ] = currentMeshletId;
+						currentTriCount ++;
+
+					}
+
+					currentMeshletId ++;
+
+				}
+
+				// Precompute Bounding Spheres for each 64-triangle Chunk (Cluster)
+				let totalChunks = 0;
+				for ( const lod of lods ) {
+
+					lod.numChunks = Math.ceil( lod.numTriangles / 64 );
+					lod.chunkStart = totalChunks;
+					totalChunks += lod.numChunks;
+
+				}
+
+				const chunkBoundsData = new Float32Array( totalChunks * 4 ); // vec4: cx, cy, cz, radius
+				let currentChunkId = 0;
+
+				for ( const lod of lods ) {
+
+					const positions = lod.positions;
+					const indices = lod.indices;
+
+					for ( let c = 0; c < lod.numChunks; c ++ ) {
+
+						const startTri = c * 64;
+						const endTri = Math.min( startTri + 64, lod.numTriangles );
+
+						// 1. Calculate Center
+						let cx = 0, cy = 0, cz = 0;
+						const vertCount = ( endTri - startTri ) * 3;
+						for ( let t = startTri; t < endTri; t ++ ) {
+
+							for ( let v = 0; v < 3; v ++ ) {
+
+								const idx = indices[ t * 3 + v ];
+								cx += positions.getX( idx );
+								cy += positions.getY( idx );
+								cz += positions.getZ( idx );
+
+							}
+
+						}
+
+						cx /= vertCount;
+						cy /= vertCount;
+						cz /= vertCount;
+
+						// 2. Calculate Radius
+						let maxDistSq = 0;
+						for ( let t = startTri; t < endTri; t ++ ) {
+
+							for ( let v = 0; v < 3; v ++ ) {
+
+								const idx = indices[ t * 3 + v ];
+								const dx = positions.getX( idx ) - cx;
+								const dy = positions.getY( idx ) - cy;
+								const dz = positions.getZ( idx ) - cz;
+								const distSq = dx * dx + dy * dy + dz * dz;
+								if ( distSq > maxDistSq ) maxDistSq = distSq;
+
+							}
+
+						}
+
+						const radius = Math.sqrt( maxDistSq );
+
+						chunkBoundsData[ currentChunkId * 4 + 0 ] = cx;
+						chunkBoundsData[ currentChunkId * 4 + 1 ] = cy;
+						chunkBoundsData[ currentChunkId * 4 + 2 ] = cz;
+						chunkBoundsData[ currentChunkId * 4 + 3 ] = radius;
+						currentChunkId ++;
+
+					}
+
+				}
+
+				// Upload LOD offsets to GPU (uvec4: triangleStart, numTriangles, chunkStart, 0)
+				const lodOffsetsData = new Uint32Array( lods.length * 4 );
+				for ( let i = 0; i < lods.length; i ++ ) {
+
+					lodOffsetsData[ i * 4 + 0 ] = lods[ i ].indexOffset / 3;
+					lodOffsetsData[ i * 4 + 1 ] = lods[ i ].numTriangles;
+					lodOffsetsData[ i * 4 + 2 ] = lods[ i ].chunkStart;
+
+				}
+
+				const lodOffsetsBuffer = storage( new THREE.StorageBufferAttribute( lodOffsetsData, 4 ), 'uvec4', lods.length ).toReadOnly();
+				chunkBoundsBuffer = storage( new THREE.StorageBufferAttribute( chunkBoundsData, 4 ), 'vec4', totalChunks ).toReadOnly();
+
+				// Storage Buffers
+				const vertexBuffer = storage( new THREE.StorageBufferAttribute( vertexArray, 4 ), 'vec4', totalVertices ).toReadOnly();
+				const uvBuffer = storage( new THREE.StorageBufferAttribute( uvArray, 2 ), 'vec2', totalVertices ).toReadOnly();
+				const indexBuffer = storage( new THREE.StorageBufferAttribute( indexArray, 1 ), 'uint', totalIndices ).toReadOnly();
+				const meshletIdBuffer = storage( new THREE.StorageBufferAttribute( meshletTriangleArray, 1 ), 'uint', totalIndices / 3 ).toReadOnly();
+
+				const materialModeUniform = uniform( 0, 'uint' );
+
+				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
+				textureMap.colorSpace = THREE.SRGBColorSpace;
+				textureMap.wrapS = THREE.RepeatWrapping;
+				textureMap.wrapT = THREE.RepeatWrapping;
+
+				const options = { Mode: 'Meshlet Debug' };
+				const materialGroup = renderer.inspector.createParameters( 'Material' );
+				materialGroup.add( options, 'Mode', { 'Meshlet Debug': 'Meshlet Debug', 'Texture': 'Texture' } ).addEventListener( 'change', ( e ) => {
+
+					materialModeUniform.value = e.value === 'Texture' ? 1 : 0;
+
+				} );
+
+				const screenBufferData = new Uint32Array( maxPixels );
+				const screenBufferAttr = new THREE.StorageBufferAttribute( screenBufferData, 1 );
+				const screenBufferCompute = storage( screenBufferAttr, 'uint', maxPixels ).toAtomic();
+
+				const screenPayloadData = new Uint32Array( maxPixels );
+				const screenPayloadAttr = new THREE.StorageBufferAttribute( screenPayloadData, 1 );
+				const screenPayloadBuffer = storage( screenPayloadAttr, 'uint', maxPixels );
+				const screenPayloadRead = storage( screenPayloadAttr, 'uint', maxPixels ).toReadOnly();
+
+				const staticInstanceData = new Float32Array( instanceCount * 4 );
+				let dataIndex = 0;
+
+				for ( let i = 0; i < rows; i ++ ) {
+
+					for ( let j = 0; j < cols; j ++ ) {
+
+						staticInstanceData[ dataIndex ++ ] = ( i - rows / 2 ) * 4.0;
+						staticInstanceData[ dataIndex ++ ] = - 1;
+						staticInstanceData[ dataIndex ++ ] = ( j - cols / 2 ) * 4.0;
+						staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+
+					}
+
+				}
+
+				const instanceDataBuffer = storage( new THREE.StorageBufferAttribute( staticInstanceData, 4 ), 'vec4', instanceCount );
+
+				const instanceWorldData = new Float32Array( instanceCount * 16 );
+				const instanceMvpData = new Float32Array( instanceCount * 16 );
+
+				instanceWorldAttr = new THREE.StorageBufferAttribute( instanceWorldData, 16 );
+				instanceMvpAttr = new THREE.StorageBufferAttribute( instanceMvpData, 16 );
+
+				instanceWorldBuffer = storage( instanceWorldAttr, 'mat4', instanceCount );
+				instanceMvpBuffer = storage( instanceMvpAttr, 'mat4', instanceCount );
+
+				const workQueueCountData = new Uint32Array( 1 );
+				const workQueueCountAttr = new THREE.StorageBufferAttribute( workQueueCountData, 1 );
+				workQueueCountAtomic = storage( workQueueCountAttr, 'uint', 1 ).toAtomic();
+				workQueueCountRead = storage( workQueueCountAttr, 'uint', 1 ).toReadOnly();
+
+				const dispatchData = new Uint32Array( 3 );
+				const dispatchAttr = new THREE.IndirectStorageBufferAttribute( dispatchData, 3 );
+				dispatchBuffer = storage( dispatchAttr, 'uint', 3 );
+
+				// Max work items = 60000 instances * 47 chunks = 2,820,000
+				const MAX_WORK_ITEMS = 2820000;
+				const workQueueData = new Uint32Array( MAX_WORK_ITEMS * 4 );
+				workQueueBuffer = storage( new THREE.StorageBufferAttribute( workQueueData, 4 ), 'uvec4', MAX_WORK_ITEMS );
+
+				projScreenMatrixUniform = uniform( new THREE.Matrix4() );
+				frustumPlanesUniform = uniformArray( [
+					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
+					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
+				], 'vec4' );
+				cameraPos = uniform( new THREE.Vector3() );
+
+				// Compute Clear
+				computeClear = Fn( () => {
+
+					atomicStore( screenBufferCompute.element( instanceIndex ), uint( 0 ) );
+					screenPayloadBuffer.element( instanceIndex ).assign( uint( 0 ) );
+
+					If( instanceIndex.equal( 0 ), () => {
+
+						atomicStore( workQueueCountAtomic.element( 0 ), uint( 0 ) );
+
+					} );
+
+				} )().compute( maxPixels ).setName( 'Compute Clear' );
+
+				// Compute Frustum (GPU Culling, LOD & Work Allocation)
+				computeFrustum = Fn( () => {
+
+					const data = instanceDataBuffer.element( instanceIndex );
+					const pos = data.xyz;
+					const scale = data.w;
+					const i = float( instanceIndex );
+
+					// Rotation
+					const rotY = time.add( i.mul( 0.1 ) );
+					const c = cos( rotY );
+					const s = sin( rotY );
+
+					// Compose MatrixWorld
+					const matrixWorld = mat4(
+						vec4( c.mul( scale ), 0.0, s.mul( scale ), 0.0 ),
+						vec4( 0.0, scale, 0.0, 0.0 ),
+						vec4( s.negate().mul( scale ), 0.0, c.mul( scale ), 0.0 ),
+						vec4( pos, 1.0 )
+					);
+
+					const visible = bool( true ).toVar();
+					const radius = scale.mul( 2.0 ); // bounding sphere radius
+
+					// Frustum culling using the 6 extracted world-space planes
+					Loop( { start: 0, end: 6 }, ( { i: planeIndex } ) => {
+
+						const plane = frustumPlanesUniform.element( planeIndex );
+						const dist = dot( plane.xyz, pos ).add( plane.w );
+
+						If( dist.lessThan( radius.negate() ), () => {
+
+							visible.assign( false );
+
+						} );
+
+					} );
+
+					If( visible, () => {
+
+						const distToCamera = distance( cameraPos, pos );
+
+						// LOD Selection dynamically built from lods array
+						const lodLevel = uint( 0 ).toVar();
+
+						let lodSelection = null;
+						for ( let i = lods.length - 1; i > 0; i -- ) {
+
+							if ( lodSelection === null ) {
+
+								lodSelection = If( distToCamera.greaterThan( float( lods[ i ].distance ) ), () => {
+
+									lodLevel.assign( i );
+
+								} );
+
+							} else {
+
+								lodSelection = lodSelection.ElseIf( distToCamera.greaterThan( float( lods[ i ].distance ) ), () => {
+
+									lodLevel.assign( i );
+
+								} );
+
+							}
+
+						}
+
+						const lodData = lodOffsetsBuffer.element( lodLevel );
+						const lodTriStart = lodData.x;
+						const lodNumTriangles = lodData.y;
+						const lodChunkStart = lodData.z;
+
+						// Calculate Work Items (64 triangles per item)
+						const workItems = lodNumTriangles.add( 63 ).div( 64 );
+
+						// Evaluate each Chunk (Cluster)
+						Loop( { name: 'cIdx', type: 'uint', start: uint( 0 ), end: workItems, condition: '<' }, ( { cIdx: chunkIndex } ) => {
+
+							const globalChunkId = lodChunkStart.add( uint( chunkIndex ) );
+							const chunkBounds = chunkBoundsBuffer.element( globalChunkId );
+							const chunkCenterLocal = chunkBounds.xyz;
+							const chunkRadiusLocal = chunkBounds.w;
+
+							// Transform chunk bounding sphere to world space and store as var to prevent inlining
+							const chunkCenterWorld = matrixWorld.mul( vec4( chunkCenterLocal, 1.0 ) ).xyz.toVar();
+							const chunkRadiusWorld = chunkRadiusLocal.mul( scale ).toVar();
+
+							const chunkVisible = bool( true ).toVar();
+
+							// Frustum cull the chunk
+							Loop( { name: 'pIdx', start: 0, end: 6 }, ( { pIdx: planeIndex } ) => {
+
+								const plane = frustumPlanesUniform.element( planeIndex );
+								const chunkDist = dot( plane.xyz, chunkCenterWorld ).add( plane.w );
+
+								If( chunkDist.lessThan( chunkRadiusWorld.negate() ), () => {
+
+									chunkVisible.assign( false );
+
+								} );
+
+							} );
+
+							If( chunkVisible, () => {
+
+								const itemIndex = atomicAdd( workQueueCountAtomic.element( 0 ), 1 );
+
+								// uvec4( instanceIndex, triangleStart, lodNumTriangles, chunkIndex )
+								workQueueBuffer.element( itemIndex ).assign(
+									uvec4( instanceIndex, lodTriStart, lodNumTriangles, uint( chunkIndex ) )
+								);
+
+							} );
+
+						} );
+
+						// Store transform for this instance
+						instanceWorldBuffer.element( instanceIndex ).assign( matrixWorld );
+						instanceMvpBuffer.element( instanceIndex ).assign( projScreenMatrixUniform.mul( matrixWorld ) );
+
+					} );
+
+				} )().compute( instanceCount ).setName( 'Compute Frustum' );
+
+				// Compute Dispatch (Indirect arguments)
+				computeDispatch = Fn( () => {
+
+					const totalWorkgroups = workQueueCountRead.element( 0 );
+
+					const maxDim = uint( 65535 );
+
+					// Split totalWorkgroups into 2D dispatch if it exceeds 65535
+					const dispatchX = min( totalWorkgroups, maxDim );
+					const dispatchY = totalWorkgroups.add( maxDim ).sub( 1 ).div( maxDim );
+
+					dispatchBuffer.element( 0 ).assign( dispatchX );
+					dispatchBuffer.element( 1 ).assign( dispatchY );
+					dispatchBuffer.element( 2 ).assign( 1 );
+
+				} )().compute( 1 ).setName( 'Compute Dispatch' );
+
+				// Edge function for barycentric coordinates
+				const edgeFunction = Fn( ( [ a, b, c ] ) => {
+
+					// (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y)
+					return c.y.sub( a.y ).mul( b.x.sub( a.x ) ).sub( c.x.sub( a.x ).mul( b.y.sub( a.y ) ) );
+
+				} );
+
+				// Compute Rasterizer
+				computeRasterize = Fn( () => {
+
+					const totalWorkgroups = workQueueCountRead.element( 0 );
+					const totalThreads = totalWorkgroups.mul( 64 );
+
+					If( instanceIndex.lessThan( totalThreads ), () => {
+
+						const workItemId = instanceIndex.div( 64 );
+						const localTriangleIndex = instanceIndex.mod( 64 );
+
+						const workItem = workQueueBuffer.element( workItemId );
+						const instId = workItem.x;
+						const lodTriStart = workItem.y;
+						const lodNumTriangles = workItem.z;
+						const chunkIndex = workItem.w;
+
+						const globalTriangleIndex = chunkIndex.mul( 64 ).add( localTriangleIndex );
+
+						If( globalTriangleIndex.lessThan( lodNumTriangles ), () => {
+
+							const megaTriangleIndex = lodTriStart.add( globalTriangleIndex );
+							const indexOffset = megaTriangleIndex.mul( 3 );
+
+							const i0 = indexBuffer.element( indexOffset );
+							const i1 = indexBuffer.element( indexOffset.add( 1 ) );
+							const i2 = indexBuffer.element( indexOffset.add( 2 ) );
+
+							const v0 = vertexBuffer.element( i0 );
+							const v1 = vertexBuffer.element( i1 );
+							const v2 = vertexBuffer.element( i2 );
+
+							const instMvpMatrix = instanceMvpBuffer.element( instId );
+
+							// MVP
+							const p0 = instMvpMatrix.mul( v0 );
+							const p1 = instMvpMatrix.mul( v1 );
+							const p2 = instMvpMatrix.mul( v2 );
+
+							// Near plane clipping
+							If( p0.w.greaterThan( 0.0 ).and( p1.w.greaterThan( 0.0 ) ).and( p2.w.greaterThan( 0.0 ) ), () => {
+
+								const ndc0 = p0.xyz.div( p0.w );
+								const ndc1 = p1.xyz.div( p1.w );
+								const ndc2 = p2.xyz.div( p2.w );
+
+								// Early Backface Culling in NDC
+								const areaNdc = edgeFunction( ndc0, ndc1, ndc2 );
+
+								If( areaNdc.greaterThan( 0.0 ), () => {
+
+									// NDC guard: skip triangles entirely outside clip volume
+									const ndcMinX = min( ndc0.x, min( ndc1.x, ndc2.x ) );
+									const ndcMaxX = max( ndc0.x, max( ndc1.x, ndc2.x ) );
+									const ndcMinY = min( ndc0.y, min( ndc1.y, ndc2.y ) );
+									const ndcMaxY = max( ndc0.y, max( ndc1.y, ndc2.y ) );
+
+									If( ndcMaxX.greaterThan( - 1.0 ).and( ndcMinX.lessThan( 1.0 ) ).and( ndcMaxY.greaterThan( - 1.0 ) ).and( ndcMinY.lessThan( 1.0 ) ), () => {
+
+										// Map to screen coordinates
+										const w = screenSize.x;
+										const h = screenSize.y;
+										const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+										const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+										const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+
+										// Bounding Box
+										const minX = max( 0.0, min( s0.x, min( s1.x, s2.x ) ) );
+										const maxX = min( w.sub( 1.0 ), max( s0.x, max( s1.x, s2.x ) ) );
+										const minY = max( 0.0, min( s0.y, min( s1.y, s2.y ) ) );
+										const maxY = min( h.sub( 1.0 ), max( s0.y, max( s1.y, s2.y ) ) );
+
+										const startX = int( floor( minX ) );
+										const endX = int( floor( maxX ) );
+										const startY = int( floor( minY ) );
+										const endY = int( floor( maxY ) );
+
+										// Sub-pixel / Valid bounds rejection
+										If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ), () => {
+
+											const area = edgeFunction( s0, s1, s2 );
+
+											const stepX_w0 = s1.y.sub( s2.y );
+											const stepY_w0 = s2.x.sub( s1.x );
+
+											const stepX_w1 = s2.y.sub( s0.y );
+											const stepY_w1 = s0.x.sub( s2.x );
+
+											const stepX_w2 = s0.y.sub( s1.y );
+											const stepY_w2 = s1.x.sub( s0.x );
+
+											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
+
+											const row_w0 = edgeFunction( s1, s2, pStart ).toVar();
+											const row_w1 = edgeFunction( s2, s0, pStart ).toVar();
+											const row_w2 = edgeFunction( s0, s1, pStart ).toVar();
+
+											// Incremental Z Math (ALU Optimization)
+											const b0_start = row_w0.div( area );
+											const b1_start = row_w1.div( area );
+											const b2_start = row_w2.div( area );
+											const row_z = b0_start.mul( ndc0.z ).add( b1_start.mul( ndc1.z ) ).add( b2_start.mul( ndc2.z ) ).toVar();
+
+											const stepX_z = stepX_w0.div( area ).mul( ndc0.z ).add( stepX_w1.div( area ).mul( ndc1.z ) ).add( stepX_w2.div( area ).mul( ndc2.z ) );
+											const stepY_z = stepY_w0.div( area ).mul( ndc0.z ).add( stepY_w1.div( area ).mul( ndc1.z ) ).add( stepY_w2.div( area ).mul( ndc2.z ) );
+
+											Loop( { name: 'y', type: 'int', start: startY, end: endY, condition: '<=' }, ( { y } ) => {
+
+												const w0 = row_w0.toVar();
+												const w1 = row_w1.toVar();
+												const w2 = row_w2.toVar();
+												const z = row_z.toVar();
+
+												Loop( { name: 'x', type: 'int', start: startX, end: endX, condition: '<=' }, ( { x } ) => {
+
+													If( w0.greaterThanEqual( 0.0 ).and( w1.greaterThanEqual( 0.0 ) ).and( w2.greaterThanEqual( 0.0 ) ), () => {
+
+														If( z.greaterThanEqual( 0.0 ).and( z.lessThanEqual( 1.0 ) ), () => {
+
+															const depth32 = uint( float( 1.0 ).sub( z ).mul( 4294967295.0 ) );
+
+															// payload32: instId (18 bits) | megaTriangleIndex (14 bits)
+															const payload32 = instId.shiftLeft( 14 ).bitOr( megaTriangleIndex.bitAnd( 0x3FFF ) );
+
+															const pixelIndex = uint( y ).mul( uint( screenSize.x ) ).add( uint( x ) );
+
+															const currentDepth = atomicLoad( screenBufferCompute.element( pixelIndex ) );
+															If( depth32.greaterThan( currentDepth ), () => {
+
+																const oldDepth = atomicMax( screenBufferCompute.element( pixelIndex ), depth32 );
+																If( oldDepth.lessThan( depth32 ), () => {
+
+																	screenPayloadBuffer.element( pixelIndex ).assign( payload32 );
+
+																} );
+
+															} );
+
+														} );
+
+													} );
+
+													w0.addAssign( stepX_w0 );
+													w1.addAssign( stepX_w1 );
+													w2.addAssign( stepX_w2 );
+													z.addAssign( stepX_z );
+
+												} );
+
+												row_w0.addAssign( stepY_w0 );
+												row_w1.addAssign( stepY_w1 );
+												row_w2.addAssign( stepY_w2 );
+												row_z.addAssign( stepY_z );
+
+											} );
+
+										} );
+
+									} );
+
+								} ); // End Early Backface Culling
+
+							} ); // End Near Plane Clipping
+
+						} ); // End globalTriangleIndex bounds check
+
+					} ); // End instanceIndex bounds check
+
+				} )().compute( dispatchAttr ).setName( 'Compute Rasterize' );
+
+				// Hash function for meshlet colors
+				const hashColor = Fn( ( [ id_in ] ) => {
+
+					let id = uint( id_in ).toVar();
+					id = id.mul( uint( 747796405 ) ).add( uint( 289559509 ) );
+					id = id.shiftRight( 16 ).bitXor( id ).mul( uint( 277803737 ) );
+					id = id.shiftRight( 16 ).bitXor( id );
+
+					const r = float( id.bitAnd( uint( 255 ) ) ).div( 255.0 );
+					const g = float( id.shiftRight( 8 ).bitAnd( uint( 255 ) ) ).div( 255.0 );
+					const b = float( id.shiftRight( 16 ).bitAnd( uint( 255 ) ) ).div( 255.0 );
+
+					return vec4( r.mul( 0.8 ).add( 0.2 ), g.mul( 0.8 ).add( 0.2 ), b.mul( 0.8 ).add( 0.2 ), 1.0 );
+
+				} );
+
+				// Fullscreen Presentation Pass
+				const material = new THREE.NodeMaterial();
+				material.colorNode = Fn( () => {
+
+					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
+					const screenY = uint( floor( uv().y.oneMinus().mul( screenSize.y ) ) );
+
+					const screenWidth = uint( screenSize.x );
+					const pixelIndex = screenY.mul( screenWidth ).add( screenX );
+					const payload32 = screenPayloadRead.element( pixelIndex );
+
+					// If 0, background color
+					const outColor = vec4( 0.1, 0.1, 0.1, 1.0 ).toVar();
+
+					If( payload32.greaterThan( 0 ), () => {
+
+						const instId = payload32.shiftRight( 14 );
+						const megaTriangleIndex = payload32.bitAnd( 0x3FFF );
+
+						If( materialModeUniform.equal( 0 ), () => {
+
+							const meshletId = meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) );
+							outColor.assign( hashColor( meshletId ) );
+
+						} ).Else( () => {
+
+							// Visibility Buffer: Fetch exact vertices and UVs
+							const i0 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 0 ) );
+							const i1 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 1 ) );
+							const i2 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 2 ) );
+
+							const v0 = vertexBuffer.element( i0 );
+							const v1 = vertexBuffer.element( i1 );
+							const v2 = vertexBuffer.element( i2 );
+
+							const t_uv0 = uvBuffer.element( i0 );
+							const t_uv1 = uvBuffer.element( i1 );
+							const t_uv2 = uvBuffer.element( i2 );
+
+							// Project Vertices to Screen Space
+							const matrixWorld = instanceWorldBuffer.element( instId );
+							const mvpMatrix = projScreenMatrixUniform.mul( matrixWorld );
+
+							const p0 = mvpMatrix.mul( v0 );
+							const p1 = mvpMatrix.mul( v1 );
+							const p2 = mvpMatrix.mul( v2 );
+
+							const ndc0 = p0.xyz.div( p0.w );
+							const ndc1 = p1.xyz.div( p1.w );
+							const ndc2 = p2.xyz.div( p2.w );
+
+							const w = screenSize.x;
+							const h = screenSize.y;
+							const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+							const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+							const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+
+							const p = vec2( float( screenX ).add( 0.5 ), float( screenY ).add( 0.5 ) );
+
+							// Compute Barycentrics
+							const area = edgeFunction( s0, s1, s2 );
+							const w0 = edgeFunction( s1, s2, p );
+							const w1 = edgeFunction( s2, s0, p );
+							const w2 = edgeFunction( s0, s1, p );
+
+							const b0 = w0.div( area );
+							const b1 = w1.div( area );
+							const b2 = w2.div( area );
+
+							// Perspective correct UV interpolation (32-bit floats!)
+							const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
+							const b0_p = b0.div( p0.w ).div( z_inv );
+							const b1_p = b1.div( p1.w ).div( z_inv );
+							const b2_p = b2.div( p2.w ).div( z_inv );
+
+							const uv_interp = t_uv0.mul( b0_p ).add( t_uv1.mul( b1_p ) ).add( t_uv2.mul( b2_p ) );
+
+							const finalUV = uv_interp.mul( 3.0 );
+							outColor.assign( texture( textureMap, finalUV ) );
+
+						} );
+
+					} );
+
+					return outColor;
+
+				} )();
+
+				quadMesh = new THREE.QuadMesh( material );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			const frustum = new THREE.Frustum();
+			const projScreenMatrix = new THREE.Matrix4();
+			const cameraInverse = new THREE.Matrix4();
+
+			function animate() {
+
+				controls.update();
+
+				camera.updateMatrixWorld();
+
+				cameraInverse.copy( camera.matrixWorld ).invert();
+				projScreenMatrix.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+				frustum.setFromProjectionMatrix( projScreenMatrix );
+
+				// Update GPU uniforms
+				projScreenMatrixUniform.value.copy( projScreenMatrix );
+				cameraPos.value.copy( camera.position );
+
+				// Pack frustum planes into the uniform array
+				const planes = frustum.planes;
+				const planesArray = frustumPlanesUniform.array;
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const p = planes[ i ];
+					planesArray[ i ].set( p.normal.x, p.normal.y, p.normal.z, p.constant );
+
+				}
+
+				// Compute & Render
+				renderer.compute( computeClear );
+				renderer.compute( computeFrustum );
+				renderer.compute( computeDispatch );
+				renderer.compute( computeRasterize );
+
+				quadMesh.render( renderer );
+
+			}
+
+		</script>
+	</body>
+</html>
