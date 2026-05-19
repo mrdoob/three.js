@@ -8,6 +8,7 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
+import { warnOnce } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -75,14 +76,6 @@ class RTTNode extends TextureNode {
 		this.height = height;
 
 		/**
-		 * The pixel ratio
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.pixelRatio = 1;
-
-		/**
 		 * The render target
 		 *
 		 * @type {RenderTarget}
@@ -104,6 +97,15 @@ class RTTNode extends TextureNode {
 		 * @default true
 		 */
 		this.autoUpdate = true;
+
+		/**
+		 * The resolution scale
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 1
+		 */
+		this._resolutionScale = 1;
 
 		/**
 		 * The node which is used with the quad mesh for RTT.
@@ -164,11 +166,8 @@ class RTTNode extends TextureNode {
 	 */
 	setSize( width, height ) {
 
-		this.width = width;
-		this.height = height;
-
-		const effectiveWidth = width * this.pixelRatio;
-		const effectiveHeight = height * this.pixelRatio;
+		const effectiveWidth = Math.round( width * this._resolutionScale );
+		const effectiveHeight = Math.round( height * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -180,12 +179,43 @@ class RTTNode extends TextureNode {
 	 * Sets the pixel ratio. This will also resize the render target.
 	 *
 	 * @param {number} pixelRatio - The pixel ratio to set.
+	 * @deprecated since r185. Use "RTTNode.setSize( width * pixelRatio, height * pixelRatio )" instead.
 	 */
-	setPixelRatio( pixelRatio ) {
+	setPixelRatio( /*pixelRatio*/ ) {
 
-		this.pixelRatio = pixelRatio;
+		warnOnce( 'RTTNode: ".setPixelRatio()" is deprecated. Use "RTTNode.setSize( width * pixelRatio, height * pixelRatio )" instead.' );
 
-		this.setSize( this.width, this.height );
+	}
+
+	/**
+	 * Sets the resolution scale.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
+	 * @returns {RTTNode} A reference to this node.
+	 */
+	setResolutionScale( resolutionScale ) {
+
+		this._resolutionScale = resolutionScale;
+
+		if ( this.autoResize === false ) {
+
+			this.setSize( this.width, this.height );
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the resolution scale.
+	 *
+	 * @returns {number} The resolution scale.
+	 */
+	getResolutionScale() {
+
+		return this._resolutionScale;
 
 	}
 
@@ -201,23 +231,10 @@ class RTTNode extends TextureNode {
 
 		if ( this.autoResize === true ) {
 
-			let effectiveWidth;
-			let effectiveHeight;
+			const size = renderer.getDrawingBufferSize( _size );
 
-			if ( currentRenderTarget ) {
-
-				effectiveWidth = currentRenderTarget.width;
-				effectiveHeight = currentRenderTarget.height;
-
-			} else {
-
-				const pixelRatio = renderer.getPixelRatio();
-				const size = renderer.getSize( _size );
-
-				effectiveWidth = Math.floor( size.width * pixelRatio );
-				effectiveHeight = Math.floor( size.height * pixelRatio );
-
-			}
+			const effectiveWidth = Math.round( size.width * this._resolutionScale );
+			const effectiveHeight = Math.round( size.height * this._resolutionScale );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
