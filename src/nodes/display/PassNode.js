@@ -998,19 +998,6 @@ class PassNode extends TempNode {
 	}
 
 	/**
-	 * Sets the pixel ratio the pass's render target and updates the size.
-	 *
-	 * @param {number} pixelRatio - The pixel ratio to set.
-	 */
-	setPixelRatio( pixelRatio ) {
-
-		this._pixelRatio = pixelRatio;
-
-		this.setSize( this._width, this._height );
-
-	}
-
-	/**
 	 * Frees internal resources. Should be called when the node is no longer in use.
 	 */
 	dispose() {

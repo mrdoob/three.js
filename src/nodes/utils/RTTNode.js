@@ -176,18 +176,6 @@ class RTTNode extends TextureNode {
 	}
 
 	/**
-	 * Sets the pixel ratio. This will also resize the render target.
-	 *
-	 * @param {number} pixelRatio - The pixel ratio to set.
-	 * @deprecated since r185. Use "RTTNode.setSize( width * pixelRatio, height * pixelRatio )" instead.
-	 */
-	setPixelRatio( /*pixelRatio*/ ) {
-
-		warnOnce( 'RTTNode: ".setPixelRatio()" is deprecated. Use ".setSize( width * pixelRatio, height * pixelRatio )" instead.' );
-
-	}
-
-	/**
 	 * Sets the resolution scale.
 	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
 	 *
