@@ -8,7 +8,6 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
-import { warnOnce } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
