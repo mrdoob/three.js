@@ -183,7 +183,7 @@ class RTTNode extends TextureNode {
 	 */
 	setPixelRatio( /*pixelRatio*/ ) {
 
-		warnOnce( 'RTTNode: ".setPixelRatio()" is deprecated. Use "RTTNode.setSize( width * pixelRatio, height * pixelRatio )" instead.' );
+		warnOnce( 'RTTNode: ".setPixelRatio()" is deprecated. Use ".setSize( width * pixelRatio, height * pixelRatio )" instead.' );
 
 	}
 
