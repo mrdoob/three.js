@@ -102,6 +102,7 @@ class DRACOLoader extends Loader {
 	/**
 	 * Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 	 *
+	 * @deprecated
 	 * @param {{type:('js'|'wasm')}} config - The decoder config.
 	 * @return {DRACOLoader} A reference to this loader.
 	 */
