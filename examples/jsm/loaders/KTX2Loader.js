@@ -103,7 +103,6 @@ import {
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
 
-
 const WASM_BIN_URL = new URL( '../libs/basis/basis_transcoder.wasm', import.meta.url ).toString();
 const WASM_JS_URL = new URL( '../libs/basis/basis_transcoder.js', import.meta.url ).toString();
 
