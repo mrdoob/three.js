@@ -116,10 +116,10 @@
 
 				const scenePass = pass( scene, camera );
 
-				const intensity = uniform( 5 );
+				const intensity = uniform( 5.0 );
 				const tintColor = uniform( new THREE.Color( 0x7a8aff ) );
 				const threshold = uniform( 0.3 );
-				const radius = uniform( 0.5 );
+				const radius = uniform( 0.0 );
 				const samples = uniform( 80 );
 
 				const bloomPass = bloom( scenePass.getTextureNode().toInspector( 'Color' ), intensity, radius, threshold );
@@ -131,8 +131,10 @@
 					// Extract bright areas to a texture (computed once, sampled many times)
 					const v = luminance( input.rgb );
 					const alpha = smoothstep( threshold, threshold.add( smoothWidth ), v );
-					const brightPass = rtt( mix( vec4( 0 ), input, alpha ) );
-					brightPass.renderTarget.texture.wrapS = THREE.MirroredRepeatWrapping;
+					const brightPass = rtt( mix( vec4( 0 ), input, alpha ), null, null, {
+						wrapS: THREE.MirroredRepeatWrapping,
+						wrapT: THREE.MirroredRepeatWrapping
+					} );
 
 					// Horizontal blur
 					const total = vec4( 0 );
