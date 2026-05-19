@@ -90,7 +90,7 @@
 				scene.background = new THREE.Color( 0xf0f0f0 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				const ktx2loader = new KTX2Loader().setTranscoderPath( 'jsm/libs/basis/' ).detectSupport( renderer );
+				const ktx2loader = new KTX2Loader().detectSupport( renderer );
 				const dracoLoader = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/' );
 				const gltfLoader = new GLTFLoader();
 			
