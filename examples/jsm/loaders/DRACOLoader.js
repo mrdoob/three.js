@@ -107,6 +107,7 @@ class DRACOLoader extends Loader {
 	 */
 	setDecoderConfig( config ) {
 
+		console.warn( 'THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.' );
 		this.decoderConfig = config;
 
 		return this;
