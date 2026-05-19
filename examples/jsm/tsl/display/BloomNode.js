@@ -312,8 +312,8 @@ class BloomNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		let resx = Math.round( width * this._resolutionScale );
-		let resy = Math.round( height * this._resolutionScale );
+		let resx = Math.floor( width * this._resolutionScale );
+		let resy = Math.floor( height * this._resolutionScale );
 
 		this._renderTargetBright.setSize( resx, resy );
 
@@ -324,8 +324,8 @@ class BloomNode extends TempNode {
 
 			this._separableBlurMaterials[ i ].invSize.value.set( 1 / resx, 1 / resy );
 
-			resx = Math.round( resx / 2 );
-			resy = Math.round( resy / 2 );
+			resx = Math.floor( resx / 2 );
+			resy = Math.floor( resy / 2 );
 
 		}
 

@@ -165,8 +165,8 @@ class RTTNode extends TextureNode {
 	 */
 	setSize( width, height ) {
 
-		const effectiveWidth = Math.round( width * this._resolutionScale );
-		const effectiveHeight = Math.round( height * this._resolutionScale );
+		const effectiveWidth = Math.floor( width * this._resolutionScale );
+		const effectiveHeight = Math.floor( height * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -220,8 +220,8 @@ class RTTNode extends TextureNode {
 
 			const size = renderer.getDrawingBufferSize( _size );
 
-			const effectiveWidth = Math.round( size.width * this._resolutionScale );
-			const effectiveHeight = Math.round( size.height * this._resolutionScale );
+			const effectiveWidth = Math.floor( size.width * this._resolutionScale );
+			const effectiveHeight = Math.floor( size.height * this._resolutionScale );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
