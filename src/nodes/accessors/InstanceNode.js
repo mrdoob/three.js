@@ -84,6 +84,14 @@ class InstanceNode extends Node {
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;
+
+		/**
+		 * The update type is set to `frame` since an update
+		 * of instanced buffer data must be checked per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
@@ -218,6 +226,8 @@ class InstanceNode extends Node {
 
 	/**
 	 * Checks if the internal buffers require an update.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
 	 */
 	updateBefore( /*frame*/ ) {
 
