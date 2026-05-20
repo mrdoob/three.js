@@ -1,6 +1,7 @@
 import {
 	FileLoader,
-	Loader
+	Loader,
+	LoaderUtils
 } from 'three';
 
 import { unzipSync } from '../libs/fflate.module.js';
@@ -49,6 +50,8 @@ class USDLoader extends Loader {
 
 		const scope = this;
 
+		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -58,7 +61,7 @@ class USDLoader extends Loader {
 
 			try {
 
-				scope.parse( text, onLoad, onError );
+				scope.parse( text, path, onLoad, onError );
 
 			} catch ( e ) {
 
@@ -88,11 +91,12 @@ class USDLoader extends Loader {
 	 * textures have finished loading.
 	 *
 	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
+	 * @param {string} [path=''] - Base URL or directory.
 	 * @param {function(Group)} [onLoad] - Executed once the group and all of its textures are ready.
 	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {Group} The parsed asset as a group.
 	 */
-	parse( buffer, onLoad, onError ) {
+	parse( buffer, path = '', onLoad, onError ) {
 
 		const usda = new USDAParser();
 		const usdc = new USDCParser();
@@ -243,7 +247,7 @@ class USDLoader extends Loader {
 
 			const composer = new USDComposer( scope.manager );
 			const data = usda.parseData( buffer );
-			return finalize( composer, composer.compose( data, {} ) );
+			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
 		}
 
@@ -253,7 +257,7 @@ class USDLoader extends Loader {
 
 			const composer = new USDComposer( scope.manager );
 			const data = usdc.parseData( toArrayBuffer( buffer ) );
-			return finalize( composer, composer.compose( data, {} ) );
+			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
 		}
 
@@ -290,7 +294,7 @@ class USDLoader extends Loader {
 		const composer = new USDComposer( scope.manager );
 		const text = textDecoder.decode( bytes );
 		const data = usda.parseData( text );
-		return finalize( composer, composer.compose( data, {} ) );
+		return finalize( composer, composer.compose( data, {}, {}, path ) );
 
 	}
 

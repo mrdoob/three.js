@@ -11,6 +11,7 @@ import {
 	DirectionalLight,
 	Euler,
 	Group,
+	LoaderUtils,
 	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -854,14 +855,13 @@ class USDComposer {
 
 		}
 
-		// Combine with base path
-		if ( this.basePath ) {
+		if ( ! this.basePath ) return cleanPath;
 
-			return this.basePath + '/' + cleanPath;
+		// LoaderUtils.resolveURL expects basePath to end with a separator;
+		// the USDZ flow passes the zip-internal directory name without one.
+		const base = this.basePath.endsWith( '/' ) ? this.basePath : this.basePath + '/';
 
-		}
-
-		return cleanPath;
+		return LoaderUtils.resolveURL( cleanPath, base );
 
 	}
 
@@ -3816,6 +3816,16 @@ class USDComposer {
 					return this._createTextureFromData( this.assets[ key ], textureAttrs, transformAttrs );
 
 				}
+
+			}
+
+			// Standalone .usd/.usda/.usdc files don't pre-load assets; treat the
+			// resolved path as a URL relative to basePath so the browser fetches
+			// the texture from disk next to the layer.
+
+			if ( this.basePath ) {
+
+				return this._createTextureFromData( resolvedPath, textureAttrs, transformAttrs );
 
 			}
 
