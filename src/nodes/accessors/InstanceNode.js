@@ -84,6 +84,7 @@ class InstanceNode extends Node {
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`.
@@ -217,10 +218,8 @@ class InstanceNode extends Node {
 
 	/**
 	 * Checks if the internal buffers require an update.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
 	 */
-	update( frame ) {
+	updateBefore( /*frame*/ ) {
 
 		if ( this.buffer !== null && this.isStorageMatrix !== true ) {
 
@@ -249,6 +248,10 @@ class InstanceNode extends Node {
 			}
 
 		}
+
+	}
+
+	update( frame ) {
 
 		if ( this.previousInstanceMatrixNode !== null ) {
 
