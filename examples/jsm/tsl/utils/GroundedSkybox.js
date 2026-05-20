@@ -2,12 +2,12 @@ import { Fn, If, vec3, float, min, cameraPosition, positionWorld } from 'three/t
 
 /**
  * @module GroundedSkybox
- * @three_import import { groundProjectedDirection } from 'three/addons/tsl/utils/GroundedSkybox.js';
+ * @three_import import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js';
  */
 
 /**
  * Projects the world position onto a sphere whose bottom is clipped by a ground disk,
- * then returns a direction usable for sampling an environment cube map.
+ * then returns a vector usable for sampling an environment cube map.
  *
  * @tsl
  * @function
@@ -15,7 +15,7 @@ import { Fn, If, vec3, float, min, cameraPosition, positionWorld } from 'three/t
  * @param {Node<float>} heightNode - The height is how far the camera that took the photo was above the ground. A larger value will magnify the downward part of the image.
  * @return {Node<vec3>} A direction vector for sampling the environment cube map.
  */
-export const groundProjectedDirection = Fn( ( [ radiusNode, heightNode ] ) => {
+export const getGroundProjectedNormal = Fn( ( [ radiusNode, heightNode ] ) => {
 
 	const p = positionWorld.sub( cameraPosition ).normalize().toConst();
 	const camPos = cameraPosition.toVar();

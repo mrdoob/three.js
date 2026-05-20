@@ -43,7 +43,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
-			import { groundProjectedDirection } from 'three/addons/tsl/utils/GroundedSkybox.js';
+			import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js';
 
 			import { cubeTexture, float } from 'three/tsl';
 
@@ -150,7 +150,7 @@
 
 				const geometry = new THREE.IcosahedronGeometry( 1, 16 );
 				const material = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
-				material.colorNode = cubeTexture( cubeMap, groundProjectedDirection( float( params.radius ), float( params.height ) ) );
+				material.colorNode = cubeTexture( cubeMap, getGroundProjectedNormal( float( params.radius ), float( params.height ) ) );
 
 				const skybox = new THREE.Mesh( geometry, material );
 				skybox.scale.setScalar( params.radius );
