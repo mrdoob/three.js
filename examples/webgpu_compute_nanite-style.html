@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty } from 'three/tsl';
+			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty, Discard, Return } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
@@ -849,13 +849,19 @@
 				const material = new THREE.NodeMaterial();
 				material.depthWrite = true;
 
-				// Output depth from the SW rasterizer so HW mesh can depth test against it
-				material.depthNode = Fn( () => {
+				// Shared screen-coordinate helper
+				const getPixelIndex = () => {
 
 					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
 					const screenY = uint( floor( uv().y.oneMinus().mul( screenSize.y ) ) );
-					const screenWidth = uint( screenSize.x );
-					const pixelIndex = screenY.mul( screenWidth ).add( screenX );
+					return { screenX, screenY, pixelIndex: screenY.mul( uint( screenSize.x ) ).add( screenX ) };
+
+				};
+
+				// Output depth from the SW rasterizer so HW mesh can depth test against it
+				material.depthNode = Fn( () => {
+
+					const { pixelIndex } = getPixelIndex();
 
 					// Extract depth18 from packed tri buffer (upper 18 bits)
 					const packedTri = screenTriRead.element( pixelIndex );
@@ -868,20 +874,19 @@
 
 				material.colorNode = Fn( () => {
 
-					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
-					const screenY = uint( floor( uv().y.oneMinus().mul( screenSize.y ) ) );
+					const { screenX, screenY, pixelIndex } = getPixelIndex();
 
-					const screenWidth = uint( screenSize.x );
-					const pixelIndex = screenY.mul( screenWidth ).add( screenX );
-
-					// Unpack from atomic buffers
+					// Single buffer read — check for background immediately
 					const packedTri = screenTriRead.element( pixelIndex );
-					const packedInst = screenInstRead.element( pixelIndex );
 
-					// If 0, background color
+					// Background color for pixels with no geometry
 					const outColor = vec4( 0.1, 0.1, 0.1, 1.0 ).toVar();
 
 					If( packedTri.greaterThan( 0 ), () => {
+
+						// Only read instId buffer for pixels with actual geometry
+						// (saves one storage buffer read per background pixel)
+						const packedInst = screenInstRead.element( pixelIndex );
 
 						const megaTriangleIndex = packedTri.bitAnd( 0x3FFF );
 						const instId = packedInst.bitAnd( 0x3FFFF );
