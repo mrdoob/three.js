@@ -342,9 +342,7 @@
 				], 'vec4' );
 				cameraPos = uniform( new THREE.Vector3() );
 				cotHalfFovUniform = uniform( 1.0 );
-				pixelErrorThresholdUniform = uniform( 1.0 ); // Target max 1 pixel error
-				cotHalfFovUniform = uniform( 1.0 );
-				pixelErrorThresholdUniform = uniform( 1.0 ); // Target 1 pixel of error max
+				pixelErrorThresholdUniform = uniform( 1.0 );
 
 				// Compute Clear
 				computeClear = Fn( () => {
@@ -381,18 +379,6 @@
 						vec4( pos, 1.0 )
 					);
 
-					const getPixelError = Fn( ( [ centerWorld, errorVal ] ) => {
-
-						const d = distance( cameraPos, centerWorld );
-						const d2 = d.pow( 2 );
-						const r2 = errorVal.pow( 2 );
-						const safeDiff = max( 0.001, d2.sub( r2 ) );
-
-						const projectedR = cotHalfFovUniform.mul( errorVal ).div( sqrt( safeDiff ) );
-						return projectedR.mul( float( screenSize.y ) ).div( 2.0 );
-
-					} );
-
 					const visible = bool( true ).toVar();
 					const radius = scale.mul( 2.0 ); // bounding sphere radius
 
@@ -414,13 +400,16 @@
 
 						const distToCamera = distance( cameraPos, pos );
 
-						// LOD Selection dynamically built from lods array (Screen-Space Projected Error)
+						// Precompute projection factor once (Screen-Space Projected Error)
+						// pixelError = cotHalfFov * errorWorld / dist * screenH / 2
+						const pixelFactor = cotHalfFovUniform.div( max( 0.01, distToCamera ) ).mul( float( screenSize.y ) ).div( 2.0 );
+
 						const lodLevel = uint( 0 ).toVar();
 
 						let lodSelection = null;
 						for ( let i = lods.length - 1; i > 0; i -- ) {
 
-							const checkLod = getPixelError( pos, float( lods[ i ].error ) ).lessThanEqual( pixelErrorThresholdUniform );
+							const checkLod = float( lods[ i ].error ).mul( scale ).mul( pixelFactor ).lessThanEqual( pixelErrorThresholdUniform );
 
 							if ( lodSelection === null ) {
 
