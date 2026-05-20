@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, distance, screenSize, time, texture, sqrt } from 'three/tsl';
+			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
@@ -40,13 +40,14 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, renderer, controls;
-			let computeRasterize, computeClear, computeFrustum, computeDispatch;
-			let quadMesh;
+			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
+			let quadMesh, hwScene, hwMesh;
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform;
-			let cotHalfFovUniform, pixelErrorThresholdUniform;
+			let cotHalfFovUniform, pixelErrorThresholdUniform, maxRasterSizeUniform;
 			let workQueueCountAtomic, workQueueCountRead, dispatchBuffer, workQueueBuffer, chunkBoundsBuffer;
 			let instanceWorldBuffer, instanceMvpBuffer;
 			let instanceWorldAttr, instanceMvpAttr;
+			let hwDrawBuffer;
 
 			const rows = 500;
 			const cols = 500;
@@ -55,6 +56,9 @@
 			const maxScreenW = 3840;
 			const maxScreenH = 2160;
 			const maxPixels = maxScreenW * maxScreenH;
+
+			const MAX_RASTER_SIZE = 32;
+			const options = { Mode: 'Meshlet Debug', Rasterizer: 'Both' };
 			
 			init();
 
@@ -277,17 +281,19 @@
 				textureMap.wrapS = THREE.RepeatWrapping;
 				textureMap.wrapT = THREE.RepeatWrapping;
 
-				const options = { Mode: 'Meshlet Debug' };
-				const materialGroup = renderer.inspector.createParameters( 'Material' );
-				materialGroup.add( options, 'Mode', { 'Meshlet Debug': 'Meshlet Debug', 'Texture': 'Texture' } ).addEventListener( 'change', ( e ) => {
+				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
+				parameterGroup.add( options, 'Mode', { 'Meshlet Debug': 'Meshlet Debug', 'Texture': 'Texture' } ).addEventListener( 'change', ( e ) => {
 
 					materialModeUniform.value = e.value === 'Texture' ? 1 : 0;
 
 				} );
 
+				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
+
 				const screenBufferData = new Uint32Array( maxPixels );
 				const screenBufferAttr = new THREE.StorageBufferAttribute( screenBufferData, 1 );
 				const screenBufferCompute = storage( screenBufferAttr, 'uint', maxPixels ).toAtomic();
+				const screenBufferRead = storage( screenBufferAttr, 'uint', maxPixels ).toReadOnly();
 
 				const screenPayloadData = new Uint32Array( maxPixels );
 				const screenPayloadAttr = new THREE.StorageBufferAttribute( screenPayloadData, 1 );
@@ -320,6 +326,7 @@
 
 				instanceWorldBuffer = storage( instanceWorldAttr, 'mat4', instanceCount );
 				instanceMvpBuffer = storage( instanceMvpAttr, 'mat4', instanceCount );
+				const instanceWorldRead = storage( instanceWorldAttr, 'mat4', instanceCount ).toReadOnly();
 
 				const workQueueCountData = new Uint32Array( 1 );
 				const workQueueCountAttr = new THREE.StorageBufferAttribute( workQueueCountData, 1 );
@@ -335,6 +342,20 @@
 				const workQueueData = new Uint32Array( MAX_WORK_ITEMS * 4 );
 				workQueueBuffer = storage( new THREE.StorageBufferAttribute( workQueueData, 4 ), 'uvec4', MAX_WORK_ITEMS );
 
+				// HW Rasterizer Buffers (for large triangles that exceed SW raster budget)
+				const MAX_HW_TRIANGLES = 100000;
+
+				// HW queue: index 0 is atomic counter, indices 1..MAX store payload32
+				const hwQueueData = new Uint32Array( MAX_HW_TRIANGLES + 1 );
+				const hwQueueAttr = new THREE.StorageBufferAttribute( hwQueueData, 1 );
+				const hwQueueAtomic = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toAtomic();
+				const hwQueueRead = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toReadOnly();
+
+				// Draw indirect buffer: vertexCount, instanceCount, firstVertex, firstInstance
+				const hwDrawData = new Uint32Array( 4 );
+				const hwDrawAttr = new THREE.IndirectStorageBufferAttribute( hwDrawData, 4 );
+				hwDrawBuffer = storage( hwDrawAttr, 'uint', 4 );
+
 				projScreenMatrixUniform = uniform( new THREE.Matrix4() );
 				frustumPlanesUniform = uniformArray( [
 					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
@@ -342,7 +363,8 @@
 				], 'vec4' );
 				cameraPos = uniform( new THREE.Vector3() );
 				cotHalfFovUniform = uniform( 1.0 );
-				pixelErrorThresholdUniform = uniform( 1.0 );
+				pixelErrorThresholdUniform = uniform( 4.0 );
+				maxRasterSizeUniform = uniform( MAX_RASTER_SIZE, 'int' ); // Max bounding box size in pixels for SW rasterizer
 
 				// Compute Clear
 				computeClear = Fn( () => {
@@ -353,6 +375,7 @@
 					If( instanceIndex.equal( 0 ), () => {
 
 						atomicStore( workQueueCountAtomic.element( 0 ), uint( 0 ) );
+						atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
 
 					} );
 
@@ -553,6 +576,7 @@
 							const p2 = instMvpMatrix.mul( v2 );
 
 							// Near plane clipping
+							// If( p0.w.greaterThan( 0.5 ).and( p1.w.greaterThan( 0.5 ) ).and( p2.w.greaterThan( 0.5 ) ), () => {
 							If( p0.w.greaterThan( 0.0 ).and( p1.w.greaterThan( 0.0 ) ).and( p2.w.greaterThan( 0.0 ) ), () => {
 
 								const ndc0 = p0.xyz.div( p0.w );
@@ -590,8 +614,19 @@
 										const startY = int( floor( minY ) );
 										const endY = int( floor( maxY ) );
 
-										// Sub-pixel / Valid bounds rejection
-										If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ), () => {
+										// Big triangle guard: skip triangles larger than maxRasterSize
+										// This is the key performance safeguard — software rasterizers
+										// should only handle small triangles. Large triangles cause O(n²)
+										// pixel iteration per thread, which kills performance when close.
+										const bbWidth = endX.sub( startX );
+										const bbHeight = endY.sub( startY );
+
+										// Compute payload32 once for both SW and HW paths
+										// payload32: instId (18 bits) | megaTriangleIndex (14 bits)
+										const payload32 = instId.shiftLeft( 14 ).bitOr( megaTriangleIndex.bitAnd( 0x3FFF ) );
+
+										// Sub-pixel / Valid bounds rejection + big triangle guard
+										If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ).and( bbWidth.lessThanEqual( maxRasterSizeUniform ) ).and( bbHeight.lessThanEqual( maxRasterSizeUniform ) ), () => {
 
 											const area = edgeFunction( s0, s1, s2 );
 
@@ -634,8 +669,7 @@
 
 															const depth32 = uint( float( 1.0 ).sub( z ).mul( 4294967295.0 ) );
 
-															// payload32: instId (18 bits) | megaTriangleIndex (14 bits)
-															const payload32 = instId.shiftLeft( 14 ).bitOr( megaTriangleIndex.bitAnd( 0x3FFF ) );
+
 
 															const pixelIndex = uint( y ).mul( uint( screenSize.x ) ).add( uint( x ) );
 
@@ -669,6 +703,17 @@
 
 											} );
 
+										} ).Else( () => {
+
+											// Big triangle → enqueue for HW rasterization
+											If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ), () => {
+
+												const hwCount = atomicAdd( hwQueueAtomic.element( 0 ), 1 );
+												const hwSlot = hwCount.add( 1 );
+												atomicStore( hwQueueAtomic.element( hwSlot ), payload32 );
+
+											} );
+
 										} );
 
 									} );
@@ -683,7 +728,20 @@
 
 				} )().compute( dispatchAttr ).setName( 'Compute Rasterize' );
 
-				// Hash function for meshlet colors
+				// Compute HW Draw Indirect Args
+				computeHWArgs = Fn( () => {
+
+					const hwCount = atomicLoad( hwQueueAtomic.element( 0 ) );
+
+					// Non-indexed draw: vertexCount = hwCount * 3 (3 verts per triangle)
+					hwDrawBuffer.element( 0 ).assign( hwCount.mul( 3 ) ); // vertexCount
+					hwDrawBuffer.element( 1 ).assign( uint( 1 ) ); // instanceCount
+					hwDrawBuffer.element( 2 ).assign( uint( 0 ) ); // firstVertex
+					hwDrawBuffer.element( 3 ).assign( uint( 0 ) ); // firstInstance
+
+				} )().compute( 1 ).setName( 'Compute HW Args' );
+
+				// Hash function for meshlet colors (shared between HW mesh and fullscreen quad)
 				const hashColor = Fn( ( [ id_in ] ) => {
 
 					let id = uint( id_in ).toVar();
@@ -699,8 +757,106 @@
 
 				} );
 
+				// HW Rasterizer Mesh (renders big triangles via GPU hardware pipeline)
+				// Unlike the SW rasterizer which writes to an atomic screen buffer,
+				// the HW mesh renders directly with real colors and hardware depth testing.
+				// It renders AFTER the fullscreen quad, overlaying HW-rasterized triangles.
+				{
+
+					// Geometry: dummy positions, vertex count driven by indirect draw
+					const hwGeometry = new THREE.BufferGeometry();
+					hwGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( new Float32Array( MAX_HW_TRIANGLES * 3 * 3 ), 3 ) );
+					hwGeometry.setIndirect( hwDrawAttr );
+					hwGeometry.boundingSphere = new THREE.Sphere().set( new THREE.Vector3(), Infinity );
+
+					// Varying to pass payload and UVs from vertex to fragment
+					const vPayload = varyingProperty( 'uint', 'vPayload' );
+					const vUv = varyingProperty( 'vec2', 'vUv' );
+
+					const hwMaterial = new THREE.NodeMaterial();
+					hwMaterial.depthWrite = true;
+					hwMaterial.depthTest = true;
+
+					// Vertex shader: vertex pulling from HW queue
+					hwMaterial.positionNode = Fn( () => {
+
+						// vertexIndex: 0,1,2, 3,4,5, 6,7,8, ...
+						const triIndex = vertexIndex.div( 3 ); // which triangle in HW queue
+						const localVert = vertexIndex.mod( 3 ); // which vertex (0, 1, 2)
+
+						const payload32 = hwQueueRead.element( triIndex.add( 1 ) );
+						const instId = payload32.shiftRight( 14 );
+						const megaTriIdx = payload32.bitAnd( 0x3FFF );
+
+						// Fetch actual vertex index from the mega index buffer
+						const vertGlobalIdx = indexBuffer.element( megaTriIdx.mul( 3 ).add( localVert ) );
+						const v = vertexBuffer.element( vertGlobalIdx );
+
+						// Transform to world space
+						const worldPos = instanceWorldRead.element( instId ).mul( v );
+
+						const uvVal = uvBuffer.element( vertGlobalIdx );
+						vUv.assign( uvVal );
+
+						vPayload.assign( payload32 );
+
+						return worldPos.xyz;
+
+					} )();
+
+					// Fragment shader: directly output final color (no storage buffer writes)
+					hwMaterial.fragmentNode = Fn( () => {
+
+						const payload32 = vPayload;
+						const instId = payload32.shiftRight( 14 );
+						const megaTriangleIndex = payload32.bitAnd( 0x3FFF );
+
+						const outColor = vec4( 0.0 ).toVar();
+
+						If( materialModeUniform.equal( 0 ), () => {
+
+							const meshletId = meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) );
+							outColor.assign( hashColor( meshletId ) );
+
+						} ).Else( () => {
+
+							// Hardware interpolated UV!
+							outColor.assign( texture( textureMap, vUv ) );
+
+						} );
+
+						return outColor;
+
+					} )();
+
+					hwMesh = new THREE.Mesh( hwGeometry, hwMaterial );
+					hwMesh.frustumCulled = false;
+
+					hwScene = new THREE.Scene();
+					hwScene.add( hwMesh );
+
+				}
+
+
 				// Fullscreen Presentation Pass
 				const material = new THREE.NodeMaterial();
+				material.depthWrite = true;
+
+				// Output depth from the SW rasterizer so HW mesh can depth test against it
+				material.depthNode = Fn( () => {
+
+					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
+					const screenY = uint( floor( uv().y.oneMinus().mul( screenSize.y ) ) );
+					const screenWidth = uint( screenSize.x );
+					const pixelIndex = screenY.mul( screenWidth ).add( screenX );
+			
+					const currentDepth32 = screenBufferRead.element( pixelIndex );
+			
+					// Reconstruct NDC Z from inverted depth32: z = 1.0 - (depth32 / 4294967295.0)
+					return float( 1.0 ).sub( float( currentDepth32 ).div( 4294967295.0 ) );
+
+				} )();
+
 				material.colorNode = Fn( () => {
 
 					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
@@ -776,8 +932,7 @@
 
 							const uv_interp = t_uv0.mul( b0_p ).add( t_uv1.mul( b1_p ) ).add( t_uv2.mul( b2_p ) );
 
-							const finalUV = uv_interp.mul( 3.0 );
-							outColor.assign( texture( textureMap, finalUV ) );
+							outColor.assign( texture( textureMap, uv_interp ) );
 
 						} );
 
@@ -836,8 +991,26 @@
 				renderer.compute( computeFrustum );
 				renderer.compute( computeDispatch );
 				renderer.compute( computeRasterize );
+				renderer.compute( computeHWArgs );
 
-				quadMesh.render( renderer );
+				const rasterMode = options.Rasterizer;
+
+				// SW presentation (fullscreen quad reads atomic buffer)
+				if ( rasterMode === 'SW Only' || rasterMode === 'Both' ) {
+
+					quadMesh.render( renderer );
+
+				}
+
+				// HW mesh renders with real depth testing + colors
+				if ( rasterMode === 'HW Only' || rasterMode === 'Both' ) {
+
+					hwScene.background = ( rasterMode === 'HW Only' ) ? new THREE.Color( 0.1, 0.1, 0.1 ) : null;
+					renderer.autoClear = ( rasterMode === 'HW Only' );
+					renderer.render( hwScene, camera );
+					renderer.autoClear = true;
+
+				}
 
 			}
 
