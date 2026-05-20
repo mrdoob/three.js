@@ -91,7 +91,7 @@ class USDLoader extends Loader {
 	 * textures have finished loading.
 	 *
 	 * @param {ArrayBuffer|string} buffer - The raw USDZ data as an array buffer.
-	 * @param {string} [path=''] - Base URL or directory.
+	 * @param {string} [path=''] - The URL base path.
 	 * @param {function(Group)} [onLoad] - Executed once the group and all of its textures are ready.
 	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {Group} The parsed asset as a group.
