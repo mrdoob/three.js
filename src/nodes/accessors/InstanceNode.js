@@ -77,13 +77,22 @@ class InstanceNode extends Node {
 		this.instanceColorNode = null;
 
 		/**
+		 * The update type is set to `frame` for updating
+		 * velocity-related data.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateType = NodeUpdateType.FRAME;
+
+		/**
 		 * The update type is set to `frame` since an update
 		 * of instanced buffer data must be checked per frame.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateType = NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`.
@@ -220,7 +229,7 @@ class InstanceNode extends Node {
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
-	update( frame ) {
+	updateBefore( /*frame*/ ) {
 
 		if ( this.buffer !== null && this.isStorageMatrix !== true ) {
 
@@ -249,6 +258,15 @@ class InstanceNode extends Node {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Updates velocity-related data if necessary.
+	 *
+	 * @param {NodeFrame} frame - The current node frame.
+	 */
+	update( frame ) {
 
 		if ( this.previousInstanceMatrixNode !== null ) {
 
