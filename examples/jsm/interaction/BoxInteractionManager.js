@@ -2,7 +2,6 @@ import {
 	BackSide,
 	Box3,
 	DoubleSide,
-	FrontSide,
 	Frustum,
 	Matrix4,
 	Sphere,
