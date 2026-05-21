@@ -61,7 +61,7 @@
 			let timeScale;
 
 			let screenTriAttr, screenTriAtomic, screenTriRead;
-			let screenInstAttr, screenInstAtomic, screenInstRead;
+			let screenInstAttr, screenInstBuffer, screenInstRead;
 			let maxPixels;
 
 			const rows = 400;
@@ -72,12 +72,9 @@
 			const options = { Mode: 'Meshlet Debug', Rasterizer: 'Both' };
 
 			// Buffer visibility packaging configuration
-			const DEPTH_PRECISION_MAX = 262143.0; 	// Maximum value of the 18-bit depth (2^18 - 1)
-			const TRIANGLE_INDEX_BITS = 14; 		// Bits allocated for triangle index (2^14 = 16384 max triangles)
-			const TRIANGLE_INDEX_MASK = 0x3FFF; 	// Bitmask to extract triangle index (14 bits)
-			const INSTANCE_INDEX_BITS = 18; 		// Bits allocated for instance ID (2^18 = 262144 max instances)
-			const INSTANCE_INDEX_MASK = 0x3FFFF; 	// Bitmask to extract instance ID (18 bits)
-			const INSTANCE_DEPTH_SHIFT = 4; 	// Shift to extract top 14 bits of depth from 18-bit depth (18 - 14)
+			const TRIANGLE_INDEX_BITS = 14; 			// Bits allocated for triangle index (2^14 = 16384 max triangles)
+			const TRIANGLE_INDEX_MASK = 0x3FFF; 		// Bitmask to extract triangle index (14 bits)
+			const DEPTH_PRECISION_MAX = 4294967295.0; 	// Maximum value of the 32-bit depth (2^32 - 1)
 
 			const background = new THREE.Color( .1, .1, .1 );
 
@@ -379,7 +376,7 @@
 				computeClear = Fn( () => {
 
 					atomicStore( screenTriAtomic.element( instanceIndex ), uint( 0 ) );
-					atomicStore( screenInstAtomic.element( instanceIndex ), uint( 0 ) );
+					screenInstBuffer.element( instanceIndex ).assign( uint( 0 ) );
 
 					If( instanceIndex.equal( 0 ), () => {
 
@@ -685,23 +682,24 @@
 
 														If( z.greaterThanEqual( 0.0 ).and( z.lessThanEqual( 1.0 ) ), () => {
 
-															// Pack depth(18 high bits) + triIndex(14 low bits) into one u32
-															const depth18 = uint( sqrt( sqrt( float( 1.0 ).sub( z ) ) ).mul( DEPTH_PRECISION_MAX ) ); // 2^18 - 1 (fourth-root distribution)
-															const depthTriPacked = depth18.shiftLeft( TRIANGLE_INDEX_BITS ).bitOr( megaTriangleIndex.bitAnd( TRIANGLE_INDEX_MASK ) );
-
-															// Pack depth(14 high bits) + instId(18 low bits) into one u32
-															const depth14 = depth18.shiftRight( INSTANCE_DEPTH_SHIFT ); // top 14 bits of depth18
-															const depthInstPacked = depth14.shiftLeft( INSTANCE_INDEX_BITS ).bitOr( instId.bitAnd( INSTANCE_INDEX_MASK ) );
+															// Calculate 32-bit depth value (fourth-root distribution to maximize depth precision)
+															const depth32 = uint( sqrt( sqrt( float( 1.0 ).sub( z ) ) ).mul( DEPTH_PRECISION_MAX ) );
 
 															const pixelIndex = uint( y ).mul( uint( screenSize.x ) ).add( uint( x ) );
 
 															// Early depth pre-check: skip atomicMax if pixel already has closer fragment
-															const currentTri = atomicLoad( screenTriAtomic.element( pixelIndex ) );
-															If( depthTriPacked.greaterThan( currentTri ), () => {
+															const currentDepth = atomicLoad( screenTriAtomic.element( pixelIndex ) );
+															If( depth32.greaterThan( currentDepth ), () => {
 
-																// Both atomicMax resolve to the same depth winner atomically
-																atomicMax( screenTriAtomic.element( pixelIndex ), depthTriPacked );
-																atomicMax( screenInstAtomic.element( pixelIndex ), depthInstPacked );
+																// Atomic depth test
+																const prevDepth = atomicMax( screenTriAtomic.element( pixelIndex ), depth32 );
+
+																// If we successfully wrote the closest depth, write the payload
+																If( depth32.greaterThan( prevDepth ), () => {
+
+																	screenInstBuffer.element( pixelIndex ).assign( payload32 );
+
+																} );
 
 															} );
 
@@ -876,12 +874,11 @@
 
 					const { pixelIndex } = getPixelIndex();
 
-					// Extract depth18 from packed tri buffer (upper 18 bits)
-					const packedTri = screenTriRead.element( pixelIndex );
-					const depth18 = packedTri.shiftRight( TRIANGLE_INDEX_BITS );
+					// Read 32-bit depth from buffer
+					const depth32 = screenTriRead.element( pixelIndex );
 
-					// Reconstruct NDC Z from non-linear depth18 (fourth-root distribution)
-					const y = float( depth18 ).div( DEPTH_PRECISION_MAX );
+					// Reconstruct NDC Z from non-linear depth32 (fourth-root distribution)
+					const y = float( depth32 ).div( DEPTH_PRECISION_MAX );
 					const y2 = y.mul( y );
 					const v = y2.mul( y2 ); // raise to the fourth power (y^4) to get original v
 					return float( 1.0 ).sub( v );
@@ -892,20 +889,19 @@
 
 					const { screenX, screenY, pixelIndex } = getPixelIndex();
 
-					// Single buffer read — check for background immediately
-					const packedTri = screenTriRead.element( pixelIndex );
+					// Single buffer read — check for background immediately (using 32-bit depth)
+					const depth32 = screenTriRead.element( pixelIndex );
 
 					// Background color for pixels with no geometry
 					const outColor = vec4( background, 1.0 ).toVar();
 
-					If( packedTri.greaterThan( 0 ), () => {
+					If( depth32.greaterThan( 0 ), () => {
 
-						// Only read instId buffer for pixels with actual geometry
-						// (saves one storage buffer read per background pixel)
-						const packedInst = screenInstRead.element( pixelIndex );
+						// Read the single packed payload (instId and megaTriangleIndex)
+						const payload32 = screenInstRead.element( pixelIndex );
 
-						const megaTriangleIndex = packedTri.bitAnd( TRIANGLE_INDEX_MASK );
-						const instId = packedInst.bitAnd( INSTANCE_INDEX_MASK );
+						const megaTriangleIndex = payload32.bitAnd( TRIANGLE_INDEX_MASK );
+						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
 
 						If( materialModeUniform.equal( 0 ), () => {
 
@@ -1005,7 +1001,7 @@
 					screenTriAtomic = storage( screenTriAttr, 'uint', maxPixels ).toAtomic();
 					screenTriRead = storage( screenTriAttr, 'uint', maxPixels ).toReadOnly();
 
-					screenInstAtomic = storage( screenInstAttr, 'uint', maxPixels ).toAtomic();
+					screenInstBuffer = storage( screenInstAttr, 'uint', maxPixels );
 					screenInstRead = storage( screenInstAttr, 'uint', maxPixels ).toReadOnly();
 
 				} else {
@@ -1016,8 +1012,8 @@
 					screenTriRead.value = screenTriAttr;
 					screenTriRead.bufferCount = maxPixels;
 
-					screenInstAtomic.value = screenInstAttr;
-					screenInstAtomic.bufferCount = maxPixels;
+					screenInstBuffer.value = screenInstAttr;
+					screenInstBuffer.bufferCount = maxPixels;
 
 					screenInstRead.value = screenInstAttr;
 					screenInstRead.bufferCount = maxPixels;
