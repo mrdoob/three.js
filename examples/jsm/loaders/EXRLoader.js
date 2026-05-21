@@ -2485,11 +2485,9 @@ class EXRLoader extends DataTextureLoader {
 
 				offset.value += EXRDecoder.size;
 
-				for ( let line_y = 0; line_y < EXRDecoder.blockHeight; line_y ++ ) {
+				for ( let line_y = 0; line_y < EXRDecoder.lines; line_y ++ ) {
 
-					const scan_y = scanlineBlockIdx * EXRDecoder.blockHeight;
-					const true_y = line_y + EXRDecoder.scanOrder( scan_y );
-					if ( true_y >= EXRDecoder.height ) continue;
+					const true_y = line + line_y;
 
 					const lineOffset = line_y * bytesPerLine;
 					const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
@@ -2543,10 +2541,9 @@ class EXRLoader extends DataTextureLoader {
 				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
 				EXRDecoder.offset = savedOffset;
 
-				for ( let line_y = 0; line_y < EXRDecoder.blockHeight; line_y ++ ) {
+				for ( let line_y = 0; line_y < EXRDecoder.lines; line_y ++ ) {
 
-					const true_y = line_y + line;
-					if ( true_y >= EXRDecoder.height ) continue;
+					const true_y = line + line_y;
 
 					const lineOffset = line_y * bytesPerLine;
 					const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
@@ -2888,7 +2885,6 @@ class EXRLoader extends DataTextureLoader {
 				channelByteOffsets: {},
 				shouldExpand: false,
 				yCbCr: false,
-				scanOrder: null,
 				totalBytes: null,
 				columns: null,
 				lines: null,
@@ -3160,16 +3156,6 @@ class EXRLoader extends DataTextureLoader {
 
 			EXRDecoder.totalBytes = byteOffset;
 			EXRDecoder.outLineWidth = EXRDecoder.width * EXRDecoder.outputChannels;
-
-			if ( EXRHeader.lineOrder === 'INCREASING_Y' ) {
-
-				EXRDecoder.scanOrder = ( y ) => y;
-
-			} else {
-
-				EXRDecoder.scanOrder = ( y ) => EXRDecoder.height - 1 - y;
-
-			}
 
 			if ( EXRHeader.spec.deepFormat ) {
 
