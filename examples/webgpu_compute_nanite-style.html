@@ -58,6 +58,7 @@
 			let instanceWorldBuffer, instanceMvpBuffer;
 			let instanceWorldAttr, instanceMvpAttr;
 			let hwDrawBuffer;
+			let timeScale;
 
 			let screenTriAttr, screenTriAtomic, screenTriRead;
 			let screenInstAttr, screenInstAtomic, screenInstRead;
@@ -279,6 +280,8 @@
 				textureMap.wrapS = THREE.RepeatWrapping;
 				textureMap.wrapT = THREE.RepeatWrapping;
 
+				timeScale = uniform( 1.0 );
+
 				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
 				parameterGroup.add( options, 'Mode', { 'Meshlet Debug': 'Meshlet Debug', 'Texture': 'Texture' } ).addEventListener( 'change', ( e ) => {
 
@@ -287,6 +290,8 @@
 				} );
 
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
+
+				parameterGroup.add( timeScale, 'value', 0.0, 1.0 );
 
 				// Atomic visibility buffers — pack depth + payload into single u32 for race-free atomicMax
 				// Buffer A: depth(18 high bits) | megaTriangleIndex(14 low bits) — triangle ID
@@ -384,7 +389,7 @@
 					const i = float( instanceIndex );
 
 					// Rotation
-					const rotY = time.add( i.mul( 0.1 ) );
+					const rotY = time.mul( timeScale ).add( i );
 					const c = cos( rotY );
 					const s = sin( rotY );
 
