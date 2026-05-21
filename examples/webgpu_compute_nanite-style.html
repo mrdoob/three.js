@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty } from 'three/tsl';
+			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty, sqrt } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
@@ -668,7 +668,7 @@
 
 															// Pack depth(18 high bits) + triIndex(14 low bits) into one u32
 															// Reversed-Z: closer = higher value. atomicMax picks closest AND its payload atomically.
-															const depth18 = uint( float( 1.0 ).sub( z ).mul( 262143.0 ) ); // 2^18 - 1
+															const depth18 = uint( sqrt( float( 1.0 ).sub( z ) ).mul( 262143.0 ) ); // 2^18 - 1 (sqrt distribution)
 															const depthTriPacked = depth18.shiftLeft( 14 ).bitOr( megaTriangleIndex.bitAnd( 0x3FFF ) );
 
 															// Pack depth(14 high bits) + instId(18 low bits) into one u32
@@ -862,8 +862,10 @@
 					const packedTri = screenTriRead.element( pixelIndex );
 					const depth18 = packedTri.shiftRight( 14 );
 
-					// Reconstruct NDC Z from inverted depth18: z = 1.0 - (depth18 / 262143.0)
-					return float( 1.0 ).sub( float( depth18 ).div( 262143.0 ) );
+					// Reconstruct NDC Z from non-linear depth18 (sqrt distribution)
+					const y = float( depth18 ).div( 262143.0 );
+					const v = y.mul( y ); // square back to get original v
+					return float( 1.0 ).sub( v );
 
 				} )();
 
