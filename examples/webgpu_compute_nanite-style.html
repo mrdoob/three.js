@@ -59,13 +59,13 @@
 			let instanceWorldAttr, instanceMvpAttr;
 			let hwDrawBuffer;
 
+			let screenTriAttr, screenTriAtomic, screenTriRead;
+			let screenInstAttr, screenInstAtomic, screenInstRead;
+			let maxPixels;
+
 			const rows = 400;
 			const cols = 400;
 			const instanceCount = rows * cols;
-
-			const maxScreenW = 3840;
-			const maxScreenH = 2160;
-			const maxPixels = maxScreenW * maxScreenH;
 
 			const MAX_RASTER_SIZE = 16;
 			const options = { Mode: 'Meshlet Debug', Rasterizer: 'Both' };
@@ -292,15 +292,7 @@
 				// Buffer A: depth(18 high bits) | megaTriangleIndex(14 low bits) — triangle ID
 				// Buffer B: depth(14 high bits) | instId(18 low bits) — instance ID
 				// Since depth occupies the high bits, atomicMax picks the closest fragment AND its payload atomically
-				const screenTriData = new Uint32Array( maxPixels );
-				const screenTriAttr = new THREE.StorageBufferAttribute( screenTriData, 1 );
-				const screenTriAtomic = storage( screenTriAttr, 'uint', maxPixels ).toAtomic();
-				const screenTriRead = storage( screenTriAttr, 'uint', maxPixels ).toReadOnly();
-
-				const screenInstData = new Uint32Array( maxPixels );
-				const screenInstAttr = new THREE.StorageBufferAttribute( screenInstData, 1 );
-				const screenInstAtomic = storage( screenInstAttr, 'uint', maxPixels ).toAtomic();
-				const screenInstRead = storage( screenInstAttr, 'uint', maxPixels ).toReadOnly();
+				createScreenBuffers();
 
 				const staticInstanceData = new Float32Array( instanceCount * 4 );
 				let dataIndex = 0;
@@ -963,12 +955,70 @@
 
 			}
 
+			function createScreenBuffers() {
+
+				const size = new THREE.Vector2();
+				renderer.getDrawingBufferSize( size );
+				const newMaxPixels = size.x * size.y;
+
+				if ( newMaxPixels === maxPixels ) return;
+
+				maxPixels = newMaxPixels;
+
+				if ( screenTriAttr ) screenTriAttr.dispose();
+				if ( screenInstAttr ) screenInstAttr.dispose();
+
+				const screenTriData = new Uint32Array( maxPixels );
+				screenTriAttr = new THREE.StorageBufferAttribute( screenTriData, 1 );
+
+				const screenInstData = new Uint32Array( maxPixels );
+				screenInstAttr = new THREE.StorageBufferAttribute( screenInstData, 1 );
+
+				if ( screenTriAtomic === undefined ) {
+
+					screenTriAtomic = storage( screenTriAttr, 'uint', maxPixels ).toAtomic();
+					screenTriRead = storage( screenTriAttr, 'uint', maxPixels ).toReadOnly();
+
+					screenInstAtomic = storage( screenInstAttr, 'uint', maxPixels ).toAtomic();
+					screenInstRead = storage( screenInstAttr, 'uint', maxPixels ).toReadOnly();
+
+				} else {
+
+					screenTriAtomic.value = screenTriAttr;
+					screenTriAtomic.bufferCount = maxPixels;
+
+					screenTriRead.value = screenTriAttr;
+					screenTriRead.bufferCount = maxPixels;
+
+					screenInstAtomic.value = screenInstAttr;
+					screenInstAtomic.bufferCount = maxPixels;
+
+					screenInstRead.value = screenInstAttr;
+					screenInstRead.bufferCount = maxPixels;
+
+					computeClear.count = maxPixels;
+					computeClear.dispose();
+
+					computeRasterize.dispose();
+					computeFrustum.dispose();
+					computeDispatch.dispose();
+					computeHWArgs.dispose();
+
+					quadMesh.material.dispose();
+					hwMesh.material.dispose();
+
+				}
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				createScreenBuffers();
 
 			}
 
