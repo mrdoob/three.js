@@ -891,7 +891,7 @@
 
 				material.colorNode = Fn( () => {
 
-					const { screenX, screenY, pixelIndex } = getPixelIndex();
+					const { pixelIndex } = getPixelIndex();
 
 					// Single buffer read — check for background immediately (using 32-bit depth)
 					const depth32 = screenTriRead.element( pixelIndex );
@@ -901,11 +901,92 @@
 
 					If( depth32.greaterThan( 0 ), () => {
 
-						// Read the single packed payload (instId and megaTriangleIndex)
+						// Read the single packed payload
 						const payload32 = screenInstRead.element( pixelIndex );
-
 						const megaTriangleIndex = payload32.bitAnd( TRIANGLE_INDEX_MASK );
 						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
+
+						// Visibility Buffer: Fetch exact vertices and UVs
+						const i0 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 0 ) );
+						const i1 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 1 ) );
+						const i2 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 2 ) );
+
+						const v0 = vertexBuffer.element( i0 );
+						const v1 = vertexBuffer.element( i1 );
+						const v2 = vertexBuffer.element( i2 );
+
+						const t_uv0 = uvBuffer.element( i0 );
+						const t_uv1 = uvBuffer.element( i1 );
+						const t_uv2 = uvBuffer.element( i2 );
+
+						// Project Vertices to Screen Space
+						const matrixWorld = instanceWorldBuffer.element( instId );
+						const mvpMatrix = projScreenMatrixUniform.mul( matrixWorld );
+
+						const p0 = mvpMatrix.mul( v0 );
+						const p1 = mvpMatrix.mul( v1 );
+						const p2 = mvpMatrix.mul( v2 );
+
+						const ndc0 = p0.xyz.div( p0.w );
+						const ndc1 = p1.xyz.div( p1.w );
+						const ndc2 = p2.xyz.div( p2.w );
+
+						const w = screenSize.x;
+						const h = screenSize.y;
+						const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+						const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+						const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+
+						const p = vec2( uv().x.mul( screenSize.x ), uv().y.oneMinus().mul( screenSize.y ) );
+
+						// Compute Barycentrics
+						const area = edgeFunction( s0, s1, s2 );
+						const w0 = edgeFunction( s1, s2, p );
+						const w1 = edgeFunction( s2, s0, p );
+						const w2 = edgeFunction( s0, s1, p );
+
+						// Guard against division by zero for safe execution
+						const safeArea = area.equal( 0.0 ).select( 1.0, area );
+						const b0 = w0.div( safeArea );
+						const b1 = w1.div( safeArea );
+						const b2 = w2.div( safeArea );
+
+						// Perspective correct UV interpolation (32-bit floats!)
+						const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
+						const safeZInv = z_inv.equal( 0.0 ).select( 1.0, z_inv );
+						const b0_p = b0.div( p0.w ).div( safeZInv );
+						const b1_p = b1.div( p1.w ).div( safeZInv );
+						const b2_p = b2.div( p2.w ).div( safeZInv );
+
+						const uv_interp = t_uv0.mul( b0_p ).add( t_uv1.mul( b1_p ) ).add( t_uv2.mul( b2_p ) );
+
+						// Compute screen-space derivatives analytically (extremely clean, no helper fragment issues)
+						const dw0_dx = s2.y.sub( s1.y );
+						const dw1_dx = s0.y.sub( s2.y );
+						const dw2_dx = s1.y.sub( s0.y );
+
+						const dw0_dy = s1.x.sub( s2.x );
+						const dw1_dy = s2.x.sub( s0.x );
+						const dw2_dy = s0.x.sub( s1.x );
+
+						const q0 = float( 1.0 ).div( p0.w );
+						const q1 = float( 1.0 ).div( p1.w );
+						const q2 = float( 1.0 ).div( p2.w );
+
+						const sum_w_q = w0.mul( q0 ).add( w1.mul( q1 ) ).add( w2.mul( q2 ) );
+						const safe_sum_w_q = sum_w_q.equal( 0.0 ).select( 1.0, sum_w_q );
+
+						const dUvDx = (
+							dw0_dx.mul( q0 ).mul( t_uv0.sub( uv_interp ) )
+								.add( dw1_dx.mul( q1 ).mul( t_uv1.sub( uv_interp ) ) )
+								.add( dw2_dx.mul( q2 ).mul( t_uv2.sub( uv_interp ) ) )
+						).div( safe_sum_w_q );
+
+						const dUvDy = (
+							dw0_dy.mul( q0 ).mul( t_uv0.sub( uv_interp ) )
+								.add( dw1_dy.mul( q1 ).mul( t_uv1.sub( uv_interp ) ) )
+								.add( dw2_dy.mul( q2 ).mul( t_uv2.sub( uv_interp ) ) )
+						).div( safe_sum_w_q );
 
 						If( materialModeUniform.equal( 0 ), () => {
 
@@ -914,58 +995,7 @@
 
 						} ).Else( () => {
 
-							// Visibility Buffer: Fetch exact vertices and UVs
-							const i0 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 0 ) );
-							const i1 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 1 ) );
-							const i2 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 2 ) );
-
-							const v0 = vertexBuffer.element( i0 );
-							const v1 = vertexBuffer.element( i1 );
-							const v2 = vertexBuffer.element( i2 );
-
-							const t_uv0 = uvBuffer.element( i0 );
-							const t_uv1 = uvBuffer.element( i1 );
-							const t_uv2 = uvBuffer.element( i2 );
-
-							// Project Vertices to Screen Space
-							const matrixWorld = instanceWorldBuffer.element( instId );
-							const mvpMatrix = projScreenMatrixUniform.mul( matrixWorld );
-
-							const p0 = mvpMatrix.mul( v0 );
-							const p1 = mvpMatrix.mul( v1 );
-							const p2 = mvpMatrix.mul( v2 );
-
-							const ndc0 = p0.xyz.div( p0.w );
-							const ndc1 = p1.xyz.div( p1.w );
-							const ndc2 = p2.xyz.div( p2.w );
-
-							const w = screenSize.x;
-							const h = screenSize.y;
-							const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
-							const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
-							const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
-
-							const p = vec2( float( screenX ).add( 0.5 ), float( screenY ).add( 0.5 ) );
-
-							// Compute Barycentrics
-							const area = edgeFunction( s0, s1, s2 );
-							const w0 = edgeFunction( s1, s2, p );
-							const w1 = edgeFunction( s2, s0, p );
-							const w2 = edgeFunction( s0, s1, p );
-
-							const b0 = w0.div( area );
-							const b1 = w1.div( area );
-							const b2 = w2.div( area );
-
-							// Perspective correct UV interpolation (32-bit floats!)
-							const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
-							const b0_p = b0.div( p0.w ).div( z_inv );
-							const b1_p = b1.div( p1.w ).div( z_inv );
-							const b2_p = b2.div( p2.w ).div( z_inv );
-
-							const uv_interp = t_uv0.mul( b0_p ).add( t_uv1.mul( b1_p ) ).add( t_uv2.mul( b2_p ) );
-
-							outColor.assign( texture( textureMap, uv_interp ) );
+							outColor.assign( texture( textureMap, uv_interp ).grad( dUvDx, dUvDy ) );
 
 						} );
 
