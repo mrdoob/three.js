@@ -650,11 +650,19 @@
 											const isTopLeft1 = stepX_w1.lessThan( 0.0 ).or( stepX_w1.equal( 0.0 ).and( stepY_w1.greaterThan( 0.0 ) ) );
 											const isTopLeft2 = stepX_w2.lessThan( 0.0 ).or( stepX_w2.equal( 0.0 ).and( stepY_w2.greaterThan( 0.0 ) ) );
 
+											const bias0 = isTopLeft0.select( 0.0, - 1e-5 );
+											const bias1 = isTopLeft1.select( 0.0, - 1e-5 );
+											const bias2 = isTopLeft2.select( 0.0, - 1e-5 );
+
 											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
 
 											const row_w0 = edgeFunction( s1, s2, pStart ).toVar();
 											const row_w1 = edgeFunction( s2, s0, pStart ).toVar();
 											const row_w2 = edgeFunction( s0, s1, pStart ).toVar();
+
+											row_w0.addAssign( bias0 );
+											row_w1.addAssign( bias1 );
+											row_w2.addAssign( bias2 );
 
 											// Incremental Z Math (ALU Optimization)
 											const b0_start = row_w0.div( area );
@@ -674,11 +682,7 @@
 
 												Loop( { name: 'x', type: 'int', start: startX, end: endX, condition: '<=' }, ( { x } ) => {
 
-													const pass0 = w0.greaterThan( 0.0 ).or( w0.equal( 0.0 ).and( isTopLeft0 ) );
-													const pass1 = w1.greaterThan( 0.0 ).or( w1.equal( 0.0 ).and( isTopLeft1 ) );
-													const pass2 = w2.greaterThan( 0.0 ).or( w2.equal( 0.0 ).and( isTopLeft2 ) );
-
-													If( pass0.and( pass1 ).and( pass2 ), () => {
+													If( w0.greaterThanEqual( 0.0 ).and( w1.greaterThanEqual( 0.0 ) ).and( w2.greaterThanEqual( 0.0 ) ), () => {
 
 														If( z.greaterThanEqual( 0.0 ).and( z.lessThanEqual( 1.0 ) ), () => {
 
