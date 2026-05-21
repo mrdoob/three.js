@@ -385,7 +385,7 @@
 
 					} );
 
-				} )().compute( maxPixels ).setName( 'Compute Clear' );
+				} )().compute( maxPixels, [ 256 ] ).setName( 'Compute Clear' );
 
 				// Compute Frustum (GPU Culling, LOD & Work Allocation)
 				computeFrustum = Fn( () => {
