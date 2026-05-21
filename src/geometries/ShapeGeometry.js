@@ -174,6 +174,8 @@ class ShapeGeometry extends BufferGeometry {
 
 		const data = super.toJSON();
 
+		if ( data.type === 'BufferGeometry' ) return data;
+
 		const shapes = this.parameters.shapes;
 
 		return toJSON( shapes, data );

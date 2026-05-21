@@ -73,6 +73,8 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		}
 
+		this._mutated = false;
+
 		// helper functions
 
 		function subdivide( detail ) {

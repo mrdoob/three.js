@@ -1,4 +1,5 @@
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 
 import {
 	BufferAttribute,
@@ -605,6 +606,29 @@ export default QUnit.module( 'Core', () => {
 			gold.data.morphTargetsRelative = false;
 
 			assert.deepEqual( j, gold, 'Generated JSON with morphAttributes is as expected' );
+
+		} );
+
+		QUnit.test( 'toJSON with mutated geometry generator', ( assert ) => {
+
+			const geometry = new BoxGeometry( 5, 5, 5 );
+
+			const parametersJSON = geometry.toJSON();
+
+			assert.strictEqual( parametersJSON.type, 'BoxGeometry', 'Geometry generator type is serialized before mutation' );
+			assert.strictEqual( parametersJSON.width, 5, 'Constructor parameters are serialized before mutation' );
+			assert.strictEqual( parametersJSON.data, undefined, 'Raw geometry data is omitted before mutation' );
+
+			geometry.translate( 10, 20, 10 );
+
+			const dataJSON = geometry.toJSON();
+			const position = dataJSON.data.attributes.position.array;
+
+			assert.strictEqual( dataJSON.type, 'BufferGeometry', 'Mutated geometry generator serializes as raw buffer data' );
+			assert.strictEqual( dataJSON.width, undefined, 'Constructor parameters are omitted after mutation' );
+			assert.strictEqual( position[ 0 ], 12.5, 'Serialized x coordinate includes translation' );
+			assert.strictEqual( position[ 1 ], 22.5, 'Serialized y coordinate includes translation' );
+			assert.strictEqual( position[ 2 ], 12.5, 'Serialized z coordinate includes translation' );
 
 		} );
 

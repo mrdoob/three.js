@@ -195,6 +195,15 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.userData = {};
 
+		/**
+		 * Whether this geometry's buffer data has changed after construction.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._mutated = false;
+
 	}
 
 	/**
@@ -366,6 +375,8 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( position !== undefined ) {
 
+			this._mutated = true;
+
 			position.applyMatrix4( matrix );
 
 			position.needsUpdate = true;
@@ -375,6 +386,8 @@ class BufferGeometry extends EventDispatcher {
 		const normal = this.attributes.normal;
 
 		if ( normal !== undefined ) {
+
+			this._mutated = true;
 
 			const normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
@@ -387,6 +400,8 @@ class BufferGeometry extends EventDispatcher {
 		const tangent = this.attributes.tangent;
 
 		if ( tangent !== undefined ) {
+
+			this._mutated = true;
 
 			tangent.transformDirection( matrix );
 
@@ -837,6 +852,8 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		this._mutated = true;
+
 		const positionAttribute = attributes.position;
 		const normalAttribute = attributes.normal;
 		const uvAttribute = attributes.uv;
@@ -992,6 +1009,8 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( positionAttribute !== undefined ) {
 
+			this._mutated = true;
+
 			let normalAttribute = this.getAttribute( 'normal' );
 
 			if ( normalAttribute === undefined || normalAttribute.count !== positionAttribute.count ) {
@@ -1082,6 +1101,8 @@ class BufferGeometry extends EventDispatcher {
 	 * correct lighting on the geometry surfaces.
 	 */
 	normalizeNormals() {
+
+		this._mutated = true;
 
 		const normals = this.attributes.normal;
 
@@ -1223,11 +1244,11 @@ class BufferGeometry extends EventDispatcher {
 		// standard BufferGeometry serialization
 
 		data.uuid = this.uuid;
-		data.type = this.type;
+		data.type = this.parameters !== undefined && this._mutated === true ? 'BufferGeometry' : this.type;
 		if ( this.name !== '' ) data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
-		if ( this.parameters !== undefined ) {
+		if ( this.parameters !== undefined && this._mutated === false ) {
 
 			const parameters = this.parameters;
 
@@ -1437,6 +1458,7 @@ class BufferGeometry extends EventDispatcher {
 		// user data
 
 		this.userData = source.userData;
+		this._mutated = source._mutated;
 
 		return this;
 

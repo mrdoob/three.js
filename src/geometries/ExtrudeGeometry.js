@@ -76,6 +76,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		this.computeVertexNormals();
 
+		this._mutated = false;
+
 		// functions
 
 		function addShape( shape ) {
@@ -763,6 +765,8 @@ class ExtrudeGeometry extends BufferGeometry {
 	toJSON() {
 
 		const data = super.toJSON();
+
+		if ( data.type === 'BufferGeometry' ) return data;
 
 		const shapes = this.parameters.shapes;
 		const options = this.parameters.options;

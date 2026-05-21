@@ -220,6 +220,8 @@ class TubeGeometry extends BufferGeometry {
 
 		const data = super.toJSON();
 
+		if ( data.type === 'BufferGeometry' ) return data;
+
 		data.path = this.parameters.path.toJSON();
 
 		return data;
