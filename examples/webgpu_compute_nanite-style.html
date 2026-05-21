@@ -77,7 +77,9 @@
 			const TRIANGLE_INDEX_MASK = 0x3FFF; 	// Bitmask to extract triangle index (14 bits)
 			const INSTANCE_INDEX_BITS = 18; 		// Bits allocated for instance ID (2^18 = 262144 max instances)
 			const INSTANCE_INDEX_MASK = 0x3FFFF; 	// Bitmask to extract instance ID (18 bits)
-			const INSTANCE_DEPTH_SHIFT = 4; 		// Shift to extract top 14 bits of depth from 18-bit depth (18 - 14)
+			const INSTANCE_DEPTH_SHIFT = 4; 	// Shift to extract top 14 bits of depth from 18-bit depth (18 - 14)
+
+			const background = new THREE.Color( .1, .1, .1 );
 
 			init();
 
@@ -885,7 +887,7 @@
 					const packedTri = screenTriRead.element( pixelIndex );
 
 					// Background color for pixels with no geometry
-					const outColor = vec4( 0.1, 0.1, 0.1, 1.0 ).toVar();
+					const outColor = vec4( background, 1.0 ).toVar();
 
 					If( packedTri.greaterThan( 0 ), () => {
 
@@ -1085,7 +1087,7 @@
 				// HW mesh renders with real depth testing + colors
 				if ( rasterMode === 'HW Only' || rasterMode === 'Both' ) {
 
-					hwScene.background = ( rasterMode === 'HW Only' ) ? new THREE.Color( 0.1, 0.1, 0.1 ) : null;
+					hwScene.background = ( rasterMode === 'HW Only' ) ? background : null;
 					renderer.autoClear = ( rasterMode === 'HW Only' );
 					renderer.render( hwScene, camera );
 					renderer.autoClear = true;
