@@ -39,6 +39,16 @@
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
 			let camera, renderer, controls;
 			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
 			let quadMesh, hwScene, hwMesh;
@@ -71,25 +81,13 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				const statsDiv = document.createElement( 'div' );
-				statsDiv.style.position = 'absolute';
-				statsDiv.style.bottom = '10px';
-				statsDiv.style.left = '10px';
-				statsDiv.style.color = 'white';
-				statsDiv.style.fontFamily = 'monospace';
-				statsDiv.style.padding = '10px';
-				statsDiv.style.background = 'rgba(0,0,0,0.5)';
-				statsDiv.style.borderRadius = '5px';
-				statsDiv.id = 'stats';
-				document.body.appendChild( statsDiv );
-
 				await renderer.init();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
 				camera.position.set( 0, 15, 50 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = 1;
+				controls.target.y = - 1.5;
 				controls.enableDamping = true;
 				controls.zoomSpeed = .5;
 				controls.maxDistance = 1000;
