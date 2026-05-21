@@ -56,6 +56,7 @@ class AnimationAction {
 		this._byClipCacheIndex = null; // for the memory manager
 
 		this._timeScaleInterpolant = null;
+		this._restoreTimeScale = null;
 		this._weightInterpolant = null;
 
 		/**
@@ -343,6 +344,10 @@ class AnimationAction {
 				startEndRatio = fadeOutDuration / fadeInDuration,
 				endStartRatio = fadeInDuration / fadeOutDuration;
 
+
+			fadeOutAction._restoreTimeScale = fadeOutAction.timeScale;
+			this._restoreTimeScale = this.timeScale;
+
 			fadeOutAction.warp( 1.0, startEndRatio, duration );
 			this.warp( endStartRatio, 1.0, duration );
 
@@ -510,6 +515,8 @@ class AnimationAction {
 			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
 
 		}
+
+		this._restoreTimeScale = null;
 
 		return this;
 
@@ -683,8 +690,6 @@ class AnimationAction {
 
 				if ( time > interpolant.parameterPositions[ 1 ] ) {
 
-					this.stopWarping();
-
 					if ( timeScale === 0 ) {
 
 						// motion has halted, pause
@@ -692,10 +697,18 @@ class AnimationAction {
 
 					} else {
 
+						if ( this._restoreTimeScale !== null ) {
+
+							timeScale = this._restoreTimeScale;
+
+						}
+
 						// warp done - apply final time scale
 						this.timeScale = timeScale;
 
 					}
+
+					this.stopWarping();
 
 				}
 
