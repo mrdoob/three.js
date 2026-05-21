@@ -204,7 +204,18 @@
 			interactions.connect(renderer, camera);
 			interactions.add(mesh);
 
-			window.addEventListener('resize', onWindowResize);
+			// E2E: deterministic-injection.js sets window.TESTING and a single frame.
+			if ( window.TESTING ) {
+
+				const style = document.createElement( 'style' );
+				style.textContent = '.draw-element img { animation: none !important; transform: rotate( -15deg ); }';
+				document.head.appendChild( style );
+
+				controls.enabled = false;
+
+			}
+
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
