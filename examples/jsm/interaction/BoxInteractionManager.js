@@ -50,7 +50,7 @@ const _FACE_NORMALS = [
  * ```
  * @three_import import { InteractionManager } from 'three/addons/interaction/BoxInteractionManager.js';
  */
-class InteractionManager {
+class BoxInteractionManager {
 
 	constructor() {
 
@@ -520,4 +520,4 @@ class InteractionManager {
 
 }
 
-export { InteractionManager };
+export { BoxInteractionManager };

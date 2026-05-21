@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>three.js webgpu - materials - html texture</title>
+	<title>three.js webgpu - materials - html box texture</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -88,7 +88,7 @@
 		import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { InteractionManager } from 'three/addons/interaction/BoxInteractionManager.js';
+		import { BoxInteractionManager } from 'three/addons/interaction/BoxInteractionManager.js';
 
 		let camera, scene, renderer, mesh, interactions, controls;
 
@@ -200,7 +200,7 @@
 
 			// Interaction
 
-			interactions = new InteractionManager();
+			interactions = new BoxInteractionManager();
 			interactions.connect(renderer, camera);
 			interactions.add(mesh);
 
