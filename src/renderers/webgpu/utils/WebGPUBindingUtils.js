@@ -419,7 +419,19 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+
+							buffer.type = GPUBufferBindingType.Storage;
+
+						} else {
+
+							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+						}
+
+					} else if ( binding.nodeUniform && binding.nodeUniform.isAtomic ) {
 
 						buffer.type = GPUBufferBindingType.Storage;
 
