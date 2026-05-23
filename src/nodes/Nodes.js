@@ -62,6 +62,7 @@ export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as SkinningNode } from './accessors/SkinningNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
+export { default as StorageTexture3DNode } from './accessors/StorageTexture3DNode.js';
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode } from './accessors/Texture3DNode.js';
 export { default as TextureNode } from './accessors/TextureNode.js';
