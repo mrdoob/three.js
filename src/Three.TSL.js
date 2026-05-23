@@ -319,7 +319,6 @@ export const min = TSL.min;
 export const mix = TSL.mix;
 export const mixElement = TSL.mixElement;
 export const mod = TSL.mod;
-export const modInt = TSL.modInt;
 export const modelDirection = TSL.modelDirection;
 export const modelNormalMatrix = TSL.modelNormalMatrix;
 export const modelPosition = TSL.modelPosition;
