@@ -1114,8 +1114,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
-
 				return NodeAccess.READ_WRITE;
 
 			}
