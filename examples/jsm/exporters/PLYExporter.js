@@ -63,12 +63,15 @@ class PLYExporter {
 		const defaultOptions = {
 			binary: false,
 			excludeAttributes: [], // normal, uv, color, index
-			littleEndian: false
+			littleEndian: false,
+			customPropertyMapping: {}
 		};
 
 		options = Object.assign( defaultOptions, options );
 
 		const excludeAttributes = options.excludeAttributes;
+		const customPropertyMapping = options.customPropertyMapping;
+		const customAttributeNames = Object.keys( customPropertyMapping );
 		let includeIndices = true;
 		let includeNormals = false;
 		let includeColors = false;
@@ -80,6 +83,9 @@ class PLYExporter {
 		let normalType = 'float';
 		let uvType = 'float';
 		let colorType = 'uchar';
+
+		const customTypes = {};
+		for ( const name of customAttributeNames ) customTypes[ name ] = 'float';
 
 		// count the vertices, check which properties are used,
 		// and cache the BufferGeometry
@@ -131,6 +137,13 @@ class PLYExporter {
 
 				}
 
+				for ( const name of customAttributeNames ) {
+
+					const attr = geometry.getAttribute( name );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array );
+
+				}
+
 			} else if ( child.isPoints ) {
 
 				const mesh = child;
@@ -155,6 +168,13 @@ class PLYExporter {
 
 					includeColors = true;
 					colorType = getPlyType( colors.array );
+
+				}
+
+				for ( const name of customAttributeNames ) {
+
+					const attr = geometry.getAttribute( name );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array );
 
 				}
 
@@ -228,6 +248,19 @@ class PLYExporter {
 
 		}
 
+		// custom attributes
+
+		for ( const name of customAttributeNames ) {
+
+			const type = customTypes[ name ];
+			for ( const propName of customPropertyMapping[ name ] ) {
+
+				header += `property ${type} ${propName}\n`;
+
+			}
+
+		}
+
 		if ( includeIndices === true ) {
 
 			// faces
@@ -257,11 +290,26 @@ class PLYExporter {
 			const colorIsFloat = isFloatType( colorType );
 			const colorScale = getColorScale( colorType );
 
+			const customWriters = {};
+			const customIsFloat = {};
+			let customStride = 0;
+
+			for ( const name of customAttributeNames ) {
+
+				const type = customTypes[ name ];
+				const writer = getBinaryWriter( type );
+				customWriters[ name ] = writer;
+				customIsFloat[ name ] = isFloatType( type );
+				customStride += customPropertyMapping[ name ].length * writer.size;
+
+			}
+
 			const vertexListLength = vertexCount * (
 				3 * posWriter.size +
 				( includeNormals ? 3 * normalWriter.size : 0 ) +
 				( includeUVs ? 2 * uvWriter.size : 0 ) +
-				( includeColors ? 3 * colorWriter.size : 0 )
+				( includeColors ? 3 * colorWriter.size : 0 ) +
+				customStride
 			);
 
 			// 1 byte shape descriptor
@@ -396,6 +444,25 @@ class PLYExporter {
 
 					}
 
+					// Custom attributes
+
+					for ( const name of customAttributeNames ) {
+
+						const writer = customWriters[ name ];
+						const propCount = customPropertyMapping[ name ].length;
+						const attr = geometry.getAttribute( name );
+						const isFloat = customIsFloat[ name ];
+
+						for ( let c = 0; c < propCount; c ++ ) {
+
+							const raw = attr != null ? getAttributeComponent( attr, i, c ) : 0;
+							writer.write( output, vOffset, isFloat ? raw : Math.round( raw ), options.littleEndian );
+							vOffset += writer.size;
+
+						}
+
+					}
+
 				}
 
 				if ( includeIndices === true ) {
@@ -464,6 +531,9 @@ class PLYExporter {
 			const uvIsFloat = isFloatType( uvType );
 			const colorIsFloat = isFloatType( colorType );
 			const colorScale = getColorScale( colorType );
+
+			const customIsFloat = {};
+			for ( const name of customAttributeNames ) customIsFloat[ name ] = isFloatType( customTypes[ name ] );
 
 			const encode = ( v, isFloat ) => isFloat ? v : Math.round( v );
 
@@ -554,6 +624,23 @@ class PLYExporter {
 
 					}
 
+					// Custom attributes
+
+					for ( const name of customAttributeNames ) {
+
+						const propCount = customPropertyMapping[ name ].length;
+						const attr = geometry.getAttribute( name );
+						const isFloat = customIsFloat[ name ];
+
+						for ( let c = 0; c < propCount; c ++ ) {
+
+							const raw = attr != null ? getAttributeComponent( attr, i, c ) : 0;
+							line += ' ' + encode( raw, isFloat );
+
+						}
+
+					}
+
 					vertexList += line + '\n';
 
 				}
@@ -638,6 +725,19 @@ function isFloatType( type ) {
 
 }
 
+function getAttributeComponent( attr, i, c ) {
+
+	switch ( c ) {
+
+		case 0: return attr.getX( i );
+		case 1: return attr.getY( i );
+		case 2: return attr.getZ( i );
+		case 3: return attr.getW( i );
+
+	}
+
+}
+
 function getColorScale( type ) {
 
 	switch ( type ) {
@@ -659,6 +759,10 @@ function getColorScale( type ) {
  * the exported PLY file. Valid values are `'color'`, `'normal'`, `'uv'`, and `'index'`. If triangle
  * indices are excluded, then a point cloud is exported.
  * @property {boolean} [littleEndian=false] - Whether the binary export uses little or big endian.
+ * @property {Object<string, Array<string>>} [customPropertyMapping] - A mapping that allows
+ * exporting custom buffer attributes as PLY vertex properties. Each entry maps a buffer attribute
+ * name to an array of PLY property names. The number of property names must match the item size
+ * of the buffer attribute. This is the inverse of `PLYLoader.setCustomPropertyNameMapping()`.
  **/
 
 /**
