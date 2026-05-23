@@ -74,6 +74,13 @@ class PLYExporter {
 		let includeColors = false;
 		let includeUVs = false;
 
+		// derive types from the attribtue's typed array (the exporter assumes
+		// all attributes of the same group e.g. "position" share the same data type)
+		let positionType = 'float';
+		let normalType = 'float';
+		let uvType = 'float';
+		let colorType = 'uchar';
+
 		// count the vertices, check which properties are used,
 		// and cache the BufferGeometry
 		let vertexCount = 0;
@@ -101,11 +108,28 @@ class PLYExporter {
 				vertexCount += vertices.count;
 				faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
-				if ( normals !== undefined ) includeNormals = true;
+				positionType = getPlyType( vertices.array );
 
-				if ( uvs !== undefined ) includeUVs = true;
+				if ( normals !== undefined ) {
 
-				if ( colors !== undefined ) includeColors = true;
+					includeNormals = true;
+					normalType = getPlyType( normals.array );
+
+				}
+
+				if ( uvs !== undefined ) {
+
+					includeUVs = true;
+					uvType = getPlyType( uvs.array );
+
+				}
+
+				if ( colors !== undefined ) {
+
+					includeColors = true;
+					colorType = getPlyType( colors.array );
+
+				}
 
 			} else if ( child.isPoints ) {
 
@@ -118,9 +142,21 @@ class PLYExporter {
 
 				vertexCount += vertices.count;
 
-				if ( normals !== undefined ) includeNormals = true;
+				positionType = getPlyType( vertices.array );
 
-				if ( colors !== undefined ) includeColors = true;
+				if ( normals !== undefined ) {
+
+					includeNormals = true;
+					normalType = getPlyType( normals.array );
+
+				}
+
+				if ( colors !== undefined ) {
+
+					includeColors = true;
+					colorType = getPlyType( colors.array );
+
+				}
 
 				includeIndices = false;
 
@@ -159,17 +195,17 @@ class PLYExporter {
 			`element vertex ${vertexCount}\n` +
 
 			// position
-			'property float x\n' +
-			'property float y\n' +
-			'property float z\n';
+			`property ${positionType} x\n` +
+			`property ${positionType} y\n` +
+			`property ${positionType} z\n`;
 
 		if ( includeNormals === true ) {
 
 			// normal
 			header +=
-				'property float nx\n' +
-				'property float ny\n' +
-				'property float nz\n';
+				`property ${normalType} nx\n` +
+				`property ${normalType} ny\n` +
+				`property ${normalType} nz\n`;
 
 		}
 
@@ -177,8 +213,8 @@ class PLYExporter {
 
 			// uvs
 			header +=
-				'property float s\n' +
-				'property float t\n';
+				`property ${uvType} s\n` +
+				`property ${uvType} t\n`;
 
 		}
 
@@ -186,9 +222,9 @@ class PLYExporter {
 
 			// colors
 			header +=
-				'property uchar red\n' +
-				'property uchar green\n' +
-				'property uchar blue\n';
+				`property ${colorType} red\n` +
+				`property ${colorType} green\n` +
+				`property ${colorType} blue\n`;
 
 		}
 
@@ -214,11 +250,19 @@ class PLYExporter {
 			// Binary File Generation
 			const headerBin = new TextEncoder().encode( header );
 
-			// 3 position values at 4 bytes
-			// 3 normal values at 4 bytes
-			// 3 color channels with 1 byte
-			// 2 uv values at 4 bytes
-			const vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
+			const posWriter = getBinaryWriter( positionType );
+			const normalWriter = includeNormals ? getBinaryWriter( normalType ) : null;
+			const uvWriter = includeUVs ? getBinaryWriter( uvType ) : null;
+			const colorWriter = includeColors ? getBinaryWriter( colorType ) : null;
+			const colorIsFloat = isFloatType( colorType );
+			const colorScale = getColorScale( colorType );
+
+			const vertexListLength = vertexCount * (
+				3 * posWriter.size +
+				( includeNormals ? 3 * normalWriter.size : 0 ) +
+				( includeUVs ? 2 * uvWriter.size : 0 ) +
+				( includeColors ? 3 * colorWriter.size : 0 )
+			);
 
 			// 1 byte shape descriptor
 			// 3 vertex indices at ${indexByteCount} bytes
@@ -248,14 +292,14 @@ class PLYExporter {
 
 
 					// Position information
-					output.setFloat32( vOffset, vertex.x, options.littleEndian );
-					vOffset += 4;
+					posWriter.write( output, vOffset, vertex.x, options.littleEndian );
+					vOffset += posWriter.size;
 
-					output.setFloat32( vOffset, vertex.y, options.littleEndian );
-					vOffset += 4;
+					posWriter.write( output, vOffset, vertex.y, options.littleEndian );
+					vOffset += posWriter.size;
 
-					output.setFloat32( vOffset, vertex.z, options.littleEndian );
-					vOffset += 4;
+					posWriter.write( output, vOffset, vertex.z, options.littleEndian );
+					vOffset += posWriter.size;
 
 					// Normal information
 					if ( includeNormals === true ) {
@@ -266,25 +310,25 @@ class PLYExporter {
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
-							output.setFloat32( vOffset, vertex.x, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, vertex.x, options.littleEndian );
+							vOffset += normalWriter.size;
 
-							output.setFloat32( vOffset, vertex.y, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, vertex.y, options.littleEndian );
+							vOffset += normalWriter.size;
 
-							output.setFloat32( vOffset, vertex.z, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, vertex.z, options.littleEndian );
+							vOffset += normalWriter.size;
 
 						} else {
 
-							output.setFloat32( vOffset, 0, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, 0, options.littleEndian );
+							vOffset += normalWriter.size;
 
-							output.setFloat32( vOffset, 0, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, 0, options.littleEndian );
+							vOffset += normalWriter.size;
 
-							output.setFloat32( vOffset, 0, options.littleEndian );
-							vOffset += 4;
+							normalWriter.write( output, vOffset, 0, options.littleEndian );
+							vOffset += normalWriter.size;
 
 						}
 
@@ -295,19 +339,19 @@ class PLYExporter {
 
 						if ( uvs != null ) {
 
-							output.setFloat32( vOffset, uvs.getX( i ), options.littleEndian );
-							vOffset += 4;
+							uvWriter.write( output, vOffset, uvs.getX( i ), options.littleEndian );
+							vOffset += uvWriter.size;
 
-							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
-							vOffset += 4;
+							uvWriter.write( output, vOffset, uvs.getY( i ), options.littleEndian );
+							vOffset += uvWriter.size;
 
 						} else {
 
-							output.setFloat32( vOffset, 0, options.littleEndian );
-							vOffset += 4;
+							uvWriter.write( output, vOffset, 0, options.littleEndian );
+							vOffset += uvWriter.size;
 
-							output.setFloat32( vOffset, 0, options.littleEndian );
-							vOffset += 4;
+							uvWriter.write( output, vOffset, 0, options.littleEndian );
+							vOffset += uvWriter.size;
 
 						}
 
@@ -322,25 +366,31 @@ class PLYExporter {
 
 							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
-							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
-							vOffset += 1;
+							const r = colorIsFloat ? tempColor.r : Math.round( tempColor.r * colorScale );
+							const g = colorIsFloat ? tempColor.g : Math.round( tempColor.g * colorScale );
+							const b = colorIsFloat ? tempColor.b : Math.round( tempColor.b * colorScale );
 
-							output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
-							vOffset += 1;
+							colorWriter.write( output, vOffset, r, options.littleEndian );
+							vOffset += colorWriter.size;
 
-							output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
-							vOffset += 1;
+							colorWriter.write( output, vOffset, g, options.littleEndian );
+							vOffset += colorWriter.size;
+
+							colorWriter.write( output, vOffset, b, options.littleEndian );
+							vOffset += colorWriter.size;
 
 						} else {
 
-							output.setUint8( vOffset, 255 );
-							vOffset += 1;
+							const white = colorIsFloat ? 1 : colorScale;
 
-							output.setUint8( vOffset, 255 );
-							vOffset += 1;
+							colorWriter.write( output, vOffset, white, options.littleEndian );
+							vOffset += colorWriter.size;
 
-							output.setUint8( vOffset, 255 );
-							vOffset += 1;
+							colorWriter.write( output, vOffset, white, options.littleEndian );
+							vOffset += colorWriter.size;
+
+							colorWriter.write( output, vOffset, white, options.littleEndian );
+							vOffset += colorWriter.size;
 
 						}
 
@@ -409,6 +459,14 @@ class PLYExporter {
 			let vertexList = '';
 			let faceList = '';
 
+			const positionIsFloat = isFloatType( positionType );
+			const normalIsFloat = isFloatType( normalType );
+			const uvIsFloat = isFloatType( uvType );
+			const colorIsFloat = isFloatType( colorType );
+			const colorScale = getColorScale( colorType );
+
+			const encode = ( v, isFloat ) => isFloat ? v : Math.round( v );
+
 			traverseMeshes( function ( mesh, geometry ) {
 
 				const vertices = geometry.getAttribute( 'position' );
@@ -429,9 +487,9 @@ class PLYExporter {
 
 					// Position information
 					let line =
-						vertex.x + ' ' +
-						vertex.y + ' ' +
-						vertex.z;
+						encode( vertex.x, positionIsFloat ) + ' ' +
+						encode( vertex.y, positionIsFloat ) + ' ' +
+						encode( vertex.z, positionIsFloat );
 
 					// Normal information
 					if ( includeNormals === true ) {
@@ -443,9 +501,9 @@ class PLYExporter {
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
 							line += ' ' +
-								vertex.x + ' ' +
-								vertex.y + ' ' +
-								vertex.z;
+								encode( vertex.x, normalIsFloat ) + ' ' +
+								encode( vertex.y, normalIsFloat ) + ' ' +
+								encode( vertex.z, normalIsFloat );
 
 						} else {
 
@@ -461,8 +519,8 @@ class PLYExporter {
 						if ( uvs != null ) {
 
 							line += ' ' +
-								uvs.getX( i ) + ' ' +
-								uvs.getY( i );
+								encode( uvs.getX( i ), uvIsFloat ) + ' ' +
+								encode( uvs.getY( i ), uvIsFloat );
 
 						} else {
 
@@ -481,14 +539,16 @@ class PLYExporter {
 
 							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
-							line += ' ' +
-								Math.floor( tempColor.r * 255 ) + ' ' +
-								Math.floor( tempColor.g * 255 ) + ' ' +
-								Math.floor( tempColor.b * 255 );
+							const r = colorIsFloat ? tempColor.r : Math.round( tempColor.r * colorScale );
+							const g = colorIsFloat ? tempColor.g : Math.round( tempColor.g * colorScale );
+							const b = colorIsFloat ? tempColor.b : Math.round( tempColor.b * colorScale );
+
+							line += ` ${r} ${g} ${b}`;
 
 						} else {
 
-							line += ' 255 255 255';
+							const white = colorIsFloat ? 1 : colorScale;
+							line += ` ${white} ${white} ${white}`;
 
 						}
 
@@ -536,6 +596,55 @@ class PLYExporter {
 		if ( typeof onDone === 'function' ) requestAnimationFrame( () => onDone( result ) );
 
 		return result;
+
+	}
+
+}
+
+function getPlyType( array ) {
+
+	if ( array instanceof Int8Array ) return 'char';
+	if ( array instanceof Uint8Array || array instanceof Uint8ClampedArray ) return 'uchar';
+	if ( array instanceof Int16Array ) return 'short';
+	if ( array instanceof Uint16Array ) return 'ushort';
+	if ( array instanceof Int32Array ) return 'int';
+	if ( array instanceof Uint32Array ) return 'uint';
+	if ( array instanceof Float32Array ) return 'float';
+	if ( array instanceof Float64Array ) return 'double';
+	return 'float';
+
+}
+
+function getBinaryWriter( type ) {
+
+	switch ( type ) {
+
+		case 'char':	return { write: ( dv, at, v ) => dv.setInt8( at, v ), size: 1 };
+		case 'uchar':	return { write: ( dv, at, v ) => dv.setUint8( at, v ), size: 1 };
+		case 'short':	return { write: ( dv, at, v, le ) => dv.setInt16( at, v, le ), size: 2 };
+		case 'ushort':	return { write: ( dv, at, v, le ) => dv.setUint16( at, v, le ), size: 2 };
+		case 'int':		return { write: ( dv, at, v, le ) => dv.setInt32( at, v, le ), size: 4 };
+		case 'uint':	return { write: ( dv, at, v, le ) => dv.setUint32( at, v, le ), size: 4 };
+		case 'float':	return { write: ( dv, at, v, le ) => dv.setFloat32( at, v, le ), size: 4 };
+		case 'double':	return { write: ( dv, at, v, le ) => dv.setFloat64( at, v, le ), size: 8 };
+
+	}
+
+}
+
+function isFloatType( type ) {
+
+	return type === 'float' || type === 'double';
+
+}
+
+function getColorScale( type ) {
+
+	switch ( type ) {
+
+		case 'uchar':	return 255;
+		case 'ushort':	return 65535;
+		default:		return 1;
 
 	}
 
