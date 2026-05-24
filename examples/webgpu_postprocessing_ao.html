@@ -76,6 +76,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGPURenderer();
+				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -508,11 +509,13 @@
 					if ( value === true ) {
 
 						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
+						renderer.toneMapping = THREE.NoToneMapping;
 
 					} else {
 
 
 						renderPipeline.outputNode = traaPass;
+						renderer.toneMapping = THREE.NeutralToneMapping;
 
 					}
 
