@@ -206,13 +206,10 @@ class GTAONode extends TempNode {
 		this.useTemporalFiltering = false;
 
 		/**
-		 * Whether to apply a 3×3 cross-bilateral filter to the raw AO output.
+		 * Controls the 3×3 cross-bilateral filter applied to the raw AO output.
 		 * Each tap is weighted by (spatial Gaussian) × (view-Z similarity) ×
 		 * (normal angle similarity), so the filter smooths horizon-scan noise
-		 * within a surface but rejects neighbors across silhouettes. When
-		 * `false`, the AO pass writes its raw output directly to the result
-		 * texture (useful when chaining with `DenoiseNode` or relying on TAA
-		 * via {@link GTAONode#useTemporalFiltering}).
+		 * within a surface but rejects neighbors across silhouettes.
 		 *
 		 * Cross-bilateral reconstruction as described in the Activision GTAO
 		 * paper, Section 5.5.
@@ -425,13 +422,10 @@ class GTAONode extends TempNode {
 
 		}
 
-		// AO horizon search. When the denoise pass is enabled the AO writes into
-		// _aoRenderTarget and the denoise pass reads it back into _denoiseRenderTarget.
-		// When disabled the AO writes straight into _denoiseRenderTarget — the public
-		// output texture is bound to _denoiseRenderTarget, so consumers see the raw
-		// AO without a recompile.
-
-		const aoTarget = this.denoise ? this._aoRenderTarget : this._denoiseRenderTarget;
+		// AO horizon search. `denoise = true` only runs the filter at scale < 1;
+		// `denoise = false` forces it off at every scale.
+		const runDenoise = this.denoise && this._resolutionScale < 1;
+		const aoTarget = runDenoise ? this._aoRenderTarget : this._denoiseRenderTarget;
 
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
@@ -444,7 +438,7 @@ class GTAONode extends TempNode {
 		// weights smooth horizon-scan noise within a surface without bleeding
 		// across silhouettes.
 
-		if ( this.denoise ) {
+		if ( runDenoise ) {
 
 			_quadMesh.material = this._denoiseMaterial;
 			_quadMesh.name = 'GTAO.Denoise';
