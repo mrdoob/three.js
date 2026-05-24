@@ -50,9 +50,9 @@ class MeshToonMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
-		 * `map` represents color data, and any texture assigned must have a
-		 * {@link Texture#colorSpace} annotation. Most `map` textures use
-		 * `colorSpace = SRGBColorSpace`.
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -64,8 +64,8 @@ class MeshToonMaterial extends Material {
 		 * {@link Texture#minFilter} and {@link Texture#magFilter} to {@link NearestFilter}
 		 * when using this type of texture.
 		 *
-		 * `gradientMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `gradientMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -92,8 +92,8 @@ class MeshToonMaterial extends Material {
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
 		 *
-		 * `aoMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -132,9 +132,9 @@ class MeshToonMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
-		 * `emissiveMap` represents color data, and any texture assigned must have a
-		 * {@link Texture#colorSpace} annotation. Most `emissiveMap` textures use
-		 * `colorSpace = SRGBColorSpace`.
+		 * `emissiveMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `emissiveMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -147,8 +147,8 @@ class MeshToonMaterial extends Material {
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
 		 *
-		 * `bumpMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -171,8 +171,8 @@ class MeshToonMaterial extends Material {
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
 		 *
-		 * `normalMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -205,8 +205,8 @@ class MeshToonMaterial extends Material {
 		 * displacement map with a matching normal map, since the renderer can
 		 * not recompute surface normals from the displaced vertices.
 		 *
-		 * `displacementMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -243,8 +243,8 @@ class MeshToonMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
-		 * `alphaMap` represents non-color data and has no color space. Any texture
-		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
