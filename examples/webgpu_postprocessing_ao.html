@@ -56,7 +56,7 @@
 			let aoPass, traaPass, transparentMesh;
 
 			const params = {
-				samples: 8,
+				samples: 16,
 				radius: 0.5,
 				scale: 0.8,
 				thickness: 1,
@@ -141,6 +141,10 @@
 				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
 				aoPass.useTemporalFiltering = true;
+				aoPass.samples.value = params.samples;
+				aoPass.radius.value = params.radius;
+				aoPass.scale.value = params.scale;
+				aoPass.thickness.value = params.thickness;
 
 				const aoPassOutput = aoPass.getTextureNode();
 
@@ -195,11 +199,13 @@
 					if ( value === true ) {
 
 						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
+						renderer.toneMapping = THREE.NoToneMapping;
 
 					} else {
 
 
 						renderPipeline.outputNode = traaPass;
+						renderer.toneMapping = THREE.AgXToneMapping;
 
 					}
 
