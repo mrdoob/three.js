@@ -144,7 +144,8 @@ class Box3 {
 	 *
 	 * Note: To compute the correct bounding box, make sure the given 3D object
 	 * has an up-to-date world matrix that reflects the current transformation of its
-	 * ancestor nodes. Call `updateWorldMatrix( true, false )` beforehand if you're unsure.
+	 * ancestor nodes. Call `object.updateWorldMatrix( true, false )` beforehand if 
+	 * you're unsure.
 	 *
 	 * @param {Object3D} object - The 3D object to compute the bounding box for.
 	 * @param {boolean} [precise=false] - If set to `true`, the method computes the smallest
