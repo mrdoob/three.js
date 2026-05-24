@@ -406,6 +406,8 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		this._transformed = true;
+
 		return this;
 
 	}
@@ -977,6 +979,8 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		this._transformed = true;
+
 	}
 
 	/**
@@ -1094,6 +1098,8 @@ class BufferGeometry extends EventDispatcher {
 			normals.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
 		}
+
+		this._transformed = true;
 
 	}
 
@@ -1229,15 +1235,25 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( this.parameters !== undefined ) {
 
-			const parameters = this.parameters;
+			if ( this._transformed === true ) {
 
-			for ( const key in parameters ) {
+				this.type = 'BufferGeometry';
 
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+				delete this.parameters;
+
+			} else {
+
+				const parameters = this.parameters;
+
+				for ( const key in parameters ) {
+
+					if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+
+				}
+
+				return data;
 
 			}
-
-			return data;
 
 		}
 
