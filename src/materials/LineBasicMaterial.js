@@ -50,6 +50,10 @@ class LineBasicMaterial extends Material {
 		 * Sets the color of the lines using data from a texture. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and any texture assigned must have a
+		 * {@link Texture#colorSpace} annotation. Most `map` textures use
+		 * `colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */

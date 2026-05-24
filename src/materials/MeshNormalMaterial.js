@@ -40,6 +40,9 @@ class MeshNormalMaterial extends Material {
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
 		 *
+		 * `bumpMap` represents non-color data and has no color space. Any texture
+		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -60,6 +63,9 @@ class MeshNormalMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data and has no color space. Any texture
+		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null

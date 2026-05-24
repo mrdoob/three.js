@@ -54,6 +54,10 @@ class SpriteMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and any texture assigned must have a
+		 * {@link Texture#colorSpace} annotation. Most `map` textures use
+		 * `colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -68,6 +72,9 @@ class SpriteMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * `alphaMap` represents non-color data and has no color space. Any texture
+		 * assigned must be annotated with `colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
