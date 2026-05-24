@@ -1,6 +1,7 @@
 import { select } from '../math/ConditionalNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { addMethodChaining } from '../tsl/TSLCore.js';
+import { returnNode } from './ReturnNode.js';
 
 /**
  * Represents a `discard` shader operation in TSL.
@@ -17,8 +18,10 @@ export const Discard = ( conditional ) => ( conditional ? select( conditional, e
  *
  * @tsl
  * @function
- * @return {ExpressionNode} The `return` expression.
+ * @param {?Node} value - Optional return value.
+ * @return {ReturnNode} The `return` expression.
  */
-export const Return = () => expression( 'return' ).toStack();
+export const Return = ( value = null ) => returnNode( value ).toStack();
 
 addMethodChaining( 'discard', Discard );
+addMethodChaining( 'return', Return );
