@@ -21,8 +21,6 @@
 
 			<small>
 				Ambient Occlusion based on GTAO.<br />
-				<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by
-				<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 				Tennyson bust from <a href="https://threedscans.com/lincoln/tennyson/" target="_blank" rel="noopener">Three D Scans</a>.
 			</small>
 		</div>
@@ -56,10 +54,8 @@
 			let camera, scene, renderer, renderPipeline, controls;
 
 			let aoPass, traaPass, transparentMesh;
-			let bedroomGroup, museumGroup;
 
 			const params = {
-				scene: 'bedroom',
 				samples: 16,
 				distanceExponent: 1,
 				distanceFallOff: 1,
@@ -70,27 +66,12 @@
 				transparentOpacity: 0.3
 			};
 
-			const sceneSettings = {
-				bedroom: {
-					cameraPosition: new THREE.Vector3( 1, 1.3, 5 ),
-					controlsTarget: new THREE.Vector3( 0, 0.5, - 1 ),
-					environmentIntensity: 1,
-					transparentMeshPosition: new THREE.Vector3( 0, 0.5, 0 )
-				},
-				museum: {
-					cameraPosition: new THREE.Vector3( 1, 3, 7 ),
-					controlsTarget: new THREE.Vector3( 0, 1.2, 0 ),
-					environmentIntensity: 0.3,
-					transparentMeshPosition: new THREE.Vector3( 0, 1.2, 1.5 )
-				}
-			};
-
 			init();
 
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.copy( sceneSettings[ params.scene ].cameraPosition );
+				camera.position.set( 1, 3, 7 );
 
 				scene = new THREE.Scene();
 
@@ -109,7 +90,7 @@
 				controls.enableDamping = true;
 				controls.minDistance = 2;
 				controls.maxDistance = 16;
-				controls.target.copy( sceneSettings[ params.scene ].controlsTarget );
+				controls.target.set( 0, 1.2, 0 );
 
 				// environment
 
@@ -118,6 +99,7 @@
 
 				scene.background = new THREE.Color( 0x666666 );
 				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				scene.environmentIntensity = 0.3;
 				environment.dispose();
 				pmremGenerator.dispose();
 
@@ -180,92 +162,6 @@
 				loader.setDRACOLoader( dracoLoader );
 				loader.setPath( 'models/gltf/' );
 
-				bedroomGroup = await buildBedroomScene( loader );
-				scene.add( bedroomGroup );
-
-				museumGroup = await buildMuseumScene( loader );
-				scene.add( museumGroup );
-
-				//
-
-				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
-				transparentMesh.visible = false;
-				scene.add( transparentMesh );
-
-				setActiveScene( params.scene );
-
-				// events
-
-				window.addEventListener( 'resize', onWindowResize );
-
-				//
-
-				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'scene', [ 'bedroom', 'museum' ] ).onChange( setActiveScene );
-				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
-				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
-				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
-				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
-				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
-				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
-				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
-				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );
-				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
-
-					if ( value === true ) {
-
-						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
-
-					} else {
-
-
-						renderPipeline.outputNode = traaPass;
-
-					}
-
-					renderPipeline.needsUpdate = true;
-
-				} );
-
-			}
-
-			function setActiveScene( name ) {
-
-				const settings = sceneSettings[ name ];
-
-				bedroomGroup.visible = name === 'bedroom';
-				museumGroup.visible = name === 'museum';
-
-				camera.position.copy( settings.cameraPosition );
-				controls.target.copy( settings.controlsTarget );
-				controls.update();
-
-				scene.environmentIntensity = settings.environmentIntensity;
-
-				transparentMesh.position.copy( settings.transparentMeshPosition );
-
-			}
-
-			async function buildBedroomScene( loader ) {
-
-				const group = new THREE.Group();
-				group.name = 'Bedroom';
-
-				const gltf = await loader.loadAsync( 'minimalistic_modern_bedroom.glb' );
-				const model = gltf.scene;
-				model.position.set( 0, 1, 0 );
-				group.add( model );
-
-				return group;
-
-			}
-
-			async function buildMuseumScene( loader ) {
-
-				const group = new THREE.Group();
-				group.name = 'Museum';
-
 				// wall-mounted spotlights
 
 				function addSpotLight( position, targetPosition ) {
@@ -277,8 +173,8 @@
 					light.distance = 6.5;
 					light.decay = 2;
 					light.target.position.copy( targetPosition );
-					group.add( light );
-					group.add( light.target );
+					scene.add( light );
+					scene.add( light.target );
 
 				}
 
@@ -315,7 +211,7 @@
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( tilesX, tilesZ ), floorMat );
 				floor.rotation.x = - Math.PI / 2;
 				floor.position.y = - 2;
-				group.add( floor );
+				scene.add( floor );
 
 				// walls
 
@@ -323,12 +219,12 @@
 
 				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 16, 10 ), wallMat );
 				backWall.position.set( 0, 3, - 5 );
-				group.add( backWall );
+				scene.add( backWall );
 
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 16, 10 ), wallMat );
 				leftWall.rotation.y = Math.PI / 2;
 				leftWall.position.set( - 5.5, 3, 0 );
-				group.add( leftWall );
+				scene.add( leftWall );
 
 				// central pedestal
 
@@ -336,22 +232,22 @@
 
 				const pedestalBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.9, 1.0, 0.2, 32 ), pedestalMat );
 				pedestalBase.position.set( 0, - 1.9, 0 );
-				group.add( pedestalBase );
+				scene.add( pedestalBase );
 
 				const pedestalShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.65, 1.5, 32 ), pedestalMat );
 				pedestalShaft.position.set( 0, - 1.05, 0 );
-				group.add( pedestalShaft );
+				scene.add( pedestalShaft );
 
 				const pedestalTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.8, 0.7, 0.25, 32 ), pedestalMat );
 				pedestalTop.position.set( 0, - 0.18, 0 );
-				group.add( pedestalTop );
+				scene.add( pedestalTop );
 
 				// torus knot
 
 				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.45, metalness: 0 } );
 				const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
 				torusKnot.position.set( 0, 0.82, 0 );
-				group.add( torusKnot );
+				scene.add( torusKnot );
 
 				// columns
 
@@ -375,7 +271,7 @@
 
 					columnGroup.scale.setScalar( 1.5 );
 					columnGroup.position.set( x, 1.0, z );
-					group.add( columnGroup );
+					scene.add( columnGroup );
 
 				}
 
@@ -402,20 +298,20 @@
 
 				const vasePedestalBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
 				vasePedestalBase.position.set( - 5, - 1.925, - 2 );
-				group.add( vasePedestalBase );
+				scene.add( vasePedestalBase );
 
 				const vasePedestalShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
 				vasePedestalShaft.position.set( - 5, - 1.35, - 2 );
-				group.add( vasePedestalShaft );
+				scene.add( vasePedestalShaft );
 
 				const vasePedestalTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
 				vasePedestalTop.position.set( - 5, - 0.775, - 2 );
-				group.add( vasePedestalTop );
+				scene.add( vasePedestalTop );
 
 				const vase = new THREE.Mesh( new THREE.LatheGeometry( vaseProfile, 24 ), vaseMat );
 				vase.position.set( - 5, - 1.6, - 2 );
 				vase.scale.setScalar( 1.8 );
-				group.add( vase );
+				scene.add( vase );
 
 				// armchair
 
@@ -457,7 +353,7 @@
 				chairGroup.scale.setScalar( 1.76 );
 				chairGroup.position.set( 4, 0.948, - 2.5 );
 				chairGroup.rotation.y = - 0.6;
-				group.add( chairGroup );
+				scene.add( chairGroup );
 
 				// side table with cup
 
@@ -483,19 +379,19 @@
 
 				tableGroup.scale.setScalar( 2.2 );
 				tableGroup.position.set( 2, 2.29, - 4 );
-				group.add( tableGroup );
+				scene.add( tableGroup );
 
 				// rug
 
 				const rugMat = new THREE.MeshStandardMaterial( { color: '#c8a0a8', roughness: 0.95, metalness: 0 } );
 				const rug = new THREE.Mesh( new THREE.BoxGeometry( 6, 0.02, 5 ), rugMat );
 				rug.position.set( 0, - 1.99, 0.5 );
-				group.add( rug );
+				scene.add( rug );
 
 				const rugBorderMat = new THREE.MeshStandardMaterial( { color: '#d4b880', roughness: 0.95, metalness: 0 } );
 				const rugBorder = new THREE.Mesh( new THREE.BoxGeometry( 6.3, 0.015, 5.3 ), rugBorderMat );
 				rugBorder.position.set( 0, - 1.9925, 0.5 );
-				group.add( rugBorder );
+				scene.add( rugBorder );
 
 				// picture frames
 
@@ -539,7 +435,7 @@
 
 					frameGroup.position.set( x, y, z );
 					if ( rotY ) frameGroup.rotation.y = rotY;
-					group.add( frameGroup );
+					scene.add( frameGroup );
 
 				}
 
@@ -556,15 +452,15 @@
 
 				const bustBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
 				bustBase.position.set( bustX, - 1.925, bustZ );
-				group.add( bustBase );
+				scene.add( bustBase );
 
 				const bustShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
 				bustShaft.position.set( bustX, - 1.35, bustZ );
-				group.add( bustShaft );
+				scene.add( bustShaft );
 
 				const bustTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
 				bustTop.position.set( bustX, - 0.775, bustZ );
-				group.add( bustTop );
+				scene.add( bustTop );
 
 				// bust GLB
 
@@ -582,9 +478,47 @@
 				const center = new THREE.Vector3();
 				fitBox.getCenter( center );
 				bust.position.set( bustX - center.x, - 0.7 - fitBox.min.y, bustZ - center.z );
-				group.add( bust );
+				scene.add( bust );
 
-				return group;
+				// Transparent plane for testing
+
+				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
+				transparentMesh.visible = false;
+				transparentMesh.position.set( 0, 1.2, 1.5 );
+				scene.add( transparentMesh );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
+				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
+				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
+				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
+				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
+
+					if ( value === true ) {
+
+						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
+
+					} else {
+
+
+						renderPipeline.outputNode = traaPass;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				} );
 
 			}
 
