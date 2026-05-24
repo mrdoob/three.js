@@ -112,6 +112,11 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The light map. Requires a second set of UVs.
 		 *
+		 * `lightMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -315,6 +320,11 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The environment map. To ensure a physically correct rendering, environment maps
 		 * are internally pre-processed with {@link PMREMGenerator}.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null

@@ -87,6 +87,11 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * The light map. Requires a second set of UVs.
 		 *
+		 * `lightMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -279,6 +284,11 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * The environment map.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
