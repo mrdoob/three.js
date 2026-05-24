@@ -60,7 +60,7 @@
 				distanceExponent: 1,
 				distanceFallOff: 1,
 				radius: 0.25,
-				scale: 1,
+				scale: 0.5,
 				thickness: 1,
 				aoOnly: false,
 				transparentOpacity: 0.3
@@ -463,6 +463,16 @@
 				bustTop.position.set( bustX, - 0.775, bustZ );
 				scene.add( bustTop );
 
+
+				// Transparent plane for testing
+
+				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
+				transparentMesh.visible = false;
+				transparentMesh.position.set( 0, 1.2, 1.5 );
+				scene.add( transparentMesh );
+
+				updateParameters();
+
 				// bust GLB
 
 				const gltf = await loader.loadAsync( 'tennyson-bust.glb' );
@@ -481,13 +491,6 @@
 				bust.position.set( bustX - center.x, - 0.7 - fitBox.min.y, bustZ - center.z );
 				scene.add( bust );
 
-				// Transparent plane for testing
-
-				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
-				transparentMesh.visible = false;
-				transparentMesh.position.set( 0, 1.2, 1.5 );
-				scene.add( transparentMesh );
-
 				// events
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -499,7 +502,7 @@
 				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
 				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
-				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
+				gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
 				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
 				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
