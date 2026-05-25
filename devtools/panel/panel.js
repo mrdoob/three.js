@@ -147,6 +147,9 @@ function requestObjectUnhighlight() {
 // Store renderer collapse states
 const rendererCollapsedState = new Map();
 
+// Store scene tree expanded states (uuid -> boolean). Defaults to expanded.
+const treeExpandedState = new Map();
+
 // Static DOM elements (created once in initUI)
 let renderersSection = null;
 let scenesSection = null;
@@ -276,6 +279,7 @@ function clearState() {
 	state.scenes.clear();
 	state.renderers.clear();
 	state.objects.clear();
+	treeExpandedState.clear();
 	sceneDirty = true;
 
 	// Hide floating panel
@@ -427,22 +431,29 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 	const icon = getObjectIcon( obj );
 	let displayName = obj.name || obj.type;
 
-	// Default rendering for other object types
-	const elem = document.createElement( 'div' );
-	elem.className = 'tree-item';
-	elem.style.paddingLeft = `${level * 20}px`;
-	elem.setAttribute( 'data-uuid', obj.uuid );
+	// Collect renderable children (renderers do not show children in the tree)
+	const children = ( ! obj.isRenderer && obj.children )
+		? obj.children
+			.map( childId => state.objects.get( childId ) )
+			.filter( child => child !== undefined && child.name !== '__THREE_DEVTOOLS_HIGHLIGHT__' )
+			.sort( ( a, b ) => {
 
-	// Apply opacity for invisible objects or if parent is invisible
-	if ( obj.visible === false || parentInvisible ) {
+				const getTypeOrder = ( o ) => {
 
-		elem.style.opacity = '0.5';
+					if ( o.isCamera ) return 1;
+					if ( o.isLight ) return 2;
+					if ( o.isGroup ) return 3;
+					if ( o.isMesh ) return 4;
+					return 5;
 
-	}
+				};
 
-	let labelContent = `<span class="icon">${icon}</span>
-		<span class="label">${displayName}</span>
-		<span class="type">${obj.type}</span>`;
+				return getTypeOrder( a ) - getTypeOrder( b );
+
+			} )
+		: [];
+
+	const hasChildren = children.length > 0;
 
 	if ( obj.isScene ) {
 
@@ -466,69 +477,103 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 
 		countObjects( obj.uuid );
 		displayName = `${obj.name || obj.type} <span class="object-details">${objectCount} objects</span>`;
-		labelContent = `<span class="icon">${icon}</span>
-			<span class="label">${displayName}</span>
-			<span class="type">${obj.type}</span>`;
 
 	}
 
-	elem.innerHTML = labelContent;
+	const togglePart = hasChildren
+		? '<span class="tree-toggle"></span>'
+		: '<span class="tree-toggle-placeholder"></span>';
 
-	// Add mouseenter handler to request object details and highlight in 3D
-	elem.addEventListener( 'mouseenter', () => {
-		requestObjectDetails( obj.uuid );
-		// Only highlight if object and all parents are visible
-		if ( obj.visible !== false && ! parentInvisible ) {
+	const labelContent = `${togglePart}<span class="icon">${icon}</span>
+		<span class="label">${displayName}</span>
+		<span class="type">${obj.type}</span>`;
 
-			requestObjectHighlight( obj.uuid );
+	let header; // the element receiving hover/highlight handlers
+
+	if ( hasChildren ) {
+
+		const node = document.createElement( 'details' );
+		node.className = 'tree-node';
+		node.setAttribute( 'data-uuid', obj.uuid );
+
+		// Default to expanded unless the user has collapsed this node before
+		const stored = treeExpandedState.get( obj.uuid );
+		node.open = stored === undefined ? true : stored;
+
+		node.addEventListener( 'toggle', () => {
+
+			treeExpandedState.set( obj.uuid, node.open );
+
+		} );
+
+		const summary = document.createElement( 'summary' );
+		summary.className = 'tree-item';
+		summary.style.paddingLeft = `${level * 20}px`;
+
+		if ( obj.visible === false || parentInvisible ) {
+
+			summary.style.opacity = '0.5';
 
 		}
-	} );
 
-	// Add mouseleave handler to remove 3D highlight
-	elem.addEventListener( 'mouseleave', () => {
-		requestObjectUnhighlight();
-	} );
+		summary.innerHTML = labelContent;
+		node.appendChild( summary );
 
-	container.appendChild( elem );
-
-	// Handle children (excluding children of renderers, as properties are shown in details)
-	if ( ! obj.isRenderer && obj.children && obj.children.length > 0 ) {
-
-		// Create a container for children
 		const childContainer = document.createElement( 'div' );
 		childContainer.className = 'children';
-		container.appendChild( childContainer );
+		node.appendChild( childContainer );
 
-		// Get all children and sort them by type for better organization
-		const children = obj.children
-			.map( childId => state.objects.get( childId ) )
-			.filter( child => child !== undefined && child.name !== '__THREE_DEVTOOLS_HIGHLIGHT__' )
-			.sort( ( a, b ) => {
+		container.appendChild( node );
 
-				const getTypeOrder = ( obj ) => {
-					if ( obj.isCamera ) return 1;
-					if ( obj.isLight ) return 2;
-					if ( obj.isGroup ) return 3;
-					if ( obj.isMesh ) return 4;
-					return 5;
-				};
-
-				const aOrder = getTypeOrder( a );
-				const bOrder = getTypeOrder( b );
-
-				return aOrder - bOrder;
-
-			} );
-
-		// Render each child
 		children.forEach( child => {
 
 			renderObject( child, childContainer, level + 1, parentInvisible || obj.visible === false );
 
 		} );
 
+		header = summary;
+
+	} else {
+
+		const elem = document.createElement( 'div' );
+		elem.className = 'tree-item';
+		elem.style.paddingLeft = `${level * 20}px`;
+		elem.setAttribute( 'data-uuid', obj.uuid );
+
+		if ( obj.visible === false || parentInvisible ) {
+
+			elem.style.opacity = '0.5';
+
+		}
+
+		elem.innerHTML = labelContent;
+
+		container.appendChild( elem );
+
+		header = elem;
+
 	}
+
+	// Add mouseenter handler to request object details and highlight in 3D
+	header.addEventListener( 'mouseenter', () => {
+
+		requestObjectDetails( obj.uuid );
+
+		// Only highlight if object and all parents are visible
+		if ( obj.visible !== false && ! parentInvisible ) {
+
+			requestObjectHighlight( obj.uuid );
+
+		}
+
+	} );
+
+	// Add mouseleave handler to remove 3D highlight
+	header.addEventListener( 'mouseleave', () => {
+
+		requestObjectUnhighlight();
+
+	} );
 
 }
 
