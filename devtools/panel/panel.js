@@ -1,4 +1,4 @@
-/* global chrome */
+/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_COMMITTED */
 
 const CONNECTION_NAME = 'three-devtools';
 const STATE_POLLING_INTERVAL = 1000;
@@ -72,7 +72,7 @@ const state = {
 
 // Floating details panel
 let floatingPanel = null;
-let mousePosition = { x: 0, y: 0 };
+const mousePosition = { x: 0, y: 0 };
 
 
 // Create a connection to the background page
@@ -94,11 +94,13 @@ backgroundPageConnection.postMessage( {
 
 // Function to scroll to canvas element
 function scrollToCanvas( rendererUuid ) {
+
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_SCROLL_TO_CANVAS,
 		uuid: rendererUuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
+
 }
 
 const intervalId = setInterval( () => {
@@ -119,28 +121,34 @@ backgroundPageConnection.onDisconnect.addListener( () => {
 
 // Function to request object details from the bridge
 function requestObjectDetails( uuid ) {
+
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_REQUEST_OBJECT_DETAILS,
 		uuid: uuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
+
 }
 
 // Function to highlight object in 3D scene
 function requestObjectHighlight( uuid ) {
+
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_HIGHLIGHT_OBJECT,
 		uuid: uuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
+
 }
 
 // Function to remove highlight from 3D scene
 function requestObjectUnhighlight() {
+
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_UNHIGHLIGHT_OBJECT,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
+
 }
 
 
@@ -372,9 +380,9 @@ function renderRenderer( obj, container ) {
 	const displayName = `${obj.type} <span class="object-details">${details.join( ' ・ ' )}</span>`;
 
 	// Use toggle icon instead of paint icon
-	const scrollButton = obj.canvasInDOM ? 
-		`<button class="scroll-to-canvas-btn" data-canvas-uuid="${obj.uuid}" title="Scroll to canvas">🙂</button>` : 
-		`<span class="scroll-to-canvas-placeholder" title="Canvas not in DOM">󠀠🫥</span>`;
+	const scrollButton = obj.canvasInDOM ?
+		`<button class="scroll-to-canvas-btn" data-canvas-uuid="${obj.uuid}" title="Scroll to canvas">🙂</button>` :
+		'<span class="scroll-to-canvas-placeholder" title="Canvas not in DOM">󠀠🫥</span>';
 	summaryElem.innerHTML = `<span class="icon toggle-icon"></span> 
 		<span class="label">${displayName}</span>
 		<span class="type">${obj.type}</span>
@@ -414,11 +422,15 @@ function renderRenderer( obj, container ) {
 	// Add click handler for scroll to canvas button
 	const scrollBtn = detailsElement.querySelector( '.scroll-to-canvas-btn' );
 	if ( scrollBtn ) {
+
 		scrollBtn.addEventListener( 'click', ( event ) => {
+
 			event.preventDefault();
 			event.stopPropagation();
 			scrollToCanvas( obj.uuid );
+
 		} );
+
 	}
 
 	container.appendChild( detailsElement ); // Append details to the main container
@@ -681,7 +693,7 @@ function createFloatingPanel() {
 function showFloatingDetails( objectData ) {
 
 	const panel = createFloatingPanel();
-	
+
 	// Clear previous content
 	panel.innerHTML = '';
 
@@ -705,7 +717,7 @@ function showFloatingDetails( objectData ) {
 
 	// Position panel near mouse
 	updateFloatingPanelPosition();
-	
+
 	// Show panel
 	panel.classList.add( 'visible' );
 
