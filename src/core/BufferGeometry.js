@@ -1112,8 +1112,6 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		this._transformed = true;
-
 	}
 
 	/**
