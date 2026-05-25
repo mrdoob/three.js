@@ -1,5 +1,3 @@
-/* global __THREE_DEVTOOLS__ */
-
 // This script handles highlighting of Three.js objects in the 3D scene
 
 ( function () {

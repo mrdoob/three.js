@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Shared protocol constants for Three.js DevTools
 
 var MESSAGE_ID = 'three-devtools';
