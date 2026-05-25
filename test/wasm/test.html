@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three-Rust Phase 3 Tests</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #1a1a2e; color: #e0e0e0; }
+        h1 { color: #00d4ff; }
+        .pass { color: #00ff88; }
+        .fail { color: #ff4466; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 4px 0; border-bottom: 1px solid #333; }
+        canvas { border: 1px solid #555; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Three-Rust Phase 3: Renderer Integration Tests</h1>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <div id="results">Running tests...</div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import {
+            Object3D, Scene, Group, Mesh,
+            Vector3, Euler, Quaternion, Matrix4,
+            PerspectiveCamera, WebGLRenderer,
+        } from '../../src/Three.js';
+        import { flush, PropPath, Method, enqueueMethod } from '../../src/wasm/core.js';
+        import { WebGLAdapter } from '../../src/renderers/webgl/WebGLAdapter.js';
+
+        const results = [];
+        let passed = 0;
+        let failed = 0;
+
+        function assert(condition, msg) {
+            if (condition) { passed++; results.push(`PASS: ${msg}`); }
+            else { failed++; results.push(`FAIL: ${msg}`); }
+        }
+
+        function assertNear(a, b, eps, msg) {
+            if (Math.abs(a - b) <= eps) { passed++; results.push(`PASS: ${msg} (${a} == ${b})`); }
+            else { failed++; results.push(`FAIL: ${msg} (expected ${b}, got ${a})`); }
+        }
+
+        // ---- Phase 2 Regression Tests ----
+        async function testSceneGraph() {
+            const root = new Object3D();
+            const child = new Object3D();
+            root.add(child);
+            child.position.set(1, 0, 0);
+            root.position.set(2, 0, 0);
+            root.updateMatrixWorld(true);
+
+            const trElements = child.matrixWorld.elements;
+            assertNear(trElements[12], 3.0, 0.0001, 'Child world position X = 3.0');
+
+            const rootJS = new THREE.Object3D();
+            const childJS = new THREE.Object3D();
+            rootJS.add(childJS);
+            childJS.position.set(1, 0, 0);
+            rootJS.position.set(2, 0, 0);
+            rootJS.updateMatrixWorld(true);
+
+            const jsElements = childJS.matrixWorld.elements;
+            for (let i = 0; i < 16; i++) {
+                assertNear(trElements[i], jsElements[i], 0.0001, `SceneGraph: matrix[${i}]`);
+            }
+        }
+
+        async function testMultipleLevels() {
+            const a = new Object3D();
+            const b = new Object3D();
+            const c = new Object3D();
+            a.add(b);
+            b.add(c);
+            a.position.set(1, 0, 0);
+            b.position.set(2, 0, 0);
+            c.position.set(3, 0, 0);
+            a.updateMatrixWorld(true);
+            const cElements = c.matrixWorld.elements;
+            assertNear(cElements[12], 6.0, 0.0001, 'Three-level: leaf world X = 6.0');
+        }
+
+        async function testRotation() {
+            const parent = new Object3D();
+            const child = new Object3D();
+            parent.add(child);
+            parent.rotation.set(0, Math.PI / 2, 0, 'XYZ');
+            child.position.set(1, 0, 0);
+            parent.updateMatrixWorld(true);
+            const trElements = child.matrixWorld.elements;
+
+            const parentJS = new THREE.Object3D();
+            const childJS = new THREE.Object3D();
+            parentJS.add(childJS);
+            parentJS.rotation.set(0, Math.PI / 2, 0, 'XYZ');
+            childJS.position.set(1, 0, 0);
+            parentJS.updateMatrixWorld(true);
+            for (let i = 0; i < 16; i++) {
+                assertNear(trElements[i], childJS.matrixWorld.elements[i], 0.0001, `Rotation: matrix[${i}]`);
+            }
+        }
+
+        async function testScale() {
+            const parent = new Object3D();
+            const child = new Object3D();
+            parent.add(child);
+            parent.scale.set(2.0, 2.0, 2.0);
+            child.position.set(1, 0, 0);
+            parent.updateMatrixWorld(true);
+            const trElements = child.matrixWorld.elements;
+            assertNear(trElements[12], 2.0, 0.0001, 'Scale: child world X = 2.0');
+        }
+
+        async function testReparenting() {
+            const a = new Object3D();
+            const b = new Object3D();
+            const c = new Object3D();
+            a.add(c);
+            a.position.set(1, 0, 0);
+            c.position.set(1, 0, 0);
+            b.position.set(10, 0, 0);
+            a.updateMatrixWorld(true);
+
+            const cMatrix1 = c.matrixWorld.elements;
+            assertNear(cMatrix1[12], 2.0, 0.0001, 'Reparent: c under a world X = 2.0');
+
+            b.add(c);
+            b.updateMatrixWorld(true);
+            const cMatrix2 = c.matrixWorld.elements;
+            assertNear(cMatrix2[12], 11.0, 0.0001, 'Reparent: c under b world X = 11.0');
+        }
+
+        // ---- Phase 3 Tests ----
+        async function testTriangleRendering() {
+            const canvas = document.getElementById('canvas');
+            const adapter = new WebGLAdapter(canvas);
+            const renderer = new WebGLRenderer(adapter);
+            const scene = new Scene();
+            const camera = new PerspectiveCamera(90, 1, 0.1, 100);
+
+            const mesh = new Mesh();
+            mesh.setGeometry(
+                [0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0],
+                []
+            );
+            mesh.setMaterial(1.0, 0.0, 0.0, 1.0);
+
+            scene.add(camera);
+            scene.add(mesh);
+            camera.updateMatrixWorld(true);
+            mesh.updateMatrixWorld(true);
+
+            // Render
+            const glCommands = renderer.render(scene, camera);
+
+            assert(glCommands && glCommands.length > 0, 'GL commands generated');
+            assert(glCommands.length > 17, `GL commands have multiple ops (${glCommands.length} bytes)`);
+
+            // Verify CLEAR_COLOR (0x01) is present (Three.js order: BUFFER_DATA then CLEAR_COLOR)
+            let hasClearColor = false;
+            for (let i = 0; i < glCommands.length; i++) {
+                if (glCommands[i] === 0x01) { hasClearColor = true; break; }
+            }
+            assert(hasClearColor, 'CLEAR_COLOR opcode present');
+
+            // Find opcodes in the command stream
+            let hasDrawArrays = false, hasBufferData = false, hasVertexAttrib = false;
+            for (let i = 0; i < glCommands.length; i++) {
+                if (glCommands[i] === 0x07) hasDrawArrays = true;
+                if (glCommands[i] === 0x04) hasBufferData = true;
+                if (glCommands[i] === 0x05) hasVertexAttrib = true;
+            }
+            assert(hasBufferData, 'GL commands include BUFFER_DATA (0x04)');
+            assert(hasVertexAttrib, 'GL commands include VERTEX_ATTRIB_POINTER (0x05)');
+            assert(hasDrawArrays, 'GL commands include DRAW_ARRAYS (0x07)');
+
+            // Pixel verification: check canvas has non-black content after rendering
+            const gl = canvas.getContext('webgl2');
+            if (gl) {
+                const pixels = new Uint8Array(4);
+                gl.readPixels(128, 128, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+                assert(pixels[0] > 0 || pixels[1] > 0 || pixels[2] > 0 || pixels[3] > 0,
+                    `Canvas has rendered content at center (r=${pixels[0]},g=${pixels[1]},b=${pixels[2]},a=${pixels[3]})`);
+            }
+        }
+
+        async function testGLCommandDump() {
+            const canvas = document.getElementById('canvas');
+            const adapter = new WebGLAdapter(canvas);
+            const renderer = new WebGLRenderer(adapter);
+            const scene = new Scene();
+            const camera = new PerspectiveCamera(90, 1, 0.1, 100);
+            camera.position.set(0, 0, 1);  // Move camera back so geometry at z=0 is visible
+            const mesh = new Mesh();
+            mesh.setGeometry([0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0]);
+            mesh.setMaterial(1.0, 0.0, 0.0, 1.0);
+            scene.add(camera);
+            scene.add(mesh);
+            camera.updateMatrixWorld(true);
+            mesh.updateMatrixWorld(true);
+
+            const glCommands = renderer.render(scene, camera);
+
+            let hexDump = '';
+            for (let i = 0; i < Math.min(glCommands.length, 100); i++) {
+                hexDump += glCommands[i].toString(16).padStart(2, '0') + ' ';
+                if ((i + 1) % 20 === 0) hexDump += '\n';
+            }
+            results.push(`GL BYTECODE: ${glCommands.length} bytes\n${hexDump}${glCommands.length > 100 ? '...' : ''}`);
+            assert(true, 'GL bytecode dump logged');
+        }
+
+        async function testClassTypes() {
+            const s = new Scene();
+            const g = new Group();
+            const m = new Mesh();
+            const c = new PerspectiveCamera();
+            assert(s.isScene, 'Scene has isScene');
+            assert(g.isGroup, 'Group has isGroup');
+            assert(m.isMesh, 'Mesh has isMesh');
+            assert(c.isCamera, 'PerspectiveCamera has isCamera');
+            assert(s.type === 'Scene', 'Scene type');
+            assert(g.type === 'Group', 'Group type');
+            assert(m.type === 'Mesh', 'Mesh type');
+        }
+
+        async function testPerformance() {
+            const N = 100;
+            const scene = new Scene();
+            const meshes = [];
+
+            const t0 = performance.now();
+
+            for (let i = 0; i < N; i++) {
+                const mesh = new Mesh();
+                const off = i * 0.01;
+                mesh.setGeometry(
+                    [off, 0.5, 0.0, off - 0.5, -0.5, 0.0, off + 0.5, -0.5, 0.0],
+                    []
+                );
+                mesh.setMaterial(1.0, 0.0, 0.0, 1.0);
+                scene.add(mesh);
+            }
+
+            const camera = new PerspectiveCamera();
+            scene.add(camera);
+            camera.updateMatrixWorld(true);
+
+            const canvas = document.getElementById('canvas');
+            const adapter = new WebGLAdapter(canvas);
+            const renderer = new WebGLRenderer(adapter);
+
+            const t1 = performance.now();
+            const glCommands = renderer.render(scene, camera);
+            const t2 = performance.now();
+
+            const setupTime = (t1 - t0).toFixed(1);
+            const renderTime = (t2 - t1).toFixed(1);
+            const totalTime = (t2 - t0).toFixed(1);
+
+            results.push(`BENCH: ${N} triangles: setup=${setupTime}ms render=${renderTime}ms total=${totalTime}ms`);
+            results.push(`BENCH: GL bytecode size: ${glCommands.length} bytes`);
+
+            assert(glCommands && glCommands.length > 0, `Performance: ${N} triangles generate GL commands`);
+            assert(totalTime < 10000, `Performance: ${N} triangles in under 10s (${totalTime}ms)`);
+        }
+
+        async function runTests() {
+            results.length = 0;
+            passed = 0;
+            failed = 0;
+
+            try {
+                // Phase 2 regression tests
+                await testSceneGraph();
+                await testMultipleLevels();
+                await testRotation();
+                await testScale();
+                await testReparenting();
+                // Phase 3 tests
+                await testClassTypes();
+                await testTriangleRendering();
+                await testGLCommandDump();
+                await testPerformance();
+            } catch (e) {
+                results.push(`ERROR: ${e.message}`);
+                results.push(`STACK: ${e.stack}`);
+                failed++;
+            }
+
+            showResults();
+        }
+
+        function showResults() {
+            const total = passed + failed;
+            const el = document.getElementById('results');
+            let html = `<h2>Results: ${passed}/${total} passed</h2><ul>`;
+            for (const r of results) {
+                const cls = r.startsWith('PASS') ? 'pass' : r.startsWith('FAIL') ? 'fail' : r.startsWith('BENCH') ? '' : r.startsWith('GL BYTECODE') ? '' : '';
+                html += `<li class="${cls}" style="white-space:pre-wrap">${r}</li>`;
+            }
+            html += '</ul>';
+            el.innerHTML = html;
+            window.__testResults = { passed, failed, total, results };
+        }
+
+        runTests();
+    </script>
+</body>
+</html>

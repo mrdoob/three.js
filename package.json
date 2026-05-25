@@ -3,20 +3,11 @@
   "version": "0.184.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
-      "import": "./build/three.module.js",
-      "require": "./build/three.cjs"
-    },
-    "./examples/fonts/*": "./examples/fonts/*",
-    "./examples/jsm/*": "./examples/jsm/*",
-    "./addons": "./examples/jsm/Addons.js",
-    "./addons/*": "./examples/jsm/*",
-    "./src/*": "./src/*",
-    "./webgpu": "./build/three.webgpu.js",
-    "./tsl": "./build/three.tsl.js"
+      "import": "./build/three.module.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -45,10 +36,10 @@
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
-    "build": "rollup -c utils/build/rollup.config.js",
+    "build": "npm run prebuild && cd /home/ihasq/code/three.js && rollup -c utils/build/rollup.config.js",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json && npm run build-llms",
     "build-llms": "node utils/llms/build.js",
-    "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
+    "build-module": "npm run prebuild && rollup -c utils/build/rollup.config.js --configOnlyModule",
     "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
     "preview": "node utils/build/preview.js",
     "lint-core": "eslint src",
@@ -68,7 +59,10 @@
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "build-wasm": "cd crates/three-core && wasm-pack build --target web --out-dir ../../src/wasm --release && cd ../..",
+    "prebuild": "npm run build-wasm",
+    "test-wasm": "node test/wasm/run_tests.cjs"
   },
   "keywords": [
     "three",
@@ -120,5 +114,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "flatbuffers": "^25.9.23"
   }
 }

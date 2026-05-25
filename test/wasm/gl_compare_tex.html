@@ -1,0 +1,83 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Texture GL Comparison</title>
+<style>body{font-family:monospace;margin:20px;background:#1a1a2e;color:#e0e0e0;}.pass{color:#0f8;}.fail{color:#f44;}pre{background:#111;padding:10px;white-space:pre-wrap;}</style></head>
+<body><h1>Texture GL Comparison</h1><div id="r">Running...</div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { WebGLAdapter } from '../../src/renderers/webgl/WebGLAdapter.js';
+import { GLCapture, OP_CODES } from '../../test/gl-capture.js';
+
+const O=[];let P=0,F=0;function L(m){O.push(m);}function A(c,m){if(c){P++;O.push('PASS: '+m);}else{F++;O.push('FAIL: '+m);}}
+
+try{
+// === THREE.JS REFERENCE ===
+const refC=document.createElement('canvas');refC.width=256;refC.height=256;
+const capt=new GLCapture();
+const ogc=HTMLCanvasElement.prototype.getContext;
+HTMLCanvasElement.prototype.getContext=function(t,a){const g=ogc.call(this,t,a);if(t==='webgl2'&&g)return capt.wrap(g);return g;};
+
+// Create a simple texture
+const texCanvas=document.createElement('canvas');texCanvas.width=2;texCanvas.height=2;
+const tctx=texCanvas.getContext('2d');tctx.fillStyle='red';tctx.fillRect(0,0,1,1);tctx.fillStyle='lime';tctx.fillRect(1,0,1,1);
+tctx.fillStyle='blue';tctx.fillRect(0,1,1,1);tctx.fillStyle='white';tctx.fillRect(1,1,1,1);
+const refTex=new THREE.CanvasTexture(texCanvas);
+
+const refS=new THREE.Scene();
+refS.add(new THREE.AmbientLight(0xffffff,1));
+const refG=new THREE.BoxGeometry(1,1,1);
+const refMat=new THREE.MeshBasicMaterial({map:refTex});
+refS.add(new THREE.Mesh(refG,refMat));
+const refCam=new THREE.PerspectiveCamera(60,1,0.1,100);refCam.position.z=3;
+const refR=new THREE.WebGLRenderer({canvas:refC,antialias:false});
+capt.start();refR.render(refS,refCam);const refCmds=capt.stop();
+HTMLCanvasElement.prototype.getContext=ogc;
+
+L('=== Three.js Reference ===');
+for(const c of refCmds)L(`  ref: ${c.name}`);
+
+// === OUR IMPLEMENTATION ===
+const{Scene,Mesh,PerspectiveCamera,WebGLRenderer}=await import('../../src/Three.js');
+const ourC=document.createElement('canvas');ourC.width=256;ourC.height=256;
+const ad=new WebGLAdapter(ourC);const renderer=new WebGLRenderer(ad);
+const ourS=new Scene();const ourCam=new PerspectiveCamera(60,1,0.1,100);ourCam.position.set(0,0,3);ourS.add(ourCam);
+
+const v=Array.from(refG.getAttribute('position').array);
+const idx=Array.from(refG.getIndex().array);
+const ourM=new Mesh();ourM.setGeometry(v,idx);ourM.setMaterial(1,0,0,1);ourS.add(ourM);
+ourM.updateMatrixWorld(true);ourCam.updateMatrixWorld(true);
+ourS._lights=[{light_type:0,color:[1,1,1],intensity:1,direction:[0,0,0]}];
+
+const gc=renderer.render(ourS,ourCam);
+const ourCmds=ad.decodeCommands(gc);
+
+L('\n=== Our Implementation ===');
+for(const c of ourCmds)L(`  our: ${c.name}`);
+
+// === VERIFICATIONS ===
+A(!!ourCmds.find(c=>c.op===0x12),'TEX_IMAGE2D opcode present');
+A(!!ourCmds.find(c=>c.op===OP_CODES.CREATE_VERTEX_SHADER),'CREATE_VERTEX_SHADER present');
+
+const ourVS=ourCmds.find(c=>c.op===OP_CODES.CREATE_VERTEX_SHADER);
+const ourFS=ourCmds.find(c=>c.op===OP_CODES.CREATE_FRAGMENT_SHADER);
+const hasSampler=ourFS?.args[0]?.includes('sampler2D');
+A(hasSampler,'Fragment shader includes sampler2D');
+const hasUvAttrib=ourVS?.args[0]?.includes('in vec2 uv');
+A(hasUvAttrib,'Vertex shader includes UV attribute');
+
+// Check VERTEX_ATTRIB_POINTER for UV (3 total for textured)
+const vaps=ourCmds.filter(c=>c.op===OP_CODES.VERTEX_ATTRIB_POINTER);
+A(vaps.length>=2,'Multiple VERTEX_ATTRIB_POINTER found (stride 32)');
+
+// Check stride=32
+const hasStride32=vaps.some(c=>c.args[4]===32);
+A(hasStride32,'VERTEX_ATTRIB_POINTER has stride=32 for UV format');
+
+}catch(e){L('ERROR: '+e.message+'\n'+e.stack);F++;}
+
+function desc(c){return c.name;}
+L(`\nTotal: ${P+F} tests, ${P} passed, ${F} failed`);
+document.getElementById('r').innerHTML='<pre>'+O.join('\n')+'</pre>';
+window.__testResults={passed:P,failed:F,output:O.join('\n')};
+</script></body></html>

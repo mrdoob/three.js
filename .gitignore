@@ -20,3 +20,6 @@ test/treeshake/index.webgpu.nodes.bundle.min.js
 test/unit/build
 
 **/node_modules
+crates/three-core/target/
+*.wasm
+_legacy_backup/

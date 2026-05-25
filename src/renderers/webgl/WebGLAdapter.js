@@ -1,11 +1,6 @@
-/**
- * @license
- * Copyright 2010-2026 Three.js Authors
- * SPDX-License-Identifier: MIT
- */
-import { __wbg_init, init_core, setWasmExports, get_gl_commands, create_object, process_commands } from './engine-BA1359S2.js';
-export { EulerProxy as Euler, Group, Matrix4Proxy as Matrix4, Mesh, Object3D, PerspectiveCamera, QuaternionProxy as Quaternion, Scene, Vector3Proxy as Vector3, WebGLRenderer } from './engine-BA1359S2.js';
-
+const GL_ARRAY_BUFFER = 0x8892;
+const GL_FLOAT = 0x1406;
+const GL_TRIANGLES = 0x0004;
 const GL_COLOR_BUFFER_BIT = 0x4000;
 const GL_DEPTH_BUFFER_BIT = 0x0100;
 const GL_VERTEX_SHADER = 0x8B31;
@@ -37,7 +32,7 @@ for (let i = 0; i < 8; i++) {
 }
 function slotName(slot) { return UNIFORM_NAMES[slot] || `slot${slot}`; }
 
-class WebGLAdapter {
+export class WebGLAdapter {
     constructor(canvas) {
         this.canvas = canvas;
         this.gl = canvas.getContext('webgl2', {
@@ -428,14 +423,3 @@ class WebGLAdapter {
         }
     }
 }
-
-// Three.js — Rust/WASM backend
-// Top-level WASM initialization + all public class re-exports
-
-
-// ---- Top-level WASM initialization ----
-await __wbg_init();
-init_core();
-setWasmExports({ process_commands, create_object, get_gl_commands });
-
-export { WebGLAdapter };

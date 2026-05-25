@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GL Command Comparison Test</title>
+<style>
+body { font-family: monospace; margin: 20px; background: #1a1a2e; color: #e0e0e0; }
+h1 { color: #00d4ff; }
+.pass { color: #00ff88; }
+.fail { color: #ff4466; }
+pre { background: #111; padding: 10px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>GL Command Comparison: Three-Rust vs Three.js Reference</h1>
+<div id="results">Running...</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+    }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { WebGLAdapter } from '../../src/renderers/webgl/WebGLAdapter.js';
+import { GLCapture, OP_CODES } from '../../test/gl-capture.js';
+
+const output = [];
+let passed = 0, failed = 0;
+
+function log(msg) { output.push(msg); }
+function assert(condition, msg) {
+    if (condition) { passed++; output.push('PASS: ' + msg); }
+    else { failed++; output.push('FAIL: ' + msg); }
+}
+
+function floatNear(a, b, eps = 1e-4) {
+    return Math.abs(a - b) <= eps;
+}
+
+// ---- Test: Single Triangle Semantic Comparison ----
+async function testSingleTriangle() {
+    // === Three.js Reference Capture ===
+    const refCanvas = document.createElement('canvas');
+    refCanvas.width = 256;
+    refCanvas.height = 256;
+
+    const capture = new GLCapture();
+    const origGetContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, attrs) {
+        const realGL = origGetContext.call(this, type, attrs);
+        if (type === 'webgl2' && realGL) return capture.wrap(realGL);
+        return realGL;
+    };
+
+    // Build identical scene in Three.js
+    const refScene = new THREE.Scene();
+    const refVertices = new Float32Array([0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0]);
+    const refGeom = new THREE.BufferGeometry();
+    refGeom.setAttribute('position', new THREE.BufferAttribute(refVertices, 3));
+
+    // Use MeshBasicMaterial without any fancy features
+    const refMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const refMesh = new THREE.Mesh(refGeom, refMat);
+    refScene.add(refMesh);
+
+    // Orthographic camera to avoid projection distortion
+    const refCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+    refCamera.position.z = 1;
+
+    const refRenderer = new THREE.WebGLRenderer({ canvas: refCanvas, antialias: false });
+
+    capture.start();
+    refRenderer.render(refScene, refCamera);
+    const refCommands = capture.stop();
+    HTMLCanvasElement.prototype.getContext = origGetContext;
+
+    log('=== Three.js Reference Commands ===');
+    for (const c of refCommands) {
+        log(`  ref: ${c.name} ${describeArgs(c)}`);
+    }
+
+    // === Our Implementation ===
+    const { Scene, Mesh, PerspectiveCamera, WebGLRenderer } = await import('../../src/Three.js');
+    const ourCanvas = document.createElement('canvas');
+    ourCanvas.width = 256;
+    ourCanvas.height = 256;
+
+    const ourAdapter = new WebGLAdapter(ourCanvas);
+    const ourRenderer = new WebGLRenderer(ourAdapter);
+    const ourScene = new Scene();
+    const ourMesh = new Mesh();
+    ourMesh.setGeometry([0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0]);
+    ourMesh.setMaterial(1.0, 0.0, 0.0, 1.0);
+    ourScene.add(ourMesh);
+    ourMesh.updateMatrixWorld(true);
+
+    const glCommands = ourRenderer.render(ourScene, null);
+    const ourCommands = ourAdapter.decodeCommands(glCommands);
+
+    log('\n=== Our Commands ===');
+    for (const c of ourCommands) {
+        log(`  our: ${c.name} ${describeArgs(c)}`);
+    }
+
+    // === Semantic Comparison ===
+    log('\n=== Semantic Comparison ===');
+
+    // 1. DRAW_ARRAYS: mode=TRIANGLES, count=3
+    const ourDraw = ourCommands.find(c => c.op === OP_CODES.DRAW_ARRAYS);
+    const refDraw = refCommands.find(c => c.op === OP_CODES.DRAW_ARRAYS);
+    assert(!!ourDraw, 'Our commands include DRAW_ARRAYS');
+    assert(!!refDraw, 'Ref commands include DRAW_ARRAYS');
+    if (ourDraw && refDraw) {
+        assert(ourDraw.args[0] === refDraw.args[0],
+            `DRAW_ARRAYS mode matches: ${ourDraw.args[0]} == ${refDraw.args[0]}`);
+        assert(ourDraw.args[2] === refDraw.args[2],
+            `DRAW_ARRAYS count matches: ${ourDraw.args[2]} == ${refDraw.args[2]}`);
+    }
+
+    // 2. VERTEX_ATTRIB_POINTER: size=3, type=FLOAT
+    const ourVAP = ourCommands.find(c => c.op === OP_CODES.VERTEX_ATTRIB_POINTER);
+    const refVAP = refCommands.find(c => c.op === OP_CODES.VERTEX_ATTRIB_POINTER);
+    assert(!!ourVAP, 'Our commands include VERTEX_ATTRIB_POINTER');
+    assert(!!refVAP, 'Ref commands include VERTEX_ATTRIB_POINTER');
+    if (ourVAP && refVAP) {
+        assert(ourVAP.args[1] === refVAP.args[1],
+            `Vertex attrib size matches: ${ourVAP.args[1]} == ${refVAP.args[1]}`);
+        assert(ourVAP.args[2] === refVAP.args[2],
+            `Vertex attrib type matches: ${ourVAP.args[2]} == ${refVAP.args[2]}`);
+    }
+
+    // 3. ENABLE_VERTEX_ATTRIB_ARRAY: index=0
+    const ourEVA = ourCommands.find(c => c.op === OP_CODES.ENABLE_VERTEX_ATTRIB_ARRAY);
+    const refEVA = refCommands.find(c => c.op === OP_CODES.ENABLE_VERTEX_ATTRIB_ARRAY);
+    assert(!!ourEVA, 'Our commands include ENABLE_VERTEX_ATTRIB_ARRAY');
+    assert(!!refEVA, 'Ref commands include ENABLE_VERTEX_ATTRIB_ARRAY');
+
+    // 4. BUFFER_DATA: verify vertex positions match
+    const ourBuf = ourCommands.find(c => c.op === OP_CODES.BUFFER_DATA);
+    const refBuf = refCommands.find(c => c.op === OP_CODES.BUFFER_DATA);
+    assert(!!ourBuf, 'Our commands include BUFFER_DATA');
+    assert(!!refBuf, 'Ref commands include BUFFER_DATA');
+
+    if (ourBuf && refBuf) {
+        const ourData = ourBuf.args[1];
+        const refData = refBuf.args[1];
+
+        // Three.js may interleave attributes. The position data is at some offset.
+        // Search ref data for our vertex pattern: (0, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0)
+        let foundPositions = false;
+        const refLen = Array.isArray(refData) ? refData.length : Object.keys(refData).length;
+        for (let offset = 0; offset + 8 < refLen; offset++) {
+            const r0 = refData[offset], r1 = refData[offset+1], r2 = refData[offset+2];
+            const r3 = refData[offset+3], r4 = refData[offset+4], r5 = refData[offset+5];
+            const r6 = refData[offset+6], r7 = refData[offset+7], r8 = refData[offset+8];
+            if (floatNear(r0, 0) && floatNear(r1, 0.5) && floatNear(r2, 0) &&
+                floatNear(r3, -0.5) && floatNear(r4, -0.5) && floatNear(r5, 0) &&
+                floatNear(r6, 0.5) && floatNear(r7, -0.5) && floatNear(r8, 0)) {
+                foundPositions = true;
+                log(`  Found vertex positions in ref buffer at offset ${offset}`);
+                break;
+            }
+        }
+
+        if (!foundPositions) {
+            // Dump first 27 floats of ref buffer for debugging
+            const refFirst = [];
+            for (let i = 0; i < Math.min(27, refLen); i++) {
+                refFirst.push(parseFloat(refData[i]).toFixed(4));
+            }
+            log(`  Ref buffer [0..26]: ${refFirst.join(' ')}`);
+
+            // Our vertex data
+            const ourFirst = [];
+            for (let i = 0; i < Math.min(ourData.length, 9); i++) {
+                ourFirst.push(parseFloat(ourData[i]).toFixed(4));
+            }
+            log(`  Our buffer [0..8]: ${ourFirst.join(' ')}`);
+        }
+
+        assert(foundPositions, 'Ref buffer contains our vertex positions');
+    }
+
+    // 5. CLEAR_COLOR present in our output
+    assert(!!ourCommands.find(c => c.op === OP_CODES.CLEAR_COLOR),
+        'Our commands include CLEAR_COLOR');
+}
+
+function describeArgs(cmd) {
+    const a = cmd.args;
+    if (cmd.op === OP_CODES.BUFFER_DATA) {
+        const data = a[1];
+        const len = Array.isArray(data) ? data.length : Object.keys(data).length;
+        return `[target=${a[0]}, dataLen=${len}]`;
+    }
+    if (cmd.op === OP_CODES.DRAW_ARRAYS) {
+        return `[mode=${a[0]}, first=${a[1]}, count=${a[2]}]`;
+    }
+    if (cmd.op === OP_CODES.VERTEX_ATTRIB_POINTER) {
+        return `[idx=${a[0]}, size=${a[1]}, type=${a[2]}, stride=${a[4]}]`;
+    }
+    if (cmd.op === OP_CODES.CLEAR_COLOR) {
+        return `[r=${a[0].toFixed(3)}, g=${a[1].toFixed(3)}, b=${a[2].toFixed(3)}, a=${a[3].toFixed(3)}]`;
+    }
+    return JSON.stringify(a).substring(0, 60);
+}
+
+// ---- Run ----
+try {
+    await testSingleTriangle();
+} catch(e) {
+    log('ERROR: ' + e.message);
+    log('STACK: ' + e.stack);
+    failed++;
+}
+
+log(`\nTotal: ${passed + failed} tests, ${passed} passed, ${failed} failed`);
+document.getElementById('results').innerHTML = '<pre>' + output.join('\n') + '</pre>';
+window.__testResults = { passed, failed, output: output.join('\n') };
+</script>
+</body>
+</html>

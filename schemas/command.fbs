@@ -1,0 +1,131 @@
+namespace three_core;
+
+// ---- Property path identifiers ----
+enum PropPath : uint8 {
+    POSITION = 0,
+    ROTATION = 1,
+    SCALE = 2,
+    QUATERNION = 3,
+    MATRIX_WORLD = 4,
+    GEOMETRY = 5,
+    MATERIAL = 6,
+    CAMERA_PROJECTION = 7,
+    CAMERA_VIEW = 8,
+    SCENE_LIGHTS = 9,
+}
+
+// ---- Method identifiers ----
+enum Method : uint16 {
+    ADD_CHILD = 0,
+    UPDATE_MATRIX_WORLD = 1,
+    CREATE_OBJECT = 2,
+    CREATE_GEOMETRY = 3,
+    CREATE_MATERIAL = 4,
+    SET_OBJECT_GEOMETRY = 5,
+    SET_OBJECT_MATERIAL = 6,
+}
+
+// ---- Value types ----
+table Vec3 {
+    x: float;
+    y: float;
+    z: float;
+}
+
+table EulerValue {
+    x: float;
+    y: float;
+    z: float;
+    order: uint8;
+}
+
+table QuatValue {
+    x: float;
+    y: float;
+    z: float;
+    w: float;
+}
+
+table FloatV {
+    v: float;
+}
+
+table GeometryData {
+    id: uint32;
+    vertices: [float];
+    indices: [uint32];
+}
+
+table MaterialData {
+    id: uint32;
+    color: [float];       // RGBA for basic, RGB diffuse for phong
+    specular: [float];     // RGB specular (phong only)
+    shininess: float;      // shininess exponent (phong only)
+    material_type: uint8;  // 0=Basic, 1=Phong
+}
+
+// Light types
+enum LightType : uint8 {
+    AMBIENT = 0,
+    DIRECTIONAL = 1,
+}
+
+table LightData {
+    light_type: LightType;
+    color: [float];      // RGB
+    intensity: float;
+    direction: [float];  // x,y,z (directional only)
+}
+
+union Value {
+    Vec3,
+    EulerValue,
+    QuatValue,
+    FloatV,
+    GeometryData,
+    MaterialData,
+    LightData,
+}
+
+// ---- MethodArg wrapper for variable-length args ----
+table MethodArg {
+    value: Value;
+}
+
+// ---- Commands ----
+table SetProperty {
+    object_id: uint32;
+    prop_path: PropPath;
+    value: Value;
+}
+
+table CallMethod {
+    object_id: uint32;
+    method: Method;
+    args: [MethodArg];
+}
+
+table ReadRequest {
+    token: uint32;
+    object_id: uint32;
+    prop_path: PropPath;
+}
+
+table CommandBatch {
+    sets: [SetProperty];
+    calls: [CallMethod];
+    reads: [ReadRequest];
+}
+
+// ---- Response ----
+table ReadResult {
+    token: uint32;
+    data: [float];
+}
+
+table ResponseBatch {
+    results: [ReadResult];
+    gl_commands: [ubyte];
+}
+
+root_type CommandBatch;
