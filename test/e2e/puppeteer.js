@@ -75,6 +75,7 @@ const exceptionList = [
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.1; // at most 0.1% different pixels
+const maxRetries = 3; // max number of retries when device is lost
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
@@ -271,7 +272,29 @@ async function main() {
 
 	for ( const file of files ) {
 
-		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
+		for ( let i = 0; i <= maxRetries; i ++ ) {
+
+			try {
+
+				await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
+				break;
+
+			} catch ( e ) {
+
+				console.yellow( `${ e }` );
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+			}
+
+			if ( i === maxRetries ) {
+
+				console.red( `Maximum retries exceeded: ${ file }` );
+				failedScreenshots.push( file );
+
+			}
+
+		}
 
 	}
 
@@ -570,9 +593,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
-			console.yellow( `${ e }` );
-			console.yellow( 'Restarting browser...' );
-			await ctx.restart();
+			throw new Error( `${ e }` );
 
 		} else {
 
