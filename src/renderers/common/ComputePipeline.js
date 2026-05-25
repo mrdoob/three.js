@@ -3,6 +3,7 @@ import Pipeline from './Pipeline.js';
 /**
  * Class for representing compute pipelines.
  *
+ * @private
  * @augments Pipeline
  */
 class ComputePipeline extends Pipeline {

@@ -9,6 +9,7 @@ let _id = 0;
  * data are the current clear values or data from the active framebuffer. This
  * module is used to represent these contexts as objects.
  *
+ * @private
  */
 class RenderContext {
 

@@ -52,6 +52,7 @@ function getKeys( obj ) {
  * draw parameters or vertex buffers. It also holds a series of caching related methods since
  * creating render objects should only be done when necessary.
  *
+ * @private
  */
 class RenderObject {
 

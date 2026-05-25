@@ -5,6 +5,7 @@ let _id = 0;
  * or resources. Bind groups are assigned to pipelines to provide them
  * with the required resources (like uniform buffers or textures).
  *
+ * @private
  */
 class BindGroup {
 

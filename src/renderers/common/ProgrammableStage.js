@@ -5,6 +5,7 @@ let _id = 0;
  * fragment or compute shaders. Unlike fixed-function states (like blending),
  * they represent the programmable part of a pipeline.
  *
+ * @private
  */
 class ProgrammableStage {
 

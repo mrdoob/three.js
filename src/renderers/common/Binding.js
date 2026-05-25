@@ -5,6 +5,7 @@
  * This module is an abstract base class for all concrete bindings types.
  *
  * @abstract
+ * @private
  */
 class Binding {
 
