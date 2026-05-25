@@ -30,10 +30,10 @@ jobs:
       - name: === Lint testing ===
         run: npm run lint
 
-      - name: === Unit testing (legacy — skipped: internals replaced) ===
-        run: echo "Legacy unit tests skipped — core logic migrated to Rust/WASM"
+      - name: Legacy unit tests skipped
+        run: echo "Legacy unit tests skipped - core logic migrated to Rust/WASM"
 
-      - name: === Unit addons testing (legacy — skipped) ===
+      - name: Legacy addon tests skipped
         run: echo "Legacy addon tests skipped"
 
       - name: === Rust/WASM unit tests ===
