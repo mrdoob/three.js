@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_COMMITTED */
+/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const CONNECTION_NAME = 'three-devtools';
 const STATE_POLLING_INTERVAL = 1000;
@@ -280,6 +280,26 @@ function processSceneBatch( sceneUuid, batchObjects ) {
 
 }
 
+// Drop a scene and all of its objects (the bridge has determined it was disposed)
+function removeScene( sceneUuid ) {
+
+	state.scenes.delete( sceneUuid );
+
+	state.objects.forEach( ( obj, uuid ) => {
+
+		if ( uuid === sceneUuid || obj._sceneUuid === sceneUuid ) {
+
+			state.objects.delete( uuid );
+			treeExpandedState.delete( uuid );
+
+		}
+
+	} );
+
+	sceneDirty = true;
+
+}
+
 // Clear state when panel is reloaded
 function clearState() {
 
@@ -333,6 +353,11 @@ function handleThreeEvent( message ) {
 		case EVENT_SCENE:
 			const { sceneUuid, objects: batchObjects } = message.detail;
 			processSceneBatch( sceneUuid, batchObjects );
+			updateSceneTree();
+			break;
+
+		case EVENT_SCENE_REMOVED:
+			removeScene( message.detail.uuid );
 			updateSceneTree();
 			break;
 
