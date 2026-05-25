@@ -1205,7 +1205,7 @@ class UIListbox extends UIDiv {
 
 			const listitem = new ListboxItem( this );
 			listitem.setId( item.id || `Listbox-${i}` );
-			listitem.setTextContent( item.name || item.type );
+			listitem.setTextContent( item.name || item.constructor.name );
 			this.add( listitem );
 
 		}
