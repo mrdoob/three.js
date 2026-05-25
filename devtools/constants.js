@@ -21,3 +21,4 @@ var EVENT_SCENE = 'scene';
 var EVENT_OBJECT_DETAILS = 'object-details';
 var EVENT_DEVTOOLS_READY = 'devtools-ready';
 var EVENT_COMMITTED = 'committed';
+var EVENT_SCENE_REMOVED = 'scene-removed';

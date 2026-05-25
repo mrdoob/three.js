@@ -1,4 +1,4 @@
-/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_OBJECT_DETAILS, EVENT_DEVTOOLS_READY */
+/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS, EVENT_DEVTOOLS_READY */
 
 /**
  * This script injected by the installed three.js developer
@@ -77,6 +77,9 @@
 				// Clear observed arrays
 				observedScenes.length = 0;
 				observedRenderers.length = 0;
+				sceneObjectCountCache.clear();
+				sceneEmptyTicks.clear();
+				removedScenes.clear();
 
 			}
 
@@ -95,6 +98,9 @@
 		const observedScenes = [];
 		const observedRenderers = [];
 		const sceneObjectCountCache = new Map(); // Cache for object counts per scene
+		const sceneEmptyTicks = new Map(); // Consecutive sendState ticks each scene has been empty
+		const removedScenes = new Set(); // Scenes hidden from the panel; tracked so we can resurrect them
+		const SCENE_EMPTY_TICKS_THRESHOLD = 5; // ~5s at 1s polling — hide empty scene from the panel
 
 		// Shared tree traversal function
 		function traverseObjectTree( rootObject, callback, skipDuplicates = false ) {
@@ -430,10 +436,44 @@
 
 			}
 
-			// Send current scenes
-			for ( const observedScene of observedScenes ) {
+			// Send current scenes. Three.js scenes have no dispose() method, so we
+			// approximate disposal: a scene that has stayed empty for several poll
+			// cycles is hidden from the panel; if it gains children again, we
+			// resurrect it (reloadSceneObjects re-dispatches the batch).
+			for ( const scene of observedScenes ) {
 
-				reloadSceneObjects( observedScene );
+				const isEmpty = scene.children.length === 0;
+				const wasRemoved = removedScenes.has( scene.uuid );
+
+				if ( isEmpty ) {
+
+					// Already hidden — nothing to send until children come back
+					if ( wasRemoved ) continue;
+
+					const ticks = ( sceneEmptyTicks.get( scene.uuid ) || 0 ) + 1;
+
+					if ( ticks >= SCENE_EMPTY_TICKS_THRESHOLD ) {
+
+						removedScenes.add( scene.uuid );
+						sceneEmptyTicks.delete( scene.uuid );
+						sceneObjectCountCache.delete( scene.uuid );
+						dispatchEvent( EVENT_SCENE_REMOVED, { uuid: scene.uuid } );
+						continue;
+
+					}
+
+					sceneEmptyTicks.set( scene.uuid, ticks );
+
+				} else {
+
+					sceneEmptyTicks.delete( scene.uuid );
+
+					// Repopulated after removal — bring it back into the panel
+					if ( wasRemoved ) removedScenes.delete( scene.uuid );
+
+				}
+
+				reloadSceneObjects( scene );
 
 			}
 
