@@ -75,7 +75,7 @@ const exceptionList = [
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.1; // at most 0.1% different pixels
-const maxRetries = 10; // max number of retries when device is lost
+const maxRetries = 3; // max number of retries when device is lost
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
@@ -240,6 +240,7 @@ async function main() {
 
 	const launchPage = async () => {
 
+		await fs.rm( './.puppeteer_profile', { recursive: true, force: true } );
 		browser = await puppeteer.launch( launchOptions );
 		const page = await browser.newPage();
 		await preparePage( page, injection, builds, errorMessagesCache );
