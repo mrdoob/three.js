@@ -283,6 +283,7 @@ async function main() {
 
 				console.yellow( `${ e }` );
 				console.yellow( 'Restarting browser...' );
+				if ( global.gc ) global.gc( { type: 'major' } );
 				await ctx.restart();
 
 			}
