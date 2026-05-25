@@ -1455,6 +1455,10 @@ class BufferGeometry extends EventDispatcher {
 
 		this.userData = source.userData;
 
+		// transformed flag
+
+		this._transformed = source._transformed;
+
 		return this;
 
 	}
