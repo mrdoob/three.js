@@ -195,6 +195,19 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.userData = {};
 
+		/**
+		 * `true` when the geometry has been transformed since construction
+		 * (e.g. via {@link BufferGeometry#applyMatrix4}). Only relevant for
+		 * geometry generators (subclasses that populate `parameters`): when set,
+		 * {@link BufferGeometry#toJSON} omits `parameters` since they no longer
+		 * describe the geometry.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._transformed = false;
+
 	}
 
 	/**
@@ -405,6 +418,8 @@ class BufferGeometry extends EventDispatcher {
 			this.computeBoundingSphere();
 
 		}
+
+		this._transformed = true;
 
 		return this;
 
@@ -977,6 +992,8 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		this._transformed = true;
+
 	}
 
 	/**
@@ -1223,11 +1240,11 @@ class BufferGeometry extends EventDispatcher {
 		// standard BufferGeometry serialization
 
 		data.uuid = this.uuid;
-		data.type = this.type;
+		data.type = ( this.parameters !== undefined && this._transformed === true ) ? 'BufferGeometry' : this.type;
 		if ( this.name !== '' ) data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
-		if ( this.parameters !== undefined ) {
+		if ( this.parameters !== undefined && this._transformed !== true ) {
 
 			const parameters = this.parameters;
 
@@ -1437,6 +1454,10 @@ class BufferGeometry extends EventDispatcher {
 		// user data
 
 		this.userData = source.userData;
+
+		// transformed flag
+
+		this._transformed = source._transformed;
 
 		return this;
 
