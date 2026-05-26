@@ -10,7 +10,7 @@ The node materials loaded with this loader can only be used with [WebGPURenderer
 
 ```js
 const loader = new MaterialXLoader().setPath( SAMPLE_PATH );
-const materials = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
+const { materials, report } = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
 ```
 
 ## Import
@@ -57,7 +57,29 @@ Executed when errors occur.
 
 **Returns:** A reference to this loader.
 
-### .parse( text : string ) : Object.<string, NodeMaterial>
+### .loadAsync( url : string, onProgress : onProgressCallback, options : Object ) : Promise
+
+Asynchronously loads a MaterialX asset.
+
+**url**
+
+The path/URL of the file to be loaded. This can be a `.mtlx` file, a `.mtlx.zip` package, or a data URI.
+
+**onProgress**
+
+Executed while the loading is in progress.
+
+**options**
+
+Optional MaterialX translation options.
+
+*   `materialName`: Selects one `surfacematerial` by name from a multi-material document.
+*   `issuePolicy`: Controls issue handling. Supported values are `warn`, `error-core`, and `error-all`.
+*   `onWarning`: Callback executed for structured translation warnings.
+
+**Returns:** A promise resolving with an object containing `materials` and `report`.
+
+### .parse( text : string, options : Object ) : Object
 
 Parses the given MaterialX data and returns the resulting materials.
 
@@ -82,9 +104,23 @@ Supported standard\_surface inputs:
 
 The raw MaterialX data as a string.
 
+**options**
+
+Optional MaterialX translation options. See [loadAsync](#loadAsync).
+
 **Overrides:** [Loader#parse](Loader.html#parse)
 
-**Returns:** A dictionary holding the parse node materials.
+**Returns:** An object containing `materials` and `report`. `materials` is a dictionary holding the parsed node materials.
+
+### .parseBuffer( data : ArrayBuffer, url : string, options : Object ) : Object
+
+Parses raw MaterialX data from an `ArrayBuffer`, `Uint8Array`, or string. ZIP buffers are detected automatically.
+
+**Returns:** An object containing `materials` and `report`.
+
+### .dispose() : MaterialXLoader
+
+Releases object URLs created while loading `.mtlx.zip` package resources.
 
 ## Source
 
