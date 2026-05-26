@@ -1184,7 +1184,11 @@ class UIListbox extends UIDiv {
 
 		}
 
-		this.types = types;
+		if ( Array.isArray( types ) ) {
+
+			this.types = types;
+
+		}
 
 		this.render();
 
