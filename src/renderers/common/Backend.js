@@ -16,7 +16,6 @@ import { REVISION, TimestampQuery } from '../../constants.js';
  * implement the interface.
  *
  * @abstract
- * @private
  */
 class Backend {
 
