@@ -34,6 +34,7 @@ export { default as BlendMode } from './renderers/common/BlendMode.js';
 export { default as GLSLNodeBuilder } from './renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 export { default as BasicNodeLibrary } from './renderers/webgpu/nodes/BasicNodeLibrary.js';
 export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/StandardNodeLibrary.js';
+export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
 import * as TSL from './nodes/TSL.js';
