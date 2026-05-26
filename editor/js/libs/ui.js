@@ -1169,19 +1169,22 @@ class UIListbox extends UIDiv {
 		this.dom.tabIndex = 0;
 
 		this.items = [];
+		this.types = [];
 		this.listitems = [];
 		this.selectedIndex = 0;
 		this.selectedValue = null;
 
 	}
 
-	setItems( items ) {
+	setItems( items, types = [] ) {
 
 		if ( Array.isArray( items ) ) {
 
 			this.items = items;
 
 		}
+
+		this.types = types;
 
 		this.render();
 
@@ -1205,7 +1208,7 @@ class UIListbox extends UIDiv {
 
 			const listitem = new ListboxItem( this );
 			listitem.setId( item.id || `Listbox-${i}` );
-			listitem.setTextContent( item.name || item.constructor.name );
+			listitem.setTextContent( item.name || this.types[ i ] || item.type );
 			this.add( listitem );
 
 		}
