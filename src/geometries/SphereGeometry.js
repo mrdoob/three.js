@@ -101,6 +101,15 @@ class SphereGeometry extends BufferGeometry {
 				vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
 				vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
+				// snap south-pole vertices to the axis to avoid floating point inaccuracies
+
+				if ( iy === heightSegments && ( thetaStart + thetaLength ) === Math.PI ) {
+
+					vertex.x = 0;
+					vertex.z = 0;
+
+				}
+
 				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal
