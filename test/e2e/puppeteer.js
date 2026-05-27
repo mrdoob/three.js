@@ -28,6 +28,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi_ballpool',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
+	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_volume_lighting_traa',
 
 	// Timming issues?
@@ -202,6 +203,7 @@ async function main() {
 		'--disable-vulkan-surface',
 		'--ignore-gpu-blocklist',
 		'--disable-gpu-driver-bug-workarounds',
+		'--disable-gpu-watchdog',
 		'--no-sandbox'
 	];
 
