@@ -45,7 +45,9 @@
 			let camera, scene, renderer, controls, timer;
 			let probes = null, probesHelper = null;
 			let modelSize = null;
-			let dirLight = null, sky = null, sun = new THREE.Vector3();
+			let dirLight = null, sky = null;
+			
+			const sun = new THREE.Vector3();
 
 			const _box = new THREE.Box3();
 			const _size = new THREE.Vector3();
@@ -94,6 +96,7 @@
 					progressBar.value = loaded / total * 100;
 
 				};
+
 				manager.onLoad = function () {
 
 					progressBar.remove();
