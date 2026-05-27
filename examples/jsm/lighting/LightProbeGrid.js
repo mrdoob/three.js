@@ -1,6 +1,8 @@
 import {
 	Box3,
 	CubeCamera,
+	Data3DTexture,
+	DataUtils,
 	FloatType,
 	HalfFloatType,
 	LinearFilter,
@@ -18,6 +20,14 @@ import {
 	WebGLCubeRenderTarget,
 	WebGLRenderTarget
 } from 'three';
+
+// Number of SH coefficients stored per probe: 9 L2 bands x 3 colour channels.
+const COEFFICIENTS_PER_PROBE = 27;
+
+// Fixed-point scale used by toJSON(): coefficients are stored as
+// Math.round( value * SERIALIZE_SCALE ) integers. 4096 keeps the quantization
+// error around 1e-4 (negligible for irradiance) while gzipping very well.
+const SERIALIZE_SCALE = 4096;
 
 // Shared fullscreen-quad scene / camera
 let _scene = null;
@@ -75,8 +85,10 @@ const ATLAS_PADDING = 1;
  * ```
  * Total atlas depth = `7 * ( nz + 2 )`.
  *
- * Baking is fully GPU-resident: cubemap rendering, SH projection, and
- * texture packing all happen on the GPU with zero CPU readback.
+ * Baking happens almost entirely on the GPU — cubemap rendering, SH
+ * projection, and texture packing all run as GPU passes; only a small
+ * `9 x totalProbes` SH coefficient buffer is read back to the CPU at the
+ * end of baking so the result can be serialized via {@link LightProbeGrid#toJSON}.
  *
  * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
  */
@@ -154,6 +166,20 @@ class LightProbeGrid extends Object3D {
 		 * @default null
 		 */
 		this.texture = null;
+
+		/**
+		 * The raw baked SH coefficients, laid out as `27` floats per probe
+		 * (`9` L2 bands times `3` colour channels), in
+		 * `ix + iy * nx + iz * nx * ny` probe order.
+		 *
+		 * Populated by {@link LightProbeGrid#bake} (read back from the GPU) and
+		 * by {@link LightProbeGrid.fromJSON}. This is the unpadded, minimal
+		 * representation used by {@link LightProbeGrid#toJSON}.
+		 *
+		 * @type {?Float32Array}
+		 * @default null
+		 */
+		this.coefficients = null;
 
 		/**
 		 * Internal render target for GPU-resident baking.
@@ -354,6 +380,35 @@ class LightProbeGrid extends Object3D {
 
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
+		// Read the final pass's SH coefficients back to the CPU so the bake can
+		// be serialized (see toJSON). The batch target is a compact 9 x totalProbes
+		// RGBA buffer; only the RGB of each of the 9 texels per row carries data.
+		{
+
+			const batchPixels = new Float32Array( 9 * totalProbes * 4 );
+			renderer.readRenderTargetPixels( batchTarget, 0, 0, 9, totalProbes, batchPixels );
+
+			const coefficients = new Float32Array( totalProbes * COEFFICIENTS_PER_PROBE );
+
+			for ( let p = 0; p < totalProbes; p ++ ) {
+
+				for ( let k = 0; k < 9; k ++ ) {
+
+					const src = ( p * 9 + k ) * 4;
+					const dst = p * COEFFICIENTS_PER_PROBE + k * 3;
+
+					coefficients[ dst ] = batchPixels[ src ];
+					coefficients[ dst + 1 ] = batchPixels[ src + 1 ];
+					coefficients[ dst + 2 ] = batchPixels[ src + 2 ];
+
+				}
+
+			}
+
+			this.coefficients = coefficients;
+
+		}
+
 		// Restore renderer state
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setViewport( _currentViewport );
@@ -376,6 +431,9 @@ class LightProbeGrid extends Object3D {
 	_ensureTextures() {
 
 		if ( this._renderTarget !== null ) return;
+
+		// Re-baking a deserialized grid: drop the standalone atlas texture.
+		if ( this.texture !== null ) this.texture.dispose();
 
 		const res = this.resolution;
 		const nx = res.x, ny = res.y, nz = res.z;
@@ -404,11 +462,167 @@ class LightProbeGrid extends Object3D {
 
 		if ( this._renderTarget !== null ) {
 
+			// Baked grid: the texture is owned by the render target.
 			this._renderTarget.dispose();
 			this._renderTarget = null;
-			this.texture = null;
+
+		} else if ( this.texture !== null ) {
+
+			// Deserialized grid: the texture is a standalone Data3DTexture.
+			this.texture.dispose();
 
 		}
+
+		this.texture = null;
+
+	}
+
+	/**
+	 * Serializes the baked grid to a JSON-compatible object.
+	 *
+	 * Only the `27` SH coefficients per probe are stored — the padded atlas
+	 * layout used on the GPU is fully reconstructed by {@link LightProbeGrid.fromJSON}.
+	 * Coefficients are stored as fixed-point integers (`value * scale`,
+	 * rounded). This is simple, human-readable, and — because the many
+	 * near-zero higher-order coefficients collapse to short tokens — gzips
+	 * better than a binary layout: a `7 x 7 x 3` grid is a ~16 KB JSON file
+	 * that gzips to ~6.7 KB.
+	 *
+	 * Requires the grid to have been baked (see {@link LightProbeGrid#bake}).
+	 *
+	 * @return {Object} A JSON-compatible representation of the grid.
+	 */
+	toJSON() {
+
+		if ( this.coefficients === null ) {
+
+			throw new Error( 'THREE.LightProbeGrid: toJSON() requires a baked grid. Call bake() first.' );
+
+		}
+
+		const source = this.coefficients;
+		const data = new Array( source.length );
+
+		for ( let i = 0; i < source.length; i ++ ) {
+
+			data[ i ] = Math.round( source[ i ] * SERIALIZE_SCALE );
+
+		}
+
+		return {
+			metadata: {
+				version: 1,
+				type: 'LightProbeGrid',
+				generator: 'LightProbeGrid.toJSON'
+			},
+			width: this.width,
+			height: this.height,
+			depth: this.depth,
+			resolution: [ this.resolution.x, this.resolution.y, this.resolution.z ],
+			position: [ this.position.x, this.position.y, this.position.z ],
+			coefficients: {
+				scale: SERIALIZE_SCALE,
+				data: data
+			}
+		};
+
+	}
+
+	/**
+	 * Reconstructs a baked grid from data produced by {@link LightProbeGrid#toJSON}.
+	 *
+	 * The returned grid carries a ready-to-use {@link Data3DTexture} and does
+	 * not need a renderer — baking can be skipped entirely.
+	 *
+	 * @param {Object} json - The serialized grid.
+	 * @return {LightProbeGrid} The reconstructed grid.
+	 */
+	static fromJSON( json ) {
+
+		const [ nx, ny, nz ] = json.resolution;
+
+		const grid = new LightProbeGrid( json.width, json.height, json.depth, nx, ny, nz );
+		grid.position.fromArray( json.position );
+		grid.updateBoundingBox();
+
+		const { scale, data } = json.coefficients;
+		const coefficients = new Float32Array( data.length );
+
+		for ( let i = 0; i < data.length; i ++ ) {
+
+			coefficients[ i ] = data[ i ] / scale;
+
+		}
+
+		grid.coefficients = coefficients;
+		grid.texture = grid._createDataTexture( coefficients );
+
+		return grid;
+
+	}
+
+	/**
+	 * Builds the padded atlas {@link Data3DTexture} from the raw SH
+	 * coefficients (`27` per probe). The atlas layout matches the one produced
+	 * by {@link LightProbeGrid#bake} so the same shader code can sample either.
+	 *
+	 * @private
+	 * @param {Float32Array} coefficients - Raw coefficients (`27` per probe).
+	 * @return {Data3DTexture} The atlas texture.
+	 */
+	_createDataTexture( coefficients ) {
+
+		const res = this.resolution;
+		const nx = res.x, ny = res.y, nz = res.z;
+		const sliceTexels = nx * ny;
+
+		const paddedSlices = nz + 2 * ATLAS_PADDING;
+		const atlasDepth = 7 * paddedSlices;
+
+		const atlas = new Uint16Array( sliceTexels * atlasDepth * 4 );
+
+		for ( let t = 0; t < 7; t ++ ) {
+
+			for ( let s = 0; s < paddedSlices; s ++ ) {
+
+				// Padding slices clamp to the first / last data slice.
+				const iz = Math.min( Math.max( s - ATLAS_PADDING, 0 ), nz - 1 );
+				const layer = t * paddedSlices + s;
+
+				for ( let iy = 0; iy < ny; iy ++ ) {
+
+					for ( let ix = 0; ix < nx; ix ++ ) {
+
+						const probeIndex = ix + iy * nx + iz * sliceTexels;
+						const src = probeIndex * COEFFICIENTS_PER_PROBE;
+						const dst = ( layer * sliceTexels + iy * nx + ix ) * 4;
+
+						for ( let ch = 0; ch < 4; ch ++ ) {
+
+							// Channels map sequentially onto the 27 coefficients;
+							// the very last channel (sub-volume 6, alpha) is unused.
+							const ci = t * 4 + ch;
+							atlas[ dst + ch ] = ci < COEFFICIENTS_PER_PROBE ? DataUtils.toHalfFloat( coefficients[ src + ci ] ) : 0;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		const texture = new Data3DTexture( atlas, nx, ny, atlasDepth );
+		texture.format = RGBAFormat;
+		texture.type = HalfFloatType;
+		texture.minFilter = LinearFilter;
+		texture.magFilter = LinearFilter;
+		texture.generateMipmaps = false;
+		texture.needsUpdate = true;
+
+		return texture;
 
 	}
 
