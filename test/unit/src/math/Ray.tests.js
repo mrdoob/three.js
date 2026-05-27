@@ -431,6 +431,38 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'intersectTriangle (watertight at shared edges)', ( assert ) => {
+
+			// Two triangles forming a quad and sharing the diagonal edge from
+			// ( -2, -2, -2 ) to ( 2, -2, 2 ). A ray aimed exactly at the midpoint of
+			// that shared edge must be detected: a non-watertight test can let the ray
+			// slip through the seam between the triangles and miss both of them.
+
+			const t1a = new Vector3( - 2, - 2, 2 );
+			const t1b = new Vector3( - 2, - 2, - 2 );
+			const t1c = new Vector3( 2, - 2, 2 );
+
+			const t2a = new Vector3( - 2, - 2, - 2 );
+			const t2b = new Vector3( 2, - 2, - 2 );
+			const t2c = new Vector3( 2, - 2, 2 );
+
+			const seam = new Vector3( 0, - 2, 0 ); // midpoint of the shared edge
+			const origin = new Vector3( - 4, - 9, 0.4 );
+			const direction = new Vector3().subVectors( seam, origin ).normalize();
+			const ray = new Ray( origin, direction );
+
+			const p1 = new Vector3();
+			const p2 = new Vector3();
+			const hit1 = ray.intersectTriangle( t1a, t1b, t1c, false, p1 );
+			const hit2 = ray.intersectTriangle( t2a, t2b, t2c, false, p2 );
+
+			assert.ok( hit1 !== null || hit2 !== null, 'Ray hitting the shared edge is not dropped' );
+
+			const hit = hit1 !== null ? p1 : p2;
+			assert.ok( hit.distanceTo( seam ) <= eps, 'Intersection lies on the shared edge' );
+
+		} );
+
 		QUnit.test( 'applyMatrix4', ( assert ) => {
 
 			let a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
