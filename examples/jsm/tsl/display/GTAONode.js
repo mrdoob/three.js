@@ -365,6 +365,12 @@ class GTAONode extends TempNode {
 
 			const ao = float( 0 ).toVar();
 
+			// Hemisphere clamp: ±( π/2 − ε ) around the projected normal angle. The 0.05 rad bias
+			// reduces self-shadowing artifacts at grazing angles. (Activision GTAO slides, Slide 58
+			// "Integration Domain": h₁' = n + max(h₁ − n, −π/2), h₂' = n + min(h₂ − n, π/2); paper
+			// Section 4.1, Eq. 5 — the max(cos(θ − γ), 0)⁺ clipping in the visibility integrand.)
+			const HEMISPHERE_MAX_ANGLE = float( Math.PI * 0.5 - 0.05 );
+
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
@@ -442,6 +448,13 @@ class GTAONode extends TempNode {
 
 				const hPos = acos( cosHorizons.y ).toVar();
 				const hNeg = acos( cosHorizons.x ).negate().toVar();
+
+				// Clamp horizons to the hemisphere around the (projected) shading normal.
+				const hPosLimit = angleN.add( HEMISPHERE_MAX_ANGLE );
+				hPos.assign( hPos.lessThan( hPosLimit ).select( hPos, hPosLimit ) );
+
+				const hNegLimit = angleN.sub( HEMISPHERE_MAX_ANGLE );
+				hNeg.assign( hNeg.greaterThan( hNegLimit ).select( hNeg, hNegLimit ) );
 
 				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
 				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
