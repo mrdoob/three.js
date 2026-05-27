@@ -31,6 +31,7 @@ let _rendererState;
  * ```
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
+ * Reference: [Slides Deck for Practical Real-Time Strategies for Accurate Indirect Occlusion](https://blog.selfshadow.com/publications/s2016-shading-course/activision/s2016_pbs_activision_occlusion.pdf).
  *
  * @augments TempNode
  * @three_import import { ao } from 'three/addons/tsl/display/GTAONode.js';
