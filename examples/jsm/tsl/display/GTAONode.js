@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, mix, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -122,17 +122,18 @@ class GTAONode extends TempNode {
 		this.thickness = uniform( 1 );
 
 		/**
-		 * Another option to tweak the occlusion. The recommended range is
-		 * `[1,2]` for attenuating the AO.
+		 * @deprecated Since the switch to quadratic ray stepping with sphere falloff,
+		 * step distribution is fixed at `t²` and this uniform has no effect. Kept for
+		 * backward compatibility and will be removed in a future release.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.distanceExponent = uniform( 1 );
 
 		/**
-		 * The distance fall off value of the ambient occlusion.
-		 * A lower value leads to a larger AO effect. The value
-		 * should lie in the range `[0,1]`.
+		 * @deprecated Replaced by the sphere falloff `mix( max( h, sH ), h, (dist/radius)² )`,
+		 * which has no tunable parameter. Kept for backward compatibility and will be
+		 * removed in a future release.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -367,14 +368,18 @@ class GTAONode extends TempNode {
 
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
+			// Per-step phase jitter for spatio-temporal decorrelation.
+			// (Activision GTAO slides 86, 92–93 "Noise Distribution".)
+			const stepJitter = mul( 0.5, noiseTexel.w ).toVar();
+
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
-				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
-				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
+				const sampleDir = vec3( cos( angle ), sin( angle ), 0 ).toVar();
+				sampleDir.assign( normalize( kernelMatrix.mul( sampleDir ) ) );
 
 				const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
-				const sliceBitangent = normalize( cross( sampleDir.xyz, viewDir ) ).toVar();
+				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toVar();
 				const sliceTangent = cross( sliceBitangent, viewDir ).toVar();
 
 				// Project the view normal onto the slice plane (remove component along sliceBitangent).
@@ -397,7 +402,11 @@ class GTAONode extends TempNode {
 
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
-					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
+					// near-field. (Blender's Eevee adaptation)
+					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
+					const sampleDist = t.mul( t );
+					const sampleViewOffset = sampleDir.mul( radiusToUse ).mul( sampleDist );
 
 					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
@@ -407,11 +416,21 @@ class GTAONode extends TempNode {
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
+					const lenX = viewDeltaX.length().toVar();
+
+					// Manual normalize guards against zero-length delta.
+					const sHX = dot( viewDir, viewDeltaX.div( max( lenX, float( 0.0001 ) ) ) );
+
+					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
+					// back toward the prior horizon as it approaches the radius boundary.
+					// (squared variant of the paper's near-field attenuation;
+					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+					const distFacX = clamp( lenX.div( radiusToUse ), 0, 1 );
+					const distFacSqX = distFacX.mul( distFacX );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaX ) );
-						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
 					} );
 
@@ -421,11 +440,16 @@ class GTAONode extends TempNode {
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
+					const lenY = viewDeltaY.length().toVar();
+
+					const sHY = dot( viewDir, viewDeltaY.div( max( lenY, float( 0.0001 ) ) ) );
+
+					const distFacY = clamp( lenY.div( radiusToUse ), 0, 1 );
+					const distFacSqY = distFacY.mul( distFacY );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaY ) );
-						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
 					} );
 
