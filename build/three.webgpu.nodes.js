@@ -45972,7 +45972,7 @@ const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] 
 	const t = float( t_immutable ).toVar();
 	const b = bool( b_immutable ).toVar();
 
-	return select( b, t, f );
+	return select( b, t, f ).uniformFlow();
 
 } ).setLayout( {
 	name: 'mx_select',
@@ -45989,7 +45989,7 @@ const mx_negate_if = /*@__PURE__*/ Fn( ( [ val_immutable, b_immutable ] ) => {
 	const b = bool( b_immutable ).toVar();
 	const val = float( val_immutable ).toVar();
 
-	return select( b, val.negate(), val );
+	return select( b, val.negate(), val ).uniformFlow();
 
 } ).setLayout( {
 	name: 'mx_negate_if',
@@ -51869,6 +51869,8 @@ class NodeBuilder {
 		//
 
 		let data = nodeData[ shaderStage ];
+
+		if ( this.subBuildLayers.length === 0 ) return data;
 
 		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
 		const subBuild = this.getClosestSubBuild( subBuilds );
@@ -65465,7 +65467,6 @@ let _color4 = null;
  * implement the interface.
  *
  * @abstract
- * @private
  */
 class Backend {
 
