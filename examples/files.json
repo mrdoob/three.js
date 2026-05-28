@@ -360,6 +360,7 @@
 		"webgpu_lights_custom",
 		"webgpu_lights_dynamic",
 		"webgpu_lights_ies_spotlight",
+		"webgpu_lightprobes_sponza",
 		"webgpu_lights_phong",
 		"webgpu_lights_physical",
 		"webgpu_lights_pointlights",
