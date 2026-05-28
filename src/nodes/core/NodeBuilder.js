@@ -2434,33 +2434,70 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		const shared = shaderNode.layout ? shaderNode.layout.shared !== false : true;
-		const cacheKey = shared ? this.renderer.backend : this;
+		const backend = this.renderer.backend;
 
-		let cache = _functionNodeCache.get( cacheKey );
+		let backendCache = _functionNodeCache.get( backend );
 
-		if ( cache === undefined ) {
+		if ( backendCache !== undefined ) {
 
-			cache = new WeakMap();
-			_functionNodeCache.set( cacheKey, cache );
+			const fn = backendCache.get( shaderNode );
+
+			if ( fn !== undefined ) {
+
+				return fn;
+
+			}
 
 		}
 
-		let fn = cache.get( shaderNode );
+		let builderCache = _functionNodeCache.get( this );
 
-		if ( fn === undefined ) {
+		if ( builderCache !== undefined ) {
 
-			fn = new FunctionNode();
+			const fn = builderCache.get( shaderNode );
 
-			const previous = this.currentFunctionNode;
+			if ( fn !== undefined ) {
 
-			this.currentFunctionNode = fn;
+				return fn;
 
-			fn.code = this.buildFunctionCode( shaderNode );
+			}
 
-			this.currentFunctionNode = previous;
+		}
 
-			cache.set( shaderNode, fn );
+		const fn = new FunctionNode();
+
+		const previous = this.currentFunctionNode;
+
+		this.currentFunctionNode = fn;
+
+		fn.code = this.buildFunctionCode( shaderNode );
+
+		this.currentFunctionNode = previous;
+
+		const nodeData = this.getDataFromNode( fn );
+		const hasUniform = nodeData.hasUniform;
+
+		if ( hasUniform ) {
+
+			if ( builderCache === undefined ) {
+
+				builderCache = new WeakMap();
+				_functionNodeCache.set( this, builderCache );
+
+			}
+
+			builderCache.set( shaderNode, fn );
+
+		} else {
+
+			if ( backendCache === undefined ) {
+
+				backendCache = new WeakMap();
+				_functionNodeCache.set( this.renderer.backend, backendCache );
+
+			}
+
+			backendCache.set( shaderNode, fn );
 
 		}
 
