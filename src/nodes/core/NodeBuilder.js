@@ -2468,14 +2468,12 @@ class NodeBuilder {
 
 			if ( fn !== undefined ) {
 
-				const nodeData = this.getDataFromNode( fn );
-				const hasUniform = nodeData.hasUniform;
+				const cachePerMaterial = this.getDataFromNode( fn ).cachePerMaterial;
 
-				if ( hasUniform && this.currentFunctionNode !== null ) {
+				if ( cachePerMaterial && this.currentFunctionNode !== null ) {
 
 					// Propagate the flag to the current function even when a cache hit.
-					const nodeData = this.getDataFromNode( this.currentFunctionNode );
-					nodeData.hasUniform = true;
+					this.getDataFromNode( this.currentFunctionNode ).cachePerMaterial = true;
 
 				}
 
@@ -2495,16 +2493,14 @@ class NodeBuilder {
 
 		this.currentFunctionNode = previous;
 
-		const nodeData = this.getDataFromNode( fn );
-		const hasUniform = nodeData.hasUniform;
+		const cachePerMaterial = this.getDataFromNode( fn ).cachePerMaterial;
 
-		if ( hasUniform ) {
+		if ( cachePerMaterial ) {
 
 			if ( previous !== null ) {
 
 				// Propagate the flag to the current function.
-				const nodeData = this.getDataFromNode( previous );
-				nodeData.hasUniform = true;
+				this.getDataFromNode( previous ).cachePerMaterial = true;
 
 			}
 

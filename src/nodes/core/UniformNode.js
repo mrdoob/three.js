@@ -181,7 +181,7 @@ class UniformNode extends InputNode {
 		if ( builder.currentFunctionNode !== null ) {
 
 			const nodeData = builder.getDataFromNode( builder.currentFunctionNode );
-			nodeData.hasUniform = true;
+			nodeData.cachePerMaterial = true;
 
 		}
 
