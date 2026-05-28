@@ -2468,6 +2468,17 @@ class NodeBuilder {
 
 			if ( fn !== undefined ) {
 
+				const nodeData = this.getDataFromNode( fn );
+				const hasUniform = nodeData.hasUniform;
+
+				if ( hasUniform && this.currentFunctionNode !== null ) {
+
+					// Propagate the flag to the current function even when a cache hit.
+					const nodeData = this.getDataFromNode( this.currentFunctionNode );
+					nodeData.hasUniform = true;
+
+				}
+
 				return fn;
 
 			}
@@ -2488,6 +2499,14 @@ class NodeBuilder {
 		const hasUniform = nodeData.hasUniform;
 
 		if ( hasUniform ) {
+
+			if ( previous !== null ) {
+
+				// Propagate the flag to the current function.
+				const nodeData = this.getDataFromNode( previous );
+				nodeData.hasUniform = true;
+
+			}
 
 			builderCache.set( shaderNode, fn );
 
