@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 // Path-based categories (used as fallback for non-JS files)
 // Ordered from most specific to least specific
@@ -46,11 +46,11 @@ const skipAuthors = new Set( [ 'dependabot', 'app/renovate', 'renovate[bot]' ] )
 // Categories that map to sections
 const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build' ];
 
-function exec( command ) {
+function exec( file, args ) {
 
 	try {
 
-		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 } ).trim();
+		return execFileSync( file, args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, stdio: [ 'ignore', 'pipe', 'ignore' ] } ).trim();
 
 	} catch ( error ) {
 
@@ -63,7 +63,7 @@ function exec( command ) {
 function getCommitsBetweenTags( fromTag, toTag ) {
 
 	// Get commits between tags (exclusive fromTag, inclusive toTag), oldest first, excluding merge commits
-	const log = exec( `git log ${fromTag}..${toTag} --no-merges --reverse --format="%H|%s|%an"` );
+	const log = exec( 'git', [ 'log', `${fromTag}..${toTag}`, '--no-merges', '--reverse', '--format=%H|%s|%an' ] );
 
 	if ( ! log ) return [];
 
@@ -78,21 +78,21 @@ function getCommitsBetweenTags( fromTag, toTag ) {
 
 function getChangedFiles( hash ) {
 
-	const files = exec( `git diff-tree --no-commit-id --name-only -r ${hash}` );
+	const files = exec( 'git', [ 'diff-tree', '--no-commit-id', '--name-only', '-r', hash ] );
 	return files ? files.split( '\n' ).filter( Boolean ) : [];
 
 }
 
 function getCoAuthorsFromPR( prNumber ) {
 
-	const result = exec( `gh pr view ${prNumber} --json commits --jq '[.commits[].authors[].login] | unique | .[]' 2>/dev/null` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'commits', '--jq', '[.commits[].authors[].login] | unique | .[]' ] );
 	return result ? result.split( '\n' ).filter( Boolean ) : [];
 
 }
 
 function getCoAuthorsFromCommit( hash ) {
 
-	const body = exec( `git log -1 --format="%b" ${hash}` );
+	const body = exec( 'git', [ 'log', '-1', '--format=%b', hash ] );
 	const regex = /Co-authored-by:\s*([^<]+)\s*<[^>]+>/gi;
 	return [ ...body.matchAll( regex ) ].map( m => normalizeAuthor( m[ 1 ].trim() ) );
 
@@ -108,7 +108,7 @@ function extractPRNumber( subject ) {
 
 function getPRInfo( prNumber ) {
 
-	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}' 2>/dev/null` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'author,title,files', '--jq', '{author: .author.login, title: .title, files: [.files[].path]}' ] );
 
 	try {
 
@@ -354,7 +354,7 @@ function addToGroup( groups, key, value ) {
 
 function validateEnvironment( tag ) {
 
-	if ( ! exec( 'gh --version 2>/dev/null' ) ) {
+	if ( ! exec( 'gh', [ '--version' ] ) ) {
 
 		console.error( 'GitHub CLI (gh) is required but not installed.' );
 		console.error( 'Install from: https://cli.github.com/' );
@@ -371,7 +371,7 @@ function validateEnvironment( tag ) {
 	}
 
 	// Verify the tag exists
-	const resolved = exec( `git rev-parse --verify ${tag}` );
+	const resolved = exec( 'git', [ 'rev-parse', '--verify', tag ] );
 
 	if ( ! resolved ) {
 
@@ -384,7 +384,7 @@ function validateEnvironment( tag ) {
 	const version = parseInt( tag.replace( 'r', '' ) );
 	const previousTag = `r${version - 1}`;
 
-	const previousResolved = exec( `git rev-parse --verify ${previousTag}` );
+	const previousResolved = exec( 'git', [ 'rev-parse', '--verify', previousTag ] );
 
 	if ( ! previousResolved ) {
 

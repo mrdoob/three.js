@@ -237,66 +237,90 @@
 
 					isBaking = true;
 
-					do {
+					try {
 
-						bakeQueued = false;
+						do {
 
-						if ( probes ) {
+							bakeQueued = false;
 
-							scene.remove( probes );
-							probes.dispose();
+							const previousProbes = probes;
+							const previousHelperVisible = probesHelper ? probesHelper.visible : false;
+							const nextProbes = new LightProbeGrid(
+								params.sizeX, params.sizeY, params.sizeZ,
+								params.countX, params.countY, params.countZ
+							);
 
-						}
+							nextProbes.position.set( params.boundsX, params.boundsY, params.boundsZ );
+							scene.add( nextProbes );
+							probeNode.probes = nextProbes;
 
-						probes = new LightProbeGrid(
-							params.sizeX, params.sizeY, params.sizeZ,
-							params.countX, params.countY, params.countZ
-						);
-						probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
-						scene.add( probes );
-						probeNode.probes = probes;
+							if ( probesHelper ) probesHelper.visible = false;
 
-						if ( probesHelper ) probesHelper.visible = false;
+							const currentInspector = renderer.inspector;
+							const currentAnimationLoop = renderer.getAnimationLoop();
+							renderer.inspector = new THREE.InspectorBase();
 
-						const currentInspector = renderer.inspector;
-						renderer.inspector = new THREE.InspectorBase();
+							try {
 
-						try {
+								await renderer.setAnimationLoop( null );
+								await bakeLightProbeGrid( renderer, scene, nextProbes, {
+									cubemapSize: 32,
+									near: 0.05,
+									far: probeFar,
+									bounces: params.bounces,
+									lightProbeNode: probeNode
+								} );
 
-							await bakeLightProbeGrid( renderer, scene, probes, {
-								cubemapSize: 32,
-								near: 0.05,
-								far: probeFar,
-								bounces: params.bounces,
-								lightProbeNode: probeNode
-							} );
+							} catch ( error ) {
 
-						} finally {
+								scene.remove( nextProbes );
+								nextProbes.dispose();
+								probeNode.probes = previousProbes;
+								probeNode.update();
 
-							renderer.inspector = currentInspector;
+								if ( probesHelper ) probesHelper.visible = previousHelperVisible;
 
-						}
+								throw error;
 
-						probes.visible = params.enabled;
-						probeNode.update();
+							} finally {
 
-						if ( ! probesHelper ) {
+								renderer.inspector = currentInspector;
+								await renderer.setAnimationLoop( currentAnimationLoop );
 
-							probesHelper = new LightProbeGridHelper( probes, params.probeSize );
-							probesHelper.visible = params.showProbes;
-							scene.add( probesHelper );
+							}
 
-						} else {
+							nextProbes.visible = params.enabled;
+							probes = nextProbes;
+							probeNode.update();
 
-							probesHelper.probes = probes;
-							probesHelper.update();
-							probesHelper.visible = params.showProbes;
+							if ( previousProbes ) {
 
-						}
+								scene.remove( previousProbes );
+								previousProbes.dispose();
 
-					} while ( bakeQueued );
+							}
 
-					isBaking = false;
+							if ( ! probesHelper ) {
+
+								probesHelper = new LightProbeGridHelper( probes, params.probeSize );
+								probesHelper.visible = params.showProbes;
+								scene.add( probesHelper );
+
+							} else {
+
+								probesHelper.probes = probes;
+								probesHelper.update();
+								probesHelper.visible = params.showProbes;
+
+							}
+
+						} while ( bakeQueued );
+
+					} finally {
+
+						isBaking = false;
+
+					}
 
 				}
 

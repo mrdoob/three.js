@@ -3,6 +3,7 @@ import {
 	CubeCamera,
 	CubeRenderTarget,
 	Data3DTexture,
+	FloatType,
 	HalfFloatType,
 	LinearFilter,
 	LightingNode,
@@ -135,7 +136,7 @@ class LightProbeGrid extends Object3D {
 
 		const rt = new RenderTarget3D( res.x, res.y, atlasDepth, {
 			format: RGBAFormat,
-			type: HalfFloatType,
+			type: FloatType,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
 			generateMipmaps: false,
@@ -308,88 +309,109 @@ async function bakeLightProbeGrid( renderer, scene, probes, options = {} ) {
 	const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
 	const currentVisible = probes.visible;
 
-	if ( currentMatrixWorldAutoUpdate === true ) {
-
-		scene.updateMatrixWorld( true );
-		scene.matrixWorldAutoUpdate = false;
-
-	}
-
 	const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
-	renderer.shadowMap.autoUpdate = false;
-	renderer.shadowMap.needsUpdate = true;
 
-	_ensureRepackResources();
+	try {
 
-	const paddedSlices = res.z + 2 * ATLAS_PADDING;
-	const rt = probes._renderTarget;
+		if ( currentMatrixWorldAutoUpdate === true ) {
 
-	for ( let pass = 0; pass <= bounces; pass ++ ) {
-
-		probes.visible = pass > 0;
-
-		if ( lightProbeNode !== null ) {
-
-			lightProbeNode.update();
+			scene.updateMatrixWorld( true );
+			scene.matrixWorldAutoUpdate = false;
 
 		}
 
-		renderer.autoClear = currentAutoClear;
-		renderer.setViewport( 0, 0, 9, totalProbes );
-		renderer.setScissor( 0, 0, 9, totalProbes );
-		renderer.setScissorTest( false );
-		renderer.setRenderTarget( batchTarget );
-		batchTarget.scissorTest = false;
-		batchTarget.viewport.set( 0, 0, 9, totalProbes );
-		renderer.clear();
+		renderer.shadowMap.autoUpdate = false;
+		renderer.shadowMap.needsUpdate = true;
 
-		batchTarget.scissorTest = true;
-		renderer.setScissorTest( true );
+		_ensureRepackResources();
 
-		for ( let iz = 0; iz < res.z; iz ++ ) {
+		const paddedSlices = res.z + 2 * ATLAS_PADDING;
+		const rt = probes._renderTarget;
 
-			for ( let iy = 0; iy < res.y; iy ++ ) {
+		for ( let pass = 0; pass <= bounces; pass ++ ) {
 
-				for ( let ix = 0; ix < res.x; ix ++ ) {
+			probes.visible = pass > 0;
 
-					const probeIndex = ix + iy * res.x + iz * res.x * res.y;
+			if ( lightProbeNode !== null ) {
 
-					probes.getProbePosition( ix, iy, iz, _position );
-					cubeCamera.position.copy( _position );
-					renderer.autoClear = currentAutoClear;
-					cubeCamera.update( renderer, scene );
+				lightProbeNode.update();
 
-					_shEnvMapNode.value = cubeRenderTarget.texture;
-					_quadMesh.material = _shMaterial;
-					renderer.autoClear = false;
-					renderer.setRenderTarget( batchTarget );
-					renderer.setViewport( 0, probeIndex, 9, 1 );
-					renderer.setScissor( 0, probeIndex, 9, 1 );
-					renderer.setScissorTest( true );
-					batchTarget.viewport.set( 0, probeIndex, 9, 1 );
-					batchTarget.scissor.set( 0, probeIndex, 9, 1 );
-					_quadMesh.render( renderer );
+			}
+
+			renderer.autoClear = currentAutoClear;
+			renderer.setViewport( 0, 0, 9, totalProbes );
+			renderer.setScissor( 0, 0, 9, totalProbes );
+			renderer.setScissorTest( false );
+			renderer.setRenderTarget( batchTarget );
+			batchTarget.scissorTest = false;
+			batchTarget.viewport.set( 0, 0, 9, totalProbes );
+			renderer.clear();
+
+			batchTarget.scissorTest = true;
+			renderer.setScissorTest( true );
+
+			for ( let iz = 0; iz < res.z; iz ++ ) {
+
+				for ( let iy = 0; iy < res.y; iy ++ ) {
+
+					for ( let ix = 0; ix < res.x; ix ++ ) {
+
+						const probeIndex = ix + iy * res.x + iz * res.x * res.y;
+
+						probes.getProbePosition( ix, iy, iz, _position );
+						cubeCamera.position.copy( _position );
+						renderer.autoClear = currentAutoClear;
+						cubeCamera.update( renderer, scene );
+
+						_shEnvMapNode.value = cubeRenderTarget.texture;
+						_quadMesh.material = _shMaterial;
+						renderer.autoClear = false;
+						renderer.setRenderTarget( batchTarget );
+						renderer.setViewport( 0, probeIndex, 9, 1 );
+						renderer.setScissor( 0, probeIndex, 9, 1 );
+						renderer.setScissorTest( true );
+						batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+						batchTarget.scissor.set( 0, probeIndex, 9, 1 );
+						_quadMesh.render( renderer );
+
+					}
 
 				}
 
 			}
 
-		}
+			rt.scissorTest = false;
+			renderer.autoClear = false;
 
-		rt.scissorTest = false;
-		renderer.autoClear = false;
+			for ( let textureIndex = 0; textureIndex < 7; textureIndex ++ ) {
 
-		for ( let textureIndex = 0; textureIndex < 7; textureIndex ++ ) {
+				const material = _repackMaterials[ textureIndex ];
+				material.batchTextureNode.value = batchTarget.texture;
+				material.resolutionNode.value.copy( res );
+				_quadMesh.material = material;
 
-			const material = _repackMaterials[ textureIndex ];
-			material.batchTextureNode.value = batchTarget.texture;
-			material.resolutionNode.value.copy( res );
-			_quadMesh.material = material;
+				for ( let iz = 0; iz < res.z; iz ++ ) {
 
-			for ( let iz = 0; iz < res.z; iz ++ ) {
+					material.sliceZNode.value = iz;
+					renderer.setRenderTarget( rt, textureIndex * paddedSlices + ATLAS_PADDING + iz );
+					renderer.setViewport( 0, 0, res.x, res.y );
+					renderer.setScissor( 0, 0, res.x, res.y );
+					renderer.setScissorTest( false );
+					rt.viewport.set( 0, 0, res.x, res.y );
+					_quadMesh.render( renderer );
 
-				material.sliceZNode.value = iz;
-				renderer.setRenderTarget( rt, textureIndex * paddedSlices + ATLAS_PADDING + iz );
+				}
+
+				material.sliceZNode.value = 0;
+				renderer.setRenderTarget( rt, textureIndex * paddedSlices );
+				renderer.setViewport( 0, 0, res.x, res.y );
+				renderer.setScissor( 0, 0, res.x, res.y );
+				renderer.setScissorTest( false );
+				rt.viewport.set( 0, 0, res.x, res.y );
+				_quadMesh.render( renderer );
+
+				material.sliceZNode.value = res.z - 1;
+				renderer.setRenderTarget( rt, textureIndex * paddedSlices + ATLAS_PADDING + res.z );
 				renderer.setViewport( 0, 0, res.x, res.y );
 				renderer.setScissor( 0, 0, res.x, res.y );
 				renderer.setScissorTest( false );
@@ -398,34 +420,20 @@ async function bakeLightProbeGrid( renderer, scene, probes, options = {} ) {
 
 			}
 
-			material.sliceZNode.value = 0;
-			renderer.setRenderTarget( rt, textureIndex * paddedSlices );
-			renderer.setViewport( 0, 0, res.x, res.y );
-			renderer.setScissor( 0, 0, res.x, res.y );
-			renderer.setScissorTest( false );
-			rt.viewport.set( 0, 0, res.x, res.y );
-			_quadMesh.render( renderer );
-
-			material.sliceZNode.value = res.z - 1;
-			renderer.setRenderTarget( rt, textureIndex * paddedSlices + ATLAS_PADDING + res.z );
-			renderer.setViewport( 0, 0, res.x, res.y );
-			renderer.setScissor( 0, 0, res.x, res.y );
-			renderer.setScissorTest( false );
-			rt.viewport.set( 0, 0, res.x, res.y );
-			_quadMesh.render( renderer );
-
 		}
 
-	}
+	} finally {
 
-	probes.visible = currentVisible;
-	renderer.autoClear = currentAutoClear;
-	renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-	scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
-	renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
-	renderer.setViewport( _currentViewport );
-	renderer.setScissor( _currentScissor );
-	renderer.setScissorTest( currentScissorTest );
+		probes.visible = currentVisible;
+		renderer.autoClear = currentAutoClear;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
+		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
+		renderer.setViewport( _currentViewport );
+		renderer.setScissor( _currentScissor );
+		renderer.setScissorTest( currentScissorTest );
+
+	}
 
 }
 
@@ -468,7 +476,7 @@ function _ensureBatchTarget( totalProbes ) {
 		if ( _batchTarget !== null ) _batchTarget.dispose();
 
 		_batchTarget = new RenderTarget( 9, totalProbes, {
-			type: HalfFloatType,
+			type: FloatType,
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			depthBuffer: false

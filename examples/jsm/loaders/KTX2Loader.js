@@ -971,6 +971,8 @@ KTX2Loader.BasisWorker = function () {
 
 const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGBFormat, RGFormat, RedFormat ] );
 
+const NORMALIZED_VK_FORMATS = new Set( [ VK_FORMAT_R16G16B16A16_UNORM ] );
+
 const FORMAT_MAP = {
 
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
@@ -1220,6 +1222,7 @@ async function createRawTexture( container ) {
 		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
 		texture.magFilter = NearestFilter;
 		texture.generateMipmaps = container.levelCount === 0;
+		texture.normalized = NORMALIZED_VK_FORMATS.has( vkFormat );
 
 	} else {
 
