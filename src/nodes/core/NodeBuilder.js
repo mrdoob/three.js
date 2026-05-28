@@ -2438,7 +2438,12 @@ class NodeBuilder {
 
 		let backendCache = _functionNodeCache.get( backend );
 
-		if ( backendCache !== undefined ) {
+		if ( backendCache === undefined ) {
+
+			backendCache = new WeakMap();
+			_functionNodeCache.set( backend, backendCache );
+
+		} else {
 
 			const fn = backendCache.get( shaderNode );
 
@@ -2452,7 +2457,12 @@ class NodeBuilder {
 
 		let builderCache = _functionNodeCache.get( this );
 
-		if ( builderCache !== undefined ) {
+		if ( builderCache === undefined ) {
+
+			builderCache = new WeakMap();
+			_functionNodeCache.set( this, builderCache );
+
+		} else {
 
 			const fn = builderCache.get( shaderNode );
 
@@ -2479,23 +2489,9 @@ class NodeBuilder {
 
 		if ( hasUniform ) {
 
-			if ( builderCache === undefined ) {
-
-				builderCache = new WeakMap();
-				_functionNodeCache.set( this, builderCache );
-
-			}
-
 			builderCache.set( shaderNode, fn );
 
 		} else {
-
-			if ( backendCache === undefined ) {
-
-				backendCache = new WeakMap();
-				_functionNodeCache.set( this.renderer.backend, backendCache );
-
-			}
 
 			backendCache.set( shaderNode, fn );
 
