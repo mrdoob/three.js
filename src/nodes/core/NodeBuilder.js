@@ -2434,14 +2434,15 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		const backend = this.renderer.backend;
+		const shared = shaderNode.layout ? shaderNode.layout.shared !== false : true;
+		const cacheKey = shared ? this.renderer.backend : this;
 
-		let cache = _functionNodeCache.get( backend );
+		let cache = _functionNodeCache.get( cacheKey );
 
 		if ( cache === undefined ) {
 
 			cache = new WeakMap();
-			_functionNodeCache.set( backend, cache );
+			_functionNodeCache.set( cacheKey, cache );
 
 		}
 
