@@ -83,7 +83,7 @@
 				sky.mieDirectionalG.value = 0.8;
 				scene.add( sky );
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
