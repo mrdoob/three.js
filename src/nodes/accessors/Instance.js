@@ -29,7 +29,8 @@ const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
 function createInstanceMatrixNode( builder, instanceMatrix, count ) {
 
 	let instanceMatrixNode;
-	const isStorageMatrix = instanceMatrix && instanceMatrix.isStorageInstancedBufferAttribute === true;
+
+	const isStorageMatrix = instanceMatrix.isStorageInstancedBufferAttribute === true;
 
 	if ( isStorageMatrix ) {
 
@@ -126,7 +127,7 @@ export const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], 
 	// get numeric value (non-node)
 	count = count.value;
 
-	const isStorageMatrix = matrices && matrices.isStorageInstancedBufferAttribute === true;
+	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
 	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, count );
