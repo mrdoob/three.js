@@ -464,7 +464,7 @@ class GTAONode extends TempNode {
 
 			// Per-step phase jitter for spatio-temporal decorrelation.
 			// (Activision GTAO slides 86, 92–93 "Noise Distribution".)
-			const stepJitter = mul( 0.5, noise2 ).toVar();
+			const stepJitter = noise2.toVar();
 
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
