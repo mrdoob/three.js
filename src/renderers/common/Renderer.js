@@ -3493,6 +3493,8 @@ class Renderer {
 		let materialPositionNode;
 		let materialSide;
 
+		const previousSourceMaterial = this._currentSourceMaterial;
+
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
@@ -3576,9 +3578,9 @@ class Renderer {
 			scene.overrideMaterial.positionNode = materialPositionNode;
 			scene.overrideMaterial.side = materialSide;
 
-			this._currentSourceMaterial = null;
-
 		}
+
+		this._currentSourceMaterial = previousSourceMaterial;
 
 		//
 
