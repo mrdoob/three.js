@@ -1,13 +1,12 @@
-import Node from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, Fn, ivec2, int, If } from '../tsl/TSLBase.js';
-import { uniform } from '../core/UniformNode.js';
+
+import { float, Fn, ivec2, int, If, uniform } from '../tsl/TSLBase.js';
 import { reference } from './ReferenceNode.js';
+import { Loop } from '../utils/LoopNode.js';
+import { OnObjectUpdate } from '../utils/EventNode.js';
+import { textureLoad } from './TextureNode.js';
 import { positionLocal } from './Position.js';
 import { normalLocal } from './Normal.js';
-import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
-import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -16,7 +15,20 @@ import { FloatType } from '../../constants.js';
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
+const _morphBaseInfluences = /*@__PURE__*/ new WeakMap();
 
+/**
+ * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+ *
+ * @param {Object} params - The parameter object.
+ * @param {Node<texture>} params.bufferMap - The morph target data array texture.
+ * @param {Node<float>} params.influence - The target's animation influence weight.
+ * @param {number} params.stride - The vertex data stride (e.g. 1 or 2).
+ * @param {Node<int>} params.width - The texture width limit.
+ * @param {Node<int>} params.depth - The target layer index (morph target index).
+ * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal).
+ * @returns {Node<vec3>} The scaled morph target translation value.
+ */
 const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
@@ -30,6 +42,12 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 
 } );
 
+/**
+ * Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
+ *
+ * @param {BufferGeometry} geometry - The geometry to parse.
+ * @returns {Object} The resolved morph targets texture data mapping entry.
+ */
 function getEntry( geometry ) {
 
 	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
@@ -157,154 +175,108 @@ function getEntry( geometry ) {
 }
 
 /**
- * This node implements the vertex transformation shader logic which is required
- * for morph target animation.
+ * TSL object representing a reference to the mesh's morphTargetInfluences array.
  *
- * @augments Node
+ * @type {ReferenceNode<float>}
  */
-class MorphNode extends Node {
+export const morphTargetInfluences = /*@__PURE__*/ reference( 'morphTargetInfluences', 'float' );
 
-	static get type() {
+/**
+ * TSL function representing the vertex shader morph targets blend setup.
+ * Dynamically computes morph targets weights and updates positionLocal and normalLocal in-place.
+ *
+ * @tsl
+ * @function
+ * @param {Mesh} mesh - The mesh.
+ */
+export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
-		return 'MorphNode';
+	const { geometry } = mesh;
 
-	}
+	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
+	const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
 
-	/**
-	 * Constructs a new morph node.
-	 *
-	 * @param {Mesh} mesh - The mesh holding the morph targets.
-	 */
-	constructor( mesh ) {
+	const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
+	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
 
-		super( 'void' );
+	if ( morphTargetsCount === 0 ) return;
 
-		/**
-		 * The mesh holding the morph targets.
-		 *
-		 * @type {Mesh}
-		 */
-		this.mesh = mesh;
+	let morphBaseInfluence = _morphBaseInfluences.get( mesh );
 
-		/**
-		 * A uniform node which represents the morph base influence value.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.morphBaseInfluence = uniform( 1 );
+	if ( ! morphBaseInfluence ) {
 
-		/**
-		 * The update type overwritten since morph nodes are updated per object.
-		 *
-		 * @type {string}
-		 */
-		this.updateType = NodeUpdateType.OBJECT;
+		morphBaseInfluence = uniform( 1 );
+		_morphBaseInfluences.set( mesh, morphBaseInfluence );
 
-	}
+		OnObjectUpdate( ( { object } ) => {
 
-	/**
-	 * Setups the morph node by assigning the transformed vertex data to predefined node variables.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
+			if ( object.geometry.morphTargetsRelative ) {
 
-		const { geometry } = builder;
-
-		const hasMorphPosition = geometry.morphAttributes.position !== undefined;
-		const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
-
-		const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
-		const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
-
-		// nodes
-
-		const { texture: bufferMap, stride, size } = getEntry( geometry );
-
-		if ( hasMorphPosition === true ) positionLocal.mulAssign( this.morphBaseInfluence );
-		if ( hasMorphNormals === true ) normalLocal.mulAssign( this.morphBaseInfluence );
-
-		const width = int( size.width );
-
-		Loop( morphTargetsCount, ( { i } ) => {
-
-			const influence = float( 0 ).toVar();
-
-			if ( this.mesh.count > 1 && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
-
-				influence.assign( textureLoad( this.mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
+				morphBaseInfluence.value = 1;
 
 			} else {
 
-				influence.assign( reference( 'morphTargetInfluences', 'float' ).element( i ).toVar() );
+				morphBaseInfluence.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
 
 			}
-
-			If( influence.notEqual( 0 ), () => {
-
-				if ( hasMorphPosition === true ) {
-
-					positionLocal.addAssign( getMorph( {
-						bufferMap,
-						influence,
-						stride,
-						width,
-						depth: i,
-						offset: int( 0 )
-					} ) );
-
-				}
-
-				if ( hasMorphNormals === true ) {
-
-					normalLocal.addAssign( getMorph( {
-						bufferMap,
-						influence,
-						stride,
-						width,
-						depth: i,
-						offset: int( 1 )
-					} ) );
-
-				}
-
-			} );
 
 		} );
 
 	}
 
-	/**
-	 * Updates the state of the morphed mesh by updating the base influence.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	update( /*frame*/ ) {
+	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-		const morphBaseInfluence = this.morphBaseInfluence;
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBaseInfluence );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBaseInfluence );
 
-		if ( this.mesh.geometry.morphTargetsRelative ) {
+	const width = int( size.width );
 
-			morphBaseInfluence.value = 1;
+	Loop( morphTargetsCount, ( { i } ) => {
+
+		const influence = float( 0 ).toVar();
+
+		if ( mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined ) ) {
+
+			influence.assign( textureLoad( mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
 		} else {
 
-			morphBaseInfluence.value = 1 - this.mesh.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+			influence.assign( morphTargetInfluences.element( i ).toVar() );
 
 		}
 
-	}
+		If( influence.notEqual( 0 ), () => {
 
-}
+			if ( hasMorphPosition === true ) {
 
-export default MorphNode;
+				positionLocal.addAssign( getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 0 )
+				} ) );
 
-/**
- * TSL function for creating a morph node.
- *
- * @tsl
- * @function
- * @param {Mesh} mesh - The mesh holding the morph targets.
- * @returns {MorphNode}
- */
-export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode ).setParameterLength( 1 );
+			}
+
+			if ( hasMorphNormals === true ) {
+
+				normalLocal.addAssign( getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 1 )
+				} ) );
+
+			}
+
+		} );
+
+	} );
+
+}, 'void' );
+
+
