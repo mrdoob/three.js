@@ -662,6 +662,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * When an override material is in use, this property points to the current
+		 * source material during the rendering of a render object.
+		 *
+		 * @private
+		 * @type {?Material}
+		 * @default null
+		 */
+		this._currentSourceMaterial = null;
+
+		/**
 		 * Whether the renderer should render transparent render objects or not.
 		 *
 		 * @type {boolean}
@@ -3491,6 +3501,8 @@ class Renderer {
 
 		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
 
+			this._currentSourceMaterial = material;
+
 			const overrideMaterial = scene.overrideMaterial;
 
 			materialOverride = true;
@@ -3563,6 +3575,8 @@ class Renderer {
 			scene.overrideMaterial.depthNode = materialDepthNode;
 			scene.overrideMaterial.positionNode = materialPositionNode;
 			scene.overrideMaterial.side = materialSide;
+
+			this._currentSourceMaterial = null;
 
 		}
 
