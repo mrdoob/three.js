@@ -696,9 +696,10 @@ class WebGPUTextureUtils {
 	 * @param {number} width - The width of the copy.
 	 * @param {number} height - The height of the copy.
 	 * @param {number} faceIndex - The face index.
-	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 * @param {?(TypedArray|ReadbackBuffer)} [target=null] - The target buffer.
+	 * @return {Promise<TypedArray|ReadbackBuffer>} A Promise that resolves with the target or a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex, target = null ) {
 
 		const device = this.backend.device;
 
@@ -711,9 +712,91 @@ class WebGPUTextureUtils {
 		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
 
 		_bufferDescriptor.size = ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ); // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
-		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+		const byteLength = _bufferDescriptor.size;
 
-		const readBuffer = device.createBuffer( _bufferDescriptor );
+		let targetByteLength = 0;
+		let readBuffer;
+		if ( target !== null && target.isReadbackBuffer ) {
+
+			const readbackInfo = this.backend.get( target );
+
+			if ( target._mapped === true ) {
+
+				throw new Error( 'THREE.WebGPUTextureUtils: ReadbackBuffer must be released before being used again.' );
+
+			}
+
+			if ( target.maxByteLength < byteLength ) {
+
+				throw new Error( 'THREE.WebGPUTextureUtils: ReadbackBuffer maxByteLength is smaller than the required readback size.' );
+
+			}
+
+			target._mapped = true;
+
+			if ( readbackInfo.readBufferGPU === undefined ) {
+
+				_bufferDescriptor.label = `${ target.name }_readback`;
+				_bufferDescriptor.size = target.maxByteLength;
+				_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+				readBuffer = device.createBuffer( _bufferDescriptor );
+
+				const releaseCallback = () => {
+
+					target.buffer = null;
+					target._mapped = false;
+
+					readBuffer.unmap();
+
+				};
+
+				const disposeCallback = () => {
+
+					target.buffer = null;
+					target._mapped = false;
+
+					readBuffer.destroy();
+
+					this.backend.delete( target );
+
+					target.removeEventListener( 'release', releaseCallback );
+					target.removeEventListener( 'dispose', disposeCallback );
+
+				};
+
+				target.addEventListener( 'release', releaseCallback );
+				target.addEventListener( 'dispose', disposeCallback );
+
+				readbackInfo.readBufferGPU = readBuffer;
+
+			} else {
+
+				readBuffer = readbackInfo.readBufferGPU;
+
+			}
+
+		} else if ( target !== null ) {
+
+			targetByteLength = target.byteLength;
+
+			if ( targetByteLength < byteLength ) {
+
+				throw new Error( 'THREE.WebGPUTextureUtils: Target buffer is smaller than the required readback size.' );
+
+			}
+
+			_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			readBuffer = device.createBuffer( _bufferDescriptor );
+
+		} else {
+
+			_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+			readBuffer = device.createBuffer( _bufferDescriptor );
+
+		}
 
 		_bufferDescriptor.reset();
 
@@ -744,13 +827,34 @@ class WebGPUTextureUtils {
 
 		submit( device, encoder.finish() );
 
-		await readBuffer.mapAsync( GPUMapMode.READ );
+		await readBuffer.mapAsync( GPUMapMode.READ, 0, byteLength );
 
-		const buffer = readBuffer.getMappedRange().slice();
+		if ( target === null ) {
 
-		readBuffer.destroy();
+			const buffer = readBuffer.getMappedRange( 0, byteLength ).slice();
+			readBuffer.destroy();
 
-		return new typedArrayType( buffer );
+			return new typedArrayType( buffer );
+
+		} else if ( target.isReadbackBuffer ) {
+
+			target.buffer = readBuffer.getMappedRange( 0, byteLength );
+
+			return target;
+
+		} else {
+
+			const buffer = readBuffer.getMappedRange( 0, byteLength );
+			const targetBuffer = ArrayBuffer.isView( target ) ? target.buffer : target;
+			const byteOffset = ArrayBuffer.isView( target ) ? target.byteOffset : 0;
+			const targetArray = new Uint8Array( targetBuffer, byteOffset, targetByteLength );
+
+			targetArray.set( new Uint8Array( buffer ) );
+			readBuffer.destroy();
+
+			return target;
+
+		}
 
 	}
 

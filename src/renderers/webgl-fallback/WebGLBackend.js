@@ -1406,11 +1406,12 @@ class WebGLBackend extends Backend {
 	 * @param {number} width - The width of the copy.
 	 * @param {number} height - The height of the copy.
 	 * @param {number} faceIndex - The face index.
-	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 * @param {?(TypedArray|ReadbackBuffer)} [target=null] - The target buffer.
+	 * @return {Promise<TypedArray|ReadbackBuffer>} A Promise that resolves with the target or a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex, target = null ) {
 
-		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex, target );
 
 	}
 

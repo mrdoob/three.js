@@ -360,7 +360,11 @@ class Info {
 	 */
 	destroyReadbackBuffer( readbackBuffer ) {
 
-		const { size } = this.memoryMap.get( readbackBuffer );
+		const data = this.memoryMap.get( readbackBuffer );
+
+		if ( data === undefined ) return;
+
+		const { size } = data;
 		this.memoryMap.delete( readbackBuffer );
 
 		this.memory.readbackBuffers --;

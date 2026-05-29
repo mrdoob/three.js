@@ -231,6 +231,7 @@ import './src/objects/Sprite.tests.js';
 
 
 //src/renderers
+import './src/renderers/common/Renderer.tests.js';
 import './src/renderers/WebGL3DRenderTarget.tests.js';
 import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';

@@ -1928,26 +1928,7 @@ class Renderer {
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
-		// tally the memory for this readback buffer
-		if ( target !== null && target.isReadbackBuffer ) {
-
-			if ( this.info.memoryMap.has( target ) === false ) {
-
-				this.info.createReadbackBuffer( target );
-
-				const disposeInfo = () => {
-
-					target.removeEventListener( 'dispose', disposeInfo );
-
-					this.info.destroyReadbackBuffer( target );
-
-				};
-
-				target.addEventListener( 'dispose', disposeInfo );
-
-			}
-
-		}
+		this._trackReadbackBuffer( target );
 
 		if ( offset % 4 !== 0 || ( count > 0 && count % 4 !== 0 ) ) {
 
@@ -3034,13 +3015,53 @@ class Renderer {
 	 * @param {number} y - The `y` coordinate of the copy region's origin.
 	 * @param {number} width - The width of the copy region.
 	 * @param {number} height - The height of the copy region.
-	 * @param {number} [textureIndex=0] - The texture index of a MRT render target.
+	 * @param {?(TypedArray|ReadbackBuffer|number)} [target=null] - The target buffer. When a number is passed, it is treated as the texture index.
 	 * @param {number} [faceIndex=0] - The active cube face index.
-	 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
+	 * @param {number} [textureIndex=0] - The texture index of a MRT render target.
+	 * @return {Promise<TypedArray|ReadbackBuffer>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array or readback buffer.
 	 */
-	async readRenderTargetPixelsAsync( renderTarget, x, y, width, height, textureIndex = 0, faceIndex = 0 ) {
+	async readRenderTargetPixelsAsync( renderTarget, x, y, width, height, target = null, faceIndex = 0, textureIndex = 0 ) {
 
-		return this.backend.copyTextureToBuffer( renderTarget.textures[ textureIndex ], x, y, width, height, faceIndex );
+		if ( typeof target === 'number' ) {
+
+			textureIndex = target;
+			target = null;
+
+		}
+
+		this._trackReadbackBuffer( target );
+
+		return this.backend.copyTextureToBuffer( renderTarget.textures[ textureIndex ], x, y, width, height, faceIndex, target );
+
+	}
+
+	/**
+	 * Tracks readback buffer memory.
+	 *
+	 * @private
+	 * @param {?ReadbackBuffer} target - The readback buffer to track.
+	 */
+	_trackReadbackBuffer( target ) {
+
+		if ( target !== null && target.isReadbackBuffer ) {
+
+			if ( this.info.memoryMap.has( target ) === false ) {
+
+				this.info.createReadbackBuffer( target );
+
+				const disposeInfo = () => {
+
+					target.removeEventListener( 'dispose', disposeInfo );
+
+					this.info.destroyReadbackBuffer( target );
+
+				};
+
+				target.addEventListener( 'dispose', disposeInfo );
+
+			}
+
+		}
 
 	}
 

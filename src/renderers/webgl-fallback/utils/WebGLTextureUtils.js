@@ -1186,9 +1186,10 @@ class WebGLTextureUtils {
 	 * @param {number} width - The width of the copy.
 	 * @param {number} height - The height of the copy.
 	 * @param {number} faceIndex - The face index.
-	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
+	 * @param {?(TypedArray|ReadbackBuffer)} [target=null] - The target buffer.
+	 * @return {Promise<TypedArray|ReadbackBuffer>} A Promise that resolves with the target or a typed array when the copy operation has finished.
 	 */
-	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex, target = null ) {
 
 		const { backend, gl } = this;
 
@@ -1198,15 +1199,62 @@ class WebGLTextureUtils {
 
 		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
 
-		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+		const glTarget = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
 
-		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
+		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTarget, textureGPU, 0 );
 
 		const typedArrayType = this._getTypedArrayType( glType );
 		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
 
 		const elementCount = width * height;
 		const byteLength = elementCount * bytesPerTexel;
+
+		let dstBuffer;
+		if ( target === null ) {
+
+			dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
+
+		} else if ( target.isReadbackBuffer ) {
+
+			if ( target._mapped === true ) {
+
+				throw new Error( 'THREE.WebGLTextureUtils: ReadbackBuffer must be released before being used again.' );
+
+			}
+
+			if ( target.maxByteLength < byteLength ) {
+
+				throw new Error( 'THREE.WebGLTextureUtils: ReadbackBuffer maxByteLength is smaller than the required readback size.' );
+
+			}
+
+			target._mapped = true;
+
+			const releaseCallback = () => {
+
+				target.buffer = null;
+				target._mapped = false;
+				target.removeEventListener( 'release', releaseCallback );
+				target.removeEventListener( 'dispose', releaseCallback );
+
+			};
+
+			target.addEventListener( 'release', releaseCallback );
+			target.addEventListener( 'dispose', releaseCallback );
+
+			dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
+
+		} else {
+
+			if ( target.byteLength < byteLength ) {
+
+				throw new Error( 'THREE.WebGLTextureUtils: Target buffer is smaller than the required readback size.' );
+
+			}
+
+			dstBuffer = ArrayBuffer.isView( target ) ? new Uint8Array( target.buffer, target.byteOffset, byteLength ) : new Uint8Array( target, 0, byteLength );
+
+		}
 
 		const buffer = gl.createBuffer();
 
@@ -1217,17 +1265,17 @@ class WebGLTextureUtils {
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
-
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
+
+		if ( target && target.isReadbackBuffer ) target.buffer = dstBuffer.buffer;
 
 		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 
 		gl.deleteFramebuffer( fb );
 
-		return dstBuffer;
+		return target !== null ? target : dstBuffer;
 
 	}
 
