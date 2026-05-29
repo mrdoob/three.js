@@ -1,7 +1,7 @@
 import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec3, ivec2, ivec4, uniform, Break, Loop, positionView,
+	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	renderGroup,
 	min, max, pow, log, clamp, dot
@@ -306,7 +306,7 @@ class ClusteredLightsNode extends LightsNode {
 		const dataB = textureLoad( this._lightsTexture, ivec2( index, 1 ) );
 
 		const position = dataA.xyz;
-		const viewPosition = this._cameraViewMatrix.mul( position );
+		const viewPosition = this._cameraViewMatrix.mul( vec4( position, 1.0 ) ).xyz;
 		const distance = dataA.w;
 		const color = dataB.rgb;
 		const decay = dataB.w;
