@@ -85,16 +85,6 @@ class NodeMaterial extends Material {
 		this.lights = false;
 
 		/**
-		 * Whether this material uses hardware clipping or not.
-		 * This property is managed by the engine and should not be
-		 * modified by apps.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.hardwareClipping = false;
-
-		/**
 		 * Node materials which set their `lights` property to `true`
 		 * are affected by all lights of the scene. Sometimes selective
 		 * lighting is wanted which means only _some_ lights in the scene
@@ -656,7 +646,7 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		this.hardwareClipping = false;
+		builder.hardwareClipping = false;
 
 		if ( builder.clippingContext === null ) return;
 
@@ -668,7 +658,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.addToStack( hardwareClipping() );
 
-			this.hardwareClipping = true;
+			builder.hardwareClipping = true;
 
 		}
 

@@ -217,6 +217,14 @@ class NodeBuilder {
 		this.clippingContext = null;
 
 		/**
+		 * Whether the built material uses hardware clipping or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.hardwareClipping = false;
+
+		/**
 		 * The generated vertex shader.
 		 *
 		 * @type {?string}

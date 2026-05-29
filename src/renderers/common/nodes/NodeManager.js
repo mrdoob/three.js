@@ -483,6 +483,7 @@ class NodeManager extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
+			nodeBuilder.hardwareClipping,
 			nodeBuilder.transforms
 		);
 
