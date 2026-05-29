@@ -32,12 +32,12 @@ const getBatchingColor = /*@__PURE__*/ Fn( ( [ colorsTexture, id ] ) => {
  * @param {Node<int>} id - The draw or instance ID.
  * @returns {Node<uint>} The indirect index.
  */
-const getIndirectIndex = /*@__PURE__*/ Fn( ( [ batchMesh, id ] ) => {
+const getIndirectIndex = /*@__PURE__*/ Fn( ( [ indirectTexture, id ] ) => {
 
-	const size = int( textureSize( textureLoad( batchMesh._indirectTexture ), 0 ).x ).toConst();
+	const size = int( textureSize( textureLoad( indirectTexture ), 0 ).x ).toConst();
 	const x = int( id ).mod( size ).toConst();
 	const y = int( id ).div( size ).toConst();
-	return textureLoad( batchMesh._indirectTexture, ivec2( x, y ) ).x;
+	return textureLoad( indirectTexture, ivec2( x, y ) ).x;
 
 } );
 
@@ -61,7 +61,7 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	const batchingIdNode = builder.getDrawIndex() === null ? instanceIndex : drawIndex;
 
-	const indirectId = getIndirectIndex( int( batchingIdNode ) );
+	const indirectId = getIndirectIndex( batchMesh._indirectTexture, int( batchingIdNode ) );
 
 	const matricesTexture = batchMesh._matricesTexture;
 
