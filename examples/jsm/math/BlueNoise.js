@@ -1,4 +1,4 @@
-import { DataTexture, RedFormat, UnsignedByteType, RepeatWrapping } from 'three';
+import { DataTexture, RedFormat, RGFormat, RGBAFormat, UnsignedByteType, RepeatWrapping } from 'three';
 
 /**
  * Generates tileable blue-noise dither arrays via Ulichney's void-and-cluster method.
@@ -247,28 +247,46 @@ class BlueNoiseGenerator {
 
 /**
  * Generate a blue noise DataTexture.
- * Returns a single-channel (Red) 8-bit texture with RepeatWrapping,
- * suitable for sampling in shaders as a tileable noise source.
+ * Returns an 8-bit texture with RepeatWrapping, suitable for sampling in shaders
+ * as a tileable noise source. Each channel is an independent blue-noise pattern,
+ * generated with a distinct seed so consumers can read decorrelated values from
+ * a single texture fetch.
  *
  * @param {number} [size=64] Texture dimension in pixels (the noise is square).
+ * @param {number} [channels=1] Number of independent noise channels. Must be `1`
+ * (RedFormat), `2` (RGFormat), or `4` (RGBAFormat). Generation cost scales linearly.
  * @return {DataTexture} The generated blue-noise DataTexture.
  */
-export function generateBlueNoiseTexture( size = 64 ) {
+export function generateBlueNoiseTexture( size = 64, channels = 1 ) {
+
+	if ( channels !== 1 && channels !== 2 && channels !== 4 ) {
+
+		throw new Error( 'generateBlueNoiseTexture: channels must be 1, 2, or 4.' );
+
+	}
+
+	const format = channels === 1 ? RedFormat : channels === 2 ? RGFormat : RGBAFormat;
 
 	const generator = new BlueNoiseGenerator();
 	generator.size = size;
 
-	const { data, maxValue } = generator.generate();
+	const pixels = new Uint8Array( size * size * channels );
 
-	// Normalize Uint32 ranks to Uint8 [0, 255]
-	const pixels = new Uint8Array( size * size );
-	for ( let i = 0, l = data.length; i < l; i ++ ) {
+	// Each channel is regenerated with a distinct seed for an independent pattern.
+	for ( let c = 0; c < channels; c ++ ) {
 
-		pixels[ i ] = ( data[ i ] / maxValue ) * 255;
+		generator.seed = c + 1;
+		const { data, maxValue } = generator.generate();
+
+		for ( let i = 0, l = data.length; i < l; i ++ ) {
+
+			pixels[ i * channels + c ] = ( data[ i ] / maxValue ) * 255;
+
+		}
 
 	}
 
-	const texture = new DataTexture( pixels, size, size, RedFormat, UnsignedByteType );
+	const texture = new DataTexture( pixels, size, size, format, UnsignedByteType );
 	texture.wrapS = RepeatWrapping;
 	texture.wrapT = RepeatWrapping;
 	texture.needsUpdate = true;
