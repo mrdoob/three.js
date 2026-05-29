@@ -104,6 +104,8 @@ function getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInve
 
 	if ( data === undefined ) {
 
+		skeleton.update();
+
 		const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
 
 		data = {
