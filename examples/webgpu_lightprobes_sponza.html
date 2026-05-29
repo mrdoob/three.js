@@ -40,13 +40,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { lights } from 'three/tsl';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
-			import { LightProbeGrid, bakeLightProbeGrid, lightProbeGrid } from 'three/addons/lighting/LightProbeGridGPU.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGridGPU.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelperGPU.js';
 
 			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
@@ -55,7 +54,7 @@
 			let camera, scene, renderer, controls, timer;
 			let probes = null, probesHelper = null;
 			let modelSize = null;
-			let dirLight = null, sky = null, probeNode = null, sceneLightsNode = null;
+			let dirLight = null, sky = null;
 
 			const sun = new THREE.Vector3();
 
@@ -119,10 +118,7 @@
 				const model = gltf.scene;
 				const embeddedLights = [];
 
-				probeNode = lightProbeGrid();
-
 				dirLight = new THREE.DirectionalLight( 0xfff2dc, 100.0 );
-				sceneLightsNode = lights( [ dirLight, probeNode ] );
 
 				model.traverse( ( child ) => {
 
@@ -130,7 +126,6 @@
 
 						child.castShadow = true;
 						child.receiveShadow = true;
-						child.material.lightsNode = sceneLightsNode;
 
 					} else if ( child.isLight ) {
 
@@ -245,6 +240,9 @@
 
 							const previousProbes = probes;
 							const previousHelperVisible = probesHelper ? probesHelper.visible : false;
+
+							if ( previousProbes ) previousProbes.visible = false;
+
 							const nextProbes = new LightProbeGrid(
 								params.sizeX, params.sizeY, params.sizeZ,
 								params.countX, params.countY, params.countZ
@@ -252,7 +250,6 @@
 
 							nextProbes.position.set( params.boundsX, params.boundsY, params.boundsZ );
 							scene.add( nextProbes );
-							probeNode.probes = nextProbes;
 
 							if ( probesHelper ) probesHelper.visible = false;
 
@@ -263,20 +260,19 @@
 							try {
 
 								await renderer.setAnimationLoop( null );
-								await bakeLightProbeGrid( renderer, scene, nextProbes, {
+								await nextProbes.bake( renderer, scene, {
 									cubemapSize: 32,
 									near: 0.05,
 									far: probeFar,
-									bounces: params.bounces,
-									lightProbeNode: probeNode
+									bounces: params.bounces
 								} );
 
 							} catch ( error ) {
 
 								scene.remove( nextProbes );
 								nextProbes.dispose();
-								probeNode.probes = previousProbes;
-								probeNode.update();
+
+								if ( previousProbes ) previousProbes.visible = params.enabled;
 
 								if ( probesHelper ) probesHelper.visible = previousHelperVisible;
 
@@ -291,7 +287,6 @@
 
 							nextProbes.visible = params.enabled;
 							probes = nextProbes;
-							probeNode.update();
 
 							if ( previousProbes ) {
 
@@ -332,7 +327,6 @@
 					if ( probes ) {
 
 						probes.visible = value;
-						probeNode.update();
 
 					}
 

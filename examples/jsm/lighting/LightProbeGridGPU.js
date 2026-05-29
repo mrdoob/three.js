@@ -28,6 +28,7 @@ import {
 	float,
 	int,
 	ivec2,
+	modelPosition,
 	max,
 	normalize,
 	normalWorld,
@@ -79,6 +80,7 @@ class LightProbeGrid extends Object3D {
 		super();
 
 		this.isLightProbeGrid = true;
+		this.isLight = true;
 
 		this.width = width;
 		this.height = height;
@@ -93,8 +95,34 @@ class LightProbeGrid extends Object3D {
 		this.boundingBox = new Box3();
 		this.texture = null;
 		this._renderTarget = null;
+		this.lightNode = lightProbeGrid();
+		this.lightNode.probes = this;
 
 		this.updateBoundingBox();
+
+	}
+
+	setSize( width = 1, height = 1, depth = 1, widthProbes, heightProbes, depthProbes ) {
+
+		const resolutionX = widthProbes !== undefined ? widthProbes : Math.max( 2, Math.round( width ) + 1 );
+		const resolutionY = heightProbes !== undefined ? heightProbes : Math.max( 2, Math.round( height ) + 1 );
+		const resolutionZ = depthProbes !== undefined ? depthProbes : Math.max( 2, Math.round( depth ) + 1 );
+		const sizeChanged = this.width !== width || this.height !== height || this.depth !== depth ||
+			this.resolution.x !== resolutionX || this.resolution.y !== resolutionY || this.resolution.z !== resolutionZ;
+
+		if ( sizeChanged ) {
+
+			this.dispose();
+
+		}
+
+		this.width = width;
+		this.height = height;
+		this.depth = depth;
+		this.resolution.set( resolutionX, resolutionY, resolutionZ );
+		this.updateBoundingBox();
+
+		return this;
 
 	}
 
@@ -123,7 +151,10 @@ class LightProbeGrid extends Object3D {
 
 	async bake( renderer, scene, options = {} ) {
 
-		return bakeLightProbeGrid( renderer, scene, this, options );
+		return bakeLightProbeGrid( renderer, scene, this, {
+			...options,
+			lightProbeNode: options.lightProbeNode || this.lightNode
+		} );
 
 	}
 
@@ -174,6 +205,8 @@ class LightProbeGridNode extends LightingNode {
 
 		super();
 
+		this.isLightProbeGridNode = true;
+
 		this.probes = probes;
 		this.texture3DNode = texture3D( _emptyTexture3D );
 		this.probesMin = uniform( new Vector3() );
@@ -217,6 +250,16 @@ class LightProbeGridNode extends LightingNode {
 		const worldPos = builder.context.positionWorld || positionWorld;
 		const worldNormal = builder.context.normalWorld || normalWorld;
 		const gridRange = this.probesMax.sub( this.probesMin );
+		const lightProbeGridCount = builder.lightsNode ? builder.lightsNode.getLights().filter( ( light ) => light.isLightProbeGrid || light.isLightProbeGridNode ).length : 0;
+		let enabled = this.enabled;
+
+		if ( lightProbeGridCount > 1 ) {
+
+			const objectInBounds = modelPosition.greaterThanEqual( this.probesMin ).all().and( modelPosition.lessThanEqual( this.probesMax ).all() );
+			enabled = enabled.and( objectInBounds );
+
+		}
+
 		const resMinusOne = this.probesResolution.sub( 1.0 );
 		const probeSpacing = gridRange.div( resMinusOne );
 		const samplePos = worldPos.add( worldNormal.mul( probeSpacing ).mul( 0.5 ) );
@@ -225,7 +268,7 @@ class LightProbeGridNode extends LightingNode {
 			.div( this.probesResolution )
 			.add( vec3( 0.5 ).div( this.probesResolution ) );
 
-		const irradiance = this.enabled.select(
+		const irradiance = enabled.select(
 			sampleLightProbeGridTexture( this.texture3DNode, uvw, worldNormal, this.probesResolution ),
 			vec3( 0.0 )
 		);
@@ -286,6 +329,8 @@ function sampleLightProbeGridTexture( probesTexture, uvw, worldNormal, probesRes
 }
 
 async function bakeLightProbeGrid( renderer, scene, probes, options = {} ) {
+
+	_ensureLightProbeGridNode( renderer );
 
 	await renderer.init();
 
@@ -425,6 +470,13 @@ async function bakeLightProbeGrid( renderer, scene, probes, options = {} ) {
 	} finally {
 
 		probes.visible = currentVisible;
+
+		if ( lightProbeNode !== null ) {
+
+			lightProbeNode.update();
+
+		}
+
 		renderer.autoClear = currentAutoClear;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
@@ -434,6 +486,67 @@ async function bakeLightProbeGrid( renderer, scene, probes, options = {} ) {
 		renderer.setScissorTest( currentScissorTest );
 
 	}
+
+}
+
+function _ensureLightProbeGridNode( renderer ) {
+
+	const library = renderer.library;
+
+	if ( library && library.getLightNodeClass( LightProbeGrid ) === null ) {
+
+		library.addLight( LightProbeGridNode, LightProbeGrid );
+
+	}
+
+	const lighting = renderer.lighting;
+
+	if ( lighting && lighting._lightProbeGridPatched !== true ) {
+
+		const getNode = lighting.getNode.bind( lighting );
+		const createNode = lighting.createNode.bind( lighting );
+
+		lighting.getNode = function ( scene ) {
+
+			return _patchLightsNode( getNode( scene ) );
+
+		};
+
+		lighting.createNode = function ( lights = [] ) {
+
+			return _patchLightsNode( createNode( _unwrapLightProbeGridNodes( lights ) ) );
+
+		};
+
+		lighting._lightProbeGridPatched = true;
+
+	}
+
+}
+
+function _patchLightsNode( lightsNode ) {
+
+	if ( lightsNode && lightsNode._lightProbeGridPatched !== true ) {
+
+		const setLights = lightsNode.setLights.bind( lightsNode );
+
+		lightsNode.setLights = function ( lights ) {
+
+			return setLights( _unwrapLightProbeGridNodes( lights ) );
+
+		};
+
+		lightsNode._lightProbeGridPatched = true;
+
+	}
+
+	return lightsNode;
+
+}
+
+function _unwrapLightProbeGridNodes( lights ) {
+
+	return lights.map( ( light ) => light && light.isLightProbeGrid ? light.lightNode : light );
 
 }
 
