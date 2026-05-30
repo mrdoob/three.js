@@ -501,8 +501,6 @@ class Line2NodeMaterial extends NodeMaterial {
 	 */
 	setupDiffuseColor( builder ) {
 
-		// VERTEX COLORS
-
 		super.setupDiffuseColor( builder );
 
 		diffuseColor.a.mulAssign( alphaLine );
