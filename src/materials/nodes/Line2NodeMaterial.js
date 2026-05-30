@@ -2,7 +2,7 @@ import NodeMaterial from './NodeMaterial.js';
 import { dashSize, diffuseColor, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
+import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
@@ -290,16 +290,15 @@ const mvpLine = Fn( ( { material } ) => {
 } )();
 
 /**
- * TSL fragment node that computes the final color and alpha of the line segment.
- * Handles dash/gap generation, alpha-to-coverage rendering, and vertex/instance/material color application.
+ * TSL fragment node that computes the shape/coverage (alpha) of the fat line segment.
+ * Handles dash/gap generation, alpha-to-coverage rendering, and round endcaps.
  *
  * @tsl
- * @type {Node<vec4>}
+ * @type {Node<float>}
  */
-const colorLine = Fn( ( { material, renderer } ) => {
+const alphaLine = Fn( ( { material, renderer } ) => {
 
 	const useAlphaToCoverage = material._useAlphaToCoverage;
-	const vertexColors = material.vertexColors;
 	const useDash = material._useDash;
 	const useWorldUnits = material._useWorldUnits;
 
@@ -383,28 +382,7 @@ const colorLine = Fn( ( { material, renderer } ) => {
 
 	}
 
-	let lineColorNode;
-
-	if ( material.lineColorNode ) {
-
-		lineColorNode = material.lineColorNode;
-
-	} else if ( vertexColors ) {
-
-		const instanceColorStart = attribute( 'instanceColorStart' );
-		const instanceColorEnd = attribute( 'instanceColorEnd' );
-
-		const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
-
-		lineColorNode = instanceColor.mul( materialColor );
-
-	} else {
-
-		lineColorNode = materialColor;
-
-	}
-
-	return vec4( lineColorNode, alpha );
+	return alpha;
 
 } )();
 
@@ -523,9 +501,22 @@ class Line2NodeMaterial extends NodeMaterial {
 	 */
 	setupDiffuseColor( builder ) {
 
+		// VERTEX COLORS
+
 		super.setupDiffuseColor( builder );
 
-		diffuseColor.mulAssign( colorLine );
+		diffuseColor.a.mulAssign( alphaLine );
+
+		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'instanceColorStart' ) ) {
+
+			const instanceColorStart = attribute( 'instanceColorStart' );
+			const instanceColorEnd = attribute( 'instanceColorEnd' );
+
+			const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
+
+			diffuseColor.rgb.mulAssign( instanceColor );
+
+		}
 
 		if ( this.transparent ) {
 
