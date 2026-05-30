@@ -626,6 +626,7 @@ class Textures extends DataMap {
 						if ( binding.isSampler && binding.texture === texture ) {
 
 							binding.reset();
+							binding.release();
 
 						}
 
