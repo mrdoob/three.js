@@ -243,8 +243,7 @@ class NodeManager extends DataMap {
 
 					return buildNodeBuilder().then( ( nodeBuilder ) => {
 
-						nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-						nodeBuilderCache.set( cacheKey, nodeBuilderState );
+						nodeBuilderState = this._cacheNodeBuilderState( renderObject, nodeBuilder );
 						nodeBuilderState.usedTimes ++;
 						renderObjectData.nodeBuilderState = nodeBuilderState;
 
@@ -280,9 +279,7 @@ class NodeManager extends DataMap {
 
 					}
 
-					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-
-					nodeBuilderCache.set( cacheKey, nodeBuilderState );
+					nodeBuilderState = this._cacheNodeBuilderState( renderObject, nodeBuilder );
 
 				}
 
@@ -459,6 +456,31 @@ class NodeManager extends DataMap {
 			computeData.version = computeNode.version;
 
 		}
+
+		return nodeBuilderState;
+
+	}
+
+	/**
+	 * Creates a node builder state for the freshly built node builder and stores it in the
+	 * node builder cache.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {NodeBuilder} nodeBuilder - The node builder.
+	 * @return {NodeBuilderState} The node builder state.
+	 */
+	_cacheNodeBuilderState( renderObject, nodeBuilder ) {
+
+		const nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+		// The cache key is recomputed *after* the build because a material's setup() is allowed
+		// to assign cache-key relevant nodes onto the material instance.
+
+		const cacheKey = renderObject.getCacheKey();
+		renderObject.initialCacheKey = cacheKey;
+
+		this.nodeBuilderCache.set( cacheKey, nodeBuilderState );
 
 		return nodeBuilderState;
 
