@@ -150,7 +150,7 @@ const mvpLine = Fn( ( { material } ) => {
 
 		If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
 
-			const alpha = trimSegmentAlpha( { start: start, end: end } );
+			const alpha = trimSegmentAlpha( { start, end } );
 			end.assign( vec4( mix( start.xyz, end.xyz, alpha ), end.w ) );
 
 			if ( useDash ) {
@@ -389,22 +389,18 @@ const colorLine = Fn( ( { material, renderer } ) => {
 
 		lineColorNode = material.lineColorNode;
 
+	} else if ( vertexColors ) {
+
+		const instanceColorStart = attribute( 'instanceColorStart' );
+		const instanceColorEnd = attribute( 'instanceColorEnd' );
+
+		const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
+
+		lineColorNode = instanceColor.mul( materialColor );
+
 	} else {
 
-		if ( vertexColors ) {
-
-			const instanceColorStart = attribute( 'instanceColorStart' );
-			const instanceColorEnd = attribute( 'instanceColorEnd' );
-
-			const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
-
-			lineColorNode = instanceColor.mul( materialColor );
-
-		} else {
-
-			lineColorNode = materialColor;
-
-		}
+		lineColorNode = materialColor;
 
 	}
 
