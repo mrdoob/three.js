@@ -282,6 +282,16 @@ class RenderObject {
 		this._monitor = null;
 
 		/**
+		 * The object's original material when this render object is drawn with an
+		 * override material.
+		 *
+		 * @type {?Material}
+		 * @private
+		 * @default null
+		 */
+		this._sourceMaterial = renderer._currentSourceMaterial;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -327,6 +337,12 @@ class RenderObject {
 
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.addEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 	}
 
@@ -922,6 +938,12 @@ class RenderObject {
 
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 		this.onDispose();
 
