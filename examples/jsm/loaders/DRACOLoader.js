@@ -19,8 +19,8 @@ const WASM_JS_URL = new URL( '../libs/draco/draco_wasm_wrapper.js', import.meta.
 const JS_URL = new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toString();
 
 const DRACO_GLTF_CONFIG = {
-	js: new URL( '../libs/draco/draco_wasm_wrapper_gltf.js', import.meta.url ).toString(),
-	wasm: new URL( '../libs/draco/draco_decoder_gltf.wasm', import.meta.url ).toString(),
+	js: new URL( '../libs/draco/gltf/draco_wasm_wrapper.js', import.meta.url ).toString(),
+	wasm: new URL( '../libs/draco/gltf/draco_decoder.wasm', import.meta.url ).toString(),
 };
 
 /**
