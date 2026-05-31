@@ -38,12 +38,10 @@ const JS_URL = new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toSt
  *
  * ```js
  * const loader = new DRACOLoader();
- * loader.setDecoderPath( '/examples/jsm/libs/draco/' );
- *
- * const geometry = await dracoLoader.loadAsync( 'models/draco/bunny.drc' );
+ * const geometry = await loader.loadAsync( 'models/draco/bunny.drc' );
  * geometry.computeVertexNormals(); // optional
  *
- * dracoLoader.dispose();
+ * loader.dispose();
  * ```
  *
  * @augments Loader
