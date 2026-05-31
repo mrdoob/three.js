@@ -8,7 +8,8 @@ import {
 	LinearSRGBColorSpace,
 	SRGBColorSpace,
 	InterleavedBuffer,
-	InterleavedBufferAttribute
+	InterleavedBufferAttribute,
+	LoaderUtils
 } from 'three';
 
 const _taskCache = new WeakMap();
@@ -16,6 +17,11 @@ const _taskCache = new WeakMap();
 const WASM_BIN_URL = new URL( '../libs/draco/draco_decoder.wasm', import.meta.url ).toString();
 const WASM_JS_URL = new URL( '../libs/draco/draco_wasm_wrapper.js', import.meta.url ).toString();
 const JS_URL = new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toString();
+
+const DRACO_GLTF_CONFIG = {
+	js: new URL( '../libs/draco/draco_wasm_wrapper_gltf.js', import.meta.url ).toString(),
+	wasm: new URL( '../libs/draco/draco_decoder_gltf.wasm', import.meta.url ).toString(),
+};
 
 /**
  * A loader for the Draco format.
@@ -58,7 +64,11 @@ class DRACOLoader extends Loader {
 
 		super( manager );
 
-		this.decoderPath = '';
+		this.decoderPaths = {
+			js: WASM_JS_URL,
+			wasm: WASM_BIN_URL,
+			dep_js: JS_URL,
+		};
 		this.decoderConfig = {};
 		this.decoderBinary = null;
 		this.decoderPending = null;
@@ -86,12 +96,25 @@ class DRACOLoader extends Loader {
 	/**
 	 * Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 	 *
-	 * @param {string} path - The decoder path.
+	 * @param {string|{js:string, wasm:string}} path - The decoder path, or a config object with explicit URLs for each decoder file.
 	 * @return {DRACOLoader} A reference to this loader.
 	 */
 	setDecoderPath( path ) {
 
-		this.decoderPath = path;
+		const { decoderPaths } = this;
+		if ( typeof path === 'object' ) {
+
+			decoderPaths.js = path.js;
+			decoderPaths.wasm = path.wasm;
+			decoderPaths.dep_js = null;
+
+		} else {
+
+			decoderPaths.js = LoaderUtils.resolveURL( 'draco_wasm_wrapper.js', path );
+			decoderPaths.wasm = LoaderUtils.resolveURL( 'draco_decoder.wasm', path );
+			decoderPaths.dep_js = LoaderUtils.resolveURL( 'draco_decoder.js', path );
+
+		}
 
 		return this;
 
@@ -335,7 +358,6 @@ class DRACOLoader extends Loader {
 	_loadLibrary( url, responseType ) {
 
 		const loader = new FileLoader( this.manager );
-		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
 		loader.setWithCredentials( this.withCredentials );
 
@@ -362,31 +384,21 @@ class DRACOLoader extends Loader {
 		const useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js';
 		const librariesPending = [];
 
-		if ( this.decoderPath === '' ) {
+		const { decoderPaths } = this;
+		if ( useJS ) {
 
-			if ( useJS ) {
+			if ( decoderPaths.dep_js === null ) {
 
-				librariesPending.push( this._loadLibrary( JS_URL, 'text' ) );
-
-			} else {
-
-				librariesPending.push( this._loadLibrary( WASM_JS_URL, 'text' ) );
-				librariesPending.push( this._loadLibrary( WASM_BIN_URL, 'arraybuffer' ) );
+				throw new Error( 'THREE.DRACOLoader: WebAssembly is required when using a custom decoder paths.' );
 
 			}
+
+			librariesPending.push( this._loadLibrary( decoderPaths.dep_js, 'text' ) );
 
 		} else {
 
-			if ( useJS ) {
-
-				librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
-
-			} else {
-
-				librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
-				librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
-
-			}
+			librariesPending.push( this._loadLibrary( decoderPaths.js, 'text' ) );
+			librariesPending.push( this._loadLibrary( decoderPaths.wasm, 'arraybuffer' ) );
 
 		}
 
@@ -757,4 +769,4 @@ function DRACOWorker() {
 
 }
 
-export { DRACOLoader };
+export { DRACOLoader, DRACO_GLTF_CONFIG };
