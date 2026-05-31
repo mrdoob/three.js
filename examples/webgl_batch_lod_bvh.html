@@ -140,10 +140,10 @@
 
 					const geometryLOD = geometriesLODArray[ i ];
 					const geometryId = batchedMesh.addGeometry( geometryLOD[ 0 ], - 1, LODIndexCount[ i ] );
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 1 ], 0.2 ); // used when below 20% of the screen height
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 2 ], 0.1 ); // below 10%
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 3 ], 0.05 ); // below 5%
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 4 ], 0.02 ); // below 2%
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 1 ], 0.08 ); // used when below ~8% of the screen height
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 2 ], 0.04 ); // below ~4%
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 3 ], 0.033 ); // below ~3.3%
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 4 ], 0.02 ); // below ~2%
 			
 				}
 
