@@ -132,9 +132,6 @@
 				const { vertexCount, indexCount, LODIndexCount } = getBatchedMeshLODCount( geometriesLODArray );
 				batchedMesh = new THREE.BatchedMesh( instancesCount, vertexCount, indexCount, new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0.8 } ) );
 
-				// the latest @three.ez/batched-mesh-extensions selects LODs by screen space; use distance to match the thresholds below
-				batchedMesh.useDistanceForLOD = true;
-
 				// enable radix sort for better performance
 				batchedMesh.customSort = createRadixSort( batchedMesh );
 
@@ -143,10 +140,10 @@
 
 					const geometryLOD = geometriesLODArray[ i ];
 					const geometryId = batchedMesh.addGeometry( geometryLOD[ 0 ], - 1, LODIndexCount[ i ] );
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 1 ], 50 );
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 2 ], 100 );
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 3 ], 125 );
-					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 4 ], 200 );
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 1 ], 0.2 ); // used when below 20% of the screen height
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 2 ], 0.1 ); // below 10%
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 3 ], 0.05 ); // below 5%
+					batchedMesh.addGeometryLOD( geometryId, geometryLOD[ 4 ], 0.02 ); // below 2%
 			
 				}
 
