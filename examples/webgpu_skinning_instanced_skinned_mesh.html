@@ -132,7 +132,7 @@
 				const skinWeights = storage( new THREE.StorageBufferAttribute( geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4', vertexCount ).toReadOnly();
 				const bindMatrix = uniform( source.bindMatrix, 'mat4' );
 				const bindMatrixInverse = uniform( source.bindMatrixInverse, 'mat4' );
-				const vertices = attributeArray( instanceCount * vertexCount * 2, 'vec4' ).setPBO( true );
+				const vertices = attributeArray( instanceCount * vertexCount * 2, 'vec4' );
 
 				computeSkinning = Fn( () => {
 
