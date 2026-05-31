@@ -13,6 +13,7 @@ import { viewportOpaqueMipTexture } from '../../nodes/display/ViewportTextureNod
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
 import { NoBlending } from '../../constants.js';
+import { warnOnce } from '../../utils.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -437,14 +438,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashOffset = 0;
 
 		/**
-		 * Defines the lines color.
-		 *
-		 * @type {?Node<vec3>}
-		 * @default null
-		 */
-		this.lineColorNode = null;
-
-		/**
 		 * Defines the offset.
 		 *
 		 * @type {?Node<float>}
@@ -538,6 +531,28 @@ class Line2NodeMaterial extends NodeMaterial {
 	}
 
 	/**
+	 * Defines the lines color.
+	 *
+	 * @deprecated since r185. Use {@link NodeMaterial#colorNode} instead.
+	 * @type {?Node<vec3>}
+	 */
+	get lineColorNode() {
+
+		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
+
+		return this.colorNode;
+
+	}
+
+	set lineColorNode( value ) {
+
+		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
+
+		this.colorNode = value;
+
+	}
+
+	/**
 	 * Whether the lines should sized in world units or not.
 	 * When set to `false` the unit is pixel.
 	 *
@@ -620,7 +635,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.vertexColors = source.vertexColors;
 		this.dashOffset = source.dashOffset;
 
-		this.lineColorNode = source.lineColorNode;
 		this.offsetNode = source.offsetNode;
 		this.dashScaleNode = source.dashScaleNode;
 		this.dashSizeNode = source.dashSizeNode;
