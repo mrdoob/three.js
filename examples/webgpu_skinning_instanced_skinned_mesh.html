@@ -48,8 +48,8 @@
 			let camera, scene, renderer, controls;
 			let mixer, timer, animatedObject, proportionBones, referenceMesh, footBones, groundFoot, dummy;
 			let instanceMatrices, instanceMatricesNode, bellyWeightsNode;
+			let computeSkinning;
 
-			const computeNodes = [];
 			const skeletonStates = new Map();
 			const timeOffsets = [];
 			const variations = [];
@@ -132,7 +132,7 @@
 				const bindMatrixInverse = uniform( source.bindMatrixInverse, 'mat4' );
 				const vertices = attributeArray( instanceCount * vertexCount * 2, 'vec4' ).setPBO( true );
 
-				const computeSkinning = Fn( () => {
+				computeSkinning = Fn( () => {
 
 					const sourceVertex = instanceIndex.mod( uint( vertexCount ) );
 					const meshInstance = instanceIndex.div( uint( vertexCount ) );
@@ -176,8 +176,6 @@
 				mesh.count = instanceCount;
 				mesh.castShadow = true;
 				mesh.frustumCulled = false;
-
-				computeNodes.push( computeSkinning );
 
 				source.parent.add( mesh );
 				source.visible = false;
@@ -410,7 +408,7 @@
 
 					for ( const state of skeletonStates.values() ) state.boneMatrices.needsUpdate = true;
 					instanceMatrices.needsUpdate = true;
-					renderer.compute( computeNodes );
+					renderer.compute( computeSkinning );
 
 				}
 
