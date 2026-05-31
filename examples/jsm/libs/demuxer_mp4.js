@@ -1,4 +1,4 @@
-import MP4Box from 'https://cdn.jsdelivr.net/npm/mp4box@0.5.3/+esm';
+import { createFile, DataStream } from 'https://cdn.jsdelivr.net/npm/mp4box@2.3.0/+esm';
 
 // From: https://w3c.github.io/webcodecs/samples/video-decode-display/
 
@@ -47,7 +47,7 @@ export class MP4Demuxer {
     this.#setStatus = setStatus;
 
     // Configure an MP4Box File for demuxing.
-    this.#file = MP4Box.createFile();
+    this.#file = createFile();
     this.#file.onError = error => setStatus("demux", error);
     this.#file.onReady = this.#onReady.bind(this);
     this.#file.onSamples = this.#onSamples.bind(this);
@@ -68,7 +68,7 @@ export class MP4Demuxer {
     for (const entry of trak.mdia.minf.stbl.stsd.entries) {
       const box = entry.avcC || entry.hvcC || entry.vpcC || entry.av1C;
       if (box) {
-        const stream = new MP4Box.DataStream(undefined, 0, MP4Box.DataStream.BIG_ENDIAN);
+        const stream = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
         box.write(stream);
         return new Uint8Array(stream.buffer, 8);  // Remove the box header.
       }

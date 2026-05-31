@@ -45,7 +45,7 @@
 
 			// Mediapipe
 
-			import vision from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0';
+			import vision from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35';
 
 			const { FaceLandmarker, FilesetResolver } = vision;
 
@@ -184,7 +184,7 @@
 			// MediaPipe
 
 			const filesetResolver = await FilesetResolver.forVisionTasks(
-				'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm'
+				'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm'
 			);
 
 			const faceLandmarker = await FaceLandmarker.createFromOptions( filesetResolver, {
