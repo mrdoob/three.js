@@ -257,16 +257,17 @@ class KTX2Loader extends Loader {
 
 			if ( typeof navigator !== 'undefined' &&
 				typeof navigator.platform !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
-				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
+				navigator.platform.indexOf( 'Linux' ) >= 0 &&
 				this.workerConfig.astcSupported && this.workerConfig.etc2Supported &&
 				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
 
-				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC2 and ASTC even though the hardware doesn't support these.
+				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC1,ETC2 and ASTC even though the hardware doesn't support these.
 				// Using these extensions will result in expensive software decompression on the main thread inside the driver, causing performance issues.
 				// When using ANGLE (e.g. via Chrome), these extensions are not exposed except for some specific Intel GPU models - however, Firefox doesn't perform this filtering.
 				// Since a granular filter is a little too fragile and we can transcode into other GPU formats, disable formats that are likely to be emulated.
 
 				this.workerConfig.astcSupported = false;
+				this.workerConfig.etc1Supported = false;
 				this.workerConfig.etc2Supported = false;
 
 			}
