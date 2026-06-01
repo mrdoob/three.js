@@ -130,18 +130,8 @@ class MathNode extends TempNode {
 		}
 
 		let promotedType = builder.getComponentType( aType );
-
-		if ( bType !== null ) {
-
-			promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( bType ) );
-
-		}
-
-		if ( cType !== null ) {
-
-			promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( cType ) );
-
-		}
+		if ( bType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( bType ) );
+		if ( cType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( cType ) );
 
 		return builder.changeComponentType( type, promotedType );
 

@@ -234,10 +234,6 @@ class OperatorNode extends TempNode {
 				typeA = type;
 				typeB = builder.changeComponentType( typeB, 'uint' );
 
-			} else if ( op === '%' ) {
-
-				typeA = typeB = type;
-
 			} else if ( builder.isMatrix( typeA ) ) {
 
 				if ( builder.isScalar( typeB ) ) {
@@ -365,11 +361,11 @@ class OperatorNode extends TempNode {
 
 				// Handle matrix operations
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `( ${ b } ${ op } ${ a } )`, type, output );
 
-				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+				} else if ( builder.isScalar( typeA ) && builder.isMatrix( typeB ) ) {
 
 					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
@@ -397,7 +393,7 @@ class OperatorNode extends TempNode {
 
 			} else {
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `${ b } ${ op } ${ a }`, type, output );
 

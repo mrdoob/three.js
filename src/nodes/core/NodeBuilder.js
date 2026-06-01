@@ -65,7 +65,7 @@ const toFloat = ( value ) => {
 
 };
 
-const _componentTypeRanks = { 'bool': 0, 'uint': 1, 'int': 2, 'float': 3 };
+const _componentTypeRanks = { bool: 0, uint: 1, int: 2, float: 3 };
 
 /**
  * Base class for builders which generate a shader program based
