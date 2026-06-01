@@ -79,7 +79,7 @@ class ClusteredLightsNode extends LightsNode {
 
 	customCacheKey() {
 
-		return this._compute.getCacheKey() + super.customCacheKey();
+		return ( this._compute ? this._compute.getCacheKey() : 0 ) + super.customCacheKey();
 
 	}
 
