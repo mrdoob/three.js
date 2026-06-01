@@ -146,6 +146,10 @@ class OperatorNode extends TempNode {
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
+		} else if ( typeB === null ) {
+
+			return typeA;
+
 		} else {
 
 			// Handle matrix operations
