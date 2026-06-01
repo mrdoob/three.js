@@ -197,7 +197,7 @@ class MathNode extends TempNode {
 
 			}
 
-			const mulNode = mul( tA, tB ).xyz;
+			const mulNode = mul( tB, tA ).xyz;
 
 			outputNode = normalize( mulNode );
 
