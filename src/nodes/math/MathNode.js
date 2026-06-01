@@ -109,21 +109,41 @@ class MathNode extends TempNode {
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
+		let type;
+
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return aType;
+			type = aType;
 
 		} else if ( bLen > cLen ) {
 
-			return bType;
+			type = bType;
 
 		} else if ( cLen > aLen ) {
 
-			return cType;
+			type = cType;
+
+		} else {
+
+			type = aType;
 
 		}
 
-		return aType;
+		let promotedType = builder.getComponentType( aType );
+
+		if ( bType !== null ) {
+
+			promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( bType ) );
+
+		}
+
+		if ( cType !== null ) {
+
+			promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( cType ) );
+
+		}
+
+		return builder.changeComponentType( type, promotedType );
 
 	}
 
@@ -137,9 +157,13 @@ class MathNode extends TempNode {
 
 		const method = this.method;
 
-		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT ) {
+		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE ) {
 
 			return 'float';
+
+		} else if ( method === MathNode.DOT ) {
+
+			return builder.getComponentType( this.getInputType( builder ) );
 
 		} else if ( method === MathNode.CROSS ) {
 
@@ -238,7 +262,7 @@ class MathNode extends TempNode {
 
 		if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
+			return builder.format( `( - ${ a.build( builder, inputType ) } )`, type, output );
 
 		} else {
 

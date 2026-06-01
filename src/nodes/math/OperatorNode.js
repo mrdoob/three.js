@@ -122,7 +122,9 @@ class OperatorNode extends TempNode {
 
 		} else if ( op === '%' ) {
 
-			return typeA;
+			const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
+
+			return builder.changeComponentType( typeA, promotedType );
 
 		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
@@ -150,7 +152,7 @@ class OperatorNode extends TempNode {
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -166,7 +168,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -180,15 +182,13 @@ class OperatorNode extends TempNode {
 
 			// Handle non-matrix cases
 
-			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+			// anytype x anytype: use the greater length vector
 
-				// anytype x anytype: use the greater length vector
+			const type = builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ? typeB : typeA;
 
-				return typeB;
+			const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
 
-			}
-
-			return typeA;
+			return builder.changeComponentType( type, promotedType );
 
 		}
 
@@ -212,17 +212,16 @@ class OperatorNode extends TempNode {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				if ( builder.isVector( typeA ) ) {
+				const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
 
-					typeB = typeA;
+				if ( builder.isVector( typeA ) || builder.isVector( typeB ) ) {
 
-				} else if ( builder.isVector( typeB ) ) {
+					const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
+					typeA = typeB = builder.getTypeFromLength( length, promotedType );
 
-					typeA = typeB;
+				} else {
 
-				} else if ( typeA !== typeB ) {
-
-					typeA = typeB = 'float';
+					typeA = typeB = promotedType;
 
 				}
 
@@ -233,12 +232,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '%' ) {
 
-				typeA = type;
-				typeB = builder.isInteger( typeA ) && builder.isInteger( typeB ) ? typeB : typeA;
+				typeA = typeB = type;
 
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
@@ -247,6 +245,7 @@ class OperatorNode extends TempNode {
 				} else if ( builder.isVector( typeB ) ) {
 
 					// matrix x vector
+
 					typeB = builder.getVectorFromMatrix( typeA );
 
 				} else if ( builder.isMatrix( typeB ) ) {
@@ -261,7 +260,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
