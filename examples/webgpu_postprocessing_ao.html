@@ -139,7 +139,7 @@
 
 				aoPass = ao( prePassDepth, prePassNormal, camera, prePassVelocity ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				aoPass.useTemporalFiltering = true;
+				aoPass.jitter = true;
 				aoPass.temporalAccumulation = true; // accumulate AO over frames to remove half-res blue-noise
 
 				const aoPassOutput = aoPass.getTextureNode();
@@ -501,8 +501,8 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 				gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
-				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
-				gui.add( aoPass, 'temporalAccumulation' ).name( 'temporal accumulation (AO)' );
+				gui.add( aoPass, 'jitter' ).name( 'jitter' );
+				gui.add( aoPass, 'temporalAccumulation' ).name( 'temporal accumulation' );
 				gui.add( aoPass.temporalAccumulationAlpha, 'value', 0.02, 1, 0.01 ).name( 'accumulation alpha' );
 				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
 				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );

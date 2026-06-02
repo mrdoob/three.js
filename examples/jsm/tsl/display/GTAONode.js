@@ -215,13 +215,13 @@ class GTAONode extends TempNode {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.useTemporalFiltering = false;
+		this.jitter = false;
 
 		/**
 		 * Whether to temporally accumulate the AO: each frame is blended with the
 		 * previous resolved frame reprojected through the velocity buffer, with stale
 		 * history (disocclusions / edges) rejected by clamping to the current frame's
-		 * local AO min/max. Pair with {@link GTAONode#useTemporalFiltering} so the
+		 * local AO min/max. Pair with {@link GTAONode#jitter} so the
 		 * pattern varies per frame — otherwise there's nothing to average.
 		 *
 		 * Defaults to `true` when a velocity node was supplied to the constructor,
@@ -287,7 +287,7 @@ class GTAONode extends TempNode {
 
 		/**
 		 * Per-frame golden-ratio scroll added to the blue-noise samples (R channel →
-		 * slice rotation, G channel → step jitter) while {@link GTAONode#useTemporalFiltering}
+		 * slice rotation, G channel → step jitter) while {@link GTAONode#jitter}
 		 * is enabled. Advancing along the R2 quasirandom sequence each frame gives the
 		 * temporal accumulation pass a fresh, maximally-decorrelated realization while
 		 * preserving each frame's blue-noise spectrum. Zero when temporal filtering is
@@ -412,7 +412,7 @@ class GTAONode extends TempNode {
 
 		// update temporal uniforms
 
-		if ( this.useTemporalFiltering === true ) {
+		if ( this.jitter === true ) {
 
 			const frameId = frame.frameId;
 
@@ -688,7 +688,7 @@ class GTAONode extends TempNode {
 		// the reprojected history is clamped to the current frame's local 3×3 AO
 		// min/max so stale values at disocclusions / edges are rejected rather than
 		// ghosting. Averaging the per-frame realizations (fresh each frame when
-		// `useTemporalFiltering` scrolls the blue noise) drives the blue-noise
+		// `jitter` scrolls the blue noise) drives the blue-noise
 		// variance toward zero. Reprojection convention matches `TRAANode`:
 		// offsetUV = velocity.xy * ( 0.5, -0.5 ), historyUV = uv - offsetUV.
 
