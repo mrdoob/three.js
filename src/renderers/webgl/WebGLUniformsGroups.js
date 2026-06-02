@@ -98,73 +98,101 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		for ( let i = 0, il = uniforms.length; i < il; i ++ ) {
 
-			const uniformArray = Array.isArray( uniforms[ i ] ) ? uniforms[ i ] : [ uniforms[ i ] ];
+			const uniformItem = uniforms[ i ];
 
-			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
+			if ( Array.isArray( uniformItem ) ) {
 
-				const uniform = uniformArray[ j ];
+				for ( let j = 0, jl = uniformItem.length; j < jl; j ++ ) {
 
-				if ( hasUniformChanged( uniform, i, j, cache ) === true ) {
-
-					const offset = uniform.__offset;
-
-					const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
-
-					let arrayOffset = 0;
-
-					for ( let k = 0; k < values.length; k ++ ) {
-
-						const value = values[ k ];
-
-						const info = getUniformSize( value );
-
-						// TODO add integer and struct support
-						if ( typeof value === 'number' || typeof value === 'boolean' ) {
-
-							uniform.__data[ 0 ] = value;
-							gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
-
-						} else if ( value.isMatrix3 ) {
-
-							// manually converting 3x3 to 3x4
-
-							uniform.__data[ 0 ] = value.elements[ 0 ];
-							uniform.__data[ 1 ] = value.elements[ 1 ];
-							uniform.__data[ 2 ] = value.elements[ 2 ];
-							uniform.__data[ 3 ] = 0;
-							uniform.__data[ 4 ] = value.elements[ 3 ];
-							uniform.__data[ 5 ] = value.elements[ 4 ];
-							uniform.__data[ 6 ] = value.elements[ 5 ];
-							uniform.__data[ 7 ] = 0;
-							uniform.__data[ 8 ] = value.elements[ 6 ];
-							uniform.__data[ 9 ] = value.elements[ 7 ];
-							uniform.__data[ 10 ] = value.elements[ 8 ];
-							uniform.__data[ 11 ] = 0;
-
-						} else if ( ArrayBuffer.isView( value ) ) {
-
-							// copy the buffer data using "set"
-							uniform.__data.set( new value.constructor( value.buffer, value.byteOffset, uniform.__data.length ) );
-
-						} else {
-
-							value.toArray( uniform.__data, arrayOffset );
-
-							arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
-
-						}
-
-					}
-
-					gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+					updateUniform( uniformItem[ j ], i, j, cache );
 
 				}
+
+			} else {
+
+				updateUniform( uniformItem, i, 0, cache );
 
 			}
 
 		}
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, null );
+
+	}
+
+	function updateUniform( uniform, index, indexArray, cache ) {
+
+		if ( hasUniformChanged( uniform, index, indexArray, cache ) === true ) {
+
+			const offset = uniform.__offset;
+			const value = uniform.value;
+
+			if ( Array.isArray( value ) ) {
+
+				let arrayOffset = 0;
+
+				for ( let k = 0; k < value.length; k ++ ) {
+
+					const val = value[ k ];
+					const info = getUniformSize( val );
+
+					writeUniformValue( val, uniform.__data, arrayOffset );
+
+					// only toArray() values advance arrayOffset
+					if ( typeof val !== 'number' && typeof val !== 'boolean' && ! val.isMatrix3 && ! ArrayBuffer.isView( val ) ) {
+
+						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
+
+					}
+
+				}
+
+			} else {
+
+				writeUniformValue( value, uniform.__data, 0 );
+
+			}
+
+			gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+
+		}
+
+	}
+
+	function writeUniformValue( value, data, offset ) {
+
+		// TODO add integer and struct support
+		if ( typeof value === 'number' || typeof value === 'boolean' ) {
+
+			data[ 0 ] = value;
+
+		} else if ( value.isMatrix3 ) {
+
+			// manually converting 3x3 to 3x4
+
+			data[ 0 ] = value.elements[ 0 ];
+			data[ 1 ] = value.elements[ 1 ];
+			data[ 2 ] = value.elements[ 2 ];
+			data[ 3 ] = 0;
+			data[ 4 ] = value.elements[ 3 ];
+			data[ 5 ] = value.elements[ 4 ];
+			data[ 6 ] = value.elements[ 5 ];
+			data[ 7 ] = 0;
+			data[ 8 ] = value.elements[ 6 ];
+			data[ 9 ] = value.elements[ 7 ];
+			data[ 10 ] = value.elements[ 8 ];
+			data[ 11 ] = 0;
+
+		} else if ( ArrayBuffer.isView( value ) ) {
+
+			// copy the buffer data using "set"
+			data.set( new value.constructor( value.buffer, value.byteOffset, data.length ) );
+
+		} else {
+
+			value.toArray( data, offset );
+
+		}
 
 	}
 
