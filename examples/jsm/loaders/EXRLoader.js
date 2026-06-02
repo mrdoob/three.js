@@ -3343,6 +3343,10 @@ class EXRLoader extends DataTextureLoader {
 			format: EXRDecoder.format,
 			colorSpace: EXRDecoder.colorSpace,
 			type: this.type,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			generateMipmaps: false,
+			flipY: false,
 		};
 
 	}
@@ -3383,24 +3387,6 @@ class EXRLoader extends DataTextureLoader {
 
 		this.part = value;
 		return this;
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		function onLoadCallback( texture, texData ) {
-
-			texture.colorSpace = texData.colorSpace;
-			texture.minFilter = LinearFilter;
-			texture.magFilter = LinearFilter;
-			texture.generateMipmaps = false;
-			texture.flipY = false;
-
-			if ( onLoad ) onLoad( texture, texData );
-
-		}
-
-		return super.load( url, onLoadCallback, onProgress, onError );
 
 	}
 
