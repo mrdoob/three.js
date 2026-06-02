@@ -1684,7 +1684,7 @@ class WebGLRenderer {
 
 			if ( _this.sortObjects === true ) {
 
-				currentRenderList.sort( _opaqueSort, _transparentSort );
+				currentRenderList.sort( _opaqueSort, _transparentSort, camera.reversedDepth );
 
 			}
 
