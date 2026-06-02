@@ -9,7 +9,7 @@ let mobile = false;
 if( window.matchMedia( "(any-pointer: coarse)" ).matches ) {
     
 	mobile = true;
-	
+
 }
 
 const ww = document.body.clientWidth / 2;
@@ -290,7 +290,7 @@ function arrayTouches( event ) {
 	this.dispatchEvent( _changeEvent );
 }
 
-function onTouchMove( event ) {
+function onTouchMove() {
 	
 	if ( this.enabled === false || this.isLocked === false ) return;
 
@@ -318,7 +318,7 @@ function onTouchMove( event ) {
 
 }
 
-function onTouchEnd( event ) {
+function onTouchEnd() {
 	
 	_eulerFinal.y = _euler.y;
 	_eulerFinal.x = _euler.x;
