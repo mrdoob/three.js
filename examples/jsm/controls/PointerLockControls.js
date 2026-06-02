@@ -1,8 +1,28 @@
 import {
 	Controls,
 	Euler,
-	Vector3
+	Vector3,
+	Vector2
 } from 'three';
+
+let mobile = false;
+if( window.matchMedia( "(any-pointer: coarse)" ).matches ) {
+    
+	mobile = true;
+	
+}
+
+const ww = document.body.clientWidth / 2;
+const wh = document.body.clientHeight / 2;
+
+let _array_x, _array_y = [];
+let _touches_x, _touches_y;
+let _last_x, _last_y;
+let _eulerX_angle = [].map( Number );
+let _eulerY_angle = [].map( Number );
+let _eulerY, _eulerX;
+const _eulerFinal = new Vector2( 0, 0 );
+const _eulerTotal = new Vector2();
 
 const _euler = new Euler( 0, 0, 0, 'YXZ' );
 const _vector = new Vector3();
@@ -106,6 +126,9 @@ class PointerLockControls extends Controls {
 		// event listeners
 
 		this._onMouseMove = onMouseMove.bind( this );
+		this._onTouchMove = onTouchMove.bind( this );
+		this._arrayTouches = arrayTouches.bind( this );
+		this._onTouchEnd = onTouchEnd.bind( this );
 		this._onPointerlockChange = onPointerlockChange.bind( this );
 		this._onPointerlockError = onPointerlockError.bind( this );
 
@@ -122,6 +145,9 @@ class PointerLockControls extends Controls {
 		super.connect( element );
 
 		this.domElement.ownerDocument.addEventListener( 'mousemove', this._onMouseMove );
+		this.domElement.ownerDocument.addEventListener( 'touchmove', this._onTouchMove );
+		this.domElement.ownerDocument.addEventListener( 'touchmove', this._arrayTouches );
+		this.domElement.ownerDocument.addEventListener( 'touchend', this._onTouchEnd );
 		this.domElement.ownerDocument.addEventListener( 'pointerlockchange', this._onPointerlockChange );
 		this.domElement.ownerDocument.addEventListener( 'pointerlockerror', this._onPointerlockError );
 
@@ -130,6 +156,9 @@ class PointerLockControls extends Controls {
 	disconnect() {
 
 		this.domElement.ownerDocument.removeEventListener( 'mousemove', this._onMouseMove );
+		this.domElement.ownerDocument.removeEventListener( 'touchmove', this._arrayTouches );
+		this.domElement.ownerDocument.removeEventListener( 'touchend', this._onTouchEnd );
+		this.domElement.ownerDocument.removeEventListener( 'touchmove', this._onTouchMove );
 		this.domElement.ownerDocument.removeEventListener( 'pointerlockchange', this._onPointerlockChange );
 		this.domElement.ownerDocument.removeEventListener( 'pointerlockerror', this._onPointerlockError );
 
@@ -198,12 +227,25 @@ class PointerLockControls extends Controls {
 	 * @param {boolean} [unadjustedMovement=false] - Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
 	 * Setting it to true will disable mouse acceleration.
 	 */
+	
 	lock( unadjustedMovement = false ) {
 
-		this.domElement.requestPointerLock( {
-			unadjustedMovement
-		} );
+		if( mobile ) {
 
+			this.isLocked = true;
+			
+			_euler.setFromQuaternion( this.object.quaternion );
+
+			_eulerFinal.x = _euler.x;
+			_eulerFinal.y = _euler.y;
+			
+		} else {
+
+			this.domElement.requestPointerLock( {
+				unadjustedMovement
+			} );
+
+		}
 	}
 
 	/**
@@ -218,6 +260,79 @@ class PointerLockControls extends Controls {
 }
 
 // event listeners
+
+function arrayTouches( event ) {
+
+	_touches_x = event.changedTouches[0].clientX - ww;
+	_touches_y = event.changedTouches[0].clientY - wh;
+
+	_array_x.push( _touches_x );
+	_array_y.push( _touches_y );
+
+	_last_x = _array_x[ _array_x.length - 2 ];
+	_last_y = _array_y[ _array_y.length - 2 ];
+
+	_eulerY = ( _touches_x - _last_x ) * 0.004 * this.pointerSpeed;
+	_eulerX = ( _touches_y - _last_y ) * 0.004 * this.pointerSpeed;
+
+	if ( _eulerY ) {
+		
+		_eulerY_angle.push( _eulerY );
+		_eulerX_angle.push( _eulerX );
+
+	} else {
+
+		_eulerY_angle.push(0);
+		_eulerX_angle.push(0);
+
+	}
+
+	this.dispatchEvent( _changeEvent );
+}
+
+function onTouchMove( event ) {
+	
+	if ( this.enabled === false || this.isLocked === false ) return;
+
+	const camera = this.object;
+	_euler.setFromQuaternion( camera.quaternion );
+
+	_eulerTotal.y = _eulerY_angle.reduce( function ( sum, element ) {
+
+		return sum + element;
+
+	}, 0 );
+
+	_eulerTotal.x = _eulerX_angle.reduce( function ( sum, element ) {
+
+		return sum + element;
+
+	}, 0 );
+
+	_euler.y = _eulerFinal.y + _eulerTotal.y;
+	_euler.x = _eulerFinal.x + _eulerTotal.x;
+
+	camera.quaternion.setFromEuler( _euler );
+
+	this.dispatchEvent( _changeEvent );
+
+}
+
+function onTouchEnd( event ) {
+	
+	_eulerFinal.y = _euler.y;
+	_eulerFinal.x = _euler.x;
+	
+	_eulerY_angle = [];
+	_eulerX_angle = [];
+
+	_array_x = [];
+	_array_y = [];
+
+	this.dispatchEvent( _changeEvent );
+
+}
+
 
 function onMouseMove( event ) {
 
