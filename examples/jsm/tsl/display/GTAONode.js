@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, FloatType, NearestFilter, LinearFilter } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, exp, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, fract } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, fract } from 'three/tsl';
 import { generateBlueNoiseTexture } from '../../math/BlueNoise.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -58,8 +58,10 @@ class GTAONode extends TempNode {
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
 	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {?Node<vec2>} velocityNode - A node that represents the scene's velocity.
+	 * Required to enable the temporal accumulation pass (see {@link GTAONode#temporalAccumulation}); omit to disable it.
 	 */
-	constructor( depthNode, normalNode, camera ) {
+	constructor( depthNode, normalNode, camera, velocityNode = null ) {
 
 		super( 'float' );
 
@@ -78,6 +80,16 @@ class GTAONode extends TempNode {
 		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
+
+		/**
+		 * A node that represents the scene's velocity. Used by the temporal
+		 * accumulation pass to reproject the previous resolved AO. `null` disables
+		 * temporal accumulation (the pass degrades to a passthrough).
+		 *
+		 * @private
+		 * @type {?Node<vec2>}
+		 */
+		this._velocityNode = velocityNode;
 
 		/**
 		 * Backing field for {@link GTAONode#resolutionScale}.
@@ -105,20 +117,6 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
-		/**
-		 * Render target the denoise pass writes into; the public output texture
-		 * always reads from this target. When {@link GTAONode#denoise} is `false`
-		 * the AO pass writes directly here and the denoise pass is skipped, so
-		 * consumers see the same texture binding regardless of the toggle.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._denoiseRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
-		this._denoiseRenderTarget.texture.name = 'GTAONode.Denoise';
-		this._denoiseRenderTarget.texture.minFilter = LinearFilter;
-		this._denoiseRenderTarget.texture.magFilter = LinearFilter;
-
 		// Half-res depth target, populated by the downsample pass when
 		// resolutionScale < 1. Depth uses Float32 because perspective depth values
 		// cluster near 1.0 where Float16 quantizes horizon angles into visible rings.
@@ -126,6 +124,19 @@ class GTAONode extends TempNode {
 		this._depthHalfRT.texture.name = 'GTAONode.DepthHalf';
 		this._depthHalfRT.texture.minFilter = NearestFilter;
 		this._depthHalfRT.texture.magFilter = NearestFilter;
+
+		// History + resolve targets for the temporal accumulation pass. LinearFilter
+		// so the reprojected history fetch (fractional UV) is bilinear, and so the
+		// output upsamples bilinearly to full-res instead of blocky nearest texels.
+		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
+		this._historyRenderTarget.texture.name = 'GTAONode.History';
+		this._historyRenderTarget.texture.minFilter = LinearFilter;
+		this._historyRenderTarget.texture.magFilter = LinearFilter;
+
+		this._accumulationRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
+		this._accumulationRenderTarget.texture.name = 'GTAONode.Accumulation';
+		this._accumulationRenderTarget.texture.minFilter = LinearFilter;
+		this._accumulationRenderTarget.texture.magFilter = LinearFilter;
 
 		// uniforms
 
@@ -195,13 +206,11 @@ class GTAONode extends TempNode {
 		this.samples = uniform( 16 );
 
 		/**
-		 * Whether to use temporal filtering or not. Setting this property to
-		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
-		 * although it introduces typical TAA artifacts like ghosting and temporal
-		 * instabilities.
-		 *
-		 * If setting this property to `false`, a manual denoise via `DenoiseNode`
-		 * might be required.
+		 * Whether to vary the sampling pattern per frame. When `true`, the blue-noise
+		 * samples are scrolled along the R2 quasirandom sequence each frame, so every
+		 * frame is a fresh, decorrelated realization for
+		 * {@link GTAONode#temporalAccumulation} (and/or an external `TRAANode`) to
+		 * average. When `false` the pattern is static.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -209,21 +218,28 @@ class GTAONode extends TempNode {
 		this.useTemporalFiltering = false;
 
 		/**
-		 * Controls the 3×3 cross-bilateral filter applied to the raw AO output.
-		 * Each tap is weighted by (spatial Gaussian) × (view-Z similarity) ×
-		 * (normal angle similarity), so the filter smooths horizon-scan noise
-		 * within a surface but rejects neighbors across silhouettes.
+		 * Whether to temporally accumulate the AO: each frame is blended with the
+		 * previous resolved frame reprojected through the velocity buffer, with stale
+		 * history (disocclusions / edges) rejected by clamping to the current frame's
+		 * local AO min/max. Pair with {@link GTAONode#useTemporalFiltering} so the
+		 * pattern varies per frame — otherwise there's nothing to average.
 		 *
-		 * Unlike `resolutionScale`, this filter runs at any resolution and is
-		 * gated purely by this flag.
-		 *
-		 * Cross-bilateral reconstruction as described in the Activision GTAO
-		 * paper, Section 5.5 (and slides 94–96 of the accompanying deck).
+		 * Defaults to `true` when a velocity node was supplied to the constructor,
+		 * `false` otherwise. Toggling enables or disables the accumulation pass at
+		 * runtime — when off, the AO pass writes the output directly (no extra pass).
 		 *
 		 * @type {boolean}
-		 * @default false
 		 */
-		this.denoise = false;
+		this.temporalAccumulation = velocityNode !== null;
+
+		/**
+		 * Current-frame blend weight for temporal accumulation when the reprojected
+		 * history is valid (range `(0, 1]`). Lower = smoother but slower to react,
+		 * higher = more responsive but noisier. `0.1` accumulates over ~10 frames.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.temporalAccumulationAlpha = uniform( 0.1 );
 
 		/**
 		 * Blue-noise texture sampled for the slice rotation and step jitter.
@@ -295,19 +311,19 @@ class GTAONode extends TempNode {
 		this._depthDownsampleMaterial = new NodeMaterial();
 		this._depthDownsampleMaterial.name = 'GTAO.DepthDownsample';
 
-		this._denoiseMaterial = new NodeMaterial();
-		this._denoiseMaterial.name = 'GTAO.Denoise';
+		this._accumulationMaterial = new NodeMaterial();
+		this._accumulationMaterial.name = 'GTAO.Accumulation';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
-		 * Points at the denoise render target — when the denoise pass is
-		 * disabled the AO pass writes there directly, so this binding is fixed
-		 * regardless of the toggle.
+		 * Points at the resolve target: the accumulation pass writes it when temporal
+		 * accumulation is on, otherwise the AO pass writes it directly. The binding is
+		 * fixed either way, so the `temporalAccumulation` toggle needs no recompile.
 		 *
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._denoiseRenderTarget.texture );
+		this._textureNode = passTexture( this, this._accumulationRenderTarget.texture );
 
 	}
 
@@ -369,7 +385,8 @@ class GTAONode extends TempNode {
 
 		this.resolution.value.set( lowW, lowH );
 		this._aoRenderTarget.setSize( lowW, lowH );
-		this._denoiseRenderTarget.setSize( lowW, lowH );
+		this._historyRenderTarget.setSize( lowW, lowH );
+		this._accumulationRenderTarget.setSize( lowW, lowH );
 
 		// Only resize the half-res RT when we'll actually use it. Shrinking it
 		// here at scale=1 while the renderer holds cached bindings from a previous
@@ -436,25 +453,29 @@ class GTAONode extends TempNode {
 
 		}
 
-		// AO horizon search.
-		const aoTarget = this.denoise ? this._aoRenderTarget : this._denoiseRenderTarget;
+		// AO horizon search. With temporal accumulation on, the AO is written to its
+		// own target and the accumulation pass resolves it into the output; with it
+		// off, the AO is written straight to the output target and the accumulation
+		// pass (and its history copy) is skipped.
+		const aoTarget = this.temporalAccumulation ? this._aoRenderTarget : this._accumulationRenderTarget;
 
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
 		renderer.setRenderTarget( aoTarget );
 		_quadMesh.render( renderer );
 
-		// Cross-bilateral denoise of the raw AO. Reads _aoRenderTarget, writes
-		// _denoiseRenderTarget at the same resolution. Depth + normal edge-aware
-		// weights smooth horizon-scan noise within a surface without bleeding
-		// across silhouettes.
+		// Temporal accumulation: reproject the previous resolved AO through the
+		// velocity buffer and blend it with the current raw AO, writing the resolve
+		// target (the node's output), then copy it into the history target for the
+		// next frame.
+		if ( this.temporalAccumulation ) {
 
-		if ( this.denoise ) {
-
-			_quadMesh.material = this._denoiseMaterial;
-			_quadMesh.name = 'GTAO.Denoise';
-			renderer.setRenderTarget( this._denoiseRenderTarget );
+			_quadMesh.material = this._accumulationMaterial;
+			_quadMesh.name = 'GTAO.Accumulation';
+			renderer.setRenderTarget( this._accumulationRenderTarget );
 			_quadMesh.render( renderer );
+
+			renderer.copyTextureToTexture( this._accumulationRenderTarget.texture, this._historyRenderTarget.texture );
 
 		}
 
@@ -660,81 +681,72 @@ class GTAONode extends TempNode {
 		this._material.fragmentNode = ao().context( builder.getSharedContext() );
 		this._material.needsUpdate = true;
 
-		// ─── Cross-bilateral denoise ───────────────────────────────────────────
+		// ─── Temporal accumulation ─────────────────────────────────────────────
 		//
-		// 3×3 spatial filter over the raw AO. Each tap is weighted by
-		// (spatial Gaussian) × (view-Z similarity) × (normal angle similarity).
-		// The center pixel is included with full weight (1×1×1). Sky neighbors
-		// (depth ≥ 1.0) are naturally rejected by the depth weight because
-		// their view-Z sits at −far.
-		//
-		// Operates at the AO target's resolution and reads the same depth /
-		// normal sources the AO pass uses (full-res when resolutionScale = 1,
-		// the half-res RTs otherwise), so the depth / normal at each tap stays
-		// aligned with the AO texel it produced. The material is always built so
-		// the `denoise` flag can be toggled at runtime without a recompile.
-		//
-		// Cross-bilateral reconstruction as described in the Activision GTAO
-		// paper, Section 5.5, and slides 94–96 of the accompanying deck
-		// (https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx),
-		// which present the spatial bilateral filter and its depth/normal edge guards.
+		// Velocity-reprojected accumulation of the raw AO. Each frame blends the
+		// current AO with the previous resolved frame sampled at the reprojected UV;
+		// the reprojected history is clamped to the current frame's local 3×3 AO
+		// min/max so stale values at disocclusions / edges are rejected rather than
+		// ghosting. Averaging the per-frame realizations (fresh each frame when
+		// `useTemporalFiltering` scrolls the blue noise) drives the blue-noise
+		// variance toward zero. Reprojection convention matches `TRAANode`:
+		// offsetUV = velocity.xy * ( 0.5, -0.5 ), historyUV = uv - offsetUV.
 
 		const aoTextureNode = texture( this._aoRenderTarget.texture );
+		const historyTextureNode = texture( this._historyRenderTarget.texture );
 
-		const denoise = Fn( () => {
+		const temporal = Fn( () => {
 
-			const centerDepth = sampleDepth( uvNode ).toVar();
+			const depth = sampleDepth( uvNode ).toVar();
 
-			// Sky pixels short-circuit. The render target clears to white (set in
-			// updateBefore via setClearColor( 0xffffff, 1 )), so discarding here
-			// leaves the sky reading as visibility = 1 (no occlusion).
-			centerDepth.greaterThanEqual( 1.0 ).discard();
+			// Sky pixels short-circuit. The AO target clears to white (set in
+			// updateBefore) so the sky reads as visibility = 1 (no occlusion).
+			depth.greaterThanEqual( 1.0 ).discard();
 
-			const centerViewZ = perspectiveDepthToViewZ( centerDepth, this._cameraNear, this._cameraFar ).toVar();
-			const centerNormal = sampleNormal( uvNode ).toVar();
+			const current = aoTextureNode.sample( uvNode ).r.toVar();
+
+			// Local AO min/max over a 3×3 neighborhood — the clamp window for history.
 			const texelSize = vec2( 1 ).div( this.resolution ).toVar();
-
-			const totalAO = float( 0 ).toVar();
-			const totalW = float( 0 ).toVar();
+			const aoMin = current.toVar();
+			const aoMax = current.toVar();
 
 			for ( let dy = - 1; dy <= 1; dy ++ ) {
 
 				for ( let dx = - 1; dx <= 1; dx ++ ) {
 
-					const sUv = uvNode.add( vec2( dx, dy ).mul( texelSize ) );
-					const sDepth = sampleDepth( sUv ).toVar();
-					const sAO = aoTextureNode.sample( sUv ).r;
-					const sViewZ = perspectiveDepthToViewZ( sDepth, this._cameraNear, this._cameraFar );
-					const sNormal = sampleNormal( sUv );
+					if ( dx === 0 && dy === 0 ) continue;
 
-					// Spatial Gaussian, σ ≈ 1 texel. dx / dy are loop-unrolled
-					// compile-time constants, so this folds to a literal float.
-					const spatialW = float( Math.exp( - 0.5 * ( dx * dx + dy * dy ) ) );
-
-					// View-Z difference falloff — rejects neighbors more than
-					// ~0.5 view-space units away at the chosen sharpness.
-					const depthDiff = abs( centerViewZ.sub( sViewZ ) );
-					const depthW = exp( depthDiff.negate().mul( 2.0 ) );
-
-					// Normal angle similarity. pow( ·, 8 ) sharpens the cutoff
-					// so a ~30° normal difference roughly halves the weight.
-					const normalW = pow( max( dot( centerNormal, sNormal ), 0 ), float( 8 ) );
-
-					const w = spatialW.mul( depthW ).mul( normalW );
-
-					totalAO.addAssign( sAO.mul( w ) );
-					totalW.addAssign( w );
+					const s = aoTextureNode.sample( uvNode.add( vec2( dx, dy ).mul( texelSize ) ) ).r;
+					aoMin.assign( min( aoMin, s ) );
+					aoMax.assign( max( aoMax, s ) );
 
 				}
 
 			}
 
-			return vec4( totalAO.div( max( totalW, float( 0.0001 ) ) ), 0, 0, 1 );
+			// Reproject through velocity (NDC → UV with Y flip). Without a velocity
+			// node, assume zero motion (the pass is forced to passthrough anyway).
+			const offsetUV = ( this._velocityNode !== null )
+				? this._velocityNode.sample( uvNode ).xy.mul( vec2( 0.5, - 0.5 ) )
+				: vec2( 0 );
+			const historyUV = uvNode.sub( offsetUV ).toVar();
+
+			// Clamp reprojected history into the current local AO range (ghost reject).
+			const history = clamp( historyTextureNode.sample( historyUV ).r, aoMin, aoMax );
+
+			// History only valid where the reprojected UV stays on screen.
+			const validUV = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
+
+			// Current-frame weight: temporalAccumulationAlpha while accumulating, 1
+			// (pure current) when the reprojected history is off-screen.
+			const alpha = validUV.select( this.temporalAccumulationAlpha, float( 1 ) );
+
+			return vec4( mix( history, current, alpha ), 0, 0, 1 );
 
 		} );
 
-		this._denoiseMaterial.fragmentNode = denoise().context( builder.getSharedContext() );
-		this._denoiseMaterial.needsUpdate = true;
+		this._accumulationMaterial.fragmentNode = temporal().context( builder.getSharedContext() );
+		this._accumulationMaterial.needsUpdate = true;
 
 		// At scale=1 the downsample passes are skipped, so building their fragment
 		// nodes is dead work. Recompile when crossing the boundary picks the right path.
@@ -784,11 +796,12 @@ class GTAONode extends TempNode {
 
 		this._aoRenderTarget.dispose();
 		this._depthHalfRT.dispose();
-		this._denoiseRenderTarget.dispose();
+		this._historyRenderTarget.dispose();
+		this._accumulationRenderTarget.dispose();
 
 		this._material.dispose();
 		this._depthDownsampleMaterial.dispose();
-		this._denoiseMaterial.dispose();
+		this._accumulationMaterial.dispose();
 
 	}
 
@@ -804,6 +817,8 @@ export default GTAONode;
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
  * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
+ * @param {?Node<vec2>} velocityNode - A node that represents the scene's velocity.
+ * Required to enable temporal accumulation of the AO; omit to disable it.
  * @returns {GTAONode}
  */
-export const ao = ( depthNode, normalNode, camera ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );
+export const ao = ( depthNode, normalNode, camera, velocityNode = null ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera, velocityNode !== null ? nodeObject( velocityNode ) : null );
