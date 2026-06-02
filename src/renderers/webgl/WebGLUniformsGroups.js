@@ -138,7 +138,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					writeUniformValue( val, uniform.__data, arrayOffset );
 
-					// Only non-primitives advance arrayOffset in STD140 layout
+					// only toArray() values advance arrayOffset
 					if ( typeof val !== 'number' && typeof val !== 'boolean' && ! val.isMatrix3 && ! ArrayBuffer.isView( val ) ) {
 
 						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
@@ -161,11 +161,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	function writeUniformValue( value, data, offset ) {
 
+		// TODO add integer and struct support
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 			data[ 0 ] = value;
 
 		} else if ( value.isMatrix3 ) {
+
+			// manually converting 3x3 to 3x4
 
 			data[ 0 ] = value.elements[ 0 ];
 			data[ 1 ] = value.elements[ 1 ];
@@ -182,6 +185,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		} else if ( ArrayBuffer.isView( value ) ) {
 
+			// copy the buffer data using "set"
 			data.set( new value.constructor( value.buffer, value.byteOffset, data.length ) );
 
 		} else {
