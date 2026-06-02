@@ -538,8 +538,6 @@ class Line2NodeMaterial extends NodeMaterial {
 	 */
 	get lineColorNode() {
 
-		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
-
 		return this.colorNode;
 
 	}
