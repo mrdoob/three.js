@@ -128,8 +128,6 @@ class LightsNode extends Node {
 		 */
 		this._lights = [];
 
-
-
 		/**
 		 * `LightsNode` sets this property to `true` by default.
 		 *
