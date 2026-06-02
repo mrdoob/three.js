@@ -151,7 +151,7 @@ class RenderList {
 		 *
 		 * @type {LightsNode}
 		 */
-		this.lightsNode = lighting.getNode( scene, camera );
+		this.lightsNode = lighting.getNode( scene );
 
 		/**
 		 * The scene's lights stored in an array. This array

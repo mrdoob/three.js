@@ -985,9 +985,9 @@ class NodeMaterial extends Material {
 	 * Setups the lights node based on the scene, environment and material.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {LightsNode} The lights node.
+	 * @return {LightingNode<Array>} The lights node.
 	 */
-	setupLights( builder ) {
+	setupMaterialLightings( builder ) {
 
 		const materialLightsNode = [];
 
@@ -1029,15 +1029,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		let lightsN = this.lightsNode || builder.lightsNode;
-
-		if ( materialLightsNode.length > 0 ) {
-
-			lightsN = builder.renderer.lighting.createNode( [ ...lightsN.getLights(), ...materialLightsNode ] );
-
-		}
-
-		return lightsN;
+		return materialLightsNode;
 
 	}
 
@@ -1070,15 +1062,16 @@ class NodeMaterial extends Material {
 
 		const lights = this.lights === true || this.lightsNode !== null;
 
-		const lightsNode = lights ? this.setupLights( builder ) : null;
+		const materialLightings = this.lights === true ? this.setupMaterialLightings( builder ) : [];
+		const lightsNode = lights ? ( this.lightsNode || builder.lightsNode ) : null;
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.getScope().hasLights ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 
-			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModel, materialLightings, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 
