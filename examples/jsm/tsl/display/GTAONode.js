@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, FloatType, NearestFilter } from 'three/webgpu';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, FloatType, NearestFilter, LinearFilter } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, exp, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp } from 'three/tsl';
 import { generateBlueNoiseTexture } from '../../math/BlueNoise.js';
 
@@ -108,8 +108,8 @@ class GTAONode extends TempNode {
 		 */
 		this._denoiseRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._denoiseRenderTarget.texture.name = 'GTAONode.Denoise';
-		this._denoiseRenderTarget.texture.minFilter = NearestFilter;
-		this._denoiseRenderTarget.texture.magFilter = NearestFilter;
+		this._denoiseRenderTarget.texture.minFilter = LinearFilter;
+		this._denoiseRenderTarget.texture.magFilter = LinearFilter;
 
 		// Half-res depth target, populated by the downsample pass when
 		// resolutionScale < 1. Depth uses Float32 because perspective depth values
