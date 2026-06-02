@@ -1,12 +1,20 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, FloatType, NearestFilter, LinearFilter } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, exp, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, exp, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, fract } from 'three/tsl';
 import { generateBlueNoiseTexture } from '../../math/BlueNoise.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
-// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
-const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
+// R2 low-discrepancy sequence constants — the 2D generalization of the golden
+// ratio. Each frame the blue-noise samples are scrolled by `frameId ×` these, so
+// successive frames form a maximally-spread quasirandom sequence for the temporal
+// accumulator while every frame keeps its blue-noise spectrum. Using two distinct
+// irrationals (rather than the same golden ratio on both channels) keeps the
+// rotation/step-jitter pair jointly well distributed in 2D instead of marching
+// along one diagonal. (Roberts 2018, "The Unreasonable Effectiveness of
+// Quasirandom Sequences"; Wolfe 2017, "Animating Noise For Integration Over Time".)
+const _r2GoldenX = 0.7548776662466927; // 1 / plastic-number
+const _r2GoldenY = 0.5698402909980532; // 1 / plastic-number²
 
 let _rendererState;
 
@@ -262,12 +270,18 @@ class GTAONode extends TempNode {
 		this._cameraFar = reference( 'far', 'float', camera );
 
 		/**
-		 * Temporal direction that influences the rotation angle for each slice.
+		 * Per-frame golden-ratio scroll added to the blue-noise samples (R channel →
+		 * slice rotation, G channel → step jitter) while {@link GTAONode#useTemporalFiltering}
+		 * is enabled. Advancing along the R2 quasirandom sequence each frame gives the
+		 * temporal accumulation pass a fresh, maximally-decorrelated realization while
+		 * preserving each frame's blue-noise spectrum. Zero when temporal filtering is
+		 * off (the noise is then static). Computed on the CPU to stay precise at large
+		 * frame counts.
 		 *
 		 * @private
-		 * @type {UniformNode<float>}
+		 * @type {UniformNode<vec2>}
 		 */
-		this._temporalDirection = uniform( 0 );
+		this._jitterOffset = uniform( new Vector2() );
 
 		/**
 		 * The material that is used to render the effect.
@@ -385,11 +399,18 @@ class GTAONode extends TempNode {
 
 			const frameId = frame.frameId;
 
-			this._temporalDirection.value = _temporalRotations[ frameId % 6 ] / 360;
+			// Scroll the blue noise along the R2 sequence. Computed here in double
+			// precision and reduced mod 1, so it stays exact for any frameId (a
+			// shader-side `frameId × irrational` would lose its fraction at high
+			// frame counts).
+			this._jitterOffset.value.set(
+				( frameId * _r2GoldenX ) % 1,
+				( frameId * _r2GoldenY ) % 1
+			);
 
 		} else {
 
-			this._temporalDirection.value = 0;
+			this._jitterOffset.value.set( 0, 0 );
 
 		}
 
@@ -500,10 +521,13 @@ class GTAONode extends TempNode {
 
 			// R and G are independent blue-noise patterns generated with different
 			// seeds, so one fetch gives a decorrelated pair. `noise1` → slice
-			// rotation, `noise2` → per-step phase jitter.
+			// rotation, `noise2` → per-step phase jitter. Each is scrolled per frame
+			// by its R2 golden-ratio offset (zero when temporal filtering is off), so
+			// successive frames are maximally decorrelated for the temporal
+			// accumulator while every frame keeps its blue-noise spectrum.
 			const noiseSample = sampleNoise( noiseUv );
-			const noise1 = noiseSample.r;
-			const noise2 = noiseSample.g;
+			const noise1 = fract( noiseSample.r.add( this._jitterOffset.x ) );
+			const noise2 = fract( noiseSample.g.add( this._jitterOffset.y ) );
 
 			// Random tangent direction from noise1, used to rotate the per-slice azimuth.
 			const tangentAngle = noise1.mul( PI ).mul( 2.0 );
@@ -524,7 +548,7 @@ class GTAONode extends TempNode {
 
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
+				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).toVar();
 				const sampleDir = vec3( cos( angle ), sin( angle ), 0 ).toVar();
 				sampleDir.assign( normalize( kernelMatrix.mul( sampleDir ) ) );
 
