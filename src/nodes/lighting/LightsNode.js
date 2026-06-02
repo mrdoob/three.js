@@ -186,11 +186,13 @@ class LightsNode extends Node {
 
 		if ( nodeData.lightNodesHash === undefined ) {
 
-			this.setupLightsNode( builder );
+			const lightNodes = this.setupLightsNode( builder );
+
+			nodeData.lightNodes = lightNodes;
 
 			const hash = [];
 
-			for ( const lightNode of nodeData.lightNodes ) {
+			for ( const lightNode of lightNodes ) {
 
 				hash.push( lightNode.getHash() );
 
@@ -229,6 +231,7 @@ class LightsNode extends Node {
 	 * process lights in the node system.
 	 *
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Array<LightingNode>} The array of lighting nodes.
 	 */
 	setupLightsNode( builder ) {
 
@@ -284,7 +287,7 @@ class LightsNode extends Node {
 
 		}
 
-		nodeData.lightNodes = lightNodes;
+		return lightNodes;
 
 	}
 
@@ -347,7 +350,11 @@ class LightsNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( nodeData.lightNodes === undefined ) this.setupLightsNode( builder );
+		if ( nodeData.lightNodes === undefined ) {
+
+			nodeData.lightNodes = this.setupLightsNode( builder );
+
+		}
 
 		return nodeData.lightNodes;
 
