@@ -164,7 +164,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 			data[ 0 ] = value;
-			gl.bufferSubData( gl.UNIFORM_BUFFER, offset, data );
 
 		} else if ( value.isMatrix3 ) {
 
