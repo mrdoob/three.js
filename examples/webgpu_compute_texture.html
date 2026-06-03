@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { texture, textureStore, Fn, instanceIndex, float, uvec2, vec4 } from 'three/tsl';
+			import { texture, textureStore, Fn, instanceIndex, uint, float, uvec2, vec4 } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -73,8 +73,8 @@
 
 				const computeTexture = Fn( ( { storageTexture } ) => {
 
-					const posX = instanceIndex.mod( width );
-					const posY = instanceIndex.div( width );
+					const posX = instanceIndex.mod( uint( width ) );
+					const posY = instanceIndex.div( uint( width ) );
 					const indexUV = uvec2( posX, posY );
 
 					// https://www.shadertoy.com/view/Xst3zN

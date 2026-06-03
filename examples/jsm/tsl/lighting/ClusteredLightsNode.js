@@ -1,7 +1,7 @@
 import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
+	attributeArray, nodeProxy, uint, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	renderGroup,
 	min, max, pow, log, clamp, dot
@@ -472,9 +472,9 @@ class ClusteredLightsNode extends LightsNode {
 			const invFocalY = float( 1 ).div( this._cameraProjectionMatrix.element( 1 ).element( 1 ) );
 
 			// 3D cluster coordinates from instanceIndex
-			const cx = instanceIndex.mod( NX );
-			const cy = instanceIndex.div( NX ).mod( NY );
-			const cz = instanceIndex.div( NX * NY );
+			const cx = instanceIndex.mod( uint( NX ) );
+			const cy = instanceIndex.div( uint( NX ) ).mod( uint( NY ) );
+			const cz = instanceIndex.div( uint( NX * NY ) );
 
 			// NDC X/Y bounds of the cluster.
 			// Y is flipped: cy=0 is the top screen row (fragment y=0), which is NDC y=+1.

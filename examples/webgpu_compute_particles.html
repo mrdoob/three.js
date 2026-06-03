@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, uniform, float, uv, vec3, hash, shapeCircle,
+			import { Fn, If, uniform, float, uv, uint, vec3, hash, shapeCircle,
 				instancedArray, instanceIndex } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -86,8 +86,8 @@
 					const position = positions.element( instanceIndex );
 					const color = colors.element( instanceIndex );
 
-					const x = instanceIndex.mod( amount );
-					const z = instanceIndex.div( amount );
+					const x = instanceIndex.mod( uint( amount ) );
+					const z = instanceIndex.div( uint( amount ) );
 
 					position.x = offset.sub( x ).mul( separation );
 					position.z = offset.sub( z ).mul( separation );

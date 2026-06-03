@@ -19,7 +19,7 @@ const _morphVec4 = /*@__PURE__*/ new Vector4();
 
 const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
-	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
+	const texelIndex = int( vertexIndex ).mul( int( stride ) ).add( offset );
 
 	const y = texelIndex.div( width );
 	const x = texelIndex.sub( y.mul( width ) );

@@ -554,8 +554,8 @@
 
 					If( instanceIndex.lessThan( totalThreads ), () => {
 
-						const workItemId = instanceIndex.div( 64 );
-						const localTriangleIndex = instanceIndex.mod( 64 );
+						const workItemId = instanceIndex.div( uint( 64 ) );
+						const localTriangleIndex = instanceIndex.mod( uint( 64 ) );
 
 						const workItem = workQueueBuffer.element( workItemId );
 						const instId = workItem.x;
