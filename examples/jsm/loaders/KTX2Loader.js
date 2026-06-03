@@ -263,7 +263,7 @@ class KTX2Loader extends Loader {
 
 				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC1,ETC2 and ASTC even though the hardware doesn't support these.
 				// Using these extensions will result in expensive software decompression on the main thread inside the driver, causing performance issues.
-				// In general, browsers should not expose extensions for emulated formats, but Chrome and Firefox currently do so on Linux.```
+				// In general, browsers should not expose extensions for emulated formats, but Chrome and Firefox currently do so on Linux.
 				// Since a granular filter is a little too fragile and we can transcode into other GPU formats, disable formats that are likely to be emulated.
 
 				this.workerConfig.astcSupported = false;
