@@ -147,13 +147,9 @@ class MathNode extends TempNode {
 
 		const method = this.method;
 
-		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE ) {
+		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT ) {
 
 			return 'float';
-
-		} else if ( method === MathNode.DOT ) {
-
-			return builder.getComponentType( this.getInputType( builder ) );
 
 		} else if ( method === MathNode.CROSS ) {
 
