@@ -237,7 +237,7 @@ class MathNode extends TempNode {
 
 		let method = this.method;
 
-		const type = this.getNodeType( builder );
+		let type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
 		const a = this.aNode;
@@ -310,6 +310,14 @@ class MathNode extends TempNode {
 				params.push( a.build( builder, inputType ) );
 				if ( b !== null ) params.push( b.build( builder, inputType ) );
 				if ( c !== null ) params.push( c.build( builder, inputType ) );
+
+			}
+
+			if ( method === MathNode.DOT ) {
+
+				// WGSL returns component type, whereas GLSL always returns float.
+
+				type = builder.getComponentType( inputType );
 
 			}
 
