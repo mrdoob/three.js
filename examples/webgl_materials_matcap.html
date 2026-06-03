@@ -190,27 +190,8 @@
 
 			function handleEXR( event ) {
 
-				const contents = event.target.result;
-
 				const loader = new EXRLoader();
-
-				loader.setDataType( THREE.HalfFloatType );
-
-				const texData = loader.parse( contents );
-
-				const texture = new THREE.DataTexture();
-
-				texture.image.width = texData.width;
-				texture.image.height = texData.height;
-				texture.image.data = texData.data;
-
-				texture.format = texData.format;
-				texture.type = texData.type;
-				texture.colorSpace = THREE.LinearSRGBColorSpace;
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.generateMipmaps = false;
-				texture.flipY = false;
+				const texture = loader.createDataTexture( event.target.result );
 
 				updateMatcap( texture );
 

@@ -35,9 +35,8 @@ class Lighting {
 	 */
 	getNode( scene ) {
 
-		// ignore post-processing
-
-		if ( scene.isQuadMesh ) return _defaultLights;
+		// Ignore renderable objects, e.g: Mesh, Sprite, etc.
+		if ( scene.isScene !== true && scene.isGroup !== true ) return _defaultLights;
 
 		let node = _weakMap.get( scene );
 
