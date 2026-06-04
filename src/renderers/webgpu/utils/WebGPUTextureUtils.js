@@ -283,13 +283,49 @@ class WebGPUTextureUtils {
 
 			}
 
+			// An ExternalTexture wraps a caller-owned GPU texture. On reinitialization (e.g. a render target
+			// resize that bumps the texture version) rebind the source instead of erroring.
+			if ( texture.isExternalTexture === true ) {
+
+				textureData.texture = texture.sourceTexture;
+				textureData.format = texture.sourceTexture.format;
+
+				return;
+
+			}
+
 			throw new Error( 'THREE.WebGPUTextureUtils: Texture already initialized.' );
 
 		}
 
 		if ( texture.isExternalTexture ) {
 
-			textureData.texture = texture.sourceTexture;
+			const sourceTexture = texture.sourceTexture;
+
+			textureData.texture = sourceTexture;
+			textureData.format = sourceTexture.format;
+
+			// When used as a multisampled render target, the external texture is the single-sample resolve
+			// target; three allocates and owns the multisampled attachment that is rendered into and resolved
+			// from (see the resolve handling in WebGPUBackend._getRenderPassDescriptor).
+			const { samples, isMSAA } = backend.utils.getTextureSampleData( texture );
+
+			if ( isMSAA ) {
+
+				const msaaTextureDescriptorGPU = new GPUTextureDescriptor();
+				msaaTextureDescriptorGPU.label = texture.name + '-msaa';
+				msaaTextureDescriptorGPU.size.width = sourceTexture.width;
+				msaaTextureDescriptorGPU.size.height = sourceTexture.height;
+				msaaTextureDescriptorGPU.size.depthOrArrayLayers = sourceTexture.depthOrArrayLayers;
+				msaaTextureDescriptorGPU.sampleCount = samples;
+				msaaTextureDescriptorGPU.dimension = this._getDimension( texture );
+				msaaTextureDescriptorGPU.format = sourceTexture.format;
+				msaaTextureDescriptorGPU.usage = GPUTextureUsage.RENDER_ATTACHMENT;
+
+				textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+
+			}
+
 			textureData.initialized = true;
 
 			return;
@@ -406,7 +442,9 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
+		// Never destroy an external texture's GPU resource. It is owned by the caller, not by three. The MSAA
+		// resolve attachment below is three-owned even for an external target, so it is still destroyed.
+		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 

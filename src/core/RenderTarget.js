@@ -126,13 +126,7 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		/**
-		 * An array of textures. Each color attachment is represented as a separate texture.
-		 * Has at least a single entry for the default color attachment.
-		 *
-		 * @type {Array<Texture>}
-		 */
-		this.textures = [];
+		this._textures = [];
 
 		const image = { width: width, height: height, depth: options.depth };
 		const texture = new Texture( image );
@@ -258,7 +252,48 @@ class RenderTarget extends EventDispatcher {
 
 	set texture( value ) {
 
+		// A texture assigned as the color attachment becomes a render-target texture, as in the constructor.
+		if ( value !== null ) {
+
+			value.isRenderTargetTexture = true;
+			value.renderTarget = this;
+
+		}
+
 		this.textures[ 0 ] = value;
+
+	}
+
+	/**
+	 * An array of textures. Each color attachment is represented as a separate texture.
+	 * Has at least a single entry for the default color attachment.
+	 *
+	 * Assigning an array flags each entry as a render-target texture, as the constructor does.
+	 *
+	 * @type {Array<Texture>}
+	 */
+	get textures() {
+
+		return this._textures;
+
+	}
+
+	set textures( value ) {
+
+		for ( let i = 0; i < value.length; i ++ ) {
+
+			const texture = value[ i ];
+
+			if ( texture !== null ) {
+
+				texture.isRenderTargetTexture = true;
+				texture.renderTarget = this;
+
+			}
+
+		}
+
+		this._textures = value;
 
 	}
 
