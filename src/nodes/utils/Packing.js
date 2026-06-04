@@ -42,7 +42,7 @@ export const unpackNormal = ( xy ) => vec3( xy, sqrt( saturate( float( 1.0 ).sub
  */
 export const directionToColor = ( node ) => {
 
-	warnOnce( 'TSL: directionToColor() has been renamed to packNormalToRGB().' ); // @deprecated r185
+	warnOnce( 'TSL: "directionToColor()" has been renamed to "packNormalToRGB()".' ); // @deprecated r185
 
 	return packNormalToRGB( node );
 
@@ -57,7 +57,7 @@ export const directionToColor = ( node ) => {
  */
 export const colorToDirection = ( node ) => {
 
-	warnOnce( 'TSL: colorToDirection() has been renamed to unpackRGBToNormal().' ); // @deprecated r185
+	warnOnce( 'TSL: "colorToDirection()" has been renamed to "unpackRGBToNormal()".' ); // @deprecated r185
 
 	return unpackRGBToNormal( node );
 

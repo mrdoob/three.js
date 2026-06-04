@@ -68,8 +68,8 @@
 			let wallMeshes = [];
 			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
 
-			let mouseRayOrigin = new THREE.Vector3();
-			let mouseRayDir = new THREE.Vector3();
+			const mouseRayOrigin = new THREE.Vector3();
+			const mouseRayDir = new THREE.Vector3();
 			let mouseMoving = false;
 			let mouseStopTimer = 0;
 			let pointerDown = false;
@@ -122,7 +122,7 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return unpackRGBToNormal(  scenePassNormal.sample( uv ) );
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 				} );
 

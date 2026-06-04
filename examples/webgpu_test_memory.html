@@ -198,7 +198,7 @@
 
 						const prePassNormal = sample( ( uv ) => {
 
-							return unpackRGBToNormal(  prePass.getTextureNode().sample( uv ) );
+							return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
 
 						} );
 						const prePassDepth = prePass.getTextureNode( 'depth' );
