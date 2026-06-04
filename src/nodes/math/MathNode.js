@@ -187,7 +187,9 @@ class MathNode extends TempNode {
 			let tA = aNode;
 			let tB = bNode;
 
-			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
+			const isMatrixInput = builder.isMatrix( tA.getNodeType( builder ) );
+
+			if ( isMatrixInput ) {
 
 				tB = vec4( vec3( tB ), 0.0 );
 
@@ -197,7 +199,7 @@ class MathNode extends TempNode {
 
 			}
 
-			const mulNode = mul( tA, tB ).xyz;
+			const mulNode = isMatrixInput ? mul( tA, tB ).xyz : mul( tB, tA ).xyz;
 
 			outputNode = normalize( mulNode );
 
