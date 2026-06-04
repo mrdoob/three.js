@@ -498,6 +498,8 @@ class NodeManager extends DataMap {
 	 */
 	getEnvironmentNode( scene ) {
 
+		if ( this.renderer.lighting.enabled === false ) return null;
+
 		this.updateEnvironment( scene );
 
 		let environmentNode = null;
@@ -600,6 +602,7 @@ class NodeManager extends DataMap {
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.type );
+			_cacheKeyValues.push( this.renderer.lighting.enabled ? 1 : 0 );
 
 			cacheKeyData.callId = callId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
