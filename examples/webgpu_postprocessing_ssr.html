@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, directionToColor, colorToDirection, vec2, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -146,7 +146,7 @@
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: directionToColor( normalView ),
+				normal: packNormalToRGB( normalView ),
 				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
@@ -173,7 +173,7 @@
 
 			const sceneNormal = sample( ( uv ) => {
 
-				return colorToDirection( scenePassNormal.sample( uv ) );
+				return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 			} );
 
