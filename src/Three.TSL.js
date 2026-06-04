@@ -47,6 +47,7 @@ export const addNodeElement = TSL.addNodeElement;
 export const agxToneMapping = TSL.agxToneMapping;
 export const all = TSL.all;
 export const alphaT = TSL.alphaT;
+export const ambientOcclusion = TSL.ambientOcclusion;
 export const and = TSL.and;
 export const anisotropy = TSL.anisotropy;
 export const anisotropyB = TSL.anisotropyB;
