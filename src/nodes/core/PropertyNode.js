@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { nodeImmutable } from '../tsl/TSLCore.js';
+import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 import { hashString } from './NodeUtils.js';
 
 /**
@@ -28,8 +28,9 @@ class PropertyNode extends Node {
 	 * @param {string} nodeType - The type of the node.
 	 * @param {?string} [name=null] - The name of the property in the shader.
 	 * @param {boolean} [varying=false] - Whether this property is a varying or not.
+	 * @param {?Node} [placeholderValue=null] - The placeholder value if not assigned.
 	 */
-	constructor( nodeType, name = null, varying = false ) {
+	constructor( nodeType, name = null, varying = false, placeholderValue = null ) {
 
 		super( nodeType );
 
@@ -49,6 +50,14 @@ class PropertyNode extends Node {
 		 * @default false
 		 */
 		this.varying = varying;
+
+		/**
+		 * The placeholder value of the property if it is not assigned.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.placeholderValue = nodeObject( placeholderValue );
 
 		/**
 		 * This flag can be used for type testing.
@@ -108,6 +117,18 @@ class PropertyNode extends Node {
 
 			nodeVar = builder.getVarFromNode( this, this.name );
 
+			if ( this.placeholderValue !== null ) {
+
+				if ( builder.getDataFromNode( this ).writeUsageCount === undefined ) {
+
+					const snippet = this.placeholderValue.build( builder, this.getNodeType( builder ) );
+
+					builder.addLineFlowCode( `${ builder.getPropertyName( nodeVar ) } = ${ snippet }`, this );
+
+				}
+
+			}
+
 		}
 
 		return builder.getPropertyName( nodeVar );
@@ -125,9 +146,10 @@ export default PropertyNode;
  * @function
  * @param {string} type - The type of the node.
  * @param {?string} [name=null] - The name of the property in the shader.
+ * @param {?Node} [placeholderValue=null] - The placeholder value if not assigned.
  * @returns {PropertyNode}
  */
-export const property = ( type, name ) => new PropertyNode( type, name );
+export const property = ( type, name, placeholderValue = null ) => new PropertyNode( type, name, false, placeholderValue );
 
 /**
  * TSL function for creating a varying property node.
@@ -136,9 +158,10 @@ export const property = ( type, name ) => new PropertyNode( type, name );
  * @function
  * @param {string} type - The type of the node.
  * @param {?string} [name=null] - The name of the varying in the shader.
+ * @param {?Node} [placeholderValue=null] - The placeholder value if not assigned.
  * @returns {PropertyNode}
  */
-export const varyingProperty = ( type, name ) => new PropertyNode( type, name, true );
+export const varyingProperty = ( type, name, placeholderValue = null ) => new PropertyNode( type, name, true, placeholderValue );
 
 /**
  * TSL object that represents the shader variable `DiffuseColor`.
