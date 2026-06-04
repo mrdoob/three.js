@@ -1636,7 +1636,7 @@ class WebGLRenderer {
 
 			// update camera matrices and frustum
 
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( camera.matrixWorldAutoUpdate === true ) camera.updateWorldMatrix( true, true );
 
 			if ( xr.enabled === true && xr.isPresenting === true && ( output === null || output.isCompositing() === false ) ) {
 

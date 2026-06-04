@@ -3456,7 +3456,7 @@ class Renderer {
 
 		}
 
-		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+		if ( camera.matrixWorldAutoUpdate === true ) camera.updateWorldMatrix( true, true );
 
 		// handle XR
 
