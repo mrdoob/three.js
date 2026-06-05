@@ -100,15 +100,45 @@ By default, 3D objects are continuously scaled. If you set this property to a nu
 
 Default is `null`.
 
+### .showE : boolean
+
+Whether the e rotation helper should be visible or not.
+
+Default is `true`.
+
 ### .showX : boolean
 
 Whether the x-axis helper should be visible or not.
 
 Default is `true`.
 
+### .showXY : boolean
+
+Whether the xy-plane helper should be visible or not.
+
+Default is `true`.
+
+### .showXYZE : boolean
+
+Whether the xyze rotation helper should be visible or not.
+
+Default is `true`.
+
+### .showXZ : boolean
+
+Whether the xz-axis helper should be visible or not.
+
+Default is `true`.
+
 ### .showY : boolean
 
 Whether the y-axis helper should be visible or not.
+
+Default is `true`.
+
+### .showYZ : boolean
+
+Whether the yz-plane helper should be visible or not.
 
 Default is `true`.
 
@@ -133,6 +163,12 @@ Default is `'world'`.
 ### .translationSnap : number
 
 By default, 3D objects are continuously translated. If you set this property to a numeric value (world units), you can define in which steps the 3D object should be translated.
+
+Default is `null`.
+
+### .viewport : Vector4
+
+The viewport rectangle, in logical (CSS) pixels with the origin at the lower-left of the canvas. Set this when the renderer uses a sub-canvas viewport so pointer coordinates map to the correct region. If `null`, the full canvas is used.
 
 Default is `null`.
 

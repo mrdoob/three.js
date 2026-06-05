@@ -604,6 +604,12 @@ Will return true if the stencil reference value is not equal to the current sten
 
 Normal information is relative to the object orientation.
 
+### .OnBeforeFrameUpdate (constant)
+
+Creates an event that triggers a function before every frame.
+
+The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+
 ### .OnBeforeMaterialUpdate (constant)
 
 Creates an event that triggers a function before the material is updated.
@@ -613,6 +619,12 @@ The event will be bound to the declared TSL function `Fn()`; it must be declared
 ### .OnBeforeObjectUpdate (constant)
 
 Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
+
+The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+
+### .OnFrameUpdate (constant)
+
+Creates an event that triggers a function every frame.
 
 The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
 
@@ -1527,9 +1539,7 @@ The texture.
 
 **device**
 
-The GPU device which is used for feature detection. It is not necessary to apply the device for most formats.
-
-Default is `null`.
+The GPU device which is used for feature detection.
 
 **Returns:** The GPU format.
 
@@ -1891,6 +1901,22 @@ The rotation applied to the third axis, in radians.
 
 A string specifying the axes order.
 
+### .setupWebGLXRFallback( renderer : WebGPURenderer, createFallbackRenderer : function, onFallback : function )
+
+Sets up a construction-time WebGL fallback for WebGPU XR examples.
+
+**renderer**
+
+The initial renderer.
+
+**createFallbackRenderer**
+
+A function that returns a new renderer with a WebGL backend.
+
+**onFallback**
+
+A function that installs the new renderer in the app.
+
 ### .shadowRenderObjectFunction( object : Object3D, scene : Scene, _camera : Camera, geometry : BufferGeometry, material : Material, group : Group, …params : any )
 
 Shadow Render Object Function.
@@ -2064,6 +2090,10 @@ This function maintains an internal cache of warning messages and will only outp
 **params**
 
 The warning message components.
+
+### .yieldToMain() : Promise.<void>
+
+Yields execution to the main thread to allow rendering and other tasks. Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimationFrame.
 
 ## Type Definitions
 

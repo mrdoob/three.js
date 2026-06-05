@@ -1,5 +1,13 @@
 import { error, warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
+import { submit } from './WebGPUUtils.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+import GPUQuerySetDescriptor from '../descriptors/GPUQuerySetDescriptor.js';
+
+const _bufferDescriptor = new GPUBufferDescriptor();
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _querySetDescriptor = new GPUQuerySetDescriptor();
 
 /**
  * Manages a pool of WebGPU timestamp queries for performance measurement.
@@ -22,24 +30,31 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		this.device = device;
 		this.type = type;
 
-		this.querySet = this.device.createQuerySet( {
-			type: 'timestamp',
-			count: this.maxQueries,
-			label: `queryset_global_timestamp_${type}`
-		} );
+		_querySetDescriptor.label = `queryset_global_timestamp_${type}`;
+		_querySetDescriptor.type = 'timestamp';
+		_querySetDescriptor.count = this.maxQueries;
+
+		this.querySet = this.device.createQuerySet( _querySetDescriptor );
+
+		_querySetDescriptor.reset();
 
 		const bufferSize = this.maxQueries * 8;
-		this.resolveBuffer = this.device.createBuffer( {
-			label: `buffer_timestamp_resolve_${type}`,
-			size: bufferSize,
-			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
-		} );
 
-		this.resultBuffer = this.device.createBuffer( {
-			label: `buffer_timestamp_result_${type}`,
-			size: bufferSize,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-		} );
+		_bufferDescriptor.label = `buffer_timestamp_resolve_${type}`;
+		_bufferDescriptor.size = bufferSize;
+		_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
+
+		this.resolveBuffer = this.device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
+
+		_bufferDescriptor.label = `buffer_timestamp_result_${type}`;
+		_bufferDescriptor.size = bufferSize;
+		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+		this.resultBuffer = this.device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
 
 	}
 
@@ -136,7 +151,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			this.currentQueryIndex = 0;
 			this.queryOffsets.clear();
 
-			const commandEncoder = this.device.createCommandEncoder();
+			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 			commandEncoder.resolveQuerySet(
 				this.querySet,
@@ -155,7 +170,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			);
 
 			const commandBuffer = commandEncoder.finish();
-			this.device.queue.submit( [ commandBuffer ] );
+			submit( this.device, commandBuffer );
 
 			if ( this.resultBuffer.mapState !== 'unmapped' ) {
 

@@ -94,7 +94,7 @@ node properties.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the node builder's material uses node properties or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, lightsData : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, lightsData : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given render object has not changed its state.</p>
@@ -115,6 +115,14 @@ node properties.</p>
 									</td>
 									<td class="description last">
 										<p>The current material lights.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderId</strong>
+									</td>
+									<td class="description last">
+										<p>The current render ID.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -164,6 +172,28 @@ monitoring.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the versions of attributes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGeometryData" translate="no">.<a href="#getGeometryData">getGeometryData</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a geometry data structure holding the geometry property values for
+monitoring.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring geometry properties.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getLights" translate="no">.<a href="#getLights">getLights</a><span class="signature">( lightsNode : <span class="param-type"><a href="LightsNode.html">LightsNode</a></span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>

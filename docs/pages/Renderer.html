@@ -247,6 +247,16 @@ If this is the case, the renderer allocates an internal render target for that p
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="onError" translate="no">.<a href="#onError">onError</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback function that defines what should happen when an uncaptured
+backend error is reported (e.g. a WebGPU validation/out-of-memory/internal
+error raised outside an error scope). Applications can override this to
+surface errors in their own UI without letting them escalate to a device
+loss. The default implementation logs to the console.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="opaque" translate="no">.<a href="#opaque">opaque</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether the renderer should render opaque render objects or not.</p>
@@ -732,7 +742,7 @@ is no longer in use by your app.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The current animation loop callback.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="StorageBufferAttribute.html">StorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, target : <span class="param-type"><a href="ReadbackBuffer.html">ReadbackBuffer</a> | ArrayBuffer</span>, offset : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;(ArrayBuffer|<a href="ReadbackBuffer.html">ReadbackBuffer</a>)></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Can be used to transfer buffer data from a storage buffer attribute
@@ -745,7 +755,33 @@ from the GPU to the CPU in context of compute shaders.</p>
 										<strong translate="no">attribute</strong>
 									</td>
 									<td class="description last">
+										<p>The storage buffer attribute to read frm.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
 										<p>The storage buffer attribute.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">offset</strong>
+									</td>
+									<td class="description last">
+										<p>The storage buffer attribute.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The offset from which to start reading the</p>
 									</td>
 								</tr>
 							</tbody>
@@ -991,8 +1027,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 					<h3 class="name name-method" id="hasCompatibility" translate="no">.<a href="#hasCompatibility">hasCompatibility</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Checks if the given compatibility is supported by the selected backend. If the
-renderer has not been initialized, this method always returns <code>false</code>.</p>
+							<p>Checks if the given compatibility is supported by the selected backend.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -1583,7 +1618,7 @@ Pass <code>null</code> to use the default sort.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setOutputRenderTarget" translate="no">.<a href="#setOutputRenderTarget">setOutputRenderTarget</a><span class="signature">( renderTarget : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="setOutputRenderTarget" translate="no">.<a href="#setOutputRenderTarget">setOutputRenderTarget</a><span class="signature">( renderTarget : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the output render target for the renderer.</p>
@@ -1816,7 +1851,7 @@ Pass <code>null</code> to use the default sort.</p>
 										<strong translate="no">y</strong>
 									</td>
 									<td class="description last">
-										<p>The vertical coordinate for the upper left corner of the viewport origin  in logical pixel unit.</p>
+										<p>The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.</p>
 									</td>
 								</tr>
 								<tr>

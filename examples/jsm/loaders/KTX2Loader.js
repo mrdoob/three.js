@@ -103,6 +103,9 @@ import {
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
 
+const WASM_BIN_URL = new URL( '../libs/basis/basis_transcoder.wasm', import.meta.url ).toString();
+const WASM_JS_URL = new URL( '../libs/basis/basis_transcoder.js', import.meta.url ).toString();
+
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
@@ -169,9 +172,9 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
-	 * Sets the transcoder path.
+	 * Sets the transcoder path to optionally set the decoder load path from a CDN.
 	 *
-	 * The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+	 * By default The WASM transcoder and JS wrapper are loaded from the `examples/jsm/libs/basis` directory.
 	 *
 	 * @param {string} path - The transcoder path to set.
 	 * @return {KTX2Loader} A reference to this loader.
@@ -254,16 +257,17 @@ class KTX2Loader extends Loader {
 
 			if ( typeof navigator !== 'undefined' &&
 				typeof navigator.platform !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
-				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
+				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Android' ) < 0 &&
 				this.workerConfig.astcSupported && this.workerConfig.etc2Supported &&
 				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
 
-				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC2 and ASTC even though the hardware doesn't support these.
+				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC1,ETC2 and ASTC even though the hardware doesn't support these.
 				// Using these extensions will result in expensive software decompression on the main thread inside the driver, causing performance issues.
-				// When using ANGLE (e.g. via Chrome), these extensions are not exposed except for some specific Intel GPU models - however, Firefox doesn't perform this filtering.
+				// In general, browsers should not expose extensions for emulated formats, but Chrome and Firefox currently do so on Linux.
 				// Since a granular filter is a little too fragile and we can transcode into other GPU formats, disable formats that are likely to be emulated.
 
 				this.workerConfig.astcSupported = false;
+				this.workerConfig.etc1Supported = false;
 				this.workerConfig.etc2Supported = false;
 
 			}
@@ -280,18 +284,30 @@ class KTX2Loader extends Loader {
 
 		if ( ! this.transcoderPending ) {
 
-			// Load transcoder wrapper.
 			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
-			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+			binaryLoader.setResponseType( 'arraybuffer' );
+
+			let jsContent, binaryContent;
+			if ( this.transcoderPath === '' ) {
+
+				jsContent = jsLoader.loadAsync( WASM_JS_URL );
+				binaryContent = binaryLoader.loadAsync( WASM_BIN_URL );
+
+			} else {
+
+				// Load transcoder wrapper.
+				jsLoader.setPath( this.transcoderPath );
+				jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+
+				// Load transcoder WASM binary.
+				binaryLoader.setPath( this.transcoderPath );
+				binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+
+			}
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
@@ -956,6 +972,8 @@ KTX2Loader.BasisWorker = function () {
 
 const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGBFormat, RGFormat, RedFormat ] );
 
+const NORMALIZED_VK_FORMATS = new Set( [ VK_FORMAT_R16G16B16A16_UNORM ] );
+
 const FORMAT_MAP = {
 
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
@@ -1205,6 +1223,7 @@ async function createRawTexture( container ) {
 		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
 		texture.magFilter = NearestFilter;
 		texture.generateMipmaps = container.levelCount === 0;
+		texture.normalized = NORMALIZED_VK_FORMATS.has( vkFormat );
 
 	} else {
 

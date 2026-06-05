@@ -282,6 +282,16 @@ class RenderObject {
 		this._monitor = null;
 
 		/**
+		 * The object's original material when this render object is drawn with an
+		 * override material.
+		 *
+		 * @type {?Material}
+		 * @private
+		 * @default null
+		 */
+		this._sourceMaterial = renderer._currentSourceMaterial;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -328,6 +338,12 @@ class RenderObject {
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
 
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.addEventListener( 'dispose', this.onMaterialDispose );
+
+		}
+
 	}
 
 	/**
@@ -365,7 +381,7 @@ class RenderObject {
 	 */
 	get hardwareClippingPlanes() {
 
-		return this.material.hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
+		return this.getNodeBuilderState().hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
 
 	}
 
@@ -511,7 +527,20 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-				attributesId[ nodeAttribute.name ] = attribute.id;
+
+				if ( attribute !== undefined ) {
+
+					if ( attribute.isInterleavedBufferAttribute ) {
+
+						attributesId[ nodeAttribute.name ] = attribute.data.uuid;
+
+					} else {
+
+						attributesId[ nodeAttribute.name ] = attribute.id;
+
+					}
+
+				}
 
 			}
 
@@ -655,7 +684,7 @@ class RenderObject {
 
 		// structural equality isn't sufficient for morph targets since the
 		// data are maintained in textures. only if the targets are all equal
-		// the texture and thus the instance of `MorphNode` can be shared.
+		// the texture and thus the `morphReference` can be shared.
 
 		for ( const name of Object.keys( geometry.morphAttributes ).sort() ) {
 
@@ -814,7 +843,11 @@ class RenderObject {
 
 				const attribute = this.geometry.getAttribute( name );
 
-				if ( attribute === undefined || attributesId[ name ] !== attribute.id ) {
+				if ( attribute === undefined ) return true;
+
+				const id = attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id;
+
+				if ( attributesId[ name ] !== id ) {
 
 					return true;
 
@@ -905,6 +938,12 @@ class RenderObject {
 
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 		this.onDispose();
 

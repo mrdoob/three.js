@@ -490,7 +490,7 @@ It's possible use `xyzw`, `rgba` or `stpq`.
 | Name | Description |
 | -- | -- |
 | `.add( node \| value, ... )` | Return the addition of two or more value. |
-| `.sub( node \| value )` | Return the subraction of two or more value. |
+| `.sub( node \| value )` | Return the subtraction of two or more value. |
 | `.mul( node \| value )` | Return the multiplication of two or more value. |
 | `.div( node \| value )` | Return the division of two or more value. |
 | `.mod( node \| value )` | Computes the remainder of dividing the first node by the second. |

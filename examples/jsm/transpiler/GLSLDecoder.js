@@ -677,7 +677,7 @@ class GLSLDecoder {
 
 			params.push( new FunctionParameter( type, name, qualifier, immutable ) );
 
-			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'Expected ","' );
+			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'THREE.GLSLDecoder: Expected ","' );
 
 		}
 
@@ -789,7 +789,7 @@ class GLSLDecoder {
 
 		if ( tokens[ 2 ].str !== '{' ) {
 
-			throw new Error( 'Expected \'{\' after struct name ' );
+			throw new Error( 'THREE.GLSLDecoder: Expected \'{\' after struct name ' );
 
 		}
 
@@ -801,13 +801,13 @@ class GLSLDecoder {
 
 			if ( typeToken.type != 'literal' || nameToken.type != 'literal' ) {
 
-				throw new Error( 'Invalid struct declaration' );
+				throw new Error( 'THREE.GLSLDecoder: Invalid struct declaration' );
 
 			}
 
 			if ( tokens[ i + 2 ].str !== ';' ) {
 
-				throw new Error( 'Missing \';\' after struct member name' );
+				throw new Error( 'THREE.GLSLDecoder: Missing \';\' after struct member name' );
 
 			}
 
@@ -818,7 +818,7 @@ class GLSLDecoder {
 
 		if ( tokens[ tokens.length - 2 ].str !== '}' ) {
 
-			throw new Error( 'Missing closing \'}\' for struct ' + structName );
+			throw new Error( 'THREE.GLSLDecoder: Missing closing \'}\' for struct ' + structName );
 
 		}
 
@@ -921,7 +921,7 @@ class GLSLDecoder {
 		// Validate curly braces
 		if ( this.getToken().str !== '{' ) {
 
-			throw new Error( 'Expected \'{\' after switch(...) ' );
+			throw new Error( 'THREE.GLSLDecoder: Expected \'{\' after switch(...) ' );
 
 		}
 

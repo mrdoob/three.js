@@ -210,9 +210,10 @@ class Plane {
 	 *
 	 * @param {Line3} line - The line to compute the intersection for.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
+	 * @param {boolean} [clampToLine=true] - Whether to clamp the intersection to the line segment.
+	 * @return {?Vector3} The intersection point. Returns `null` if no intersection is detected.
 	 */
-	intersectLine( line, target ) {
+	intersectLine( line, target, clampToLine = true ) {
 
 		const direction = line.delta( _vector1 );
 
@@ -234,7 +235,7 @@ class Plane {
 
 		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
-		if ( t < 0 || t > 1 ) {
+		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
 
 			return null;
 

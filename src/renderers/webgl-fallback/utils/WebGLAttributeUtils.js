@@ -254,76 +254,81 @@ class WebGLAttributeUtils {
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {ReadbackBuffer} readbackBuffer - The readback buffer.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( readbackBuffer ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const attribute = readbackBuffer.attribute;
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const { bufferGPU } = backend.get( bufferAttribute );
+		const attributeInfo = backend.get( bufferAttribute );
+		const { bufferGPU } = attributeInfo;
 
-		const array = attribute.array;
-		const byteLength = array.byteLength;
+		const byteLength = count === - 1 ? attributeInfo.byteLength - offset : count;
 
-		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		// read the data back
+		let dstBuffer;
+		if ( target === null ) {
 
-		const readbackBufferData = backend.get( readbackBuffer );
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
 
-		let { writeBuffer } = readbackBufferData;
+		} else if ( target.isReadbackBuffer ) {
 
-		if ( writeBuffer === undefined ) {
+			if ( target._mapped === true ) {
 
-			writeBuffer = gl.createBuffer();
+				throw new Error( 'THREE.WebGPURenderer: ReadbackBuffer must be released before being used again.' );
 
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-			gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
+			}
 
-			// dispose
+			const releaseCallback = () => {
 
-			const dispose = () => {
-
-				gl.deleteBuffer( writeBuffer );
-
-				backend.delete( readbackBuffer );
-
-				readbackBuffer.removeEventListener( 'dispose', dispose );
+				target.buffer = null;
+				target._mapped = false;
+				target.removeEventListener( 'release', releaseCallback );
+				target.removeEventListener( 'dispose', releaseCallback );
 
 			};
 
-			readbackBuffer.addEventListener( 'dispose', dispose );
+			target.addEventListener( 'release', releaseCallback );
+			target.addEventListener( 'dispose', releaseCallback );
 
-			// register
-
-			readbackBufferData.writeBuffer = writeBuffer;
+			// WebGL has no concept of a "mapped" data buffer so we create a new buffer, instead.
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
+			target.buffer = dstBuffer.buffer;
 
 		} else {
 
-			gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+			dstBuffer = new Uint8Array( target );
 
 		}
 
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
-
-		await backend.utils._clientWaitAsync();
-
-		const dstBuffer = new attribute.array.constructor( array.length );
-
 		// Ensure the buffer is bound before reading
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-
-		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
+		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		gl.getBufferSubData( gl.COPY_READ_BUFFER, offset, dstBuffer );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer;
+		// return the appropriate type
+		if ( target && target.isReadbackBuffer ) {
+
+			return target;
+
+		} else {
+
+			return dstBuffer.buffer;
+
+		}
 
 	}
 

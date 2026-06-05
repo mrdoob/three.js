@@ -16,7 +16,6 @@ import { REVISION, TimestampQuery } from '../../constants.js';
  * implement the interface.
  *
  * @abstract
- * @private
  */
 class Backend {
 
@@ -123,6 +122,15 @@ class Backend {
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	finishRender( /*renderContext*/ ) {}
+
+	/**
+	 * Sets the XR rendering destination.
+	 *
+	 * Backends that render directly into XR framebuffers can override this hook.
+	 *
+	 * @param {?Object} xrTarget - The XR rendering destination.
+	 */
+	setXRTarget( /*xrTarget*/ ) {}
 
 	/**
 	 * This method is executed at the beginning of a compute call and
@@ -277,9 +285,10 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture*/ ) { }
+	updateSampler( /*texture, textureNode*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -388,6 +397,22 @@ class Backend {
 	 * @param {BufferAttribute} attribute - The buffer attribute.
 	 */
 	createStorageAttribute( /*attribute*/ ) { }
+
+	/**
+	 * Creates a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	createUniformBuffer( /*uniformBuffer*/ ) { }
+
+	/**
+	 * Destroys a uniform buffer.
+	 *
+	 * @abstract
+	 * @param {Buffer} uniformBuffer - The uniform buffer.
+	 */
+	destroyUniformBuffer( /*uniformBuffer*/ ) { }
 
 	/**
 	 * Updates the GPU buffer of a shader attribute.

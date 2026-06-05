@@ -12,6 +12,12 @@ Limitations:
 *   There is perhaps some question as to how valid it is to always assume little-endian-ness.
 *   ASCII decoding assumes file is UTF-8.
 
+```js
+const loader = new STLLoader();
+const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
+scene.add( new THREE.Mesh( geometry ) );
+```
+
 For binary STLs geometry might contain colors for vertices. To use it:
 
 ```js
@@ -32,14 +38,6 @@ for ( let i = 0; i < nGeometryGroups; i ++ ) {
 	materials.push( material );
 }
 const mesh = new THREE.Mesh(geometry, materials);
-```
-
-## Code Example
-
-```js
-const loader = new STLLoader();
-const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
-scene.add( new THREE.Mesh( geometry ) );
 ```
 
 ## Import

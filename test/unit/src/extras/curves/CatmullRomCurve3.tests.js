@@ -387,7 +387,7 @@ export default QUnit.module( 'Extras', () => {
 				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
 
 			} );
-			
+
 			QUnit.test( 'two points', ( assert ) => {
 
 				const curve = new CatmullRomCurve3( [

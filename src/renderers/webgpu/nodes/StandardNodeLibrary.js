@@ -50,7 +50,6 @@ import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicTo
  * used in {@link WebGPURenderer}. It maps lights, tone mapping
  * techniques and materials to node-based implementations.
  *
- * @private
  * @augments NodeLibrary
  */
 class StandardNodeLibrary extends NodeLibrary {

@@ -291,8 +291,6 @@ Object.defineProperties( Node.prototype, proto );
 
 // --- FINISH ---
 
-const nodeBuilderFunctionsCacheMap = new WeakMap();
-
 const ShaderNodeObject = function ( obj, altType = null ) {
 
 	const type = getValueType( obj );
@@ -506,25 +504,51 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( shaderNode.layout ) {
 
-			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+			// build inputs first
 
-			if ( functionNodesCacheMap === undefined ) {
+			if ( rawInputs ) {
 
-				functionNodesCacheMap = new WeakMap();
+				// use layout inputs to ensure that no extra parameters are built
 
-				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+				const inputs = shaderNode.layout.inputs;
+
+				if ( isArrayAsParameter( rawInputs ) ) {
+
+					const rawArrayParameters = rawInputs;
+
+					for ( let i = 0; i < inputs.length; i ++ ) {
+
+						const rawParameter = rawArrayParameters[ i ];
+
+						if ( rawParameter && rawParameter.isNode ) {
+
+							rawParameter.build( builder );
+
+						}
+
+					}
+
+				} else {
+
+					const rawObjectParameters = rawInputs[ 0 ];
+
+					for ( const param of inputs ) {
+
+						const rawParameter = rawObjectParameters[ param.name ];
+
+						if ( rawParameter && rawParameter.isNode ) {
+
+							rawParameter.build( builder );
+
+						}
+
+					}
+
+				}
 
 			}
 
-			let functionNode = functionNodesCacheMap.get( shaderNode );
-
-			if ( functionNode === undefined ) {
-
-				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
-
-				functionNodesCacheMap.set( shaderNode, functionNode );
-
-			}
+			const functionNode = builder.buildFunctionNode( shaderNode );
 
 			builder.addInclude( functionNode );
 
@@ -532,7 +556,7 @@ class ShaderCallNodeInternal extends Node {
 
 			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
 
-			result = nodeObject( functionNode.call( inputs ) );
+			result = functionNode.call( inputs );
 
 		} else {
 
@@ -679,15 +703,19 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
+function isArrayAsParameter( params ) {
+
+	return params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+}
+
 function getLayoutParameters( params ) {
 
 	let output;
 
 	nodeObjects( params );
 
-	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-	if ( isArrayAsParameter ) {
+	if ( isArrayAsParameter( params ) ) {
 
 		output = [ ...params ];
 
@@ -957,6 +985,26 @@ export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = nu
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
 export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
 
+export const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
+
+	return new Proxy( constructorFunction, {
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( nodeInstance, prop, receiver );
+
+		},
+
+		set( target, prop, value ) {
+
+			return Reflect.set( nodeInstance, prop, value );
+
+		}
+
+	} );
+
+};
+
 let fnId = 0;
 
 class FnNode extends Node {
@@ -1191,9 +1239,6 @@ export const bvec4 = new ConvertType( 'bvec4' );
 export const mat2 = new ConvertType( 'mat2' );
 export const mat3 = new ConvertType( 'mat3' );
 export const mat4 = new ConvertType( 'mat4' );
-
-export const string = ( value = '' ) => new ConstNode( value, 'string' );
-export const arrayBuffer = ( value ) => new ConstNode( value, 'ArrayBuffer' );
 
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );

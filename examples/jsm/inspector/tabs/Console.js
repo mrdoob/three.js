@@ -12,7 +12,7 @@ class Console extends Tab {
 		this.buildHeader();
 
 		this.logContainer = document.createElement( 'div' );
-		this.logContainer.id = 'console-log';
+		this.logContainer.classList.add( 'console-log' );
 		this.content.appendChild( this.logContainer );
 
 	}

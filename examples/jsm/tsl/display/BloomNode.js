@@ -9,6 +9,15 @@ const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
+const luminosityHighPass = Fn( ( { input, threshold, smoothWidth } ) => {
+
+	const v = luminance( input.rgb );
+	const alpha = smoothstep( threshold, threshold.add( smoothWidth ), v );
+
+	return mix( vec4( 0 ), input, alpha );
+
+} );
+
 /**
  * Post processing node for creating a bloom effect.
  * ```js
@@ -74,21 +83,21 @@ class BloomNode extends TempNode {
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.strength = uniform( strength );
+		this.strength = strength.isNode ? strength : uniform( strength );
 
 		/**
 		 * The radius of the bloom. Must be in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.radius = uniform( radius );
+		this.radius = radius.isNode ? radius : uniform( radius );
 
 		/**
 		 * The luminance threshold limits which bright areas contribute to the bloom effect.
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.threshold = uniform( threshold );
+		this.threshold = threshold.isNode ? threshold : uniform( threshold );
 
 		/**
 		 * Can be used to tweak the extracted luminance from the scene.
@@ -96,6 +105,22 @@ class BloomNode extends TempNode {
 		 * @type {UniformNode<float>}
 		 */
 		this.smoothWidth = uniform( 0.01 );
+
+		/**
+		 * Scale factor for the internal render targets.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this._resolutionScale = 0.5;
+
+		/**
+		 * Can be used to inject a custom high pass filter (e.g., for anamorphic effects).
+		 *
+		 * @type {Function}
+		 */
+		this.highPassFn = luminosityHighPass;
 
 		/**
 		 * An array that holds the render targets for the horizontal blur passes.
@@ -254,6 +279,32 @@ class BloomNode extends TempNode {
 	}
 
 	/**
+	 * Sets the resolution scale for the pass.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
+	 * @return {BloomNode} A reference to this node.
+	 */
+	setResolutionScale( resolutionScale ) {
+
+		this._resolutionScale = resolutionScale;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution scale of the pass.
+	 *
+	 * @return {number} The current resolution scale. A value of `1` means full resolution.
+	 */
+	getResolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	/**
 	 * Sets the size of the effect.
 	 *
 	 * @param {number} width - The width of the effect.
@@ -261,8 +312,8 @@ class BloomNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		let resx = Math.round( width / 2 );
-		let resy = Math.round( height / 2 );
+		let resx = Math.floor( width * this._resolutionScale );
+		let resy = Math.floor( height * this._resolutionScale );
 
 		this._renderTargetBright.setSize( resx, resy );
 
@@ -273,8 +324,8 @@ class BloomNode extends TempNode {
 
 			this._separableBlurMaterials[ i ].invSize.value.set( 1 / resx, 1 / resy );
 
-			resx = Math.round( resx / 2 );
-			resy = Math.round( resy / 2 );
+			resx = Math.floor( resx / 2 );
+			resy = Math.floor( resy / 2 );
 
 		}
 
@@ -350,19 +401,8 @@ class BloomNode extends TempNode {
 
 		// luminosity high pass material
 
-		const luminosityHighPass = Fn( () => {
-
-			const texel = this.inputNode;
-			const v = luminance( texel.rgb );
-
-			const alpha = smoothstep( this.threshold, this.threshold.add( this.smoothWidth ), v );
-
-			return mix( vec4( 0 ), texel, alpha );
-
-		} );
-
 		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
-		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
+		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } ).context( builder.getSharedContext() );
 		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 

@@ -874,17 +874,19 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 			}
 
-			// Extract code example from classdesc
+			// Extract code example from classdesc, but only if there is exactly one
+			// code block. Class descriptions with multiple snippets lack a clear
+			// "the" example, and picking one arbitrarily produces out-of-context output.
 			if ( doclet.classdesc ) {
 
-				const codeBlockRegex = /<pre class="prettyprint source[^"]*"><code>([\s\S]*?)<\/code><\/pre>/;
-				const match = doclet.classdesc.match( codeBlockRegex );
+				const codeBlockRegex = /<pre class="prettyprint source[^"]*"><code>([\s\S]*?)<\/code><\/pre>/g;
+				const matches = doclet.classdesc.match( codeBlockRegex );
 
-				if ( match ) {
+				if ( matches && matches.length === 1 ) {
 
-					doclet.codeExample = match[ 0 ];
+					doclet.codeExample = matches[ 0 ];
 					// Remove the code example from classdesc
-					doclet.classdesc = doclet.classdesc.replace( codeBlockRegex, '' ).trim();
+					doclet.classdesc = doclet.classdesc.replace( matches[ 0 ], '' ).trim();
 
 				}
 

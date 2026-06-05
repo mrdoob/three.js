@@ -6,6 +6,12 @@ A Note on Row-Major and Column-Major Ordering:
 
 The constructor and [Matrix2#set](Matrix2.html#set) method take arguments in [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order) order, while internally they are stored in the [Matrix2#elements](Matrix2.html#elements) array in column-major order. This means that calling:
 
+```js
+const m = new THREE.Matrix2();
+m.set( 11, 12,
+       21, 22 );
+```
+
 will result in the elements array containing:
 
 ```js
@@ -14,14 +20,6 @@ m.elements = [ 11, 21,
 ```
 
 and internally all calculations are performed using column-major ordering. However, as the actual ordering makes no difference mathematically and most people are used to thinking about matrices in row-major order, the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source code, you'll have to take the transpose of any matrices outlined here to make sense of the calculations.
-
-## Code Example
-
-```js
-const m = new THREE.Matrix2();
-m.set( 11, 12,
-       21, 22 );
-```
 
 ## Constructor
 
@@ -54,12 +52,6 @@ Constructs a new 2x2 matrix. The arguments are supposed to be in row-major order
 ### .elements : Array.<number>
 
 A column-major list of matrix values.
-
-### .isMatrix2 : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
 
 ## Methods
 

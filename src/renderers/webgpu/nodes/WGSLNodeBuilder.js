@@ -352,7 +352,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }T_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -851,6 +851,80 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet for gathering four texels from the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} gatherSnippet - A WGSL snippet that represents the index of the channel to read.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
+
+		const componentSnippet = texture.isDepthTexture === true ? '' : `${gatherSnippet}, `;
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${componentSnippet}${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet })`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet })`;
+
+		}
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet })`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet when sampling textures with explicit mip level.
 	 *
 	 * @param {Texture} texture - The texture.
@@ -1127,7 +1201,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				// Also textureGather always need sampler.
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -1908,14 +1983,16 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
-				const texture = uniform.node.value;
+				const textureNode = uniform.node;
+				const texture = textureNode.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				// Also textureGather always need sampler.
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) ) {
+					if ( this.isSampleCompare( texture ) && textureNode.compareNode !== null ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -2146,7 +2223,7 @@ ${ flowData.code }
 
 						} else {
 
-							let structSnippet = '\t@location( 0 ) color: vec4<f32>';
+							let structSnippet = `\t@location( 0 ) color: ${ this.getType( this.getOutputType() ) }`;
 
 							const builtins = this.getBuiltins( 'output' );
 
@@ -2156,7 +2233,7 @@ ${ flowData.code }
 							stageData.structs += this._getWGSLStruct( 'OutputStruct', structSnippet );
 							stageData.structs += '\nvar<private> output : OutputStruct;';
 
-							flow += `output.color = ${ flowSlotData.result };\n\n\treturn output;`;
+							flow += `output.color = ${ this.format( flowSlotData.result, mainNode.getNodeType( this ), this.getOutputType() ) };\n\n\treturn output;`;
 
 						}
 

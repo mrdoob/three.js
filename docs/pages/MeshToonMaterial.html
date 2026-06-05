@@ -114,7 +114,9 @@ other maps which only affect the light and shade of the material the
 displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
-repositions, the vertices of the mesh.</p>
+repositions, the vertices of the mesh. For best results, pair a
+displacement map with a matching normal map, since the renderer can
+not recompute surface normals from the displaced vertices.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -162,7 +164,7 @@ be sure to set the emissive color to something other than black.</p>
 					<h3 class="name" id="gradientMap" translate="no">.<a href="#gradientMap">gradientMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>Gradient map for toon shading. It's required to set
-<a href="Texture.html#minFilter">Texture#minFilter</a> and <a href="Texture.html#magFilter">Texture#magFilter</a> to {@linkNearestFilter}
+<a href="Texture.html#minFilter">Texture#minFilter</a> and <a href="Texture.html#magFilter">Texture#magFilter</a> to <a href="global.html#NearestFilter">NearestFilter</a>
 when using this type of texture.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>

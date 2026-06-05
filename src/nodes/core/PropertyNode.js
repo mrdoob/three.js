@@ -69,6 +69,20 @@ class PropertyNode extends Node {
 
 	}
 
+	getNodeType( builder ) {
+
+		const nodeType = super.getNodeType( builder );
+
+		if ( nodeType === 'output' ) {
+
+			return builder.getOutputType();
+
+		}
+
+		return nodeType;
+
+	}
+
 	customCacheKey() {
 
 		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
@@ -292,7 +306,7 @@ export const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Sh
  * @tsl
  * @type {PropertyNode<vec4>}
  */
-export const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output' );
+export const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'output', 'Output' );
 
 /**
  * TSL object that represents the shader variable `dashSize`.

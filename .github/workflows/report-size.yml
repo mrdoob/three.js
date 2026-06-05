@@ -6,18 +6,20 @@ on:
     types:
       - completed
 
-# This workflow needs to be run with "pull-requests: write" permissions to
-# be able to comment on the pull request. We can't checkout the PR code
-# in this workflow.
-# Reference:
-# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 permissions:
-  pull-requests: write
+  contents: read
 
 jobs:
   report-size:
     name: Comment on PR
     runs-on: ubuntu-latest
+    # This job needs "pull-requests: write" permissions to be able to comment
+    # on the pull request. We can't checkout the PR code in this workflow.
+    # Reference:
+    # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
     steps:
@@ -29,7 +31,7 @@ jobs:
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         id: download-artifact
         with:
           result-encoding: string
@@ -58,7 +60,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Install Node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 24
           cache: 'npm'

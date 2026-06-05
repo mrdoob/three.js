@@ -865,6 +865,14 @@ Returns the arccosine of the parameter.
 
 The parameter.
 
+### .acosh( x : Node | number ) : Node
+
+Returns the inverse hyperbolic cosine of the parameter.
+
+**x**
+
+The parameter.
+
 ### .add( a : Node, b : Node, …params : Node ) : OperatorNode
 
 Returns the addition of two or more value.
@@ -1015,6 +1023,14 @@ Returns the arcsine of the parameter.
 
 The parameter.
 
+### .asinh( x : Node | number ) : Node
+
+Returns the inverse hyperbolic sine of the parameter.
+
+**x**
+
+The parameter.
+
 ### .assign( targetNode : Node, sourceNode : Node ) : AssignNode
 
 TSL function for creating an assign node.
@@ -1038,6 +1054,14 @@ The y parameter.
 **x**
 
 The x parameter.
+
+### .atanh( x : Node | number ) : Node
+
+Returns the inverse hyperbolic tangent of the parameter.
+
+**x**
+
+The parameter.
 
 ### .atomicAdd( pointerNode : Node, valueNode : Node ) : AtomicFunctionNode
 
@@ -1835,6 +1859,36 @@ TSL function for setting up the default clipping logic.
 
 TSL function for setting up alpha to coverage.
 
+### .clusteredLights( maxLights : number, tileSize : number, zSlices : number, maxLightsPerCluster : number ) : ClusteredLightsNode
+
+TSL function that creates a clustered lights node.
+
+**maxLights**
+
+Maximum number of point lights.
+
+Default is `1024`.
+
+**tileSize**
+
+Screen tile size in pixels.
+
+Default is `32`.
+
+**zSlices**
+
+Depth slice count.
+
+Default is `24`.
+
+**maxLightsPerCluster**
+
+Per-cluster light-list capacity.
+
+Default is `64`.
+
+**Returns:** The clustered lights node.
+
 ### .code( code : string, includes : Array.<Node>, language : 'js' | 'wgsl' | 'glsl' ) : CodeNode
 
 TSL function for creating a code node.
@@ -1893,23 +1947,25 @@ The color to unpack.
 
 **Returns:** The direction.
 
-### .compute( node : Node, count : number | Array.<number>, workgroupSize : Array.<number> ) : AtomicFunctionNode
+### .compute( node : Node, count : number | Array.<number>, workgroupSize : Array.<number> ) : ComputeNode
 
 TSL function for creating a compute node.
 
 **node**
 
-TODO
+The TSL logic for the compute shader.
 
 **count**
 
-TODO.
+The compute count or dispatch size.
 
 **workgroupSize**
 
-TODO.
+The workgroup size.
 
 Default is `[64]`.
+
+**Returns:** ,
 
 ### .computeBuiltin( name : string, nodeType : string ) : ComputeBuiltinNode
 
@@ -1923,17 +1979,17 @@ The built-in name.
 
 The node type.
 
-### .computeKernel( node : Node, workgroupSize : Array.<number> ) : AtomicFunctionNode
+### .computeKernel( node : Node, workgroupSize : Array.<number> ) : ComputeNode
 
 TSL function for creating a compute kernel node.
 
 **node**
 
-TODO
+The TSL logic for the compute shader.
 
 **workgroupSize**
 
-TODO.
+The workgroup size.
 
 Default is `[64]`.
 
@@ -2012,6 +2068,14 @@ Default is `{type:HalfFloatType}`.
 ### .cos( x : Node | number ) : Node
 
 Returns the cosine of the parameter.
+
+**x**
+
+The parameter.
+
+### .cosh( x : Node | number ) : Node
+
+Returns the hyperbolic cosine of the parameter.
 
 **x**
 
@@ -2375,6 +2439,18 @@ The buffer offset.
 
 Default is `0`.
 
+### .dynamicLights( options : Object ) : DynamicLightsNode
+
+TSL function that creates a dynamic lights node.
+
+**options**
+
+Dynamic lighting configuration.
+
+Default is `{}`.
+
+**Returns:** The created dynamic lights node.
+
 ### .equal( a : Node, b : Node ) : OperatorNode
 
 Checks if two nodes are equal.
@@ -2524,6 +2600,26 @@ Computes the fractional part of the parameter.
 **x**
 
 The parameter.
+
+### .fsr1( node : Node.<vec4>, sharpness : number | Node.<float>, denoise : boolean | Node.<bool> ) : FSR1Node
+
+TSL function for creating an FSR 1 node for post processing.
+
+**node**
+
+The node that represents the input of the effect.
+
+**sharpness**
+
+RCAS sharpening strength. 0 = maximum, 2 = none.
+
+Default is `0.2`.
+
+**denoise**
+
+Whether to attenuate RCAS sharpening in noisy areas.
+
+Default is `false`.
 
 ### .fwidth( x : Node | number ) : Node
 
@@ -3378,18 +3474,6 @@ The first input.
 **b**
 
 The second input.
-
-### .modInt( a : Node, b : Node ) : OperatorNode
-
-**a**
-
-The first input.
-
-**b**
-
-The second input.
-
-**Deprecated:** since r175. Use [mod](TSL.html#mod) instead.
 
 ### .morphReference( mesh : Mesh ) : MorphNode
 
@@ -4289,9 +4373,9 @@ The exposure.
 
 **Returns:** The tone mapped color.
 
-### .remap( node : Node, inLowNode : Node, inHighNode : Node, outLowNode : Node, outHighNode : Node ) : RemapNode
+### .remap( node : Node, inLowNode : Node, inHighNode : Node, outLowNode : Node, outHighNode : Node ) : Node
 
-TSL function for creating a remap node.
+This node allows to remap a node value from one range into another. E.g a value of `0.4` in the range `[ 0.3, 0.5 ]` should be remapped into the normalized range `[ 0, 1 ]`. `remap` takes care of that and converts the original value of `0.4` to `0.5`.
 
 **node**
 
@@ -4317,9 +4401,9 @@ The target upper bound of the range.
 
 Default is `float(1)`.
 
-### .remapClamp( node : Node, inLowNode : Node, inHighNode : Node, outLowNode : Node, outHighNode : Node ) : RemapNode
+### .remapClamp( node : Node, inLowNode : Node, inHighNode : Node, outLowNode : Node, outHighNode : Node ) : Node
 
-TSL function for creating a remap node, but with enabled clamping.
+This node allows to remap a node value from one range into another but with enabled clamping. E.g a value of `0.4` in the range `[ 0.3, 0.5 ]` should be remapped into the normalized range `[ 0, 1 ]`. `remapClamp` takes care of that and converts the original value of `0.4` to `0.5`.
 
 **node**
 
@@ -4347,7 +4431,7 @@ Default is `float(1)`.
 
 ### .renderOutput( color : Node, toneMapping : number, outputColorSpace : string ) : RenderOutputNode
 
-TSL function for creating a posterize node.
+TSL function for creating a render output node.
 
 **color**
 
@@ -4698,6 +4782,26 @@ Influences the internal sorting.
 
 Default is `0`.
 
+### .sharpen( node : Node.<vec4>, sharpness : number | Node.<float>, denoise : boolean | Node.<bool> ) : SharpenNode
+
+TSL function for creating a sharpen node for post processing.
+
+**node**
+
+The node that represents the input of the effect.
+
+**sharpness**
+
+Sharpening strength. 0 = maximum, 2 = none.
+
+Default is `0.2`.
+
+**denoise**
+
+Whether to attenuate sharpening in noisy areas.
+
+Default is `false`.
+
 ### .shiftLeft( a : Node, b : Node ) : OperatorNode
 
 Shifts a node to the left.
@@ -4751,6 +4855,14 @@ The value to compute the sin for.
 Controls the amount of bounces.
 
 **Returns:** The result value.
+
+### .sinh( x : Node | number ) : Node
+
+Returns the hyperbolic sine of the parameter.
+
+**x**
+
+The parameter.
 
 ### .skinning( skinnedMesh : SkinnedMesh ) : SkinningNode
 
@@ -5039,6 +5151,26 @@ The value node that should be stored in the texture.
 
 Default is `null`.
 
+### .storageTexture3D( value : Storage3DTexture, uvNode : Node.<vec3>, storeNode : Node ) : StorageTexture3DNode
+
+TSL function for creating a 3D storage texture node.
+
+**value**
+
+The 3D storage texture.
+
+**uvNode**
+
+The uv node.
+
+Default is `null`.
+
+**storeNode**
+
+The value node that should be stored in the texture.
+
+Default is `null`.
+
 ### .struct( membersLayout : Object, name : string ) : function
 
 TSL function for creating a struct node.
@@ -5315,9 +5447,37 @@ The value provided to the reduction by the current invocation.
 
 **Returns:** The result of the reduction operation.
 
+### .taau( beautyNode : TextureNode, depthNode : TextureNode, velocityNode : TextureNode, camera : Camera ) : TAAUNode
+
+TSL function for creating a TAAU node for Temporal Anti-Aliasing Upscaling.
+
+**beautyNode**
+
+The texture node that represents the input of the effect.
+
+**depthNode**
+
+A node that represents the scene's depth.
+
+**velocityNode**
+
+A node that represents the scene's velocity.
+
+**camera**
+
+The camera the scene is rendered with.
+
 ### .tan( x : Node | number ) : Node
 
 Returns the tangent of the parameter.
+
+**x**
+
+The parameter.
+
+### .tanh( x : Node | number ) : Node
+
+Returns the hyperbolic tangent of the parameter.
 
 **x**
 
@@ -5521,7 +5681,7 @@ A level node which defines the requested mip.
 
 Default is `null`.
 
-### .textureStore( value : StorageTexture, uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
+### .textureStore( value : StorageTexture | StorageTextureNode, uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
 
 TODO: Explain difference to `storageTexture()`.
 
@@ -6089,7 +6249,7 @@ The camera's near value.
 
 The camera's far value.
 
-### .viewportDepthTexture( uvNode : Node, levelNode : Node ) : ViewportDepthTextureNode
+### .viewportDepthTexture( uvNode : Node, levelNode : Node, depthTexture : DepthTexture ) : ViewportDepthTextureNode
 
 TSL function for a viewport depth texture node.
 
@@ -6102,6 +6262,12 @@ Default is `screenUV`.
 **levelNode**
 
 The level node.
+
+Default is `null`.
+
+**depthTexture**
+
+A depth texture. If not provided, a depth texture is created automatically.
 
 Default is `null`.
 

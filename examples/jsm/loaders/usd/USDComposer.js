@@ -11,6 +11,7 @@ import {
 	DirectionalLight,
 	Euler,
 	Group,
+	LoaderUtils,
 	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -83,6 +84,7 @@ class USDComposer {
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
+		this.texturePromises = [];
 
 	}
 
@@ -102,6 +104,7 @@ class USDComposer {
 		this.basePath = basePath;
 		this.skinnedMeshes = [];
 		this.skeletons = {};
+		this.texturePromises = [];
 
 		// Build indexes for O(1) lookups
 		this._buildIndexes();
@@ -109,7 +112,7 @@ class USDComposer {
 		// Get FPS from root spec
 		const rootSpec = this.specsByPath[ '/' ];
 		const rootFields = rootSpec ? rootSpec.fields : {};
-		this.fps = rootFields.framesPerSecond || rootFields.timeCodesPerSecond || 30;
+		this.fps = rootFields.timeCodesPerSecond || rootFields.framesPerSecond || 24;
 
 		const group = new Group();
 		this._buildHierarchy( group, '/' );
@@ -852,14 +855,13 @@ class USDComposer {
 
 		}
 
-		// Combine with base path
-		if ( this.basePath ) {
+		if ( ! this.basePath ) return cleanPath;
 
-			return this.basePath + '/' + cleanPath;
+		// LoaderUtils.resolveURL expects basePath to end with a separator;
+		// the USDZ flow passes the zip-internal directory name without one.
+		const base = this.basePath.endsWith( '/' ) ? this.basePath : this.basePath + '/';
 
-		}
-
-		return cleanPath;
+		return LoaderUtils.resolveURL( cleanPath, base );
 
 	}
 
@@ -3817,6 +3819,16 @@ class USDComposer {
 
 			}
 
+			// Standalone .usd/.usda/.usdc files don't pre-load assets; treat the
+			// resolved path as a URL relative to basePath so the browser fetches
+			// the texture from disk next to the layer.
+
+			if ( this.basePath ) {
+
+				return this._createTextureFromData( resolvedPath, textureAttrs, transformAttrs );
+
+			}
+
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
@@ -3864,27 +3876,48 @@ class USDComposer {
 		}
 
 		const image = new Image();
-		image.onload = function () {
 
-			texture.image = image;
+		this.texturePromises.push( new Promise( ( resolve ) => {
 
-			if ( textureAttrs ) {
+			image.onload = function () {
 
-				texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
-				texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
+				texture.image = image;
 
-			}
+				if ( textureAttrs ) {
 
-			scope._applyTextureTransforms( texture, transformAttrs );
-			texture.needsUpdate = true;
+					texture.wrapS = scope._getWrapMode( textureAttrs[ 'inputs:wrapS' ] );
+					texture.wrapT = scope._getWrapMode( textureAttrs[ 'inputs:wrapT' ] );
 
-			if ( typeof data !== 'string' ) {
+				}
 
-				URL.revokeObjectURL( url );
+				scope._applyTextureTransforms( texture, transformAttrs );
+				texture.needsUpdate = true;
 
-			}
+				if ( typeof data !== 'string' ) {
 
-		};
+					URL.revokeObjectURL( url );
+
+				}
+
+				resolve();
+
+			};
+
+			image.onerror = function () {
+
+				console.warn( 'USDLoader: Failed to load texture:', url );
+
+				if ( typeof data !== 'string' ) {
+
+					URL.revokeObjectURL( url );
+
+				}
+
+				resolve();
+
+			};
+
+		} ) );
 
 		image.src = url;
 

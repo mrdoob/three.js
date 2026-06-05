@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { UIPanel, UIRow } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -419,7 +420,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
@@ -483,7 +487,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
@@ -519,7 +526,9 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/camera/orthographic' ) );
 	option.onClick( function () {
 
-		const aspect = editor.camera.aspect;
+		const aspect = editor.camera.isPerspectiveCamera
+			? editor.camera.aspect
+			: ( editor.camera.right - editor.camera.left ) / ( editor.camera.top - editor.camera.bottom );
 		const camera = new THREE.OrthographicCamera( - aspect, aspect );
 		camera.name = 'OrthographicCamera';
 

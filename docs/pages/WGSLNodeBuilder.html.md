@@ -22,6 +22,18 @@ The renderer.
 
 ## Properties
 
+### .allowEarlyReturns : boolean
+
+A flag that indicates that early returns are allowed.
+
+Default is `true`.
+
+### .allowGlobalVariables : boolean
+
+A flag that indicates that global variables are allowed.
+
+Default is `true`.
+
 ### .builtins : Object.<string, Map.<string, Object>>
 
 A dictionary that holds for each shader stage a Map of builtins.
@@ -305,6 +317,74 @@ The name of the video texture uniform in the shader.
 A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 
 **Returns:** The name of the dimension variable.
+
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the WGSL snippet for gathering four texels from the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**gatherSnippet**
+
+A WGSL snippet that represents the index of the channel to read.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A WGSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The WGSL snippet.
+
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**compareSnippet**
+
+A WGSL snippet that represents the reference value.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A WGSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The WGSL snippet.
 
 ### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
 
@@ -800,14 +880,6 @@ The node data type.
 
 **Returns:** The WGSL type.
 
-### .getUniformBufferLimit() : number
-
-Returns the maximum uniform buffer size limit.
-
-**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
-
-**Returns:** The maximum uniform buffer size in bytes.
-
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.
@@ -848,7 +920,7 @@ The shader stage.
 
 **Returns:** The WGSL snippet that defines the uniforms.
 
-### .getVar( type : string, name : string, count : number ) : string
+### .getVar( type : string, name : string, count : number, qualifier : string ) : string
 
 Returns a WGSL string representing a variable.
 
@@ -865,6 +937,12 @@ The variable's name.
 The array length.
 
 Default is `null`.
+
+**qualifier**
+
+The variable's qualifier.
+
+Default is `''`.
 
 **Overrides:** [NodeBuilder#getVar](NodeBuilder.html#getVar)
 

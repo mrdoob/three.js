@@ -394,6 +394,12 @@ Central build method which controls the build for the given object.
 
 **Returns:** A reference to this node builder.
 
+### .buildAsync() : Promise.<NodeBuilder> (async)
+
+Async version of build() that yields to main thread between shader stages. Use this in compileAsync() to prevent blocking the main thread.
+
+**Returns:** A promise that resolves to this node builder.
+
 ### .buildCode() (abstract)
 
 Controls the code build of the shader stages.
@@ -760,7 +766,7 @@ Returns a list bindings of all shader stages separated by groups.
 
 **Returns:** The list of bindings.
 
-### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string ) : NodeAttribute
+### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string, name : string ) : NodeAttribute
 
 Returns an instance of [NodeAttribute](NodeAttribute.html) for the given buffer attribute node.
 
@@ -771,6 +777,12 @@ The buffer attribute node.
 **type**
 
 The node type.
+
+**name**
+
+The name of the buffer attribute.
+
+Default is `null`.
 
 **Returns:** The node attribute.
 
@@ -1035,6 +1047,18 @@ The output struct node.
 The output struct types.
 
 **Returns:** The struct type attribute.
+
+### .getOutputType( index : number ) : string
+
+Returns the type of the color output based on the renderer's render target.
+
+**index**
+
+The index of the render target texture.
+
+Default is `0`.
+
+**Returns:** The type.
 
 ### .getPropertyName( node : Node, shaderStage : 'vertex' | 'fragment' | 'compute' | 'any' ) : string
 
@@ -1318,13 +1342,19 @@ Default is `false`.
 
 **Returns:** The node variable.
 
-### .getVars( shaderStage : 'vertex' | 'fragment' | 'compute' | 'any' ) : string
+### .getVars( shaderStage : 'vertex' | 'fragment' | 'compute' | 'any', global : boolean ) : string
 
 Returns the variable definitions as a shader string for the given shader stage.
 
 **shaderStage**
 
 The shader stage.
+
+**global**
+
+Whether the variables are global.
+
+Default is `false`.
 
 **Returns:** The variable code section.
 
@@ -1531,6 +1561,10 @@ Checks if the given texture requires a manual conversion to the working color sp
 The texture to check.
 
 **Returns:** Whether the given texture requires a conversion to working color space or not.
+
+### .prebuild()
+
+Prebuild the node builder.
 
 ### .registerDeclaration( node : Object )
 

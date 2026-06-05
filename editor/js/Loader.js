@@ -45,6 +45,14 @@ function Loader( editor ) {
 				while ( normalized.startsWith( '../' ) ) normalized = normalized.slice( 3 );
 				while ( normalized.startsWith( '/' ) ) normalized = normalized.slice( 1 );
 
+				try {
+
+					normalized = decodeURIComponent( normalized );
+
+				} catch ( e ) { /* malformed URI — keep as-is */ }
+
+				normalized = normalized.normalize( 'NFC' );
+
 				return normalized;
 
 			};
@@ -458,28 +466,6 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					// 2.0
-
-					if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
-
-						const blob = new Blob( [ contents ], { type: 'text/javascript' } );
-						const url = URL.createObjectURL( blob );
-
-						const worker = new Worker( url );
-
-						worker.onmessage = function ( event ) {
-
-							event.data.metadata = { version: 2 };
-							handleJSON( event.data );
-
-						};
-
-						worker.postMessage( Date.now() );
-
-						return;
-
-					}
-
 					// >= 3.0
 
 					let data;
@@ -718,25 +704,54 @@ function Loader( editor ) {
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
+					let renderOrder = 0;
+
 					for ( let i = 0; i < paths.length; i ++ ) {
 
 						const path = paths[ i ];
 
-						const material = new THREE.MeshBasicMaterial( {
-							color: path.color,
-							depthWrite: false
-						} );
+						// fill
 
-						const shapes = SVGLoader.createShapes( path );
+						const fillMaterial = SVGLoader.createFillMaterial( path );
 
-						for ( let j = 0; j < shapes.length; j ++ ) {
+						if ( fillMaterial ) {
 
-							const shape = shapes[ j ];
+							const shapes = path.toShapes();
 
-							const geometry = new THREE.ShapeGeometry( shape );
-							const mesh = new THREE.Mesh( geometry, material );
+							for ( let j = 0; j < shapes.length; j ++ ) {
 
-							group.add( mesh );
+								const shape = shapes[ j ];
+
+								const geometry = new THREE.ShapeGeometry( shape );
+								const mesh = new THREE.Mesh( geometry, fillMaterial );
+								mesh.renderOrder = renderOrder ++;
+
+								group.add( mesh );
+
+							}
+
+						}
+
+						// stroke
+
+						const strokeMaterial = SVGLoader.createStrokeMaterial( path );
+
+						if ( strokeMaterial ) {
+
+							for ( const subPath of path.subPaths ) {
+
+								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+
+								if ( geometry ) {
+
+									const mesh = new THREE.Mesh( geometry, strokeMaterial );
+									mesh.renderOrder = renderOrder ++;
+
+									group.add( mesh );
+
+								}
+
+							}
 
 						}
 
@@ -765,10 +780,12 @@ function Loader( editor ) {
 					const { USDLoader } = await import( 'three/addons/loaders/USDLoader.js' );
 
 					const loader = new USDLoader( manager );
-					const group = loader.parse( contents );
-					group.name = filename;
+					loader.parse( contents, '', function ( group ) {
 
-					editor.execute( new AddObjectCommand( editor, group ) );
+						group.name = filename;
+						editor.execute( new AddObjectCommand( editor, group ) );
+
+					} );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -792,32 +809,6 @@ function Loader( editor ) {
 					scene.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, scene ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
-			case 'vtk':
-			case 'vtp':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const contents = event.target.result;
-
-					const { VTKLoader } = await import( 'three/addons/loaders/VTKLoader.js' );
-
-					const geometry = new VTKLoader().parse( contents );
-					const material = new THREE.MeshStandardMaterial();
-
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -982,10 +973,22 @@ function Loader( editor ) {
 
 		const zip = unzipSync( new Uint8Array( contents ) );
 
+		// Build a lookup map with NFC-normalized keys to handle
+		// unicode normalization differences (e.g. NFD vs NFC)
+
+		const zipLookup = {};
+
+		for ( const path in zip ) {
+
+			zipLookup[ path.normalize( 'NFC' ) ] = zip[ path ];
+
+		}
+
 		const manager = new THREE.LoadingManager();
 		manager.setURLModifier( function ( url ) {
 
-			const file = zip[ url ];
+			const normalized = decodeURIComponent( url ).normalize( 'NFC' );
+			const file = zipLookup[ normalized ];
 
 			if ( file ) {
 

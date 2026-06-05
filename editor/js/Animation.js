@@ -367,7 +367,14 @@ function Animation( editor ) {
 
 			clipRow.addEventListener( 'click', function () {
 
-				editor.select( root );
+				if ( editor.selected !== root ) {
+
+					signals.objectSelected.remove( selectDefaultClip );
+					editor.select( root );
+					signals.objectSelected.add( selectDefaultClip );
+
+				}
+
 				selectClip( clip, root );
 				update(); // Refresh to update highlighting
 
@@ -578,10 +585,7 @@ function Animation( editor ) {
 
 	}
 
-	updateTime();
-
-	// Auto-select clip when an object with animations is selected
-	signals.objectSelected.add( function ( object ) {
+	function selectDefaultClip( object ) {
 
 		if ( object !== null && object.animations && object.animations.length > 0 ) {
 
@@ -590,7 +594,12 @@ function Animation( editor ) {
 
 		}
 
-	} );
+	}
+
+	updateTime();
+
+	// Auto-select clip when an object with animations is selected
+	signals.objectSelected.add( selectDefaultClip );
 
 	// Update when scene changes
 	signals.editorCleared.add( clear );

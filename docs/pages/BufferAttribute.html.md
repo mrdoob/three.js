@@ -178,6 +178,10 @@ The source index into the given buffer attribute.
 
 **Returns:** A reference to this instance.
 
+### .dispose()
+
+Disposes of the buffer attribute. Available only in [WebGPURenderer](WebGPURenderer.html).
+
 ### .getComponent( index : number, component : number ) : number
 
 Returns the given component of the vector at the given index.

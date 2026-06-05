@@ -1370,6 +1370,24 @@ const computeFn = Fn( () => {
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="acosh" translate="no">.<a href="#acosh">acosh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the inverse hyperbolic cosine of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span>, &hellip;params : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1682,6 +1700,24 @@ or an array containing the default values (e.g., [ vec3() ]).</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="asinh" translate="no">.<a href="#asinh">asinh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the inverse hyperbolic sine of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="assign" translate="no">.<a href="#assign">assign</a><span class="signature">( targetNode : <span class="param-type"><a href="Node.html">Node</a></span>, sourceNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="AssignNode.html">AssignNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1730,6 +1766,24 @@ If two parameters are provided, the result is <code>atan2(y/x)</code>.</p>
 									</td>
 									<td class="description last">
 										<p>The x parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="atanh" translate="no">.<a href="#atanh">atanh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the inverse hyperbolic tangent of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3290,6 +3344,55 @@ Useful for masking effects based on distance from center.</p>
 							<p>TSL function for setting up alpha to coverage.</p>
 						</div>
 					</div>
+					<h3 class="name name-method" id="clusteredLights" translate="no">.<a href="#clusteredLights">clusteredLights</a><span class="signature">( maxLights : <span class="param-type">number</span>, tileSize : <span class="param-type">number</span>, zSlices : <span class="param-type">number</span>, maxLightsPerCluster : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function that creates a clustered lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of point lights.</p>
+										<p>Default is <code>1024</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">tileSize</strong>
+									</td>
+									<td class="description last">
+										<p>Screen tile size in pixels.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">zSlices</strong>
+									</td>
+									<td class="description last">
+										<p>Depth slice count.</p>
+										<p>Default is <code>24</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLightsPerCluster</strong>
+									</td>
+									<td class="description last">
+										<p>Per-cluster light-list capacity.</p>
+										<p>Default is <code>64</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clustered lights node.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="code" translate="no">.<a href="#code">code</a><span class="signature">( code : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span>, language : <span class="param-type">'js' | 'wgsl' | 'glsl'</span> )</span><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -3384,7 +3487,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="colorToDirection" translate="no">.<a href="#colorToDirection">colorToDirection</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="unpackRGBToNormal" translate="no">.<a href="#unpackRGBToNormal">unpackRGBToNormal</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Unpacks a color value into a direction vector.</p>
@@ -3405,7 +3508,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 							<dt class="tag-returns"><strong>Returns:</strong> The direction.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, count : <span class="param-type">number | Array.&lt;number></span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : <a href="AtomicFunctionNode.html">AtomicFunctionNode</a></span> </h3>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, count : <span class="param-type">number | Array.&lt;number></span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a compute node.</p>
@@ -3417,7 +3520,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
-										<p>TODO</p>
+										<p>The TSL logic for the compute shader.</p>
 									</td>
 								</tr>
 								<tr>
@@ -3425,7 +3528,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
-										<p>TODO.</p>
+										<p>The compute count or dispatch size.</p>
 									</td>
 								</tr>
 								<tr>
@@ -3433,12 +3536,15 @@ Simulates the analog signal bleeding in CRT displays where colors
 										<strong translate="no">workgroupSize</strong>
 									</td>
 									<td class="description last">
-										<p>TODO.</p>
+										<p>The workgroup size.</p>
 										<p>Default is <code>[64]</code>.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> ,</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="computeBuiltin" translate="no">.<a href="#computeBuiltin">computeBuiltin</a><span class="signature">( name : <span class="param-type">string</span>, nodeType : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeBuiltinNode.html">ComputeBuiltinNode</a></span> </h3>
 					<div class="method">
@@ -3466,7 +3572,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="computeKernel" translate="no">.<a href="#computeKernel">computeKernel</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : <a href="AtomicFunctionNode.html">AtomicFunctionNode</a></span> </h3>
+					<h3 class="name name-method" id="computeKernel" translate="no">.<a href="#computeKernel">computeKernel</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a compute kernel node.</p>
@@ -3478,7 +3584,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 										<strong translate="no">node</strong>
 									</td>
 									<td class="description last">
-										<p>TODO</p>
+										<p>The TSL logic for the compute shader.</p>
 									</td>
 								</tr>
 								<tr>
@@ -3486,7 +3592,7 @@ Simulates the analog signal bleeding in CRT displays where colors
 										<strong translate="no">workgroupSize</strong>
 									</td>
 									<td class="description last">
-										<p>TODO.</p>
+										<p>The workgroup size.</p>
 										<p>Default is <code>[64]</code>.</p>
 									</td>
 								</tr>
@@ -3631,6 +3737,24 @@ Simulates the analog signal bleeding in CRT displays where colors
 					<div class="method">
 						<div class="description">
 							<p>Returns the cosine of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="cosh" translate="no">.<a href="#cosh">cosh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the hyperbolic cosine of the parameter.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -4127,7 +4251,7 @@ densening fog farther from the camera.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="directionToColor" translate="no">.<a href="#directionToColor">directionToColor</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="packNormalToRGB" translate="no">.<a href="#packNormalToRGB">packNormalToRGB</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Packs a direction vector into a color value.</p>
@@ -4365,6 +4489,28 @@ Use this function if attribute data are updated per frame.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="dynamicLights" translate="no">.<a href="#dynamicLights">dynamicLights</a><span class="signature">( options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="DynamicLightsNode.html">DynamicLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function that creates a dynamic lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Dynamic lighting configuration.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created dynamic lights node.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="equal" translate="no">.<a href="#equal">equal</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
 					<div class="method">
@@ -4669,6 +4815,42 @@ Nodes of this type are assigned to <code>Scene.fogNode</code>.</p>
 									</td>
 									<td class="description last">
 										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="fsr1" translate="no">.<a href="#fsr1">fsr1</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, sharpness : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span>, denoise : <span class="param-type">boolean | <a href="Node.html">Node</a>.&lt;bool></span> )</span><span class="type-signature"> : <a href="FSR1Node.html">FSR1Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating an FSR 1 node for post processing.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the input of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sharpness</strong>
+									</td>
+									<td class="description last">
+										<p>RCAS sharpening strength. 0 = maximum, 2 = none.</p>
+										<p>Default is <code>0.2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">denoise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to attenuate RCAS sharpening in noisy areas.</p>
+										<p>Default is <code>false</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -6394,32 +6576,6 @@ When no material is set, the node refers to the material of the current rendered
 								</tr>
 							</tbody>
 						</table>
-					</div>
-					<h3 class="name name-method" id="modInt" translate="no">.<a href="#modInt">modInt</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
-					<div class="method">
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">a</strong>
-									</td>
-									<td class="description last">
-										<p>The first input.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">b</strong>
-									</td>
-									<td class="description last">
-										<p>The second input.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r175. Use <a href="TSL.html#mod">mod</a> instead.</dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="morphReference" translate="no">.<a href="#morphReference">morphReference</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="MorphNode.html">MorphNode</a></span> </h3>
 					<div class="method">
@@ -8267,10 +8423,12 @@ to an array-like property that should be represented as a uniform buffer.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The tone mapped color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="remap" translate="no">.<a href="#remap">remap</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, inLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, inHighNode : <span class="param-type"><a href="Node.html">Node</a></span>, outLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, outHighNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="RemapNode.html">RemapNode</a></span> </h3>
+					<h3 class="name name-method" id="remap" translate="no">.<a href="#remap">remap</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, inLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, inHighNode : <span class="param-type"><a href="Node.html">Node</a></span>, outLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, outHighNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TSL function for creating a remap node.</p>
+							<p>This node allows to remap a node value from one range into another. E.g a value of
+<code>0.4</code> in the range <code>[ 0.3, 0.5 ]</code> should be remapped into the normalized range <code>[ 0, 1 ]</code>.
+<code>remap</code> takes care of that and converts the original value of <code>0.4</code> to <code>0.5</code>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -8319,10 +8477,12 @@ to an array-like property that should be represented as a uniform buffer.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="remapClamp" translate="no">.<a href="#remapClamp">remapClamp</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, inLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, inHighNode : <span class="param-type"><a href="Node.html">Node</a></span>, outLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, outHighNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="RemapNode.html">RemapNode</a></span> </h3>
+					<h3 class="name name-method" id="remapClamp" translate="no">.<a href="#remapClamp">remapClamp</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, inLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, inHighNode : <span class="param-type"><a href="Node.html">Node</a></span>, outLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, outHighNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TSL function for creating a remap node, but with enabled clamping.</p>
+							<p>This node allows to remap a node value from one range into another but with enabled clamping. E.g a value of
+<code>0.4</code> in the range <code>[ 0.3, 0.5 ]</code> should be remapped into the normalized range <code>[ 0, 1 ]</code>.
+<code>remapClamp</code> takes care of that and converts the original value of <code>0.4</code> to <code>0.5</code>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -8374,7 +8534,7 @@ to an array-like property that should be represented as a uniform buffer.</p>
 					<h3 class="name name-method" id="renderOutput" translate="no">.<a href="#renderOutput">renderOutput</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a></span>, toneMapping : <span class="param-type">number</span>, outputColorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="RenderOutputNode.html">RenderOutputNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TSL function for creating a posterize node.</p>
+							<p>TSL function for creating a render output node.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -9044,6 +9204,42 @@ on whether the position data are 2D or 3D, the rotation is expressed a single fl
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="sharpen" translate="no">.<a href="#sharpen">sharpen</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, sharpness : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span>, denoise : <span class="param-type">boolean | <a href="Node.html">Node</a>.&lt;bool></span> )</span><span class="type-signature"> : <a href="SharpenNode.html">SharpenNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a sharpen node for post processing.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the input of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sharpness</strong>
+									</td>
+									<td class="description last">
+										<p>Sharpening strength. 0 = maximum, 2 = none.</p>
+										<p>Default is <code>0.2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">denoise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to attenuate sharpening in noisy areas.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="shiftLeft" translate="no">.<a href="#shiftLeft">shiftLeft</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -9161,6 +9357,24 @@ Reference: <a href="https://iquilezles.org/articles/functions/" target="_blank" 
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The result value.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="sinh" translate="no">.<a href="#sinh">sinh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the hyperbolic sine of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="skinning" translate="no">.<a href="#skinning">skinning</a><span class="signature">( skinnedMesh : <span class="param-type"><a href="SkinnedMesh.html">SkinnedMesh</a></span> )</span><span class="type-signature"> : <a href="SkinningNode.html">SkinningNode</a></span> </h3>
 					<div class="method">
@@ -9742,6 +9956,42 @@ to complete before the barrier can be passed.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="storageTexture3D" translate="no">.<a href="#storageTexture3D">storageTexture3D</a><span class="signature">( value : <span class="param-type"><a href="Storage3DTexture.html">Storage3DTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTexture3DNode.html">StorageTexture3DNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a 3D storage texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D storage texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">storeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node that should be stored in the texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="struct" translate="no">.<a href="#struct">struct</a><span class="signature">( membersLayout : <span class="param-type">Object</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : function</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -10301,10 +10551,70 @@ among active invocations in the subgroup.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The result of the reduction operation.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="taau" translate="no">.<a href="#taau">taau</a><span class="signature">( beautyNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, velocityNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : <a href="TAAUNode.html">TAAUNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a TAAU node for Temporal Anti-Aliasing Upscaling.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">beautyNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node that represents the input of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">velocityNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's velocity.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="tan" translate="no">.<a href="#tan">tan</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the tangent of the parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="tanh" translate="no">.<a href="#tanh">tanh</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the hyperbolic tangent of the parameter.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -10668,7 +10978,7 @@ to complete before the barrier can be passed.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="textureStore" translate="no">.<a href="#textureStore">textureStore</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="textureStore" translate="no">.<a href="#textureStore">textureStore</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a> | <a href="StorageTextureNode.html">StorageTextureNode</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TODO: Explain difference to <code>storageTexture()</code>.</p>
@@ -11800,7 +12110,7 @@ compared to ColorAdjustment#saturation.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="viewportDepthTexture" translate="no">.<a href="#viewportDepthTexture">viewportDepthTexture</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ViewportDepthTextureNode.html">ViewportDepthTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="viewportDepthTexture" translate="no">.<a href="#viewportDepthTexture">viewportDepthTexture</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a></span>, depthTexture : <span class="param-type"><a href="DepthTexture.html">DepthTexture</a></span> )</span><span class="type-signature"> : <a href="ViewportDepthTextureNode.html">ViewportDepthTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for a viewport depth texture node.</p>
@@ -11822,6 +12132,15 @@ compared to ColorAdjustment#saturation.</p>
 									</td>
 									<td class="description last">
 										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthTexture</strong>
+									</td>
+									<td class="description last">
+										<p>A depth texture. If not provided, a depth texture is created automatically.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>

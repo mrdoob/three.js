@@ -4,6 +4,10 @@
 		<title>three.js webgpu - fat lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - fat lines">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lines_fat.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lines_fat.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -53,7 +57,7 @@
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.setClearColor( 0x000000 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
@@ -110,7 +114,7 @@
 					linewidth: 5, // in world units with size attenuation, pixels otherwise
 					vertexColors: true,
 					dashed: false,
-					alphaToCoverage: true,
+					alphaToCoverage: false,
 
 				} );
 
@@ -118,6 +122,9 @@
 				line.computeLineDistances();
 				line.scale.set( 1, 1, 1 );
 				scene.add( line );
+
+
+				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicNodeMaterial ) - rendered with gl.LINE_STRIP
 
 				const geo = new THREE.BufferGeometry();
 				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
@@ -164,7 +171,7 @@
 
 				// main scene
 
-				renderer.setClearColor( 0x000000, 0 );
+				renderer.setClearColor( 0x000000 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
 
@@ -208,8 +215,8 @@
 				const param = {
 					'line type': 0,
 					'world units': false,
-					'width': 5,
-					'alphaToCoverage': true,
+					'width': 10,
+					'alphaToCoverage': false,
 					'dashed': false,
 					'dash offset': 0,
 					'dash scale': 1,
@@ -243,9 +250,18 @@
 					matLine.worldUnits = val;
 					matLine.needsUpdate = true;
 
+					if ( val ) {
+
+						widthController.name( 'width (world units)' ).min( 0.1 ).max( 0.5 ).setValue( 0.5 );
+
+					} else {
+
+						widthController.name( 'width (pixels)' ).min( 1 ).max( 10 ).setValue( 10 );
+					}
+
 				} );
 
-				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
+				const widthController = gui.add( param, 'width', 1, 10 ).name( 'width (pixels)' ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

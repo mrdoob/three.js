@@ -6,7 +6,23 @@ An IES version of the default spot light node.
 
 ## Constructor
 
-### new IESSpotLightNode()
+### new IESSpotLightNode( light : SpotLight )
+
+Constructs a new IES spot light node.
+
+**light**
+
+The spot light source.
+
+Default is `null`.
+
+## Properties
+
+### ._iesTextureNode : TextureNode
+
+The texture node representing the IES texture.
+
+Default is `null`.
 
 ## Methods
 
@@ -25,6 +41,16 @@ The angle to compute the spot attenuation for.
 **Overrides:** [SpotLightNode#getSpotAttenuation](SpotLightNode.html#getSpotAttenuation)
 
 **Returns:** The spot attenuation.
+
+### .update( frame : NodeFrame )
+
+Overwritten to update the IES spot light texture.
+
+**frame**
+
+A reference to the current node frame.
+
+**Overrides:** [SpotLightNode#update](SpotLightNode.html#update)
 
 ## Source
 

@@ -46,6 +46,18 @@ Default is `float()`.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is inferred from range definition.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getConstNode( node : Node ) : Node
 
 Returns a constant node from the given node by traversing it.
@@ -55,18 +67,6 @@ Returns a constant node from the given node by traversing it.
 The node to traverse.
 
 **Returns:** The constant node, if found.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is inferred from range definition.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .getVectorLength( builder : NodeBuilder ) : number
 
