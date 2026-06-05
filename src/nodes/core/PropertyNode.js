@@ -119,7 +119,7 @@ class PropertyNode extends Node {
 
 			if ( this.placeholderValue !== null ) {
 
-				if ( builder.getDataFromNode( this ).writeUsageCount === undefined ) {
+				if ( builder.hasWriteUsage( this ) === false ) {
 
 					const snippet = this.placeholderValue.build( builder, this.getNodeType( builder ) );
 
