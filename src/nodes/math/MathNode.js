@@ -182,7 +182,6 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// pre-multiplies the direction by the matrix and normalizes the result
-			// the direction can be passed as either the first or the second argument
 
 			let matrixNode, directionNode;
 
