@@ -504,7 +504,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		}
 
-		const pageElapsed = + ( ( performance.now() - pageStart ) / 1000 ).toFixed( 1 );
+		const pageElapsed = ( performance.now() - pageStart ) / 1000;
 
 		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
 
@@ -558,14 +558,14 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			if ( differentPixels < maxDifferentPixels ) {
 
-				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file } (${ pageElapsed }s)` );
+				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			} else {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
-				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file } (${ pageElapsed }s)` );
+				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			}
 
