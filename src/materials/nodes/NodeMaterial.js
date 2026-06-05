@@ -991,6 +991,12 @@ class NodeMaterial extends Material {
 
 		const materialLightsNode = [];
 
+		if ( builder.renderer.lighting.enabled === false ) {
+
+			return materialLightsNode;
+
+		}
+
 		//
 
 		const envNode = this.setupEnvironment( builder );

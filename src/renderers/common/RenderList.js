@@ -1,5 +1,7 @@
 import { DoubleSide } from '../../constants.js';
 
+const _emptyArray = /*@__PURE__*/ Object.freeze( [] );
+
 /**
  * Default sorting function for opaque render items.
  *
@@ -143,6 +145,13 @@ class RenderList {
 		 * @type {Array<Object>}
 		 */
 		this.bundles = [];
+
+		/**
+		 * The lighting management component.
+		 *
+		 * @type {Lighting}
+		 */
+		this.lighting = lighting;
 
 		/**
 		 * The render list's lights node. This node is later
@@ -384,7 +393,7 @@ class RenderList {
 
 		// update lights
 
-		this.lightsNode.setLights( this.lightsArray );
+		this.lightsNode.setLights( this.lighting.enabled ? this.lightsArray : _emptyArray );
 
 		// Clear references from inactive renderItems in the list
 
