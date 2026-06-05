@@ -815,6 +815,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
+			'sidebar/project/camera': 'Camera',
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
@@ -849,6 +850,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'Scale',
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
+			'sidebar/settings/shortcuts/perspective': 'Perspective',
+			'sidebar/settings/shortcuts/orthographic': 'Orthographic',
 
 			'sidebar/history': 'History',
 			'sidebar/history/clear': 'Clear',
