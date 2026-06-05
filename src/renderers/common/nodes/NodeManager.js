@@ -597,7 +597,7 @@ class NodeManager extends DataMap {
 
 			if ( this.renderer.lighting.enabled ) {
 
-				if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
+				_cacheKeyValues.push( lightsNode.getCacheKey( true ) );
 
 				_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 				_cacheKeyValues.push( this.renderer.shadowMap.type );
