@@ -20,7 +20,18 @@ class XR {
 
 		const onSessionStarted = async ( session ) => {
 
-			camera.copy( editor.camera );
+			if ( editor.camera.isPerspectiveCamera ) {
+
+				camera.copy( editor.camera );
+
+			} else {
+
+				// an orthographic default camera can't be mirrored into a perspective XR camera
+
+				camera.position.copy( editor.camera.position );
+				camera.quaternion.copy( editor.camera.quaternion );
+
+			}
 
 			const sidebar = document.getElementById( 'sidebar' );
 			sidebar.style.width = '350px';

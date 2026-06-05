@@ -503,6 +503,8 @@ function SidebarScene( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
+	signals.cameraResetted.add( refreshUI );
+
 	signals.objectChanged.add( function ( object ) {
 
 		const options = outliner.options;
