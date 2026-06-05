@@ -109,21 +109,31 @@ class MathNode extends TempNode {
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
+		let type;
+
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return aType;
+			type = aType;
 
 		} else if ( bLen > cLen ) {
 
-			return bType;
+			type = bType;
 
 		} else if ( cLen > aLen ) {
 
-			return cType;
+			type = cType;
+
+		} else {
+
+			type = aType;
 
 		}
 
-		return aType;
+		let promotedType = builder.getComponentType( aType );
+		if ( bType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( bType ) );
+		if ( cType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( cType ) );
+
+		return builder.changeComponentType( type, promotedType );
 
 	}
 
@@ -227,7 +237,7 @@ class MathNode extends TempNode {
 
 		let method = this.method;
 
-		const type = this.getNodeType( builder );
+		let type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
 		const a = this.aNode;
@@ -238,7 +248,7 @@ class MathNode extends TempNode {
 
 		if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
+			return builder.format( `( - ${ a.build( builder, inputType ) } )`, type, output );
 
 		} else {
 
@@ -300,6 +310,14 @@ class MathNode extends TempNode {
 				params.push( a.build( builder, inputType ) );
 				if ( b !== null ) params.push( b.build( builder, inputType ) );
 				if ( c !== null ) params.push( c.build( builder, inputType ) );
+
+			}
+
+			if ( method === MathNode.DOT ) {
+
+				// WGSL returns component type, whereas GLSL always returns float.
+
+				type = builder.getComponentType( inputType );
 
 			}
 

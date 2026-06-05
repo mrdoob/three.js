@@ -65,6 +65,8 @@ const toFloat = ( value ) => {
 
 };
 
+const _componentTypeRanks = { bool: 0, uint: 1, int: 2, float: 3 };
+
 /**
  * Base class for builders which generate a shader program based
  * on a 3D object and its node material definition.
@@ -1470,6 +1472,18 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Whether the given type is a scalar type or not.
+	 *
+	 * @param {string} type - The type to check.
+	 * @return {boolean} Whether the given type is a scalar type or not.
+	 */
+	isScalar( type ) {
+
+		return type === 'float' || type === 'bool' || type === 'int' || type === 'uint';
+
+	}
+
+	/**
 	 * Whether the given type is a vector type or not.
 	 *
 	 * @param {string} type - The type to check.
@@ -1714,6 +1728,19 @@ class NodeBuilder {
 	changeComponentType( type, newComponentType ) {
 
 		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
+
+	}
+
+	/**
+	 * Returns the higher-ranked component type for the given component types.
+	 *
+	 * @param {string} typeA - The first type.
+	 * @param {string} typeB - The second type.
+	 * @return {string} The new type.
+	 */
+	getPromotedComponentType( typeA, typeB ) {
+
+		return _componentTypeRanks[ typeA ] >= _componentTypeRanks[ typeB ] ? typeA : typeB;
 
 	}
 

@@ -1,7 +1,7 @@
 import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec2, ivec2, ivec4, uniform, Break, Loop, positionView,
+	attributeArray, nodeProxy, uint, int, float, vec2, ivec2, ivec4, uniform, Break, Loop, positionView,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
 } from 'three/tsl';
 
@@ -364,8 +364,8 @@ class TiledLightsNode extends LightsNode {
 			const tiledBufferSize = bufferSize.clone().divideScalar( tileSize ).floor();
 
 			const tileScreen = vec2(
-				instanceIndex.mod( tiledBufferSize.width ),
-				instanceIndex.div( tiledBufferSize.width )
+				instanceIndex.mod( uint( tiledBufferSize.width ) ),
+				instanceIndex.div( uint( tiledBufferSize.width ) )
 			).mul( tileSize ).div( screenSize );
 
 			const blockSize = float( tileSize ).div( screenSize );

@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { storageTexture, textureStore, Fn, instanceIndex, uniform, float, vec2, vec4, uvec2, ivec2, int, NodeAccess } from 'three/tsl';
+			import { storageTexture, textureStore, Fn, instanceIndex, uniform, float, vec2, vec4, uvec2, ivec2, uint, int, NodeAccess } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -99,8 +99,8 @@
 
 				const computeInit = Fn( () => {
 
-					const posX = instanceIndex.mod( width );
-					const posY = instanceIndex.div( width );
+					const posX = instanceIndex.mod( uint( width ) );
+					const posY = instanceIndex.div( uint( width ) );
 					const indexUV = uvec2( posX, posY );
 					const uv = vec2( float( posX ).div( width ), float( posY ).div( height ) );
 
@@ -130,8 +130,8 @@
 				// compute loop: read from one texture, blur, write to another
 				const computePingPong = Fn( ( [ readTex, writeTex ] ) => {
 
-					const posX = instanceIndex.mod( width );
-					const posY = instanceIndex.div( width );
+					const posX = instanceIndex.mod( uint( width ) );
+					const posY = instanceIndex.div( uint( width ) );
 					const indexUV = ivec2( int( posX ), int( posY ) );
 
 					const color = blur( readTex, indexUV );
