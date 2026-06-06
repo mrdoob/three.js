@@ -207,13 +207,12 @@ class GTAONode extends TempNode {
 		 * local AO min/max. Pair with {@link GTAONode#jitter} so the
 		 * pattern varies per frame — otherwise there's nothing to average.
 		 *
-		 * Defaults to `true` when a velocity node was supplied to the constructor,
-		 * `false` otherwise. Toggling enables or disables the accumulation pass at
-		 * runtime — when off, the AO pass writes the output directly (no extra pass).
+		 * When `false`, the AO pass writes the output directly and no accumulation
+		 * pass runs. Requires a velocity node to be supplied to the constructor.
 		 *
 		 * @type {boolean}
 		 */
-		this.temporalAccumulation = velocityNode !== null;
+		this.temporalAccumulation = false;
 
 		/**
 		 * Current-frame blend weight for temporal accumulation when the reprojected
