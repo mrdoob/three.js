@@ -92,12 +92,12 @@ class GTAONode extends TempNode {
 		this._velocityNode = velocityNode;
 
 		/**
-		 * Backing field for {@link GTAONode#resolutionScale}.
+		 * Render resolution as a fraction of the screen size (`1` = full, `0.5` = half).
 		 *
-		 * @private
 		 * @type {number}
+		 * @default 1
 		 */
-		this._resolutionScale = 1;
+		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -319,29 +319,6 @@ class GTAONode extends TempNode {
 	}
 
 	/**
-	 * Render resolution as a fraction of the screen size (`1` = full, `0.5` = half).
-	 * At `< 1` the AO is computed at lower resolution; depth is sampled via
-	 * `textureGather` so the min-Z foreground-priority footprint is resolved inline
-	 * at every sample, with no separate downsample pass. Normals are always sampled
-	 * at full resolution.
-	 *
-	 * @type {number}
-	 * @default 1
-	 */
-	get resolutionScale() {
-
-		return this._resolutionScale;
-
-	}
-
-	set resolutionScale( value ) {
-
-		if ( value === this._resolutionScale ) return;
-		this._resolutionScale = value;
-
-	}
-
-	/**
 	 * Sets the size of the effect.
 	 *
 	 * @param {number} width - The width of the effect.
@@ -349,8 +326,8 @@ class GTAONode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		const lowW = Math.max( 1, Math.round( this._resolutionScale * width ) );
-		const lowH = Math.max( 1, Math.round( this._resolutionScale * height ) );
+		const lowW = Math.max( 1, Math.round( this.resolutionScale * width ) );
+		const lowH = Math.max( 1, Math.round( this.resolutionScale * height ) );
 
 		this.resolution.value.set( lowW, lowH );
 		this._aoRenderTarget.setSize( lowW, lowH );
