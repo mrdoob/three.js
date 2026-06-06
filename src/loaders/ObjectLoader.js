@@ -459,6 +459,8 @@ class ObjectLoader extends Loader {
 
 		function loadImage( url ) {
 
+			url = scope.manager.resolveURL( url );
+
 			scope.manager.itemStart( url );
 
 			return loader.load( url, function () {

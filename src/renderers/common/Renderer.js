@@ -662,6 +662,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * When an override material is in use, this property points to the current
+		 * source material during the rendering of a render object.
+		 *
+		 * @private
+		 * @type {?Material}
+		 * @default null
+		 */
+		this._currentSourceMaterial = null;
+
+		/**
 		 * Whether the renderer should render transparent render objects or not.
 		 *
 		 * @type {boolean}
@@ -923,9 +933,24 @@ class Renderer {
 
 		//
 
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+
+		camera = this._updateCamera( camera );
+
+		//
+
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
 		//
+
+		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+		if ( ! camera.isArrayCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+		}
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera );
@@ -1567,87 +1592,9 @@ class Renderer {
 
 		//
 
-
-		const xr = this.xr;
-
-		if ( xr.isPresenting === false ) {
-
-			let projectionMatrixNeedsUpdate = false;
-
-			// reversed depth
-
-			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
-
-				camera._reversedDepth = true;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera._reversedDepth = true;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// WebGPU/WebGL coordinate system
-
-			const coordinateSystem = this.coordinateSystem;
-
-			if ( camera.coordinateSystem !== coordinateSystem ) {
-
-				camera.coordinateSystem = coordinateSystem;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.coordinateSystem = coordinateSystem;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// camera update
-
-			if ( projectionMatrixNeedsUpdate === true ) {
-
-				camera.updateProjectionMatrix();
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.updateProjectionMatrix();
-
-					}
-
-				}
-
-			}
-
-		}
-
-		//
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-		if ( xr.enabled === true && xr.isPresenting === true ) {
-
-			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
-			camera = xr.getCamera(); // use XR camera for rendering
-
-		}
+		camera = this._updateCamera( camera );
 
 		//
 
@@ -1711,7 +1658,7 @@ class Renderer {
 
 		if ( this.sortObjects === true ) {
 
-			renderList.sort( this._opaqueSort, this._transparentSort );
+			renderList.sort( this._opaqueSort, this._transparentSort, camera.reversedDepth );
 
 		}
 
@@ -3433,6 +3380,98 @@ class Renderer {
 	}
 
 	/**
+	 * Updates the camera so it's prepared for rendering operations.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera to update.
+	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
+	 */
+	_updateCamera( camera ) {
+
+		const xr = this.xr;
+
+		if ( xr.isPresenting === false ) {
+
+			let projectionMatrixNeedsUpdate = false;
+
+			// reversed depth
+
+			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
+
+				camera._reversedDepth = true;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera._reversedDepth = true;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// WebGPU/WebGL coordinate system
+
+			const coordinateSystem = this.coordinateSystem;
+
+			if ( camera.coordinateSystem !== coordinateSystem ) {
+
+				camera.coordinateSystem = coordinateSystem;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.coordinateSystem = coordinateSystem;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// camera update
+
+			if ( projectionMatrixNeedsUpdate === true ) {
+
+				camera.updateProjectionMatrix();
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.updateProjectionMatrix();
+
+					}
+
+				}
+
+			}
+
+		}
+
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+		// handle XR
+
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+			camera = xr.getCamera(); // use XR camera for rendering
+
+		}
+
+		return camera;
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -3454,6 +3493,8 @@ class Renderer {
 		let materialPositionNode;
 		let materialSide;
 
+		const previousSourceMaterial = this._currentSourceMaterial;
+
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
@@ -3461,6 +3502,8 @@ class Renderer {
 		//
 
 		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
+
+			this._currentSourceMaterial = material;
 
 			const overrideMaterial = scene.overrideMaterial;
 
@@ -3536,6 +3579,8 @@ class Renderer {
 			scene.overrideMaterial.side = materialSide;
 
 		}
+
+		this._currentSourceMaterial = previousSourceMaterial;
 
 		//
 

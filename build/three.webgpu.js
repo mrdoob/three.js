@@ -17391,6 +17391,150 @@ const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec4' ).once() )().toVarying( 'v_modelViewProjection' );
 
 /**
+ * EventNode is a node that executes a callback during specific update phases.
+ *
+ * @augments Node
+ */
+class EventNode extends Node {
+
+	static get type() {
+
+		return 'EventNode';
+
+	}
+
+	/**
+	 * Creates an EventNode.
+	 *
+	 * @param {string} eventType - The type of event
+	 * @param {Function} callback - The callback to execute on update.
+	 */
+	constructor( eventType, callback ) {
+
+		super( 'void' );
+
+		this.eventType = eventType;
+		this.callback = callback;
+
+		if ( eventType === EventNode.OBJECT ) {
+
+			this.updateType = NodeUpdateType.OBJECT;
+
+		} else if ( eventType === EventNode.MATERIAL ) {
+
+			this.updateType = NodeUpdateType.RENDER;
+
+		} else if ( eventType === EventNode.FRAME ) {
+
+			this.updateType = NodeUpdateType.FRAME;
+
+		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
+
+			this.updateBeforeType = NodeUpdateType.OBJECT;
+
+		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
+
+			this.updateBeforeType = NodeUpdateType.RENDER;
+
+		} else if ( eventType === EventNode.BEFORE_FRAME ) {
+
+			this.updateBeforeType = NodeUpdateType.FRAME;
+
+		}
+
+	}
+
+	update( frame ) {
+
+		this.callback( frame );
+
+	}
+
+	updateBefore( frame ) {
+
+		this.callback( frame );
+
+	}
+
+}
+
+EventNode.OBJECT = 'object';
+EventNode.MATERIAL = 'material';
+EventNode.FRAME = 'frame';
+EventNode.BEFORE_OBJECT = 'beforeObject';
+EventNode.BEFORE_MATERIAL = 'beforeMaterial';
+EventNode.BEFORE_FRAME = 'beforeFrame';
+
+/**
+ * Helper to create an EventNode and add it to the stack.
+ *
+ * @param {string} type - The event type.
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const createEvent = ( type, callback ) => new EventNode( type, callback ).toStack();
+
+/**
+ * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback );
+
+/**
+ * Creates an event that triggers a function when the first object that uses the material is rendered.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
+
+/**
+ * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFORE_OBJECT, callback );
+
+/**
+ * Creates an event that triggers a function before the material is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
+
+/**
  * This class enables element access on instances of {@link StorageBufferNode}.
  * In most cases, it is indirectly used when accessing elements with the
  * {@link StorageBufferNode#element} method.
@@ -17926,866 +18070,605 @@ class StorageBufferNode extends BufferNode {
  */
 const storage = ( value, type = null, count = 0 ) => new StorageBufferNode( value, type, count );
 
+const _matrixBuffers = /*@__PURE__*/ new WeakMap();
+const _colorBuffers = /*@__PURE__*/ new WeakMap();
+const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
+
 /**
- * This node implements the vertex shader logic which is required
- * when rendering 3D objects via instancing. The code makes sure
- * vertex positions, normals and colors can be modified via instanced
- * data.
+ * Creates the appropriate node for instanced matrix transformations.
+ * Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
  *
- * @augments Node
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
+ * @param {number} count - The instance count.
+ * @returns {Node} The matrix node.
  */
-class InstanceNode extends Node {
+function createInstanceMatrixNode( builder, instanceMatrix, count ) {
 
-	static get type() {
+	let instanceMatrixNode;
 
-		return 'InstanceNode';
+	const isStorageMatrix = instanceMatrix.isStorageInstancedBufferAttribute === true;
 
-	}
+	if ( isStorageMatrix ) {
 
-	/**
-	 * Constructs a new instance node.
-	 *
-	 * @param {number} count - The number of instances.
-	 * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
-	 * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
-	 */
-	constructor( count, instanceMatrix, instanceColor = null ) {
+		instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
-		super( 'void' );
+	} else {
 
-		/**
-		 * The number of instances.
-		 *
-		 * @type {number}
-		 */
-		this.count = count;
+		const uniformBufferSize = count * 16 * 4;
 
-		/**
-		 * Instanced buffer attribute representing the transformation of instances.
-		 *
-		 * @type {InstancedBufferAttribute}
-		 */
-		this.instanceMatrix = instanceMatrix;
+		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
-		/**
-		 * Instanced buffer attribute representing the color of instances.
-		 *
-		 * @type {InstancedBufferAttribute}
-		 */
-		this.instanceColor = instanceColor;
-
-		/**
-		 * The node that represents the instance matrix data.
-		 *
-		 * @type {?Node}
-		 */
-		this.instanceMatrixNode = null;
-
-		/**
-		 * The node that represents the instance color data.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.instanceColorNode = null;
-
-		/**
-		 * The update type is set to `frame` for updating
-		 * velocity-related data.
-		 *
-		 * @type {string}
-		 * @default 'frame'
-		 */
-		this.updateType = NodeUpdateType.FRAME;
-
-		/**
-		 * The update type is set to `frame` since an update
-		 * of instanced buffer data must be checked per frame.
-		 *
-		 * @type {string}
-		 * @default 'frame'
-		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
-
-		/**
-		 * A reference to a buffer that is used by `instanceMatrixNode`.
-		 *
-		 * @type {?InstancedInterleavedBuffer}
-		 */
-		this.buffer = null;
-
-		/**
-		 * A reference to a buffer that is used by `instanceColorNode`.
-		 *
-		 * @type {?InstancedBufferAttribute}
-		 */
-		this.bufferColor = null;
-
-		/**
-		 * The previous instance matrices. Required for computing motion vectors.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.previousInstanceMatrixNode = null;
-
-	}
-
-	/**
-	 * Tracks whether the matrix data is provided via a storage buffer.
-	 *
-	 * @type {boolean}
-	 */
-	get isStorageMatrix() {
-
-		const { instanceMatrix } = this;
-
-		return instanceMatrix && instanceMatrix.isStorageInstancedBufferAttribute === true;
-
-	}
-
-	/**
-	 * Tracks whether the color data is provided via a storage buffer.
-	 *
-	 * @type {boolean}
-	 */
-	get isStorageColor() {
-
-		const { instanceColor } = this;
-
-		return instanceColor && instanceColor.isStorageInstancedBufferAttribute === true;
-
-	}
-
-	/**
-	 * Setups the internal buffers and nodes and assigns the transformed vertex data
-	 * to predefined node variables for accumulation. That follows the same patterns
-	 * like with morph and skinning nodes.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
-
-		let { instanceMatrixNode, instanceColorNode } = this;
-
-		// instance matrix
-
-		if ( instanceMatrixNode === null ) {
-
-			instanceMatrixNode = this._createInstanceMatrixNode( true, builder );
-
-			this.instanceMatrixNode = instanceMatrixNode;
-
-		}
-
-		// instance color
-
-		const { instanceColor, isStorageColor } = this;
-
-		if ( instanceColor && instanceColorNode === null ) {
-
-			if ( isStorageColor ) {
-
-				instanceColorNode = storage( instanceColor, 'vec3', Math.max( instanceColor.count, 1 ) ).element( instanceIndex );
-
-			} else {
-
-				const bufferAttribute = new InstancedBufferAttribute( instanceColor.array, 3 );
-
-				const bufferFn = instanceColor.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-				this.bufferColor = bufferAttribute;
-
-				instanceColorNode = vec3( bufferFn( bufferAttribute, 'vec3', 3, 0 ) );
-
-			}
-
-			this.instanceColorNode = instanceColorNode;
-
-		}
-
-		// POSITION
-
-		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
-		positionLocal.assign( instancePosition );
-
-		if ( builder.needsPreviousData() ) {
-
-			positionPrevious.assign( this.getPreviousInstancedPosition( builder ) );
-
-		}
-
-		// NORMAL
-
-		if ( builder.hasGeometryAttribute( 'normal' ) ) {
-
-			const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
-
-			// ASSIGNS
-
-			normalLocal.assign( instanceNormal );
-
-		}
-
-		// COLOR
-
-		if ( this.instanceColorNode !== null ) {
-
-			varyingProperty( 'vec3', 'vInstanceColor' ).assign( this.instanceColorNode );
-
-		}
-
-	}
-
-	/**
-	 * Checks if the internal buffers require an update.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	updateBefore( /*frame*/ ) {
-
-		if ( this.buffer !== null && this.isStorageMatrix !== true ) {
-
-			this.buffer.clearUpdateRanges();
-			this.buffer.updateRanges.push( ... this.instanceMatrix.updateRanges );
-
-			// update version if necessary
-
-			if ( this.instanceMatrix.version !== this.buffer.version ) {
-
-				this.buffer.version = this.instanceMatrix.version;
-
-			}
-
-		}
-
-		if ( this.instanceColor && this.bufferColor !== null && this.isStorageColor !== true ) {
-
-			this.bufferColor.clearUpdateRanges();
-			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
-
-			if ( this.instanceColor.version !== this.bufferColor.version ) {
-
-				this.bufferColor.version = this.instanceColor.version;
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Updates velocity-related data if necessary.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	update( frame ) {
-
-		if ( this.previousInstanceMatrixNode !== null ) {
-
-			frame.object.previousInstanceMatrix.array.set( this.instanceMatrix.array );
-
-		}
-
-	}
-
-	/**
-	 * Computes the transformed/instanced vertex position of the previous frame.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec3>} The instanced position from the previous frame.
-	 */
-	getPreviousInstancedPosition( builder ) {
-
-		const instancedMesh = builder.object;
-
-		if ( this.previousInstanceMatrixNode === null ) {
-
-			instancedMesh.previousInstanceMatrix = this.instanceMatrix.clone();
-
-			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false, builder );
-
-		}
-
-		return this.previousInstanceMatrixNode.mul( positionPrevious ).xyz;
-
-	}
-
-	/**
-	 * Creates a node representing the instance matrix data.
-	 *
-	 * @private
-	 * @param {boolean} assignBuffer - Whether the created interleaved buffer should be assigned to the `buffer` member or not.
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Node} The instance matrix node.
-	 */
-	_createInstanceMatrixNode( assignBuffer, builder ) {
-
-		let instanceMatrixNode;
-
-		const { instanceMatrix } = this;
-		const { count } = instanceMatrix;
-
-		if ( this.isStorageMatrix ) {
-
-			instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
 		} else {
 
-			const uniformBufferSize = count * 16 * 4; // count * 16 components * 4 bytes (float)
+			let interleaved = _matrixBuffers.get( instanceMatrix );
 
-			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+			if ( ! interleaved ) {
 
-				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
-
-			} else {
-
-				const interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-
-				if ( assignBuffer === true ) this.buffer = interleaved;
-
-				const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-				const instanceBuffers = [
-					bufferFn( interleaved, 'vec4', 16, 0 ),
-					bufferFn( interleaved, 'vec4', 16, 4 ),
-					bufferFn( interleaved, 'vec4', 16, 8 ),
-					bufferFn( interleaved, 'vec4', 16, 12 )
-				];
-
-				instanceMatrixNode = mat4( ...instanceBuffers );
+				interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
+				_matrixBuffers.set( instanceMatrix, interleaved );
 
 			}
 
+			const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+			const instanceBuffers = [
+				bufferFn( interleaved, 'vec4', 16, 0 ),
+				bufferFn( interleaved, 'vec4', 16, 4 ),
+				bufferFn( interleaved, 'vec4', 16, 8 ),
+				bufferFn( interleaved, 'vec4', 16, 12 )
+			];
+
+			instanceMatrixNode = mat4( ...instanceBuffers );
+
 		}
 
-		return instanceMatrixNode;
-
 	}
+
+	return instanceMatrixNode;
 
 }
 
 /**
- * TSL function for creating an instance node.
+ * Retrieves or initializes the previous frame instance matrix node for motion vectors.
+ * Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
  *
- * @tsl
- * @function
- * @param {number} count - The number of instances.
- * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
- * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
- * @returns {InstanceNode}
+ * @param {InstancedMesh} instancedMesh - The instanced mesh object.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The current matrix buffer attribute.
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {number} count - The instance count.
+ * @returns {Node} The previous frame instance matrix node.
  */
-const instance = /*@__PURE__*/ nodeProxy( InstanceNode ).setParameterLength( 2, 3 );
+function getPreviousInstance( instancedMesh, instanceMatrix, builder, count ) {
 
-/**
- * This is a special version of `InstanceNode` which requires the usage of {@link InstancedMesh}.
- * It allows an easier setup of the instance node.
- *
- * @augments InstanceNode
- */
-class InstancedMeshNode extends InstanceNode {
+	let data = _previousInstanceMatrices.get( instancedMesh );
 
-	static get type() {
+	if ( data === undefined ) {
 
-		return 'InstancedMeshNode';
+		const previousInstanceMatrix = instanceMatrix.clone();
+
+		data = {
+			previousInstanceMatrix,
+			node: createInstanceMatrixNode( builder, previousInstanceMatrix, count )
+		};
+
+		_previousInstanceMatrices.set( instancedMesh, data );
 
 	}
 
-	/**
-	 * Constructs a new instanced mesh node.
-	 *
-	 * @param {InstancedMesh} instancedMesh - The instanced mesh.
-	 */
-	constructor( instancedMesh ) {
-
-		const { count, instanceMatrix, instanceColor } = instancedMesh;
-
-		super( count, instanceMatrix, instanceColor );
-
-		/**
-		 * A reference to the instanced mesh.
-		 *
-		 * @type {InstancedMesh}
-		 */
-		this.instancedMesh = instancedMesh;
-
-	}
+	return data.node;
 
 }
 
 /**
- * TSL function for creating an instanced mesh node.
+ * TSL object representing a varying property for the instanced color vector.
+ *
+ * @type {VaryingNode<vec3>}
+ */
+const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceColor' );
+
+/**
+ * TSL function representing the standard instancing vertex shader setup.
+ * Transforms positionLocal and normalLocal, and assigns varying color in-place.
  *
  * @tsl
  * @function
- * @param {InstancedMesh} instancedMesh - The instancedMesh.
- * @returns {InstancedMeshNode}
+ * @param {number} count - The instance count.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The instanced transformation matrices.
+ * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} [colors=null] - The optional instanced colors.
  */
-const instancedMesh = /*@__PURE__*/ nodeProxy( InstancedMeshNode ).setParameterLength( 1 );
+const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder ) => {
 
-/**
- * This node implements the vertex shader logic which is required
- * when rendering 3D objects via batching. `BatchNode` must be used
- * with instances of {@link BatchedMesh}.
- *
- * @augments Node
- */
-class BatchNode extends Node {
+	// get numeric value (non-node)
+	count = count.value;
 
-	static get type() {
+	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
+	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-		return 'BatchNode';
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, count );
 
-	}
+	// interleaved buffer tracking for matrix
+	let interleavedMatrix = null;
 
-	/**
-	 * Constructs a new batch node.
-	 *
-	 * @param {BatchedMesh} batchMesh - A reference to batched mesh.
-	 */
-	constructor( batchMesh ) {
+	if ( ! isStorageMatrix ) {
 
-		super( 'void' );
+		const uniformBufferSize = count * 16 * 4;
 
-		/**
-		 * A reference to batched mesh.
-		 *
-		 * @type {BatchedMesh}
-		 */
-		this.batchMesh = batchMesh;
+		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
 
-		/**
-		 * The batching index node.
-		 *
-		 * @type {?IndexNode}
-		 * @default null
-		 */
-		this.batchingIdNode = null;
-
-	}
-
-	/**
-	 * Setups the internal buffers and nodes and assigns the transformed vertex data
-	 * to predefined node variables for accumulation. That follows the same patterns
-	 * like with morph and skinning nodes.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
-
-		if ( this.batchingIdNode === null ) {
-
-			if ( builder.getDrawIndex() === null ) {
-
-				this.batchingIdNode = instanceIndex;
-
-			} else {
-
-				this.batchingIdNode = drawIndex;
-
-			}
+			interleavedMatrix = _matrixBuffers.get( matrices );
 
 		}
 
-		const getIndirectIndex = Fn( ( [ id ] ) => {
+	}
 
-			const size = int( textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 ).x ).toConst();
-			const x = int( id ).mod( size ).toConst();
-			const y = int( id ).div( size ).toConst();
-			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x;
+	let instanceColorNode = null;
+	let interleavedColor = null;
 
-		} ).setLayout( {
-			name: 'getIndirectIndex',
-			type: 'uint',
-			inputs: [
-				{ name: 'id', type: 'int' }
-			]
+	if ( colors ) {
+
+		if ( isStorageColor ) {
+
+			instanceColorNode = storage( colors, 'vec3', Math.max( colors.count, 1 ) ).element( instanceIndex );
+
+		} else {
+
+			let bufferAttribute = _colorBuffers.get( colors );
+
+			if ( ! bufferAttribute ) {
+
+				bufferAttribute = new InstancedBufferAttribute( colors.array, 3 );
+				_colorBuffers.set( colors, bufferAttribute );
+
+			}
+
+			interleavedColor = bufferAttribute;
+
+			const bufferFn = colors.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+			instanceColorNode = vec3( bufferFn( bufferAttribute, 'vec3', 3, 0 ) );
+
+		}
+
+	}
+
+	// Synchronization of dynamic buffer updates per frame
+	if ( interleavedMatrix !== null || interleavedColor !== null ) {
+
+		OnFrameUpdate( () => {
+
+			if ( interleavedMatrix !== null ) {
+
+				interleavedMatrix.clearUpdateRanges();
+				interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
+
+				if ( matrices.version !== interleavedMatrix.version ) {
+
+					interleavedMatrix.version = matrices.version;
+
+				}
+
+			}
+
+			if ( colors && interleavedColor !== null ) {
+
+				interleavedColor.clearUpdateRanges();
+				interleavedColor.updateRanges.push( ...colors.updateRanges );
+
+				if ( colors.version !== interleavedColor.version ) {
+
+					interleavedColor.version = colors.version;
+
+				}
+
+			}
+
 		} );
 
-		const indirectId = getIndirectIndex( int( this.batchingIdNode ) );
+	}
 
-		const matricesTexture = this.batchMesh._matricesTexture;
+	// POSITION
 
-		const size = int( textureSize( textureLoad( matricesTexture ), 0 ).x ).toConst();
-		const j = float( indirectId ).mul( 4 ).toInt().toConst();
+	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
+	positionLocal.assign( instancePosition );
 
-		const x = j.mod( size ).toConst();
-		const y = j.div( size ).toConst();
-		const batchingMatrix = mat4(
-			textureLoad( matricesTexture, ivec2( x, y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
-		);
+	if ( builder.needsPreviousData() ) {
 
+		const instancedMesh = builder.object;
 
-		const colorsTexture = this.batchMesh._colorsTexture;
+		OnObjectUpdate( ( { object } ) => {
 
-		if ( colorsTexture !== null ) {
+			const previousInstanceData = _previousInstanceMatrices.get( object );
 
-			const getBatchingColor = Fn( ( [ id ] ) => {
+			previousInstanceData.previousInstanceMatrix.array.set( matrices.array );
 
-				const size = int( textureSize( textureLoad( colorsTexture ), 0 ).x ).toConst();
-				const j = id;
-				const x = j.mod( size ).toConst();
-				const y = j.div( size ).toConst();
-				return textureLoad( colorsTexture, ivec2( x, y ) ).rgb;
+		} );
 
-			} ).setLayout( {
-				name: 'getBatchingColor',
-				type: 'vec3',
-				inputs: [
-					{ name: 'id', type: 'int' }
-				]
-			} );
-
-			const color = getBatchingColor( indirectId );
-
-			varyingProperty( 'vec3', 'vBatchColor' ).assign( color );
-
-		}
-
-		const bm = mat3( batchingMatrix );
-
-		positionLocal.assign( batchingMatrix.mul( positionLocal ) );
-
-		const transformedNormal = normalLocal.div( vec3( bm[ 0 ].dot( bm[ 0 ] ), bm[ 1 ].dot( bm[ 1 ] ), bm[ 2 ].dot( bm[ 2 ] ) ) );
-
-		const batchingNormal = bm.mul( transformedNormal ).xyz;
-
-		normalLocal.assign( batchingNormal );
-
-		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
-
-			tangentLocal.mulAssign( bm );
-
-		}
+		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder, count );
+		positionPrevious.assign( previousInstanceMatrixNode.mul( positionPrevious ).xyz );
 
 	}
+
+	// NORMAL
+
+	if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
+		normalLocal.assign( instanceNormal );
+
+	}
+
+	// COLOR
+
+	if ( instanceColorNode !== null ) {
+
+		instanceColor.assign( instanceColorNode );
+
+	}
+
+}, 'void' );
+
+/**
+ * TSL wrapper for applying instanced mesh rendering setup.
+ *
+ * @tsl
+ * @function
+ * @param {InstancedMesh} instancedMesh - The instanced mesh.
+ */
+const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ] ) => {
+
+	const { count, instanceMatrix, instanceColor } = instancedMesh;
+
+	instance( count, instanceMatrix, instanceColor );
+
+}, 'void' );
+
+/**
+ * TSL function that retrieves the batching color for a given instance ID from a colors texture.
+ *
+ * @param {Node<texture>} colorsTexture - The colors texture.
+ * @param {Node<int>} id - The instance or batch ID.
+ * @returns {Node<vec3>} The retrieved color.
+ */
+const getBatchingColor = /*@__PURE__*/ Fn( ( [ colorsTexture, id ] ) => {
+
+	const size = int( textureSize( textureLoad( colorsTexture ), 0 ).x ).toConst();
+	const j = int( id );
+	const x = j.mod( size ).toConst();
+	const y = j.div( size ).toConst();
+	return textureLoad( colorsTexture, ivec2( x, y ) ).rgb;
+
+} );
+
+/**
+ * TSL function that retrieves the indirect index for a given batch ID.
+ *
+ * @param {BatchedMesh} batchMesh - The batched mesh.
+ * @param {Node<int>} id - The draw or instance ID.
+ * @returns {Node<uint>} The indirect index.
+ */
+const getIndirectIndex = /*@__PURE__*/ Fn( ( [ indirectTexture, id ] ) => {
+
+	const size = int( textureSize( textureLoad( indirectTexture ), 0 ).x ).toConst();
+	const x = int( id ).mod( size ).toConst();
+	const y = int( id ).div( size ).toConst();
+	return textureLoad( indirectTexture, ivec2( x, y ) ).x;
+
+} );
+
+/**
+ * TSL object representing a varying property for the batching color vector.
+ *
+ * @type {VaryingNode<vec3>}
+ */
+const batchColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vBatchColor' );
+
+/**
+ * TSL function representing the vertex shader batching setup.
+ * Applies the batch transformation matrix to positionLocal, normalLocal, and tangentLocal.
+ * Also assigns the batch color if a color texture is present.
+ *
+ * @tsl
+ * @function
+ * @param {BatchedMesh} batchMesh - The batched mesh.
+ */
+const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
+
+	const batchingIdNode = builder.getDrawIndex() === null ? instanceIndex : drawIndex;
+
+	const indirectId = getIndirectIndex( batchMesh._indirectTexture, int( batchingIdNode ) );
+
+	const matricesTexture = batchMesh._matricesTexture;
+
+	const size = int( textureSize( textureLoad( matricesTexture ), 0 ).x ).toConst();
+	const j = float( indirectId ).mul( 4 ).toInt().toConst();
+
+	const x = j.mod( size ).toConst();
+	const y = j.div( size ).toConst();
+	const batchingMatrix = mat4(
+		textureLoad( matricesTexture, ivec2( x, y ) ),
+		textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
+		textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
+		textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
+	);
+
+	const colorsTexture = batchMesh._colorsTexture;
+
+	if ( colorsTexture !== null ) {
+
+		const color = getBatchingColor( colorsTexture, indirectId );
+
+		batchColor.assign( color );
+
+	}
+
+	const bm = mat3( batchingMatrix );
+
+	positionLocal.assign( batchingMatrix.mul( positionLocal ) );
+
+	const transformedNormal = normalLocal.div( vec3( bm[ 0 ].dot( bm[ 0 ] ), bm[ 1 ].dot( bm[ 1 ] ), bm[ 2 ].dot( bm[ 2 ] ) ) );
+
+	const batchingNormal = bm.mul( transformedNormal ).xyz;
+
+	normalLocal.assign( batchingNormal );
+
+	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+		tangentLocal.mulAssign( bm );
+
+	}
+
+}, 'void' );
+
+const _skeletonsUpdated = /*@__PURE__*/ new WeakMap();
+const _previousBoneMatricesData = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Computes the skinned position by applying bone matrices based on weights.
+ *
+ * @param {Node} boneMatrices - The bone matrices buffer or storage node.
+ * @param {Node<vec3>} position - The vertex position to transform.
+ * @param {Node<mat4>} bindMatrix - The bind matrix node.
+ * @param {Node<mat4>} bindMatrixInverse - The inverse bind matrix node.
+ * @param {Node<uvec4>} skinIndex - The skin index attribute.
+ * @param {Node<vec4>} skinWeight - The skin weight attribute.
+ * @returns {Node<vec3>} The skinned position.
+ */
+function getSkinnedPosition( boneMatrices, position, bindMatrix, bindMatrixInverse, skinIndex, skinWeight ) {
+
+	const boneMatX = boneMatrices.element( skinIndex.x );
+	const boneMatY = boneMatrices.element( skinIndex.y );
+	const boneMatZ = boneMatrices.element( skinIndex.z );
+	const boneMatW = boneMatrices.element( skinIndex.w );
+
+	// POSITION
+
+	const skinVertex = bindMatrix.mul( position );
+
+	const skinned = add(
+		boneMatX.mul( skinWeight.x ).mul( skinVertex ),
+		boneMatY.mul( skinWeight.y ).mul( skinVertex ),
+		boneMatZ.mul( skinWeight.z ).mul( skinVertex ),
+		boneMatW.mul( skinWeight.w ).mul( skinVertex )
+	);
+
+	return bindMatrixInverse.mul( skinned ).xyz;
 
 }
 
 /**
- * TSL function for creating a batch node.
+ * Computes the skinned normal and tangent vectors by applying bone matrices based on weights.
  *
- * @tsl
- * @function
- * @param {BatchedMesh} batchMesh - A reference to batched mesh.
- * @returns {BatchNode}
+ * @param {Node} boneMatrices - The bone matrices buffer or storage node.
+ * @param {Node<vec3>} normal - The normal vector in local space.
+ * @param {Node<vec3>} tangent - The tangent vector in local space.
+ * @param {Node<mat4>} bindMatrix - The bind matrix node.
+ * @param {Node<mat4>} bindMatrixInverse - The inverse bind matrix node.
+ * @param {Node<uvec4>} skinIndex - The skin index attribute.
+ * @param {Node<vec4>} skinWeight - The skin weight attribute.
+ * @returns {{skinNormal: Node<vec3>, skinTangent: Node<vec3>}} The skinned normal and tangent.
  */
-const batch = /*@__PURE__*/ nodeProxy( BatchNode ).setParameterLength( 1 );
+function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, bindMatrixInverse, skinIndex, skinWeight ) {
 
-const _frameId = new WeakMap();
+	const boneMatX = boneMatrices.element( skinIndex.x );
+	const boneMatY = boneMatrices.element( skinIndex.y );
+	const boneMatZ = boneMatrices.element( skinIndex.z );
+	const boneMatW = boneMatrices.element( skinIndex.w );
+
+	// NORMAL and TANGENT
+
+	let skinMatrix = add(
+		skinWeight.x.mul( boneMatX ),
+		skinWeight.y.mul( boneMatY ),
+		skinWeight.z.mul( boneMatZ ),
+		skinWeight.w.mul( boneMatW )
+	);
+
+	skinMatrix = bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix );
+
+	const skinNormal = skinMatrix.transformDirection( normal ).xyz;
+	const skinTangent = skinMatrix.transformDirection( tangent ).xyz;
+
+	return { skinNormal, skinTangent };
+
+}
 
 /**
- * This node implements the vertex transformation shader logic which is required
- * for skinning/skeletal animation.
+ * Retrieves or initializes the previous frame skinned position node for motion vectors.
+ * Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
  *
- * @augments Node
+ * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
+ * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
+ * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
+ * @param {Node<uvec4>} skinIndexNode - The skin index attribute.
+ * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
+ * @returns {Node<vec3>} The skinned position from the previous frame.
  */
-class SkinningNode extends Node {
+function getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
 
-	static get type() {
+	const skeleton = skinnedMesh.skeleton;
 
-		return 'SkinningNode';
+	let data = _previousBoneMatricesData.get( skeleton );
 
-	}
-
-	/**
-	 * Constructs a new skinning node.
-	 *
-	 * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
-	 */
-	constructor( skinnedMesh ) {
-
-		super( 'void' );
-
-		/**
-		 * The skinned mesh.
-		 *
-		 * @type {SkinnedMesh}
-		 */
-		this.skinnedMesh = skinnedMesh;
-
-		/**
-		 * The update type overwritten since skinning nodes are updated per object.
-		 *
-		 * @type {string}
-		 */
-		this.updateType = NodeUpdateType.OBJECT;
-
-		//
-
-		/**
-		 * The skin index attribute.
-		 *
-		 * @type {AttributeNode}
-		 */
-		this.skinIndexNode = attribute( 'skinIndex', 'uvec4' );
-
-		/**
-		 * The skin weight attribute.
-		 *
-		 * @type {AttributeNode}
-		 */
-		this.skinWeightNode = attribute( 'skinWeight', 'vec4' );
-
-		/**
-		 * The bind matrix node.
-		 *
-		 * @type {Node<mat4>}
-		 */
-		this.bindMatrixNode = reference( 'bindMatrix', 'mat4' );
-
-		/**
-		 * The bind matrix inverse node.
-		 *
-		 * @type {Node<mat4>}
-		 */
-		this.bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
-
-		/**
-		 * The bind matrices as a uniform buffer node.
-		 *
-		 * @type {Node}
-		 */
-		this.boneMatricesNode = referenceBuffer( 'skeleton.boneMatrices', 'mat4', skinnedMesh.skeleton.bones.length );
-
-		/**
-		 * The current vertex position in local space.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.positionNode = positionLocal;
-
-		/**
-		 * The result of vertex position in local space.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.toPositionNode = positionLocal;
-
-		/**
-		 * The previous bind matrices as a uniform buffer node.
-		 * Required for computing motion vectors.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.previousBoneMatricesNode = null;
-
-	}
-
-	/**
-	 * Transforms the given vertex position via skinning.
-	 *
-	 * @param {Node} [boneMatrices=this.boneMatricesNode] - The bone matrices
-	 * @param {Node<vec3>} [position=this.positionNode] - The vertex position in local space.
-	 * @return {Node<vec3>} The transformed vertex position.
-	 */
-	getSkinnedPosition( boneMatrices = this.boneMatricesNode, position = this.positionNode ) {
-
-		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode } = this;
-
-		const boneMatX = boneMatrices.element( skinIndexNode.x );
-		const boneMatY = boneMatrices.element( skinIndexNode.y );
-		const boneMatZ = boneMatrices.element( skinIndexNode.z );
-		const boneMatW = boneMatrices.element( skinIndexNode.w );
-
-		// POSITION
-
-		const skinVertex = bindMatrixNode.mul( position );
-
-		const skinned = add(
-			boneMatX.mul( skinWeightNode.x ).mul( skinVertex ),
-			boneMatY.mul( skinWeightNode.y ).mul( skinVertex ),
-			boneMatZ.mul( skinWeightNode.z ).mul( skinVertex ),
-			boneMatW.mul( skinWeightNode.w ).mul( skinVertex )
-		);
-
-		return bindMatrixInverseNode.mul( skinned ).xyz;
-
-	}
-
-	/**
-	 * Transforms the given vertex normal and tangent via skinning.
-	 *
-	 * @param {Node} [boneMatrices=this.boneMatricesNode] - The bone matrices
-	 * @param {Node<vec3>} [normal=normalLocal] - The vertex normal in local space.
-	 * @param {Node<vec3>} [tangent=tangentLocal] - The vertex tangent in local space.
-	 * @return {{skinNormal: Node<vec3>, skinTangent:Node<vec3>}} The transformed vertex normal and tangent.
-	 */
-	getSkinnedNormalAndTangent( boneMatrices = this.boneMatricesNode, normal = normalLocal, tangent = tangentLocal ) {
-
-		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode } = this;
-
-		const boneMatX = boneMatrices.element( skinIndexNode.x );
-		const boneMatY = boneMatrices.element( skinIndexNode.y );
-		const boneMatZ = boneMatrices.element( skinIndexNode.z );
-		const boneMatW = boneMatrices.element( skinIndexNode.w );
-
-		// NORMAL and TANGENT
-
-		let skinMatrix = add(
-			skinWeightNode.x.mul( boneMatX ),
-			skinWeightNode.y.mul( boneMatY ),
-			skinWeightNode.z.mul( boneMatZ ),
-			skinWeightNode.w.mul( boneMatW )
-		);
-
-		skinMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
-
-		const skinNormal = skinMatrix.transformDirection( normal ).xyz;
-		const skinTangent = skinMatrix.transformDirection( tangent ).xyz;
-
-		return { skinNormal, skinTangent };
-
-	}
-
-	/**
-	 * Computes the transformed/skinned vertex position of the previous frame.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec3>} The skinned position from the previous frame.
-	 */
-	getPreviousSkinnedPosition( builder ) {
-
-		const skinnedMesh = builder.object;
-
-		if ( this.previousBoneMatricesNode === null ) {
-
-			skinnedMesh.skeleton.previousBoneMatrices = new Float32Array( skinnedMesh.skeleton.boneMatrices );
-
-			this.previousBoneMatricesNode = referenceBuffer( 'skeleton.previousBoneMatrices', 'mat4', skinnedMesh.skeleton.bones.length );
-
-		}
-
-		return this.getSkinnedPosition( this.previousBoneMatricesNode, positionPrevious );
-
-	}
-
-	/**
-	 * Setups the skinning node by assigning the transformed vertex data to predefined node variables.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec3>} The transformed vertex position.
-	 */
-	setup( builder ) {
-
-		if ( builder.needsPreviousData() ) {
-
-			positionPrevious.assign( this.getPreviousSkinnedPosition( builder ) );
-
-		}
-
-		const skinPosition = this.getSkinnedPosition();
-
-		if ( this.toPositionNode ) this.toPositionNode.assign( skinPosition );
-
-		//
-
-		if ( builder.hasGeometryAttribute( 'normal' ) ) {
-
-			const { skinNormal, skinTangent } = this.getSkinnedNormalAndTangent();
-
-			normalLocal.assign( skinNormal );
-
-			if ( builder.hasGeometryAttribute( 'tangent' ) ) {
-
-				tangentLocal.assign( skinTangent );
-
-			}
-
-		}
-
-		return skinPosition;
-
-	}
-
-	/**
-	 * Generates the code snippet of the skinning node.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string} output - The current output.
-	 * @return {string} The generated code snippet.
-	 */
-	generate( builder, output ) {
-
-		if ( output !== 'void' ) {
-
-			return super.generate( builder, output );
-
-		}
-
-	}
-
-	/**
-	 * Updates the state of the skinned mesh by updating the skeleton once per frame.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	update( frame ) {
-
-		const skeleton = frame.object && frame.object.skeleton ? frame.object.skeleton : this.skinnedMesh.skeleton;
-
-		if ( _frameId.get( skeleton ) === frame.frameId ) return;
-
-		_frameId.set( skeleton, frame.frameId );
-
-		if ( this.previousBoneMatricesNode !== null ) {
-
-			if ( skeleton.previousBoneMatrices === null ) {
-
-				// cloned skeletons miss "previousBoneMatrices" in their first updated
-
-				skeleton.previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-
-			}
-
-			skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
-
-
-		}
+	if ( data === undefined ) {
 
 		skeleton.update();
 
+		const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+
+		data = {
+			previousBoneMatrices,
+			node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
+		};
+
+		_previousBoneMatricesData.set( skeleton, data );
+
 	}
+
+	return getSkinnedPosition( data.node, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 }
 
 /**
- * TSL function for creating a skinning node.
+ * TSL function representing the standard skeletal animation vertex shader setup.
+ * Transforms positionLocal, normalLocal, and tangentLocal in-place.
  *
  * @tsl
  * @function
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
- * @returns {SkinningNode}
  */
-const skinning = ( skinnedMesh ) => new SkinningNode( skinnedMesh );
+const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
+
+	const skinIndexNode = attribute( 'skinIndex', 'uvec4' );
+	const skinWeightNode = attribute( 'skinWeight', 'vec4' );
+	const bindMatrixNode = reference( 'bindMatrix', 'mat4' );
+	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
+	const boneMatricesNode = referenceBuffer( 'skeleton.boneMatrices', 'mat4', skinnedMesh.skeleton.bones.length );
+
+	OnObjectUpdate( ( { object, frameId } ) => {
+
+		const skeleton = object.skeleton;
+
+		if ( _skeletonsUpdated.get( skeleton ) !== frameId ) {
+
+			_skeletonsUpdated.set( skeleton, frameId );
+
+			const skeletonData = _previousBoneMatricesData.get( skeleton );
+
+			if ( skeletonData !== undefined ) {
+
+				skeletonData.previousBoneMatrices.set( skeleton.boneMatrices );
+
+			}
+
+			skeleton.update();
+
+		}
+
+	} );
+
+	if ( builder.needsPreviousData() ) {
+
+		const previousSkinnedPosition = getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+
+		positionPrevious.assign( previousSkinnedPosition );
+
+	}
+
+	const skinPosition = getSkinnedPosition( boneMatricesNode, positionLocal, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+	positionLocal.assign( skinPosition );
+
+	if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+		const { skinNormal, skinTangent } = getSkinnedNormalAndTangent( boneMatricesNode, normalLocal, tangentLocal, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+
+		normalLocal.assign( skinNormal );
+
+		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+			tangentLocal.assign( skinTangent );
+
+		}
+
+	}
+
+}, 'void' );
 
 /**
- * TSL function for computing skinning.
+ * TSL function that computes skeletal animation for custom compute passes.
  *
  * @tsl
  * @function
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
- * @param {Node<vec3>} [toPosition=null] - The target position.
- * @returns {SkinningNode}
+ * @param {Node<vec3>} [toPosition=null] - The target position node to assign.
+ * @returns {Node<vec3>} The computed skinned position node.
  */
-const computeSkinning = ( skinnedMesh, toPosition = null ) => {
+const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], builder ) => {
 
-	const node = new SkinningNode( skinnedMesh );
-	node.positionNode = storage( new InstancedBufferAttribute( skinnedMesh.geometry.getAttribute( 'position' ).array, 3 ), 'vec3' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
-	node.skinIndexNode = storage( new InstancedBufferAttribute( new Uint32Array( skinnedMesh.geometry.getAttribute( 'skinIndex' ).array ), 4 ), 'uvec4' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
-	node.skinWeightNode = storage( new InstancedBufferAttribute( skinnedMesh.geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
-	node.bindMatrixNode = uniform( skinnedMesh.bindMatrix, 'mat4' );
-	node.bindMatrixInverseNode = uniform( skinnedMesh.bindMatrixInverse, 'mat4' );
-	node.boneMatricesNode = buffer( skinnedMesh.skeleton.boneMatrices, 'mat4', skinnedMesh.skeleton.bones.length );
-	node.toPositionNode = toPosition;
+	const positionNode = storage( new InstancedBufferAttribute( skinnedMesh.geometry.getAttribute( 'position' ).array, 3 ), 'vec3' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
+	const skinIndexNode = storage( new InstancedBufferAttribute( new Uint32Array( skinnedMesh.geometry.getAttribute( 'skinIndex' ).array ), 4 ), 'uvec4' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
+	const skinWeightNode = storage( new InstancedBufferAttribute( skinnedMesh.geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
+	const bindMatrixNode = uniform( skinnedMesh.bindMatrix, 'mat4' );
+	const bindMatrixInverseNode = uniform( skinnedMesh.bindMatrixInverse, 'mat4' );
+	const boneMatricesNode = buffer( skinnedMesh.skeleton.boneMatrices, 'mat4', skinnedMesh.skeleton.bones.length );
 
-	return nodeObject( node );
+	const skeleton = skinnedMesh.skeleton;
 
-};
+	OnObjectUpdate( ( { frameId } ) => {
+
+		if ( _skeletonsUpdated.get( skeleton ) !== frameId ) {
+
+			_skeletonsUpdated.set( skeleton, frameId );
+
+			const state = _previousBoneMatricesData.get( skeleton );
+
+			if ( state !== undefined ) {
+
+				state.previousBoneMatrices.set( skeleton.boneMatrices );
+
+			}
+
+			skeleton.update();
+
+		}
+
+	} );
+
+	if ( builder.needsPreviousData() ) {
+
+		const previousSkinnedPosition = getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+
+		positionPrevious.assign( previousSkinnedPosition );
+
+	}
+
+	const skinPosition = getSkinnedPosition( boneMatricesNode, positionNode, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+
+	if ( toPosition !== null ) {
+
+		toPosition.assign( skinPosition );
+
+	}
+
+	if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+		const { skinNormal, skinTangent } = getSkinnedNormalAndTangent( boneMatricesNode, normalLocal, tangentLocal, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+
+		normalLocal.assign( skinNormal );
+
+		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+			tangentLocal.assign( skinTangent );
+
+		}
+
+	}
+
+	return skinPosition;
+
+} );
 
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
@@ -19132,7 +19015,20 @@ const Break = () => expression( 'break' ).toStack();
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
+const _morphBaseInfluences = /*@__PURE__*/ new WeakMap();
 
+/**
+ * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+ *
+ * @param {Object} params - The parameter object.
+ * @param {Node<texture>} params.bufferMap - The morph target data array texture.
+ * @param {Node<float>} params.influence - The target's animation influence weight.
+ * @param {number} params.stride - The vertex data stride (e.g. 1 or 2).
+ * @param {Node<int>} params.width - The texture width limit.
+ * @param {Node<int>} params.depth - The target layer index (morph target index).
+ * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal).
+ * @returns {Node<vec3>} The scaled morph target translation value.
+ */
 const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
@@ -19146,6 +19042,12 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 
 } );
 
+/**
+ * Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
+ *
+ * @param {BufferGeometry} geometry - The geometry to parse.
+ * @returns {Object} The resolved morph targets texture data mapping entry.
+ */
 function getEntry( geometry ) {
 
 	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
@@ -19273,155 +19175,109 @@ function getEntry( geometry ) {
 }
 
 /**
- * This node implements the vertex transformation shader logic which is required
- * for morph target animation.
+ * TSL object representing a reference to the mesh's morphTargetInfluences array.
  *
- * @augments Node
+ * @type {ReferenceNode<float>}
  */
-class MorphNode extends Node {
+const morphTargetInfluences = /*@__PURE__*/ reference( 'morphTargetInfluences', 'float' );
 
-	static get type() {
+/**
+ * TSL function representing the vertex shader morph targets blend setup.
+ * Dynamically computes morph targets weights and updates positionLocal and normalLocal in-place.
+ *
+ * @tsl
+ * @function
+ * @param {Mesh} mesh - The mesh.
+ */
+const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
-		return 'MorphNode';
+	const { geometry } = mesh;
 
-	}
+	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
+	const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
 
-	/**
-	 * Constructs a new morph node.
-	 *
-	 * @param {Mesh} mesh - The mesh holding the morph targets.
-	 */
-	constructor( mesh ) {
+	const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
+	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
 
-		super( 'void' );
+	if ( morphTargetsCount === 0 ) return;
 
-		/**
-		 * The mesh holding the morph targets.
-		 *
-		 * @type {Mesh}
-		 */
-		this.mesh = mesh;
+	let morphBaseInfluence = _morphBaseInfluences.get( mesh );
 
-		/**
-		 * A uniform node which represents the morph base influence value.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.morphBaseInfluence = uniform( 1 );
+	if ( ! morphBaseInfluence ) {
 
-		/**
-		 * The update type overwritten since morph nodes are updated per object.
-		 *
-		 * @type {string}
-		 */
-		this.updateType = NodeUpdateType.OBJECT;
+		morphBaseInfluence = uniform( 1 );
+		_morphBaseInfluences.set( mesh, morphBaseInfluence );
 
-	}
+		OnObjectUpdate( ( { object } ) => {
 
-	/**
-	 * Setups the morph node by assigning the transformed vertex data to predefined node variables.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 */
-	setup( builder ) {
+			if ( object.geometry.morphTargetsRelative ) {
 
-		const { geometry } = builder;
-
-		const hasMorphPosition = geometry.morphAttributes.position !== undefined;
-		const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
-
-		const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
-		const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
-
-		// nodes
-
-		const { texture: bufferMap, stride, size } = getEntry( geometry );
-
-		if ( hasMorphPosition === true ) positionLocal.mulAssign( this.morphBaseInfluence );
-		if ( hasMorphNormals === true ) normalLocal.mulAssign( this.morphBaseInfluence );
-
-		const width = int( size.width );
-
-		Loop( morphTargetsCount, ( { i } ) => {
-
-			const influence = float( 0 ).toVar();
-
-			if ( this.mesh.count > 1 && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
-
-				influence.assign( textureLoad( this.mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
+				morphBaseInfluence.value = 1;
 
 			} else {
 
-				influence.assign( reference( 'morphTargetInfluences', 'float' ).element( i ).toVar() );
+				morphBaseInfluence.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
 
 			}
-
-			If( influence.notEqual( 0 ), () => {
-
-				if ( hasMorphPosition === true ) {
-
-					positionLocal.addAssign( getMorph( {
-						bufferMap,
-						influence,
-						stride,
-						width,
-						depth: i,
-						offset: int( 0 )
-					} ) );
-
-				}
-
-				if ( hasMorphNormals === true ) {
-
-					normalLocal.addAssign( getMorph( {
-						bufferMap,
-						influence,
-						stride,
-						width,
-						depth: i,
-						offset: int( 1 )
-					} ) );
-
-				}
-
-			} );
 
 		} );
 
 	}
 
-	/**
-	 * Updates the state of the morphed mesh by updating the base influence.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	update( /*frame*/ ) {
+	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-		const morphBaseInfluence = this.morphBaseInfluence;
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBaseInfluence );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBaseInfluence );
 
-		if ( this.mesh.geometry.morphTargetsRelative ) {
+	const width = int( size.width );
 
-			morphBaseInfluence.value = 1;
+	Loop( morphTargetsCount, ( { i } ) => {
+
+		const influence = float( 0 ).toVar();
+
+		if ( mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined ) ) {
+
+			influence.assign( textureLoad( mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
 		} else {
 
-			morphBaseInfluence.value = 1 - this.mesh.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+			influence.assign( morphTargetInfluences.element( i ).toVar() );
 
 		}
 
-	}
+		If( influence.notEqual( 0 ), () => {
 
-}
+			if ( hasMorphPosition === true ) {
 
-/**
- * TSL function for creating a morph node.
- *
- * @tsl
- * @function
- * @param {Mesh} mesh - The mesh holding the morph targets.
- * @returns {MorphNode}
- */
-const morphReference = /*@__PURE__*/ nodeProxy( MorphNode ).setParameterLength( 1 );
+				positionLocal.addAssign( getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 0 )
+				} ) );
+
+			}
+
+			if ( hasMorphNormals === true ) {
+
+				normalLocal.addAssign( getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 1 )
+				} ) );
+
+			}
+
+		} );
+
+	} );
+
+}, 'void' );
 
 /**
  * Base class for lighting nodes.
@@ -20335,7 +20191,7 @@ class ClippingNode extends Node {
 		const clippingContext = builder.clippingContext;
 		const { intersectionPlanes, unionPlanes } = clippingContext;
 
-		this.hardwareClipping = builder.material.hardwareClipping;
+		this.hardwareClipping = builder.hardwareClipping;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
@@ -20757,16 +20613,6 @@ class NodeMaterial extends Material {
 		 * @default false
 		 */
 		this.lights = false;
-
-		/**
-		 * Whether this material uses hardware clipping or not.
-		 * This property is managed by the engine and should not be
-		 * modified by apps.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.hardwareClipping = false;
 
 		/**
 		 * Node materials which set their `lights` property to `true`
@@ -21330,7 +21176,7 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		this.hardwareClipping = false;
+		builder.hardwareClipping = false;
 
 		if ( builder.clippingContext === null ) return;
 
@@ -21342,7 +21188,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.addToStack( hardwareClipping() );
 
-			this.hardwareClipping = true;
+			builder.hardwareClipping = true;
 
 		}
 
@@ -21450,13 +21296,13 @@ class NodeMaterial extends Material {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morphReference( object ).toStack();
+			morphReference( object );
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).toStack();
+			skinning( object );
 
 		}
 
@@ -21472,13 +21318,13 @@ class NodeMaterial extends Material {
 
 		if ( object.isBatchedMesh ) {
 
-			batch( object ).toStack();
+			batch( object );
 
 		}
 
 		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
-			instancedMesh( object ).toStack();
+			instancedMesh( object );
 
 		}
 
@@ -21528,15 +21374,11 @@ class NodeMaterial extends Material {
 
 		if ( object.instanceColor ) {
 
-			const instanceColor = varyingProperty( 'vec3', 'vInstanceColor' );
-
 			colorNode = instanceColor.mul( colorNode );
 
 		}
 
 		if ( object.isBatchedMesh && object._colorsTexture ) {
-
-			const batchColor = varyingProperty( 'vec3', 'vBatchColor' );
 
 			colorNode = batchColor.mul( colorNode );
 
@@ -22168,6 +22010,376 @@ class LineDashedNodeMaterial extends NodeMaterial {
 const _defaultValues$b = /*@__PURE__*/ new LineDashedMaterial();
 
 /**
+ * Varying node representing the world position of the segment start in view space.
+ * Used for distance and coordinate calculations across the fragment shader.
+ * @type {VaryingNode<vec3>}
+ */
+const worldStart = varyingProperty( 'vec3', 'worldStart' );
+
+/**
+ * Varying node representing the world position of the segment end in view space.
+ * Used for distance and coordinate calculations across the fragment shader.
+ * @type {VaryingNode<vec3>}
+ */
+const worldEnd = varyingProperty( 'vec3', 'worldEnd' );
+
+/**
+ * Varying node representing the accumulated distance along the line.
+ * Crucial for correctly computing dashed line intervals in fragment stage.
+ * @type {VaryingNode<float>}
+ */
+const lineDistance = varyingProperty( 'float', 'lineDistance' );
+
+/**
+ * Varying node representing the interpolated world/view position of the current fragment.
+ * Used for line/ray distance checks under perspective projection.
+ * @type {VaryingNode<vec4>}
+ */
+const worldPos = varyingProperty( 'vec4', 'worldPos' );
+
+/**
+ * Trims the line segment to avoid rendering behind the camera near plane.
+ * Computes an interpolation factor (alpha) to clamp the segment's coordinate.
+ *
+ * @param {Object} inputs
+ * @param {Node<vec4>} inputs.start - Segment start position in view space.
+ * @param {Node<vec4>} inputs.end - Segment end position in view space.
+ * @returns {Node<float>} The interpolation factor (alpha) to trim the segment.
+ */
+const trimSegmentAlpha = Fn( ( { start, end } ) => {
+
+	const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
+	const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
+
+	// we need different nearEstimate formula for reversed and default depth buffer
+	// a is positive with a reversed depth buffer so it can be used for controlling the code flow
+
+	const nearEstimate = a.greaterThan( 0 ).select( b.negate().div( a.add( 1 ) ), b.mul( -0.5 ).div( a ) );
+
+	return nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
+
+}, { start: 'vec4', end: 'vec4', return: 'float' } );
+
+/**
+ * Calculates the closest points on two 3D lines.
+ * Used for perspective-correct line rendering and coordinates interpolation.
+ *
+ * @param {Object} inputs
+ * @param {Node<vec3>} inputs.p1 - Start of line 1.
+ * @param {Node<vec3>} inputs.p2 - End of line 1.
+ * @param {Node<vec3>} inputs.p3 - Start of line 2.
+ * @param {Node<vec3>} inputs.p4 - End of line 2.
+ * @returns {Node<vec2>} A vec2 containing the parametric coordinates (mua, mub) of the closest points on line 1 and line 2.
+ */
+const closestLineToLine = Fn( ( { p1, p2, p3, p4 } ) => {
+
+	const p13 = p1.sub( p3 );
+	const p43 = p4.sub( p3 );
+
+	const p21 = p2.sub( p1 );
+
+	const d1343 = p13.dot( p43 );
+	const d4321 = p43.dot( p21 );
+	const d1321 = p13.dot( p21 );
+	const d4343 = p43.dot( p43 );
+	const d2121 = p21.dot( p21 );
+
+	const denom = d2121.mul( d4343 ).sub( d4321.mul( d4321 ) );
+	const numer = d1343.mul( d4321 ).sub( d1321.mul( d4343 ) );
+
+	const mua = numer.div( denom ).clamp();
+	const mub = d1343.add( d4321.mul( mua ) ).div( d4343 ).clamp();
+
+	return vec2( mua, mub );
+
+}, { p1: 'vec3', p2: 'vec3', p3: 'vec3', p4: 'vec3', return: 'vec2' } );
+
+/**
+ * TSL node acting as a custom Model-View-Projection (MVP) for fat lines,
+ * expanding 3D segments into screen/world-facing ribbons of a specified width.
+ *
+ * @tsl
+ * @type {Node<vec4>}
+ */
+const mvpLine = Fn( ( { material } ) => {
+
+	const useDash = material._useDash;
+	const useWorldUnits = material._useWorldUnits;
+
+	const instanceStart = attribute( 'instanceStart' );
+	const instanceEnd = attribute( 'instanceEnd' );
+
+	// camera space
+
+	const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
+	const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
+
+	let distanceStart, distanceEnd;
+
+	if ( useDash ) {
+
+		distanceStart = float( attribute( 'instanceDistanceStart' ) ).toVar( 'distanceStart' );
+		distanceEnd = float( attribute( 'instanceDistanceEnd' ) ).toVar( 'distanceEnd' );
+
+	}
+
+	if ( useWorldUnits ) {
+
+		worldStart.assign( start.xyz );
+		worldEnd.assign( end.xyz );
+
+	}
+
+	const aspect = viewport.z.div( viewport.w );
+
+	// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
+	// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
+	// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
+	// perhaps there is a more elegant solution -- WestLangley
+
+	const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1 ); // 4th entry in the 3rd column
+
+	If( perspective, () => {
+
+		If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
+
+			const alpha = trimSegmentAlpha( { start, end } );
+			end.assign( vec4( mix( start.xyz, end.xyz, alpha ), end.w ) );
+
+			if ( useDash ) {
+
+				distanceEnd.assign( mix( distanceStart, distanceEnd, alpha ) );
+
+			}
+
+		} ).ElseIf( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
+
+			const alpha = trimSegmentAlpha( { start: end, end: start } );
+			start.assign( vec4( mix( end.xyz, start.xyz, alpha ), start.w ) );
+
+			if ( useDash ) {
+
+				distanceStart.assign( mix( distanceEnd, distanceStart, alpha ) );
+
+			}
+
+		} );
+
+	} );
+
+	if ( useDash ) {
+
+		const dashScaleNode = material.dashScaleNode ? float( material.dashScaleNode ) : materialLineScale;
+		const offsetNode = material.offsetNode ? float( material.offsetNode ) : materialLineDashOffset;
+
+		let lineDist = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( distanceStart ), dashScaleNode.mul( distanceEnd ) );
+		lineDist = lineDist.add( offsetNode );
+
+		lineDistance.assign( lineDist );
+
+	}
+
+	// clip space
+	const clipStart = cameraProjectionMatrix.mul( start );
+	const clipEnd = cameraProjectionMatrix.mul( end );
+
+	// ndc space
+	const ndcStart = clipStart.xyz.div( clipStart.w );
+	const ndcEnd = clipEnd.xyz.div( clipEnd.w );
+
+	// direction
+	const dir = ndcEnd.xy.sub( ndcStart.xy ).toVar();
+
+	// account for clip-space aspect ratio
+	dir.x.assign( dir.x.mul( aspect ) );
+	dir.assign( dir.normalize() );
+
+	const clip = vec4().toVar();
+
+	if ( useWorldUnits ) {
+
+		// get the offset direction as perpendicular to the view vector
+
+		const worldDir = end.xyz.sub( start.xyz ).normalize();
+		const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();
+		const worldUp = worldDir.cross( tmpFwd ).normalize();
+		const worldFwd = worldDir.cross( worldUp );
+
+		worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
+
+		// height offset
+		const hw = materialLineWidth.mul( 0.5 );
+		worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
+
+		// don't extend the line if we're rendering dashes because we
+		// won't be rendering the endcaps
+		if ( ! useDash ) {
+
+			// cap extension
+			worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
+
+			// add width to the box
+			worldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
+
+			// endcaps
+			If( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
+
+				worldPos.subAssign( vec4( worldFwd.mul( 2.0 ).mul( hw ), 0 ) );
+
+			} );
+
+		}
+
+		// project the worldpos
+		clip.assign( cameraProjectionMatrix.mul( worldPos ) );
+
+		// shift the depth of the projected points so the line
+		// segments overlap neatly
+		const clipPose = vec3().toVar();
+
+		clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
+		clip.z.assign( clipPose.z.mul( clip.w ) );
+
+	} else {
+
+		const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
+
+		// undo aspect ratio adjustment
+		dir.x.assign( dir.x.div( aspect ) );
+		offset.x.assign( offset.x.div( aspect ) );
+
+		// sign flip
+		offset.assign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
+
+		// endcaps
+		If( positionGeometry.y.lessThan( 0.0 ), () => {
+
+			offset.assign( offset.sub( dir ) );
+
+		} ).ElseIf( positionGeometry.y.greaterThan( 1.0 ), () => {
+
+			offset.assign( offset.add( dir ) );
+
+		} );
+
+		// adjust for linewidth
+		offset.assign( offset.mul( materialLineWidth ) );
+
+		// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+		offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
+
+		// select end
+		clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
+
+		// back to clip space
+		offset.assign( offset.mul( clip.w ) );
+
+		clip.assign( clip.add( vec4( offset, 0, 0 ) ) );
+
+	}
+
+	return clip;
+
+} )();
+
+/**
+ * TSL fragment node that computes the shape/coverage (alpha) of the fat line segment.
+ * Handles dash/gap generation, alpha-to-coverage rendering, and round endcaps.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+const alphaLine = Fn( ( { material, renderer } ) => {
+
+	const useAlphaToCoverage = material._useAlphaToCoverage;
+	const useDash = material._useDash;
+	const useWorldUnits = material._useWorldUnits;
+
+	const vUv = uv$1();
+
+	if ( useDash ) {
+
+		const dashSizeNode = material.dashSizeNode ? float( material.dashSizeNode ) : materialLineDashSize;
+		const gapSizeNode = material.gapSizeNode ? float( material.gapSizeNode ) : materialLineGapSize;
+
+		dashSize.assign( dashSizeNode );
+		gapSize.assign( gapSizeNode );
+
+		vUv.y.lessThan( -1 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
+		lineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
+
+	}
+
+	const alpha = float( 1 ).toVar( 'alpha' );
+
+	if ( useWorldUnits ) {
+
+		// Find the closest points on the view ray and the line segment
+		const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
+		const lineDir = worldEnd.sub( worldStart );
+		const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+
+		const p1 = worldStart.add( lineDir.mul( params.x ) );
+		const p2 = rayEnd.mul( params.y );
+		const delta = p1.sub( p2 );
+		const len = delta.length();
+		const norm = len.div( materialLineWidth );
+
+		if ( ! useDash ) {
+
+			if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
+
+				const dnorm = norm.fwidth();
+				alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
+
+			} else {
+
+				norm.greaterThan( 0.5 ).discard();
+
+			}
+
+		}
+
+	} else {
+
+		// round endcaps
+
+		if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
+
+			const a = vUv.x;
+			const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+
+			const len2 = a.mul( a ).add( b.mul( b ) );
+
+			const dlen = float( len2.fwidth() ).toVar( 'dlen' );
+
+			If( vUv.y.abs().greaterThan( 1.0 ), () => {
+
+				alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+
+			} );
+
+		} else {
+
+			If( vUv.y.abs().greaterThan( 1.0 ), () => {
+
+				const a = vUv.x;
+				const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+				const len2 = a.mul( a ).add( b.mul( b ) );
+
+				len2.greaterThan( 1.0 ).discard();
+
+			} );
+
+		}
+
+	}
+
+	return alpha;
+
+} )();
+
+/**
  * This node material can be used to render lines with a size larger than one
  * by representing them as instanced meshes.
  *
@@ -22216,14 +22428,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * @default 0
 		 */
 		this.dashOffset = 0;
-
-		/**
-		 * Defines the lines color.
-		 *
-		 * @type {?Node<vec3>}
-		 * @default null
-		 */
-		this.lineColorNode = null;
 
 		/**
 		 * Defines the offset.
@@ -22275,377 +22479,68 @@ class Line2NodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * Setups the vertex and fragment stage of this node material.
+	 * Setups the diffuse color of the line material in the fragment stage.
+	 * Overrides the base setup to incorporate line/dash rendering and blending.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	setup( builder ) {
+	setupDiffuseColor( builder ) {
 
-		const { renderer } = builder;
+		super.setupDiffuseColor( builder );
 
-		const useAlphaToCoverage = this._useAlphaToCoverage;
-		const vertexColors = this.vertexColors;
-		const useDash = this._useDash;
-		const useWorldUnits = this._useWorldUnits;
+		diffuseColor.a.mulAssign( alphaLine );
 
-		const trimSegmentAlpha = Fn( ( { start, end } ) => {
+		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'instanceColorStart' ) ) {
 
-			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
-			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
+			const instanceColorStart = attribute( 'instanceColorStart' );
+			const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-			// we need different nearEstimate formula for reversed and default depth buffer
-			// a is positive with a reversed depth buffer so it can be used for controlling the code flow
+			const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
 
-			const nearEstimate = a.greaterThan( 0 ).select( b.negate().div( a.add( 1 ) ), b.mul( -0.5 ).div( a ) );
-
-			return nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
-
-		} ).setLayout( {
-			name: 'trimSegmentAlpha',
-			type: 'float',
-			inputs: [
-				{ name: 'start', type: 'vec4' },
-				{ name: 'end', type: 'vec4' }
-			]
-		} );
-
-		this.vertexNode = Fn( () => {
-
-			const instanceStart = attribute( 'instanceStart' );
-			const instanceEnd = attribute( 'instanceEnd' );
-
-			// camera space
-
-			const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
-			const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
-
-			let distanceStart, distanceEnd;
-
-			if ( useDash ) {
-
-				distanceStart = float( attribute( 'instanceDistanceStart' ) ).toVar( 'distanceStart' );
-				distanceEnd = float( attribute( 'instanceDistanceEnd' ) ).toVar( 'distanceEnd' );
-
-			}
-
-			if ( useWorldUnits ) {
-
-				varyingProperty( 'vec3', 'worldStart' ).assign( start.xyz );
-				varyingProperty( 'vec3', 'worldEnd' ).assign( end.xyz );
-
-			}
-
-			const aspect = viewport.z.div( viewport.w );
-
-			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
-			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
-			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
-			// perhaps there is a more elegant solution -- WestLangley
-
-			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1 ); // 4th entry in the 3rd column
-
-			If( perspective, () => {
-
-				If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
-
-					const alpha = trimSegmentAlpha( { start: start, end: end } );
-					end.assign( vec4( mix( start.xyz, end.xyz, alpha ), end.w ) );
-
-					if ( useDash ) {
-
-						distanceEnd.assign( mix( distanceStart, distanceEnd, alpha ) );
-
-					}
-
-				} ).ElseIf( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
-
-					const alpha = trimSegmentAlpha( { start: end, end: start } );
-					start.assign( vec4( mix( end.xyz, start.xyz, alpha ), start.w ) );
-
-					if ( useDash ) {
-
-						distanceStart.assign( mix( distanceEnd, distanceStart, alpha ) );
-
-					}
-
-			 	} );
-
-			} );
-
-			if ( useDash ) {
-
-				const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
-				const offsetNode = this.offsetNode ? float( this.offsetNode ) : materialLineDashOffset;
-
-				let lineDistance = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( distanceStart ), dashScaleNode.mul( distanceEnd ) );
-				lineDistance = lineDistance.add( offsetNode );
-
-				varyingProperty( 'float', 'lineDistance' ).assign( lineDistance );
-
-			}
-
-			// clip space
-			const clipStart = cameraProjectionMatrix.mul( start );
-			const clipEnd = cameraProjectionMatrix.mul( end );
-
-			// ndc space
-			const ndcStart = clipStart.xyz.div( clipStart.w );
-			const ndcEnd = clipEnd.xyz.div( clipEnd.w );
-
-			// direction
-			const dir = ndcEnd.xy.sub( ndcStart.xy ).toVar();
-
-			// account for clip-space aspect ratio
-			dir.x.assign( dir.x.mul( aspect ) );
-			dir.assign( dir.normalize() );
-
-			const clip = vec4().toVar();
-
-			if ( useWorldUnits ) {
-
-				// get the offset direction as perpendicular to the view vector
-
-				const worldDir = end.xyz.sub( start.xyz ).normalize();
-				const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();
-				const worldUp = worldDir.cross( tmpFwd ).normalize();
-				const worldFwd = worldDir.cross( worldUp );
-
-				const worldPos = varyingProperty( 'vec4', 'worldPos' );
-
-				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
-
-				// height offset
-				const hw = materialLineWidth.mul( 0.5 );
-				worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
-
-				// don't extend the line if we're rendering dashes because we
-				// won't be rendering the endcaps
-				if ( ! useDash ) {
-
-					// cap extension
-					worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
-
-					// add width to the box
-					worldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
-
-					// endcaps
-					If( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
-
-						worldPos.subAssign( vec4( worldFwd.mul( 2.0 ).mul( hw ), 0 ) );
-
-					} );
-
-				}
-
-				// project the worldpos
-				clip.assign( cameraProjectionMatrix.mul( worldPos ) );
-
-				// shift the depth of the projected points so the line
-				// segments overlap neatly
-				const clipPose = vec3().toVar();
-
-				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
-				clip.z.assign( clipPose.z.mul( clip.w ) );
-
-			} else {
-
-				const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
-
-				// undo aspect ratio adjustment
-				dir.x.assign( dir.x.div( aspect ) );
-				offset.x.assign( offset.x.div( aspect ) );
-
-				// sign flip
-				offset.assign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
-
-				// endcaps
-				If( positionGeometry.y.lessThan( 0.0 ), () => {
-
-					offset.assign( offset.sub( dir ) );
-
-				} ).ElseIf( positionGeometry.y.greaterThan( 1.0 ), () => {
-
-					offset.assign( offset.add( dir ) );
-
-				} );
-
-				// adjust for linewidth
-				offset.assign( offset.mul( materialLineWidth ) );
-
-				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
-
-				// select end
-				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
-
-				// back to clip space
-				offset.assign( offset.mul( clip.w ) );
-
-				clip.assign( clip.add( vec4( offset, 0, 0 ) ) );
-
-			}
-
-			return clip;
-
-		} )();
-
-		const closestLineToLine = Fn( ( { p1, p2, p3, p4 } ) => {
-
-			const p13 = p1.sub( p3 );
-			const p43 = p4.sub( p3 );
-
-			const p21 = p2.sub( p1 );
-
-			const d1343 = p13.dot( p43 );
-			const d4321 = p43.dot( p21 );
-			const d1321 = p13.dot( p21 );
-			const d4343 = p43.dot( p43 );
-			const d2121 = p21.dot( p21 );
-
-			const denom = d2121.mul( d4343 ).sub( d4321.mul( d4321 ) );
-			const numer = d1343.mul( d4321 ).sub( d1321.mul( d4343 ) );
-
-			const mua = numer.div( denom ).clamp();
-			const mub = d1343.add( d4321.mul( mua ) ).div( d4343 ).clamp();
-
-			return vec2( mua, mub );
-
-		} ).setLayout( {
-			name: 'closestLineToLine',
-			type: 'vec2',
-			inputs: [
-				{ name: 'p1', type: 'vec3' },
-				{ name: 'p2', type: 'vec3' },
-				{ name: 'p3', type: 'vec3' },
-				{ name: 'p4', type: 'vec3' }
-			]
-		} );
-
-		this.colorNode = Fn( () => {
-
-			const vUv = uv$1();
-
-			if ( useDash ) {
-
-				const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
-				const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
-
-				dashSize.assign( dashSizeNode );
-				gapSize.assign( gapSizeNode );
-
-				const vLineDistance = varyingProperty( 'float', 'lineDistance' );
-
-				vUv.y.lessThan( -1 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
-				vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
-
-			}
-
-			const alpha = float( 1 ).toVar( 'alpha' );
-
-			if ( useWorldUnits ) {
-
-				const worldStart = varyingProperty( 'vec3', 'worldStart' );
-				const worldEnd = varyingProperty( 'vec3', 'worldEnd' );
-
-				// Find the closest points on the view ray and the line segment
-				const rayEnd = varyingProperty( 'vec4', 'worldPos' ).xyz.normalize().mul( 1e5 );
-				const lineDir = worldEnd.sub( worldStart );
-				const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
-
-				const p1 = worldStart.add( lineDir.mul( params.x ) );
-				const p2 = rayEnd.mul( params.y );
-				const delta = p1.sub( p2 );
-				const len = delta.length();
-				const norm = len.div( materialLineWidth );
-
-				if ( ! useDash ) {
-
-					if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
-
-						const dnorm = norm.fwidth();
-						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
-
-					} else {
-
-						norm.greaterThan( 0.5 ).discard();
-
-					}
-
-				}
-
-			} else {
-
-				// round endcaps
-
-				if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
-
-					const a = vUv.x;
-					const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
-
-					const len2 = a.mul( a ).add( b.mul( b ) );
-
-					const dlen = float( len2.fwidth() ).toVar( 'dlen' );
-
-					If( vUv.y.abs().greaterThan( 1.0 ), () => {
-
-						alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
-
-					} );
-
-				} else {
-
-					If( vUv.y.abs().greaterThan( 1.0 ), () => {
-
-						const a = vUv.x;
-						const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
-						const len2 = a.mul( a ).add( b.mul( b ) );
-
-						len2.greaterThan( 1.0 ).discard();
-
-					} );
-
-				}
-
-			}
-
-			let lineColorNode;
-
-			if ( this.lineColorNode ) {
-
-				lineColorNode = this.lineColorNode;
-
-			} else {
-
-				if ( vertexColors ) {
-
-					const instanceColorStart = attribute( 'instanceColorStart' );
-					const instanceColorEnd = attribute( 'instanceColorEnd' );
-
-					const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
-
-					lineColorNode = instanceColor.mul( materialColor );
-
-				} else {
-
-					lineColorNode = materialColor;
-
-				}
-
-			}
-
-			return vec4( lineColorNode, alpha );
-
-		} )();
-
-		if ( this.transparent ) {
-
-			const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
-
-			this.outputNode = vec4( this.colorNode.rgb.mul( opacityNode ).add( viewportOpaqueMipTexture().rgb.mul( opacityNode.oneMinus() ) ), this.colorNode.a );
+			diffuseColor.rgb.mulAssign( instanceColor );
 
 		}
 
-		super.setup( builder );
+		if ( this.transparent ) {
+
+			diffuseColor.rgb.assign( diffuseColor.rgb.mul( diffuseColor.a ).add( viewportOpaqueMipTexture().rgb.mul( diffuseColor.a.oneMinus() ) ) );
+
+		}
+
+	}
+
+	/**
+	 * Setups the position in clip space for the vertex stage of the fat line.
+	 * Overrides the default model-view-projection to return the expanded fat line vertex coordinates.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec4>} The position of the fat line vertex in clip space.
+	 */
+	setupModelViewProjection( /*builder*/ ) {
+
+		return mvpLine;
+
+	}
+
+	/**
+	 * Defines the lines color.
+	 *
+	 * @deprecated since r185. Use {@link NodeMaterial#colorNode} instead.
+	 * @type {?Node<vec3>}
+	 */
+	get lineColorNode() {
+
+		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
+
+		return this.colorNode;
+
+	}
+
+	set lineColorNode( value ) {
+
+		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
+
+		this.colorNode = value;
 
 	}
 
@@ -22732,7 +22627,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.vertexColors = source.vertexColors;
 		this.dashOffset = source.dashOffset;
 
-		this.lineColorNode = source.lineColorNode;
 		this.offsetNode = source.offsetNode;
 		this.dashScaleNode = source.dashScaleNode;
 		this.dashSizeNode = source.dashSizeNode;
@@ -29720,6 +29614,16 @@ class RenderObject {
 		this._monitor = null;
 
 		/**
+		 * The object's original material when this render object is drawn with an
+		 * override material.
+		 *
+		 * @type {?Material}
+		 * @private
+		 * @default null
+		 */
+		this._sourceMaterial = renderer._currentSourceMaterial;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -29766,6 +29670,12 @@ class RenderObject {
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
 
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.addEventListener( 'dispose', this.onMaterialDispose );
+
+		}
+
 	}
 
 	/**
@@ -29803,7 +29713,7 @@ class RenderObject {
 	 */
 	get hardwareClippingPlanes() {
 
-		return this.material.hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
+		return this.getNodeBuilderState().hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
 
 	}
 
@@ -30106,7 +30016,7 @@ class RenderObject {
 
 		// structural equality isn't sufficient for morph targets since the
 		// data are maintained in textures. only if the targets are all equal
-		// the texture and thus the instance of `MorphNode` can be shared.
+		// the texture and thus the `morphReference` can be shared.
 
 		for ( const name of Object.keys( geometry.morphAttributes ).sort() ) {
 
@@ -30360,6 +30270,12 @@ class RenderObject {
 
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 		this.onDispose();
 
@@ -32674,6 +32590,10 @@ class Bindings extends DataMap {
 
 						binding.release();
 
+					} else if ( binding.isSampler ) {
+
+						binding.release();
+
 					}
 
 				}
@@ -33217,12 +33137,21 @@ class RenderList {
 	 *
 	 * @param {?function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
 	 * @param {?function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {boolean} reversedDepth - Whether a reversed depth buffer is used or not.
 	 */
-	sort( customOpaqueSort, customTransparentSort ) {
+	sort( customOpaqueSort, customTransparentSort, reversedDepth ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
 		if ( this.transparentDoublePass.length > 1 ) this.transparentDoublePass.sort( customTransparentSort || reversePainterSortStable );
 		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
+
+		if ( reversedDepth ) {
+
+			this.opaque.reverse();
+			this.transparentDoublePass.reverse();
+			this.transparent.reverse();
+
+		}
 
 	}
 
@@ -34328,6 +34257,7 @@ class Textures extends DataMap {
 						if ( binding.isSampler && binding.texture === texture ) {
 
 							binding.reset();
+							binding.release();
 
 						}
 
@@ -38277,150 +38207,6 @@ class SampleNode extends Node {
  * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
  */
 const sample = ( callback, uv = null ) => new SampleNode( callback, nodeObject( uv ) );
-
-/**
- * EventNode is a node that executes a callback during specific update phases.
- *
- * @augments Node
- */
-class EventNode extends Node {
-
-	static get type() {
-
-		return 'EventNode';
-
-	}
-
-	/**
-	 * Creates an EventNode.
-	 *
-	 * @param {string} eventType - The type of event
-	 * @param {Function} callback - The callback to execute on update.
-	 */
-	constructor( eventType, callback ) {
-
-		super( 'void' );
-
-		this.eventType = eventType;
-		this.callback = callback;
-
-		if ( eventType === EventNode.OBJECT ) {
-
-			this.updateType = NodeUpdateType.OBJECT;
-
-		} else if ( eventType === EventNode.MATERIAL ) {
-
-			this.updateType = NodeUpdateType.RENDER;
-
-		} else if ( eventType === EventNode.FRAME ) {
-
-			this.updateType = NodeUpdateType.FRAME;
-
-		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
-
-			this.updateBeforeType = NodeUpdateType.OBJECT;
-
-		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
-
-			this.updateBeforeType = NodeUpdateType.RENDER;
-
-		} else if ( eventType === EventNode.BEFORE_FRAME ) {
-
-			this.updateBeforeType = NodeUpdateType.FRAME;
-
-		}
-
-	}
-
-	update( frame ) {
-
-		this.callback( frame );
-
-	}
-
-	updateBefore( frame ) {
-
-		this.callback( frame );
-
-	}
-
-}
-
-EventNode.OBJECT = 'object';
-EventNode.MATERIAL = 'material';
-EventNode.FRAME = 'frame';
-EventNode.BEFORE_OBJECT = 'beforeObject';
-EventNode.BEFORE_MATERIAL = 'beforeMaterial';
-EventNode.BEFORE_FRAME = 'beforeFrame';
-
-/**
- * Helper to create an EventNode and add it to the stack.
- *
- * @param {string} type - The event type.
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const createEvent = ( type, callback ) => new EventNode( type, callback ).toStack();
-
-/**
- * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback );
-
-/**
- * Creates an event that triggers a function when the first object that uses the material is rendered.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
-
-/**
- * Creates an event that triggers a function every frame.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
-
-/**
- * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFORE_OBJECT, callback );
-
-/**
- * Creates an event that triggers a function before the material is updated.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
-
-/**
- * Creates an event that triggers a function before every frame.
- *
- * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
- *
- * @param {Function} callback - The callback function.
- * @returns {EventNode}
- */
-const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
 
 /**
  * This special type of instanced buffer attribute is intended for compute shaders.
@@ -47918,6 +47704,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	backgroundIntensity: backgroundIntensity,
 	backgroundRotation: backgroundRotation,
 	batch: batch,
+	batchColor: batchColor,
 	bentNormalView: bentNormalView,
 	billboarding: billboarding,
 	bitAnd: bitAnd,
@@ -48067,6 +47854,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	incrementBefore: incrementBefore,
 	inspector: inspector,
 	instance: instance,
+	instanceColor: instanceColor,
 	instanceIndex: instanceIndex,
 	instancedArray: instancedArray,
 	instancedBufferAttribute: instancedBufferAttribute,
@@ -48174,6 +47962,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	modelWorldMatrix: modelWorldMatrix,
 	modelWorldMatrixInverse: modelWorldMatrixInverse,
 	morphReference: morphReference,
+	morphTargetInfluences: morphTargetInfluences,
 	mrt: mrt,
 	mul: mul,
 	mx_aastep: mx_aastep,
@@ -48761,9 +48550,10 @@ class NodeBuilderState {
 	 * @param {Array<Node>} updateBeforeNodes - An array of nodes that implement their `updateBefore()` method.
 	 * @param {Array<Node>} updateAfterNodes - An array of nodes that implement their `updateAfter()` method.
 	 * @param {NodeMaterialObserver} observer - A node material observer.
+	 * @param {boolean} hardwareClipping - Whether the built material uses hardware clipping or not.
 	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
 	 */
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, hardwareClipping, transforms = [] ) {
 
 		/**
 		 * The native vertex shader code.
@@ -48837,6 +48627,13 @@ class NodeBuilderState {
 		 * @type {NodeMaterialObserver}
 		 */
 		this.observer = observer;
+
+		/**
+		 * Whether the built material uses hardware clipping or not.
+		 *
+		 * @type {boolean}
+		 */
+		this.hardwareClipping = hardwareClipping;
 
 		/**
 		 * How often this state is used by render objects.
@@ -50153,9 +49950,9 @@ class NodeBuilder {
 		 * A list of all nodes the builder is processing
 		 * for this 3D object.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.nodes = [];
+		this.nodes = new Set();
 
 		/**
 		 * A list of all nodes the builder is processing in sequential order.
@@ -50163,9 +49960,9 @@ class NodeBuilder {
 		 * This is used to determine the update order of nodes, which is important for
 		 * {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.sequentialNodes = [];
+		this.sequentialNodes = new Set();
 
 		/**
 		 * A list of all nodes which {@link Node#update} method should be executed.
@@ -50233,6 +50030,14 @@ class NodeBuilder {
 		 * @type {?ClippingContext}
 		 */
 		this.clippingContext = null;
+
+		/**
+		 * Whether the built material uses hardware clipping or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.hardwareClipping = false;
 
 		/**
 		 * The generated vertex shader.
@@ -50549,7 +50354,7 @@ class NodeBuilder {
 	 */
 	includes( node ) {
 
-		return this.nodes.includes( node );
+		return this.nodes.has( node );
 
 	}
 
@@ -50834,9 +50639,9 @@ class NodeBuilder {
 	 */
 	addNode( node ) {
 
-		if ( this.nodes.includes( node ) === false ) {
+		if ( this.nodes.has( node ) === false ) {
 
-			this.nodes.push( node );
+			this.nodes.add( node );
 
 			this.setHashNode( node, node.getHash( this ) );
 
@@ -50858,11 +50663,7 @@ class NodeBuilder {
 
 		if ( updateBeforeType !== NodeUpdateType.NONE || updateAfterType !== NodeUpdateType.NONE ) {
 
-			if ( this.sequentialNodes.includes( node ) === false ) {
-
-				this.sequentialNodes.push( node );
-
-			}
+			this.sequentialNodes.add( node );
 
 		}
 
@@ -55167,6 +54968,7 @@ class NodeManager extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
+			nodeBuilder.hardwareClipping,
 			nodeBuilder.transforms
 		);
 
@@ -59328,6 +59130,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * When an override material is in use, this property points to the current
+		 * source material during the rendering of a render object.
+		 *
+		 * @private
+		 * @type {?Material}
+		 * @default null
+		 */
+		this._currentSourceMaterial = null;
+
+		/**
 		 * Whether the renderer should render transparent render objects or not.
 		 *
 		 * @type {boolean}
@@ -59589,9 +59401,24 @@ class Renderer {
 
 		//
 
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+
+		camera = this._updateCamera( camera );
+
+		//
+
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
 		//
+
+		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+		if ( ! camera.isArrayCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+		}
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera );
@@ -60233,87 +60060,9 @@ class Renderer {
 
 		//
 
-
-		const xr = this.xr;
-
-		if ( xr.isPresenting === false ) {
-
-			let projectionMatrixNeedsUpdate = false;
-
-			// reversed depth
-
-			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
-
-				camera._reversedDepth = true;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera._reversedDepth = true;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// WebGPU/WebGL coordinate system
-
-			const coordinateSystem = this.coordinateSystem;
-
-			if ( camera.coordinateSystem !== coordinateSystem ) {
-
-				camera.coordinateSystem = coordinateSystem;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.coordinateSystem = coordinateSystem;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// camera update
-
-			if ( projectionMatrixNeedsUpdate === true ) {
-
-				camera.updateProjectionMatrix();
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.updateProjectionMatrix();
-
-					}
-
-				}
-
-			}
-
-		}
-
-		//
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-		if ( xr.enabled === true && xr.isPresenting === true ) {
-
-			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
-			camera = xr.getCamera(); // use XR camera for rendering
-
-		}
+		camera = this._updateCamera( camera );
 
 		//
 
@@ -60377,7 +60126,7 @@ class Renderer {
 
 		if ( this.sortObjects === true ) {
 
-			renderList.sort( this._opaqueSort, this._transparentSort );
+			renderList.sort( this._opaqueSort, this._transparentSort, camera.reversedDepth );
 
 		}
 
@@ -62099,6 +61848,98 @@ class Renderer {
 	}
 
 	/**
+	 * Updates the camera so it's prepared for rendering operations.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera to update.
+	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
+	 */
+	_updateCamera( camera ) {
+
+		const xr = this.xr;
+
+		if ( xr.isPresenting === false ) {
+
+			let projectionMatrixNeedsUpdate = false;
+
+			// reversed depth
+
+			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
+
+				camera._reversedDepth = true;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera._reversedDepth = true;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// WebGPU/WebGL coordinate system
+
+			const coordinateSystem = this.coordinateSystem;
+
+			if ( camera.coordinateSystem !== coordinateSystem ) {
+
+				camera.coordinateSystem = coordinateSystem;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.coordinateSystem = coordinateSystem;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// camera update
+
+			if ( projectionMatrixNeedsUpdate === true ) {
+
+				camera.updateProjectionMatrix();
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.updateProjectionMatrix();
+
+					}
+
+				}
+
+			}
+
+		}
+
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+		// handle XR
+
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+			camera = xr.getCamera(); // use XR camera for rendering
+
+		}
+
+		return camera;
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -62120,6 +61961,8 @@ class Renderer {
 		let materialPositionNode;
 		let materialSide;
 
+		const previousSourceMaterial = this._currentSourceMaterial;
+
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
@@ -62127,6 +61970,8 @@ class Renderer {
 		//
 
 		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
+
+			this._currentSourceMaterial = material;
 
 			const overrideMaterial = scene.overrideMaterial;
 
@@ -62202,6 +62047,8 @@ class Renderer {
 			scene.overrideMaterial.side = materialSide;
 
 		}
+
+		this._currentSourceMaterial = previousSourceMaterial;
 
 		//
 
@@ -63462,6 +63309,15 @@ class Sampler extends Binding {
 
 		this.generation = null;
 		this.version = -1;
+
+	}
+
+	/**
+	 * Releases the texture reference.
+	 */
+	release() {
+
+		this._texture = null;
 
 	}
 
@@ -87188,4 +87044,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, Backend, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicNodeLibrary, BasicShadowMap, BatchNode, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeRenderTarget, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeBuilder, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderOutputNode, RenderPipeline, RenderTarget, Renderer, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StandardNodeLibrary, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WGSLNodeBuilder, WebGLBackend, WebGLCapabilities, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, Backend, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicNodeLibrary, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeRenderTarget, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeBuilder, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderOutputNode, RenderPipeline, RenderTarget, Renderer, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StandardNodeLibrary, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WGSLNodeBuilder, WebGLBackend, WebGLCapabilities, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };

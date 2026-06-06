@@ -265,6 +265,10 @@ class Bindings extends DataMap {
 
 						binding.release();
 
+					} else if ( binding.isSampler ) {
+
+						binding.release();
+
 					}
 
 				}

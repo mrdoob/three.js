@@ -35,7 +35,7 @@
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
 					"monomorph": "https://cdn.jsdelivr.net/npm/monomorph@2.3.1/build/monomorph.js",
-					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.0/build/bounce.js"
+					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.1/build/bounce.js"
 				}
 			}
 		</script>
@@ -43,7 +43,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { World } from '@perplexdotgg/bounce';
@@ -68,8 +68,8 @@
 			let wallMeshes = [];
 			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
 
-			let mouseRayOrigin = new THREE.Vector3();
-			let mouseRayDir = new THREE.Vector3();
+			const mouseRayOrigin = new THREE.Vector3();
+			const mouseRayDir = new THREE.Vector3();
 			let mouseMoving = false;
 			let mouseStopTimer = 0;
 			let pointerDown = false;
@@ -102,7 +102,7 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					diffuseColor: diffuseColor,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					velocity: velocity
 				} ) );
 
@@ -122,7 +122,7 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return colorToDirection( scenePassNormal.sample( uv ) );
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 				} );
 

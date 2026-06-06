@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - skinning individual instancing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - skinning instancing individual">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_skinning_instancing_individual.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_skinning_instancing_individual.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Skinning Individual Instancing</span>
+			</div>
+
+			<small>
+				Per-instance poses are computed once and reused by every render pass.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, add, attributeArray, color, instanceIndex, screenUV, storage, transformNormal, transformNormalToView, uint, uniform, vec4, vertexIndex } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			let camera, scene, renderer, controls;
+			let mixer, timer, animatedObject, proportionBones, referenceMesh, footBones, groundFoot, dummy;
+			let instanceMatrices, instanceMatricesNode, bellyWeightsNode;
+			let computeSkinning;
+
+			const skeletonStates = new Map();
+			const timeOffsets = [];
+			const variations = [];
+			const leftFoot = new THREE.Vector3();
+			const rightFoot = new THREE.Vector3();
+
+			init();
+
+			function createSourceVertexAttribute( geometry ) {
+
+				const position = geometry.getAttribute( 'position' );
+				const normal = geometry.getAttribute( 'normal' );
+				const bellyPosition = position.clone();
+				const data = new Float32Array( position.count * 12 );
+
+				for ( let i = 0; i < position.count; i ++ ) {
+
+					const amount = Math.max( 0, 1 - Math.abs( position.getY( i ) - 0.94 ) / 0.3 ) * 0.8;
+
+					bellyPosition.setXYZ(
+						i,
+						position.getX( i ) * amount,
+						0,
+						position.getZ( i ) * amount
+					);
+
+					const offset = i * 12;
+
+					data[ offset + 0 ] = position.getX( i );
+					data[ offset + 1 ] = position.getY( i );
+					data[ offset + 2 ] = position.getZ( i );
+					data[ offset + 4 ] = normal.getX( i );
+					data[ offset + 5 ] = normal.getY( i );
+					data[ offset + 6 ] = normal.getZ( i );
+					data[ offset + 8 ] = bellyPosition.getX( i );
+					data[ offset + 9 ] = bellyPosition.getY( i );
+					data[ offset + 10 ] = bellyPosition.getZ( i );
+
+				}
+
+				return new THREE.StorageBufferAttribute( data, 4 );
+
+			}
+
+			function getSkeletonState( skeleton, instanceCount ) {
+
+				let state = skeletonStates.get( skeleton );
+
+				if ( state === undefined ) {
+
+					const boneCount = skeleton.bones.length;
+					const boneMatrices = new THREE.StorageBufferAttribute( instanceCount * boneCount, 16 );
+
+					state = {
+						skeleton,
+						boneCount,
+						boneMatrices,
+						boneMatricesNode: storage( boneMatrices, 'mat4', boneMatrices.count ).toReadOnly()
+					};
+
+					skeletonStates.set( skeleton, state );
+
+				}
+
+				return state;
+
+			}
+
+			function createComputedMesh( source, instanceCount ) {
+
+				const geometry = source.geometry.clone();
+				const material = source.material.clone();
+				const vertexCount = geometry.getAttribute( 'position' ).count;
+				const skeletonState = getSkeletonState( source.skeleton, instanceCount );
+
+				const sourceVertices = storage( createSourceVertexAttribute( geometry ), 'vec4', vertexCount * 3 ).toReadOnly();
+				const skinIndices = storage( new THREE.StorageBufferAttribute( new Uint32Array( geometry.getAttribute( 'skinIndex' ).array ), 4 ), 'uvec4', vertexCount ).toReadOnly();
+				const skinWeights = storage( new THREE.StorageBufferAttribute( geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4', vertexCount ).toReadOnly();
+				const bindMatrix = uniform( source.bindMatrix, 'mat4' );
+				const bindMatrixInverse = uniform( source.bindMatrixInverse, 'mat4' );
+				const vertices = attributeArray( instanceCount * vertexCount * 2, 'vec4' );
+
+				computeSkinning = Fn( () => {
+
+					const sourceVertex = instanceIndex.mod( uint( vertexCount ) );
+					const meshInstance = instanceIndex.div( uint( vertexCount ) );
+					const sourceOffset = sourceVertex.mul( uint( 3 ) );
+					const targetOffset = instanceIndex.mul( uint( 2 ) );
+					const boneOffset = meshInstance.mul( uint( skeletonState.boneCount ) );
+					const skinIndex = skinIndices.element( sourceVertex );
+					const skinWeight = skinWeights.element( sourceVertex );
+					const morphPosition = sourceVertices.element( sourceOffset ).xyz.add( sourceVertices.element( sourceOffset.add( uint( 2 ) ) ).xyz.mul( bellyWeightsNode.element( meshInstance ) ) );
+					const skinVertex = bindMatrix.mul( morphPosition );
+					const boneMatX = skeletonState.boneMatricesNode.element( boneOffset.add( skinIndex.x ) );
+					const boneMatY = skeletonState.boneMatricesNode.element( boneOffset.add( skinIndex.y ) );
+					const boneMatZ = skeletonState.boneMatricesNode.element( boneOffset.add( skinIndex.z ) );
+					const boneMatW = skeletonState.boneMatricesNode.element( boneOffset.add( skinIndex.w ) );
+					const skinMatrix = add(
+						skinWeight.x.mul( boneMatX ),
+						skinWeight.y.mul( boneMatY ),
+						skinWeight.z.mul( boneMatZ ),
+						skinWeight.w.mul( boneMatW )
+					);
+					const skinPosition = bindMatrixInverse.mul( add(
+						boneMatX.mul( skinWeight.x ).mul( skinVertex ),
+						boneMatY.mul( skinWeight.y ).mul( skinVertex ),
+						boneMatZ.mul( skinWeight.z ).mul( skinVertex ),
+						boneMatW.mul( skinWeight.w ).mul( skinVertex )
+					) ).xyz;
+					const skinNormal = bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix ).transformDirection( sourceVertices.element( sourceOffset.add( uint( 1 ) ) ).xyz ).xyz;
+					const instanceMatrix = instanceMatricesNode.element( meshInstance );
+
+					vertices.element( targetOffset ).assign( vec4( instanceMatrix.mul( skinPosition ).xyz, 1 ) );
+					vertices.element( targetOffset.add( uint( 1 ) ) ).assign( vec4( transformNormal( skinNormal, instanceMatrix ), 0 ) );
+
+				} )().compute( instanceCount * vertexCount ).setName( 'Compute Instanced Skinning' );
+
+				const meshVertex = instanceIndex.mul( uint( vertexCount ) ).add( vertexIndex ).mul( uint( 2 ) );
+
+				material.positionNode = vertices.element( meshVertex ).xyz;
+				material.normalNode = transformNormalToView( vertices.element( meshVertex.add( uint( 1 ) ) ).xyz ).toVarying();
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.count = instanceCount;
+				mesh.castShadow = true;
+				mesh.frustumCulled = false;
+
+				source.parent.add( mesh );
+				source.visible = false;
+
+			}
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 60 );
+				camera.position.set( 4.6, 3.3, 6.2 );
+
+				scene = new THREE.Scene();
+				scene.backgroundNode = screenUV.y.mix( color( 0x8f989c ), color( 0xe7eaeb ) );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x939b9e, 1.2 ) );
+
+				const directionalLight = new THREE.DirectionalLight( 0xfffbf4, 2.8 );
+				directionalLight.position.set( - 4, 10, 8 );
+				directionalLight.castShadow = true;
+				directionalLight.shadow.mapSize.set( 2048, 2048 );
+				directionalLight.shadow.camera.left = - 5;
+				directionalLight.shadow.camera.right = 5;
+				directionalLight.shadow.camera.top = 5;
+				directionalLight.shadow.camera.bottom = - 5;
+				directionalLight.shadow.camera.near = 0.1;
+				directionalLight.shadow.camera.far = 30;
+				directionalLight.shadow.camera.updateProjectionMatrix();
+				scene.add( directionalLight );
+
+				const rimLight = new THREE.DirectionalLight( 0xe8f4ff, 0.85 );
+				rimLight.position.set( 7, 5, - 5 );
+				scene.add( rimLight );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 400, 400 ),
+					new THREE.ShadowMaterial( { color: 0x5d6568, opacity: 0.3 } )
+				);
+
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				new GLTFLoader().load( 'models/gltf/Michelle.glb', function ( gltf ) {
+
+					const object = gltf.scene;
+					const instanceCount = 30;
+					const duration = gltf.animations[ 0 ].duration;
+					const skinnedMeshes = [];
+
+					dummy = new THREE.Object3D();
+					animatedObject = object;
+					mixer = new THREE.AnimationMixer( object );
+					mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+					object.traverse( ( child ) => {
+
+						if ( child.isSkinnedMesh === true ) skinnedMeshes.push( child );
+
+					} );
+
+					referenceMesh = skinnedMeshes[ 0 ];
+					const skeleton = referenceMesh.skeleton;
+					const getBone = ( name ) => skeleton.bones.find( ( bone ) => bone.name.endsWith( name ) );
+					const proportionTargets = [
+						getBone( 'Head' ), getBone( 'Spine' ), getBone( 'Spine2' ),
+						getBone( 'LeftArm' ), getBone( 'RightArm' ),
+						getBone( 'LeftForeArm' ), getBone( 'RightForeArm' ),
+						getBone( 'LeftUpLeg' ), getBone( 'RightUpLeg' ),
+						getBone( 'LeftLeg' ), getBone( 'RightLeg' )
+					];
+
+					proportionBones = {
+						head: proportionTargets[ 0 ],
+						belly: proportionTargets[ 1 ],
+						chest: proportionTargets[ 2 ],
+						arms: proportionTargets.slice( 3, 7 ),
+						legs: proportionTargets.slice( 7 ),
+						baseScales: proportionTargets.map( ( bone ) => bone.scale.clone() )
+					};
+					footBones = [ getBone( 'LeftFoot' ), getBone( 'RightFoot' ) ];
+
+					const bodyTypes = [
+						{ width: 0.92, height: 1.09, depth: 0.92, belly: 0, headScale: 0.96, bellyWidth: 0.98, chestWidth: 0.98, armLength: 1.03, legLength: 1.04 },
+						{ width: 1.0, height: 1.05, depth: 0.99, belly: 0, headScale: 0.98, bellyWidth: 1.0, chestWidth: 1.03, armLength: 1.02, legLength: 1.02 },
+						{ width: 1.0, height: 1.0, depth: 1.0, belly: 0, headScale: 1.0, bellyWidth: 1.0, chestWidth: 1.0, armLength: 1.0, legLength: 1.0 },
+						{ width: 1.08, height: 0.9, depth: 1.1, belly: 0.75, headScale: 1.06, bellyWidth: 1.12, chestWidth: 1.0, armLength: 0.9, legLength: 0.9 },
+						{ width: 1.2, height: 0.8, depth: 1.22, belly: 1.6, headScale: 1.12, bellyWidth: 1.24, chestWidth: 1.04, armLength: 0.72, legLength: 0.7 }
+					];
+
+					const bellyWeights = new THREE.StorageBufferAttribute( instanceCount, 1 );
+					instanceMatrices = new THREE.StorageBufferAttribute( instanceCount, 16 );
+					bellyWeightsNode = storage( bellyWeights, 'float', instanceCount ).toReadOnly();
+					instanceMatricesNode = storage( instanceMatrices, 'mat4', instanceCount ).toReadOnly();
+
+					for ( let i = 0; i < instanceCount; i ++ ) {
+
+						const bodyType = bodyTypes[ i % bodyTypes.length ];
+						const isChild = i % 2 === 0;
+						const size = isChild ? ( i % 4 === 0 ? 0.68 : 0.78 ) : 1;
+						const innerRing = i < 10;
+						const ringIndex = innerRing ? i : i - 10;
+						const ringCount = innerRing ? 10 : 20;
+						const angle = ringIndex / ringCount * Math.PI * 2;
+						const radius = innerRing ? 175 : 340;
+
+						timeOffsets.push( duration * i / instanceCount );
+						variations.push( {
+							... bodyType,
+							size,
+							x: Math.sin( angle ) * radius,
+							y: Math.cos( angle ) * radius
+						} );
+						bellyWeights.array[ i ] = bodyType.belly;
+
+					}
+
+					bellyWeights.needsUpdate = true;
+					animatedObject.updateMatrixWorld( true );
+					skeleton.update();
+					groundFoot = getFootCoordinate();
+
+					for ( const child of skinnedMeshes ) createComputedMesh( child, instanceCount );
+
+					scene.add( object );
+
+				} );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 0.96;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.75, 0 );
+				controls.enableDamping = true;
+				controls.minDistance = 3;
+				controls.maxDistance = 25;
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function applyProportions( variation ) {
+
+				const { head, belly, chest, arms, legs, baseScales } = proportionBones;
+				const bones = [ head, belly, chest, ... arms, ... legs ];
+
+				for ( let i = 0; i < bones.length; i ++ ) bones[ i ].scale.copy( baseScales[ i ] );
+
+				head.scale.multiplyScalar( variation.headScale );
+				belly.scale.x *= variation.bellyWidth;
+				belly.scale.z *= variation.bellyWidth;
+				chest.scale.x *= variation.chestWidth;
+				chest.scale.z *= variation.chestWidth;
+
+				for ( const bone of arms ) bone.scale.y *= variation.armLength;
+				for ( const bone of legs ) bone.scale.y *= variation.legLength;
+
+			}
+
+			function getFootCoordinate() {
+
+				footBones[ 0 ].getWorldPosition( leftFoot );
+				footBones[ 1 ].getWorldPosition( rightFoot );
+				referenceMesh.worldToLocal( leftFoot );
+				referenceMesh.worldToLocal( rightFoot );
+
+				return Math.max( leftFoot.z, rightFoot.z );
+
+			}
+
+			function updateInstanceMatrix( index, variation ) {
+
+				const foot = getFootCoordinate();
+
+				dummy.position.set( variation.x, variation.y, groundFoot - foot * variation.height * variation.size );
+				dummy.scale.set( variation.width, variation.depth, variation.height ).multiplyScalar( variation.size );
+				dummy.updateMatrix();
+				dummy.matrix.toArray( instanceMatrices.array, index * 16 );
+
+			}
+
+			function animate() {
+
+				timer.update();
+				controls.update();
+
+				if ( mixer ) {
+
+					const elapsed = timer.getElapsed();
+
+					for ( let i = 0; i < timeOffsets.length; i ++ ) {
+
+						mixer.setTime( elapsed + timeOffsets[ i ] );
+						applyProportions( variations[ i ] );
+						animatedObject.updateMatrixWorld( true );
+
+						for ( const state of skeletonStates.values() ) {
+
+							state.skeleton.update();
+							state.boneMatrices.array.set( state.skeleton.boneMatrices, i * state.boneCount * 16 );
+
+						}
+
+						updateInstanceMatrix( i, variations[ i ] );
+
+					}
+
+					for ( const state of skeletonStates.values() ) state.boneMatrices.needsUpdate = true;
+					instanceMatrices.needsUpdate = true;
+					renderer.compute( computeSkinning );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

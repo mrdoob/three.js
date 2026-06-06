@@ -15,6 +15,21 @@ const _weakMap = /*@__PURE__*/ new WeakMap();
 class Lighting {
 
 	/**
+	 * Constructs a new lighting manager.
+	 */
+	constructor() {
+
+		/**
+		 * Whether this lighting manager is enabled or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
+
+	}
+
+	/**
 	 * Creates a new lights node for the given array of lights.
 	 *
 	 * @param {Array<Light>} lights - The render object.
@@ -35,9 +50,8 @@ class Lighting {
 	 */
 	getNode( scene ) {
 
-		// ignore post-processing
-
-		if ( scene.isQuadMesh ) return _defaultLights;
+		// Ignore renderable objects, e.g: Mesh, Sprite, etc.
+		if ( scene.isScene !== true && scene.isGroup !== true ) return _defaultLights;
 
 		let node = _weakMap.get( scene );
 

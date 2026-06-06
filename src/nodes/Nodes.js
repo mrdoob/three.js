@@ -43,24 +43,19 @@ import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // accessors
-export { default as BatchNode } from './accessors/BatchNode.js';
 export { default as BufferAttributeNode } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode } from './accessors/BufferNode.js';
 export { default as BuiltinNode } from './accessors/BuiltinNode.js';
 export { default as ClippingNode } from './accessors/ClippingNode.js';
 export { default as CubeTextureNode } from './accessors/CubeTextureNode.js';
-export { default as InstanceNode } from './accessors/InstanceNode.js';
-export { default as InstancedMeshNode } from './accessors/InstancedMeshNode.js';
 export { default as MaterialNode } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode } from './accessors/MaterialReferenceNode.js';
 export { default as ModelNode } from './accessors/ModelNode.js';
-export { default as MorphNode } from './accessors/MorphNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
 export { default as ReferenceBaseNode } from './accessors/ReferenceBaseNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
-export { default as SkinningNode } from './accessors/SkinningNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
 export { default as StorageTexture3DNode } from './accessors/StorageTexture3DNode.js';
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';

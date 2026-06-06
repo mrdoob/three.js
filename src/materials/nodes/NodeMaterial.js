@@ -1,16 +1,16 @@
 import { Material } from '../Material.js';
 
 import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
-import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { output, diffuseColor, ambientOcclusion, emissive } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
 import { normalLocal } from '../../nodes/accessors/Normal.js';
-import { instancedMesh } from '../../nodes/accessors/InstancedMeshNode.js';
-import { batch } from '../../nodes/accessors/BatchNode.js';
+import { instancedMesh, instanceColor } from '../../nodes/accessors/Instance.js';
+import { batch, batchColor } from '../../nodes/accessors/Batch.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
-import { skinning } from '../../nodes/accessors/SkinningNode.js';
-import { morphReference } from '../../nodes/accessors/MorphNode.js';
+import { skinning } from '../../nodes/accessors/Skinning.js';
+import { morphReference } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
@@ -83,16 +83,6 @@ class NodeMaterial extends Material {
 		 * @default false
 		 */
 		this.lights = false;
-
-		/**
-		 * Whether this material uses hardware clipping or not.
-		 * This property is managed by the engine and should not be
-		 * modified by apps.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.hardwareClipping = false;
 
 		/**
 		 * Node materials which set their `lights` property to `true`
@@ -533,6 +523,7 @@ class NodeMaterial extends Material {
 		if ( this.fragmentNode === null ) {
 
 			this.setupDiffuseColor( builder );
+			this.setupAmbientOcclusion( builder );
 			this.setupVariants( builder );
 
 			const outgoingLightNode = this.setupLighting( builder );
@@ -656,7 +647,7 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		this.hardwareClipping = false;
+		builder.hardwareClipping = false;
 
 		if ( builder.clippingContext === null ) return;
 
@@ -668,7 +659,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.addToStack( hardwareClipping() );
 
-			this.hardwareClipping = true;
+			builder.hardwareClipping = true;
 
 		}
 
@@ -776,13 +767,13 @@ class NodeMaterial extends Material {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morphReference( object ).toStack();
+			morphReference( object );
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).toStack();
+			skinning( object );
 
 		}
 
@@ -798,13 +789,13 @@ class NodeMaterial extends Material {
 
 		if ( object.isBatchedMesh ) {
 
-			batch( object ).toStack();
+			batch( object );
 
 		}
 
 		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
-			instancedMesh( object ).toStack();
+			instancedMesh( object );
 
 		}
 
@@ -854,15 +845,11 @@ class NodeMaterial extends Material {
 
 		if ( object.instanceColor ) {
 
-			const instanceColor = varyingProperty( 'vec3', 'vInstanceColor' );
-
 			colorNode = instanceColor.mul( colorNode );
 
 		}
 
 		if ( object.isBatchedMesh && object._colorsTexture ) {
-
-			const batchColor = varyingProperty( 'vec3', 'vBatchColor' );
 
 			colorNode = batchColor.mul( colorNode );
 
@@ -999,11 +986,17 @@ class NodeMaterial extends Material {
 	 * Setups the lights node based on the scene, environment and material.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {LightsNode} The lights node.
+	 * @return {LightingNode<Array>} The lights node.
 	 */
-	setupLights( builder ) {
+	setupMaterialLightings( builder ) {
 
 		const materialLightsNode = [];
+
+		if ( builder.renderer.lighting.enabled === false ) {
+
+			return materialLightsNode;
+
+		}
 
 		//
 
@@ -1023,6 +1016,24 @@ class NodeMaterial extends Material {
 
 		}
 
+		if ( builder.context.ambientOcclusion ) {
+
+			materialLightsNode.push( new AONode( builder.context.ambientOcclusion ) );
+
+		}
+
+		return materialLightsNode;
+
+	}
+
+	/**
+	 * Setups the ambient occlusion node from the material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The ambient occlusion node.
+	 */
+	setupAmbientOcclusion( builder ) {
+
 		let aoNode = this.aoNode;
 
 		if ( aoNode === null && builder.material.aoMap ) {
@@ -1037,21 +1048,13 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( aoNode ) {
+		if ( aoNode !== null ) {
 
-			materialLightsNode.push( new AONode( aoNode ) );
+			ambientOcclusion.assign( aoNode );
 
-		}
-
-		let lightsN = this.lightsNode || builder.lightsNode;
-
-		if ( materialLightsNode.length > 0 ) {
-
-			lightsN = builder.renderer.lighting.createNode( [ ...lightsN.getLights(), ...materialLightsNode ] );
+			builder.context.ambientOcclusion = ambientOcclusion;
 
 		}
-
-		return lightsN;
 
 	}
 
@@ -1084,15 +1087,16 @@ class NodeMaterial extends Material {
 
 		const lights = this.lights === true || this.lightsNode !== null;
 
-		const lightsNode = lights ? this.setupLights( builder ) : null;
+		const materialLightings = this.lights === true ? this.setupMaterialLightings( builder ) : [];
+		const lightsNode = lights ? ( this.lightsNode || builder.lightsNode ) : null;
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.getScope().hasLights ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 
-			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModel, materialLightings, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 

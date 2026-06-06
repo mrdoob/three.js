@@ -207,7 +207,7 @@ diffuseTexture.type = THREE.UnsignedByteType;
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
 scenePass.setMRT( mrt( {
   output: output,
-  normal: directionToColor( normalView ),
+  normal: packNormalToRGB( normalView ),
   metalrough: vec2( metalness, roughness )
 } ) );
 
@@ -224,7 +224,7 @@ metalRoughTexture.type = THREE.UnsignedByteType;
 
 const sceneNormal = sample( ( uv ) => {
 
-  return colorToDirection( scenePassNormal.sample( uv ) );
+  return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 } );
 </pre>

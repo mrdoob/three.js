@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -113,13 +113,13 @@
 				prePass.transparent = false;
 
 				prePass.setMRT( mrt( {
-					output: directionToColor( normalView ),
+					output: packNormalToRGB( normalView ),
 					velocity: velocity
 				} ) );
 
 				const prePassNormal = sample( ( uv ) => {
 
-					return colorToDirection( prePass.getTextureNode().sample( uv ) );
+					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
 
 				} );
 

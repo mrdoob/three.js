@@ -230,7 +230,7 @@ class DynamicLightsNode extends LightsNode {
 
 		}
 
-		this._lightNodes = lightNodes;
+		return lightNodes;
 
 	}
 

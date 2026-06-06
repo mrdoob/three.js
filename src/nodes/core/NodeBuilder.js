@@ -49,7 +49,7 @@ const typeFromArray = new Map( [
 	[ Float32Array, 'float' ]
 ] );
 
-const toFloat = ( value ) => {
+const _toFloat = ( value ) => {
 
 	if ( /e/g.test( value ) ) {
 
@@ -62,6 +62,28 @@ const toFloat = ( value ) => {
 		return value + ( value % 1 ? '' : '.0' );
 
 	}
+
+};
+
+const _checkWriteUsage = ( data ) => {
+
+	if ( data.writeUsageCount > 0 ) return true;
+
+	if ( data.subBuildsCache !== undefined ) {
+
+		for ( const subBuild in data.subBuildsCache ) {
+
+			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+
+				return true;
+
+			}
+
+		}
+
+	}
+
+	return false;
 
 };
 
@@ -135,9 +157,9 @@ class NodeBuilder {
 		 * A list of all nodes the builder is processing
 		 * for this 3D object.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.nodes = [];
+		this.nodes = new Set();
 
 		/**
 		 * A list of all nodes the builder is processing in sequential order.
@@ -145,9 +167,9 @@ class NodeBuilder {
 		 * This is used to determine the update order of nodes, which is important for
 		 * {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.sequentialNodes = [];
+		this.sequentialNodes = new Set();
 
 		/**
 		 * A list of all nodes which {@link Node#update} method should be executed.
@@ -215,6 +237,14 @@ class NodeBuilder {
 		 * @type {?ClippingContext}
 		 */
 		this.clippingContext = null;
+
+		/**
+		 * Whether the built material uses hardware clipping or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.hardwareClipping = false;
 
 		/**
 		 * The generated vertex shader.
@@ -531,7 +561,7 @@ class NodeBuilder {
 	 */
 	includes( node ) {
 
-		return this.nodes.includes( node );
+		return this.nodes.has( node );
 
 	}
 
@@ -816,9 +846,9 @@ class NodeBuilder {
 	 */
 	addNode( node ) {
 
-		if ( this.nodes.includes( node ) === false ) {
+		if ( this.nodes.has( node ) === false ) {
 
-			this.nodes.push( node );
+			this.nodes.add( node );
 
 			this.setHashNode( node, node.getHash( this ) );
 
@@ -840,11 +870,7 @@ class NodeBuilder {
 
 		if ( updateBeforeType !== NodeUpdateType.NONE || updateAfterType !== NodeUpdateType.NONE ) {
 
-			if ( this.sequentialNodes.includes( node ) === false ) {
-
-				this.sequentialNodes.push( node );
-
-			}
+			this.sequentialNodes.add( node );
 
 		}
 
@@ -1205,6 +1231,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the builder is currently in an assignment context.
+	 *
+	 * @return {boolean} Whether the builder is in an assignment context.
+	 */
+	isContextAssign() {
+
+		return this.context.assign === true;
+
+	}
+
+	/**
 	 * Calling this method increases the usage count for the given node by one.
 	 *
 	 * @param {Node} node - The node to increase the usage count for.
@@ -1215,7 +1252,47 @@ class NodeBuilder {
 		const nodeData = this.getDataFromNode( node );
 		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
 
+		if ( this.isContextAssign() ) {
+
+			nodeData.writeUsageCount = nodeData.writeUsageCount === undefined ? 1 : nodeData.writeUsageCount + 1;
+
+		} else {
+
+			nodeData.readUsageCount = nodeData.readUsageCount === undefined ? 1 : nodeData.readUsageCount + 1;
+
+		}
+
 		return nodeData.usageCount;
+
+	}
+
+	/**
+	 * Returns whether the given node has been written to in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been written to.
+	 */
+	hasWriteUsage( node ) {
+
+		const refNode = node.getShared( this );
+		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
+		const nodeData = cache.getData( refNode );
+
+		if ( nodeData !== undefined ) {
+
+			for ( const shaderStage in nodeData ) {
+
+				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -1352,11 +1429,11 @@ class NodeBuilder {
 
 		}
 
-		if ( type === 'float' ) return toFloat( value );
+		if ( type === 'float' ) return _toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
-		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ _toFloat( value.r ) }, ${ _toFloat( value.g ) }, ${ _toFloat( value.b ) } )`;
 
 		const typeLength = this.getTypeLength( type );
 

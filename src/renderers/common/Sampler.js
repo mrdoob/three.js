@@ -119,6 +119,15 @@ class Sampler extends Binding {
 
 	}
 
+	/**
+	 * Releases the texture reference.
+	 */
+	release() {
+
+		this._texture = null;
+
+	}
+
 }
 
 export default Sampler;
