@@ -196,9 +196,9 @@ class GTAONode extends TempNode {
 		 * average. When `false` the pattern is static.
 		 *
 		 * @type {boolean}
-		 * @default false
+		 * @default true
 		 */
-		this.jitter = false;
+		this.jitter = true;
 
 		/**
 		 * Whether to temporally accumulate the AO: each frame is blended with the

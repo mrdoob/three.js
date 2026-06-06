@@ -139,7 +139,6 @@
 
 				aoPass = ao( prePassDepth, prePassNormal, camera, prePassVelocity ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				aoPass.jitter = true;
 				aoPass.temporalAccumulation = true; // accumulate AO over frames to remove half-res blue-noise
 
 				const aoPassOutput = aoPass.getTextureNode();
