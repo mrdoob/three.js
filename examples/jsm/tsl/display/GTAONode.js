@@ -393,6 +393,13 @@ class GTAONode extends TempNode {
 		// next frame.
 		if ( this.temporalAccumulation ) {
 
+			if ( this._velocityNode === null && ! this._warnedNoVelocity ) {
+
+				console.warn( 'GTAONode: temporalAccumulation requires a velocityNode passed to the constructor.' );
+				this._warnedNoVelocity = true;
+
+			}
+
 			_quadMesh.material = this._accumulationMaterial;
 			_quadMesh.name = 'GTAO.Accumulation';
 			renderer.setRenderTarget( this._accumulationRenderTarget );
