@@ -998,7 +998,7 @@ export const transformDirection = /*@__PURE__*/ nodeProxyIntent( MathNode, MathN
  * @param {Node<mat3|mat4>} viewMatrix - The view matrix.
  * @returns {Node<vec3>} The normal vector in view space.
  */
-export const transformNormalByViewMatrix = ( normal, viewMatrix ) => transformDirection( viewMatrix, normal );
+export const transformNormalByViewMatrix = ( normal, viewMatrix ) => normalize( mul( viewMatrix, vec4( vec3( normal ), 0.0 ) ).xyz );
 
 /**
  * Transforms a normal vector by the inverse of the view matrix and then normalizes the result.

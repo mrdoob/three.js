@@ -33,4 +33,4 @@ export const reflectVector = /*@__PURE__*/ reflectView.transformDirection( camer
  * @tsl
  * @type {Node<vec3>}
  */
-export const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraWorldMatrix ).toVar( 'reflectVector' );
+export const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraWorldMatrix ).toVar( 'refractVector' );
