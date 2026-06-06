@@ -627,11 +627,10 @@ class GTAONode extends TempNode {
 
 		const temporal = Fn( () => {
 
-			const depth = sampleDepth( uvNode ).toVar();
-
-			// Sky pixels short-circuit. The AO target clears to white (set in
-			// updateBefore) so the sky reads as visibility = 1 (no occlusion).
-			depth.greaterThanEqual( 1.0 ).discard();
+			// Sky pixels short-circuit. Single sample is sufficient here — the
+			// gather + min used by sampleDepth() is only needed in the horizon
+			// search where silhouette blending would corrupt the result.
+			this.depthNode.sample( uvNode ).greaterThanEqual( 1.0 ).discard();
 
 			const current = aoTextureNode.sample( uvNode ).r.toVar();
 
