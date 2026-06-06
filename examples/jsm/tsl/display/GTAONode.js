@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, FloatType, NearestFilter, LinearFilter } from 'three/webgpu';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, LinearFilter } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, fract } from 'three/tsl';
 import { generateBlueNoiseTexture } from '../../math/BlueNoise.js';
 
@@ -117,14 +117,6 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
-		// Half-res depth target, populated by the downsample pass when
-		// resolutionScale < 1. Depth uses Float32 because perspective depth values
-		// cluster near 1.0 where Float16 quantizes horizon angles into visible rings.
-		this._depthHalfRT = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat, type: FloatType } );
-		this._depthHalfRT.texture.name = 'GTAONode.DepthHalf';
-		this._depthHalfRT.texture.minFilter = NearestFilter;
-		this._depthHalfRT.texture.magFilter = NearestFilter;
-
 		// History + resolve targets for the temporal accumulation pass. LinearFilter
 		// so the reprojected history fetch (fractional UV) is bilinear, and so the
 		// output upsamples bilinearly to full-res instead of blocky nearest texels.
@@ -154,15 +146,6 @@ class GTAONode extends TempNode {
 		 * @type {UniformNode<vec2>}
 		 */
 		this.resolution = uniform( new Vector2() );
-
-		/**
-		 * Full screen resolution; used by the downsample passes to map each half-res
-		 * texel to its full-res footprint.
-		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
-		 */
-		this._fullResolution = uniform( new Vector2() );
 
 		/**
 		 * The thickness of the ambient occlusion.
@@ -308,9 +291,6 @@ class GTAONode extends TempNode {
 		this._material = new NodeMaterial();
 		this._material.name = 'GTAO';
 
-		this._depthDownsampleMaterial = new NodeMaterial();
-		this._depthDownsampleMaterial.name = 'GTAO.DepthDownsample';
-
 		this._accumulationMaterial = new NodeMaterial();
 		this._accumulationMaterial.name = 'GTAO.Accumulation';
 
@@ -340,11 +320,10 @@ class GTAONode extends TempNode {
 
 	/**
 	 * Render resolution as a fraction of the screen size (`1` = full, `0.5` = half).
-	 * At `< 1`, a min-Z depth downsample runs first and the AO shader reads from that
-	 * half-res target, which avoids the banding caused by silhouette-bleed when the
-	 * AO is computed at half-res against the full-res depth input. Normals are still
-	 * sampled at full resolution. Crossing the `1` ↔ `< 1` boundary triggers a shader
-	 * recompile (the texture binding is decided at compile time).
+	 * At `< 1` the AO is computed at lower resolution; depth is sampled via
+	 * `textureGather` so the min-Z foreground-priority footprint is resolved inline
+	 * at every sample, with no separate downsample pass. Normals are always sampled
+	 * at full resolution.
 	 *
 	 * @type {number}
 	 * @default 1
@@ -358,15 +337,7 @@ class GTAONode extends TempNode {
 	set resolutionScale( value ) {
 
 		if ( value === this._resolutionScale ) return;
-
-		const crossedBoundary = ( value === 1 ) !== ( this._resolutionScale === 1 );
 		this._resolutionScale = value;
-
-		if ( crossedBoundary && this._material ) {
-
-			this._material.needsUpdate = true;
-
-		}
 
 	}
 
@@ -378,8 +349,6 @@ class GTAONode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		this._fullResolution.value.set( width, height );
-
 		const lowW = Math.max( 1, Math.round( this._resolutionScale * width ) );
 		const lowH = Math.max( 1, Math.round( this._resolutionScale * height ) );
 
@@ -387,15 +356,6 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget.setSize( lowW, lowH );
 		this._historyRenderTarget.setSize( lowW, lowH );
 		this._accumulationRenderTarget.setSize( lowW, lowH );
-
-		// Only resize the half-res RT when we'll actually use it. Shrinking it
-		// here at scale=1 while the renderer holds cached bindings from a previous
-		// scale<1 compile would corrupt later frames.
-		if ( this._resolutionScale !== 1 ) {
-
-			this._depthHalfRT.setSize( lowW, lowH );
-
-		}
 
 	}
 
@@ -440,19 +400,6 @@ class GTAONode extends TempNode {
 
 		renderer.setClearColor( 0xffffff, 1 );
 
-		// Downsample depth to half-res (min-Z foreground-priority) so the AO horizon
-		// search runs on a consistent low-res grid and doesn't band on silhouettes
-		// from bilinear bleed in the full-res depth input.
-
-		if ( this._resolutionScale !== 1 ) {
-
-			_quadMesh.material = this._depthDownsampleMaterial;
-			_quadMesh.name = 'GTAO.DepthDownsample';
-			renderer.setRenderTarget( this._depthHalfRT );
-			_quadMesh.render( renderer );
-
-		}
-
 		// AO horizon search. With temporal accumulation on, the AO is written to its
 		// own target and the accumulation pass resolves it into the output; with it
 		// off, the AO is written straight to the output target and the accumulation
@@ -495,18 +442,18 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		// At scale<1 the AO shader reads depth from the half-res RT populated by the
-		// downsample pass; at scale=1 it samples the source node directly. The choice
-		// is compile-time — the resolutionScale setter triggers a recompile when
-		// crossing the boundary. Normals are always sampled at full-res.
-		const useHalfRes = this._resolutionScale !== 1;
-		const depthSourceNode = useHalfRes ? texture( this._depthHalfRT.texture ) : this.depthNode;
 		const normalSourceNode = this.normalNode;
-		const fallbackDepthForNormal = useHalfRes ? this._depthHalfRT.texture : this.depthNode.value;
+		const fallbackDepthForNormal = this.depthNode.value;
 
+		// Bilinear depth sampling blends values across silhouette edges, producing
+		// phantom mid-depth values that corrupt the horizon search and cause visible
+		// banding at low AO radius. textureGather returns the same 2×2 footprint
+		// unblended, so we can take the min (nearest surface wins) without a separate
+		// downsample pass.
 		const sampleDepth = ( uv ) => {
 
-			const depth = depthSourceNode.sample( uv ).r;
+			const g = this.depthNode.gather().sample( uv );
+			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -748,42 +695,6 @@ class GTAONode extends TempNode {
 		this._accumulationMaterial.fragmentNode = temporal().context( builder.getSharedContext() );
 		this._accumulationMaterial.needsUpdate = true;
 
-		// At scale=1 the downsample passes are skipped, so building their fragment
-		// nodes is dead work. Recompile when crossing the boundary picks the right path.
-		if ( ! useHalfRes ) {
-
-			return this._textureNode;
-
-		}
-
-		// Each half-res output texel covers ratio×ratio full-res texels (ratio =
-		// fullRes / lowRes). Sample at integer-pixel-center UVs so `.sample()` reads
-		// the exact texel with no bilinear bleed and stays valid on multisampled depth.
-		const computeFullResFootprint = () => {
-
-			const ratio = this._fullResolution.div( this.resolution );
-			const baseFull = uv().mul( this.resolution ).floor().mul( ratio );
-			const sampleAt = ( i, j ) => baseFull.add( vec2( i, j ).mul( ratio.sub( 1 ).max( 0 ) ) ).add( 0.5 ).div( this._fullResolution );
-			return { sampleAt };
-
-		};
-
-		// Depth: min-Z over the 2×2 footprint (foreground priority — half-res depth
-		// is always a real surface depth, never a phantom mid-silhouette value).
-		const depthDownsample = Fn( () => {
-
-			const { sampleAt } = computeFullResFootprint();
-			const d00 = this.depthNode.sample( sampleAt( 0, 0 ) ).r.toVar();
-			const d10 = this.depthNode.sample( sampleAt( 1, 0 ) ).r.toVar();
-			const d01 = this.depthNode.sample( sampleAt( 0, 1 ) ).r.toVar();
-			const d11 = this.depthNode.sample( sampleAt( 1, 1 ) ).r.toVar();
-			return vec4( min( min( d00, d10 ), min( d01, d11 ) ), 0, 0, 1 );
-
-		} );
-
-		this._depthDownsampleMaterial.fragmentNode = depthDownsample().context( builder.getSharedContext() );
-		this._depthDownsampleMaterial.needsUpdate = true;
-
 		return this._textureNode;
 
 	}
@@ -795,12 +706,10 @@ class GTAONode extends TempNode {
 	dispose() {
 
 		this._aoRenderTarget.dispose();
-		this._depthHalfRT.dispose();
 		this._historyRenderTarget.dispose();
 		this._accumulationRenderTarget.dispose();
 
 		this._material.dispose();
-		this._depthDownsampleMaterial.dispose();
 		this._accumulationMaterial.dispose();
 
 	}
