@@ -74,12 +74,59 @@ export class Style {
 	}
 
 	.toggle-icon {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: 40px;
 		font-size: 20px;
 		transition: background-color 0.2s;
+	}
+
+	.console-badge-container {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		display: flex;
+		gap: 2px;
+		pointer-events: none;
+	}
+
+	.console-badge,
+	.tab-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 14px;
+		height: 14px;
+		padding: 0 4px;
+		border-radius: 7px;
+		font-size: 9px;
+		font-weight: bold;
+		color: #ffffff;
+		line-height: 1;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+		border: 1px solid rgba(0, 0, 0, 0.2);
+	}
+
+	.tab-badge-container {
+		position: absolute;
+		top: 2px;
+		right: 3px;
+		display: flex;
+		gap: 2px;
+		pointer-events: none;
+	}
+
+	.console-badge.error,
+	.tab-badge.error {
+		background-color: var(--color-red);
+	}
+
+	.console-badge.warn,
+	.tab-badge.warn {
+		background-color: var(--color-yellow);
+		color: #111111;
 	}
 
 	.profiler-toggle:hover .toggle-icon {
