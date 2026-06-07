@@ -165,12 +165,7 @@ export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorld
 
 	const m = mat3( matrix );
 
-	// The columns of `mat3( col0, col1, col2 )` are the cross products of the columns of `m`
-	// (the cofactor matrix). The normal matrix — the transpose of the inverse of `m` — is the
-	// cofactor matrix divided by the determinant; building it this way avoids an explicit
-	// matrix inverse, which WGSL has no built-in for. Normalization discards the magnitude of
-	// the determinant but not its sign, so the sign is reapplied to keep reflections (negative
-	// determinant) correctly oriented instead of flipped.
+	// temporary workaround until inverse() can be used
 
 	const col0 = m[ 1 ].cross( m[ 2 ] );
 	const col1 = m[ 2 ].cross( m[ 0 ] );
@@ -178,7 +173,7 @@ export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorld
 
 	const determinant = m[ 0 ].dot( col0 );
 
-	return mat3( col0, col1, col2 ).mul( normal ).mul( determinant.sign() ).normalize();
+	return mat3( col0, col1, col2 ).mul( normal ).mul( determinant ).normalize();
 
 } );
 
