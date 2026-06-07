@@ -223,16 +223,12 @@ class GTAONode extends TempNode {
 		this.temporalAccumulationAlpha = uniform( 0.1 );
 
 		/**
-		 * Optional tileable noise texture driving the slice rotation (channel R) and
-		 * per-step phase jitter (channel G). When `null` (default), the AO uses cheap
-		 * per-pixel interleaved gradient noise — no texture fetch, no CPU generation.
-		 * Inject a two-channel blue-noise texture here for a higher-quality spectrum
-		 * when a temporal resolve (TRAA / accumulation) is available.
+		 * Backing field for {@link GTAONode#noiseNode}.
 		 *
+		 * @private
 		 * @type {?TextureNode}
-		 * @default null
 		 */
-		this.noiseNode = null;
+		this._noiseNode = null;
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -302,6 +298,36 @@ class GTAONode extends TempNode {
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._accumulationRenderTarget.texture );
+
+	}
+
+	/**
+	 * Optional tileable noise texture driving the slice rotation (channel R) and
+	 * per-step phase jitter (channel G). When `null` (default), the AO uses cheap
+	 * per-pixel interleaved gradient noise — no texture fetch, no CPU generation.
+	 * Assign a two-channel blue-noise texture for a higher-quality spectrum when a
+	 * temporal resolve (TRAA / accumulation) is available. Switching the source at
+	 * runtime triggers a shader recompile.
+	 *
+	 * @type {?TextureNode}
+	 * @default null
+	 */
+	get noiseNode() {
+
+		return this._noiseNode;
+
+	}
+
+	set noiseNode( value ) {
+
+		if ( value === this._noiseNode ) return;
+
+		this._noiseNode = value;
+
+		// The noise source is resolved at build time inside the AO fragment, so the
+		// fragment must be rebuilt (not just recompiled) to switch between the
+		// texture path and interleaved gradient noise.
+		if ( this._rebuildAOMaterial !== undefined ) this._rebuildAOMaterial();
 
 	}
 
@@ -626,8 +652,17 @@ class GTAONode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = ao().context( builder.getSharedContext() );
-		this._material.needsUpdate = true;
+		// The IGN ↔ noise-texture choice is resolved at build time inside `ao()`, so
+		// switching `noiseNode` at runtime has to rebuild this fragment, not just
+		// recompile the existing one.
+		this._rebuildAOMaterial = () => {
+
+			this._material.fragmentNode = ao().context( builder.getSharedContext() );
+			this._material.needsUpdate = true;
+
+		};
+
+		this._rebuildAOMaterial();
 
 		// ─── Temporal accumulation ─────────────────────────────────────────────
 		//
