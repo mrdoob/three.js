@@ -6,14 +6,11 @@ import { Color } from '../../math/Color.js';
 
 /**
  * A standard node material that opts into screen-space subsurface scattering
- * when used with {@link SSSSNode}. Writes per-object SSS parameters into
- * dedicated MRT slots (`sssParams0`, `sssParams1`) so the SSSS blur pass can
- * apply a distinct scattering profile per material.
+ * when used with {@link SSSSNode}. Pass the scene to `subsurfaceScattering()` and
+ * SSSSNode will discover, register, and track this material automatically via
+ * scene graph events — no manual registration needed.
  *
- * MRT layout written by this material:
- * - `albedo`:    rgb = base color, a = texturingMode (SSSSNode.TEXTURING_MODE; 0 = no SSS)
- * - `sssParams0`: rgb = scatteringDistance (world units per channel), a = worldScale
- * - `sssParams1`: rgb = scatteringColor (artistic tint), a = strength (blend factor)
+ * Call `dispose()` when the material is no longer needed.
  *
  * @augments MeshStandardNodeMaterial
  */
@@ -33,6 +30,8 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 	constructor( parameters ) {
 
 		super( parameters );
+
+		this.isMeshSubsurfaceNodeMaterial = true;
 
 		/**
 		 * Per-channel scattering radius in world units (r, g, b).
@@ -57,30 +56,29 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		this.strengthNode = uniform( 1.0 );
 
 		/**
-		 * World-space multiplier applied to `scatteringDistance`.
+		 * Albedo-SSS interaction mode. Values match SSSSNode.TEXTURING_MODE:
+		 * 0 = POST_SCATTER, 1 = PRE_AND_POST_SCATTER, 2 = NONE.
 		 *
 		 * @type {UniformNode<float>}
+		 * @default 1 (PRE_AND_POST_SCATTER)
 		 */
-		this.worldScaleNode = uniform( 1.0 );
+		this.texturingModeNode = uniform( 1 );
 
 		/**
-		 * Albedo-SSS interaction mode, stored directly in albedo.a.
-		 * Values match SSSSNode.TEXTURING_MODE: 1 = POST_SCATTER,
-		 * 2 = PRE_AND_POST_SCATTER, 3 = NONE. 0 is reserved for non-SSS pixels.
+		 * Slot index in the shared SSS parameter buffer, written into `albedo.a`
+		 * during the geometry pass. Assigned automatically by {@link SSSSNode};
+		 * do not set manually.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 2 (PRE_AND_POST_SCATTER)
 		 */
-		this.texturingModeNode = uniform( 2 );
+		this.sssSlotNode = uniform( 0 );
 
 	}
 
 	setup( builder ) {
 
 		this.mrtNode = mrt( {
-			albedo: vec4( diffuseColor.rgb, this.texturingModeNode ),
-			sssParams0: vec4( this.scatteringDistanceNode, this.worldScaleNode ),
-			sssParams1: vec4( this.scatteringColorNode, this.strengthNode ),
+			albedo: vec4( diffuseColor.rgb, this.sssSlotNode ),
 		} );
 
 		super.setup( builder );
@@ -92,8 +90,8 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		this.scatteringDistanceNode = source.scatteringDistanceNode;
 		this.scatteringColorNode = source.scatteringColorNode;
 		this.strengthNode = source.strengthNode;
-		this.worldScaleNode = source.worldScaleNode;
 		this.texturingModeNode = source.texturingModeNode;
+		// sssSlotNode is NOT copied — each instance owns its own slot
 
 		return super.copy( source );
 

@@ -1,5 +1,4 @@
-// https://advances.realtimerendering.com/s2018/Efficient%20screen%20space%20subsurface%20scattering%20Siggraph%202018.pdf
-import { RenderTarget, HalfFloatType, TempNode, QuadMesh, NodeMaterial, RendererUtils, Vector2, Vector3, Color, DataTexture, RGBAFormat, FloatType, RepeatWrapping, NearestFilter } from 'three/webgpu';
+import { RenderTarget, HalfFloatType, TempNode, QuadMesh, NodeMaterial, RendererUtils, Vector2, Vector3, Vector4, Color, DataTexture, RGBAFormat, FloatType, RepeatWrapping, NearestFilter } from 'three/webgpu';
 import { Fn, float, vec2, vec3, vec4, int, uv, uniform, uniformArray, Loop, texture, passTexture, NodeUpdateType, If, abs, max, min, exp, sqrt, pow, mix, dot, cross, normalize, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -77,10 +76,9 @@ function _generateNoiseTexture( size = 64 ) {
 }
 
 const TEXTURING_MODE = {
-	POST_SCATTER: 1,       // albedo.a = 1, albedoExp = 1.0
-	PRE_AND_POST_SCATTER: 2, // albedo.a = 2, albedoExp = 0.5
-	NONE: 3,               // albedo.a = 3, albedoExp = 0.0
-	// 0 is reserved for non-SSS pixels (no blur)
+	POST_SCATTER: 0, // albedoExp = 1.0 — full albedo demodulation
+	PRE_AND_POST_SCATTER: 1, // albedoExp = 0.5 — sqrt albedo demodulation
+	NONE: 2, // albedoExp = 0.0 — blur lit color directly
 };
 
 /**
@@ -121,15 +119,15 @@ class SSSSNode extends TempNode {
 	 * @param {TextureNode} depthNode - Scene depth texture.
 	 * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS mask).
 	 * @param {PerspectiveCamera} camera - The scene camera.
-	 * @param {TextureNode|null} [normalNode=null] - Optional view-space normals; improves accuracy on oblique surfaces.
-	 * @param {TextureNode|null} [sssParams0Node=null] - Optional MRT texture written by {@link MeshSubsurfaceNodeMaterial}
-	 *   encoding per-object SSS params: rgb = scatteringDistance, a = worldScale.
-	 *   When provided, overrides the pass-level `scatteringDistance` and `worldScale` uniforms per pixel.
-	 * @param {TextureNode|null} [sssParams1Node=null] - Optional MRT texture written by {@link MeshSubsurfaceNodeMaterial}
-	 *   encoding per-object SSS params: rgb = scatteringColor, a = strength.
-	 *   When provided, overrides the pass-level `scatteringColor` and `strength` uniforms per pixel.
+	 * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
+	 *   SSSSNode listens to `childadded` / `childremoved` events so materials are discovered
+	 *   automatically as objects enter or leave the scene graph.
+	 * @param {TextureNode|null} [normalNode=null] - Optional MRT view-space normals texture. When provided,
+	 *   the blur disk is oriented on each pixel's tangent plane instead of screen-space, which improves
+	 *   accuracy on oblique surfaces. Requires adding a `normals` slot to the scene MRT and passing
+	 *   `scenePass.getTextureNode('normals')` here.
 	 */
-	constructor( colorNode, depthNode, albedoNode, camera, normalNode = null, sssParams0Node = null, sssParams1Node = null ) {
+	constructor( colorNode, depthNode, albedoNode, camera, scene, normalNode = null ) {
 
 		super( 'vec4' );
 
@@ -137,8 +135,6 @@ class SSSSNode extends TempNode {
 		this.depthNode = depthNode;
 		this.albedoNode = albedoNode;
 		this.normalNode = normalNode;
-		this.sssParams0Node = sssParams0Node;
-		this.sssParams1Node = sssParams1Node;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -216,6 +212,26 @@ class SSSSNode extends TempNode {
 		 * @type {PerspectiveCamera}
 		 */
 		this._camera = camera;
+
+		/**
+		 * @private
+		 * @type {Scene}
+		 */
+		this._scene = scene;
+
+		// Per-material SSS registry.
+		// _sssSlots: sparse array indexed by slot (slot 0 = dummy for non-SSS pixels).
+		// _materialSlots: WeakMap(material → slot) for O(1) lookup and GC-friendly storage.
+		// _freeSSSSlots: recycled slots from disposed/removed materials.
+		this._sssSlots = [ null ];
+		this._materialSlots = new WeakMap();
+		this._freeSSSSlots = [];
+		this._sssBuffer = null;
+		this._sssBufferNeedsRebuild = true;
+
+		// Bind handlers so they can be added and removed by reference.
+		this._onChildAdded = this._onChildAdded.bind( this );
+		this._onChildRemoved = this._onChildRemoved.bind( this );
 
 		/**
 		 * @private
@@ -301,6 +317,25 @@ class SSSSNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._sssRenderTarget.texture );
 
+		// Initial scan: register existing SSS materials and attach childadded/childremoved
+		// listeners to every existing node. Three.js has no 'descendantadded' event, so we
+		// must propagate the listener manually to catch future nested additions/removals.
+		scene.addEventListener( 'childadded', this._onChildAdded );
+		scene.addEventListener( 'childremoved', this._onChildRemoved );
+		scene.traverse( ( obj ) => {
+
+			this._checkObject( obj );
+			if ( obj !== scene ) {
+
+				obj.addEventListener( 'childadded', this._onChildAdded );
+				obj.addEventListener( 'childremoved', this._onChildRemoved );
+
+			}
+
+		} );
+
+		this._rebuildSSSBuffer();
+
 	}
 
 	/**
@@ -344,6 +379,96 @@ class SSSSNode extends TempNode {
 
 	}
 
+	_checkObject( obj ) {
+
+		if ( obj.isMesh && obj.material && obj.material.isMeshSubsurfaceNodeMaterial ) {
+
+			if ( ! this._materialSlots.has( obj.material ) ) {
+
+				this._registerSSS( obj.material );
+
+			}
+
+		}
+
+	}
+
+	_onChildAdded( { child } ) {
+
+		child.traverse( ( obj ) => {
+
+			this._checkObject( obj );
+			obj.addEventListener( 'childadded', this._onChildAdded );
+			obj.addEventListener( 'childremoved', this._onChildRemoved );
+
+		} );
+
+	}
+
+	_onChildRemoved( { child } ) {
+
+		child.traverse( ( obj ) => {
+
+			obj.removeEventListener( 'childadded', this._onChildAdded );
+			obj.removeEventListener( 'childremoved', this._onChildRemoved );
+
+		} );
+
+	}
+
+	_registerSSS( material ) {
+
+		const reusingSlot = this._freeSSSSlots.length > 0;
+		const slot = reusingSlot ? this._freeSSSSlots.pop() : this._sssSlots.length;
+		this._sssSlots[ slot ] = material;
+		this._materialSlots.set( material, slot );
+		material.sssSlotNode.value = slot;
+		material.addEventListener( 'dispose', () => this._unregisterSSS( material ) );
+		if ( ! reusingSlot ) this._sssBufferNeedsRebuild = true;
+
+	}
+
+	_unregisterSSS( material ) {
+
+		const slot = this._materialSlots.get( material );
+		if ( slot === undefined ) return;
+		this._sssSlots[ slot ] = null;
+		this._materialSlots.delete( material );
+		this._freeSSSSlots.push( slot );
+		material.sssSlotNode.value = 0;
+
+	}
+
+	_rebuildSSSBuffer() {
+
+		const count = this._sssSlots.length;
+		const entries = [];
+		for ( let i = 0; i < count * 2; i ++ ) entries.push( new Vector4() );
+		this._sssBuffer = uniformArray( entries, 'vec4' );
+		this._sssBufferNeedsRebuild = false;
+		if ( this._sssMaterial ) this._sssMaterial.needsUpdate = true;
+
+	}
+
+	_syncSSSBuffer() {
+
+		const buf = this._sssBuffer.array;
+		for ( let slot = 1; slot < this._sssSlots.length; slot ++ ) {
+
+			const mat = this._sssSlots[ slot ];
+			if ( mat === null ) continue;
+			const sd = mat.scatteringDistanceNode.value;
+			const sc = mat.scatteringColorNode.value;
+			const i = slot * 2;
+			buf[ i ].set( sd.r, sd.g, sd.b, mat.strengthNode.value );
+			buf[ i + 1 ].set( sc.r, sc.g, sc.b, mat.texturingModeNode.value );
+
+		}
+
+		this._sssBuffer.needsUpdate = true;
+
+	}
+
 	/**
 	 * Sets the size of the internal render targets.
 	 *
@@ -383,6 +508,9 @@ class SSSSNode extends TempNode {
 		this._cameraProjectionMatrix.value.copy( this._camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse.value.copy( this._camera.projectionMatrixInverse );
 
+		if ( this._sssBufferNeedsRebuild ) this._rebuildSSSBuffer();
+		this._syncSSSBuffer();
+
 		_quadMesh.material = this._sssMaterial;
 		renderer.setRenderTarget( this._sssRenderTarget );
 		_quadMesh.render( renderer );
@@ -399,7 +527,8 @@ class SSSSNode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const { colorNode, depthNode, albedoNode, normalNode, sssParams0Node, sssParams1Node } = this;
+		const { colorNode, depthNode, albedoNode, normalNode } = this;
+		const sssBuffer = this._sssBuffer;
 		const { samples, outputMode } = this;
 		const { fogType, fogNear, fogFar, fogDensity } = this;
 		const fogColorUniform = this.fogColor;
@@ -458,14 +587,15 @@ class SSSSNode extends TempNode {
 				const centerFF = computeFogFactor( linearDepth ).toVar();
 				const centerColorDefogged = defog( centerColor.rgb, centerFF ).toVar();
 
-				const _p0 = sssParams0Node.sample( vuv ).toVar();
-				const _p1 = sssParams1Node.sample( vuv ).toVar();
+				const slot = int( sssMask ).toVar();
+				const _p0 = sssBuffer.element( slot.mul( 2 ) ).toVar();
+				const _p1 = sssBuffer.element( slot.mul( 2 ).add( 1 ) ).toVar();
 				const pixelScatteringDistance = _p0.rgb;
-				const pixelWorldScale = _p0.a;
+				const pixelStrength = _p0.a;
 				const pixelScatteringColor = _p1.rgb;
-				const pixelStrength = _p1.a;
+				const pixelTexturingMode = _p1.a;
 
-				const scatterDist = pixelScatteringDistance.mul( pixelWorldScale ).toVar();
+				const scatterDist = pixelScatteringDistance.toVar();
 				const sR = float( 3.67 ).div( max( scatterDist.x, 0.0001 ) ).toVar();
 				const sG = float( 3.67 ).div( max( scatterDist.y, 0.0001 ) ).toVar();
 				const sB = float( 3.67 ).div( max( scatterDist.z, 0.0001 ) ).toVar();
@@ -497,8 +627,7 @@ class SSSSNode extends TempNode {
 				const Brot = T.mul( sinA.negate() ).add( B.mul( cosA ) ).toVar();
 				const sampleWorldStep = radiusScale.mul( linearDepth ).div( _projScale ).toVar();
 
-				// albedo.a stores SSSSNode.TEXTURING_MODE (1/2/3); derive albedoExp via 1.5 - mode*0.5
-				const albedoExp = float( 1.5 ).sub( sssMask.mul( 0.5 ) ).toVar();
+				const albedoExp = float( 1.0 ).sub( pixelTexturingMode.mul( 0.5 ) ).toVar();
 				const outFactor = pow( centerAlbedo, vec3( albedoExp ) ).toVar();
 
 				const totalR = float( 0.0 ).toVar();
@@ -620,6 +749,19 @@ class SSSSNode extends TempNode {
 	 */
 	dispose() {
 
+		this._scene.removeEventListener( 'childadded', this._onChildAdded );
+		this._scene.removeEventListener( 'childremoved', this._onChildRemoved );
+		this._scene.traverse( ( obj ) => {
+
+			if ( obj !== this._scene ) {
+
+				obj.removeEventListener( 'childadded', this._onChildAdded );
+				obj.removeEventListener( 'childremoved', this._onChildRemoved );
+
+			}
+
+		} );
+
 		this._sssRenderTarget.dispose();
 		this._sssMaterial.dispose();
 
@@ -638,11 +780,13 @@ export default SSSSNode;
  * @param {TextureNode} depthNode - Scene depth texture.
  * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS mask).
  * @param {PerspectiveCamera} camera - The scene camera.
- * @param {TextureNode|null} [normalNode=null] - Optional view-space normal texture.
- * @param {TextureNode|null} [sssParams0Node=null] - Optional per-object params texture (rgb = scatteringDistance, a = worldScale).
- * @param {TextureNode|null} [sssParams1Node=null] - Optional per-object params texture (rgb = scatteringColor, a = strength).
+ * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
+ * @param {TextureNode|null} [normalNode=null] - Optional MRT view-space normals texture. When provided,
+ *   the blur disk is oriented on each pixel's tangent plane instead of screen-space, which improves
+ *   accuracy on oblique surfaces. Requires adding a `normals` slot to the scene MRT and passing
+ *   `scenePass.getTextureNode('normals')` here.
  * @returns {SSSSNode}
  */
-export const subsurfaceScattering = ( colorNode, depthNode, albedoNode, camera, normalNode = null, sssParams0Node = null, sssParams1Node = null ) => new SSSSNode( colorNode, depthNode, albedoNode, camera, normalNode, sssParams0Node, sssParams1Node );
+export const subsurfaceScattering = ( colorNode, depthNode, albedoNode, camera, scene, normalNode = null ) => new SSSSNode( colorNode, depthNode, albedoNode, camera, scene, normalNode );
 
 export { TEXTURING_MODE };

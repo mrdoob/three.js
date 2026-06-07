@@ -68,7 +68,7 @@
 
 				await renderer.init();
 
-				//
+				// camera / scene
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.set( 0, 0, 6 );
@@ -80,12 +80,12 @@
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
 				scene.environmentIntensity = 0.2;
 
-				//
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 
-				//
+				// lights
 
 				const keyLight = new THREE.SpotLight( 0xfff0e0, 60, 0, 0.5, 0.4 );
 				keyLight.position.set( 4, 3, 3 );
@@ -96,7 +96,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x404060, 0.5 ) );
 
-				//
+				// shell
 
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ) );
@@ -111,12 +111,12 @@
 				shell.scale.multiplyScalar( 2.5 / Math.max( shellSize.x, shellSize.y, shellSize.z ) );
 
 				const shellMaterial = new THREE.MeshSubsurfaceNodeMaterial( {
-					color: new THREE.Color( 0.85, 0.65, 0.55 ),
+					color: 0xD9A68C,
 					roughness: 0.6,
 					metalness: 0.0,
 				} );
 				shellMaterial.scatteringDistanceNode.value.set( 0.25, 0.18, 0.12 );
-				shellMaterial.scatteringColorNode.value.set( 1.0, 0.9, 0.8 );
+				shellMaterial.scatteringColorNode.value.set( 0xFFE6CC );
 				shellMaterial.strengthNode.value = 0.7;
 				shellMaterial.texturingModeNode.value = TEXTURING_MODE.NONE; // flat color, no albedo demodulation needed
 
@@ -134,7 +134,7 @@
 
 				scene.add( shell );
 
-				//
+				// head
 
 				const textureLoader = new THREE.TextureLoader();
 				const skinMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
@@ -162,22 +162,18 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output,
+					// rgb: base color read back by the blur shader for albedo demodulation.
+					// a:   SSS slot index — 0 = skip blur (default for non-SSS objects);
+					//      MeshSubsurfaceNodeMaterial writes its auto-assigned slot here.
 					albedo: vec4( diffuseColor.rgb, 0.0 ),
-					// Default zero for non-SSS materials; overridden per-pixel by MeshSubsurfaceNodeMaterial.
-					sssParams0: vec4( 0, 0, 0, 0 ), // rgb = scatteringDistance, a = worldScale
-					sssParams1: vec4( 0, 0, 0, 0 ), // rgb = scatteringColor,    a = strength
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassAlbedo = scenePass.getTextureNode( 'albedo' );
-				const scenePassSSSParams0 = scenePass.getTextureNode( 'sssParams0' );
-				const scenePassSSSParams1 = scenePass.getTextureNode( 'sssParams1' );
 
 				const subsurfaceScatteringPass = subsurfaceScattering(
-					scenePassColor, scenePassDepth, scenePassAlbedo, camera,
-					null, // normalNode
-					scenePassSSSParams0, scenePassSSSParams1,
+					scenePassColor, scenePassDepth, scenePassAlbedo, camera, scene,
 				);
 				subsurfaceScatteringPass.samples.value = 32;
 
@@ -211,21 +207,19 @@
 					'None': TEXTURING_MODE.NONE,
 				};
 
-				const headFolder = renderer.inspector.createParameters( 'Head (skin)' );
+				const headFolder = renderer.inspector.createParameters( 'Head' );
 				headFolder.add( head.material.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
 				headFolder.addColor( head.material.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
 				headFolder.addColor( head.material.scatteringColorNode, 'value' ).name( 'scattering color' );
 				headFolder.add( head.material.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
-				headFolder.add( head.material.worldScaleNode, 'value', 0.01, 10, 0.01 ).name( 'world scale' );
 
 				const shellFolder = renderer.inspector.createParameters( 'Shell' );
 				shellFolder.add( shellMaterial.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
 				shellFolder.addColor( shellMaterial.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
 				shellFolder.addColor( shellMaterial.scatteringColorNode, 'value' ).name( 'scattering color' );
 				shellFolder.add( shellMaterial.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
-				shellFolder.add( shellMaterial.worldScaleNode, 'value', 0.01, 10, 0.01 ).name( 'world scale' );
 
-				//
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
