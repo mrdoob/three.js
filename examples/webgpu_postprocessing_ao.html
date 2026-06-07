@@ -39,9 +39,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, texture } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { generateBlueNoiseTexture } from 'three/addons/math/BlueNoise.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -60,9 +61,12 @@
 				radius: 0.5,
 				scale: 0.8,
 				thickness: 1,
+				blueNoise: false,
 				aoOnly: false,
 				transparentOpacity: 0.3
 			};
+
+			let blueNoiseTexture = null; // generated lazily on first enable
 
 			init();
 
@@ -139,7 +143,8 @@
 
 				aoPass = ao( prePassDepth, prePassNormal, camera, prePassVelocity ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				aoPass.temporalAccumulation = true; // accumulate AO over frames to remove half-res blue-noise
+				aoPass.temporalAccumulation = false; // single-pass, no temporal resolve
+				aoPass.jitter = false; // static noise pattern: avoids per-frame crawl (leaves a faint fixed dither)
 
 				const aoPassOutput = aoPass.getTextureNode();
 
@@ -500,6 +505,13 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 				gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+				gui.add( params, 'blueNoise' ).name( 'blue noise' ).onChange( ( value ) => {
+
+					// IGN by default; blue noise generated lazily on first enable
+					if ( value && blueNoiseTexture === null ) blueNoiseTexture = texture( generateBlueNoiseTexture( 64, 2 ) );
+					aoPass.noiseNode = value ? blueNoiseTexture : null;
+
+				} );
 				gui.add( aoPass, 'jitter' ).name( 'jitter' );
 				gui.add( aoPass, 'temporalAccumulation' ).name( 'temporal accumulation' );
 				gui.add( aoPass.temporalAccumulationAlpha, 'value', 0.02, 1, 0.01 ).name( 'accumulation alpha' );
