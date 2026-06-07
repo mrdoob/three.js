@@ -302,7 +302,7 @@
 
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
 
-				parameterGroup.add( timeScale, 'value', 0.0, 1.0 );
+				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
 
 				// Atomic visibility buffers — pack depth + payload into single u32 for race-free atomicMax
 				// Buffer A: depth(18 high bits) | megaTriangleIndex(14 low bits) — triangle ID
