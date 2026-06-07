@@ -9,6 +9,24 @@ class Console extends Tab {
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
 
+		this.unreadErrors = 0;
+		this.unreadWarns = 0;
+
+		this.tabBadgeContainer = document.createElement( 'span' );
+		this.tabBadgeContainer.className = 'tab-badge-container';
+
+		this.tabErrorBadge = document.createElement( 'span' );
+		this.tabErrorBadge.className = 'tab-badge error';
+		this.tabErrorBadge.style.display = 'none';
+
+		this.tabWarnBadge = document.createElement( 'span' );
+		this.tabWarnBadge.className = 'tab-badge warn';
+		this.tabWarnBadge.style.display = 'none';
+
+		this.tabBadgeContainer.appendChild( this.tabErrorBadge );
+		this.tabBadgeContainer.appendChild( this.tabWarnBadge );
+		this.button.appendChild( this.tabBadgeContainer );
+
 		this.buildHeader();
 
 		this.logContainer = document.createElement( 'div' );
@@ -210,6 +228,95 @@ class Console extends Tab {
 
 	}
 
+	setActive( isActive ) {
+
+		super.setActive( isActive );
+
+		if ( isActive && this.profiler && this.profiler.panel.classList.contains( 'visible' ) ) {
+
+			this.clearUnread();
+
+		}
+
+	}
+
+	clearUnread() {
+
+		this.unreadErrors = 0;
+		this.unreadWarns = 0;
+		this.updateBadges();
+
+	}
+
+	updateBadges() {
+
+		if ( ! this.profiler ) return;
+
+		const errorBadge = this.profiler.toggleButton.querySelector( '.console-badge.error' );
+		const warnBadge = this.profiler.toggleButton.querySelector( '.console-badge.warn' );
+
+		if ( errorBadge ) {
+
+			if ( this.unreadErrors > 0 ) {
+
+				errorBadge.textContent = this.unreadErrors;
+				errorBadge.style.display = '';
+
+			} else {
+
+				errorBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( warnBadge ) {
+
+			if ( this.unreadWarns > 0 ) {
+
+				warnBadge.textContent = this.unreadWarns;
+				warnBadge.style.display = '';
+
+			} else {
+
+				warnBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( this.tabErrorBadge ) {
+
+			if ( this.unreadErrors > 0 ) {
+
+				this.tabErrorBadge.textContent = this.unreadErrors;
+				this.tabErrorBadge.style.display = '';
+
+			} else {
+
+				this.tabErrorBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( this.tabWarnBadge ) {
+
+			if ( this.unreadWarns > 0 ) {
+
+				this.tabWarnBadge.textContent = this.unreadWarns;
+				this.tabWarnBadge.style.display = '';
+
+			} else {
+
+				this.tabWarnBadge.style.display = 'none';
+
+			}
+
+		}
+
+	}
+
 	addMessage( type, text ) {
 
 		const msg = document.createElement( 'div' );
@@ -228,6 +335,25 @@ class Console extends Tab {
 		if ( this.logContainer.children.length > 200 ) {
 
 			this.logContainer.removeChild( this.logContainer.firstChild );
+
+		}
+
+		// Update unread counts if the console is not active/visible
+		const isUnread = ! this.isActive;
+
+		if ( isUnread ) {
+
+			if ( type === 'error' ) {
+
+				this.unreadErrors ++;
+				this.updateBadges();
+
+			} else if ( type === 'warn' ) {
+
+				this.unreadWarns ++;
+				this.updateBadges();
+
+			}
 
 		}
 

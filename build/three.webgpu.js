@@ -4897,8 +4897,9 @@ class PropertyNode extends Node {
 	 * @param {string} nodeType - The type of the node.
 	 * @param {?string} [name=null] - The name of the property in the shader.
 	 * @param {boolean} [varying=false] - Whether this property is a varying or not.
+	 * @param {?Node} [placeholderNode=null] - The placeholder node if not assigned.
 	 */
-	constructor( nodeType, name = null, varying = false ) {
+	constructor( nodeType, name = null, varying = false, placeholderNode = null ) {
 
 		super( nodeType );
 
@@ -4918,6 +4919,14 @@ class PropertyNode extends Node {
 		 * @default false
 		 */
 		this.varying = varying;
+
+		/**
+		 * The placeholder node of the property if it is not assigned.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.placeholderNode = nodeObject( placeholderNode );
 
 		/**
 		 * This flag can be used for type testing.
@@ -4977,6 +4986,18 @@ class PropertyNode extends Node {
 
 			nodeVar = builder.getVarFromNode( this, this.name );
 
+			if ( this.placeholderNode !== null ) {
+
+				if ( builder.hasWriteUsage( this ) === false ) {
+
+					const snippet = this.placeholderNode.build( builder, this.getNodeType( builder ) );
+
+					builder.addLineFlowCode( `${ builder.getPropertyName( nodeVar ) } = ${ snippet }`, this );
+
+				}
+
+			}
+
 		}
 
 		return builder.getPropertyName( nodeVar );
@@ -4992,9 +5013,10 @@ class PropertyNode extends Node {
  * @function
  * @param {string} type - The type of the node.
  * @param {?string} [name=null] - The name of the property in the shader.
+ * @param {?Node} [placeholderNode=null] - The placeholder node if not assigned.
  * @returns {PropertyNode}
  */
-const property = ( type, name ) => new PropertyNode( type, name );
+const property = ( type, name, placeholderNode = null ) => new PropertyNode( type, name, false, placeholderNode );
 
 /**
  * TSL function for creating a varying property node.
@@ -5003,9 +5025,10 @@ const property = ( type, name ) => new PropertyNode( type, name );
  * @function
  * @param {string} type - The type of the node.
  * @param {?string} [name=null] - The name of the varying in the shader.
+ * @param {?Node} [placeholderNode=null] - The placeholder node if not assigned.
  * @returns {PropertyNode}
  */
-const varyingProperty = ( type, name ) => new PropertyNode( type, name, true );
+const varyingProperty = ( type, name, placeholderNode = null ) => new PropertyNode( type, name, true, placeholderNode );
 
 /**
  * TSL object that represents the shader variable `DiffuseColor`.
@@ -5246,6 +5269,15 @@ const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'At
  * @type {PropertyNode<float>}
  */
 const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
+
+/**
+ * TSL object that represents the shader variable `AmbientOcclusion`.
+ * If no value is assigned to this property, it defaults to a placeholder value of `1.0`.
+ *
+ * @tsl
+ * @type {PropertyNode<float>}
+ */
+const ambientOcclusion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AmbientOcclusion', false, 1 );
 
 /**
  * This node can be used to group single instances of {@link UniformNode}
@@ -9279,8 +9311,18 @@ class VaryingNode extends Node {
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
 
-			// force node run in vertex stage
-			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, properties.node, type, propertyName );
+			if ( builder.shaderStage === NodeShaderStage.VERTEX ) {
+
+				const snippet = properties.node.build( builder, type );
+
+				builder.addLineFlowCode( `${ propertyName } = ${ snippet }`, this );
+
+			} else {
+
+				// force node run in vertex stage
+				builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, properties.node, type, propertyName );
+
+			}
 
 			properties[ propertyKey ] = propertyName;
 
@@ -16328,24 +16370,24 @@ const bentNormalView = /*@__PURE__*/ ( Fn( () => {
 } ).once() )();
 
 /**
- * Packs a direction vector into a color value.
+ * Packs a normal vector into a color value.
  *
  * @tsl
  * @function
  * @param {Node<vec3>} node - The direction to pack.
  * @return {Node<vec3>} The color.
  */
-const directionToColor = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0.5 );
+const packNormalToRGB = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0.5 );
 
 /**
- * Unpacks a color value into a direction vector.
+ * Unpacks a color value into a normal vector.
  *
  * @tsl
  * @function
  * @param {Node<vec3>} node - The color to unpack.
  * @return {Node<vec3>} The direction.
  */
-const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
+const unpackRGBToNormal = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 
 /**
  * Unpacks a tangent space normal, reconstructing the Z component by projecting the X,Y coordinates onto the hemisphere.
@@ -16357,6 +16399,36 @@ const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
  * @return {Node<vec3>} The resulting normal.
  */
 const unpackNormal = ( xy ) => vec3( xy, sqrt( saturate( float( 1.0 ).sub( dot( xy, xy ) ) ) ) );
+
+/**
+ * @tsl
+ * @function
+ * @deprecated since r185. Use {@link packNormalToRGB} instead.
+ * @param {Node<vec3>} node - The direction to pack.
+ * @returns {Node<vec3>}
+ */
+const directionToColor = ( node ) => {
+
+	warnOnce( 'TSL: "directionToColor()" has been renamed to "packNormalToRGB()".' ); // @deprecated r185
+
+	return packNormalToRGB( node );
+
+};
+
+/**
+ * @tsl
+ * @function
+ * @deprecated since r185. Use {@link unpackRGBToNormal} instead.
+ * @param {Node<vec3>} node - The color to unpack.
+ * @returns {Node<vec3>}
+ */
+const colorToDirection = ( node ) => {
+
+	warnOnce( 'TSL: "colorToDirection()" has been renamed to "unpackRGBToNormal()".' ); // @deprecated r185
+
+	return unpackRGBToNormal( node );
+
+};
 
 /**
  * This class can be used for applying normals maps to materials.
@@ -16986,11 +17058,27 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.LIGHT_MAP ) {
 
-			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
+			if ( material.lightMap ) {
+
+				node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
+
+			} else {
+
+				node = vec3( 0.0 );
+
+			}
 
 		} else if ( scope === MaterialNode.AO ) {
 
-			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+			if ( material.aoMap ) {
+
+				node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+
+			} else {
+
+				node = float( 1.0 );
+
+			}
 
 		} else if ( scope === MaterialNode.LINE_DASH_OFFSET ) {
 
@@ -17626,7 +17714,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.isContextAssign();
 
 		//
 
@@ -19374,10 +19462,11 @@ class LightingContextNode extends ContextNode {
 	 *
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {?LightingModel} [lightingModel=null] - The current lighting model.
+	 * @param {?Array<LightingNode>} materialLightings - The material lightings nodes.
 	 * @param {?Node<vec3>} [backdropNode=null] - A backdrop node.
 	 * @param {?Node<float>} [backdropAlphaNode=null] - A backdrop alpha node.
 	 */
-	constructor( lightsNode, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
+	constructor( lightsNode, lightingModel = null, materialLightings = [], backdropNode = null, backdropAlphaNode = null ) {
 
 		super( lightsNode );
 
@@ -19388,6 +19477,12 @@ class LightingContextNode extends ContextNode {
 		 * @default null
 		 */
 		this.lightingModel = lightingModel;
+
+		/**
+		 * @type {?Array<LightingNode>}
+		 * @default []
+		 */
+		this.materialLightings = materialLightings;
 
 		/**
 		 * A backdrop node.
@@ -19424,7 +19519,7 @@ class LightingContextNode extends ContextNode {
 	 */
 	getContext() {
 
-		const { backdropNode, backdropAlphaNode } = this;
+		const { materialLightings, backdropNode, backdropAlphaNode } = this;
 
 		const directDiffuse = vec3().toVar( 'directDiffuse' ),
 			directSpecular = vec3().toVar( 'directSpecular' ),
@@ -19444,6 +19539,7 @@ class LightingContextNode extends ContextNode {
 			iblIrradiance: vec3().toVar( 'iblIrradiance' ),
 			ambientOcclusion: float( 1 ).toVar( 'ambientOcclusion' ),
 			reflectedLight,
+			materialLightings,
 			backdrop: backdropNode,
 			backdropAlpha: backdropAlphaNode
 		};
@@ -21053,6 +21149,7 @@ class NodeMaterial extends Material {
 		if ( this.fragmentNode === null ) {
 
 			this.setupDiffuseColor( builder );
+			this.setupAmbientOcclusion( builder );
 			this.setupVariants( builder );
 
 			const outgoingLightNode = this.setupLighting( builder );
@@ -21515,11 +21612,17 @@ class NodeMaterial extends Material {
 	 * Setups the lights node based on the scene, environment and material.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {LightsNode} The lights node.
+	 * @return {LightingNode<Array>} The lights node.
 	 */
-	setupLights( builder ) {
+	setupMaterialLightings( builder ) {
 
 		const materialLightsNode = [];
+
+		if ( builder.renderer.lighting.enabled === false ) {
+
+			return materialLightsNode;
+
+		}
 
 		//
 
@@ -21539,6 +21642,24 @@ class NodeMaterial extends Material {
 
 		}
 
+		if ( builder.context.ambientOcclusion ) {
+
+			materialLightsNode.push( new AONode( builder.context.ambientOcclusion ) );
+
+		}
+
+		return materialLightsNode;
+
+	}
+
+	/**
+	 * Setups the ambient occlusion node from the material.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The ambient occlusion node.
+	 */
+	setupAmbientOcclusion( builder ) {
+
 		let aoNode = this.aoNode;
 
 		if ( aoNode === null && builder.material.aoMap ) {
@@ -21553,21 +21674,13 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( aoNode ) {
+		if ( aoNode !== null ) {
 
-			materialLightsNode.push( new AONode( aoNode ) );
+			ambientOcclusion.assign( aoNode );
 
-		}
-
-		let lightsN = this.lightsNode || builder.lightsNode;
-
-		if ( materialLightsNode.length > 0 ) {
-
-			lightsN = builder.renderer.lighting.createNode( [ ...lightsN.getLights(), ...materialLightsNode ] );
+			builder.context.ambientOcclusion = ambientOcclusion;
 
 		}
-
-		return lightsN;
 
 	}
 
@@ -21600,15 +21713,16 @@ class NodeMaterial extends Material {
 
 		const lights = this.lights === true || this.lightsNode !== null;
 
-		const lightsNode = lights ? this.setupLights( builder ) : null;
+		const materialLightings = this.lights === true ? this.setupMaterialLightings( builder ) : [];
+		const lightsNode = lights ? ( this.lightsNode || builder.lightsNode ) : null;
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.getScope().hasLights ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 
-			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModel, materialLightings, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 
@@ -22530,8 +22644,6 @@ class Line2NodeMaterial extends NodeMaterial {
 	 */
 	get lineColorNode() {
 
-		warnOnce( 'Line2NodeMaterial: "lineColorNode" has been deprecated. Use "colorNode" instead.' ); // @deprecated r185
-
 		return this.colorNode;
 
 	}
@@ -22691,7 +22803,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		// By convention, a normal packed to RGB is in sRGB color space. Convert it to working color space.
 
-		diffuseColor.assign( colorSpaceToWorking( vec4( directionToColor( normalView ), opacityNode ), SRGBColorSpace ) );
+		diffuseColor.assign( colorSpaceToWorking( vec4( packNormalToRGB( normalView ), opacityNode ), SRGBColorSpace ) );
 
 	}
 
@@ -32779,6 +32891,8 @@ class Bindings extends DataMap {
 
 }
 
+const _emptyArray = /*@__PURE__*/ Object.freeze( [] );
+
 /**
  * Default sorting function for opaque render items.
  *
@@ -32924,13 +33038,20 @@ class RenderList {
 		this.bundles = [];
 
 		/**
+		 * The lighting management component.
+		 *
+		 * @type {Lighting}
+		 */
+		this.lighting = lighting;
+
+		/**
 		 * The render list's lights node. This node is later
 		 * relevant for the actual analytical light nodes which
 		 * compute the scene's lighting in the shader.
 		 *
 		 * @type {LightsNode}
 		 */
-		this.lightsNode = lighting.getNode( scene, camera );
+		this.lightsNode = lighting.getNode( scene );
 
 		/**
 		 * The scene's lights stored in an array. This array
@@ -33163,7 +33284,7 @@ class RenderList {
 
 		// update lights
 
-		this.lightsNode.setLights( this.lightsArray );
+		this.lightsNode.setLights( this.lighting.enabled ? this.lightsArray : _emptyArray );
 
 		// Clear references from inactive renderItems in the list
 
@@ -42122,7 +42243,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.isContextAssign();
 		snippet = super.generate( builder );
 
 		if ( isAssignContext !== true ) {
@@ -43169,12 +43290,48 @@ function lightViewPosition( light ) {
  */
 const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );
 
+/**
+ * A node representing the total diffuse light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalDiffuse = property( 'vec3', 'totalDiffuse' );
+
+/**
+ * A node representing the total specular light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalSpecular = property( 'vec3', 'totalSpecular' );
+
+/**
+ * A node representing the outgoing light.
+ *
+ * @type {Node<vec3>}
+ */
+const outgoingLight = property( 'vec3', 'outgoingLight' );
+
+/**
+ * Sorts an array of lights in ascending order by their IDs.
+ *
+ * @private
+ * @param {Array<Light>} lights - The array of lights to sort.
+ * @return {Array<Light>} The sorted array of lights.
+ */
 const sortLights = ( lights ) => {
 
 	return lights.sort( ( a, b ) => a.id - b.id );
 
 };
 
+/**
+ * Finds and returns a lighting node associated with a specific light ID.
+ *
+ * @private
+ * @param {number} id - The ID of the light to search for.
+ * @param {Array<LightingNode>} lightNodes - The array of lighting nodes to search within.
+ * @return {?LightingNode} The matching lighting node, or null if not found.
+ */
 const getLightNodeById = ( id, lightNodes ) => {
 
 	for ( const lightNode of lightNodes ) {
@@ -43191,7 +43348,20 @@ const getLightNodeById = ( id, lightNodes ) => {
 
 };
 
+/**
+ * WeakMap cache mapping light objects to their corresponding lighting node instances.
+ *
+ * @private
+ * @type {WeakMap<Light, LightingNode>}
+ */
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Array used to temporarily store light IDs and shadow casting states for hashing.
+ *
+ * @private
+ * @type {Array<number>}
+ */
 const _hashData = [];
 
 /**
@@ -43221,21 +43391,21 @@ class LightsNode extends Node {
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalDiffuseNode = property( 'vec3', 'totalDiffuse' );
+		this.totalDiffuseNode = totalDiffuse;
 
 		/**
 		 * A node representing the total specular light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalSpecularNode = property( 'vec3', 'totalSpecular' );
+		this.totalSpecularNode = totalSpecular;
 
 		/**
 		 * A node representing the outgoing light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.outgoingLightNode = property( 'vec3', 'outgoingLight' );
+		this.outgoingLightNode = outgoingLight;
 
 		/**
 		 * An array representing the lights in the scene.
@@ -43244,25 +43414,6 @@ class LightsNode extends Node {
 		 * @type {Array<Light>}
 		 */
 		this._lights = [];
-
-		/**
-		 * For each light in the scene, this node will create a
-		 * corresponding light node.
-		 *
-		 * @private
-		 * @type {?Array<LightingNode>}
-		 * @default null
-		 */
-		this._lightNodes = null;
-
-		/**
-		 * A hash for identifying the current light nodes setup.
-		 *
-		 * @private
-		 * @type {?string}
-		 * @default null
-		 */
-		this._lightNodesHash = null;
 
 		/**
 		 * `LightsNode` sets this property to `true` by default.
@@ -43318,26 +43469,36 @@ class LightsNode extends Node {
 	 */
 	getHash( builder ) {
 
-		if ( this._lightNodesHash === null ) {
+		const nodeData = builder.getDataFromNode( this );
 
-			if ( this._lightNodes === null ) this.setupLightsNode( builder );
+		if ( nodeData.lightNodesHash === undefined ) {
+
+			const lightNodes = this.setupLightsNode( builder );
+
+			nodeData.lightNodes = lightNodes;
 
 			const hash = [];
 
-			for ( const lightNode of this._lightNodes ) {
+			for ( const lightNode of lightNodes ) {
 
 				hash.push( lightNode.getHash() );
 
 			}
 
-			this._lightNodesHash = 'lights-' + hash.join( ',' );
+			nodeData.lightNodesHash = 'lights-' + hash.join( ',' );
 
 		}
 
-		return this._lightNodesHash;
+		return nodeData.lightNodesHash;
 
 	}
 
+	/**
+	 * Analyzes the node's dependencies by building all nested light nodes
+	 * and the output node.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 */
 	analyze( builder ) {
 
 		const properties = builder.getNodeProperties( this );
@@ -43357,21 +43518,24 @@ class LightsNode extends Node {
 	 * process lights in the node system.
 	 *
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Array<LightingNode>} The array of lighting nodes.
 	 */
 	setupLightsNode( builder ) {
 
+		const nodeData = builder.getDataFromNode( this );
 		const lightNodes = [];
 
-		const previousLightNodes = this._lightNodes;
+		const previousLightNodes = nodeData.lightNodes || null;
+		const materialLightings = builder.context.materialLightings;
 
-		const lights = sortLights( this._lights );
+		const lights = sortLights( [ ...materialLightings, ...this._lights ] );
 		const nodeLibrary = builder.renderer.library;
 
 		for ( const light of lights ) {
 
 			if ( light.isNode ) {
 
-				lightNodes.push( nodeObject( light ) );
+				lightNodes.push( light );
 
 			} else {
 
@@ -43410,7 +43574,7 @@ class LightsNode extends Node {
 
 		}
 
-		this._lightNodes = lightNodes;
+		return lightNodes;
 
 	}
 
@@ -43433,6 +43597,13 @@ class LightsNode extends Node {
 
 	}
 
+	/**
+	 * Sets up a direct rect area light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and area light properties.
+	 */
 	setupDirectRectAreaLight( builder, lightNode, lightData ) {
 
 		const { lightingModel, reflectedLight } = builder.context;
@@ -43464,9 +43635,15 @@ class LightsNode extends Node {
 
 	getLightNodes( builder ) {
 
-		if ( this._lightNodes === null ) this.setupLightsNode( builder );
+		const nodeData = builder.getDataFromNode( this );
 
-		return this._lightNodes;
+		if ( nodeData.lightNodes === undefined ) {
+
+			nodeData.lightNodes = this.setupLightsNode( builder );
+
+		}
+
+		return nodeData.lightNodes;
 
 	}
 
@@ -43552,9 +43729,6 @@ class LightsNode extends Node {
 	setLights( lights ) {
 
 		this._lights = lights;
-
-		this._lightNodes = null;
-		this._lightNodesHash = null;
 
 		return this;
 
@@ -47674,6 +47848,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	agxToneMapping: agxToneMapping,
 	all: all,
 	alphaT: alphaT,
+	ambientOcclusion: ambientOcclusion,
 	and: and,
 	anisotropy: anisotropy,
 	anisotropyB: anisotropyB,
@@ -48048,6 +48223,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	outputStruct: outputStruct,
 	overloadingFn: overloadingFn,
 	packHalf2x16: packHalf2x16,
+	packNormalToRGB: packNormalToRGB,
 	packSnorm2x16: packSnorm2x16,
 	packUnorm2x16: packUnorm2x16,
 	parabola: parabola,
@@ -48222,6 +48398,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	uniformTexture: uniformTexture,
 	unpackHalf2x16: unpackHalf2x16,
 	unpackNormal: unpackNormal,
+	unpackRGBToNormal: unpackRGBToNormal,
 	unpackSnorm2x16: unpackSnorm2x16,
 	unpackUnorm2x16: unpackUnorm2x16,
 	unpremultiplyAlpha: unpremultiplyAlpha,
@@ -49864,7 +50041,7 @@ const typeFromArray = new Map( [
 	[ Float32Array, 'float' ]
 ] );
 
-const toFloat = ( value ) => {
+const _toFloat = ( value ) => {
 
 	if ( /e/g.test( value ) ) {
 
@@ -49877,6 +50054,28 @@ const toFloat = ( value ) => {
 		return value + ( value % 1 ? '' : '.0' );
 
 	}
+
+};
+
+const _checkWriteUsage = ( data ) => {
+
+	if ( data.writeUsageCount > 0 ) return true;
+
+	if ( data.subBuildsCache !== undefined ) {
+
+		for ( const subBuild in data.subBuildsCache ) {
+
+			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+
+				return true;
+
+			}
+
+		}
+
+	}
+
+	return false;
 
 };
 
@@ -51024,6 +51223,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the builder is currently in an assignment context.
+	 *
+	 * @return {boolean} Whether the builder is in an assignment context.
+	 */
+	isContextAssign() {
+
+		return this.context.assign === true;
+
+	}
+
+	/**
 	 * Calling this method increases the usage count for the given node by one.
 	 *
 	 * @param {Node} node - The node to increase the usage count for.
@@ -51034,7 +51244,47 @@ class NodeBuilder {
 		const nodeData = this.getDataFromNode( node );
 		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
 
+		if ( this.isContextAssign() ) {
+
+			nodeData.writeUsageCount = nodeData.writeUsageCount === undefined ? 1 : nodeData.writeUsageCount + 1;
+
+		} else {
+
+			nodeData.readUsageCount = nodeData.readUsageCount === undefined ? 1 : nodeData.readUsageCount + 1;
+
+		}
+
 		return nodeData.usageCount;
+
+	}
+
+	/**
+	 * Returns whether the given node has been written to in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been written to.
+	 */
+	hasWriteUsage( node ) {
+
+		const refNode = node.getShared( this );
+		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
+		const nodeData = cache.getData( refNode );
+
+		if ( nodeData !== undefined ) {
+
+			for ( const shaderStage in nodeData ) {
+
+				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -51171,11 +51421,11 @@ class NodeBuilder {
 
 		}
 
-		if ( type === 'float' ) return toFloat( value );
+		if ( type === 'float' ) return _toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
-		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ _toFloat( value.r ) }, ${ _toFloat( value.g ) }, ${ _toFloat( value.b ) } )`;
 
 		const typeLength = this.getTypeLength( type );
 
@@ -54983,6 +55233,8 @@ class NodeManager extends DataMap {
 	 */
 	getEnvironmentNode( scene ) {
 
+		if ( this.renderer.lighting.enabled === false ) return null;
+
 		this.updateEnvironment( scene );
 
 		let environmentNode = null;
@@ -55075,16 +55327,23 @@ class NodeManager extends DataMap {
 
 		if ( cacheKeyData.callId !== callId ) {
 
-			const environmentNode = this.getEnvironmentNode( scene );
-			const fogNode = this.getFogNode( scene );
-
-			if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
-			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
-
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.type );
+			_cacheKeyValues.push( this.renderer.lighting.enabled ? 1 : 0 );
+
+			if ( this.renderer.lighting.enabled ) {
+
+				_cacheKeyValues.push( lightsNode.getCacheKey( true ) );
+
+				_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
+				_cacheKeyValues.push( this.renderer.shadowMap.type );
+
+				const environmentNode = this.getEnvironmentNode( scene );
+				if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
+
+			}
+
+			const fogNode = this.getFogNode( scene );
+			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
 			cacheKeyData.callId = callId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
@@ -56063,6 +56322,21 @@ const _weakMap = /*@__PURE__*/ new WeakMap();
 class Lighting {
 
 	/**
+	 * Constructs a new lighting manager.
+	 */
+	constructor() {
+
+		/**
+		 * Whether this lighting manager is enabled or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
+
+	}
+
+	/**
 	 * Creates a new lights node for the given array of lights.
 	 *
 	 * @param {Array<Light>} lights - The render object.
@@ -56083,9 +56357,8 @@ class Lighting {
 	 */
 	getNode( scene ) {
 
-		// ignore post-processing
-
-		if ( scene.isQuadMesh ) return _defaultLights;
+		// Ignore renderable objects, e.g: Mesh, Sprite, etc.
+		if ( scene.isScene !== true && scene.isGroup !== true ) return _defaultLights;
 
 		let node = _weakMap.get( scene );
 
@@ -59205,10 +59478,13 @@ class Renderer {
 			onShaderError: null,
 			getShaderAsync: async ( scene, camera, object ) => {
 
-				await this.compileAsync( scene, camera );
+				await this.compileAsync( object, camera, scene );
+
+				const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera );
-				const renderContext = this._renderContexts.get( this._renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -73654,7 +73930,7 @@ class WebGPUUtils {
 
 		}
 
-		samples = samples || 1;
+		samples = this.getSampleCount( samples || 1 );
 
 		const isMSAA = samples > 1 && texture.renderTarget !== null && ( texture.isDepthTexture !== true && texture.isFramebufferTexture !== true );
 		const primarySamples = isMSAA ? 1 : samples;

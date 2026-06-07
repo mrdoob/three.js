@@ -737,10 +737,13 @@ class Renderer {
 			onShaderError: null,
 			getShaderAsync: async ( scene, camera, object ) => {
 
-				await this.compileAsync( scene, camera );
+				await this.compileAsync( object, camera, scene );
+
+				const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera );
-				const renderContext = this._renderContexts.get( this._renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
 
