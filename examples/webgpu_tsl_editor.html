@@ -184,6 +184,8 @@ output = vec4( finalColor, opacity );
 
 							compiling = true;
 
+							mesh.visible = false;
+
 							if ( options.output === 'WGSL' ) {
 
 								rawShader = await renderer.debug.getShaderAsync( scene, camera, mesh );
@@ -194,6 +196,8 @@ output = vec4( finalColor, opacity );
 								rawShader = await webGLRenderer.debug.getShaderAsync( scene, camera, mesh );
 
 							}
+
+							mesh.visible = true;
 
 							compiling = false;
 
