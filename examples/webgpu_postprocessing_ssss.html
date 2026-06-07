@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - subsurfaceScattering</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - subsurfaceScattering">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssss.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssss.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSSS</span>
+			</div>
+
+			<small>
+				Screen-Space Subsurface Scattering.<br />
+				Lee Perry-Smith head from <a href="https://casual-effects.com/data/" target="_blank" rel="noopener">casual-effects.com</a>.<br />
+				Ramose Murex shell from <a href="https://threedscans.com/shell/ramose-murex/" target="_blank" rel="noopener">Three D Scans</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, diffuseColor, vec4 } from 'three/tsl';
+
+			import { subsurfaceScattering, TEXTURING_MODE } from 'three/addons/tsl/display/SSSSNode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, controls, renderPipeline;
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.AgXToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( 0, 0, 6 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environmentIntensity = 0.2;
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				//
+
+				const keyLight = new THREE.SpotLight( 0xfff0e0, 60, 0, 0.5, 0.4 );
+				keyLight.position.set( 4, 3, 3 );
+				keyLight.castShadow = true;
+				keyLight.shadow.mapSize.set( 2048, 2048 );
+				keyLight.shadow.bias = - 0.0001;
+				scene.add( keyLight );
+
+				scene.add( new THREE.AmbientLight( 0x404060, 0.5 ) );
+
+				//
+
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ) );
+				const gltf = await loader.loadAsync( 'models/gltf/shell.glb' );
+				const shell = gltf.scene;
+
+				shell.rotation.y = Math.PI / 2;
+				shell.rotation.z = - Math.PI / 2;
+				shell.position.set( 1.5, 0.3, 0 );
+
+				const shellSize = new THREE.Box3().setFromObject( shell ).getSize( new THREE.Vector3() );
+				shell.scale.multiplyScalar( 2.5 / Math.max( shellSize.x, shellSize.y, shellSize.z ) );
+
+				const shellMaterial = new THREE.MeshSubsurfaceNodeMaterial( {
+					color: new THREE.Color( 0.85, 0.65, 0.55 ),
+					roughness: 0.6,
+					metalness: 0.0,
+				} );
+				shellMaterial.scatteringDistanceNode.value.set( 0.25, 0.18, 0.12 );
+				shellMaterial.scatteringColorNode.value.set( 1.0, 0.9, 0.8 );
+				shellMaterial.strengthNode.value = 0.7;
+				shellMaterial.texturingModeNode.value = TEXTURING_MODE.NONE; // flat color, no albedo demodulation needed
+
+				shell.traverse( ( child ) => {
+
+					if ( child.isMesh ) {
+
+						child.castShadow = true;
+						child.receiveShadow = true;
+						child.material = shellMaterial;
+
+					}
+
+				} );
+
+				scene.add( shell );
+
+				//
+
+				const textureLoader = new THREE.TextureLoader();
+				const skinMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
+				skinMap.colorSpace = THREE.SRGBColorSpace;
+
+				const headGltf = await loader.loadAsync( 'models/gltf/LeePerrySmith/LeePerrySmith.glb' );
+				const head = new THREE.Mesh(
+					headGltf.scene.children[ 0 ].geometry,
+					new THREE.MeshSubsurfaceNodeMaterial( {
+						map: skinMap,
+						roughness: 0.7,
+						metalness: 0.0,
+					} )
+				);
+				head.castShadow = true;
+				head.receiveShadow = true;
+				head.position.set( - 1.5, - 0.3, 0 );
+				head.scale.setScalar( 0.5 );
+				scene.add( head );
+
+				// post-processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output,
+					albedo: vec4( diffuseColor.rgb, 0.0 ),
+					// Default zero for non-SSS materials; overridden per-pixel by MeshSubsurfaceNodeMaterial.
+					sssParams0: vec4( 0, 0, 0, 0 ), // rgb = scatteringDistance, a = worldScale
+					sssParams1: vec4( 0, 0, 0, 0 ), // rgb = scatteringColor,    a = strength
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassAlbedo = scenePass.getTextureNode( 'albedo' );
+				const scenePassSSSParams0 = scenePass.getTextureNode( 'sssParams0' );
+				const scenePassSSSParams1 = scenePass.getTextureNode( 'sssParams1' );
+
+				const subsurfaceScatteringPass = subsurfaceScattering(
+					scenePassColor, scenePassDepth, scenePassAlbedo, camera,
+					null, // normalNode
+					scenePassSSSParams0, scenePassSSSParams1,
+				);
+				subsurfaceScatteringPass.samples.value = 32;
+
+				renderPipeline.outputNode = subsurfaceScatteringPass.getTextureNode();
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'SSSS' );
+
+				gui.add( { enabled: true }, 'enabled' ).name( 'enabled' ).onChange( ( value ) => {
+
+					renderPipeline.outputNode = value ? subsurfaceScatteringPass.getTextureNode() : scenePassColor;
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+				gui.add( subsurfaceScatteringPass.outputMode, 'value', {
+					'Default': 0,
+					'Amplified Diff': 1,
+					'Blur Only': 2,
+					'Depth': 3,
+					'Weights': 4,
+					'Albedo': 5,
+				} ).name( 'output' );
+				gui.add( subsurfaceScatteringPass.samples, 'value', 4, 64, 1 ).name( 'samples' );
+				gui.add( subsurfaceScatteringPass, 'resolutionScale', 0.1, 1.0, 0.01 ).name( 'resolution' );
+
+				const texturingModeOptions = {
+					'Post-Scatter': TEXTURING_MODE.POST_SCATTER,
+					'Pre+Post Scatter': TEXTURING_MODE.PRE_AND_POST_SCATTER,
+					'None': TEXTURING_MODE.NONE,
+				};
+
+				const headFolder = renderer.inspector.createParameters( 'Head (skin)' );
+				headFolder.add( head.material.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
+				headFolder.addColor( head.material.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
+				headFolder.addColor( head.material.scatteringColorNode, 'value' ).name( 'scattering color' );
+				headFolder.add( head.material.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
+				headFolder.add( head.material.worldScaleNode, 'value', 0.01, 10, 0.01 ).name( 'world scale' );
+
+				const shellFolder = renderer.inspector.createParameters( 'Shell' );
+				shellFolder.add( shellMaterial.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
+				shellFolder.addColor( shellMaterial.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
+				shellFolder.addColor( shellMaterial.scatteringColorNode, 'value' ).name( 'scattering color' );
+				shellFolder.add( shellMaterial.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
+				shellFolder.add( shellMaterial.worldScaleNode, 'value', 0.01, 10, 0.01 ).name( 'world scale' );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
