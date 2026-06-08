@@ -28,7 +28,6 @@
   "files": [
     "build",
     "examples/jsm",
-    "examples/fonts",
     "LICENSE",
     "package.json",
     "README.md",
