@@ -391,8 +391,11 @@ class TiledLightsNode extends LightsNode {
 				const ndc = projectedPosition.div( projectedPosition.w );
 				const screenPosition = ndc.xy.mul( 0.5 ).add( 0.5 ).flipY();
 
-				const distanceFromCamera = viewPosition.z;
-				const pointRadius = distance.div( distanceFromCamera );
+				const viewDepth = viewPosition.z.negate();
+				const projectionScaleX = cameraProjectionMatrix.element( 0 ).element( 0 );
+				const projectionScaleY = cameraProjectionMatrix.element( 1 ).element( 1 );
+				const projectionScale = projectionScaleX.max( projectionScaleY );
+				const pointRadius = distance.mul( projectionScale ).mul( 0.5 ).div( viewDepth );
 
 				If( circleIntersectsAABB( screenPosition, pointRadius, minBounds, maxBounds ), () => {
 
