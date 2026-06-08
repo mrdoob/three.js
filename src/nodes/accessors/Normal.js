@@ -163,17 +163,9 @@ export const clearcoatNormalView = /*@__PURE__*/ ( Fn( ( { subBuildFn, context }
  */
 export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ] ) => {
 
-	const m = mat3( matrix );
+	const normalMatrix = mat3( matrix ).inverse().transpose();
 
-	// temporary workaround until inverse() can be used
-
-	const col0 = m[ 1 ].cross( m[ 2 ] );
-	const col1 = m[ 2 ].cross( m[ 0 ] );
-	const col2 = m[ 0 ].cross( m[ 1 ] );
-
-	const determinant = m[ 0 ].dot( col0 );
-
-	return mat3( col0, col1, col2 ).mul( normal ).mul( determinant ).normalize();
+	return normalMatrix.mul( normal ).normalize();
 
 } );
 
