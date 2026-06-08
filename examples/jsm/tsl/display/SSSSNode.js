@@ -595,154 +595,155 @@ class SSSSNode extends TempNode {
 				const centerAlbedo = max( centerAlbedoSample.rgb, vec3( ALBEDO_EPS ) ).toVar();
 				const sssMask = centerAlbedoSample.a.toVar();
 
-				const centerViewPos = getViewPos( centerDepth, vuv ).toVar();
-				const linearDepth = centerViewPos.z.negate().toVar();
-				const centerFF = computeFogFactor( linearDepth ).toVar();
-				const centerColorDefogged = defog( centerColor.rgb, centerFF ).toVar();
+				If( sssMask.greaterThanEqual( 0.5 ), () => {
 
-				const slot = int( sssMask ).toVar();
-				const _p0 = sssBuffer.element( slot.mul( 2 ) ).toVar();
-				const _p1 = sssBuffer.element( slot.mul( 2 ).add( 1 ) ).toVar();
-				const pixelScatteringDistance = _p0.rgb;
-				const pixelStrength = _p0.a;
-				const pixelScatteringColor = _p1.rgb;
-				const pixelTexturingMode = _p1.a;
+					const centerViewPos = getViewPos( centerDepth, vuv ).toVar();
+					const linearDepth = centerViewPos.z.negate().toVar();
+					const centerFF = computeFogFactor( linearDepth ).toVar();
+					const centerColorDefogged = defog( centerColor.rgb, centerFF ).toVar();
 
-				const scatterDist = pixelScatteringDistance.toVar();
-				const sR = float( 3.67 ).div( max( scatterDist.x, 0.0001 ) ).toVar();
-				const sG = float( 3.67 ).div( max( scatterDist.y, 0.0001 ) ).toVar();
-				const sB = float( 3.67 ).div( max( scatterDist.z, 0.0001 ) ).toVar();
-				const sMin = min( sR, min( sG, sB ) ).toVar();
+					const slot = int( sssMask ).toVar();
+					const _p0 = sssBuffer.element( slot.mul( 2 ) ).toVar();
+					const _p1 = sssBuffer.element( slot.mul( 2 ).add( 1 ) ).toVar();
+					const pixelScatteringDistance = _p0.rgb;
+					const pixelStrength = _p0.a;
+					const pixelScatteringColor = _p1.rgb;
+					const pixelTexturingMode = _p1.a;
 
-				const worldRadius = float( maxR ).div( sMin ).toVar();
-				const screenRadius = worldRadius.mul( _projScale ).div( linearDepth ).toVar();
-				const effectiveMaxRadius = min( worldRadius.mul( _projScale ).div( _cameraNear ), _resolution.y.mul( 0.25 ) );
-				const clampedRadius = min( screenRadius, effectiveMaxRadius ).toVar();
-				const radiusScale = clampedRadius.div( float( maxR ) ).toVar();
+					const scatterDist = pixelScatteringDistance.toVar();
+					const sR = float( 3.67 ).div( max( scatterDist.x, 0.0001 ) ).toVar();
+					const sG = float( 3.67 ).div( max( scatterDist.y, 0.0001 ) ).toVar();
+					const sB = float( 3.67 ).div( max( scatterDist.z, 0.0001 ) ).toVar();
+					const sMin = min( sR, min( sG, sB ) ).toVar();
 
-				const skipBlur = sssMask.lessThan( 0.5 ).toVar();
-				const effectiveSamples = skipBlur.select( int( 0 ), int( samples ) ).toVar();
-				const effectiveStrength = pixelStrength.mul( skipBlur.select( float( 0.0 ), float( 1.0 ) ) ).toVar();
+					const worldRadius = float( maxR ).div( sMin ).toVar();
+					const screenRadius = worldRadius.mul( _projScale ).div( linearDepth ).toVar();
+					const effectiveMaxRadius = min( worldRadius.mul( _projScale ).div( _cameraNear ), _resolution.y.mul( 0.25 ) );
+					const clampedRadius = min( screenRadius, effectiveMaxRadius ).toVar();
+					const radiusScale = clampedRadius.div( float( maxR ) ).toVar();
 
-				const noiseUV = vuv.mul( _lowResolution ).div( 64.0 );
-				const noiseVal = _noiseNode.sample( noiseUV );
-				const cosA = noiseVal.r.toVar();
-				const sinA = noiseVal.g.toVar();
 
-				// Tangent-plane disk basis; falls back to screen-aligned disk when no normalNode.
-				const centerNormal = normalNode
-					? normalize( normalNode.sample( vuv ).rgb ).toVar()
-					: vec3( 0.0, 0.0, 1.0 ).toVar();
-				const seedUp = abs( centerNormal.y ).lessThan( 0.99 ).select( vec3( 0.0, 1.0, 0.0 ), vec3( 1.0, 0.0, 0.0 ) );
-				const T = normalize( seedUp.sub( centerNormal.mul( dot( seedUp, centerNormal ) ) ) ).toVar();
-				const B = cross( centerNormal, T ).toVar();
-				const Trot = T.mul( cosA ).add( B.mul( sinA ) ).toVar();
-				const Brot = T.mul( sinA.negate() ).add( B.mul( cosA ) ).toVar();
-				const sampleWorldStep = radiusScale.mul( linearDepth ).div( _projScale ).toVar();
+					const noiseUV = vuv.mul( _lowResolution ).div( 64.0 );
+					const noiseVal = _noiseNode.sample( noiseUV );
+					const cosA = noiseVal.r.toVar();
+					const sinA = noiseVal.g.toVar();
 
-				const albedoExp = pixelTexturingMode.mul( 0.5 ).toVar();
-				const outFactor = pow( centerAlbedo, vec3( albedoExp ) ).toVar();
+					// Tangent-plane disk basis; falls back to screen-aligned disk when no normalNode.
+					const centerNormal = normalNode
+						? normalize( normalNode.sample( vuv ).rgb ).toVar()
+						: vec3( 0.0, 0.0, 1.0 ).toVar();
+					const seedUp = abs( centerNormal.y ).lessThan( 0.99 ).select( vec3( 0.0, 1.0, 0.0 ), vec3( 1.0, 0.0, 0.0 ) );
+					const T = normalize( seedUp.sub( centerNormal.mul( dot( seedUp, centerNormal ) ) ) ).toVar();
+					const B = cross( centerNormal, T ).toVar();
+					const Trot = T.mul( cosA ).add( B.mul( sinA ) ).toVar();
+					const Brot = T.mul( sinA.negate() ).add( B.mul( cosA ) ).toVar();
+					const sampleWorldStep = radiusScale.mul( linearDepth ).div( _projScale ).toVar();
 
-				const totalR = float( 0.0 ).toVar();
-				const totalG = float( 0.0 ).toVar();
-				const totalB = float( 0.0 ).toVar();
-				const weightSumR = float( 0.0 ).toVar();
-				const weightSumG = float( 0.0 ).toVar();
-				const weightSumB = float( 0.0 ).toVar();
+					const albedoExp = pixelTexturingMode.mul( 0.5 ).toVar();
+					const outFactor = pow( centerAlbedo, vec3( albedoExp ) ).toVar();
 
-				Loop( { start: int( 0 ), end: effectiveSamples, type: 'int', condition: '<' }, ( { i } ) => {
+					const totalR = float( 0.0 ).toVar();
+					const totalG = float( 0.0 ).toVar();
+					const totalB = float( 0.0 ).toVar();
+					const weightSumR = float( 0.0 ).toVar();
+					const weightSumG = float( 0.0 ).toVar();
+					const weightSumB = float( 0.0 ).toVar();
 
-					const sampleData = _samplesU.element( i );
-					const sx = sampleData.x.toVar();
-					const sy = sampleData.y.toVar();
-					const sr = sampleData.z.toVar();
+					Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
-					const viewOffset = Trot.mul( sx ).add( Brot.mul( sy ) ).mul( sampleWorldStep );
-					const viewSamplePos = centerViewPos.add( viewOffset );
-					const clipPos = _cameraProjectionMatrix.mul( vec4( viewSamplePos, 1.0 ) );
-					const ndc = clipPos.xy.div( clipPos.w );
-					const sampleUV = clamp( ndc.mul( 0.5 ).add( 0.5 ), vec2( 0.0 ), vec2( 1.0 ) );
+						const sampleData = _samplesU.element( i );
+						const sx = sampleData.x.toVar();
+						const sy = sampleData.y.toVar();
+						const sr = sampleData.z.toVar();
 
-					const sampledColor = sampleColor( sampleUV );
-					const sampledDepth = sampleDepth( sampleUV ).toVar();
-					const sampledAlbedo = max( sampleAlbedo( sampleUV ), vec3( ALBEDO_EPS ) ).toVar();
-					const sampleViewPos = getViewPos( sampledDepth, sampleUV ).toVar();
+						const viewOffset = Trot.mul( sx ).add( Brot.mul( sy ) ).mul( sampleWorldStep );
+						const viewSamplePos = centerViewPos.add( viewOffset );
+						const clipPos = _cameraProjectionMatrix.mul( vec4( viewSamplePos, 1.0 ) );
+						const ndc = clipPos.xy.div( clipPos.w );
+						const sampleUV = clamp( ndc.mul( 0.5 ).add( 0.5 ), vec2( 0.0 ), vec2( 1.0 ) );
 
-					const sampleFF = computeFogFactor( sampleViewPos.z.negate() );
-					const sampledColorDefogged = defog( sampledColor.rgb, sampleFF );
-					const inFactorSample = pow( sampledAlbedo, vec3( albedoExp ) );
-					const irradiance = sampledColorDefogged.div( inFactorSample ).toVar();
+						const sampledColor = sampleColor( sampleUV );
+						const sampledDepth = sampleDepth( sampleUV ).toVar();
+						const sampledAlbedo = max( sampleAlbedo( sampleUV ), vec3( ALBEDO_EPS ) ).toVar();
+						const sampleViewPos = getViewPos( sampledDepth, sampleUV ).toVar();
 
-					const worldR = sr.div( sMin ).toVar();
-					const dx = centerViewPos.x.sub( sampleViewPos.x );
-					const dy = centerViewPos.y.sub( sampleViewPos.y );
-					const dz = centerViewPos.z.sub( sampleViewPos.z );
-					const worldDist = sqrt( dx.mul( dx ).add( dy.mul( dy ) ).add( dz.mul( dz ) ) );
-					const depthDiff = abs( centerViewPos.z.sub( sampleViewPos.z ) ).toVar();
-					const d = max( worldDist, 0.00001 ).toVar();
+						const sampleFF = computeFogFactor( sampleViewPos.z.negate() );
+						const sampledColorDefogged = defog( sampledColor.rgb, sampleFF );
+						const inFactorSample = pow( sampledAlbedo, vec3( albedoExp ) );
+						const irradiance = sampledColorDefogged.div( inFactorSample ).toVar();
 
-					const wR = evalWeight( d, sR ).toVar();
-					const wG = evalWeight( d, sG ).toVar();
-					const wB = evalWeight( d, sB ).toVar();
+						const worldR = sr.div( sMin ).toVar();
+						const dx = centerViewPos.x.sub( sampleViewPos.x );
+						const dy = centerViewPos.y.sub( sampleViewPos.y );
+						const dz = centerViewPos.z.sub( sampleViewPos.z );
+						const worldDist = sqrt( dx.mul( dx ).add( dy.mul( dy ) ).add( dz.mul( dz ) ) );
+						const depthDiff = abs( centerViewPos.z.sub( sampleViewPos.z ) ).toVar();
+						const d = max( worldDist, 0.00001 ).toVar();
 
-					const valid = depthDiff
-						.lessThan( worldR.mul( 2.0 ) )
-						.and( sampledDepth.lessThan( 1.0 ) )
-						.select( 1.0, 0.0 )
-						.toVar();
+						const wR = evalWeight( d, sR ).toVar();
+						const wG = evalWeight( d, sG ).toVar();
+						const wB = evalWeight( d, sB ).toVar();
 
-					const vR = wR.mul( valid ).toVar();
-					const vG = wG.mul( valid ).toVar();
-					const vB = wB.mul( valid ).toVar();
+						const valid = depthDiff
+							.lessThan( worldR.mul( 2.0 ) )
+							.and( sampledDepth.lessThan( 1.0 ) )
+							.select( 1.0, 0.0 )
+							.toVar();
 
-					totalR.addAssign( vR.mul( irradiance.r ) );
-					totalG.addAssign( vG.mul( irradiance.g ) );
-					totalB.addAssign( vB.mul( irradiance.b ) );
-					weightSumR.addAssign( vR );
-					weightSumG.addAssign( vG );
-					weightSumB.addAssign( vB );
+						const vR = wR.mul( valid ).toVar();
+						const vG = wG.mul( valid ).toVar();
+						const vB = wB.mul( valid ).toVar();
+
+						totalR.addAssign( vR.mul( irradiance.r ) );
+						totalG.addAssign( vG.mul( irradiance.g ) );
+						totalB.addAssign( vB.mul( irradiance.b ) );
+						weightSumR.addAssign( vR );
+						weightSumG.addAssign( vG );
+						weightSumB.addAssign( vB );
+
+					} );
+
+					const blurredIrradiance = vec3(
+						totalR.div( max( weightSumR, 0.00001 ) ),
+						totalG.div( max( weightSumG, 0.00001 ) ),
+						totalB.div( max( weightSumB, 0.00001 ) ),
+					);
+					// Disney Diffuse Fresnel transmission at the exit point in the view direction [Burley 2015].
+					// F_dt(v) = 1 - 0.5 * (1 - |n·v|)^5 — models light refracting out of the surface.
+					const viewDir = normalize( centerViewPos.negate() );
+					const NdotV = abs( dot( centerNormal, viewDir ) );
+					const Fdt = float( 1.0 ).sub( float( 0.5 ).mul( pow( float( 1.0 ).sub( NdotV ), float( 5.0 ) ) ) );
+					const blurred = blurredIrradiance.mul( outFactor ).mul( pixelScatteringColor ).mul( Fdt );
+					const blendedColor = mix( centerColorDefogged, blurred, pixelStrength );
+
+					const diff = blurred.sub( centerColorDefogged ).mul( 20.0 ).add( 0.5 );
+					const depthVis = vec3( linearDepth.div( 10.0 ) );
+					const weightsMax = max( weightSumR, max( weightSumG, weightSumB ) ).add( 0.0001 );
+					const weightsVis = vec3(
+						weightSumR.div( weightsMax ),
+						weightSumG.div( weightsMax ),
+						weightSumB.div( weightsMax ),
+					);
+					const albedoVis = centerAlbedo;
+
+					const rawOut = outputMode
+						.greaterThan( 4.5 )
+						.select(
+							albedoVis,
+							outputMode.greaterThan( 3.5 ).select(
+								weightsVis,
+								outputMode.greaterThan( 2.5 ).select(
+									depthVis,
+									outputMode.greaterThan( 1.5 ).select( blurred, outputMode.greaterThan( 0.5 ).select( diff, blendedColor ) ),
+								),
+							),
+						);
+
+					// Re-apply fog at the center pixel's depth after the blur.
+					const foggedOut = mix( rawOut, fogColorUniform, centerFF );
+					result.assign( vec4( foggedOut, centerColor.a ) );
 
 				} );
-
-				const blurredIrradiance = vec3(
-					totalR.div( max( weightSumR, 0.00001 ) ),
-					totalG.div( max( weightSumG, 0.00001 ) ),
-					totalB.div( max( weightSumB, 0.00001 ) ),
-				);
-				// Disney Diffuse Fresnel transmission at the exit point in the view direction [Burley 2015].
-				// F_dt(v) = 1 - 0.5 * (1 - |n·v|)^5 — models light refracting out of the surface.
-				const viewDir = normalize( centerViewPos.negate() );
-				const NdotV = abs( dot( centerNormal, viewDir ) );
-				const Fdt = float( 1.0 ).sub( float( 0.5 ).mul( pow( float( 1.0 ).sub( NdotV ), float( 5.0 ) ) ) );
-				const blurred = blurredIrradiance.mul( outFactor ).mul( pixelScatteringColor ).mul( Fdt );
-				const blendedColor = mix( centerColorDefogged, blurred, effectiveStrength );
-
-				const diff = blurred.sub( centerColorDefogged ).mul( 20.0 ).add( 0.5 );
-				const depthVis = vec3( linearDepth.div( 10.0 ) );
-				const weightsMax = max( weightSumR, max( weightSumG, weightSumB ) ).add( 0.0001 );
-				const weightsVis = vec3(
-					weightSumR.div( weightsMax ),
-					weightSumG.div( weightsMax ),
-					weightSumB.div( weightsMax ),
-				);
-				const albedoVis = centerAlbedo;
-
-				const rawOut = outputMode
-					.greaterThan( 4.5 )
-					.select(
-						albedoVis,
-						outputMode.greaterThan( 3.5 ).select(
-							weightsVis,
-							outputMode.greaterThan( 2.5 ).select(
-								depthVis,
-								outputMode.greaterThan( 1.5 ).select( blurred, outputMode.greaterThan( 0.5 ).select( diff, blendedColor ) ),
-							),
-						),
-					);
-
-				// Re-apply fog at the center pixel's depth after the blur.
-				const foggedOut = mix( rawOut, fogColorUniform, centerFF );
-				result.assign( vec4( foggedOut, centerColor.a ) );
 
 			} );
 
