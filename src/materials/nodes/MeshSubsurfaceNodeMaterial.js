@@ -32,15 +32,29 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		this.isMeshSubsurfaceNodeMaterial = true;
 
 		/**
-		 * Per-channel scattering radius in world units (r, g, b).
-		 * Larger values produce more translucency on each channel.
+		 * Main artistic SSS control. Each channel is an independent blur radius in world units,
+		 * so it drives both the *size* and *color* of the scatter simultaneously: a larger value
+		 * on a channel makes that wavelength bleed further under the surface, and the ratio
+		 * between channels sets the apparent scatter color.
+		 *
+		 * The default `(0.5, 0.08, 0.03)` is human skin: red blurs ~6× wider than green, which
+		 * is what makes a backlit ear glow red. Equal values (e.g. `(0.3, 0.3, 0.3)`) produce
+		 * a neutral grey glow with no chromatic character.
+		 *
+		 * Tune by looking at thin backlit areas (ear tips, fingers): scale all channels up/down
+		 * to control radius, adjust the ratio between channels to shift the scatter color.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
 		this.scatteringDistanceNode = uniform( new Color( 0.5, 0.08, 0.03 ) );
 
 		/**
-		 * Optional artistic tint multiplied onto the blurred result.
+		 * Secondary color correction, applied as a multiply on the already-blurred result.
+		 * Does not affect blur radius or profile shape — use it only to nudge the scatter hue
+		 * after dialing in `scatteringDistanceNode`. Defaults to `(1, 1, 1)` (no effect).
+		 *
+		 * Useful when the per-channel blur widths give the right translucency feel but the
+		 * resulting color needs a slight warm or cool shift without widening any channel.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */

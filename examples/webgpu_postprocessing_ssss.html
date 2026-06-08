@@ -74,11 +74,7 @@
 				camera.position.set( 0, 0, 6 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaaaaa );
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
-				scene.environmentIntensity = 0.2;
+				scene.background = new THREE.Color( 0x111111 );
 
 				// controls
 
@@ -87,14 +83,16 @@
 
 				// lights
 
-				const keyLight = new THREE.SpotLight( 0xfff0e0, 60, 0, 0.5, 0.4 );
+				const keyLight = new THREE.SpotLight( 0xffffff, 60, 0, 0.5, 0.4 );
 				keyLight.position.set( 4, 3, 3 );
 				keyLight.castShadow = true;
-				keyLight.shadow.mapSize.set( 2048, 2048 );
+				keyLight.shadow.mapSize.set( 1024, 1024 );
 				keyLight.shadow.bias = - 0.0001;
 				scene.add( keyLight );
 
-				scene.add( new THREE.AmbientLight( 0x404060, 0.5 ) );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environmentIntensity = 0.2;
 
 				// shell
 
@@ -115,8 +113,8 @@
 					roughness: 0.6,
 					metalness: 0.0,
 				} );
-				shellMaterial.scatteringDistanceNode.value.set( 0.25, 0.18, 0.12 );
-				shellMaterial.scatteringColorNode.value.set( 0xFFE6CC );
+				shellMaterial.scatteringDistanceNode.value.set( 0.45, 0.35, 0.22 );
+				shellMaterial.scatteringColorNode.value.set( 0xFFFFFF );
 				shellMaterial.strengthNode.value = 0.7;
 				shellMaterial.texturingModeNode.value = TEXTURING_MODE.NONE; // flat color, no albedo demodulation needed
 
