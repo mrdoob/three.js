@@ -288,10 +288,15 @@ class SSSSNode extends TempNode {
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 
 		/**
+		 * Packed projection matrix elements for cheap view-space position reconstruction.
+		 * _projDepthParams: [p22, p23, p32, p33] — used to recover view-Z from NDC depth.
+		 *   p32 = -1 (perspective) or 0 (orthographic) drives the unified formula.
+		 * _projScaleXY: [1/p00, 1/p11] — precomputed reciprocals to recover view-X/Y.
+		 * Works for any standard symmetric perspective or orthographic camera.
 		 * @private
-		 * @type {UniformNode<mat4>}
 		 */
-		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+		this._projDepthParams = uniform( new Vector4() );
+		this._projScaleXY = uniform( new Vector2() );
 
 		const allSamples = _precomputeSamples( _MAX_SAMPLES );
 
@@ -519,7 +524,9 @@ class SSSSNode extends TempNode {
 		this._projScale.value = 0.5 * size.height * this._camera.projectionMatrix.elements[ 5 ];
 		this._cameraNear.value = this._camera.near;
 		this._cameraProjectionMatrix.value.copy( this._camera.projectionMatrix );
-		this._cameraProjectionMatrixInverse.value.copy( this._camera.projectionMatrixInverse );
+		const pe = this._camera.projectionMatrix.elements;
+		this._projDepthParams.value.set( pe[ 10 ], pe[ 14 ], pe[ 11 ], pe[ 15 ] );
+		this._projScaleXY.value.set( 1 / pe[ 0 ], 1 / pe[ 5 ] );
 
 		if ( this._sssBufferNeedsRebuild ) this._rebuildSSSBuffer();
 		this._syncSSSBuffer();
@@ -545,7 +552,7 @@ class SSSSNode extends TempNode {
 		const { samples, outputMode } = this;
 		const { fogType, fogNear, fogFar, fogDensity } = this;
 		const fogColorUniform = this.fogColor;
-		const { _lowResolution, _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _cameraProjectionMatrixInverse, _samplesU, _noiseNode } = this;
+		const { _lowResolution, _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _projDepthParams, _projScaleXY, _samplesU, _noiseNode } = this;
 		const maxR = this._maxR;
 
 		const sampleColor = ( uvCoord ) => colorNode.sample( uvCoord );
@@ -554,14 +561,15 @@ class SSSSNode extends TempNode {
 
 		const getViewPos = ( depthVal, coordVal ) => {
 
-			const z = depthVal.mul( 2.0 ).sub( 1.0 );
-			const clipPos = vec4( coordVal.mul( 2.0 ).sub( 1.0 ), z, 1.0 );
-			const viewPos = _cameraProjectionMatrixInverse.mul( clipPos );
-			return viewPos.xyz.div( viewPos.w );
+			const ndc = coordVal.mul( 2.0 ).sub( 1.0 );
+			const ndcZ = depthVal.mul( 2.0 ).sub( 1.0 );
+			// Unified formula valid for both perspective (p32=-1, p33=0) and
+			// orthographic (p32=0, p33=1) cameras.
+			const vz = _projDepthParams.y.sub( ndcZ.mul( _projDepthParams.w ) ).div( ndcZ.mul( _projDepthParams.z ).sub( _projDepthParams.x ) );
+			const clipW = _projDepthParams.z.mul( vz ).add( _projDepthParams.w );
+			return vec3( ndc.x.mul( clipW ).mul( _projScaleXY.x ), ndc.y.mul( clipW ).mul( _projScaleXY.y ), vz );
 
 		};
-
-		const evalWeight = ( d, s ) => exp( s.mul( d ).negate() ).add( exp( s.mul( d ).div( 3.0 ).negate() ) );
 
 		// Returns fog factor in [0,1]: 0 = no fog, 1 = full fog.
 		const computeFogFactor = ( depth ) => {
@@ -664,13 +672,18 @@ class SSSSNode extends TempNode {
 
 						const sampledColor = sampleColor( sampleUV );
 						const sampledDepth = sampleDepth( sampleUV ).toVar();
-						const sampledAlbedo = max( sampleAlbedo( sampleUV ), vec3( ALBEDO_EPS ) ).toVar();
 						const sampleViewPos = getViewPos( sampledDepth, sampleUV ).toVar();
 
 						const sampleFF = computeFogFactor( sampleViewPos.z.negate() );
 						const sampledColorDefogged = defog( sampledColor.rgb, sampleFF );
-						const inFactorSample = pow( sampledAlbedo, vec3( albedoExp ) );
-						const irradiance = sampledColorDefogged.div( inFactorSample ).toVar();
+						const irradiance = sampledColorDefogged.toVar();
+
+						If( albedoExp.greaterThan( 0.0 ), () => {
+
+							const sampledAlbedo = max( sampleAlbedo( sampleUV ), vec3( ALBEDO_EPS ) );
+							irradiance.assign( sampledColorDefogged.div( pow( sampledAlbedo, vec3( albedoExp ) ) ) );
+
+						} );
 
 						const worldR = sr.div( sMin ).toVar();
 						const dx = centerViewPos.x.sub( sampleViewPos.x );
@@ -680,9 +693,8 @@ class SSSSNode extends TempNode {
 						const depthDiff = abs( centerViewPos.z.sub( sampleViewPos.z ) ).toVar();
 						const d = max( worldDist, 0.00001 ).toVar();
 
-						const wR = evalWeight( d, sR ).toVar();
-						const wG = evalWeight( d, sG ).toVar();
-						const wB = evalWeight( d, sB ).toVar();
+						const sd = vec3( sR, sG, sB ).mul( d );
+						const w = exp( sd.negate() ).add( exp( sd.div( 3.0 ).negate() ) );
 
 						const valid = depthDiff
 							.lessThan( worldR.mul( 2.0 ) )
@@ -690,16 +702,14 @@ class SSSSNode extends TempNode {
 							.select( 1.0, 0.0 )
 							.toVar();
 
-						const vR = wR.mul( valid ).toVar();
-						const vG = wG.mul( valid ).toVar();
-						const vB = wB.mul( valid ).toVar();
+						const v = w.mul( valid );
 
-						totalR.addAssign( vR.mul( irradiance.r ) );
-						totalG.addAssign( vG.mul( irradiance.g ) );
-						totalB.addAssign( vB.mul( irradiance.b ) );
-						weightSumR.addAssign( vR );
-						weightSumG.addAssign( vG );
-						weightSumB.addAssign( vB );
+						totalR.addAssign( v.x.mul( irradiance.r ) );
+						totalG.addAssign( v.y.mul( irradiance.g ) );
+						totalB.addAssign( v.z.mul( irradiance.b ) );
+						weightSumR.addAssign( v.x );
+						weightSumG.addAssign( v.y );
+						weightSumB.addAssign( v.z );
 
 					} );
 
