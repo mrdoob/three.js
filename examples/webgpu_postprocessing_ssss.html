@@ -208,16 +208,16 @@
 				};
 
 				const headFolder = renderer.inspector.createParameters( 'Head' );
+				headFolder.add( head.material.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
 				headFolder.add( head.material.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
 				headFolder.addColor( head.material.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
 				headFolder.addColor( head.material.scatteringColorNode, 'value' ).name( 'scattering color' );
-				headFolder.add( head.material.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
 
 				const shellFolder = renderer.inspector.createParameters( 'Shell' );
+				shellFolder.add( shellMaterial.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
 				shellFolder.add( shellMaterial.texturingModeNode, 'value', texturingModeOptions ).name( 'texturing mode' );
 				shellFolder.addColor( shellMaterial.scatteringDistanceNode, 'value' ).name( 'scattering distance' );
 				shellFolder.addColor( shellMaterial.scatteringColorNode, 'value' ).name( 'scattering color' );
-				shellFolder.add( shellMaterial.strengthNode, 'value', 0, 1, 0.01 ).name( 'strength' );
 
 				// events
 

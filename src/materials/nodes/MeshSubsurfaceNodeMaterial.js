@@ -6,9 +6,7 @@ import { Color } from '../../math/Color.js';
 
 /**
  * A standard node material that opts into screen-space subsurface scattering
- * when used with {@link SSSSNode}. Pass the scene to `subsurfaceScattering()` and
- * SSSSNode will discover, register, and track this material automatically via
- * scene graph events — no manual registration needed.
+ * when used with {@link SSSSNode}.
  *
  * Call `dispose()` when the material is no longer needed.
  *
@@ -49,7 +47,7 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		this.scatteringColorNode = uniform( new Color( 1, 1, 1 ) );
 
 		/**
-		 * Blend factor between the original and blurred color.
+		 * Subsurface scattering strength. 0 = none, 1 = full. Expected range is [0, 1].
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -57,12 +55,22 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 
 		/**
 		 * Albedo-SSS interaction mode. Values match SSSSNode.TEXTURING_MODE:
-		 * 0 = POST_SCATTER, 1 = PRE_AND_POST_SCATTER, 2 = NONE.
+		 *
+		 * - `NONE` (0): `blur(color)` — blurs the lit color directly. Use for surfaces without
+		 *   a meaningful albedo texture (constant-color materials, metallic surfaces, debug
+		 *   scenarios).
+		 * - `PRE_AND_POST_SCATTER` (1): `sqrt(albedo) * blur(color / sqrt(albedo))` — albedo
+		 *   partially bleeds into the blur, tinting the scattered light with the surface color.
+		 *   Use when strong pigmentation (birthmarks, bruises, tattoos) should influence the
+		 *   subsurface color, or for stylised/painterly skin where a softer texture boundary
+		 *   is desirable.
+		 * - `POST_SCATTER` (2): `albedo * blur(color / albedo)` — preserves high-frequency
+		 *   albedo detail; recommended for scanned skin textures.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 1 (PRE_AND_POST_SCATTER)
+		 * @default 2 (POST_SCATTER)
 		 */
-		this.texturingModeNode = uniform( 1 );
+		this.texturingModeNode = uniform( 2 );
 
 		/**
 		 * Slot index in the shared SSS parameter buffer, written into `albedo.a`
@@ -71,14 +79,14 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.sssSlotNode = uniform( 0 );
+		this.subsurfaceSlotNode = uniform( 0 );
 
 	}
 
 	setup( builder ) {
 
 		this.mrtNode = mrt( {
-			albedo: vec4( diffuseColor.rgb, this.sssSlotNode ),
+			albedo: vec4( diffuseColor.rgb, this.subsurfaceSlotNode ),
 		} );
 
 		super.setup( builder );
@@ -91,7 +99,7 @@ class MeshSubsurfaceNodeMaterial extends MeshStandardNodeMaterial {
 		this.scatteringColorNode = source.scatteringColorNode;
 		this.strengthNode = source.strengthNode;
 		this.texturingModeNode = source.texturingModeNode;
-		// sssSlotNode is NOT copied — each instance owns its own slot
+		// subsurfaceSlotNode is NOT copied — each instance owns its own slot
 
 		return super.copy( source );
 

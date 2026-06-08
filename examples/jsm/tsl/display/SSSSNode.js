@@ -76,24 +76,37 @@ function _generateNoiseTexture( size = 64 ) {
 }
 
 const TEXTURING_MODE = {
-	POST_SCATTER: 0, // albedoExp = 1.0 — full albedo demodulation
-	PRE_AND_POST_SCATTER: 1, // albedoExp = 0.5 — sqrt albedo demodulation
-	NONE: 2, // albedoExp = 0.0 — blur lit color directly
+	NONE: 0,
+	PRE_AND_POST_SCATTER: 1,
+	POST_SCATTER: 2,
 };
 
 /**
  * Screen-space subsurface scattering (SSSS) post-processing node.
  *
  * Blurs the lit scene color using a Burley normalized diffusion profile sampled
- * in screen space, with optional albedo-aware texturing modes (Unity HDRP-style):
- *
- * - `POST_SCATTER`: `albedo * blur(color / albedo)` — preserves high-frequency
- *   albedo detail; recommended for scanned skin textures.
- * - `PRE_AND_POST_SCATTER`: `sqrt(albedo) * blur(color / sqrt(albedo))`.
- * - `NONE`: `blur(color)` — blurs the lit color directly.
+ * in screen space, with optional albedo-aware texturing modes.
  *
  * Requires the scene to be rendered with an MRT that exposes a separate
  * albedo attachment (rgb = base color, a = SSS mask: 1 = SSS on, 0 = skip).
+ *
+ * ```js
+ * const renderPipeline = new RenderPipeline( renderer );
+ * const scenePass = pass( scene, camera );
+ * scenePass.setMRT( mrt( {
+ * 	output: output,
+ * 	albedo: metalness.mix( vec4( 0 ), vec4( diffuseColor.rgb, 1 ) ),
+ * } ) );
+ *
+ * const sss = subsurfaceScattering(
+ * 	scenePass.getTextureNode( 'output' ),
+ * 	scenePass.getTextureNode( 'depth' ),
+ * 	scenePass.getTextureNode( 'albedo' ),
+ * 	camera, scene
+ * );
+ *
+ * renderPipeline.outputNode = sss.getTextureNode();
+ * ```
  *
  * References:
  * - {@link https://advances.realtimerendering.com/s2018/Efficient%20screen%20space%20subsurface%20scattering%20Siggraph%202018.pdf}
@@ -422,7 +435,7 @@ class SSSSNode extends TempNode {
 		const slot = reusingSlot ? this._freeSSSSlots.pop() : this._sssSlots.length;
 		this._sssSlots[ slot ] = material;
 		this._materialSlots.set( material, slot );
-		material.sssSlotNode.value = slot;
+		material.subsurfaceSlotNode.value = slot;
 		material.addEventListener( 'dispose', () => this._unregisterSSS( material ) );
 		if ( ! reusingSlot ) this._sssBufferNeedsRebuild = true;
 
@@ -435,7 +448,7 @@ class SSSSNode extends TempNode {
 		this._sssSlots[ slot ] = null;
 		this._materialSlots.delete( material );
 		this._freeSSSSlots.push( slot );
-		material.sssSlotNode.value = 0;
+		material.subsurfaceSlotNode.value = 0;
 
 	}
 
@@ -627,7 +640,7 @@ class SSSSNode extends TempNode {
 				const Brot = T.mul( sinA.negate() ).add( B.mul( cosA ) ).toVar();
 				const sampleWorldStep = radiusScale.mul( linearDepth ).div( _projScale ).toVar();
 
-				const albedoExp = float( 1.0 ).sub( pixelTexturingMode.mul( 0.5 ) ).toVar();
+				const albedoExp = pixelTexturingMode.mul( 0.5 ).toVar();
 				const outFactor = pow( centerAlbedo, vec3( albedoExp ) ).toVar();
 
 				const totalR = float( 0.0 ).toVar();
