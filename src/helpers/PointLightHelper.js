@@ -76,6 +76,8 @@ class PointLightHelper extends Mesh {
 	 */
 	update() {
 
+		this.matrixWorldNeedsUpdate = true;
+
 		this.light.updateWorldMatrix( true, false );
 
 		if ( this.color !== undefined ) {
