@@ -52,6 +52,20 @@ export class Style {
 		font-family: var(--font-family);
 	}
 
+	.profiler-toggle-graph {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+		pointer-events: none;
+		background: transparent;
+		border: none;
+		border-radius: inherit;
+		opacity: 0.5;
+	}
+
 	.profiler-toggle.position-right.panel-open {
 		right: auto;
 		left: 15px;
@@ -75,6 +89,7 @@ export class Style {
 
 	.toggle-icon {
 		position: relative;
+		z-index: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -143,6 +158,8 @@ export class Style {
 	}
 
 	.toggle-text {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		align-items: baseline;
 		padding: 8px 14px;
@@ -157,6 +174,8 @@ export class Style {
 	}
 
 	.builtin-tabs-container {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		align-items: stretch;
 		gap: 0;
