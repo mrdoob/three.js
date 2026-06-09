@@ -1,5 +1,6 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
+import { Graph } from './Graph.js';
 import { getItem, setItem } from '../Inspector.js';
 
 export class Profiler extends EventDispatcher {
@@ -341,6 +342,12 @@ export class Profiler extends EventDispatcher {
 			this.miniPanel.classList.add( 'position-right' );
 
 		}
+
+		// Create a background performance graph for the toggle button
+		this.toggleGraph = new Graph( 80 );
+		this.toggleGraph.addLine( 'fps', '#4c4c6bff' );
+		this.toggleGraph.domElement.className = 'profiler-toggle-graph';
+		this.toggleButton.appendChild( this.toggleGraph.domElement );
 
 	}
 
