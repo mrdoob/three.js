@@ -1489,6 +1489,14 @@ export class Style {
 		margin-bottom: 2px;
 	}
 
+	.mini-panel-content .list-container.parameters .list-children-container > .list-item-wrapper:first-child:has(> .list-item-row:not(.collapsible)) {
+		margin-top: 2px;
+	}
+
+	.mini-panel-content .list-container.parameters .list-children-container > .list-item-wrapper:last-child:has(> .list-item-row:not(.collapsible)) {
+		margin-bottom: 4px;
+	}
+
 	@media screen and (max-width: 450px) and (orientation: portrait) {
 
 		.console-filter-input {
