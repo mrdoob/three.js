@@ -245,9 +245,9 @@ class SSSSNode extends TempNode {
 		 * always stays full resolution.
 		 *
 		 * @type {number}
-		 * @default 0.5
+		 * @default 1
 		 */
-		this.resolutionScale = 0.5;
+		this.resolutionScale = 1;
 
 		/**
 		 * Whether to jitter the per-pixel sample rotation over time. Setting this

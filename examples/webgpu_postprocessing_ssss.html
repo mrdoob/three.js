@@ -180,6 +180,7 @@
 					scenePassColor, scenePassDepth, scenePassAlbedo, camera, scene,
 				);
 				subsurfaceScatteringPass.samples.value = 32;
+				subsurfaceScatteringPass.resolutionScale = 0.5; // running the blur at half the tap count is often sufficient
 				subsurfaceScatteringPass.jitter = true; // jitter the noise so TRAA can resolve it
 
 				const traaPass = traa( subsurfaceScatteringPass.getTextureNode(), scenePassDepth, scenePassVelocity, camera );
