@@ -12,6 +12,7 @@ var MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
 var MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 var MESSAGE_REGISTER = 'register';
 var MESSAGE_COMMITTED = 'committed';
+var MESSAGE_SET_MONITORING = 'set-monitoring';
 
 // Bridge/DevTools events
 var EVENT_REGISTER = 'register';

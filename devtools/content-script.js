@@ -7,6 +7,7 @@ const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
 const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
 const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
+const MESSAGE_SET_MONITORING = 'set-monitoring';
 
 // Helper to check if extension context is valid
 function isExtensionContextValid() {
@@ -53,7 +54,8 @@ function handleBackgroundMessage( message ) {
 		MESSAGE_REQUEST_OBJECT_DETAILS,
 		MESSAGE_SCROLL_TO_CANVAS,
 		MESSAGE_HIGHLIGHT_OBJECT,
-		MESSAGE_UNHIGHLIGHT_OBJECT
+		MESSAGE_UNHIGHLIGHT_OBJECT,
+		MESSAGE_SET_MONITORING
 	] );
 
 	if ( forwardableMessages.has( message.name ) ) {

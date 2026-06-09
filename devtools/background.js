@@ -1,4 +1,4 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_COMMITTED */
+/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_COMMITTED */
 
 importScripts( 'constants.js' );
 
@@ -32,7 +32,8 @@ chrome.runtime.onConnect.addListener( port => {
 		MESSAGE_REQUEST_OBJECT_DETAILS,
 		MESSAGE_SCROLL_TO_CANVAS,
 		MESSAGE_HIGHLIGHT_OBJECT,
-		MESSAGE_UNHIGHLIGHT_OBJECT
+		MESSAGE_UNHIGHLIGHT_OBJECT,
+		MESSAGE_SET_MONITORING
 	] );
 
 	// Listen for messages from the devtools panel
@@ -45,7 +46,11 @@ chrome.runtime.onConnect.addListener( port => {
 
 		} else if ( forwardableMessages.has( message.name ) && tabId ) {
 
-			chrome.tabs.sendMessage( tabId, message );
+			chrome.tabs.sendMessage( tabId, message ).catch( () => {
+
+				// Ignore error - content script might not be injected yet
+
+			} );
 
 		} else if ( tabId === undefined ) {
 
