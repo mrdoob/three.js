@@ -249,7 +249,7 @@ class Performance extends Tab {
 		//
 
 		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameStats.data[ 2 ], frame.gpu.toFixed( 2 ) );
+		setText( this.frameStats.data[ 2 ], inspector.getRenderer().backend.hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
 		setText( this.frameStats.data[ 3 ], frame.total.toFixed( 2 ) );
 
 		//
