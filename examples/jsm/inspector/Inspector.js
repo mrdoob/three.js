@@ -251,9 +251,28 @@ class Inspector extends RendererInspector {
 
 		//
 
-		if ( renderer.inspector.domElement.parentElement === null && renderer.domElement.parentElement !== null ) {
+		if ( renderer.inspector.domElement.parentElement === null ) {
 
-			renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+			if ( renderer.domElement.parentElement !== null ) {
+
+				renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+
+			} else {
+
+				const observer = new MutationObserver( () => {
+
+					if ( renderer.domElement.parentElement !== null ) {
+
+						renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+						observer.disconnect();
+
+					}
+
+				} );
+
+				observer.observe( document.body || document.documentElement, { childList: true, subtree: true } );
+
+			}
 
 		}
 
