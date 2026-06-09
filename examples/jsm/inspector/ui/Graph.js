@@ -35,8 +35,7 @@ export class Graph {
 
 		this.lines[ id ] = {
 			color: color,
-			resolvedColor: null,
-			transparentColor: null,
+			resolved: null,
 			points: []
 		};
 
@@ -116,20 +115,14 @@ export class Graph {
 			const line = this.lines[ id ];
 			if ( line.points.length === 0 ) continue;
 
-			if ( ! line.resolvedColor ) {
+			if ( ! line.resolved ) {
 
-				const res = this._resolveColor( line.color );
-
-				if ( res ) {
-
-					line.resolvedColor = res.color;
-					line.transparentColor = res.transparent;
-
-				}
+				line.resolved = this._resolveColor( line.color );
 
 			}
 
-			const drawColor = line.resolvedColor || '#ffffff';
+			const resolved = line.resolved;
+			const drawColor = resolved ? resolved.color : '#ffffff';
 			const offset = width - ( ( line.points.length - 1 ) * pointStep );
 
 			// 1. Draw fill (with opacity)
@@ -139,7 +132,7 @@ export class Graph {
 
 				const gradient = ctx.createLinearGradient( 0, 0, 0, height );
 				gradient.addColorStop( 0, drawColor );
-				gradient.addColorStop( 1, line.transparentColor || 'rgba(0,0,0,0)' );
+				gradient.addColorStop( 1, ( resolved && resolved.transparent ) || 'rgba(0,0,0,0)' );
 				fillStyle = gradient;
 
 			}
