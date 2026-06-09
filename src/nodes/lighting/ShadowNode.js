@@ -1,14 +1,15 @@
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import QuadMesh from '../../renderers/common/QuadMesh.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, vec4, int, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, vec4, int, Fn } from '../tsl/TSLCore.js';
 import { reference } from '../accessors/ReferenceNode.js';
-import { texture, textureLoad } from '../accessors/TextureNode.js';
+import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
@@ -18,9 +19,6 @@ import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
-import ChainMap from '../../renderers/common/ChainMap.js';
-import { textureSize } from '../accessors/TextureSizeNode.js';
-import { uv } from '../accessors/UV.js';
 import { positionLocal } from '../accessors/Position.js';
 import { uniform } from '../core/UniformNode.js';
 import { equirectDirection } from '../utils/EquirectUV.js';
@@ -619,7 +617,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			} else {
 
-				depthNode = textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).r;
+				depthNode = texture( this.shadowMap.depthTexture ).r;
 
 			}
 
