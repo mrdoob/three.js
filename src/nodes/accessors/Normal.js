@@ -3,7 +3,7 @@ import { cameraViewMatrix } from './Camera.js';
 import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 import { mat3, vec3, Fn, addMethodChaining } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
-import { directionToFaceDirection } from '../display/FrontFacingNode.js';
+import { negateOnBackSide } from '../display/FrontFacingNode.js';
 import { warn } from '../../utils.js';
 
 /**
@@ -102,7 +102,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		if ( builder.isFlatShading() !== true ) {
 
-			node = directionToFaceDirection( node );
+			node = negateOnBackSide( node );
 
 		}
 

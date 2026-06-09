@@ -116,6 +116,8 @@ class DirectionalLightHelper extends Object3D {
 	 */
 	update() {
 
+		this.matrixWorldNeedsUpdate = true;
+
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
 

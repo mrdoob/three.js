@@ -3,7 +3,7 @@ import { cameraWorldMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { tangentViewFrame } from './TangentUtils.js';
-import { directionToFaceDirection } from '../display/FrontFacingNode.js';
+import { negateOnBackSide } from '../display/FrontFacingNode.js';
 
 /**
  * TSL object that represents the tangent attribute of the current rendered object.
@@ -43,7 +43,7 @@ export const tangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.isFlatShading() !== true ) {
 
-		node = directionToFaceDirection( node );
+		node = negateOnBackSide( node );
 
 	}
 
