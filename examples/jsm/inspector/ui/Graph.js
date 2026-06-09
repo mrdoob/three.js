@@ -33,7 +33,14 @@ export class Graph {
 
 	addLine( id, color ) {
 
-		this.lines[ id ] = { color, points: [], resolvedColor: null };
+		const res = this._resolveColor( color );
+
+		this.lines[ id ] = {
+			color: color,
+			resolvedColor: res.color,
+			transparentColor: res.transparent,
+			points: []
+		};
 
 	}
 
@@ -111,17 +118,22 @@ export class Graph {
 			const line = this.lines[ id ];
 			if ( line.points.length === 0 ) continue;
 
-			if ( ! line.resolvedColor ) {
-
-				line.resolvedColor = this.resolveColor( line.color );
-
-			}
-
 			const drawColor = line.resolvedColor || '#ffffff';
 			const offset = width - ( ( line.points.length - 1 ) * pointStep );
 
 			// 1. Draw fill (with opacity)
-			ctx.fillStyle = drawColor;
+			let fillStyle = drawColor;
+
+			if ( height > 0 ) {
+
+				const gradient = ctx.createLinearGradient( 0, 0, 0, height );
+				gradient.addColorStop( 0, drawColor );
+				gradient.addColorStop( 1, line.transparentColor || 'rgba(0,0,0,0)' );
+				fillStyle = gradient;
+
+			}
+
+			ctx.fillStyle = fillStyle;
 			ctx.globalAlpha = 0.4;
 			ctx.beginPath();
 			ctx.moveTo( offset, height );
@@ -166,17 +178,53 @@ export class Graph {
 
 	}
 
-	resolveColor( color ) {
+	_resolveColor( color ) {
+
+		let resolved = color;
 
 		if ( color.startsWith( 'var(' ) ) {
 
 			const varName = color.slice( 4, - 1 ).trim();
-			const resolved = getComputedStyle( this.domElement ).getPropertyValue( varName ).trim();
-			return resolved || null;
+			resolved = getComputedStyle( this.domElement ).getPropertyValue( varName ).trim();
+
+			if ( ! resolved ) {
+
+				const defaults = {
+					'--color-fps': 'rgb(63, 81, 181)',
+					'--color-call': 'rgb(255, 185, 34)',
+					'--color-red': 'rgb(244, 67, 54)',
+					'--color-yellow': 'rgb(255, 193, 7)'
+				};
+
+				resolved = defaults[ varName ] || '#ffffff';
+
+			}
 
 		}
 
-		return color;
+		let transparentColor = 'rgba(0,0,0,0)';
+
+		if ( resolved.startsWith( '#' ) ) {
+
+			const hex = resolved.substring( 0, 7 );
+			transparentColor = hex + '00';
+
+		} else if ( resolved.startsWith( 'rgb' ) ) {
+
+			const match = resolved.match( /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/ );
+
+			if ( match ) {
+
+				transparentColor = `rgba(${match[ 1 ]}, ${match[ 2 ]}, ${match[ 3 ]}, 0)`;
+
+			}
+
+		}
+
+		return {
+			color: resolved,
+			transparent: transparentColor
+		};
 
 	}
 
