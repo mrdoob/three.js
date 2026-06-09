@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - PointLight ShadowMap</title>
+		<title>three.js webgpu - point light shadow-map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta property="og:title" content="three.js webgpu - PointLight ShadowMap">
 		<meta property="og:type" content="website">
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_shadowmap_pointlight.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_shadowmap_pointlight.jpg">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - PointLight ShadowMap
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>PointLight ShadowMap</span>
+			</div>
+
+			<small>Animated point light shadows.</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -28,11 +37,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer, stats;
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer;
 			let pointLight, pointLight2;
 
 			init();
@@ -114,15 +123,16 @@
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				// renderer.shadowMap.type = THREE.BasicShadowMap;
-				await renderer.init();
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 10, 0 );
 				controls.update();
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+
 
 				//
 
@@ -174,8 +184,6 @@
 				pointLight2.rotation.z = time;
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

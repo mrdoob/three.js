@@ -177,6 +177,7 @@ export const dynamicBufferAttribute = TSL.dynamicBufferAttribute;
 export const element = TSL.element;
 export const emissive = TSL.emissive;
 export const equal = TSL.equal;
+export const equirectDirection = TSL.equirectDirection;
 export const equirectUV = TSL.equirectUV;
 export const exp = TSL.exp;
 export const exp2 = TSL.exp2;
