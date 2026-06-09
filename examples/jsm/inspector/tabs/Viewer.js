@@ -89,6 +89,7 @@ class Viewer extends Tab {
 		// Container for full screen view
 		const fullViewerContainer = document.createElement( 'div' );
 		fullViewerContainer.className = 'full-viewer-container';
+		fullViewerContainer.style.touchAction = 'none';
 		this.content.appendChild( fullViewerContainer );
 
 		const nodes = new Item( 'User Defined' );
@@ -146,6 +147,7 @@ class Viewer extends Tab {
 		// Event forwarding setup for OrbitControls
 		this.isDraggingThumbnail = false;
 		this.activeSourceCanvas = null;
+		this.activePointerIds = new Set();
 
 		const handleGlobalPointer = ( e ) => {
 
@@ -166,8 +168,14 @@ class Viewer extends Tab {
 
 			if ( e.type === 'pointerup' || e.type === 'pointercancel' ) {
 
-				this.isDraggingThumbnail = false;
-				this.activeSourceCanvas = null;
+				this.activePointerIds.delete( e.pointerId );
+
+				if ( this.activePointerIds.size === 0 ) {
+
+					this.isDraggingThumbnail = false;
+					this.activeSourceCanvas = null;
+
+				}
 
 			}
 
@@ -200,6 +208,9 @@ class Viewer extends Tab {
 
 		super.hide();
 		this.maximizedByFullscreenButton = false;
+		this.isDraggingThumbnail = false;
+		this.activeSourceCanvas = null;
+		this.activePointerIds.clear();
 
 	}
 
@@ -219,6 +230,7 @@ class Viewer extends Tab {
 			wrapper.style.display = 'inline-block';
 			wrapper.style.width = '140px';
 			wrapper.style.height = '140px';
+			wrapper.style.touchAction = 'none';
 
 			// View full screen button
 			const viewBtn = document.createElement( 'button' );
@@ -288,6 +300,8 @@ class Viewer extends Tab {
 
 	setupEventForwarding( sourceCanvas ) {
 
+		sourceCanvas.style.touchAction = 'none';
+
 		const onPointerDown = ( e ) => {
 
 			const renderer = this.inspector.getRenderer();
@@ -298,6 +312,7 @@ class Viewer extends Tab {
 
 			this.isDraggingThumbnail = true;
 			this.activeSourceCanvas = sourceCanvas;
+			this.activePointerIds.add( e.pointerId );
 
 			// Project and dispatch pointerdown
 			this.forwardEvent( e, sourceCanvas, targetCanvas );

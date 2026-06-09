@@ -1774,6 +1774,10 @@ export class Style {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
+	.node-canvas-wrapper {
+		touch-action: none;
+	}
+
 	.node-canvas-wrapper .node-canvas-detach-btn {
 		position: absolute;
 		top: 5px;
@@ -1900,6 +1904,7 @@ export class Style {
 		height: 100%;
 		overflow: hidden;
 		position: relative;
+		touch-action: none;
 	}
 
 }
