@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import { nodeImmutable, float, Fn } from '../tsl/TSLBase.js';
+import { warnOnce } from '../../utils.js';
 
 import { BackSide, DoubleSide } from '../../constants.js';
 
@@ -83,7 +84,7 @@ export const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 
  * @param {Node<vec3>} direction - The direction vector to convert.
  * @returns {Node<vec3>} The converted direction vector.
  */
-export const directionToFaceDirection = /*@__PURE__*/ Fn( ( [ direction ], { material } ) => {
+export const negateOnBackSide = /*@__PURE__*/ Fn( ( [ direction ], { material } ) => {
 
 	const side = material.side;
 
@@ -100,3 +101,24 @@ export const directionToFaceDirection = /*@__PURE__*/ Fn( ( [ direction ], { mat
 	return direction;
 
 } );
+
+/**
+ * Converts a direction vector to a face direction vector based on the material's side.
+ *
+ * If the material is set to `BackSide`, the direction is inverted.
+ * If the material is set to `DoubleSide`, the direction is multiplied by `faceDirection`.
+ *
+ * @tsl
+ * @function
+ * @deprecated since r185. Use {@link negateOnBackSide} instead.
+ * @param {Node<vec3>} direction - The direction vector to convert.
+ * @returns {Node<vec3>} The converted direction vector.
+ */
+export const directionToFaceDirection = ( direction ) => {
+
+	warnOnce( 'TSL: "directionToFaceDirection()" has been renamed to "negateOnBackSide()".' ); // @deprecated r185
+
+	return negateOnBackSide( direction );
+
+};
+
