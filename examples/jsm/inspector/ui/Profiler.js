@@ -435,6 +435,7 @@ export class Profiler extends EventDispatcher {
 		if ( this.panel.classList.contains( 'maximized' ) ) {
 
 			this.panel.classList.remove( 'maximized' );
+			this.domElement.classList.remove( 'maximized' );
 
 			// Restore size based on current position
 			if ( this.position === 'bottom' ) {
@@ -465,6 +466,7 @@ export class Profiler extends EventDispatcher {
 			}
 
 			this.panel.classList.add( 'maximized' );
+			this.domElement.classList.add( 'maximized' );
 
 			// Maximize based on current position
 			if ( this.position === 'bottom' ) {
@@ -757,6 +759,7 @@ export class Profiler extends EventDispatcher {
 			if ( this.panel.classList.contains( 'maximized' ) ) {
 
 				this.panel.classList.remove( 'maximized' );
+				this.domElement.classList.remove( 'maximized' );
 				this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 
 			}
@@ -1569,8 +1572,8 @@ export class Profiler extends EventDispatcher {
 
 			}
 
-			// Count only non-detached tabs that come before this one
-			if ( ! t.isDetached ) {
+			// Count only non-detached, non-builtin tabs that come before this one
+			if ( ! t.isDetached && ! t.builtin ) {
 
 				insertIndex ++;
 

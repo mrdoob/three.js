@@ -38,7 +38,7 @@ class Console extends Tab {
 	buildHeader() {
 
 		const header = document.createElement( 'div' );
-		header.className = 'console-header';
+		header.className = 'toolbar';
 
 		const filterInput = document.createElement( 'input' );
 		filterInput.type = 'text';

@@ -37,8 +37,8 @@ export class Tab extends EventDispatcher {
 		this.button.textContent = title;
 
 		this.content = document.createElement( 'div' );
-		this.content.classList.add( `${this.id}-content` );
 		this.content.className = 'profiler-content';
+		this.content.classList.add( `${this.id}-content` );
 
 		this._isActive = false;
 		this.isVisible = true;
