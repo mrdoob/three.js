@@ -1160,12 +1160,14 @@ export class Style {
 		position: relative;
 	}
 
-	.graph-svg {
-		width: 100%;
+	.graph-svg, .graph-canvas {
+		width: 0;
+		min-width: 100%;
 		height: 80px;
 		background-color: var(--profiler-header);
 		border: 1px solid var(--profiler-border);
 		border-radius: 4px;
+		display: block;
 	}
 
 	.graph-path {
