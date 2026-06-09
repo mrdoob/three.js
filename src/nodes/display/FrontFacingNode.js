@@ -75,14 +75,18 @@ export const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
 export const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 1.0 );
 
 /**
- * Converts a direction vector to a face direction vector based on the material's side.
+ * Negates a direction or normal vector if the rendering occurs on the back side of a face,
+ * based on the material's side configuration.
  *
- * If the material is set to `BackSide`, the direction is inverted.
- * If the material is set to `DoubleSide`, the direction is multiplied by `faceDirection`.
+ * - If the material's side is `BackSide`, the direction is inverted (negated).
+ * - If the material's side is `DoubleSide`, the direction is multiplied by `faceDirection`
+ *   (negated only for back-facing fragments).
+ * - If the material's side is `FrontSide` (default), the direction remains unchanged.
  *
  * @tsl
- * @param {Node<vec3>} direction - The direction vector to convert.
- * @returns {Node<vec3>} The converted direction vector.
+ * @function
+ * @param {Node<vec3>} direction - The direction vector to process.
+ * @returns {Node<vec3>} The processed direction vector.
  */
 export const negateOnBackSide = /*@__PURE__*/ Fn( ( [ direction ], { material } ) => {
 
@@ -103,10 +107,13 @@ export const negateOnBackSide = /*@__PURE__*/ Fn( ( [ direction ], { material } 
 } );
 
 /**
- * Converts a direction vector to a face direction vector based on the material's side.
+ * Negates a direction or normal vector if the rendering occurs on the back side of a face,
+ * based on the material's side configuration.
  *
- * If the material is set to `BackSide`, the direction is inverted.
- * If the material is set to `DoubleSide`, the direction is multiplied by `faceDirection`.
+ * - If the material's side is `BackSide`, the direction is inverted (negated).
+ * - If the material's side is `DoubleSide`, the direction is multiplied by `faceDirection`
+ *   (negated only for back-facing fragments).
+ * - If the material's side is `FrontSide` (default), the direction remains unchanged.
  *
  * @tsl
  * @function
