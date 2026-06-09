@@ -33,12 +33,10 @@ export class Graph {
 
 	addLine( id, color ) {
 
-		const res = this._resolveColor( color );
-
 		this.lines[ id ] = {
 			color: color,
-			resolvedColor: res.color,
-			transparentColor: res.transparent,
+			resolvedColor: null,
+			transparentColor: null,
 			points: []
 		};
 
@@ -118,6 +116,19 @@ export class Graph {
 			const line = this.lines[ id ];
 			if ( line.points.length === 0 ) continue;
 
+			if ( ! line.resolvedColor ) {
+
+				const res = this._resolveColor( line.color );
+
+				if ( res ) {
+
+					line.resolvedColor = res.color;
+					line.transparentColor = res.transparent;
+
+				}
+
+			}
+
 			const drawColor = line.resolvedColor || '#ffffff';
 			const offset = width - ( ( line.points.length - 1 ) * pointStep );
 
@@ -189,14 +200,7 @@ export class Graph {
 
 			if ( ! resolved ) {
 
-				const defaults = {
-					'--color-fps': 'rgb(63, 81, 181)',
-					'--color-call': 'rgb(255, 185, 34)',
-					'--color-red': 'rgb(244, 67, 54)',
-					'--color-yellow': 'rgb(255, 193, 7)'
-				};
-
-				resolved = defaults[ varName ] || '#ffffff';
+				return null;
 
 			}
 
