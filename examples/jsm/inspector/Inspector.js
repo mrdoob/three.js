@@ -79,6 +79,11 @@ class Inspector extends RendererInspector {
 				needsUpdate: false,
 				duration: .02,
 				time: 0
+			},
+			toggleGraph: {
+				needsUpdate: false,
+				duration: .02,
+				time: 0
 			}
 		};
 
@@ -463,6 +468,7 @@ class Inspector extends RendererInspector {
 
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
+		this.updateCycle( this.displayCycle.toggleGraph );
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
@@ -470,6 +476,17 @@ class Inspector extends RendererInspector {
 
 			this.performance.updateText( this, frame );
 			this.memory.updateText( this );
+
+		}
+
+		if ( this.displayCycle.toggleGraph.needsUpdate ) {
+
+			if ( this.profiler.toggleGraph ) {
+
+				this.profiler.toggleGraph.addPoint( 'fps', this.fps );
+				this.profiler.toggleGraph.update();
+
+			}
 
 		}
 
@@ -482,6 +499,7 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
+		this.displayCycle.toggleGraph.needsUpdate = false;
 
 	}
 

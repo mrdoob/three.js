@@ -208,7 +208,8 @@ class Timeline extends Tab {
 		graphContainer.appendChild( this.graphSlider );
 
 		// Setup SVG from Graph
-		this.graph.domElement.style.width = '100%';
+		this.graph.domElement.style.width = '0';
+		this.graph.domElement.style.minWidth = '100%';
 		this.graph.domElement.style.height = '100%';
 		this.graphSlider.appendChild( this.graph.domElement );
 
