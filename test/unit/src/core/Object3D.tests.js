@@ -1033,6 +1033,7 @@ export default QUnit.module( 'Core', () => {
 			object.matrixWorld.identity();
 
 			object.matrixAutoUpdate = false;
+			object.matrixWorldNeedsUpdate = true;
 			object.updateWorldMatrix( true, false );
 
 			assert.deepEqual( object.matrix.elements,
