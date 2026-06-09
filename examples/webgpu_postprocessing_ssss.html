@@ -40,9 +40,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, diffuseColor, vec4 } from 'three/tsl';
+			import { pass, mrt, output, diffuseColor, vec4, velocity } from 'three/tsl';
 
 			import { subsurfaceScattering, TEXTURING_MODE } from 'three/addons/tsl/display/SSSSNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -57,7 +58,7 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.AgXToneMapping;
@@ -103,10 +104,10 @@
 
 				shell.rotation.y = Math.PI / 2;
 				shell.rotation.z = - Math.PI / 2;
-				shell.position.set( 1.5, 0.3, 0 );
+				shell.position.set( 1.5, 0.4, 0 );
 
 				const shellSize = new THREE.Box3().setFromObject( shell ).getSize( new THREE.Vector3() );
-				shell.scale.multiplyScalar( 2.5 / Math.max( shellSize.x, shellSize.y, shellSize.z ) );
+				shell.scale.multiplyScalar( 3 / Math.max( shellSize.x, shellSize.y, shellSize.z ) );
 
 				const shellMaterial = new THREE.MeshSubsurfaceNodeMaterial( {
 					color: 0xD9A68C,
@@ -138,14 +139,17 @@
 				const skinMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
 				skinMap.colorSpace = THREE.SRGBColorSpace;
 
+				const headMaterial = new THREE.MeshSubsurfaceNodeMaterial( {
+					map: skinMap,
+					roughness: 0.7,
+					metalness: 0.0,
+				} );
+				headMaterial.strengthNode.value = 0.7;
+
 				const headGltf = await loader.loadAsync( 'models/gltf/LeePerrySmith/LeePerrySmith.glb' );
 				const head = new THREE.Mesh(
 					headGltf.scene.children[ 0 ].geometry,
-					new THREE.MeshSubsurfaceNodeMaterial( {
-						map: skinMap,
-						roughness: 0.7,
-						metalness: 0.0,
-					} )
+					headMaterial
 				);
 				head.castShadow = true;
 				head.receiveShadow = true;
@@ -164,18 +168,23 @@
 					// a:   SSS slot index — 0 = skip blur (default for non-SSS objects);
 					//      MeshSubsurfaceNodeMaterial writes its auto-assigned slot here.
 					albedo: vec4( diffuseColor.rgb, 0.0 ),
+					velocity,
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassAlbedo = scenePass.getTextureNode( 'albedo' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
 				const subsurfaceScatteringPass = subsurfaceScattering(
 					scenePassColor, scenePassDepth, scenePassAlbedo, camera, scene,
 				);
 				subsurfaceScatteringPass.samples.value = 32;
+				subsurfaceScatteringPass.jitter = true; // jitter the noise so TRAA can resolve it
 
-				renderPipeline.outputNode = subsurfaceScatteringPass.getTextureNode();
+				const traaPass = traa( subsurfaceScatteringPass.getTextureNode(), scenePassDepth, scenePassVelocity, camera );
+
+				renderPipeline.outputNode = traaPass;
 
 				// gui
 
@@ -183,7 +192,7 @@
 
 				gui.add( { enabled: true }, 'enabled' ).name( 'enabled' ).onChange( ( value ) => {
 
-					renderPipeline.outputNode = value ? subsurfaceScatteringPass.getTextureNode() : scenePassColor;
+					renderPipeline.outputNode = value ? traaPass : scenePassColor;
 					renderPipeline.needsUpdate = true;
 
 				} );
@@ -197,7 +206,7 @@
 					'Albedo': 5,
 				} ).name( 'output' );
 				gui.add( subsurfaceScatteringPass.samples, 'value', 4, 64, 1 ).name( 'samples' );
-				gui.add( subsurfaceScatteringPass, 'resolutionScale', 0.1, 1.0, 0.01 ).name( 'resolution' );
+				gui.add( subsurfaceScatteringPass, 'jitter' ).name( 'jitter' );
 
 				const texturingModeOptions = {
 					'Post-Scatter': TEXTURING_MODE.POST_SCATTER,

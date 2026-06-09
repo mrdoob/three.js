@@ -9,6 +9,16 @@ let _rendererState;
 const _GOLDEN_RATIO = ( 1 + Math.sqrt( 5 ) ) / 2;
 const _MAX_SAMPLES = 64;
 
+/**
+ * Numerically inverts the Burley normalized diffusion CDF using Halley's method.
+ * Used to importance-sample the diffusion profile by mapping uniform random
+ * values to radial distances.
+ *
+ * @param {number} u - Uniform sample in (0, 1).
+ * @param {number} s - Burley shape parameter (controls falloff width).
+ * @param {number} [iterations=12] - Number of Halley iterations.
+ * @returns {number} Radial distance r such that CDF(r) ≈ u.
+ */
 function _invertBurleyCDF( u, s, iterations = 12 ) {
 
 	let r = - Math.log( Math.max( 1 - u, 1e-10 ) ) / s;
@@ -33,6 +43,14 @@ function _invertBurleyCDF( u, s, iterations = 12 ) {
 
 }
 
+/**
+ * Precomputes a Fibonacci-spiral disk of importance-sampled Burley diffusion
+ * profile offsets. Each entry is a `Vector3(x, y, r)` where `(x, y)` is the
+ * unit-disk direction and `r` is the radial distance drawn from the profile CDF.
+ *
+ * @param {number} numSamples - Number of samples to generate.
+ * @returns {Vector3[]} Array of sample offsets.
+ */
 function _precomputeSamples( numSamples ) {
 
 	const s = 1.0;
@@ -51,7 +69,19 @@ function _precomputeSamples( numSamples ) {
 
 }
 
-function _generateNoiseTexture( size = 64 ) {
+/**
+ * Generates a tiling texture of random 2D unit vectors (cos θ, sin θ) used to
+ * rotate the sample disk per pixel, breaking up structured blur patterns.
+ *
+ * This is the "random kernel rotations" optimization from the Optimizations
+ * section of [Golubev 2018]. It trades structured undersampling artifacts for
+ * less objectionable noise, which a temporal resolve (e.g. `TRAANode`, enabled
+ * via the {@link SSSSNode#jitter} flag) cleans up over successive frames.
+ *
+ * @param {number} [size=64] - Width and height of the square texture in texels.
+ * @returns {DataTexture} RGBA Float texture with rotation vectors in the RG channels.
+ */
+function _generateWhiteNoiseTexture( size = 64 ) {
 
 	const data = new Float32Array( size * size * 4 );
 
@@ -123,8 +153,6 @@ class SSSSNode extends TempNode {
 
 	}
 
-	static TEXTURING_MODE = TEXTURING_MODE;
-
 	/**
 	 * Constructs a new SSSS node.
 	 *
@@ -152,8 +180,8 @@ class SSSSNode extends TempNode {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
-		 * Maximum blur samples per pixel. The actual count scales down
-		 * with the LOD factor for small screen-space disks.
+		 * Maximum blur samples per pixel. The effective tap count used each frame is
+		 * this value scaled by {@link SSSSNode#resolutionScale}.
 		 *
 		 * @type {UniformNode<int>}
 		 * @default 32
@@ -210,13 +238,28 @@ class SSSSNode extends TempNode {
 		this.fogDensity = uniform( 0.025 );
 
 		/**
-		 * Fraction of full resolution at which the SSS blur runs.
-		 * Values below 1 trade quality for performance.
+		 * Performance knob in the range `(0, 1]`. Scales the number of diffusion taps
+		 * per pixel to `round( samples * resolutionScale )`, striding them across the
+		 * full kernel so the blur radius stays the same and only gets noisier (enable
+		 * {@link SSSSNode#jitter} with a `TRAANode` to resolve that noise). The output
+		 * always stays full resolution.
 		 *
 		 * @type {number}
-		 * @default 1
+		 * @default 0.5
 		 */
-		this.resolutionScale = 1;
+		this.resolutionScale = 0.5;
+
+		/**
+		 * Whether to jitter the per-pixel sample rotation over time. Setting this
+		 * property to `true` requires the usage of `TRAANode`, which resolves the
+		 * resulting noise into a clean image while allowing a lower sample count.
+		 * When `false`, the rotation is static so the raw output is stable without
+		 * a temporal resolve.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.jitter = false;
 
 		// private
 
@@ -251,12 +294,8 @@ class SSSSNode extends TempNode {
 		 * @type {RenderTarget}
 		 */
 		this._sssRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._sssRenderTarget.texture.name = 'SSSS.LowRes';
+		this._sssRenderTarget.texture.name = 'SSSS';
 
-		/**
-		 * @private
-		 * @type {RenderTarget}
-		 */
 		/**
 		 * @private
 		 * @type {UniformNode<vec2>}
@@ -264,16 +303,49 @@ class SSSSNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
+		 * Resolution at which the per-pixel noise rotation tiles, i.e.
+		 * `resolutionScale * resolution`.
+		 *
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._lowResolution = uniform( new Vector2() );
 
 		/**
+		 * Effective number of blur taps per pixel: `round( samples * resolutionScale )`,
+		 * recomputed each frame. This is the knob `resolutionScale` turns on the
+		 * expensive path.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._effectiveSamples = uniform( 32 );
+
+		/**
+		 * Spacing between consecutive taps within the precomputed kernel
+		 * (`samples / effectiveSamples`). A stride > 1 spreads the reduced tap set
+		 * across the full kernel so the blur radius stays constant as
+		 * `resolutionScale` drops. Equals 1 at full resolution.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._sampleStride = uniform( 1.0 );
+
+		/**
 		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._projScale = uniform( 1.0 );
+
+		/**
+		 * Golden-ratio noise UV shift applied when temporal filtering is enabled,
+		 * kept in the [0, 1) range. Stays 0 when temporal filtering is disabled.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._temporalNoiseOffset = uniform( 0 );
 
 		/**
 		 * @private
@@ -316,7 +388,7 @@ class SSSSNode extends TempNode {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._noiseNode = texture( _generateNoiseTexture() );
+		this._noiseNode = texture( _generateWhiteNoiseTexture() );
 
 		/**
 		 * @private
@@ -325,10 +397,6 @@ class SSSSNode extends TempNode {
 		this._sssMaterial = new NodeMaterial();
 		this._sssMaterial.name = 'SSSS';
 
-		/**
-		 * @private
-		 * @type {NodeMaterial}
-		 */
 		/**
 		 * @private
 		 * @type {PassTextureNode}
@@ -353,6 +421,18 @@ class SSSSNode extends TempNode {
 		} );
 
 		this._rebuildSSSBuffer();
+
+	}
+
+	/**
+	 * The internal render target. Exposed so that nodes like TRAANode can read
+	 * its dimensions via the standard `passNode.renderTarget` convention.
+	 *
+	 * @type {RenderTarget}
+	 */
+	get renderTarget() {
+
+		return this._sssRenderTarget;
 
 	}
 
@@ -488,7 +568,7 @@ class SSSSNode extends TempNode {
 	}
 
 	/**
-	 * Sets the size of the internal render targets.
+	 * Sets the size of the internal render target.
 	 *
 	 * @param {number} width - Output width in pixels.
 	 * @param {number} height - Output height in pixels.
@@ -497,18 +577,18 @@ class SSSSNode extends TempNode {
 
 		this._resolution.value.set( width, height );
 
+		// The output stays full resolution (single pass). `resolutionScale` only
+		// tiles the noise rotation at a lower frequency; the matching reduction in
+		// the per-pixel tap count is applied via `_effectiveSamples` in updateBefore.
 		const w = Math.max( 1, Math.round( this.resolutionScale * width ) );
 		const h = Math.max( 1, Math.round( this.resolutionScale * height ) );
 		this._lowResolution.value.set( w, h );
-		// Output render target must stay at full resolution — without a separate
-		// composite pass there is no way to upscale a low-res SSS blur back to full
-		// res. resolutionScale only affects the noise UV tiling (_lowResolution).
 		this._sssRenderTarget.setSize( width, height );
 
 	}
 
 	/**
-	 * Executes the SSS blur and bilateral upsample passes once per frame.
+	 * Executes the SSS blur pass once per frame.
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
@@ -521,7 +601,18 @@ class SSSSNode extends TempNode {
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
+		// resolutionScale turns down the expensive path: fewer taps per pixel, strided
+		// across the full kernel so the blur radius is unaffected (stride 1 at scale 1).
+		const effectiveSamples = Math.max( 1, Math.round( this.samples.value * this.resolutionScale ) );
+		this._effectiveSamples.value = effectiveSamples;
+		this._sampleStride.value = this.samples.value / effectiveSamples;
+
 		this._projScale.value = 0.5 * size.height * this._camera.projectionMatrix.elements[ 5 ];
+		// Advance the noise rotation each frame so TRAA can accumulate distinct samples.
+		// frameId is wrapped to keep the golden-ratio product small and precise.
+		this._temporalNoiseOffset.value = this.jitter
+			? ( ( frame.frameId % 4096 ) * ( _GOLDEN_RATIO % 1 ) ) % 1
+			: 0;
 		this._cameraNear.value = this._camera.near;
 		this._cameraProjectionMatrix.value.copy( this._camera.projectionMatrix );
 		const pe = this._camera.projectionMatrix.elements;
@@ -540,7 +631,7 @@ class SSSSNode extends TempNode {
 	}
 
 	/**
-	 * Builds the TSL shader graph for both passes.
+	 * Builds the TSL shader graph for the SSS blur pass.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {PassTextureNode}
@@ -549,10 +640,10 @@ class SSSSNode extends TempNode {
 
 		const { colorNode, depthNode, albedoNode, normalNode } = this;
 		const sssBuffer = this._sssBuffer;
-		const { samples, outputMode } = this;
+		const { outputMode } = this;
 		const { fogType, fogNear, fogFar, fogDensity } = this;
 		const fogColorUniform = this.fogColor;
-		const { _lowResolution, _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _projDepthParams, _projScaleXY, _samplesU, _noiseNode } = this;
+		const { _lowResolution, _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _projDepthParams, _projScaleXY, _samplesU, _noiseNode, _temporalNoiseOffset, _effectiveSamples, _sampleStride } = this;
 		const maxR = this._maxR;
 
 		const sampleColor = ( uvCoord ) => colorNode.sample( uvCoord );
@@ -631,7 +722,8 @@ class SSSSNode extends TempNode {
 					const radiusScale = clampedRadius.div( float( maxR ) ).toVar();
 
 
-					const noiseUV = vuv.mul( _lowResolution ).div( 64.0 );
+					// Temporal offset (0 unless temporal filtering is enabled) shifts the noise lookup each frame.
+					const noiseUV = vuv.mul( _lowResolution ).div( 64.0 ).add( vec2( _temporalNoiseOffset ) );
 					const noiseVal = _noiseNode.sample( noiseUV );
 					const cosA = noiseVal.r.toVar();
 					const sinA = noiseVal.g.toVar();
@@ -657,9 +749,14 @@ class SSSSNode extends TempNode {
 					const weightSumG = float( 0.0 ).toVar();
 					const weightSumB = float( 0.0 ).toVar();
 
-					Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
+					// `_effectiveSamples` = round( samples * resolutionScale ): the tap
+					// count is where resolutionScale cheapens the expensive path.
+					Loop( { start: int( 0 ), end: int( _effectiveSamples ), type: 'int', condition: '<' }, ( { i } ) => {
 
-						const sampleData = _samplesU.element( i );
+						// Stride across the full kernel so fewer taps still span the
+						// whole blur radius (idx === i when resolutionScale is 1).
+						const idx = int( float( i ).add( 0.5 ).mul( _sampleStride ) ).toVar();
+						const sampleData = _samplesU.element( idx );
 						const sx = sampleData.x.toVar();
 						const sy = sampleData.y.toVar();
 						const sr = sampleData.z.toVar();
