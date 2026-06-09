@@ -73,6 +73,23 @@ class Timeline extends Tab {
 
 	}
 
+	init( inspector ) {
+
+		super.init( inspector );
+
+		this.profiler.addEventListener( 'resize', () => {
+
+			if ( ! this.isRecording && this.frames.length > 0 ) {
+
+				this.renderSlider();
+
+			}
+
+		} );
+
+	}
+
+
 	buildHeader() {
 
 		const header = document.createElement( 'div' );
@@ -1301,7 +1318,7 @@ class Timeline extends Tab {
 		this.renderTimelineTrack( frame );
 
 		// Update UI texts
-		const isCompact = window.innerWidth < 800;
+		const isCompact = this.profiler.panel.offsetWidth < 800;
 		const frameLabel = isCompact ? '' : 'Frame: ';
 		const fpsSuffix = isCompact ? '' : ' FPS';
 		const callsSuffix = isCompact ? '' : ' calls';
