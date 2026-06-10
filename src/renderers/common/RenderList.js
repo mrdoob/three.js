@@ -192,6 +192,18 @@ class RenderList {
 		 */
 		this.occlusionQueryCount = 0;
 
+		/**
+		 * The last object that was counted for occlusion query testing. Used to
+		 * avoid counting an object more than once when it produces multiple render
+		 * items (e.g. a mesh with multiple material groups), since such an object
+		 * is covered by a single occlusion query.
+		 *
+		 * @private
+		 * @type {?Object3D}
+		 * @default null
+		 */
+		this._lastOcclusionObject = null;
+
 	}
 
 	/**
@@ -213,6 +225,7 @@ class RenderList {
 		this.lightsArray.length = 0;
 
 		this.occlusionQueryCount = 0;
+		this._lastOcclusionObject = null;
 
 		return this;
 
@@ -290,7 +303,12 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
+		if ( object.occlusionTest === true && this._lastOcclusionObject !== object ) {
+
+			this.occlusionQueryCount ++;
+			this._lastOcclusionObject = object;
+
+		}
 
 		if ( material.transparent === true || material.transmission > 0 ||
 			( material.transmissionNode && material.transmissionNode.isNode ) ||
