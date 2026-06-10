@@ -68,8 +68,6 @@ class Attributes extends DataMap {
 	 */
 	addBindGroup( attribute, bindGroup ) {
 
-		if ( this.backend.isWebGPUBackend !== true ) return false;
-
 		const data = this.data.get( attribute );
 
 		if ( data !== undefined ) {
