@@ -217,6 +217,11 @@ class NodeMaterialObserver {
 
 			}
 
+			const { environmentIntensity, environmentRotation } = renderObject.scene;
+
+			data.environmentIntensity = environmentIntensity;
+			data.environmentRotation = environmentRotation.clone();
+
 			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
@@ -598,6 +603,20 @@ class NodeMaterialObserver {
 				}
 
 			}
+
+		}
+
+		// scene
+
+		const scene = renderObject.scene;
+
+		if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
+				renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+
+			renderObjectData.environmentIntensity = scene.environmentIntensity;
+			renderObjectData.environmentRotation.copy( scene.environmentRotation );
+
+			return false;
 
 		}
 
