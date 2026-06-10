@@ -70,17 +70,12 @@ function _precomputeSamples( numSamples ) {
 }
 
 /**
- * Generates a tiling texture of per-texel white-noise scalars in `[0, 1)`, stored
- * in every channel. The value seeds the per-pixel rotation of the sample disk,
- * breaking up structured blur patterns.
- *
- * Animating the value over time with a golden-ratio value offset (see
- * {@link SSSSNode#jitter}) gives each pixel a low-discrepancy temporal sequence, so a
- * temporal resolve (`TRAANode`) accumulates it into a clean image over successive
- * frames while allowing a reduced tap count.
+ * Generates a tiling texture of per-texel white-noise scalars in `[0, 1)`, read
+ * from the red channel to seed the per-pixel rotation of the sample disk and break
+ * up structured blur patterns.
  *
  * @param {number} [size=64] - Width and height of the square texture in texels.
- * @returns {DataTexture} RGBA Float texture with the scalar replicated across channels.
+ * @returns {DataTexture} RGBA float texture (the scalar is stored in rgb, alpha = 1).
  */
 function _generateWhiteNoiseTexture( size = 64 ) {
 
@@ -118,15 +113,17 @@ const TEXTURING_MODE = {
  * Blurs the lit scene color using a Burley normalized diffusion profile sampled
  * in screen space, with optional albedo-aware texturing modes.
  *
- * Requires the scene to be rendered with an MRT that exposes a separate
- * albedo attachment (rgb = base color, a = SSS mask: 1 = SSS on, 0 = skip).
+ * Requires the scene to be rendered with an MRT that exposes a separate albedo
+ * attachment (rgb = base color, a = SSS slot index, 0 = no SSS). Declare the
+ * attachment with `a = 0` as the non-SSS default; {@link MeshSubsurfaceNodeMaterial}
+ * writes its assigned slot into `albedo.a` automatically.
  *
  * ```js
  * const renderPipeline = new RenderPipeline( renderer );
  * const scenePass = pass( scene, camera );
  * scenePass.setMRT( mrt( {
  * 	output: output,
- * 	albedo: metalness.mix( vec4( 0 ), vec4( diffuseColor.rgb, 1 ) ),
+ * 	albedo: vec4( diffuseColor.rgb, 0.0 ),
  * } ) );
  *
  * const sss = subsurfaceScattering(
@@ -159,7 +156,7 @@ class SSSSNode extends TempNode {
 	 *
 	 * @param {TextureNode} colorNode - Lit scene color from the scene pass.
 	 * @param {TextureNode} depthNode - Scene depth texture.
-	 * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS mask).
+	 * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS slot index, 0 = no SSS).
 	 * @param {PerspectiveCamera} camera - The scene camera.
 	 * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
 	 *   SSSSNode listens to `childadded` / `childremoved` events so materials are discovered
@@ -893,7 +890,7 @@ export default SSSSNode;
  * @function
  * @param {TextureNode} colorNode - Lit scene color texture.
  * @param {TextureNode} depthNode - Scene depth texture.
- * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS mask).
+ * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS slot index, 0 = no SSS).
  * @param {PerspectiveCamera} camera - The scene camera.
  * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
  * @param {TextureNode|null} [normalNode=null] - Optional MRT view-space normals texture. When provided,
