@@ -610,13 +610,17 @@ class NodeMaterialObserver {
 
 		const scene = renderObject.scene;
 
-		if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
-				renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+		if ( scene.environment !== null && material.envMap === null ) {
 
-			renderObjectData.environmentIntensity = scene.environmentIntensity;
-			renderObjectData.environmentRotation.copy( scene.environmentRotation );
+			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
 
-			return false;
+				renderObjectData.environmentIntensity = scene.environmentIntensity;
+				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+
+				return false;
+
+			}
 
 		}
 
