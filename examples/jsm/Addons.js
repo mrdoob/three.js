@@ -149,6 +149,7 @@ export * from './misc/MorphAnimMesh.js';
 export * from './misc/MorphBlendMesh.js';
 export * from './misc/ProgressiveLightMap.js';
 export * from './misc/RollerCoaster.js';
+export * from './misc/TileCreasedNormalsPlugin.js';
 export * from './misc/TubePainter.js';
 export * from './misc/Volume.js';
 export * from './misc/VolumeSlice.js';
