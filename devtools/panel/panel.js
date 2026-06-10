@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_TOGGLE_MONITORING, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const CONNECTION_NAME = 'three-devtools';
 const STATE_POLLING_INTERVAL = 1000;
@@ -151,6 +151,7 @@ function connect() {
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_SET_MONITORING,
 		enabled: monitoringEnabled,
+		revision: state.revision,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 
@@ -415,6 +416,7 @@ function handleThreeEvent( message ) {
 				postToBackground( {
 					name: MESSAGE_SET_MONITORING,
 					enabled: false,
+					revision: state.revision,
 					tabId: chrome.devtools.inspectedWindow.tabId
 				} );
 
@@ -453,6 +455,11 @@ function handleThreeEvent( message ) {
 			clearState();
 			updateRenderers();
 			updateSceneTree();
+			break;
+
+		case MESSAGE_TOGGLE_MONITORING:
+			// Toolbar icon clicked
+			setMonitoring( ! monitoringEnabled );
 			break;
 
 	}
@@ -712,6 +719,7 @@ function setMonitoring( enabled ) {
 	postToBackground( {
 		name: MESSAGE_SET_MONITORING,
 		enabled: enabled,
+		revision: state.revision,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 

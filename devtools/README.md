@@ -68,7 +68,7 @@ The panel UI provides the visual representation of the Three.js objects:
 - **Scene Hierarchy Visualization**: Browse the complete scene graph.
 - **Object Inspection**: View basic object properties (type, name).
 - **Renderer Details**: View properties, render stats, and memory usage for `WebGLRenderer` instances.
-- **Monitoring Toggle**: An On/Off button in the panel header pauses all polling and page instrumentation (state requests, hover highlighting) so the inspected page runs at full speed. The last choice is remembered across sessions (shared by all DevTools windows of the extension).
+- **Monitoring Toggle**: An On/Off button in the panel header pauses all polling and page instrumentation (state requests, hover highlighting) so the inspected page runs at full speed. The last choice is remembered across sessions (shared by all DevTools windows of the extension). While the panel is open, clicking the extension's toolbar icon toggles it too, and the badge shows `off` while paused; without an open panel the icon click scrolls to the first canvas.
 
 ## Communication Flow
 

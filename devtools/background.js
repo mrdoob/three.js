@@ -1,12 +1,66 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_COMMITTED */
+/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_TOGGLE_MONITORING, MESSAGE_COMMITTED */
 
 importScripts( 'constants.js' );
 
 // Map tab IDs to connections
 const connections = new Map();
 
+// Update the toolbar badge, ignoring errors for closed tabs
+function setBadge( tabId, text, color ) {
+
+	chrome.action.setBadgeText( { tabId: tabId, text: text } ).catch( () => {
+
+		// Ignore error - tab might have been closed
+
+	} );
+
+	if ( color ) {
+
+		chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {
+
+			// Ignore error - tab might have been closed
+
+		} );
+		chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: color } ).catch( () => {
+
+			// Ignore error - tab might have been closed
+
+		} );
+
+	}
+
+}
+
+// Show the three.js revision on the toolbar badge
+function updateRevisionBadge( tabId, revision ) {
+
+	// Without a revision, leave the badge as it is
+	if ( ! revision ) return;
+
+	revision = String( revision );
+	const number = revision.replace( /\D+$/, '' );
+	const isDev = revision.includes( 'dev' );
+
+	setBadge( tabId, number, isDev ? '#ff0098' : '#049ef4' );
+
+}
+
 // Handle extension icon clicks in the toolbar
 chrome.action.onClicked.addListener( ( tab ) => {
+
+	const port = connections.get( tab.id );
+
+	if ( port ) {
+
+		// Panel is open - toggle monitoring on/off
+		port.postMessage( {
+			id: MESSAGE_ID,
+			name: MESSAGE_TOGGLE_MONITORING
+		} );
+
+		return;
+
+	}
 
 	// Send scroll-to-canvas message to the content script (no UUID = scroll to first canvas)
 	chrome.tabs.sendMessage( tab.id, {
@@ -45,6 +99,21 @@ chrome.runtime.onConnect.addListener( port => {
 			connections.set( tabId, port );
 
 		} else if ( forwardableMessages.has( message.name ) && tabId ) {
+
+			// Reflect the monitoring state on the toolbar badge
+			if ( message.name === MESSAGE_SET_MONITORING ) {
+
+				if ( message.enabled ) {
+
+					updateRevisionBadge( tabId, message.revision );
+
+				} else {
+
+					setBadge( tabId, 'off', '#666666' );
+
+				}
+
+			}
 
 			chrome.tabs.sendMessage( tabId, message ).catch( () => {
 
@@ -93,25 +162,7 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 		// If three.js is detected, show a badge
 		if ( message.name === MESSAGE_REGISTER && message.detail && message.detail.revision ) {
 
-			const revision = String( message.detail.revision );
-			const number = revision.replace( /\D+$/, '' );
-			const isDev = revision.includes( 'dev' );
-
-			chrome.action.setBadgeText( { tabId: tabId, text: number } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
-			chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
-			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: isDev ? '#ff0098' : '#049ef4' } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
+			updateRevisionBadge( tabId, message.detail.revision );
 
 		}
 
@@ -149,11 +200,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 	// Clear badge on navigation, only for top-level navigation
 	if ( frameId === 0 ) {
 
-		chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
-
-			// Ignore error - tab might have been closed
-
-		} );
+		setBadge( tabId, '' );
 
 	}
 
@@ -174,11 +221,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 // Clear badge when a tab is closed
 chrome.tabs.onRemoved.addListener( ( tabId ) => {
 
-	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
-
-		// Ignore error - tab is already gone
-
-	} );
+	setBadge( tabId, '' );
 
 	// Clean up connection if it exists for the closed tab
 	if ( connections.has( tabId ) ) {
