@@ -48,20 +48,6 @@ function updateRevisionBadge( tabId, revision ) {
 // Handle extension icon clicks in the toolbar
 chrome.action.onClicked.addListener( ( tab ) => {
 
-	const port = connections.get( tab.id );
-
-	if ( port ) {
-
-		// Panel is open - toggle monitoring on/off
-		port.postMessage( {
-			id: MESSAGE_ID,
-			name: MESSAGE_TOGGLE_MONITORING
-		} );
-
-		return;
-
-	}
-
 	// Send scroll-to-canvas message to the content script (no UUID = scroll to first canvas)
 	chrome.tabs.sendMessage( tab.id, {
 		name: MESSAGE_SCROLL_TO_CANVAS,
@@ -72,6 +58,42 @@ chrome.action.onClicked.addListener( ( tab ) => {
 		console.log( 'Could not send scroll-to-canvas message to tab', tab.id );
 
 	} );
+
+} );
+
+// Add a monitoring toggle to the toolbar icon's context menu
+const MENU_TOGGLE_MONITORING = 'three-devtools-toggle-monitoring';
+
+chrome.runtime.onInstalled.addListener( () => {
+
+	chrome.contextMenus.removeAll( () => {
+
+		chrome.contextMenus.create( {
+			id: MENU_TOGGLE_MONITORING,
+			title: 'Toggle monitoring',
+			contexts: [ 'action' ]
+		} );
+
+	} );
+
+} );
+
+chrome.contextMenus.onClicked.addListener( ( info, tab ) => {
+
+	if ( info.menuItemId !== MENU_TOGGLE_MONITORING || ! tab ) return;
+
+	const port = connections.get( tab.id );
+
+	// Only the panel holds the monitoring state, so this is a no-op
+	// while the panel is closed (nothing is polling then anyway)
+	if ( port ) {
+
+		port.postMessage( {
+			id: MESSAGE_ID,
+			name: MESSAGE_TOGGLE_MONITORING
+		} );
+
+	}
 
 } );
 

@@ -27,6 +27,7 @@
 	}],
 	"permissions": [
 		"activeTab",
+		"contextMenus",
 		"webNavigation"
 	]
 } 
