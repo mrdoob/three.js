@@ -108,7 +108,7 @@ chrome.runtime.onInstalled.addListener( () => {
 
 			chrome.contextMenus.create( {
 				id: MENU_MONITORING_ID,
-				title: 'Enable monitoring',
+				title: 'Monitor three.js scenes',
 				type: 'checkbox',
 				checked: enabled,
 				contexts: [ 'action' ]

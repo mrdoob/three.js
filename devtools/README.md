@@ -68,7 +68,7 @@ The panel UI provides the visual representation of the Three.js objects:
 - **Scene Hierarchy Visualization**: Browse the complete scene graph.
 - **Object Inspection**: View basic object properties (type, name).
 - **Renderer Details**: View properties, render stats, and memory usage for `WebGLRenderer` instances.
-- **Monitoring Toggle**: Monitoring can be paused so the inspected page runs at full speed — either with the On/Off button in the panel header or with the "Enable monitoring" checkbox in the toolbar icon's right-click menu. Pausing stops all polling and page instrumentation (state requests, hover highlighting). The state is stored in `chrome.storage.local`, shared across tabs and remembered across sessions; the toolbar badge shows `off` while paused and the three.js revision otherwise.
+- **Monitoring Toggle**: Monitoring can be paused so the inspected page runs at full speed — either with the On/Off button in the panel header or with the "Monitor three.js scenes" checkbox in the toolbar icon's right-click menu. Pausing stops all polling and page instrumentation (state requests, hover highlighting). The state is stored in `chrome.storage.local`, shared across tabs and remembered across sessions; the toolbar badge shows `off` while paused and the three.js revision otherwise.
 
 ## Communication Flow
 
