@@ -1,11 +1,10 @@
-/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_TOGGLE_MONITORING, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, STORAGE_KEY_MONITORING, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const CONNECTION_NAME = 'three-devtools';
 const STATE_POLLING_INTERVAL = 1000;
-const STORAGE_KEY_MONITORING = 'three-devtools-monitoring-enabled';
 
-// Restore last monitoring choice (default: on)
-let monitoringEnabled = localStorage.getItem( STORAGE_KEY_MONITORING ) !== 'false';
+// Monitoring on/off state, restored from storage before connecting (default: on)
+let monitoringEnabled = true;
 
 // --- Utility Functions ---
 function getObjectIcon( obj ) {
@@ -146,15 +145,9 @@ function connect() {
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 
-	// Sync the bridge with the persisted monitoring state. When enabled the
-	// bridge responds with a full state refresh.
-	backgroundPageConnection.postMessage( {
-		name: MESSAGE_SET_MONITORING,
-		enabled: monitoringEnabled,
-		revision: state.revision,
-		tabId: chrome.devtools.inspectedWindow.tabId
-	} );
-
+	// The background syncs the page with the persisted monitoring state in
+	// response to the init message. When enabled the bridge responds with a
+	// full state refresh.
 	if ( monitoringEnabled ) startPolling();
 
 }
@@ -408,20 +401,6 @@ function handleThreeEvent( message ) {
 
 		case EVENT_REGISTER:
 			state.revision = message.detail.revision;
-
-			// The page (re)loaded with a fresh bridge that defaults to
-			// enabled - re-assert the persisted off state
-			if ( ! monitoringEnabled ) {
-
-				postToBackground( {
-					name: MESSAGE_SET_MONITORING,
-					enabled: false,
-					revision: state.revision,
-					tabId: chrome.devtools.inspectedWindow.tabId
-				} );
-
-			}
-
 			break;
 
 		case EVENT_RENDERER:
@@ -455,11 +434,6 @@ function handleThreeEvent( message ) {
 			clearState();
 			updateRenderers();
 			updateSceneTree();
-			break;
-
-		case MESSAGE_TOGGLE_MONITORING:
-			// Toolbar icon clicked
-			setMonitoring( ! monitoringEnabled );
 			break;
 
 	}
@@ -710,18 +684,20 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 }
 
 // Toggle monitoring on/off. Off makes the extension inert: no polling and no
-// hover messages, so the inspected page does no devtools work.
+// hover messages, so the inspected page does no devtools work. The background
+// reacts to the storage change and syncs the badge, menu and page bridges.
 function setMonitoring( enabled ) {
 
-	monitoringEnabled = enabled;
-	localStorage.setItem( STORAGE_KEY_MONITORING, String( enabled ) );
+	chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: enabled } );
 
-	postToBackground( {
-		name: MESSAGE_SET_MONITORING,
-		enabled: enabled,
-		revision: state.revision,
-		tabId: chrome.devtools.inspectedWindow.tabId
-	} );
+	applyMonitoring( enabled );
+
+}
+
+// Apply the monitoring state locally
+function applyMonitoring( enabled ) {
+
+	monitoringEnabled = enabled;
 
 	if ( enabled ) {
 
@@ -743,6 +719,17 @@ function setMonitoring( enabled ) {
 	updateMonitoringUI();
 
 }
+
+// Apply monitoring changes made elsewhere (toolbar icon context menu)
+chrome.storage.onChanged.addListener( ( changes, area ) => {
+
+	if ( area !== 'local' || ! ( STORAGE_KEY_MONITORING in changes ) ) return;
+
+	const enabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
+
+	if ( enabled !== monitoringEnabled ) applyMonitoring( enabled );
+
+} );
 
 function updateMonitoringUI() {
 
@@ -961,8 +948,12 @@ chrome.devtools.network.onNavigated.addListener( () => {
 
 } );
 
-// Initial UI setup
-initUI();
+// Restore the persisted monitoring state, then build the UI and connect
+chrome.storage.local.get( { [ STORAGE_KEY_MONITORING ]: true } ).then( ( items ) => {
 
-// Connect to the background page
-connect();
+	monitoringEnabled = items[ STORAGE_KEY_MONITORING ] === true;
+
+	initUI();
+	connect();
+
+} );

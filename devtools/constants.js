@@ -13,7 +13,9 @@ var MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 var MESSAGE_REGISTER = 'register';
 var MESSAGE_COMMITTED = 'committed';
 var MESSAGE_SET_MONITORING = 'set-monitoring';
-var MESSAGE_TOGGLE_MONITORING = 'toggle-monitoring';
+
+// chrome.storage.local keys
+var STORAGE_KEY_MONITORING = 'monitoring-enabled';
 
 // Bridge/DevTools events
 var EVENT_REGISTER = 'register';

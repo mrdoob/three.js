@@ -1,9 +1,20 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_TOGGLE_MONITORING, MESSAGE_COMMITTED */
+/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_COMMITTED, STORAGE_KEY_MONITORING */
 
 importScripts( 'constants.js' );
 
 // Map tab IDs to connections
 const connections = new Map();
+
+// Context menu item on the toolbar icon
+const MENU_MONITORING_ID = 'three-devtools-monitoring';
+
+// Read the persisted monitoring state (default: on)
+function getMonitoringEnabled() {
+
+	return chrome.storage.local.get( { [ STORAGE_KEY_MONITORING ]: true } )
+		.then( ( items ) => items[ STORAGE_KEY_MONITORING ] === true );
+
+}
 
 // Update the toolbar badge, ignoring errors for closed tabs
 function setBadge( tabId, text, color ) {
@@ -31,17 +42,44 @@ function setBadge( tabId, text, color ) {
 
 }
 
-// Show the three.js revision on the toolbar badge
-function updateRevisionBadge( tabId, revision ) {
+// Show the monitoring state ('off') or the three.js revision on the badge
+function updateBadge( tabId, revision, monitoringEnabled ) {
 
-	// Without a revision, leave the badge as it is
-	if ( ! revision ) return;
+	if ( ! monitoringEnabled ) {
+
+		setBadge( tabId, 'off', '#666666' );
+		return;
+
+	}
+
+	if ( ! revision ) {
+
+		setBadge( tabId, '' );
+		return;
+
+	}
 
 	revision = String( revision );
 	const number = revision.replace( /\D+$/, '' );
 	const isDev = revision.includes( 'dev' );
 
 	setBadge( tabId, number, isDev ? '#ff0098' : '#049ef4' );
+
+}
+
+// Sync a tab's bridge with the monitoring state. When enabled the bridge
+// responds with a full state refresh.
+function sendSetMonitoring( tabId, enabled ) {
+
+	chrome.tabs.sendMessage( tabId, {
+		name: MESSAGE_SET_MONITORING,
+		enabled: enabled,
+		tabId: tabId
+	} ).catch( () => {
+
+		// Ignore error - content script might not be injected yet
+
+	} );
 
 }
 
@@ -61,39 +99,65 @@ chrome.action.onClicked.addListener( ( tab ) => {
 
 } );
 
-// Add a monitoring toggle to the toolbar icon's context menu
-const MENU_TOGGLE_MONITORING = 'three-devtools-toggle-monitoring';
-
+// Add a monitoring on/off checkbox to the toolbar icon context menu
 chrome.runtime.onInstalled.addListener( () => {
 
 	chrome.contextMenus.removeAll( () => {
 
-		chrome.contextMenus.create( {
-			id: MENU_TOGGLE_MONITORING,
-			title: 'Toggle monitoring',
-			contexts: [ 'action' ]
+		getMonitoringEnabled().then( ( enabled ) => {
+
+			chrome.contextMenus.create( {
+				id: MENU_MONITORING_ID,
+				title: 'Enable monitoring',
+				type: 'checkbox',
+				checked: enabled,
+				contexts: [ 'action' ]
+			} );
+
 		} );
 
 	} );
 
 } );
 
-chrome.contextMenus.onClicked.addListener( ( info, tab ) => {
+chrome.contextMenus.onClicked.addListener( ( info ) => {
 
-	if ( info.menuItemId !== MENU_TOGGLE_MONITORING || ! tab ) return;
+	if ( info.menuItemId === MENU_MONITORING_ID ) {
 
-	const port = connections.get( tab.id );
-
-	// Only the panel holds the monitoring state, so this is a no-op
-	// while the panel is closed (nothing is polling then anyway)
-	if ( port ) {
-
-		port.postMessage( {
-			id: MESSAGE_ID,
-			name: MESSAGE_TOGGLE_MONITORING
-		} );
+		chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: info.checked === true } );
 
 	}
+
+} );
+
+// React to monitoring changes from the context menu or the panel: update the
+// menu checkbox and the badge/bridge of every tab where three.js registered
+chrome.storage.onChanged.addListener( ( changes, area ) => {
+
+	if ( area !== 'local' || ! ( STORAGE_KEY_MONITORING in changes ) ) return;
+
+	const enabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
+
+	chrome.contextMenus.update( MENU_MONITORING_ID, { checked: enabled } ).catch( () => {
+
+		// Ignore error - menu might not have been created yet
+
+	} );
+
+	chrome.storage.session.get( null ).then( ( items ) => {
+
+		for ( const key of Object.keys( items ) ) {
+
+			if ( ! key.startsWith( 'revision-' ) ) continue;
+
+			const tabId = parseInt( key.slice( 'revision-'.length ), 10 );
+
+			updateBadge( tabId, items[ key ], enabled );
+			sendSetMonitoring( tabId, enabled );
+
+		}
+
+	} );
 
 } );
 
@@ -108,8 +172,7 @@ chrome.runtime.onConnect.addListener( port => {
 		MESSAGE_REQUEST_OBJECT_DETAILS,
 		MESSAGE_SCROLL_TO_CANVAS,
 		MESSAGE_HIGHLIGHT_OBJECT,
-		MESSAGE_UNHIGHLIGHT_OBJECT,
-		MESSAGE_SET_MONITORING
+		MESSAGE_UNHIGHLIGHT_OBJECT
 	] );
 
 	// Listen for messages from the devtools panel
@@ -120,22 +183,14 @@ chrome.runtime.onConnect.addListener( port => {
 			tabId = message.tabId;
 			connections.set( tabId, port );
 
+			// Sync the page with the persisted monitoring state
+			getMonitoringEnabled().then( ( enabled ) => {
+
+				sendSetMonitoring( tabId, enabled );
+
+			} );
+
 		} else if ( forwardableMessages.has( message.name ) && tabId ) {
-
-			// Reflect the monitoring state on the toolbar badge
-			if ( message.name === MESSAGE_SET_MONITORING ) {
-
-				if ( message.enabled ) {
-
-					updateRevisionBadge( tabId, message.revision );
-
-				} else {
-
-					setBadge( tabId, 'off', '#666666' );
-
-				}
-
-			}
 
 			chrome.tabs.sendMessage( tabId, message ).catch( () => {
 
@@ -184,7 +239,19 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 		// If three.js is detected, show a badge
 		if ( message.name === MESSAGE_REGISTER && message.detail && message.detail.revision ) {
 
-			updateRevisionBadge( tabId, message.detail.revision );
+			const revision = String( message.detail.revision );
+
+			// Remember the revision so the badge can be restored on re-enable
+			chrome.storage.session.set( { [ 'revision-' + tabId ]: revision } );
+
+			getMonitoringEnabled().then( ( enabled ) => {
+
+				updateBadge( tabId, revision, enabled );
+
+				// A freshly loaded page's bridge defaults to enabled
+				if ( ! enabled ) sendSetMonitoring( tabId, false );
+
+			} );
 
 		}
 
@@ -223,6 +290,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 	if ( frameId === 0 ) {
 
 		setBadge( tabId, '' );
+		chrome.storage.session.remove( 'revision-' + tabId );
 
 	}
 
@@ -244,6 +312,7 @@ chrome.webNavigation.onCommitted.addListener( details => {
 chrome.tabs.onRemoved.addListener( ( tabId ) => {
 
 	setBadge( tabId, '' );
+	chrome.storage.session.remove( 'revision-' + tabId );
 
 	// Clean up connection if it exists for the closed tab
 	if ( connections.has( tabId ) ) {

@@ -31,7 +31,7 @@ The extension follows a standard Chrome DevTools extension architecture:
 
 1. When a page loads, Chrome injects `bridge.js` into the page's main world (including iframes).
 2. `bridge.js` creates the `window.__THREE_DEVTOOLS__` global object.
-3. When the DevTools panel is opened, `panel.js` connects to `background.js` (`init`) and sends `set-monitoring` with the persisted monitoring flag. When monitoring is enabled, the bridge responds with a full state refresh and the panel then polls `request-state` every second.
+3. When the DevTools panel is opened, `panel.js` restores the monitoring state from `chrome.storage.local` and connects to `background.js` (`init`), which syncs the page with the persisted monitoring state (`set-monitoring`). When monitoring is enabled, the bridge responds with a full state refresh and the panel then polls `request-state` every second.
 4. `background.js` relays the state request to `content-script.js`, which posts it to `bridge.js`.
 5. `bridge.js` responds by sending back observed renderer data (`renderer` message) and batched scene data (`scene` message).
 6. Three.js detects `window.__THREE_DEVTOOLS__` and sends registration/observation events to the bridge script as objects are created or the library initializes.
@@ -68,11 +68,11 @@ The panel UI provides the visual representation of the Three.js objects:
 - **Scene Hierarchy Visualization**: Browse the complete scene graph.
 - **Object Inspection**: View basic object properties (type, name).
 - **Renderer Details**: View properties, render stats, and memory usage for `WebGLRenderer` instances.
-- **Monitoring Toggle**: An On/Off button in the panel header pauses all polling and page instrumentation (state requests, hover highlighting) so the inspected page runs at full speed. The last choice is remembered across sessions (shared by all DevTools windows of the extension). While the panel is open, the toolbar icon's right-click menu offers a "Toggle monitoring" option too, and the badge shows `off` while paused.
+- **Monitoring Toggle**: Monitoring can be paused so the inspected page runs at full speed — either with the On/Off button in the panel header or with the "Enable monitoring" checkbox in the toolbar icon's right-click menu. Pausing stops all polling and page instrumentation (state requests, hover highlighting). The state is stored in `chrome.storage.local`, shared across tabs and remembered across sessions; the toolbar badge shows `off` while paused and the three.js revision otherwise.
 
 ## Communication Flow
 
-1. **Panel ↔ Background ↔ Content Script**: Standard extension messaging for panel initialization, state requests and monitoring control (`init`, `request-state`, `set-monitoring`).
+1. **Panel ↔ Background ↔ Content Script**: Standard extension messaging for panel initialization and state requests (`init`, `request-state`). `background.js` drives monitoring control (`set-monitoring`) from the state stored in `chrome.storage.local`.
 2. **Three.js → Bridge**: Three.js detects `window.__THREE_DEVTOOLS__` and uses its `dispatchEvent` method (sending `'register'`, `'observe'`).
 3. **Bridge → Content Script**: Bridge uses `window.postMessage` to send data (`'register'`, `'renderer'`, `'scene'`, `'update'`) to the content script.
 4. **Content Script → Background**: Content script uses `chrome.runtime.sendMessage` to relay messages from the bridge to the background.
