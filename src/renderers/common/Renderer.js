@@ -36,7 +36,8 @@ import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { context } from '../../nodes/core/ContextNode.js';
-import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
+import AsyncCompilation from './AsyncCompilation.js';
+import { error, warn, warnOnce } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -70,6 +71,15 @@ class Renderer {
 	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
+	 * @property {boolean} [asyncCompilation=false] - If set to `true`, the renderer never performs unbounded
+	 * node building or synchronous pipeline creation on the render path. New and changed materials are
+	 * prepared in the background and appear when ready: new objects are skipped until their first
+	 * compilation finished (like textures, which render as placeholders until uploaded), and changed
+	 * objects keep rendering their last compiled state until the replacement is promoted atomically
+	 * between frames. Use {@link Renderer#compileAsync} to prewarm materials when pop-in is unacceptable.
+	 * Applications can bias the compilation order of important drawables by setting a `compilePriority`
+	 * hint on a 3D object (or its material): positive values compile ahead of all automatic replacement
+	 * work, negative values compile after it. The hint is read when a compilation is requested.
 	 */
 
 	/**
@@ -102,7 +112,8 @@ class Renderer {
 			samples = 0,
 			getFallback = null,
 			outputBufferType = HalfFloatType,
-			multiview = false
+			multiview = false,
+			asyncCompilation = false
 		} = parameters;
 
 		/**
@@ -653,6 +664,39 @@ class Renderer {
 		this._initPromise = null;
 
 		/**
+		 * Whether async compilation mode is enabled. Fixed for the
+		 * renderer's lifetime.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._asyncCompilation = asyncCompilation === true;
+
+		/**
+		 * The background compilation driver coordinating node builds,
+		 * pipeline creation and safe-point promotion. Created in `init()`.
+		 *
+		 * @private
+		 * @type {?AsyncCompilation}
+		 * @default null
+		 */
+		this._compilation = null;
+
+		/**
+		 * Applications that render on demand can set this callback so a
+		 * finished background compilation can request the frame that
+		 * displays it. It is invoked at most once per batch of completed
+		 * work, from the driver's own service callback — never synchronously
+		 * from a promise resolution. It is a notification; it is not
+		 * required for progress.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.onBackgroundWorkReady = null;
+
+		/**
 		 * An array of compilation promises which are used in `compileAsync()`.
 		 *
 		 * @private
@@ -816,9 +860,11 @@ class Renderer {
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
-			this._renderLists = new RenderLists( this.lighting );
+			this._renderLists = new RenderLists( this.lighting, this._asyncCompilation === true ? this._objects : null );
 			this._bundles = new RenderBundles();
 			this._renderContexts = new RenderContexts( this );
+
+			this._compilation = new AsyncCompilation( this );
 
 			//
 
@@ -1008,7 +1054,7 @@ class Renderer {
 
 		}
 
-		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
+		// process render lists - _createObjectPipeline requests background compilations
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -1027,38 +1073,10 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
-		// Process compilation work items sequentially to avoid freezing
-		// Yields between objects to keep animation smooth
+		// resolve when the compilations discovered at call time have
+		// settled — later mutations don't extend the promise
 
-		for ( const item of compilationPromises ) {
-
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
-			renderObject.drawRange = item.object.geometry.drawRange;
-			renderObject.group = item.group;
-
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
-
-			this._nodes.updateBefore( renderObject );
-			this._geometries.updateForRender( renderObject );
-			this._nodes.updateForRender( renderObject );
-			this._bindings.updateForRender( renderObject );
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
-			this._pipelines.getForRender( renderObject, pipelinePromises );
-			if ( pipelinePromises.length > 0 ) {
-
-				await Promise.all( pipelinePromises );
-
-			}
-
-			this._nodes.updateAfter( renderObject );
-
-			// Yield between objects to allow animation frames
-			await yieldToMain();
-
-		}
+		await Promise.all( compilationPromises );
 
 	}
 
@@ -1232,6 +1250,15 @@ class Renderer {
 
 		this._isDeviceLost = true;
 
+		// settle all background work into a defined dead state: cancel all
+		// entries, resolve all waiters, clear queued promotions
+
+		if ( this._compilation !== null ) {
+
+			this._compilation.clear( 'cancelled' );
+
+		}
+
 	}
 
 	/**
@@ -1363,6 +1390,15 @@ class Renderer {
 		}
 
 		this._renderScene( scene, camera );
+
+		// service the compilation driver once per top-level frame so
+		// background compilation progresses even without idle time
+
+		if ( this._compilation !== null && this._callDepth === - 1 ) {
+
+			this._compilation.update();
+
+		}
 
 	}
 
@@ -1514,6 +1550,15 @@ class Renderer {
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
 
 		if ( this._isDeviceLost === true ) return;
+
+		// safe point: promotions are applied only at the entry of a
+		// top-level render call — nested renders never observe a swap
+
+		if ( this._compilation !== null && this._callDepth === - 1 ) {
+
+			this._compilation.applyPromotions();
+
+		}
 
 		//
 
@@ -2527,6 +2572,8 @@ class Renderer {
 
 			this.info.dispose();
 			this.backend.dispose();
+
+			this._compilation.dispose();
 
 			this._animation.dispose();
 			this._objects.dispose();
@@ -3668,6 +3715,11 @@ class Renderer {
 	 * This method represents the default `_handleObjectFunction` implementation which creates
 	 * a render object from the given data and performs the draw command with the selected backend.
 	 *
+	 * In async compilation mode the render loop never performs node building
+	 * or pipeline creation: structural changes request a background
+	 * replacement and the render object keeps drawing its compiled state;
+	 * objects without a compiled pipeline are skipped until ready.
+	 *
 	 * @private
 	 * @param {Object3D} object - The 3D object.
 	 * @param {Material} material - The object's material.
@@ -3694,6 +3746,32 @@ class Renderer {
 
 		}
 
+		// nested renders issued from inside a driver slice (e.g. PMREM
+		// generation during a background build) compile classically — their
+		// output is sampled and cached immediately, so their drawables must
+		// not be skipped
+
+		const asyncPath = this._asyncCompilation === true && this._compilation._updating === false;
+
+		if ( asyncPath === true ) {
+
+			// live structural mutations that do not bump the material version
+			// (e.g. blend mode values) request a background replacement
+
+			if ( this._pipelines.isReady( renderObject ) === true && this.backend.detectStructuralChange( renderObject ) === true ) {
+
+				this._objects.requestPending( renderObject, renderObject.getCacheKey(), true, passId );
+
+			}
+
+			// not compiled yet — skip until the background work finished;
+			// this also guards the refresh block below, which would
+			// otherwise trigger a synchronous node build
+
+			if ( this._pipelines.isReady( renderObject ) === false ) return;
+
+		}
+
 		//
 
 		const needsRefresh = this._nodes.needsRefresh( renderObject );
@@ -3709,17 +3787,19 @@ class Renderer {
 
 		}
 
-		this._pipelines.updateForRender( renderObject );
+		// in async compilation mode the pipeline belongs to the compiled state
 
-		//
+		if ( asyncPath === false ) {
 
-		if ( this._pipelines.isReady( renderObject ) ) {
+			this._pipelines.updateForRender( renderObject );
 
-			this.backend.draw( renderObject, this.info );
-
-			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+			if ( this._pipelines.isReady( renderObject ) === false ) return;
 
 		}
+
+		this.backend.draw( renderObject, this.info );
+
+		if ( needsRefresh ) this._nodes.updateAfter( renderObject );
 
 	}
 
@@ -3739,43 +3819,21 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		// If in async compilation mode, queue the work for sequential execution
-		if ( this._compilationPromises !== null ) {
-
-			// Store work items instead of promises - will be processed sequentially
-			this._compilationPromises.push( {
-				object,
-				material,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				passId,
-				renderContext: this._currentRenderContext
-			} );
-
-			return;
-
-		}
-
-		// Sync path
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
-		//
+		// request a background compilation for the current structural state
+		// unless the render object is already compiled or already pending —
+		// covered requests join the existing work
 
-		this._nodes.updateBefore( renderObject );
+		const entry = this._compilation.request( renderObject, passId );
 
-		this._geometries.updateForRender( renderObject );
+		if ( entry !== null && this._compilationPromises !== null ) {
 
-		this._nodes.updateForRender( renderObject );
-		this._bindings.updateForRender( renderObject );
+			this._compilationPromises.push( new Promise( ( resolve ) => entry.onSettled( resolve ) ) );
 
-		this._pipelines.getForRender( renderObject, this._compilationPromises );
-
-		this._nodes.updateAfter( renderObject );
+		}
 
 	}
 

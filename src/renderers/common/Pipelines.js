@@ -74,6 +74,16 @@ class Pipelines extends DataMap {
 			compute: new Map()
 		};
 
+		/**
+		 * Completion promises of render pipelines that are still being
+		 * created asynchronously, used for promise deduplication: requests
+		 * for a pipeline that is already building join its promise.
+		 *
+		 * @private
+		 * @type {Map<Pipeline,Promise>}
+		 */
+		this._inFlight = new Map();
+
 	}
 
 	/**
@@ -154,10 +164,9 @@ class Pipelines extends DataMap {
 	 * Returns a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
-	getForRender( renderObject, promises = null ) {
+	getForRender( renderObject ) {
 
 		const data = this.get( renderObject );
 
@@ -194,7 +203,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
-				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises );
+				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey );
 
 			} else {
 
@@ -215,6 +224,82 @@ class Pipelines extends DataMap {
 		}
 
 		return data.pipeline;
+
+	}
+
+	/**
+	 * Requests the render pipeline for a background compilation. The
+	 * pipeline is created asynchronously and keyed from the render object's
+	 * draw snapshot (via `drawMaterial`); requests for a pipeline that is
+	 * still building join its completion promise.
+	 *
+	 * The caller must guarantee the render object's node builder state has
+	 * been created — the background driver builds it before this step.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {{pipeline:RenderObjectPipeline,promise:?Promise}} The pipeline and its
+	 * completion promise (`null` when the pipeline is already settled).
+	 */
+	getForRenderAsync( renderObject ) {
+
+		const data = this.get( renderObject );
+
+		let pipeline = data.pipeline;
+
+		if ( pipeline === undefined ) {
+
+			const nodeBuilderState = renderObject.getNodeBuilderState();
+
+			const name = renderObject.material ? renderObject.material.name : '';
+
+			const stageVertex = this._getProgramStage( 'vertex', nodeBuilderState.vertexShader, name );
+			const stageFragment = this._getProgramStage( 'fragment', nodeBuilderState.fragmentShader, name );
+
+			const cacheKey = this._getRenderCacheKey( renderObject, stageVertex, stageFragment );
+
+			pipeline = this.caches.get( cacheKey );
+
+			if ( pipeline === undefined ) {
+
+				pipeline = new RenderObjectPipeline( cacheKey, stageVertex, stageFragment );
+
+				this.caches.set( cacheKey, pipeline );
+
+				renderObject.pipeline = pipeline;
+
+				const promises = [];
+
+				this.backend.createRenderPipeline( renderObject, promises );
+
+				if ( promises.length > 0 ) {
+
+					const promise = Promise.all( promises ).finally( () => {
+
+						this._inFlight.delete( pipeline );
+
+					} );
+
+					this._inFlight.set( pipeline, promise );
+
+				}
+
+			} else {
+
+				renderObject.pipeline = pipeline;
+
+			}
+
+			pipeline.usedTimes ++;
+			stageVertex.usedTimes ++;
+			stageFragment.usedTimes ++;
+
+			data.pipeline = pipeline;
+
+		}
+
+		const promise = this._inFlight.get( pipeline );
+
+		return { pipeline, promise: promise !== undefined ? promise : null };
 
 	}
 
@@ -244,6 +329,18 @@ class Pipelines extends DataMap {
 		const pipelineData = this.backend.get( pipeline );
 
 		return pipelineData.pipeline !== undefined && pipelineData.pipeline !== null;
+
+	}
+
+	/**
+	 * Returns `true` if the given pipeline's creation failed.
+	 *
+	 * @param {Pipeline} pipeline - The pipeline.
+	 * @return {boolean} Whether the pipeline creation failed or not.
+	 */
+	isPipelineFailed( pipeline ) {
+
+		return this.backend.get( pipeline ).error === true;
 
 	}
 
@@ -314,6 +411,7 @@ class Pipelines extends DataMap {
 			fragment: new Map(),
 			compute: new Map()
 		};
+		this._inFlight = new Map();
 
 	}
 
@@ -368,10 +466,9 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageVertex - The programmable stage representing the vertex shader.
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
 	 * @param {string} cacheKey - The cache key.
-	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {RenderObjectPipeline} The render pipeline.
 	 */
-	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
+	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey ) {
 
 		// check for existing pipeline
 
@@ -387,11 +484,7 @@ class Pipelines extends DataMap {
 
 			renderObject.pipeline = pipeline;
 
-			// The `promises` array is `null` by default and only set to an empty array when
-			// `Renderer.compileAsync()` is used. The next call actually fills the array with
-			// pending promises that resolve when the render pipelines are ready for rendering.
-
-			this.backend.createRenderPipeline( renderObject, promises );
+			this.backend.createRenderPipeline( renderObject, null );
 
 		}
 

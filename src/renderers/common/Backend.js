@@ -258,6 +258,34 @@ class Backend {
 	needsRenderUpdate( /*renderObject*/ ) { }
 
 	/**
+	 * Primes the structural change detection state of `needsRenderUpdate()`
+	 * from a compiled draw snapshot. Used by async compilation mode so live
+	 * mutations made while a replacement compiled are still detected after
+	 * it swaps in.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Material|Object} drawState - The compiled draw snapshot (or the live material).
+	 */
+	syncRenderUpdateState( /*renderObject, drawState*/ ) { }
+
+	/**
+	 * Detects live structural mutations that do not bump the material
+	 * version. Async compilation mode requests a replacement when this
+	 * returns `true`. Backends that read pipeline state live at encode
+	 * time (e.g. WebGL) do not need to implement this.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {boolean} Whether a structural value diverged from the compiled snapshot.
+	 */
+	detectStructuralChange( /*renderObject*/ ) {
+
+		return false;
+
+	}
+
+	/**
 	 * Returns a cache key that is used to identify render pipelines.
 	 *
 	 * @abstract

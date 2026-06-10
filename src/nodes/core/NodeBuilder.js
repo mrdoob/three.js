@@ -30,7 +30,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
-import { warn, error, yieldToMain } from '../../utils.js';
+import { warn, error } from '../../utils.js';
 
 let _id = 0;
 
@@ -3267,24 +3267,6 @@ class NodeBuilder {
 		this._buildStepState = null;
 
 		return true;
-
-	}
-
-	/**
-	 * Async version of build() that yields to main thread between work
-	 * slices. Use this in compileAsync() to prevent blocking the main thread.
-	 *
-	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
-	 */
-	async buildAsync() {
-
-		while ( this.buildStep( performance.now() + 2 ) === false ) {
-
-			await yieldToMain();
-
-		}
-
-		return this;
 
 	}
 

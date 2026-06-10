@@ -75,6 +75,27 @@ class Info {
 		};
 
 		/**
+		 * Async compilation related metrics, maintained by the renderer's
+		 * background compilation driver. Gauges reflect the live driver
+		 * state; counters and timings are lifetime values.
+		 *
+		 * @type {Object}
+		 * @readonly
+		 * @property {number} queued - The number of compilations awaiting their background build.
+		 * @property {number} pipelines - The number of async pipelines awaiting completion.
+		 * @property {number} promotions - The lifetime number of promoted replacements.
+		 * @property {number} failed - The lifetime number of failed builds.
+		 * @property {number} mainThreadTime - The milliseconds of driver main-thread slices (lifetime).
+		 */
+		this.asyncCompilation = {
+			queued: 0,
+			pipelines: 0,
+			promotions: 0,
+			failed: 0,
+			mainThreadTime: 0
+		};
+
+		/**
 		 * Compute related metrics.
 		 *
 		 * @type {Object}

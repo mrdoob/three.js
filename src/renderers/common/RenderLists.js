@@ -15,8 +15,10 @@ class RenderLists {
 	 * Constructs a render lists management component.
 	 *
 	 * @param {Lighting} lighting - The lighting management component.
+	 * @param {?RenderObjects} [objects=null] - When set (async compilation mode),
+	 * render lists classify from per-material compiled snapshots.
 	 */
-	constructor( lighting ) {
+	constructor( lighting, objects = null ) {
 
 		/**
 		 * The lighting management component.
@@ -24,6 +26,13 @@ class RenderLists {
 		 * @type {Lighting}
 		 */
 		this.lighting = lighting;
+
+		/**
+		 * The render objects management component, or `null`.
+		 *
+		 * @type {?RenderObjects}
+		 */
+		this.objects = objects;
 
 		/**
 		 * The internal chain map which holds the render lists.
@@ -52,7 +61,7 @@ class RenderLists {
 
 		if ( list === undefined ) {
 
-			list = new RenderList( this.lighting, scene, camera );
+			list = new RenderList( this.lighting, scene, camera, this.objects );
 			lists.set( _chainKeys, list );
 
 		}

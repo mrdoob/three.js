@@ -35,6 +35,7 @@ const exceptionList = [
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webaudio_visualizer',
+	'webgpu_async_compilation', // continuous random material churn, no stable frame
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',

@@ -300,6 +300,38 @@ class RenderObject {
 		this._sourceMaterial = renderer._currentSourceMaterial;
 
 		/**
+		 * The replacement render object being compiled in the background in
+		 * async compilation mode. This render object keeps drawing its
+		 * compiled state until the replacement swaps in atomically at a
+		 * top-level safe point.
+		 *
+		 * @type {?RenderObject}
+		 * @default null
+		 */
+		this.pending = null;
+
+		/**
+		 * The structural draw snapshot this render object was compiled with
+		 * in async compilation mode. Encode-time structural values (e.g.
+		 * `wireframe`, `stencilRef`) are read from here instead of from the
+		 * live material, see `drawMaterial`.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.drawState = null;
+
+		/**
+		 * Whether `dispose()` has been called. Guards against double
+		 * disposal when a material dispose event reaches both a render
+		 * object and its pending replacement.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.disposed = false;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -390,6 +422,19 @@ class RenderObject {
 	get hardwareClippingPlanes() {
 
 		return this.getNodeBuilderState().hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
+
+	}
+
+	/**
+	 * The material state structural values are read from at encode time: the
+	 * compiled draw snapshot when present, otherwise the live material.
+	 *
+	 * @type {Material|Object}
+	 * @readonly
+	 */
+	get drawMaterial() {
+
+		return this.drawState !== null ? this.drawState : this.material;
 
 	}
 
@@ -589,7 +634,7 @@ class RenderObject {
 	 */
 	getDrawParameters() {
 
-		const { object, material, geometry, group, drawRange } = this;
+		const { object, geometry, group, drawRange } = this;
 
 		const drawParams = this.drawParams || ( this.drawParams = {
 			vertexCount: 0,
@@ -621,7 +666,7 @@ class RenderObject {
 
 		let rangeFactor = 1;
 
-		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
+		if ( this.drawMaterial.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
 
 			rangeFactor = 2;
 
@@ -943,6 +988,10 @@ class RenderObject {
 	 * Frees internal resources.
 	 */
 	dispose() {
+
+		if ( this.disposed === true ) return;
+
+		this.disposed = true;
 
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );

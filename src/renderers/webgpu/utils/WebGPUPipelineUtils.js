@@ -71,7 +71,9 @@ class WebGPUPipelineUtils {
 	 */
 	createRenderPipeline( renderObject, promises ) {
 
-		const { object, material, geometry, pipeline } = renderObject;
+		const { object, geometry, pipeline } = renderObject;
+
+		const material = renderObject.drawMaterial;
 		const { vertexProgram, fragmentProgram } = pipeline;
 
 		const backend = this.backend;
@@ -79,6 +81,7 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
+
 
 		// bind group layouts
 
@@ -280,16 +283,28 @@ class WebGPUPipelineUtils {
 
 		} else {
 
+			// the creation is issued and the error scope is closed synchronously:
+			// the API snapshots the descriptor at call time and async creation
+			// errors are delivered through the promise rejection, so neither the
+			// shared descriptor nor the device's error scope stack may stay
+			// populated/open across the asynchronous window — concurrent pipeline
+			// creations interleave there and would inherit stale descriptor state
+			// or misattributed errors
+
+			const pipelinePromise = device.createRenderPipelineAsync( _renderPipelineDescriptor );
+			const errorScopePromise = device.popErrorScope();
+
+			_renderPipelineDescriptor.reset();
+
 			const p = new Promise( async ( resolve /*, reject*/ ) => {
 
 				try {
 
 					let asyncError = null;
-					let pipelinePromise = null;
 
 					try {
 
-						pipelinePromise = device.createRenderPipelineAsync( _renderPipelineDescriptor );
+						pipelineData.pipeline = await pipelinePromise;
 
 					} catch ( err ) {
 
@@ -297,23 +312,7 @@ class WebGPUPipelineUtils {
 
 					}
 
-					_renderPipelineDescriptor.reset();
-
-					if ( pipelinePromise !== null ) {
-
-						try {
-
-							pipelineData.pipeline = await pipelinePromise;
-
-						} catch ( err ) {
-
-							asyncError = err;
-
-						}
-
-					}
-
-					const errorScope = await device.popErrorScope();
+					const errorScope = await errorScopePromise;
 
 					if ( errorScope !== null || asyncError !== null ) {
 
