@@ -159,8 +159,6 @@ class Pipelines extends DataMap {
 	 */
 	getForRender( renderObject, promises = null ) {
 
-		const { backend } = this;
-
 		const data = this.get( renderObject );
 
 		if ( this._needsRenderUpdate( renderObject ) ) {
@@ -183,33 +181,8 @@ class Pipelines extends DataMap {
 
 			// programmable stages
 
-			let stageVertex = this.programs.vertex.get( nodeBuilderState.vertexShader );
-
-			if ( stageVertex === undefined ) {
-
-				if ( previousPipeline && previousPipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.vertexProgram );
-
-				stageVertex = new ProgrammableStage( nodeBuilderState.vertexShader, 'vertex', name );
-				this.programs.vertex.set( nodeBuilderState.vertexShader, stageVertex );
-
-				backend.createProgram( stageVertex );
-				this.info.createProgram( stageVertex );
-
-			}
-
-			let stageFragment = this.programs.fragment.get( nodeBuilderState.fragmentShader );
-
-			if ( stageFragment === undefined ) {
-
-				if ( previousPipeline && previousPipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.fragmentProgram );
-
-				stageFragment = new ProgrammableStage( nodeBuilderState.fragmentShader, 'fragment', name );
-				this.programs.fragment.set( nodeBuilderState.fragmentShader, stageFragment );
-
-				backend.createProgram( stageFragment );
-				this.info.createProgram( stageFragment );
-
-			}
+			const stageVertex = this._getProgramStage( 'vertex', nodeBuilderState.vertexShader, name, previousPipeline ? previousPipeline.vertexProgram : null );
+			const stageFragment = this._getProgramStage( 'fragment', nodeBuilderState.fragmentShader, name, previousPipeline ? previousPipeline.fragmentProgram : null );
 
 			// determine render pipeline
 
@@ -254,10 +227,19 @@ class Pipelines extends DataMap {
 	 */
 	isReady( renderObject ) {
 
-		const data = this.get( renderObject );
-		const pipeline = data.pipeline;
+		const pipeline = this.get( renderObject ).pipeline;
 
-		if ( pipeline === undefined ) return false;
+		return pipeline !== undefined && this.isPipelineReady( pipeline );
+
+	}
+
+	/**
+	 * Returns `true` if the given pipeline's backend object is ready.
+	 *
+	 * @param {Pipeline} pipeline - The pipeline.
+	 * @return {boolean} Whether the pipeline is ready or not.
+	 */
+	isPipelineReady( pipeline ) {
 
 		const pipelineData = this.backend.get( pipeline );
 
@@ -277,15 +259,11 @@ class Pipelines extends DataMap {
 
 		if ( pipeline ) {
 
-			// pipeline
-
-			pipeline.usedTimes --;
-
-			if ( pipeline.usedTimes === 0 ) this._releasePipeline( pipeline );
-
-			// programs
-
 			if ( pipeline.isComputePipeline ) {
+
+				pipeline.usedTimes --;
+
+				if ( pipeline.usedTimes === 0 ) this._releasePipeline( pipeline );
 
 				pipeline.computeProgram.usedTimes --;
 
@@ -293,17 +271,33 @@ class Pipelines extends DataMap {
 
 			} else {
 
-				pipeline.fragmentProgram.usedTimes --;
-				pipeline.vertexProgram.usedTimes --;
-
-				if ( pipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( pipeline.vertexProgram );
-				if ( pipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( pipeline.fragmentProgram );
+				this.releaseRenderPipeline( pipeline );
 
 			}
 
 		}
 
 		return super.delete( object );
+
+	}
+
+	/**
+	 * Releases one reference unit on the given render pipeline and its
+	 * programs, freeing them when unused.
+	 *
+	 * @param {RenderObjectPipeline} pipeline - The pipeline.
+	 */
+	releaseRenderPipeline( pipeline ) {
+
+		pipeline.usedTimes --;
+
+		if ( pipeline.usedTimes === 0 ) this._releasePipeline( pipeline );
+
+		pipeline.vertexProgram.usedTimes --;
+		pipeline.fragmentProgram.usedTimes --;
+
+		if ( pipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( pipeline.vertexProgram );
+		if ( pipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( pipeline.fragmentProgram );
 
 	}
 
@@ -431,6 +425,38 @@ class Pipelines extends DataMap {
 	_getRenderCacheKey( renderObject, stageVertex, stageFragment ) {
 
 		return stageVertex.id + ',' + stageFragment.id + ',' + this.backend.getRenderCacheKey( renderObject );
+
+	}
+
+	/**
+	 * Returns the programmable stage for the given shader code, creating it
+	 * if necessary. When a previous program is passed and became unused, it
+	 * is released.
+	 *
+	 * @private
+	 * @param {('vertex'|'fragment')} type - The shader stage type.
+	 * @param {string} code - The native shader code.
+	 * @param {string} name - The material name, used for labeling.
+	 * @param {?ProgrammableStage} [previousProgram=null] - The previously used program, if any.
+	 * @return {ProgrammableStage} The programmable stage.
+	 */
+	_getProgramStage( type, code, name, previousProgram = null ) {
+
+		let program = this.programs[ type ].get( code );
+
+		if ( program === undefined ) {
+
+			if ( previousProgram !== null && previousProgram.usedTimes === 0 ) this._releaseProgram( previousProgram );
+
+			program = new ProgrammableStage( code, type, name );
+			this.programs[ type ].set( code, program );
+
+			this.backend.createProgram( program );
+			this.info.createProgram( program );
+
+		}
+
+		return program;
 
 	}
 
