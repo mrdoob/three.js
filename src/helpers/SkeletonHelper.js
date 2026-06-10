@@ -96,7 +96,7 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
-	updateMatrixWorld( force ) {
+	onBeforeRender() {
 
 		const bones = this.bones;
 
@@ -125,9 +125,7 @@ class SkeletonHelper extends LineSegments {
 
 		}
 
-		geometry.getAttribute( 'position' ).needsUpdate = true;
-
-		super.updateMatrixWorld( force );
+		position.needsUpdate = true;
 
 	}
 
